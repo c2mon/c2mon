@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<jardesc>
+    <jar path="//cern.ch/dfs/Users/m/mbrightw/Documents/c2mon.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/tim2-server-startup/prototype-jar.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=tim2-server-common/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-daqcommunication-in/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-cachepersistence/src\/java"/>
+        <javaElement handleIdentifier="=tim2-util/src\/java&lt;cern.tim.util.threadhandler"/>
+        <javaElement handleIdentifier="=tim2-server-configuration/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-command/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-auth/src\/java"/>
+        <javaElement handleIdentifier="=tim2-shared-daq/src\/java"/>
+        <javaElement handleIdentifier="=tim2-util/src\/java&lt;cern.tim.util.buffer"/>
+        <javaElement handleIdentifier="=tim2-server-supervision/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-rule/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-startup/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-daqcommunication-out/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-cache/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-benchmark/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-alarm"/>
+        <javaElement handleIdentifier="=tim2-shared-rule/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-cacheloading/src\/java"/>
+        <javaElement handleIdentifier="=tim2-shared-common/src\/java"/>
+        <javaElement handleIdentifier="=tim2-server-cachedbaccess/src\/java"/>
+        <javaElement handleIdentifier="=tim2-util/src\/java&lt;cern.tim.util.activemq"/>
+        <javaElement handleIdentifier="=tim2-util/src\/java&lt;cern.tim.util.parser"/>
+        <javaElement handleIdentifier="=tim2-shared-client/src\/java"/>
+    </selectedElements>
+</jardesc>

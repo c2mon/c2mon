@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <product name="tim2-server-startup" version="1.0.0" directory="tim2/tim2-server/tim2-server-startup">
+    <desc>
+    	TIM2 server module managing the server start up (with main method)
+    </desc>
+    <href>http://timweb.cern.ch</href>
+    <dependencies>
+<!--    	<dep product="spring"/> need version 3, aop at runtime -->
+<!--      <dep product="commons-cli" version="2.0"/>  not used so far	-->
+      <dep product="log4j" />      
+      <dep product="junit" version="4.8.2"/>
+    </dependencies> 
+  </product>
+</products>

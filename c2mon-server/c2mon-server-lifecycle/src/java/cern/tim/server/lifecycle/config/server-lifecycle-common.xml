@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- scan the module for annotations -->
+  <context:annotation-config/>
+  <context:component-scan base-package="cern.tim.server.lifecycle"/>  
+  
+  <!-- import the optional modules loaded in a separate Spring configuration file (in the server configuration directory) -->
+  <import resource="file:${tim.home}/config/server-modules.xml"/>
+  
+  <bean id="lifecycleProcessor" class="org.springframework.context.support.DefaultLifecycleProcessor">
+    <!-- timeout value in milliseconds -->
+    <property name="timeoutPerShutdownPhase" value="60000"/>    
+  </bean>
+
+</beans>

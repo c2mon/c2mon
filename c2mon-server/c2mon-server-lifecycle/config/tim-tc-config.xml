@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:tc-config xmlns:con="http://www.terracotta.org/config">
+  <tc-properties>
+     <property name="l2.berkeleydb.je.cleaner.bytesInterval" value="20000000" />
+     <property name="l1.objectmanager.remote.maxDNALRUSize" value="200000" />
+     <property name="l1.cachemanager.criticalThreshold" value="95" />
+     <property name="l1.cachemanager.threshold" value="90" />
+     <property name="l2.objectmanager.dgc.young.enabled" value="true" />
+     <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="180000" />     
+  </tc-properties>  
+  <servers>
+    <server host="cs-ccr-tim4" name="server1">
+      <dso-port>9510</dso-port>
+      <jmx-port>9520</jmx-port>
+      <l2-group-port>9530</l2-group-port>
+      <dso>
+        <persistence>
+          <mode>permanent-store</mode>
+        </persistence>
+        <garbage-collection>
+         <enabled>true</enabled>
+         <verbose>true</verbose>
+         <interval>1200</interval>
+        </garbage-collection>
+      </dso>
+      <data>%(user.home)/dist/terracotta/log/server-data</data>      
+      <logs>%(user.home)/dist/terracotta/log/server-logs</logs>
+      <statistics>%(user.home)/dist/terracotta/log/cluster-statistics</statistics>
+    </server>
+        <server host="cs-ccr-tim5" name="server2">
+      <dso-port>9511</dso-port>
+      <jmx-port>9521</jmx-port>
+      <l2-group-port>9531</l2-group-port>
+      <dso>
+        <persistence>
+          <mode>permanent-store</mode>
+        </persistence>
+        <garbage-collection>
+         <enabled>true</enabled>
+         <verbose>true</verbose>
+         <interval>1200</interval>
+        </garbage-collection>
+      </dso>
+      <data>%(user.home)/dist/terracotta/log/server2-data</data>
+      <logs>%(user.home)/dist/terracotta/log/server2-logs</logs>
+      <statistics>%(user.home)/dist/terracotta/log/cluster2-statistics</statistics>
+    </server>
+    <ha>
+    	<mode>networked-active-passive</mode>
+    	<networked-active-passive>
+    		<election-time>5</election-time>
+    	</networked-active-passive>
+    </ha>
+  </servers>
+  <clients>
+    <logs>%(user.home)/dist/terracotta/log/client-logs-%(server.process.name)</logs>
+    <modules>
+<!--      <repository>C:\Program Files\terracotta\terracotta-3.2.0\modules</repository>-->
+<!--      <repository>D:\Profiles\mbrightw\terracotta-3.2.0\modules</repository>-->
+      <module group-id="org.terracotta.modules" name="tim-ehcache-2.0"/>
+      <module group-id="org.terracotta.modules" name="tim-distributed-cache"/>
+      <module group-id="org.terracotta.modules" name="tim-concurrent-collections"/>
+      <module group-id="org.terracotta.modules" name="tim-tomcat-6.0"/>
+    </modules>
+    <dso>
+      <fault-count>50</fault-count>
+      <debugging>
+        <runtime-logging>
+          <named-loader-debug>true</named-loader-debug>
+        </runtime-logging>
+      </debugging>
+    </dso>
+  </clients>
+  <application>
+    <dso>
+      <instrumented-classes>
+        <!-- DataTag cache -->
+        <include>
+          <class-expression>cern.tim.server.common.tag.AbstractTagCacheObject</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.common.datatag.DataTagCacheObject</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.shared.common.datatag.DataTagQuality</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.shared.common.datatag.DataTagAddress</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.shared.common.datatag.DataTagConstants</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.util.parser.SimpleXMLParser</class-expression>
+        </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.HardwareAddressImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.shared.common.datatag.address.HardwareAddressFactory</class-expression>
+        </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.DIPHardwareAddressImpl</class-expression>
+        </include>        
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl</class-expression>
+        </include>        
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.DiamonHardwareAddressImpl</class-expression>
+        </include>        
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl</class-expression>
+        </include> 
+         <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.DBHardwareAddressImpl</class-expression>
+        </include>       
+        <include>
+          <class-expression>cern.tim.shared.common.type.TagDataType</class-expression>
+        </include> 
+        <include>
+          <class-expression>cern.tim.server.cache.datatag.DataTagFacadeImpl</class-expression>
+        </include>       
+        <include>
+          <class-expression>cern.tim.shared.common.datatag.DataTagValueDictionary</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.DataTagConfigHandler</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.TagConfigHandlerImpl</class-expression>
+        </include>
+        <!-- RuleTag cache -->
+        <include>
+          <class-expression>cern.tim.server.common.rule.RuleTagCacheObject</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.shared.rule.RuleExpression</class-expression>
+         </include>
+         <include>
+          <class-expression>cern.tim.shared.rule.RuleInputTagId</class-expression>
+         </include>         
+        <include>
+          <class-expression>cern.tim.shared.rule.SimpleRuleExpression</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.shared.rule.GTPMRuleExpression</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.shared.rule.GTPMRuleCondition</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.cache.rule.RuleTagFacadeImpl</class-expression>
+        </include>
+         <include>
+          <class-expression>cern.tim.server.cache.rule.RuleTagPostLoaderProcessor</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.rule.evaluation.RuleEvaluator</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.RuleTagConfigHandler</class-expression>
+        </include>              
+        <!-- ControlTag cache -->
+        <include>
+           <class-expression>cern.tim.server.common.control.ControlTagCacheObject</class-expression>
+         </include>
+         <include>
+          <class-expression>cern.tim.server.cache.control.ControlTagFacadeImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.ControlTagConfigHandler</class-expression>
+        </include>              
+        <!-- Process cache -->
+        <include>
+          <class-expression>cern.tim.server.common.process.ProcessCacheObject</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.cache.process.ProcessFacadeImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.ProcessConfigHandler</class-expression>
+        </include>
+        <!-- Equipment cache -->
+        <include>
+           <class-expression>cern.tim.server.common.equipment.AbstractEquipmentCacheObject</class-expression>
+        </include>       
+        <include>
+          <class-expression>cern.tim.server.common.equipment.EquipmentCacheObject</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.cache.equipment.EquipmentFacadeImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.AbstractEquipmentConfigHandler</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.EquipmentConfigHandler</class-expression>
+        </include>
+        <!-- Subequipment cache -->
+        <include>
+          <class-expression>cern.tim.server.common.subequipment.SubEquipmentCacheObject</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.cache.subequipment.SubEquipmentFacadeImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.SubEquipmentConfigHandler</class-expression>
+        </include>
+        <!-- AliveTimer cache -->
+        <include>
+          <class-expression>cern.tim.server.common.alive.AliveTimerCacheObject</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.cache.alive.AliveTimerFacadeImpl</class-expression>
+        </include>
+        <!-- CommFault cache -->
+        <include>
+          <class-expression>cern.tim.server.common.commfault.CommFaultTagCacheObject</class-expression>
+        </include>
+        <!-- Alarm cache -->
+        <include>
+          <class-expression>cern.tim.server.common.alarm.AlarmCacheObject</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.cache.alarm.AlarmFacadeImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.cache.alarm.AlarmFacadeImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.AlarmConfigHandler</class-expression>
+        </include>
+        <!-- configuration module -->
+        <include>
+          <class-expression>cern.tim.server.configuration.impl.ConfigurationLoaderImpl</class-expression>
+        </include>
+        <!-- supervision classes -->
+        <include>
+          <class-expression>cern.tim.server.supervision.impl.SupervisionManagerImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.supervision.alive.AliveTimerManagerImpl</class-expression>
+        </include>    
+        <!-- DistributedParams classes -->
+        <include>
+          <class-expression>cern.tim.server.common.config.CacheStatus</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.common.config.AliveStatus</class-expression>
+        </include>    
+        <!-- Alarm aggregator (not core so may wish to move to TIM module!) -->
+        <include>
+          <class-expression>cern.tim.server.alarm.impl.AlarmAggregatorImpl</class-expression>
+        </include>    
+      </instrumented-classes>
+<!--      <locks>      -->
+<!--        <autolock auto-synchronized="false">-->
+<!--          <method-expression>* cern.tim.server.common.alive.AliveTimerCacheObject.*(..)</method-expression>-->
+<!--          <lock-level>read</lock-level>-->
+<!--        </autolock>-->
+<!--        <autolock auto-synchronized="false">-->
+<!--          <method-expression>* cern.tim.server.supervision.alive.AliveTimerManagerImpl.*(..)</method-expression>-->
+<!--          <lock-level>read</lock-level>-->
+<!--        </autolock>-->
+<!--        <autolock auto-synchronized="false">-->
+<!--          <method-expression>* cern.tim.server.cache.alive.AliveTimerFacadeImpl.*(..)</method-expression>-->
+<!--          <lock-level>write</lock-level>-->
+<!--        </autolock>-->
+<!--      </locks>-->
+<!--      <locks>-->
+<!--        <autolock auto-synchronized="false">-->
+<!--          <method-expression>* ch.cern.tim.cachetest.receiver.MyMdpImpl.*(..)</method-expression>-->
+<!--          <lock-level>write</lock-level>-->
+<!--        </autolock>-->
+<!--        <autolock auto-synchronized="true">-->
+<!--          <method-expression>* ch.cern.tim.shared.datatag.DataTagCacheObject.update(..)</method-expression>-->
+<!--          <lock-level>write</lock-level>-->
+<!--        </autolock>-->
+<!--      </locks>-->
+       <roots>
+        <root>       
+          <field-expression>* cern.tim.server.common.config.DistributedParams.cacheStatus</field-expression>
+          <root-name>cacheStatus</root-name>
+        </root>
+        <root>       
+          <field-expression>* cern.tim.server.common.config.DistributedParams.aliveStatus</field-expression>
+          <root-name>aliveStatus</root-name>
+        </root>
+        <root>       
+          <field-expression>* cern.tim.server.common.config.DistributedParams.serverMode</field-expression>
+          <root-name>serverMode</root-name>
+        </root>
+        <root>       
+          <field-expression>* cern.tim.server.common.config.DistributedParams.cachePersistenceEnabled</field-expression>
+          <root-name>cachePersistenceEnabled</root-name>
+        </root>
+        <root>       
+          <field-expression>* cern.tim.server.common.config.DistributedParams.exclusiveConfigLock</field-expression>
+          <root-name>exclusiveConfigLock</root-name>
+        </root>
+       </roots>
+<!--      <web-applications>-->
+<!--        <web-application>viewTags</web-application>-->
+<!--      </web-applications>-->
+<!--      <app-groups>-->
+<!--        <app-group name="sharedCache">-->
+<!--          <web-application>viewTags</web-application>-->
+<!--          <named-classloader>Standard.system</named-classloader>-->
+<!--        </app-group>-->
+<!--      </app-groups>      -->
+    </dso>
+  </application>
+</con:tc-config>
