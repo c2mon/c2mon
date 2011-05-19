@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <context:annotation-config/>
+  <context:component-scan base-package="cern.c2mon.server.configuration"/>
+  
+  <!-- DB connection for this module -->
+  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-db.xml"/>
+  
+  <bean id="configurationRequestConverter" class="cern.tim.shared.client.configuration.ConfigurationRequestConverter" init-method="init"/>
+  
+   <!-- TODO rename as connection factory all factories in C2MON, and specify one as priority -->
+  <bean id="configRequestConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="${jms.broker.url}"/>
+    <property name="userName" value="${jms.config.user}" />
+    <property name="password" value="${jms.config.password}" />
+  </bean>
+  
+  <bean id="configRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+   <constructor-arg index="0" value="${jms.config.destination}"/>
+  </bean>
+    
+  <bean id="configRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+      <!-- include exception listener here? -->    
+      <property name="connectionFactory" ref="configRequestConnectionFactory"/>
+      <property name="destination" ref="configRequestDestination"/>
+      <property name="messageListener" ref="configurationRequestHandler" />
+      <property name="concurrentConsumers" value="1"/>
+      <property name="maxConcurrentConsumers" value="1"/>      
+      <property name="sessionTransacted" value="false"/>  
+<!--      <property name="errorHandler" ref="processRequestHandler"/>         -->
+  </bean>
+
+</beans>

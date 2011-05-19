@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+  
+  <!-- requires all DB and cache modules for component testing of the configuration module -->
+  <import resource="classpath:cern/tim/server/cache/config/server-cache-single-server.xml"/>
+  <import resource="classpath:cern/tim/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>   
+  <import resource="classpath:cern/tim/server/cache/loading/config/server-cacheloading.xml"/> 
+<!--  <import resource="classpath:cern/tim/server/cachepersistence/config/server-cachepersistence.xml"/> -->
+  <import resource="classpath:cern/tim/server/common/config/server-common.xml"/> 
+  
+  <!-- DB connection for this module -->
+  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-db.xml"/>
+  
+  <!-- mock the communication bean; needs to be before the configloader class -->
+  <bean id="processCommunicationManager" class="org.easymock.EasyMock" factory-method="createStrictMock">
+    <constructor-arg value="cern.tim.server.daqcommunication.out.ProcessCommunicationManager"/>  
+  </bean>
+  
+  <bean id="testDataHelper" class="cern.tim.server.cache.dbaccess.test.TestDataHelper"/>
+  
+  <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor"/>
+  <bean id="configurationDAO" class="cern.c2mon.server.configuration.mybatis.ConfigurationDAOImpl"/>
+    
+  <bean id="dataTagConfigHandler" class="cern.c2mon.server.configuration.handler.DataTagConfigHandler" autowire="constructor"/>
+  <bean id="controlTagConfigHandler" class="cern.c2mon.server.configuration.handler.ControlTagConfigHandler" autowire="constructor"/>
+  <bean id="commandTagConfigHandler" class="cern.c2mon.server.configuration.handler.CommandTagConfigHandler"/>
+  <bean id="processConfigHandler" class="cern.c2mon.server.configuration.handler.ProcessConfigHandler" autowire="constructor"/>
+  <bean id="alarmConfigHandler" class="cern.c2mon.server.configuration.handler.AlarmConfigHandler" autowire="constructor"/>
+  <bean id="subEquipmentConfigHandler" class="cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler" autowire="constructor"/>
+  <bean id="equipmentConfigHandler" class="cern.c2mon.server.configuration.handler.EquipmentConfigHandler" autowire="constructor"/>
+  <bean id="ruleTagConfigHandler" class="cern.c2mon.server.configuration.handler.RuleTagConfigHandler" autowire="constructor"/> 
+  
+  <bean id="tagConfigGateway" class="cern.c2mon.server.configuration.handler.TagConfigGateway" autowire="constructor"/> 
+  
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations" >
+      <list>
+        <value>file:${tim.properties.location}</value>        
+      </list>
+    </property>   
+  </bean>
+
+</beans>

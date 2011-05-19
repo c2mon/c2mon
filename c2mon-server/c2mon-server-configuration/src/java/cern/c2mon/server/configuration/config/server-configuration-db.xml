@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- data source for configuration requests -->
+  <bean id="configurationDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+    <property name="url" value="${jdbc.config.url}"/>
+    <property name="username" value="${jdbc.config.user}"/>
+    <property name="password" value="${jdbc.config.password}"/>
+<!--    <property name="defaultAutoCommit" value="false"/>-->
+<!--    <property name="logWriter" value=""/>-->
+    <property name="initialSize" value="${datasource.config.connections.initial}"/>
+    <property name="maxActive" value="${datasource.config.connections.max}"/>
+  </bean>
+  
+  <bean id="configSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="configLocation" value="classpath:cern/c2mon/server/configuration/sqlmap/sql-map-config.xml"/>
+    <property name="dataSource" ref="configurationDataSource"/>    
+  </bean>
+    
+  <bean id="configurationMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="configSqlSessionFactory"/>
+    <property name="mapperInterface" value="cern.c2mon.server.configuration.mybatis.ConfigurationMapper"/>
+  </bean>
+
+</beans>

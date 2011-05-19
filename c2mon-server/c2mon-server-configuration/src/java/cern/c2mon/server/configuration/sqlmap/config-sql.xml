@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+  
+  <mapper namespace="cern.c2mon.server.configuration.mybatis.ConfigurationMapper">
+    
+    <resultMap id="configElementResultMap" type="ConfigurationElement">
+      <id property="sequenceId" column="elt_seqid"/>                   
+      <result property="configId" column="elt_configid"/>              
+      <result property="action" column="elt_modetype" jdbcType="VARCHAR"/>
+      <result property="entity" column="elt_elementtype" jdbcType="VARCHAR" typeHandler="EntityTypeHandler"/>
+      <result property="entityId" column="elt_elementpkey" jdbcType="VARCHAR"/>
+      <association property="elementProperties" column="elt_seqid" javaType="java.util.Properties"
+                                                                        select="propertiesSelect"/>
+    </resultMap>
+    
+    <resultMap id="propertiesResultMap" type="java.util.Properties">
+      <id property="sequenceId" column="elt_seqid"/>                
+      <result property="configId" column="elt_configid"/>              
+      <result property="action" column="elt_modetype" jdbcType="VARCHAR"/>
+      <result property="entity" column="elt_elementtype" jdbcType="VARCHAR"/>
+      <result property="entityId" column="elt_elementpkey" jdbcType="VARCHAR"/>                       
+    </resultMap>
+    
+    <select id="propertiesSelect" parameterType="int" resultType="java.util.Properties">
+      SELECT ELEMENTFIELD, ELEMENTVALUE 
+        FROM TIMCONFIGVAL 
+       WHERE SEQID = #{seqId}
+    </select>
+    
+    <select id="getConfigName" parameterType="java.lang.Integer" resultType="java.lang.String">
+      SELECT CONFIGNAME
+        FROM TIMCONFIG
+       WHERE CONFIGID=#{configId}      
+    </select>
+    
+    <select id="getConfigElements" parameterType="java.lang.Integer" resultMap="configElementResultMap">
+      SELECT E.SEQID AS elt_seqid, E.CONFIGID AS elt_configid, 
+             E.MODETYPE AS elt_modetype, E.ELEMENTTYPE AS elt_elementtype, 
+             E.ELEMENTPKEY AS elt_elementpkey 
+        FROM TIMCONFIGELT E 
+       WHERE E.CONFIGID = #{configId}
+       ORDER BY E.SEQID
+    </select>
+       
+         
+  </mapper>
