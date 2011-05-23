@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ShortTermLog">
+
+	<!--
+		Use type aliases to avoid typing the full class name every time.
+	-->
+	<typeAlias alias="DataTagSTLog"
+		type="ch.cern.tim.server.log.bean.DataTagShortTermLog" />
+	<typeAlias alias="DataTagHistoryInput"
+		type="ch.cern.tim.server.log.bean.DataTagHistoryInput" />
+
+
+	<!--
+		Result maps describe the mapping between the columns returned from a
+		query, and the class properties. A result map isn't necessary if the
+		columns (or aliases) match to the properties exactly.
+	-->
+	<resultMap id="DataTagResult" class="DataTagSTLog">
+		<result property="tagValue" column="tagvalue" />
+		<result property="tagDataType" column="tagdatatype" />
+		<result property="tagTimestamp" column="tagtime" />
+		<result property="tagQualityCode" column="tagstatus" />
+		<result property="tagQualityDesc" column="tagstatusdesc" />
+		<result property="tagMode" column="tagmode" />
+		<result property="logDate" column="logdate" />
+		<result property="tagId" column="tagid" />
+		<result property="tagName" column="tagname" />
+		<result property="tagDir" column="tagdir" />
+	</resultMap>
+
+	<!--
+		Inserts a new row in the ShortTermLog table that represents some log
+		information for a given dataTag. The values for the inserted row are
+		stored in the DataTagShortTermLog object
+	-->
+  <insert id="insertDataTagLog" parameterClass="DataTagSTLog">
+      INSERT INTO shorttermlog (LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE,
+      TAGSTATUS, TAGSTATUSDESC, TAGMODE, TAGDIR, TAGTIME)
+      VALUES (
+      <dynamic prepend="">        
+        <!-- The logDate is not null, because is a dataTag read from the fallback file -->
+        <isNotNull property="logDate">SYS_EXTRACT_UTC(from_tz(#logDate#,'$timezone$'))</isNotNull>
+        <!-- The logDate is null, what means that comes from a DAQ -->
+        <isNull property="logDate">SYS_EXTRACT_UTC(SYSTIMESTAMP)</isNull>
+      </dynamic>
+       ,#tagId#,#tagName#,#tagValue#,#tagDataType#,#tagQualityCode#,#tagQualityDesc#,#tagMode#,'I',from_tz(#tagTimestamp#,DBTIMEZONE))      
+  </insert>
+
+	<!--
+		Sends a query to the database that returns the rows which represent
+		the log for the different values that a specific dataTag has taken
+		during a given interval of time
+	-->
+	<select id="selectDataTagHistory" parameterClass="DataTagHistoryInput"
+		resultMap="DataTagResult">
+    <![CDATA[SELECT * FROM ( 
+    SELECT tagvalue, tagdatatype, tagtime, tagstatus, tagstatusdesc, tagmode, logdate, tagid, tagname, tagdir 
+    FROM shorttermlog 
+    WHERE tagid=#dataTagId# AND LOGDATE BETWEEN TO_DATE(#startDate#, 'DD.MM.YYYY HH24:MI:SS') AND TO_DATE(#endDate#, 'DD.MM.YYYY HH24:MI:SS')  
+    ORDER BY logdate DESC)
+    WHERE rownum <= #numRecords# 
+    ORDER BY tagtime DESC]]>
+	</select>
+
+	<!--
+		Sends a query to the database that returns the last ten values that a
+		datatag has taken
+	-->
+	<select id="selectByTagId" parameterClass="Long" resultMap="DataTagResult">
+    <![CDATA[SELECT tagvalue, tagdatatype, tagtime, tagstatus, tagstatusdesc, tagmode, logdate, tagid,tagname, tagdir
+    FROM shorttermlog 
+    WHERE tagid=#tagId#]]>
+	</select>
+
+
+</sqlMap>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <!-- configure the data source connection pool (from .tim.properties in production) -->
+  <!-- on shutdown ... -->
+  <bean id="stlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+    <property name="url" value="${jdbc.stl.url}"/>
+    <property name="username" value="${jdbc.stl.user}"/>
+    <property name="password" value="${jdbc.stl.password}"/>
+    <property name="defaultAutoCommit" value="false"/>
+<!--    <property name="logWriter" value=""/>-->
+    <property name="initialSize" value="${datasource.stl.connections.initial}"/>
+    <property name="maxActive" value="${datasource.stl.connections.max}"/>
+  </bean>
+	
+	<bean id="stlSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	  <property name="configLocation" value="classpath:cern/c2mon/server/shorttermlog/sqlmap/sql-map-config.xml"/>
+	  <property name="dataSource" ref="stlDataSource"/>    
+	</bean>
+
+  <bean id="supervisionMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="stlSqlSessionFactory"/>        
+    <property name="mapperInterface" value="cern.c2mon.server.shorttermlog.mapper.SupervisionMapper"/>
+  </bean>
+  
+</beans>

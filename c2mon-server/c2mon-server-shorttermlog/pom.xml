@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.tim2.tim2-server</groupId>
+    <artifactId>tim2-server-pom</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-server</groupId>
+  <version>1.0.1-SNAPSHOT</version>
+  <name>c2mon-server-shorttermlog</name>
+  <artifactId>c2mon-server-shorttermlog</artifactId>
+  <packaging>jar</packaging>
+  <description>C2MON server module for short-term logging to the DB (of Tag updates, Commands and Supervision events)</description>
+  <url>http://timweb.cern.ch</url>
+
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>ojdbc14</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>orai18n</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis-spring</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+    </dependency>
+    
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    
+    <!-- Spring deps -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>    
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>    
+    
+    <!-- C2MON dependencies -->
+    <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-supervision</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-persistence-manager</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8</version>
+        <configuration>
+          <argLine>
+            -Dtim.properties.location=${tim.properties.location}
+            -Ddatasource.stl.connections.initial=1
+            -Ddatasource.stl.connections.max=1
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <developers />
+</project>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!--
+    take "namespace=Mapper interface" for the mapper SQL statements to
+    be picked up automatically
+  -->
+<mapper namespace="cern.c2mon.server.shorttermlog.mapper.DataTagLogMapper">
+
+  <!--
+    Inserts a new row in the ShortTermLog table that represents some log
+    information for a given dataTag. The values for the inserted row are
+    stored in the DataTagShortTermLog object
+  -->
+  <insert id="insertLog" parameterType="DataTagSTLog">
+    INSERT INTO shorttermlog (LOGDATE, TAGID, TAGNAME, TAGVALUE,
+    TAGDATATYPE,
+    TAGSTATUS, TAGSTATUSDESC, TAGMODE, TAGDIR, TAGTIME)
+    VALUES (
+    <!-- The logDate is not null, because is a dataTag read from the fallback file -->
+    <if test="logDate != null">SYS_EXTRACT_UTC(from_tz(#{logDate,jdbcType=TIMESTAMP},'${timezone}'))</if>
+    <!-- The logDate is null, what means that comes from a DAQ -->
+    <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>
+    ,#{tagId,jdbcType=NUMERIC},#{tagName,jdbcType=VARCHAR},#{tagValue,jdbcType=VARCHAR}
+    ,#{tagDataType,jdbcType=VARCHAR},#{tagQualityCode,jdbcType=NUMERIC}
+    ,#{tagQualityDesc,jdbcType=VARCHAR},#{tagMode,jdbcType=NUMERIC}
+    ,'I',from_tz(#{tagTimestamp,jdbcType=TIMESTAMP},DBTIMEZONE))
+  </insert>
+  
+  <!-- only used to remove inserts done during testing -->
+  <delete id="deleteDataTagLog" parameterType="Long">
+    DELETE FROM shorttermlog WHERE tagid = #{id}
+  </delete>
+  
+</mapper>

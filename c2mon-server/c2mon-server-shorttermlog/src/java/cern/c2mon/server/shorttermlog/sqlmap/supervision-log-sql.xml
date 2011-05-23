@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!--
+    take "namespace=Mapper interface" for the mapper SQL statements to
+    be picked up automatically
+  -->
+<mapper namespace="cern.c2mon.server.shorttermlog.mapper.SupervisionMapper">
+
+  <resultMap id="supervisionEntityResultMap" type="SupervisionEvent">    
+      <result property="entity" column="sul_entity"/>
+      <result property="entityId" column="sul_id"/>
+      <result property="status" column="sul_status"/>
+      <result property="eventTime" column="sul_date"/>  
+      <result property="message" column="sul_message" jdbcType="VARCHAR"/>             
+  </resultMap>
+    
+<!--      <constructor>-->
+<!--        <arg column="sul_entity" />-->
+<!--        <arg column="sul_id" javaType="Long"/>-->
+<!--        <arg column="sul_status" javaType="java.lang.enum"/>        -->
+<!--        <arg column="sul_date" javaType="java.sql.Timestamp"/>-->
+<!--        <arg column="sul_message" javaType="String" jdbcType="VARCHAR"/>-->
+<!--      </constructor>                   -->
+<!--  </resultMap>-->
+
+  <insert id="logSupervisionEvent" parameterType="SupervisionEvent">
+    INSERT INTO supervision_log (sul_entity, sul_id, sul_status, sul_date, sul_message)
+    VALUES (
+    #{entity}, #{entityId}, #{status}, #{eventTime}, #{message, jdbcType=VARCHAR})
+  </insert>
+  
+  <select id="getEntitySupervision" parameterType="Long" resultMap="supervisionEntityResultMap" >
+    SELECT sul_entity, sul_id, sul_date, sul_status, sul_message
+      FROM supervision_log
+     WHERE sul_id = #{id}    
+  </select>
+  
+  <delete id="testDelete" parameterType="Long">
+    DELETE FROM supervision_log
+          WHERE sul_id = #{id}        
+  </delete>
+  
+</mapper>
