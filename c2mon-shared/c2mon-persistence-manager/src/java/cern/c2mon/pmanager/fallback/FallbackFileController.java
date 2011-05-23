@@ -220,7 +220,7 @@ public class FallbackFileController {
                             + " has been created");
                 }
             } catch (IOException e) {
-                LOG.error("constructor() - Error while creating the logfile");
+                LOG.error("constructor() - Error while creating the logfile", e);
             }
         }
 
@@ -233,7 +233,7 @@ public class FallbackFileController {
                 }
                 initializeCounterFile();
             } catch (IOException e) {
-                LOG.error("constructor() - Error while creating the counterfile");
+                LOG.error("constructor() - Error while creating the counterfile", e);
             }
         }
 
@@ -249,7 +249,7 @@ public class FallbackFileController {
                     + dataFile.getName() + " file is " + getNumberOfLines());
         } catch (Exception e) {
             LOG
-                    .error("Error while trying to initialize the lines counter for the fallback file");
+                    .error("Error while trying to initialize the lines counter for the fallback file", e);
         }
     }
 
