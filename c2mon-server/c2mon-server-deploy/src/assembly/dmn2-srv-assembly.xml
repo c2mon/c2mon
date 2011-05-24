@@ -9,11 +9,12 @@
 	<formats>
 		<format>tar.gz</format>
 	</formats>
-	<!-- <includeBaseDirectory>false</includeBaseDirectory> -->
+		
+	<!--  do not include base directory -->
+	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<componentDescriptors>
-		<componentDescriptor>c2mon-srv-common-assembly.xml
-		</componentDescriptor>
+		<componentDescriptor>c2mon-srv-common-assembly.xml</componentDescriptor>
 	</componentDescriptors>
 
 	<dependencySets>
@@ -23,8 +24,8 @@
 			<includes>
 				<!-- list all dmn2-srv specific modules here -->
 				<!--
-					<include>cern.dmn2.dmn2-client:dmn2-client</include> 
-				-->
+					<include>cern.dmn2.dmn2-client:dmn2-client</include> 					
+				-->			
 			</includes>
 			<excludes>
 				<exclude>cern.2mon.c2mon-server:c2mon-server-deploy</exclude>
@@ -54,13 +55,6 @@
 			<outputDirectory>conf/</outputDirectory>
 			<fileMode>0644</fileMode>
 		</fileSet>
-		<!--
-			<fileSet> <includes> <include>tmp/*</include> </includes>
-			<fileMode>0755</fileMode> </fileSet> <fileSet> <includes>
-			<include>log/</include> </includes> <fileMode>0777</fileMode>
-			<directoryMode>0777</directoryMode> </fileSet>
-		-->
-
 		<fileSet>
 			<includes>
 				<include>tmp/*</include>
@@ -83,6 +77,7 @@
 			<outputDirectory>/</outputDirectory>
 			<destName>changelog.txt</destName>
 			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
 		</file>
 	</files>
 

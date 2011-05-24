@@ -9,11 +9,12 @@
 	<formats>
 		<format>tar.gz</format>
 	</formats>
-	<!-- <includeBaseDirectory>false</includeBaseDirectory> -->
+	
+	<!--  do not include base directory -->
+	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<componentDescriptors>
-		<componentDescriptor>c2mon-srv-common-assembly.xml
-		</componentDescriptor>
+		<componentDescriptor>c2mon-srv-common-assembly.xml</componentDescriptor>
 	</componentDescriptors>
 
 	<dependencySets>
@@ -74,6 +75,7 @@
 			<source>${basedir}/changelog/tim2-srv-changelog.txt</source>
 			<outputDirectory>/</outputDirectory>
 			<destName>changelog.txt</destName>
+			<fileMode>0444</fileMode>
 			<lineEnding>unix</lineEnding>			
 		</file>
 	</files>
