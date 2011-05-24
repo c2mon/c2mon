@@ -9,7 +9,7 @@
 		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 
-	<groupId>cern.2mon.c2mon-server</groupId>
+	<groupId>cern.c2mon.c2mon-server</groupId>
 	<artifactId>c2mon-server-all</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
 
