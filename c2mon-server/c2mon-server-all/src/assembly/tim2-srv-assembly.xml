@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+	<id>tim2</id>
+
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+	<!-- <includeBaseDirectory>false</includeBaseDirectory> -->
+
+	<componentDescriptors>
+		<componentDescriptor>c2mon-srv-common-assembly.xml
+		</componentDescriptor>
+	</componentDescriptors>
+
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<!-- <outputFileNameMapping>${artifactId}.${artifact.extension}</outputFileNameMapping> -->
+			<includes>
+				<!-- list all tim2-srv specific modules here -->
+				<!--
+					<include>groupId:arrtifactId</include> ... ... ...
+				-->
+
+			</includes>
+			<excludes>
+				<exclude>cern.2mon.c2mon-server:c2mon-server-all</exclude>
+			</excludes>
+			<fileMode>0644</fileMode>
+		</dependencySet>
+	</dependencySets>
+
+	<fileSets>
+		<fileSet>
+			<directory>bin</directory>
+			<includes>
+				<include>tim2*.sh</include>
+			</includes>
+			<outputDirectory>/bin</outputDirectory>
+			<fileMode>0755</fileMode>
+		</fileSet>
+		<fileSet>
+			<directory>conf</directory>
+			<includes>
+				<!--  the files should be specified one-by-one for every solution -->
+				<include>tim2*.properties</include>
+				<include>tim2*.xml</include>
+			</includes>
+			<outputDirectory>conf/</outputDirectory>
+			<fileMode>0644</fileMode>
+		</fileSet>
+		<fileSet>
+			<includes>
+				<include>tmp/*</include>
+			</includes>
+			<fileMode>0755</fileMode>
+		</fileSet>
+		<fileSet>
+			<includes>
+				<include>log/</include>
+			</includes>
+			<fileMode>0755</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+	</fileSets>
+
+	<files>
+		<!--  copy changelog -->
+		<file>
+			<source>${basedir}/changelog/tim2-srv-changelog.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>changelog.txt</destName>
+			<lineEnding>unix</lineEnding>			
+		</file>
+	</files>
+
+</assembly>
