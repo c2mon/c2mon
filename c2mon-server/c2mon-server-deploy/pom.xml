@@ -21,20 +21,73 @@
 	<url></url>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-cache</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-cachepersistence</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-common</artifactId>
+           <scope>runtime</scope>
+        </dependency>
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-cache</artifactId>
+           <scope>runtime</scope>
+        </dependency>
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-cacheloading</artifactId>
+           <scope>runtime</scope>
+        </dependency>
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-cachedbaccess</artifactId>
+           <scope>runtime</scope>
+        </dependency>               
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-auth</artifactId>
+           <scope>runtime</scope>
+        </dependency>               
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-cachepersistence</artifactId>
+           <scope>runtime</scope>
+        </dependency>                             
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-benchmark</artifactId>
+           <scope>runtime</scope>
+        </dependency>                             
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-command</artifactId>
+           <scope>runtime</scope>
+        </dependency>                             
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-daqcommunication-in</artifactId>
+           <scope>runtime</scope>
+        </dependency>                             
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-daqcommunication-out</artifactId>
+           <scope>runtime</scope>
+        </dependency>                             
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-rule</artifactId>
+           <scope>runtime</scope>
+        </dependency>                             
+        <dependency>
+           <groupId>cern.tim2.tim2-server</groupId>
+           <artifactId>tim2-server-supervision</artifactId>
+           <scope>runtime</scope>
+        </dependency>                             
+        <dependency>
+           <groupId>cern.c2mon.c2mon-server</groupId>
+           <artifactId>c2mon-server-configuration</artifactId>
+           <scope>runtime</scope>
+        </dependency>                             		
 	</dependencies>
-
+	
 	<developers />
 	<build>
 		<plugins>

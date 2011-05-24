@@ -27,7 +27,7 @@
 				-->
 			</includes>
 			<excludes>
-				<exclude>cern.2mon.c2mon-server:c2mon-server-all</exclude>
+				<exclude>cern.2mon.c2mon-server:c2mon-server-deploy</exclude>
 			</excludes>
 			<fileMode>0644</fileMode>
 		</dependencySet>
