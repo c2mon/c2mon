@@ -10,7 +10,7 @@
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-server</groupId>
-	<artifactId>c2mon-server-all</artifactId>
+	<artifactId>c2mon-server-deploy</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
