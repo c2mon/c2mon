@@ -28,13 +28,11 @@
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
-			</outputFileNameMapping>
-			<useProjectArtifact>true</useProjectArtifact>
-			<scope>runtime</scope>
+			</outputFileNameMapping>			
+			<fileMode>0644</fileMode>			
 			<includes>
 				<include>cern.tim2.tim2-server:tim2-server-rule</include>
-			</includes>
-			<fileMode>0644</fileMode>
+			</includes>			
 		</dependencySet>
 		<!--
 			this dependency set loads recursively all dependencies of the the
@@ -49,6 +47,7 @@
 			<outputDirectory>/lib</outputDirectory>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
 			</outputFileNameMapping>
+			<fileMode>0644</fileMode>
 			<excludes>
 				<exclude>cern.tim2*:*</exclude>
 				<exclude>cern.c2mon*:*</exclude>
@@ -69,7 +68,7 @@
 		<fileSet>
 			<directory>conf</directory>
 			<includes>
-				<!--  the files should be specified one-by-one for every solution -->
+				<!--  TODO: the files below should be specified one-by-one ? -->
 				<include>dmn2*.properties</include>
 				<include>dmn2*.xml</include>
 			</includes>

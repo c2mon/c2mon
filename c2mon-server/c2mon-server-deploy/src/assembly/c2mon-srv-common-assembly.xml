@@ -4,7 +4,8 @@
   <dependencySets>
     <dependencySet>
       <outputDirectory>/lib</outputDirectory>
-      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>                                                             
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+      <fileMode>0644</fileMode>                                                             
       <includes>
         <!--  define all common modules for both solutions (DMN2 and TIM2) here-->
         <include>cern.tim2.tim2-server:tim2-server-common</include>        
@@ -22,8 +23,7 @@
         <!--
          <include>cern.tim2.tim2-server:tim2-server-rule</include>
         -->        
-      </includes>
-      <fileMode>0644</fileMode>
+      </includes>      
     </dependencySet>
   </dependencySets>
 </component>
