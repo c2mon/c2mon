@@ -9,30 +9,51 @@
 	<formats>
 		<format>tar.gz</format>
 	</formats>
-		
+
 	<!--  do not include base directory -->
 	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<componentDescriptors>
-		<componentDescriptor>c2mon-srv-common-assembly.xml</componentDescriptor>
+		<componentDescriptor>c2mon-srv-common-assembly.xml
+		</componentDescriptor>
 	</componentDescriptors>
 
+
+	<!-- list all tim2-srv specific modules here -->
+	<!--
+		NOTE: if the list is empty the whole ependencySets block shall be
+		commented out!
+	-->
 	<dependencySets>
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
-			<!-- <outputFileNameMapping>${artifactId}.${artifact.extension}</outputFileNameMapping> -->
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
+			</outputFileNameMapping>
+			<useProjectArtifact>true</useProjectArtifact>
+			<scope>runtime</scope>
 			<includes>
-				<!-- list all dmn2-srv specific modules here -->
-				<!--
-					<include>cern.dmn2.dmn2-client:dmn2-client</include> 					
-				-->			
+				<include>cern.tim2.tim2-server:tim2-server-rule</include>
 			</includes>
-			<excludes>
-				<exclude>cern.2mon.c2mon-server:c2mon-server-deploy</exclude>
-			</excludes>
 			<fileMode>0644</fileMode>
 		</dependencySet>
+		<!--
+			this dependency set loads recursively all dependencies of the the
+			c2mon modules
+		-->
 
+		<!--
+			this dependency set loads recursively all dependencies of the the
+			c2mon modules
+		-->
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
+			</outputFileNameMapping>
+			<excludes>
+				<exclude>cern.tim2*:*</exclude>
+				<exclude>cern.c2mon*:*</exclude>
+			</excludes>
+		</dependencySet>
 
 	</dependencySets>
 

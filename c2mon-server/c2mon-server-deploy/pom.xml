@@ -13,7 +13,7 @@
 	<artifactId>c2mon-server-deploy</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
 
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
 	<description>
 		c2mon server assembling all required modules and correct configuration for tim2 and dmn	2 solutions
@@ -21,73 +21,60 @@
 	<url></url>
 
 	<dependencies>
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-common</artifactId>
-           <scope>runtime</scope>
-        </dependency>
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-cache</artifactId>
-           <scope>runtime</scope>
-        </dependency>
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-cacheloading</artifactId>
-           <scope>runtime</scope>
-        </dependency>
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-cachedbaccess</artifactId>
-           <scope>runtime</scope>
-        </dependency>               
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-auth</artifactId>
-           <scope>runtime</scope>
-        </dependency>               
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-cachepersistence</artifactId>
-           <scope>runtime</scope>
-        </dependency>                             
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-benchmark</artifactId>
-           <scope>runtime</scope>
-        </dependency>                             
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-command</artifactId>
-           <scope>runtime</scope>
-        </dependency>                             
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-daqcommunication-in</artifactId>
-           <scope>runtime</scope>
-        </dependency>                             
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-daqcommunication-out</artifactId>
-           <scope>runtime</scope>
-        </dependency>                             
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-rule</artifactId>
-           <scope>runtime</scope>
-        </dependency>                             
-        <dependency>
-           <groupId>cern.tim2.tim2-server</groupId>
-           <artifactId>tim2-server-supervision</artifactId>
-           <scope>runtime</scope>
-        </dependency>                             
-        <dependency>
-           <groupId>cern.c2mon.c2mon-server</groupId>
-           <artifactId>c2mon-server-configuration</artifactId>
-           <scope>runtime</scope>
-        </dependency>                             		
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-cache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-cacheloading</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-cachedbaccess</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-auth</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-cachepersistence</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-benchmark</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-command</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-daqcommunication-in</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-daqcommunication-out</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-rule</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-supervision</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-configuration</artifactId>
+		</dependency>
 	</dependencies>
-	
+
 	<developers />
 	<build>
 		<plugins>
@@ -95,10 +82,12 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.2.1</version>
 				<configuration>
+					
 					<descriptors>
 						<descriptor>src/assembly/dmn2-srv-assembly.xml</descriptor>
 						<descriptor>src/assembly/tim2-srv-assembly.xml</descriptor>
 					</descriptors>
+
 				</configuration>
 				<executions>
 					<execution>
