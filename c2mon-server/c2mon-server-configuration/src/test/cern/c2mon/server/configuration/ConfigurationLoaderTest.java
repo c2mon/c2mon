@@ -184,7 +184,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     controlTagMapper.deleteControlTag(500L);
     commandTagMapper.deleteCommandTag(10000L);
     ruleTagMapper.deleteRuleTag(50100L);
-    equipmentMapper.deleteEquipment(100L);
+    equipmentMapper.deleteEquipment(110L);
     controlTagMapper.deleteControlTag(501L);
     processMapper.deleteProcess(2L);
     subEquipmentMapper.deleteSubEquipment(200L);
@@ -203,7 +203,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     controlTagMapper.deleteControlTag(500L);
     commandTagMapper.deleteCommandTag(10000L);
     ruleTagMapper.deleteRuleTag(50100L);
-    equipmentMapper.deleteEquipment(100L);
+    equipmentMapper.deleteEquipment(110L);
     controlTagMapper.deleteControlTag(501L);
     processMapper.deleteProcess(2L);
     subEquipmentMapper.deleteSubEquipment(200L);
@@ -472,9 +472,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     System.out.println(report.toXML());
     
-    EquipmentCacheObject cacheObject = (EquipmentCacheObject) equipmentCache.get(100L);
-    EquipmentCacheObject expectedObject = new EquipmentCacheObject(100L);
-    expectedObject.setName("E_TEST");
+    EquipmentCacheObject cacheObject = (EquipmentCacheObject) equipmentCache.get(110L);
+    EquipmentCacheObject expectedObject = new EquipmentCacheObject(110L);
+    expectedObject.setName("E_CONFIG_TEST");
     expectedObject.setAddress("serverHostName=VGTCVENTTEST");
     expectedObject.setStateTagId(1222L);
     expectedObject.setCommFaultTagId(1223L);
@@ -510,7 +510,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertTrue(report.toXML().contains("CONTROLTAG"));
     assertTrue(report.toXML().contains("EQUIPMENT"));
     
-    cacheObject = (EquipmentCacheObject) equipmentCache.get(100L);
+    cacheObject = (EquipmentCacheObject) equipmentCache.get(110L);
     expectedObject.setDescription("updated description");
     expectedObject.setAddress("serverHostName=VGTCVENTTEST;test");
     expectedObject.setAliveTagId(501L);
@@ -523,8 +523,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     report = configurationLoader.applyConfiguration(15, timSessionInfo.getSessionId());
     System.out.println(report.toXML());
     assertTrue(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertFalse(equipmentCache.hasKey(100L));
-    assertNull(equipmentMapper.getItem(100L));
+    assertFalse(equipmentCache.hasKey(110L));
+    assertNull(equipmentMapper.getItem(110L));
     //commfault and alive should no longer be in cache (notice the cache is no longer consistent now - hence @DirtiesContext)
     //assertFalse(aliveTimerCache.hasKey(cacheObject.getAliveTagId())); TODO no alive set for TestHandler03 in DB yet... 
     assertFalse(commFaultTagCache.hasKey(cacheObject.getCommFaultTagId()));

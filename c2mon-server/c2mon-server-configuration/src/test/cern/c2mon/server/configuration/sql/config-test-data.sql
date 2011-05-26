@@ -163,23 +163,23 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   
 --create equipment (uses TESTHANDLER03 control tags and Process for simplicity)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-  values (13,'create equipment', 'create equipment 100', 'mbrightw', '?', sysdate);     
+  values (13,'create equipment', 'create equipment 110', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (13,13,'CREATE','Equipment','100');
+  values (13,13,'CREATE','Equipment','110');
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'address','serverHostName=VGTCVENTTEST');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'stateTagId','1222');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'processId','50');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'description','test description');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'handlerClass','ch.cern.tim.driver.');
-insert into timconfigval (seqid, elementfield, elementvalue) values (13,'name','E_TEST');
+insert into timconfigval (seqid, elementfield, elementvalue) values (13,'name','E_CONFIG_TEST');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'commFaultTagId','1223');
 
 --update equipment (contains 2 elts in config: create controltag and update equipment)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-  values (25,'update equipment', 'update equipment 100', 'mbrightw', '?', sysdate);     
+  values (25,'update equipment', 'update equipment 110', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (26,25,'UPDATE','Equipment','100');
+  values (26,25,'UPDATE','Equipment','110');
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (26,'address','serverHostName=VGTCVENTTEST;test');
 insert into timconfigval (seqid, elementfield, elementvalue) values (26,'description','updated description');
@@ -202,9 +202,9 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (25,'maxValu
 
 --remove equipment
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-  values (15,'remove equipment', 'remove equipment 100', 'mbrightw', '?', sysdate);     
+  values (15,'remove equipment', 'remove equipment 110', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (15,15,'REMOVE','Equipment','100');
+  values (15,15,'REMOVE','Equipment','110');
   
  --create process (uses P_TESTHANDLER03 control tag)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
@@ -272,7 +272,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (22,'dataTag
 insert into timconfigval (seqid, elementfield, elementvalue) values (22,'faultFamily','fault family');
 insert into timconfigval (seqid, elementfield, elementvalue) values (22,'faultMember','fault member');
 insert into timconfigval (seqid, elementfield, elementvalue) values (22,'faultCode','223');
-insert into timconfigval (seqid, elementfield, elementvalue) values (22,'alarmCondition','<AlarmCondition class="cern.tim.server.common.alarm.ValueAlarmCondition"><alarm-value type="Boolean">true</alarm-value></AlarmCondition>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (22,'alarmCondition','<AlarmCondition class="ch.cern.tim.shared.alarm.ValueAlarmCondition"><alarm-value type="Boolean">true</alarm-value></AlarmCondition>');
 
 --update alarm - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
