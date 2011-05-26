@@ -39,7 +39,7 @@ CONF_HOME=$C2MON_HOME/config
 #.tim.properties location
 TIM_PROPERTIES=~/.tim2.properties
 #log4j configuration file
-LOG4J_CONF_FILE=$CONF_HOME/log4j.tim.xml
+LOG4J_CONF_FILE=$CONF_HOME/log4j.xml
 #log directory
 LOG_DIR=$C2MON_HOME/log
 #directory of shared libraries
