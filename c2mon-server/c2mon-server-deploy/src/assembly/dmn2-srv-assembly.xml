@@ -54,26 +54,17 @@
 
 	</dependencySets>
 
-	<fileSets>
-		<fileSet>
-			<directory>bin</directory>
-			<includes>
-				<include>dmn2*.sh</include>
-			</includes>
-			<outputDirectory>/bin</outputDirectory>
-			<fileMode>0755</fileMode>
-		</fileSet>
-
-		<!--
-			<fileSet> <directory>conf</directory> <includes>
-			<include>c2mon*.properties</include>
-			<include>dmn2*.properties</include> </includes>
-			<outputDirectory>conf/</outputDirectory> <fileMode>0644</fileMode>
-			</fileSet>
-		-->
-	</fileSets>
-
 	<files>
+
+		<!--  copy sthe starting script -->
+		<file>
+			<source>${basedir}/bin/dmn2-c2mon.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<destName>c2mon.sh</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+		
 		<!--  copy changelog -->
 		<file>
 			<source>${basedir}/changelog/dmn2-srv-changelog.txt</source>

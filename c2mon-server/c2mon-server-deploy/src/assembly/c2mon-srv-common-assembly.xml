@@ -29,6 +29,7 @@
   
     <!-- create default tmp and log folders in the assembly -->
     <fileSet>
+    
       <includes>
         <include>tmp/*</include>
 	  </includes>
@@ -41,6 +42,17 @@
        <fileMode>0755</fileMode>
        <directoryMode>0755</directoryMode>
     </fileSet>
-  
+      
   </fileSets>
+  
+  <files>  
+	 <!--  copy she jmx shutdown script -->
+	 <file>
+		<source>${basedir}/bin/jmx-shutdown-script.txt</source>
+		<outputDirectory>/</outputDirectory>		
+		<lineEnding>unix</lineEnding>
+		<fileMode>0444</fileMode>
+	</file>
+  </files>
+    
 </component>
