@@ -122,7 +122,13 @@
         </include> 
          <include>
           <class-expression>ch.cern.tim.shared.datatag.address.impl.DBHardwareAddressImpl</class-expression>
-        </include>       
+        </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.SGatewayHardwareAddressImpl</class-expression>           
+        </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.datatag.address.impl.LASERHardwareAddressImpl</class-expression>
+        </include>
         <include>
           <class-expression>cern.tim.shared.common.type.TagDataType</class-expression>
         </include> 
@@ -239,6 +245,27 @@
         <include>
           <class-expression>cern.tim.server.configuration.handler.AlarmConfigHandler</class-expression>
         </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.alarm.ValueAlarmCondition</class-expression>
+        </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.alarm.RangeAlarmCondition</class-expression>
+        </include>
+        <include>
+          <class-expression>ch.cern.tim.shared.alarm.AlarmCondition</class-expression>
+        </include>
+        <!-- Command cache -->
+        <include>
+          <class-expression>cern.tim.server.common.command.CommandTagCacheObject</class-expression>
+        </include>        
+        <include>
+          <class-expression>cern.tim.shared.daq.command.AuthorizedHosts</class-expression>
+          <!-- excludes the regexp; call parsePattern on reload -->
+          <honor-transient>true</honor-transient>
+          <on-load>
+            <method>parsePattern</method>
+          </on-load>
+        </include>         
         <!-- configuration module -->
         <include>
           <class-expression>cern.tim.server.configuration.impl.ConfigurationLoaderImpl</class-expression>
