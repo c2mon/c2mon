@@ -16,7 +16,7 @@ export JAVA_HOME=/usr/java/jdk1.6.0_11
 ###################
 
 #Terracotta installation directory
-TERRACOTTA_HOME=~/opt/terracotta
+TERRACOTTA_HOME=$HOME/opt/terracotta
 #Terracotta server host (must be set if running server cluster)
 TC_HOST=cs-ccr-tim4
 #second C2MON host (must be set if running server cluster)
@@ -37,7 +37,7 @@ C2MON_HOME=$HOME/dev/tim2-prototype
 #config home
 CONF_HOME=$C2MON_HOME/config
 #.tim.properties location
-TIM_PROPERTIES=~/.tim2.properties
+TIM_PROPERTIES=$HOME/.tim2.properties
 #log4j configuration file
 LOG4J_CONF_FILE=$CONF_HOME/log4j.xml
 #log directory
@@ -143,7 +143,7 @@ C2MON_ARGS=
 #property triggering cache clustering
 CACHE_MODE_PROPERTY="-Dcern.c2mon.cache.mode=multi"
 
-COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dtim.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dtim.log.dir=$LOG_DIR -Dtim.properties.location=$TIM_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=~/jmxremote.password -Dcom.sun.management.jmxremote.access.file=~/jmxremote.access -Dcom.sun.management.jmxremote.ssl=false"
+COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dtim.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dtim.log.dir=$LOG_DIR -Dtim.properties.location=$TIM_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$HOME/.jmxremote.password -Dcom.sun.management.jmxremote.access.file=$HOME/.jmxremote.access -Dcom.sun.management.jmxremote.ssl=false"
 
 CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dtc.config=$TERRACOTTA_CONFIG $CACHE_MODE_PROPERTY"
 
