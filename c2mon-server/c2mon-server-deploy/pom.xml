@@ -78,11 +78,10 @@
 	<developers />
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
+			<plugin>			
+				<artifactId>maven-assembly-plugin</artifactId>				
 				<configuration>
-					
+
 					<descriptors>
 						<descriptor>src/assembly/dmn2-srv-assembly.xml</descriptor>
 						<descriptor>src/assembly/tim2-srv-assembly.xml</descriptor>

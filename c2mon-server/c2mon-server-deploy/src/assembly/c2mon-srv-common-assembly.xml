@@ -19,11 +19,28 @@
         <include>cern.tim2.tim2-server:tim2-server-daqcommunication-in</include>
         <include>cern.tim2.tim2-server:tim2-server-daqcommunication-out</include>       
         <include>cern.tim2.tim2-server:tim2-server-supervision</include>        
-        <include>cern.c2mon.c2mon-server:c2mon-server-configuration</include>
-        <!--
-         <include>cern.tim2.tim2-server:tim2-server-rule</include>
-        -->        
+        <include>cern.c2mon.c2mon-server:c2mon-server-configuration</include>        
+        <include>cern.tim2.tim2-server:tim2-server-rule</include>                                  
       </includes>      
     </dependencySet>
   </dependencySets>
+  
+  <fileSets>
+  
+    <!-- create default tmp and log folders in the assembly -->
+    <fileSet>
+      <includes>
+        <include>tmp/*</include>
+	  </includes>
+	  <fileMode>0755</fileMode>
+    </fileSet>
+    <fileSet>
+      <includes>
+         <include>log/</include>
+       </includes>
+       <fileMode>0755</fileMode>
+       <directoryMode>0755</directoryMode>
+    </fileSet>
+  
+  </fileSets>
 </component>

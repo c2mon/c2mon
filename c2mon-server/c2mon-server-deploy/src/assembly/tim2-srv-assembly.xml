@@ -24,16 +24,13 @@
 		NOTE: if the list is empty the whole ependencySets block shall be
 		commented out!
 	-->
+
 	<dependencySets>
 		<!--
-			<dependencySet> <outputDirectory>/lib</outputDirectory>
-			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
-			<includes> </includes> <fileMode>0644</fileMode> </dependencySet>
-		-->
-
-		<!--
 			this dependency set loads recursively all dependencies of the the
-			c2mon modules
+			c2mon modules. This is a HACK solving the problem described in that
+			event:
+			http://stackoverflow.com/questions/6018174/maven-assembly-dependency-set-with-include-doesnt-pick-up-transitive-dependencie
 		-->
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
@@ -49,6 +46,7 @@
 	</dependencySets>
 
 
+
 	<fileSets>
 		<fileSet>
 			<directory>bin</directory>
@@ -58,29 +56,15 @@
 			<outputDirectory>/bin</outputDirectory>
 			<fileMode>0755</fileMode>
 		</fileSet>
-		<fileSet>
-			<directory>conf</directory>
-			<includes>
-				<!--  TODO: the files below should be specified one-by-one ? -->
-				<include>tim2*.properties</include>
-				<include>tim2*.xml</include>
-			</includes>
-			<outputDirectory>conf/</outputDirectory>
-			<fileMode>0644</fileMode>
-		</fileSet>
-		<fileSet>
-			<includes>
-				<include>tmp/*</include>
-			</includes>
-			<fileMode>0755</fileMode>
-		</fileSet>
-		<fileSet>
-			<includes>
-				<include>log/</include>
-			</includes>
-			<fileMode>0755</fileMode>
-			<directoryMode>0755</directoryMode>
-		</fileSet>
+
+		<!--
+			<fileSet> <directory>conf</directory> <includes>
+			<include>c2mon*.properties</include>
+			<include>tim2*.properties</include> <include>tim2*.xml</include>
+			</includes> <outputDirectory>conf/</outputDirectory>
+			<fileMode>0644</fileMode> </fileSet>
+		-->
+
 	</fileSets>
 
 	<files>
@@ -92,6 +76,50 @@
 			<fileMode>0444</fileMode>
 			<lineEnding>unix</lineEnding>
 		</file>
+
+		<!--  log4j configuration -->
+		<file>
+			<source>${basedir}/conf/tim2-log4j.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>log4j.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+		<file>
+			<source>${basedir}/conf/tim2-cache.properties</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>c2mon-cache.properties</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+		<file>
+			<source>${basedir}/conf/tim2-datasource.properties</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>c2mon-datasource.properties</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+		<file>
+			<source>${basedir}/conf/tim2-jms.properties</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>c2mon-jms.properties</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+        <file>
+			<source>${basedir}/conf/tim2-modules.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>c2mon-modules.properties</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+        <file>
+			<source>${basedir}/conf/tim2-tc-config.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>c2mon-tc-config.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>		
 	</files>
 
 </assembly>
