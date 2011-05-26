@@ -65,7 +65,7 @@ C2MON_PIDFILE=$HOST_TMP_DIR/c2mon.pid
 # jmx admin user name for shutdown
 JMX_USER=timjmx
 # jmx admin password
-JMX_PASSWORD=jmxDaff0d1l
+JMX_PASSWORD=jmxtim
 # oc4j port
 JMX_PORT=9523
 
