@@ -1,51 +1,65 @@
 #!/bin/bash
 #
-# description: Starts and stops the C2MON server. Can also be used
+# Description: Starts and stops the C2MON server. Can also be used
 # to manage a cluster of two C2MON servers, with options for stopping
 # and starting a second C2MON server on a different machine. 
+#
+# When deploying, adjust the variables in the first two sections
+# below.
+#
+# HOME variable must be set before calling this script.
 
-# Declare and export environment variables
-# ----------------------------------------------------------------
+########################
+# DEPLOYMENT VARIABLES #
+########################
+
+#export Java for TC script also!
 export JAVA_HOME=/usr/java/jdk1.6.0_11
+#server home
+C2MON_HOME=$HOME/dev/tim2-prototype
+#.tim.properties location
+TIM_PROPERTIES=$HOME/.tim2.properties
+#first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
+C2MON_PRIMARY_HOST=cs-ccr-tim3
 
-# Declare local variables
-# ----------------------------------------------------------------
+##########################################
+# DEPLOYMENT VARIABLES: CLUSTERED CONFIG #
+##########################################
 
-###################
-# CLUSTERED SETUP #
-###################
-
-#Terracotta installation directory
-TERRACOTTA_HOME=$HOME/opt/terracotta
 #Terracotta server host (must be set if running server cluster)
 TC_HOST=cs-ccr-tim4
+#Terracotta installation directory
+TERRACOTTA_HOME=$HOME/opt/terracotta
 #second C2MON host (must be set if running server cluster)
 C2MON_SECOND_HOST=cs-ccr-tim8
 #terracotta server name (one of them)
 #TC_NAME=server1
 #terracotta DSO port
 TC_PORT=9510
-#Terracotta configuration location (either file or host:port)
-TERRACOTTA_CONFIG=$TC_HOST:$TC_PORT
 
 #################
 # COMMON SETUP  #
 #################
 
-#server home
-C2MON_HOME=$HOME/dev/tim2-prototype
 #config home
 CONF_HOME=$C2MON_HOME/config
-#.tim.properties location
-TIM_PROPERTIES=$HOME/.tim2.properties
 #log4j configuration file
 LOG4J_CONF_FILE=$CONF_HOME/log4j.xml
 #log directory
 LOG_DIR=$C2MON_HOME/log
 #directory of shared libraries
 SHARED_LIB_HOME=$HOME/dist/libs
-#first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
-C2MON_PRIMARY_HOST=cs-ccr-tim3
+
+###################
+# CLUSTERED SETUP #
+###################
+
+#Terracotta configuration location (either file or host:port)
+TERRACOTTA_CONFIG=$TC_HOST:$TC_PORT
+
+####################
+# MORE SETTINGS... #
+####################
 
 #set correct host
 if [ "$2" == "second" ] ; then
