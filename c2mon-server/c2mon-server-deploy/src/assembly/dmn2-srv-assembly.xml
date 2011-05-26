@@ -14,7 +14,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<componentDescriptors>
-		<componentDescriptor>c2mon-srv-common-assembly.xml
+		<componentDescriptor>src/assembly/c2mon-srv-common-assembly.xml
 		</componentDescriptor>
 	</componentDescriptors>
 
@@ -24,27 +24,23 @@
 		NOTE: if the list is empty the whole ependencySets block shall be
 		commented out!
 	-->
-	
+
 	<dependencySets>
-	
-	<!-- 
-		<dependencySet>
-			<outputDirectory>/lib</outputDirectory>
+
+		<!--
+			<dependencySet> <outputDirectory>/lib</outputDirectory>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
-			</outputFileNameMapping>
-			<fileMode>0644</fileMode>			
-			<includes>
-				<include>cern.tim2.tim2-server:tim2-server-rule</include>
-			</includes>
-		</dependencySet>
-	-->
-		
-	    <!--
-		  this dependency set loads recursively all dependencies of the the
-		  c2mon modules. This is a HACK solving the problem described in that
-		  event:
-		  http://stackoverflow.com/questions/6018174/maven-assembly-dependency-set-with-include-doesnt-pick-up-transitive-dependencie
-	    -->
+			</outputFileNameMapping> <fileMode>0644</fileMode> <includes>
+			<include>cern.tim2.tim2-server:tim2-server-rule</include> </includes>
+			</dependencySet>
+		-->
+
+		<!--
+			this dependency set loads recursively all dependencies of the the
+			c2mon modules. This is a HACK solving the problem described in that
+			event:
+			http://stackoverflow.com/questions/6018174/maven-assembly-dependency-set-with-include-doesnt-pick-up-transitive-dependencie
+		-->
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
@@ -67,18 +63,14 @@
 			<outputDirectory>/bin</outputDirectory>
 			<fileMode>0755</fileMode>
 		</fileSet>
-		
+
 		<!--
-		<fileSet>
-			<directory>conf</directory>
-			<includes>		
-				<include>c2mon*.properties</include>
-				<include>dmn2*.properties</include>				
-			</includes>
-			<outputDirectory>conf/</outputDirectory>
-			<fileMode>0644</fileMode>
-		</fileSet>
-		-->			
+			<fileSet> <directory>conf</directory> <includes>
+			<include>c2mon*.properties</include>
+			<include>dmn2*.properties</include> </includes>
+			<outputDirectory>conf/</outputDirectory> <fileMode>0644</fileMode>
+			</fileSet>
+		-->
 	</fileSets>
 
 	<files>
@@ -120,20 +112,20 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-        <file>
+		<file>
 			<source>${basedir}/conf/dmn2-modules.xml</source>
 			<outputDirectory>conf/</outputDirectory>
 			<destName>c2mon-modules.properties</destName>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-        <file>
+		<file>
 			<source>${basedir}/conf/dmn2-tc-config.xml</source>
 			<outputDirectory>conf/</outputDirectory>
 			<destName>c2mon-tc-config.xml</destName>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
-		</file>				
+		</file>
 	</files>
 
 </assembly>

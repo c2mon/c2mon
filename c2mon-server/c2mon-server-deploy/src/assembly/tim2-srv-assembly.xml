@@ -14,7 +14,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<componentDescriptors>
-		<componentDescriptor>c2mon-srv-common-assembly.xml
+		<componentDescriptor>src/assembly/c2mon-srv-common-assembly.xml
 		</componentDescriptor>
 	</componentDescriptors>
 
