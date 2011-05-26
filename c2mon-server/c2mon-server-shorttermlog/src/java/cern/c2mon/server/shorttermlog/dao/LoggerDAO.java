@@ -25,7 +25,6 @@ import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
-import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.springframework.dao.DataAccessException;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;

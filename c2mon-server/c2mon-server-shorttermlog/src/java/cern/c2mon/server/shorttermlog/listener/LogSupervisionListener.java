@@ -21,6 +21,9 @@ package cern.c2mon.server.shorttermlog.listener;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.shorttermlog.mapper.SupervisionMapper;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -74,6 +77,7 @@ public class LogSupervisionListener implements SupervisionListener {
     supervisionNotifier.registerAsListener(this);
   }
 
+  @Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.DEFAULT)
   @Override
   public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
     if (LOGGER.isDebugEnabled()){

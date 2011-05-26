@@ -17,6 +17,10 @@
     <property name="initialSize" value="${datasource.stl.connections.initial}"/>
     <property name="maxActive" value="${datasource.stl.connections.max}"/>
   </bean>
+  
+  <bean id="stlTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="stlDataSource"/>
+  </bean>
 	
 	<bean id="stlSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 	  <property name="configLocation" value="classpath:cern/c2mon/server/shorttermlog/sqlmap/sql-map-config.xml"/>
