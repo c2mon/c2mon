@@ -97,7 +97,7 @@
         <file>
 			<source>${basedir}/conf/tim2-modules.xml</source>
 			<outputDirectory>conf/</outputDirectory>
-			<destName>c2mon-modules.properties</destName>
+			<destName>c2mon-modules.xml</destName>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
