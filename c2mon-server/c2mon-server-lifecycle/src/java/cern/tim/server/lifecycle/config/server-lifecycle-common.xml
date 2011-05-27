@@ -10,7 +10,7 @@
   <context:component-scan base-package="cern.tim.server.lifecycle"/>  
   
   <!-- import the optional modules loaded in a separate Spring configuration file (in the server configuration directory) -->
-  <import resource="file:${tim.home}/config/server-modules.xml"/>
+  <import resource="file:${tim.home}/config/c2mon-modules.xml"/>
   
   <bean id="lifecycleProcessor" class="org.springframework.context.support.DefaultLifecycleProcessor">
     <!-- timeout value in milliseconds -->
