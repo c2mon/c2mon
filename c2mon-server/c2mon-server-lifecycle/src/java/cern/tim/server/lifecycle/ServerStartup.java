@@ -95,7 +95,7 @@ public final class ServerStartup {
     }
     logger.info("Using tim.properties file at: " + System.getProperty("tim.properties.location"));
     
-    String confLocation = "file:" + System.getProperty("tim.home") + "/config";
+    String confLocation = "file:" + System.getProperty("tim.home") + "/conf";
     
     String[] coreProperties = new String[]{"file:" + System.getProperty("tim.properties.location"),
                                            confLocation + "/tim-jms.properties",
