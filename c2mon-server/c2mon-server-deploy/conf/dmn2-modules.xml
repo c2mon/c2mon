@@ -13,7 +13,9 @@
   <import resource="classpath:cern/tim/server/cachepersistence/config/server-cachepersistence.xml"/>
   <import resource="classpath:cern/tim/server/command/config/server-command.xml"/>
   <import resource="classpath:cern/tim/server/benchmark/config/server-benchmark.xml"/>
-  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml"/>
   
+  <!-- don't set-up shortterm log for dmn2-srv for now 
+  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml"/>
+  -->
 
 </beans>
