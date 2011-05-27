@@ -112,7 +112,7 @@ JMX_PORT=9523
 ##############
 
 #librairies (links to required libs)
-APP_LIB_DIR=$C2MON_HOME/libs
+APP_LIB_DIR=$C2MON_HOME/lib
 APP_LIBS=$APP_LIB_DIR/*
 
 #Terracotta module libraries
