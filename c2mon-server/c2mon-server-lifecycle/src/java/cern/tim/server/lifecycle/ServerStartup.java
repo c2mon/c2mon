@@ -39,9 +39,9 @@ import org.springframework.context.support.GenericApplicationContext;
  * 
  * The main method can be called with the following arguments:
  * 
- *  -Dlog4j.configuration - location of the log4j configuration file (compulsory)
- *  -Dtim.properties      - location of the tim.properties file 
- *                          (optional - default is .tim2.properties in the user home directory) 
+ *  -Dlog4j.configuration         - location of the log4j configuration file (compulsory)
+ *  -Dtim.properties.location     - location of the tim.properties file 
+ *                                  (optional - default is .c2mon.properties in the user home directory) 
  *  
  * @author Mark Brightwell
  *
@@ -91,16 +91,16 @@ public final class ServerStartup {
      
     //set default tim.properties location if not specified as Dtim.properties.location     
     if (System.getProperty("tim.properties.location") == null) {
-      System.setProperty("tim.properties.location", System.getProperty("user.home") + "/.tim2.properties");
+      System.setProperty("tim.properties.location", System.getProperty("user.home") + "/.c2mon.properties");
     }
-    logger.info("Using tim.properties file at: " + System.getProperty("tim.properties.location"));
+    logger.info("Using c2mon.properties file at: " + System.getProperty("tim.properties.location"));
     
     String confLocation = "file:" + System.getProperty("tim.home") + "/conf";
     
     String[] coreProperties = new String[]{"file:" + System.getProperty("tim.properties.location"),
-                                           confLocation + "/tim-jms.properties",
-                                           confLocation + "/tim-datasource.properties",
-                                           confLocation + "/tim-cache.properties"};
+                                           confLocation + "/c2mon-jms.properties",
+                                           confLocation + "/c2mon-datasource.properties",
+                                           confLocation + "/c2mon-cache.properties"};
     
     GenericBeanDefinition propertiesFactoryBean = new GenericBeanDefinition();
     propertiesFactoryBean.setBeanClass(PropertiesFactoryBean.class);
