@@ -19,7 +19,8 @@
         <include>cern.tim2.tim2-server:tim2-server-daqcommunication-in</include>
         <include>cern.tim2.tim2-server:tim2-server-daqcommunication-out</include>       
         <include>cern.tim2.tim2-server:tim2-server-supervision</include>        
-        <include>cern.c2mon.c2mon-server:c2mon-server-configuration</include>        
+        <include>cern.c2mon.c2mon-server:c2mon-server-configuration</include>
+        <include>cern.c2mon.c2mon-server:c2mon-server-lifecycle</include>        
         <include>cern.tim2.tim2-server:tim2-server-rule</include>                                  
       </includes>      
     </dependencySet>
@@ -31,7 +32,7 @@
     <fileSet>
     
       <includes>
-        <include>tmp/*</include>
+        <include>tmp/</include>
 	  </includes>
 	  <fileMode>0755</fileMode>
     </fileSet>
