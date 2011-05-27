@@ -18,7 +18,7 @@ export JAVA_HOME=/usr/java/jdk1.6.0_11
 #server home
 C2MON_HOME=$HOME/dev/tim2-prototype
 #.tim.properties location
-TIM_PROPERTIES=$HOME/.tim2.properties
+TIM_PROPERTIES=$HOME/.c2mon.properties
 #first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
 C2MON_PRIMARY_HOST=cs-ccr-tim3
 
