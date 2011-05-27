@@ -38,8 +38,8 @@
 			</outputFileNameMapping>
 			<fileMode>0644</fileMode>
 			<excludes>
-				<exclude>cern.tim2*:*</exclude>
-				<exclude>cern.c2mon*:*</exclude>
+				<exclude>cern.tim2.server*:*</exclude>
+				<exclude>cern.c2mon.server*:*</exclude>
 			</excludes>
 		</dependencySet>
 
