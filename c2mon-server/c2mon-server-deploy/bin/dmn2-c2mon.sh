@@ -42,7 +42,7 @@ TC_PORT=9510
 #################
 
 #config home
-CONF_HOME=$C2MON_HOME/config
+CONF_HOME=$C2MON_HOME/conf
 #log4j configuration file
 LOG4J_CONF_FILE=$CONF_HOME/log4j.xml
 #log directory
