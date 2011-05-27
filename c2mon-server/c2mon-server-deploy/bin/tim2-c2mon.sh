@@ -14,7 +14,15 @@
 ########################
 
 #export Java for TC script also!
-export JAVA_HOME=/usr/java/jdk1.6.0_11
+
+
+# make sure JAVA_HOME is set correctly
+if [ -n $JAVA_HOME ]; then 	
+   # use default if not
+   export JAVA_HOME=/usr/java/jdk1.6.0_11
+fi
+
+
 #server home
 C2MON_HOME=$HOME/dev/tim2-prototype
 #.tim.properties location
