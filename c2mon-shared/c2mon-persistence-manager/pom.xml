@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-shared</groupId>
-		<artifactId>c2mon-shared-pom</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
-	</parent>
-	<groupId>cern.c2mon.c2mon-shared</groupId>
-	<artifactId>c2mon-persistence-manager</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
-	<name>c2mon-persistence-manager</name>
-	<packaging>jar</packaging>
-	<description>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-shared</groupId>
+    <artifactId>c2mon-shared-pom</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-shared</groupId>
+  <artifactId>c2mon-shared-persistence-manager</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+  <name>c2mon-shared-persistence-manager</name>
+  <packaging>jar</packaging>
+  <description>
       This JAR is part of C2MON's persistence layer. It manages all the incoming requests to commit data
       to C2MON's DB by providing a fallback mechanism that guarantees that not data will be lost in case 
       there is a DB failure. The backup mechanism is normally implemented by creating in the server some
@@ -21,37 +21,37 @@
       The code is generic enough to allow its use by any other C2MON project that has to deal with the persistence
       layer.
   </description>
-	<url>http://timweb.cern.ch</url>
+  <url>http://timweb.cern.ch</url>
 
-	<dependencies>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-util</artifactId>
-		</dependency>
-	</dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-util</artifactId>
+    </dependency>
+  </dependencies>
 
-	<developers />
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.8</version>
-				<configuration>
-					<argLine>
-						-Dtim.log.fallback.file=FallBackFileControllerTest.log                        
-                    </argLine>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <developers />
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8</version>
+        <configuration>
+          <argLine>
+            -Dtim.log.fallback.file=FallBackFileControllerTest.log                        
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
