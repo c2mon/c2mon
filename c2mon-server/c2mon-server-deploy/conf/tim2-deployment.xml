@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+      <product name="c2mon">
+            <application name="c2mon-tim2-prod">
+                  <deployment installLocation="/opt/c2mon-tim2/">
+                        <directory name="conf">
+                              <file name=".jmxremote.passwd" source="/user/timoper/c2mon-conf/" mask="400" />
+                              <file name=".jmxremote.access" source="/user/timoper/c2mon-conf/" mask="400" />
+                              <file name=".c2mon.properties" source="/user/timoper/c2mon-conf/" mask="400" />
+                        </directory>
+                        <backupPolicy keepBackups="2">
+                              <preserve type="dir" name="log" />
+                        </backupPolicy>
+                        <notification>
+                            <!-- you can give more than one mail for deployment notification -->
+                              <mail address="timdiamon-developers@cern.ch" />
+                        </notification>
+                  </deployment>
+            </application>
+      </product>
+</products>
