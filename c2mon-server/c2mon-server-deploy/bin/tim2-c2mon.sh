@@ -149,14 +149,14 @@ SPRING_MODULES=$SHARED_LIB_HOME/spring-modules/spring-modules-cache
 #apache commons libs
 #APACHE_COMMONS_LIBS=$SHARED_LIB_HOME/apache-commons/commons-cli-1.1.jar:$SHARED_LIB_HOME/apache-commons/commons-io-1.4.jar
 
-#application jar location
-APPLICATION_JAR=$C2MON_HOME/dist/c2mon.jar
+#for jmx lifecycle
+JMXJAR=$SHARED_LIB_HOME/jmxterm/jmxterm-1.0-alpha-4-uber.jar
 
 #all needed librairies (including cachetest)
 if [ ! "$2" == "single" ]; then
-    REQUIRED_LIBS=$APPLICATION_JAR:$APP_LIBS:$TERRACOTTA_MODULES:$SPRING_MODULES
+    REQUIRED_LIBS=$APP_LIBS:$TERRACOTTA_MODULES:$SPRING_MODULES
 else
-    REQUIRED_LIBS=$APPLICATION_JAR:$APP_LIBS
+    REQUIRED_LIBS=$APP_LIBS:
 fi
 
 #:$EHCACHE_LIBS
@@ -182,26 +182,28 @@ CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cac
 if [ ! "$2" == "single" ]; then
     C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $CLUSTER_JAVA_ARGS"  
     C2MON_START_CMD="$TERRACOTTA_HOME/bin/dso-java.sh $C2MON_JAVA_ARGS -classpath ${REQUIRED_LIBS} cern.tim.server.lifecycle.ServerStartup  $C2MON_ARGS"
+    C2MON_STOP_CMD="$JAVA_HOME/jre/bin/java -jar $JMXJAR -i $C2MON_HOME/bin/jmx-shutdown-script.txt -n -e -l localhost:$JMX_PORT  -u $JMX_USER -p $JMX_PASSWORD"
 else
     C2MON_JAVA_ARGS=$COMMON_JAVA_ARGS
     C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -classpath $REQUIRED_LIBS  cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS"
+    C2MON_STOP_CMD="echo \"attempting to shutdown the server with kill call\""
 fi
     
-C2MON_STOP_CMD="$JAVA_HOME/jre/bin/java -jar $APP_LIB_DIR/jmxterm-1.0-alpha-4-uber.jar -i $C2MON_HOME/bin/jmx-shutdown-script.txt -n -e -l localhost:$JMX_PORT  -u $JMX_USER -p $JMX_PASSWORD"
+
 
 #export LD_LIBRARY_PATH=/opt/oc4j/jdbc/lib
 #export PATH=$JAVA_HOME/jre/bin:$JAVA_HOME/bin:$LD_LIBRARY_PATH:$PATH
 
 #if [ "$3" != "" ] ; then
 #  echo "JAVA_HOME       : $JAVA_HOME"
-  #echo "ORACLE_HOME     : $ORACLE_HOME"
-#  echo "TERRACOTTA_HOME       : $TERRACOTTA_HOME"
+#  echo "ORACLE_HOME     : $ORACLE_HOME"
+#  echo "TERRACOTTA_HOME : $TERRACOTTA_HOME"
 #  echo
-  #echo "PATH            : $PATH"
-  #echo "LD_LIBRARY_PATH : $LD_LIBRARY_PATH"
+#  echo "PATH            : $PATH"
+#  echo "LD_LIBRARY_PATH : $LD_LIBRARY_PATH"
 
-#  echo "C2MON start cmd  : $C2MON_START_CMD"
-#  echo "C2MON stop cmd   : $C2MON_STOP_CMD"
+#  echo "C2MON start cmd : $C2MON_START_CMD"
+#  echo "C2MON stop cmd  : $C2MON_STOP_CMD"
 #fi
 
 # Source function library.
