@@ -64,12 +64,21 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0755</fileMode>
 		</file>
-		
+
 		<!--  copy changelog -->
 		<file>
 			<source>${basedir}/changelog/dmn2-srv-changelog.txt</source>
 			<outputDirectory>/</outputDirectory>
 			<destName>changelog.txt</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+        <!--  deployment descriptor -->
+		<file>
+			<source>${basedir}/conf/dmn2-deployment.xml</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>deployment.xml</destName>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>

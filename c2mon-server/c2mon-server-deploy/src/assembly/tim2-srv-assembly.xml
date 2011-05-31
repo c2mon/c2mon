@@ -65,6 +65,15 @@
 			<lineEnding>unix</lineEnding>
 		</file>
 
+        <!--  deployment descriptor -->
+		<file>
+			<source>${basedir}/conf/tim2-deployment.xml</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>deployment.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
 		<!--  log4j configuration -->
 		<file>
 			<source>${basedir}/conf/tim2-log4j.xml</source>
