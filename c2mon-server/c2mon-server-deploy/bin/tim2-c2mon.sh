@@ -15,20 +15,29 @@
 
 #export Java for TC script also!
 
-
 # make sure JAVA_HOME is set correctly
 if [ -n $JAVA_HOME ]; then 	
    # use default if not
    export JAVA_HOME=/usr/java/jdk1.6.0_11
 fi
 
+# get the current location 
+C2MON_HOME=`dirname $0`
 
-#server home
-C2MON_HOME=$HOME/dev/tim2-prototype
-#.tim.properties location
-TIM_PROPERTIES=$HOME/.c2mon.properties
+#set server home
+[[ $C2MON_HOME == "." ]] && C2MON_HOME=$PWD
+C2MON_HOME=$C2MON_HOME/../
+
+#.c2mon.properties location
+C2MON_PROPERTIES=$C2MON_HOME/conf/.c2mon.properties
+
 #first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
-C2MON_PRIMARY_HOST=cs-ccr-tim3
+# make sure C2MON_PRIMARY_HOST is set correctly
+if [ -n $C2MON_PRIMARY_HOST ]; then 	
+   # use default if not
+   export C2MON_PRIMARY_HOST=cs-ccr-tim3
+fi
+
 
 ##########################################
 # DEPLOYMENT VARIABLES: CLUSTERED CONFIG #
@@ -165,7 +174,7 @@ C2MON_ARGS=
 #property triggering cache clustering
 CACHE_MODE_PROPERTY="-Dcern.c2mon.cache.mode=multi"
 
-COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dtim.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dtim.log.dir=$LOG_DIR -Dtim.properties.location=$TIM_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$HOME/.jmxremote.password -Dcom.sun.management.jmxremote.access.file=$HOME/.jmxremote.access -Dcom.sun.management.jmxremote.ssl=false"
+COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dtim.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dtim.log.dir=$LOG_DIR -Dtim.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$HOME/.jmxremote.password -Dcom.sun.management.jmxremote.access.file=$HOME/.jmxremote.access -Dcom.sun.management.jmxremote.ssl=false"
 
 CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dtc.config=$TERRACOTTA_CONFIG $CACHE_MODE_PROPERTY"
 

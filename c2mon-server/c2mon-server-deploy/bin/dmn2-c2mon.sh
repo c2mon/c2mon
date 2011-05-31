@@ -21,27 +21,40 @@ if [ -n $JAVA_HOME ]; then
    export JAVA_HOME=/usr/java/jdk1.6.0_11
 fi
 
-#server home
-C2MON_HOME=$HOME/dev/tim2-prototype
-#.tim.properties location
-TIM_PROPERTIES=$HOME/.c2mon.properties
-#first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
-C2MON_PRIMARY_HOST=cs-ccr-tim3
+# get the current location 
+C2MON_HOME=`dirname $0`
 
-##########################################
-# DEPLOYMENT VARIABLES: CLUSTERED CONFIG #
-##########################################
+#set server home
+[[ $C2MON_HOME == "." ]] && C2MON_HOME=$PWD
+C2MON_HOME=$C2MON_HOME/../
+
+#.c2mon.properties location
+C2MON_PROPERTIES=$C2MON_HOME/conf/.c2mon.properties
+
+#first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
+# make sure C2MON_PRIMARY_HOST is set correctly
+if [ -n $C2MON_PRIMARY_HOST ]; then 	
+   # use default if not
+   export C2MON_PRIMARY_HOST=cs-ccr-laserprod
+fi
+
+
+##############################################################
+# DEPLOYMENT VARIABLES: CLUSTERED CONFIG - NOT USED FOR DMN2 #
+##############################################################
 
 #Terracotta server host (must be set if running server cluster)
 TC_HOST=cs-ccr-tim4
 #Terracotta installation directory
-TERRACOTTA_HOME=$HOME/opt/terracotta
+TERRACOTTA_HOME=$C2MON_HOME/opt/terracotta
 #second C2MON host (must be set if running server cluster)
 C2MON_SECOND_HOST=cs-ccr-tim8
 #terracotta server name (one of them)
 #TC_NAME=server1
 #terracotta DSO port
 TC_PORT=9510
+
+
 
 #################
 # COMMON SETUP  #
@@ -54,7 +67,7 @@ LOG4J_CONF_FILE=$CONF_HOME/log4j.xml
 #log directory
 LOG_DIR=$C2MON_HOME/log
 #directory of shared libraries
-SHARED_LIB_HOME=$HOME/dist/libs
+SHARED_LIB_HOME=$C2MON_HOME/dist/libs
 
 ###################
 # CLUSTERED SETUP #
@@ -163,7 +176,7 @@ C2MON_ARGS=
 #property triggering cache clustering
 CACHE_MODE_PROPERTY="-Dcern.c2mon.cache.mode=multi"
 
-COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dtim.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dtim.log.dir=$LOG_DIR -Dtim.properties.location=$TIM_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$HOME/.jmxremote.password -Dcom.sun.management.jmxremote.access.file=$HOME/.jmxremote.access -Dcom.sun.management.jmxremote.ssl=false"
+COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dtim.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dtim.log.dir=$LOG_DIR -Dtim.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$HOME/.jmxremote.password -Dcom.sun.management.jmxremote.access.file=$HOME/.jmxremote.access -Dcom.sun.management.jmxremote.ssl=false"
 
 CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dtc.config=$TERRACOTTA_CONFIG $CACHE_MODE_PROPERTY"
 
@@ -183,14 +196,14 @@ C2MON_STOP_CMD="$JAVA_HOME/jre/bin/java -jar $APP_LIB_DIR/jmxterm-1.0-alpha-4-ub
 
 #if [ "$3" != "" ] ; then
 #  echo "JAVA_HOME       : $JAVA_HOME"
-  #echo "ORACLE_HOME     : $ORACLE_HOME"
-#  echo "TERRACOTTA_HOME       : $TERRACOTTA_HOME"
+#  echo "ORACLE_HOME     : $ORACLE_HOME"
+#  echo "TERRACOTTA_HOME : $TERRACOTTA_HOME"
 #  echo
-  #echo "PATH            : $PATH"
-  #echo "LD_LIBRARY_PATH : $LD_LIBRARY_PATH"
+#  echo "PATH            : $PATH"
+#  echo "LD_LIBRARY_PATH : $LD_LIBRARY_PATH"
 
-#  echo "C2MON start cmd  : $C2MON_START_CMD"
-#  echo "C2MON stop cmd   : $C2MON_STOP_CMD"
+#  echo "C2MON start cmd : $C2MON_START_CMD"
+#  echo "C2MON stop cmd  : $C2MON_STOP_CMD"
 #fi
 
 # Source function library.
