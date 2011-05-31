@@ -94,13 +94,13 @@
             -Dtim.properties.location=${tim.properties.location}
             -Ddatasource.config.connections.initial=1
             -Ddatasource.config.connections.max=1
-            -Djms.config.destination=tim.config
+            -Djms.config.destination=tim.config.test
             <!-- cache module properties for integration testing -->
             -Ddatasource.persistence.connections.initial=2
             -Ddatasource.persistence.connections.max=2
-            -Dcache.loader.batch.size=1000
+            -Dcache.loader.batch.size=10000
             -Dcache.loader.threads.max=2
-            -Dcache.loader.queue.size=1000      
+            -Dcache.loader.queue.size=1000    
           </argLine>
         </configuration>
       </plugin>
