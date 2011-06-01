@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-  <!-- configure the data source connection pool (from .tim.properties in production) -->
+  <!-- configure the data source connection pool (from .c2mon.properties in production) -->
   <!-- on shutdown ... -->
   <bean id="stlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
     <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>

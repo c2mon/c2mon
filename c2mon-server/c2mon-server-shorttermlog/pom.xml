@@ -84,7 +84,7 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-shared</groupId>
-      <artifactId>c2mon-persistence-manager</artifactId>
+      <artifactId>c2mon-shared-persistence-manager</artifactId>
     </dependency>
   </dependencies>
 
@@ -95,7 +95,7 @@
         <artifactId>maven-surefire-plugin</artifactId>       
         <configuration>
           <argLine>
-            -Dtim.properties.location=${tim.properties.location}
+            -Dc2mon.properties.location=${c2mon.properties.location}
             -Ddatasource.stl.connections.initial=1
             -Ddatasource.stl.connections.max=1
           </argLine>
