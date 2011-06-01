@@ -1,21 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-      <product name="c2mon">
-            <application name="c2mon-diamon2-prod">
-                  <deployment installLocation="/opt/c2mon-dmn2/">
-                        <directory name="conf">
-                              <file name=".jmxremote.passwd" source="/user/diamonop/c2mon-conf/" mask="400" />
-                              <file name=".jmxremote.access" source="/user/diamonop/c2mon-conf/" mask="400" />
-                              <file name=".c2mon.properties" source="/user/diamonop/c2mon-conf/" mask="400" />
-                        </directory>
-                        <backupPolicy keepBackups="2">
-                              <preserve type="dir" name="log" />
-                        </backupPolicy>
-                        <notification>
-                            <!-- you can give more than one mail for deployment notification -->
-                              <mail address="timdiamon-developers@cern.ch" />
-                        </notification>
-                  </deployment>
-            </application>
-      </product>
+	<product name="c2mon">
+
+		<!--
+			this application section is a parent configuration for both
+			c2mon-dmn2-prod and c2mon-dmn2-test
+		-->
+		<application>
+			<deployment installLocation="/opt/c2mon/srv/">
+				<backupPolicy keepBackups="2">
+					<preserve type="dir" name="log" />
+				</backupPolicy>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="timdiamon-developers@cern.ch" />
+				</notification>
+			</deployment>
+		</application>
+
+		<application name="c2mon-dmn2-prod">
+			<deployment>
+				<directory name="conf">
+					<file name=".jmxremote.passwd" source="/user/diamonop/c2mon/prod/conf/"
+						mask="400" />
+					<file name=".jmxremote.access" source="/user/diamonop/c2mon/prod/conf/"
+						mask="400" />
+					<file name=".c2mon.properties" source="/user/diamonop/c2mon/prod/conf/"
+						mask="400" />
+				</directory>
+			</deployment>
+		</application>
+
+		<application name="c2mon-dmn2-test">
+			<deployment>
+				<directory name="conf">
+					<file name=".jmxremote.passwd" source="/user/diamonop/c2mon/test/conf/"
+						mask="400" />
+					<file name=".jmxremote.access" source="/user/diamonop/c2mon/test/conf/"
+						mask="400" />
+					<file name=".c2mon.properties" source="/user/diamonop/c2mon/test/conf/"
+						mask="400" />
+				</directory>
+			</deployment>
+		</application>
+
+	</product>
 </products>
