@@ -91,7 +91,7 @@
         <version>2.8</version>
         <configuration>
           <argLine>
-            -Dtim.properties.location=${tim.properties.location}
+            -Dc2mon.properties.location=${c2mon.properties.location}
             -Ddatasource.config.connections.initial=1
             -Ddatasource.config.connections.max=1
             -Djms.config.destination=tim.config.test
