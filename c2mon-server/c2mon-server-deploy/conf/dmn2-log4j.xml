@@ -7,9 +7,9 @@
   Specify the name of the log file in the ${tim.log.file} system property.
   To do this, start your program the following way:
 
-    java -Dtim.log.file=c:/tim.log ... YourMainClass
+    java -Dc2mon.log.file=c:/tim.log ... YourMainClass
   or
-    java -Dtim.log.file=c:/tim.log ... -jar YourRunnableJar.jar
+    java -Dc2mon.log.file=c:/tim.log ... -jar YourRunnableJar.jar
 
   If you don't, the log file will be created in the temp directory. If this 
   isn't possible either, log output will be printed on the console.
@@ -48,7 +48,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.dir}/tim.log" />
+    <param name="File" value="${c2mon.log.dir}/tim.log" />
     <param name="MaxBackupIndex" value="3" />
     <param name="MaxFileSize" value="5MB" />
     <param name="BufferedIO" value="false" />
@@ -69,7 +69,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.dir}/IncomingSourceTag.log" />
+    <param name="File" value="${c2mon.log.dir}/IncomingSourceTag.log" />
     <param name="MaxBackupIndex" value="1" />
     <param name="MaxFileSize" value="5MB" />
     <param name="BufferedIO" value="false" />
@@ -84,7 +84,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.dir}/RuleTag.log" />
+    <param name="File" value="${c2mon.log.dir}/RuleTag.log" />
     <param name="MaxBackupIndex" value="1" />
     <param name="MaxFileSize" value="5MB" />
     <param name="BufferedIO" value="false" />
@@ -99,7 +99,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.dir}/BenchmarkDataTag.log" />
+    <param name="File" value="${c2mon.log.dir}/BenchmarkDataTag.log" />
     <param name="MaxBackupIndex" value="1" />
     <param name="MaxFileSize" value="5MB" />
     <param name="BufferedIO" value="false" />
@@ -114,7 +114,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.dir}/BenchmarkPriority.log" />
+    <param name="File" value="${c2mon.log.dir}/BenchmarkPriority.log" />
     <param name="MaxBackupIndex" value="1" />
     <param name="MaxFileSize" value="5MB" />
     <param name="BufferedIO" value="false" />
