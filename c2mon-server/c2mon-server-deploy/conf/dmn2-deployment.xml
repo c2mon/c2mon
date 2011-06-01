@@ -6,8 +6,8 @@
 			this application section is a parent configuration for both
 			c2mon-dmn2-prod and c2mon-dmn2-test
 		-->
-		<application>
-			<deployment installLocation="/opt/c2mon/srv/">
+		<application name="default"> 
+			<deployment installLocation="/opt/c2mon-dmn2">
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
 				</backupPolicy>
@@ -18,7 +18,7 @@
 			</deployment>
 		</application>
 
-		<application name="c2mon-dmn2-prod">
+		<application name="c2mon-dmn2-prod" extends="default">
 			<deployment>
 				<directory name="conf">
 					<file name=".jmxremote.passwd" source="/user/diamonop/c2mon/prod/conf/"
@@ -31,8 +31,8 @@
 			</deployment>
 		</application>
 
-		<application name="c2mon-dmn2-test">
-			<deployment>
+		<application name="c2mon-dmn2-test" extends="default" >
+			<deployment installLocation="/opt/c2mon-dmn2-test">
 				<directory name="conf">
 					<file name=".jmxremote.passwd" source="/user/diamonop/c2mon/test/conf/"
 						mask="400" />
