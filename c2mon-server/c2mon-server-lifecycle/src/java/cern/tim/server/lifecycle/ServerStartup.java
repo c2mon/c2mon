@@ -40,7 +40,7 @@ import org.springframework.context.support.GenericApplicationContext;
  * The main method can be called with the following arguments:
  * 
  *  -Dlog4j.configuration         - location of the log4j configuration file (compulsory)
- *  -Dtim.properties.location     - location of the tim.properties file 
+ *  -Dc2mon.properties.location     - location of the c2mon.properties file 
  *                                  (optional - default is .c2mon.properties in the user home directory) 
  *  
  * @author Mark Brightwell
@@ -89,15 +89,15 @@ public final class ServerStartup {
       System.exit(-1);
     }
      
-    //set default tim.properties location if not specified as Dtim.properties.location     
-    if (System.getProperty("tim.properties.location") == null) {
-      System.setProperty("tim.properties.location", System.getProperty("user.home") + "/.c2mon.properties");
+    //set default c2mon.properties location if not specified as Dc2mon.properties.location     
+    if (System.getProperty("c2mon.properties.location") == null) {
+      System.setProperty("c2mon.properties.location", System.getProperty("user.home") + "/.c2mon.properties");
     }
-    logger.info("Using c2mon.properties file at: " + System.getProperty("tim.properties.location"));
+    logger.info("Using c2mon.properties file at: " + System.getProperty("c2mon.properties.location"));
     
     String confLocation = "file:" + System.getProperty("tim.home") + "/conf";
     
-    String[] coreProperties = new String[]{"file:" + System.getProperty("tim.properties.location"),
+    String[] coreProperties = new String[]{"file:" + System.getProperty("c2mon.properties.location"),
                                            confLocation + "/c2mon-jms.properties",
                                            confLocation + "/c2mon-datasource.properties",
                                            confLocation + "/c2mon-cache.properties"};
