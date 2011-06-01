@@ -31,6 +31,10 @@ C2MON_HOME=$C2MON_HOME/../
 #.c2mon.properties location
 C2MON_PROPERTIES=$C2MON_HOME/conf/.c2mon.properties
 
+C2MON_JMX_REMOTE_ACCESS=$C2MON_HOME/conf/.jmxremote.access
+C2MON_JMX_REMOTE_PASSWD=$C2MON_HOME/conf/.jmxremote.passwd
+
+
 #first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
 # make sure C2MON_PRIMARY_HOST is set correctly
 if [ -n $C2MON_PRIMARY_HOST ]; then 	
@@ -174,7 +178,7 @@ C2MON_ARGS=
 #property triggering cache clustering
 CACHE_MODE_PROPERTY="-Dcern.c2mon.cache.mode=multi"
 
-COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$HOME/.jmxremote.password -Dcom.sun.management.jmxremote.access.file=$HOME/.jmxremote.access -Dcom.sun.management.jmxremote.ssl=false"
+COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$C2MON_JMX_REMOTE_PASSWD -Dcom.sun.management.jmxremote.access.file=$C2MON_JMX_REMOTE_ACCESS -Dcom.sun.management.jmxremote.ssl=false"
 
 CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dtc.config=$TERRACOTTA_CONFIG $CACHE_MODE_PROPERTY"
 
