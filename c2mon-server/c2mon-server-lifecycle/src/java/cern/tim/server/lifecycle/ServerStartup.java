@@ -95,7 +95,7 @@ public final class ServerStartup {
     }
     logger.info("Using c2mon.properties file at: " + System.getProperty("c2mon.properties.location"));
     
-    String confLocation = "file:" + System.getProperty("tim.home") + "/conf";
+    String confLocation = "file:" + System.getProperty("c2mon.home") + "/conf";
     
     String[] coreProperties = new String[]{"file:" + System.getProperty("c2mon.properties.location"),
                                            confLocation + "/c2mon-jms.properties",
