@@ -26,12 +26,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>1.2.14</version>
-			</dependency>
-
 			<!--  tim2 shared libraries -->
 			<dependency>
 				<groupId>cern.tim2.tim2-shared</groupId>
@@ -71,6 +65,17 @@
 				<version>[1.0.0,2.0.0)</version>
 			</dependency>
 
+			<!-- Other dependecies -->
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.14</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-validator</artifactId>
+				<version>4.2.0.Beta2</version>
+			</dependency>
 			<!--  Gson: Java to Json conversion -->
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
