@@ -16,7 +16,7 @@
 #export Java for TC script also!
 
 # make sure JAVA_HOME is set correctly
-if [ -n $JAVA_HOME ]; then 	
+if [ -z $JAVA_HOME ]; then 	
    # use default if not
    export JAVA_HOME=/usr/java/jdk1.6.0_11
 fi
@@ -37,7 +37,7 @@ C2MON_JMX_REMOTE_PASSWD=$C2MON_HOME/conf/.jmxremote.passwd
 
 #first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
 # make sure C2MON_PRIMARY_HOST is set correctly
-if [ -n $C2MON_PRIMARY_HOST ]; then 	
+if [ -z $C2MON_PRIMARY_HOST ]; then 	
    # use default if not
    export C2MON_PRIMARY_HOST=cs-ccr-laserprod
 fi
