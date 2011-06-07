@@ -5,8 +5,8 @@ import cern.tim.server.cache.DataTagFacade;
 import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.cache.TimCache;
 import cern.tim.server.cache.loading.ConfigurableDAO;
+import cern.tim.server.common.tag.Tag;
 import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.common.tag.Tag;
 
 /**
  * Public methods in this class should perform the complete

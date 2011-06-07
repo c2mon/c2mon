@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.common.control.ControlTag;
 import cern.tim.server.common.rule.RuleTag;
-import cern.tim.shared.common.tag.Tag;
+import cern.tim.server.common.tag.Tag;
 
 /**
  * Gateway bean used to call the TagConfigHandler methods on the
