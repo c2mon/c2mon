@@ -32,6 +32,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
 
@@ -89,7 +90,7 @@ public class SupervisionMapperTest {
    */
   @Test
   public void testLogSupervision() {
-    SupervisionEvent event = new SupervisionEvent(ENTITY, ID, STATUS, DATE, MESSAGE);
+    SupervisionEvent event = new SupervisionEventImpl(ENTITY, ID, STATUS, DATE, MESSAGE);
     supervisionMapper.logSupervisionEvent(event);
     
     //check event was properly saved
