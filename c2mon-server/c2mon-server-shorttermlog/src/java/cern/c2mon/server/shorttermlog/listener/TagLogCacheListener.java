@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.shorttermlog.logger.BatchLogger;
 import cern.tim.server.cache.CacheRegistrationService;
-import cern.tim.shared.common.tag.Tag;
+import cern.tim.server.common.tag.Tag;
 import cern.tim.util.buffer.PullEvent;
 import cern.tim.util.buffer.PullException;
 import cern.tim.util.buffer.SynchroBufferListener;

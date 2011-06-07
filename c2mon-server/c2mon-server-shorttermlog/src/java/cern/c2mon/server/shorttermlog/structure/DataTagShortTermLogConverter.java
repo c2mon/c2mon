@@ -20,9 +20,9 @@
 
 package cern.c2mon.server.shorttermlog.structure;
 
+import cern.tim.server.common.tag.Tag;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagValueDictionary;
-import cern.tim.shared.common.tag.Tag;
 import cern.tim.shared.common.type.TypeConverter;
 
 /**
