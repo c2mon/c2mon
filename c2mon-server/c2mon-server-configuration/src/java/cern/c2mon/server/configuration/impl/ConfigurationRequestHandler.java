@@ -77,7 +77,7 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
     try {
       replyDestination = message.getJMSReplyTo();
     } catch (JMSException jmse) {
-      LOGGER.error("fromMessage() : Cannot extract ReplyTo from message.", jmse);
+      LOGGER.error("onMessage() : Cannot extract ReplyTo from message.", jmse);
       throw jmse;
     }
     if (replyDestination != null) {
@@ -89,7 +89,7 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
       }
       messageProducer.send(replyMessage);
     } else {
-      LOGGER.error("fromMessage(): JMSReplyTo destination is null - cannot send reply.");
+      LOGGER.error("onMessage(): JMSReplyTo destination is null - cannot send reply.");
       throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
     }    
   }
