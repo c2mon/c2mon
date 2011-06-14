@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+<!-- scan the package for Spring annotations -->
+<context:annotation-config/>
+<context:component-scan base-package="cern.c2mon.server.client"/>
+
+<bean id="clientActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+  <property name="brokerURL" value="${jms.broker.url}"/>
+  <property name="userName" value="${jms.client.user}"/>
+  <property name="password" value="${jms.client.password}"/>
+</bean>
+
+<!-- connection factory used for all connections to the server -->
+<bean id="clientPooledConnectionFactory" class="org.jencks.amqpool.PooledConnectionFactory">
+   <constructor-arg ref="clientActiveMQConnectionFactory"/>
+   <property name="maxConnections" value="${jms.client.connections.max}" />
+   <property name="maximumActive" value="${jms.client.sessions.max}"/>
+</bean>
+
+<!-- plugged into ActiveJmsSender -->
+<bean id="clientTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+<!--  <qualifier value="sourceUpdateJmsTemplate"/>-->
+  <property name="connectionFactory" ref="clientPooledConnectionFactory"/>
+</bean>
+
+
+<!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
+<bean name="clientTopicPublisher" class="cern.tim.util.jms.ActiveJmsSender">
+  <property name="jmsTemplate" ref="clientTopicPublisherJmsTemplate"></property>
+</bean>
+
+<bean id="tagRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+   <constructor-arg index="0" value="${jms.tag.destination}"/>
+</bean>
+
+<bean id="tagRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+      <!-- include exception listener here? -->    
+      <property name="connectionFactory" ref="clientPooledConnectionFactory"/>
+      <property name="destination" ref="tagRequestDestination"/>
+      <property name="messageListener" ref="tagRequestHandler" />
+      <property name="concurrentConsumers" value="1"/>
+      <property name="maxConcurrentConsumers" value="1"/>      
+      <property name="sessionTransacted" value="true"/>  
+      <property name="errorHandler" ref="tagRequestErrorHandler"/>
+  </bean>
+
+</beans>
