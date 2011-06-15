@@ -41,6 +41,14 @@
       <artifactId>tim2-server-alarm</artifactId>
     </dependency>
     <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-common</artifactId>
+    </dependency>
+    <dependency>
       <groupId>cern.tim2.tim2-shared</groupId>
       <artifactId>tim2-shared-client</artifactId>
     </dependency>
