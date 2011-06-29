@@ -2,8 +2,8 @@ package cern.c2mon.server.client.request;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -11,6 +11,7 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,15 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
-import cern.c2mon.shared.client.TransferTagRequest;
-import cern.c2mon.shared.client.TransferTagValue;
-import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
+import cern.c2mon.shared.client.request.ClientRequest;
+import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.tim.server.cache.TagFacadeGateway;
 import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.common.alarm.TagWithAlarms;
+import cern.tim.server.supervision.SupervisionFacade;
+import cern.tim.util.json.GsonFactory;
+
+import com.google.gson.Gson;
 
 /**
  * Handles tag requests received on JMS from C2MON clients.
@@ -35,11 +38,11 @@ import cern.tim.server.common.alarm.TagWithAlarms;
  * 
  * @author Matthias Braeger
  */
-@Service("tagRequestHandler")
-public class TagRequestHandler implements SessionAwareMessageListener<Message> {
+@Service("clientRequestHandler")
+public class ClientRequestHandler implements SessionAwareMessageListener<Message> {
 
   /** Private class logger */
-  private static final Logger LOG = Logger.getLogger(TagRequestHandler.class);
+  private static final Logger LOG = Logger.getLogger(ClientRequestHandler.class);
   
   /** Reference to the tag facade gateway to retrieve a tag copies with the associated alarms */
   private final TagFacadeGateway tagFacadeGateway;
@@ -47,30 +50,40 @@ public class TagRequestHandler implements SessionAwareMessageListener<Message> {
   /** Reference to the tag location service to check whether a tag exists */
   private final TagLocationService tagLocationService;
   
+  /** Reference to the supervision facade service for handling the supervision request */
+  private final SupervisionFacade supervisionFacade;
+  
+  /** Json message serializer/deserializer */
+  private static final Gson GSON = GsonFactory.createGson();
+  
   /**
    * Default Constructor
    * @param pTagLocationService Reference to the tag location service singleton
    * @param pTagFacadeGateway Reference to the tag facade gateway singleton
+   * @param pSupervisionFacade Reference to the supervision facade singelton
    */
   @Autowired
-  public TagRequestHandler(final TagLocationService pTagLocationService, final TagFacadeGateway pTagFacadeGateway) {
+  public ClientRequestHandler(final TagLocationService pTagLocationService, 
+                              final TagFacadeGateway pTagFacadeGateway,
+                              final SupervisionFacade pSupervisionFacade) {
     tagLocationService = pTagLocationService;
     tagFacadeGateway = pTagFacadeGateway;
+    supervisionFacade = pSupervisionFacade;
   }
   
   /**
-   * This method is called when a C2MON client is sending a <code>TransferTagRequest</code>
+   * This method is called when a C2MON client is sending a <code>ClientRequest</code>
    * to the server. The server retrieves the request Tag and associated alarms information
    * from the cache and sends them back through the reply topic
-   * @param message the JMS message which contains the Json <code>TransferTagRequest</code>
+   * @param message the JMS message which contains the Json <code>ClientRequest</code>
    * @param session The JMS session
    * @throws JMSException Is thrown, e.g. if the reply destination topic is not set.
-   * @see TransferTagRequest
+   * @see ClientRequest
    */
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
-    TransferTagRequest tagRequest = TagRequestMessageConverter.fromMessage(message);
-    Collection< ? extends TransferTagValue> response = handleTransferTagRequest(tagRequest);
+    ClientRequest clientRequest = ClientRequestMessageConverter.fromMessage(message);
+    Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest);
  
     // Extract reply topic
     Destination replyDestination = null;
@@ -84,17 +97,10 @@ public class TagRequestHandler implements SessionAwareMessageListener<Message> {
       MessageProducer messageProducer = session.createProducer(replyDestination);      
       TextMessage replyMessage = session.createTextMessage();
       
-      //TODO: Please call here for each result type is associated Gson instance!
-      switch (tagRequest.getResultType()) {
-        case TransferTag:
-          replyMessage.setText(TransferTagImpl.getGson().toJson(response));
-          break;
-        case TransferTagValue:
-        default:
-          replyMessage.setText(TransferTagValueImpl.getGson().toJson(response));
-      }
+      // Send response as  Json message
+      replyMessage.setText(GSON.toJson(response));
       if (LOG.isDebugEnabled()) {
-        LOG.debug("onMessage() : Sending TransferTagRequest response with " + response.size() + " tags to client.");
+        LOG.debug("onMessage() : Sending ClientRequest response with " + response.size() + " tags to client.");
       }
       messageProducer.send(replyMessage);
     } else {
@@ -107,13 +113,30 @@ public class TagRequestHandler implements SessionAwareMessageListener<Message> {
   /**
    * Inner method for handling the tag request. Therefore it has to get for all tag ids
    * mentioned in that request the tag and alarm referenses. 
-   * @param tagRequest The request
+   * @param clientRequest The request
    * @return The response that shall be transfered back to the C2MON client layer
    */
+  private Collection< ? extends ClientRequestResult> handleClientRequest(@Valid final ClientRequest clientRequest) {
+    switch (clientRequest.getRequestType()) {
+      case TAG_REQUEST:
+        return handleTagRequest(clientRequest);
+      case SUPERVISION_REQUEST:
+        return supervisionFacade.getAllSupervisionStates();
+      default:
+        LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
+        return Collections.emptyList();
+    } // end switch
+  }
+  
+  /**
+   * Inner method which handles the tag requests
+   * @param tagRequest The tag request sent from the flient
+   * @return Collection of 
+   */
   @SuppressWarnings("unchecked")
-  private Collection< ? extends TransferTagValue> handleTransferTagRequest(final TransferTagRequest tagRequest) {
-    final List transferTags = new ArrayList(tagRequest.getTagIds().size());
+  private Collection< ? extends ClientRequestResult> handleTagRequest(final ClientRequest tagRequest) {
     final Iterator<Long> iter = tagRequest.getTagIds().iterator();
+    final Collection transferTags = new ArrayList(tagRequest.getTagIds().size());
     
     while (iter.hasNext()) {
       final Long tagId = iter.next();
@@ -121,14 +144,15 @@ public class TagRequestHandler implements SessionAwareMessageListener<Message> {
         final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
         
         switch (tagRequest.getResultType()) {
-          case TransferTag:
+          case TRANSFER_TAG_LIST:
             transferTags.add(TransferObjectFactory.createTransferTag(tagWithAlarms));
             break;
-          case TransferTagValue:
+          case TRANSFER_TAG_VALUE_LIST:
             transferTags.add(TransferObjectFactory.createTransferTagValue(tagWithAlarms));
             break;
           default:
-            throw new MessageConversionException("Could not generate TransferTagRequestResponse message. Unknown enum ResultType!");
+            LOG.error("handleTagRequest() - Could not generate response message. Unknown enum ResultType "
+                + tagRequest.getResultType());
         }
       }
     } // end while

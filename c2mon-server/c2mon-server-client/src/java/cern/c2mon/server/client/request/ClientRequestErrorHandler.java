@@ -11,10 +11,10 @@ import org.springframework.util.ErrorHandler;
  * @author Matthias Braeger
  */
 @Service("tagRequestErrorHandler")
-public class TagRequestErrorHandler implements ErrorHandler {
+public class ClientRequestErrorHandler implements ErrorHandler {
 
   /** Log4j logger */
-  private static final Logger LOG = Logger.getLogger(TagRequestErrorHandler.class);
+  private static final Logger LOG = Logger.getLogger(ClientRequestErrorHandler.class);
   
   @Override
   public void handleError(final Throwable exception) {

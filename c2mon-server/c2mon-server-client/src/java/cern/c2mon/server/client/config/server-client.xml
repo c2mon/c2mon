@@ -42,7 +42,7 @@
       <!-- include exception listener here? -->    
       <property name="connectionFactory" ref="clientPooledConnectionFactory"/>
       <property name="destination" ref="tagRequestDestination"/>
-      <property name="messageListener" ref="tagRequestHandler" />
+      <property name="messageListener" ref="clientRequestHandler" />
       <property name="concurrentConsumers" value="1"/>
       <property name="maxConcurrentConsumers" value="1"/>      
       <property name="sessionTransacted" value="true"/>  

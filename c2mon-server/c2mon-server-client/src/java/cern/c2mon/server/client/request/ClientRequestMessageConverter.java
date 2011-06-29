@@ -7,8 +7,8 @@ import javax.jms.TextMessage;
 import org.apache.log4j.Logger;
 import org.springframework.jms.support.converter.MessageConversionException;
 
-import cern.c2mon.shared.client.TransferTagRequest;
-import cern.c2mon.shared.client.tag.TransferTagRequestImpl;
+import cern.c2mon.shared.client.request.ClientRequest;
+import cern.c2mon.shared.client.request.ClientRequestImpl;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -17,17 +17,17 @@ import com.google.gson.JsonSyntaxException;
  * message into a <code>TransferTagRequest</code> object.
  *
  * @author Matthias Braeger
- * @see TransferTagRequest
+ * @see ClientRequest
  */
-abstract class TagRequestMessageConverter {
+abstract class ClientRequestMessageConverter {
   
   /** Class logger */
-  private static final Logger LOG = Logger.getLogger(TagRequestMessageConverter.class);
+  private static final Logger LOG = Logger.getLogger(ClientRequestMessageConverter.class);
   
   /**
    * Hidden default constructor
    */
-  private TagRequestMessageConverter() {
+  private ClientRequestMessageConverter() {
     // Do nothing
   }
   
@@ -38,11 +38,11 @@ abstract class TagRequestMessageConverter {
    * @throws JMSException In case of problems when getting the text from the JMS text message
    * @throws MessageConversionException In case of problems while deserializing the JMS message
    */
-  public static final TransferTagRequest fromMessage(final Message message) throws JMSException, MessageConversionException {
+  public static final ClientRequest fromMessage(final Message message) throws JMSException, MessageConversionException {
     if (message instanceof TextMessage) {
       String json = ((TextMessage) message).getText();
       try {
-        return TransferTagRequestImpl.fromJson(json);
+        return ClientRequestImpl.fromJson(json);
       }
       catch (JsonSyntaxException jse) {
         StringBuffer str = new StringBuffer("fromMessage() : Unsupported JSON message (");
