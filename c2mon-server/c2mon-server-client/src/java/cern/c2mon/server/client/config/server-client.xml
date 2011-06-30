@@ -9,6 +9,12 @@
 <context:annotation-config/>
 <context:component-scan base-package="cern.c2mon.server.client"/>
 
+<!--
+
+Connection settings for client module
+
+-->
+
 <bean id="clientActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
   <property name="brokerURL" value="${jms.broker.url}"/>
   <property name="userName" value="${jms.client.user}"/>
@@ -22,31 +28,58 @@
    <property name="maximumActive" value="${jms.client.sessions.max}"/>
 </bean>
 
+<!-- 
+
+Publication to Tag updates
+
+ -->
+
 <!-- plugged into ActiveJmsSender -->
 <bean id="clientTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-<!--  <qualifier value="sourceUpdateJmsTemplate"/>-->
   <property name="connectionFactory" ref="clientPooledConnectionFactory"/>
 </bean>
-
 
 <!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
 <bean name="clientTopicPublisher" class="cern.tim.util.jms.ActiveJmsSender">
   <property name="jmsTemplate" ref="clientTopicPublisherJmsTemplate"></property>
 </bean>
 
-<bean id="tagRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
-   <constructor-arg index="0" value="${jms.tag.destination}"/>
+<!-- 
+
+Publication of Supervision events
+
+ -->
+
+<!-- JmsTemplate for sending supervision events; default destination set -->
+<bean id="supervisionTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+  <property name="connectionFactory" ref="clientPooledConnectionFactory"/>
+  <property name="defaultDestinationName" value="${jms.client.supervision.topic}"/>
 </bean>
 
-<bean id="tagRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+<!-- JmsSender for publishing to supervision events to the client  -->
+<bean name="supervisionTopicPublisher" class="cern.tim.util.jms.ActiveJmsSender">
+  <property name="jmsTemplate" ref="supervisionTopicPublisherJmsTemplate"></property>
+</bean>
+
+<!-- 
+
+Request from clients
+
+ -->
+
+<bean id="clientRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+   <constructor-arg index="0" value="${jms.client.request.queue}"/>
+</bean>
+
+<bean id="clientRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
       <!-- include exception listener here? -->    
       <property name="connectionFactory" ref="clientPooledConnectionFactory"/>
-      <property name="destination" ref="tagRequestDestination"/>
+      <property name="destination" ref="clientRequestDestination"/>
       <property name="messageListener" ref="clientRequestHandler" />
       <property name="concurrentConsumers" value="1"/>
-      <property name="maxConcurrentConsumers" value="1"/>      
+      <property name="maxConcurrentConsumers" value="5"/>      
       <property name="sessionTransacted" value="true"/>  
       <property name="errorHandler" ref="tagRequestErrorHandler"/>
-  </bean>
+</bean>
 
 </beans>

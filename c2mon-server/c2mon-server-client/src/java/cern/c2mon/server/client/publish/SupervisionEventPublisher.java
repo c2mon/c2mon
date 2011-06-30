@@ -5,6 +5,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.tim.server.supervision.SupervisionListener;
@@ -14,16 +15,14 @@ import cern.tim.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 
+@Service
 public class SupervisionEventPublisher implements SupervisionListener {
 
-  /** Bean providing for sending JMS messages and waiting for a response */
+  /** Bean providing for sending JMS messages and waiting for a response; default destination set */
   private final JmsSender jmsSender;
   
   /** Reference to the <code>SupervisionNotifier</code> for registering this listener */
   private final SupervisionNotifier supervisionNotifier;
-  
-  /** The JMS topic on which the supervision events shall be sent */
-  private String supervisionEventTopic = null;
   
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
@@ -52,17 +51,7 @@ public class SupervisionEventPublisher implements SupervisionListener {
 
 
   @Override
-  public void notifySupervisionEvent(@Valid final SupervisionEvent supervisionEvent) {
-    if (supervisionEventTopic != null) {
-      jmsSender.sendToTopic(GSON.toJson(supervisionEvent), supervisionEventTopic);
-    }
-  }
-  
-  
-  /**
-   * @param topic the supervisionEventTopic to set
-   */
-  public final void setSupervisionEventTopic(final String topic) {
-    this.supervisionEventTopic = topic;
+  public void notifySupervisionEvent(@Valid final SupervisionEvent supervisionEvent) { 
+    jmsSender.send(GSON.toJson(supervisionEvent));
   }
 }
