@@ -127,7 +127,7 @@ public class RuleTagConfigHandler extends TagConfigHandlerImpl<RuleTag> {
       } else if (!ruleTag.getAlarmIds().isEmpty()) {
         elementReport.setFailure("Unable to remove Rule with id " + id + " until the following alarms have been removed " + ruleTag.getAlarmIds().toString()); 
       } else {
-        commonTagFacade.invalidate(ruleTag.getId(), new DataTagQuality(DataTagQuality.REMOVED, "The Rule has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
+        //commonTagFacade.invalidate(ruleTag.getId(), new DataTagQuality(DataTagQuality.REMOVED, "The Rule has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
         configurableDAO.deleteItem(ruleTag.getId());
         tagCache.remove(ruleTag.getId());        
       }

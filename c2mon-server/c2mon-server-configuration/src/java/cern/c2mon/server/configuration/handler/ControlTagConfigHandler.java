@@ -127,7 +127,7 @@ public class ControlTagConfigHandler extends TagConfigHandlerImpl<ControlTag> {
       } else if (!controlTag.getAlarmIds().isEmpty()) {
         tagReport.setFailure("Unable to remove ControlTag with id " + id + " until the following alarms have been removed " + controlTag.getAlarmIds().toString()); 
       } else {
-        dataTagFacade.invalidate(controlTag, new DataTagQuality(DataTagQuality.REMOVED, "The ControlTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
+        //dataTagFacade.invalidate(controlTag, new DataTagQuality(DataTagQuality.REMOVED, "The ControlTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
         configurableDAO.deleteItem(controlTag.getId());
         tagCache.remove(controlTag.getId());
       }

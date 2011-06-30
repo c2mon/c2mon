@@ -78,6 +78,7 @@ import cern.tim.shared.common.NoSimpleValueParseException;
 import cern.tim.shared.common.datatag.DataTagAddress;
 import cern.tim.shared.common.datatag.DataTagConstants;
 import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.common.datatag.DataTagValueDictionary;
 import cern.tim.shared.common.datatag.address.HardwareAddressFactory;
 import cern.tim.shared.daq.config.Change;
@@ -231,7 +232,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     expectedObject.setLogged(false); //null allowed
 
-    expectedObject.setDataTagQuality(new DataTagQuality(DataTagQuality.UNINITIALISED, "ControlTag created"));
+    expectedObject.setDataTagQuality(new DataTagQualityImpl());
     
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
     
@@ -329,7 +330,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setMaxValue(new Float(23.3));
     expectedObject.setValueDictionary(new DataTagValueDictionary());
     expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND3")));
-    expectedObject.setDataTagQuality(new DataTagQuality(DataTagQuality.UNINITIALISED, "DataTag created"));
+    expectedObject.setDataTagQuality(new DataTagQualityImpl());
     //expectedObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis())); //should be set to creation time, so not null
     //expectedObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     //expectedObject.setRuleIdsString("1234,3456"); //NO: never loaded at reconfiguration of datatag, but only when a new rule is added

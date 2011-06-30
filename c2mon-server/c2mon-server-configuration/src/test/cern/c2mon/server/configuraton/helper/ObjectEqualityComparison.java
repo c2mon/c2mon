@@ -50,8 +50,7 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.isSimulated(), object.isSimulated());
     assertNotNull(object.getValueDictionary());
     //assertEquals(expectedObject.getValueDictionary().toXML(), object.getValueDictionary().toXML()); //compare XML of value dictionary
-    assertEquals(expectedObject.getDataTagQuality().getQualityCode(), object.getDataTagQuality().getQualityCode());//quality compare code and string
-    assertEquals(expectedObject.getDataTagQuality().getQualityDesc(), object.getDataTagQuality().getQualityDesc());    
+    assertEquals(expectedObject.getDataTagQuality(), object.getDataTagQuality());  
     assertEquals(expectedObject.getRuleIdsString(), object.getRuleIdsString());
     assertEquals(expectedObject.getRuleIds(), object.getRuleIds());
   }
