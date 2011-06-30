@@ -139,10 +139,10 @@
           <class-expression>cern.tim.shared.common.datatag.DataTagValueDictionary</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.configuration.handler.DataTagConfigHandler</class-expression>
+          <class-expression>cern.tim.server.configuration.handler.impl.DataTagConfigHandlerImpl</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.configuration.handler.TagConfigHandlerImpl</class-expression>
+          <class-expression>cern.tim.server.configuration.handler.impl.TagConfigHandlerImpl</class-expression>
         </include>
         <!-- RuleTag cache -->
         <include>
@@ -173,7 +173,7 @@
           <class-expression>cern.tim.server.rule.evaluation.RuleEvaluator</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.configuration.handler.RuleTagConfigHandler</class-expression>
+          <class-expression>cern.tim.server.configuration.handler.impl.RuleTagConfigHandlerImpl</class-expression>
         </include>              
         <!-- ControlTag cache -->
         <include>
@@ -183,7 +183,7 @@
           <class-expression>cern.tim.server.cache.control.ControlTagFacadeImpl</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.configuration.handler.ControlTagConfigHandler</class-expression>
+          <class-expression>cern.tim.server.configuration.handler.impl.ControlTagConfigHandlerImpl</class-expression>
         </include>              
         <!-- Process cache -->
         <include>
@@ -193,7 +193,7 @@
           <class-expression>cern.tim.server.cache.process.ProcessFacadeImpl</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.configuration.handler.ProcessConfigHandler</class-expression>
+          <class-expression>cern.tim.server.configuration.handler.impl.ProcessConfigHandlerImpl</class-expression>
         </include>
         <!-- Equipment cache -->
         <include>
@@ -206,10 +206,10 @@
           <class-expression>cern.tim.server.cache.equipment.EquipmentFacadeImpl</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.configuration.handler.AbstractEquipmentConfigHandler</class-expression>
+          <class-expression>cern.tim.server.configuration.handler.impl.AbstractEquipmentConfigHandler</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.configuration.handler.EquipmentConfigHandler</class-expression>
+          <class-expression>cern.tim.server.configuration.handler.impl.EquipmentConfigHandlerImpl</class-expression>
         </include>
         <!-- Subequipment cache -->
         <include>
@@ -219,7 +219,7 @@
           <class-expression>cern.tim.server.cache.subequipment.SubEquipmentFacadeImpl</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.configuration.handler.SubEquipmentConfigHandler</class-expression>
+          <class-expression>cern.tim.server.configuration.handler.impl.SubEquipmentConfigHandlerImpl</class-expression>
         </include>
         <!-- AliveTimer cache -->
         <include>
@@ -243,7 +243,7 @@
           <class-expression>cern.tim.server.cache.alarm.AlarmFacadeImpl</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.configuration.handler.AlarmConfigHandler</class-expression>
+          <class-expression>cern.tim.server.configuration.handler.impl.AlarmConfigHandlerImpl</class-expression>
         </include>
         <include>
           <class-expression>ch.cern.tim.shared.alarm.ValueAlarmCondition</class-expression>
