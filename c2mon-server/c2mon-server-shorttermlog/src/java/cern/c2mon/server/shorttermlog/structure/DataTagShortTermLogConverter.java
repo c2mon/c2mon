@@ -20,10 +20,13 @@
 
 package cern.c2mon.server.shorttermlog.structure;
 
+import com.google.gson.Gson;
+
 import cern.tim.server.common.tag.Tag;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagValueDictionary;
 import cern.tim.shared.common.type.TypeConverter;
+import cern.tim.util.json.GsonFactory;
 
 /**
  *This class is in charge of all objects transformations that may involved the
@@ -41,6 +44,11 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
     
     /** The index to which the text will be significative */
     private static final int SPLIT_INDEX = 99;
+    
+    /**
+     * Gson object used for converting DataTagQuality to String.
+     */
+    private Gson gson = GsonFactory.createGson();
     
     /**
      * Private constructor to prevent the class from being instantiated
@@ -94,15 +102,15 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
      *            Description of the code number
      * @return A new DataTagQuality object
      */
-    private static DataTagQuality toQuality(final short code, final String desc) {
-        DataTagQuality dtQuality = new DataTagQuality();
-        if (code == DataTagQuality.OK) {
-            dtQuality = new DataTagQuality(DataTagQuality.OK, "OK");
-        } else {
-            dtQuality = new DataTagQuality(code, desc);
-        }
-        return dtQuality;
-    }
+//    private static DataTagQuality toQuality(final short code, final String desc) {
+//        DataTagQuality dtQuality = new DataTagQuality();
+//        if (code == DataTagQuality.OK) {
+//            dtQuality = new DataTagQuality(DataTagQuality.OK, "OK");
+//        } else {
+//            dtQuality = new DataTagQuality(code, desc);
+//        }
+//        return dtQuality;
+//    }
 
     /**
      * Creates a new object whose type is set up based in the parameters
@@ -136,24 +144,24 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
      *            The dataTag value object
      * @return A complete description for the dataTag
      */
-    private static String toValueDescription(final DataTagValueDictionary dtDictionary,
-            final TagShortTermLog dtShortTerm, final Object dtValue) {
-        String valueDescription = "";
-        if (dtShortTerm.getTagQualityCode() == DataTagQuality.OK) {
-            if (dtShortTerm.getTagName() != null) {
-                valueDescription = dtShortTerm.getTagQualityDesc(); 
-            } else {
-                valueDescription = "";
-            }
-        }
-        if (dtValue != null) {
-            if (dtDictionary != null && (dtDictionary.getDescription(dtValue) != null)) {
-                valueDescription = valueDescription + " "
-                        + dtDictionary.getDescription(dtValue);
-            }
-        }
-        return valueDescription;
-    }
+//    private static String toValueDescription(final DataTagValueDictionary dtDictionary,
+//            final TagShortTermLog dtShortTerm, final Object dtValue) {
+//        String valueDescription = "";
+//        if (dtShortTerm.getTagQualityCode() == DataTagQuality.OK) {
+//            if (dtShortTerm.getTagName() != null) {
+//                valueDescription = dtShortTerm.getTagQualityDesc(); 
+//            } else {
+//                valueDescription = "";
+//            }
+//        }
+//        if (dtValue != null) {
+//            if (dtDictionary != null && (dtDictionary.getDescription(dtValue) != null)) {
+//                valueDescription = valueDescription + " "
+//                        + dtDictionary.getDescription(dtValue);
+//            }
+//        }
+//        return valueDescription;
+//    }
 
     @Override
     public Loggable convertToLogged(Tag tag) {
@@ -169,9 +177,8 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
       }        
       dtSTLog.setTagDataType(tag.getDataType());
       dtSTLog.setTagTimestamp(tag.getTimestamp());
-      dtSTLog.setTagQualityCode(tag.getDataTagQuality().getQualityCode());
-      dtSTLog.setTagQualityDesc(tag.getDataTagQuality().getQualityDesc());
-      
+      dtSTLog.setTagQualityCode(0); //all set to 0 now; TODO remove column from DB at some point
+      dtSTLog.setTagQualityDesc(gson.toJson(tag.getDataTagQuality().getInvalidQualityStates()));      
       if (dtSTLog.getTagQualityDesc() != null && dtSTLog.getTagQualityDesc().length() > MAX_LENGTH) {
           dtSTLog.setTagQualityDesc(dtSTLog.getTagQualityDesc().substring(0, SPLIT_INDEX));
       }
