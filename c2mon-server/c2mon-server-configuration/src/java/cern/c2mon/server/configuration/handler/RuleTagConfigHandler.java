@@ -18,122 +18,40 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler;
 
-import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.Properties;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import cern.tim.server.cache.RuleTagCache;
-import cern.tim.server.cache.RuleTagFacade;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.loading.RuleTagLoaderDAO;
-import cern.tim.server.common.rule.RuleTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.common.datatag.DataTagQuality;
 
 /**
- * Class managing the reconfiguration action on RuleTags.
- * The update and create methods should throw exceptions
- * which will be caught by the ConfigurationLoader class
- * and entered into the report.
- * 
- * <p>The remove method may be called from the Process 
- * remove method, in which case the sub-report can be
- * filled in if necessary.
+ * Bean managing configuration updates to C2MON RuleTags.
  * 
  * @author Mark Brightwell
  *
  */
-@Service
-public class RuleTagConfigHandler extends TagConfigHandlerImpl<RuleTag> {
-  
-  /**
-   * Circular dependency between RuleTagConfigHandler
-   * and TagConfigGateway, so autowire field.
-   */
-  @Autowired
-  private TagConfigGateway tagConfigGateway;
+public interface RuleTagConfigHandler {
 
-  @Autowired
-  public RuleTagConfigHandler(RuleTagCache ruleTagCache,
-      RuleTagFacade ruleTagFacade, RuleTagLoaderDAO ruleTagLoaderDAO, TagLocationService tagLocationService) {
-    super(ruleTagLoaderDAO, ruleTagFacade, ruleTagCache, tagLocationService);              
-  }
-  
   /**
-   * Creates a rule on existing tags. 
+   * Creates a RuleTag in the C2MON server.
    * 
-   * <p>The DAQ does not need informing of this change (so no return
-   * type as for DataTags.
-   * 
-   * @param element the details of the new object
-   * @throws IllegalAccessException 
+   * @param element contains details of the Tag
+   * @throws IllegalAccessException
    */
-  public void createRuleTag(ConfigurationElement element) throws IllegalAccessException {
-    checkId(element.getEntityId());
-    RuleTag ruleTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-    Collection<Long> tagIds = ruleTag.getRuleInputTagIds();
-    for (Long tagId : tagIds) {      
-      tagConfigGateway.addRuleToTag(tagId, ruleTag.getId()); 
-    }
-    configurableDAO.insert(ruleTag);
-    tagCache.putQuiet(ruleTag);        
-  }
-  
+  void createRuleTag(ConfigurationElement element) throws IllegalAccessException;
+
   /**
-   * Takes all the necessary actions when updating
-   * the configuration of a rule tag (updating the cache
-   * object and the database).
-   * 
-   * @param id the id of the rule that is being reconfigured
-   * @param properties the properties of fields that have changed
-   * @throws IllegalAccessException 
+   * Updates a RuleTag in the C2MON server.
+   * @param id the id of the Tag to update
+   * @param elementProperties details of the fields to modify  
    */
-  public void updateRuleTag(Long id, Properties properties) throws IllegalAccessException {  
-    RuleTag ruleTag = tagCache.get(id);
-    ruleTag.getWriteLock().lock();
-    try {
-      Collection<Long> oldTagIds = null;
-      //first record the old tag Ids before reconfiguring
-      if (properties.containsKey("ruleText")) {
-         oldTagIds = ruleTag.getRuleInputTagIds();
-      }
-      configurableDAO.updateConfig(ruleTag);
-      commonTagFacade.updateConfig(ruleTag, properties);      
-      //if successful so far, adjust associated Tag (remove all old, add all new)
-      if (oldTagIds != null) {
-        for (Long oldTagId : oldTagIds) {
-          tagConfigGateway.removeRuleFromTag(oldTagId, ruleTag.getId());
-        }
-        for (Long newTagId : ruleTag.getRuleInputTagIds()) {
-          tagConfigGateway.addRuleToTag(newTagId, ruleTag.getId());    
-        }
-      }
-    } finally {
-      ruleTag.getWriteLock().unlock();      
-    }
-    
-  }
-  
-  public void removeRuleTag(Long id, ConfigurationElementReport elementReport) {
-    RuleTag ruleTag = tagCache.get(id);
-    ruleTag.getWriteLock().lock();
-    try {     
-      if (!ruleTag.getRuleIds().isEmpty()) {
-        elementReport.setFailure("Unable to remove Rule with id " + id + " until the following rules have been removed " + ruleTag.getRuleIds().toString());      
-      } else if (!ruleTag.getAlarmIds().isEmpty()) {
-        elementReport.setFailure("Unable to remove Rule with id " + id + " until the following alarms have been removed " + ruleTag.getAlarmIds().toString()); 
-      } else {
-        //commonTagFacade.invalidate(ruleTag.getId(), new DataTagQuality(DataTagQuality.REMOVED, "The Rule has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
-        configurableDAO.deleteItem(ruleTag.getId());
-        tagCache.remove(ruleTag.getId());        
-      }
-    } finally {
-      ruleTag.getWriteLock().unlock();
-    }   
-  }
-     
+  void updateRuleTag(Long id, Properties elementProperties) throws IllegalAccessException;
+
+  /**
+   * Removes a ruleTag from the C2MON server.
+   * @param id the id of the Tag to remove
+   * @param tagReport the report for this event; 
+   *         is passed as parameter so cascaded action can attach subreports
+   */
+  void removeRuleTag(Long id, ConfigurationElementReport tagReport);
+
 }

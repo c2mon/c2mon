@@ -16,17 +16,19 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.server.configuration.handler;
+package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.springframework.transaction.UnexpectedRollbackException;
+
+import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.AliveTimerCache;
-import cern.tim.server.cache.AliveTimerFacade;
 import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.CommFaultTagFacade;
+import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.TimCache;
 import cern.tim.server.cache.equipment.CommonEquipmentFacade;
 import cern.tim.server.cache.loading.ConfigurableDAO;
@@ -71,12 +73,17 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
   /**
    * Facade to alive timer.
    */
-  private AliveTimerFacade aliveTimerFacade;
+  private AliveTimerCache aliveTimerCache;
   
   /**
    * Facade to CommFaultTag.
    */
-  private CommFaultTagFacade commFaultTagFacade;
+  private CommFaultTagCache commFaultTagCache;
+  
+  /**
+   * Reference to process cache, needed for cleaning on configuration errors.
+   */
+  private ProcessCache processCache;
   
   /**
    * Constructor.
@@ -84,21 +91,21 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    * @param commonEquipmentFacade the Facade bean for the (Sub)Equipment
    * @param abstractEquipmentCache the Cache bean for the (Sub)Equipment
    * @param configurableDAO the DAO for the (Sub)Equipment
-   * @param aliveTimerFacade the AliveTimer facade bean
-   * @param commFaultTagFacade
+   * @param commFaultTagCache ref to cache 
+   * @param aliveTimerCache ref to cache
    */
-  public AbstractEquipmentConfigHandler(
+  protected AbstractEquipmentConfigHandler(
       final ControlTagConfigHandler controlTagConfigHandler,     
       final CommonEquipmentFacade<T> commonEquipmentFacade,
-      TimCache<T> abstractEquipmentCache, ConfigurableDAO<T> configurableDAO,
-      AliveTimerFacade aliveTimerFacade, CommFaultTagFacade commFaultTagFacade) {
+      final TimCache<T> abstractEquipmentCache, final ConfigurableDAO<T> configurableDAO,
+      final AliveTimerCache aliveTimerCache, final CommFaultTagCache commFaultTagCache) {
     super();
     this.controlTagConfigHandler = controlTagConfigHandler;
     this.commonEquipmentFacade = commonEquipmentFacade;
     this.abstractEquipmentCache = abstractEquipmentCache;
     this.configurableDAO = configurableDAO;
-    this.aliveTimerFacade = aliveTimerFacade;
-    this.commFaultTagFacade = commFaultTagFacade;
+    this.aliveTimerCache = aliveTimerCache;
+    this.commFaultTagCache = commFaultTagCache;   
   }
   
   /**
@@ -108,18 +115,35 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    * @return the generated AbstractEquipment object
    * @throws IllegalAccessException should not be thrown here (inherited at interface from Tag creation).
    */
-  public T createAbstractEquipment(final ConfigurationElement element) throws IllegalAccessException {
+  protected T createAbstractEquipment(final ConfigurationElement element) throws IllegalAccessException {
     T abstractEquipment = commonEquipmentFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
     configurableDAO.insert(abstractEquipment);
+    
+    //clear alive and commfault caches
+    //(synch ok as locked equipment so no changes to these ids)
+    if (abstractEquipment.getAliveTagId() != null) {
+      aliveTimerCache.remove(abstractEquipment.getAliveTagId());
+    }
+    if (abstractEquipment.getCommFaultTagId() != null) {
+      commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
+    }
+       
     //TODO necessary to use DB loading or not?? to check...
-    abstractEquipmentCache.putQuiet(abstractEquipment);    
-    aliveTimerFacade.generateFromEquipment(abstractEquipment); //TODO same in process...
-    commFaultTagFacade.generateFromEquipment(abstractEquipment);
+    //removed as now rely on automatic cache loading from DB
+//    abstractEquipmentCache.putQuiet(abstractEquipment);    
+//    aliveTimerFacade.generateFromEquipment(abstractEquipment); 
+//    commFaultTagFacade.generateFromEquipment(abstractEquipment);
     return abstractEquipment;
   }
 
   /**
    * Can be called directly for both Equipment and SubEquipment configuration updates.
+   * 
+   * <p>Updates made to Equipments are done programmatically both in cache and DB, to
+   * avoid reloading the Equipment from the DB at runtime, which can be time-consuming
+   * if many tags are declared.
+   * 
+   * <p>Should be called within the AbstractEquipment write lock.
    * 
    * <p>Should not throw the {@link IllegalAccessException} (only Tags can).
    * @param equipmentId of the (Sub)Equipment
@@ -127,30 +151,35 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    * @return ProcessChange used only for Equipment reconfiguration (not SubEquipment)
    * @throws IllegalAccessException not thrown for Equipment
    */
-  public List<ProcessChange> updateAbstractEquipment(final Long equipmentId, final Properties properties) 
+  protected List<ProcessChange> updateAbstractEquipment(final T abstractEquipment, final Properties properties) 
                                     throws IllegalAccessException {
-    //TODO or not todo: warning: can still update commfault, alive and state tag id to non-existent tags (id is NOT checked and exceptions will be thrown!) 
+    //TODO or not todo: warning: can still update commfault, alive and state tag id to non-existent tags (id is NOT checked and exceptions will be thrown!)
+    
     //do not allow id changes! (they would not be applied in any case)
     if (properties.containsKey("id")) {
       throw new ConfigurationException(ConfigurationException.UNDEFINED, 
           "Attempting to change the (sub)equipment id - this is not currently supported!");
     }    
-    T abstractEquipment = abstractEquipmentCache.get(equipmentId);
+  
     EquipmentConfigurationUpdate equipmentUpdate;
-    try {
-      abstractEquipment.getWriteLock().lock();
+    try {    
       equipmentUpdate = (EquipmentConfigurationUpdate) commonEquipmentFacade.updateConfig(abstractEquipment, properties);
       configurableDAO.updateConfig(abstractEquipment);      
-    } finally {
-      abstractEquipment.getWriteLock().unlock();     
-    }   
-    Long processId = commonEquipmentFacade.getProcessForAbstractEquipment(equipmentId).getId();
+    } catch (Exception ex) {
+      //if failure, remove equipment from cache; also clean Process, AliveTimer and CommFaultTag caches
+      abstractEquipmentCache.remove(abstractEquipment.getId());      
+      throw new UnexpectedRollbackException("Unexpected exception caught when updating an (Sub)Equipment configuration"
+          + " - rolling back the DB changes and cleaning the cache", ex);
+    }
+    
+    //create change event for DAQ layer
+    Long processId = commonEquipmentFacade.getProcessForAbstractEquipment(abstractEquipment.getId()).getId();
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(commonEquipmentFacade.getProcessForAbstractEquipment(equipmentId).getId(), equipmentUpdate));
+    processChanges.add(new ProcessChange(commonEquipmentFacade.getProcessForAbstractEquipment(abstractEquipment.getId()).getId(), equipmentUpdate));
     //if alive tags associated to equipment are changed and have an address, 
     //  inform DAQ also (use same changeId so these become sub-reports of the correct report)
     if (equipmentUpdate.getAliveTagId() != null) {
-      ProcessChange processChange = controlTagConfigHandler.getCreateEvent(equipmentUpdate.getChangeId(), abstractEquipment.getAliveTagId(), equipmentId, processId);
+      ProcessChange processChange = controlTagConfigHandler.getCreateEvent(equipmentUpdate.getChangeId(), abstractEquipment.getAliveTagId(), abstractEquipment.getId(), processId);
       //null if this alive does not have an Address -> is not in list of DataTags on DAQ
       if (processChange != null) {
         processChanges.add(processChange);

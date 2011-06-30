@@ -1,4 +1,6 @@
-package cern.c2mon.server.configuration.handler;
+package cern.c2mon.server.configuration.handler.impl;
+
+import cern.tim.server.common.tag.Tag;
 
 /**
  * Common interface of the ConfigHandlers that
@@ -6,9 +8,9 @@ package cern.c2mon.server.configuration.handler;
  * 
  * @author Mark Brightwell
  *
- * @param <T>
+ * @param <T> cache object type
  */
-public interface TagConfigHandler<T> {
+public interface TagConfigHandler<T extends Tag> {
 
   /**
    * Adds this Rule to the list of Rules that
@@ -28,6 +30,13 @@ public interface TagConfigHandler<T> {
    */
   void removeRuleFromTag(Long tagId, Long ruleId);
   
+  /**
+   * Removes the Alarm from the list of alarms
+   * attached to the Tag.
+   * 
+   * @param tagId the Tag id
+   * @param alarmId the id of the alarm to remove
+   */
   void removeAlarmFromTag(Long tagId, Long alarmId);
 
   /**

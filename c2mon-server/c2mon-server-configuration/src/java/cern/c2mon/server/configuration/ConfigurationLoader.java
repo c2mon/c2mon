@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration;
 
+import cern.tim.shared.client.configuration.ConfigurationException;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
@@ -28,6 +29,7 @@ import cern.tim.shared.client.configuration.ConfigurationReport;
  * is through the ${tim.config} JMS queue. Clients can send reconfiguration
  * requests directly to this queue (the ConfigurationLoader is then called
  * internally).
+ * 
  * @author Mark Brightwell
  *
  */
@@ -42,6 +44,12 @@ public interface ConfigurationLoader {
    * <p>The returned report is made up of reports for each individual configuration
    * element, including reports returned by the DAQ.
    * 
+   * <p>Configuration are made up of a number of configuration elements. Configuration
+   * elements are either applied successfully on the server or not at all. However,
+   * if a configuration element fails on the DAQ layer for some reason, but applied
+   * successfully on the server, the change will be committed on the server (DAQ
+   * may need a restart).
+   * 
    * <p>TODO NOT DECIDED YET: If a reconfiguration of a point, rule or alarm fails for 
    * some reason, the element mode is switched to UNCONFIGURED and a new configuration 
    * should be applied. Notice that if an equipment or process reconfiguration fails, 
@@ -50,6 +58,7 @@ public interface ConfigurationLoader {
    * @param configId the id of the configuration to apply to the server
    * @param sessionId authorization to run the config loader
    * @return a report with details of the success/failure of the reconfiguration
+   * @throws ConfigurationException if the configuration fails (report is attached)
    */
   ConfigurationReport applyConfiguration(int configId, String sessionId);
   

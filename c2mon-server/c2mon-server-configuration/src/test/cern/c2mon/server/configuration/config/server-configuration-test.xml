@@ -25,16 +25,16 @@
   <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor"/>
   <bean id="configurationDAO" class="cern.c2mon.server.configuration.mybatis.ConfigurationDAOImpl"/>
     
-  <bean id="dataTagConfigHandler" class="cern.c2mon.server.configuration.handler.DataTagConfigHandler" autowire="constructor"/>
-  <bean id="controlTagConfigHandler" class="cern.c2mon.server.configuration.handler.ControlTagConfigHandler" autowire="constructor"/>
-  <bean id="commandTagConfigHandler" class="cern.c2mon.server.configuration.handler.CommandTagConfigHandler"/>
-  <bean id="processConfigHandler" class="cern.c2mon.server.configuration.handler.ProcessConfigHandler" autowire="constructor"/>
-  <bean id="alarmConfigHandler" class="cern.c2mon.server.configuration.handler.AlarmConfigHandler" autowire="constructor"/>
-  <bean id="subEquipmentConfigHandler" class="cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler" autowire="constructor"/>
-  <bean id="equipmentConfigHandler" class="cern.c2mon.server.configuration.handler.EquipmentConfigHandler" autowire="constructor"/>
-  <bean id="ruleTagConfigHandler" class="cern.c2mon.server.configuration.handler.RuleTagConfigHandler" autowire="constructor"/> 
+  <bean id="dataTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DataTagConfigHandlerImpl" autowire="constructor"/>
+  <bean id="controlTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.ControlTagConfigHandlerImpl" autowire="constructor"/>
+  <bean id="commandTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler"/>
+  <bean id="processConfigHandler" class="cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl" autowire="constructor"/>
+  <bean id="alarmConfigHandler" class="cern.c2mon.server.configuration.handler.impl.AlarmConfigHandlerImpl" autowire="constructor"/>
+  <bean id="subEquipmentConfigHandler" class="cern.c2mon.server.configuration.handler.impl.SubEquipmentConfigHandlerImpl" autowire="constructor"/>
+  <bean id="equipmentConfigHandler" class="cern.c2mon.server.configuration.handler.impl.EquipmentConfigHandlerImpl" autowire="constructor"/>
+  <bean id="ruleTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.RuleTagConfigHandlerImpl" autowire="constructor"/> 
   
-  <bean id="tagConfigGateway" class="cern.c2mon.server.configuration.handler.TagConfigGateway" autowire="constructor"/> 
+  <bean id="tagConfigGateway" class="cern.c2mon.server.configuration.handler.impl.TagConfigGateway" autowire="constructor"/> 
   
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="locations" >

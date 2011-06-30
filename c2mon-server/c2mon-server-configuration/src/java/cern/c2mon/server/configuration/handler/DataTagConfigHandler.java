@@ -18,176 +18,48 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.DataTagCache;
-import cern.tim.server.cache.DataTagFacade;
-import cern.tim.server.cache.EquipmentFacade;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.cache.loading.DataTagLoaderDAO;
-import cern.tim.server.common.datatag.DataTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.daq.config.Change;
-import cern.tim.shared.daq.config.DataTagAdd;
-import cern.tim.shared.daq.config.DataTagRemove;
 
 /**
- * Bean managing DataTag (re-)configuations in the server (create, update and remove).
- * 
- * <p>Currently all alarms and rules must be manually removed from any tag before it can be removed.
- * This also applied when removing an Equipment or Process: this will only succeed if all alarms
- * and rules have first been removed.
+ * Bean managing configuration updates to C2MON DataTags.
  * 
  * @author Mark Brightwell
  *
  */
-@Service
-public class DataTagConfigHandler extends TagConfigHandlerImpl<DataTag> {
-  
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = Logger.getLogger(DataTagConfigHandler.class);  
-  
-  /**
-   * Reference to the equipment facade.
-   */
-  private EquipmentFacade equipmentFacade;  
-  
-  /**
-   * Autowired constructor.
-   * @param dataTagFacade reference to facade bean
-   * @param dataTagLoaderDAO reference to DAO
-   * @param dataTagCache reference to cache
-   * @param equipmentFacade reference to equipment facade
-   * @param tagLocationService reference to tag location bean
-   */
-  @Autowired
-  public DataTagConfigHandler(final DataTagFacade dataTagFacade,
-      final DataTagLoaderDAO dataTagLoaderDAO, final DataTagCache dataTagCache,
-      final EquipmentFacade equipmentFacade, final TagLocationService tagLocationService) {
-    super(dataTagLoaderDAO, dataTagFacade, dataTagCache, tagLocationService);           
-    this.equipmentFacade = equipmentFacade;    
-  }
+public interface DataTagConfigHandler {
 
   /**
-   * Create the cache objects, puts it in the DB, loads it into the cache, and returns the 
-   * change event for sending to the DAQ.
-   * @param element the server configuration element
-   * @return the change event to send to the DAQ
-   * @throws IllegalAccessException if problem in creating HardwareAddress
+   * Creates a DataTag in the C2MON server.
+   * 
+   * @param element contains details of the Tag
+   * @return list of creation events to send to the DAQ layer
+   * @throws IllegalAccessException
    */
-  public List<ProcessChange> createDataTag(final ConfigurationElement element) throws IllegalAccessException {    
-    checkId(element.getEntityId());
-    DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());   
-    configurableDAO.insert(dataTag);
-    tagCache.putQuiet(dataTag);
-    equipmentFacade.addTagToEquipment(dataTag.getEquipmentId(), dataTag.getId());
-    DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), 
-                                    ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));
-    ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagAdd));    
-    return processChanges;    
-  }
+  List<ProcessChange> createDataTag(ConfigurationElement element) throws IllegalAccessException;
   
   /**
-   * Updates the DataTag configuration in the cache and
-   * database. 
-   * 
-   * <p>Throws an exception if an attempt is made to move
-   * the tag to another Equipment: in this case the tag
-   * should be removed and recreated.
-   * @param id the id of the tag
-   * @param properties the properties containing the changes
-   * @return an change event if action is necessary by the DAQ; otherwise null
+   * Updates a DataTag in the C2MON server.
+   * @param id the id of the Tag to update
+   * @param elementProperties details of the fields to modify
+   * @return a list of changes to send to the DAQ layer
    */
-  public List<ProcessChange> updateDataTag(final Long id, final Properties properties) {
-    //reject if trying to change equipment it is attached to - not currently allowed
-    if (properties.containsKey("equipmentId")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
-          "Attempting to change the equipment to which a tag is attached - this is not currently supported!");
-    }
-    Change dataTagUpdate = null;
-    DataTag dataTag = tagCache.get(id);
-    try {
-      dataTag.getWriteLock().lock();
-      dataTagUpdate = commonTagFacade.updateConfig(dataTag, properties); //TODO returns DAQ config report or null  
-      configurableDAO.updateConfig(dataTag);      
-    } catch (Exception ex) {
-      //((DataTagFacade) commonTagFacade).setStatus(dataTag, Status.RECONFIGURATION_ERROR);
-      LOGGER.error("Exception caught while updating a datatag.", ex);
-      throw new RuntimeException(ex);
-    } finally {
-      dataTag.getWriteLock().unlock();
-    }       
-    ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagUpdate));
-    return processChanges;
-  }
+  List<ProcessChange> updateDataTag(Long id, Properties elementProperties);
   
   /**
-   * If the tag has no associated alarms or rules, it is removed
-   * from the database and cache. The reference to this tag in the
-   * Equipment is also removed.
-   * 
-   * @param id the id of the DataTag to remove
-   * @param elementReport is updated if removing is not possible
-   * @return the DAQ change event, used if called directly from ConfigurationLoader 
-   *      (not as consequence of Process removal for instance); IMPORTANT: config
-   *      id of event still needs setting
+   * Removes a DataTag from the C2MON server.
+   * @param id the id of the Tag to remove
+   * @param tagReport the report for this event; 
+   *         is passed as parameter so cascaded action can attach subreports
+   * @return a list of changes to send to the DAQ layer
    */
-  public List<ProcessChange> removeDataTag(final Long id, final ConfigurationElementReport elementReport) {  
-    DataTag dataTag = tagCache.get(id);
-    dataTag.getWriteLock().lock();
-    try {     
-      if (!dataTag.getRuleIds().isEmpty()) {
-        String message = "Unable to remove DataTag with id " + id + " until the following rules have been removed " + dataTag.getRuleIds().toString(); 
-        elementReport.setFailure(message);
-        throw new ConfigurationException(ConfigurationException.UNDEFINED, message);
-      } else if (!dataTag.getAlarmIds().isEmpty()) {
-        String message = "Unable to remove DataTag with id " + id + " until the following alarms have been removed " + dataTag.getAlarmIds().toString();
-        elementReport.setFailure(message); 
-        throw new ConfigurationException(ConfigurationException.UNDEFINED, message);
-      } else {
-        //not possible below as removed from the cache by that point!!!
-        //((DataTagFacade) commonTagFacade).invalidate(dataTag, new DataTagQuality(DataTagQuality.REMOVED, "The DataTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
-        configurableDAO.deleteItem(dataTag.getId());
-        tagCache.remove(dataTag.getId());        
-      }
-      dataTag.getWriteLock().unlock();
-      //outside above lock as locks equipment (lock hierarchy: never lock equipment after tag)
-      try {
-        equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
-      } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.warn("Unable to locate Equipment with id " + dataTag.getEquipmentId() + "in the cache, when attempting to remove a Tag reference from it.");
-      }      
-    } catch (Exception ex) {
-      //commonTagFacade.setStatus(dataTag, Status.RECONFIGURATION_ERROR);
-      elementReport.setFailure("Exception caught while removing datatag", ex);
-      LOGGER.error("Exception caught while removing datatag with id " + id, ex);
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, ex);      
-    } finally {
-      if (dataTag.getWriteLock().isHeldByCurrentThread()) {
-        dataTag.getWriteLock().unlock();
-      }      
-    }     
-    DataTagRemove removeEvent = new DataTagRemove();  
-    removeEvent.setDataTagId(id);
-    removeEvent.setEquipmentId(dataTag.getEquipmentId());
-    ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), removeEvent));
-    return processChanges;
-  }
+  List<ProcessChange> removeDataTag(Long id, ConfigurationElementReport tagReport);
+
+  
   
   
 }

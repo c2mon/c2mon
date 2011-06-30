@@ -1,3 +1,7 @@
+DELETE FROM timconfigval;
+DELETE FROM timconfigelt;
+DELETE FROM timconfig;
+
 -- test data for configuration module junit tests
 
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
@@ -161,19 +165,19 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (12,12,'REMOVE','RuleTag','50100');
   
---create equipment (uses TESTHANDLER03 control tags and Process for simplicity)
+--create equipment (uses available control tags and TESTHANDLER3 Process for simplicity)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (13,'create equipment', 'create equipment 110', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (13,13,'CREATE','Equipment','110');
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'address','serverHostName=VGTCVENTTEST');
-insert into timconfigval (seqid, elementfield, elementvalue) values (13,'stateTagId','1222');
+insert into timconfigval (seqid, elementfield, elementvalue) values (13,'stateTagId','1250');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'processId','50');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'description','test description');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'handlerClass','ch.cern.tim.driver.');
 insert into timconfigval (seqid, elementfield, elementvalue) values (13,'name','E_CONFIG_TEST');
-insert into timconfigval (seqid, elementfield, elementvalue) values (13,'commFaultTagId','1223');
+insert into timconfigval (seqid, elementfield, elementvalue) values (13,'commFaultTagId','1252');
 
 --update equipment (contains 2 elts in config: create controltag and update equipment)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
@@ -240,10 +244,10 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (19,19,'CREATE','SubEquipment','200');
   
-insert into timconfigval (seqid, elementfield, elementvalue) values (19,'stateTagId','1230');
-insert into timconfigval (seqid, elementfield, elementvalue) values (19,'aliveTagId','1231');
+insert into timconfigval (seqid, elementfield, elementvalue) values (19,'stateTagId','1250');
+insert into timconfigval (seqid, elementfield, elementvalue) values (19,'aliveTagId','1251');
 insert into timconfigval (seqid, elementfield, elementvalue) values (19,'aliveInterval','30000');
-insert into timconfigval (seqid, elementfield, elementvalue) values (19,'commFaultTagId','1232');
+insert into timconfigval (seqid, elementfield, elementvalue) values (19,'commFaultTagId','1252');
 insert into timconfigval (seqid, elementfield, elementvalue) values (19,'parent_equip_id','150');
 insert into timconfigval (seqid, elementfield, elementvalue) values (19,'description','test description');
 insert into timconfigval (seqid, elementfield, elementvalue) values (19,'name','SUB_E_TEST');

@@ -32,6 +32,7 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.configuration.ConfigurationLoader;
+import cern.tim.shared.client.configuration.ConfigurationException;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 import cern.tim.shared.client.configuration.ConfigurationRequest;
 import cern.tim.shared.client.configuration.ConfigurationRequestConverter;
@@ -71,7 +72,12 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
   public void onMessage(Message message, Session session) throws JMSException {    
     ConfigurationRequest configRequest = (ConfigurationRequest) configurationRequestConverter.fromMessage(message);
     LOGGER.info("Reconfiguration request received for configuration with id " + configRequest.getConfigId());
-    ConfigurationReport configurationReport = configurationLoader.applyConfiguration(configRequest.getConfigId(), configRequest.getSessionId());
+    ConfigurationReport configurationReport;
+    try {
+       configurationReport = configurationLoader.applyConfiguration(configRequest.getConfigId(), configRequest.getSessionId());
+    } catch (ConfigurationException ex) {
+      configurationReport = ex.getConfigurationReport();
+    }    
     // Extract reply topic
     Destination replyDestination = null;
     try {

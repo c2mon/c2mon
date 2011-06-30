@@ -1,6 +1,6 @@
 package cern.c2mon.server.configuration;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
@@ -29,11 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuraton.helper.ObjectEqualityComparison;
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.AliveTimerCache;
@@ -77,7 +79,6 @@ import cern.tim.shared.common.ConfigurationException;
 import cern.tim.shared.common.NoSimpleValueParseException;
 import cern.tim.shared.common.datatag.DataTagAddress;
 import cern.tim.shared.common.datatag.DataTagConstants;
-import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.common.datatag.DataTagValueDictionary;
 import cern.tim.shared.common.datatag.address.HardwareAddressFactory;
@@ -97,6 +98,8 @@ import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-test.xml" })
+@TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
+@Transactional("cacheTransactionManager")
 public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   /**
@@ -104,6 +107,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   @Autowired
   private ProcessCommunicationManager mockManager;
+  
+  @Autowired
+  private DataSourceTransactionManager dataSourceTransactionManager;
   
   @Autowired
   private ConfigurationLoader configurationLoader;
@@ -198,7 +204,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     reset(mockManager);    
   }
   
-  //@After
+  @After
   public void afterTest() {    
     dataTagMapper.deleteDataTag(5000000L);
     controlTagMapper.deleteControlTag(500L);
@@ -240,7 +246,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     report = configurationLoader.applyConfiguration(6, timSessionInfo.getSessionId());
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    ControlTagCacheObject updatedCacheObject = (ControlTagCacheObject) controlTagCache.get(500L);
+    //ControlTagCacheObject updatedCacheObject = (ControlTagCacheObject) controlTagCache.get(500L);
     expectedObject.setDescription("modified description");
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
     
@@ -416,10 +422,14 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     
     //test unable to remove tag 5000000 (check XML output for failure)
-    report = configurationLoader.applyConfiguration(7, timSessionInfo.getSessionId());
-    System.out.println(report.toXML());
-    assertTrue(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    
+    boolean failed = false;
+    try {
+      report = configurationLoader.applyConfiguration(7, timSessionInfo.getSessionId());
+    } catch (cern.tim.shared.client.configuration.ConfigurationException e) {
+      System.out.println(e.getConfigurationReport());
+      failed = true;
+    }   
+    assertTrue(failed);    
     
     //update ruletag
     expectedObject.setJapcAddress("newTestConfigJAPCaddress");
@@ -477,8 +487,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     EquipmentCacheObject expectedObject = new EquipmentCacheObject(110L);
     expectedObject.setName("E_CONFIG_TEST");
     expectedObject.setAddress("serverHostName=VGTCVENTTEST");
-    expectedObject.setStateTagId(1222L);
-    expectedObject.setCommFaultTagId(1223L);
+    expectedObject.setStateTagId(1250L);
+    expectedObject.setCommFaultTagId(1252L);    
     expectedObject.setHandlerClassName("ch.cern.tim.driver.");
     expectedObject.setProcessId(50L);
     expectedObject.setDescription("test description");
@@ -488,9 +498,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     //also check that the process, commfault and alive cache were updated
     Process process = processCache.get(expectedObject.getProcessId());
     assertTrue(process.getEquipmentIds().contains(expectedObject.getId()));
-    //the alivetimer and commfault have overriden those already in the cache (check reference to the equipment has changed)
-    //assertNotNull(aliveTimerCache.get(cacheObject.getAliveTagId())); TODO no alive in DB yet
-    //assertEquals(expectedObject.getId(), aliveTimerCache.get(cacheObject.getAliveTagId()).getRelatedId());
+    //the alivetimer and commfault have overriden those already in the cache (check reference to the equipment has changed)   
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
     
@@ -518,16 +526,20 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     ObjectEqualityComparison.assertEquipmentEquals(expectedObject, cacheObject);
     
+    //check alive timer reference is updated in DB
+    assertEquals(new Long(501), equipmentMapper.getItem(110L).getAliveTagId());
+    //also expect alivetimercache to have element 501:
+    assertNotNull(aliveTimerCache.get(501L));
+    
     //remove equipment
-    //remove does not complete successfully as control tags cannot be removed as already used...
-    //still the equipment itself has been successfully removed
+    //remove completes successfully; both Equipment and ControlTags are removed
     report = configurationLoader.applyConfiguration(15, timSessionInfo.getSessionId());
     System.out.println(report.toXML());
-    assertTrue(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(equipmentCache.hasKey(110L));
     assertNull(equipmentMapper.getItem(110L));
-    //commfault and alive should no longer be in cache (notice the cache is no longer consistent now - hence @DirtiesContext)
-    //assertFalse(aliveTimerCache.hasKey(cacheObject.getAliveTagId())); TODO no alive set for TestHandler03 in DB yet... 
+    //commfault and alive should no longer be in cache 
+    assertFalse(aliveTimerCache.hasKey(cacheObject.getAliveTagId())); 
     assertFalse(commFaultTagCache.hasKey(cacheObject.getCommFaultTagId()));
     verify(mockManager);
   }
@@ -566,9 +578,14 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
     
     //remove (fails to complete - see process comment above)
-    report = configurationLoader.applyConfiguration(18, timSessionInfo.getSessionId());
-    System.out.println(report.toXML());
-    assertTrue(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    boolean failed = false;
+    try {
+      report = configurationLoader.applyConfiguration(18, timSessionInfo.getSessionId());
+    } catch (cern.tim.shared.client.configuration.ConfigurationException e) {
+      System.out.println(e.getConfigurationReport());
+      failed = true;
+    }      
+    assertTrue(failed);
     assertFalse(processCache.hasKey(2L));
     assertNull(processMapper.getItem(2L));
     verify(mockManager);
@@ -590,9 +607,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     SubEquipmentCacheObject cacheObject = (SubEquipmentCacheObject) subEquipmentCache.get(200L);
     SubEquipmentCacheObject expectedObject = new SubEquipmentCacheObject(200L);
     expectedObject.setName("SUB_E_TEST");    
-    expectedObject.setStateTagId(1230L);
-    expectedObject.setCommFaultTagId(1232L);
-    expectedObject.setAliveTagId(1231L);
+    expectedObject.setStateTagId(1250L);
+    expectedObject.setCommFaultTagId(1252L);
+    expectedObject.setAliveTagId(1251L);
     expectedObject.setAliveInterval(30000);
     expectedObject.setHandlerClassName("-");
     expectedObject.setParentId(150L);
@@ -600,37 +617,46 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     ObjectEqualityComparison.assertSubEquipmentEquals(expectedObject, cacheObject);
     
+    //check DB update was successful
+    SubEquipmentCacheObject dbObject = (SubEquipmentCacheObject) subEquipmentMapper.getItem(200L);
+    ObjectEqualityComparison.assertSubEquipmentEquals(expectedObject, dbObject);
+    
     //also check that the equipment, commfault and alive cache were updated
     Equipment equipment = equipmentCache.get(expectedObject.getParentId());
     assertTrue(equipment.getSubEquipmentIds().contains(expectedObject.getId()));
-    //the alivetimer and commfault have been set in the caches 
+    //the alivetimer and commfault caches should reflect the changes
     assertNotNull(aliveTimerCache.get(expectedObject.getAliveTagId())); 
     assertEquals(expectedObject.getId(), aliveTimerCache.get(cacheObject.getAliveTagId()).getRelatedId());
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
     
-    //update should fail as try to change parent id
-    report = configurationLoader.applyConfiguration(20, timSessionInfo.getSessionId());
-    assertTrue(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    System.out.println(report.toXML());
+    //update should fail as try to change parent id 
+    boolean failed = false;
+    try {
+      report = configurationLoader.applyConfiguration(20, timSessionInfo.getSessionId());     
+    } catch (cern.tim.shared.client.configuration.ConfigurationException e) {
+      System.out.println(e.getConfigurationReport());
+      failed = true;
+    }      
+    assertTrue(failed);   
     
-    //remove subequipment - should fail as control tags are already used 
+    //remove subequipment - succeeds
     //(control tags should remain, equipment should go as should commfault and alive cache objects)
     report = configurationLoader.applyConfiguration(21, timSessionInfo.getSessionId());
     System.out.println(report.toXML());
-    assertTrue(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(subEquipmentCache.hasKey(200L));
     assertNull(equipmentMapper.getItem(200L));    
     //commfault and alive should no longer be in cache
     assertFalse(aliveTimerCache.hasKey(cacheObject.getAliveTagId())); 
     assertFalse(commFaultTagCache.hasKey(cacheObject.getCommFaultTagId()));
     //control still there
-    assertTrue(controlTagCache.hasKey(1231L)); //is alive
-    assertNotNull(controlTagMapper.getItem(1231L));
-    assertTrue(controlTagCache.hasKey(1230L)); //is alive
-    assertNotNull(controlTagMapper.getItem(1230L));
-    assertTrue(controlTagCache.hasKey(1232L)); //is alive
-    assertNotNull(controlTagMapper.getItem(1232L));
+    assertFalse(controlTagCache.hasKey(1251L));
+    assertNull(controlTagMapper.getItem(1251L));
+    assertFalse(controlTagCache.hasKey(1250L));
+    assertNull(controlTagMapper.getItem(1250L));
+    assertFalse(controlTagCache.hasKey(1252L)); 
+    assertNull(controlTagMapper.getItem(1252L));
     verify(mockManager);
   }
   
