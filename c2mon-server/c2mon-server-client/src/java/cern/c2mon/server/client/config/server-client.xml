@@ -24,8 +24,7 @@ Connection settings for client module
 <!-- connection factory used for all connections to the server -->
 <bean id="clientPooledConnectionFactory" class="org.jencks.amqpool.PooledConnectionFactory">
    <constructor-arg ref="clientActiveMQConnectionFactory"/>
-   <property name="maxConnections" value="${jms.client.connections.max}" />
-   <property name="maximumActive" value="${jms.client.sessions.max}"/>
+   <property name="maxConnections" value="${jms.client.connections.max}" />   
 </bean>
 
 <!-- 
