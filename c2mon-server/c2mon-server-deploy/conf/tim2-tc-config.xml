@@ -82,7 +82,7 @@
           <class-expression>cern.tim.server.common.datatag.DataTagCacheObject</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.shared.common.datatag.DataTagQuality</class-expression>
+          <class-expression>cern.tim.shared.common.datatag.DataTagQualityImpl</class-expression>
         </include>
         <include>
           <class-expression>cern.tim.shared.common.datatag.DataTagAddress</class-expression>
