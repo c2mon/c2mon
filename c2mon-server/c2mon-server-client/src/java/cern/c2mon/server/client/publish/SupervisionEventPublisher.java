@@ -34,7 +34,7 @@ public class SupervisionEventPublisher implements SupervisionListener {
    * @param pTimCache Used for registering this class as listener
    */
   @Autowired
-  public SupervisionEventPublisher(@Qualifier("clientTopicPublisher") final JmsSender pJmsSender,
+  public SupervisionEventPublisher(@Qualifier("supervisionTopicPublisher") final JmsSender pJmsSender,
                                    final SupervisionNotifier pSupervisionNotifier) {
     jmsSender = pJmsSender;
     supervisionNotifier = pSupervisionNotifier;
