@@ -8,11 +8,11 @@
     <version>1.0.1-SNAPSHOT</version>
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
-  <artifactId>c2mon-client</artifactId>
+  <artifactId>c2mon-client-core</artifactId>
   <version>1.0.1-SNAPSHOT</version>
-  <name>c2mon-client</name>
+  <name>c2mon-client-core</name>
   <packaging>jar</packaging>
-  <description>The C2MON Client API which  handles the communication to the C2MON server.</description>
+  <description>The C2MON Client API which handles the communication to the C2MON server.</description>
   <url>http://timweb.cern.ch</url>
 
   <dependencies>
