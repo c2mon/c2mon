@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
+import cern.c2mon.shared.client.request.JsonRequest;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TransferTag;
 import cern.c2mon.shared.client.tag.TransferTagValue;
@@ -20,7 +21,7 @@ public class ClientRequestMessageConverterTest {
 
   @Test
   public void testSupervisionMessageConversion() {
-    ClientRequestImpl<SupervisionEvent> request = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);
+    JsonRequest<SupervisionEvent> request = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);
     
     TextMessage message = new ActiveMQTextMessage();
     try {
@@ -37,7 +38,7 @@ public class ClientRequestMessageConverterTest {
   
   @Test
   public void testTransferTagMessageConversion() {
-    ClientRequestImpl<TransferTag> request = new ClientRequestImpl<TransferTag>(TransferTag.class);
+    JsonRequest<TransferTag> request = new ClientRequestImpl<TransferTag>(TransferTag.class);
     
     TextMessage message = new ActiveMQTextMessage();
     try {
@@ -55,7 +56,7 @@ public class ClientRequestMessageConverterTest {
   
   @Test
   public void testTransferTagValueMessageConversion() {
-    ClientRequestImpl<TransferTagValue> request = new ClientRequestImpl<TransferTagValue>(TransferTagValue.class);
+    JsonRequest<TransferTagValue> request = new ClientRequestImpl<TransferTagValue>(TransferTagValue.class);
     
     TextMessage message = new ActiveMQTextMessage();
     try {
