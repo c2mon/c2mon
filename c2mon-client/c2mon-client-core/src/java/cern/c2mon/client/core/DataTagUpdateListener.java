@@ -18,7 +18,6 @@
  
 package cern.c2mon.client.core;
 
-import cern.c2mon.client.core.tag.ClientDataTag;
 import cern.c2mon.client.core.tag.ClientDataTagValue;
 
 /**
@@ -40,5 +39,5 @@ public interface DataTagUpdateListener {
    * @param tagUpdate A copy of the <code>ClientDataTagValue</code> object with the 
    *                  updated properties
    */
-  public void onUpdate(ClientDataTagValue tagUpdate);
+  void onUpdate(ClientDataTagValue tagUpdate);
 }
