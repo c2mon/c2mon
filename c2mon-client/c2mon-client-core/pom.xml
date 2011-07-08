@@ -17,10 +17,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.jencks</groupId>
-      <artifactId>jencks-amqpool</artifactId>
-    </dependency>
-    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
     </dependency>
@@ -39,6 +35,16 @@
     <dependency>
       <groupId>cern.tim2.tim2-shared</groupId>
       <artifactId>tim2-shared-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-auth</artifactId>
+      <version>1.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-jms</artifactId>
+      <version>1.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
