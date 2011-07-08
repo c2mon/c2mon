@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 import org.junit.Test;
 
-import cern.c2mon.client.core.DataTagUpdateListener;
+import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.client.core.tag.ClientDataTag;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagValue;
@@ -55,7 +55,6 @@ public class ClientDataTagImplTest {
     assertEquals(cdt.getId(), clone.getId());
     assertEquals(cdt.getName(), clone.getName());
     assertEquals(cdt.getRuleExpression(), clone.getRuleExpression());
-    assertEquals(cdt.getTopicName(), clone.getTopicName());
     assertEquals(cdt.getType(), clone.getType());
     assertEquals(cdt.getTypeNumeric(), clone.getTypeNumeric());
     assertEquals(cdt.getUnit(), clone.getUnit());

@@ -15,29 +15,30 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
- 
-package cern.c2mon.client.core;
+package cern.c2mon.client.core.listener;
 
-import cern.c2mon.client.core.tag.ClientDataTagValue;
+import cern.c2mon.shared.client.supervision.Heartbeat;
 
 /**
- * An update event gets fired when a <code>ClientDataTag</code> 
- * changes either its value or its quality property.
- * 
- * You can register a <code>DataTagUpdateListener</code> with a 
- * <code>ClientDataTag</code> so as to be notified of these property changes.
- * @see ClientDataTag
- * @author Matthias Braeger
+ * Interface to be implemented by HeartbeatListeners
  */
-public interface DataTagUpdateListener {
+
+public interface HeartbeatListener {
+  /**
+   * This method is called whenever a Heartbeat is received from the server.
+   * @param pHeartbeat heartbeat received from the server
+   */
+  public void onHeartbeatReceived(final Heartbeat pHeartbeat);
+  /**
+   * This method is called when the last Heartbeat from the server expires.
+   * @param pHeartbeat last heartbeat received BEFORE the timer expired.
+   */
+  public void onHeartbeatExpired(final Heartbeat pHeartbeat);
 
   /**
-   * This method gets called when the value or quality property of a
-   * <code>ClientDataTag</code> has changed. It receives then a <b>copy</b>
-   * of the updated object in the C2MON client cache.
-   * 
-   * @param tagUpdate A copy of the <code>ClientDataTagValue</code> object with the 
-   *                  updated properties
+   * This method is called when a Heartbeat is received from the server after
+   * a Heartbeat expiration.
+   * @param pHeartbeat heartbeat received from the server
    */
-  void onUpdate(ClientDataTagValue tagUpdate);
+  public void onHeartbeatResumed(final Heartbeat pHeartbeat);
 }

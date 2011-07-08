@@ -15,12 +15,11 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
- 
 package cern.c2mon.client.core.tag;
 import java.sql.Timestamp;
 import java.util.Collection;
 
-import cern.c2mon.client.core.DataTagUpdateListener;
+import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.rule.RuleExpression;

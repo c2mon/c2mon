@@ -27,8 +27,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.core.DataTagUpdateListener;
+import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.jms.ServerUpdateListener;
+import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.client.tag.TransferTag;
 import cern.c2mon.shared.client.tag.TransferTagValue;
 import cern.tim.shared.common.datatag.DataTagQuality;
@@ -48,7 +52,7 @@ import cern.tim.shared.rule.RuleFormatException;
  * @see DataTagUpdateListener
  * @author Matthias Braeger
  */
-public class ClientDataTagImpl implements ClientDataTag, Cloneable {//, ServerMessageListener, {
+public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, TopicRegistrationDetails, Cloneable {
   
   /** The value of the tag */
   private Object tagValue;
@@ -350,8 +354,7 @@ public class ClientDataTagImpl implements ClientDataTag, Cloneable {//, ServerMe
     
     try {
       this.updateTagLock.readLock().lock();
-      // TODO: uncomment
-//      pListener.onUpdate(this);
+      pListener.onUpdate(this);
     }
     finally {
       this.updateTagLock.readLock().unlock();
@@ -418,6 +421,20 @@ public class ClientDataTagImpl implements ClientDataTag, Cloneable {//, ServerMe
     return isEmpty;
   }
   
+  /**
+   * Checks whether the update is valid or not
+   * @param transferTagValue The received update
+   * @return <code>true</code>, if the update passed all checks
+   */
+  private boolean isValidUpdate(final TransferTagValue transferTagValue) {
+    boolean valid = true;
+    valid &= transferTagValue != null;
+    valid &= transferTagValue.getId().equals(id);
+    valid &= transferTagValue.getServerTimestamp().after(serverTimestamp);
+    
+    return valid;
+  }
+  
   
   /**
    * Inner method to update the tag quality without changing the inaccessible states
@@ -442,28 +459,33 @@ public class ClientDataTagImpl implements ClientDataTag, Cloneable {//, ServerMe
     else {
       tagQuality.setInvalidStates(qualityUpdate.getInvalidQualityStates());
     }
-  }
-  
+  } 
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#update(cern.c2mon.shared.client.tag.TransferTagValue)
+  /**
+   * This thread safe inner method updates the given <code>TransferTagValue</code> object.
+   * It copies every single field of the <code>TransferTag</code> object and notifies
+   * then the registered listener about the update by providing a copy of the
+   * <code>ClientDataTag</code> object.
+   * 
+   * @param transferTagValue The object that contains the updates.
+   * @return <code>true</code>, if the update was successful, otherwise
+   *         <code>false</code>
    */
-  @Override
-  public boolean update(final TransferTagValue transferTagValue) {
-    if (transferTagValue != null && transferTagValue.getId().equals(id)) {
-      updateTagLock.writeLock().lock();
-      try {
+  private boolean update(final TransferTagValue transferTagValue) {
+    updateTagLock.writeLock().lock();
+    try {
+      boolean valid = isValidUpdate(transferTagValue);
+
+      if (valid) {
         doUpdateValues(transferTagValue);
         // Notify all listeners of the update
         notifyListeners();
       }
-      finally {
-        updateTagLock.writeLock().unlock();
-      }
-      return true;
+
+      return valid;
     }
-    else {
-      return false;
+    finally {
+      updateTagLock.writeLock().unlock();
     }
   }
   
@@ -472,9 +494,11 @@ public class ClientDataTagImpl implements ClientDataTag, Cloneable {//, ServerMe
    */
   @Override
   public boolean update(final TransferTag transferTag) throws RuleFormatException {
-    if (transferTag != null && transferTag.getId().equals(id)) {
-      updateTagLock.writeLock().lock();
-      try {
+    updateTagLock.writeLock().lock();
+    try {
+      boolean valid = isValidUpdate(transferTag);
+    
+      if (valid) {
         if (transferTag.getRuleExpression() != null) {
           ruleExpression = RuleExpression.createExpression(transferTag.getRuleExpression());
         }
@@ -494,18 +518,78 @@ public class ClientDataTagImpl implements ClientDataTag, Cloneable {//, ServerMe
         // Notify all listeners of the update
         notifyListeners();
       }
-      finally {
-        updateTagLock.writeLock().unlock();
-      }
       
-      return true;
+      return valid;
     }
-    else {
+    finally {
+      updateTagLock.writeLock().unlock();
+    }
+  }
+  
+  /**
+   * Update method for the supervision events.
+   * 
+   * @param supervisionEvent The supervision update event
+   * @return <code>true</code>, if the <code>ClientDataTag</code> has
+   *         successfully being updated.
+   */
+  @Override
+  public boolean update(final SupervisionEvent supervisionEvent) {
+    if (supervisionEvent == null) {
       return false;
+    }
+
+    updateTagLock.writeLock().lock();
+    try {
+      boolean validUpdate = false;
+      validUpdate |= equipmentIds.contains(supervisionEvent.getEntityId());
+      validUpdate |= processIds.contains(supervisionEvent.getEntityId());
+
+      if (validUpdate) {
+        TagQualityStatus tagQualityStatusFlag;
+        switch (supervisionEvent.getEntity()) {
+        case PROCESS:
+          tagQualityStatusFlag = TagQualityStatus.PROCESS_DOWN;
+          break;
+        case EQUIPMENT:
+          tagQualityStatusFlag = TagQualityStatus.EQUIPMENT_DOWN;
+          break;
+        case SUBEQUIPMENT:
+          tagQualityStatusFlag = TagQualityStatus.SUBEQUIPMENT_DOWN;
+          break;
+        default:
+          throw new IllegalArgumentException("The supervision event type " + supervisionEvent.getEntity() + " is not supported.");
+        }
+
+        // Check whether the it's down or not
+        boolean down = false;
+        down |= supervisionEvent.getStatus().equals(SupervisionStatus.DOWN);
+        down |= supervisionEvent.getStatus().equals(SupervisionStatus.STOPPED);
+        if (down) {
+          tagQuality.addInvalidStatus(tagQualityStatusFlag, supervisionEvent.getMessage());
+        }
+        else {
+          tagQuality.removeInvalidStatus(tagQualityStatusFlag);
+        }
+        
+        // Notify all listeners of the update
+        notifyListeners();
+      }
+
+      return validUpdate;
+    }
+    finally {
+      updateTagLock.writeLock().unlock();
     }
   }
   
   
+  /**
+   * Inner method for updating the all value fields from this
+   * <code>ClientDataTag</code> instance
+   * 
+   * @param transferTagValue Reference to the object containing the updates 
+   */
   private void doUpdateValues(final TransferTagValue transferTagValue) {
     updateTagQuality(transferTagValue.getDataTagQuality());
     
@@ -518,23 +602,6 @@ public class ClientDataTagImpl implements ClientDataTag, Cloneable {//, ServerMe
     tagValue = transferTagValue.getValue();
   }
   
-
-// TODO: Refactor!
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#onMessageReceived(java.lang.Object)
-   */
-//  @Override
-  public void onMessageReceived(final Object pPayload) {
-//    if (pPayload instanceof DataTag) {
-//      this.update((DataTag) pPayload);
-//    }
-//    else if (pPayload instanceof DataTagValue) {
-//      this.update((DataTagValue) pPayload);
-//    }
-//    else  {
-//      LOG.warn("onMessageReceived() : Unable to handle message payload of type : " + pPayload.getClass().getName());
-//    }
-  }
 
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#getTopicName()
@@ -671,6 +738,12 @@ public class ClientDataTagImpl implements ClientDataTag, Cloneable {//, ServerMe
     clone.listeners = new ArrayList<DataTagUpdateListener>();
     
     return clone;    
+  }
+
+
+  @Override
+  public void onUpdate(TransferTagValue transferTagValue) {
+    update(transferTagValue);
   }
 }
 
