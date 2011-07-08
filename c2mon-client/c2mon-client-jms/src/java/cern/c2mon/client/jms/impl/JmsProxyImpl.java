@@ -47,6 +47,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.ServerUpdateListener;
+import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
@@ -118,12 +119,17 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * of a given listener.
    */
   private Map<ServerUpdateListener, ReentrantReadWriteLock.WriteLock> listenerLocks;
-
+  
   /**
    * Listeners that need informing about JMS connection and disconnection
    * events.
    */
   private Collection<ConnectionListener> connectionListeners; 
+  
+  /**
+   * Subscribes to the Supervision topic and notifies any registered listeners. 
+   */
+  private SupervisionListenerWrapper supervisionListenerWrapper;
   
   /**
    * Recording connection status to JMS.
@@ -154,7 +160,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * Constructor
    */
   public JmsProxyImpl() {
-    connectionFactory = new ActiveMQConnectionFactory("", "", "");
+    connectionFactory = new ActiveMQConnectionFactory(System.getProperty("c2mon.jms.broker.url"), 
+                                                        System.getProperty("c2mon.jms.broker.user"), 
+                                                        System.getProperty("c2mon.jms.broker.passwd"));
     sessions = new ArrayList<Session>(SESSION_POOL_SIZE);
     connected = false;
     shutdownRequested = false;
@@ -165,7 +173,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     topicToWrapper = new ConcurrentHashMap<String, MessageListenerWrapper>();
     registeredListeners = new ConcurrentHashMap<ServerUpdateListener, TopicRegistrationDetails>();
     listenerLocks = new ConcurrentHashMap<ServerUpdateListener, ReentrantReadWriteLock.WriteLock>();
-    connectionListeners = new ArrayList<ConnectionListener>();
+    connectionListeners = new ArrayList<ConnectionListener>(); 
+    supervisionListenerWrapper = new SupervisionListenerWrapper();
   }
   
  
@@ -276,10 +285,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       if (!registeredListeners.isEmpty()) {
         messageConsumers.clear();
         topicToWrapper.clear();
-        //refresh all registered listeners      
+        //refresh all registered listeners for Tag updates      
         for (Map.Entry<ServerUpdateListener, TopicRegistrationDetails> entry : registeredListeners.entrySet()) {
           registerUpdateListener(entry.getKey(), entry.getValue());
         }
+        //refresh supervision subscription
+        subscribeToSupervisionTopic();
       }      
     } catch (JMSException e) {
       LOGGER.error("Did not manage to refresh Topic subscriptions.", e);
@@ -290,6 +301,23 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     
   }
   
+  /**
+   * Called when refreshing subscriptions at start up and again
+   * if the connection goes down.
+   * 
+   * @throws JMSException if unable to subsribe
+   */
+  private void subscribeToSupervisionTopic() throws JMSException {   
+    if (connected) {      
+        Session session = getRandomSession();                   
+        Topic topic = session.createTopic(System.getProperty("c2mon.jms.supervision.topic"));
+        MessageConsumer consumer = session.createConsumer(topic);                 
+        consumer.setMessageListener(supervisionListenerWrapper);        
+    } else {           
+      throw new JMSException("Not currently connected - will attempt to re-subscribe on reconnection.");     
+    }
+  }
+
   @Override
   public boolean isRegisteredListener(final ServerUpdateListener serverUpdateListener) {
     if (serverUpdateListener == null) {
@@ -437,6 +465,16 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   public void onException(final JMSException exception) {
     LOGGER.error("JMSException caught by JMS connection exception listener. Attempting to reconnect.", exception);
     startReconnectThread();
+  }
+  
+  @Override
+  public void registerSupervisionListener(final SupervisionListener supervisionListener) {
+    supervisionListenerWrapper.addListener(supervisionListener);           
+  }
+
+  @Override
+  public void unregisterSupervisionListener(final SupervisionListener supervisionListener) {   
+    supervisionListenerWrapper.removeListener(supervisionListener);        
   }
 
   //Spring lifecycle methods

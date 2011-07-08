@@ -144,4 +144,19 @@ public interface JmsProxy {
    * @throws IllegalArgumentException if argument is null
    */
   void registerConnectionListener(ConnectionListener connectionListener);
+  
+  /**
+   * Register a listener to be notified of supervision events received
+   * from the server.
+   * 
+   * @param supervisionListener the listener to register
+   */
+  void registerSupervisionListener(SupervisionListener supervisionListener);
+  
+  /**
+   * Unregister the listener from receiving supervision updates.
+   * 
+   * @param supervisionListener the listener to remove
+   */
+  void unregisterSupervisionListener(SupervisionListener supervisionListener);
 }
