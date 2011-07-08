@@ -39,7 +39,7 @@ public final class C2monServiceGateway {
   private static C2monSessionManager sessionManager = null;
   
   /** Static reference to the <code>C2monSupervisionManager</code> singleton instance */
-  private static C2monSupervisionManager heartbeatManager = null;
+  private static C2monSupervisionManager supervisionManager = null;
  
   
   /**
@@ -58,7 +58,7 @@ public final class C2monServiceGateway {
     return tagManager;
   }
 
-
+  
   /**
    * @return the sessionManager
    */
@@ -66,11 +66,12 @@ public final class C2monServiceGateway {
     return sessionManager;
   }
 
+  
   /**
    * @return the heartbeatManager
    */
-  public static C2monSupervisionManager getHeartbeatManager() {
-    return heartbeatManager;
+  public static C2monSupervisionManager getSupervisionManager() {
+    return supervisionManager;
   }
 
 
@@ -98,7 +99,7 @@ public final class C2monServiceGateway {
       
       tagManager = pTagManager;
       sessionManager = pSessionManager;
-      heartbeatManager = pHeartbeatManager;
+      supervisionManager = pHeartbeatManager;
     }
   }
 }
