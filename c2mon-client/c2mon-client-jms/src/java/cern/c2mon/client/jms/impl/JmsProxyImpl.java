@@ -20,9 +20,7 @@ package cern.c2mon.client.jms.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -56,6 +54,16 @@ import cern.c2mon.shared.client.request.JsonRequest;
  * Implementation of the JmsProxy singleton bean. Also see the interface
  * for documentation.
  * 
+ * <p>A new session (thread) is created for every Topic subscription. For this
+ * reason, the number of different topics across all Tags should be
+ * kept to a reasonable number (say around 50) and adjusted upwards if the number
+ * of incoming updates is causing performance problems. These sessions are created when
+ * needed and closed when possible (i.e. when no more update listeners registered on 
+ * the topic).
+ * 
+ * <p>Separate sessions are used for listening to supervision events and sending
+ * requests to the server (the latter created at request time).
+ * 
  * @author Mark Brightwell
  *
  */
@@ -86,17 +94,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * The unique JMS connection used.
    */
   private Connection connection;
-  
-  /**
-   * For randomly accessing the session list.
-   */
-  private Random random;
-  
-  /**
-   * Pool of sessions.
-   */
-  private List<Session> sessions;
-    
+      
   /**
    * Indicates which {@link MessageListenerWrapper} is listening to a given topic
    * (each wrapper listens to a single topic). 
@@ -104,9 +102,10 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   private Map<String, MessageListenerWrapper> topicToWrapper;
   
   /**
-   * Points to the {@link MessageConsumer} instantiated for a given wrapper.
+   * Points to the JMS Session started for a given wrapper. Only the sessions
+   * used for Tag update subscriptions are referenced here.
    */
-  private Map<MessageListenerWrapper, MessageConsumer> messageConsumers;
+  private Map<MessageListenerWrapper, Session> sessions;
   
   /**
    * 1-1 correspondence between ServerUpdateListeners and the Tags they are
@@ -162,14 +161,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   public JmsProxyImpl() {
     connectionFactory = new ActiveMQConnectionFactory(System.getProperty("c2mon.jms.broker.url"), 
                                                         System.getProperty("c2mon.jms.broker.user"), 
-                                                        System.getProperty("c2mon.jms.broker.passwd"));
-    sessions = new ArrayList<Session>(SESSION_POOL_SIZE);
+                                                        System.getProperty("c2mon.jms.broker.passwd"));    
     connected = false;
-    shutdownRequested = false;
-    random = new Random(System.currentTimeMillis());
+    shutdownRequested = false;    
     connectingWriteLock = new ReentrantReadWriteLock().writeLock();
     refreshLock = new ReentrantReadWriteLock();
-    messageConsumers = new ConcurrentHashMap<MessageListenerWrapper, MessageConsumer>();    
+    sessions = new ConcurrentHashMap<MessageListenerWrapper, Session>();    
     topicToWrapper = new ConcurrentHashMap<String, MessageListenerWrapper>();
     registeredListeners = new ConcurrentHashMap<ServerUpdateListener, TopicRegistrationDetails>();
     listenerLocks = new ConcurrentHashMap<ServerUpdateListener, ReentrantReadWriteLock.WriteLock>();
@@ -189,13 +186,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    */
   private void connect() {
       while (!connected && !shutdownRequested) {
-        try {          
-          sessions.clear();
-          connection = connectionFactory.createConnection();       
-          for (int i = 0; i < SESSION_POOL_SIZE; i++) {
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            sessions.add(session);
-          }     
+        try {                    
+          connection = connectionFactory.createConnection();         
           refreshSubscriptions();
           connected = true;
           connection.setExceptionListener(this);
@@ -238,7 +230,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     connected = false;
     notifyConnectionListenerOnDisconnection();
     try {
-      connection.close();
+      connection.close(); //closes all consumers and sessions also
     } catch (JMSException jmsEx) {
       LOGGER.error("Exception caught while attempting to disconnect from JMS - aborting this attempt.", jmsEx);
     } 
@@ -277,10 +269,10 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     refreshLock.writeLock().lock();    
     try {    
       if (!registeredListeners.isEmpty()) {
-        messageConsumers.clear();
+        sessions.clear();
         topicToWrapper.clear();
         //refresh all registered listeners for Tag updates      
-        for (Map.Entry<ServerUpdateListener, TopicRegistrationDetails> entry : registeredListeners.entrySet()) {
+        for (Map.Entry<ServerUpdateListener, TopicRegistrationDetails> entry : registeredListeners.entrySet()) {          
           registerUpdateListener(entry.getKey(), entry.getValue());
         }
         //refresh supervision subscription
@@ -302,8 +294,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * @throws JMSException if unable to subsribe
    */
   private void subscribeToSupervisionTopic() throws JMSException {   
-    if (connected) {      
-        Session session = getRandomSession();                   
+    if (connected) {       
+        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);                   
         Topic topic = session.createTopic(System.getProperty("c2mon.jms.supervision.topic"));
         MessageConsumer consumer = session.createConsumer(topic);                 
         consumer.setMessageListener(supervisionListenerWrapper);        
@@ -333,13 +325,13 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
               String topicName = TopicRegistrationDetails.getTopicName();
               if (topicToWrapper.containsKey(topicName)) {
                 topicToWrapper.get(topicName).addListener(serverUpdateListener, TopicRegistrationDetails.getId());
-              } else {
-                Session session = getRandomSession();                   
+              } else {                
+                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);               
                 Topic topic = session.createTopic(TopicRegistrationDetails.getTopicName());
                 MessageConsumer consumer = session.createConsumer(topic);         
                 MessageListenerWrapper wrapper = new MessageListenerWrapper(TopicRegistrationDetails.getId(), serverUpdateListener);
                 consumer.setMessageListener(wrapper);
-                messageConsumers.put(wrapper, consumer);
+                sessions.put(wrapper, session);
               }                             
               registeredListeners.put(serverUpdateListener, TopicRegistrationDetails);
             } else {           
@@ -359,14 +351,6 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     } finally {
       refreshLock.readLock().unlock();
     }    
-  }
-
-  /**
-   * Returns a random session from the session pool.
-   * @return a JMS session from the pool
-   */
-  private Session getRandomSession() {
-    return sessions.get(random.nextInt(SESSION_POOL_SIZE));
   }
 
   @Override
@@ -398,7 +382,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       throw new NullPointerException("sendRequest(..) method called with null queue name argument");
     }
     if (connected) {
-      Session session = getRandomSession();           
+      Session session = connection.createSession(false, Session.SESSION_TRANSACTED);           
       TextMessage message = session.createTextMessage(jsonRequest.toJson());
       TemporaryQueue replyQueue = session.createTemporaryQueue();
       message.setJMSReplyTo(replyQueue);     
@@ -425,15 +409,15 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
         TopicRegistrationDetails subsribedToTag = registeredListeners.get(serverUpdateListener);
         MessageListenerWrapper wrapper = topicToWrapper.get(serverUpdateListener);
         wrapper.removeListener(subsribedToTag.getId());
-        if (wrapper.isEmpty()) {
+        if (wrapper.isEmpty()) { //no subscribed listeners, so close session
           try {            
-            MessageConsumer consumer = messageConsumers.get(wrapper);
-            consumer.close();            
+            Session session = sessions.get(wrapper);
+            session.close();            
           } catch (JMSException ex) {
             LOGGER.error("Failed to unregister properly from a Tag update; subscriptions will be refreshed.");            
             startReconnectThread();            
           } finally {
-            messageConsumers.remove(wrapper);            
+            sessions.remove(wrapper);            
             topicToWrapper.remove(subsribedToTag.getTopicName());
             registeredListeners.remove(serverUpdateListener);
           }
