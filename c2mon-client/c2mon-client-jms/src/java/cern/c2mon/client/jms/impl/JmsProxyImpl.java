@@ -209,22 +209,16 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
         }
       }
       if (connected) {
-        ArrayList<Long> registeredIds = new ArrayList<Long>(registeredListeners.size());
-        for (Map.Entry<ServerUpdateListener, TopicRegistrationDetails> entry : registeredListeners.entrySet()) {
-          registeredIds.add(entry.getValue().getId());
-        }
-        notifyConnectionListenerOnConnection(registeredIds);        
+        notifyConnectionListenerOnConnection();        
       }      
   }
   
   /**
-   * Notifies all {@link ConnectionListener}s of a connection.
-   * @param registeredIds list of tag ids currently registered 
+   * Notifies all {@link ConnectionListener}s of a connection. 
    */
-  @SuppressWarnings("unchecked")
-  private void notifyConnectionListenerOnConnection(final ArrayList<Long> registeredIds) {
+  private void notifyConnectionListenerOnConnection() {
     for (ConnectionListener listener : connectionListeners) {
-      listener.onConnection((Collection<Long>) registeredIds.clone());
+      listener.onConnection();
     }
   }
   
