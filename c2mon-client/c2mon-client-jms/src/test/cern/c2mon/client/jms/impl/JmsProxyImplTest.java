@@ -31,6 +31,7 @@ import org.springframework.context.SmartLifecycle;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.ServerUpdateListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
+import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 
 /**
@@ -118,19 +119,45 @@ public class JmsProxyImplTest {
   }
   
   /**
-   * Test sendRequest with null request object.
+   * Test sendRequest with null request object - should throw exception.
    * @throws JMSException
+   * @throws InterruptedException 
    */
-//  @Test(expected = NullPointerException.class)
-//  public void testSendRequest() throws JMSException { 
-//    //need to simulate start
-//    EasyMock.expect(connection.createSession(false, Session.SESSION_TRANSACTED)).andReturn(session);    
-//        
-//    EasyMock.replay(connection);
-//    ((SmartLifecycle) jmsProxy).start();
-//    jmsProxy.sendRequest(null, "test.queue", 1000);
-//    EasyMock.verify(connection);
-//  }
+  @Test(expected = NullPointerException.class)
+  public void testSendRequestNullRequest() throws JMSException, InterruptedException { 
+    //need to simulate start
+    EasyMock.expect(connectionFactory.createConnection()).andReturn(connection);    
+    EasyMock.expect(connection.createSession(false, Session.SESSION_TRANSACTED)).andReturn(session);    
+        
+    EasyMock.replay(connectionFactory);
+    EasyMock.replay(connection);
+    ((SmartLifecycle) jmsProxy).start();
+    Thread.sleep(2000); //leave time for connection thread to run (and set connected flag to true)
+    jmsProxy.sendRequest(null, "test.queue", 1000);
+    EasyMock.verify(connectionFactory);
+    EasyMock.verify(connection);
+  }
+  
+  /**
+   * Test sendRequest with null queue name - should throw exception.
+   * @throws JMSException
+   * @throws InterruptedException 
+   */
+  @Test(expected = NullPointerException.class)
+  public void testSendRequestNullQueue() throws JMSException, InterruptedException { 
+    JsonRequest<ClientRequestResult> jsonRequest = EasyMock.createMock(JsonRequest.class);
+    //need to simulate start
+    EasyMock.expect(connectionFactory.createConnection()).andReturn(connection);    
+    EasyMock.expect(connection.createSession(false, Session.SESSION_TRANSACTED)).andReturn(session);    
+        
+    EasyMock.replay(connectionFactory);
+    EasyMock.replay(connection);
+    ((SmartLifecycle) jmsProxy).start();
+    Thread.sleep(2000); //leave time for connection thread to run (and set connected flag to true)
+    jmsProxy.sendRequest(jsonRequest, null, 1000);
+    EasyMock.verify(connectionFactory);
+    EasyMock.verify(connection);
+  }
   
   
 }
