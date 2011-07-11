@@ -19,15 +19,7 @@
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-    </dependency>
+    </dependency>    
     <dependency>
       <groupId>javax.jms</groupId>
       <artifactId>jms</artifactId>
@@ -40,6 +32,25 @@
       <groupId>cern.tim2.tim2-shared</groupId>
       <artifactId>tim2-shared-client</artifactId>
     </dependency>
+    
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
+     <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-util</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <developers />
@@ -51,9 +62,10 @@
         <version>2.8</version>
         <configuration>
           <argLine>
-            -Dc2mon.jms.broker.url=tcp://timjms1:61616
-            -Dc2mon.jms.broker.user=not-used
-            -Dc2mon.jms.broker.passwd=not-used
+            -Dc2mon.jms.url=tcp://timjms1:61616
+            -Dc2mon.jms.user=not-used
+            -Dc2mon.jms.passwd=not-used
+            -Dc2mon.jms.supervision.topic=c2mon.JmsProxy.test.supervision.topic
           </argLine>
         </configuration>
       </plugin>

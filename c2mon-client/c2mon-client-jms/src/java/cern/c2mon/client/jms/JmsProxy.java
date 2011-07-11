@@ -72,15 +72,15 @@ public interface JmsProxy {
    * done automatically on reconnection.
    * 
    * @param serverUpdateListener the listener that will be called on update
-   * @param clientDataTag the tag for which the updates are destined (also
-   *                    the listener in current C2MON client API implementation)
+   * @param topicRegistrationDetails the details need to register to updates
+   *                                  for a given Tag
    * @throws JMSException if there is a JMS failure in subscribing; the JmsProxy will
    *                  subscribe this listener automatically once the connection is back,
    *                  but the caller may with to invalidate the Tag in the meantime
    * @throws NullPointerException if either argument is null
    */
   void registerUpdateListener(ServerUpdateListener serverUpdateListener, 
-                                  TopicRegistrationDetails clientDataTag) throws JMSException;
+                                  TopicRegistrationDetails topicRegistrationDetails) throws JMSException;
 
   /**
    * Unregisters a listener from receiving updates destined for the specified
@@ -88,7 +88,7 @@ public interface JmsProxy {
    * so can safely be called without a call to the isRegistered method.
    * 
    * @param serverUpdateListener the listener to unregister
-   * @throws IllegalArgumentException if argument is null
+   * @throws NullPointerException if argument is null
    */
   void unregisterUpdateListener(ServerUpdateListener serverUpdateListener);
   

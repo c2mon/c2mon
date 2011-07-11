@@ -26,6 +26,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -39,6 +40,7 @@ import javax.jms.Topic;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +65,9 @@ import cern.c2mon.shared.client.request.JsonRequest;
  * 
  * <p>Separate sessions are used for listening to supervision events and sending
  * requests to the server (the latter created at request time).
+ * 
+ * <p>Notice this component requires an explicit start of the Spring context (or direct call to the
+ * start method).
  * 
  * @author Mark Brightwell
  *
@@ -137,6 +142,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   private volatile boolean connected;
   
   /**
+   * Track start/stop status.
+   */
+  private volatile boolean running;
+  
+  /**
    * A final shutdown of this JmsProxy has been requested.
    */
   private volatile boolean shutdownRequested;
@@ -154,16 +164,24 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * consumers on the various sessions.
    */
   private ReentrantReadWriteLock refreshLock;
+
+  /**
+   * Topic on which supervision events arrive from server.
+   */
+  private Destination supervisionTopic;
   
   /**
-   * Constructor
+   * Constructor.
    * @param connectionFactory the JMS connection factory
+   * @param supervisionTopic topic on which supervision events arrive from server
    */
   @Autowired
-  public JmsProxyImpl(final ConnectionFactory connectionFactory) {
+  public JmsProxyImpl(final ConnectionFactory connectionFactory, @Qualifier("supervisionTopic") final Destination supervisionTopic) {
     this.jmsConnectionFactory = connectionFactory;
+    this.supervisionTopic = supervisionTopic;
     
     connected = false;
+    running = false;
     shutdownRequested = false;    
     connectingWriteLock = new ReentrantReadWriteLock().writeLock();
     refreshLock = new ReentrantReadWriteLock();
@@ -189,9 +207,10 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       while (!connected && !shutdownRequested) {
         try {                    
           connection = jmsConnectionFactory.createConnection();         
-          refreshSubscriptions();
-          connected = true;
+          refreshSubscriptions();          
           connection.setExceptionListener(this);
+          connection.start();
+          connected = true;
         } catch (Exception e) {
           LOGGER.error("Exception caught while trying to refresh the JMS connection; sleeping 5s before retrying.", e);
           try {
@@ -269,16 +288,16 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   private void refreshSubscriptions() throws JMSException {
     refreshLock.writeLock().lock();    
     try {    
-      if (!registeredListeners.isEmpty()) {
+      if (!registeredListeners.isEmpty()) {        
         sessions.clear();
-        topicToWrapper.clear();
+        topicToWrapper.clear();      
         //refresh all registered listeners for Tag updates      
         for (Map.Entry<ServerUpdateListener, TopicRegistrationDetails> entry : registeredListeners.entrySet()) {          
           registerUpdateListener(entry.getKey(), entry.getValue());
-        }
-        //refresh supervision subscription
-        subscribeToSupervisionTopic();
-      }      
+        }        
+      } 
+      //refresh supervision subscription
+      subscribeToSupervisionTopic();
     } catch (JMSException e) {
       LOGGER.error("Did not manage to refresh Topic subscriptions.", e);
       throw e;
@@ -295,56 +314,55 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * @throws JMSException if unable to subsribe
    */
   private void subscribeToSupervisionTopic() throws JMSException {   
-    if (connected) {       
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);                   
-        Topic topic = session.createTopic(System.getProperty("c2mon.jms.supervision.topic"));
-        MessageConsumer consumer = session.createConsumer(topic);                 
-        consumer.setMessageListener(supervisionListenerWrapper);        
-    } else {           
-      throw new JMSException("Not currently connected - will attempt to re-subscribe on reconnection.");     
-    }
+      Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);                           
+      MessageConsumer consumer = session.createConsumer(supervisionTopic);                 
+      consumer.setMessageListener(supervisionListenerWrapper);           
   }
 
   @Override
   public boolean isRegisteredListener(final ServerUpdateListener serverUpdateListener) {
     if (serverUpdateListener == null) {
       throw new IllegalArgumentException("isRegisteredListener() method called with null parameter!");
-    }
-    return registeredListeners.containsKey(serverUpdateListener);
+    }   
+    return registeredListeners.containsKey(serverUpdateListener);    
   }
 
   @Override
   public void registerUpdateListener(final ServerUpdateListener serverUpdateListener, 
-                            final TopicRegistrationDetails TopicRegistrationDetails) throws JMSException {   
+                            final TopicRegistrationDetails topicRegistrationDetails) throws JMSException {   
     refreshLock.readLock().lock();
     try {
+      if (!listenerLocks.containsKey(serverUpdateListener)) {
+        listenerLocks.put(serverUpdateListener, new ReentrantReadWriteLock().writeLock());
+      }
       listenerLocks.get(serverUpdateListener).lock();
       try {
         if (!isRegisteredListener(serverUpdateListener)) { //throw exception if ServerUpdateListener null
           try {
             if (connected) {
-              String topicName = TopicRegistrationDetails.getTopicName();
+              String topicName = topicRegistrationDetails.getTopicName();
               if (topicToWrapper.containsKey(topicName)) {
-                topicToWrapper.get(topicName).addListener(serverUpdateListener, TopicRegistrationDetails.getId());
+                topicToWrapper.get(topicName).addListener(serverUpdateListener, topicRegistrationDetails.getId());
               } else {                
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);               
-                Topic topic = session.createTopic(TopicRegistrationDetails.getTopicName());
+                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);              
+                Topic topic = session.createTopic(topicRegistrationDetails.getTopicName());
                 MessageConsumer consumer = session.createConsumer(topic);         
-                MessageListenerWrapper wrapper = new MessageListenerWrapper(TopicRegistrationDetails.getId(), serverUpdateListener);
+                MessageListenerWrapper wrapper = new MessageListenerWrapper(topicRegistrationDetails.getId(), serverUpdateListener);
                 consumer.setMessageListener(wrapper);
+                topicToWrapper.put(topicName, wrapper);
                 sessions.put(wrapper, session);
               }                             
-              registeredListeners.put(serverUpdateListener, TopicRegistrationDetails);
+              registeredListeners.put(serverUpdateListener, topicRegistrationDetails);
             } else {           
               throw new JMSException("Not currently connected - will attempt to subscribe on reconnection. Attempting to reconnect.");     
             }
           } catch (JMSException e) {
             LOGGER.error("Failed to subscribe to topic - will do so on reconnection.", e);
-            registeredListeners.put(serverUpdateListener, TopicRegistrationDetails);
+            registeredListeners.put(serverUpdateListener, topicRegistrationDetails);
             throw e;
           }
         } else {
-          LOGGER.debug("Update listener already registered; skipping registration (for Tag " + TopicRegistrationDetails.getId() + ")");     
+          LOGGER.debug("Update listener already registered; skipping registration (for Tag " + topicRegistrationDetails.getId() + ")");     
         }
       } finally {
         listenerLocks.get(serverUpdateListener).unlock();
@@ -361,15 +379,18 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     }
     refreshLock.readLock().lock();
     try {
-      ReentrantReadWriteLock.WriteLock lock = listenerLocks.get(registeredListener);
-      lock.lock();      
+      if (!listenerLocks.containsKey(registeredListener)) {
+        throw new IllegalStateException("Tried to replace a unrecognized update listener.");
+      }
+      ReentrantReadWriteLock.WriteLock listenerLock = listenerLocks.get(registeredListener);
+      listenerLock.lock();      
       try {
         TopicRegistrationDetails tag = registeredListeners.get(registeredListener); 
         topicToWrapper.get(tag.getTopicName()).addListener(replacementListener, tag.getId());       
         listenerLocks.put(replacementListener, listenerLocks.remove(registeredListener));
         registeredListeners.put(replacementListener, registeredListeners.remove(registeredListener));
       } finally {
-        lock.unlock();        
+        listenerLock.unlock();        
       }
     } finally {
       refreshLock.readLock().unlock();
@@ -383,7 +404,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       throw new NullPointerException("sendRequest(..) method called with null queue name argument");
     }
     if (connected) {
-      Session session = connection.createSession(false, Session.SESSION_TRANSACTED);           
+      Session session = connection.createSession(true, Session.SESSION_TRANSACTED);           
       TextMessage message = session.createTextMessage(jsonRequest.toJson());
       TemporaryQueue replyQueue = session.createTemporaryQueue();
       message.setJMSReplyTo(replyQueue);     
@@ -406,24 +427,34 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   public void unregisterUpdateListener(final ServerUpdateListener serverUpdateListener) {
     refreshLock.readLock().lock();
     try {
-      if (isRegisteredListener(serverUpdateListener)) {
-        TopicRegistrationDetails subsribedToTag = registeredListeners.get(serverUpdateListener);
-        MessageListenerWrapper wrapper = topicToWrapper.get(serverUpdateListener);
-        wrapper.removeListener(subsribedToTag.getId());
-        if (wrapper.isEmpty()) { //no subscribed listeners, so close session
-          try {            
-            Session session = sessions.get(wrapper);
-            session.close();            
-          } catch (JMSException ex) {
-            LOGGER.error("Failed to unregister properly from a Tag update; subscriptions will be refreshed.");            
-            startReconnectThread();            
-          } finally {
-            sessions.remove(wrapper);            
-            topicToWrapper.remove(subsribedToTag.getTopicName());
-            registeredListeners.remove(serverUpdateListener);
+      if (!listenerLocks.containsKey(serverUpdateListener)) {
+        throw new IllegalStateException("Tried to unregister a unrecognized update listener.");
+      }
+      ReentrantReadWriteLock.WriteLock listenerLock = listenerLocks.get(serverUpdateListener);
+      listenerLock.lock();
+      try {
+        if (isRegisteredListener(serverUpdateListener)) {
+          TopicRegistrationDetails subsribedToTag = registeredListeners.get(serverUpdateListener);
+          MessageListenerWrapper wrapper = topicToWrapper.get(subsribedToTag.getTopicName());
+          wrapper.removeListener(subsribedToTag.getId());
+          if (wrapper.isEmpty()) { //no subscribed listeners, so close session
+            try {            
+              Session session = sessions.get(wrapper);
+              session.close();            
+            } catch (JMSException ex) {
+              LOGGER.error("Failed to unregister properly from a Tag update; subscriptions will be refreshed.");            
+              startReconnectThread();            
+            } finally {
+              sessions.remove(wrapper);            
+              topicToWrapper.remove(subsribedToTag.getTopicName());
+              registeredListeners.remove(serverUpdateListener);
+              listenerLocks.remove(serverUpdateListener);
+            }
           }
-        }
-      }       
+        } 
+      } finally {
+        listenerLock.unlock();
+      }            
     } finally {
       refreshLock.readLock().unlock();
     }       
@@ -477,7 +508,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
 
   @Override
   public boolean isRunning() {
-    return !shutdownRequested;
+    return running;
   }
 
   @Override
@@ -488,13 +519,15 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       public void run() {
         connect();
       }
-    }).start();    
+    }).start();
+    running = true;
   }
   
   @Override
   public void stop() {
     shutdownRequested = true;
     disconnect();
+    running = false;
   }
 
   @Override
