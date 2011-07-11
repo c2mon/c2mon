@@ -36,9 +36,9 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -88,7 +88,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   /**
    * The JMS connection factory.
    */
-  private ConnectionFactory connectionFactory;
+  private ConnectionFactory jmsConnectionFactory;
   
   /**
    * The unique JMS connection used.
@@ -157,11 +157,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   
   /**
    * Constructor
+   * @param connectionFactory the JMS connection factory
    */
-  public JmsProxyImpl() {
-    connectionFactory = new ActiveMQConnectionFactory(System.getProperty("c2mon.jms.broker.url"), 
-                                                        System.getProperty("c2mon.jms.broker.user"), 
-                                                        System.getProperty("c2mon.jms.broker.passwd"));    
+  @Autowired
+  public JmsProxyImpl(final ConnectionFactory connectionFactory) {
+    this.jmsConnectionFactory = connectionFactory;
+    
     connected = false;
     shutdownRequested = false;    
     connectingWriteLock = new ReentrantReadWriteLock().writeLock();
@@ -187,7 +188,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   private void connect() {
       while (!connected && !shutdownRequested) {
         try {                    
-          connection = connectionFactory.createConnection();         
+          connection = jmsConnectionFactory.createConnection();         
           refreshSubscriptions();
           connected = true;
           connection.setExceptionListener(this);
@@ -447,11 +448,17 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   
   @Override
   public void registerSupervisionListener(final SupervisionListener supervisionListener) {
+    if (supervisionListener == null) {
+      throw new IllegalArgumentException("Trying to register null Supervision listener with JmsProxy.");
+    }
     supervisionListenerWrapper.addListener(supervisionListener);           
   }
 
   @Override
-  public void unregisterSupervisionListener(final SupervisionListener supervisionListener) {   
+  public void unregisterSupervisionListener(final SupervisionListener supervisionListener) { 
+    if (supervisionListener == null) {
+      throw new IllegalArgumentException("Trying to unregister null Supervision listener with JmsProxy.");
+    }
     supervisionListenerWrapper.removeListener(supervisionListener);        
   }
 
