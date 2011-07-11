@@ -25,6 +25,10 @@
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.jms</groupId>
       <artifactId>jms</artifactId>
     </dependency>
@@ -45,6 +49,13 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.8</version>
+        <configuration>
+          <argLine>
+            -Dc2mon.jms.broker.url=tcp://timjms1:61616
+            -Dc2mon.jms.broker.user=not-used
+            -Dc2mon.jms.broker.passwd=not-used
+          </argLine>
+        </configuration>
       </plugin>
     </plugins>
   </build>
