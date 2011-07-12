@@ -259,7 +259,7 @@ public class JmsProxyTest implements ApplicationContextAware {
     
     jmsProxy.registerSupervisionListener(supervisionListener1);
     jmsProxy.registerSupervisionListener(supervisionListener2);
-    String topicName = System.getProperty("c2mon.jms.supervision.topic");
+    String topicName = System.getProperty("c2mon.client.jms.supervision.topic");
     Assert.assertNotNull(topicName);
     jmsSender.sendToTopic(((SupervisionEventImpl) event).toJson(), topicName);
     

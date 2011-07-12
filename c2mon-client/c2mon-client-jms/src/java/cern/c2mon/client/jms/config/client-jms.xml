@@ -19,7 +19,12 @@
   </bean>
   
   <bean id="supervisionTopic" class="org.apache.activemq.command.ActiveMQTopic">
-    <constructor-arg value="${c2mon.jms.supervision.topic}"/>
+    <constructor-arg value="${c2mon.client.jms.supervision.topic}"/>
+  </bean>
+  
+  <bean class="cern.c2mon.client.jms.impl.RequestHandlerImpl" autowire="constructor">
+    <property name="requestQueue" value="${c2mon.client.jms.request.queue}"/>
+    <property name="requestTimeout" value="10000"/>
   </bean>
 
 </beans>

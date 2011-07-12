@@ -79,11 +79,6 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * Class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(JmsProxyImpl.class);
-  
-  /**
-   * Number of JMS sessions that will be cached.
-   */
-  private static final int SESSION_POOL_SIZE = 20;
 
   /**
    * Time between reconnection attempts if the first attempt fails (in milliseconds).
@@ -397,6 +392,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     }    
   }
 
+  /**
+   * ActiveMQ-specific implementation since need to create topic.
+   */
   @Override
   public <T extends ClientRequestResult> Collection<T> sendRequest(final JsonRequest<T> jsonRequest, 
                                                    final String queueName, final int timeout) throws JMSException {  
@@ -422,7 +420,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       throw new JMSException("Not currently connected: unable to send request at this time.");
     }    
   }
-
+ 
   @Override
   public void unregisterUpdateListener(final ServerUpdateListener serverUpdateListener) {
     refreshLock.readLock().lock();
