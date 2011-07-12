@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern</groupId>
+		<artifactId>parent-pom</artifactId>
+		<version>1.0.5-SNAPSHOT</version>
+	</parent>
+
+	<groupId>cern.c2mon.c2mon-client</groupId>
+	<artifactId>c2mon-client-pom</artifactId>
+	<version>1.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<description>
+      This is a common parent POM for all c2-mon client modules
+    </description>
+	<url>http://timweb.cern.ch</url>
+
+	<!-- Shared version number properties -->
+	<properties>
+		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.14</version>
+			</dependency>
+			
+			<!--  spring libraries -->
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-tx</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-jms</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-test</artifactId>
+				<version>${org.springframework.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context-support</artifactId>
+				<version>${org.springframework.version}</version>
+			</dependency>
+
+			<!--  tim2 shared libraries -->
+			<dependency>
+				<groupId>cern.tim2.tim2-shared</groupId>
+				<artifactId>tim2-shared-util</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-shared</groupId>
+				<artifactId>tim2-shared-common</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>			
+			<dependency>
+				<groupId>cern.tim2.tim2-shared</groupId>
+				<artifactId>tim2-shared-client</artifactId>
+				<version>[0.9.9,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-shared</groupId>
+				<artifactId>tim2-shared-rule</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.c2mon.c2mon-shared</groupId>
+				<artifactId>c2mon-shared-persistence-manager</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+
+			<!-- tim2-server libraries -->
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-common</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-test</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-auth</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-cache</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-cachedbaccess</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-cacheloading</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-cachepersistence</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-daqcommunication-out</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-daqcommunication-in</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-supervision</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.c2mon.c2mon-server</groupId>
+				<artifactId>c2mon-server-configuration</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-alarm</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-command</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-rule</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.tim2.tim2-server</groupId>
+				<artifactId>tim2-server-benchmark</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.c2mon.c2mon-server</groupId>
+				<artifactId>c2mon-server-lifecycle</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+
+			<!-- 3rd parties -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>[4.8.1, 5.0.0)</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>oracle</groupId>
+				<artifactId>ojdbc14</artifactId>
+				<version>10.2.0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>oracle</groupId>
+				<artifactId>orai18n</artifactId>
+				<version>10.2.0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>org.easymock</groupId>
+				<artifactId>easymock</artifactId>
+				<version>2.5</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.easymock</groupId>
+				<artifactId>easymockclassextension</artifactId>
+				<version>2.4</version>
+				<scope>test</scope>
+			</dependency>
+		
+			<dependency>
+				<groupId>javax.jms</groupId>
+				<artifactId>jms</artifactId>
+				<version>1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.activemq</groupId>
+				<artifactId>activemq-all</artifactId>
+				<version>5.3.2</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+
+		<!--
+			DEFINE ALL PLUGINS THAT NEED TO BE USED BY SERVER MODULS HERE
+		-->
+		<pluginManagement>
+			<plugins>
+				<!--
+					NOTE: Unless specified directly we don't need a groupId
+					specification because the group is org.apache.maven.plugins
+					...which is assumed by default.
+				-->
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.2.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>appassembler-maven-plugin</artifactId>
+					<version>1.1.1</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>1.6</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.8.1</version>
+				</plugin>
+			</plugins>
+
+		</pluginManagement>
+
+		<plugins/>
+		
+	</build>
+</project>
+
