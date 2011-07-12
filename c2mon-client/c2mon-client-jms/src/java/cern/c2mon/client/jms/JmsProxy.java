@@ -89,6 +89,7 @@ public interface JmsProxy {
    * 
    * @param serverUpdateListener the listener to unregister
    * @throws NullPointerException if argument is null
+   * @throws IllegalStateException if trying to unregister an unrecognized ServerUpdateListener
    */
   void unregisterUpdateListener(ServerUpdateListener serverUpdateListener);
   
@@ -102,7 +103,7 @@ public interface JmsProxy {
    * 
    * @param serverUpdateListener the listener to check
    * @return true if registered
-   * @throws IllegalArgumentException if argument is null
+   * @throws NullPointerException if argument is null
    */  
   boolean isRegisteredListener(ServerUpdateListener serverUpdateListener);
 
@@ -114,7 +115,7 @@ public interface JmsProxy {
    * 
    * @param registeredListener the current registered listener
    * @param replacementListener the new listener to register
-   * @throws IllegalArgumentException if either argument is null
+   * @throws NullPointerException if either argument is null
    */
   void replaceListener(ServerUpdateListener registeredListener, ServerUpdateListener replacementListener);
   
@@ -141,7 +142,7 @@ public interface JmsProxy {
    * Register a listener for connection/disconnection events.
    * 
    * @param connectionListener the listener to register
-   * @throws IllegalArgumentException if argument is null
+   * @throws NullPointerException if argument is null
    */
   void registerConnectionListener(ConnectionListener connectionListener);
   
@@ -150,7 +151,7 @@ public interface JmsProxy {
    * from the server.
    * 
    * @param supervisionListener the listener to register
-   * @throws IllegalArgumentException if argument is null
+   * @throws NullPointerException if argument is null
    */
   void registerSupervisionListener(SupervisionListener supervisionListener);
   
@@ -158,7 +159,7 @@ public interface JmsProxy {
    * Unregister the listener from receiving supervision updates.
    * 
    * @param supervisionListener the listener to remove
-   * @throws IllegalArgumentException if argument is null
+   * @throws NullPointerException if argument is null
    */
   void unregisterSupervisionListener(SupervisionListener supervisionListener);
 }

@@ -317,7 +317,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   @Override
   public boolean isRegisteredListener(final ServerUpdateListener serverUpdateListener) {
     if (serverUpdateListener == null) {
-      throw new IllegalArgumentException("isRegisteredListener() method called with null parameter!");
+      throw new NullPointerException("isRegisteredListener() method called with null parameter!");
     }   
     return registeredListeners.containsKey(serverUpdateListener);    
   }
@@ -370,7 +370,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   @Override
   public void replaceListener(final ServerUpdateListener registeredListener, final ServerUpdateListener replacementListener) {
     if (registeredListener == null && replacementListener == null) {
-      throw new IllegalArgumentException("replaceListener(..) method called with null argument");
+      throw new NullPointerException("replaceListener(..) method called with null argument");
     }
     refreshLock.readLock().lock();
     try {
@@ -426,7 +426,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     refreshLock.readLock().lock();
     try {
       if (!listenerLocks.containsKey(serverUpdateListener)) {
-        throw new IllegalStateException("Tried to unregister a unrecognized update listener.");
+        throw new IllegalStateException("Tried to unregister an unrecognized update listener.");
       }
       ReentrantReadWriteLock.WriteLock listenerLock = listenerLocks.get(serverUpdateListener);
       listenerLock.lock();
@@ -461,7 +461,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   @Override
   public void registerConnectionListener(final ConnectionListener connectionListener) {
     if (connectionListener == null) {
-      throw new IllegalArgumentException("registerConnectionListener(..) method called with null listener argument");
+      throw new NullPointerException("registerConnectionListener(..) method called with null listener argument");
     }
     connectionListeners.add(connectionListener);
   }
@@ -478,7 +478,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   @Override
   public void registerSupervisionListener(final SupervisionListener supervisionListener) {
     if (supervisionListener == null) {
-      throw new IllegalArgumentException("Trying to register null Supervision listener with JmsProxy.");
+      throw new NullPointerException("Trying to register null Supervision listener with JmsProxy.");
     }
     supervisionListenerWrapper.addListener(supervisionListener);           
   }
@@ -486,7 +486,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   @Override
   public void unregisterSupervisionListener(final SupervisionListener supervisionListener) { 
     if (supervisionListener == null) {
-      throw new IllegalArgumentException("Trying to unregister null Supervision listener with JmsProxy.");
+      throw new NullPointerException("Trying to unregister null Supervision listener with JmsProxy.");
     }
     supervisionListenerWrapper.removeListener(supervisionListener);        
   }

@@ -99,7 +99,7 @@ public class JmsProxyImplTest {
    * Call unregister supervision with null.
    * @throws JMSException 
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void testUnRegisterNullSupervisionListener() throws JMSException {
     jmsProxy.unregisterSupervisionListener(null);
   }
@@ -108,7 +108,7 @@ public class JmsProxyImplTest {
    * Call unregister supervision with null.
    * @throws JMSException 
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void testRegisterNullSupervisionListener() throws JMSException {
     jmsProxy.registerSupervisionListener(null);
   }
@@ -117,7 +117,7 @@ public class JmsProxyImplTest {
    * Call unregister supervision with null.
    * @throws JMSException 
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = NullPointerException.class)
   public void testRegisterNullConnectionListener() throws JMSException {
     jmsProxy.registerConnectionListener(null);
   }
