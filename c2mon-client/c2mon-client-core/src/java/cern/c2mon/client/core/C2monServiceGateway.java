@@ -17,7 +17,9 @@
  ******************************************************************************/
 package cern.c2mon.client.core;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,6 +34,9 @@ import org.springframework.stereotype.Service;
  */
 public final class C2monServiceGateway {
   
+  /** Class logger */
+  private static final Logger LOGGER = Logger.getLogger(C2monServiceGateway.class);
+  
   /** Static reference to the <code>C2monShortTermLogManager</code> singleton instance */
   private static C2monHistoryManager stlManager = null;
   
@@ -43,7 +48,6 @@ public final class C2monServiceGateway {
   
   /** Static reference to the <code>C2monSupervisionManager</code> singleton instance */
   private static C2monSupervisionManager supervisionManager = null;
- 
   
   /**
    * Hidden constructor
@@ -86,7 +90,23 @@ public final class C2monServiceGateway {
     return supervisionManager;
   }
 
-
+  /**
+   * Starts the C2MON core. Must be called at application start-up.
+   * 
+   * <p>This method needs to be called before the C2monServiceGateway 
+   * can be used. It should be called synchronously by the main application
+   * thread, and will return once the core is ready for use. Notice
+   * that the method will return even if the core cannot connect to
+   * JMS (reconnection attempts will be made until successful).
+   */
+  public static void startC2monClient() {
+    LOGGER.info("Starting C2MON client core.");
+    final ClassPathXmlApplicationContext xmlContext = 
+                    new ClassPathXmlApplicationContext("cern/c2mon/client/core/config/c2mon-client.xml");
+    xmlContext.start();
+    xmlContext.registerShutdownHook();
+  }
+  
   /**
    * The lifecycle of this inner class is managed by the Spring
    * context. It's purpose is to set the static fields of the
