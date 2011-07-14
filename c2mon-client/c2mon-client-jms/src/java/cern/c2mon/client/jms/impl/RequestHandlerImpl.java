@@ -29,8 +29,8 @@ import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.tag.TransferTag;
-import cern.c2mon.shared.client.tag.TransferTagValue;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.client.command.CommandTagHandle;
 
 /**
@@ -79,21 +79,21 @@ public class RequestHandlerImpl implements RequestHandler {
   }
 
   @Override
-  public Collection<TransferTag> requestTags(final Collection<Long> tagIds) throws JMSException {
+  public Collection<TagUpdate> requestTags(final Collection<Long> tagIds) throws JMSException {
     if (tagIds == null) {
       throw new NullPointerException("requestTags(..) method called with null parameter.");
     }
-    ClientRequestImpl<TransferTag> clientRequest = new ClientRequestImpl<TransferTag>(TransferTag.class);
+    ClientRequestImpl<TagUpdate> clientRequest = new ClientRequestImpl<TagUpdate>(TagUpdate.class);
     clientRequest.addTagIds(tagIds);
     return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
   }
   
   @Override
-  public Collection<TransferTagValue> requestTagValues(final Collection<Long> tagIds) throws JMSException {
+  public Collection<TagValueUpdate> requestTagValues(final Collection<Long> tagIds) throws JMSException {
     if (tagIds == null) {
       throw new NullPointerException("requestTagValues(..) method called with null parameter.");
     }
-    ClientRequestImpl<TransferTagValue> clientRequest = new ClientRequestImpl<TransferTagValue>(TransferTagValue.class);
+    ClientRequestImpl<TagValueUpdate> clientRequest = new ClientRequestImpl<TagValueUpdate>(TagValueUpdate.class);
     clientRequest.addTagIds(tagIds);
     return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
   }

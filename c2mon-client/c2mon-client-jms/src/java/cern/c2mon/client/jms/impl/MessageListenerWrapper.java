@@ -28,8 +28,8 @@ import javax.jms.TextMessage;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.jms.ServerUpdateListener;
-import cern.c2mon.shared.client.tag.TransferTagValue;
+import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 
 /**
@@ -39,8 +39,8 @@ import cern.c2mon.shared.client.tag.TransferTagValueImpl;
  * 
  * <p>Tag update listeners can register with this wrapper to receive updates
  * for a specific Tag (specified by id). The wrapper listens on a the given topic
- * and notifies {@link ServerUpdateListener}s when an update is received for
- * the corresponding Tag. Notice only one ServerUpdateListener will be registered
+ * and notifies {@link TagUpdateListener}s when an update is received for
+ * the corresponding Tag. Notice only one TagUpdateListener will be registered
  * for a given id (the latest one added). In other words, this wrapper also
  * functions as a filter on the topic, with undesired messages being filtered
  * out.
@@ -58,7 +58,7 @@ class MessageListenerWrapper implements MessageListener {
   /**
    * Wrapped listener. Methods accessing this field are synchronized.
    */
-  private Map<Long, ServerUpdateListener> listeners = new HashMap<Long, ServerUpdateListener>();
+  private Map<Long, TagUpdateListener> listeners = new HashMap<Long, TagUpdateListener>();
   
   /**
    * Constructor. Adds the listener to receive updates for the specified Tag id. 
@@ -66,7 +66,7 @@ class MessageListenerWrapper implements MessageListener {
    * @param tagId the ClientDataTag id
    * @param serverUpdateListener the listener that should be registered
    */
-  public MessageListenerWrapper(final Long tagId, final ServerUpdateListener serverUpdateListener) { 
+  public MessageListenerWrapper(final Long tagId, final TagUpdateListener serverUpdateListener) { 
     addListener(serverUpdateListener, tagId);
   }
 
@@ -78,7 +78,7 @@ class MessageListenerWrapper implements MessageListener {
    * @param listener the listener to notify on update
    * @param tagId listens to updates for the ClientDataTag with this id
    */
-  public synchronized void addListener(final ServerUpdateListener listener, final Long tagId) {    
+  public synchronized void addListener(final TagUpdateListener listener, final Long tagId) {    
     listeners.put(tagId, listener);    
   }
   
@@ -116,9 +116,9 @@ class MessageListenerWrapper implements MessageListener {
   public synchronized void onMessage(final Message message) { 
     try {
       if (message instanceof TextMessage) {
-        TransferTagValue transferTagValue = TransferTagValueImpl.fromJson(((TextMessage) message).getText());
-        if (listeners.containsKey(transferTagValue.getId())) {
-          listeners.get(transferTagValue.getId()).onUpdate(transferTagValue);
+        TagValueUpdate tagValueUpdate = TransferTagValueImpl.fromJson(((TextMessage) message).getText());
+        if (listeners.containsKey(tagValueUpdate.getId())) {
+          listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
         }
       } else {
         LOGGER.warn("Non-text message received on ");

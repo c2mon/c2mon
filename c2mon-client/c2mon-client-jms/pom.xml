@@ -36,6 +36,10 @@
       <groupId>cern.tim2.tim2-shared</groupId>
       <artifactId>tim2-shared-client</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-common</artifactId>
+    </dependency>
     
     <!-- test dependencies -->
     <dependency>

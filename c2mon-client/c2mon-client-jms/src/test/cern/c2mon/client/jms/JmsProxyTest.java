@@ -40,6 +40,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -110,7 +111,7 @@ public class JmsProxyTest implements ApplicationContextAware {
    */
   @Test
   public void testRegisterUpdateListener() throws JMSException {
-    ServerUpdateListener listener = EasyMock.createMock(ServerUpdateListener.class);
+    TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
     TopicRegistrationDetails details = EasyMock.createMock(TopicRegistrationDetails.class);
     EasyMock.expect(details.getTopicName()).andReturn("c2mon.JmsProxy.test.topic.registration");
     EasyMock.expect(details.getTopicName()).andReturn("c2mon.JmsProxy.test.topic.registration");
@@ -132,7 +133,7 @@ public class JmsProxyTest implements ApplicationContextAware {
    */
   @Test
   public void testUpdateNotification() throws JMSException, InterruptedException {
-    ServerUpdateListener listener = EasyMock.createMock(ServerUpdateListener.class);
+    TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
     TopicRegistrationDetails details = new TopicRegistrationDetails() {
       
       @Override
@@ -178,7 +179,7 @@ public class JmsProxyTest implements ApplicationContextAware {
    */
   @Test
   public void testUnregisterUpdateListener() throws JMSException {
-    ServerUpdateListener listener = EasyMock.createMock(ServerUpdateListener.class);
+    TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
     TopicRegistrationDetails details = new TopicRegistrationDetails() {
       
       @Override
@@ -208,7 +209,7 @@ public class JmsProxyTest implements ApplicationContextAware {
    */
   @Test
   public void testReplaceUpdateListener() throws JMSException {
-    ServerUpdateListener listener = EasyMock.createMock(ServerUpdateListener.class);
+    TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
     TopicRegistrationDetails details = new TopicRegistrationDetails() {
       
       @Override
@@ -223,7 +224,7 @@ public class JmsProxyTest implements ApplicationContextAware {
     };
     
     //new listener to replace old
-    ServerUpdateListener newListener = EasyMock.createMock(ServerUpdateListener.class);
+    TagUpdateListener newListener = EasyMock.createMock(TagUpdateListener.class);
       
     //first register (already tested)
     jmsProxy.registerUpdateListener(listener, details);

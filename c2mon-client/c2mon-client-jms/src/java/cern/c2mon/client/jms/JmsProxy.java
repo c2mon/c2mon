@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 
@@ -79,7 +80,7 @@ public interface JmsProxy {
    *                  but the caller may with to invalidate the Tag in the meantime
    * @throws NullPointerException if either argument is null
    */
-  void registerUpdateListener(ServerUpdateListener serverUpdateListener, 
+  void registerUpdateListener(TagUpdateListener serverUpdateListener, 
                                   TopicRegistrationDetails topicRegistrationDetails) throws JMSException;
 
   /**
@@ -91,7 +92,7 @@ public interface JmsProxy {
    * @throws NullPointerException if argument is null
    * @throws IllegalStateException if trying to unregister an unrecognized ServerUpdateListener
    */
-  void unregisterUpdateListener(ServerUpdateListener serverUpdateListener);
+  void unregisterUpdateListener(TagUpdateListener serverUpdateListener);
   
   /**
    * Determines if the passed listener is currently registered
@@ -105,7 +106,7 @@ public interface JmsProxy {
    * @return true if registered
    * @throws NullPointerException if argument is null
    */  
-  boolean isRegisteredListener(ServerUpdateListener serverUpdateListener);
+  boolean isRegisteredListener(TagUpdateListener serverUpdateListener);
 
   /**
    * Replace the current registered listener with another one.
@@ -117,7 +118,7 @@ public interface JmsProxy {
    * @param replacementListener the new listener to register
    * @throws NullPointerException if either argument is null
    */
-  void replaceListener(ServerUpdateListener registeredListener, ServerUpdateListener replacementListener);
+  void replaceListener(TagUpdateListener registeredListener, TagUpdateListener replacementListener);
   
   /**
    * Send a request to the server and wait "timeout" milliseconds for a response.

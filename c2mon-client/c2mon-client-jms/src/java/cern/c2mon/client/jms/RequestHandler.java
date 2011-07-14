@@ -23,8 +23,8 @@ import java.util.Collection;
 import javax.jms.JMSException;
 
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.tag.TransferTag;
-import cern.c2mon.shared.client.tag.TransferTagValue;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.client.command.CommandTagHandle;
 
 /**
@@ -48,7 +48,7 @@ public interface RequestHandler {
    *                      if a JMS problem occurs while making the request
    * @throws NullPointerException if called with a null argument
    */
-  Collection<TransferTag> requestTags(Collection<Long> tagIds) throws JMSException;
+  Collection<TagUpdate> requestTags(Collection<Long> tagIds) throws JMSException;
   
   /**
    * Queries the server for the latest values for the request tags.
@@ -61,7 +61,7 @@ public interface RequestHandler {
    *                      if a JMS problem occurs while making the request
    * @throws NullPointerException if called with a null argument
    */
-  Collection<TransferTagValue> requestTagValues(Collection<Long> tagIds) throws JMSException;
+  Collection<TagValueUpdate> requestTagValues(Collection<Long> tagIds) throws JMSException;
   
   /**
    * Queries the server for the current Supervision status of all

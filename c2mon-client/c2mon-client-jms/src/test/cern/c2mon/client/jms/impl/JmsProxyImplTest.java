@@ -31,8 +31,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.SmartLifecycle;
 
+import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.jms.JmsProxy;
-import cern.c2mon.client.jms.ServerUpdateListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
@@ -83,7 +83,7 @@ public class JmsProxyImplTest {
    */
   @Test(expected = NullPointerException.class)
   public void testRegisterNullDetails() throws JMSException {
-    jmsProxy.registerUpdateListener(EasyMock.createMock(ServerUpdateListener.class), null);
+    jmsProxy.registerUpdateListener(EasyMock.createMock(TagUpdateListener.class), null);
   }
   
   /**

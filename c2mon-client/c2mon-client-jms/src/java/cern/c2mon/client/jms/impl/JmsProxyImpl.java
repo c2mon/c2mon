@@ -44,9 +44,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.JmsProxy;
-import cern.c2mon.client.jms.ServerUpdateListener;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.request.ClientRequestResult;
@@ -111,13 +111,13 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * 1-1 correspondence between ServerUpdateListeners and the Tags they are
    * receiving updates for (usually both are the same object).
    */
-  private Map<ServerUpdateListener, TopicRegistrationDetails> registeredListeners;
+  private Map<TagUpdateListener, TopicRegistrationDetails> registeredListeners;
   
   /**
    * Listener locks, to prevent concurrent subscription/unsubscription
    * of a given listener.
    */
-  private Map<ServerUpdateListener, ReentrantReadWriteLock.WriteLock> listenerLocks;
+  private Map<TagUpdateListener, ReentrantReadWriteLock.WriteLock> listenerLocks;
   
   /**
    * Listeners that need informing about JMS connection and disconnection
@@ -182,8 +182,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     refreshLock = new ReentrantReadWriteLock();
     sessions = new ConcurrentHashMap<MessageListenerWrapper, Session>();    
     topicToWrapper = new ConcurrentHashMap<String, MessageListenerWrapper>();
-    registeredListeners = new ConcurrentHashMap<ServerUpdateListener, TopicRegistrationDetails>();
-    listenerLocks = new ConcurrentHashMap<ServerUpdateListener, ReentrantReadWriteLock.WriteLock>();
+    registeredListeners = new ConcurrentHashMap<TagUpdateListener, TopicRegistrationDetails>();
+    listenerLocks = new ConcurrentHashMap<TagUpdateListener, ReentrantReadWriteLock.WriteLock>();
     connectionListeners = new ArrayList<ConnectionListener>(); 
     supervisionListenerWrapper = new SupervisionListenerWrapper();
   }
@@ -287,7 +287,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
         sessions.clear();
         topicToWrapper.clear();      
         //refresh all registered listeners for Tag updates      
-        for (Map.Entry<ServerUpdateListener, TopicRegistrationDetails> entry : registeredListeners.entrySet()) {          
+        for (Map.Entry<TagUpdateListener, TopicRegistrationDetails> entry : registeredListeners.entrySet()) {          
           registerUpdateListener(entry.getKey(), entry.getValue());
         }        
       } 
@@ -315,7 +315,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   }
 
   @Override
-  public boolean isRegisteredListener(final ServerUpdateListener serverUpdateListener) {
+  public boolean isRegisteredListener(final TagUpdateListener serverUpdateListener) {
     if (serverUpdateListener == null) {
       throw new NullPointerException("isRegisteredListener() method called with null parameter!");
     }   
@@ -323,7 +323,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   }
 
   @Override
-  public void registerUpdateListener(final ServerUpdateListener serverUpdateListener, 
+  public void registerUpdateListener(final TagUpdateListener serverUpdateListener, 
                             final TopicRegistrationDetails topicRegistrationDetails) throws JMSException {   
     refreshLock.readLock().lock();
     try {
@@ -332,7 +332,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       }
       listenerLocks.get(serverUpdateListener).lock();
       try {
-        if (!isRegisteredListener(serverUpdateListener)) { //throw exception if ServerUpdateListener null
+        if (!isRegisteredListener(serverUpdateListener)) { //throw exception if TagUpdateListener null
           try {
             if (connected) {
               String topicName = topicRegistrationDetails.getTopicName();
@@ -368,7 +368,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   }
 
   @Override
-  public void replaceListener(final ServerUpdateListener registeredListener, final ServerUpdateListener replacementListener) {
+  public void replaceListener(final TagUpdateListener registeredListener, final TagUpdateListener replacementListener) {
     if (registeredListener == null && replacementListener == null) {
       throw new NullPointerException("replaceListener(..) method called with null argument");
     }
@@ -422,7 +422,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   }
  
   @Override
-  public void unregisterUpdateListener(final ServerUpdateListener serverUpdateListener) {
+  public void unregisterUpdateListener(final TagUpdateListener serverUpdateListener) {
     refreshLock.readLock().lock();
     try {
       if (!listenerLocks.containsKey(serverUpdateListener)) {

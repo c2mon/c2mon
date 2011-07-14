@@ -20,7 +20,7 @@ package cern.c2mon.client.jms;
 
 /**
  * Specifies the details needed by the JmsProxy to register a 
- * {@link ServerUpdateListener} to incoming {@link TransferTagValue}s.
+ * {@link ServerUpdateListener} to incoming {@link TagValueUpdate}s.
  * 
  * <p>These details are used by the JmsProxy to register on JMS for
  * the updates and direct them to the appropriate listener.
