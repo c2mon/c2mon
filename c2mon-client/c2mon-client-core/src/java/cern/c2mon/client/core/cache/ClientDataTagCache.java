@@ -20,6 +20,7 @@ package cern.c2mon.client.core.cache;
 import java.util.Collection;
 import java.util.Set;
 
+import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.client.core.tag.ClientDataTag;
@@ -40,7 +41,7 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    * Adds the <code>ClientDataTag</code> reference to the cache.
    * <p>
    * This method is used by the
-   * {@link cern.c2mon.client.core.C2monTagManager#subscribeDataTags(Set, DataTagUpdateListener)}
+   * {@link C2monTagManager#subscribeDataTags(Set, DataTagUpdateListener)}
    * method to update the cache with newly registered <code>ClientDataTag</code> objects.
    * This method is called before you adding the {@link DataTagUpdateListener} references
    * to the <code>ClientDataTag</code>. 

@@ -65,20 +65,6 @@ public interface BasicCacheHandler {
   Collection<ClientDataTag> getAllTagsForProcess(Long processId);
   
   /**
-   * @return A reference list to all <code>ClientDataTag</code> objects
-   *         which have at least one <code>DataTagUpdateListener</code>
-   *         listener subscribed.
-   * @throws NullPointerException When the parameter is <code>null</code>
-   */
-  Collection<ClientDataTag> getAllSubscribedDataTags();
-  
-  /**
-   * @return A reference list to all <code>ClientDataTag</code> objects
-   *         which have no <code>DataTagUpdateListener</code> registered.
-   */
-  Collection<ClientDataTag> getAllUnsubscribedDataTags();
-  
-  /**
    * Enables or disables the History mode of the cache. In history mode all
    * getter-methods will then return references to objects in the history cache.
    * Also the registered <code>DataTagUpdateListener</code>'s will then receive
@@ -87,9 +73,13 @@ public interface BasicCacheHandler {
    * However, the internal live cache is still update will live events and stays
    * up to date once it is decided to switch back into live mode.
    * <p>
+   * Please note that this method can be locked by other threads. Locking is
+   * realized with the {@link #getHistoryModeSyncLock()} method.
+   * <p>
    * This method shall only be used by the {@link HistoryManager}
    *  
    * @param enable <code>true</code>, for enabling the history mode
+   * @see #getHistoryModeSyncLock()
    */
   void setHistoryMode(boolean enable);
   
@@ -97,6 +87,16 @@ public interface BasicCacheHandler {
    * @return <code>true</code>, if the history mode of the cache is enabled 
    */
   boolean isHistoryModeEnabled();
+  
+  /** 
+   * The returning object can be used for preventing any thread changing the 
+   * the cache mode. The {@link #setHistoryMode(boolean)} method is internally
+   * synchronizing on the same object.
+   * @return The synchronization object for locking other thread changing the
+   *         cache mode.
+   * @see #setHistoryMode(boolean)
+   */
+  Object getHistoryModeSyncLock();
   
   /**
    * Checks whether the tag with the given tag id is already cached.

@@ -30,7 +30,7 @@ import cern.c2mon.client.jms.SupervisionListener;
  *
  * @author Matthias Braeger
  */
-interface CoreSupervisionManager extends C2monSupervisionManager {
+public interface CoreSupervisionManager extends C2monSupervisionManager {
 
   /**
    * Registers a <code>SupervisionListener</code> which is then getting informed

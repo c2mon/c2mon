@@ -37,13 +37,23 @@ import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.ClientDataTag;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagValue;
-import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.rule.RuleFormatException;
 
+/**
+ * The tag manager implements the <code>C2monTagManager</code> interface.
+ * It's main job is to delegate cache requests and to update the cache
+ * with new registered tags. Therefore it has to request an initial update
+ * from the C2MON server.
+ * <p>
+ * Please note that the <code>TagManager</code> is not in charge of registering
+ * the <code>ClientDataTags</code> to the <code>JmsProxy</code> nor to the
+ * <code>SupervisionManager</code>. This is done directly by the cache. 
+ * @author Matthias Braeger
+ */
 @Service
 public class TagManager implements CoreTagManager {
 
@@ -56,12 +66,6 @@ public class TagManager implements CoreTagManager {
   /** Provides methods for requesting tag information from the C2MON server */
   private final RequestHandler clientRequestHandler;
   
-  /** Reference to the JMS proxy singleton */
-  private final JmsProxy jmsProxy;
-  
-  /** Reference to the supervision manager singleton */
-  private final CoreSupervisionManager supervisionManager;
-  
   /** Lock for accessing the <code>listeners</code> variable */
   private ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
 
@@ -72,19 +76,13 @@ public class TagManager implements CoreTagManager {
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
    * @param pCache The cache instance which is managing all <code>ClientDataTag</code> objects
-   * @param pJmsProxy Reference to the JMS proxy singleton
    * @param pRequestHandler Provides methods for requesting tag information from the C2MON server
-   * @param pSupervisionManager Reference to the supervision manager singleton
    */
   @Autowired
   protected TagManager(final ClientDataTagCache pCache, 
-                       final JmsProxy pJmsProxy,
-                       final RequestHandler pRequestHandler,
-                       final CoreSupervisionManager pSupervisionManager) {
+                       final RequestHandler pRequestHandler) {
     this.cache = pCache;
-    this.jmsProxy = pJmsProxy;
     this.clientRequestHandler = pRequestHandler;
-    this.supervisionManager = pSupervisionManager;
   }
   
   @Override
@@ -127,7 +125,8 @@ public class TagManager implements CoreTagManager {
     }
     
     initializeNewTags(tagIds);
-    final Set<Long> newTagSubscriptionsIds = cache.addDataTagUpdateListener(tagIds, listener);
+    
+    final Set<Long> newTagSubscriptionsIds = this.cache.addDataTagUpdateListener(tagIds, listener);
 
     fireOnNewTagSubscriptionsEvent(newTagSubscriptionsIds);
   }
@@ -144,63 +143,59 @@ public class TagManager implements CoreTagManager {
   private Set<Long> initializeNewTags(final Set<Long> tagIds) {
     // Find tag id's which are not yet in the cache
     Map<Long, ClientDataTag> newTags = new HashMap<Long, ClientDataTag>();
-    ClientDataTag newTag = null;
-    for (Long tagId : tagIds) { 
-      if (!cache.containsTag(tagId)) {
-        newTag = new ClientDataTagImpl(tagId);
-        newTag.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG);
-        newTags.put(tagId, newTag);
-      }
-    }
     
-    try {
-      // Request initial tag information from C2MON server
-      Collection<TagUpdate> requestedTags = clientRequestHandler.requestTags(newTags.keySet());
-      // Update the new tags
-      for (TagUpdate tagUpdate : requestedTags) {
-        try { 
-          newTag = newTags.get(tagUpdate.getId());
-          newTag.update(tagUpdate);
-          try {
-            supervisionManager.addSupervisionListener(newTag, newTag.getProcessIds(), newTag.getEquipmentIds());
-            jmsProxy.registerUpdateListener(newTag, newTag);
-          }
-          catch (JMSException e) {
-            LOG.warn("initializeNewTags() - invalidate tag " + newTag.getId() + ". Reason: JMS connection lost.");
-            newTag.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE, "JMS connection lost.");
-          }
-        }
-        catch (RuleFormatException e) {
-          LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
-          throw new RuntimeException(e);
+    synchronized (cache.getHistoryModeSyncLock()) {
+      // Find out which tags need to be initialized
+      ClientDataTag newTag = null;
+      for (Long tagId : tagIds) { 
+        if (!cache.containsTag(tagId)) {
+          newTag = new ClientDataTagImpl(tagId);
+          newTag.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG);
+          newTags.put(tagId, newTag);
         }
       }
-    
-      // Update a second time in case an update was send before the ClientDataTag was subscribed to the topic
-      Collection<TagValueUpdate> requestedTagValues = clientRequestHandler.requestTagValues(tagIds);
-      for (TagValueUpdate tagValueUpdate : requestedTagValues) {
-        newTag = newTags.get(tagValueUpdate.getId());
-        if (newTag.getServerTimestamp() == null || newTag.getServerTimestamp().before(tagValueUpdate.getServerTimestamp())) {
-          try {
-            newTag.update(tagValueUpdate);
+      
+      try {
+        // Request initial tag information from C2MON server
+        Collection<TagUpdate> requestedTags = clientRequestHandler.requestTags(newTags.keySet());
+        // Update the new tags and put them into the cache
+        for (TagUpdate tagUpdate : requestedTags) {
+          try { 
+            newTag = newTags.get(tagUpdate.getId());
+            newTag.update(tagUpdate);
           }
           catch (RuleFormatException e) {
-            LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagValueUpdate.getId(), e);
+            LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
             throw new RuntimeException(e);
           }
         }
+        
+        // Add data into the cache which will also subscribe them for live updates
+        for (ClientDataTag cdt : newTags.values()) {
+          this.cache.put(cdt);
+        }
+      
+        // Update a second time in case an update was send before the ClientDataTag was subscribed to the topic
+        Collection<TagValueUpdate> requestedTagValues = clientRequestHandler.requestTagValues(tagIds);
+        for (TagValueUpdate tagValueUpdate : requestedTagValues) {
+          newTag = newTags.get(tagValueUpdate.getId());
+          if (newTag.getServerTimestamp() == null || newTag.getServerTimestamp().before(tagValueUpdate.getServerTimestamp())) {
+            try {
+              newTag.update(tagValueUpdate);
+            }
+            catch (RuleFormatException e) {
+              LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagValueUpdate.getId(), e);
+              throw new RuntimeException(e);
+            }
+          }
+        }
       }
-    }
-    catch (JMSException e) {
-      LOG.warn("initializeNewTags() - JMS connection lost -> Invalidate all newly requested tags.");
-      for (ClientDataTag cdt : newTags.values()) {
-        cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE, "JMS connection lost.");
+      catch (JMSException e) {
+        LOG.warn("initializeNewTags() - JMS connection lost -> Invalidate all newly requested tags.");
+        for (ClientDataTag cdt : newTags.values()) {
+          cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE, "JMS connection lost.");
+        }
       }
-    }
-    
-    // Add new entries to the cache
-    for (ClientDataTag cdt : newTags.values()) {
-      cache.put(cdt);
     }
     
     return newTags.keySet();
@@ -243,25 +238,27 @@ public class TagManager implements CoreTagManager {
   /**
    * Fires an <code>onNewTagSubscriptions()</code> event to all registered
    * <code>TagSubscriptionListener</code> listeners.
-   * @param tagIds
+   * @param tagIds list of new subscribed tags
    */
   private void fireOnNewTagSubscriptionsEvent(final Set<Long> tagIds) {
-    listenersLock.readLock().lock();
-    try {
-      Set<Long> copyList = new HashSet<Long>(tagIds);
-      for (TagSubscriptionListener listener : tagSubscriptionListeners) {
-        listener.onNewTagSubscriptions(copyList);
+    if (!tagIds.isEmpty()) {
+      listenersLock.readLock().lock();
+      try {
+        Set<Long> copyList = new HashSet<Long>(tagIds);
+        for (TagSubscriptionListener listener : tagSubscriptionListeners) {
+          listener.onNewTagSubscriptions(copyList);
+        }
       }
-    }
-    finally {
-      listenersLock.readLock().unlock();
+      finally {
+        listenersLock.readLock().unlock();
+      }
     }
   }
   
   /**
    * Fires an <code>onUnsubscribe()</code> event to all registered
    * <code>TagSubscriptionListener</code> listeners.
-   * @param tagIds
+   * @param tagIds list of tags that have been removed from the cache
    */
   private void fireOnUnsubscribeEvent(final Set<Long> tagIds) {
     listenersLock.readLock().lock();

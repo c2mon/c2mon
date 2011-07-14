@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * This file is part of the Technical Infrastructure Monitoring (TIM) project.
+ * See http://ts-project-tim.web.cern.ch
+ * 
+ * Copyright (C) 2004 - 2011 CERN. This program is free software; you can
+ * redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version. This program is distributed
+ * in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received
+ * a copy of the GNU General Public License along with this program; if not,
+ * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ * 
+ * Author: TIM team, tim.support@cern.ch
+ ******************************************************************************/
 package cern.c2mon.client.core.cache;
 
 import java.util.ArrayList;
@@ -17,12 +34,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTag;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.rule.RuleFormatException;
 
 @Service
@@ -30,6 +47,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   /** Log4j Logger for this class */
   private static final Logger LOG = Logger.getLogger(ClientDataTagCacheImpl.class);
+  
+  /** Default message for a JMS connection lost exception */
+  private static final String JMS_CONNECTION_LOST_MSG = "JMS connection lost.";
   
   /**
    * Pointer to the actual used cache instance (live or history)
@@ -40,7 +60,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
    * <code>Map</code> containing all subscribed data tags which are updated via the
    * <code>HistoryManager</code>
    */
-  private Map<Long, ClientDataTag> historyCache =  new Hashtable<Long, ClientDataTag>(1500);
+  private final Map<Long, ClientDataTag> historyCache =  new Hashtable<Long, ClientDataTag>(1500);
   
   /** 
    * <code>Map</code> containing all subscribed data tags which are updated via the
@@ -57,10 +77,16 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   /** Provides methods for requesting tag information from the C2MON server */
   private final RequestHandler clientRequestHandler;
   
+  /** Reference to the supervision manager singleton */
+  private final CoreSupervisionManager supervisionManager;
+  
   /**
    * Flag to remember whether the cache is in history mode or not
    */
   private boolean historyMode = false;
+  
+  /** Thread synchronization lock for avoiding a cache mode switch */ 
+  private final Object historyModeLock = new Object();
   
   
   /**
@@ -70,9 +96,11 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
    * @param pRequestHandler Provides methods for requesting tag information from the C2MON server
    */
   @Autowired
-  protected ClientDataTagCacheImpl(final JmsProxy pJmsProxy, final RequestHandler pRequestHandler) {
+  protected ClientDataTagCacheImpl(final JmsProxy pJmsProxy, final RequestHandler pRequestHandler, final CoreSupervisionManager pSupervisionManager) {
     this.jmsProxy = pJmsProxy;
     this.clientRequestHandler = pRequestHandler;
+    this.supervisionManager = pSupervisionManager;
+    
     this.activeCache = this.liveCache;
   }
   
@@ -89,45 +117,6 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     }
   
     return cdt;
-  }
-
-  @Override
-  public Collection<ClientDataTag> getAllSubscribedDataTags() {
-    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>(activeCache.size());
-    
-    cacheLock.readLock().lock();
-    try {
-      for (ClientDataTag cdt : activeCache.values()) {
-        if (cdt.hasUpdateListeners()) {
-          list.add(cdt);
-        }
-      }
-    }
-    finally {
-      cacheLock.readLock().unlock();
-    }
-    
-    return list;
-  }
-  
-  @Override
-  public Collection<ClientDataTag> getAllUnsubscribedDataTags() {
-    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>();
-
-    cacheLock.readLock().lock();
-    try {
-      for (ClientDataTag cdt : activeCache.values()) {
-        if (!cdt.hasUpdateListeners()) {
-          list.add(cdt);
-        }
-      }
-    }
-    finally {
-      cacheLock.readLock().unlock();
-    }
-
-    
-    return list;  
   }
 
   @Override
@@ -192,7 +181,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     if (clientDataTag != null) {
       cacheLock.writeLock().lock();
       try {
-        liveCache.put(clientDataTag.getId(), clientDataTag);
+        handleLiveTagRegistration(clientDataTag);
+        ClientDataTag oldEntry = liveCache.put(clientDataTag.getId(), clientDataTag);
+        
         if (historyMode) {
           try {
             ClientDataTag historyTag = clientDataTag.clone();
@@ -222,7 +213,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
       Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(tagIds);
       for (TagUpdate tagUpdate : tagUpdates) {
         try {
-          liveCache.get(tagUpdate.getId()).update(tagUpdate);
+          ClientDataTag liveTag = liveCache.get(tagUpdate.getId()); 
+          liveTag.update(tagUpdate);
+          handleLiveTagRegistration(liveTag);
         }
         catch (RuleFormatException e) {
           LOG.error("refresh() - Could not update tag with id " + tagUpdate.getId(), e);
@@ -230,7 +223,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
       }
     }
     catch (JMSException e) {
-      LOG.error("refresh() - Could not refresh tags in the cache. JMS connection lost.");
+      LOG.error("refresh() - Could not refresh tags in the cache. " + JMS_CONNECTION_LOST_MSG);
       jmsConnectionLost = true;
     }
     finally {
@@ -241,7 +234,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
       cacheLock.readLock().lock();
       try {
         for (ClientDataTag cdt : liveCache.values()) {
-          cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE, "JMS connection lost.");
+          cdt.invalidate(JMS_CONNECTION_LOST_MSG);
         }
       }
       finally {
@@ -249,6 +242,28 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
       }
     }
     
+  }
+  
+  /**
+   * This inner method gets called whenever a live tag is added to the cache
+   * or when a refresh is triggered. it handles the the live tag registration
+   * to the <code>JmsProxy</code> and the <code>SupervisionManager</code>. 
+   * @param liveTag The live tag
+   */
+  private void handleLiveTagRegistration(final ClientDataTag liveTag) {
+    final DataTagQuality tagQuality = liveTag.getDataTagQuality();
+    try {
+      if (tagQuality.isInitialised() && tagQuality.isExistingTag()) {
+        supervisionManager.addSupervisionListener(liveTag, liveTag.getProcessIds(), liveTag.getEquipmentIds());
+        if (!jmsProxy.isRegisteredListener(liveTag)) {
+          jmsProxy.registerUpdateListener(liveTag, liveTag);
+        }
+      }
+    }
+    catch (JMSException e) {
+      LOG.warn("initializeNewTags() - invalidate tag " + liveTag.getId() + ". Reason: " + JMS_CONNECTION_LOST_MSG);
+      liveTag.invalidate(JMS_CONNECTION_LOST_MSG);
+    }
   }
 
   /** 
@@ -267,7 +282,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
       }
       ClientDataTag liveTag = liveCache.remove(tagId);
       jmsProxy.unregisterUpdateListener(liveTag);
-      
+      supervisionManager.removeSupervisionListener(liveTag);
     } 
   }
 
@@ -343,26 +358,33 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public synchronized void setHistoryMode(final boolean enable) {
-    if (historyMode == enable) {
-      LOG.info("setHistoryMode() - The cache is already in history mode.");
-      return;
-    }
-    
-    cacheLock.writeLock().lock();
-    try {
-      if (enable) {
-        enableHistoryMode();
+  public void setHistoryMode(final boolean enable) {
+    synchronized (historyModeLock) {
+      if (historyMode == enable) {
+        LOG.info("setHistoryMode() - The cache is already in history mode.");
+        return;
       }
-      else {
-        disableHistoryMode();
+      
+      cacheLock.writeLock().lock();
+      try {
+        if (enable) {
+          enableHistoryMode();
+        }
+        else {
+          disableHistoryMode();
+        }
       }
+      finally {
+        cacheLock.writeLock().unlock();
+      }
+      
+      historyMode = enable;
     }
-    finally {
-      cacheLock.writeLock().unlock();
-    }
-    
-    historyMode = enable;
+  }
+  
+  @Override
+  public Object getHistoryModeSyncLock() {
+    return historyModeLock;
   }
   
   /**
@@ -421,14 +443,14 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public Set<Long> addDataTagUpdateListener(final Set<Long> tagIds, final DataTagUpdateListener listener) {
-    Set<Long> retVals = new HashSet<Long>();
+    Set<Long> newSubscriptions = new HashSet<Long>();
     cacheLock.readLock().lock();
     try {
       ClientDataTag cdt = null;
       for (Long tagId : tagIds) {
         cdt = activeCache.get(tagId);
         if (!cdt.hasUpdateListeners()) {
-          retVals.add(tagId);
+          newSubscriptions.add(tagId);
         }
         cdt.addUpdateListener(listener);
       }
@@ -437,6 +459,6 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
       cacheLock.readLock().unlock();
     }
     
-    return retVals;
+    return newSubscriptions;
   }
 }
