@@ -49,10 +49,14 @@ Publication of Supervision events
 
  -->
 
+<bean id="supervisionDestination" class="org.apache.activemq.command.ActiveMQTopic">
+  <constructor-arg value="${jms.client.supervision.topic}"/>
+</bean>
+
 <!-- JmsTemplate for sending supervision events; default destination set -->
 <bean id="supervisionTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-  <property name="connectionFactory" ref="clientPooledConnectionFactory"/>
-  <property name="defaultDestinationName" value="${jms.client.supervision.topic}"/>
+  <property name="connectionFactory" ref="clientPooledConnectionFactory"/>  
+  <property name="defaultDestination" ref="supervisionDestination"/>
 </bean>
 
 <!-- JmsSender for publishing to supervision events to the client  -->
