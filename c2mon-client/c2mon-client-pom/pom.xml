@@ -14,7 +14,7 @@
 	<packaging>pom</packaging>
 
 	<description>
-      This is a common parent POM for all c2-mon client modules
+      This is a common parent POM for all C2MON client modules
     </description>
 	<url>http://timweb.cern.ch</url>
 
@@ -69,7 +69,7 @@
 				<version>${org.springframework.version}</version>
 			</dependency>
 
-			<!--  tim2 shared libraries -->
+			<!--  C2MON shared libraries -->
 			<dependency>
 				<groupId>cern.tim2.tim2-shared</groupId>
 				<artifactId>tim2-shared-util</artifactId>
@@ -96,94 +96,34 @@
 				<artifactId>tim2-shared-rule</artifactId>
 				<version>[1.0.0,2.0.0)</version>
 			</dependency>
+			
+			<!--  C2MON client libraries -->
 			<dependency>
-				<groupId>cern.c2mon.c2mon-shared</groupId>
-				<artifactId>c2mon-shared-persistence-manager</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-
-			<!-- tim2-server libraries -->
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-common</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-test</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-auth</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-cache</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-cachedbaccess</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-cacheloading</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-cachepersistence</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-daqcommunication-out</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-daqcommunication-in</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-supervision</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-server</groupId>
-				<artifactId>c2mon-server-configuration</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-alarm</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-command</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-rule</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-server</groupId>
-				<artifactId>tim2-server-benchmark</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-server</groupId>
-				<artifactId>c2mon-server-lifecycle</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-common</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-core</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-jms</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-auth</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-heartbeat</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      
 
 			<!-- 3rd parties -->
 			<dependency>
