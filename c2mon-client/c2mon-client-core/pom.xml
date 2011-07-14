@@ -56,7 +56,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.8</version>        
+        <version>2.8</version>
+         <configuration>
+          <argLine>          
+            <!-- needed for the client JMS module -->
+            -Dc2mon.jms.url=tcp://timjmstest:61616
+            -Dc2mon.jms.user=not-used
+            -Dc2mon.jms.passwd=not-used
+            -Dc2mon.client.jms.supervision.topic=c2mon.JmsProxy.test.supervision.topic
+            -Dc2mon.client.jms.request.queue=c2mon.JmsProxy.test.request.queue
+          </argLine>
+        </configuration>      
       </plugin>
     </plugins>
   </build>
