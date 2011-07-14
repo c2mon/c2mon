@@ -58,7 +58,7 @@ public abstract class SessionManager  {
 
 
   /**
-   * Check wether the SessionManager has been initialised.
+   * Check whether the SessionManager has been initialized.
    */
   public static boolean isInitialised() {
     return (SessionManager.instance != null);
