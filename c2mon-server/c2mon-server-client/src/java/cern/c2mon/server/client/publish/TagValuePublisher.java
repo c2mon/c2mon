@@ -27,7 +27,7 @@ import cern.tim.util.jms.JmsSender;
  * @author Matthias Braeger
  * 
  * @see AlarmAggregatorListener
- * @see TransferTagValue
+ * @see TagValueUpdate
  */
 @Service
 public class TagValuePublisher implements AlarmAggregatorListener {

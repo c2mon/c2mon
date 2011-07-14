@@ -14,8 +14,8 @@ import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.JsonRequest;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.tag.TransferTag;
-import cern.c2mon.shared.client.tag.TransferTagValue;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 
 public class ClientRequestMessageConverterTest {
 
@@ -38,7 +38,7 @@ public class ClientRequestMessageConverterTest {
   
   @Test
   public void testTransferTagMessageConversion() {
-    JsonRequest<TransferTag> request = new ClientRequestImpl<TransferTag>(TransferTag.class);
+    JsonRequest<TagUpdate> request = new ClientRequestImpl<TagUpdate>(TagUpdate.class);
     
     TextMessage message = new ActiveMQTextMessage();
     try {
@@ -56,7 +56,7 @@ public class ClientRequestMessageConverterTest {
   
   @Test
   public void testTransferTagValueMessageConversion() {
-    JsonRequest<TransferTagValue> request = new ClientRequestImpl<TransferTagValue>(TransferTagValue.class);
+    JsonRequest<TagValueUpdate> request = new ClientRequestImpl<TagValueUpdate>(TagValueUpdate.class);
     
     TextMessage message = new ActiveMQTextMessage();
     try {
