@@ -124,7 +124,7 @@
             -Djms.update.consumers.max=1
             -Djms.update.consumers.initial=1
             -Djms.update.consumers.warmuptime=1
-            -Djms.update.connections.max=1
+            -Dc2mon.jms.daqin.connections.max=1
             -Djms.process.updateQueueTrunk=test.tim.process.update
             -Djms.update.transacted=true
             -Djms.process.requestQueue=test.tim.process.request
