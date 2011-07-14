@@ -30,7 +30,7 @@
 				<artifactId>log4j</artifactId>
 				<version>1.2.14</version>
 			</dependency>
-			
+
 			<!--  spring libraries -->
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -85,7 +85,7 @@
 				<groupId>cern.tim2.tim2-shared</groupId>
 				<artifactId>tim2-shared-common</artifactId>
 				<version>[1.0.0,2.0.0)</version>
-			</dependency>			
+			</dependency>
 			<dependency>
 				<groupId>cern.tim2.tim2-shared</groupId>
 				<artifactId>tim2-shared-client</artifactId>
@@ -96,34 +96,34 @@
 				<artifactId>tim2-shared-rule</artifactId>
 				<version>[1.0.0,2.0.0)</version>
 			</dependency>
-			
+
 			<!--  C2MON client libraries -->
 			<dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-common</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-core</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-jms</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-auth</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-heartbeat</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      
+				<groupId>cern.c2mon.c2mon-client</groupId>
+				<artifactId>c2mon-client-common</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.c2mon.c2mon-client</groupId>
+				<artifactId>c2mon-client-core</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.c2mon.c2mon-client</groupId>
+				<artifactId>c2mon-client-jms</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.c2mon.c2mon-client</groupId>
+				<artifactId>c2mon-client-auth</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+			<dependency>
+				<groupId>cern.c2mon.c2mon-client</groupId>
+				<artifactId>c2mon-client-heartbeat</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+
 
 			<!-- 3rd parties -->
 			<dependency>
@@ -154,7 +154,7 @@
 				<version>2.4</version>
 				<scope>test</scope>
 			</dependency>
-		
+
 			<dependency>
 				<groupId>javax.jms</groupId>
 				<artifactId>jms</artifactId>
@@ -201,8 +201,8 @@
 
 		</pluginManagement>
 
-		<plugins/>
-		
+		<plugins />
+
 	</build>
 </project>
 
