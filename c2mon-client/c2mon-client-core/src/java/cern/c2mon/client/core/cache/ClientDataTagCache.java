@@ -18,23 +18,80 @@
 package cern.c2mon.client.core.cache;
 
 import java.util.Collection;
+import java.util.Set;
 
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.client.core.tag.ClientDataTag;
 
 /**
- * This interface describes the methods which are provided to access the
- * client data tag cache.
+ * This interface describes the methods which are provided manipulate
+ * the references in the client data tag cache.
+ * <p>
+ * <b>Please note</b>, that only the {@link TagManager} should use this
+ * interface face! If your class needs absolutely to access the cache
+ * it should use the {@link BasicCacheHandler} instead. 
  *
  * @author Matthias Braeger
+ * @see BasicCacheHandler
  */
-public interface ClientDataTagCache {
+public interface ClientDataTagCache extends BasicCacheHandler {
+  /**
+   * Adds the <code>ClientDataTag</code> reference to the cache.
+   * <p>
+   * This method is used by the
+   * {@link cern.c2mon.client.core.C2monTagManager#subscribeDataTags(Set, DataTagUpdateListener)}
+   * method to update the cache with newly registered <code>ClientDataTag</code> objects.
+   * This method is called before you adding the {@link DataTagUpdateListener} references
+   * to the <code>ClientDataTag</code>. 
+   * <p>
+   * Please note that the cache does not handle the subscription of the
+   * <code>ClientDataTag</code> to the <code>JmsProxy</code> or <code>SupervisionManager</code>.
+   * All this is done by the <code>C2monTagManager</code>.
+   * 
+   * @param clientDataTag the <code>ClientDataTag</code> that shall be
+   *                      added to the cache.
+   * @see cern.c2mon.client.core.C2monTagManager#subscribeDataTags(Collection, DataTagUpdateListener)
+   * @throws NullPointerException When the parameter is <code>null</code>
+   */
+  void put(ClientDataTag clientDataTag);
   
-  Collection<ClientDataTag> getAllTagsForListener(DataTagUpdateListener listener);
+  /**
+   * Adds the given listener to the tags in the cache.
+   * @param tagIds List of tag ids
+   * @param listener The listener to be added to the <code>ClientDataTag</code> references
+   * @return List containing the tag id's of all <code>ClientDataTag</code> objects in the
+   *         cache which did not have already at least one listener registered.
+   * @throws NullPointerException If one of the parameter is <code>null</code> or if one of 
+   *                              the tags is not present in the cache 
+   */
+  Set<Long> addDataTagUpdateListener(Set<Long> tagIds, DataTagUpdateListener listener);
   
-  Collection<ClientDataTag> getAllTagsForEquipment(Long equipmentId);
+  /**
+   * This method synchronizes subscribed data tags with the server.
+   * It will ask the server to send the actual tag information for all subscribed data tags.
+   * Once the cache is synchronized, all subscribed <code>DataTagUpdateListener</code> will
+   * be notified.
+   */
+  void refresh();
   
-  Collection<ClientDataTag> getAllTagsForProcess(Long equipmentId);
+  /**
+   * Unsubscribes the given listener from all cache objects. 
+   * @param listener The listener which shall be unsubscribed.
+   * @return List of id's from those tags which have no <code>DataTagUpdateListener</code>
+   *         anymore subscribed.
+   * @throws NullPointerException When the parameter is <code>null</code>
+   */
+  Set<Long> unsubscribeAllDataTags(DataTagUpdateListener listener);
   
-  // TODO: This interface is not completely defined!
+  /**
+   * Unsubscribes the given listener from all tags specified by the
+   * list of tag ids.
+   * @param dataTagIds list of tag ids 
+   * @param listener The listener which shall be unsubscribed.
+   * @return List of id's from those tags which have no <code>DataTagUpdateListener</code>
+   *         anymore subscribed.
+   * @throws NullPointerException When the parameter is <code>null</code>
+   */
+  Set<Long> unsubscribeDataTags(Set<Long> dataTagIds, DataTagUpdateListener listener);
 }

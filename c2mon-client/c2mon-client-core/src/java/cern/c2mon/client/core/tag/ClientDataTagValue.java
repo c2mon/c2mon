@@ -80,14 +80,30 @@ public interface ClientDataTagValue  {
   /**
    * Returns the values of the registered alarms or an empty collection,
    * if no alarm is defined on that tag.
-   * @return The collection of registered alarms
+   * @return A shallow copy of the collection of registered alarms
    */
   Collection<AlarmValue> getAlarms();
   
   /**
-   * @return The list of alarms id's that are defined for that tag. 
+   * @return A shallow copy of the list of alarms id's that are defined for that tag. 
    */
   Collection<Long> getAlarmIds();
+  
+  /**
+   * Returns the list of equipment id's to which the tag is linked to.
+   * A data tag is by definition always attached to only one equipment,
+   * but rules might have dependencies to several equipments.
+   * @return A shallow copy of the list of equipment id's that are defined for that tag. 
+   */
+  Collection<Long> getEquipmentIds();
+  
+  /**
+   * Returns the list of process id's to which the tag is linked to.
+   * A data tag is by definition always attached to only one processes,
+   * but rules might have dependencies to several processes.
+   * @return A shallow copy of the list of process id's that are defined for that tag. 
+   */
+  Collection<Long> getProcessIds();
   
   /**
    * @return <code>true</code>, if the value of this reference object was 

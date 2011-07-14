@@ -19,9 +19,13 @@ package cern.c2mon.client.core.tag;
 
 import java.util.Collection;
 
+import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.jms.SupervisionListener;
+import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.tag.TransferTag;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.rule.RuleFormatException;
 
@@ -35,7 +39,7 @@ import cern.tim.shared.rule.RuleFormatException;
  *
  * @author Matthias Braeger
  */
-public interface ClientDataTag extends ClientDataTagValue {
+public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, TopicRegistrationDetails, SupervisionListener, Cloneable {
 
   /**
    * Invalidates the tag with {@link TagQualityStatus#INACCESSIBLE} and sets
@@ -56,6 +60,17 @@ public interface ClientDataTag extends ClientDataTagValue {
    * @see #removeUpdateListener(DataTagUpdateListener)
    */
   void addUpdateListener(final DataTagUpdateListener pListener);
+  
+  /**
+   * Adds all <code>DataTagUpdateListener</code> of the list to the ClientDataTag and 
+   * generates an initial update event for those listeners.
+   * Any change to the ClientDataTag value or quality attributes will trigger
+   * an update event to all <code>DataTagUpdateListener</code> objects 
+   * registered.
+   * @param pListenerList the DataTagUpdateListener comments
+   * @see #removeUpdateListener(DataTagUpdateListener)
+   */
+  void addUpdateListeners(final Collection<DataTagUpdateListener> pListenerList);
 
   /**
    * 
@@ -78,6 +93,11 @@ public interface ClientDataTag extends ClientDataTagValue {
    * @param pListener The listener that shall be unregistered
    */
   void removeUpdateListener(final DataTagUpdateListener pListener);
+  
+  /**
+   * Removes all previously registered <code>DataTagUpdateListener</code>
+   */
+  void removeAllUpdateListeners();
 
   /**
    * Returns information whether the tag has any update listeners registered
@@ -93,6 +113,29 @@ public interface ClientDataTag extends ClientDataTagValue {
    * It copies every single field of the <code>TransferTag</code> object and notifies
    * then the registered listener about the update by providing a copy of the
    * <code>ClientDataTag</code> object.
+   * <p>
+   * Please note that the <code>ClientDataTag</code> gets only updated, if the tag id's
+   * matches and if the server time stamp of the update is older thatn the current time
+   * stamp set.
+   * 
+   * @param tagUpdate The object that contains the updates.
+   * @return <code>true</code>, if the update was successful, otherwise
+   *         <code>false</code>
+   * @throws RuleFormatException In case that the <code>TransferTag</code>
+   *         parameter contains a invalid rule expression.
+   */
+  boolean update(final TagUpdate tagUpdate) throws RuleFormatException;
+  
+  
+  /**
+   * This thread safe method updates the given <code>ClientDataTag</code> object.
+   * It copies every single field of the <code>TransferTagValue</code> object and notifies
+   * then the registered listener about the update by providing a copy of the
+   * <code>ClientDataTag</code> object.
+   * <p>
+   * Please note that the <code>ClientDataTag</code> gets only updated, if the tag id's
+   * matches and if the server time stamp of the update is older thatn the current time
+   * stamp set.
    * 
    * @param transferTag The object that contains the updates.
    * @return <code>true</code>, if the update was successful, otherwise
@@ -100,7 +143,7 @@ public interface ClientDataTag extends ClientDataTagValue {
    * @throws RuleFormatException In case that the <code>TransferTag</code>
    *         parameter contains a invalid rule expression.
    */
-  boolean update(final TransferTag transferTag) throws RuleFormatException;
+  boolean update(final TagValueUpdate tagValueUpdate) throws RuleFormatException;
 
   
   /**
@@ -120,9 +163,19 @@ public interface ClientDataTag extends ClientDataTagValue {
   
   /**
    * Creates a clone of the this object. The only difference is that
-   * it does not copy the registered listeners.
+   * it does not copy the registered listeners. If you are only interested
+   * in the static information of the object you should call after cloning
+   * the {@link #clean()} method.
    * @return The clone of this object
    * @throws CloneNotSupportedException Thrown, if one of the field does not support cloning.
+   * @see #clean()
    */
   ClientDataTag clone() throws CloneNotSupportedException;
+  
+  /**
+   * Removes all <code>ClientDataTagValue</code> information from the object.
+   * This is in particular interesting for the history mode which only needs
+   * the static information from the live tag object. 
+   */
+  void clean();
 }

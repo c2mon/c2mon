@@ -32,6 +32,9 @@ import org.springframework.stereotype.Service;
  */
 public final class C2monServiceGateway {
   
+  /** Static reference to the <code>C2monShortTermLogManager</code> singleton instance */
+  private static C2monHistoryManager stlManager = null;
+  
   /** Static reference to the <code>C2monTagManager</code> singleton instance */
   private static C2monTagManager tagManager = null;
   
@@ -56,6 +59,15 @@ public final class C2monServiceGateway {
    */
   public static C2monTagManager getTagManager() {
     return tagManager;
+  }
+  
+  
+  /**
+   * @return The C2MON tag manager, which is managing
+   *         the tag subscribtion and unsubscription.
+   */
+  public static C2monHistoryManager getShortTermLogManager() {
+    return stlManager;
   }
 
   
@@ -90,16 +102,19 @@ public final class C2monServiceGateway {
      * @param pTagManager The tag manager singleton 
      * @param pSessionManager The session manager singleton
      * @param pHeartbeatManager The heartbeat singleton
+     * @param pShortTermLogManager The short term log manager
      */
     @Autowired
     private SpringGatewayInitializer(
         final C2monTagManager pTagManager,
         final C2monSessionManager pSessionManager,
-        final C2monSupervisionManager pHeartbeatManager) {
+        final C2monSupervisionManager pHeartbeatManager,
+        final C2monHistoryManager pShortTermLogManager) {
       
       tagManager = pTagManager;
       sessionManager = pSessionManager;
       supervisionManager = pHeartbeatManager;
+      stlManager = pShortTermLogManager;
     }
   }
 }

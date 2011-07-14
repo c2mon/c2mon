@@ -18,6 +18,7 @@
 package cern.c2mon.client.core;
 
 import java.util.Collection;
+import java.util.Set;
 
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.client.core.tag.ClientDataTagValue;
@@ -42,7 +43,7 @@ public interface C2monTagManager {
    * @param dataTagIds A collection of data tag IDs
    * @param listener the listener which shall be registered
    */
-  void subscribeDataTags(final Collection<Long> dataTagIds, final DataTagUpdateListener listener);
+  void subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
   
   /**
    * Use this method for unregistering a listener from receiving updates for specific data tags.
@@ -50,7 +51,7 @@ public interface C2monTagManager {
    * @param dataTagIds A collection of data tag IDs
    * @param listener the listener which shall be registered
    */
-  void unsubscribeDataTags(final Collection<Long> dataTagIds, final DataTagUpdateListener listener);
+  void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
   
   
   /**

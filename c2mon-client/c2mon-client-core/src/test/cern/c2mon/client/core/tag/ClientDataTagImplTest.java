@@ -10,17 +10,17 @@ import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.client.core.tag.ClientDataTag;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagValue;
-import cern.c2mon.shared.client.tag.TransferTag;
+import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 
 public class ClientDataTagImplTest {
 
-  private TransferTag createValidTransferTag(final Long tagId) {
+  private TagUpdate createValidTransferTag(final Long tagId) {
     DataTagQuality tagQuality = new DataTagQualityImpl();
     tagQuality.validate();
-    TransferTag transferTag = 
+    TagUpdate tagUpdate = 
       new TransferTagImpl(
           tagId,
           Float.valueOf(1.23f),
@@ -31,7 +31,7 @@ public class ClientDataTagImplTest {
           "My.data.tag.name",
           "My.jms.topic");
     
-    return transferTag;
+    return tagUpdate;
   }
   
   @Test

@@ -56,12 +56,4 @@ public interface C2monSupervisionManager {
    * @param pListener the listener instance to register
    */
   void addConnectionListener(final ConnectionListener pListener);
-
-  /**
-   * Removes the given connection listener from the <code>JmsProxy</code>
-   * instance.
-   * 
-   * @param pListener the listener instance to removed
-   */
-  void removeConnectionListener(final ConnectionListener pListener);
 }

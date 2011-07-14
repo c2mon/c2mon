@@ -39,12 +39,14 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-auth</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-common</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-jms</artifactId>
-      <version>1.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

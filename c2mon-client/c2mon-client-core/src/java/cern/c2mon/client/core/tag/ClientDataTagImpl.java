@@ -28,13 +28,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
-import cern.c2mon.client.jms.ServerUpdateListener;
-import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
-import cern.c2mon.shared.client.tag.TransferTag;
-import cern.c2mon.shared.client.tag.TransferTagValue;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.common.datatag.TagQualityStatus;
@@ -52,7 +50,10 @@ import cern.tim.shared.rule.RuleFormatException;
  * @see DataTagUpdateListener
  * @author Matthias Braeger
  */
-public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, TopicRegistrationDetails, Cloneable {
+public class ClientDataTagImpl implements ClientDataTag {
+  
+  /** Default description when the object is not yet initialized */
+  private static final String DEFAULT_DESCRIPTION = "Tag not initialised.";
   
   /** The value of the tag */
   private Object tagValue;
@@ -81,7 +82,7 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
   
   /** The quality of the tag */
   private DataTagQuality tagQuality = 
-    new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, "DataTag not initialised from server.");
+    new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
   
   /** The alarm objects associated to this data tag */
   private ArrayList<AlarmValue> alarms = new ArrayList<AlarmValue>();
@@ -90,13 +91,15 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
   private Timestamp sourceTimestamp = null;
   
   /** The server timestamp that indicates when the change message passed the server */
-  private Timestamp serverTimestamp = null;
+  private Timestamp serverTimestamp = new Timestamp(0L);
 
   /** Unit of the tag */
   private String unit = null;
   
   /** The current tag value description */
-  private String description = "DataTag not initialised from server.";
+  private String description = DEFAULT_DESCRIPTION;
+  
+    
   
   /**
    * String representation of the JMS destination where the DataTag 
@@ -137,14 +140,16 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
   
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#getId()
-   */  
+   */
+  @Override
   public Long getId() {
     return this.id;
   }
 
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#getName()
-   */  
+   */ 
+  @Override
   public String getName() {
     updateTagLock.readLock().lock();
     try {
@@ -162,7 +167,8 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
 
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#getValue()
-   */  
+   */
+  @Override
   public Object getValue() {
     updateTagLock.readLock().lock();
     try {
@@ -268,6 +274,7 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#getDataTagQuality()
    */
+  @Override
   public DataTagQuality getDataTagQuality() {
     updateTagLock.readLock().lock();
     try {
@@ -281,7 +288,8 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
 
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#invalidate(java.lang.String)
-   */  
+   */
+  @Override
   public void invalidate(final String pDescription) {
     try {
       updateTagLock.writeLock().lock();
@@ -329,6 +337,7 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#addUpdateListener(cern.c2mon.client.tag.DataTagUpdateListener)
    */
+  @Override
   public void addUpdateListener(final DataTagUpdateListener pListener) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("addUpdateListener() called.");
@@ -361,6 +370,13 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
     }
   }
   
+  @Override
+  public void addUpdateListeners(final Collection<DataTagUpdateListener> pListenerList) {
+    for (DataTagUpdateListener listener : pListenerList) {
+      addUpdateListener(listener);
+    }
+  }
+  
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#getUpdateListeners()
    */
@@ -378,6 +394,7 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#isUpdateListenerRegistered(cern.c2mon.client.tag.DataTagUpdateListener)
    */
+  @Override
   public boolean isUpdateListenerRegistered(DataTagUpdateListener pListener) {
     boolean isRegistered = false;
     try {
@@ -394,6 +411,7 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#removeUpdateListener(cern.c2mon.client.tag.DataTagUpdateListener)
    */
+  @Override
   public void removeUpdateListener(final DataTagUpdateListener pListener) {
     try {
       listenersLock.writeLock().lock();
@@ -404,11 +422,21 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
     }
   }
 
-
+  @Override
+  public void removeAllUpdateListeners() {
+    listenersLock.writeLock().lock();
+    try {
+      listeners.clear();
+    }
+    finally {
+      listenersLock.writeLock().unlock();
+    }
+  }
   
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#hasUpdateListeners()
    */
+  @Override
   public boolean hasUpdateListeners() {
     boolean isEmpty = false;
     try {
@@ -423,14 +451,14 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
   
   /**
    * Checks whether the update is valid or not
-   * @param transferTagValue The received update
+   * @param tagValueUpdate The received update
    * @return <code>true</code>, if the update passed all checks
    */
-  private boolean isValidUpdate(final TransferTagValue transferTagValue) {
+  private boolean isValidUpdate(final TagValueUpdate tagValueUpdate) {
     boolean valid = true;
-    valid &= transferTagValue != null;
-    valid &= transferTagValue.getId().equals(id);
-    valid &= transferTagValue.getServerTimestamp().after(serverTimestamp);
+    valid &= tagValueUpdate != null;
+    valid &= tagValueUpdate.getId().equals(id);
+    valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp);
     
     return valid;
   }
@@ -461,23 +489,14 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
     }
   } 
 
-  /**
-   * This thread safe inner method updates the given <code>TransferTagValue</code> object.
-   * It copies every single field of the <code>TransferTag</code> object and notifies
-   * then the registered listener about the update by providing a copy of the
-   * <code>ClientDataTag</code> object.
-   * 
-   * @param transferTagValue The object that contains the updates.
-   * @return <code>true</code>, if the update was successful, otherwise
-   *         <code>false</code>
-   */
-  private boolean update(final TransferTagValue transferTagValue) {
+  @Override
+  public boolean update(final TagValueUpdate tagValueUpdate) {
     updateTagLock.writeLock().lock();
     try {
-      boolean valid = isValidUpdate(transferTagValue);
+      boolean valid = isValidUpdate(tagValueUpdate);
 
       if (valid) {
-        doUpdateValues(transferTagValue);
+        doUpdateValues(tagValueUpdate);
         // Notify all listeners of the update
         notifyListeners();
       }
@@ -493,27 +512,27 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
    * @see cern.c2mon.client.tag.ClientDataTag#update(cern.c2mon.shared.client.tag.TransferTag)
    */
   @Override
-  public boolean update(final TransferTag transferTag) throws RuleFormatException {
+  public boolean update(final TagUpdate tagUpdate) throws RuleFormatException {
     updateTagLock.writeLock().lock();
     try {
-      boolean valid = isValidUpdate(transferTag);
+      boolean valid = isValidUpdate(tagUpdate);
     
       if (valid) {
-        if (transferTag.getRuleExpression() != null) {
-          ruleExpression = RuleExpression.createExpression(transferTag.getRuleExpression());
+        if (tagUpdate.getRuleExpression() != null) {
+          ruleExpression = RuleExpression.createExpression(tagUpdate.getRuleExpression());
         }
         
-        doUpdateValues(transferTag);
+        doUpdateValues(tagUpdate);
         
         processIds.clear();
-        processIds.addAll(transferTag.getProcessIds());
+        processIds.addAll(tagUpdate.getProcessIds());
         
         equipmentIds.clear();
-        equipmentIds.addAll(transferTag.getEquipmentIds());
+        equipmentIds.addAll(tagUpdate.getEquipmentIds());
         
-        tagName = transferTag.getName();
-        topicName = transferTag.getTopicName();
-        unit = transferTag.getUnit();
+        tagName = tagUpdate.getName();
+        topicName = tagUpdate.getTopicName();
+        unit = tagUpdate.getUnit();
         
         // Notify all listeners of the update
         notifyListeners();
@@ -588,18 +607,18 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
    * Inner method for updating the all value fields from this
    * <code>ClientDataTag</code> instance
    * 
-   * @param transferTagValue Reference to the object containing the updates 
+   * @param tagValueUpdate Reference to the object containing the updates 
    */
-  private void doUpdateValues(final TransferTagValue transferTagValue) {
-    updateTagQuality(transferTagValue.getDataTagQuality());
+  private void doUpdateValues(final TagValueUpdate tagValueUpdate) {
+    updateTagQuality(tagValueUpdate.getDataTagQuality());
     
     alarms.clear();
-    alarms.addAll(transferTagValue.getAlarms());
+    alarms.addAll(tagValueUpdate.getAlarms());
     
-    description = transferTagValue.getDescription();
-    serverTimestamp = transferTagValue.getServerTimestamp();
-    sourceTimestamp = transferTagValue.getSourceTimestamp();
-    tagValue = transferTagValue.getValue();
+    description = tagValueUpdate.getDescription();
+    serverTimestamp = tagValueUpdate.getServerTimestamp();
+    sourceTimestamp = tagValueUpdate.getSourceTimestamp();
+    tagValue = tagValueUpdate.getValue();
   }
   
 
@@ -742,8 +761,37 @@ public class ClientDataTagImpl implements ClientDataTag, ServerUpdateListener, T
 
 
   @Override
-  public void onUpdate(TransferTagValue transferTagValue) {
-    update(transferTagValue);
+  public void onUpdate(final TagValueUpdate tagValueUpdate) {
+    update(tagValueUpdate);
+  }
+
+
+  @Override
+  public Collection<Long> getEquipmentIds() {
+    return new ArrayList<Long>(equipmentIds);
+  }
+
+
+  @Override
+  public Collection<Long> getProcessIds() {
+    return new ArrayList<Long>(processIds);
+  }
+
+
+  @Override
+  public void clean() {
+    this.alarms.clear();
+    this.description = DEFAULT_DESCRIPTION;
+    this.tagQuality.setInvalidStatus(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
+    this.serverTimestamp = new Timestamp(0L);
+    this.sourceTimestamp = null;
+    this.tagValue = null;
+  }
+
+
+  @Override
+  public void onSupervisionUpdate(SupervisionEvent supervisionEvent) {
+    update(supervisionEvent);
   }
 }
 
