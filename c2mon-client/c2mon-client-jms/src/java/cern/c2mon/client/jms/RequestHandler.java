@@ -44,9 +44,9 @@ public interface RequestHandler {
    * 
    * @param tagIds the ids of the tags
    * @return a collection of transfer objects with the values/configuration information
-   * @throws JMSException if not currently connected or 
-   *                      if a JMS problem occurs while making the request
+   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
    * @throws NullPointerException if called with a null argument
+   * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<TagUpdate> requestTags(Collection<Long> tagIds) throws JMSException;
   
@@ -57,9 +57,9 @@ public interface RequestHandler {
    * 
    * @param tagIds the ids of the tags
    * @return a collection of transfer objects with the value information
-   * @throws JMSException if not currently connected or 
-   *                      if a JMS problem occurs while making the request
+   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
    * @throws NullPointerException if called with a null argument
+   * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<TagValueUpdate> requestTagValues(Collection<Long> tagIds) throws JMSException;
   
@@ -68,7 +68,8 @@ public interface RequestHandler {
    * entities in the server (Process, Equipment and SubEquipment).
    * @return a collection of current events, each containing the status
    *                  of one of the entities
-   * @throws JMSException 
+   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request 
+   * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException;
   

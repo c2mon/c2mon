@@ -58,7 +58,7 @@ import cern.tim.util.jms.ActiveJmsSender;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/client/jms/config/client-jms.xml" })
+@ContextConfiguration({ "classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml" })
 public class JmsProxyTest implements ApplicationContextAware {
 
   /**

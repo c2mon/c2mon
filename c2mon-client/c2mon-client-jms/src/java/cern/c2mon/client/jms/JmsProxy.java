@@ -77,7 +77,7 @@ public interface JmsProxy {
    *                                  for a given Tag
    * @throws JMSException if there is a JMS failure in subscribing; the JmsProxy will
    *                  subscribe this listener automatically once the connection is back,
-   *                  but the caller may with to invalidate the Tag in the meantime
+   *                  but the caller may wish to invalidate the Tag in the meantime
    * @throws NullPointerException if either argument is null
    */
   void registerUpdateListener(TagUpdateListener serverUpdateListener, 
