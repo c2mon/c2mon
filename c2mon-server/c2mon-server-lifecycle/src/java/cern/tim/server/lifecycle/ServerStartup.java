@@ -21,6 +21,8 @@ package cern.tim.server.lifecycle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -112,6 +114,11 @@ public final class ServerStartup {
     GenericApplicationContext ctx = new GenericApplicationContext();    
     ctx.registerBeanDefinition("serverProperties", propertiesFactoryBean);        
     ctx.refresh();
+    
+    Properties serverProperties = ctx.getBean(Properties.class);
+    for (Map.Entry<Object, Object> entry : serverProperties.entrySet()) {
+      System.setProperty((String) entry.getKey(), (String) entry.getValue());
+    }   
         
     //by default run in single-server mode
     List<String> cacheModeModules;
