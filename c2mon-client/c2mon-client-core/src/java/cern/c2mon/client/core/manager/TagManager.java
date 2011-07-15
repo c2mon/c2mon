@@ -126,9 +126,8 @@ public class TagManager implements CoreTagManager {
     
     initializeNewTags(tagIds);
     
-    final Set<Long> newTagSubscriptionsIds = this.cache.addDataTagUpdateListener(tagIds, listener);
-
-    fireOnNewTagSubscriptionsEvent(newTagSubscriptionsIds);
+    // add listener to tags
+    this.cache.addDataTagUpdateListener(tagIds, listener);
   }
   
   /**
@@ -174,6 +173,9 @@ public class TagManager implements CoreTagManager {
         for (ClientDataTag cdt : newTags.values()) {
           this.cache.put(cdt);
         }
+        
+        // Inform listeners (e.g. HistoryManager) about new subscriptions
+        fireOnNewTagSubscriptionsEvent(newTags.keySet());
       
         // Update a second time in case an update was send before the ClientDataTag was subscribed to the topic
         Collection<TagValueUpdate> requestedTagValues = clientRequestHandler.requestTagValues(tagIds);
