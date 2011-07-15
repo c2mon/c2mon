@@ -64,6 +64,15 @@ public interface BasicCacheHandler {
    */
   Collection<ClientDataTag> getAllTagsForProcess(Long processId);
   
+  
+  /**
+   * @return A reference list to all <code>ClientDataTag</code> objects
+   *         which have at least one <code>DataTagUpdateListener</code>
+   *         listener subscribed.
+   */
+  Collection<ClientDataTag> getAllSubscribedDataTags();
+  
+  
   /**
    * Enables or disables the History mode of the cache. In history mode all
    * getter-methods will then return references to objects in the history cache.

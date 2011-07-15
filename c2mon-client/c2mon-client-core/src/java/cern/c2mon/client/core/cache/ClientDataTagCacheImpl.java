@@ -118,6 +118,25 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   
     return cdt;
   }
+  
+  @Override
+  public Collection<ClientDataTag> getAllSubscribedDataTags() {
+    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>(activeCache.size());
+    
+    cacheLock.readLock().lock();
+    try {
+      for (ClientDataTag cdt : activeCache.values()) {
+        if (cdt.hasUpdateListeners()) {
+          list.add(cdt);
+        }
+      }
+    }
+    finally {
+      cacheLock.readLock().unlock();
+    }
+    
+    return list;
+  }
 
   @Override
   public Collection<ClientDataTag> getAllTagsForEquipment(final Long equipmentId) {
