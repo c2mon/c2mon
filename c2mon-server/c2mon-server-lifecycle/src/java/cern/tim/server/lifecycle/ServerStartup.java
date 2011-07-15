@@ -115,7 +115,7 @@ public final class ServerStartup {
     ctx.registerBeanDefinition("serverProperties", propertiesFactoryBean);        
     ctx.refresh();
     
-    Properties serverProperties = ctx.getBean(Properties.class);
+    Properties serverProperties = (Properties) ctx.getBean("serverProperties");
     for (Map.Entry<Object, Object> entry : serverProperties.entrySet()) {
       System.setProperty((String) entry.getKey(), (String) entry.getValue());
     }   
