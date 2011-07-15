@@ -136,10 +136,11 @@ public class JmsProxyImplTest {
     EasyMock.expect(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).andReturn(session);
     connection.setExceptionListener(EasyMock.isA(ExceptionListener.class));  
     connection.start();
-    EasyMock.expect(connection.createSession(true, Session.SESSION_TRANSACTED)).andReturn(session);    
+    EasyMock.expect(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).andReturn(session);    
     
     MessageConsumer messageConsumer = EasyMock.createMock(MessageConsumer.class);
     EasyMock.expect(session.createConsumer(EasyMock.isA(Destination.class))).andReturn(messageConsumer);
+    session.close();
         
     EasyMock.replay(connectionFactory);
     EasyMock.replay(connection);
