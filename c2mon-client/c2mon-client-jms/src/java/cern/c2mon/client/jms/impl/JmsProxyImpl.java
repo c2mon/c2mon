@@ -404,20 +404,25 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       throw new NullPointerException("sendRequest(..) method called with null queue name argument");
     }
     if (connected) {
-      Session session = connection.createSession(true, Session.SESSION_TRANSACTED);           
-      TextMessage message = session.createTextMessage(jsonRequest.toJson());
-      TemporaryQueue replyQueue = session.createTemporaryQueue();
-      message.setJMSReplyTo(replyQueue);     
-      MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
-      producer.send(message);
-      MessageConsumer consumer = session.createConsumer(replyQueue);
-      Message replyMessage = consumer.receive(timeout);
-      if (replyMessage == null) {
-        LOGGER.error("No reply received from server on ClientRequest.");
-        throw new RuntimeException("No reply received from server - possible timeout?");
-      }      
-      return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText());      
-     
+      Session session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
+      try {
+        TextMessage message = session.createTextMessage(jsonRequest.toJson());
+        TemporaryQueue replyQueue = session.createTemporaryQueue();
+        message.setJMSReplyTo(replyQueue);     
+        MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
+        producer.send(message);
+        session.commit();
+        MessageConsumer consumer = session.createConsumer(replyQueue);
+        Message replyMessage = consumer.receive(timeout);
+        if (replyMessage == null) {
+          LOGGER.error("No reply received from server on ClientRequest.");
+          throw new RuntimeException("No reply received from server - possible timeout?");
+        }      
+        return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText()); 
+      } finally {
+        session.commit();
+        session.close();
+      }       
     } else {
       throw new JMSException("Not currently connected: unable to send request at this time.");
     }    
