@@ -17,10 +17,13 @@
  ******************************************************************************/
 package cern.c2mon.client.core.manager;
 
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.client.auth.SessionListener;
 import cern.c2mon.client.core.C2monSessionManager;
 import cern.tim.shared.client.auth.SessionInfo;
 
+@Service
 public class SessionManager implements C2monSessionManager {
 
   @Override

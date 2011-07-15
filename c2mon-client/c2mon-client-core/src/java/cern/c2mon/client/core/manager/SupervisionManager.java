@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
-import javax.jms.JMSException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +42,9 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
 
   /** Log4j logger instance */
   private static final Logger LOG = Logger.getLogger(SupervisionManager.class);
+  
+  /** Set to <code>true</code>, if the supervision  cache is correctly initialized */
+  private boolean c2monConnectionEstablished = false;
   
   /** Lock for changes on the listeners maps */
   private final ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
@@ -256,14 +258,21 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
       for (SupervisionEvent event : allCurrentEvents) {
         onSupervisionUpdate(event);
       }
+      c2monConnectionEstablished = true;
     }
-    catch (JMSException e) {
-      LOG.error("onConnection() - Could not update the supervision event cache.", e);
+    catch (Exception e) {
+      LOG.error("onConnection() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage());
+      c2monConnectionEstablished = false;
     }
   }
 
   @Override
   public void onDisconnection() {
-    //TODO: inform TagManager, who has to invalidate all tags
+    c2monConnectionEstablished = false;
+  }
+
+  @Override
+  public boolean isServerConnectionWorking() {
+    return c2monConnectionEstablished;
   }
 }

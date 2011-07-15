@@ -56,4 +56,12 @@ public interface C2monSupervisionManager {
    * @param pListener the listener instance to register
    */
   void addConnectionListener(final ConnectionListener pListener);
+  
+  
+  /**
+   * @return <code>true</code>, if the supervision manager is connected to the
+   * server and was able to initialize correctly all <code>SupervisionEvent</code>
+   * states.
+   */
+  boolean isServerConnectionWorking();
 }

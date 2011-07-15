@@ -115,7 +115,7 @@ public final class C2monServiceGateway {
    * @author Matthias Braeger
    */
   @Service
-  private class SpringGatewayInitializer {
+  private static class SpringGatewayInitializer {
     
     /**
      * Default Constructor used by the Spring container
