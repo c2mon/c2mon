@@ -19,10 +19,6 @@
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
     </dependency>   
     <dependency>
       <groupId>org.springframework</groupId>
@@ -47,6 +43,16 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-jms</artifactId>
+    </dependency>
+    
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
     </dependency>
   </dependencies>
 

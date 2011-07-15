@@ -34,25 +34,6 @@ import cern.tim.shared.rule.RuleExpression;
  * @author Matthias Braeger
  */
 public interface ClientDataTagValue  {
-  /** Hash Code type constant used by <code>getNumericType()</code> */
-  int TYPE_UNKNOWN = Void.class.hashCode();
-  /** Hash Code type constant used by <code>getNumericType()</code> */
-  int TYPE_BOOLEAN = Boolean.class.hashCode();
-  /** Hash Code type constant used by <code>getNumericType()</code> */
-  int TYPE_FLOAT = Float.class.hashCode();
-  /** Hash Code type constant used by <code>getNumericType()</code> */
-  int TYPE_INTEGER = Integer.class.hashCode();
-  /** Hash Code type constant used by <code>getNumericType()</code> */
-  int TYPE_DOUBLE = Double.class.hashCode();
-  /** Hash Code type constant used by <code>getNumericType()</code> */
-  int TYPE_LONG = Long.class.hashCode();
-  /** Hash Code type constant used by <code>getNumericType()</code> */
-  int TYPE_SHORT = Short.class.hashCode();
-  /** Hash Code type constant used by <code>getNumericType()</code> */
-  int TYPE_STRING = String.class.hashCode();
-  /** Hash Code type constant used by <code>getNumericType()</code> */
-  int TYPE_BYTE = Byte.class.hashCode();
-  
   /**
    * Returns the tag identifier
    * @return the tag identifier
@@ -158,19 +139,13 @@ public interface ClientDataTagValue  {
   Class< ? > getType();
   
   /**
-   * Returns the has code of the class type that is used by this
-   * class instance. The return value is always one of the specified
-   * <code>TYPE</code> constants.
-   * @return The hash code of the class type
-   * @see ClientDataTagValue#TYPE_BOOLEAN
-   * @see ClientDataTagValue#TYPE_BYTE
-   * @see ClientDataTagValue#TYPE_DOUBLE
-   * @see ClientDataTagValue#TYPE_FLOAT
-   * @see ClientDataTagValue#TYPE_INTEGER
-   * @see ClientDataTagValue#TYPE_LONG
-   * @see ClientDataTagValue#TYPE_SHORT
-   * @see ClientDataTagValue#TYPE_STRING
-   * @see ClientDataTagValue#TYPE_UNKNOWN
+   * Returns the hash code of the class type that is used by this
+   * class instance. The return value is one of the specified
+   * <code>TypeNumeric</code> constants.
+   * @return The hash code of the class type as <code>enum</code>. Returns
+   *         {@link TypeNumeric#TYPE_UNKNOWN}, if value is <code>null</code>
+   *         or the value Object not one of the know raw value types.
+   * @see TypeNumeric
    */
-  public long getTypeNumeric();
+  TypeNumeric getTypeNumeric();
 }

@@ -254,20 +254,24 @@ public class ClientDataTagImpl implements ClientDataTag {
    * @see cern.c2mon.client.tag.ClientDataTag#getTypeNumeric()
    */
   @Override
-  public long getTypeNumeric() {
+  public TypeNumeric getTypeNumeric() {
     updateTagLock.readLock().lock();
     try {
       Class< ? > type = getType();
-      if (type == null) {
-        return ClientDataTagValue.TYPE_UNKNOWN;
-      }
-      else {
-        return type.hashCode();
+      if (type != null) {
+        int typeNumeric = type.hashCode();
+        for (TypeNumeric t : TypeNumeric.values()) {
+          if (t.getCode() == typeNumeric) {
+            return t;
+          }
+        }
       }
     }
     finally {
       updateTagLock.readLock().unlock();
     }
+    
+    return TypeNumeric.TYPE_UNKNOWN;
   }
 
 
@@ -324,9 +328,9 @@ public class ClientDataTagImpl implements ClientDataTag {
       }
     }
     catch (CloneNotSupportedException cloneException) {
-      LOG.error(
-          "notifyListeners() - Cloning the ClientDataTagImpl object failed! No update sent to the client.",
-          cloneException);
+      LOG.fatal(
+          "notifyListeners() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
+      throw new RuntimeException(cloneException);
     }
     finally {
       listenersLock.readLock().unlock();
@@ -363,7 +367,12 @@ public class ClientDataTagImpl implements ClientDataTag {
     
     try {
       this.updateTagLock.readLock().lock();
-      pListener.onUpdate(this);
+      pListener.onUpdate(this.clone());
+    }
+    catch (CloneNotSupportedException cloneException) {
+      LOG.fatal(
+          "addUpdateListener() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
+      throw new RuntimeException(cloneException);
     }
     finally {
       this.updateTagLock.readLock().unlock();
@@ -620,7 +629,6 @@ public class ClientDataTagImpl implements ClientDataTag {
     sourceTimestamp = tagValueUpdate.getSourceTimestamp();
     tagValue = tagValueUpdate.getValue();
   }
-  
 
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#getTopicName()
@@ -635,7 +643,6 @@ public class ClientDataTagImpl implements ClientDataTag {
       updateTagLock.readLock().unlock();
     }
   }
-
 
   /* (non-Javadoc)
    * @see cern.c2mon.client.tag.ClientDataTag#isRuleResult()
@@ -759,24 +766,20 @@ public class ClientDataTagImpl implements ClientDataTag {
     return clone;    
   }
 
-
   @Override
   public void onUpdate(final TagValueUpdate tagValueUpdate) {
     update(tagValueUpdate);
   }
-
 
   @Override
   public Collection<Long> getEquipmentIds() {
     return new ArrayList<Long>(equipmentIds);
   }
 
-
   @Override
   public Collection<Long> getProcessIds() {
     return new ArrayList<Long>(processIds);
   }
-
 
   @Override
   public void clean() {
@@ -788,10 +791,8 @@ public class ClientDataTagImpl implements ClientDataTag {
     this.tagValue = null;
   }
 
-
   @Override
   public void onSupervisionUpdate(SupervisionEvent supervisionEvent) {
     update(supervisionEvent);
   }
 }
-
