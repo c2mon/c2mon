@@ -19,13 +19,21 @@
 package cern.c2mon.client.jms;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 
 import junit.framework.Assert;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.command.ActiveMQQueue;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,11 +44,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -50,6 +60,7 @@ import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStat
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.util.jms.ActiveJmsSender;
+import cern.tim.util.json.GsonFactory;
 
 /**
  * Integration testing of JmsProxy implementation with ActiveMQ broker.
@@ -76,6 +87,8 @@ public class JmsProxyTest implements ApplicationContextAware {
    * For sending message to the broker, to be picked up by the tested proxy.
    */
   private ActiveJmsSender jmsSender;
+  
+  private JmsTemplate serverTemplate;
  
   /**
    * Starts context.
@@ -83,10 +96,12 @@ public class JmsProxyTest implements ApplicationContextAware {
    */
   @Before
   public void setUp() throws InterruptedException {
+    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(System.getProperty("c2mon.jms.user"), 
+                                                                                System.getProperty("c2mon.jms.passwd"),
+                                                                                System.getProperty("c2mon.jms.url")); 
     jmsSender = new ActiveJmsSender();
-    jmsSender.setJmsTemplate(new JmsTemplate(new ActiveMQConnectionFactory(System.getProperty("c2mon.jms.user"), 
-                                                                           System.getProperty("c2mon.jms.passwd"),
-                                                                           System.getProperty("c2mon.jms.url"))));    
+    jmsSender.setJmsTemplate(new JmsTemplate(connectionFactory));
+    serverTemplate = new JmsTemplate(connectionFactory); 
     ((AbstractApplicationContext) context).start();
     //JMS connection is started in separate thread, so leave time to connect
     Thread.sleep(2000);
@@ -99,10 +114,50 @@ public class JmsProxyTest implements ApplicationContextAware {
    * @throws InterruptedException 
    */
   @Test(expected = RuntimeException.class)
-  public void testSendRequest() throws JMSException {     
+  public void testSendRequestNoReply() throws JMSException {     
     JsonRequest<ClientRequestResult> jsonRequest = EasyMock.createMock(JsonRequest.class);
     EasyMock.expect(jsonRequest.toJson()).andReturn("{}");
     jmsProxy.sendRequest(jsonRequest, "random.no.reply.queue", 1000); //wait 1s for an answer
+  }
+  
+  
+  /**
+   * Tests the sending of a request to the server and receiving a response
+   * (decodes response and checks non null).
+   * 
+   * Start a new thread to mimick the server response to a client request.
+   * @throws JMSException 
+   * @throws InterruptedException 
+   */
+  @Test
+  public void testSendRequest() throws JMSException, InterruptedException {     
+    JsonRequest<SupervisionEvent> jsonRequest = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);      
+    final String queueName = System.getProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
+    new Thread(new Runnable() {      
+      @Override
+      public void run() {       
+        serverTemplate.execute(new SessionCallback<Object>() {
+
+          @Override
+          public Object doInJms(Session session) throws JMSException {            
+            MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(queueName));
+            Message message = consumer.receive(10000);            
+            Assert.assertNotNull(message);
+            Assert.assertTrue(message instanceof TextMessage);
+            //send some response (empty collection)
+            Collection<SupervisionEvent> supervisionEvents = new ArrayList<SupervisionEvent>();
+            supervisionEvents.add(new SupervisionEventImpl(SupervisionEntity.PROCESS, 1L, SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "test response"));
+            Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(supervisionEvents));
+            MessageProducer producer = session.createProducer(message.getJMSReplyTo());
+            producer.send(replyMessage);
+            return null;
+          }
+         
+        }, true);
+      }
+    }).start();     
+    Collection<SupervisionEvent> response = jmsProxy.sendRequest(jsonRequest, queueName, 10000); //wait 10s for an answer
+    Assert.assertNotNull(response);    
   }
   
   /**
