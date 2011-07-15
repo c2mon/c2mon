@@ -411,8 +411,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       MessageConsumer consumer = session.createConsumer(replyQueue);
       Message replyMessage = consumer.receive(timeout);
       if (replyMessage == null) {
-        LOGGER.error("Null reply received from server on ClientRequest.");
-        throw new RuntimeException("Null reply received from server - possible timeout?");
+        LOGGER.error("No reply received from server on ClientRequest.");
+        throw new RuntimeException("No reply received from server - possible timeout?");
       }      
       return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText());      
      
