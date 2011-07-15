@@ -37,8 +37,8 @@ public final class C2monServiceGateway {
   /** Class logger */
   private static final Logger LOGGER = Logger.getLogger(C2monServiceGateway.class);
   
-  /** Static reference to the <code>C2monShortTermLogManager</code> singleton instance */
-  private static C2monHistoryManager stlManager = null;
+  /** Static reference to the <code>C2monHistoryManager</code> singleton instance */
+  private static C2monHistoryManager historyManager = null;
   
   /** Static reference to the <code>C2monTagManager</code> singleton instance */
   private static C2monTagManager tagManager = null;
@@ -67,11 +67,11 @@ public final class C2monServiceGateway {
   
   
   /**
-   * @return The C2MON tag manager, which is managing
-   *         the tag subscribtion and unsubscription.
+   * @return The C2MON history manager which allows 
+   *         switching data into history mode.
    */
-  public static C2monHistoryManager getShortTermLogManager() {
-    return stlManager;
+  public static C2monHistoryManager getHistoryManager() {
+    return historyManager;
   }
 
   
@@ -122,19 +122,19 @@ public final class C2monServiceGateway {
      * @param pTagManager The tag manager singleton 
      * @param pSessionManager The session manager singleton
      * @param pHeartbeatManager The heartbeat singleton
-     * @param pShortTermLogManager The short term log manager
+     * @param pHistoryManager The history manager
      */
     @Autowired
     private SpringGatewayInitializer(
         final C2monTagManager pTagManager,
         final C2monSessionManager pSessionManager,
         final C2monSupervisionManager pHeartbeatManager,
-        final C2monHistoryManager pShortTermLogManager) {
+        final C2monHistoryManager pHistoryManager) {
       
       tagManager = pTagManager;
       sessionManager = pSessionManager;
       supervisionManager = pHeartbeatManager;
-      stlManager = pShortTermLogManager;
+      historyManager = pHistoryManager;
     }
   }
 }
