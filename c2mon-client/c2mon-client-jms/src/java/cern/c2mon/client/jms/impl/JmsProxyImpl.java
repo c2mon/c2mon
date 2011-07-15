@@ -69,6 +69,8 @@ import cern.c2mon.shared.client.request.JsonRequest;
  * <p>Notice this component requires an explicit start of the Spring context (or direct call to the
  * start method).
  * 
+ * <p>Connect and disconnect methods are synchronized to prevent them running in parallel.
+ * 
  * @author Mark Brightwell
  *
  */
@@ -198,7 +200,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * <p>Listeners are notified of connection once the connection
    * is reestablished and all topic subscriptions are back.
    */
-  private void connect() {
+  private synchronized void connect() {
       while (!connected && !shutdownRequested) {
         try {                    
           connection = jmsConnectionFactory.createConnection();         
@@ -241,7 +243,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   /**
    * Also notifies listeners of disconnection.
    */
-  private void disconnect() {
+  private synchronized void disconnect() {
     connected = false;
     notifyConnectionListenerOnDisconnection();
     try {
