@@ -17,6 +17,7 @@ import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
+import cern.tim.shared.common.datatag.TagQualityStatus;
 
 public class ClientDataTagImplTest {
 
@@ -57,7 +58,7 @@ public class ClientDataTagImplTest {
     assertEquals(original.getValue(), copy.getValue());
   }
   
-  private void checkTagCopy(final ClientDataTag original, final ClientDataTag copy) {
+  private void checkTagCopy(final ClientDataTagImpl original, final ClientDataTagImpl copy) {
     checkTagValueCopy(original, copy);
     if (original.getUpdateListeners().isEmpty()) {
       assertEquals(original.getUpdateListeners().size(), copy.getUpdateListeners().size());
@@ -70,10 +71,10 @@ public class ClientDataTagImplTest {
   
   @Test
   public void testClean() throws CloneNotSupportedException {
-    final ClientDataTag cdt = new ClientDataTagImpl(1234L);
+    final ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
     cdt.onUpdate(createValidTransferTag(1234L));
     
-    ClientDataTag copy = cdt.clone();
+    ClientDataTagImpl copy = cdt.clone();
     copy.clean();
     
     assertNotSame("The two objects should not point to the same reference in memory!", cdt, copy);
@@ -95,7 +96,7 @@ public class ClientDataTagImplTest {
   
   @Test
   public void testTypeNumeric() {
-    final ClientDataTag cdt = new ClientDataTagImpl(1234L);
+    final ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
     
     cdt.onUpdate(createValidTransferTag(1234L, Float.valueOf(1.234f)));
     assertEquals(TypeNumeric.TYPE_FLOAT, cdt.getTypeNumeric());
@@ -140,7 +141,7 @@ public class ClientDataTagImplTest {
   @Test
   public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException {
     //test setup
-    ClientDataTag cdt = new ClientDataTagImpl(1234L);
+    ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
     cdt.onUpdate(createValidTransferTag(1234L));
     DataTagUpdateListener mockUpdateListener = EasyMock.createMock(DataTagUpdateListener.class);
     mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(cdt)), EasyMock.eq(cdt)));
@@ -155,7 +156,7 @@ public class ClientDataTagImplTest {
   
   @Test
   public void testUpdateListener() {
-    final ClientDataTag cdt = new ClientDataTagImpl(1234L);
+    final ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
     cdt.addUpdateListener(new DataTagUpdateListener() {
       @Override
       public void onUpdate(final ClientDataTagValue tagUpdate) {
@@ -170,8 +171,8 @@ public class ClientDataTagImplTest {
   
   @Test
   public void testClone() throws Exception {
-    ClientDataTag cdt = new ClientDataTagImpl(1234L);
-    ClientDataTag clone = cdt.clone();
+    ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
+    ClientDataTagImpl clone = cdt.clone();
     checkTagCopy(cdt, clone);
     
     cdt.update(createValidTransferTag(1234L));
@@ -188,7 +189,7 @@ public class ClientDataTagImplTest {
     clone = cdt.clone();
     checkTagCopy(cdt, clone);
     
-    cdt.invalidate("Down");
+    cdt.invalidate(TagQualityStatus.INACCESSIBLE, "Down");
     clone = cdt.clone();
     checkTagCopy(cdt, clone);
     
@@ -199,13 +200,13 @@ public class ClientDataTagImplTest {
   
   @Test
   public void testEquals() throws CloneNotSupportedException {
-    ClientDataTag cdt = new ClientDataTagImpl(1234L);
-    ClientDataTag clone = cdt.clone();
+    ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
+    ClientDataTagImpl clone = cdt.clone();
     clone.clean();
     
     assertEquals(cdt, clone);
     
-    ClientDataTag cdt2 = new ClientDataTagImpl(4321L);
+    ClientDataTagImpl cdt2 = new ClientDataTagImpl(4321L);
     assertFalse(cdt.equals(cdt2));
   }
 }

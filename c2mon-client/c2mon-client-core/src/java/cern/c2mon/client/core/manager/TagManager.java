@@ -35,7 +35,6 @@ import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.ClientDataTag;
-import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagValue;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -108,38 +107,27 @@ public class TagManager implements CoreTagManager {
     cache.refresh();
   }
 
+  /**
+   * Determine from its request all new tag id's which are not yet available in the cache.
+   * Those ones are then created with a request to the C2MON server and afterwards registered
+   * for the listener.  
+   */
   @Override
-  public synchronized void subscribeDataTags(final Set<Long> tagIds, final DataTagUpdateListener listener) {
+  public synchronized boolean subscribeDataTags(final Set<Long> tagIds, final DataTagUpdateListener listener) {
     if (tagIds == null) {
       LOG.warn("subscribeDataTags() : called with null parameter (id collection). Ignoring request.");
-      return;
+      return false;
     }
 
     if (listener == null) {
       LOG.warn("subscribeDataTags() : called with null parameter (DataTagUpdateListener). Ignoring request.");
-      return;
+      return false;
     }
 
     if (LOG.isDebugEnabled()) {
       LOG.debug(new StringBuffer("subscribeDataTags() : called for ").append(tagIds.size()).append(" tags."));
     }
-    
-    initializeNewTags(tagIds);
-    
-    // add listener to tags
-    this.cache.addDataTagUpdateListener(tagIds, listener);
-  }
-  
-  /**
-   * This inner method is used by {@link #subscribeDataTags(Set, DataTagUpdateListener)}
-   * to determine from its request all new tag id's which are not yet available in the cache.
-   * Those ones are then initialized with a request to the C2MON server and afterwards added
-   * to the cache.  
-   * @param tagIds list of tag id's which might contain id's from tags
-   *                   which are not yet available in the cache.
-   * @return List of all tags which were not yet present in the cache.
-   */
-  private Set<Long> initializeNewTags(final Set<Long> tagIds) {
+      
     // Find tag id's which are not yet in the cache
     Map<Long, ClientDataTag> newTags = new HashMap<Long, ClientDataTag>();
     
@@ -148,7 +136,7 @@ public class TagManager implements CoreTagManager {
       ClientDataTag newTag = null;
       for (Long tagId : tagIds) { 
         if (!cache.containsTag(tagId)) {
-          newTag = new ClientDataTagImpl(tagId);
+          newTag = cache.create(tagId);
           newTag.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG);
           newTags.put(tagId, newTag);
         }
@@ -169,16 +157,14 @@ public class TagManager implements CoreTagManager {
           }
         }
         
-        // Add data into the cache which will also subscribe them for live updates
-        for (ClientDataTag cdt : newTags.values()) {
-          this.cache.put(cdt);
-        }
+        // add listener to tags
+        this.cache.addDataTagUpdateListener(tagIds, listener);
         
         // Inform listeners (e.g. HistoryManager) about new subscriptions
         fireOnNewTagSubscriptionsEvent(newTags.keySet());
       
         // Update a second time in case an update was send before the ClientDataTag was subscribed to the topic
-        Collection<TagValueUpdate> requestedTagValues = clientRequestHandler.requestTagValues(tagIds);
+        Collection<TagValueUpdate> requestedTagValues = clientRequestHandler.requestTagValues(newTags.keySet());
         for (TagValueUpdate tagValueUpdate : requestedTagValues) {
           newTag = newTags.get(tagValueUpdate.getId());
           if (newTag.getServerTimestamp() == null || newTag.getServerTimestamp().before(tagValueUpdate.getServerTimestamp())) {
@@ -195,12 +181,13 @@ public class TagManager implements CoreTagManager {
       catch (JMSException e) {
         LOG.warn("initializeNewTags() - JMS connection lost -> Invalidate all newly requested tags.");
         for (ClientDataTag cdt : newTags.values()) {
-          cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE, "JMS connection lost.");
+          cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.JMS_CONNECTION_DOWN, "JMS connection lost.");
         }
+        return false;
       }
     }
     
-    return newTags.keySet();
+    return true;
   }
 
   @Override

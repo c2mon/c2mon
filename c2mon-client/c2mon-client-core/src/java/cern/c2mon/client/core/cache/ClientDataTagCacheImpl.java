@@ -36,10 +36,12 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTag;
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.rule.RuleFormatException;
 
 @Service
@@ -54,19 +56,19 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   /**
    * Pointer to the actual used cache instance (live or history)
    */
-  private Map<Long, ClientDataTag> activeCache = null;
+  private Map<Long, ClientDataTagImpl> activeCache = null;
   
   /** 
    * <code>Map</code> containing all subscribed data tags which are updated via the
    * <code>HistoryManager</code>
    */
-  private final Map<Long, ClientDataTag> historyCache =  new Hashtable<Long, ClientDataTag>(1500);
+  private final Map<Long, ClientDataTagImpl> historyCache =  new Hashtable<Long, ClientDataTagImpl>(1500);
   
   /** 
    * <code>Map</code> containing all subscribed data tags which are updated via the
    * <code>JmsProxy</code>
    */
-  private final Map<Long, ClientDataTag> liveCache = new Hashtable<Long, ClientDataTag>(1500);
+  private final Map<Long, ClientDataTagImpl> liveCache = new Hashtable<Long, ClientDataTagImpl>(1500);
   
   /** Thread lock for access to the <code>dataTags</code> Map */
   private final ReentrantReadWriteLock cacheLock = new ReentrantReadWriteLock();
@@ -125,7 +127,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     
     cacheLock.readLock().lock();
     try {
-      for (ClientDataTag cdt : activeCache.values()) {
+      for (ClientDataTagImpl cdt : activeCache.values()) {
         if (cdt.hasUpdateListeners()) {
           list.add(cdt);
         }
@@ -163,7 +165,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
     cacheLock.readLock().lock();
     try {
-      for (ClientDataTag cdt : activeCache.values()) {
+      for (ClientDataTagImpl cdt : activeCache.values()) {
         if (cdt.isUpdateListenerRegistered(listener)) {
           list.add(cdt);
         }
@@ -196,19 +198,22 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public void put(final ClientDataTag clientDataTag) {
-    if (clientDataTag != null) {
-      cacheLock.writeLock().lock();
-      try {
-        handleLiveTagRegistration(clientDataTag);
-        ClientDataTag oldEntry = liveCache.put(clientDataTag.getId(), clientDataTag);
+  public ClientDataTag create(final Long tagId) {
+    if (tagId == null) {
+      throw new NullPointerException("This method does not allow the tag id being null.");
+    }
+    ClientDataTagImpl cdt = new ClientDataTagImpl(tagId);
+    cacheLock.writeLock().lock();
+    try {
+      if (!containsTag(tagId)) {
+        liveCache.put(cdt.getId(), cdt);
         
         if (historyMode) {
           try {
-            ClientDataTag historyTag = clientDataTag.clone();
+            ClientDataTagImpl historyTag = cdt.clone();
             historyTag.clean();
             // Adds the cleaned clone (without listeners) to the history cache.
-            historyCache.put(clientDataTag.getId(), historyTag);
+            historyCache.put(cdt.getId(), historyTag);
             
           }
           catch (CloneNotSupportedException e) {
@@ -217,10 +222,16 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           }
         }
       }
-      finally {
-        cacheLock.writeLock().unlock();
+      else {
+        cdt = liveCache.get(tagId);
       }
+      
     }
+    finally {
+      cacheLock.writeLock().unlock();
+    }
+    
+    return cdt;
   }
 
   @Override
@@ -253,7 +264,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
       cacheLock.readLock().lock();
       try {
         for (ClientDataTag cdt : liveCache.values()) {
-          cdt.invalidate(JMS_CONNECTION_LOST_MSG);
+          cdt.invalidate(TagQualityStatus.JMS_CONNECTION_DOWN, JMS_CONNECTION_LOST_MSG);
         }
       }
       finally {
@@ -281,7 +292,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     }
     catch (JMSException e) {
       LOG.warn("initializeNewTags() - invalidate tag " + liveTag.getId() + ". Reason: " + JMS_CONNECTION_LOST_MSG);
-      liveTag.invalidate(JMS_CONNECTION_LOST_MSG);
+      liveTag.invalidate(TagQualityStatus.JMS_CONNECTION_DOWN, JMS_CONNECTION_LOST_MSG);
     }
   }
 
@@ -310,7 +321,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     Set<Long> tagsToRemove = new HashSet<Long>();
     cacheLock.writeLock().lock();
     try {
-      for (ClientDataTag cdt : activeCache.values()) {
+      for (ClientDataTagImpl cdt : activeCache.values()) {
         if (cdt.isUpdateListenerRegistered(listener)) {
           cdt.removeUpdateListener(listener);
           if (!cdt.hasUpdateListeners()) {
@@ -334,7 +345,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     Set<Long> tagsToRemove = new HashSet<Long>();
     cacheLock.writeLock().lock();
     try {
-      ClientDataTag cdt = null;
+      ClientDataTagImpl cdt = null;
       for (Long tagId : dataTagIds) {
         cdt = activeCache.get(tagId);
         if (cdt != null) {
@@ -412,12 +423,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
    */
   private void enableHistoryMode() {
     historyCache.clear();
-    ClientDataTag liveTag = null;
-    ClientDataTag historyTag = null;
+    ClientDataTagImpl liveTag = null;
+    ClientDataTagImpl historyTag = null;
     Collection<DataTagUpdateListener> listeners = null;
     
     try {
-      for (Entry<Long, ClientDataTag> entry : liveCache.entrySet()) {
+      for (Entry<Long, ClientDataTagImpl> entry : liveCache.entrySet()) {
         liveTag = entry.getValue();
         
         historyTag = liveTag.clone();
@@ -441,10 +452,10 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
    * listeners back to the live cache instance.
    */
   private void disableHistoryMode() {
-    ClientDataTag historyTag = null;
+    ClientDataTagImpl historyTag = null;
     Collection<DataTagUpdateListener> listeners = null;
     
-    for (Entry<Long, ClientDataTag> entry : historyCache.entrySet()) {
+    for (Entry<Long, ClientDataTagImpl> entry : historyCache.entrySet()) {
       historyTag = entry.getValue();
       listeners = historyTag.getUpdateListeners();
       
@@ -465,11 +476,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     Set<Long> newSubscriptions = new HashSet<Long>();
     cacheLock.readLock().lock();
     try {
-      ClientDataTag cdt = null;
+      ClientDataTagImpl cdt = null;
       for (Long tagId : tagIds) {
         cdt = activeCache.get(tagId);
         if (!cdt.hasUpdateListeners()) {
           newSubscriptions.add(tagId);
+          handleLiveTagRegistration(liveCache.get(tagId));
         }
         cdt.addUpdateListener(listener);
       }

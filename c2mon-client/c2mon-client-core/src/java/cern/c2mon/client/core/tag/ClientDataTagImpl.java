@@ -294,7 +294,7 @@ public class ClientDataTagImpl implements ClientDataTag {
    * @see cern.c2mon.client.tag.ClientDataTag#invalidate(java.lang.String)
    */
   @Override
-  public void invalidate(final String pDescription) {
+  public void invalidate(final TagQualityStatus status, final String pDescription) {
     try {
       updateTagLock.writeLock().lock();
       
@@ -302,7 +302,7 @@ public class ClientDataTagImpl implements ClientDataTag {
         LOG.debug("invalidate() called for tag " + this.id);
       }
       // Invalidate the object.
-      tagQuality.addInvalidStatus(TagQualityStatus.INACCESSIBLE, pDescription);
+      tagQuality.addInvalidStatus(status, pDescription);
       
       notifyListeners();
     }
@@ -338,10 +338,15 @@ public class ClientDataTagImpl implements ClientDataTag {
   }
 
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#addUpdateListener(cern.c2mon.client.tag.DataTagUpdateListener)
+  /**
+   * Adds a <code>DataTagUpdateListener</code> to the ClientDataTag and 
+   * generates an initial update event for that listener.
+   * Any change to the ClientDataTag value or quality attributes will trigger
+   * an update event to all <code>DataTagUpdateListener</code> objects 
+   * registered.
+   * @param pListener the DataTagUpdateListener comments
+   * @see #removeUpdateListener(DataTagUpdateListener)
    */
-  @Override
   public void addUpdateListener(final DataTagUpdateListener pListener) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("addUpdateListener() called.");
@@ -379,17 +384,24 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
   
-  @Override
+  /**
+   * Adds all <code>DataTagUpdateListener</code> of the list to the ClientDataTag and 
+   * generates an initial update event for those listeners.
+   * Any change to the ClientDataTag value or quality attributes will trigger
+   * an update event to all <code>DataTagUpdateListener</code> objects 
+   * registered.
+   * @param pListenerList the DataTagUpdateListener comments
+   * @see #removeUpdateListener(DataTagUpdateListener)
+   */
   public void addUpdateListeners(final Collection<DataTagUpdateListener> pListenerList) {
     for (DataTagUpdateListener listener : pListenerList) {
       addUpdateListener(listener);
     }
   }
   
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getUpdateListeners()
+  /**
+   * @return All listeners registered to this data tag
    */
-  @Override
   public Collection<DataTagUpdateListener> getUpdateListeners() {
     try {
       listenersLock.readLock().lock();
@@ -400,11 +412,14 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
   
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#isUpdateListenerRegistered(cern.c2mon.client.tag.DataTagUpdateListener)
+  /**
+   * Returns <code>true</code>, if the given listener is registered
+   * for receiving updates of that tag.
+   * @param pListener the listener to check
+   * @return <code>true</code>, if the given listener is registered
+   * for receiving updates of that tag.
    */
-  @Override
-  public boolean isUpdateListenerRegistered(DataTagUpdateListener pListener) {
+  public boolean isUpdateListenerRegistered(final DataTagUpdateListener pListener) {
     boolean isRegistered = false;
     try {
       listenersLock.readLock().lock();
@@ -417,10 +432,11 @@ public class ClientDataTagImpl implements ClientDataTag {
     return isRegistered;
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#removeUpdateListener(cern.c2mon.client.tag.DataTagUpdateListener)
+  /**
+   * Removes (synchronized) a previously registered <code>DataTagUpdateListener</code>
+   * @see #addUpdateListener
+   * @param pListener The listener that shall be unregistered
    */
-  @Override
   public void removeUpdateListener(final DataTagUpdateListener pListener) {
     try {
       listenersLock.writeLock().lock();
@@ -431,7 +447,9 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
 
-  @Override
+  /**
+   * Removes all previously registered <code>DataTagUpdateListener</code>
+   */
   public void removeAllUpdateListeners() {
     listenersLock.writeLock().lock();
     try {
@@ -442,10 +460,12 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
   
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#hasUpdateListeners()
+  /**
+   * Returns information whether the tag has any update listeners registered
+   * or not
+   * @return <code>true</code>, if this <code>ClientDataTag</code> instance has
+   *         update listeners registered.
    */
-  @Override
   public boolean hasUpdateListeners() {
     boolean isEmpty = false;
     try {
@@ -738,9 +758,19 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
   
+  
+  /**
+   * Creates a clone of the this object. The only difference is that
+   * it does not copy the registered listeners. If you are only interested
+   * in the static information of the object you should call after cloning
+   * the {@link #clean()} method.
+   * @return The clone of this object
+   * @throws CloneNotSupportedException Thrown, if one of the field does not support cloning.
+   * @see #clean()
+   */
   @SuppressWarnings("unchecked")
   @Override
-  public ClientDataTag clone() throws CloneNotSupportedException {
+  public ClientDataTagImpl clone() throws CloneNotSupportedException {
     ClientDataTagImpl clone = (ClientDataTagImpl) super.clone();
     
     clone.processIds = (HashSet<Long>) processIds.clone();
@@ -781,7 +811,11 @@ public class ClientDataTagImpl implements ClientDataTag {
     return new ArrayList<Long>(processIds);
   }
 
-  @Override
+  /**
+   * Removes all <code>ClientDataTagValue</code> information from the object.
+   * This is in particular interesting for the history mode which only needs
+   * the static information from the live tag object. 
+   */
   public void clean() {
     this.alarms.clear();
     this.description = DEFAULT_DESCRIPTION;

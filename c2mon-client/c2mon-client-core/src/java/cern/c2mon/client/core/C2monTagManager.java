@@ -42,8 +42,9 @@ public interface C2monTagManager {
    *  
    * @param dataTagIds A collection of data tag IDs
    * @param listener the listener which shall be registered
+   * @return <code>true</code>, if the registration was successfull, otherwhise <code>false</code>
    */
-  void subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
+  boolean subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
   
   /**
    * Use this method for unregistering a listener from receiving updates for specific data tags.

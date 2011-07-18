@@ -46,67 +46,10 @@ public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, To
    * the quality description to <code>pDescription</code>
    * Notifies all registered <code>DataTagUpdateListeners</code> of the change
    * of state.
+   * @param pStatus The invalidation status to be added to the tag 
    * @param pDescription the quality description
    */
-  void invalidate(final String pDescription);
-
-  /**
-   * Adds a <code>DataTagUpdateListener</code> to the ClientDataTag and 
-   * generates an initial update event for that listener.
-   * Any change to the ClientDataTag value or quality attributes will trigger
-   * an update event to all <code>DataTagUpdateListener</code> objects 
-   * registered.
-   * @param pListener the DataTagUpdateListener comments
-   * @see #removeUpdateListener(DataTagUpdateListener)
-   */
-  void addUpdateListener(final DataTagUpdateListener pListener);
-  
-  /**
-   * Adds all <code>DataTagUpdateListener</code> of the list to the ClientDataTag and 
-   * generates an initial update event for those listeners.
-   * Any change to the ClientDataTag value or quality attributes will trigger
-   * an update event to all <code>DataTagUpdateListener</code> objects 
-   * registered.
-   * @param pListenerList the DataTagUpdateListener comments
-   * @see #removeUpdateListener(DataTagUpdateListener)
-   */
-  void addUpdateListeners(final Collection<DataTagUpdateListener> pListenerList);
-
-  /**
-   * 
-   * @return All listeners registered to this data tag
-   */
-  Collection<DataTagUpdateListener> getUpdateListeners();
-
-  /**
-   * Returns <code>true</code>, if the given listener is registered
-   * for receiving updates of that tag.
-   * @param pListener the listener to check
-   * @return <code>true</code>, if the given listener is registered
-   * for receiving updates of that tag.
-   */
-  boolean isUpdateListenerRegistered(DataTagUpdateListener pListener);
-
-  /**
-   * Removes (synchronized) a previously registered <code>DataTagUpdateListener</code>
-   * @see #addUpdateListener
-   * @param pListener The listener that shall be unregistered
-   */
-  void removeUpdateListener(final DataTagUpdateListener pListener);
-  
-  /**
-   * Removes all previously registered <code>DataTagUpdateListener</code>
-   */
-  void removeAllUpdateListeners();
-
-  /**
-   * Returns information whether the tag has any update listeners registered
-   * or not
-   * @return <code>true</code>, if this <code>ClientDataTag</code> instance has
-   *         update listeners registered.
-   */
-  boolean hasUpdateListeners();
-
+  void invalidate(TagQualityStatus pStatus, final String pDescription);
   
   /**
    * This thread safe method updates the given <code>ClientDataTag</code> object.
@@ -171,11 +114,4 @@ public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, To
    * @see #clean()
    */
   ClientDataTag clone() throws CloneNotSupportedException;
-  
-  /**
-   * Removes all <code>ClientDataTagValue</code> information from the object.
-   * This is in particular interesting for the history mode which only needs
-   * the static information from the live tag object. 
-   */
-  void clean();
 }

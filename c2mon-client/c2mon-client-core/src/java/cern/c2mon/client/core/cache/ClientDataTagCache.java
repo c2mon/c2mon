@@ -38,24 +38,29 @@ import cern.c2mon.client.core.tag.ClientDataTag;
  */
 public interface ClientDataTagCache extends BasicCacheHandler {
   /**
-   * Adds the <code>ClientDataTag</code> reference to the cache.
+   * Creates a <code>ClientDataTag</code> object and adds it to the cache. If the cache
+   * has already an entry for that tag it does not create a new one but returns
+   * the existing <b>live tag</b> reference.
    * <p>
    * This method is used by the
    * {@link C2monTagManager#subscribeDataTags(Set, DataTagUpdateListener)}
-   * method to update the cache with newly registered <code>ClientDataTag</code> objects.
-   * This method is called before you adding the {@link DataTagUpdateListener} references
+   * method to create new tags in the cache.
+   * This method is called before adding the {@link DataTagUpdateListener} references
    * to the <code>ClientDataTag</code>. 
    * <p>
    * Please note that the cache does not handle the subscription of the
    * <code>ClientDataTag</code> to the <code>JmsProxy</code> or <code>SupervisionManager</code>.
-   * All this is done by the <code>C2monTagManager</code>.
+   * All this is done by the <code>C2monTagManager</code>. For this it is using the
+   * <b>live tag</b> reference which is returned by this method call.
    * 
-   * @param clientDataTag the <code>ClientDataTag</code> that shall be
+   * @param tagId The id of the <code>ClientDataTag</code> that shall be
    *                      added to the cache.
+   * @return The reference to the live tag. Please not that if the cache is in history mode and you
+   *         want to get that reference of the tag you need to call {@link #get(Long)}.
    * @see cern.c2mon.client.core.C2monTagManager#subscribeDataTags(Collection, DataTagUpdateListener)
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  void put(ClientDataTag clientDataTag);
+  ClientDataTag create(Long tagId);
   
   /**
    * Adds the given listener to the tags in the cache.
