@@ -18,14 +18,9 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageListener;
 import javax.jms.TextMessage;
-
-import org.apache.log4j.Logger;
 
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -41,57 +36,16 @@ import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
  * @author Mark Brightwell
  *
  */
-class SupervisionListenerWrapper implements MessageListener {
+class SupervisionListenerWrapper extends AbstractListenerWrapper<SupervisionListener, SupervisionEvent>{
 
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = Logger.getLogger(MessageListenerWrapper.class);
-  
-  /**
-   * Listener registered for receiving supervision events.  
-   */
-  private Collection<SupervisionListener> listeners = new ArrayList<SupervisionListener>();
-    
-  
-  /**
-   * Registers the listener for update notifications of SupervisionEvents.
-   * 
-   * @param listener the listener to notify on update 
-   */
-  public synchronized void addListener(final SupervisionListener listener) {    
-    listeners.add(listener);    
-  }
-  
-  /**
-   * Unsubscribes the listener for update notifications.
-   * 
-   * @param listener to remove
-   */
-  public synchronized void removeListener(final SupervisionListener listener) {
-    listeners.remove(listener);
-  }
-  
-  /**
-   * Converts message into SupervisionEvent and notifies registered listeners.
-   * 
-   * <p>All exceptions are caught and logged (both exceptions in message conversion
-   * and thrown by the listeners).
-   */
   @Override
-  public synchronized void onMessage(final Message message) {
-    try {
-      if (message instanceof TextMessage) {
-        SupervisionEvent supervisionEvent = SupervisionEventImpl.fromJson(((TextMessage) message).getText());
-        for (SupervisionListener listener : listeners) {
-          listener.onSupervisionUpdate(supervisionEvent);
-        }
-      } else {
-        LOGGER.warn("Non-text message received on supervision topic - ignoring update!");
-      }
-    } catch (Exception e) {
-      LOGGER.error("Exception caught while receiving a SupervisionEvent update from the server", e);
-    }
+  protected SupervisionEvent convertMessage(Message message) throws JMSException {
+    return SupervisionEventImpl.fromJson(((TextMessage) message).getText());
+  }
+
+  @Override
+  protected void invokeListener(SupervisionListener listener, SupervisionEvent event) {
+    listener.onSupervisionUpdate(event);
   }
 
 }

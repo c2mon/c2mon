@@ -163,4 +163,21 @@ public interface JmsProxy {
    * @throws NullPointerException if argument is null
    */
   void unregisterSupervisionListener(SupervisionListener supervisionListener);
+  
+  /**
+   * Register a listener to be notified of heartbeat events incoming
+   * from the server.
+   * 
+   * @param heartbeatListener the listener to register
+   * @throws NullPointerException if argument is null
+   */
+  void registerHeartbeatListener(HeartbeatListener heartbeatListener);
+  
+  /**
+   * Unregister the listener from receiving heartbeat updates.
+   * 
+   * @param supervisionListener the listener to remove
+   * @throws NullPointerException if argument is null
+   */
+  void unregisterHeartbeatListener(HeartbeatListener heartbeatListener);
 }

@@ -46,6 +46,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.jms.ConnectionListener;
+import cern.c2mon.client.jms.HeartbeatListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
@@ -126,11 +127,17 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * events.
    */
   private Collection<ConnectionListener> connectionListeners; 
+  private ReentrantReadWriteLock connectionListenersLock;
   
   /**
    * Subscribes to the Supervision topic and notifies any registered listeners. 
    */
   private SupervisionListenerWrapper supervisionListenerWrapper;
+  
+  /**
+   *  Subscribes to the Supervision topic and notifies any registered listeners.
+   */
+  private HeartbeatListenerWrapper heartbeatListenerWrapper;
   
   /**
    * Recording connection status to JMS.
@@ -166,6 +173,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * Topic on which supervision events arrive from server.
    */
   private Destination supervisionTopic;
+    
+  /**
+   * Topic on which server heartbeat messages are arriving.
+   */
+  private Destination heartbeatTopic;
   
   /**
    * Constructor.
@@ -173,9 +185,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * @param supervisionTopic topic on which supervision events arrive from server
    */
   @Autowired
-  public JmsProxyImpl(final ConnectionFactory connectionFactory, @Qualifier("supervisionTopic") final Destination supervisionTopic) {
+  public JmsProxyImpl(final ConnectionFactory connectionFactory, @Qualifier("supervisionTopic") final Destination supervisionTopic,
+                      @Qualifier("heartbeatTopic") final Destination heartbeatTopic) {
     this.jmsConnectionFactory = connectionFactory;
     this.supervisionTopic = supervisionTopic;
+    this.heartbeatTopic = heartbeatTopic;
+    
     
     connected = false;
     running = false;
@@ -187,7 +202,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     registeredListeners = new ConcurrentHashMap<TagUpdateListener, TopicRegistrationDetails>();
     listenerLocks = new ConcurrentHashMap<TagUpdateListener, ReentrantReadWriteLock.WriteLock>();
     connectionListeners = new ArrayList<ConnectionListener>(); 
+    connectionListenersLock = new ReentrantReadWriteLock();
     supervisionListenerWrapper = new SupervisionListenerWrapper();
+    heartbeatListenerWrapper = new HeartbeatListenerWrapper();
   }
   
  
@@ -226,18 +243,28 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
    * Notifies all {@link ConnectionListener}s of a connection. 
    */
   private void notifyConnectionListenerOnConnection() {
-    for (ConnectionListener listener : connectionListeners) {
-      listener.onConnection();
-    }
+    connectionListenersLock.writeLock().lock();
+    try {
+      for (ConnectionListener listener : connectionListeners) {
+        listener.onConnection();
+      }      
+    } finally {
+      connectionListenersLock.writeLock().unlock();
+    }    
   }
   
   /**
    * Notifies all {@link ConnectionListener}s on a disconnection.
    */
   private void notifyConnectionListenerOnDisconnection() {
-    for (ConnectionListener listener : connectionListeners) {
-      listener.onDisconnection();
-    }
+    connectionListenersLock.writeLock().lock();
+    try {
+      for (ConnectionListener listener : connectionListeners) {
+        listener.onDisconnection();
+      }
+    } finally {
+      connectionListenersLock.writeLock().unlock();
+    }    
   }
 
   /**
@@ -295,6 +322,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
       } 
       //refresh supervision subscription
       subscribeToSupervisionTopic();
+      subscribeToHeartbeatTopic();
     } catch (JMSException e) {
       LOGGER.error("Did not manage to refresh Topic subscriptions.", e);
       throw e;
@@ -304,6 +332,18 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     
   }
   
+  /**
+   * Subscribes to the heartbeat topic. Called when refreshing
+   * all subscriptions.
+   */
+  private void subscribeToHeartbeatTopic() throws JMSException {
+    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);                           
+    MessageConsumer consumer = session.createConsumer(heartbeatTopic);                 
+    consumer.setMessageListener(heartbeatListenerWrapper);
+  }
+
+
+
   /**
    * Called when refreshing subscriptions at start up and again
    * if the connection goes down.
@@ -329,6 +369,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
                             final TopicRegistrationDetails topicRegistrationDetails) throws JMSException {   
     refreshLock.readLock().lock();
     try {
+      if (topicRegistrationDetails == null) {
+        throw new NullPointerException("Trying to register a TagUpdateListener with null RegistrationDetails!");
+      }
       if (!listenerLocks.containsKey(serverUpdateListener)) {
         listenerLocks.put(serverUpdateListener, new ReentrantReadWriteLock().writeLock());
       }
@@ -403,6 +446,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     if (queueName == null) {
       throw new NullPointerException("sendRequest(..) method called with null queue name argument");
     }
+    if (jsonRequest == null) {
+      throw new NullPointerException("sendRequest(..) method called with null request argument");
+    }
     if (connected) {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
       try {
@@ -468,7 +514,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     if (connectionListener == null) {
       throw new NullPointerException("registerConnectionListener(..) method called with null listener argument");
     }
-    connectionListeners.add(connectionListener);
+    connectionListenersLock.writeLock().lock();
+    try {
+      connectionListeners.add(connectionListener);
+    } finally {
+      connectionListenersLock.writeLock().unlock();
+    }    
   }
 
   /**
@@ -491,11 +542,27 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
   @Override
   public void unregisterSupervisionListener(final SupervisionListener supervisionListener) { 
     if (supervisionListener == null) {
-      throw new NullPointerException("Trying to unregister null Supervision listener with JmsProxy.");
+      throw new NullPointerException("Trying to unregister null Supervision listener from JmsProxy.");
     }
     supervisionListenerWrapper.removeListener(supervisionListener);        
   }
 
+  @Override
+  public void registerHeartbeatListener(final HeartbeatListener heartbeatListener) {
+    if (heartbeatListener == null) {
+      throw new NullPointerException("Trying to register null Heartbeat listener with JmsProxy.");
+    }
+    heartbeatListenerWrapper.addListener(heartbeatListener);
+  }
+
+  @Override
+  public void unregisterHeartbeatListener(final HeartbeatListener heartbeatListener) {
+    if (heartbeatListener == null) {
+      throw new NullPointerException("Trying to unregister null Heartbeat listener from JmsProxy.");
+    }
+    heartbeatListenerWrapper.removeListener(heartbeatListener);
+  }
+  
   //Spring lifecycle methods
   
   @Override

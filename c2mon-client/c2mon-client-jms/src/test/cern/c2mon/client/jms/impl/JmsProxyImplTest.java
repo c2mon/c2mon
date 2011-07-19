@@ -24,6 +24,7 @@ import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.easymock.EasyMock;
@@ -64,7 +65,8 @@ public class JmsProxyImplTest {
     connection = EasyMock.createMock(Connection.class);
     session = EasyMock.createMock(Session.class);
     Destination supervisionTopic = EasyMock.createMock(Destination.class);
-    jmsProxy = new JmsProxyImpl(connectionFactory, supervisionTopic);
+    Destination heartbeatTopic = EasyMock.createMock(Destination.class);
+    jmsProxy = new JmsProxyImpl(connectionFactory, supervisionTopic, heartbeatTopic);
   }
   
   /**
@@ -114,6 +116,24 @@ public class JmsProxyImplTest {
   }
   
   /**
+   * Call register heartbeat with null.
+   * @throws JMSException 
+   */
+  @Test(expected = NullPointerException.class)
+  public void testRegisterNullHeartbeatListener() throws JMSException {
+    jmsProxy.registerHeartbeatListener(null);
+  }
+  
+  /**
+   * Call unregister heartbeat with null.
+   * @throws JMSException 
+   */
+  @Test(expected = NullPointerException.class)
+  public void testUnregisterNullHeartbeatListener() throws JMSException {
+    jmsProxy.unregisterHeartbeatListener(null);
+  }
+  
+  /**
    * Call unregister supervision with null.
    * @throws JMSException 
    */
@@ -133,24 +153,27 @@ public class JmsProxyImplTest {
   public void testStartAndSendRequestNullRequest() throws JMSException, InterruptedException { 
     //need to simulate start
     EasyMock.expect(connectionFactory.createConnection()).andReturn(connection).times(2);        
-    EasyMock.expect(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).andReturn(session);
+    EasyMock.expect(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).andReturn(session).times(3);
     connection.setExceptionListener(EasyMock.isA(ExceptionListener.class));  
-    connection.start();
-    EasyMock.expect(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).andReturn(session);    
+    connection.start();       
     
     MessageConsumer messageConsumer = EasyMock.createMock(MessageConsumer.class);
-    EasyMock.expect(session.createConsumer(EasyMock.isA(Destination.class))).andReturn(messageConsumer);
+    EasyMock.expect(session.createConsumer(EasyMock.isA(Destination.class))).andReturn(messageConsumer).times(2);    
+    messageConsumer.setMessageListener(EasyMock.isA(MessageListener.class));
+    messageConsumer.setMessageListener(EasyMock.isA(MessageListener.class));
     session.close();
         
     EasyMock.replay(connectionFactory);
     EasyMock.replay(connection);
     EasyMock.replay(session);
+    EasyMock.replay(messageConsumer);
     ((SmartLifecycle) jmsProxy).start();
     Thread.sleep(2000); //leave time for connection thread to run (and set connected flag to true)
     jmsProxy.sendRequest(null, "test.queue", 1000);
     EasyMock.verify(connectionFactory);
     EasyMock.verify(connection);
     EasyMock.verify(session);
+    EasyMock.verify(messageConsumer);
   }
   
   /**
@@ -162,16 +185,28 @@ public class JmsProxyImplTest {
   public void testSendRequestNullQueue() throws JMSException, InterruptedException { 
     JsonRequest<ClientRequestResult> jsonRequest = EasyMock.createMock(JsonRequest.class);
     //need to simulate start
-    EasyMock.expect(connectionFactory.createConnection()).andReturn(connection);    
-    EasyMock.expect(connection.createSession(false, Session.SESSION_TRANSACTED)).andReturn(session);    
+    EasyMock.expect(connectionFactory.createConnection()).andReturn(connection).times(2);        
+    EasyMock.expect(connection.createSession(false, Session.AUTO_ACKNOWLEDGE)).andReturn(session).times(3);
+    connection.setExceptionListener(EasyMock.isA(ExceptionListener.class));  
+    connection.start();       
+    
+    MessageConsumer messageConsumer = EasyMock.createMock(MessageConsumer.class);
+    EasyMock.expect(session.createConsumer(EasyMock.isA(Destination.class))).andReturn(messageConsumer).times(2);    
+    messageConsumer.setMessageListener(EasyMock.isA(MessageListener.class));
+    messageConsumer.setMessageListener(EasyMock.isA(MessageListener.class));
+    session.close();
         
     EasyMock.replay(connectionFactory);
     EasyMock.replay(connection);
+    EasyMock.replay(session);
+    EasyMock.replay(messageConsumer);
     ((SmartLifecycle) jmsProxy).start();
     Thread.sleep(2000); //leave time for connection thread to run (and set connected flag to true)
     jmsProxy.sendRequest(jsonRequest, null, 1000);
     EasyMock.verify(connectionFactory);
     EasyMock.verify(connection);
+    EasyMock.verify(session);
+    EasyMock.verify(messageConsumer);
   }
-  
+
 }
