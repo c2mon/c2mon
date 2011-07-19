@@ -137,24 +137,26 @@ public class TagManager implements CoreTagManager {
       for (Long tagId : tagIds) { 
         if (!cache.containsTag(tagId)) {
           newTag = cache.create(tagId);
-          newTag.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG);
+          newTag.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known to the system.");
           newTags.put(tagId, newTag);
         }
       }
       
       try {
         initializeNewTags(newTags);
-        // add listener to tags
+        // add listener to tags and subscribe them to the live topics
         this.cache.addDataTagUpdateListener(tagIds, listener);
         // Inform listeners (e.g. HistoryManager) about new subscriptions
         fireOnNewTagSubscriptionsEvent(newTags.keySet());
         synchronizeNewTags(newTags);
       }
       catch (JMSException e) {
-        LOG.warn("initializeNewTags() - JMS connection lost -> Invalidate all newly requested tags.");
+        LOG.error("subscribeDataTags() - JMS connection lost -> Invalidate all newly requested tags.", e);
         for (ClientDataTag cdt : newTags.values()) {
           cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.JMS_CONNECTION_DOWN, "JMS connection lost.");
         }
+        // add listener anyway to tags
+        this.cache.addDataTagUpdateListener(tagIds, listener);
         return false;
       }
     }
@@ -179,7 +181,7 @@ public class TagManager implements CoreTagManager {
           newTag.update(tagUpdate);
         }
         catch (RuleFormatException e) {
-          LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+          LOG.fatal("initializeNewTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
           throw new RuntimeException(e);
         }
       }
@@ -203,7 +205,7 @@ public class TagManager implements CoreTagManager {
             newTag.update(tagValueUpdate);
           }
           catch (RuleFormatException e) {
-            LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagValueUpdate.getId(), e);
+            LOG.fatal("synchronizeNewTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagValueUpdate.getId(), e);
             throw new RuntimeException(e);
           }
         }

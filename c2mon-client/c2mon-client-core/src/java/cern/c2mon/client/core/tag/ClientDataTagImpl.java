@@ -20,7 +20,7 @@ package cern.c2mon.client.core.tag;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -52,6 +52,9 @@ import cern.tim.shared.rule.RuleFormatException;
  */
 public class ClientDataTagImpl implements ClientDataTag {
   
+  /** Log4j instance */
+  private static final Logger LOG = Logger.getLogger(ClientDataTagImpl.class);
+  
   /** Default description when the object is not yet initialized */
   private static final String DEFAULT_DESCRIPTION = "Tag not initialised.";
   
@@ -67,7 +70,7 @@ public class ClientDataTagImpl implements ClientDataTag {
    * is just one id defined. Only rules might have dependencies
    * to multiple processes (DAQs).
    */
-  private HashSet<Long> processIds = new HashSet<Long>();
+  private Map<Long, SupervisionEvent> processSupervisionStatus = new HashMap<Long, SupervisionEvent>();
   
   /** 
    * Containing all equipment id's which are relevant to compute the
@@ -75,7 +78,7 @@ public class ClientDataTagImpl implements ClientDataTag {
    * is just one id defined. Only rules might have dependencies
    * to multiple equipments.
    */
-  private HashSet<Long> equipmentIds = new HashSet<Long>();
+  private Map<Long, SupervisionEvent> equipmentSupervisionStatus = new HashMap<Long, SupervisionEvent>();
   
   /** The unique name of the tag */
   private String tagName = null;
@@ -97,9 +100,7 @@ public class ClientDataTagImpl implements ClientDataTag {
   private String unit = null;
   
   /** The current tag value description */
-  private String description = DEFAULT_DESCRIPTION;
-  
-    
+  private String description = ""; 
   
   /**
    * String representation of the JMS destination where the DataTag 
@@ -109,7 +110,6 @@ public class ClientDataTagImpl implements ClientDataTag {
 
   /** In case this data tag is a rule this variable contains its rule expression */
   private RuleExpression ruleExpression = null;
-
 
   /**
    * List of DataTagUpdateListeners registered for updates on this DataTag
@@ -121,9 +121,6 @@ public class ClientDataTagImpl implements ClientDataTag {
   
   /** Lock to prevent more than one thread at a time to update the value */
   private final ReentrantReadWriteLock updateTagLock = new ReentrantReadWriteLock();
-  
-  /** Log4j instance */
-  private static final Logger LOG = Logger.getLogger(ClientDataTagImpl.class);
 
 
   /**
@@ -553,11 +550,19 @@ public class ClientDataTagImpl implements ClientDataTag {
         
         doUpdateValues(tagUpdate);
         
-        processIds.clear();
-        processIds.addAll(tagUpdate.getProcessIds());
+        // update process map
+        Map<Long, SupervisionEvent> updatedProcessMap = new HashMap<Long, SupervisionEvent>();
+        for (Long processId : tagUpdate.getProcessIds()) {
+         updatedProcessMap.put(processId, processSupervisionStatus.get(processId)); 
+        }
+        processSupervisionStatus = updatedProcessMap;
         
-        equipmentIds.clear();
-        equipmentIds.addAll(tagUpdate.getEquipmentIds());
+        // update equipment map
+        Map<Long, SupervisionEvent> updatedEquipmentMap = new HashMap<Long, SupervisionEvent>();
+        for (Long equipmentId : tagUpdate.getEquipmentIds()) {
+          updatedEquipmentMap.put(equipmentId, equipmentSupervisionStatus.get(equipmentId)); 
+        }
+        equipmentSupervisionStatus = updatedEquipmentMap;
         
         tagName = tagUpdate.getName();
         topicName = tagUpdate.getTopicName();
@@ -586,42 +591,33 @@ public class ClientDataTagImpl implements ClientDataTag {
     if (supervisionEvent == null) {
       return false;
     }
-
     updateTagLock.writeLock().lock();
     try {
       boolean validUpdate = false;
-      validUpdate |= equipmentIds.contains(supervisionEvent.getEntityId());
-      validUpdate |= processIds.contains(supervisionEvent.getEntityId());
+      validUpdate |= equipmentSupervisionStatus.containsKey(supervisionEvent.getEntityId());
+      validUpdate |= processSupervisionStatus.containsKey(supervisionEvent.getEntityId());
 
       if (validUpdate) {
-        TagQualityStatus tagQualityStatusFlag;
+        SupervisionEvent oldEvent;
         switch (supervisionEvent.getEntity()) {
-        case PROCESS:
-          tagQualityStatusFlag = TagQualityStatus.PROCESS_DOWN;
-          break;
-        case EQUIPMENT:
-          tagQualityStatusFlag = TagQualityStatus.EQUIPMENT_DOWN;
-          break;
-        case SUBEQUIPMENT:
-          tagQualityStatusFlag = TagQualityStatus.SUBEQUIPMENT_DOWN;
-          break;
-        default:
-          throw new IllegalArgumentException("The supervision event type " + supervisionEvent.getEntity() + " is not supported.");
-        }
-
-        // Check whether the it's down or not
-        boolean down = false;
-        down |= supervisionEvent.getStatus().equals(SupervisionStatus.DOWN);
-        down |= supervisionEvent.getStatus().equals(SupervisionStatus.STOPPED);
-        if (down) {
-          tagQuality.addInvalidStatus(tagQualityStatusFlag, supervisionEvent.getMessage());
-        }
-        else {
-          tagQuality.removeInvalidStatus(tagQualityStatusFlag);
+          case PROCESS:
+            oldEvent = processSupervisionStatus.put(supervisionEvent.getEntityId(), supervisionEvent);
+            updateProcessStatus(supervisionEvent);
+            break;
+          case EQUIPMENT:
+            oldEvent = equipmentSupervisionStatus.put(supervisionEvent.getEntityId(), supervisionEvent);
+            updateEquipmentStatus(supervisionEvent);
+            break;
+          default:
+            String errorMsg = "The supervision event type " + supervisionEvent.getEntity() + " is not supported.";
+            LOG.error("update(SupervisionEvent) - " + errorMsg);
+            throw new IllegalArgumentException(errorMsg);
         }
         
-        // Notify all listeners of the update
-        notifyListeners();
+        if (oldEvent == null || !supervisionEvent.equals(oldEvent)) {
+          // Notify all listeners of the update
+          notifyListeners();
+        }
       }
 
       return validUpdate;
@@ -631,6 +627,67 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
   
+  /**
+   * Inner method for updating the process status of this tag and
+   * computing the error message, if one of the linked processes is down.
+   * @param supervisionEvent The process supervision event.
+   */
+  private void updateProcessStatus(final SupervisionEvent supervisionEvent) {
+    boolean down = false;
+    StringBuffer invalidationMessage = new StringBuffer();
+    for (SupervisionEvent event : processSupervisionStatus.values()) {
+      if (event != null) {
+        boolean isDown = false;
+        isDown |= event.getStatus().equals(SupervisionStatus.DOWN);
+        isDown |= event.getStatus().equals(SupervisionStatus.STOPPED);
+        if (isDown) {
+          down = true;
+          if (invalidationMessage.length() > 0) {
+            invalidationMessage.append("; ");
+          }
+          invalidationMessage.append(event.getMessage());
+        }
+      }
+    }
+    
+    if (down) { 
+      tagQuality.addInvalidStatus(TagQualityStatus.PROCESS_DOWN, invalidationMessage.toString());
+    }
+    else {
+      tagQuality.removeInvalidStatus(TagQualityStatus.PROCESS_DOWN);
+    }
+  }
+  
+  /**
+   * Inner method for updating the equipment status of this tag and
+   * computing the error message, if one of the linked equipments is down.
+   * @param supervisionEvent The equipment supervision event.
+   */
+  private void updateEquipmentStatus(final SupervisionEvent supervisionEvent) {
+    boolean down = false;
+    StringBuffer invalidationMessage = new StringBuffer();
+    for (SupervisionEvent event : equipmentSupervisionStatus.values()) {
+      if (event != null) {
+        boolean isDown = false;
+        isDown |= event.getStatus().equals(SupervisionStatus.DOWN);
+        isDown |= event.getStatus().equals(SupervisionStatus.STOPPED);
+        if (isDown) {
+          down = true;
+          if (invalidationMessage.length() > 0) {
+            invalidationMessage.append("; ");
+          }
+          invalidationMessage.append(event.getMessage());
+        }
+      }
+    }
+    
+    if (down) { 
+      tagQuality.addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, invalidationMessage.toString());
+    }
+    else {
+      tagQuality.removeInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN);
+    }
+  }
   
   /**
    * Inner method for updating the all value fields from this
@@ -773,8 +830,17 @@ public class ClientDataTagImpl implements ClientDataTag {
   public ClientDataTagImpl clone() throws CloneNotSupportedException {
     ClientDataTagImpl clone = (ClientDataTagImpl) super.clone();
     
-    clone.processIds = (HashSet<Long>) processIds.clone();
-    clone.equipmentIds = (HashSet<Long>) equipmentIds.clone();
+    // Just clone the process ids
+    clone.processSupervisionStatus = new HashMap<Long, SupervisionEvent>(processSupervisionStatus.size());
+    for (Long processId : processSupervisionStatus.keySet()) {
+      clone.processSupervisionStatus.put(processId, null);
+    }
+    
+    // Just clone the equipment ids
+    clone.equipmentSupervisionStatus = new HashMap<Long, SupervisionEvent>(equipmentSupervisionStatus.size());
+    for (Long equipmentId : equipmentSupervisionStatus.keySet()) {
+      clone.equipmentSupervisionStatus.put(equipmentId, null);
+    }
     
     // AlarmsValue objects are immutable
     clone.alarms = (ArrayList<AlarmValue>) alarms.clone();
@@ -803,12 +869,12 @@ public class ClientDataTagImpl implements ClientDataTag {
 
   @Override
   public Collection<Long> getEquipmentIds() {
-    return new ArrayList<Long>(equipmentIds);
+    return new ArrayList<Long>(equipmentSupervisionStatus.keySet());
   }
 
   @Override
   public Collection<Long> getProcessIds() {
-    return new ArrayList<Long>(processIds);
+    return new ArrayList<Long>(processSupervisionStatus.keySet());
   }
 
   /**

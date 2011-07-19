@@ -20,7 +20,14 @@ package cern.c2mon.client.core;
 
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 import org.junit.Test;
+
+import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.core.tag.ClientDataTagValue;
 
 /**
  * Integration test of Client API modules.
@@ -30,6 +37,11 @@ import org.junit.Test;
  */
 public class C2monServiceGatewayTest {
 
+  /**
+   * Log4j instance
+   */
+  private static final Logger LOG = Logger.getLogger(C2monServiceGatewayTest.class);
+  
   @Test
   public void startClient() {
     C2monServiceGateway.startC2monClient();
@@ -38,4 +50,53 @@ public class C2monServiceGatewayTest {
     assertNotNull(C2monServiceGateway.getTagManager());
   }
   
+  
+  /**
+   * Starts the C2MON client API and registers to some tags
+   * @param args
+   */
+  public static void main(String[] args) {
+    // Put here your list of tags that you want to test!
+    Set<Long> tagIds = new HashSet<Long>();
+    tagIds.add(159195L);
+    tagIds.add(159135L);
+    tagIds.add(156974L);
+    tagIds.add(187252L);
+    tagIds.add(187248L);
+    tagIds.add(187208L);
+    tagIds.add(187244L);
+    tagIds.add(187227L);
+    tagIds.add(165354L);
+    tagIds.add(159207L);
+    
+    try {
+      C2monServiceGateway.startC2monClient();
+      try {
+        // Sleep to give the JmsProxy time to connect (Should be removed soon!)
+        Thread.sleep(2000);
+      }
+      catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      
+      C2monTagManager tagManager = C2monServiceGateway.getTagManager();
+      tagManager.subscribeDataTags(tagIds, new DataTagUpdateListener() {
+        @Override
+        public void onUpdate(ClientDataTagValue tagUpdate) {
+          System.out.println("Update received for tag " + tagUpdate.getId() + ":");
+          System.out.println("\ttag name           : " + tagUpdate.getName());
+          System.out.println("\tvalue              : " + tagUpdate.getValue());
+          System.out.println("\ttype               : " + tagUpdate.getTypeNumeric());
+          System.out.println("\tvalue description  : " + tagUpdate.getDescription());
+          System.out.println("\tquality Code       : " + tagUpdate.getDataTagQuality().toString());
+          System.out.println("\tquality description: " + tagUpdate.getDataTagQuality().getDescription());
+          System.out.println();
+        }
+      });
+    }
+    catch (Exception e) {
+      LOG.error("Catched runtime exception on main thread.", e);
+      System.exit(1);
+    }
+  }
 }
