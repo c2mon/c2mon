@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
@@ -76,7 +78,7 @@ import cern.c2mon.shared.client.request.JsonRequest;
  *
  */
 @Service
-public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLifecycle {
+public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
   /**
    * Class logger.
@@ -563,26 +565,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     heartbeatListenerWrapper.removeListener(heartbeatListener);
   }
   
-  //Spring lifecycle methods
-  
-  @Override
-  public boolean isAutoStartup() {
-    return false;
-  }
-
-  @Override
-  public void stop(Runnable callback) {
-    stop();
-    callback.run();
-  }
-
-  @Override
-  public boolean isRunning() {
-    return running;
-  }
-
-  @Override
-  public void start() {
+  @PostConstruct
+  public void init() {
     //thread starting connection; is stopped when calling shutdown method
     new Thread(new Runnable() {      
       @Override
@@ -593,16 +577,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener, SmartLif
     running = true;
   }
   
-  @Override
+  @PreDestroy
   public void stop() {
     shutdownRequested = true;
     disconnect();
     running = false;
-  }
-
-  @Override
-  public int getPhase() {
-    return Integer.MAX_VALUE;
   }
 
 }

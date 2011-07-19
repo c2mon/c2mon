@@ -167,7 +167,7 @@ public class JmsProxyImplTest {
     EasyMock.replay(connection);
     EasyMock.replay(session);
     EasyMock.replay(messageConsumer);
-    ((SmartLifecycle) jmsProxy).start();
+    ((JmsProxyImpl) jmsProxy).init();
     Thread.sleep(2000); //leave time for connection thread to run (and set connected flag to true)
     jmsProxy.sendRequest(null, "test.queue", 1000);
     EasyMock.verify(connectionFactory);
@@ -200,7 +200,7 @@ public class JmsProxyImplTest {
     EasyMock.replay(connection);
     EasyMock.replay(session);
     EasyMock.replay(messageConsumer);
-    ((SmartLifecycle) jmsProxy).start();
+    ((JmsProxyImpl) jmsProxy).init();
     Thread.sleep(2000); //leave time for connection thread to run (and set connected flag to true)
     jmsProxy.sendRequest(jsonRequest, null, 1000);
     EasyMock.verify(connectionFactory);

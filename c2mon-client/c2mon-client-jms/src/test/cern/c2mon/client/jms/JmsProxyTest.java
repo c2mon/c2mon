@@ -70,12 +70,7 @@ import cern.tim.util.json.GsonFactory;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml" })
-public class JmsProxyTest implements ApplicationContextAware {
-
-  /**
-   * Spring context that needs starting.
-   */
-  private ApplicationContext context;
+public class JmsProxyTest {
   
   /**
    * Component to test.
@@ -101,8 +96,7 @@ public class JmsProxyTest implements ApplicationContextAware {
                                                                                 System.getProperty("c2mon.jms.url")); 
     jmsSender = new ActiveJmsSender();
     jmsSender.setJmsTemplate(new JmsTemplate(connectionFactory));
-    serverTemplate = new JmsTemplate(connectionFactory); 
-    ((AbstractApplicationContext) context).start();
+    serverTemplate = new JmsTemplate(connectionFactory);    
     //JMS connection is started in separate thread, so leave time to connect
     Thread.sleep(2000);
   }
@@ -356,11 +350,5 @@ public class JmsProxyTest implements ApplicationContextAware {
     testSupervisionNotification();
     testUpdateNotification();
   }
-
-  @Override
-  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-    context = applicationContext;
-  }
-  
   
 }
