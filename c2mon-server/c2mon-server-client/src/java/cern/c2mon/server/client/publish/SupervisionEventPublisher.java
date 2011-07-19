@@ -3,6 +3,7 @@ package cern.c2mon.server.client.publish;
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ import com.google.gson.Gson;
 @Service
 public class SupervisionEventPublisher implements SupervisionListener {
 
+  /** Class logger */
+  private static final Logger LOGGER = Logger.getLogger(SupervisionEventPublisher.class);
+  
   /** Bean providing for sending JMS messages and waiting for a response; default destination set */
   private final JmsSender jmsSender;
   
@@ -52,6 +56,7 @@ public class SupervisionEventPublisher implements SupervisionListener {
 
   @Override
   public void notifySupervisionEvent(@Valid final SupervisionEvent supervisionEvent) { 
+    LOGGER.debug("Publishing supervision event: " + GSON.toJson(supervisionEvent));
     jmsSender.send(GSON.toJson(supervisionEvent));
   }
 }
