@@ -21,11 +21,11 @@
 		<application name="c2mon-dmn2-prod" extends="default">
 			<deployment>
 				<directory name="conf">
-					<file name=".jmxremote.passwd" source="/user/diamonop/c2mon/prod/conf/"
+					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/prod/conf/"
 						mask="400" />
-					<file name=".jmxremote.access" source="/user/diamonop/c2mon/prod/conf/"
+					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/prod/conf/"
 						mask="400" />
-					<file name=".c2mon.properties" source="/user/diamonop/c2mon/prod/conf/"
+					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/prod/conf/"
 						mask="400" />
 				</directory>
 			</deployment>
@@ -34,11 +34,11 @@
 		<application name="c2mon-dmn2-test" extends="default" >
 			<deployment installLocation="/opt/c2mon-dmn2-test">
 				<directory name="conf">
-					<file name=".jmxremote.passwd" source="/user/diamonop/c2mon/test/conf/"
+					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/test/conf/"
 						mask="400" />
-					<file name=".jmxremote.access" source="/user/diamonop/c2mon/test/conf/"
+					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/test/conf/"
 						mask="400" />
-					<file name=".c2mon.properties" source="/user/diamonop/c2mon/test/conf/"
+					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/test/conf/"
 						mask="400" />
 				</directory>
 			</deployment>
