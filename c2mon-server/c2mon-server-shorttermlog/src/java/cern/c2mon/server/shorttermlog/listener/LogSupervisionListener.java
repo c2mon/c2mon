@@ -18,6 +18,8 @@
  *****************************************************************************/
 package cern.c2mon.server.shorttermlog.listener;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +74,7 @@ public class LogSupervisionListener implements SupervisionListener {
    * Called at bean initialisation. Registers for
    * notifications.
    */
+  @PostConstruct
   public void init() {
     LOGGER.debug("Registering short-term-log module for supervision updates");
     supervisionNotifier.registerAsListener(this);
