@@ -143,40 +143,12 @@ public class TagManager implements CoreTagManager {
       }
       
       try {
-        // Request initial tag information from C2MON server
-        Collection<TagUpdate> requestedTags = clientRequestHandler.requestTags(newTags.keySet());
-        // Update the new tags and put them into the cache
-        for (TagUpdate tagUpdate : requestedTags) {
-          try { 
-            newTag = newTags.get(tagUpdate.getId());
-            newTag.update(tagUpdate);
-          }
-          catch (RuleFormatException e) {
-            LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
-            throw new RuntimeException(e);
-          }
-        }
-        
+        initializeNewTags(newTags);
         // add listener to tags
         this.cache.addDataTagUpdateListener(tagIds, listener);
-        
         // Inform listeners (e.g. HistoryManager) about new subscriptions
         fireOnNewTagSubscriptionsEvent(newTags.keySet());
-      
-        // Update a second time in case an update was send before the ClientDataTag was subscribed to the topic
-        Collection<TagValueUpdate> requestedTagValues = clientRequestHandler.requestTagValues(newTags.keySet());
-        for (TagValueUpdate tagValueUpdate : requestedTagValues) {
-          newTag = newTags.get(tagValueUpdate.getId());
-          if (newTag.getServerTimestamp() == null || newTag.getServerTimestamp().before(tagValueUpdate.getServerTimestamp())) {
-            try {
-              newTag.update(tagValueUpdate);
-            }
-            catch (RuleFormatException e) {
-              LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagValueUpdate.getId(), e);
-              throw new RuntimeException(e);
-            }
-          }
-        }
+        synchronizeNewTags(newTags);
       }
       catch (JMSException e) {
         LOG.warn("initializeNewTags() - JMS connection lost -> Invalidate all newly requested tags.");
@@ -188,6 +160,55 @@ public class TagManager implements CoreTagManager {
     }
     
     return true;
+  }
+  
+  /**
+   * Requests from the C2MON server the initial values for all tags of the passed map. 
+   * @param newTags Map of uninitialized tags from the cache
+   * @throws JMSException In case of a JMS problem
+   */
+  private void initializeNewTags(final Map<Long, ClientDataTag> newTags) throws JMSException {
+    if (!newTags.isEmpty()) {
+      ClientDataTag newTag = null;
+      // Request initial tag information from C2MON server
+      Collection<TagUpdate> requestedTags = clientRequestHandler.requestTags(newTags.keySet());
+      // Update the new tags and put them into the cache
+      for (TagUpdate tagUpdate : requestedTags) {
+        try { 
+          newTag = newTags.get(tagUpdate.getId());
+          newTag.update(tagUpdate);
+        }
+        catch (RuleFormatException e) {
+          LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+          throw new RuntimeException(e);
+        }
+      }
+    }
+  }
+  
+  /**
+   * Update a second time in case an update was send before the ClientDataTag
+   * was subscribed to the topic.
+   * @param newTags Map of uninitialized tags from the cache
+   * @throws JMSException In case of a JMS problem
+   */
+  private void synchronizeNewTags(final Map<Long, ClientDataTag> newTags) throws JMSException {
+    if (!newTags.isEmpty()) {
+      ClientDataTag newTag = null;
+      Collection<TagValueUpdate> requestedTagValues = clientRequestHandler.requestTagValues(newTags.keySet());
+      for (TagValueUpdate tagValueUpdate : requestedTagValues) {
+        newTag = newTags.get(tagValueUpdate.getId());
+        if (newTag.getServerTimestamp() == null || newTag.getServerTimestamp().before(tagValueUpdate.getServerTimestamp())) {
+          try {
+            newTag.update(tagValueUpdate);
+          }
+          catch (RuleFormatException e) {
+            LOG.fatal("Received an incorrect rule tag from the server. Please check tag with id " + tagValueUpdate.getId(), e);
+            throw new RuntimeException(e);
+          }
+        }
+      }
+    }
   }
 
   @Override

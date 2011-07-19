@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- the main Spring XML configuration file for starting up the C2MON client core context -->
+
+  <bean id="jmsProxy" class="org.easymock.EasyMock" factory-method="createMock">
+    <constructor-arg value="cern.c2mon.client.jms.JmsProxy"/>
+  </bean>
+  
+  <bean id="requestHandler" class="org.easymock.EasyMock" factory-method="createMock">
+    <constructor-arg value="cern.c2mon.client.jms.RequestHandler"/>
+  </bean>
+  
+  <bean id="supervisionManager" class="org.easymock.EasyMock" factory-method="createMock">
+    <constructor-arg value="cern.c2mon.client.core.manager.CoreSupervisionManager"/>
+  </bean>
+  
+  <bean id="clientDataTagCache" class="cern.c2mon.client.core.cache.ClientDataTagCacheImpl">
+    <constructor-arg value="jmsProxy"/>
+    <constructor-arg value="requestHandler"/>
+    <constructor-arg value="supervisionManager"/>
+  </bean>
+  
+  <bean id="tagManager" class="cern.c2mon.client.core.manager.TagManager">
+    <constructor-arg value="clientDataTagCache"/>
+    <constructor-arg value="requestHandler"/>
+  </bean>
+
+</beans>
