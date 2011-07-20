@@ -13,6 +13,6 @@
   </typeAliases>
   <mappers>
     <mapper resource="cern/c2mon/server/shorttermlog/sqlmap/datatag-log-sql.xml"/>
-    <mapper resource="cern/c2mon/shared/client/supervision/sqlmap/supervision-log-sql.xml"/>
+    <mapper resource="cern/c2mon/shared/client/supervision/ibatis/supervision-log-sql.xml"/>
   </mappers>
 </configuration>
