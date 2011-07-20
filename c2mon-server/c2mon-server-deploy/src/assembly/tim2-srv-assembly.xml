@@ -26,6 +26,22 @@
 	-->
 
 	<dependencySets>
+	
+
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
+			</outputFileNameMapping>
+			<fileMode>0644</fileMode>
+			<includes>
+				<!--
+					define SRV modules used by TIM2 only 
+				-->				
+				<include>cern.c2mon.c2mon-server:c2mon-server-shorttermlog</include>
+			</includes>
+		</dependencySet>
+	
+	
 		<!--
 			this dependency set loads recursively all dependencies of the the
 			c2mon modules. This is a HACK solving the problem described in that
