@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+  
+  <!-- This file configures the (optional) modules that should be started at runtime -->
+  
+  <!-- Included any required properties that should be loaded into the Spring context for use by the modules -->
+  
+  <!-- Import a single XML configuration for each (optional) server module (the order is of no importance) -->
+  <!-- If required, the file can be located in the server configuration directory (so not in the classpath) -->
+  <import resource="classpath:cern/tim/server/rule/config/server-rule.xml"/>
+  <import resource="classpath:cern/tim/server/cachepersistence/config/server-cachepersistence.xml"/>
+  <import resource="classpath:cern/tim/server/command/config/server-command.xml"/>
+  <import resource="classpath:cern/tim/server/benchmark/config/server-benchmark.xml"/>
+  
+  <!-- don't set-up shortterm log for dmn2-srv for now 
+  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml"/>
+  -->
+
+</beans>
