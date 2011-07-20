@@ -580,6 +580,15 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
   @Override
   public void onHeartbeatResumed(Heartbeat pHeartbeat) {
     synchronized (refreshLiveCacheSyncLock) {
+      if (heartbeatExpired) {
+        cacheLock.readLock().lock();
+        try {
+          removeLiveCacheInvalidation(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED);
+        }
+        finally {
+          cacheLock.readLock().unlock();
+        }
+      }
       if (heartbeatExpired || jmsConnectionDown) {
         LOG.info("onHeartbeatResumed() - Server heartbeat is resumed -> refreshing the live cache.");
         refreshLiveCache();
@@ -590,6 +599,15 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
   @Override
   public void onConnection() {
     synchronized (refreshLiveCacheSyncLock) {
+      if (jmsConnectionDown) {
+        cacheLock.readLock().lock();
+        try {
+          removeLiveCacheInvalidation(TagQualityStatus.JMS_CONNECTION_DOWN);
+        }
+        finally {
+          cacheLock.readLock().unlock();
+        }
+      }
       if (jmsConnectionDown || heartbeatExpired) {
         LOG.info("onConnection() - JMS connection is now up -> refreshing the live cache.");
         refreshLiveCache();
@@ -624,6 +642,17 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
     LOG.debug("invalidateLiveCache() - Invalidating " + liveCache.size() + " tag entries with " + status + ".");
     for (ClientDataTagImpl cdt : liveCache.values()) {
       cdt.invalidate(status, invalidationMessage);
+    }
+  }
+  
+  /**
+   * Inner method for removing an invalid status from all tags from the live cache
+   * @param statusToRemove The invalidation status to remove
+   */
+  private void removeLiveCacheInvalidation(final TagQualityStatus statusToRemove) {  
+    LOG.debug("removeLiveCacheInvalidation() - removing " + statusToRemove + " from " + liveCache.size() + " tag entries.");
+    for (ClientDataTagImpl cdt : liveCache.values()) {
+      cdt.getDataTagQuality().removeInvalidStatus(statusToRemove);
     }
   }
 }
