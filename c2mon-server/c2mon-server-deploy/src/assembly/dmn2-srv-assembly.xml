@@ -47,8 +47,8 @@
 			</outputFileNameMapping>
 			<fileMode>0644</fileMode>
 			<excludes>
-				<exclude>cern.tim2.server*:*</exclude>
-				<exclude>cern.c2mon.server*:*</exclude>
+				<exclude>cern.tim2.tim2-server*:*</exclude>
+				<exclude>cern.c2mon.c2mon-server*:*</exclude>
 			</excludes>
 		</dependencySet>
 
@@ -74,7 +74,7 @@
 			<fileMode>0444</fileMode>
 		</file>
 
-        <!--  deployment descriptor -->
+		<!--  deployment descriptor -->
 		<file>
 			<source>${basedir}/conf/dmn2-deployment.xml</source>
 			<outputDirectory>/</outputDirectory>
@@ -126,6 +126,7 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
+
 	</files>
 
 </assembly>
