@@ -74,12 +74,19 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   /** Reference to the <code>RequestHandler</code> singleton instance */
   private final RequestHandler clientRequestHandler;
   
+  /** Reference to the <code>HeartbeatManager</code> singleton instance */
+  private final HeartbeatListenerManager heartbeatManager;
+  
   @Autowired
-  protected SupervisionManager(final JmsProxy pJmsProxy, final RequestHandler pRequestHandler) {
+  protected SupervisionManager(final JmsProxy pJmsProxy, final RequestHandler pRequestHandler, final HeartbeatListenerManager pHeartbeatManager) {
     jmsProxy = pJmsProxy;
     clientRequestHandler = pRequestHandler;
+    heartbeatManager = pHeartbeatManager;
   }
   
+  /**
+   * Called by Spring to initialize this service.
+   */
   @PostConstruct
   private void init() {
     jmsProxy.registerConnectionListener(this);
@@ -92,14 +99,13 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   }
 
   @Override
-  public void addHeartbeatListener(final HeartbeatListener pListener) {
-    // TODO: Implement method!
+  public void addHeartbeatListener(final HeartbeatListener listener) {
+    heartbeatManager.addHeartbeatListener(listener);
   }
 
   @Override
-  public void removeHeartbeatListener(final HeartbeatListener pListener) {
-    // TODO Auto-generated method stub
-    
+  public void removeHeartbeatListener(final HeartbeatListener listener) {
+    heartbeatManager.removeHeartbeatListener(listener);
   }
 
   @Override

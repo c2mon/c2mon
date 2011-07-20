@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
 import org.apache.log4j.Logger;
@@ -34,24 +35,64 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTag;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
+import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
+import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.rule.RuleFormatException;
 
+/**
+ * This class implements the cache of the C2MON client API. The public method
+ * provided by this class are never accessed directly by the application layer.
+ * Only the <code>TagManager</code> has a reference to the cache service and is
+ * controlling the access to it.
+ * <p>
+ * The cache provides a <code>create()</code> method for creating a new
+ * <code>ClientDataTag</code> cache entry. In the background it handles also the
+ * subscription to the incoming live events. Only the initialization of the tag
+ * is performed by the <code>TagManager</code>.
+ * <p>
+ * It is possible to switch the <code>ClientDataTagCache</code> from live mode
+ * into history mode and back. Therefore this class manages internally two
+ * <code>ClientDataTag</code> map instances, one for live tag updates and the
+ * other for historical events. Depending on the cache mode the getter methods
+ * return either references to the live tags or to the history tags. 
+ *
+ * @author Matthias Braeger
+ */
 @Service
-public class ClientDataTagCacheImpl implements ClientDataTagCache {
+public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatListener, ConnectionListener {
 
   /** Log4j Logger for this class */
   private static final Logger LOG = Logger.getLogger(ClientDataTagCacheImpl.class);
   
   /** Default message for a JMS connection lost exception */
   private static final String JMS_CONNECTION_LOST_MSG = "JMS connection lost.";
+  
+  /** 
+   * Is set to <code>true</code>, if the live cache has been invalidated because of
+   * a JMS exception.
+   */
+  private boolean jmsConnectionDown = true;
+  
+  /** 
+   * Is set to <code>true</code>, if the live cache has been invalidated because of
+   * a heartbeat expiration.
+   */
+  private boolean heartbeatExpired = true;
+  
+  /** 
+   * Synchronization lock object to avoid several thread refreshing at the
+   * same time the live cache. 
+   */
+  private final Object refreshLiveCacheSyncLock = new Object();
   
   /**
    * Pointer to the actual used cache instance (live or history)
@@ -104,6 +145,15 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     this.supervisionManager = pSupervisionManager;
     
     this.activeCache = this.liveCache;
+  }
+  
+  /**
+   * This method is called by Spring after having created this service.
+   */
+  @PostConstruct
+  private void init() {
+    supervisionManager.addConnectionListener(this);
+    supervisionManager.addHeartbeatListener(this);
   }
   
   @Override
@@ -233,12 +283,16 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     
     return cdt;
   }
-
-  @Override
-  public void refresh() {
+  
+  /**
+   * Inner method which synchronizes the live cache with the C2MON server
+   */
+  private void refreshLiveCache() {
     boolean jmsConnectionLost = false;
     cacheLock.readLock().lock();
     try {
+      LOG.info("refreshLiveCache() - Synchronizing " + liveCache.size() + " live cache entries with the server.");
+      
       Collection<Long> tagIds = liveCache.keySet();
       Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(tagIds);
       for (TagUpdate tagUpdate : tagUpdates) {
@@ -248,30 +302,37 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           handleLiveTagRegistration(liveTag);
         }
         catch (RuleFormatException e) {
-          LOG.error("refresh() - Could not update tag with id " + tagUpdate.getId(), e);
+          LOG.error("refreshLiveCache() - Could not update tag with id " + tagUpdate.getId(), e);
         }
       }
     }
     catch (JMSException e) {
-      LOG.error("refresh() - Could not refresh tags in the cache. " + JMS_CONNECTION_LOST_MSG);
+      LOG.error("refreshLiveCache() - Could not refresh tags in the cache. " + JMS_CONNECTION_LOST_MSG);
       jmsConnectionLost = true;
     }
     finally {
       cacheLock.readLock().unlock();
     }
-    
+  
     if (jmsConnectionLost) {
       cacheLock.readLock().lock();
       try {
-        for (ClientDataTag cdt : liveCache.values()) {
-          cdt.invalidate(TagQualityStatus.JMS_CONNECTION_DOWN, JMS_CONNECTION_LOST_MSG);
-        }
+        invalidateLiveCache(TagQualityStatus.JMS_CONNECTION_DOWN, JMS_CONNECTION_LOST_MSG);
       }
       finally {
         cacheLock.readLock().unlock();
       }
     }
     
+    this.jmsConnectionDown = jmsConnectionLost;
+    this.heartbeatExpired = jmsConnectionLost;
+  }
+
+  @Override
+  public void refresh() {
+    synchronized (refreshLiveCacheSyncLock) {
+      refreshLiveCache();
+    } // end synchronized block
   }
   
   /**
@@ -491,5 +552,78 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     }
     
     return newSubscriptions;
+  }
+
+  @Override
+  public void onHeartbeatExpired(final Heartbeat pHeartbeat) {
+    synchronized (refreshLiveCacheSyncLock) {
+      if (!heartbeatExpired) {
+        cacheLock.readLock().lock();
+        try {
+          LOG.info("onHeartbeatExpired() - Server heartbeat has expired -> invalidating the live cache, if not yet done.");
+          String errMsg = "Server heartbeat has expired.";
+          invalidateLiveCache(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED, errMsg);
+          heartbeatExpired = true;
+        }
+        finally {
+          cacheLock.readLock().unlock();
+        }
+      }
+    }
+  }
+
+  @Override
+  public void onHeartbeatReceived(Heartbeat pHeartbeat) {
+    // Do nothing
+  }
+
+  @Override
+  public void onHeartbeatResumed(Heartbeat pHeartbeat) {
+    synchronized (refreshLiveCacheSyncLock) {
+      if (heartbeatExpired || jmsConnectionDown) {
+        LOG.info("onHeartbeatResumed() - Server heartbeat is resumed -> refreshing the live cache.");
+        refreshLiveCache();
+      }
+    }
+  }
+
+  @Override
+  public void onConnection() {
+    synchronized (refreshLiveCacheSyncLock) {
+      if (jmsConnectionDown || heartbeatExpired) {
+        LOG.info("onConnection() - JMS connection is now up -> refreshing the live cache.");
+        refreshLiveCache();
+      }
+    }
+  }
+
+  @Override
+  public void onDisconnection() {
+    synchronized (refreshLiveCacheSyncLock) {
+      if (!jmsConnectionDown) {
+        cacheLock.readLock().lock();
+        try {    
+          LOG.info("onDisconnection() - JMS connection is down -> invalidating the live cache, if not yet done.");
+          invalidateLiveCache(TagQualityStatus.JMS_CONNECTION_DOWN, JMS_CONNECTION_LOST_MSG);
+          jmsConnectionDown = true;
+        }
+        finally {
+          cacheLock.readLock().unlock();
+        }
+      }
+    }
+  }
+  
+  /**
+   * Inner method for invalidating all tags from the live cache with a given
+   * <code>TagQualityStatus</code> flag.
+   * @param status The invalidation status to add
+   * @param invalidationMessage The invalidation message.
+   */
+  private void invalidateLiveCache(final TagQualityStatus status, final String invalidationMessage) {  
+    LOG.debug("invalidateLiveCache() - Invalidating " + liveCache.size() + " tag entries with " + status + ".");
+    for (ClientDataTagImpl cdt : liveCache.values()) {
+      cdt.invalidate(status, invalidationMessage);
+    }
   }
 }
