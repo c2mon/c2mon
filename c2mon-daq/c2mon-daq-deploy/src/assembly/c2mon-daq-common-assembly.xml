@@ -1,0 +1,49 @@
+<component xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2 http://maven.apache.org/xsd/component-1.1.2.xsd">
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/lib</outputDirectory>
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+      <fileMode>0644</fileMode>                                                             
+      <includes>
+        <!--  define all common modules for both solutions (DMN2 and TIM2) here-->
+        <include>cern.tim2.tim2-daq:tim2-daq-core</include>
+        <include>cern.tim2.tim2-daq:tim2-daq-ssh</include>
+        <include>cern.tim2.tim2-daq:tim2-daq-japc</include>
+        <include>cern.tim2.tim2-daq:tim2-daq-testhandler</include>                 
+       </includes>      
+    </dependencySet>
+  </dependencySets>
+  
+  <fileSets>
+  
+    <!-- create default tmp and log folders in the assembly -->
+    <fileSet>
+    
+      <includes>
+        <include>tmp/</include>
+	  </includes>
+	  <fileMode>0755</fileMode>
+    </fileSet>
+    <fileSet>
+      <includes>
+         <include>log/</include>
+       </includes>
+       <fileMode>0755</fileMode>
+       <directoryMode>0755</directoryMode>
+    </fileSet>
+      
+  </fileSets>
+  
+  <files>  
+		<file>
+			<source>${basedir}/conf/P_YourProcessName_log4j.xml_Debug</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>P_YourProcessName_log4j.xml_Debug</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>	 
+  </files>
+    
+</component>

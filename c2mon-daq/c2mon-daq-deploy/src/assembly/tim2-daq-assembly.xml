@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+	<id>tim2</id>
+
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+
+	<!--  do not include base directory -->
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<componentDescriptors>
+		<componentDescriptor>src/assembly/c2mon-daq-common-assembly.xml
+		</componentDescriptor>
+	</componentDescriptors>
+
+
+	<!-- list all tim2-srv specific modules here -->
+	<!--
+		NOTE: if the list is empty the whole ependencySets block shall be
+		commented out!
+	-->
+
+	<dependencySets>
+	
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
+			</outputFileNameMapping>
+			<fileMode>0644</fileMode>
+			<includes>
+				<!--
+					define DAQ modules used by TIM2 only 
+				-->				
+				<include>cern.tim2.tim2-daq:tim2-daq-dip</include>
+				<include>cern.tim2.tim2-daq:tim2-daq-ens</include>
+				<include>cern.tim2.tim2-daq:tim2-daq-opc</include>
+				<include>cern.tim2.tim2-daq:tim2-daq-jec</include>
+				<include>cern.tim2.tim2-daq:tim2-daq-laser</include>								
+				<!-- 
+				<include>cern.tim2.tim2-daq:tim2-daq-db</include>
+				 -->
+			</includes>
+		</dependencySet>
+
+		<!--
+			this dependency set loads recursively all dependencies of the the
+			c2mon modules. This is a HACK solving the problem described in that
+			event:
+			http://stackoverflow.com/questions/6018174/maven-assembly-dependency-set-with-include-doesnt-pick-up-transitive-dependencie
+		-->		 
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
+			</outputFileNameMapping>
+			<fileMode>0644</fileMode>
+			<excludes>
+				<exclude>cern.tim2.tim2-daq*:*</exclude>
+			</excludes>
+		</dependencySet>
+		
+		
+	</dependencySets>
+
+	<files>
+
+		<!--  copy sthe starting script -->
+		<file>
+			<source>${basedir}/bin/tim2-daqprocess2.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<destName>daqprocess2.sh</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+
+		<!--  copy changelog -->
+		<file>
+			<source>${basedir}/changelog/tim2-daq-changelog.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>changelog.txt</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  deployment descriptor -->
+		<file>
+			<source>${basedir}/conf/tim2-deployment.xml</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>deployment.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  log4j configuration -->
+		<file>
+			<source>${basedir}/conf/tim2-log4j.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>log4j.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+	</files>
+
+</assembly>

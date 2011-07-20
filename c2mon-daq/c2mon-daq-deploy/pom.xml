@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cern.tim2.tim2-daq</groupId>
+		<artifactId>tim2-daq-pom</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>cern.c2mon.c2mon-daq</groupId>
+	<artifactId>c2mon-daq-deploy</artifactId>
+	<name>C2MON DAQ deployment module</name>
+	<version>1.0.1-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<description>
+		C2MON DAQ assembling all required modules and configuration files for TIM2 and DMN2 solutions
+    </description>
+	<url></url>
+
+	<developers />
+
+	<modules>
+		<module>modules/tim2</module>
+		<module>modules/dmn2</module>
+	</modules>
+
+	<build/>
+	
+</project>
