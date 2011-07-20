@@ -484,7 +484,9 @@ public class ClientDataTagImpl implements ClientDataTag {
     boolean valid = true;
     valid &= tagValueUpdate != null;
     valid &= tagValueUpdate.getId().equals(id);
-    valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp);
+    if (tagQuality.isAccessible()) { // If inaccessible we always allow a refresh
+      valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp);
+    }
     
     return valid;
   }
