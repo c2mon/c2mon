@@ -13,6 +13,7 @@ public interface HeartbeatListener {
 
   /**
    * Called on reception of a heartbeat message from the server.
+   * @param heartbeat The heartbeat message received from the server
    */
   void onHeartbeat(Heartbeat heartbeat);
     
