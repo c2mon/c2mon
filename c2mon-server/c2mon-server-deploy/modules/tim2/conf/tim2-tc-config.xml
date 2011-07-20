@@ -275,7 +275,7 @@
           <class-expression>cern.tim.server.supervision.impl.SupervisionManagerImpl</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.supervision.alive.AliveTimerManagerImpl</class-expression>
+          <class-expression>cern.tim.server.supervision.alive.AliveTimerChecker</class-expression>
         </include>    
         <!-- DistributedParams classes -->
         <include>
