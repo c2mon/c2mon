@@ -138,7 +138,8 @@ APP_LIBS=$APP_LIB_DIR/*
 
 #Terracotta module libraries
 TC_MOD_HOME=$TERRACOTTA_HOME/platform/modules/org/terracotta/modules
-TERRACOTTA_MODULES=$TC_MOD_HOME/tim-distributed-cache/1.3.2/tim-distributed-cache-1.3.2.jar:$TC_MOD_HOME/tim-ehcache-2.0/1.5.2/tim-ehcache-2.0-1.5.2.jar:$TC_MOD_HOME/tim-concurrent-collections/1.3.2/tim-concurrent-collections-1.3.2.jar:$TC_MOD_HOME/tim-async-processing/1.3.2/tim-async-processing-1.3.2.jar:$TC_MOD_HOME/tim-annotations/1.5.1/tim-annotations-1.5.1.jar
+#TERRACOTTA_MODULES=$TC_MOD_HOME/tim-distributed-cache/1.3.2/tim-distributed-cache-1.3.2.jar:$TC_MOD_HOME/tim-ehcache-2.0/1.5.2/tim-ehcache-2.0-1.5.2.jar:$TC_MOD_HOME/tim-concurrent-collections/1.3.2/tim-concurrent-collections-1.3.2.jar:$TC_MOD_HOME/tim-async-processing/1.3.2/tim-async-processing-1.3.2.jar:$TC_MOD_HOME/tim-annotations/1.5.1/tim-annotations-1.5.1.jar
+TERRACOTTA_MODULES=$TC_MOD_HOME/tim-ehcache-2.x/1.7.2/tim-ehcache-2.x-1.7.2.jar
 
 #Spring modules
 SPRING_MODULES=$SHARED_LIB_HOME/spring-modules/spring-modules-cache
@@ -158,7 +159,7 @@ JMXJAR=$SHARED_LIB_HOME/jmxterm/jmxterm-1.0-alpha-4-uber.jar
 
 #all needed librairies (including cachetest)
 if [ ! "$2" == "single" ]; then
-    REQUIRED_LIBS=$APP_LIBS:$TERRACOTTA_MODULES:$SPRING_MODULES
+    REQUIRED_LIBS=$APP_LIBS:$TERRACOTTA_MODULES
 else
     REQUIRED_LIBS=$APP_LIBS:
 fi
