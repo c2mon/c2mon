@@ -51,5 +51,3 @@ if [ -d ${DAQ_TMP}/${HOSTNAME} ] ; then
 else 
   echo "This machine is not a DAQ host!"
 fi
-
-
