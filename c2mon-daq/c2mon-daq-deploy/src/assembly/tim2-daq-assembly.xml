@@ -26,7 +26,7 @@
 	-->
 
 	<dependencySets>
-	
+
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
@@ -35,12 +35,12 @@
 			<includes>
 				<!--
 					define DAQ modules used by TIM2 only 
-				-->				
+				-->
 				<include>cern.tim2.tim2-daq:tim2-daq-dip</include>
 				<include>cern.tim2.tim2-daq:tim2-daq-ens</include>
 				<include>cern.tim2.tim2-daq:tim2-daq-opc</include>
 				<include>cern.tim2.tim2-daq:tim2-daq-jec</include>
-				<include>cern.tim2.tim2-daq:tim2-daq-laser</include>								
+				<include>cern.tim2.tim2-daq:tim2-daq-laser</include>
 				<!-- 
 				<include>cern.tim2.tim2-daq:tim2-daq-db</include>
 				 -->
@@ -52,7 +52,7 @@
 			c2mon modules. This is a HACK solving the problem described in that
 			event:
 			http://stackoverflow.com/questions/6018174/maven-assembly-dependency-set-with-include-doesnt-pick-up-transitive-dependencie
-		-->		 
+		-->
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
@@ -62,9 +62,20 @@
 				<exclude>cern.tim2.tim2-daq*:*</exclude>
 			</excludes>
 		</dependencySet>
-		
-		
+
+
 	</dependencySets>
+
+	<fileSets>
+	    <!--  take the native libraries and copy them to /lib_so -->
+		<fileSet>			
+			<outputDirectory>/lib_so</outputDirectory>
+			<includes> 
+			  <include>*.so</include> 
+			</includes>	
+			<directory>${project.build.directory}/lib_so/lib/i386-SLC5-gpp/shared</directory>		
+		</fileSet>
+	</fileSets>
 
 	<files>
 
