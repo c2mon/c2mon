@@ -26,7 +26,7 @@
 	-->
 
 	<dependencySets>
-   
+
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
@@ -46,19 +46,28 @@
 			c2mon modules. This is a HACK solving the problem described in that
 			event:
 			http://stackoverflow.com/questions/6018174/maven-assembly-dependency-set-with-include-doesnt-pick-up-transitive-dependencie
-		-->		
+		-->
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
 			</outputFileNameMapping>
 			<fileMode>0644</fileMode>
 			<excludes>
-				<exclude>cern.tim2.tim2-daq*:*</exclude>				
+				<exclude>cern.tim2.tim2-daq*:*</exclude>
 			</excludes>
 		</dependencySet>
 	</dependencySets>
 
 	<files>
+
+		<!--  copy sthe configuration file -->
+		<file>
+			<source>${basedir}/conf/dmn2-daq.conf</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>daq.conf</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
 
 		<!--  copy sthe starting script -->
 		<file>

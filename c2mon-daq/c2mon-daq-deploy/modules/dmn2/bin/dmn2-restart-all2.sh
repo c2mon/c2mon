@@ -1,3 +1,5 @@
+#!/bin/sh
+#
 # sets the home directory
 #
 HOME=`dirname $0`
@@ -9,7 +11,7 @@ C2MON_DAQ_HOME=$HOME
 C2MON_LOG=$C2MON_DAQ_HOME/log
 C2MON_LIB=$C2MON_DAQ_HOME/lib
 
-C2MON_DAQ_HOME=$C2MON_DAQ_HOME/bin/daqprocess2.sh
+C2MON_DAQ_CONTROL=$C2MON_DAQ_HOME/bin/daqprocess2.sh
 
 
 for proc in `cat $C2MON_DAQ_HOME/conf/daqprocess.lst`; do
@@ -27,7 +29,7 @@ for proc in `cat $C2MON_DAQ_HOME/conf/daqprocess.lst`; do
       # $C2MON_DAQ_CONTROL restart $proc
       $C2MON_DAQ_CONTROL stop $proc
       $C2MON_DAQ_CONTROL start $proc
-    fi  
-    sleep 1 
+    fi
+    sleep 1
   fi
 done

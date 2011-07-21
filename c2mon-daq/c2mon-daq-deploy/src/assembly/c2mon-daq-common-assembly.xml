@@ -36,14 +36,7 @@
       
   </fileSets>
   
-  <files>
-		<file>
-			<source>${basedir}/conf/daq.conf</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>daq.conf</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>	 	    
+  <files>		  
 		<file>
 			<source>${basedir}/conf/P_YourProcessName_log4j.xml_Debug</source>
 			<outputDirectory>conf/</outputDirectory>

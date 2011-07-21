@@ -1,3 +1,5 @@
+#!/bin/sh
+#
 DAQ_HOME=~/dist/daqprocess2
 DAQ_CONTROL=$DAQ_HOME/bin/daqprocess2.sh
 

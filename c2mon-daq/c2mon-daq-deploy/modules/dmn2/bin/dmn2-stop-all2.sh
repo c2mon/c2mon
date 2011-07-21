@@ -1,3 +1,5 @@
+#!/bin/sh
+#
 # sets the home directory
 #
 HOME=`dirname $0`
@@ -12,8 +14,6 @@ C2MON_LIB=$C2MON_DAQ_HOME/lib
 JAVA_EXEC=/usr/java/jdk/bin/java
 
 C2MON_DAQ_CONTROL=$C2MON_DAQ_HOME/bin/daqprocess2.sh
-
-#DAQ_HOSTS=(cs-ccr-tim4 cs-ccr-tim9)
 
 pushd $C2MON_DAQ_HOME/tmp/ >/dev/null 2>/dev/null
 LS=`ls -1 *.pid`

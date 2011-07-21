@@ -68,6 +68,15 @@
 
 	<files>
 
+		<!--  copy sthe configuration file -->
+		<file>
+			<source>${basedir}/conf/tim2-daq.conf</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>daq.conf</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
 		<!--  copy sthe starting script -->
 		<file>
 			<source>${basedir}/bin/tim2-daqprocess2.sh</source>
