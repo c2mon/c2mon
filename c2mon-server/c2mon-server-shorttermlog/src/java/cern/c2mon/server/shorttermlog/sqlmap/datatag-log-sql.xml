@@ -26,7 +26,7 @@
     ,#{tagId,jdbcType=NUMERIC},#{tagName,jdbcType=VARCHAR},#{tagValue,jdbcType=VARCHAR}
     ,#{tagDataType,jdbcType=VARCHAR},#{tagQualityCode,jdbcType=NUMERIC}
     ,#{tagQualityDesc,jdbcType=VARCHAR},#{tagMode,jdbcType=NUMERIC}
-    ,'I',from_tz(#{sourceTimestamp,jdbcType=TIMESTAMP},DBTIMEZONE),
+    ,'I',#{sourceTimestamp,jdbcType=TIMESTAMP},
          #{daqTimestamp,jdbcType=TIMESTAMP},
          #{serverTimestamp,jdbcType=TIMESTAMP})
   </insert>
