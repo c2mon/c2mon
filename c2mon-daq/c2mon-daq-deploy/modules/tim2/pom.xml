@@ -63,6 +63,38 @@
 	<developers />
 	<build>
 		<plugins>
+		
+			<!-- Unpack native libraries -->			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<artifactItems>
+						<artifactItem>
+
+							<groupId>cern.en.ice</groupId>
+							<artifactId>dip</artifactId>
+							<classifier>i386-SLC5-gpp-shared</classifier>
+							<type>nar</type>
+
+							<overWrite>true</overWrite>
+							<outputDirectory>${project.build.directory}/lib_so</outputDirectory>
+						</artifactItem>
+					</artifactItems>
+				</configuration>
+			</plugin>		
+		
+		
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
