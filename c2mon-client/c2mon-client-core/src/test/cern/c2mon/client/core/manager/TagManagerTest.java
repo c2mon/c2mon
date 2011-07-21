@@ -24,6 +24,7 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagValue;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
+import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
@@ -133,6 +134,7 @@ public class TagManagerTest {
           tagId,
           value,
           tagQuality,
+          TagMode.TEST,
           new Timestamp(System.currentTimeMillis() - 10000L),
           new Timestamp(System.currentTimeMillis()),
           "Test description",

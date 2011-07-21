@@ -13,6 +13,7 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 
 import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.tim.shared.common.datatag.DataTagQuality;
@@ -33,6 +34,7 @@ public class ClientDataTagImplTest {
           tagId,
           value,
           tagQuality,
+          TagMode.TEST,
           new Timestamp(System.currentTimeMillis() - 10000L),
           new Timestamp(System.currentTimeMillis()),
           "Test description",
