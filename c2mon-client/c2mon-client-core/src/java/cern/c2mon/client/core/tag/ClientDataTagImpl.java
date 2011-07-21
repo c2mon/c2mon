@@ -32,6 +32,7 @@ import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.common.datatag.DataTagQuality;
@@ -61,6 +62,15 @@ public class ClientDataTagImpl implements ClientDataTag {
   
   /** The value of the tag */
   private Object tagValue;
+  
+  /** The current tag mode */
+  private TagMode mode;
+  
+  /** 
+   * <code>true</code>, if the tag value is currently simulated and not
+   * corresponding to a live event.
+   */
+  private boolean simulated = false;
 
   /** Unique identifier for a DataTag */
   private final Long id;
@@ -162,10 +172,29 @@ public class ClientDataTagImpl implements ClientDataTag {
       updateTagLock.readLock().unlock();
     }
   }
+  
+  @Override
+  public TagMode getMode() {
+    updateTagLock.readLock().lock();
+    try {
+      return mode;
+    }
+    finally {
+      updateTagLock.readLock().unlock();
+    }
+  }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getValue()
-   */
+  @Override
+  public boolean isSimulated() {
+    updateTagLock.readLock().lock();
+    try {
+      return simulated;
+    }
+    finally {
+      updateTagLock.readLock().unlock();
+    }
+  }
+
   @Override
   public Object getValue() {
     updateTagLock.readLock().lock();
@@ -177,10 +206,6 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
 
-
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getSourceTimestamp()
-   */
   @Override
   public Timestamp getSourceTimestamp() {
     updateTagLock.readLock().lock();
@@ -196,11 +221,7 @@ public class ClientDataTagImpl implements ClientDataTag {
       updateTagLock.readLock().unlock();
     }
   }
-  
-  
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getServerTimestamp()
-   */
+
   @Override
   public Timestamp getServerTimestamp() {
     updateTagLock.readLock().lock();
@@ -212,10 +233,6 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
 
-  
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getUnit()
-   */
   @Override
   public String getUnit() {
     updateTagLock.readLock().lock();
@@ -230,9 +247,6 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getType()
-   */
   @Override
   public final Class< ? > getType() {
     updateTagLock.readLock().lock();
@@ -248,9 +262,6 @@ public class ClientDataTagImpl implements ClientDataTag {
     }
   }
   
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getTypeNumeric()
-   */
   @Override
   public TypeNumeric getTypeNumeric() {
     updateTagLock.readLock().lock();
@@ -272,10 +283,6 @@ public class ClientDataTagImpl implements ClientDataTag {
     return TypeNumeric.TYPE_UNKNOWN;
   }
 
-
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#getDataTagQuality()
-   */
   @Override
   public DataTagQuality getDataTagQuality() {
     updateTagLock.readLock().lock();
@@ -285,8 +292,7 @@ public class ClientDataTagImpl implements ClientDataTag {
     finally {
       updateTagLock.readLock().unlock();
     }
-  }
-  
+  }  
   
   /**
    * Removes the invalid quality status and informs the listeners but only,
@@ -309,7 +315,6 @@ public class ClientDataTagImpl implements ClientDataTag {
       updateTagLock.writeLock().unlock();
     }
   }
-
 
   /**
    * Invalidates the tag with {@link TagQualityStatus#INACCESSIBLE} and sets
@@ -734,6 +739,8 @@ public class ClientDataTagImpl implements ClientDataTag {
     serverTimestamp = tagValueUpdate.getServerTimestamp();
     sourceTimestamp = tagValueUpdate.getSourceTimestamp();
     tagValue = tagValueUpdate.getValue();
+    mode = tagValueUpdate.getMode();
+    simulated = tagValueUpdate.isSimulated();
   }
 
   /* (non-Javadoc)
