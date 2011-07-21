@@ -291,18 +291,20 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
     boolean jmsConnectionLost = false;
     cacheLock.readLock().lock();
     try {
-      LOG.info("refreshLiveCache() - Synchronizing " + liveCache.size() + " live cache entries with the server.");
-      
-      Collection<Long> tagIds = liveCache.keySet();
-      Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(tagIds);
-      for (TagUpdate tagUpdate : tagUpdates) {
-        try {
-          ClientDataTag liveTag = liveCache.get(tagUpdate.getId()); 
-          liveTag.update(tagUpdate);
-          handleLiveTagRegistration(liveTag);
-        }
-        catch (RuleFormatException e) {
-          LOG.error("refreshLiveCache() - Could not update tag with id " + tagUpdate.getId(), e);
+      if (!liveCache.isEmpty()) {
+        LOG.info("refreshLiveCache() - Synchronizing " + liveCache.size() + " live cache entries with the server.");
+        
+        Collection<Long> tagIds = liveCache.keySet();
+        Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(tagIds);
+        for (TagUpdate tagUpdate : tagUpdates) {
+          try {
+            ClientDataTagImpl liveTag = liveCache.get(tagUpdate.getId()); 
+            liveTag.update(tagUpdate);
+            handleLiveTagRegistration(liveTag);
+          }
+          catch (RuleFormatException e) {
+            LOG.error("refreshLiveCache() - Could not update tag with id " + tagUpdate.getId(), e);
+          }
         }
       }
     }
@@ -341,7 +343,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
    * to the <code>JmsProxy</code> and the <code>SupervisionManager</code>. 
    * @param liveTag The live tag
    */
-  private void handleLiveTagRegistration(final ClientDataTag liveTag) {
+  private void handleLiveTagRegistration(final ClientDataTagImpl liveTag) {
     final DataTagQuality tagQuality = liveTag.getDataTagQuality();
     try {
       if (tagQuality.isInitialised() && tagQuality.isExistingTag()) {
@@ -580,14 +582,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
   @Override
   public void onHeartbeatResumed(Heartbeat pHeartbeat) {
     synchronized (refreshLiveCacheSyncLock) {
-      if (heartbeatExpired) {
-        cacheLock.readLock().lock();
-        try {
-          removeLiveCacheInvalidation(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED);
-        }
-        finally {
-          cacheLock.readLock().unlock();
-        }
+      cacheLock.readLock().lock();
+      try {
+        removeLiveCacheInvalidation(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED);
+      }
+      finally {
+        cacheLock.readLock().unlock();
       }
       if (heartbeatExpired || jmsConnectionDown) {
         LOG.info("onHeartbeatResumed() - Server heartbeat is resumed -> refreshing the live cache.");
@@ -599,14 +599,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
   @Override
   public void onConnection() {
     synchronized (refreshLiveCacheSyncLock) {
-      if (jmsConnectionDown) {
-        cacheLock.readLock().lock();
-        try {
-          removeLiveCacheInvalidation(TagQualityStatus.JMS_CONNECTION_DOWN);
-        }
-        finally {
-          cacheLock.readLock().unlock();
-        }
+      cacheLock.readLock().lock();
+      try {
+        removeLiveCacheInvalidation(TagQualityStatus.JMS_CONNECTION_DOWN);
+      }
+      finally {
+        cacheLock.readLock().unlock();
       }
       if (jmsConnectionDown || heartbeatExpired) {
         LOG.info("onConnection() - JMS connection is now up -> refreshing the live cache.");
@@ -652,7 +650,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
   private void removeLiveCacheInvalidation(final TagQualityStatus statusToRemove) {  
     LOG.debug("removeLiveCacheInvalidation() - removing " + statusToRemove + " from " + liveCache.size() + " tag entries.");
     for (ClientDataTagImpl cdt : liveCache.values()) {
-      cdt.getDataTagQuality().removeInvalidStatus(statusToRemove);
+      cdt.validate(statusToRemove);
     }
   }
 }

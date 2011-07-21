@@ -17,16 +17,12 @@
  ******************************************************************************/
 package cern.c2mon.client.core.tag;
 
-import java.util.Collection;
-
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.rule.RuleFormatException;
 
 /**
@@ -40,16 +36,6 @@ import cern.tim.shared.rule.RuleFormatException;
  * @author Matthias Braeger
  */
 public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, TopicRegistrationDetails, SupervisionListener, Cloneable {
-
-  /**
-   * Invalidates the tag with {@link TagQualityStatus#INACCESSIBLE} and sets
-   * the quality description to <code>pDescription</code>
-   * Notifies all registered <code>DataTagUpdateListeners</code> of the change
-   * of state.
-   * @param pStatus The invalidation status to be added to the tag 
-   * @param pDescription the quality description
-   */
-  void invalidate(TagQualityStatus pStatus, final String pDescription);
   
   /**
    * This thread safe method updates the given <code>ClientDataTag</code> object.

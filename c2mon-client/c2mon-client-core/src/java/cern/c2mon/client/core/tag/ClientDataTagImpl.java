@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
@@ -285,21 +286,47 @@ public class ClientDataTagImpl implements ClientDataTag {
       updateTagLock.readLock().unlock();
     }
   }
-
-
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.ClientDataTag#invalidate(java.lang.String)
+  
+  
+  /**
+   * Removes the invalid quality status and informs the listeners but only,
+   * if the status flag was really being set before.
+   * @param statusToRemove The invalid quality status to be removed from this tag.
    */
-  @Override
-  public void invalidate(final TagQualityStatus status, final String pDescription) {
+  public void validate(final TagQualityStatus statusToRemove) {
+    updateTagLock.writeLock().lock();
     try {
-      updateTagLock.writeLock().lock();
-      
       if (LOG.isDebugEnabled()) {
-        LOG.debug("invalidate() called for tag " + this.id);
+        LOG.debug("validate() - Removing " + statusToRemove + " quality status from tag " + this.id);
+      }
+      if (tagQuality.isInvalidStatusSet(statusToRemove)) {
+        // remove the quality status
+        tagQuality.removeInvalidStatus(statusToRemove);
+        notifyListeners();
+      }
+    }
+    finally {
+      updateTagLock.writeLock().unlock();
+    }
+  }
+
+
+  /**
+   * Invalidates the tag with {@link TagQualityStatus#INACCESSIBLE} and sets
+   * the quality description to <code>pDescription</code>
+   * Notifies all registered <code>DataTagUpdateListeners</code> of the change
+   * of state.
+   * @param status The invalidation status to be added to the tag 
+   * @param description the quality description
+   */
+  public void invalidate(final TagQualityStatus status, final String description) {
+    updateTagLock.writeLock().lock();
+    try {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("invalidate() - Invalidating tag " + this.id + " with quality status " + status);
       }
       // Invalidate the object.
-      tagQuality.addInvalidStatus(status, pDescription);
+      tagQuality.addInvalidStatus(status, description);
       
       notifyListeners();
     }
@@ -832,16 +859,26 @@ public class ClientDataTagImpl implements ClientDataTag {
   public ClientDataTagImpl clone() throws CloneNotSupportedException {
     ClientDataTagImpl clone = (ClientDataTagImpl) super.clone();
     
-    // Just clone the process ids
+    // clone the process id map
     clone.processSupervisionStatus = new HashMap<Long, SupervisionEvent>(processSupervisionStatus.size());
-    for (Long processId : processSupervisionStatus.keySet()) {
-      clone.processSupervisionStatus.put(processId, null);
+    for (Entry<Long, SupervisionEvent> entry : processSupervisionStatus.entrySet()) {
+      if (entry.getValue() != null) {
+        clone.processSupervisionStatus.put(entry.getKey(), entry.getValue().clone());
+      }
+      else {
+        clone.processSupervisionStatus.put(entry.getKey(), null);
+      }
     }
     
-    // Just clone the equipment ids
+    // clone the equipment id map
     clone.equipmentSupervisionStatus = new HashMap<Long, SupervisionEvent>(equipmentSupervisionStatus.size());
-    for (Long equipmentId : equipmentSupervisionStatus.keySet()) {
-      clone.equipmentSupervisionStatus.put(equipmentId, null);
+    for (Entry<Long, SupervisionEvent> entry : equipmentSupervisionStatus.entrySet()) {
+      if (entry.getValue() != null) {
+        clone.equipmentSupervisionStatus.put(entry.getKey(), entry.getValue().clone());
+      }
+      else {
+        clone.equipmentSupervisionStatus.put(entry.getKey(), null);
+      }
     }
     
     // AlarmsValue objects are immutable
@@ -891,6 +928,12 @@ public class ClientDataTagImpl implements ClientDataTag {
     this.serverTimestamp = new Timestamp(0L);
     this.sourceTimestamp = null;
     this.tagValue = null;
+    for (Long id : processSupervisionStatus.keySet()) {
+      processSupervisionStatus.put(id, null);
+    }
+    for (Long id : equipmentSupervisionStatus.keySet()) {
+      equipmentSupervisionStatus.put(id, null);
+    }
   }
 
   @Override
