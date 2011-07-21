@@ -57,6 +57,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.util.jms.ActiveJmsSender;
@@ -208,7 +209,8 @@ public class JmsProxyTest {
     //send update
     jmsSender.sendToTopic(new TransferTagValueImpl(details.getId(), 
                                                    10L, 
-                                                   new DataTagQualityImpl(), 
+                                                   new DataTagQualityImpl(),
+                                                   TagMode.TEST,
                                                    new Timestamp(System.currentTimeMillis()), 
                                                    new Timestamp(System.currentTimeMillis()), 
                                                    "description").toJson(), 
