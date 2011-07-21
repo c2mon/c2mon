@@ -45,7 +45,13 @@ public class TagShortTermLog implements IFallback, Loggable {
     private String tagDataType;
 
     /** Data tag timestamp */
-    private Timestamp tagTimestamp;
+    private Timestamp sourceTimestamp;
+    
+    /** Timestamp set when sent from DAQ */
+    private Timestamp daqTimestamp;
+    
+    /** Timestamp when written to cache */
+    private Timestamp serverTimestamp;    
 
     /** Code that shows whether the quality of the datatag is good or not */
     private int tagQualityCode;
@@ -122,16 +128,16 @@ public class TagShortTermLog implements IFallback, Loggable {
     /**
      * @return the tagTimestamp
      */
-    public final Timestamp getTagTimestamp() {
-        return tagTimestamp;
+    public final Timestamp getSourceTimestamp() {
+        return sourceTimestamp;
     }
 
     /**
      * @param tTimestamp
      *            the tagTimestamp to set
      */
-    public final void setTagTimestamp(final Timestamp tTimestamp) {
-        this.tagTimestamp = tTimestamp;
+    public final void setSourceTimestamp(final Timestamp tTimestamp) {
+        this.sourceTimestamp = tTimestamp;
     }
 
     /**
@@ -269,7 +275,9 @@ public class TagShortTermLog implements IFallback, Loggable {
                 dtShortTermLog.setTagValue(tagValue);    
             }            
             dtShortTermLog.setTagDataType(value[j++]);
-            dtShortTermLog.setTagTimestamp(Timestamp.valueOf(value[j++]));
+            dtShortTermLog.setSourceTimestamp(Timestamp.valueOf(value[j++]));
+            dtShortTermLog.setDaqTimestamp(Timestamp.valueOf(value[j++]));
+            dtShortTermLog.setServerTimestamp(Timestamp.valueOf(value[j++]));            
             dtShortTermLog.setTagQualityCode(new Integer(value[j++]).shortValue());
             String description = (String)value[j++];
             if (description.equalsIgnoreCase("null")) {
@@ -310,11 +318,15 @@ public class TagShortTermLog implements IFallback, Loggable {
         str.append('\t');
         str.append(getTagDataType());
         str.append('\t');
-        str.append(getTagTimestamp());
+        str.append(getSourceTimestamp());
+        str.append('\t');
+        str.append(getDaqTimestamp());
+        str.append('\t');
+        str.append(getServerTimestamp());
         str.append('\t');
         str.append(getTagQualityCode());
         str.append('\t');
-        if ((getTagQualityDesc() != null) && (getTagQualityDesc().equals(""))){
+        if ((getTagQualityDesc() != null) && (getTagQualityDesc().equals(""))) {
             str.append("null");
         } else {
             str.append(getTagQualityDesc());
@@ -357,7 +369,9 @@ public class TagShortTermLog implements IFallback, Loggable {
                 && dt.getTagQualityDesc().equals(this.getTagQualityDesc())
                 && dt.getTagValue().equals(this.getTagValue())
                 && dt.getTagDataType().equals(this.getTagDataType())
-                && this.getTagTimestamp().equals(this.getTagTimestamp()) 
+                && this.getSourceTimestamp().equals(this.getSourceTimestamp()) 
+                && this.getDaqTimestamp().equals(this.getDaqTimestamp()) 
+                && this.getServerTimestamp().equals(this.getServerTimestamp()) 
                 && dt.getTagDir().equals(this.getTagDir())) {
             equal = true;
         }
@@ -380,6 +394,34 @@ public class TagShortTermLog implements IFallback, Loggable {
     @Override
     public String getValue() {
      return getTagValue();
+    }
+
+    /**
+     * @return the daqTimestamp
+     */
+    public Timestamp getDaqTimestamp() {
+      return daqTimestamp;
+    }
+
+    /**
+     * @param daqTimestamp the daqTimestamp to set
+     */
+    public void setDaqTimestamp(Timestamp daqTimestamp) {
+      this.daqTimestamp = daqTimestamp;
+    }
+
+    /**
+     * @return the serverTimestamp
+     */
+    public Timestamp getServerTimestamp() {
+      return serverTimestamp;
+    }
+
+    /**
+     * @param serverTimestamp the serverTimestamp to set
+     */
+    public void setServerTimestamp(Timestamp serverTimestamp) {
+      this.serverTimestamp = serverTimestamp;
     }
 
 }

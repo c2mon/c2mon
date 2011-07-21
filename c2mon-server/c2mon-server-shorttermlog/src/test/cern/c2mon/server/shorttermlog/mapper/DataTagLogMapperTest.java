@@ -92,7 +92,9 @@ public class DataTagLogMapperTest {
     TagShortTermLog dataTagShortTermLog = new TagShortTermLog();
     dataTagShortTermLog.setTagId(ID);
     dataTagShortTermLog.setTagDataType(DATATYPE);    
-    dataTagShortTermLog.setTagTimestamp(TAGTIME); 
+    dataTagShortTermLog.setSourceTimestamp(TAGTIME); 
+    dataTagShortTermLog.setDaqTimestamp(TAGTIME);
+    dataTagShortTermLog.setServerTimestamp(TAGTIME);    
     dataTagShortTermLog.setTagValue(TAGVALUE);
     dataTagLogMapper.insertLog(dataTagShortTermLog);
   }
@@ -108,7 +110,9 @@ public class DataTagLogMapperTest {
     dataTagShortTermLog.setTagId(ID);
     dataTagShortTermLog.setTagDataType(DATATYPE);
     dataTagShortTermLog.setLogDate(LOGTIME);
-    dataTagShortTermLog.setTagTimestamp(TAGTIME); 
+    dataTagShortTermLog.setSourceTimestamp(TAGTIME); 
+    dataTagShortTermLog.setDaqTimestamp(TAGTIME); 
+    dataTagShortTermLog.setServerTimestamp(TAGTIME); 
     dataTagShortTermLog.setTagValue(TAGVALUE);
     dataTagShortTermLog.setTimezone(TimeZone.getDefault().getID());
     dataTagLogMapper.insertLog(dataTagShortTermLog);

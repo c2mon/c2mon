@@ -20,8 +20,12 @@
 
 package cern.c2mon.server.shorttermlog.structure;
 
+import java.util.ResourceBundle.Control;
+
 import com.google.gson.Gson;
 
+import cern.tim.server.common.control.ControlTag;
+import cern.tim.server.common.datatag.DataTag;
 import cern.tim.server.common.tag.Tag;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagValueDictionary;
@@ -176,7 +180,11 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
           dtSTLog.setTagValue(null);
       }        
       dtSTLog.setTagDataType(tag.getDataType());
-      dtSTLog.setTagTimestamp(tag.getTimestamp());
+      if (tag instanceof DataTag || tag instanceof ControlTag) {
+        dtSTLog.setSourceTimestamp(((DataTag)tag).getSourceTimestamp());
+        dtSTLog.setDaqTimestamp(((DataTag)tag).getDaqTimestamp());
+      }
+      dtSTLog.setServerTimestamp(tag.getCacheTimestamp());      
       dtSTLog.setTagQualityCode(0); //all set to 0 now; TODO remove column from DB at some point
       dtSTLog.setTagQualityDesc(gson.toJson(tag.getDataTagQuality().getInvalidQualityStates()));      
       if (dtSTLog.getTagQualityDesc() != null && dtSTLog.getTagQualityDesc().length() > MAX_LENGTH) {

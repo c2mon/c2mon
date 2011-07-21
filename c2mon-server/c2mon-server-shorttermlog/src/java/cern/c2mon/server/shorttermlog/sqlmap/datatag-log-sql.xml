@@ -17,7 +17,7 @@
   <insert id="insertLog" parameterType="DataTagSTLog">
     INSERT INTO shorttermlog (LOGDATE, TAGID, TAGNAME, TAGVALUE,
     TAGDATATYPE,
-    TAGSTATUS, TAGSTATUSDESC, TAGMODE, TAGDIR, TAGTIME)
+    TAGSTATUS, TAGSTATUSDESC, TAGMODE, TAGDIR, TAGTIME, TAGDAQTIME, TAGSERVERTIME)
     VALUES (
     <!-- The logDate is not null, because is a dataTag read from the fallback file -->
     <if test="logDate != null">SYS_EXTRACT_UTC(from_tz(#{logDate,jdbcType=TIMESTAMP},'${timezone}'))</if>
@@ -26,7 +26,7 @@
     ,#{tagId,jdbcType=NUMERIC},#{tagName,jdbcType=VARCHAR},#{tagValue,jdbcType=VARCHAR}
     ,#{tagDataType,jdbcType=VARCHAR},#{tagQualityCode,jdbcType=NUMERIC}
     ,#{tagQualityDesc,jdbcType=VARCHAR},#{tagMode,jdbcType=NUMERIC}
-    ,'I',from_tz(#{tagTimestamp,jdbcType=TIMESTAMP},DBTIMEZONE))
+    ,'I',#{sourceTimestamp,jdbcType=TIMESTAMP},#{daqTimestamp,jdbcType=TIMESTAMP},#{serverTimestamp,jdbcType=TIMESTAMP})
   </insert>
   
   <!-- only used to remove inserts done during testing -->
