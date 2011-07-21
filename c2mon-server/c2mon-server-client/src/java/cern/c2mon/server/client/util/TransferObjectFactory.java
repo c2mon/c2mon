@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.validation.Valid;
-
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.server.common.alarm.Alarm;
@@ -42,6 +41,7 @@ public abstract class TransferObjectFactory {
             tag.getId(),
             tag.getValue(),
             tag.getDataTagQuality(),
+            getTagMode(tag),
             tag.getTimestamp(),
             tag.getCacheTimestamp(),
             tag.getDescription(),
@@ -49,7 +49,7 @@ public abstract class TransferObjectFactory {
             tag.getTopic());
       
       addAlarmValues(transferTag, tagWithAlarms.getAlarms());
-      
+      transferTag.setSimulated(tag.isSimulated());
       transferTag.addEquimpmentIds(tag.getEquipmentIds());
       transferTag.addProcessIds(tag.getProcessIds());
     }
@@ -71,15 +71,37 @@ public abstract class TransferObjectFactory {
         new TransferTagValueImpl(
             tag.getId(), 
             tag.getValue(), 
-            tag.getDataTagQuality(), 
+            tag.getDataTagQuality(),
+            getTagMode(tag),
             tag.getTimestamp(), 
             tag.getCacheTimestamp(), 
             tag.getDescription());
       
       addAlarmValues(tagValue, tagWithAlarms.getAlarms());
+      tagValue.setSimulated(tag.isSimulated());
     }
     
     return tagValue;
+  }
+  
+  /**
+   * Inner method to determine the actual tag mode
+   * @param tag The tag for which the mode has to be determined
+   * @return The tag mode
+   */
+  private static TagMode getTagMode(final Tag tag) {
+    TagMode mode;
+    if (tag.isInOperation()) {
+      mode = TagMode.OPERATIONAL;
+    }
+    else if (tag.isInMaintenance()) {
+      mode = TagMode.MAINTENANCE;
+    }
+    else {
+      mode = TagMode.TEST;
+    }
+    
+    return mode;
   }
   
   
