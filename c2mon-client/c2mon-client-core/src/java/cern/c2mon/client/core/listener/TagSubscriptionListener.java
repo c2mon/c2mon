@@ -19,8 +19,8 @@ package cern.c2mon.client.core.listener;
 
 import java.util.Set;
 
+import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.core.manager.TagManager;
-import cern.c2mon.client.core.tag.ClientDataTag;
 
 /**
  * Is used by {@link TagManager} to notify listeners about new tag subscriptions

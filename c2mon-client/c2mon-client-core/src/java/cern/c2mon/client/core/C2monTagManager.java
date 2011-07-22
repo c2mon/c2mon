@@ -20,8 +20,8 @@ package cern.c2mon.client.core;
 import java.util.Collection;
 import java.util.Set;
 
-import cern.c2mon.client.core.listener.DataTagUpdateListener;
-import cern.c2mon.client.core.tag.ClientDataTagValue;
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 
 /**
  * This interface describes the methods which are provided by

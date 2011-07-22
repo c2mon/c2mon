@@ -26,8 +26,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import cern.c2mon.client.core.listener.DataTagUpdateListener;
-import cern.c2mon.client.core.tag.ClientDataTagValue;
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 
 /**
  * Integration test of Client API modules.

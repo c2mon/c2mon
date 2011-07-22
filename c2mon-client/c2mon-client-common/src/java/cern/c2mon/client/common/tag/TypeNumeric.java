@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.core.tag;
+package cern.c2mon.client.common.tag;
 
 /**
  * Enumeration of all class types that are supported by

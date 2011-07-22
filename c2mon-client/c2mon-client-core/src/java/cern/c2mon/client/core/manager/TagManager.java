@@ -31,11 +31,11 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
-import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
-import cern.c2mon.client.core.tag.ClientDataTag;
-import cern.c2mon.client.core.tag.ClientDataTagValue;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;

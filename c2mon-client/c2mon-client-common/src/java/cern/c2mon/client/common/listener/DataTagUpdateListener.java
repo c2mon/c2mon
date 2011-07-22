@@ -16,9 +16,10 @@
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
  
-package cern.c2mon.client.core.listener;
+package cern.c2mon.client.common.listener;
 
-import cern.c2mon.client.core.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
+;
 
 /**
  * An update event gets fired when a <code>ClientDataTag</code> 

@@ -15,11 +15,9 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.core.tag;
+package cern.c2mon.client.common.tag;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.jms.SupervisionListener;
-import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -35,7 +33,7 @@ import cern.tim.shared.rule.RuleFormatException;
  *
  * @author Matthias Braeger
  */
-public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, TopicRegistrationDetails, SupervisionListener, Cloneable {
+public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, Cloneable {
   
   /**
    * This thread safe method updates the given <code>ClientDataTag</code> object.

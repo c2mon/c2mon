@@ -15,14 +15,14 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.core.tag;
+package cern.c2mon.client.common.tag;
 import java.sql.Timestamp;
 import java.util.Collection;
 
-import cern.c2mon.client.core.listener.DataTagUpdateListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.tim.shared.common.rule.RuleInputValue;
 import cern.tim.shared.rule.RuleExpression;
 
 /**
@@ -34,7 +34,7 @@ import cern.tim.shared.rule.RuleExpression;
  * @see DataTagUpdateListener
  * @author Matthias Braeger
  */
-public interface ClientDataTagValue  {
+public interface ClientDataTagValue extends RuleInputValue {
   /**
    * Returns the tag identifier
    * @return the tag identifier
@@ -121,10 +121,11 @@ public interface ClientDataTagValue  {
   String getDescription();
 
   /**
-   * Returns the tag source timestamp
-   * @return the tag source timestamp
+   * Returns the tag source timestamp. In case the tag is uninitialized
+   * it return the default time stamp which is from 1970.
+   * @return the tag source timestamp.
    */
-  Timestamp getSourceTimestamp();
+  Timestamp getTimestamp();
   
   /**
    * Returns the time when the data tag update

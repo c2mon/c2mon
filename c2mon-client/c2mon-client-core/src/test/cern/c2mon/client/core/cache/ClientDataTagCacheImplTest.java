@@ -14,9 +14,9 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
-import cern.c2mon.client.core.tag.ClientDataTag;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
@@ -117,7 +117,7 @@ public class ClientDataTagCacheImplTest {
     tagIds.add(1L);
     tagIds.add(2L);
     for (Long tagId : tagIds) {
-      ClientDataTag cdtMock = prepareClientDataTagCreateMock(tagId); 
+      ClientDataTagImpl cdtMock = prepareClientDataTagCreateMock(tagId); 
       jmsProxyMock.unregisterUpdateListener(cdtMock);
       supervisionManagerMock.removeSupervisionListener(cdtMock);
     }
@@ -189,8 +189,8 @@ public class ClientDataTagCacheImplTest {
     EasyMock.verify(jmsProxyMock, supervisionManagerMock);
   }
   
-  private ClientDataTag prepareClientDataTagCreateMock(final Long tagId) throws RuleFormatException, JMSException {
-    ClientDataTag cdtMock = new ClientDataTagImpl(tagId);
+  private ClientDataTagImpl prepareClientDataTagCreateMock(final Long tagId) throws RuleFormatException, JMSException {
+    ClientDataTagImpl cdtMock = new ClientDataTagImpl(tagId);
     cdtMock.update(createValidTransferTag(tagId));
     supervisionManagerMock.addSupervisionListener(cdtMock, cdtMock.getProcessIds(), cdtMock.getEquipmentIds());
     EasyMock.expect(jmsProxyMock.isRegisteredListener(cdtMock)).andReturn(false);

@@ -34,10 +34,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
-import cern.c2mon.client.core.tag.ClientDataTag;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.JmsProxy;
@@ -373,7 +373,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
       if (historyMode) {
         historyCache.remove(tagId);
       }
-      ClientDataTag liveTag = liveCache.remove(tagId);
+      ClientDataTagImpl liveTag = liveCache.remove(tagId);
       jmsProxy.unregisterUpdateListener(liveTag);
       supervisionManager.removeSupervisionListener(liveTag);
     } 

@@ -12,7 +12,9 @@ import java.sql.Timestamp;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
@@ -48,7 +50,7 @@ public class ClientDataTagImplTest {
     assertNotSame("The two objects should not point to the same reference in memory!", original, copy);
     assertTrue(original.equals(copy));
     assertEquals(original.getServerTimestamp(), copy.getServerTimestamp());
-    assertEquals(original.getSourceTimestamp(), copy.getSourceTimestamp());
+    assertEquals(original.getTimestamp(), copy.getTimestamp());
     assertEquals(original.getDescription(), copy.getDescription());
     assertEquals(original.getDataTagQuality(), copy.getDataTagQuality());
     assertEquals(original.getId(), copy.getId());
@@ -85,7 +87,7 @@ public class ClientDataTagImplTest {
     assertTrue(cdt.getServerTimestamp().after(copy.getServerTimestamp()));
     assertNull(copy.getValue());
     assertEquals(0, copy.getAlarmIds().size());
-    assertEquals(new Timestamp(0L), copy.getSourceTimestamp());
+    assertEquals(new Timestamp(0L), copy.getTimestamp());
     assertEquals("Tag not initialised.", copy.getDescription());
     assertFalse(copy.getDataTagQuality().isInitialised());
     assertEquals(cdt.getName(), copy.getName());

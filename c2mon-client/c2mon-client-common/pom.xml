@@ -21,6 +21,10 @@
 			<groupId>cern.tim2.tim2-shared</groupId>
 			<artifactId>tim2-shared-client</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-common</artifactId>
+		</dependency>
 	</dependencies>
 	<developers />
 </project>

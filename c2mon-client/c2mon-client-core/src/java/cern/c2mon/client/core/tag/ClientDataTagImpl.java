@@ -28,7 +28,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.core.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.TypeNumeric;
+import cern.c2mon.client.jms.SupervisionListener;
+import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
@@ -52,7 +56,7 @@ import cern.tim.shared.rule.RuleFormatException;
  * @see DataTagUpdateListener
  * @author Matthias Braeger
  */
-public class ClientDataTagImpl implements ClientDataTag {
+public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetails, SupervisionListener {
   
   /** Log4j instance */
   private static final Logger LOG = Logger.getLogger(ClientDataTagImpl.class);
@@ -207,11 +211,13 @@ public class ClientDataTagImpl implements ClientDataTag {
   }
 
   @Override
-  public Timestamp getSourceTimestamp() {
+  public Timestamp getTimestamp() {
     updateTagLock.readLock().lock();
     try { 
       if (sourceTimestamp == null) {
-        return new Timestamp(0);
+        // Use the server timestamp, because the tag might never been
+        // sent by an equipment. In that case the sourceTimestamp is null.
+        return serverTimestamp;
       }
       else {
         return sourceTimestamp;
@@ -292,7 +298,18 @@ public class ClientDataTagImpl implements ClientDataTag {
     finally {
       updateTagLock.readLock().unlock();
     }
-  }  
+  }
+  
+  @Override
+  public boolean isValid() {
+    updateTagLock.readLock().lock();
+    try {
+      return tagQuality.isValid();
+    }
+    finally {
+      updateTagLock.readLock().unlock();
+    }
+  }
   
   /**
    * Removes the invalid quality status and informs the listeners but only,
