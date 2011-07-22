@@ -39,7 +39,7 @@ C2MON_JMX_REMOTE_PASSWD=$C2MON_HOME/conf/.jmxremote.passwd
 # make sure C2MON_PRIMARY_HOST is set correctly
 if [ -z $C2MON_PRIMARY_HOST ]; then 	
    # use default if not
-   export C2MON_PRIMARY_HOST=cs-ccr-tim3
+   export C2MON_PRIMARY_HOST=cs-ccr-tim11
 fi
 
 
