@@ -61,4 +61,10 @@ public interface C2monSessionManager {
    * @return true, if the logout was successful
    */
   boolean logout();
+  
+  /**
+   * @return The information about the current session, or
+   *         <code>null</code>, if user is not logged in.
+   */
+  SessionInfo getSessionInfo();
 }

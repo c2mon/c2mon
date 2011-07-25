@@ -49,7 +49,7 @@ public interface C2monTagManager {
   /**
    * Use this method for unregistering a listener from receiving updates for specific data tags.
    *  
-   * @param dataTagIds A collection of data tag IDs
+   * @param dataTagIds A collection of data tag id's
    * @param listener the listener which shall be registered
    */
   void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
@@ -72,15 +72,33 @@ public interface C2monTagManager {
    */
   Collection<ClientDataTagValue> getAllSubscribedDataTags(final DataTagUpdateListener listener);
   
+  /**
+   * Returns for every valid id of the list a copy of the cached data tag.
+   * If the value is not in the cache it will try to fetch it from the server.
+   * However, in case of a connection error or an unknown tag id the corresponding
+   * tag might be missing.
+   * 
+   * @param tagIds A collection of data tag id's
+   * @return A collection of all <code>ClientDataTag</code> objects
+   */
+  Collection<ClientDataTagValue> getDataTags(Collection<Long> tagIds);
   
   /**
-   * This method shall be used to synchronize subscribed data tags with the
+   * This method is used to synchronize subscribed data tags with the
    * server. It will ask the server to send the actual tag information for
-   * all subscribed data tags. The C2MON client API will then an update to
-   * all subscribed listeners.
+   * all subscribed data tags. The C2MON client API will then send an update
+   * to all subscribed listeners.
    */
   void refreshDataTags();
   
-  
-  
+  /**
+   * This method is used to synchronize a list subscribed data tags with the
+   * server. It will ask the server to send the actual tag information for
+   * all subscribed tags of the given list. The C2MON client API will then send
+   * an update to all subscribed listeners.
+   * 
+   * @param tagIds A collection of data tag id's
+   * @throws NullPointerException if the Collection is <code>null</code>.
+   */
+  void refreshDataTags(Collection<Long> tagIds);
 }

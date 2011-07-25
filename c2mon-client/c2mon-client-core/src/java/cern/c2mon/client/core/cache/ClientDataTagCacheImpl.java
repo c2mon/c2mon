@@ -286,15 +286,21 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
   
   /**
    * Inner method which synchronizes the live cache with the C2MON server
+   * @param pTagIds Set of tag id's that shall be refreshed. If the parameter
+   *        is <code>null</code>, the entire cache is updated.
    */
-  private void refreshLiveCache() {
+  private void refreshLiveCache(final Set<Long> pTagIds) {
     boolean jmsConnectionLost = false;
     cacheLock.readLock().lock();
     try {
       if (!liveCache.isEmpty()) {
-        LOG.info("refreshLiveCache() - Synchronizing " + liveCache.size() + " live cache entries with the server.");
+        Set<Long> tagIds = pTagIds;
+        if (tagIds == null) {
+          // Refresh entire cache
+          tagIds = liveCache.keySet();
+        }
+        LOG.info("refreshLiveCache() - Synchronizing " + tagIds.size() + " live cache entries with the server.");
         
-        Collection<Long> tagIds = liveCache.keySet();
         Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(tagIds);
         for (TagUpdate tagUpdate : tagUpdates) {
           try {
@@ -333,7 +339,14 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
   @Override
   public void refresh() {
     synchronized (refreshLiveCacheSyncLock) {
-      refreshLiveCache();
+      refreshLiveCache(null);
+    } // end synchronized block
+  }
+  
+  @Override
+  public void refresh(final Set<Long> tagIds) {
+    synchronized (refreshLiveCacheSyncLock) {
+      refreshLiveCache(tagIds);
     } // end synchronized block
   }
   
@@ -591,7 +604,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
       }
       if (heartbeatExpired || jmsConnectionDown) {
         LOG.info("onHeartbeatResumed() - Server heartbeat is resumed -> refreshing the live cache.");
-        refreshLiveCache();
+        refreshLiveCache(null);
       }
     }
   }
@@ -608,7 +621,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
       }
       if (jmsConnectionDown || heartbeatExpired) {
         LOG.info("onConnection() - JMS connection is now up -> refreshing the live cache.");
-        refreshLiveCache();
+        refreshLiveCache(null);
       }
     }
   }

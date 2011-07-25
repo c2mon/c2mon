@@ -17,6 +17,10 @@
  ******************************************************************************/
 package cern.c2mon.client.core.manager;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.auth.SessionListener;
@@ -26,6 +30,20 @@ import cern.tim.shared.client.auth.SessionInfo;
 @Service
 public class SessionManager implements C2monSessionManager {
 
+  /** Log4j instance */
+  private static final Logger LOG = Logger.getLogger(SessionManager.class);
+
+  /**
+   * Information about the current session.
+   */
+  private SessionInfo currentSession = null;
+
+  /**
+   * Collection of listeners that will be notified whenever a login/logout
+   * action completes successfully.
+   */
+  private Collection<SessionListener> sessionListeners = new ArrayList<SessionListener>();
+  
   @Override
   public void addSessionListener(SessionListener pListener) {
     // TODO Auto-generated method stub
@@ -49,4 +67,11 @@ public class SessionManager implements C2monSessionManager {
     // TODO Auto-generated method stub
     
   }
+
+  @Override
+  public SessionInfo getSessionInfo() {
+    return currentSession;
+  }
+  
+  
 }

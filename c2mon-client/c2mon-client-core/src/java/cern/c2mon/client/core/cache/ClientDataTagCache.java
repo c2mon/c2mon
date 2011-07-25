@@ -82,6 +82,16 @@ public interface ClientDataTagCache extends BasicCacheHandler {
   void refresh();
   
   /**
+   * This method synchronizes subscribed data tags with the server.
+   * It will ask the server to send the actual tag information for all subscribed data tags.
+   * Once the cache is synchronized, all subscribed <code>DataTagUpdateListener</code> will
+   * be notified.
+   * 
+   * @param tagIds A set of data tag id's
+   */
+  void refresh(Set<Long> tagIds);
+  
+  /**
    * Unsubscribes the given listener from all cache objects. 
    * @param listener The listener which shall be unsubscribed.
    * @return List of id's from those tags which have no <code>DataTagUpdateListener</code>

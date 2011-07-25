@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.jms.JMSException;
@@ -36,6 +37,7 @@ import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -94,6 +96,7 @@ public class TagManager implements CoreTagManager {
         clonedDataTags.add(cdt.clone());
       }
       catch (CloneNotSupportedException e) {
+        LOG.error("Unable to clone ClientDataTag with id " + cdt.getId(), e);
         throw new UnsupportedOperationException("Unable to clone ClientDataTag with id " + cdt.getId(), e);
       }
     }
@@ -105,6 +108,11 @@ public class TagManager implements CoreTagManager {
   @Override
   public void refreshDataTags() {
     cache.refresh();
+  }
+  
+  @Override
+  public void refreshDataTags(final Collection<Long> tagIds) {
+    cache.refresh(new HashSet<Long>(tagIds));
   }
 
   /**
@@ -181,8 +189,8 @@ public class TagManager implements CoreTagManager {
           newTag.update(tagUpdate);
         }
         catch (RuleFormatException e) {
-          LOG.fatal("initializeNewTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
-          throw new RuntimeException(e);
+          LOG.error("initializeNewTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+          throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
         }
       }
     }
@@ -283,5 +291,51 @@ public class TagManager implements CoreTagManager {
     finally {
       listenersLock.readLock().unlock();
     }
+  }
+
+  @Override
+  public Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds) {
+    Collection<ClientDataTagValue> resultList = new ArrayList<ClientDataTagValue>();
+    Collection<Long> missingTags = new ArrayList<Long>();
+    Map<Long, ClientDataTag> cachedValues = cache.get(new HashSet<Long>(tagIds));
+    
+    try {
+      for (Entry<Long, ClientDataTag> cacheEntry : cachedValues.entrySet()) {
+        if (cacheEntry.getValue() != null) {
+          resultList.add(cacheEntry.getValue().clone());
+        }
+        else {
+          missingTags.add(cacheEntry.getKey());
+        }
+      }
+    }
+    catch (CloneNotSupportedException e) {
+      LOG.error("getDataTags() - Unable to clone ClientDataTag! Please check the code.", e);
+      throw new UnsupportedOperationException("Unable to clone ClientDataTag! Please check the code.", e);
+    }
+    
+    // If there are missing values fetch them from the server
+    if (!missingTags.isEmpty()) {
+      try {
+        Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(missingTags);
+        for (TagUpdate tagUpdate : tagUpdates) {          
+          try {
+            ClientDataTag cdt = new ClientDataTagImpl(tagUpdate.getId());
+            cdt.update(tagUpdate);
+            resultList.add(cdt); // No need to clone in this case
+          }
+          catch (RuleFormatException e) {
+            LOG.error("getDataTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+            throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
+          }
+          
+        }
+      }
+      catch (JMSException e) {
+        LOG.error("getDataTags() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+      }
+    }
+    
+    return resultList;
   }
 }
