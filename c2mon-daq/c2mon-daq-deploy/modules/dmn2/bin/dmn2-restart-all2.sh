@@ -2,19 +2,20 @@
 #
 # sets the home directory
 #
-HOME=`dirname $0`
-[[ $HOME == "." ]] && HOME=$PWD
-HOME=$HOME/..
 
-C2MON_DAQ_HOME=$HOME
+# sets the home directory
+#
+DAQ_HOME=`dirname $0`
+[[ ${DAQ_HOME} == "." ]] && DAQ_HOME=$PWD
+DAQ_HOME=${DAQ_HOME}/..
 
-C2MON_LOG=$C2MON_DAQ_HOME/log
-C2MON_LIB=$C2MON_DAQ_HOME/lib
+C2MON_LOG=$DAQ_HOME/log
+C2MON_LIB=$DAQ_HOME/lib
 
-C2MON_DAQ_CONTROL=$C2MON_DAQ_HOME/bin/daqprocess2.sh
+C2MON_DAQ_CONTROL=$DAQ_HOME/bin/daqprocess2.sh
 
 
-for proc in `cat $C2MON_DAQ_HOME/conf/daqprocess.lst`; do
+for proc in `cat $DAQ_HOME/conf/daqprocess.lst`; do
   $C2MON_DAQ_CONTROL status $proc >/dev/null
   if [ $? -eq 0 ] ; then
     echo "$proc is running"

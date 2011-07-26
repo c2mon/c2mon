@@ -2,20 +2,20 @@
 #
 # sets the home directory
 #
-HOME=`dirname $0`
-[[ $HOME == "." ]] && HOME=$PWD
-HOME=$HOME/..
 
-C2MON_DAQ_HOME=$HOME
+DAQ_HOME=`dirname $0`
+[[ ${DAQ_HOME} == "." ]] && DAQ_HOME=$PWD
+DAQ_HOME=${DAQ_HOME}/..
 
-C2MON_LOG=$C2MON_DAQ_HOME/log
-C2MON_LIB=$C2MON_DAQ_HOME/lib
+
+C2MON_LOG=$DAQ_HOME/log
+C2MON_LIB=$DAQ_HOME/lib
 
 JAVA_EXEC=/usr/java/jdk/bin/java
 
-C2MON_DAQ_CONTROL=$C2MON_DAQ_HOME/bin/daqprocess2.sh
+C2MON_DAQ_CONTROL=$DAQ_HOME/bin/daqprocess2.sh
 
-pushd $C2MON_DAQ_HOME/tmp/ >/dev/null 2>/dev/null
+pushd $DAQ_HOME/tmp/ >/dev/null 2>/dev/null
 LS=`ls -1 *.pid`
 popd >/dev/null 2>/dev/null
 
@@ -27,7 +27,7 @@ for pidfile in $LS; do
   sleep 1
   done
 
-pushd $C2MON_DAQ_HOME/tmp/cs-ccr-tim1/ >/dev/null 2>/dev/null
+pushd $DAQ_HOME/tmp/cs-ccr-tim1/ >/dev/null 2>/dev/null
 LS=`ls -1 *.pid`
 popd >/dev/null 2>/dev/null
 
@@ -39,7 +39,7 @@ for pidfile in $LS; do
   sleep 1
 done
 
-pushd $C2MON_DAQ_HOME/tmp/cs-ccr-tim6/ >/dev/null 2>/dev/null
+pushd $DAQ_HOME/tmp/cs-ccr-tim6/ >/dev/null 2>/dev/null
 LS=`ls -1 *.pid`
 popd >/dev/null 2>/dev/null
 
@@ -52,7 +52,7 @@ for pidfile in $LS; do
 done
 
 
-pushd $C2MON_DAQ_HOME/tmp/cs-ccr-tim9/ >/dev/null 2>/dev/null
+pushd $DAQ_HOME/tmp/cs-ccr-tim9/ >/dev/null 2>/dev/null
 LS=`ls -1 *.pid`
 popd >/dev/null 2>/dev/null
 

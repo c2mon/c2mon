@@ -6,28 +6,17 @@ TIME=`date +"%F %T.%3N"`
 
 # sets the home directory
 #
-HOME=`dirname $0`
-[[ $HOME == "." ]] && HOME=$PWD
-HOME=$HOME/..
-
-DAQ_HOME=$HOME
+DAQ_HOME=`dirname $0`
+[[ ${DAQ_HOME} == "." ]] && DAQ_HOME=$PWD
+DAQ_HOME=${DAQ_HOME}/..
 
 DAQ_HOST=`hostname -s`
 
-DAQ_SCRIPT=${C2MON_DAQ_HOME}/bin/daqprocess2
+DAQ_SCRIPT=${DAQ_HOME}/bin/C2MON-DAQ-DMN2-TEST.jvm
 
-export DAQ_LOG_HOME=/var/log/${USER}/daqprocess2
-export DAQ_CONF_HOME=$DAQ_HOME/conf
+export DAQ_LOG_HOME=${DAQ_HOME}/log
+export DAQ_CONF_HOME=${DAQ_HOME}/conf
 DAQ_LOG_FILE=${DAQ_LOG_HOME}/daqprocess.log
-
-
-# Creating directory structure, if it doesn't exit yet
-if [ ! -d ${DAQ_HOME}/tmp/${DAQ_PRIMARY_HOST} ] ; then
-  mkdir ${DAQ_HOME}/tmp/${DAQ_PRIMARY_HOST}
-fi
-if [ ! -d ${DAQ_HOME}/tmp/${DAQ_SECONDARY_HOST} ] ; then
-  mkdir ${DAQ_HOME}/tmp/${DAQ_SECONDARY_HOST}
-fi
 
 # the name of the parameter determining that the DAQ start-up script
 # should output only XML feedback messages
@@ -44,7 +33,7 @@ else
   export ADDITIONAL_PARAMS="$3 $4 $5 $6 $7 $8 $9"
 fi
 
-PID_FILE="${DAQ_HOME}/tmp/${DAQ_PRIMARY_HOST}/daqprocess_${PROCESS_NAME}.pid"
+PID_FILE="${DAQ_HOME}/tmp/daqprocess_${PROCESS_NAME}.pid"
 
 # Check which log4j configuration script should be used
 if [ -f ${DAQ_CONF_HOME}/${PROCESS_NAME}_log4j.xml ] ; then
@@ -412,7 +401,7 @@ C2MONDAQ_printBasicUsageInfo() {
     echo "  -eqAppendersOnly  {if placed in pair with -eqLoggers, the emh's output     "
     echo "                     will be redirected to specific emh's appender files     "
     echo "                     only. EMH's output will not affect the process logger}  "
-    echo "  -testMode [-t]    {starts the DAQ in test mode. no JMS connections will be "
+    echo "  -t [-testMode ]   {starts the DAQ in test mode. no JMS connections will be "
     echo "                     established}                                            "
     echo "  -noDeadband       {disables all dynamic deadband filtering; static         "
     echo "                     deadbands remain active}                                "

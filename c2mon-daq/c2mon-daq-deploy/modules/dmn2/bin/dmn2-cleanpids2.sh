@@ -9,17 +9,17 @@
 # Author: Matthias Braeger
 #
 
+
 # sets the home directory
 #
-HOME=`dirname $0`
-[[ $HOME == "." ]] && HOME=$PWD
-HOME=$HOME/..
+DAQ_HOME=`dirname $0`
+[[ ${DAQ_HOME} == "." ]] && DAQ_HOME=$PWD
+DAQ_HOME=${DAQ_HOME}/..
 
-C2MON_DAQ_HOME=$HOME
-
+DAQ_HOST=`hostname -s`
 
 # Temp directory of the DAQ processes
-DAQ_TMP=${C2MON_DAQ_HOME}/tmp
+DAQ_TMP=${DAQ_HOME}/tmp
 
 
 # Call the runs function to find out if a process with
