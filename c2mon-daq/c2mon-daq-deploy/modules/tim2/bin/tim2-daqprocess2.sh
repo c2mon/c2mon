@@ -15,12 +15,20 @@
 # http://timweb/wiki/doku.php?id=documentation:howto#how_to_build_and_deploy_a_daq_module
 # ------------------------------------------------------------------------------
 
-# Start/stop/restart TIM DAQ process
+# Start/stop/restart TIM2 DAQ process
 
+
+# sets the home directory
+#
+DAQ_HOME=`dirname $0`
+[[ ${DAQ_HOME} == "." ]] && DAQ_HOME=$PWD
+DAQ_HOME=${DAQ_HOME}/..
+
+DAQ_HOST=`hostname -s`
 
 TIME=`date +"%F %T.%3N"`
-DAQ_HOME=$HOME/dist/daqprocess2
-DAQ_SCRIPT=~/dist/daqprocess2/build/bin/daqprocess2
+
+DAQ_SCRIPT=${DAQ_HOME}/bin/C2MON-DAQ-DMN2-TEST.jvm
 
 export DAQ_LOG_HOME=/var/log/${USER}/daqprocess2
 export DAQ_CONF_HOME=$DAQ_HOME/conf
