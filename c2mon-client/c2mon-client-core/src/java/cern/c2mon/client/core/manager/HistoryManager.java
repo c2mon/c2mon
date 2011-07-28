@@ -198,6 +198,10 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
       if (cache.isHistoryModeEnabled()
           && this.historyPlayer != null 
           && this.historyPlayer.isHistoryPlayerActive()) {
+        
+        this.historyPlayer.unregisterTags(tagIds);
+
+        //this.historyPlayer.unregisterSupervisionListener(entity, listener)
         // TODO Unregister the datatags
         // TODO Unregister the equipment events, and the process events
       }
