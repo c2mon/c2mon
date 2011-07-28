@@ -440,6 +440,21 @@ public class HistoryPlayerImpl
   }
   
   /**
+   * Unregisters all listeners which are registered on this tag.
+   * 
+   * @param tagIds
+   *          the tag ids to unregister
+   */
+  @Override
+  public void unregisterTags(final Collection<Long> tagIds) {
+    for (final Long tagId : tagIds) {
+      this.publisher.getTagListenersManager().remove(tagId);
+    }
+    
+    this.historyLoader.getHistoryStore().unregisterTags(tagIds);
+  }
+  
+  /**
    * Call this method after registration of any listeners. Preferably called
    * after registering a bunch of listeners, and not in a loop.
    * 
@@ -654,6 +669,5 @@ public class HistoryPlayerImpl
     }
     return null;
   }
-  
   
 }

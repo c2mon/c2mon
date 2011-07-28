@@ -18,6 +18,7 @@
 package cern.c2mon.client.history.playback;
 
 import java.util.Collection;
+import java.util.Set;
 
 import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.common.history.HistoryProvider;
@@ -93,6 +94,14 @@ public interface HistoryPlayerCoreAccess extends HistoryPlayer {
    *          The listener to unregister
    */
   void unregisterTagUpdateListener(TagUpdateListener tagUpdateListener);
+  
+  /**
+   * Unregisters all listeners which listens on this tag.
+   * 
+   * @param tagIds
+   *          the tag ids to unregister
+   */
+  void unregisterTags(Collection<Long> tagIds);
 
   /**
    * Unregisters the listener from all supervision events it is registered to.

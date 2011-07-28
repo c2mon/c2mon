@@ -97,6 +97,15 @@ public class KeyForValuesMap<K, V> {
     }
     return removedKeys;
   }
+  
+  /**
+   * All values with the given key will be removed.
+   * 
+   * @param key the key to remove. 
+   */
+  public synchronized void remove(final K key) {
+    this.keysWithValues.remove(key);
+  }
 
   /**
    * 
@@ -142,5 +151,5 @@ public class KeyForValuesMap<K, V> {
     }
     return result;
   }
-
+  
 }

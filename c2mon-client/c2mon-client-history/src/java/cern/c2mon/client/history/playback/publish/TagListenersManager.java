@@ -8,7 +8,7 @@ import cern.c2mon.client.common.listener.TagUpdateListener;
  * This class keeps lists of which listeners is listening on which tag.
  * 
  * @author vdeila
- *
+ * 
  */
 public class TagListenersManager extends KeyForValuesMap<Long, TagUpdateListener> {
 
@@ -29,7 +29,7 @@ public class TagListenersManager extends KeyForValuesMap<Long, TagUpdateListener
    *         tag
    */
   @Override
-  public synchronized boolean add(final Long tagId, final TagUpdateListener listener) {
+  public boolean add(final Long tagId, final TagUpdateListener listener) {
     return super.add(tagId, listener);
   }
 
@@ -48,7 +48,7 @@ public class TagListenersManager extends KeyForValuesMap<Long, TagUpdateListener
    * @return the listeners registered on the <code>tagId</code>
    */
   @Override
-  public synchronized Collection<TagUpdateListener> getValues(final Long tagId) {
+  public Collection<TagUpdateListener> getValues(final Long tagId) {
     return super.getValues(tagId);
   }
 
@@ -59,7 +59,7 @@ public class TagListenersManager extends KeyForValuesMap<Long, TagUpdateListener
    * @return <code>true</code> if the tag id have listeners
    */
   @Override
-  public synchronized boolean haveKey(final Long tagId) {
+  public boolean haveKey(final Long tagId) {
     return super.haveKey(tagId);
   }
 
@@ -71,10 +71,19 @@ public class TagListenersManager extends KeyForValuesMap<Long, TagUpdateListener
    *         of this listener
    */
   @Override
-  public synchronized Collection<Long> remove(final TagUpdateListener listener) {
+  public Collection<Long> remove(final TagUpdateListener listener) {
     return super.remove(listener);
   }
-  
-  
-  
+
+  /**
+   * All listeners will be removed from the given tag.
+   * 
+   * @param tagId
+   *          the tag to remove.
+   */
+  @Override
+  public void remove(final Long tagId) {
+    super.remove(tagId);
+  }
+
 }
