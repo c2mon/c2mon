@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-pom</artifactId>
+        <version>1.0.1-SNAPSHOT</version>
+    </parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-jviews-history</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+    <name>c2mon-jviews-history</name>
+    <packaging>jar</packaging>
+    <description>
+        Provides GUI used in history play back for the tim2-jviews-viewer.
+    </description>
+    <url>http://timweb.cern.ch</url>
+    <dependencies>
+        <dependency>
+            <groupId>com.toedter</groupId>
+            <artifactId>jcalendar</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>cern.tim2.tim2-shared</groupId>
+            <artifactId>tim2-shared-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cern.c2mon.c2mon-client</groupId>
+            <artifactId>c2mon-client-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cern.c2mon.c2mon-client</groupId>
+            <artifactId>c2mon-client-core</artifactId>
+        </dependency>
+    </dependencies>
+    <developers />
+</project>

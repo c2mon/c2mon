@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!--
+    This mapper first defines which interface ("namespace") that should be instantiated
+    by iBatis.
+    The functions within defines the functions in the mapper's interface. And the function's
+    parameter.
+  -->
+<mapper namespace="cern.c2mon.client.history.dbaccess.HistoryMapper">
+
+  <!--
+      Defines what object every single row will be converted into,
+      and how this object is mapped from the sql table
+  -->
+  <resultMap id="historyRecordResultMap" type="HistoryRecord">
+    <constructor>
+      <idArg column="TAGID" javaType="Long"/>
+    </constructor>
+    <result property="logDate" column="LOGDATE" jdbcType="TIMESTAMP"/>
+    <result property="tagName" column="TAGNAME" jdbcType="VARCHAR"/>
+    <result property="tagValue" column="TAGVALUE" jdbcType="VARCHAR"/>
+    <result property="tagDataType" column="TAGDATATYPE" jdbcType="VARCHAR"/>
+    
+    <result property="tagTime" column="TAGTIME" jdbcType="TIMESTAMP"/>
+    <result property="daqTime" column="TAGDAQTIME" jdbcType="TIMESTAMP"/>
+    <result property="serverTime" column="TAGSERVERTIME" jdbcType="TIMESTAMP"/>
+    
+    <result property="dataTagQuality" column="TAGSTATUSDESC" jdbcType="VARCHAR" javaType="DataTagQuality"/>
+    <result property="tagMode" column="TAGMODE"/>
+    <result property="fromInitialSnapshot" column="FROMSNAPSHOT"/>
+  </resultMap>
+  
+  <resultMap id="SupervisionRecordResultMap" type="SupervisionRecordBean">
+    <constructor>
+      <idArg column="SUL_ENTITY" javaType="SupervisionEntity" />
+      <idArg column="SUL_ID" javaType="Long" />
+    </constructor>
+    
+    <result property="date" column="SUL_DATE" jdbcType="TIMESTAMP" />
+    <result property="status" column="SUL_STATUS" jdbcType="VARCHAR" javaType="SupervisionStatus" />
+    <result property="message" column="SUL_MESSAGE" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!--
+    Requests the history records of a list of tags from the short term log
+  -->
+  <select   id="getRecords" 
+            parameterType="ShortTermLogHistoryRequestBean"
+            resultMap="historyRecordResultMap">
+            
+    <if test="maxRecords != null">
+      SELECT * FROM (
+    </if>
+    
+    SELECT 
+        LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE, 
+        TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE
+    FROM SHORTTERMLOG
+    WHERE
+      TAGID IN 
+      <foreach item="tag" index="index" collection="tagIds"
+        open="(" separator="," close=")">
+        #{tag}
+      </foreach>
+      <if test="fromTimeStr != null">
+        <if test="toTimeStr != null">
+          AND TAGSERVERTIME BETWEEN
+              TO_DATE(#{fromTimeStr}, 'DD.MM.YYYY HH24:MI:SS')
+              AND TO_DATE(#{toTimeStr}, 'DD.MM.YYYY HH24:MI:SS')
+        </if>
+      </if>
+    ORDER BY TAGSERVERTIME DESC, TAGDAQTIME DESC, TAGTIME DESC
+    
+    <if test="maxRecords != null">
+      )
+      WHERE ROWNUM <![CDATA[ <= ]]> #{maxRecords}
+    </if>
+  </select>
+
+  <!--
+    Requests the initial value for the given tag.
+    Searches the initial log and from the 00:00 of the day where the log is requested to the start time
+    of the request. Then the latest record is returned.
+  -->
+  <select   id="getInitialRecord" 
+            parameterType="InitialRecordHistoryRequestBean"
+            resultMap="historyRecordResultMap">
+    SELECT * FROM (
+        SELECT LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 0 AS FROMSNAPSHOT
+        FROM SHORTTERMLOG
+        WHERE
+            tagid = #{tagId}
+            AND LOGDATE <![CDATA[ >= ]]> TO_DATE(#{logStartStr}, 'DD.MM.YYYY HH24:MI:SS')
+            AND LOGDATE <![CDATA[ <= ]]> TO_DATE(#{logEndStr}, 'DD.MM.YYYY HH24:MI:SS')
+        UNION ALL
+        SELECT LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 1 AS FROMSNAPSHOT
+        FROM STL_DAY_SNAPSHOT
+        WHERE
+            tagid = #{tagId}
+            AND LOGDATE = TO_DATE(#{logInitialDayStr}, 'DD.MM.YYYY')
+        ORDER BY 1 DESC, 8 DESC
+    )
+    WHERE rownum <![CDATA[ <= 1 ]]>
+  </select>
+  
+  <!--
+    Requests supervision events matching the request parameter
+   -->
+  <select   id="getSupervisionEvents" 
+            parameterType="SupervisionEventRequestBean"
+            resultMap="SupervisionRecordResultMap">
+    SELECT SUL_ENTITY, SUL_ID, SUL_DATE, SUL_STATUS, SUL_MESSAGE
+    FROM SUPERVISION_LOG
+    WHERE
+        (SUL_ID = #{id})
+        AND (SUL_ENTITY LIKE #{entity})
+    ORDER BY SUL_DATE ASC
+  </select>
+  
+</mapper>
+
