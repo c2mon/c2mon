@@ -18,9 +18,9 @@
 package cern.c2mon.client.history.playback;
 
 import java.util.Collection;
-import java.util.Set;
 
 import cern.c2mon.client.common.history.HistoryPlayer;
+import cern.c2mon.client.common.history.HistoryPlayerEvents;
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.listener.TagUpdateListener;
@@ -36,7 +36,7 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
  * @author vdeila
  * 
  */
-public interface HistoryPlayerCoreAccess extends HistoryPlayer {
+public interface HistoryPlayerCoreAccess extends HistoryPlayer, HistoryPlayerEvents {
 
   /**
    * Configures the player with a data source and a time period
