@@ -18,12 +18,12 @@
 package cern.c2mon.client.history.playback.schedule;
 
 /**
- * Is used by the {@link TimTimer}
+ * Is used by the {@link TimerQueue}
  * 
  * @author vdeila
  * 
  */
-public interface TimTimerClock {
+public interface TimerQueueClock {
 
   /**
    * 

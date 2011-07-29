@@ -45,7 +45,7 @@ import cern.c2mon.client.history.playback.player.PlaybackControlImpl;
 import cern.c2mon.client.history.playback.publish.HistoryPublisher;
 import cern.c2mon.client.history.playback.publish.SupervisionListenersManager;
 import cern.c2mon.client.history.playback.schedule.HistoryScheduler;
-import cern.c2mon.client.history.playback.schedule.TimClockSynchronizer;
+import cern.c2mon.client.history.playback.schedule.ClockSynchronizer;
 import cern.c2mon.client.history.tag.HistoryTagValueUpdateImpl;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -66,7 +66,7 @@ import cern.tim.shared.common.datatag.TagQualityStatus;
  * @see HistoryScheduler
  * @see PlaybackControl
  * @see PlaybackSynchronizeControl
- * @see TimClockSynchronizer
+ * @see ClockSynchronizer
  * @see HistoryConfiguration
  * 
  * @see Clock
@@ -89,7 +89,7 @@ public class HistoryPlayerImpl
   private Clock clock;
 
   /** Keeps the clock synchronized */
-  private TimClockSynchronizer clockSynchronizer;
+  private ClockSynchronizer clockSynchronizer;
   
   /**
    * {@link HistoryLoader} is responsible for loading all history data and put
@@ -136,7 +136,7 @@ public class HistoryPlayerImpl
     this.historyLoader = new HistoryLoader();
     this.publisher = new HistoryPublisher();
     this.playbackControl = new PlaybackControlImpl(this);
-    this.clockSynchronizer = new TimClockSynchronizer(this.playbackControl);
+    this.clockSynchronizer = new ClockSynchronizer(this.playbackControl);
     this.historyScheduler = new HistoryScheduler(this);
     
     this.eventsForwarder = new HistoryPlayerEventsForwarder(this.historyPlayerListeners);
@@ -645,7 +645,7 @@ public class HistoryPlayerImpl
    * @return the clockSynchronizer
    */
   @Override
-  public TimClockSynchronizer getClockSynchronizer() {
+  public ClockSynchronizer getClockSynchronizer() {
     return clockSynchronizer;
   }
 

@@ -22,7 +22,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.history.playback.PlaybackSynchronizeControl;
-import cern.c2mon.client.history.playback.schedule.event.TimTimerListener;
+import cern.c2mon.client.history.playback.schedule.event.TimerQueueListener;
 
 /**
  * Synchronizes the clock, if the view is updating to the tags too slow, the
@@ -31,10 +31,10 @@ import cern.c2mon.client.history.playback.schedule.event.TimTimerListener;
  * @author vdeila
  * 
  */
-public class TimClockSynchronizer implements TimTimerListener {
+public class ClockSynchronizer implements TimerQueueListener {
 
   /** Log4j logger for this class */
-  private static final Logger LOG = Logger.getLogger(TimClockSynchronizer.class);
+  private static final Logger LOG = Logger.getLogger(ClockSynchronizer.class);
 
   /** The thread used to delay the clock when the tag updates is taking too long */
   private Thread timerBehindScheduleThread = null;
@@ -49,7 +49,7 @@ public class TimClockSynchronizer implements TimTimerListener {
    * 
    * @param playbackControl the playback control of the history player to synchronize
    */
-  public TimClockSynchronizer(final PlaybackSynchronizeControl playbackControl) {
+  public ClockSynchronizer(final PlaybackSynchronizeControl playbackControl) {
     this.playbackControl = playbackControl;
   }
   

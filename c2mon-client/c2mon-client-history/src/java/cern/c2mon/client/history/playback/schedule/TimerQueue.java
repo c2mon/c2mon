@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import cern.c2mon.client.history.playback.schedule.event.TimTimerListener;
+import cern.c2mon.client.history.playback.schedule.event.TimerQueueListener;
 
 /**
  * A facility for threads to schedule tasks for future execution in a background
@@ -56,12 +56,12 @@ import cern.c2mon.client.history.playback.schedule.event.TimTimerListener;
  * 
  * @author Josh Bloch
  * @version 2.0, 07/25/2011
- * @see TimTimerTask
+ * @see TimerTask
  * @see Object#wait(long)
  * @since 1.3
  */
 
-public class TimTimer {
+public class TimerQueue {
   /**
    * The timer task queue. This data structure is shared with the timer thread.
    * The timer produces tasks, via its various schedule calls, and the timer
@@ -108,7 +108,7 @@ public class TimTimer {
    * @see Thread
    * @see #cancel()
    */
-  public TimTimer(final TimTimerClock clock) {
+  public TimerQueue(final TimerQueueClock clock) {
     this("Timer-" + serialNumber(), clock);
   }
 
@@ -124,7 +124,7 @@ public class TimTimer {
    * @see Thread#isDaemon()
    * @since 1.5
    */
-  public TimTimer(final String name, final TimTimerClock clock) {
+  public TimerQueue(final String name, final TimerQueueClock clock) {
     thread = new TimerThread(queue, clock);
     thread.setName(name);
     thread.start();
@@ -144,7 +144,7 @@ public class TimTimer {
    *           if task was already scheduled or cancelled, or timer was
    *           cancelled.
    */
-  public void schedule(TimTimerTask task, long delay) {
+  public void schedule(TimerTask task, long delay) {
     if (delay < 0)
       throw new IllegalArgumentException("Negative delay.");
     sched(task, System.currentTimeMillis() + delay, 0);
@@ -164,7 +164,7 @@ public class TimTimer {
    *           if task was already scheduled or cancelled, timer was cancelled,
    *           or timer thread terminated.
    */
-  public void schedule(TimTimerTask task, Date time) {
+  public void schedule(TimerTask task, Date time) {
     sched(task, time.getTime(), 0);
   }
 
@@ -204,7 +204,7 @@ public class TimTimer {
    *           if task was already scheduled or cancelled, timer was cancelled,
    *           or timer thread terminated.
    */
-  public void schedule(TimTimerTask task, long delay, long period) {
+  public void schedule(TimerTask task, long delay, long period) {
     if (delay < 0)
       throw new IllegalArgumentException("Negative delay.");
     if (period <= 0)
@@ -247,7 +247,7 @@ public class TimTimer {
    *           if task was already scheduled or cancelled, timer was cancelled,
    *           or timer thread terminated.
    */
-  public void schedule(TimTimerTask task, Date firstTime, long period) {
+  public void schedule(TimerTask task, Date firstTime, long period) {
     if (period <= 0)
       throw new IllegalArgumentException("Non-positive period.");
     sched(task, firstTime.getTime(), -period);
@@ -290,7 +290,7 @@ public class TimTimer {
    *           if task was already scheduled or cancelled, timer was cancelled,
    *           or timer thread terminated.
    */
-  public void scheduleAtFixedRate(TimTimerTask task, long delay, long period) {
+  public void scheduleAtFixedRate(TimerTask task, long delay, long period) {
     if (delay < 0)
       throw new IllegalArgumentException("Negative delay.");
     if (period <= 0)
@@ -334,7 +334,7 @@ public class TimTimer {
    *           if task was already scheduled or cancelled, timer was cancelled,
    *           or timer thread terminated.
    */
-  public void scheduleAtFixedRate(TimTimerTask task, Date firstTime, long period) {
+  public void scheduleAtFixedRate(TimerTask task, Date firstTime, long period) {
     if (period <= 0)
       throw new IllegalArgumentException("Non-positive period.");
     sched(task, firstTime.getTime(), period);
@@ -354,7 +354,7 @@ public class TimTimer {
    *           if task was already scheduled or cancelled, timer was cancelled,
    *           or timer thread terminated.
    */
-  private void sched(TimTimerTask task, long time, long period) {
+  private void sched(TimerTask task, long time, long period) {
     if (time < 0)
       throw new IllegalArgumentException("Illegal execution time.");
 
@@ -363,11 +363,11 @@ public class TimTimer {
         throw new IllegalStateException("Timer already cancelled.");
 
       synchronized (task.lock) {
-        if (task.state != TimTimerTask.VIRGIN)
+        if (task.state != TimerTask.VIRGIN)
           throw new IllegalStateException("Task already scheduled or cancelled");
         task.nextExecutionTime = time;
         task.period = period;
-        task.state = TimTimerTask.SCHEDULED;
+        task.state = TimerTask.SCHEDULED;
       }
 
       queue.add(task);
@@ -429,7 +429,7 @@ public class TimTimer {
 
     synchronized (queue) {
       for (int i = queue.size(); i > 0; i--) {
-        if (queue.get(i).state == TimTimerTask.CANCELLED) {
+        if (queue.get(i).state == TimerTask.CANCELLED) {
           queue.quickRemove(i);
           result++;
         }
@@ -447,7 +447,7 @@ public class TimTimer {
    * @param listener
    *          The listener to add
    */
-  public void addTimTimerListener(final TimTimerListener listener) {
+  public void addTimerQueueListener(final TimerQueueListener listener) {
     this.thread.addTimTimerListener(listener);
   }
 
@@ -456,7 +456,7 @@ public class TimTimer {
    * @param listener
    *          The listener to remove
    */
-  public void removeTimTimerListener(final TimTimerListener listener) {
+  public void removeTimerQueueListener(final TimerQueueListener listener) {
     this.thread.removeTimTimerListener(listener);
   }
 }
@@ -501,7 +501,7 @@ class TimerThread extends Thread {
   /**
    * The list of listeners
    */
-  private List<TimTimerListener> listeners = new ArrayList<TimTimerListener>();
+  private List<TimerQueueListener> listeners = new ArrayList<TimerQueueListener>();
 
   /**
    * The lock for {@link #listeners}
@@ -516,9 +516,9 @@ class TimerThread extends Thread {
   private TaskQueue queue;
 
   /** The clock */
-  private TimTimerClock clock;
+  private TimerQueueClock clock;
 
-  TimerThread(final TaskQueue queue, final TimTimerClock clock) {
+  TimerThread(final TaskQueue queue, final TimerQueueClock clock) {
     this.clock = clock;
     this.queue = queue;
     super.setName("TIM-Timer-Thread");
@@ -543,7 +543,7 @@ class TimerThread extends Thread {
   private void mainLoop() {
     while (true) {
       try {
-        TimTimerTask task;
+        TimerTask task;
         boolean taskFired;
         long millisecondsBehindSchedule = 0;
         synchronized (queue) {
@@ -557,7 +557,7 @@ class TimerThread extends Thread {
           long currentTime, executionTime;
           task = queue.getMin();
           synchronized (task.lock) {
-            if (task.state == TimTimerTask.CANCELLED) {
+            if (task.state == TimerTask.CANCELLED) {
               queue.removeMin();
               continue; // No action required, poll queue again
             }
@@ -576,7 +576,7 @@ class TimerThread extends Thread {
             if (taskFired) {
               if (task.period == 0) { // Non-repeating, remove
                 queue.removeMin();
-                task.state = TimTimerTask.EXECUTED;
+                task.state = TimerTask.EXECUTED;
               }
               else { // Repeating task, reschedule
                 queue.rescheduleMin(task.period < 0 ? currentTime - task.period : executionTime + task.period);
@@ -621,7 +621,7 @@ class TimerThread extends Thread {
   private void fireIsBehindSchedule(final long byTime) {
     try {
       this.listenersLock.readLock().lock();
-      for (TimTimerListener listener : listeners) {
+      for (TimerQueueListener listener : listeners) {
         listener.timerIsBehindSchedule(byTime);
       }
     }
@@ -636,7 +636,7 @@ class TimerThread extends Thread {
   private void fireIsOnSchedule() {
     try {
       this.listenersLock.readLock().lock();
-      for (TimTimerListener listener : listeners) {
+      for (TimerQueueListener listener : listeners) {
         listener.timerIsOnSchedule();
       }
     }
@@ -650,7 +650,7 @@ class TimerThread extends Thread {
    * @param listener
    *          The listener to add
    */
-  public void addTimTimerListener(final TimTimerListener listener) {
+  public void addTimTimerListener(final TimerQueueListener listener) {
     try {
       this.listenersLock.writeLock().lock();
       listeners.add(listener);
@@ -665,7 +665,7 @@ class TimerThread extends Thread {
    * @param listener
    *          The listener to remove
    */
-  public void removeTimTimerListener(final TimTimerListener listener) {
+  public void removeTimTimerListener(final TimerQueueListener listener) {
     try {
       this.listenersLock.writeLock().lock();
       listeners.remove(listener);
@@ -692,7 +692,7 @@ class TaskQueue {
    * node n in the heap, and each descendant of n, d, n.nextExecutionTime <=
    * d.nextExecutionTime.
    */
-  private TimTimerTask[] queue = new TimTimerTask[128];
+  private TimerTask[] queue = new TimerTask[128];
 
   /**
    * The number of tasks in the priority queue. (The tasks are stored in
@@ -710,7 +710,7 @@ class TaskQueue {
   /**
    * Adds a new task to the priority queue.
    */
-  void add(TimTimerTask task) {
+  void add(TimerTask task) {
     // Grow backing store if necessary
     if (size + 1 == queue.length)
       queue = Arrays.copyOf(queue, 2 * queue.length);
@@ -723,7 +723,7 @@ class TaskQueue {
    * Return the "head task" of the priority queue. (The head task is an task
    * with the lowest nextExecutionTime.)
    */
-  TimTimerTask getMin() {
+  TimerTask getMin() {
     return queue[1];
   }
 
@@ -732,7 +732,7 @@ class TaskQueue {
    * task, which is returned by getMin) to the number of tasks on the queue,
    * inclusive.
    */
-  TimTimerTask get(int i) {
+  TimerTask get(int i) {
     return queue[i];
   }
 
@@ -797,7 +797,7 @@ class TaskQueue {
       int j = k >> 1;
       if (queue[j].nextExecutionTime <= queue[k].nextExecutionTime)
         break;
-      TimTimerTask tmp = queue[j];
+      TimerTask tmp = queue[j];
       queue[j] = queue[k];
       queue[k] = tmp;
       k = j;
@@ -820,7 +820,7 @@ class TaskQueue {
         j++; // j indexes smallest kid
       if (queue[k].nextExecutionTime <= queue[j].nextExecutionTime)
         break;
-      TimTimerTask tmp = queue[j];
+      TimerTask tmp = queue[j];
       queue[j] = queue[k];
       queue[k] = tmp;
       k = j;

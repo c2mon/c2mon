@@ -21,7 +21,7 @@ import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.history.playback.components.Clock;
 import cern.c2mon.client.history.playback.data.HistoryLoader;
 import cern.c2mon.client.history.playback.publish.HistoryPublisher;
-import cern.c2mon.client.history.playback.schedule.TimClockSynchronizer;
+import cern.c2mon.client.history.playback.schedule.ClockSynchronizer;
 
 /**
  * This interface describes the methods that is accessable by components related
@@ -49,7 +49,7 @@ public interface HistoryPlayerInternal extends HistoryPlayer {
    * @return the clock synchronizer which keeps the clock synchronized with the
    *         views
    */
-  TimClockSynchronizer getClockSynchronizer();
+  ClockSynchronizer getClockSynchronizer();
 
   /**
    * @return the history loader

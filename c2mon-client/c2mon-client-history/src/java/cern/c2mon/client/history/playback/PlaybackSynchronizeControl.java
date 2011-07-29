@@ -18,15 +18,15 @@
 package cern.c2mon.client.history.playback;
 
 import cern.c2mon.client.common.history.PlaybackControl;
-import cern.c2mon.client.history.playback.schedule.TimClockSynchronizer;
+import cern.c2mon.client.history.playback.schedule.ClockSynchronizer;
 
 /**
  * This interface describes methods to be able to disable the playback for a
  * while, and then enable it again. This is used by
- * {@link TimClockSynchronizer} to make the clock synchronized with
+ * {@link ClockSynchronizer} to make the clock synchronized with
  * the updated tags.
  * 
- * @see TimClockSynchronizer
+ * @see ClockSynchronizer
  * 
  * @author vdeila
  * 

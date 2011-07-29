@@ -19,12 +19,12 @@ package cern.c2mon.client.history.playback.schedule.event;
 
 /**
  * 
- * Used by {@link TimTimer} to inform about events
+ * Used by {@link TimerQueue} to inform about events
  * 
  * @author vdeila
  * 
  */
-public interface TimTimerListener {
+public interface TimerQueueListener {
 
   /**
    * Is invoked if the timer is behind schedule. This might happen if one

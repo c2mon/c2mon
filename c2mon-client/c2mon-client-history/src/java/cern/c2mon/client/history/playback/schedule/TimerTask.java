@@ -9,7 +9,7 @@ package cern.c2mon.client.history.playback.schedule;
  * @since   1.3
  */
 
-public abstract class TimTimerTask implements Runnable {
+public abstract class TimerTask implements Runnable {
     /**
      * This object is used to control access to the TimerTask internals.
      */
@@ -59,7 +59,7 @@ public abstract class TimTimerTask implements Runnable {
     /**
      * Creates a new timer task.
      */
-    protected TimTimerTask() {
+    protected TimerTask() {
     }
 
     /**

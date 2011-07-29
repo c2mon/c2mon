@@ -1,53 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-client</groupId>
-		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
-	</parent>
-	<groupId>cern.c2mon.c2mon-client</groupId>
-	<artifactId>c2mon-client-history</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
-	<name>c2mon-client-history</name>
-	<packaging>jar</packaging>
-	<description>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-pom</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-client</groupId>
+  <artifactId>c2mon-client-history</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+  <name>c2mon-client-history</name>
+  <packaging>jar</packaging>
+  <description>
     	Providing history data and playback for the C2MON client.
     </description>
-	<url>http://timweb.cern.ch</url>
-	<dependencies>
-        <dependency>
-            <groupId>com.toedter</groupId>
-            <artifactId>jcalendar</artifactId>
-            <version>1.3.2</version>
-        </dependency>
-		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-client</artifactId>
-		</dependency>
-        <dependency>
-            <groupId>cern.c2mon.c2mon-client</groupId>
-            <artifactId>c2mon-client-common</artifactId>
-        </dependency>
-        <dependency>
-        	<groupId>org.mybatis</groupId>
-        	<artifactId>mybatis</artifactId>
-        	<version>3.0.4</version>
-        	<type>jar</type>
-        	<scope>compile</scope>
-        </dependency>
-        <dependency>
-        	<groupId>oracle</groupId>
-        	<artifactId>ojdbc14</artifactId>
-        	<version>10.2.0.4</version>
-        	<type>jar</type>
-        	<scope>compile</scope>
-        </dependency>
-        <dependency>
-        	<groupId>cern.c2mon.c2mon-client</groupId>
-        	<artifactId>c2mon-client-jms</artifactId>
-        </dependency>
-	</dependencies>
-	<developers />
+  <url>http://timweb.cern.ch</url>
+  <dependencies>
+    <dependency>
+      <groupId>com.toedter</groupId>
+      <artifactId>jcalendar</artifactId>
+      <version>1.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+      <version>3.0.4</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>ojdbc14</artifactId>
+      <version>10.2.0.4</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-jms</artifactId>
+    </dependency>
+
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+  <developers />
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8</version>
+        <configuration>
+          <argLine>
+            <!-- for the tests -->
+            -Djdbc.ro.driver=oracle.jdbc.OracleDriver
+            -Djdbc.ro.url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=dbsrva116)(PORT=1574))(ENABLE=BROKEN)(CONNECT_DATA=(SID=TIMTST)))"
+            -Djdbc.ro.user=timstlog
+            -Djdbc.ro.password=stl0gTCr0cus
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

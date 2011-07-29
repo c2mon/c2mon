@@ -53,10 +53,10 @@ public class HistoryScheduler {
   private static final long BEHIND_SCHEDULE_THRESHOLD = 200;
 
   /** A timer to schedule data tag update events */
-  private TimTimer timer;
+  private TimerQueue timer;
 
   /** A callback for the {@link #timer} to check the time */
-  private TimTimerClock timTimerClock;
+  private TimerQueueClock timerQueueClock;
 
   /** Is a callback for the tim timer for updating the data tags */
   private final TagUpdateListener updateValueCallback;
@@ -74,7 +74,7 @@ public class HistoryScheduler {
    */
   public HistoryScheduler(final HistoryPlayerInternal historyPlayer) {
     this.historyPlayer = historyPlayer;
-    this.timTimerClock = new TimTimerClockDelegate();
+    this.timerQueueClock = new TimTimerClockDelegate();
     createTimTimer();
 
     this.updateValueCallback = new TagUpdateListener() {
@@ -117,17 +117,17 @@ public class HistoryScheduler {
   }
 
   /**
-   * Creates an instance of the {@link TimTimer} and adds a listener to it
+   * Creates an instance of the {@link TimerQueue} and adds a listener to it
    */
   private void createTimTimer() {
-    final TimTimer oldTimer = this.timer;
+    final TimerQueue oldTimer = this.timer;
     if (oldTimer != null) {
       oldTimer.cancel();
       oldTimer.purge();
-      oldTimer.removeTimTimerListener(historyPlayer.getClockSynchronizer());
+      oldTimer.removeTimerQueueListener(historyPlayer.getClockSynchronizer());
     }
-    this.timer = new TimTimer(this.timTimerClock);
-    this.timer.addTimTimerListener(historyPlayer.getClockSynchronizer());
+    this.timer = new TimerQueue(this.timerQueueClock);
+    this.timer.addTimerQueueListener(historyPlayer.getClockSynchronizer());
   }
 
   /**
@@ -141,7 +141,7 @@ public class HistoryScheduler {
 
     final long currentTime = historyPlayer.getPlaybackControl().getClockTime();
 
-    final TimTimer timTimer = this.timer;
+    final TimerQueue timerQueue = this.timer;
 
     // iterate over the data tags
     for (final Long tagId : tagIDs) {
@@ -162,7 +162,7 @@ public class HistoryScheduler {
             }
             if (timestamp != null) {
               try {
-                timTimer.schedule(new UpdateClientDataTagTask(this.updateValueCallback, value), timestamp);
+                timerQueue.schedule(new UpdateClientDataTagTask(this.updateValueCallback, value), timestamp);
               }
               catch (IllegalStateException e) {
                 // If another thread is calling the cancelAllScheduledEvents()
@@ -235,7 +235,7 @@ public class HistoryScheduler {
   /**
    * Callback for the {@link HistoryPlayerImpl#timer} to get the time, etc.
    */
-  class TimTimerClockDelegate implements TimTimerClock {
+  class TimTimerClockDelegate implements TimerQueueClock {
     @Override
     public long getBehindScheduleThreshold() {
       return (long) (BEHIND_SCHEDULE_THRESHOLD * historyPlayer.getPlaybackControl().getPlaybackSpeed());

@@ -23,13 +23,14 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 
 /**
  * Instances of this class are used to schedule an update of a
- * <code>ClientDataTag</code>. Tasks can be scheduled with the
- * <code>TimTimer</code>.
+ * {@link TagValueUpdate}. Tasks can be scheduled with the
+ * {@link TimerQueue}.
  * 
  * @author Michael Berberich
- * @see TimTimer
+ * @author vdeila
+ * @see TimerQueue
  */
-public class UpdateClientDataTagTask extends TimTimerTask {
+public class UpdateClientDataTagTask extends TimerTask {
   /** The data tag to update */
   private TagUpdateListener updateDelegate;
 
