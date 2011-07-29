@@ -27,7 +27,7 @@ import java.util.Date;
  * @author vdeila
  * 
  */
-public interface HistoryPlayer extends HistoryPlayerEvents {
+public interface HistoryPlayer {
 
   /**
    * This method checks how far the records have been loaded and returns it.
