@@ -70,7 +70,7 @@
         <configuration>
           <argLine>
             <!-- for this module -->
-            -Dc2mon.jms.url=tcp://timjmstest1:61616
+            -Dc2mon.jms.url=tcp://jms-tim-test1:61616
             -Dc2mon.jms.user=not-used
             -Dc2mon.jms.passwd=not-used
             -Dc2mon.client.jms.supervision.topic=c2mon.JmsProxy.test.supervision.topic
