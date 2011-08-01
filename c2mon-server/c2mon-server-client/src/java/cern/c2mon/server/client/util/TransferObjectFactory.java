@@ -11,7 +11,6 @@ import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.common.rule.RuleTag;
-import cern.tim.server.common.rule.RuleTagCacheObject;
 import cern.tim.server.common.tag.Tag;
 
 /**
