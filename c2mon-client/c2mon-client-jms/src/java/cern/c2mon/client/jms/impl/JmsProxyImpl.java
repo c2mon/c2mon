@@ -245,13 +245,13 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Notifies all {@link ConnectionListener}s of a connection. 
    */
   private void notifyConnectionListenerOnConnection() {
-    connectionListenersLock.writeLock().lock();
+    connectionListenersLock.readLock().lock();
     try {
       for (ConnectionListener listener : connectionListeners) {
         listener.onConnection();
       }      
     } finally {
-      connectionListenersLock.writeLock().unlock();
+      connectionListenersLock.readLock().unlock();
     }    
   }
   
@@ -259,13 +259,13 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Notifies all {@link ConnectionListener}s on a disconnection.
    */
   private void notifyConnectionListenerOnDisconnection() {
-    connectionListenersLock.writeLock().lock();
+    connectionListenersLock.readLock().lock();
     try {
       for (ConnectionListener listener : connectionListeners) {
         listener.onDisconnection();
       }
     } finally {
-      connectionListenersLock.writeLock().unlock();
+      connectionListenersLock.readLock().unlock();
     }    
   }
 
