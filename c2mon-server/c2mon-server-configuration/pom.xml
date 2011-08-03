@@ -102,7 +102,10 @@
             -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test
             -Dcache.loader.batch.size=10000
             -Dcache.loader.threads.max=2
-            -Dcache.loader.queue.size=1000    
+            -Dcache.loader.queue.size=1000
+            -Dcache.loader.equipment.batch.size=5
+            -Dcache.loader.equipment.threads.max=2
+            -Dcache.loader.equipment.queue.size=1000     
           </argLine>
         </configuration>
       </plugin>
