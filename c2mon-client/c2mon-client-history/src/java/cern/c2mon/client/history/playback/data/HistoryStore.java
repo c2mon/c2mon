@@ -353,6 +353,9 @@ public class HistoryStore {
     else {
       final Timestamp oldTimestamp = getTagHaveRecordsUntilTime(tagId);
       add = oldTimestamp == null || time.after(oldTimestamp);
+      if (!add) {
+        add = null;
+      }
     }
 
     // Don't update the value if it already exists a later time for the tagId
@@ -484,8 +487,10 @@ public class HistoryStore {
     // Ending the batch
     this.setBatching(false);
 
+    if (registeredTags.size() > 0) {
     // Notifies which tags have been added
-    this.fireTagsAdded(registeredTags);
+      this.fireTagsAdded(registeredTags);
+    }
 
     return result;
   }

@@ -18,7 +18,6 @@
 package cern.c2mon.client.history.playback;
 
 import cern.c2mon.client.common.history.HistoryPlayer;
-import cern.c2mon.client.history.playback.components.Clock;
 import cern.c2mon.client.history.playback.data.HistoryLoader;
 import cern.c2mon.client.history.playback.publish.HistoryPublisher;
 import cern.c2mon.client.history.playback.schedule.ClockSynchronizer;
@@ -38,11 +37,6 @@ public interface HistoryPlayerInternal extends HistoryPlayer {
    *         otherwise
    */
   boolean isHistoryPlayerActive();
-
-  /**
-   * @return The clock of the history player.
-   */
-  Clock getClock();
 
   /**
    * 

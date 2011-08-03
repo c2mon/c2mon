@@ -44,8 +44,8 @@ import cern.c2mon.client.history.playback.exceptions.NoHistoryProviderAvailableE
 import cern.c2mon.client.history.playback.player.PlaybackControlImpl;
 import cern.c2mon.client.history.playback.publish.HistoryPublisher;
 import cern.c2mon.client.history.playback.publish.SupervisionListenersManager;
-import cern.c2mon.client.history.playback.schedule.HistoryScheduler;
 import cern.c2mon.client.history.playback.schedule.ClockSynchronizer;
+import cern.c2mon.client.history.playback.schedule.HistoryScheduler;
 import cern.c2mon.client.history.tag.HistoryTagValueUpdateImpl;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -85,9 +85,6 @@ public class HistoryPlayerImpl
   /** A manager which keeps track of the listeners */
   private final ListenersManager<HistoryPlayerListener> historyPlayerListeners;
   
-  /** The clock the history player is based on */
-  private Clock clock;
-
   /** Keeps the clock synchronized */
   private ClockSynchronizer clockSynchronizer;
   
@@ -130,12 +127,9 @@ public class HistoryPlayerImpl
     this.tagsToRegisterLiveValueLock = new ReentrantLock();
     this.historyModeActive = false;
     
-    // create a default clock for the history player
-    this.clock = new Clock(new Date(), new Date());
-    
     this.historyLoader = new HistoryLoader();
     this.publisher = new HistoryPublisher();
-    this.playbackControl = new PlaybackControlImpl(this);
+    this.playbackControl = new PlaybackControlImpl();
     this.clockSynchronizer = new ClockSynchronizer(this.playbackControl);
     this.historyScheduler = new HistoryScheduler(this);
     
@@ -249,9 +243,7 @@ public class HistoryPlayerImpl
     }
     
     // Sets the clock
-    final Clock oldClock = this.clock;
-    this.clock = new Clock(this.getStart(), this.getStart());
-    this.clock.setSpeedMultiplier(oldClock.getSpeedMultiplier());
+    setClockEndTime(this.getStart());
   }
   
   /**
@@ -284,10 +276,8 @@ public class HistoryPlayerImpl
       LOG.debug("Playback available until " + newEndTime.toString());
     }
     
-    this.historyScheduler.cancelAllScheduledEvents();
     // Updates the clock
     setClockEndTime(newEndTime);
-    this.historyScheduler.rescheduleEvents();
   }
   
   /**
@@ -307,16 +297,7 @@ public class HistoryPlayerImpl
    * @param endTime The new end time to set
    */
   private void setClockEndTime(final Date endTime) {
-    final Clock oldClock = clock;
-    clock = new Clock(getStart(), endTime);
-    clock.setTime(oldClock.getTime());
-    clock.setSpeedMultiplier(oldClock.getSpeedMultiplier());
-    if (oldClock.isRunning()) {
-      clock.start();
-    }
-    if (oldClock.isPaused()) {
-      clock.pause();
-    }
+    playbackControl.setClockTimespan(getStart(), endTime);
   }
   
   /**
@@ -359,9 +340,9 @@ public class HistoryPlayerImpl
       // Registers the listener
       this.publisher.getTagListenersManager().add(tagId, tagUpdateListener);
       
+      final TagValueUpdate currentValue;
       if (currentRealtimeValue != null) {
-        
-        final TagValueUpdate currentValue = 
+        currentValue = 
           new HistoryTagValueUpdateImpl(
               currentRealtimeValue.getId(), 
               currentRealtimeValue.getDataTagQuality(), 
@@ -371,14 +352,26 @@ public class HistoryPlayerImpl
               currentRealtimeValue.getDescription(), 
               currentRealtimeValue.getAlarms().toArray(new AlarmValue[0]), 
               currentRealtimeValue.getMode());
-        
-        tagsToRegisterLiveValueLock.lock();
-        try {
-          tagsToRegisterLiveValue.add(currentValue);
-        }
-        finally {
-          tagsToRegisterLiveValueLock.unlock();
-        }
+      }
+      else {
+        currentValue = 
+          new HistoryTagValueUpdateImpl(
+              tagId, 
+              null, 
+              null, 
+              null, 
+              null, 
+              null, 
+              null, 
+              null);
+      }
+      
+      tagsToRegisterLiveValueLock.lock();
+      try {
+        tagsToRegisterLiveValue.add(currentValue);
+      }
+      finally {
+        tagsToRegisterLiveValueLock.unlock();
       }
     }
   }
@@ -435,8 +428,10 @@ public class HistoryPlayerImpl
   public void unregisterTagUpdateListener(final TagUpdateListener tagUpdateListener) {
     final Collection<Long> removedTags = this.publisher.getTagListenersManager().remove(tagUpdateListener);
     
-    // Removes the tags from the history store
-    this.historyLoader.getHistoryStore().unregisterTags(removedTags);
+    if (removedTags.size() > 0) {
+      // Removes the tags from the history store
+      this.historyLoader.getHistoryStore().unregisterTags(removedTags);
+    }
   }
   
   /**
@@ -468,42 +463,49 @@ public class HistoryPlayerImpl
       LOG.debug("Filtering datatags");
     }
     
-    final Collection<Long> tagsToLoad;
-    this.tagsToRegisterLiveValueLock.lock();
     try {
-      tagsToLoad = 
-        this.historyLoader.getHistoryStore().filterRealTimeValues(
-            this.tagsToRegisterLiveValue.toArray(new TagValueUpdate[0]));
+      this.historyLoader.getHistoryStore().setBatching(true);
       
-      this.tagsToRegisterLiveValue.clear();
+      final Collection<Long> tagsToLoad;
+      this.tagsToRegisterLiveValueLock.lock();
+      try {
+        tagsToLoad = 
+          this.historyLoader.getHistoryStore().filterRealTimeValues(
+              this.tagsToRegisterLiveValue.toArray(new TagValueUpdate[0]));
+        
+        this.tagsToRegisterLiveValue.clear();
+      }
+      finally {
+        this.tagsToRegisterLiveValueLock.unlock();
+      }
+      
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Invalidating data tags");
+      }
+      
+      // Invalidates the tags which is not yet loaded
+      for (final Long tagId : tagsToLoad) {
+        final TagValueUpdate tagValueInvalidation = new HistoryTagValueUpdateImpl(
+            tagId, 
+            new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, "Loading history records.."), 
+            null, 
+            null, 
+            new Timestamp(System.currentTimeMillis()), 
+            "",  
+            TagMode.OPERATIONAL);
+        publisher.publish(tagValueInvalidation);
+      }
+      
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Registering data tags");
+      }
+      
+      // Register the tag in the history store
+      this.historyLoader.getHistoryStore().registerTags(tagsToLoad.toArray(new Long[0]));
     }
     finally {
-      this.tagsToRegisterLiveValueLock.unlock();
+      this.historyLoader.getHistoryStore().setBatching(false);
     }
-    
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Invalidating data tags");
-    }
-    
-    // Invalidates the tags which is not yet loaded
-    for (final Long tagId : tagsToLoad) {
-      final TagValueUpdate tagValueInvalidation = new HistoryTagValueUpdateImpl(
-          tagId, 
-          new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, "Loading history records.."), 
-          null, 
-          null, 
-          new Timestamp(System.currentTimeMillis()), 
-          "",  
-          TagMode.OPERATIONAL);
-      publisher.publish(tagValueInvalidation);
-    }
-    
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Registering data tags");
-    }
-    
-    // Register the tag in the history store
-    this.historyLoader.getHistoryStore().registerTags(tagsToLoad.toArray(new Long[0]));
     
     if (LOG.isDebugEnabled()) {
       LOG.debug("Initiates loading");
@@ -600,14 +602,6 @@ public class HistoryPlayerImpl
     catch (NullPointerException e) {
       return null;
     }
-  }
-
-  /**
-   * @return The clock of the history player.
-   */
-  @Override
-  public Clock getClock() {
-    return this.clock;
   }
   
   /**

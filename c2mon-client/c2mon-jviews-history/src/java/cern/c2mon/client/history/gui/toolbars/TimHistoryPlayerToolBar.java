@@ -315,7 +315,7 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
     }
 
     @Override
-    public void onPlaybackStarted() {
+    public void onPlaybackStarting() {
       playButtonIsPlaying = true;
       playButton.setIcon(PAUSE_ICON);
       setTimeSliderEnabled(false);

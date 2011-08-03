@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 
@@ -50,7 +51,7 @@ public class HistoryScheduler {
   private static final Logger LOG = Logger.getLogger(HistoryScheduler.class);
 
   /** The amount of milliseconds that it can be behind schedule (in real time) */
-  private static final long BEHIND_SCHEDULE_THRESHOLD = 200;
+  public static final long BEHIND_SCHEDULE_THRESHOLD = 200;
 
   /** A timer to schedule data tag update events */
   private TimerQueue timer;
@@ -67,6 +68,9 @@ public class HistoryScheduler {
   /** A manager which keeps track of the listeners */
   private final ListenersManager<HistorySchedulerListener> listenersManager = new ListenersManager<HistorySchedulerListener>();
 
+  /** Whether or not rescheduling is needed before playback */
+  private AtomicBoolean needsRescheduling = new AtomicBoolean(false);
+  
   /**
    * 
    * @param historyPlayer
@@ -87,7 +91,13 @@ public class HistoryScheduler {
     this.historyPlayer.getPlaybackControl().addPlaybackControlListener(new PlaybackControlAdapter() {
       @Override
       public void onClockTimeSet(final long newTime) {
+        cancelAllScheduledEvents();
         rescheduleEvents();
+      }
+
+      @Override
+      public void onPlaybackStarting() {
+        rescheduleIfNeeded();
       }
     });
   }
@@ -105,29 +115,46 @@ public class HistoryScheduler {
    * at the clock's current time and schedule new events for future updates.
    */
   public void rescheduleEvents() {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("History player reinitialized at " + new Date(historyPlayer.getPlaybackControl().getClockTime()));
+    this.needsRescheduling.compareAndSet(false, true);
+    if (historyPlayer.getPlaybackControl().isPlaying()) {
+      rescheduleIfNeeded();
     }
+  }
+  
+  /**
+   * Reschedules only if needed. Is called only when currently playing, or is
+   * going to play
+   */
+  private void rescheduleIfNeeded() {
+    if (this.needsRescheduling.compareAndSet(true, false)) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("History player reinitialized at " + new Date(historyPlayer.getPlaybackControl().getClockTime()));
+      }
 
-    final Collection<Long> tagIds = Arrays.asList(historyPlayer.getHistoryLoader().getHistoryStore().getRegisteredTags());
-
-    this.cancelAllScheduledEvents();
-    this.updateDataTagsWithValueAtCurrentTime(tagIds);
-    this.scheduleEvents(tagIds);
+      final Collection<Long> tagIds = Arrays.asList(historyPlayer.getHistoryLoader().getHistoryStore().getRegisteredTags());
+      this.updateDataTagsWithValueAtCurrentTime(tagIds);
+      this.scheduleEvents(tagIds);
+    }
   }
 
   /**
    * Creates an instance of the {@link TimerQueue} and adds a listener to it
+   * 
+   * @return the created timer
    */
-  private void createTimTimer() {
-    final TimerQueue oldTimer = this.timer;
+  private TimerQueue createTimTimer() {
+    final TimerQueue newTimer = new TimerQueue(this.timerQueueClock);
+    newTimer.addTimerQueueListener(historyPlayer.getClockSynchronizer());
+    final TimerQueue oldTimer;
+    synchronized (this) {
+      oldTimer = this.timer;
+      this.timer = newTimer;
+    }
     if (oldTimer != null) {
       oldTimer.cancel();
-      oldTimer.purge();
       oldTimer.removeTimerQueueListener(historyPlayer.getClockSynchronizer());
     }
-    this.timer = new TimerQueue(this.timerQueueClock);
-    this.timer.addTimerQueueListener(historyPlayer.getClockSynchronizer());
+    return newTimer;
   }
 
   /**
@@ -136,13 +163,13 @@ public class HistoryScheduler {
    * @param tagIDs
    *          The data tag IDs to schedule update events for
    */
-  private void scheduleEvents(final Collection<Long> tagIDs) {
+  private synchronized void scheduleEvents(final Collection<Long> tagIDs) {
     LOG.debug("Schedules history events");
 
     final long currentTime = historyPlayer.getPlaybackControl().getClockTime();
 
-    final TimerQueue timerQueue = this.timer;
-
+    final TimerQueue timerQueue = createTimTimer();
+    
     // iterate over the data tags
     for (final Long tagId : tagIDs) {
       final TagHistory dataTagHistory = historyPlayer.getHistoryLoader().getHistoryStore().getTagHistory(tagId);

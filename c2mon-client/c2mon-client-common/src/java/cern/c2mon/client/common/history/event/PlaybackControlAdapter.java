@@ -39,7 +39,7 @@ public class PlaybackControlAdapter implements PlaybackControlListener {
   }
 
   @Override
-  public void onPlaybackStarted() {
+  public void onPlaybackStarting() {
 
   }
 

@@ -42,6 +42,7 @@ import cern.c2mon.client.history.HistoryProviderFactory;
 import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
 import cern.c2mon.client.history.playback.HistoryPlayerCoreAccess;
 import cern.c2mon.client.history.playback.HistoryPlayerImpl;
+import cern.c2mon.client.history.playback.publish.KeyForValuesMap;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
 
@@ -59,12 +60,16 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   
   /** the history player */
   private HistoryPlayerCoreAccess historyPlayer;
+  
+  /** Keeps track of which tag id belongs to which {@link SupervisionListener} */
+  private final KeyForValuesMap<Long, SupervisionListener> tagToSupervisionListener;
 
   @Autowired
   protected HistoryManager(final CoreTagManager pTagManager, final BasicCacheHandler pCache) {
     this.tagManager = pTagManager;
     this.cache = pCache;
     this.historyPlayer = null;
+    this.tagToSupervisionListener = new KeyForValuesMap<Long, SupervisionListener>();
   }
 
   /**
@@ -126,7 +131,10 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   }
 
   /**
-   * Subscribes the tags to the history player
+   * Subscribes the tags to the history player.<br/>
+   * <br/>
+   * The caller must hold the {@link BasicCacheHandler#getHistoryModeSyncLock()}
+   * when calling this method
    * 
    * @param tagIds
    *          The tags to subscribes
@@ -136,54 +144,58 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   }
 
   /**
-   * Subscribes the tags to the history player
+   * Subscribes the tags to the history player.<br/>
+   * <br/>
+   * The caller must hold the {@link BasicCacheHandler#getHistoryModeSyncLock()}
+   * when calling this method
    * 
    * @param clientDataTags
    *          The tags to subscribes
    */
   private void subscribeTagsToHistory(final Collection<ClientDataTag> clientDataTags) {
-    synchronized (cache.getHistoryModeSyncLock()) {
-      if (cache.isHistoryModeEnabled()
-          && this.historyPlayer != null 
-          && this.historyPlayer.isHistoryPlayerActive()) {
+    if (cache.isHistoryModeEnabled()
+        && this.historyPlayer != null 
+        && this.historyPlayer.isHistoryPlayerActive()) {
+      
+      // Registers all the tag update listeners and supervision listeners  
+      for (final ClientDataTag cdt : clientDataTags) {
         
-        // Registers all the tag update listeners and supervision listeners  
-        for (final ClientDataTag cdt : clientDataTags) {
-          
-          
-          // Registers to tag updates
-          try {
-            this.historyPlayer.registerTagUpdateListener(
-                (TagUpdateListener) cdt,
-                cdt.getId(),
-                cdt.clone());
-          }
-          catch (CloneNotSupportedException e) {
-            LOG.error("subscribeTagsToHistory() - Unable to clone ClientDataTag with id " + cdt.getId(), e);
-            throw new UnsupportedOperationException("Unable to clone ClientDataTag with id " + cdt.getId(), e);
-          }
-          
-          // Register to supervision events
-          this.historyPlayer.registerSupervisionListener(
-              SupervisionEntity.PROCESS,
-              (SupervisionListener) cdt,
-              cdt.getProcessIds());
-          
-          this.historyPlayer.registerSupervisionListener(
-              SupervisionEntity.EQUIPMENT,
-              (SupervisionListener) cdt,
-              cdt.getEquipmentIds());
-          
+        
+        // Registers to tag updates
+        try {
+          this.historyPlayer.registerTagUpdateListener(
+              (TagUpdateListener) cdt,
+              cdt.getId(),
+              cdt.clone());
+        }
+        catch (CloneNotSupportedException e) {
+          LOG.error("subscribeTagsToHistory() - Unable to clone ClientDataTag with id " + cdt.getId(), e);
+          throw new UnsupportedOperationException("Unable to clone ClientDataTag with id " + cdt.getId(), e);
+        }
+        
+        // Tracks the listener, used when for later when unsubscribing
+        tagToSupervisionListener.add(cdt.getId(), (SupervisionListener) cdt);
+        
+        // Register to supervision events
+        this.historyPlayer.registerSupervisionListener(
+            SupervisionEntity.PROCESS,
+            (SupervisionListener) cdt,
+            cdt.getProcessIds());
+        
+        this.historyPlayer.registerSupervisionListener(
+            SupervisionEntity.EQUIPMENT,
+            (SupervisionListener) cdt,
+            cdt.getEquipmentIds());
+        
 //          For the day the SupervisionEntity.SUBEQUIPMENT also comes
 //          this.historyPlayer.registerSupervisionListener(
 //              SupervisionEntity.SUBEQUIPMENT,
 //              (SupervisionListener) clientDataTag,
 //              clientDataTag.getSubEquipmentIds());
-        }
-        
-        // Begins the loading process
-        this.historyPlayer.beginLoading();
       }
+      
+      // Begins the loading process
+      this.historyPlayer.beginLoading();
     }
   }
 
@@ -201,9 +213,15 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
         
         this.historyPlayer.unregisterTags(tagIds);
 
-        //this.historyPlayer.unregisterSupervisionListener(entity, listener)
-        // TODO Unregister the datatags
-        // TODO Unregister the equipment events, and the process events
+        // Unregistering the supervision listeners
+        for (final Long tagId : tagIds) {
+          for (final SupervisionListener listener : tagToSupervisionListener.getValues(tagId)) {
+            this.historyPlayer.unregisterSupervisionListener(SupervisionEntity.PROCESS, listener);
+            this.historyPlayer.unregisterSupervisionListener(SupervisionEntity.EQUIPMENT, listener);
+            this.historyPlayer.unregisterSupervisionListener(SupervisionEntity.SUBEQUIPMENT, listener);
+            tagToSupervisionListener.remove(listener);
+          }
+        }
       }
     }
     

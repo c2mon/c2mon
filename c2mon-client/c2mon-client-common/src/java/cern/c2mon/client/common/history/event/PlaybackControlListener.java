@@ -26,9 +26,9 @@ package cern.c2mon.client.common.history.event;
 public interface PlaybackControlListener {
 
   /**
-   * Invoked when the playback is started
+   * Invoked when the playback is starting
    */
-  void onPlaybackStarted();
+  void onPlaybackStarting();
 
   /**
    * Invoked when the playback is stopped or paused

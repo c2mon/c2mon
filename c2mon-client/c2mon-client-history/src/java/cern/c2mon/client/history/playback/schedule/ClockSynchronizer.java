@@ -21,6 +21,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.client.common.history.event.PlaybackControlAdapter;
 import cern.c2mon.client.history.playback.PlaybackSynchronizeControl;
 import cern.c2mon.client.history.playback.schedule.event.TimerQueueListener;
 
@@ -51,6 +52,13 @@ public class ClockSynchronizer implements TimerQueueListener {
    */
   public ClockSynchronizer(final PlaybackSynchronizeControl playbackControl) {
     this.playbackControl = playbackControl;
+    
+    this.playbackControl.addPlaybackControlListener(new PlaybackControlAdapter() {
+      @Override
+      public void onPlaybackStopped() {
+        interruptBehindScheduleThread();
+      }
+    });
   }
   
   /**
