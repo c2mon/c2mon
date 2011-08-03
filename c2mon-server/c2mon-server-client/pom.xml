@@ -110,6 +110,9 @@
             -Dcache.loader.batch.size=10000
             -Dcache.loader.threads.max=2
             -Dcache.loader.queue.size=1000
+            -Dcache.loader.equipment.batch.size=5
+            -Dcache.loader.equipment.threads.max=2
+            -Dcache.loader.equipment.queue.size=1000  
 
             <!-- supervision -->
             -Dc2mon.heartbeat.interval=60000
