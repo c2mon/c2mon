@@ -99,7 +99,7 @@ public final class HistoryGuiProvider {
         initializingProgressDialog = new InitializingProgressDialog(parent);
 
         // Make it listen to history player events
-        historyPlayer.addHistoryPlayerListener(initializingProgressDialog);
+        C2monServiceGateway.getHistoryManager().getHistoryPlayerEvents().addHistoryPlayerListener(initializingProgressDialog);
 
         // Make it listen to history provider events
         final HistoryProvider historyProvider = historyPlayer.getHistoryProvider();
