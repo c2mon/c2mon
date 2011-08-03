@@ -57,6 +57,21 @@
     </layout> 
   </appender>
   
+   <appender name="PersistenceAppender" class="org.apache.log4j.RollingFileAppender">
+    <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
+    <root-ref/>
+      <appender-ref ref="FallbackConsoleAppender"/>
+    </errorHandler>
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/persistence.log" />
+    <param name="MaxBackupIndex" value="3" />
+    <param name="MaxFileSize" value="50MB" />
+    <param name="BufferedIO" value="false" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
+    </layout>
+  </appender>
+  
    <appender name="FallbackConsoleAppender" class="org.apache.log4j.ConsoleAppender">
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
@@ -153,6 +168,10 @@
   <logger name="cern.tim"  additivity="false">
     <level value="debug"/>
     <appender-ref ref="FileAppender"/>
+  </logger>
+   <logger name="cern.tim.server.cachepersistence"  additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="PersistenceAppender"/>
   </logger>
   <root>
     <level value="info"/>
