@@ -35,16 +35,20 @@ import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.client.jms.SupervisionListener;
+import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 @Service
-public class SupervisionManager implements CoreSupervisionManager, SupervisionListener, ConnectionListener {
+public class SupervisionManager implements CoreSupervisionManager, SupervisionListener, ConnectionListener, HeartbeatListener {
 
   /** Log4j logger instance */
   private static final Logger LOG = Logger.getLogger(SupervisionManager.class);
   
   /** Set to <code>true</code>, if the supervision  cache is correctly initialized */
-  private boolean c2monConnectionEstablished = false;
+  private volatile boolean c2monConnectionEstablished = false;
+  
+  /** <code>true</code>, if JmsProxy sent a <code>onConnection()</code> notification */
+  private volatile boolean jmsConnectionUp = false;
   
   /** Lock for changes on the listeners maps */
   private final ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
@@ -91,10 +95,17 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   private void init() {
     jmsProxy.registerConnectionListener(this);
     jmsProxy.registerSupervisionListener(this);
+    heartbeatManager.addHeartbeatListener(this);
   }
   
   @Override
   public void addConnectionListener(final ConnectionListener pListener) {
+    if (jmsConnectionUp) {
+      pListener.onConnection();
+    }
+    else {
+      pListener.onDisconnection();
+    }
     jmsProxy.registerConnectionListener(pListener);
   }
 
@@ -259,27 +270,50 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
 
   @Override
   public void onConnection() {
-    try {
-      Collection<SupervisionEvent> allCurrentEvents = clientRequestHandler.getCurrentSupervisionStatus();
-      for (SupervisionEvent event : allCurrentEvents) {
-        onSupervisionUpdate(event);
+    jmsConnectionUp = true;
+    refreshSupervisionStatus();
+  }
+  
+  private void refreshSupervisionStatus() {
+    if (!c2monConnectionEstablished) {
+      try {
+        Collection<SupervisionEvent> allCurrentEvents = clientRequestHandler.getCurrentSupervisionStatus();
+        for (SupervisionEvent event : allCurrentEvents) {
+          onSupervisionUpdate(event);
+        }
+        c2monConnectionEstablished = true;
+        LOG.info("refreshSupervisionStatus() - supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
       }
-      c2monConnectionEstablished = true;
-      LOG.info("onConnection() - supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
-    }
-    catch (Exception e) {
-      LOG.error("onConnection() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage());
-      c2monConnectionEstablished = false;
+      catch (Exception e) {
+        LOG.error("refreshSupervisionStatus() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage());
+        c2monConnectionEstablished = false;
+      }
     }
   }
 
   @Override
   public void onDisconnection() {
+    jmsConnectionUp = false;
     c2monConnectionEstablished = false;
   }
 
   @Override
   public boolean isServerConnectionWorking() {
     return c2monConnectionEstablished;
+  }
+
+  @Override
+  public void onHeartbeatExpired(Heartbeat pHeartbeat) {
+    c2monConnectionEstablished = false;
+  }
+
+  @Override
+  public void onHeartbeatReceived(Heartbeat pHeartbeat) {
+    refreshSupervisionStatus();
+  }
+
+  @Override
+  public void onHeartbeatResumed(Heartbeat pHeartbeat) {
+    refreshSupervisionStatus();
   }
 }

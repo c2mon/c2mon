@@ -68,7 +68,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private Object tagValue;
   
   /** The current tag mode */
-  private TagMode mode;
+  private TagMode mode = TagMode.TEST;
   
   /** 
    * <code>true</code>, if the tag value is currently simulated and not
@@ -132,10 +132,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private List<DataTagUpdateListener> listeners = new ArrayList<DataTagUpdateListener>();
 
   /** Thread lock for access to the <code>DataTagUpdateListener</code> list */
-  private final ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
+  private ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
   
   /** Lock to prevent more than one thread at a time to update the value */
-  private final ReentrantReadWriteLock updateTagLock = new ReentrantReadWriteLock();
+  private ReentrantReadWriteLock updateTagLock = new ReentrantReadWriteLock();
 
 
   /**
@@ -361,25 +361,27 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * Private method to notify all registered <code>DataTagUpdateListener</code> instances.
    */
   private void notifyListeners() {
-    listenersLock.readLock().lock();
     try {
-      ClientDataTag clone = this.clone();
-      for (DataTagUpdateListener updateListener : listeners) { 
-        try { 
-          updateListener.onUpdate(clone);
+      final ClientDataTag clone = this.clone();
+      listenersLock.readLock().lock();
+      try {
+        for (DataTagUpdateListener updateListener : listeners) { 
+          try { 
+            updateListener.onUpdate(clone);
+          }
+          catch (Exception e) {
+            LOG.error("notifyListeners() : error notifying DataTagUpdateListeners", e);
+          }
         }
-        catch (Exception e) {
-          LOG.error("notifyListeners() : error notifying DataTagUpdateListeners", e);
-        }
+      }
+      finally {
+        listenersLock.readLock().unlock();
       }
     }
     catch (CloneNotSupportedException cloneException) {
       LOG.fatal(
           "notifyListeners() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
       throw new RuntimeException(cloneException);
-    }
-    finally {
-      listenersLock.readLock().unlock();
     }
   }
 
@@ -417,16 +419,12 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     }
     
     try {
-      this.updateTagLock.readLock().lock();
       pListener.onUpdate(this.clone());
     }
     catch (CloneNotSupportedException cloneException) {
       LOG.fatal(
           "addUpdateListener() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
       throw new RuntimeException(cloneException);
-    }
-    finally {
-      this.updateTagLock.readLock().unlock();
     }
   }
   
@@ -881,48 +879,57 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   @SuppressWarnings("unchecked")
   @Override
   public ClientDataTagImpl clone() throws CloneNotSupportedException {
-    ClientDataTagImpl clone = (ClientDataTagImpl) super.clone();
-    
-    // clone the process id map
-    clone.processSupervisionStatus = new HashMap<Long, SupervisionEvent>(processSupervisionStatus.size());
-    for (Entry<Long, SupervisionEvent> entry : processSupervisionStatus.entrySet()) {
-      if (entry.getValue() != null) {
-        clone.processSupervisionStatus.put(entry.getKey(), entry.getValue().clone());
+    updateTagLock.readLock().lock();
+    try {
+      ClientDataTagImpl clone = (ClientDataTagImpl) super.clone();
+      
+      clone.listenersLock = new ReentrantReadWriteLock();
+      clone.updateTagLock = new ReentrantReadWriteLock();
+      
+      // clone the process id map
+      clone.processSupervisionStatus = new HashMap<Long, SupervisionEvent>(processSupervisionStatus.size());
+      for (Entry<Long, SupervisionEvent> entry : processSupervisionStatus.entrySet()) {
+        if (entry.getValue() != null) {
+          clone.processSupervisionStatus.put(entry.getKey(), entry.getValue().clone());
+        }
+        else {
+          clone.processSupervisionStatus.put(entry.getKey(), null);
+        }
       }
-      else {
-        clone.processSupervisionStatus.put(entry.getKey(), null);
+      
+      // clone the equipment id map
+      clone.equipmentSupervisionStatus = new HashMap<Long, SupervisionEvent>(equipmentSupervisionStatus.size());
+      for (Entry<Long, SupervisionEvent> entry : equipmentSupervisionStatus.entrySet()) {
+        if (entry.getValue() != null) {
+          clone.equipmentSupervisionStatus.put(entry.getKey(), entry.getValue().clone());
+        }
+        else {
+          clone.equipmentSupervisionStatus.put(entry.getKey(), null);
+        }
       }
-    }
-    
-    // clone the equipment id map
-    clone.equipmentSupervisionStatus = new HashMap<Long, SupervisionEvent>(equipmentSupervisionStatus.size());
-    for (Entry<Long, SupervisionEvent> entry : equipmentSupervisionStatus.entrySet()) {
-      if (entry.getValue() != null) {
-        clone.equipmentSupervisionStatus.put(entry.getKey(), entry.getValue().clone());
+      
+      // AlarmsValue objects are immutable
+      clone.alarms = (ArrayList<AlarmValue>) alarms.clone();
+      
+      if (tagQuality != null) {
+        clone.tagQuality = tagQuality.clone();
       }
-      else {
-        clone.equipmentSupervisionStatus.put(entry.getKey(), null);
+      if (sourceTimestamp != null) {
+        clone.sourceTimestamp = (Timestamp) sourceTimestamp.clone();
       }
+      if (serverTimestamp != null) {
+        clone.serverTimestamp = (Timestamp) serverTimestamp.clone();
+      }
+      if (ruleExpression != null) {
+        clone.ruleExpression = (RuleExpression) ruleExpression.clone();
+      }
+      clone.listeners = new ArrayList<DataTagUpdateListener>();
+      
+      return clone;
     }
-    
-    // AlarmsValue objects are immutable
-    clone.alarms = (ArrayList<AlarmValue>) alarms.clone();
-    
-    if (tagQuality != null) {
-      clone.tagQuality = tagQuality.clone();
+    finally {
+      updateTagLock.readLock().unlock();
     }
-    if (sourceTimestamp != null) {
-      clone.sourceTimestamp = (Timestamp) sourceTimestamp.clone();
-    }
-    if (serverTimestamp != null) {
-      clone.serverTimestamp = (Timestamp) serverTimestamp.clone();
-    }
-    if (ruleExpression != null) {
-      clone.ruleExpression = (RuleExpression) ruleExpression.clone();
-    }
-    clone.listeners = new ArrayList<DataTagUpdateListener>();
-    
-    return clone;    
   }
 
   @Override

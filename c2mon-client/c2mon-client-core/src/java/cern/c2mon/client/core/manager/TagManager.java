@@ -104,6 +104,11 @@ public class TagManager implements CoreTagManager {
     
     return clonedDataTags;
   }
+  
+  @Override
+  public Set<Long> getAllSubscribedDataTagIds(final DataTagUpdateListener listener) {
+    return cache.getAllTagIdsForListener(listener);
+  }
 
   @Override
   public void refreshDataTags() {
@@ -152,10 +157,10 @@ public class TagManager implements CoreTagManager {
       
       try {
         initializeNewTags(newTags);
-        // add listener to tags and subscribe them to the live topics
-        this.cache.addDataTagUpdateListener(tagIds, listener);
         // Inform listeners (e.g. HistoryManager) about new subscriptions
         fireOnNewTagSubscriptionsEvent(newTags.keySet());
+        // add listener to tags and subscribe them to the live topics
+        cache.addDataTagUpdateListener(tagIds, listener);
         synchronizeNewTags(newTags);
       }
       catch (JMSException e) {
@@ -184,7 +189,7 @@ public class TagManager implements CoreTagManager {
       Collection<TagUpdate> requestedTags = clientRequestHandler.requestTags(newTags.keySet());
       // Update the new tags and put them into the cache
       for (TagUpdate tagUpdate : requestedTags) {
-        try { 
+        try {
           newTag = newTags.get(tagUpdate.getId());
           newTag.update(tagUpdate);
         }
@@ -197,8 +202,8 @@ public class TagManager implements CoreTagManager {
   }
   
   /**
-   * Update a second time in case an update was send before the ClientDataTag
-   * was subscribed to the topic.
+   * Updates a second time in case an update was send before 
+   * the ClientDataTag was subscribed to the topic.
    * @param newTags Map of uninitialized tags from the cache
    * @throws JMSException In case of a JMS problem
    */
@@ -217,7 +222,7 @@ public class TagManager implements CoreTagManager {
             throw new RuntimeException(e);
           }
         }
-      }
+      } // end for loop
     }
   }
 

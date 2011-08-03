@@ -222,7 +222,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   @Override
   public HistoryPlayerEvents getHistoryPlayerEvents() {
     synchronized (cache.getHistoryModeSyncLock()) {
-      if (this.historyPlayer != null) {
+      if (this.historyPlayer == null) {
         this.historyPlayer = new HistoryPlayerImpl(); 
       }
       return this.historyPlayer;

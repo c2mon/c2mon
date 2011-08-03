@@ -68,9 +68,18 @@ public interface C2monTagManager {
    * 
    * @param listener The listener for which we want to get the data tags
    *        subscriptions
-   * @return A collection of all <code>ClientDataTag</code> objects
+   * @return A collection of <code>ClientDataTag</code> objects
    */
   Collection<ClientDataTagValue> getAllSubscribedDataTags(final DataTagUpdateListener listener);
+  
+  /**
+   * Returns for a given listener a list of all subscribed data tags ids.
+   * 
+   * @param listener The listener for which we want to get the data tags
+   *        subscriptions
+   * @return A collection of tag ids
+   */
+  Set<Long> getAllSubscribedDataTagIds(final DataTagUpdateListener listener);
   
   /**
    * Returns for every valid id of the list a copy of the cached data tag.

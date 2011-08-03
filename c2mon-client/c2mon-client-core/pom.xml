@@ -16,14 +16,7 @@
   <url>http://timweb.cern.ch</url>
 
   <dependencies>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>   
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-    </dependency>             
+    <!-- C2MON dependencies -->             
     <dependency>
       <groupId>cern.tim2.tim2-shared</groupId>
       <artifactId>tim2-shared-client</artifactId>
@@ -44,6 +37,20 @@
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-jms</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-history</artifactId>
+    </dependency>
+    
+    <!-- 3rd party dependencies -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>   
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
     
     <!-- test dependencies -->
     <dependency>
@@ -58,13 +65,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
     </dependency>
-    <dependency>
-    	<groupId>cern.c2mon.c2mon-client</groupId>
-    	<artifactId>c2mon-client-history</artifactId>
-    	<version>1.0.1-SNAPSHOT</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
-    </dependency>
   </dependencies>
 
   <developers />
@@ -77,7 +77,7 @@
          <configuration>
           <argLine>          
             <!-- needed for the client JMS module -->
-            -Dc2mon.jms.url=tcp://timjmstest1:61616
+            -Dc2mon.jms.url=tcp://jms-tim-test1:61616
             -Dc2mon.jms.user=not-used
             -Dc2mon.jms.passwd=not-used
             -Dc2mon.client.jms.supervision.topic=c2mon.JmsProxy.test.supervision.topic

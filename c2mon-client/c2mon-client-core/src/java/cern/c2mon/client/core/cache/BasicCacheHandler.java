@@ -47,6 +47,15 @@ public interface BasicCacheHandler {
   Collection<ClientDataTag> getAllTagsForListener(DataTagUpdateListener listener);
   
   /**
+   * Returns all tag ids for which the given <code>DataTagUpdateListener</code>
+   * is registered.
+   * @param listener The listener for which all registered tags shall be returned
+   * @return A collection of tag ids
+   * @throws NullPointerException When the parameter is <code>null</code>
+   */
+  Set<Long> getAllTagIdsForListener(DataTagUpdateListener listener);
+  
+  /**
    * Returns all <code>ClientDataTag</code> references in the cache which are linked
    * to the given equipment id.
    * @param equipmentId The equipment id

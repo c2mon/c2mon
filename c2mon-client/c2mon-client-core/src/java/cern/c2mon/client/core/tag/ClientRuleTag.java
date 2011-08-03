@@ -20,28 +20,22 @@ package cern.c2mon.client.core.tag;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
-import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.common.datatag.TagQualityStatus;
-import cern.tim.shared.common.rule.RuleInputValue;
 import cern.tim.shared.rule.RuleEvaluationException;
 import cern.tim.shared.rule.RuleExpression;
 
@@ -74,6 +68,12 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   /** List of unique update listeners */
   private final List<DataTagUpdateListener> listeners = new ArrayList<DataTagUpdateListener>();;
   
+  /** The actual list of rule input values, that was received by onUpdate() method */
+  private final Map<Long, ClientDataTagValue> ruleInputValues = new Hashtable<Long, ClientDataTagValue>();
+  
+  /** Thread synchronization lock for the rule input Values map */
+  private final ReentrantReadWriteLock ruleMapLock = new ReentrantReadWriteLock();
+  
   /** Thread synchronization lock for listeners list */
   private final ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
   
@@ -99,9 +99,6 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
    */
   private static final Collection<AlarmValue> EMPTY_ALARM_LIST = new ArrayList<AlarmValue>();
   
-  /** reference to the <code>C2monTagManager</code> singleton */
-  private final C2monTagManager tagManager;
-  
   /**
    * Default Constructor<br>
    * Do not forget to unsubscribe from the input tags once you not need anymore
@@ -109,11 +106,8 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
    * @param pRule The client rule expression 
    * @see ClientRuleTag#unsubscribe()
    */
-  @SuppressWarnings("unchecked")
   public ClientRuleTag(final RuleExpression pRule) { 
     this.rule = pRule;
-    this.tagManager = C2monServiceGateway.getTagManager();
-    tagManager.subscribeDataTags(new HashSet<Long>(rule.getInputTagIds()), this);
   }
   
   /**
@@ -219,62 +213,60 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   private void computeRuleResult() {
     DataTagQuality newRuleQuality = new DataTagQualityImpl();
     newRuleQuality.validate();
-    
+
     this.simulated = false; // reset simulation flag
     TagMode newRuleMode = TagMode.OPERATIONAL;
-    
+
     if (rule != null) {
-      Collection<ClientDataTagValue> ruleInputValues = tagManager.getAllSubscribedDataTags(this);
-      if (ruleInputValues != null) {
-        synchronized (ruleInputValues) {
-          if (ruleInputValues.size() == rule.getInputTagIds().size()) {
-            final Map<Long, Object> ruleMap = new Hashtable<Long, Object>();
-            // Iterate of input tags and compute the state of the client rule
-            for (ClientDataTagValue inputValue : ruleInputValues) {
-              // Add tag value to rule map for later evaluation
-              ruleMap.put(inputValue.getId(), inputValue);
-              // compute simulated flag
-              this.simulated |= inputValue.isSimulated();
-              // Compute rule mode
-              switch (inputValue.getMode()) {
-                case TEST:
-                  if (!newRuleMode.equals(TagMode.MAINTENANCE)) {
-                    newRuleMode = TagMode.TEST;
-                  }
-                  break;
-                case MAINTENANCE:
-                  newRuleMode = TagMode.MAINTENANCE;
-                  break;
-                default:
-                  // Do nothing
+      ruleMapLock.readLock().lock();
+      try {
+        if (ruleInputValues.size() == rule.getInputTagIds().size()) {
+          // Iterate of input tags and compute the state of the client rule
+          for (ClientDataTagValue inputValue : ruleInputValues.values()) {
+            // compute simulated flag
+            this.simulated |= inputValue.isSimulated();
+            // Compute rule mode
+            switch (inputValue.getMode()) {
+            case TEST:
+              if (!newRuleMode.equals(TagMode.MAINTENANCE)) {
+                newRuleMode = TagMode.TEST;
               }
-              
-              // Check, if value tag is valid or not
-              if (!inputValue.isValid()) {
-                // Add Invalidations flags to the the rule
-                Map<TagQualityStatus, String> qualityStatusMap = 
-                  inputValue.getDataTagQuality().getInvalidQualityStates();
-                for (Entry<TagQualityStatus, String> entry : qualityStatusMap.entrySet()) {
-                  newRuleQuality.addInvalidStatus(entry.getKey(), entry.getValue());
-                }
-              }
-            } // end of for loop
-            
-            // Set the rule quality
-            this.ruleQuality = newRuleQuality;
-            // Set new rule mode
-            this.ruleMode = newRuleMode;
-            
-            try {
-              this.ruleResult = rule.evaluate(ruleMap);
-            } catch (RuleEvaluationException e) {
-              this.ruleQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_VALUE, "Rule expression could not be evaluated. See log messages.");
-              LOG.debug("computeRule() - \"" + rule.getExpression() + "\" could not be evaluated.", e);
+              break;
+            case MAINTENANCE:
+              newRuleMode = TagMode.MAINTENANCE;
+              break;
+            default:
+              // Do nothing
             }
-            // Update the time stamp of the ClientRuleTag
-            this.timestamp = new Timestamp(System.currentTimeMillis());
+
+            // Check, if value tag is valid or not
+            if (!inputValue.isValid()) {
+              // Add Invalidations flags to the the rule
+              Map<TagQualityStatus, String> qualityStatusMap = inputValue.getDataTagQuality().getInvalidQualityStates();
+              for (Entry<TagQualityStatus, String> entry : qualityStatusMap.entrySet()) {
+                newRuleQuality.addInvalidStatus(entry.getKey(), entry.getValue());
+              }
+            }
+          } // end of for loop
+
+          // Set the rule quality
+          this.ruleQuality = newRuleQuality;
+          // Set new rule mode
+          this.ruleMode = newRuleMode;
+
+          try {
+            this.ruleResult = rule.evaluate(new Hashtable<Long, Object>(ruleInputValues));
           }
+          catch (RuleEvaluationException e) {
+            this.ruleQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_VALUE, "Rule expression could not be evaluated. See log messages.");
+            LOG.debug("computeRule() - \"" + rule.getExpression() + "\" could not be evaluated.", e);
+          }
+          // Update the time stamp of the ClientRuleTag
+          this.timestamp = new Timestamp(System.currentTimeMillis());
         }
+      }
+      finally {
+        ruleMapLock.readLock().unlock();
       }
     }
   }
@@ -313,9 +305,7 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
    * instance in order to de-register from all input Tags of this
    * client rule and to clear the list of registered listeners.
    */
-  @SuppressWarnings("unchecked")
   public void unsubscribe() {
-    tagManager.unsubscribeDataTags(rule.getInputTagIds(), this);
     try {
       listenersLock.writeLock().lock();
       listeners.clear();
@@ -327,6 +317,13 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   
   @Override
   public void onUpdate(final ClientDataTagValue cdt) {
+    ruleMapLock.writeLock().lock();
+    try {
+      ruleInputValues.put(cdt.getId(), cdt);
+    }
+    finally {
+      ruleMapLock.writeLock().unlock();
+    }
     forceUpdate();
   }
   
@@ -460,7 +457,7 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
 
   @Override
   public Collection<AlarmValue> getAlarms() {
-    return new ArrayList<AlarmValue>();
+    return EMPTY_ALARM_LIST;
   }
 
   @Override

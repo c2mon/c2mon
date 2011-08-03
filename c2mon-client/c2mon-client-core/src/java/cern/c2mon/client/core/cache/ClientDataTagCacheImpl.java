@@ -192,7 +192,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
 
   @Override
   public Collection<ClientDataTag> getAllTagsForEquipment(final Long equipmentId) {
-    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>(activeCache.size());
+    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>();
   
     cacheLock.readLock().lock();
     try {
@@ -211,7 +211,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
 
   @Override
   public Collection<ClientDataTag> getAllTagsForListener(final DataTagUpdateListener listener) {
-    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>(activeCache.size());
+    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>();
 
     cacheLock.readLock().lock();
     try {
@@ -227,10 +227,29 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
     
     return list;
   }
+  
+  @Override
+  public Set<Long> getAllTagIdsForListener(final DataTagUpdateListener listener) {
+    Set<Long> list = new HashSet<Long>();
+
+    cacheLock.readLock().lock();
+    try {
+      for (ClientDataTagImpl cdt : activeCache.values()) {
+        if (cdt.isUpdateListenerRegistered(listener)) {
+          list.add(cdt.getId());
+        }
+      }
+    }
+    finally {
+      cacheLock.readLock().unlock();
+    }
+    
+    return list;
+  }
 
   @Override
   public Collection<ClientDataTag> getAllTagsForProcess(final Long processId) {
-    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>(activeCache.size());
+    Collection<ClientDataTag> list = new ArrayList<ClientDataTag>();
 
     cacheLock.readLock().lock();
     try {
@@ -387,7 +406,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
         historyCache.remove(tagId);
       }
       ClientDataTagImpl liveTag = liveCache.remove(tagId);
-      jmsProxy.unregisterUpdateListener(liveTag);
+      try {
+        jmsProxy.unregisterUpdateListener(liveTag);
+      }
+      catch (Exception e) {
+        LOG.warn("remove() - Could not unregister tag " + tagId + " from JmsProxy. Reason: " + e.getMessage());
+      }
       supervisionManager.removeSupervisionListener(liveTag);
     } 
   }

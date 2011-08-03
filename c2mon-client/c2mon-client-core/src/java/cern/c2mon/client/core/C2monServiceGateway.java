@@ -37,6 +37,9 @@ public final class C2monServiceGateway {
   /** Class logger */
   private static final Logger LOGGER = Logger.getLogger(C2monServiceGateway.class);
   
+  /** Static reference to the <code>C2monCommandManager</code> singleton instance */
+  private static C2monCommandManager commandManager = null;
+  
   /** Static reference to the <code>C2monHistoryManager</code> singleton instance */
   private static C2monHistoryManager historyManager = null;
   
@@ -56,6 +59,15 @@ public final class C2monServiceGateway {
     // Do nothing
   }
 
+  
+  /**
+   * @return The C2MON tag manager, which is managing
+   *         the command tags
+   */
+  public static C2monCommandManager getCommandManager() {
+    return commandManager;
+  }
+  
   
   /**
    * @return The C2MON tag manager, which is managing
