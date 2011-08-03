@@ -277,7 +277,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     try {
       connection.close(); //closes all consumers and sessions also
     } catch (JMSException jmsEx) {
-      LOGGER.error("Exception caught while attempting to disconnect from JMS - aborting this attempt.", jmsEx);
+      LOGGER.error("disconnect() - Exception caught while attempting to disconnect from JMS - aborting this attempt.", jmsEx);
     } 
   }
   
@@ -579,6 +579,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   @PreDestroy
   public void stop() {
     shutdownRequested = true;
+    connectionListenersLock.writeLock().lock();
+    try {
+      connectionListeners.clear();
+    } finally {
+      connectionListenersLock.writeLock().unlock();
+    }  
     disconnect();
     running = false;
   }
