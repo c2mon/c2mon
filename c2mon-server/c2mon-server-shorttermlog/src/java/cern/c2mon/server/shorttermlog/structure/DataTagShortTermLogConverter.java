@@ -188,7 +188,7 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
       dtSTLog.setTagQualityCode(0); //all set to 0 now; TODO remove column from DB at some point
       dtSTLog.setTagQualityDesc(gson.toJson(tag.getDataTagQuality().getInvalidQualityStates()));      
       if (dtSTLog.getTagQualityDesc() != null && dtSTLog.getTagQualityDesc().length() > MAX_LENGTH) {
-          dtSTLog.setTagQualityDesc(dtSTLog.getTagQualityDesc().substring(0, SPLIT_INDEX));
+          dtSTLog.setTagQualityDesc("{\"UNKNOWN_REASON\":\"Invalid quality String was too long: unable to store in ShortTermLog table.\"}");
       }
       return dtSTLog;
     }
