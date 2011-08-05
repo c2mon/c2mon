@@ -9,5 +9,6 @@ public interface C2MonClientApiTestService {
     List<MetricDef> getAllDeviceRuleMetrics();
 
     List<MetricDef> getAllRuleMetrics();	
-	
+    
+    MetricDef getDeviceRuleMetric(final String processName);	
 }
