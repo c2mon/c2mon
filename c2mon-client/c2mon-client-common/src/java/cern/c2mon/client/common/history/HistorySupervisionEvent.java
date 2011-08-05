@@ -17,19 +17,15 @@
  *****************************************************************************/
 package cern.c2mon.client.common.history;
 
-import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
- * Extension of the {@link TagValueUpdate}
+ * This interface describes the methods of a {@link SupervisionEvent} when
+ * retrieved from the history.
  * 
  * @author vdeila
  * 
  */
-public interface HistoryTagValueUpdate extends TagValueUpdate, HistoryUpdate {
-
-  /**
-   * @return the dataType
-   */
-  String getDataType();
+public interface HistorySupervisionEvent extends SupervisionEvent, HistoryUpdate {
 
 }

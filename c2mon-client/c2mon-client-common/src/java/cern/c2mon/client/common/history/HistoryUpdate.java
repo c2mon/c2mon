@@ -17,19 +17,22 @@
  *****************************************************************************/
 package cern.c2mon.client.common.history;
 
-import cern.c2mon.shared.client.tag.TagValueUpdate;
+import java.sql.Timestamp;
 
 /**
- * Extension of the {@link TagValueUpdate}
+ * This interface is used to keep track of the data from history. It have the
+ * function {@link #getExecutionTimestamp()} so the player will know when to
+ * execute the update.
  * 
  * @author vdeila
  * 
  */
-public interface HistoryTagValueUpdate extends TagValueUpdate, HistoryUpdate {
+public interface HistoryUpdate {
 
   /**
-   * @return the dataType
+   * 
+   * @return the time of when this update should execute
    */
-  String getDataType();
+  Timestamp getExecutionTimestamp();
 
 }

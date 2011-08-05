@@ -17,19 +17,24 @@
  *****************************************************************************/
 package cern.c2mon.client.common.history;
 
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-
 /**
- * Extension of the {@link TagValueUpdate}
+ * A interface which describes methods that can be used to check the
+ * availability of history providers
+ * 
+ * @see HistoryProvider
  * 
  * @author vdeila
  * 
  */
-public interface HistoryTagValueUpdate extends TagValueUpdate, HistoryUpdate {
+public interface HistoryProviderAvailability {
 
   /**
-   * @return the dataType
+   * 
+   * @param type
+   *          the type to check
+   * @return <code>true</code> if the history provider <code>type</code> is
+   *         available
    */
-  String getDataType();
+  boolean isAvailable(HistoryProviderType type);
 
 }

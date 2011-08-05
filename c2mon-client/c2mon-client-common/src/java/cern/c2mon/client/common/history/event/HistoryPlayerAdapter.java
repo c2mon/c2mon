@@ -18,6 +18,7 @@
 package cern.c2mon.client.common.history.event;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 
 import cern.c2mon.client.common.history.HistoryProvider;
 
@@ -59,6 +60,10 @@ public abstract class HistoryPlayerAdapter implements HistoryPlayerListener {
 
   @Override
   public void onHistoryProviderChanged(final HistoryProvider historyProvider) { }
+
+  @Override
+  public void onTagsInitialized(Collection<Long> tagIds) {
+  }
   
   
 }

@@ -98,4 +98,12 @@ public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, Cl
    * @see #clean()
    */
   ClientDataTag clone() throws CloneNotSupportedException;
+
+
+  /**
+   * Removes all <code>ClientDataTagValue</code> information from the object.
+   * This is in particular interesting for the history mode which sometimes just
+   * uses the static information from the live tag object. 
+   */
+  void clean();
 }
