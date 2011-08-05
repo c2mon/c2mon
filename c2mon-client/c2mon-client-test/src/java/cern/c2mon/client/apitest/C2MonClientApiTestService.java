@@ -1,0 +1,8 @@
+package cern.c2mon.client.apitest;
+
+import java.util.List;
+
+public interface C2MonClientApiTestService {
+   
+	List<MetricDef> getAllMetrics();
+}
