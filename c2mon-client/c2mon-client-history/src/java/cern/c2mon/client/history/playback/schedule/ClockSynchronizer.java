@@ -91,24 +91,26 @@ public class ClockSynchronizer implements TimerQueueListener {
                 final long timeToSleep = (long) (byTime / playbackControl.getPlaybackSpeed());
                 // Pauses the clock
                 playbackControl.disablePlayback();
-
-                if (LOG.isDebugEnabled()) {
-                  LOG.debug(String.format("The data is going behind schedule, delaying the clock by %d milliseconds", timeToSleep));
-                }
-
-                // Waits as long as it is behind schedule
                 try {
-                  Thread.sleep(timeToSleep);
-                }
-                catch (InterruptedException e) {
                   if (LOG.isDebugEnabled()) {
-                    LOG.debug(String.format("The pausing of the clock were interrupted"));
+                    LOG.debug(String.format("The data is going behind schedule, delaying the clock by %d milliseconds", timeToSleep));
                   }
-                  return;
+  
+                  // Waits as long as it is behind schedule
+                  try {
+                    Thread.sleep(timeToSleep);
+                  }
+                  catch (InterruptedException e) {
+                    if (LOG.isDebugEnabled()) {
+                      LOG.debug(String.format("The pausing of the clock were interrupted"));
+                    }
+                    return;
+                  }
                 }
-
-                // Resumes the clock again
-                playbackControl.enablePlayback();
+                finally {
+                  // Resumes the clock again
+                  playbackControl.enablePlayback();
+                }
               }
             }
             finally {
@@ -139,10 +141,7 @@ public class ClockSynchronizer implements TimerQueueListener {
     if (LOG.isDebugEnabled()) {
       LOG.debug("The TimTimer is back on schedule");
     }
-    if (interruptBehindScheduleThread()) {
-      // Continue the clock if the interruption was successful
-      playbackControl.enablePlayback();
-    }
+    interruptBehindScheduleThread();
   }
 
   /**

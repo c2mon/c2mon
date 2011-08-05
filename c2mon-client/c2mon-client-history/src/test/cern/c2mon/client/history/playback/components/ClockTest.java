@@ -19,6 +19,8 @@ package cern.c2mon.client.history.playback.components;
 
 import java.sql.Timestamp;
 import java.util.GregorianCalendar;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.Assert;
 
@@ -26,6 +28,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.client.common.history.Timespan;
+import cern.c2mon.client.history.playback.player.Clock;
+import cern.c2mon.client.history.playback.player.event.ClockListener;
 
 /**
  * Tests the {@link Clock} component
@@ -193,6 +197,46 @@ public class ClockTest {
     Assert.assertFalse("It shouldn't have reached the end time yet", clock.hasReachedEndTime());
     
     Thread.sleep(runTimePart2);
+    Assert.assertTrue("It should have reached the end time", clock.hasReachedEndTime());
+    checkTime(clock.getEndTime(), clock.getTime());
+  }
+  
+  /**
+   * Tests hasReachedEndTime function
+   * 
+   * @see Clock#hasReachedEndTime()
+   */
+  @Test
+  public void testClockListener() throws InterruptedException {
+    final long totalTime = this.clock.getEndDate().getTime() - this.clock.getStartDate().getTime();
+    final double speedMultiplier = totalTime / (double) (RUN_TIME);
+    
+    long runTimePart1 = RUN_TIME / 2;
+    long runTimePart2 = RUN_TIME - runTimePart1;
+    
+    final long endTimeReachesAfter = RUN_TIME - ACCEPTED_TIME_ERROR;
+    final CountDownLatch listenerCall = new CountDownLatch(1);
+    
+    final ClockListener listener = new ClockListener() {
+      @Override
+      public void onEndTimeReached() {
+        if (System.currentTimeMillis() < endTimeReachesAfter) {
+          Assert.fail("The end time event were called too early.");
+        }
+        listenerCall.countDown();
+      }
+    };
+    clock.addClockListener(listener);
+    
+    clock.setSpeedMultiplier(speedMultiplier);
+    clock.start();
+    
+    Thread.sleep(runTimePart1);
+    Assert.assertFalse("It shouldn't have reached the end time yet", clock.hasReachedEndTime());
+    
+    Assert.assertTrue("The onEndTimeReached() were not called as expected.",
+        listenerCall.await(runTimePart2 + ACCEPTED_TIME_ERROR, TimeUnit.MILLISECONDS));
+    
     Assert.assertTrue("It should have reached the end time", clock.hasReachedEndTime());
     checkTime(clock.getEndTime(), clock.getTime());
   }

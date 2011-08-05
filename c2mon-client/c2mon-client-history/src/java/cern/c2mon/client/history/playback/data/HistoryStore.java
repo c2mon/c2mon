@@ -412,7 +412,7 @@ public class HistoryStore {
    */
   public Collection<Long> filterRealTimeValues(final TagValueUpdate... currentValuesCollection) {
     // The result which will be returned
-    final List<Long> result = new ArrayList<Long>();
+    final Set<Long> result = new HashSet<Long>();
 
     // A list of removed tags / not added to the result list
     final Set<Long> registeredTags = new HashSet<Long>();
@@ -425,8 +425,9 @@ public class HistoryStore {
         continue;
       }
 
-      // If the tag is not existing, it is filtered..
+      // If the tag doesn't existing in real time, it must be retrieved
       if (tag.getDataTagQuality() != null && !tag.getDataTagQuality().isExistingTag()) {
+        result.add(tag.getId());
         continue;
       }
 
@@ -488,7 +489,9 @@ public class HistoryStore {
     this.setBatching(false);
 
     if (registeredTags.size() > 0) {
-    // Notifies which tags have been added
+      this.fireOnTagInitialized(registeredTags);
+      
+      // Notifies which tags have been added
       this.fireTagsAdded(registeredTags);
     }
 
@@ -538,16 +541,19 @@ public class HistoryStore {
   /**
    * Adds the history records to the store with this initialization data
    * 
+   * @param tagIds
+   *          The tag ids which is loaded. The loaded end time will be set for
+   *          all these tag ids.
    * @param tagValueUpdates
    *          The initialization data
    */
-  public int addInitialHistoryData(final Collection<TagValueUpdate> tagValueUpdates) {
+  public int addInitialHistoryData(final Collection<Long> tagIds, final Collection<TagValueUpdate> tagValueUpdates) {
     final Set<Long> initializedTags = new HashSet<Long>();
-    for (final TagValueUpdate tag : tagValueUpdates) {
-      initializedTags.add(tag.getId());
+    for (final Long tag : tagIds) {
+      initializedTags.add(tag);
     }
     setTagInitialized(true, initializedTags);
-    return addHistoryValues(tagValueUpdates, getStart());
+    return addHistoryValues(tagIds, tagValueUpdates, getStart());
   }
 
   /**
@@ -555,15 +561,18 @@ public class HistoryStore {
    * initialized. Call the {@link #addInitialHistoryData(Collection, Timestamp)}
    * with the initial data for the tags you want to initialize.
    * 
+   * @param tagIds
+   *          The tag ids which is loaded. The loaded end time will be set for
+   *          all these tag ids.
    * @param tagValueUpdates
    *          The collection of values to add
    * @param endTime
    *          The end time of the tags in the collection
    * 
    */
-  public int addHistoryValues(final Collection<TagValueUpdate> tagValueUpdates, final Timestamp endTime) {
+  public int addHistoryValues(final Collection<Long> tagIds, final Collection<TagValueUpdate> tagValueUpdates, final Timestamp endTime) {
     
-    return addHistoryValues(
+    return addHistoryValues(tagIds,
         HistoryDataUtil.toTagHistoryCollection(tagValueUpdates).toArray(new TagHistory[0]), endTime);
   }
 
@@ -572,6 +581,9 @@ public class HistoryStore {
    * initialized. Call the {@link #addInitialHistoryData(Collection, Timestamp)}
    * with the initial data for the tags you want to initialize.
    * 
+   * @param tagIds
+   *          The tag ids which is loaded. The loaded end time will be set for
+   *          all these tag ids.
    * @param tagHistories
    *          The collection to add
    * @param endTime
@@ -579,13 +591,16 @@ public class HistoryStore {
    * @return The number of records that is added
    * 
    */
-  private int addHistoryValues(final TagHistory[] tagHistories, final Timestamp endTime) {
+  private int addHistoryValues(final Collection<Long> tagIds, final TagHistory[] tagHistories, final Timestamp endTime) {
 
     // Starting a batch
     this.setBatching(true);
 
     // A list storing all the new tagIds. Is used at the end to notify listeners
     final List<Long> addedTagIds = new ArrayList<Long>();
+    
+    // A list of tags which have their first record added
+    final List<Long> initializedTags = new ArrayList<Long>();
 
     int recordsAdded = 0;
 
@@ -606,32 +621,44 @@ public class HistoryStore {
           this.dataTagHistoriesLock.writeLock().lock();
           TagHistory tagHistory = this.dataTagHistories.get(history.getTagId());
 
-          // If tagHistory not already exists it it created and added to the
-          // dataTagHistories map
-          if (tagHistory == null) {
-            tagHistory = new TagHistory(history.getTagId());
-            this.dataTagHistories.put(tagHistory.getTagId(), tagHistory);
-          }
-
-          // Adds all the records of class TagValueUpdate which is not null
-          // and does have a Timestamp.
-          for (final TagValueUpdate tagValueUpdate : history.getHistory()) {
-            if (tagValueUpdate.getServerTimestamp() != null) {
-              tagHistory.add(tagValueUpdate);
-              recordsAdded++;
+          final TagValueUpdate[] historyValues = history.getHistory();
+          
+          if (historyValues != null && historyValues.length > 0) {
+            // If tagHistory not already exists it it created and added to the
+            // dataTagHistories map
+            if (tagHistory == null) {
+              tagHistory = new TagHistory(history.getTagId());
+              this.dataTagHistories.put(tagHistory.getTagId(), tagHistory);
+              initializedTags.add(tagHistory.getTagId());
             }
+  
+            // Adds all the records of class TagValueUpdate which is not null
+            // and does have a Timestamp.
+            for (final TagValueUpdate tagValueUpdate : historyValues) {
+              if (tagValueUpdate.getServerTimestamp() != null) {
+                tagHistory.add(tagValueUpdate);
+                recordsAdded++;
+              }
+            }
+  
+            // Sorts the records
+            this.sortRecordsInDataTagHistory(tagHistory);
           }
-
-          // Sorts the records
-          this.sortRecordsInDataTagHistory(tagHistory);
         }
         finally {
           this.dataTagHistoriesLock.writeLock().unlock();
         }
       }
-      setTagHaveRecordsUntilTime(history.getTagId(), endTime);
     }
-
+    
+    for (final Long tagId : tagIds) {
+      setTagHaveRecordsUntilTime(tagId, endTime);
+    }
+    
+    if (initializedTags.size() > 0) {
+      this.fireOnTagInitialized(initializedTags);
+    }
+    
     // Notifies that the tags have been added
     if (addedTagIds.size() > 0) {
       this.fireTagsAdded(addedTagIds);
@@ -793,7 +820,7 @@ public class HistoryStore {
    */
 
   /**
-   * Fires the {@link HistoryStoreListener}.tagsAdded(tagIds); on all the
+   * Fires the {@link HistoryStoreListener#onTagCollectionChanged(Collection)} on all the
    * listeners
    * 
    * @param tagIds
@@ -801,7 +828,20 @@ public class HistoryStore {
    */
   protected void fireTagsAdded(final Collection<Long> tagIds) {
     for (HistoryStoreListener listener : getHistoryStoreListeners()) {
-      listener.onTagsAdded(tagIds);
+      listener.onTagCollectionChanged(tagIds);
+    }
+  }
+  
+  /**
+   * Fires the {@link HistoryStoreListener#onTagsInitialized(Collection)} on all the
+   * listeners
+   * 
+   * @param tagIds
+   *          The argument to send
+   */
+  protected void fireOnTagInitialized(final Collection<Long> tagIds) {
+    for (HistoryStoreListener listener : getHistoryStoreListeners()) {
+      listener.onTagsInitialized(tagIds);
     }
   }
 

@@ -34,12 +34,17 @@ public abstract class HistoryStoreAdapter implements HistoryStoreListener {
   }
 
   @Override
-  public void onTagsAdded(final Collection<Long> tagIds) {
+  public void onTagCollectionChanged(final Collection<Long> tagIds) {
 
   }
 
   @Override
   public void onPlaybackBufferFullyLoaded() {
+    
+  }
+
+  @Override
+  public void onTagsInitialized(Collection<Long> tagIds) {
     
   }
   

@@ -34,13 +34,12 @@ import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.event.HistoryPlayerListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.history.playback.components.Clock;
 import cern.c2mon.client.history.playback.components.ListenersManager;
 import cern.c2mon.client.history.playback.data.HistoryLoader;
 import cern.c2mon.client.history.playback.data.HistoryStore;
-import cern.c2mon.client.history.playback.data.event.HistoryLoaderAdapter;
 import cern.c2mon.client.history.playback.data.event.HistoryStoreAdapter;
 import cern.c2mon.client.history.playback.exceptions.NoHistoryProviderAvailableException;
+import cern.c2mon.client.history.playback.player.Clock;
 import cern.c2mon.client.history.playback.player.PlaybackControlImpl;
 import cern.c2mon.client.history.playback.publish.HistoryPublisher;
 import cern.c2mon.client.history.playback.publish.SupervisionListenersManager;
@@ -138,36 +137,38 @@ public class HistoryPlayerImpl
     this.historyLoader.getHistoryStore().addHistoryStoreListener(this.eventsForwarder);
     
     // Installs listeners
-    installHistoryListeners();
+    installHistoryStoreListeners();
   }
   
   /**
-   * Installs the listeners for the {@link HistoryLoader} and the {@link HistoryStore}
+   * Installs the listeners for the {@link HistoryStore}
    */
-  private void installHistoryListeners() {
+  private void installHistoryStoreListeners() {
     // Adds a listener for when the time of history available is changed 
     this.historyLoader.getHistoryStore().addHistoryStoreListener(new HistoryStoreAdapter() {
       @Override
       public void onPlaybackBufferIntervalUpdated(final Timestamp newEndTime) {
-        HistoryPlayerImpl.this.playbackBufferIntervalUpdated(newEndTime);
+        playbackBufferIntervalUpdated(newEndTime);
       }
 
       @Override
-      public void onTagsAdded(final Collection<Long> tagIds) {
-        HistoryPlayerImpl.this.historyLoaded(tagIds);
+      public void onTagCollectionChanged(final Collection<Long> tagIds) {
+        historyScheduler.rescheduleEvents();
       }
 
       @Override
       public void onPlaybackBufferFullyLoaded() {
-        HistoryPlayerImpl.this.playbackBufferFullyLoaded();
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Playback fully loaded");
+        }
+        
+        playbackBufferIntervalUpdated(getEnd());
       }
-    });
-    
-    this.historyLoader.addHistoryLoaderListener(new HistoryLoaderAdapter() {
+      
       @Override
-      public void onInitialValuesLoaded(final Collection<Long> tags) {
+      public void onTagsInitialized(final Collection<Long> tagIds) {
         // initialize the new data tags with the value at current time
-        getHistoryScheduler().updateDataTagsWithValueAtCurrentTime(tags);
+        getHistoryScheduler().updateDataTagsWithValueAtCurrentTime(tagIds);
       }
     });
   }
@@ -281,17 +282,6 @@ public class HistoryPlayerImpl
   }
   
   /**
-   * Is invoked when the history is fully loaded
-   */
-  private void playbackBufferFullyLoaded() {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Playback fully loaded");
-    }
-    
-    playbackBufferIntervalUpdated(getEnd());
-  }
-  
-  /**
    * Sets the new time on the clock
    * 
    * @param endTime The new end time to set
@@ -307,18 +297,6 @@ public class HistoryPlayerImpl
   @Override
   public Timestamp getHistoryLoadedUntil() {
     return this.historyLoader.getHistoryStore().getHistoryIsLoadedUntilTime();
-  }
-
-  /**
-   * This method is called every time a bunch of history data has been loaded.
-   * It updates the new data tags with the proper value and schedules events for
-   * all future updates.
-   * 
-   * @param tagIDs
-   *          A collection of the new tag IDs
-   */
-  private void historyLoaded(final Collection<Long> tagIDs) {
-    this.historyScheduler.rescheduleEvents();
   }
   
   /**
@@ -479,39 +457,48 @@ public class HistoryPlayerImpl
         this.tagsToRegisterLiveValueLock.unlock();
       }
       
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Invalidating data tags");
+      if (tagsToLoad.size() > 0) {
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Invalidating data tags");
+        }
+        
+        // Invalidates the tags which is not yet loaded
+        for (final Long tagId : tagsToLoad) {
+          final TagValueUpdate tagValueInvalidation = new HistoryTagValueUpdateImpl(
+              tagId, 
+              new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, "Loading history records.."), 
+              null, 
+              null, 
+              new Timestamp(System.currentTimeMillis()), 
+              "",  
+              TagMode.OPERATIONAL);
+          publisher.publish(tagValueInvalidation);
+        }
+        
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Registering data tags");
+        }
+        
+        // Register the tag in the history store
+        this.historyLoader.getHistoryStore().registerTags(tagsToLoad.toArray(new Long[0]));
       }
-      
-      // Invalidates the tags which is not yet loaded
-      for (final Long tagId : tagsToLoad) {
-        final TagValueUpdate tagValueInvalidation = new HistoryTagValueUpdateImpl(
-            tagId, 
-            new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, "Loading history records.."), 
-            null, 
-            null, 
-            new Timestamp(System.currentTimeMillis()), 
-            "",  
-            TagMode.OPERATIONAL);
-        publisher.publish(tagValueInvalidation);
-      }
-      
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Registering data tags");
-      }
-      
-      // Register the tag in the history store
-      this.historyLoader.getHistoryStore().registerTags(tagsToLoad.toArray(new Long[0]));
     }
     finally {
       this.historyLoader.getHistoryStore().setBatching(false);
     }
     
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Initiates loading");
+    if (historyLoader.getHistoryStore().isLoadingComplete()) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("History is loaded only by filtering.");
+      }
     }
-    
-    historyLoader.beginLoading();
+    else {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Initiates loading");
+      }
+      
+      historyLoader.beginLoading();
+    }
   }
   
   /**

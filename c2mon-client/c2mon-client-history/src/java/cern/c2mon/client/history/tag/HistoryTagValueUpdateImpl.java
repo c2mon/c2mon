@@ -205,9 +205,21 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
     this.dataType = dataType;
   }
 
+  /**
+   * @return the string representation of the object
+   */
   @Override
   public String toString() {
     return String.format("Id: %d, ServerTime: %s", getId(), getServerTimestamp().toString());
+  }
+
+  /**
+   * 
+   * @return the time of when this update should execute
+   */
+  @Override
+  public Timestamp getExecutionTimestamp() {
+    return getServerTimestamp();
   }
   
   

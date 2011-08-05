@@ -30,22 +30,32 @@ import java.util.Collection;
 public interface HistoryStoreListener {
 
   /**
-   * Invoked when one or more tag(s) is added
+   * Invoked when one or more tags is changed
    * 
    * @param tagIds
-   *          The tagIds which is added
+   *          The tagIds which is changed
    */
-  void onTagsAdded(Collection<Long> tagIds);
+  void onTagCollectionChanged(Collection<Long> tagIds);
+
+  /**
+   * Invoked when one or more tags gets its first record in the store
+   * 
+   * @param tagIds
+   *          the tag ids which is initialized by having their first set of
+   *          record(s)
+   */
+  void onTagsInitialized(Collection<Long> tagIds);
 
   /**
    * Invoked when new data has arrived and makes it possible get data from
    * further out in time, or if new data tags is added which makes the end time
    * move backwards to get the data for the new records.
    * 
-   * @param newEndTime The new end time
+   * @param newEndTime
+   *          The new end time
    */
   void onPlaybackBufferIntervalUpdated(Timestamp newEndTime);
-  
+
   /**
    * Invoked when all playback buffer is loaded
    */

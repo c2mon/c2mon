@@ -15,39 +15,37 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.history.playback.data.event;
+package cern.c2mon.client.history.dbaccess;
 
-import cern.c2mon.client.history.playback.data.HistoryLoader;
+import cern.c2mon.client.common.history.HistoryProviderAvailability;
+import cern.c2mon.client.common.history.HistoryProviderType;
 
 /**
- * Used by {@link HistoryLoader} to inform about events
- * 
- * @see HistoryLoaderAdapter
+ * Implementation of the {@link HistoryProviderAvailability}. Used to see if a
+ * history provider is available or not
  * 
  * @author vdeila
- *
+ * 
  */
-public interface HistoryLoaderListener {
+public class HistoryProviderAvailabilityImpl implements HistoryProviderAvailability {
 
   /**
-   * Invoked when the starting to initialize history
-   */
-  void onInitializingHistoryStarting();
-  
-  /**
-   * Invoked with the current status of the initialization
    * 
-   * @param progressMessage A message describing the current actions taken
+   * @param type
+   *          the type to check
+   * @return <code>true</code> if the history provider <code>type</code> is
+   *         available
    */
-  void onInitializingHistoryProgressStatusChanged(final String progressMessage);
-  
-  /**
-   * Invoked when the history initialization is finished
-   */
-  void onInitializingHistoryFinished();
-  
-  /**
-   * Invoked if memory resources is to low to load more data
-   */
-  void onStoppedLoadingDueToOutOfMemory();
+  @Override
+  public boolean isAvailable(final HistoryProviderType type) {
+    switch (type) {
+    case HISTORY_SHORT_TERM_LOG:
+      return DatasourceProperties.getInstance().isDatasourceAvailable();
+    case HISTORY_EVENTS:
+      return false;
+    default:
+      return false;
+    }
+  }
+
 }

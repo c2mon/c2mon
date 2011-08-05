@@ -19,12 +19,13 @@ package cern.c2mon.client.history.dbaccess.util;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.history.dbaccess.beans.HistoryRecordBean;
 import cern.c2mon.client.history.dbaccess.beans.SupervisionRecordBean;
+import cern.c2mon.client.history.tag.HistorySupervisionEventImpl;
 import cern.c2mon.client.history.tag.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.common.type.TypeConverter;
@@ -76,8 +77,8 @@ public final class BeanConverterUtil {
    * @param bean the bean to convert
    * @return the converted object
    */
-  public static SupervisionEvent toSupervisionEvent(final SupervisionRecordBean bean) {
-    return new SupervisionEventImpl(
+  public static HistorySupervisionEvent toSupervisionEvent(final SupervisionRecordBean bean) {
+    return new HistorySupervisionEventImpl(
         bean.getEntity(), 
         bean.getId(), 
         bean.getStatus(), 

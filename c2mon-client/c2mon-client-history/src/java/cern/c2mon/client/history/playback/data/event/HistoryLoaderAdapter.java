@@ -36,10 +36,6 @@ public abstract class HistoryLoaderAdapter implements HistoryLoaderListener {
   }
 
   @Override
-  public void onInitialValuesLoaded(final Collection<Long> tags) {
-  }
-
-  @Override
   public void onInitializingHistoryProgressStatusChanged(final String progressMessage) {
   }
 

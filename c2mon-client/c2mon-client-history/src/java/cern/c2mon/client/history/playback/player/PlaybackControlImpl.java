@@ -25,8 +25,8 @@ import cern.c2mon.client.common.history.PlaybackControl;
 import cern.c2mon.client.common.history.event.PlaybackControlListener;
 import cern.c2mon.client.history.playback.HistoryPlayerImpl;
 import cern.c2mon.client.history.playback.PlaybackSynchronizeControl;
-import cern.c2mon.client.history.playback.components.Clock;
 import cern.c2mon.client.history.playback.components.ListenersManager;
+import cern.c2mon.client.history.playback.player.event.ClockListener;
 
 /**
  * This class controls the {@link Clock} of the playback
@@ -69,6 +69,12 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
   public PlaybackControlImpl() {
     // Creates a default clock
     this.clock = new Clock(new Date(), new Date());
+    this.clock.addClockListener(new ClockListener() {
+      @Override
+      public void onEndTimeReached() {
+        pause();
+      }
+    });
   }
 
   @Override
@@ -86,8 +92,9 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
 
   @Override
   public void pause() {
-    pauseClock();
-    firePlaybackStopped();
+    if (pauseClock()) {
+      firePlaybackStopped();
+    }
   }
 
   @Override
@@ -108,15 +115,15 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
 
   @Override
   public void setPlaybackSpeed(final double multiplier) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("Sets speed to %.1f", multiplier));
-    }
-
     // Sets the new speed
-    getClock().setSpeedMultiplier(multiplier);
-
-    // Notifies listeners
-    fireClockPlaybackSpeedChanged(multiplier);
+    if (getClock().setSpeedMultiplier(multiplier)) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(String.format("Set speed to %.1f", multiplier));
+      }
+  
+      // Notifies listeners
+      fireClockPlaybackSpeedChanged(multiplier);
+    }
 
   }
 
@@ -126,9 +133,13 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
     case PLAYING:
       playbackStatus = PlaybackStatus.PLAYING_DISABLED;
       getClock().pause();
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Disabled a playing clock");
+      }
       break;
     case PAUSED:
       playbackStatus = PlaybackStatus.PAUSED_DISABLED;
+      LOG.debug("Disabled a paused clock");
       break;
     default:
       break;
@@ -141,42 +152,54 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
     case PLAYING_DISABLED:
       playbackStatus = PlaybackStatus.PLAYING;
       getClock().start();
+      LOG.debug("Enabled the clock, is now playing");
       break;
     case PAUSED_DISABLED:
       playbackStatus = PlaybackStatus.PAUSED;
+      LOG.debug("Enabled the clock, is now paused");
       break;
     default:
       break;
     }
   }
 
-  /** Pauses the clock */
-  private synchronized void pauseClock() {
+  /**
+   * Pauses the clock
+   * 
+   * @return <code>true</code> if the clock were playing, and is now paused.
+   *         <code>false</code> if the clock already were paused
+   */
+  private synchronized boolean pauseClock() {
     switch (playbackStatus) {
     case PLAYING_DISABLED:
       playbackStatus = PlaybackStatus.PAUSED_DISABLED;
-      break;
+      return true;
     case PLAYING:
       playbackStatus = PlaybackStatus.PAUSED;
       getClock().pause();
-      break;
+      return true;
     default:
-      break;
+      return false;
     }
   }
 
-  /** Resumes the clock */
-  private synchronized void resumeClock() {
+  /**
+   * Resumes the clock
+   * 
+   * @return <code>true</code> if the clock were paused, and is now playing.
+   *         <code>false</code> if the clock already were playing
+   */
+  private synchronized boolean resumeClock() {
     switch (playbackStatus) {
     case PAUSED_DISABLED:
       playbackStatus = PlaybackStatus.PLAYING_DISABLED;
-      break;
+      return true;
     case PAUSED:
       playbackStatus = PlaybackStatus.PLAYING;
       getClock().start();
-      break;
+      return true;
     default:
-      break;
+      return false;
     }
   }
 
@@ -288,6 +311,10 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
     }
     if (!getClock().getEndDate().equals(end)) {
       getClock().setEndTime(end.getTime());
+    }
+    long time = getClockTime();
+    if (time < start.getTime() || time > end.getTime()) {
+      setClockTime(start.getTime());
     }
   }
 

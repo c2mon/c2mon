@@ -91,8 +91,8 @@ public class HistoryScheduler {
     this.historyPlayer.getPlaybackControl().addPlaybackControlListener(new PlaybackControlAdapter() {
       @Override
       public void onClockTimeSet(final long newTime) {
-        cancelAllScheduledEvents();
         rescheduleEvents();
+        updateDataTagsWithValueAtCurrentTime();
       }
 
       @Override
@@ -131,9 +131,8 @@ public class HistoryScheduler {
         LOG.debug("History player reinitialized at " + new Date(historyPlayer.getPlaybackControl().getClockTime()));
       }
 
-      final Collection<Long> tagIds = Arrays.asList(historyPlayer.getHistoryLoader().getHistoryStore().getRegisteredTags());
-      this.updateDataTagsWithValueAtCurrentTime(tagIds);
-      this.scheduleEvents(tagIds);
+      this.updateDataTagsWithValueAtCurrentTime();
+      this.scheduleEvents();
     }
   }
 
@@ -157,6 +156,14 @@ public class HistoryScheduler {
     return newTimer;
   }
 
+  /**
+   * Schedule future events for all data tags
+   */
+  private void scheduleEvents() {
+    final Collection<Long> tagIds = Arrays.asList(historyPlayer.getHistoryLoader().getHistoryStore().getRegisteredTags());
+    scheduleEvents(tagIds);
+  }
+  
   /**
    * Schedule future events for the provided collection of data tag IDs
    * 
@@ -207,6 +214,14 @@ public class HistoryScheduler {
   }
 
   /**
+   * Updates all registered data tags with the value at the current time of the clock
+   */
+  public void updateDataTagsWithValueAtCurrentTime() {
+    final Collection<Long> tagIds = Arrays.asList(historyPlayer.getHistoryLoader().getHistoryStore().getRegisteredTags());
+    updateDataTagsWithValueAtCurrentTime(tagIds);
+  }
+  
+  /**
    * Updates all data tags with the value at the current time of the clock
    * 
    * @param tagIds
@@ -240,7 +255,7 @@ public class HistoryScheduler {
             final DataTagQualityImpl dataTagQuality = new DataTagQualityImpl(TagQualityStatus.UNDEFINED_TAG,
                 "No history records was found in the short term log at the specified time");
 
-            tagValue = new HistoryTagValueUpdateImpl(tagId, dataTagQuality, null, null, new Timestamp(System.currentTimeMillis()), "", TagMode.OPERATIONAL);
+            tagValue = new HistoryTagValueUpdateImpl(tagId, dataTagQuality, null, null, new Timestamp(1), "", TagMode.OPERATIONAL);
           }
 
           historyPlayer.getPublisher().publish(tagValue);

@@ -317,11 +317,12 @@ public class HistoryPlayerImplTest {
           ((TIMESPAN.getEnd().getTime() - TIMESPAN.getStart().getTime()) 
             / (double) PLAYBACK_SPEED_MULTIPLIER);
     
-    // Make the playback use the double amount of time than the actual playback
-    // speed would use
+    // Make the playback use at least the double amount of time than the actual
+    // playback speed would use
     final double timeToDelayPerUpdate = 
       (2.0 * (playbackTime / (double) (initialRecords.size() + historyRecords.size())));
     
+    // Splits the time into milli seconds and nano seconds
     final long millisecondsToDelay = (long) timeToDelayPerUpdate;
     final int nanosecondsToDelay = 1 + (int) ((timeToDelayPerUpdate - millisecondsToDelay) * 1000000.0);
     

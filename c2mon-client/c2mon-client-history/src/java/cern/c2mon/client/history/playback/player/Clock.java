@@ -16,14 +16,19 @@
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
-package cern.c2mon.client.history.playback.components;
+package cern.c2mon.client.history.playback.player;
 
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import cern.c2mon.client.history.playback.components.ListenersManager;
+import cern.c2mon.client.history.playback.player.event.ClockListener;
 
 /**
- * Implements a clock. The clock can be used e.g. to fake the system time.
+ * Implements a clock. The clock can be used to fake the system time.
  * 
- * @author Michael Berberich
+ * @author vdeila
  */
 public class Clock {
 
@@ -45,6 +50,15 @@ public class Clock {
   /** Multiplier to make the clock go faster or slower */
   private double speedMultiplier = 1.0;
 
+  /** Keeps track of the listeners of the clock */
+  private final ListenersManager<ClockListener> listeners;
+  
+  /** The timer which invokes the listener when the end time is reached. */
+  private Timer endTimeTimer;
+  
+  /** The task that notifies the listeners */
+  private TimerTask endTimeTimerTask;
+  
   /**
    * Constructor
    * 
@@ -65,8 +79,58 @@ public class Clock {
 
     // Starts the clock paused
     this.paused = true;
+    
+    // Creates a timer which invokes the listeners when the end time is reached
+    this.endTimeTimer = new Timer("Clock-End-Time-Timer", true);
+    this.endTimeTimerTask = null;
+    
+    this.listeners = new ListenersManager<ClockListener>();
   }
-
+  
+  /**
+   * Schedules the {@link #endTimeTimerTask} if the player is running, else it
+   * only cancels any other tasks.
+   */
+  private synchronized void rescheduleEndTimeTimer() {
+    if (isRunning()) {
+      final long endTimeIsReachedAtTime = System.currentTimeMillis()
+                                        + (long) ((getEndTime() - getTime()) / getSpeedMultiplier()) + 1;
+      if (this.endTimeTimerTask != null
+          && Math.abs(this.endTimeTimerTask.scheduledExecutionTime() - endTimeIsReachedAtTime) <= 1) {
+        // Do nothing, as the timer is already set correctly
+        return;
+      }
+      else {
+        // A new timer task must be created 
+        if (this.endTimeTimerTask != null) {
+          this.endTimeTimerTask.cancel();
+        }
+        this.endTimeTimerTask = new TimerTask() {
+          @Override
+          public void run() {
+            if (hasReachedEndTime()) {
+              for (final ClockListener listener : listeners.getAll()) {
+                listener.onEndTimeReached();
+              }
+            }
+            else {
+              rescheduleEndTimeTimer();
+            }
+          }
+        };
+        this.endTimeTimer.schedule(this.endTimeTimerTask, new Date(endTimeIsReachedAtTime));
+      }
+    }
+    else { // the clock is paused
+      if (this.endTimeTimerTask != null) {
+        this.endTimeTimerTask.cancel();
+        this.endTimeTimerTask = null;
+      }
+    }
+    
+    
+  }
+  
   /**
    * 
    * @return The time elapsed since the clock was (last) resumed. If it is
@@ -138,6 +202,9 @@ public class Clock {
     if (doPausing) {
       resume();
     }
+    else {
+      rescheduleEndTimeTimer();
+    }
   }
 
   /**
@@ -147,6 +214,7 @@ public class Clock {
    */
   public synchronized void setEndTime(final long time) {
     this.endDate = new Date(time);
+    rescheduleEndTimeTimer();
   }
 
   /**
@@ -177,6 +245,7 @@ public class Clock {
       // Stores the real time of when the clock was resumed
       this.resumedAtRealtime = System.currentTimeMillis();
       this.paused = false;
+      rescheduleEndTimeTimer();
     }
   }
 
@@ -190,6 +259,7 @@ public class Clock {
       // the total
       this.virtualTimeElapsedBeforeLastPause += elapsedSinceResume();
       this.paused = true;
+      rescheduleEndTimeTimer();
     }
   }
 
@@ -202,31 +272,47 @@ public class Clock {
   }
 
   /**
+   * 
    * @param speedMultiplier
-   *          the speedMultiplier to set
+   *          the multiplier to set
+   * @return <code>true</code> if the speed multiplier were changed because of
+   *         the call, <code>false</code> if the speed were already set to the
+   *         given multiplier
    */
-  public synchronized void setSpeedMultiplier(final double speedMultiplier) {
-    // If the clock is currently running it must be paused and resumed
-    // for the elapsed time to be counted with the correct, current, multiplier
-    final boolean doPausing = !this.paused;
-    if (doPausing) {
-      pause();
+  public synchronized boolean setSpeedMultiplier(final double speedMultiplier) {
+    if (this.speedMultiplier == speedMultiplier) {
+      return false;
     }
-    this.speedMultiplier = speedMultiplier;
-    if (doPausing) {
-      resume();
+    else {
+      // If the clock is currently running it must be paused and resumed
+      // for the elapsed time to be counted with the correct, current, multiplier
+      final boolean doPausing = !this.paused;
+      if (doPausing) {
+        pause();
+      }
+      this.speedMultiplier = speedMultiplier;
+      if (doPausing) {
+        resume();
+      }
+      else {
+        rescheduleEndTimeTimer();
+      }
+      return true;
     }
   }
 
   /**
    * Checks if the clock has reached the specified end time.
    * 
-   * @return true if the clock has reached its end, false otherwise
+   * @return <code>true</code> if the clock has reached its end, false otherwise
    */
   public boolean hasReachedEndTime() {
-    if (getTime(false) >= getEndDate().getTime()) {
-      pause();
-      setTime(getEndDate().getTime());
+    final long currentTime = getTime(false);
+    if (currentTime >= getEndDate().getTime()) {
+      if (currentTime > getEndDate().getTime()) {
+        pause();
+        setTime(getEndDate().getTime());
+      }
       return true;
     }
     else {
@@ -325,4 +411,25 @@ public class Clock {
     return speedMultiplier;
   }
 
+  /*
+   * Functions for adding and removing listeners
+   */
+  
+  /**
+   * 
+   * @param listener
+   *          The listener to add
+   */
+  public void addClockListener(final ClockListener listener) {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * 
+   * @param listener
+   *          The listener to remove
+   */
+  public void removeClockListener(final ClockListener listener) {
+    this.listeners.remove(listener);
+  }
 }

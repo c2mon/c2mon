@@ -104,11 +104,7 @@ public class HistoryPlayerEventsForwarder implements HistoryLoaderListener, Hist
   }
 
   @Override
-  public void onTagsAdded(final Collection<Long> tagIds) {
-  }
-
-  @Override
-  public void onInitialValuesLoaded(final Collection<Long> tags) {
+  public void onTagCollectionChanged(final Collection<Long> tagIds) {
   }
 
   @Override
@@ -135,6 +131,13 @@ public class HistoryPlayerEventsForwarder implements HistoryLoaderListener, Hist
       for (HistoryPlayerListener listener : historyPlayerListeners.getAll()) {
         listener.onInitializingHistoryProgressChanged(-1);
       }
+    }
+  }
+
+  @Override
+  public void onTagsInitialized(final Collection<Long> tagIds) {
+    for (HistoryPlayerListener listener : historyPlayerListeners.getAll()) {
+      listener.onTagsInitialized(tagIds);
     }
   }
 

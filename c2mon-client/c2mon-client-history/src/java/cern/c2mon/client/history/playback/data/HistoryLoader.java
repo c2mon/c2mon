@@ -301,175 +301,7 @@ public class HistoryLoader {
       historyBufferingThreadLock.writeLock().lock();
       
       if (this.historyBufferingThread == null) {
-        this.historyBufferingThread = new Thread(new Runnable() {
-          @Override
-          public void run() {
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Buffering process is started");
-            }
-            
-            // Which data frame is currently loaded
-            long currentDataFrame = 0;
-            
-            // How many times loadHistory have returned false in a row
-            int failsInARow = 0;
-            
-            // Set to true whenever you want to stop loading
-            boolean stopLoading = false;
-            
-            boolean fireMemoryWarning = false;
-            
-            while (true) {
-              fireMemoryWarning = !memoryConsumptionAdviser.haveEnoughMemory();
-              // While the buffering thread should not stop and loading is not complete
-              if (stopLoading
-                  || isStopBufferingThread() 
-                  || historyStore.isLoadingComplete()
-                  || fireMemoryWarning) {
-                try {
-                  historyBufferingThreadLock.writeLock().lock();
-                  historyBufferingThread = null;
-                }
-                finally {
-                  historyBufferingThreadLock.writeLock().unlock();
-                }
-                break;
-              }
-              
-              // Get the time of which everything is loaded until
-              Timestamp loadedUntilTime = historyStore.getHistoryIsLoadedUntilTime(true);
-              
-              // List of tags which should be loaded
-              final List<Long> tagsWithOldestTime = new ArrayList<Long>();
-              
-              // Finds also the oldest timestamp
-              Timestamp oldestTimestamp = getHistoryConfiguration().getTimespan().getEnd();
-              
-              for (int tryCount = 0; tryCount <= 1 && tagsWithOldestTime.size() <= 0; tryCount++) {
-                
-                if (tryCount == 1) {
-                  // If it doesn't find any tags the first time
-                  // it uses the oldest timestamp
-                  if (oldestTimestamp.before(getHistoryConfiguration().getTimespan().getEnd())) {
-                    loadedUntilTime = oldestTimestamp;
-                    LOG.debug("Buffering: Didn't find any matching dates, using the oldest timestamp");
-                  }
-                  else {
-                    LOG.debug("Buffering: The oldest timestamp is the end timestamp.");
-                  }
-                }
-                
-                // Finds the tags to load
-                for (final Long tag : historyStore.getRegisteredTags()) {
-                  if (historyStore.isTagInitialized(tag)) {
-                    // Don't load the tag if it is not accepted
-                    final Timestamp tagIsLoadedUntil = historyStore.getTagHaveRecordsUntilTime(tag);
-                    
-                    if (tagIsLoadedUntil.before(oldestTimestamp)) {
-                      oldestTimestamp = tagIsLoadedUntil;
-                    }
-                    
-                    if (tagIsLoadedUntil.equals(loadedUntilTime)) {
-                      tagsWithOldestTime.add(tag);
-                    }
-                  }
-                }
-              }
-              
-              // Registers that we want to load the given tags.
-              // The returned tags is the tags which is not already being worked on.
-              final Collection<Long> tagsToLoad = tagsLoading.registerWork(tagsWithOldestTime);
-              
-              if (tagsToLoad.size() == 0) {
-                // If there for some reason is no tags to load
-                if (tagsWithOldestTime.size() > 0) {
-                  // Checks if tags at the moment is being loaded
-                  // In that case, wait for a few seconds
-                  try {
-                    Thread.sleep(5000);
-                  }
-                  catch (InterruptedException e) { }
-                }
-                else {
-                  stopLoading = true;
-                  if (!historyStore.isLoadingComplete(true)) {
-                    LOG.error("The history is not fully loaded, but also no more loading can be done.. Canceling loading.. This may be due to timeout.");
-                  }
-                }
-              }
-              else {
-                // Load the tags
-                
-                // Gets the start time and estimates the ending time
-                final Timestamp startTimestamp = new Timestamp(loadedUntilTime.getTime() + 1);
-                final Timestamp endTimestamp;
-                
-                // Estimates the ending time given how long it wants to load
-                if (currentDataFrame == 0) {
-                  // If it is the first frame, it targets a lower time for the retrieval. Choosing shorter time periode
-                  endTimestamp = estimateEndTimestamp(tagsToLoad.size(), startTimestamp, TARGET_MS_OF_LOADING_FIRST_BUNCH);
-                }
-                else {
-                  endTimestamp = estimateEndTimestamp(tagsToLoad.size(), startTimestamp, TARGET_MS_OF_LOADING_PER_BUNCH);
-                }
-                
-                if (LOG.isDebugEnabled()) {
-                  LOG.debug(String.format("Loading history at speed: %.2f hours of data per second", tagLoadingSpeedEstimate.getSpeed() / (60.0*60.0)));
-                }
-                
-                // Loads the history
-                final boolean result = loadHistory(tagsToLoad, startTimestamp, endTimestamp);
-                
-                if (result) {
-                  failsInARow = 0;
-                  currentDataFrame ++;
-                }
-                else {
-                  failsInARow ++;
-                  if (failsInARow >= LOAD_HISTORY_ACCEPTED_FAILS_IN_A_ROW) {
-                    LOG.error(String.format(
-                        "Loading history failed %d times in a row, no more histroy will be loaded..",
-                        failsInARow));
-                    stopLoading = true;
-                  }
-                  else {
-                    LOG.warn("Loading history have failed, trying again");
-                    try {
-                      Thread.sleep(LOAD_HISTORY_SLEEP_TIME_ON_FAIL);
-                    }
-                    catch (InterruptedException e) { }
-                  }
-                }
-                
-                // Unregisters the work on the tags
-                tagsLoading.unregisterWork(tagsToLoad);
-              }
-              
-            } // End of while loop
-            
-            if (fireMemoryWarning) {
-              final Thread outOfMemoryInvokerThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                  for (HistoryLoaderListener listener : getHistoryLoaderListeners()) {
-                    listener.onStoppedLoadingDueToOutOfMemory();
-                  }
-                }
-              });
-              outOfMemoryInvokerThread.setName("TIM-Memory-Warning-Invoker-Thread");
-              outOfMemoryInvokerThread.start();
-            }
-            
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("Buffering process terminates");
-            }
-            
-            // Notifies the listeners of how much is loaded
-            historyStore.firePlaybackBufferIntervalUpdated();
-            
-          }
-        });
-        this.historyBufferingThread.setName("TIM-History-Buffering");
+        this.historyBufferingThread = new HistoryBufferingProcess();
         this.historyBufferingThread.start();
       }
     }
@@ -676,12 +508,11 @@ public class HistoryLoader {
             return;
           }
           
-          if (tagValues != null && tagValues.size() > 0) {
-            // Add the collection to the list of records
-            recordsRetrieved.addAndGet(historyStore.addHistoryValues(
-                Arrays.asList(tagValues.toArray(new TagValueUpdate[0])),
-                endTime));
-          }
+          // Add the collection to the list of records
+          recordsRetrieved.addAndGet(historyStore.addHistoryValues(
+              dataTags,
+              Arrays.asList(tagValues.toArray(new TagValueUpdate[0])),
+              endTime));
         }
         finally {
           countDownLatch.countDown();
@@ -776,15 +607,10 @@ public class HistoryLoader {
     fireInitializingHistoryProgress("Initial data loaded, storing and filtering the data");
     
     // Adds the tags to the history store
-    this.historyStore.addInitialHistoryData(Arrays.asList(values.toArray(new TagValueUpdate[0])));
+    this.historyStore.addInitialHistoryData(tagIds, Arrays.asList(values.toArray(new TagValueUpdate[0])));
     
     LOG.debug("Initial data is loaded, notifying view(s)");
-    fireInitializingHistoryProgress("Initial data is loaded, notifying view(s)");
-    
-    // Notifies the listeners that the initial values are loaded
-    for (HistoryLoaderListener listener : getHistoryLoaderListeners()) {
-      listener.onInitialValuesLoaded(tagIds);
-    }
+    fireInitializingHistoryProgress("Initial data is loaded");
     
     LOG.debug("Initial data loading is complete");
   }
@@ -899,6 +725,180 @@ public class HistoryLoader {
    */
   public HistoryStore getHistoryStore() {
     return historyStore;
+  }
+  
+  /** This threads loads data using the history provider */
+  class HistoryBufferingProcess extends Thread {
+    public HistoryBufferingProcess() {
+      setName("TIM-History-Buffering");
+    }
+    
+    @Override
+    public void run() {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Buffering process is started");
+      }
+      
+      // Which data frame is currently loaded
+      long currentDataFrame = 0;
+      
+      // How many times loadHistory have returned false in a row
+      int failsInARow = 0;
+      
+      // Set to true whenever you want to stop loading
+      boolean stopLoading = false;
+      
+      boolean fireMemoryWarning = false;
+      
+      while (true) {
+        fireMemoryWarning = !memoryConsumptionAdviser.haveEnoughMemory();
+        // While the buffering thread should not stop and loading is not complete
+        if (stopLoading
+            || isStopBufferingThread() 
+            || historyStore.isLoadingComplete()
+            || fireMemoryWarning) {
+          try {
+            historyBufferingThreadLock.writeLock().lock();
+            historyBufferingThread = null;
+          }
+          finally {
+            historyBufferingThreadLock.writeLock().unlock();
+          }
+          break;
+        }
+        
+        // Get the time of which everything is loaded until
+        Timestamp loadedUntilTime = historyStore.getHistoryIsLoadedUntilTime(true);
+        
+        // List of tags which should be loaded
+        final List<Long> tagsWithOldestTime = new ArrayList<Long>();
+        
+        // Finds also the oldest timestamp
+        Timestamp oldestTimestamp = getHistoryConfiguration().getTimespan().getEnd();
+        
+        for (int tryCount = 0; tryCount <= 1 && tagsWithOldestTime.size() <= 0; tryCount++) {
+          
+          if (tryCount == 1) {
+            // If it doesn't find any tags the first time
+            // it uses the oldest timestamp
+            if (oldestTimestamp.before(getHistoryConfiguration().getTimespan().getEnd())) {
+              loadedUntilTime = oldestTimestamp;
+              LOG.debug("Buffering: Didn't find any matching dates, using the oldest timestamp");
+            }
+            else {
+              LOG.debug("Buffering: The oldest timestamp is the end timestamp.");
+            }
+          }
+          
+          // Finds the tags to load
+          for (final Long tag : historyStore.getRegisteredTags()) {
+            if (historyStore.isTagInitialized(tag)) {
+              // Don't load the tag if it is not accepted
+              final Timestamp tagIsLoadedUntil = historyStore.getTagHaveRecordsUntilTime(tag);
+              
+              if (tagIsLoadedUntil.before(oldestTimestamp)) {
+                oldestTimestamp = tagIsLoadedUntil;
+              }
+              
+              if (tagIsLoadedUntil.equals(loadedUntilTime)) {
+                tagsWithOldestTime.add(tag);
+              }
+            }
+          }
+        }
+        
+        // Registers that we want to load the given tags.
+        // The returned tags is the tags which is not already being worked on.
+        final Collection<Long> tagsToLoad = tagsLoading.registerWork(tagsWithOldestTime);
+        
+        if (tagsToLoad.size() == 0) {
+          // If there for some reason is no tags to load
+          if (tagsWithOldestTime.size() > 0) {
+            // Checks if tags at the moment is being loaded
+            // In that case, wait for a few seconds
+            try {
+              Thread.sleep(5000);
+            }
+            catch (InterruptedException e) { }
+          }
+          else {
+            stopLoading = true;
+            if (!historyStore.isLoadingComplete(true)) {
+              LOG.error("The history is not fully loaded, but also no more loading can be done.. Canceling loading.. This may be due to timeout.");
+            }
+          }
+        }
+        else {
+          // Load the tags
+          
+          // Gets the start time and estimates the ending time
+          final Timestamp startTimestamp = new Timestamp(loadedUntilTime.getTime() + 1);
+          final Timestamp endTimestamp;
+          
+          // Estimates the ending time given how long it wants to load
+          if (currentDataFrame == 0) {
+            // If it is the first frame, it targets a lower time for the retrieval. Choosing shorter time periode
+            endTimestamp = estimateEndTimestamp(tagsToLoad.size(), startTimestamp, TARGET_MS_OF_LOADING_FIRST_BUNCH);
+          }
+          else {
+            endTimestamp = estimateEndTimestamp(tagsToLoad.size(), startTimestamp, TARGET_MS_OF_LOADING_PER_BUNCH);
+          }
+          
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Loading history at speed: %.2f hours of data per second", tagLoadingSpeedEstimate.getSpeed() / (60.0*60.0)));
+          }
+          
+          // Loads the history
+          final boolean result = loadHistory(tagsToLoad, startTimestamp, endTimestamp);
+          
+          if (result) {
+            failsInARow = 0;
+            currentDataFrame ++;
+          }
+          else {
+            failsInARow ++;
+            if (failsInARow >= LOAD_HISTORY_ACCEPTED_FAILS_IN_A_ROW) {
+              LOG.error(String.format(
+                  "Loading history failed %d times in a row, no more histroy will be loaded..",
+                  failsInARow));
+              stopLoading = true;
+            }
+            else {
+              LOG.warn("Loading history have failed, trying again");
+              try {
+                Thread.sleep(LOAD_HISTORY_SLEEP_TIME_ON_FAIL);
+              }
+              catch (InterruptedException e) { }
+            }
+          }
+          
+          // Unregisters the work on the tags
+          tagsLoading.unregisterWork(tagsToLoad);
+        }
+        
+      } // End of while loop
+      
+      if (fireMemoryWarning) {
+        final Thread outOfMemoryInvokerThread = new Thread(new Runnable() {
+          @Override
+          public void run() {
+            for (HistoryLoaderListener listener : getHistoryLoaderListeners()) {
+              listener.onStoppedLoadingDueToOutOfMemory();
+            }
+          }
+        });
+        outOfMemoryInvokerThread.setName("TIM-Memory-Warning-Invoker-Thread");
+        outOfMemoryInvokerThread.start();
+      }
+      
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Buffering process terminates");
+      }
+      
+      // Notifies the listeners of how much is loaded
+      historyStore.firePlaybackBufferIntervalUpdated();
+      
+    }
   }
   
 }

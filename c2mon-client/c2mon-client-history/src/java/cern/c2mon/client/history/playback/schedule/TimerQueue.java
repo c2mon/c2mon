@@ -521,7 +521,7 @@ class TimerThread extends Thread {
   TimerThread(final TaskQueue queue, final TimerQueueClock clock) {
     this.clock = clock;
     this.queue = queue;
-    super.setName("TIM-Timer-Thread");
+    setName("TIM-Timer-Thread");
   }
 
   public void run() {

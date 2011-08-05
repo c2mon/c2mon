@@ -15,39 +15,19 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.history.playback.data.event;
-
-import cern.c2mon.client.history.playback.data.HistoryLoader;
+package cern.c2mon.client.history.playback.player.event;
 
 /**
- * Used by {@link HistoryLoader} to inform about events
- * 
- * @see HistoryLoaderAdapter
+ * Listener for the {@link Clock}
  * 
  * @author vdeila
- *
+ * 
  */
-public interface HistoryLoaderListener {
+public interface ClockListener {
 
   /**
-   * Invoked when the starting to initialize history
+   * Invoked when the end time is reached
    */
-  void onInitializingHistoryStarting();
-  
-  /**
-   * Invoked with the current status of the initialization
-   * 
-   * @param progressMessage A message describing the current actions taken
-   */
-  void onInitializingHistoryProgressStatusChanged(final String progressMessage);
-  
-  /**
-   * Invoked when the history initialization is finished
-   */
-  void onInitializingHistoryFinished();
-  
-  /**
-   * Invoked if memory resources is to low to load more data
-   */
-  void onStoppedLoadingDueToOutOfMemory();
+  void onEndTimeReached();
+
 }

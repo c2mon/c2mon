@@ -2,7 +2,10 @@ package cern.c2mon.client.history.playback.publish;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+
 import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
@@ -16,6 +19,9 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
  */
 public class HistoryPublisher {
 
+  /** Log4j logger for this class */
+  private static final Logger LOG = Logger.getLogger(HistoryPublisher.class);
+  
   /** Manages the listeners of the tags */
   private final TagListenersManager tagListenersManager;
 
@@ -72,7 +78,15 @@ public class HistoryPublisher {
    */
   public void publish(final TagValueUpdate newValue) {
     for (final TagUpdateListener listener : this.tagListenersManager.getValues(newValue.getId())) {
-      listener.onUpdate(newValue);
+      try {
+        if (listener instanceof ClientDataTag) {
+          ((ClientDataTag) listener).clean();
+        }
+        listener.onUpdate(newValue);
+      }
+      catch (Exception e) {
+        LOG.error(String.format("Error when trying to update tag (id: %d)", newValue.getId()), e);
+      }
     }
   }
   
