@@ -52,6 +52,7 @@ import cern.c2mon.client.common.history.event.HistoryPlayerListener;
 import cern.c2mon.client.common.history.event.HistoryProviderListener;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
 import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.history.tag.HistoryTagValueUpdateImpl;
@@ -89,6 +90,9 @@ public class HistoryManagerTest {
   
   @Autowired
   private HistoryProvider historyProviderMock;
+  
+  @Autowired
+  private CoreTagManager tagManagerMock; 
   
   /*
    * Test variables
@@ -154,7 +158,7 @@ public class HistoryManagerTest {
   @Test
   public void testStartHistoryPlayerMode() throws HistoryPlayerNotActiveException {
     
-    final HistoryPlayerListener historyPlayerListenerMock = EasyMock.createMock(HistoryPlayerListener.class);
+    final HistoryPlayerListener historyPlayerListenerMock = EasyMock.createNiceMock(HistoryPlayerListener.class);
 
     // The list of history provider listeners which will be added
     final Capture<HistoryProviderListener> historyProviderListeners = new Capture<HistoryProviderListener>(CaptureType.ALL);
@@ -215,6 +219,7 @@ public class HistoryManagerTest {
             sourceTimestamp, 
             serverTimestamp, 
             "Test tag");
+      value.getDataTagQuality().validate();
       cdt.update(value);
       
       if (!isAddedLater) {
@@ -296,9 +301,9 @@ public class HistoryManagerTest {
     historyPlayerListenerMock.onHistoryProviderChanged(historyProviderMock);
     
     // startHistoryPlayerMode
-    EasyMock.expect(cacheMock.getAllSubscribedDataTags()).andReturn(subscribedTags);
-    
     historyPlayerListenerMock.onActivatedHistoryPlayer();
+    
+    historyPlayerListenerMock.onTagsInitialized(EasyMock.<Collection<Long>>anyObject());
     
     // HistoryPlayer#beginLoading()
     // HistoryStore#registerTags(Long[])
@@ -319,7 +324,7 @@ public class HistoryManagerTest {
     // Phase 2
     // Subscribing to more data tags
     
-    EasyMock.expect(cacheMock.get(EasyMock.capture(cacheGetParameter))).andReturn(subscribedTagsAddedLater);
+    
     
     // HistoryPlayer#beginLoading()
     // HistoryStore#registerTags(Long[])
@@ -348,6 +353,9 @@ public class HistoryManagerTest {
     // Sets stub methods
     //
     
+    EasyMock.expect(cacheMock.get(EasyMock.capture(cacheGetParameter))).andReturn(subscribedTagsAddedLater).atLeastOnce();
+    EasyMock.expect(cacheMock.getAllSubscribedDataTags()).andReturn(subscribedTags).atLeastOnce();
+    
     historyPlayerListenerMock.onInitializingHistoryProgressStatusChanged(EasyMock.<String>anyObject());
     EasyMock.expectLastCall().atLeastOnce().asStub();
     
@@ -363,7 +371,21 @@ public class HistoryManagerTest {
     EasyMock.expect(cacheMock.getHistoryModeSyncLock()).andStubReturn(historyModeSyncLock);
     EasyMock.expect(cacheMock.isHistoryModeEnabled()).andStubReturn(true);
     
+    EasyMock.expect(tagManagerMock.getDataTags(EasyMock.<Collection<Long>>anyObject()))
+      .andDelegateTo(new TagManager(null, null) {
+        @Override
+        public Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds) {
+          final List<ClientDataTagValue> result = new ArrayList<ClientDataTagValue>();
+          for (ClientDataTag cdt : subscribedTags) {
+            if (tagIds.contains(cdt.getId())) {
+              result.add(cdt);
+            }
+          }
+          return result;
+        }
+      }).anyTimes();
     
+    //Arrays.asList(subscribedTags.toArray(new ClientDataTagValue[0]))
     
     //
     // Replay
@@ -371,7 +393,7 @@ public class HistoryManagerTest {
     
     final AtomicBoolean finishedLoading = new AtomicBoolean(false);
     
-    EasyMock.replay(cacheMock, historyProviderMock, historyPlayerListenerMock);
+    EasyMock.replay(cacheMock, historyProviderMock, historyPlayerListenerMock, tagManagerMock);
     historyManager.getHistoryPlayerEvents().addHistoryPlayerListener(historyPlayerListenerMock);
      
     // Event to know when the history is finish loading

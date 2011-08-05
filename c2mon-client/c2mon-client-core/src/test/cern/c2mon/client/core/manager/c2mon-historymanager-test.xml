@@ -11,12 +11,12 @@
     <constructor-arg value="cern.c2mon.client.core.cache.BasicCacheHandler"/>
   </bean>
   
-  <bean id="tagManager" class="org.easymock.EasyMock" factory-method="createMock">
-    <constructor-arg value="cern.c2mon.client.core.manager.CoreTagManager"/>
-  </bean>
-  
   <bean id="historyProvider" class="org.easymock.EasyMock" factory-method="createMock">
     <constructor-arg value="cern.c2mon.client.common.history.HistoryProvider"/>
+  </bean>
+  
+  <bean id="tagManager" class="org.easymock.EasyMock" factory-method="createNiceMock" >
+    <constructor-arg value="cern.c2mon.client.core.manager.CoreTagManager"/>
   </bean>
   
   <bean id="historyManager" class="cern.c2mon.client.core.manager.HistoryManager">
