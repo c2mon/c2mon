@@ -13,6 +13,7 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -78,7 +79,7 @@ public class ClientDataTagImplTest {
     final ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
     cdt.onUpdate(createValidTransferTag(1234L));
     
-    ClientDataTagImpl copy = cdt.clone();
+    ClientDataTag copy = cdt.clone();
     copy.clean();
     
     assertNotSame("The two objects should not point to the same reference in memory!", cdt, copy);
@@ -100,7 +101,7 @@ public class ClientDataTagImplTest {
   
   @Test
   public void testTypeNumeric() {
-    final ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
+    final ClientDataTag cdt = new ClientDataTagImpl(1234L);
     
     cdt.onUpdate(createValidTransferTag(1234L, Float.valueOf(1.234f)));
     assertEquals(TypeNumeric.TYPE_FLOAT, cdt.getTypeNumeric());
@@ -205,7 +206,7 @@ public class ClientDataTagImplTest {
   @Test
   public void testEquals() throws CloneNotSupportedException {
     ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
-    ClientDataTagImpl clone = cdt.clone();
+    ClientDataTag clone = cdt.clone();
     clone.clean();
     
     assertEquals(cdt, clone);
