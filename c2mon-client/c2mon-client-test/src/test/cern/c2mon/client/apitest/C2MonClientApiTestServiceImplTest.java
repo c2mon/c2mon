@@ -31,9 +31,9 @@ public class C2MonClientApiTestServiceImplTest {
 		assertEquals(2, def.size());
 		
 		assertEquals("TESTDEVICE1:STATUS", def.get(0).getMetricName());
-		assertEquals(100, def.get(0).getEquipmentRuleTag());
+		assertEquals(100, def.get(0).getRuleTagId());
 		
 		assertEquals("TESTDEVICE2:STATUS", def.get(1).getMetricName());
-		assertEquals(222, def.get(1).getEquipmentRuleTag());
+		assertEquals(222, def.get(1).getRuleTagId());
 	}
 }

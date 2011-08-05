@@ -93,16 +93,16 @@
 
 	<build>
 	
-<!--		<resources>-->
-<!--			<resource>-->
-<!--				<directory>src/java/resources</directory>-->
-<!--			</resource>-->
-<!--		</resources>-->
-<!--		<testResources>-->
-<!--			<testResource>-->
-<!--				<directory>src/test/resources</directory>-->
-<!--			</testResource>-->
-<!--		</testResources>-->
+		<resources>
+			<resource>
+				<directory>src/java/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
 		
 		
 	</build>

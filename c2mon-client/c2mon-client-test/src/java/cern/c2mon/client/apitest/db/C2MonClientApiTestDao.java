@@ -13,6 +13,7 @@ public interface C2MonClientApiTestDao {
 	 */
 
 	List<MetricDef> getAllMetrics();
+	
 
 	/**
 	 * This method returns all registered device-status rules
@@ -20,11 +21,20 @@ public interface C2MonClientApiTestDao {
 	 * @return
 	 */
 	List<MetricDef> getAllDeviceRuleMetrics();
-
+	
+	
 	/**
 	 * This method returns all registered rules
 	 * 
 	 * @return
 	 */
-	List<MetricDef> getAllRuleMetrics();
+	List<MetricDef> getAllSimpleRuleMetrics();
+	
+
+    /**
+     * This method returns device-status rule metric for given process name
+     * 
+     * @return
+     */
+    MetricDef getDeviceRuleMetric(final String processName);	
 }

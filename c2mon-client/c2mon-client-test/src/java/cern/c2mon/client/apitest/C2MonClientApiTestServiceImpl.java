@@ -39,7 +39,7 @@ public class C2MonClientApiTestServiceImpl implements C2MonClientApiTestService 
     @Override
     public List<MetricDef> getAllRuleMetrics() {
         log.debug("entering getAllRuleMetrics()");
-        return dao.getAllRuleMetrics();
+        return dao.getAllSimpleRuleMetrics();
     }
 
 }

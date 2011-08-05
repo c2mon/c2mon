@@ -35,10 +35,10 @@ public class C2MonClientApiTest {
 		}
 
 		
-		List<MetricDef> metrics = service.getAllMetrics();
+		List<MetricDef> metrics = service.getAllDeviceRuleMetrics();
 		
 		for (MetricDef md : metrics ) {
-			out.println(format("%d %s",md.getEquipmentRuleTag(), md.getMetricName()));
+			out.println(format("%d %s",md.getRuleTagId(), md.getMetricName()));
 		}
 	
 	}
