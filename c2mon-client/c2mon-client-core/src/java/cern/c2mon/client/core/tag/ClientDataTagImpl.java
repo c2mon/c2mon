@@ -947,11 +947,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     return new ArrayList<Long>(processSupervisionStatus.keySet());
   }
 
-  /**
-   * Removes all <code>ClientDataTagValue</code> information from the object.
-   * This is in particular interesting for the history mode which only needs
-   * the static information from the live tag object. 
-   */
+  @Override
   public void clean() {
     this.alarms.clear();
     this.description = DEFAULT_DESCRIPTION;

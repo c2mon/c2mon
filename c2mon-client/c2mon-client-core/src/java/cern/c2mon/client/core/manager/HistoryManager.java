@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.common.history.HistoryPlayerEvents;
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistoryProviderAvailability;
 import cern.c2mon.client.common.history.HistoryProviderType;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
@@ -39,6 +40,7 @@ import cern.c2mon.client.core.C2monHistoryManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.history.HistoryProviderFactory;
+import cern.c2mon.client.history.dbaccess.HistoryProviderAvailabilityImpl;
 import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
 import cern.c2mon.client.history.playback.HistoryPlayerCoreAccess;
 import cern.c2mon.client.history.playback.HistoryPlayerImpl;
@@ -63,6 +65,8 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   
   /** Keeps track of which tag id belongs to which {@link SupervisionListener} */
   private final KeyForValuesMap<Long, SupervisionListener> tagToSupervisionListener;
+  
+  private HistoryProviderAvailability historyProviderAvailability;
 
   @Autowired
   protected HistoryManager(final CoreTagManager pTagManager, final BasicCacheHandler pCache) {
@@ -70,6 +74,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
     this.cache = pCache;
     this.historyPlayer = null;
     this.tagToSupervisionListener = new KeyForValuesMap<Long, SupervisionListener>();
+    this.historyProviderAvailability = null;
   }
 
   /**
@@ -96,22 +101,28 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
         
         // Activating the history player
         this.historyPlayer.activateHistoryPlayer();
+        try {
         
-        // Subscribes all the current subscribed tags
-        subscribeTagsToHistory(cache.getAllSubscribedDataTags());
+          // Subscribes all the current subscribed tags
+          subscribeTagsToHistory(cache.getAllSubscribedDataTags());
+        }
+        catch (RuntimeException e) {
+          this.historyPlayer.deactivateHistoryPlayer();
+          cache.setHistoryMode(false);
+          throw e;
+        }
       }
     }
   }
 
   @Override
   public void stopHistoryPlayerMode() {
-    cache.setHistoryMode(false);
-    
     synchronized (cache.getHistoryModeSyncLock()) {
       if (this.historyPlayer != null) {
         this.historyPlayer.deactivateHistoryPlayer();
       }
     }
+    cache.setHistoryMode(false);
   }
 
   @Override
@@ -160,18 +171,21 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
       // Registers all the tag update listeners and supervision listeners  
       for (final ClientDataTag cdt : clientDataTags) {
         
-        
-        // Registers to tag updates
+        ClientDataTag realtimeValue;
         try {
-          this.historyPlayer.registerTagUpdateListener(
-              (TagUpdateListener) cdt,
-              cdt.getId(),
-              cdt.clone());
+          realtimeValue = cdt.clone();
         }
         catch (CloneNotSupportedException e) {
-          LOG.error("subscribeTagsToHistory() - Unable to clone ClientDataTag with id " + cdt.getId(), e);
-          throw new UnsupportedOperationException("Unable to clone ClientDataTag with id " + cdt.getId(), e);
+          realtimeValue = null;
+          LOG.warn("Could not clone the ClientDataTag, it will be retrieved from the database.", e);
         }
+        cdt.clean();
+        
+        // Registers to tag updates
+        this.historyPlayer.registerTagUpdateListener(
+            (TagUpdateListener) cdt,
+            cdt.getId(),
+            realtimeValue);
         
         // Tracks the listener, used when for later when unsubscribing
         tagToSupervisionListener.add(cdt.getId(), (SupervisionListener) cdt);
@@ -260,6 +274,14 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   @Override
   public boolean isHistoryModeEnabled() {
     return cache.isHistoryModeEnabled();
+  }
+
+  @Override
+  public synchronized HistoryProviderAvailability getHistoryProviderAvailability() {
+    if (this.historyProviderAvailability == null) {
+      this.historyProviderAvailability = new HistoryProviderAvailabilityImpl();
+    }
+    return this.historyProviderAvailability;
   }
 
 }

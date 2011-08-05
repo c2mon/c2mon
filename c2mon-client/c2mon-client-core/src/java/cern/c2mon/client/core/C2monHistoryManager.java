@@ -20,6 +20,7 @@ package cern.c2mon.client.core;
 import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.common.history.HistoryPlayerEvents;
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistoryProviderAvailability;
 import cern.c2mon.client.common.history.HistoryProviderType;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.event.HistoryPlayerListener;
@@ -68,6 +69,13 @@ public interface C2monHistoryManager {
    *           password is given.
    */
   HistoryProvider getHistoryProvider(final HistoryProviderType type) throws NoHistoryProviderException;
+
+  /**
+   * 
+   * @return an interface that provides methods for checking if any of the
+   *         history providers is available
+   */
+  HistoryProviderAvailability getHistoryProviderAvailability();
 
   /**
    * 

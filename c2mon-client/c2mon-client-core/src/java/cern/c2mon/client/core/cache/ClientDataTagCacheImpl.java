@@ -280,7 +280,6 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
         if (historyMode) {
           try {
             ClientDataTagImpl historyTag = cdt.clone();
-            historyTag.clean();
             // Adds the cleaned clone (without listeners) to the history cache.
             historyCache.put(cdt.getId(), historyTag);
             
@@ -532,7 +531,6 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache, HeartbeatList
         liveTag = entry.getValue();
         
         historyTag = liveTag.clone();
-        historyTag.clean();
         
         listeners = liveTag.getUpdateListeners();
         liveTag.removeAllUpdateListeners();
