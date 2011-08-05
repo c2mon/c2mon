@@ -174,12 +174,6 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
     this.add(this.clockLabel);
 
     this.setFloatable(false);
-    if (C2monServiceGateway.getHistoryManager().isHistoryModeEnabled()) {
-      this.setVisible(true);
-    }
-    else {
-      this.setVisible(false);
-    }
     
     // Install listener
     C2monServiceGateway.getHistoryManager().getHistoryPlayerEvents().addHistoryPlayerListener(new HistoryPlayerEvents());
@@ -213,6 +207,8 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
       
       @Override
       public void valueForced(final ChangeEvent e) {
+        // Is called when someone tries to change the value to more than is loaded.
+        
         try {
           if (C2monServiceGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().isPlaying()) {
             // If the clock is running it is paused
@@ -243,6 +239,8 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
           playbackControlEvents = new PlaybackControlEvents();
         }
         historyPlayer.getPlaybackControl().addPlaybackControlListener(playbackControlEvents);
+        
+        updateGuiElements();
       }
       catch (HistoryPlayerNotActiveException e) {
         LOG.warn("The history player is not available, in the activating history player event..", e);
@@ -295,7 +293,6 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
     public void onHistoryIsFullyLoaded() {
       timeSlider.setPercentLoaded(1.0);
     }
-
   }
   
   /**
@@ -349,10 +346,15 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
             @Override
             public void run() {
               try {
-                C2monServiceGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().setClockTime(computeTimeFromTimeSlider());
+                final long newTime = computeTimeFromTimeSlider();
+                C2monServiceGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().setClockTime(newTime);
+                
+                if (LOG.isDebugEnabled()) {
+                  LOG.debug("Changed the time to " + new Timestamp(newTime).toString());
+                }
               }
               catch (HistoryPlayerNotActiveException e) {
-                // Ignore
+                LOG.error("Couldn't change the time, because the history player mode is not active..", e);
               }
               finally {
                 setTimeSliderEnabled(true);
@@ -444,12 +446,19 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
     this.clockLabel.updateTime();
   }
   
+  /** Updates the label of the speed button */
+  private void updateSpeedButtonText() {
+    this.speedButton.setText(getClockSpeedString());
+  }
+
+  
   /**
    * Updates all gui elements that depend on the clock.
    */
   private void updateGuiElements() {
     updateClockLabel();
     updateTimeSliderValue();
+    updateSpeedButtonText();
   }
 
   /**

@@ -25,10 +25,10 @@ import javax.swing.JOptionPane;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistoryProviderType;
 import cern.c2mon.client.common.history.Timespan;
+import cern.c2mon.client.common.history.exception.NoHistoryProviderException;
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.history.dbaccess.HistorySessionFactory;
-import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
 import cern.c2mon.client.history.gui.components.HistoryPlayerConfigPanel;
 
 /**
@@ -96,19 +96,30 @@ public class HistoryPlayerSwitchDialog {
       while (answer == -1);
 
       if (answer == JOptionPane.OK_OPTION) {
-        HistoryProvider historyProvider = null;
+        HistoryProvider historyProvider;
         try {
-          historyProvider = HistorySessionFactory.getInstance().createHistoryProvider();
+          historyProvider = C2monServiceGateway.getHistoryManager().getHistoryProvider(HistoryProviderType.HISTORY_SHORT_TERM_LOG);
         }
-        catch (HistoryException e) {
+        catch (NoHistoryProviderException e) {
           LOG.error("Cannot create a history provider, can't load historical data", e);
+          historyProvider = null;
         }
         if (historyProvider == null) {
           JOptionPane.showMessageDialog(null, "Cannot get data, as no history provider is available!", "Can't load history data", JOptionPane.ERROR_MESSAGE);
           return false;
         }
-
-        C2monServiceGateway.getHistoryManager().startHistoryPlayerMode(historyProvider, new Timespan(start, end));
+        
+        try {
+          C2monServiceGateway.getHistoryManager().startHistoryPlayerMode(historyProvider, new Timespan(start, end));
+        }
+        catch (Exception e) {
+          LOG.error("Something went wrong when starting the history player", e);
+          if (C2monServiceGateway.getHistoryManager().isHistoryModeEnabled()) {
+            C2monServiceGateway.getHistoryManager().stopHistoryPlayerMode();
+          }
+          JOptionPane.showMessageDialog(null, "Cannot start the history player. See the log.", "Can't start history player", JOptionPane.ERROR_MESSAGE);
+          return false;
+        }
         
         return true;
       } else {

@@ -27,7 +27,6 @@ import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.event.HistoryPlayerAdapter;
 import cern.c2mon.client.common.history.event.HistoryPlayerListener;
-import cern.c2mon.client.common.history.event.HistoryProviderListener;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.history.gui.dialogs.HistoryPlayerSwitchDialog;
@@ -99,12 +98,12 @@ public final class HistoryGuiProvider {
         initializingProgressDialog = new InitializingProgressDialog(parent);
 
         // Make it listen to history player events
-        C2monServiceGateway.getHistoryManager().getHistoryPlayerEvents().addHistoryPlayerListener(initializingProgressDialog);
+        C2monServiceGateway.getHistoryManager().getHistoryPlayerEvents().addHistoryPlayerListener(initializingProgressDialog.getHistoryPlayerEvents());
 
         // Make it listen to history provider events
         final HistoryProvider historyProvider = historyPlayer.getHistoryProvider();
         if (historyProvider != null) {
-          historyPlayer.getHistoryProvider().addHistoryProviderListener((HistoryProviderListener) initializingProgressDialog);
+          historyPlayer.getHistoryProvider().addHistoryProviderListener(initializingProgressDialog.getHistoryProviderEvents());
         }
       }
 
@@ -112,7 +111,7 @@ public final class HistoryGuiProvider {
       public void onHistoryProviderChanged(final HistoryProvider historyProvider) {
         if (initializingProgressDialog != null) {
           // Make it listen to the new history provider's events
-          historyProvider.addHistoryProviderListener(initializingProgressDialog);
+          historyProvider.addHistoryProviderListener(initializingProgressDialog.getHistoryProviderEvents());
         }
       }
     };
