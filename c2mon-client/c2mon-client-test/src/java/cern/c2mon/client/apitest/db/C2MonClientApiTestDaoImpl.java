@@ -25,7 +25,28 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
     public List<MetricDef> getAllMetrics() {
 
         StringBuilder sql = new StringBuilder(
-                "select equipment_name||':STATUS' metric_name, equipment_rule_tag_id from dmn_equipment_v order by 1");
+                "select device || '/' || property || '/' || field metric_name, metric_rule_tag_id from dmn_metric_v where "
+                        + "order by metric_rule_tag_id");
+
+        Object[] args = null;
+
+        RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
+
+            @Override
+            public MetricDef mapRow(ResultSet rs, int arg1) throws SQLException {
+                MetricDef def = new MetricDef(rs.getLong("metric_rule_tag_id"), rs.getString("metric_name"));
+                return def;
+            }
+        };
+
+        return this.jdbcTemplate.query(sql.toString(), mapper, args);
+
+    }
+
+    @Override
+    public List<MetricDef> getAllDeviceRuleMetrics() {
+        StringBuilder sql = new StringBuilder(
+                "select equipment_name||':STATUS' metric_name, equipment_rule_tag_id from dmn_equipment_v order by equipment_rule_tag_id");
 
         Object[] args = null;
 
@@ -39,20 +60,14 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
         };
 
         return this.jdbcTemplate.query(sql.toString(), mapper, args);
-
-    }
-
-    @Override
-    public List<MetricDef> getAllDeviceRuleMetrics() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
     public List<MetricDef> getAllRuleMetrics() {
 
         StringBuilder sql = new StringBuilder(
-                "select device || '/' ||  property || '/' || field metric_name, equipment_rule_tag_id from dmn_metric_v where metric_rule_tag_id is not null order by 1");
+                "select device || '/' || property || '/' || field metric_name, metric_rule_tag_id from dmn_metric_v where "
+                        + "metric_rule_tag_id is not null order by metric_rule_tag_id");
 
         Object[] args = null;
 
@@ -60,7 +75,7 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
 
             @Override
             public MetricDef mapRow(ResultSet rs, int arg1) throws SQLException {
-                MetricDef def = new MetricDef(rs.getLong("equipment_rule_tag_id"), rs.getString("metric_name"));
+                MetricDef def = new MetricDef(rs.getLong("metric_rule_tag_id"), rs.getString("metric_name"));
                 return def;
             }
         };

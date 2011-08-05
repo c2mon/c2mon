@@ -24,9 +24,9 @@ public class C2MonClientApiTestDaoTest {
 	C2MonClientApiTestDao dao;
 
 	@Test
-	public void testGetAllMetrics() throws Exception {
+	public void getAllDeviceRuleMetrics() throws Exception {
 
-		List<MetricDef> def = dao.getAllMetrics();
+		List<MetricDef> def = dao.getAllDeviceRuleMetrics();
 
 		assertEquals(2, def.size());
 		

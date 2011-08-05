@@ -24,9 +24,9 @@ public class C2MonClientApiTestServiceImplTest {
 	C2MonClientApiTestService service;
 
 	@Test
-	public void testGetAllMetrics() throws Exception {
+	public void getAllDeviceRuleMetrics() throws Exception {
 
-		List<MetricDef> def = service.getAllMetrics();
+		List<MetricDef> def = service.getAllDeviceRuleMetrics();
 
 		assertEquals(2, def.size());
 		
