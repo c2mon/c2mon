@@ -38,7 +38,7 @@ public class C2MonClientApiTest {
 		List<MetricDef> metrics = service.getAllMetrics();
 		
 		for (MetricDef md : metrics ) {
-			out.println(format("%d %s",md.getEquipmentRuleTag(), md.getEquipmentName()));
+			out.println(format("%d %s",md.getEquipmentRuleTag(), md.getMetricName()));
 		}
 	
 	}

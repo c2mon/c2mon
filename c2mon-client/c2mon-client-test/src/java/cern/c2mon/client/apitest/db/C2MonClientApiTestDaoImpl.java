@@ -14,49 +14,58 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
 
-	private SimpleJdbcTemplate jdbcTemplate;
+    private SimpleJdbcTemplate jdbcTemplate;
 
     @Autowired
     public void setDataSource(DataSource dataSource) {
-          this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+        this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
     }
-	
-	
-	@Override
-	public List<MetricDef> getAllMetrics() {
 
-		StringBuilder sql = new StringBuilder(
-				"select equipment_name, equipment_rule_tag_id from dmn_equipment_v order by 1");
+    @Override
+    public List<MetricDef> getAllMetrics() {
 
-		Object[] args = null;
+        StringBuilder sql = new StringBuilder(
+                "select equipment_name||':STATUS' metric_name, equipment_rule_tag_id from dmn_equipment_v order by 1");
 
-		RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
+        Object[] args = null;
 
-			@Override
-			public MetricDef mapRow(ResultSet rs, int arg1) throws SQLException {
-				MetricDef def = new MetricDef(
-						rs.getLong("equipment_rule_tag_id"),
-						rs.getString("equipment_name"));
-				return def;
-			}
-		};
+        RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
 
-		return this.jdbcTemplate.query(sql.toString(), mapper, args);
+            @Override
+            public MetricDef mapRow(ResultSet rs, int arg1) throws SQLException {
+                MetricDef def = new MetricDef(rs.getLong("equipment_rule_tag_id"), rs.getString("metric_name"));
+                return def;
+            }
+        };
 
-	}
+        return this.jdbcTemplate.query(sql.toString(), mapper, args);
 
+    }
 
-	@Override
-	public List<MetricDef> getAllDeviceRuleMetrics() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public List<MetricDef> getAllDeviceRuleMetrics() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
+    @Override
+    public List<MetricDef> getAllRuleMetrics() {
 
-	@Override
-	public List<MetricDef> getAllRuleMetrics() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        StringBuilder sql = new StringBuilder(
+                "select device || '/' ||  property || '/' || field metric_name, equipment_rule_tag_id from dmn_metric_v where metric_rule_tag_id is not null order by 1");
+
+        Object[] args = null;
+
+        RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
+
+            @Override
+            public MetricDef mapRow(ResultSet rs, int arg1) throws SQLException {
+                MetricDef def = new MetricDef(rs.getLong("equipment_rule_tag_id"), rs.getString("metric_name"));
+                return def;
+            }
+        };
+
+        return this.jdbcTemplate.query(sql.toString(), mapper, args);
+    }
 
 }

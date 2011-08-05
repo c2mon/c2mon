@@ -2,19 +2,19 @@ package cern.c2mon.client.apitest;
 
 public class MetricDef {
    long equipmentRuleTag;
-	String equipmentName;
+	String metricName;
 
 	public long getEquipmentRuleTag() {
 		return equipmentRuleTag;
 	}
 
-	public String getEquipmentName() {
-		return equipmentName;
+	public String getMetricName() {
+		return metricName;
 	}
 	
 	public MetricDef(final long equipmentRuleTag, final String equipmentName) {
 		this.equipmentRuleTag = equipmentRuleTag;
-		this.equipmentName = equipmentName;
+		this.metricName = equipmentName;
 		
 	}
 }
