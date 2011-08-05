@@ -100,10 +100,10 @@
 			<version>1.2.2-201002241055</version>
 		</dependency>
 
-		<dependency>
-			<groupId>cern.c2mon.c2mon-client</groupId>
-			<artifactId>c2mon-client-core</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>cern.c2mon.c2mon-client</groupId>-->
+<!--			<artifactId>c2mon-client-core</artifactId>-->
+<!--		</dependency>-->
 
 	</dependencies>
 
