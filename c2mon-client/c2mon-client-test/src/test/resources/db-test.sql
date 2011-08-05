@@ -15,12 +15,13 @@ CREATE TABLE dmn_metric_v (
     device VARCHAR(4000) NOT NULL,
     property VARCHAR(4000) NOT NULL,
     field VARCHAR(4000) NOT NULL,
-    metric_rule_tag_id INTEGER NOT NULL,
+    metric_rule_tag_id INTEGER,
     CONSTRAINT TUC_METRIC_DEF_1 UNIQUE (device,property,field)
 );
 
 
 INSERT INTO dmn_metric_v (device, property, field, metric_rule_tag_id) VALUES ('DIAMON.CLIC.CS-CCR-DEV2','Acquisition', 'ntp.avg', 188866);
 INSERT INTO dmn_metric_v (device, property, field, metric_rule_tag_id) VALUES ('DIAMON.CLIC.CS-CCR-DEV2','Acquisition', 'sys.kern.activeproc', 188864);
+INSERT INTO dmn_metric_v (device, property, field, metric_rule_tag_id) VALUES ('DIAMON.CLIC.CS-CCR-DEV2','Acquisition', 'some-metric-with-no-rule', null);
 
 
