@@ -1,4 +1,4 @@
-package cern.c2mon.client.apitest;
+package cern.c2mon.client.apitest.service.impl;
 
 import java.util.List;
 
@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cern.c2mon.client.apitest.MetricDef;
 import cern.c2mon.client.apitest.db.C2MonClientApiTestDao;
+import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
 
 @Service
 public class C2MonClientApiTestServiceImpl implements C2MonClientApiTestService {

@@ -8,6 +8,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
+
 public class C2MonClientApiTest {
 
 	private static Logger log = Logger.getLogger(C2MonClientApiTest.class);

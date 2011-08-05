@@ -1,6 +1,8 @@
-package cern.c2mon.client.apitest;
+package cern.c2mon.client.apitest.service;
 
 import java.util.List;
+
+import cern.c2mon.client.apitest.MetricDef;
 
 public interface C2MonClientApiTestService {
    

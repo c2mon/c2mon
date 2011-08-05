@@ -14,6 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.apitest.MetricDef;
+import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
