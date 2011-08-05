@@ -33,8 +33,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
  * Tests the iBatis mapper against the Oracle DB.
