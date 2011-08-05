@@ -179,6 +179,12 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
           realtimeValue = null;
           LOG.warn("Could not clone the ClientDataTag, it will be retrieved from the database.", e);
         }
+        if (realtimeValue != null) {
+          if (realtimeValue.getServerTimestamp().getTime() == 0) {
+            realtimeValue = null;
+          }
+        }
+        
         cdt.clean();
         
         // Registers to tag updates
