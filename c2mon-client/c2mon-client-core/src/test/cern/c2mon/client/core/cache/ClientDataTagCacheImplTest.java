@@ -2,8 +2,8 @@ package cern.c2mon.client.core.cache;
 
 import static junit.framework.Assert.*;
 
-import java.lang.reflect.Array;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +22,7 @@ import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
@@ -37,13 +38,15 @@ public class ClientDataTagCacheImplTest {
   /**
    * Component to test
    */
-  private ClientDataTagCache cache;
+  private ClientDataTagCacheImpl cache;
   
   private JmsProxy jmsProxyMock;
   
   private RequestHandler requestHandlerMock;
   
   private CoreSupervisionManager supervisionManagerMock;
+  
+  private CacheController controller;
   
   /**
    * Creates JmsProxy with Mocks 
@@ -53,22 +56,17 @@ public class ClientDataTagCacheImplTest {
     jmsProxyMock = EasyMock.createMock(JmsProxy.class);
     requestHandlerMock = EasyMock.createMock(RequestHandler.class);
     supervisionManagerMock = EasyMock.createMock(CoreSupervisionManager.class);
+    controller = new CacheControllerImpl();
     
-    cache = new ClientDataTagCacheImpl(jmsProxyMock, requestHandlerMock, supervisionManagerMock);
+    cache = new ClientDataTagCacheImpl(jmsProxyMock, requestHandlerMock, supervisionManagerMock, controller);
   }
   
   @Test
   public void testEmptyCache() {
+    cache.init();
     assertEquals(0, cache.getAllSubscribedDataTags().size());
   }
   
-  @Test
-  public void testCreateAndGet() throws Exception {
-    ClientDataTag cdt1 = cache.create(1L);
-    assertSame(cdt1, cache.get(1L));
-    ClientDataTag cdt2 = cache.create(2L);
-    assertSame(cdt2, cache.get(2L));
-  }
   
   /**
    * Adds two tags into the cache and subscribes them to a <code>DataTagUpdateListener</code>.
@@ -77,59 +75,60 @@ public class ClientDataTagCacheImplTest {
   @Test
   public void testAddDataTagUpdateListener() throws Exception {
     // Test setup
+    supervisionManagerMock.addConnectionListener(cache);
+    supervisionManagerMock.addHeartbeatListener(cache);
     Set<Long> tagIds = new HashSet<Long>();
     tagIds.add(1L);
     tagIds.add(2L);
+    Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
     for (Long tagId : tagIds) {
+      serverUpdates.add(createValidTransferTag(tagId));
       prepareClientDataTagCreateMock(tagId);
     }
+    EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
+    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
     DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
     
     // run test
-    EasyMock.replay(jmsProxyMock, supervisionManagerMock);
-    ClientDataTag cdt1 = cache.create(1L);
-    cdt1.update(createValidTransferTag(1L));
-    ClientDataTag cdt2 = cache.create(2L);
-    cdt2.update(createValidTransferTag(2L));
+    EasyMock.replay(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
+    cache.init();
     Collection<ClientDataTag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(0, cachedTags.size());
     cache.addDataTagUpdateListener(tagIds, listener);
+    
+    
     cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
-    for (ClientDataTag tag : cachedTags) {
-      if (tag.getId() == 1L) {
-        assertSame(cdt1, tag);
-      }
-      else {
-        assertSame(cdt2, tag);
-      }
-    }
     
     // check test success
-    EasyMock.verify(jmsProxyMock, supervisionManagerMock);
+    EasyMock.verify(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
   }
   
   
   @Test
   public void testUnsubscribeAllDataTags() throws Exception {
     // test setup
+    supervisionManagerMock.addConnectionListener(cache);
+    supervisionManagerMock.addHeartbeatListener(cache);
     Set<Long> tagIds = new HashSet<Long>();
     tagIds.add(1L);
     tagIds.add(2L);
+    Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
     for (Long tagId : tagIds) {
+      serverUpdates.add(createValidTransferTag(tagId));
       ClientDataTagImpl cdtMock = prepareClientDataTagCreateMock(tagId); 
       jmsProxyMock.unregisterUpdateListener(cdtMock);
       supervisionManagerMock.removeSupervisionListener(cdtMock);
     }
+    EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
+    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
     DataTagUpdateListener listener1 = EasyMock.createMock(DataTagUpdateListener.class);
     DataTagUpdateListener listener2 = EasyMock.createMock(DataTagUpdateListener.class);
+
     
     // run test
-    EasyMock.replay(jmsProxyMock, supervisionManagerMock);
-    ClientDataTag cdt1 = cache.create(1L);
-    cdt1.update(createValidTransferTag(1L));
-    ClientDataTag cdt2 = cache.create(2L);
-    cdt2.update(createValidTransferTag(2L));
+    EasyMock.replay(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
+    cache.init();
     cache.addDataTagUpdateListener(tagIds, listener1);
     Collection<ClientDataTag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
@@ -143,41 +142,64 @@ public class ClientDataTagCacheImplTest {
     assertEquals(0, cachedTags.size());
     
     // check test success
-    EasyMock.verify(jmsProxyMock, supervisionManagerMock);
+    EasyMock.verify(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
   }
   
   
   @Test
   public void testContainsTag() throws Exception {
-    ClientDataTag cdt1 = cache.create(1L);
-    cdt1.update(createValidTransferTag(1L));
-    ClientDataTag cdt2 = cache.create(2L);
-    cdt2.update(createValidTransferTag(2L));
-    assertTrue(cache.containsTag(cdt1.getId()));
-    assertTrue(cache.containsTag(cdt2.getId()));
+    // Test setup
+    supervisionManagerMock.addConnectionListener(cache);
+    supervisionManagerMock.addHeartbeatListener(cache);
+    Set<Long> tagIds = new HashSet<Long>();
+    tagIds.add(1L);
+    tagIds.add(2L);
+    Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
+    for (Long tagId : tagIds) {
+      serverUpdates.add(createValidTransferTag(tagId));
+      prepareClientDataTagCreateMock(tagId);
+    }
+    EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
+    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
+    DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
+    
+    // run test
+    EasyMock.replay(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
+    cache.init();
+    cache.addDataTagUpdateListener(tagIds, listener);
+    assertTrue(cache.containsTag(1L));
+    assertTrue(cache.containsTag(2L));
     assertFalse(cache.containsTag(23423L));
+    
+    // check test success
+    EasyMock.verify(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
   }
   
   @Test
   public void testHistoryMode() throws Exception {
-    // test setup
+    // Test setup
+    supervisionManagerMock.addConnectionListener(cache);
+    supervisionManagerMock.addHeartbeatListener(cache);
     Set<Long> tagIds = new HashSet<Long>();
     tagIds.add(1L);
     tagIds.add(2L);
+    Collection<TagUpdate> serverUpdates = new ArrayList<TagUpdate>(tagIds.size());
     for (Long tagId : tagIds) {
-      prepareClientDataTagCreateMock(tagId); 
+      serverUpdates.add(createValidTransferTag(tagId));
+      prepareClientDataTagCreateMock(tagId);
     }
+    EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
+    EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
     DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
     
     // run test
-    EasyMock.replay(jmsProxyMock, supervisionManagerMock);
-    ClientDataTag cdt1 = cache.create(1L);
-    cdt1.update(createValidTransferTag(1L));
+    EasyMock.replay(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
+    cache.init();
+    cache.addDataTagUpdateListener(tagIds, listener);
     cache.setHistoryMode(true);
-    ClientDataTag cdt2 = cache.create(2L);
-    cdt2.update(createValidTransferTag(2L));
-    assertTrue(cache.containsTag(cdt1.getId()));
-    assertTrue(cache.containsTag(cdt2.getId()));
+    for (Long tagId : tagIds) {
+      assertTrue(cache.containsTag(tagId));
+    }
     assertFalse(cache.containsTag(23423L));
     
     assertTrue(cache.isHistoryModeEnabled());
@@ -186,7 +208,7 @@ public class ClientDataTagCacheImplTest {
     assertEquals(2, cachedTags.size());
     
     // check test success
-    EasyMock.verify(jmsProxyMock, supervisionManagerMock);
+    EasyMock.verify(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
   }
   
   private ClientDataTagImpl prepareClientDataTagCreateMock(final Long tagId) throws RuleFormatException, JMSException {

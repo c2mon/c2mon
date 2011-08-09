@@ -19,10 +19,14 @@
     <constructor-arg value="cern.c2mon.client.core.manager.CoreSupervisionManager"/>
   </bean>
   
+  <bean id="cacheController" class="cern.c2mon.client.core.cache.CacheControllerImpl">
+  </bean>
+  
   <bean id="clientDataTagCache" class="cern.c2mon.client.core.cache.ClientDataTagCacheImpl">
     <constructor-arg value="jmsProxy"/>
     <constructor-arg value="requestHandler"/>
     <constructor-arg value="supervisionManager"/>
+    <constructor-arg value="cacheController"/>
   </bean>
   
   <bean id="tagManager" class="cern.c2mon.client.core.manager.TagManager">

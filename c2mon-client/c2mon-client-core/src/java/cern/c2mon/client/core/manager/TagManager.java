@@ -19,7 +19,6 @@ package cern.c2mon.client.core.manager;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +39,6 @@ import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.rule.RuleFormatException;
 
 /**
@@ -140,90 +137,13 @@ public class TagManager implements CoreTagManager {
     if (LOG.isDebugEnabled()) {
       LOG.debug(new StringBuffer("subscribeDataTags() : called for ").append(tagIds.size()).append(" tags."));
     }
-      
-    // Find tag id's which are not yet in the cache
-    Map<Long, ClientDataTag> newTags = new HashMap<Long, ClientDataTag>();
     
-    synchronized (cache.getHistoryModeSyncLock()) {
-      // Find out which tags need to be initialized
-      ClientDataTag newTag = null;
-      for (Long tagId : tagIds) { 
-        if (!cache.containsTag(tagId)) {
-          newTag = cache.create(tagId);
-          newTag.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known to the system.");
-          newTags.put(tagId, newTag);
-        }
-      }
+    // add listener to tags and subscribe them to the live topics
+    Set<Long> newTags = cache.addDataTagUpdateListener(tagIds, listener);
+    // Inform listeners (e.g. HistoryManager) about new subscriptions
+    fireOnNewTagSubscriptionsEvent(newTags);
       
-      try {
-        initializeNewTags(newTags);
-        // Inform listeners (e.g. HistoryManager) about new subscriptions
-        fireOnNewTagSubscriptionsEvent(newTags.keySet());
-        // add listener to tags and subscribe them to the live topics
-        cache.addDataTagUpdateListener(tagIds, listener);
-        synchronizeNewTags(newTags);
-      }
-      catch (JMSException e) {
-        LOG.error("subscribeDataTags() - JMS connection lost -> Invalidate all newly requested tags.", e);
-        for (ClientDataTag cdt : newTags.values()) {
-          cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.JMS_CONNECTION_DOWN, "JMS connection lost.");
-        }
-        // add listener anyway to tags
-        this.cache.addDataTagUpdateListener(tagIds, listener);
-        return false;
-      }
-    }
-    
     return true;
-  }
-  
-  /**
-   * Requests from the C2MON server the initial values for all tags of the passed map. 
-   * @param newTags Map of uninitialized tags from the cache
-   * @throws JMSException In case of a JMS problem
-   */
-  private void initializeNewTags(final Map<Long, ClientDataTag> newTags) throws JMSException {
-    if (!newTags.isEmpty()) {
-      ClientDataTag newTag = null;
-      // Request initial tag information from C2MON server
-      Collection<TagUpdate> requestedTags = clientRequestHandler.requestTags(newTags.keySet());
-      // Update the new tags and put them into the cache
-      for (TagUpdate tagUpdate : requestedTags) {
-        try {
-          newTag = newTags.get(tagUpdate.getId());
-          newTag.update(tagUpdate);
-        }
-        catch (RuleFormatException e) {
-          LOG.error("initializeNewTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
-          throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
-        }
-      }
-    }
-  }
-  
-  /**
-   * Updates a second time in case an update was send before 
-   * the ClientDataTag was subscribed to the topic.
-   * @param newTags Map of uninitialized tags from the cache
-   * @throws JMSException In case of a JMS problem
-   */
-  private void synchronizeNewTags(final Map<Long, ClientDataTag> newTags) throws JMSException {
-    if (!newTags.isEmpty()) {
-      ClientDataTag newTag = null;
-      Collection<TagValueUpdate> requestedTagValues = clientRequestHandler.requestTagValues(newTags.keySet());
-      for (TagValueUpdate tagValueUpdate : requestedTagValues) {
-        newTag = newTags.get(tagValueUpdate.getId());
-        if (newTag.getServerTimestamp() == null || newTag.getServerTimestamp().before(tagValueUpdate.getServerTimestamp())) {
-          try {
-            newTag.update(tagValueUpdate);
-          }
-          catch (RuleFormatException e) {
-            LOG.fatal("synchronizeNewTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagValueUpdate.getId(), e);
-            throw new RuntimeException(e);
-          }
-        }
-      } // end for loop
-    }
   }
 
   @Override
