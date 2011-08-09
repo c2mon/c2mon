@@ -17,5 +17,7 @@
   <!-- don't set-up shortterm log for dmn2-srv for now 
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml"/>
   -->
+  
+  <import resource="classpath:cern/c2mon/server/client/config/server-client.xml"/>
 
 </beans>
