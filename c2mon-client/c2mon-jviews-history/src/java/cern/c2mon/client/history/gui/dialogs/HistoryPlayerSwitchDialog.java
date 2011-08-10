@@ -62,9 +62,9 @@ public class HistoryPlayerSwitchDialog {
    *         <code>false</code> if the history player is currently active, or if
    *         it couldn't configure the player.
    */
-  public boolean show() {
+  public void show() {
     if (C2monServiceGateway.getHistoryManager().isHistoryModeEnabled()) {
-      return false;
+      return;
     }
     else {
       //
@@ -96,34 +96,35 @@ public class HistoryPlayerSwitchDialog {
       while (answer == -1);
 
       if (answer == JOptionPane.OK_OPTION) {
-        HistoryProvider historyProvider;
+        final HistoryProvider historyProvider;
         try {
           historyProvider = C2monServiceGateway.getHistoryManager().getHistoryProvider(HistoryProviderType.HISTORY_SHORT_TERM_LOG);
         }
         catch (NoHistoryProviderException e) {
           LOG.error("Cannot create a history provider, can't load historical data", e);
-          historyProvider = null;
-        }
-        if (historyProvider == null) {
           JOptionPane.showMessageDialog(null, "Cannot get data, as no history provider is available!", "Can't load history data", JOptionPane.ERROR_MESSAGE);
-          return false;
+          return;
         }
         
-        try {
-          C2monServiceGateway.getHistoryManager().startHistoryPlayerMode(historyProvider, new Timespan(start, end));
-        }
-        catch (Exception e) {
-          LOG.error("Something went wrong when starting the history player", e);
-          if (C2monServiceGateway.getHistoryManager().isHistoryModeEnabled()) {
-            C2monServiceGateway.getHistoryManager().stopHistoryPlayerMode();
+        final Timespan historyTimespan = new Timespan(start, end);
+        
+        final Thread startHistoryModeThread = new Thread(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              C2monServiceGateway.getHistoryManager().startHistoryPlayerMode(historyProvider, historyTimespan);
+            }
+            catch (Exception e) {
+              LOG.error("Something went wrong when starting the history player", e);
+              if (C2monServiceGateway.getHistoryManager().isHistoryModeEnabled()) {
+                C2monServiceGateway.getHistoryManager().stopHistoryPlayerMode();
+              }
+              JOptionPane.showMessageDialog(parent, "Cannot start the history player. Please see the log for more information.", "Can't start history player", JOptionPane.ERROR_MESSAGE);
+            }
           }
-          JOptionPane.showMessageDialog(null, "Cannot start the history player. See the log.", "Can't start history player", JOptionPane.ERROR_MESSAGE);
-          return false;
-        }
-        
-        return true;
-      } else {
-        return false;
+        });
+        startHistoryModeThread.setName("Start-History-Mode-Thread");
+        startHistoryModeThread.start();
       }
     }
   }

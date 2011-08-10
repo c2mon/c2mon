@@ -27,6 +27,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.SupervisionEventRequest;
 import cern.c2mon.client.history.dbaccess.beans.HistoryRecordBean;
@@ -35,8 +36,6 @@ import cern.c2mon.client.history.dbaccess.beans.ShortTermLogHistoryRequestBean;
 import cern.c2mon.client.history.dbaccess.beans.SupervisionEventRequestBean;
 import cern.c2mon.client.history.dbaccess.beans.SupervisionRecordBean;
 import cern.c2mon.client.history.dbaccess.util.BeanConverterUtil;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * Implementation of the {@link HistoryProvider}<br/>
@@ -317,30 +316,9 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     return result;
   }
 
-  /**
-   * 
-   * @param id
-   *          the id
-   * @param entity
-   *          the entity
-   * @return a list of supervision events for the given id and entity
-   */
   @Override
-  public Collection<SupervisionEvent> getSupervisionEvents(final Long id, final SupervisionEntity entity) {
-    return getSupervisionEvents(Arrays.asList(new SupervisionEventRequest(id, entity)));
-  }
-
-  /**
-   * 
-   * @param requests
-   *          The supervision events that is requested
-   * @return a collection of supervision events which matches any of the ones in
-   *         the collection
-   */
-  @Override
-  public Collection<SupervisionEvent> getSupervisionEvents(final Collection<SupervisionEventRequest> requests) {
-
-    final List<SupervisionEvent> result = new ArrayList<SupervisionEvent>();
+  public Collection<HistorySupervisionEvent> getInitialSupervisionEvents(final Timestamp initializationTime, final Collection<SupervisionEventRequest> requests) {
+    final List<HistorySupervisionEvent> result = new ArrayList<HistorySupervisionEvent>();
 
     if (requests == null || requests.size() == 0) {
       return result;
@@ -357,8 +335,75 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       int progress = 0;
 
       for (final SupervisionEventRequest request : requests) {
-        final Collection<SupervisionRecordBean> records = historyMapper.getSupervisionEvents(new SupervisionEventRequestBean(request.getId(), request
-            .getEntity()));
+        final Collection<SupervisionRecordBean> records = 
+          historyMapper.getInitialSupervisionEvents(
+              new SupervisionEventRequestBean(
+                  request.getId(), 
+                  request.getEntity(),
+                  initializationTime,
+                  null));
+
+        // Adds the records from the query to the result, converted into
+        // SupervisionEvent
+        for (final SupervisionRecordBean record : records) {
+          result.add(BeanConverterUtil.toSupervisionEvent(record));
+        }
+
+        progress++;
+        fireQueryProgressChanged(progress / (double) requests.size());
+      }
+
+    }
+    finally {
+      session.close();
+    }
+
+    fireQueryProgressChanged(1.0);
+
+    // Tells the listener that the query is finished
+    fireQueryFinished();
+
+    return result;
+  }
+  
+  /**
+   * 
+   * @param from
+   *          the start time
+   * @param to
+   *          the end time
+   * @param requests
+   *          The supervision events that is requested
+   * @return a collection of supervision events which matches any of the ones in
+   *         the collection
+   */
+  @Override
+  public Collection<HistorySupervisionEvent> getSupervisionEvents(final Timestamp from, final Timestamp to, final Collection<SupervisionEventRequest> requests) {
+
+    final List<HistorySupervisionEvent> result = new ArrayList<HistorySupervisionEvent>();
+
+    if (requests == null || requests.size() == 0) {
+      return result;
+    }
+
+    // Tells the listeners that a query is starting
+    fireQueryStarting();
+
+    // Opens a session where the data is received from
+    final SqlSession session = this.sessionFactory.openSession();
+    try {
+      final HistoryMapper historyMapper = getHistoryMapper(session);
+
+      int progress = 0;
+
+      for (final SupervisionEventRequest request : requests) {
+        final Collection<SupervisionRecordBean> records = 
+          historyMapper.getSupervisionEvents(
+              new SupervisionEventRequestBean(
+                  request.getId(), 
+                  request.getEntity(),
+                  from,
+                  to));
 
         // Adds the records from the query to the result, converted into
         // SupervisionEvent

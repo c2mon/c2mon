@@ -143,6 +143,12 @@ public class FakeHistoryMapperImpl implements HistoryMapper {
     throw new UnsupportedOperationException("This test function is not yet implemented");
     // Todo implement to test
   }
+
+  @Override
+  public List<SupervisionRecordBean> getInitialSupervisionEvents(SupervisionEventRequestBean request) {
+    throw new UnsupportedOperationException("This test function is not yet implemented");
+ // Todo implement to test
+  }
   
   
 

@@ -21,11 +21,10 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.SupervisionEventRequest;
 import cern.c2mon.client.common.history.event.HistoryProviderListener;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * Dummy class for testing purpose
@@ -71,18 +70,18 @@ public class HistoryProviderDummy implements HistoryProvider {
   }
 
   @Override
-  public Collection<SupervisionEvent> getSupervisionEvents(Long id, SupervisionEntity entity) {
-    return null;
-  }
-
-  @Override
-  public Collection<SupervisionEvent> getSupervisionEvents(Collection<SupervisionEventRequest> requests) {
-    return null;
-  }
-
-  @Override
   public void removeHistoryProviderListener(HistoryProviderListener listener) {
 
+  }
+
+  @Override
+  public Collection<HistorySupervisionEvent> getInitialSupervisionEvents(Timestamp initializationTime, Collection<SupervisionEventRequest> requests) {
+    return null;
+  }
+
+  @Override
+  public Collection<HistorySupervisionEvent> getSupervisionEvents(Timestamp from, Timestamp to, Collection<SupervisionEventRequest> requests) {
+    return null;
   }
 
 }

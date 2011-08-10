@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.easymock.Capture;
@@ -53,9 +55,10 @@ import cern.c2mon.client.common.history.event.HistoryProviderListener;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.C2monSupervisionManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.client.history.tag.HistoryTagValueUpdateImpl;
+import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
@@ -92,7 +95,10 @@ public class HistoryManagerTest {
   private HistoryProvider historyProviderMock;
   
   @Autowired
-  private CoreTagManager tagManagerMock; 
+  private CoreTagManager tagManagerMock;
+  
+  @Autowired
+  private CoreSupervisionManager supervisionManagerMock;  
   
   /*
    * Test variables
@@ -123,6 +129,9 @@ public class HistoryManagerTest {
   
   /** The number of tags which will be added later */
   private static final int NUMBER_OF_ADDED_TAGS = 50;
+  
+  /** The number of milliseconds to wait for the initialization */
+  private static final int INITIALIZE_TIMEOUT = 10000;
   
   
   /** Exception handler for multi threaded tests */
@@ -156,7 +165,7 @@ public class HistoryManagerTest {
 
   
   @Test
-  public void testStartHistoryPlayerMode() throws HistoryPlayerNotActiveException {
+  public void testStartHistoryPlayerMode() throws HistoryPlayerNotActiveException, InterruptedException {
     
     final HistoryPlayerListener historyPlayerListenerMock = EasyMock.createNiceMock(HistoryPlayerListener.class);
 
@@ -303,8 +312,6 @@ public class HistoryManagerTest {
     // startHistoryPlayerMode
     historyPlayerListenerMock.onActivatedHistoryPlayer();
     
-    historyPlayerListenerMock.onTagsInitialized(EasyMock.<Collection<Long>>anyObject());
-    
     // HistoryPlayer#beginLoading()
     // HistoryStore#registerTags(Long[])
     historyPlayerListenerMock.onHistoryDataAvailabilityChanged(timespan.getStart());
@@ -353,6 +360,8 @@ public class HistoryManagerTest {
     // Sets stub methods
     //
     
+    EasyMock.expect(supervisionManagerMock.isServerConnectionWorking()).andStubReturn(Boolean.TRUE);
+    
     EasyMock.expect(cacheMock.get(EasyMock.capture(cacheGetParameter))).andReturn(subscribedTagsAddedLater).atLeastOnce();
     EasyMock.expect(cacheMock.getAllSubscribedDataTags()).andReturn(subscribedTags).atLeastOnce();
     
@@ -392,8 +401,9 @@ public class HistoryManagerTest {
     //
     
     final AtomicBoolean finishedLoading = new AtomicBoolean(false);
+    final CountDownLatch initializingCountDownLatch = new CountDownLatch(1);
     
-    EasyMock.replay(cacheMock, historyProviderMock, historyPlayerListenerMock, tagManagerMock);
+    EasyMock.replay(cacheMock, historyProviderMock, historyPlayerListenerMock, tagManagerMock, supervisionManagerMock);
     historyManager.getHistoryPlayerEvents().addHistoryPlayerListener(historyPlayerListenerMock);
      
     // Event to know when the history is finish loading
@@ -402,9 +412,16 @@ public class HistoryManagerTest {
       public void onHistoryIsFullyLoaded() {
         finishedLoading.set(true);
       }
+
+      @Override
+      public void onInitializingHistoryFinished() {
+        initializingCountDownLatch.countDown();
+      }
     });
     
     historyManager.startHistoryPlayerMode(historyProviderMock, timespan);
+    
+    initializingCountDownLatch.await(INITIALIZE_TIMEOUT, TimeUnit.MILLISECONDS);
     
     // Checks that the correct initial tag ids have been requested
     final Collection<Long> requestedInitialValues = Arrays.asList(initalRecordRequest.getValue());

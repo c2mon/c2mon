@@ -15,48 +15,38 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.history.dbaccess.util;
+package cern.c2mon.client.history.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
+import cern.c2mon.client.common.history.id.TagValueUpdateId;
 
 /**
- * Methods for managing time zones
+ * Utility class for data ids
  * 
  * @author vdeila
- *
+ * 
  */
-public final class TimeZoneUtil {
-  
+public final class DataIdUtil {
+
   /**
-   * Converts a date into another timezone
    * 
-   * @param timeZone
-   *          The timezone to convert into
-   * @param date
-   *          The date to convert into the timezone
-   * @return The converted date
+   * @param tagIds
+   *          the tag ids to convert into a {@link HistoryUpdateId} collection
+   * @return a {@link HistoryUpdateId} collection with the given tag ids
    */
-  public static Date convertDateIntoTimezone(final TimeZone timeZone, final Date date) {
-    final String dateTimeFormat = "dd.MM.yyyy HH:mm:ss";
-    final SimpleDateFormat dateWithTimezone = new SimpleDateFormat(dateTimeFormat);
-    dateWithTimezone.setTimeZone(timeZone);
-    try {
-      final Date gmtDate = new SimpleDateFormat(dateTimeFormat).parse(dateWithTimezone.format(date));
-      return gmtDate;
+  public static Collection<HistoryUpdateId> convertTagIdsToDataIdCollection(final Collection<Long> tagIds) {
+    final List<HistoryUpdateId> historyUpdateIds = new ArrayList<HistoryUpdateId>();
+    for (final Long tagId : tagIds) {
+      historyUpdateIds.add(new TagValueUpdateId(tagId));
     }
-    catch (ParseException e) {
-      // Will never happen
-      return null;
-    }
+    return historyUpdateIds;
   }
-  
-  /**
-   * Private constructor, is only a utility class
-   */
-  private TimeZoneUtil() {
-    
+
+  /** Hidden constructor */
+  private DataIdUtil() {
   }
 }

@@ -15,32 +15,63 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.history.playback.schedule.event;
-
-import java.util.Collection;
+package cern.c2mon.client.common.history.id;
 
 /**
- * Is used by the {@link HistoryScheduler} to inform about events
+ * This class is used to identify one or multiple {@link TagValueUpdate}
  * 
  * @author vdeila
  *
  */
-public interface HistorySchedulerListener {
+public class TagValueUpdateId extends HistoryUpdateId {
+
+  /** the tag id */
+  private final Long tagId;
+  
+  /**
+   * 
+   * @param tagId the tag id
+   */
+  public TagValueUpdateId(final Long tagId) {
+    this.tagId = tagId;
+  }
 
   /**
-   * Is invoked when a collection of tags is updated
-   * 
-   * @param tagIds
-   *          The tag ids which are updated
+   * @return the tagId
    */
-  void startingUpdatingOfDataTags(final Collection<Long> tagIds);
+  public Long getTagId() {
+    return tagId;
+  }
 
-  /**
-   * Is invoked when the history player is finish updating a collection of tags
-   * 
-   * @param tagIds
-   *          The tag ids which are updated
-   */
-  void finishedUpdatingOfDataTags(final Collection<Long> tagIds);
+  @Override
+  public String toString() {
+    return String.format("TagValueUpdate %d", this.tagId);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((tagId == null) ? 0 : tagId.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!(obj instanceof TagValueUpdateId))
+      return false;
+    TagValueUpdateId other = (TagValueUpdateId) obj;
+    if (tagId == null) {
+      if (other.tagId != null)
+        return false;
+    }
+    else if (!tagId.equals(other.tagId))
+      return false;
+    return true;
+  }
 
 }

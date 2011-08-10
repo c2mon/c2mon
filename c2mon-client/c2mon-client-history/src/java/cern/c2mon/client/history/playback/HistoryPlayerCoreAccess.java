@@ -26,8 +26,8 @@ import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.jms.SupervisionListener;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This interface describes the methods to be used by the c2mon-core which are

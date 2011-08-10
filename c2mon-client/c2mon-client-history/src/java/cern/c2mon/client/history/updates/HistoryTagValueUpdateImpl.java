@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.history.tag;
+package cern.c2mon.client.history.updates;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
+import cern.c2mon.client.common.history.id.TagValueUpdateId;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -36,8 +38,8 @@ import cern.tim.shared.common.datatag.DataTagQuality;
  */
 public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
 
-  /** the tag identifier */
-  private final Long id;
+  /** the id */
+  private final TagValueUpdateId id;
 
   /** the DataTagQuality object for this data tag. */
   private final DataTagQuality dataTagQuality;
@@ -81,7 +83,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
 
   /**
    * 
-   * @param id
+   * @param tagId
    *          the tag identifier
    * @param dataTagQuality
    *          the DataTagQuality object for this data tag.
@@ -103,9 +105,9 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
    * @param mode
    *          the current mode of the tag.
    */
-  public HistoryTagValueUpdateImpl(final Long id, final DataTagQuality dataTagQuality, final Object value, final Timestamp sourceTimestamp,
+  public HistoryTagValueUpdateImpl(final Long tagId, final DataTagQuality dataTagQuality, final Object value, final Timestamp sourceTimestamp,
       final Timestamp serverTimestamp, final String description, final AlarmValue[] alarms, final TagMode mode) {
-    this.id = id;
+    this.id = new TagValueUpdateId(tagId);
     this.dataTagQuality = dataTagQuality;
     this.value = value;
     this.sourceTimestamp = sourceTimestamp;
@@ -121,7 +123,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
 
   /**
    * 
-   * @param id
+   * @param tagId
    *          the tag identifier
    * @param dataTagQuality
    *          the DataTagQuality object for this data tag.
@@ -140,9 +142,28 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
    * @param mode
    *          the current mode of the tag.
    */
-  public HistoryTagValueUpdateImpl(final Long id, final DataTagQuality dataTagQuality, final Object value, final Timestamp sourceTimestamp,
+  public HistoryTagValueUpdateImpl(final Long tagId, final DataTagQuality dataTagQuality, final Object value, final Timestamp sourceTimestamp,
       final Timestamp serverTimestamp, final String description, final TagMode mode) {
-    this(id, dataTagQuality, value, sourceTimestamp, serverTimestamp, description, null, mode);
+    this(tagId, dataTagQuality, value, sourceTimestamp, serverTimestamp, description, null, mode);
+  }
+  
+  /**
+   * 
+   * @param tagValueUpdate the value to copy
+   */
+  public HistoryTagValueUpdateImpl(final TagValueUpdate tagValueUpdate) {
+    this(
+        tagValueUpdate.getId(), 
+        tagValueUpdate.getDataTagQuality(), 
+        tagValueUpdate.getValue(), 
+        tagValueUpdate.getSourceTimestamp(), 
+        tagValueUpdate.getServerTimestamp(), 
+        tagValueUpdate.getDescription(), 
+        tagValueUpdate.getAlarms().toArray(new AlarmValue[0]), 
+        tagValueUpdate.getMode());
+    if (tagValueUpdate instanceof HistoryTagValueUpdateImpl) {
+      this.dataType = ((HistoryTagValueUpdateImpl) tagValueUpdate).getDataType();
+    }
   }
 
   @Override
@@ -162,7 +183,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
 
   @Override
   public Long getId() {
-    return this.id;
+    return this.id.getTagId();
   }
 
   @Override
@@ -220,6 +241,96 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
   @Override
   public Timestamp getExecutionTimestamp() {
     return getServerTimestamp();
+  }
+
+  @Override
+  public HistoryUpdateId getDataId() {
+    return this.id;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((alarms == null) ? 0 : alarms.hashCode());
+    result = prime * result + ((dataTagQuality == null) ? 0 : dataTagQuality.hashCode());
+    result = prime * result + ((dataType == null) ? 0 : dataType.hashCode());
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + (isSimulated ? 1231 : 1237);
+    result = prime * result + ((mode == null) ? 0 : mode.hashCode());
+    result = prime * result + ((serverTimestamp == null) ? 0 : serverTimestamp.hashCode());
+    result = prime * result + ((sourceTimestamp == null) ? 0 : sourceTimestamp.hashCode());
+    result = prime * result + ((value == null) ? 0 : value.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!(obj instanceof HistoryTagValueUpdateImpl))
+      return false;
+    HistoryTagValueUpdateImpl other = (HistoryTagValueUpdateImpl) obj;
+    if (alarms == null) {
+      if (other.alarms != null)
+        return false;
+    }
+    else if (!alarms.equals(other.alarms))
+      return false;
+    if (dataTagQuality == null) {
+      if (other.dataTagQuality != null)
+        return false;
+    }
+    else if (!dataTagQuality.equals(other.dataTagQuality))
+      return false;
+    if (dataType == null) {
+      if (other.dataType != null)
+        return false;
+    }
+    else if (!dataType.equals(other.dataType))
+      return false;
+    if (description == null) {
+      if (other.description != null)
+        return false;
+    }
+    else if (!description.equals(other.description))
+      return false;
+    if (id == null) {
+      if (other.id != null)
+        return false;
+    }
+    else if (!id.equals(other.id))
+      return false;
+    if (isSimulated != other.isSimulated)
+      return false;
+    if (mode == null) {
+      if (other.mode != null)
+        return false;
+    }
+    else if (!mode.equals(other.mode))
+      return false;
+    if (serverTimestamp == null) {
+      if (other.serverTimestamp != null)
+        return false;
+    }
+    else if (!serverTimestamp.equals(other.serverTimestamp))
+      return false;
+    if (sourceTimestamp == null) {
+      if (other.sourceTimestamp != null)
+        return false;
+    }
+    else if (!sourceTimestamp.equals(other.sourceTimestamp))
+      return false;
+    if (value == null) {
+      if (other.value != null)
+        return false;
+    }
+    else if (!value.equals(other.value))
+      return false;
+    return true;
   }
   
   

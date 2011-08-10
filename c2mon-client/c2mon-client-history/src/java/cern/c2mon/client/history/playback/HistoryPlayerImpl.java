@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
@@ -32,6 +33,9 @@ import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.PlaybackControl;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.event.HistoryPlayerListener;
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
+import cern.c2mon.client.common.history.id.SupervisionEventId;
+import cern.c2mon.client.common.history.id.TagValueUpdateId;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.history.playback.components.ListenersManager;
@@ -45,14 +49,11 @@ import cern.c2mon.client.history.playback.publish.HistoryPublisher;
 import cern.c2mon.client.history.playback.publish.SupervisionListenersManager;
 import cern.c2mon.client.history.playback.schedule.ClockSynchronizer;
 import cern.c2mon.client.history.playback.schedule.HistoryScheduler;
-import cern.c2mon.client.history.tag.HistoryTagValueUpdateImpl;
+import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This class implements a type of video player which provides functionality to
@@ -108,6 +109,12 @@ public class HistoryPlayerImpl
   /** Lock for {@link #tagsToRegisterLiveValue} */
   private final ReentrantLock tagsToRegisterLiveValueLock;
   
+  /** List of supervision event ids which will be loaded when {@link #beginLoading()} is called  */
+  private final ArrayList<SupervisionEventId> supervisionEventsToRegister;
+  
+  /** Lock for {@link #supervisionEventsToRegister} */
+  private final ReentrantLock supervisionEventsToRegisterLock;
+  
   /** For scheduling the tag value updates. */
   private final HistoryScheduler historyScheduler;
   
@@ -124,6 +131,9 @@ public class HistoryPlayerImpl
     this.historyPlayerListeners = new ListenersManager<HistoryPlayerListener>();
     this.tagsToRegisterLiveValue = new ArrayList<TagValueUpdate>();
     this.tagsToRegisterLiveValueLock = new ReentrantLock();
+    this.supervisionEventsToRegister = new ArrayList<SupervisionEventId>();
+    this.supervisionEventsToRegisterLock = new ReentrantLock(); 
+    
     this.historyModeActive = false;
     
     this.historyLoader = new HistoryLoader();
@@ -152,9 +162,11 @@ public class HistoryPlayerImpl
       }
 
       @Override
-      public void onTagCollectionChanged(final Collection<Long> tagIds) {
+      public void onDataCollectionChanged(final Collection<HistoryUpdateId> historyUpdateIds) {
         historyScheduler.rescheduleEvents();
       }
+      
+      
 
       @Override
       public void onPlaybackBufferFullyLoaded() {
@@ -166,9 +178,9 @@ public class HistoryPlayerImpl
       }
       
       @Override
-      public void onTagsInitialized(final Collection<Long> tagIds) {
+      public void onDataInitialized(final Collection<HistoryUpdateId> historyUpdateIds) {
         // initialize the new data tags with the value at current time
-        getHistoryScheduler().updateDataTagsWithValueAtCurrentTime(tagIds);
+        getHistoryScheduler().updateDataTagsWithValueAtCurrentTime(historyUpdateIds);
       }
     });
   }
@@ -355,6 +367,62 @@ public class HistoryPlayerImpl
   }
   
   /**
+   * Unregisters the listener from all tags it is registered to.
+   * 
+   * @param tagUpdateListener
+   *          The listener to unregister
+   */
+  @Override
+  public void unregisterTagUpdateListener(final TagUpdateListener tagUpdateListener) {
+    final Collection<Long> removedTagIds = this.publisher.getTagListenersManager().remove(tagUpdateListener);
+    
+    unregisterTagsFromHistoryStore(removedTagIds);
+  }
+  
+  /**
+   * Unregisters all listeners which are registered on this tag.
+   * 
+   * @param tagIds
+   *          the tag ids to unregister
+   */
+  @Override
+  public void unregisterTags(final Collection<Long> tagIds) {
+    for (final Long tagId : tagIds) {
+      this.publisher.getTagListenersManager().remove(tagId);
+    }
+    
+    unregisterTagsFromHistoryStore(tagIds);
+  }
+  
+  /**
+   * 
+   * @param tagIds the tag ids to unregister from the {@link HistoryLoader#getHistoryStore()}
+   */
+  private void unregisterTagsFromHistoryStore(final Collection<Long> tagIds) {
+    final List<HistoryUpdateId> removedDataIds = new ArrayList<HistoryUpdateId>(tagIds.size());
+    
+    this.tagsToRegisterLiveValueLock.lock();
+    try {
+      // Creates the "removedDataIds" list
+      // and removes it from the "supervisionEventsToRegister" if it exists.
+      for (final Long id : tagIds) {
+        final TagValueUpdateId tagValueUpdateId = new TagValueUpdateId(id);
+        if (!this.tagsToRegisterLiveValue.remove(tagValueUpdateId)) {
+          removedDataIds.add(tagValueUpdateId);
+        }
+      }
+    }
+    finally {
+      this.tagsToRegisterLiveValueLock.unlock();
+    }
+    
+    if (removedDataIds.size() > 0) {
+      // Removes the tags from the history store
+      this.historyLoader.getHistoryStore().unregisterTags(removedDataIds);
+    }
+  }
+  
+  /**
    * Registers the listener to the given set of supervision events
    * 
    * @param supervisionListener
@@ -376,7 +444,15 @@ public class HistoryPlayerImpl
       supervisionManager.add(id, supervisionListener);
     }
     
-    // TODO Add something to the history store or similiar?
+    this.supervisionEventsToRegisterLock.lock();
+    try {
+      for (final Long id : ids) {
+        this.supervisionEventsToRegister.add(new SupervisionEventId(entity, id));
+      }
+    }
+    finally {
+      this.supervisionEventsToRegisterLock.unlock();
+    }
   }
   
   /**
@@ -389,42 +465,27 @@ public class HistoryPlayerImpl
    */
   @Override
   public void unregisterSupervisionListener(final SupervisionEntity entity, final SupervisionListener listener) {
-    //final Collection<Long> removedTags = 
-    this.publisher.getSupervisionManager(entity).remove(listener);
+    final Collection<Long> removedIds = this.publisher.getSupervisionManager(entity).remove(listener);
+    final List<HistoryUpdateId> removedDataIds = new ArrayList<HistoryUpdateId>(removedIds.size());
     
-    // TODO Removes the supervision data from the history store
-    // this.historyLoader.getHistoryStore().unregisterSupervision(removedTags);
-  }
-  
-  /**
-   * Unregisters the listener from all tags it is registered to.
-   * 
-   * @param tagUpdateListener
-   *          The listener to unregister
-   */
-  @Override
-  public void unregisterTagUpdateListener(final TagUpdateListener tagUpdateListener) {
-    final Collection<Long> removedTags = this.publisher.getTagListenersManager().remove(tagUpdateListener);
-    
-    if (removedTags.size() > 0) {
-      // Removes the tags from the history store
-      this.historyLoader.getHistoryStore().unregisterTags(removedTags);
+    this.supervisionEventsToRegisterLock.lock();
+    try {
+      // Creates the "removedDataIds" list
+      // and removes it from the "supervisionEventsToRegister" if it exists.
+      for (final Long id : removedIds) {
+        final SupervisionEventId supervisionEventId = new SupervisionEventId(entity, id);
+        if (!this.supervisionEventsToRegister.remove(supervisionEventId)) {
+          removedDataIds.add(supervisionEventId);
+        }
+      }
     }
-  }
-  
-  /**
-   * Unregisters all listeners which are registered on this tag.
-   * 
-   * @param tagIds
-   *          the tag ids to unregister
-   */
-  @Override
-  public void unregisterTags(final Collection<Long> tagIds) {
-    for (final Long tagId : tagIds) {
-      this.publisher.getTagListenersManager().remove(tagId);
+    finally {
+      this.supervisionEventsToRegisterLock.unlock();
     }
     
-    this.historyLoader.getHistoryStore().unregisterTags(tagIds);
+    // Removes the supervision data from the history store
+    this.historyLoader.getHistoryStore().unregisterTags(removedDataIds);
+    
   }
   
   /**
@@ -444,10 +505,10 @@ public class HistoryPlayerImpl
     try {
       this.historyLoader.getHistoryStore().setBatching(true);
       
-      final Collection<Long> tagsToLoad;
+      final Collection<HistoryUpdateId> filteredTags;
       this.tagsToRegisterLiveValueLock.lock();
       try {
-        tagsToLoad = 
+        filteredTags = 
           this.historyLoader.getHistoryStore().filterRealTimeValues(
               this.tagsToRegisterLiveValue.toArray(new TagValueUpdate[0]));
         
@@ -457,30 +518,33 @@ public class HistoryPlayerImpl
         this.tagsToRegisterLiveValueLock.unlock();
       }
       
-      if (tagsToLoad.size() > 0) {
+      if (filteredTags.size() > 0) {
         if (LOG.isDebugEnabled()) {
           LOG.debug("Invalidating data tags");
         }
         
         // Invalidates the tags which is not yet loaded
-        for (final Long tagId : tagsToLoad) {
-          final TagValueUpdate tagValueInvalidation = new HistoryTagValueUpdateImpl(
-              tagId, 
-              new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, "Loading history records.."), 
-              null, 
-              null, 
-              new Timestamp(System.currentTimeMillis()), 
-              "",  
-              TagMode.OPERATIONAL);
-          publisher.publish(tagValueInvalidation);
+        for (final Object id : filteredTags) {
+          publisher.invalidate(id, "Loading history records.");
         }
         
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Registering data tags");
+          LOG.debug("Registering data objects");
+        }
+        
+        final List<HistoryUpdateId> tagsToLoad = new ArrayList<HistoryUpdateId>();
+        tagsToLoad.addAll(filteredTags);
+        
+        this.supervisionEventsToRegisterLock.lock();
+        try {
+          tagsToLoad.addAll(this.supervisionEventsToRegister);
+        }
+        finally {
+          this.supervisionEventsToRegisterLock.unlock();
         }
         
         // Register the tag in the history store
-        this.historyLoader.getHistoryStore().registerTags(tagsToLoad.toArray(new Long[0]));
+        this.historyLoader.getHistoryStore().registerTags(tagsToLoad.toArray(new HistoryUpdateId[0]));
       }
     }
     finally {

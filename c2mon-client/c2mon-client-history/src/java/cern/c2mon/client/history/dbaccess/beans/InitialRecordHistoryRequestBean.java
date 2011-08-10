@@ -18,11 +18,8 @@
 package cern.c2mon.client.history.dbaccess.beans;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * This class is passed as a parameter when requesting the initial record for a
@@ -32,11 +29,6 @@ import java.util.TimeZone;
  * 
  */
 public class InitialRecordHistoryRequestBean {
-
-  /**
-   * The format of the string with a date and time
-   */
-  private static final String DATE_TIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
 
   /**
    * The format of the string with only the date
@@ -49,16 +41,8 @@ public class InitialRecordHistoryRequestBean {
   /** The requested record will be having the value that was on this time */
   private Timestamp beforeTime;
 
-  /** The format used when having date and time */
-  private final SimpleDateFormat dateTimeFormat;
-
   /** The format used when having only date */
   private final SimpleDateFormat dateFormat;
-
-  /**
-   * This is the timezone of the log date in the database.
-   */
-  private static final TimeZone LOG_DATE_TIMEZONE = TimeZone.getTimeZone("GMT");
 
   /**
    * 
@@ -71,8 +55,6 @@ public class InitialRecordHistoryRequestBean {
   public InitialRecordHistoryRequestBean(final long tagId, final Timestamp beforeTime) {
     this.tagId = tagId;
     this.beforeTime = beforeTime;
-
-    this.dateTimeFormat = new SimpleDateFormat(DATE_TIME_FORMAT);
     this.dateFormat = new SimpleDateFormat(DATE_FORMAT);
   }
 
@@ -83,7 +65,7 @@ public class InitialRecordHistoryRequestBean {
    */
   public Timestamp getLogStart() {
     final Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(getBeforeTimeWithLogTimezone().getTime());
+    calendar.setTimeInMillis(getBeforeTime().getTime());
     calendar.set(Calendar.HOUR_OF_DAY, 0);
     calendar.set(Calendar.MINUTE, 0);
     calendar.set(Calendar.SECOND, 0);
@@ -103,34 +85,7 @@ public class InitialRecordHistoryRequestBean {
     calendar.add(Calendar.DATE, -1);
     return new Timestamp(calendar.getTimeInMillis());
   }
-
-  /**
-   * @return the beforeTime with the timezone of the log column in the database
-   */
-  private Date getBeforeTimeWithLogTimezone() {
-    return convertDateIntoTimezone(LOG_DATE_TIMEZONE, getBeforeTime());
-  }
-
-  /*
-   * Dates converted to strings
-   */
-
-  /**
-   * 
-   * @return The String version of <code>getLogStart</code>.
-   */
-  public String getLogStartStr() {
-    return this.dateTimeFormat.format(getLogStart());
-  }
-
-  /**
-   * 
-   * @return The String version of <code>getBeforeTimeWithLogTimezone</code>.
-   */
-  public String getLogEndStr() {
-    return this.dateTimeFormat.format(getBeforeTimeWithLogTimezone());
-  }
-
+  
   /**
    * 
    * @return The String version of <code>getLogInitialDay</code>.
@@ -163,27 +118,5 @@ public class InitialRecordHistoryRequestBean {
    */
   public long getTagId() {
     return tagId;
-  }
-
-  /**
-   * 
-   * @param timeZone
-   *          The timezone to convert into
-   * @param date
-   *          The date to convert into the timezone
-   * @return The converted date
-   */
-  private static Date convertDateIntoTimezone(final TimeZone timeZone, final Date date) {
-    final String dateTimeFormat = "dd.MM.yyyy HH:mm:ss";
-    final SimpleDateFormat dateWithTimezone = new SimpleDateFormat(dateTimeFormat);
-    dateWithTimezone.setTimeZone(timeZone);
-    try {
-      final Date gmtDate = new SimpleDateFormat(dateTimeFormat).parse(dateWithTimezone.format(date));
-      return gmtDate;
-    }
-    catch (ParseException e) {
-      // Will never happen
-      return null;
-    }
   }
 }

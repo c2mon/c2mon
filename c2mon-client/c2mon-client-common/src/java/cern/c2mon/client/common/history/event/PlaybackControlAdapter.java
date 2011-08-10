@@ -26,15 +26,21 @@ package cern.c2mon.client.common.history.event;
 public class PlaybackControlAdapter implements PlaybackControlListener {
 
   public PlaybackControlAdapter() {
+    
   }
 
   @Override
-  public void onClockPlaybackSpeedChanged(double newMultiplier) {
+  public void onClockPlaybackSpeedChanged(final double newMultiplier) {
 
   }
 
   @Override
-  public void onClockTimeSet(long newTime) {
+  public void onClockTimeChanging(final long newTime) {
+    
+  }
+  
+  @Override
+  public void onClockTimeChanged(final long newTime) {
 
   }
 
@@ -47,5 +53,7 @@ public class PlaybackControlAdapter implements PlaybackControlListener {
   public void onPlaybackStopped() {
 
   }
+
+  
 
 }

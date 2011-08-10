@@ -17,8 +17,10 @@
  *****************************************************************************/
 package cern.c2mon.client.history.dbaccess.beans;
 
+import java.sql.Timestamp;
+
 import cern.c2mon.client.history.dbaccess.HistoryMapper;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This class is passed as an argument when requesting data from through the
@@ -35,16 +37,27 @@ public class SupervisionEventRequestBean {
   /** The entities for the id to get */
   private SupervisionEntity entity;
 
+  /** From time */
+  private Timestamp fromTime;
+
+  /** To time */
+  private Timestamp toTime;
   /**
    * 
    * @param id
    *          The id
-   * @param entities
+   * @param entity
    *          The entities for the id to get
+   * @param fromTime
+   *          the start time
+   * @param toTime
+   *          the end time
    */
-  public SupervisionEventRequestBean(final Long id, final SupervisionEntity entity) {
+  public SupervisionEventRequestBean(final Long id, final SupervisionEntity entity, final Timestamp fromTime, final Timestamp toTime) {
     this.id = id;
     this.entity = entity;
+    this.fromTime = fromTime;
+    this.toTime = toTime;
   }
 
   /**
@@ -60,6 +73,20 @@ public class SupervisionEventRequestBean {
   public SupervisionEntity getEntity() {
     return entity;
   }
-  
-  
+
+  /**
+   * 
+   * @return the from time
+   */
+  public Timestamp getFromTime() {
+    return fromTime;
+  }
+
+  /**
+   * 
+   * @return the to time
+   */
+  public Timestamp getToTime() {
+    return toTime;
+  }
 }

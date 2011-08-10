@@ -245,7 +245,4 @@ public class HistoryRecordBean {
   public void setServerTime(final Timestamp serverTime) {
     this.serverTime = serverTime;
   }
-  
-  
-  
 }

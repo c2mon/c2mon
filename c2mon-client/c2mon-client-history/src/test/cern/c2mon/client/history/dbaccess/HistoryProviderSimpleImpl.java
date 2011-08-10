@@ -6,10 +6,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.SupervisionEventRequest;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This implementation uses only data which is given to it when it is
@@ -25,6 +24,12 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
 
   /** The list of records */
   private final List<HistoryTagValueUpdate> historyRecords;
+  
+  /** The list of inital supervision events */
+  private final List<HistorySupervisionEvent> initialSupervisionRecords;
+  
+  /** The list of supervision events */
+  private final List<HistorySupervisionEvent> supervisionRecords;
 
   /**
    * If set, it will delay the responses with this amount of milliseconds per
@@ -38,10 +43,20 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
    *          The list of initial records
    * @param historyRecords
    *          The list of records
+   * @param initialSupervisionRecords
+   *          The list of inital supervision events
+   * @param supervisionRecords
+   *          The list of supervision events
    */
-  public HistoryProviderSimpleImpl(final List<HistoryTagValueUpdate> initialRecords, final List<HistoryTagValueUpdate> historyRecords) {
+  public HistoryProviderSimpleImpl(
+      final List<HistoryTagValueUpdate> initialRecords, 
+      final List<HistoryTagValueUpdate> historyRecords,
+      final List<HistorySupervisionEvent> initialSupervisionRecords,
+      final List<HistorySupervisionEvent> supervisionRecords) {
     this.initialRecords = initialRecords;
     this.historyRecords = historyRecords;
+    this.initialSupervisionRecords = initialSupervisionRecords;
+    this.supervisionRecords = supervisionRecords;
   }
 
   @Override
@@ -60,13 +75,7 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
         }
       }
       
-      if (emulatedResponseTime != null) {
-        try {
-          Thread.sleep(emulatedResponseTime);
-        }
-        catch (InterruptedException e) { }
-      }
-
+      emulateWait(1);
       fireQueryProgressChanged(i / (double) pTagIds.length);
     }
 
@@ -93,12 +102,7 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
       }
     }
     
-    if (emulatedResponseTime != null) {
-      try {
-        Thread.sleep(emulatedResponseTime * tagIds.length);
-      }
-      catch (InterruptedException e) { }
-    }
+    emulateWait(tagIds.length);
 
     fireQueryProgressChanged(1.0);
     fireQueryFinished();
@@ -126,15 +130,72 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
   }
 
   @Override
-  public Collection<SupervisionEvent> getSupervisionEvents(final Long id, final SupervisionEntity entity) {
-    throw new UnsupportedOperationException("Trying to use a method that is not implemented");
+  public Collection<HistorySupervisionEvent> getInitialSupervisionEvents(final Timestamp initializationTime, final Collection<SupervisionEventRequest> requests) {
+    final List<HistorySupervisionEvent> result = new ArrayList<HistorySupervisionEvent>();
+
+    fireQueryStarting();
+    fireQueryProgressChanged(0.0);
+
+    // Filters out the events that is requested
+    for (final SupervisionEventRequest request : requests) {
+      for (HistorySupervisionEvent record : initialSupervisionRecords) {
+        if (record.getEntityId().equals(request.getId())
+            && record.getEntity().equals(request.getEntity())
+            && record.getEventTime().compareTo(initializationTime) <= 0) {
+          result.add(record);
+          break;
+        }
+      }
+      emulateWait(1);
+      fireQueryProgressChanged(result.size() / (double) requests.size());
+    }
+
+    fireQueryProgressChanged(1.0);
+    fireQueryFinished();
+
+    return result;
   }
 
   @Override
-  public Collection<SupervisionEvent> getSupervisionEvents(final Collection<SupervisionEventRequest> requests) {
-    throw new UnsupportedOperationException("Trying to use a method that is not implemented");
+  public Collection<HistorySupervisionEvent> getSupervisionEvents(final Timestamp from, final Timestamp to, final Collection<SupervisionEventRequest> requests) {
+    fireQueryStarting();
+
+    fireQueryProgressChanged(0.0);
+
+    // Filters out the events that is requested
+    final List<HistorySupervisionEvent> result = new ArrayList<HistorySupervisionEvent>();
+    
+    for (final SupervisionEventRequest request : requests) { 
+      for (final HistorySupervisionEvent event : supervisionRecords) {
+        if (event.getEntityId().equals(request.getId())
+          && event.getEntity().equals(request.getEntity())
+          && event.getEventTime().compareTo(from) >= 0
+          && event.getEventTime().compareTo(to) <= 0) {
+          result.add(event);
+          break;
+        }
+      }
+      emulateWait(1);
+      fireQueryProgressChanged(result.size() / (double) requests.size());
+    }
+
+    fireQueryProgressChanged(1.0);
+    fireQueryFinished();
+    return result;
   }
 
+  /**
+   * Emulates the time it takes to get the records from the database
+   */
+  private void emulateWait(final int numberOfTags) {
+    if (emulatedResponseTime != null) {
+      try {
+        Thread.sleep(emulatedResponseTime * numberOfTags);
+      }
+      catch (InterruptedException e) { }
+    }
+  }
+  
   /**
    * 
    * @return If set, it will delay the responses with this amount of

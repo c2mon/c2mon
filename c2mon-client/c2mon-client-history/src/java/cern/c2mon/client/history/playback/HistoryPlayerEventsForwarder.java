@@ -23,6 +23,7 @@ import java.util.Collection;
 import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.common.history.event.HistoryPlayerListener;
 import cern.c2mon.client.common.history.event.HistoryProviderListener;
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
 import cern.c2mon.client.history.playback.components.ListenersManager;
 import cern.c2mon.client.history.playback.data.event.HistoryLoaderListener;
 import cern.c2mon.client.history.playback.data.event.HistoryStoreListener;
@@ -102,11 +103,7 @@ public class HistoryPlayerEventsForwarder implements HistoryLoaderListener, Hist
       listener.onHistoryDataAvailabilityChanged(newEndTime);
     }
   }
-
-  @Override
-  public void onTagCollectionChanged(final Collection<Long> tagIds) {
-  }
-
+  
   @Override
   public void queryStarting() {
     if (this.isInitializing) {
@@ -135,10 +132,11 @@ public class HistoryPlayerEventsForwarder implements HistoryLoaderListener, Hist
   }
 
   @Override
-  public void onTagsInitialized(final Collection<Long> tagIds) {
-    for (HistoryPlayerListener listener : historyPlayerListeners.getAll()) {
-      listener.onTagsInitialized(tagIds);
-    }
+  public void onDataCollectionChanged(final Collection<HistoryUpdateId> historyUpdateIds) {
+  }
+
+  @Override
+  public void onDataInitialized(final Collection<HistoryUpdateId> historyUpdateIds) {
   }
 
 }

@@ -19,15 +19,23 @@ package cern.c2mon.client.common.history;
 
 import java.sql.Timestamp;
 
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
+
 /**
- * This interface is used to keep track of the data from history. It have the
- * function {@link #getExecutionTimestamp()} so the player will know when to
- * execute the update.
+ * This interface is used to keep track of the data which is from the history.
+ * It have a function to get the execution time of the update so the player will know
+ * when to execute the update. And it also have an identifier.
  * 
  * @author vdeila
  * 
  */
 public interface HistoryUpdate {
+
+  /**
+   * 
+   * @return the id of the update
+   */
+  HistoryUpdateId getDataId();
 
   /**
    * 

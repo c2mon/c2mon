@@ -21,7 +21,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.client.history.util.TagHistory;
+import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistoryUpdate;
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
+import cern.c2mon.client.history.updates.HistorySupervisionEventImpl;
+import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
+import cern.c2mon.client.history.util.HistoryGroup;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 
 /**
@@ -34,26 +40,37 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 public final class HistoryDataUtil {
 
   /**
-   * Converts a bunch of values into {@link TagHistory} objects.
+   * Converts a bunch of values into {@link HistoryGroup} objects.
    * 
    * @param tagValueUpdates
    *          The values to convert
    * @return a collection of the converted objects
    */
-  public static Collection<TagHistory> toTagHistoryCollection(final Collection<TagValueUpdate> tagValueUpdates) {
-    final Map<Long, TagHistory> dataTagHistoryMap = new HashMap<Long, TagHistory>();
+  public static Collection<HistoryGroup> toTagHistoryCollection(final Collection<HistoryUpdate> tagValueUpdates) {
+    final Map<HistoryUpdateId, HistoryGroup> dataTagHistoryMap = new HashMap<HistoryUpdateId, HistoryGroup>();
 
     // Converts the tagValueUpdates into a dataTagHistoryMap
-    for (final TagValueUpdate tagValueUpdate : tagValueUpdates) {
-      if (tagValueUpdate == null) {
+    for (final HistoryUpdate historyUpdate : tagValueUpdates) {
+      if (historyUpdate == null) {
         continue;
       }
-      TagHistory history = dataTagHistoryMap.get(tagValueUpdate.getId());
+      
+      HistoryGroup history = dataTagHistoryMap.get(historyUpdate.getDataId());
       if (history == null) {
-        history = new TagHistory(tagValueUpdate.getId());
-        dataTagHistoryMap.put(history.getTagId(), history);
+        history = new HistoryGroup(historyUpdate.getDataId());
+        dataTagHistoryMap.put(historyUpdate.getDataId(), history);
       }
-      history.add(tagValueUpdate);
+      if (historyUpdate instanceof TagValueUpdate) {
+        history.add(new HistoryTagValueUpdateImpl((TagValueUpdate) historyUpdate));
+      }
+      else if (historyUpdate instanceof SupervisionEvent && historyUpdate.getDataId().isSupervisionEventId()) {
+        final SupervisionEvent event = (SupervisionEvent) historyUpdate;
+        history.add(new HistorySupervisionEventImpl(
+            historyUpdate.getDataId().getSupervisionEventId(), event.getStatus(), event.getEventTime(), event.getMessage()));
+      }
+      else {
+        throw new RuntimeException(String.format("The HistoryUpdate type is not supported (%s)", historyUpdate.getClass().getName()));
+      }
     }
 
     return dataTagHistoryMap.values();

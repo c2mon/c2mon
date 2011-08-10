@@ -56,11 +56,21 @@ public interface HistoryMapper {
   List<HistoryRecordBean> getRecords(final ShortTermLogHistoryRequestBean request);
 
   /**
+   * This method requests only the initial values for the events
+   * 
+   * @param request
+   *          A request bean describing what to request
+   * @return a list of records meeting the criteria of the request bean
+   */
+  List<SupervisionRecordBean> getInitialSupervisionEvents(final SupervisionEventRequestBean request);
+
+  /**
+   * Use the {@link #getInitialSupervisionEvents(SupervisionEventRequestBean)}
+   * to get the initial values, this function only returns what's in between.
    * 
    * @param request
    *          A request bean describing what to request
    * @return a list of records meeting the criteria of the request bean
    */
   List<SupervisionRecordBean> getSupervisionEvents(final SupervisionEventRequestBean request);
-
 }

@@ -5,6 +5,7 @@ import org.junit.runners.Suite;
 
 import cern.c2mon.client.history.dbaccess.AllDbAccessTests;
 import cern.c2mon.client.history.playback.HistoryPlayerImplTest;
+import cern.c2mon.client.history.playback.HistoryPlayerImplTest2;
 import cern.c2mon.client.history.playback.components.ClockTest;
 
 /**
@@ -17,6 +18,7 @@ import cern.c2mon.client.history.playback.components.ClockTest;
 @Suite.SuiteClasses({
   AllDbAccessTests.class,
   HistoryPlayerImplTest.class,
+  HistoryPlayerImplTest2.class,
   ClockTest.class
 })
 public class AllHistoryTests {

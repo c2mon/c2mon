@@ -4,10 +4,10 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.SupervisionEventRequest;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * Implementation of the {@link HistoryProvider}<br/>
@@ -60,13 +60,13 @@ class SqlHistoryEventsProviderDAO extends HistoryProviderAbs {
   }
 
   @Override
-  public Collection<SupervisionEvent> getSupervisionEvents(Long id, SupervisionEntity entity) {
+  public Collection<HistorySupervisionEvent> getInitialSupervisionEvents(Timestamp initializationTime, Collection<SupervisionEventRequest> requests) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Collection<SupervisionEvent> getSupervisionEvents(Collection<SupervisionEventRequest> requests) {
+  public Collection<HistorySupervisionEvent> getSupervisionEvents(Timestamp from, Timestamp to, Collection<SupervisionEventRequest> requests) {
     // TODO Auto-generated method stub
     return null;
   }

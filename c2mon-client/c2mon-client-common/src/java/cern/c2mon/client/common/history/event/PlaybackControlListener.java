@@ -36,13 +36,22 @@ public interface PlaybackControlListener {
   void onPlaybackStopped();
   
   /**
-   * Invoked when the clock is manually changed, is NOT called continuously when
-   * the playback is running
+   * Invoked when the clock is going to be manually changed, is NOT called
+   * continuously when the playback is running
    * 
    * @param newTime
-   *          The new time that is set
+   *          The new time that it is being set to.
    */
-  void onClockTimeSet(final long newTime);
+  void onClockTimeChanging(final long newTime);
+
+  /**
+   * Invoked when the clock have been manually changed, is NOT called
+   * continuously when the playback is running
+   * 
+   * @param newTime
+   *          The new time that it have been set to
+   */
+  void onClockTimeChanged(final long newTime);
 
   /**
    * Invoked when the playback speed is changed

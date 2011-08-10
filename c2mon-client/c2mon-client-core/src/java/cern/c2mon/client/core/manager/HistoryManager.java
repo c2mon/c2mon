@@ -45,8 +45,9 @@ import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
 import cern.c2mon.client.history.playback.HistoryPlayerCoreAccess;
 import cern.c2mon.client.history.playback.HistoryPlayerImpl;
 import cern.c2mon.client.history.playback.publish.KeyForValuesMap;
+import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.SupervisionListener;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 @Service
 public class HistoryManager implements C2monHistoryManager, TagSubscriptionListener {
@@ -60,21 +61,26 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   /** Reference to the <code>ClientDataTagCache</code> */
   private final BasicCacheHandler cache;
   
+  /** Reference to the <code>C2monSupervisionManager</code> */
+  private final CoreSupervisionManager supervisionManager;
+  
   /** the history player */
-  private HistoryPlayerCoreAccess historyPlayer;
+  private HistoryPlayerCoreAccess historyPlayer = null;
   
   /** Keeps track of which tag id belongs to which {@link SupervisionListener} */
-  private final KeyForValuesMap<Long, SupervisionListener> tagToSupervisionListener;
+  private final KeyForValuesMap<Long, SupervisionListener> tagToSupervisionListener = new KeyForValuesMap<Long, SupervisionListener>();
   
-  private HistoryProviderAvailability historyProviderAvailability;
+  /** Interface to keep track of which providers are available */
+  private HistoryProviderAvailability historyProviderAvailability = null;
+  
+  /** A connection listener checking if the connection to the JMS is lost. */
+  private ConnectionListener jmsConnectionListener = null;
 
   @Autowired
-  protected HistoryManager(final CoreTagManager pTagManager, final BasicCacheHandler pCache) {
+  protected HistoryManager(final CoreTagManager pTagManager, final BasicCacheHandler pCache, final CoreSupervisionManager pSupervisionManager) {
     this.tagManager = pTagManager;
     this.cache = pCache;
-    this.historyPlayer = null;
-    this.tagToSupervisionListener = new KeyForValuesMap<Long, SupervisionListener>();
-    this.historyProviderAvailability = null;
+    this.supervisionManager = pSupervisionManager;
   }
 
   /**
@@ -88,26 +94,35 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
 
   @Override
   public void startHistoryPlayerMode(final HistoryProvider provider, final Timespan timespan) {
+    if (!supervisionManager.isServerConnectionWorking()) {
+      throw new RuntimeException("Cannot go into history mode, because the connection to the server is down.");
+    }
+    
     cache.setHistoryMode(true);
-
+    
     synchronized (cache.getHistoryModeSyncLock()) {
       if (cache.isHistoryModeEnabled()) {
-        if (this.historyPlayer == null) {
-          this.historyPlayer = new HistoryPlayerImpl();
+        if (jmsConnectionListener == null) {
+          jmsConnectionListener = new ConnectionEvents();
+          supervisionManager.addConnectionListener(jmsConnectionListener);
         }
         
+        if (historyPlayer == null) {
+          historyPlayer = new HistoryPlayerImpl();
+        }
+
         // Configures the history player with the given provider and time span
-        this.historyPlayer.configure(provider, timespan);
-        
+        historyPlayer.configure(provider, timespan);
+
         // Activating the history player
-        this.historyPlayer.activateHistoryPlayer();
+        historyPlayer.activateHistoryPlayer();
         try {
-        
+
           // Subscribes all the current subscribed tags
           subscribeTagsToHistory(cache.getAllSubscribedDataTags());
         }
         catch (RuntimeException e) {
-          this.historyPlayer.deactivateHistoryPlayer();
+          historyPlayer.deactivateHistoryPlayer();
           cache.setHistoryMode(false);
           throw e;
         }
@@ -127,18 +142,22 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
 
   @Override
   public void onNewTagSubscriptions(final Set<Long> tagIds) {
-    synchronized (cache.getHistoryModeSyncLock()) {
-      if (cache.isHistoryModeEnabled()
-          && this.historyPlayer != null 
-          && this.historyPlayer.isHistoryPlayerActive()) {
-        subscribeTagsToHistory(tagIds);
+    if (tagIds != null && tagIds.size() > 0) {
+      synchronized (cache.getHistoryModeSyncLock()) {
+        if (cache.isHistoryModeEnabled()
+            && this.historyPlayer != null 
+            && this.historyPlayer.isHistoryPlayerActive()) {
+          subscribeTagsToHistory(tagIds);
+        }
       }
     }
   }
 
   @Override
   public void onUnsubscribe(final Set<Long> tagIds) {
-    unsubscribeTagsFromHistory(tagIds);
+    if (tagIds != null && tagIds.size() > 0) {
+      unsubscribeTagsFromHistory(tagIds);
+    }
   }
 
   /**
@@ -288,6 +307,21 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
       this.historyProviderAvailability = new HistoryProviderAvailabilityImpl();
     }
     return this.historyProviderAvailability;
+  }
+  
+  class ConnectionEvents implements ConnectionListener {
+    @Override
+    public void onConnection() {
+      
+    }
+
+    @Override
+    public void onDisconnection() {
+      if (isHistoryModeEnabled()) {
+        stopHistoryPlayerMode();
+        LOG.info("The history mode is stopped, because the connection to the server is lost.");
+      }
+    }
   }
 
 }

@@ -15,14 +15,15 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.history.tag;
+package cern.c2mon.client.history.updates;
 
 import java.sql.Timestamp;
 
 import cern.c2mon.client.common.history.HistorySupervisionEvent;
+import cern.c2mon.client.common.history.id.SupervisionEventId;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
  * This class implement the {@link SupervisionEvent} and is used when the event
@@ -33,17 +34,16 @@ import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStat
  */
 public class HistorySupervisionEventImpl implements HistorySupervisionEvent {
 
-  /** The entity for which this supervision event is created */
-  private final SupervisionEntity entity;
-  /** The id of the entity */
-  private final Long entityId;
+  /** The id of the supervision event */
+  private final SupervisionEventId id;
+  
   /** one state from the <code>SupervisionStatus</code> enumeration */
   private final SupervisionStatus status;
   /** time of the event */
   private final Timestamp eventTime;
   /** Free text for describing this event */
   private final String message;
-
+  
   /**
    * Constructor.
    * 
@@ -60,8 +60,24 @@ public class HistorySupervisionEventImpl implements HistorySupervisionEvent {
    */
   public HistorySupervisionEventImpl(final SupervisionEntity entity, final Long entityId, final SupervisionStatus status, final Timestamp eventTime,
       final String message) {
-    this.entity = entity;
-    this.entityId = entityId;
+    this(new SupervisionEventId(entity, entityId), status, eventTime, message);
+  }
+  
+  /**
+   * Constructor.
+   * 
+   * @param identity
+   *          The identify of the supervision event
+   * @param status
+   *          one state from the <code>SupervisionStatus</code> enumeration
+   * @param eventTime
+   *          time of the event
+   * @param message
+   *          Free text for describing this event
+   */
+  public HistorySupervisionEventImpl(final SupervisionEventId identity, final SupervisionStatus status, final Timestamp eventTime,
+      final String message) {
+    this.id = identity;
     this.status = status;
     this.eventTime = eventTime;
     this.message = message;
@@ -71,14 +87,14 @@ public class HistorySupervisionEventImpl implements HistorySupervisionEvent {
    * @return the entity
    */
   public SupervisionEntity getEntity() {
-    return entity;
+    return this.id.getEntity();
   }
 
   /**
    * @return the entityId
    */
   public Long getEntityId() {
-    return entityId;
+    return this.id.getEntityId();
   }
 
   /**
@@ -109,7 +125,7 @@ public class HistorySupervisionEventImpl implements HistorySupervisionEvent {
    */
   @Override
   public SupervisionEvent clone() {
-    return new HistorySupervisionEventImpl(entity, entityId, status, eventTime, message);
+    return new HistorySupervisionEventImpl(id.getEntity(), id.getEntityId(), status, eventTime, message);
   }
 
   /**
@@ -120,4 +136,69 @@ public class HistorySupervisionEventImpl implements HistorySupervisionEvent {
     return getEventTime();
   }
 
+  @Override
+  public SupervisionEventId getDataId() {
+    return this.id;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("HistorySupervisionEventImpl [eventTime=%s, id=%s, status=%s]", eventTime, id, status);
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((eventTime == null) ? 0 : eventTime.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((message == null) ? 0 : message.hashCode());
+    result = prime * result + ((status == null) ? 0 : status.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!(obj instanceof SupervisionEvent))
+      return false;
+    SupervisionEvent other = (SupervisionEvent) obj;
+    if (eventTime == null) {
+      if (other.getEventTime() != null)
+        return false;
+    }
+    else if (!eventTime.equals(other.getEventTime()))
+      return false;
+    if (id == null || id.getEntityId() == null) {
+      if (other.getEntityId() != null)
+        return false;
+    }
+    else if (!id.getEntityId().equals(other.getEntityId()))
+      return false;
+    if (id.getEntity() == null) {
+      if (other.getEntity() != null)
+        return false;
+    }
+    else if (!id.getEntity().equals(other.getEntity()))
+      return false;
+    if (message == null) {
+      if (other.getMessage() != null)
+        return false;
+    }
+    else if (!message.equals(other.getMessage()))
+      return false;
+    if (status == null) {
+      if (other.getStatus() != null)
+        return false;
+    }
+    else if (!status.equals(other.getStatus()))
+      return false;
+    return true;
+  }
+
+  
+  
 }

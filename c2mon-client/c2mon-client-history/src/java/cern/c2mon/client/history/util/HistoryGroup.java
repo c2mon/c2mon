@@ -23,60 +23,64 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import cern.c2mon.client.common.history.HistoryUpdate;
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
 import cern.c2mon.client.history.playback.data.HistoryStore;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
 
 /**
- * This class holds a list of {@link TagValueUpdate}s.
- * Is used by {@link HistoryStore} to keep tag history in memory.
+ * This class holds a list of {@link HistoryUpdate}s. Is used by
+ * {@link HistoryStore} to keep history for one id (tag id or supervision event
+ * id) in memory.
  * 
  * @author vdeila
- *
+ * 
  */
-public class TagHistory {
-  
+public class HistoryGroup {
+
   /**
-   * The tag Id which is associated with the records
+   * The data id which is associated with the records
    */
-  private long tagId;
-  
+  private HistoryUpdateId historyUpdateId;
+
   /**
-   * The records of the tag
+   * The records of the id
    */
-  private final List<TagValueUpdate> history;
-  
+  private final List<HistoryUpdate> history;
+
   /**
    * Lock for <code>history</code>
    */
   private ReentrantReadWriteLock historyLock = new ReentrantReadWriteLock();
-  
+
   /**
    * 
-   * @param tagId The tag Id which the records will be associated with 
+   * @param historyUpdateId
+   *          The data id which the records will be associated with
    */
-  public TagHistory(final long tagId) {
-    this.tagId = tagId;
-    this.history = new ArrayList<TagValueUpdate>();
+  public HistoryGroup(final HistoryUpdateId historyUpdateId) {
+    this.historyUpdateId = historyUpdateId;
+    this.history = new ArrayList<HistoryUpdate>();
   }
-  
+
   /**
    * @return the history
    */
-  public TagValueUpdate[] getHistory() {
+  public HistoryUpdate[] getHistory() {
     try {
       this.historyLock.readLock().lock();
-      return this.history.toArray(new TagValueUpdate[0]);
+      return this.history.toArray(new HistoryUpdate[0]);
     }
     finally {
       this.historyLock.readLock().unlock();
     }
   }
-  
+
   /**
    * 
-   * @param dataTagValue The record to add to the list
+   * @param dataTagValue
+   *          The record to add to the list
    */
-  public void add(final TagValueUpdate dataTagValue) {
+  public void add(final HistoryUpdate dataTagValue) {
     try {
       this.historyLock.writeLock().lock();
       this.history.add(dataTagValue);
@@ -87,18 +91,19 @@ public class TagHistory {
   }
 
   /**
-   * @return The tag Id which is associated with the records
+   * @return The id which is associated with the records
    */
-  public long getTagId() {
-    return this.tagId;
+  public HistoryUpdateId getTagId() {
+    return this.historyUpdateId;
   }
 
   /**
    * Sorts the records by the given comparator
    * 
-   * @param comparator The comparator to use to sort the list
+   * @param comparator
+   *          The comparator to use to sort the list
    */
-  public void sortHistory(final Comparator<TagValueUpdate> comparator) {
+  public void sortHistory(final Comparator<HistoryUpdate> comparator) {
     try {
       this.historyLock.writeLock().lock();
       Collections.sort(this.history, comparator);
@@ -107,5 +112,5 @@ public class TagHistory {
       this.historyLock.writeLock().unlock();
     }
   }
-  
+
 }

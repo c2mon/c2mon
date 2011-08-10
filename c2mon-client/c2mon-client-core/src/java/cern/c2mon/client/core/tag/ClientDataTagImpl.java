@@ -35,13 +35,13 @@ import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.tim.shared.rule.RuleExpression;
 import cern.tim.shared.rule.RuleFormatException;
 

@@ -18,7 +18,6 @@
 package cern.c2mon.client.common.history.event;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 
 import cern.c2mon.client.common.history.HistoryProvider;
 
@@ -59,15 +58,6 @@ public interface HistoryPlayerListener {
    * Invoked when starting to retrieve the initial data
    */
   void onInitializingHistoryStarted();
-  
-  /**
-   * Invoked when one or more tags gets its first record
-   * 
-   * @param tagIds
-   *          the tag ids which is initialized by having their first set of
-   *          record(s)
-   */
-  void onTagsInitialized(Collection<Long> tagIds);
 
   /**
    * Invoked with the current status of the initialization

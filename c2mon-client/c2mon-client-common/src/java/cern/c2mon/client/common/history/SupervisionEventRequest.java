@@ -17,7 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.client.common.history;
 
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This is passed as an argument to

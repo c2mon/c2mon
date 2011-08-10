@@ -42,6 +42,7 @@
     <result property="date" column="SUL_DATE" jdbcType="TIMESTAMP" />
     <result property="status" column="SUL_STATUS" jdbcType="VARCHAR" javaType="SupervisionStatus" />
     <result property="message" column="SUL_MESSAGE" jdbcType="VARCHAR" />
+    
   </resultMap>
 
   <!--
@@ -60,16 +61,15 @@
         TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE
     FROM SHORTTERMLOG
     WHERE
-      TAGID IN 
-      <foreach item="tag" index="index" collection="tagIds"
-        open="(" separator="," close=")">
-        #{tag}
-      </foreach>
+      (TAGID IN 
+        <foreach item="tag" index="index" collection="tagIds"
+          open="(" separator="," close=")">
+          #{tag}
+        </foreach>
+      )
       <if test="fromTimeStr != null">
         <if test="toTimeStr != null">
-          AND TAGSERVERTIME BETWEEN
-              TO_DATE(#{fromTimeStr}, 'DD.MM.YYYY HH24:MI:SS')
-              AND TO_DATE(#{toTimeStr}, 'DD.MM.YYYY HH24:MI:SS')
+          AND TAGSERVERTIME BETWEEN #{fromTimeStr} AND #{toTime}
         </if>
       </if>
     ORDER BY TAGSERVERTIME DESC, TAGDAQTIME DESC, TAGTIME DESC
@@ -93,15 +93,15 @@
         FROM SHORTTERMLOG
         WHERE
             tagid = #{tagId}
-            AND LOGDATE <![CDATA[ >= ]]> TO_DATE(#{logStartStr}, 'DD.MM.YYYY HH24:MI:SS')
-            AND LOGDATE <![CDATA[ <= ]]> TO_DATE(#{logEndStr}, 'DD.MM.YYYY HH24:MI:SS')
+            AND LOGDATE <![CDATA[ >= ]]> #{logStart}
+            AND LOGDATE <![CDATA[ <= ]]> #{beforeTime}
         UNION ALL
         SELECT LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 1 AS FROMSNAPSHOT
         FROM STL_DAY_SNAPSHOT
         WHERE
             tagid = #{tagId}
             AND LOGDATE = TO_DATE(#{logInitialDayStr}, 'DD.MM.YYYY')
-        ORDER BY 1 DESC, 8 DESC
+        ORDER BY 8 DESC, 7 DESC, 1 DESC
     )
     WHERE rownum <![CDATA[ <= 1 ]]>
   </select>
@@ -117,7 +117,30 @@
     WHERE
         (SUL_ID = #{id})
         AND (SUL_ENTITY LIKE #{entity})
+        <if test="fromTime != null ">
+            <if test="toTime != null">
+              AND SUL_DATE BETWEEN #{fromTime} AND #{toTime}
+            </if>
+        </if>
     ORDER BY SUL_DATE ASC
+  </select>
+  
+  <!--
+    Requests the initial supervision event matching the request parameter
+   -->
+  <select   id="getInitialSupervisionEvents" 
+            parameterType="SupervisionEventRequestBean"
+            resultMap="SupervisionRecordResultMap">
+    SELECT * FROM (
+      SELECT SUL_ENTITY, SUL_ID, SUL_DATE, SUL_STATUS, SUL_MESSAGE
+      FROM SUPERVISION_LOG
+      WHERE
+          (SUL_ID = #{id})
+          AND (SUL_ENTITY LIKE #{entity})
+          AND SUL_DATE <![CDATA[ <= ]]> #{fromTime}
+      ORDER BY SUL_DATE DESC
+    )
+    WHERE rownum <![CDATA[ <= 1 ]]>
   </select>
   
 </mapper>

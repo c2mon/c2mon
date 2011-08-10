@@ -18,6 +18,7 @@
 
 package cern.c2mon.client.history.gui.toolbars;
 
+import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,6 +26,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Timestamp;
 
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
@@ -72,13 +75,13 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
   private ClockLabel clockLabel;
 
   /** The play/pause button */
-  private JButton playButton;
+  private AbstractButton playButton;
 
   /** <code>true</code> if the {@link #playButton} is playing (ie. showing the pause sign) */
   private boolean playButtonIsPlaying;
   
   /** The speed button */
-  private JButton speedButton;
+  private AbstractButton speedButton;
 
   /** The popup menu showing the different speeds */
   private JPopupMenu speedPopupMenu;
@@ -116,7 +119,12 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
    * Constructor
    */
   public TimHistoryPlayerToolBar() {
-    this.playButton = new JButton(PLAY_ICON);
+    super(HORIZONTAL);
+    this.setBorder(BorderFactory.createEmptyBorder());
+    this.setOpaque(false);
+    
+    this.playButton = createButton();
+    this.playButton.setIcon(PLAY_ICON);
     this.playButtonIsPlaying = false;
     this.playButton.addActionListener(new ActionListener() {
       @Override
@@ -130,7 +138,9 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
       }
     });
     
-    this.speedButton = new JButton(getClockSpeedString());
+    this.speedButton = createButton();
+    this.speedButton.setHideActionText(false);
+    this.speedButton.setPreferredSize(null);
     this.speedButton.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
@@ -151,6 +161,7 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
         }
       }
     });
+    updateSpeedButtonText();
     
     this.speedPopupMenu = new JPopupMenu();
     for (final double speed : CLOCK_SPEEDS) {
@@ -181,6 +192,22 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
     installBufferedChangeEventListener();
     installTimeSliderListener();
     installUpdateGuiTimer();
+  }
+  
+  /**
+   * Creates a simple standardized button
+   * 
+   * @return A <code>JButton</code>
+   */
+  private AbstractButton createButton() {
+    final AbstractButton button = new JButton();
+    button.setMinimumSize(new Dimension(26, 26));
+    button.setMaximumSize(new Dimension(26, 26));
+    button.setPreferredSize(new Dimension(26, 26));
+    button.setHideActionText(true);
+    button.setEnabled(true);
+
+    return button;
   }
   
   /**
@@ -306,7 +333,7 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
     }
 
     @Override
-    public void onClockTimeSet(long newTime) {
+    public void onClockTimeChanged(long newTime) {
       // updateClockLabel();
       updateGuiElements();
     }

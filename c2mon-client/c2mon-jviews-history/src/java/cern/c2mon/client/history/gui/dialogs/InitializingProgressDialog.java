@@ -100,16 +100,9 @@ public class InitializingProgressDialog {
       getInitializingProgressDialog().setProgress(null);
       getInitializingProgressDialog().setStatus(null);
       getInitializingProgressDialog().setParent(parentComponent);
-      
-      final Thread progressThread = new Thread(new Runnable() {
-        @Override
-        public void run() {
-          // Shows the progress bar
-          getInitializingProgressDialog().show();
-        }
-      });
-      progressThread.setName("Progress-bar-Thread");
-      progressThread.start();
+
+      // Shows the progress bar
+      getInitializingProgressDialog().show();
     }
 
     @Override

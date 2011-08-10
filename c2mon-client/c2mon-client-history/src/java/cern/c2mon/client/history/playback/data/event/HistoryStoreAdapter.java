@@ -20,6 +20,8 @@ package cern.c2mon.client.history.playback.data.event;
 import java.sql.Timestamp;
 import java.util.Collection;
 
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
+
 /**
  * Adapter for {@link HistoryStoreListener} which enabled you to choose which
  * methods you would like to override
@@ -29,24 +31,17 @@ import java.util.Collection;
 public abstract class HistoryStoreAdapter implements HistoryStoreListener {
 
   @Override
-  public void onPlaybackBufferIntervalUpdated(final Timestamp newEndTime) {
-
-  }
+  public void onDataCollectionChanged(final Collection<HistoryUpdateId> historyUpdateIds) { }
 
   @Override
-  public void onTagCollectionChanged(final Collection<Long> tagIds) {
-
-  }
+  public void onDataInitialized(final Collection<HistoryUpdateId> historyUpdateIds) { }
 
   @Override
-  public void onPlaybackBufferFullyLoaded() {
-    
-  }
+  public void onPlaybackBufferFullyLoaded() { }
 
   @Override
-  public void onTagsInitialized(Collection<Long> tagIds) {
-    
-  }
+  public void onPlaybackBufferIntervalUpdated(final Timestamp newEndTime) { }
+
   
   
 

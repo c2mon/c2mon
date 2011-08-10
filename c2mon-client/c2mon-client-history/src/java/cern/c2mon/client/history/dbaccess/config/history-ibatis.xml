@@ -12,8 +12,8 @@
     <typeAlias alias="DataTagQuality" type="cern.tim.shared.common.datatag.DataTagQuality" />
     <typeAlias alias="SupervisionRecordBean" type="cern.c2mon.client.history.dbaccess.beans.SupervisionRecordBean" />
     <typeAlias alias="Timestamp" type="java.sql.Timestamp" />
-    <typeAlias alias="SupervisionEntity" type="cern.c2mon.shared.client.supervision.SupervisionConstants$SupervisionEntity" />
-    <typeAlias alias="SupervisionStatus" type="cern.c2mon.shared.client.supervision.SupervisionConstants$SupervisionStatus" />
+    <typeAlias alias="SupervisionEntity" type="cern.tim.shared.common.supervision.SupervisionConstants$SupervisionEntity" />
+    <typeAlias alias="SupervisionStatus" type="cern.tim.shared.common.supervision.SupervisionConstants$SupervisionStatus" />
   </typeAliases>
   
   <typeHandlers>

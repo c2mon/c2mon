@@ -30,9 +30,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import cern.c2mon.client.common.history.HistoryUpdate;
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
+import cern.c2mon.client.common.history.id.TagValueUpdateId;
 import cern.c2mon.client.history.playback.data.event.HistoryStoreListener;
 import cern.c2mon.client.history.playback.data.utilities.HistoryDataUtil;
-import cern.c2mon.client.history.util.TagHistory;
+import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
+import cern.c2mon.client.history.util.HistoryGroup;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 
 /**
@@ -44,11 +48,12 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
  */
 public class HistoryStore {
 
-  /** A list of tag ids which will be filtered out */
-  private static final Long[] ILLEGAL_TAG_IDS = new Long[] { -1L, 0L };
+  /** A list of data ids which will be filtered out */
+  private static final HistoryUpdateId[] ILLEGAL_IDS = new HistoryUpdateId[] { 
+    new TagValueUpdateId(-1L), new TagValueUpdateId(0L) };
   
   /** A map containing all history for all the objects */
-  private Map<Long, TagHistory> dataTagHistories;
+  private Map<HistoryUpdateId, HistoryGroup> dataHistories;
 
   /** A lock for dataTagHistories map */
   private ReentrantReadWriteLock dataTagHistoriesLock;
@@ -66,20 +71,20 @@ public class HistoryStore {
   private ReentrantReadWriteLock historyStoreListenersLock;
 
   /**
-   * A map with the tagIds, each containing the ending time for how far the
-   * records have been retrieved. All tags which can be loaded will be in this
+   * A map with the dataIds, each containing the ending time for how far the
+   * records have been retrieved. All data which can be loaded will be in this
    * list, even just with the start time as timestamp.
    */
-  private Map<Long, Timestamp> tagsHaveRecordsUntilTime;
+  private Map<HistoryUpdateId, Timestamp> tagsHaveRecordsUntilTime;
 
   /** A lock for tagsHaveRecordsUntilTime list */
   private ReentrantReadWriteLock tagsHaveRecordsUntilTimeLock;
 
   /** 
-   * Tags that have been initialized, i.e. first value is loaded.
+   * Data that have been initialized, i.e. first value is loaded.
    * A tag will not be loaded before it is initialized.
    */
-  private Set<Long> initializedTags;
+  private Set<HistoryUpdateId> initializedTags;
 
   /** Lock for {@link #initializedTags} */
   private ReentrantReadWriteLock initializedTagsLock;
@@ -127,10 +132,10 @@ public class HistoryStore {
     this.start = new Timestamp(theTime);
     this.end = new Timestamp(theTime);
 
-    this.dataTagHistories = new Hashtable<Long, TagHistory>();
+    this.dataHistories = new Hashtable<HistoryUpdateId, HistoryGroup>();
     this.historyStoreListeners = new ArrayList<HistoryStoreListener>();
-    this.tagsHaveRecordsUntilTime = new HashMap<Long, Timestamp>();
-    this.initializedTags = new HashSet<Long>();
+    this.tagsHaveRecordsUntilTime = new HashMap<HistoryUpdateId, Timestamp>();
+    this.initializedTags = new HashSet<HistoryUpdateId>();
     this.recordsLoadedUntilTime = null;
     this.recordsLoadedUntilTimeIsDirty = false;
     this.batchesGoingOn = 0;
@@ -144,7 +149,7 @@ public class HistoryStore {
     // Clears the dataTagHistories
     try {
       this.dataTagHistoriesLock.writeLock().lock();
-      this.dataTagHistories.clear();
+      this.dataHistories.clear();
     }
     finally {
       this.dataTagHistoriesLock.writeLock().unlock();
@@ -185,7 +190,7 @@ public class HistoryStore {
    * if necessary
    * 
    * @return <code>true</code> if the time have changed, <code>false</code>
-   *         otherwise. Does only compare tags that is "accepted"!
+   *         otherwise. Does only compare data that is "accepted"!
    */
   private boolean updateTimeRecordsIsLoadedUntil() {
     Timestamp newTimestamp = null;
@@ -210,17 +215,17 @@ public class HistoryStore {
 
         boolean haveAllValues = true;
         Timestamp leastLoadedTimestamp = this.getEnd();
-        final Long[] tagIds;
+        final HistoryUpdateId[] dataIds;
         try {
           this.tagsHaveRecordsUntilTimeLock.readLock().lock();
-          tagIds = this.tagsHaveRecordsUntilTime.keySet().toArray(new Long[0]);
+          dataIds = this.tagsHaveRecordsUntilTime.keySet().toArray(new HistoryUpdateId[0]);
         }
         finally {
           this.tagsHaveRecordsUntilTimeLock.readLock().unlock();
         }
 
-        for (Long tagId : tagIds) {
-          final Timestamp registeredEndTime = getTagHaveRecordsUntilTime(tagId);
+        for (HistoryUpdateId historyUpdateId : dataIds) {
+          final Timestamp registeredEndTime = getTagHaveRecordsUntilTime(historyUpdateId);
           if (registeredEndTime == null) {
             // If there isn't any registered time, it have not been loaded at
             // all.
@@ -329,44 +334,44 @@ public class HistoryStore {
   /**
    * Removes the value from
    * 
-   * @param tagId
-   *          The id of the tag to remove
+   * @param historyUpdateId
+   *          The id of the data to remove
    */
-  private void removeTagHaveRecordsUntilTime(final Long tagId) {
-    setTagHaveRecordsUntilTime(tagId, null);
+  private void removeTagHaveRecordsUntilTime(final HistoryUpdateId historyUpdateId) {
+    setTagHaveRecordsUntilTime(historyUpdateId, null);
   }
 
   /**
    * The value is only set if <code>time</code> is after the value already there
    * (if any)
    * 
-   * @param tagId
-   *          The tag Id to set the new time for
+   * @param historyUpdateId
+   *          The data id to set the new time for
    * @param time
    *          The time to set, or <code>null</code> to remove
    */
-  private void setTagHaveRecordsUntilTime(final Long tagId, final Timestamp time) {
+  private void setTagHaveRecordsUntilTime(final HistoryUpdateId historyUpdateId, final Timestamp time) {
     Boolean add = null;
     if (time == null) {
       add = false;
     }
     else {
-      final Timestamp oldTimestamp = getTagHaveRecordsUntilTime(tagId);
+      final Timestamp oldTimestamp = getTagHaveRecordsUntilTime(historyUpdateId);
       add = oldTimestamp == null || time.after(oldTimestamp);
       if (!add) {
         add = null;
       }
     }
 
-    // Don't update the value if it already exists a later time for the tagId
+    // Don't update the value if it already exists a later time for the dataId
     if (add != null) {
       try {
         this.tagsHaveRecordsUntilTimeLock.writeLock().lock();
         if (add) {
-          this.tagsHaveRecordsUntilTime.put(tagId, time);
+          this.tagsHaveRecordsUntilTime.put(historyUpdateId, time);
         }
         else {
-          this.tagsHaveRecordsUntilTime.remove(tagId);
+          this.tagsHaveRecordsUntilTime.remove(historyUpdateId);
         }
       }
       finally {
@@ -378,15 +383,15 @@ public class HistoryStore {
 
   /**
    * 
-   * @param tagId
-   *          The tag id to retrieve the time for
+   * @param historyUpdateId
+   *          The data id to retrieve the time for
    * @return The ending time for how far the records have been retrieved for the
    *         tag Id
    */
-  public Timestamp getTagHaveRecordsUntilTime(final Long tagId) {
+  public Timestamp getTagHaveRecordsUntilTime(final HistoryUpdateId historyUpdateId) {
     try {
       this.tagsHaveRecordsUntilTimeLock.readLock().lock();
-      return this.tagsHaveRecordsUntilTime.get(tagId);
+      return this.tagsHaveRecordsUntilTime.get(historyUpdateId);
     }
     finally {
       this.tagsHaveRecordsUntilTimeLock.readLock().unlock();
@@ -394,28 +399,28 @@ public class HistoryStore {
   }
 
   /**
-   * This method does smart filtering on the real time values, the tags which
-   * does not need to be loaded is added to the store. The tags which were not
+   * This method does smart filtering on the real time values, the data which
+   * does not need to be loaded is added to the store. The data which were not
    * added is returned.<br/>
    * <br/>
-   * This function automatically registers the tags which is filtered (i.e. not
+   * This function automatically registers the data which is filtered (i.e. not
    * returned).
    * 
-   * @see #registerTags(Long...)
+   * @see #registerTags(HistoryUpdateId...)
    * 
    * @param currentValuesCollection
    *          A collection of all the current real time values. It is assumed
    *          that the TagValueUpdates in this collection have the most recent
    *          value
-   * @return The tagIds which is not added to the store, and must be retrieved
+   * @return The object ids which is not added to the store, and must be retrieved
    *         from the short term log
    */
-  public Collection<Long> filterRealTimeValues(final TagValueUpdate... currentValuesCollection) {
+  public Collection<HistoryUpdateId> filterRealTimeValues(final TagValueUpdate... currentValuesCollection) {
     // The result which will be returned
-    final Set<Long> result = new HashSet<Long>();
+    final Set<HistoryUpdateId> result = new HashSet<HistoryUpdateId>();
 
-    // A list of removed tags / not added to the result list
-    final Set<Long> registeredTags = new HashSet<Long>();
+    // A list of removed data / not added to the result list
+    final Set<HistoryUpdateId> registeredTags = new HashSet<HistoryUpdateId>();
 
     // Starting a batch
     this.setBatching(true);
@@ -425,14 +430,16 @@ public class HistoryStore {
         continue;
       }
 
+      final HistoryUpdateId tagDataId = new TagValueUpdateId(tag.getId());
+      
       // If the tag doesn't existing in real time, it must be retrieved
       if (tag.getDataTagQuality() != null && !tag.getDataTagQuality().isExistingTag()) {
-        result.add(tag.getId());
+        result.add(tagDataId);
         continue;
       }
-
+      
       // If the tag is already finish loading
-      final Timestamp loadedUntilTime = getTagHaveRecordsUntilTime(tag.getId());
+      final Timestamp loadedUntilTime = getTagHaveRecordsUntilTime(tagDataId);
       if (loadedUntilTime != null && loadedUntilTime.compareTo(getEnd()) >= 0) {
         continue;
       }
@@ -440,7 +447,7 @@ public class HistoryStore {
       // If the tag from the realtime collection have a timestamp of before
       // the start time of the playback, it means it already have the latest
       // value, and don't need to look it up on the server.
-      if (!registeredTags.contains(tag.getId())) {
+      if (!registeredTags.contains(tagDataId)) {
 
         // If the Timestamp is from before the start time
         // it means no updates have been made in the periode to today.
@@ -451,14 +458,14 @@ public class HistoryStore {
           // Puts the TagHistory into the dataTagHistories map
           try {
             this.dataTagHistoriesLock.writeLock().lock();
-            wasRegistered = !this.dataTagHistories.containsKey(tag.getId());
+            wasRegistered = !this.dataHistories.containsKey(tagDataId);
             if (wasRegistered) {
-              final TagHistory tagHistory = new TagHistory(tag.getId());
-
+              final HistoryGroup historyGroup = new HistoryGroup(tagDataId);
+              
               // Adds the record to the histories
-              tagHistory.add(tag);
+              historyGroup.add(new HistoryTagValueUpdateImpl(tag));
 
-              this.dataTagHistories.put(tagHistory.getTagId(), tagHistory);
+              this.dataHistories.put(tagDataId, historyGroup);
             }
           }
           finally {
@@ -466,21 +473,21 @@ public class HistoryStore {
           }
 
           if (wasRegistered) {
-            // Adds the tag to the list of registered tags as it is not added to
+            // Adds the tag to the list of registered data as it is not added to
             // the result
-            registeredTags.add(tag.getId());
+            registeredTags.add(tagDataId);
 
             // Sets the tag to initialized
-            setTagInitialized(true, tag.getId());
+            setTagInitialized(true, tagDataId);
           }
 
           // This tag is now fully loaded
-          this.setTagHaveRecordsUntilTime(tag.getId(), getEnd());
+          this.setTagHaveRecordsUntilTime(tagDataId, getEnd());
         }
         else if (loadedUntilTime == null) {
           // Adds the tag to the result, since it must be retrieved from the
           // server
-          result.add(tag.getId());
+          result.add(tagDataId);
         }
       }
     } // for loop
@@ -489,10 +496,10 @@ public class HistoryStore {
     this.setBatching(false);
 
     if (registeredTags.size() > 0) {
-      this.fireOnTagInitialized(registeredTags);
+      this.fireOnObjectsInitialized(registeredTags);
       
-      // Notifies which tags have been added
-      this.fireTagsAdded(registeredTags);
+      // Notifies which data have been added
+      this.fireOnObjectCollectionChanged(registeredTags);
     }
 
     return result;
@@ -500,19 +507,19 @@ public class HistoryStore {
 
   /**
    * 
-   * @param tagId
+   * @param historyUpdateId
    *          The tag id to get the value for
    * @param time
    *          The time of the value to retrieve
-   * @return The {@link TagValueUpdate} that belongs to the specific time,
+   * @return The {@link HistoryUpdate} that belongs to the specific time,
    *         <code>null</code> if there aren't one
    */
-  public TagValueUpdate getTagValue(final long tagId, final long time) {
-    final TagHistory history = this.getTagHistory(tagId);
+  public HistoryUpdate getTagValue(final HistoryUpdateId historyUpdateId, final long time) {
+    final HistoryGroup history = this.getHistory(historyUpdateId);
 
-    TagValueUpdate latestValue = null;
+    HistoryUpdate latestValue = null;
     if (history != null) {
-      final TagValueUpdate[] logRecords = history.getHistory();
+      final HistoryUpdate[] logRecords = history.getHistory();
 
       // check if there is any history for this data tag, if none is found
       // we set the latest value to null which results in invalidating the
@@ -521,13 +528,13 @@ public class HistoryStore {
       if (logRecords != null && logRecords.length > 0) {
         // init latest value with first log record
 
-        for (TagValueUpdate record : logRecords) {
+        for (HistoryUpdate record : logRecords) {
           // look for the first timestamp that is over the current time,
           // then take the value just before
 
-          if (record != null && record.getServerTimestamp() != null) {
+          if (record != null && record.getExecutionTimestamp() != null) {
             // If record is null or the timestamp is null, it is useless..
-            if (record.getServerTimestamp().getTime() > time) {
+            if (record.getExecutionTimestamp().getTime() > time) {
               break;
             }
             latestValue = record;
@@ -541,108 +548,108 @@ public class HistoryStore {
   /**
    * Adds the history records to the store with this initialization data
    * 
-   * @param tagIds
-   *          The tag ids which is loaded. The loaded end time will be set for
-   *          all these tag ids.
-   * @param tagValueUpdates
+   * @param historyUpdateIds
+   *          The data ids which is loaded. The loaded end time will be set for
+   *          all these data ids.
+   * @param historyUpdates
    *          The initialization data
+   * @return the number of records added
    */
-  public int addInitialHistoryData(final Collection<Long> tagIds, final Collection<TagValueUpdate> tagValueUpdates) {
-    final Set<Long> initializedTags = new HashSet<Long>();
-    for (final Long tag : tagIds) {
+  public int addInitialTagValueUpdates(final Collection<HistoryUpdateId> historyUpdateIds, final Collection<HistoryUpdate> historyUpdates) {
+    final Set<HistoryUpdateId> initializedTags = new HashSet<HistoryUpdateId>();
+    for (final HistoryUpdateId tag : historyUpdateIds) {
       initializedTags.add(tag);
     }
     setTagInitialized(true, initializedTags);
-    return addHistoryValues(tagIds, tagValueUpdates, getStart());
+    return addHistoryValues(historyUpdateIds, historyUpdates, getStart());
   }
 
   /**
-   * Adds the history records to the store, except the tags which are not
+   * Adds the history records to the store, except the data which are not
    * initialized. Call the {@link #addInitialHistoryData(Collection, Timestamp)}
-   * with the initial data for the tags you want to initialize.
+   * with the initial data for the data you want to initialize.
    * 
-   * @param tagIds
-   *          The tag ids which is loaded. The loaded end time will be set for
-   *          all these tag ids.
-   * @param tagValueUpdates
+   * @param historyUpdateIds
+   *          The data ids which is loaded. The loaded end time will be set for
+   *          all these data ids.
+   * @param historyUpdates
    *          The collection of values to add
    * @param endTime
-   *          The end time of the tags in the collection
-   * 
+   *          The end time of the data in the collection
+   * @return the number of records added
    */
-  public int addHistoryValues(final Collection<Long> tagIds, final Collection<TagValueUpdate> tagValueUpdates, final Timestamp endTime) {
-    
-    return addHistoryValues(tagIds,
-        HistoryDataUtil.toTagHistoryCollection(tagValueUpdates).toArray(new TagHistory[0]), endTime);
+  public int addHistoryValues(final Collection<HistoryUpdateId> historyUpdateIds, final Collection<HistoryUpdate> historyUpdates, final Timestamp endTime) {
+    return addHistoryValues(historyUpdateIds,
+        HistoryDataUtil.toTagHistoryCollection(historyUpdates).toArray(new HistoryGroup[0]), endTime);
   }
 
   /**
-   * Adds the history records to the store, except the tags which are not
+   * Adds the history records to the store, except the data which are not
    * initialized. Call the {@link #addInitialHistoryData(Collection, Timestamp)}
-   * with the initial data for the tags you want to initialize.
+   * with the initial data for the data you want to initialize.
    * 
-   * @param tagIds
-   *          The tag ids which is loaded. The loaded end time will be set for
-   *          all these tag ids.
+   * @param historyUpdateIds
+   *          The data ids which is loaded. The loaded end time will be set for
+   *          all these data ids.
    * @param tagHistories
    *          The collection to add
    * @param endTime
-   *          The end time of the tags in the collection
+   *          The end time of the data in the collection
    * @return The number of records that is added
    * 
    */
-  private int addHistoryValues(final Collection<Long> tagIds, final TagHistory[] tagHistories, final Timestamp endTime) {
+  private int addHistoryValues(final Collection<HistoryUpdateId> historyUpdateIds, final HistoryGroup[] tagHistories, final Timestamp endTime) {
 
     // Starting a batch
     this.setBatching(true);
 
-    // A list storing all the new tagIds. Is used at the end to notify listeners
-    final List<Long> addedTagIds = new ArrayList<Long>();
+    // A list storing all the new dataIds. Is used at the end to notify listeners
+    final List<HistoryUpdateId> addedIds = new ArrayList<HistoryUpdateId>();
     
-    // A list of tags which have their first record added
-    final List<Long> initializedTags = new ArrayList<Long>();
+    // A list of data which have their first record added
+    final List<HistoryUpdateId> initializedIds = new ArrayList<HistoryUpdateId>();
 
     int recordsAdded = 0;
 
     // Loops through the tagHistoryCollection. Adds all the valid ones.
-    for (final TagHistory history : tagHistories) {
-      if (history.getHistory() != null && history.getHistory().length > 0) {
+    for (final HistoryGroup newHistory : tagHistories) {
+      if (newHistory.getHistory() != null && newHistory.getHistory().length > 0) {
 
         // The data is not added if the tag is not registered
-        if (!isTagInitialized(history.getTagId())) {
+        if (!isTagInitialized(newHistory.getTagId())) {
           continue;
         }
 
-        addedTagIds.add(history.getTagId());
+        addedIds.add(newHistory.getTagId());
 
         // Checks if a DataTagHistory already exists for the tag,
         // if not it this new history object will be added.
         try {
           this.dataTagHistoriesLock.writeLock().lock();
-          TagHistory tagHistory = this.dataTagHistories.get(history.getTagId());
+          HistoryGroup historyGroup = this.dataHistories.get(newHistory.getTagId());
 
-          final TagValueUpdate[] historyValues = history.getHistory();
+          final HistoryUpdate[] historyValues = newHistory.getHistory();
           
           if (historyValues != null && historyValues.length > 0) {
             // If tagHistory not already exists it it created and added to the
             // dataTagHistories map
-            if (tagHistory == null) {
-              tagHistory = new TagHistory(history.getTagId());
-              this.dataTagHistories.put(tagHistory.getTagId(), tagHistory);
-              initializedTags.add(tagHistory.getTagId());
+            if (historyGroup == null) {
+              historyGroup = new HistoryGroup(newHistory.getTagId());
+              this.dataHistories.put(historyGroup.getTagId(), historyGroup);
+              initializedIds.add(historyGroup.getTagId());
             }
   
             // Adds all the records of class TagValueUpdate which is not null
             // and does have a Timestamp.
-            for (final TagValueUpdate tagValueUpdate : historyValues) {
-              if (tagValueUpdate.getServerTimestamp() != null) {
-                tagHistory.add(tagValueUpdate);
+            for (final HistoryUpdate tagValueUpdate : historyValues) {
+              if (tagValueUpdate.getExecutionTimestamp() != null) {
+                historyGroup.add(tagValueUpdate);
                 recordsAdded++;
               }
             }
   
             // Sorts the records
-            this.sortRecordsInDataTagHistory(tagHistory);
+            this.sortRecordsInDataTagHistory(historyGroup);
           }
         }
         finally {
@@ -651,24 +658,24 @@ public class HistoryStore {
       }
     }
     
-    for (final Long tagId : tagIds) {
-      setTagHaveRecordsUntilTime(tagId, endTime);
+    for (final HistoryUpdateId historyUpdateId : historyUpdateIds) {
+      setTagHaveRecordsUntilTime(historyUpdateId, endTime);
     }
     
-    if (initializedTags.size() > 0) {
-      this.fireOnTagInitialized(initializedTags);
-    }
-    
-    // Notifies that the tags have been added
-    if (addedTagIds.size() > 0) {
-      this.fireTagsAdded(addedTagIds);
-    }
-
     // Notifies that the history is changed
     this.historyChanged();
 
     // Ending the batch
     this.setBatching(false);
+    
+    if (initializedIds.size() > 0) {
+      this.fireOnObjectsInitialized(initializedIds);
+    }
+    
+    // Notifies that the data have been added
+    if (addedIds.size() > 0) {
+      this.fireOnObjectCollectionChanged(addedIds);
+    }
 
     return recordsAdded;
   }
@@ -679,18 +686,18 @@ public class HistoryStore {
    * @param history
    *          The history containing the records to sort
    */
-  private void sortRecordsInDataTagHistory(final TagHistory history) {
-    history.sortHistory(new Comparator<TagValueUpdate>() {
+  private void sortRecordsInDataTagHistory(final HistoryGroup history) {
+    history.sortHistory(new Comparator<HistoryUpdate>() {
       /**
        * Sort by {@link TagValueUpdate#getServerTimestamp()}
        */
       @Override
-      public int compare(final TagValueUpdate tagValueUpdate1, final TagValueUpdate tagValueUpdate2) {
+      public int compare(final HistoryUpdate tagValueUpdate1, final HistoryUpdate tagValueUpdate2) {
         if (tagValueUpdate1 == null || tagValueUpdate2 == null) {
           return whichIsNull(tagValueUpdate1, tagValueUpdate2);
         }
 
-        return tagValueUpdate1.getServerTimestamp().compareTo(tagValueUpdate2.getServerTimestamp());
+        return tagValueUpdate1.getExecutionTimestamp().compareTo(tagValueUpdate2.getExecutionTimestamp());
       }
     });
   }
@@ -700,9 +707,9 @@ public class HistoryStore {
    * <code>null</code> for it to succeed
    * 
    * @param obj1
-   *          Object to compare
+   *          HistoryUpdateId to compare
    * @param obj2
-   *          Object to compare
+   *          HistoryUpdateId to compare
    * @return <code>0</code> (zero) if both is null, -1 if obj1 is null, 1 if
    *         obj2 is null
    */
@@ -721,14 +728,14 @@ public class HistoryStore {
 
   /**
    * 
-   * @param tagId
-   *          The tag id to search for
-   * @return The {@link TagHistory} associated with the tagId
+   * @param id
+   *          The id to search for
+   * @return The {@link HistoryGroup} associated with the dataId
    */
-  public TagHistory getTagHistory(final long tagId) {
+  public HistoryGroup getHistory(final HistoryUpdateId id) {
     try {
       this.dataTagHistoriesLock.readLock().lock();
-      return this.dataTagHistories.get(tagId);
+      return this.dataHistories.get(id);
     }
     finally {
       this.dataTagHistoriesLock.readLock().unlock();
@@ -737,12 +744,12 @@ public class HistoryStore {
 
   /**
    * 
-   * @return An array of all the data tag ids registered
+   * @return An array of all the data data ids registered
    */
-  public Long[] getRegisteredTags() {
+  public HistoryUpdateId[] getRegisteredDataIds() {
     try {
       this.tagsHaveRecordsUntilTimeLock.readLock().lock();
-      return this.tagsHaveRecordsUntilTime.keySet().toArray(new Long[0]);
+      return this.tagsHaveRecordsUntilTime.keySet().toArray(new HistoryUpdateId[0]);
     }
     finally {
       this.tagsHaveRecordsUntilTimeLock.readLock().unlock();
@@ -750,19 +757,19 @@ public class HistoryStore {
   }
 
   /**
-   * Checks if the tag have been registered ({@link #registerTags(Long...)}) or
+   * Checks if the tag have been registered ({@link #registerTags(HistoryUpdateId...)}) or
    * if it have been registered by
    * {@link #filterRealTimeValues(TagValueUpdate...)}
    * 
-   * @param tagId
+   * @param historyUpdateId
    *          The tag to search for
-   * @return <code>true</code> if the tag is in the list of tags,
+   * @return <code>true</code> if the tag is in the list of data,
    *         <code>false</code> otherwise
    */
-  public boolean isRegistered(final Long tagId) {
+  public boolean isRegistered(final HistoryUpdateId historyUpdateId) {
     try {
       this.tagsHaveRecordsUntilTimeLock.readLock().lock();
-      return this.tagsHaveRecordsUntilTime.containsKey(tagId);
+      return this.tagsHaveRecordsUntilTime.containsKey(historyUpdateId);
     }
     finally {
       this.tagsHaveRecordsUntilTimeLock.readLock().unlock();
@@ -770,23 +777,23 @@ public class HistoryStore {
   }
 
   /**
-   * @param tagId
-   *          The tagId of the DataTagHistory to remove
-   * @return The removed {@link TagHistory}, or <code>null</code> if not found
+   * @param historyUpdateId
+   *          The dataId of the DataTagHistory to remove
+   * @return The removed {@link HistoryGroup}, or <code>null</code> if not found
    */
-  public TagHistory removeDataTagHistory(final Long tagId) {
+  public HistoryGroup removeDataTagHistory(final HistoryUpdateId historyUpdateId) {
 
     // Sets the tag to not initialized
-    setTagInitialized(false, tagId);
+    setTagInitialized(false, historyUpdateId);
 
     // Removes tag from tagsHaveRecordsUntilTime
-    removeTagHaveRecordsUntilTime(tagId);
+    removeTagHaveRecordsUntilTime(historyUpdateId);
 
-    TagHistory removedElement = null;
+    HistoryGroup removedElement = null;
     // Removes the tag from dataTagHistories
     try {
       this.dataTagHistoriesLock.writeLock().lock();
-      removedElement = this.dataTagHistories.remove(tagId);
+      removedElement = this.dataHistories.remove(historyUpdateId);
     }
     finally {
       this.dataTagHistoriesLock.writeLock().unlock();
@@ -797,18 +804,18 @@ public class HistoryStore {
   }
 
   /**
-   * Removes the tags, and also removes the tag ids from the accepted list
+   * Removes the data, and also removes the data ids from the accepted list
    * 
-   * @param tagIds
-   *          The tagIds of the {@link DataTagHistory}s to remove
+   * @param historyUpdateIds
+   *          The dataIds of the {@link DataTagHistory}s to remove
    */
-  public void removeDataTagHistory(final Collection<Long> tagIds) {
+  public void removeDataTagHistory(final Collection<HistoryUpdateId> historyUpdateIds) {
     // Starts a batch
     this.setBatching(true);
 
-    // Removes the tags
-    for (Long tagId : tagIds) {
-      removeDataTagHistory(tagId);
+    // Removes the data
+    for (HistoryUpdateId historyUpdateId : historyUpdateIds) {
+      removeDataTagHistory(historyUpdateId);
     }
 
     // Ends the batch
@@ -820,28 +827,28 @@ public class HistoryStore {
    */
 
   /**
-   * Fires the {@link HistoryStoreListener#onTagCollectionChanged(Collection)} on all the
+   * Fires the {@link HistoryStoreListener#onDataCollectionChanged(Collection)} on all the
    * listeners
    * 
-   * @param tagIds
+   * @param ids
    *          The argument to send
    */
-  protected void fireTagsAdded(final Collection<Long> tagIds) {
+  protected void fireOnObjectCollectionChanged(final Collection<HistoryUpdateId> ids) {
     for (HistoryStoreListener listener : getHistoryStoreListeners()) {
-      listener.onTagCollectionChanged(tagIds);
+      listener.onDataCollectionChanged(ids);
     }
   }
   
   /**
-   * Fires the {@link HistoryStoreListener#onTagsInitialized(Collection)} on all the
+   * Fires the {@link HistoryStoreListener#onDataInitialized(Collection)} on all the
    * listeners
    * 
-   * @param tagIds
+   * @param ids
    *          The argument to send
    */
-  protected void fireOnTagInitialized(final Collection<Long> tagIds) {
+  protected void fireOnObjectsInitialized(final Collection<HistoryUpdateId> ids) {
     for (HistoryStoreListener listener : getHistoryStoreListeners()) {
-      listener.onTagsInitialized(tagIds);
+      listener.onDataInitialized(ids);
     }
   }
 
@@ -935,14 +942,14 @@ public class HistoryStore {
 
   /**
    * 
-   * @param tagId
+   * @param historyUpdateId
    *          The tag id to check
    * @return <code>true</code> if the tag have been registered
    */
-  public boolean isTagRegistered(final Long tagId) {
+  public boolean isTagRegistered(final HistoryUpdateId historyUpdateId) {
     try {
       this.tagsHaveRecordsUntilTimeLock.readLock().lock();
-      return tagsHaveRecordsUntilTime.containsKey(tagId);
+      return tagsHaveRecordsUntilTime.containsKey(historyUpdateId);
     }
     finally {
       this.tagsHaveRecordsUntilTimeLock.readLock().unlock();
@@ -951,7 +958,7 @@ public class HistoryStore {
 
   /**
    * 
-   * @return <code>true</code> if all the tags have been loaded until the end
+   * @return <code>true</code> if all the data have been loaded until the end
    *         timestamp
    */
   public boolean isLoadingComplete() {
@@ -966,7 +973,7 @@ public class HistoryStore {
    *        from a client data tag, there is at the moment no possible way of
    *        knowing it. Default is false
    * 
-   * @return <code>true</code> if all the tags have been loaded until the end
+   * @return <code>true</code> if all the data have been loaded until the end
    *         timestamp
    */
   public boolean isLoadingComplete(final boolean forceUpdate) {
@@ -1003,26 +1010,26 @@ public class HistoryStore {
   }
 
   /**
-   * Initializes the tags, by calling this with the tag ids before starting the
+   * Initializes the data, by calling this with the data ids before starting the
    * actual loading, you ensure that the {@link #getHistoryIsLoadedUntilTime()}
    * returns the correct value.<br/>
    * Does not initialize the tag!
    * 
-   * @param tagIds
-   *          The tag ids to add
+   * @param ids
+   *          The data ids to add
    *          
    * @see #addInitialHistoryData(Collection)
    */
-  public void registerTags(final Long... tagIds) {
+  public void registerTags(final HistoryUpdateId... ids) {
     this.setBatching(true);
     try {
-      // Initializes the tags
+      // Initializes the data
       this.tagsHaveRecordsUntilTimeLock.writeLock().lock();
       try {
-        for (Long tagId : tagIds) {
-          if (HistoryStore.isTagIdAcceptable(tagId)) {
-            if (this.tagsHaveRecordsUntilTime.get(tagId) == null) {
-              this.tagsHaveRecordsUntilTime.put(tagId, getStart());
+        for (HistoryUpdateId historyUpdateId : ids) {
+          if (HistoryStore.isTagIdAcceptable(historyUpdateId)) {
+            if (this.tagsHaveRecordsUntilTime.get(historyUpdateId) == null) {
+              this.tagsHaveRecordsUntilTime.put(historyUpdateId, getStart());
             }
           }
         }
@@ -1040,34 +1047,42 @@ public class HistoryStore {
   }
   
   /**
-   * Unregisters the tags by removing all data about the tags
+   * Unregisters the data by removing all data about the data
    * 
-   * @param tagIds
-   *          The id's of the tags to remove
+   * @param historyUpdateIds
+   *          The id's of the data to remove
    */
-  public void unregisterTags(final Collection<Long> tagIds) {
+  public void unregisterTags(final Collection<HistoryUpdateId> historyUpdateIds) {
     this.setBatching(true);
     try {
-      // Removes the tags from dataTagHistories
+      // Removes the data from dataTagHistories
       try {
         this.dataTagHistoriesLock.writeLock().lock();
-        for (Long tagId : tagIds) {
-          this.dataTagHistories.remove(tagId);
+        for (HistoryUpdateId historyUpdateId : historyUpdateIds) {
+          this.dataHistories.remove(historyUpdateId);
         }
       }
       finally {
         this.dataTagHistoriesLock.writeLock().unlock();
       }
 
-      // Removes the tags from the tagsHaveRecordsUntilTime
+      // Removes the data from the tagsHaveRecordsUntilTime
       try {
         this.tagsHaveRecordsUntilTimeLock.writeLock().lock();
-        for (Long tagId : tagIds) {
-          this.tagsHaveRecordsUntilTime.remove(tagId);
+        for (HistoryUpdateId historyUpdateId : historyUpdateIds) {
+          this.tagsHaveRecordsUntilTime.remove(historyUpdateId);
         }
       }
       finally {
         this.tagsHaveRecordsUntilTimeLock.writeLock().unlock();
+      }
+      
+      try {
+        this.initializedTagsLock.writeLock().lock();
+        this.initializedTags.removeAll(historyUpdateIds);
+      }
+      finally {
+        this.initializedTagsLock.writeLock().unlock();
       }
 
       // Notifies that the history is changed
@@ -1080,15 +1095,15 @@ public class HistoryStore {
 
   /**
    * 
-   * @param tagId
-   *          The tag id to check
-   * @return <code>true</code> if the tag have been initialized, i.e. the first
+   * @param id
+   *          The id to check
+   * @return <code>true</code> if the object have been initialized, i.e. the first
    *         value have been loaded
    */
-  public boolean isTagInitialized(final Long tagId) {
+  public boolean isTagInitialized(final HistoryUpdateId id) {
     this.initializedTagsLock.readLock().lock();
     try {
-      return this.initializedTags.contains(tagId);
+      return this.initializedTags.contains(id);
     }
     finally {
       this.initializedTagsLock.readLock().unlock();
@@ -1097,11 +1112,11 @@ public class HistoryStore {
 
   /**
    * 
-   * @return <code>true</code> if there exist uninitialized tags
+   * @return <code>true</code> if there exist uninitialized data
    */
   public boolean isUninitializedTags() {
-    for (final Long tagId : this.getRegisteredTags()) {
-      if (!isTagInitialized(tagId)) {
+    for (final HistoryUpdateId historyUpdateId : this.getRegisteredDataIds()) {
+      if (!isTagInitialized(historyUpdateId)) {
         return true;
       }
     }
@@ -1110,14 +1125,14 @@ public class HistoryStore {
 
   /**
    * 
-   * @return The tags which are not yet initialized
+   * @return The data which are not yet initialized
    */
-  public Collection<Long> getUninitializedTags() {
-    final Set<Long> result = new HashSet<Long>();
+  public Collection<HistoryUpdateId> getUninitializedTags() {
+    final Set<HistoryUpdateId> result = new HashSet<HistoryUpdateId>();
 
-    for (final Long tagId : this.getRegisteredTags()) {
-      if (!isTagInitialized(tagId)) {
-        result.add(tagId);
+    for (final HistoryUpdateId historyUpdateId : this.getRegisteredDataIds()) {
+      if (!isTagInitialized(historyUpdateId)) {
+        result.add(historyUpdateId);
       }
     }
 
@@ -1129,11 +1144,11 @@ public class HistoryStore {
    * @param initialized
    *          <code>true</code> to set it to initialized, <code>false</code> to
    *          set it to not initialized
-   * @param tagIds
-   *          The tag ids to change the initialization state for
+   * @param dataIds
+   *          The data ids to change the initialization state for
    */
-  private void setTagInitialized(final boolean initialized, final Long... tagIds) {
-    setTagInitialized(initialized, Arrays.asList(tagIds));
+  private void setTagInitialized(final boolean initialized, final HistoryUpdateId ... dataIds) {
+    setTagInitialized(initialized, Arrays.asList(dataIds));
   }
 
   /**
@@ -1141,31 +1156,31 @@ public class HistoryStore {
    * @param initialized
    *          <code>true</code> to set it to initialized, <code>false</code> to
    *          set it to not initialized
-   * @param tagIds
-   *          The tag ids to change the initialization state for
+   * @param historyUpdateIds
+   *          The data ids to change the initialization state for
    */
-  private void setTagInitialized(final boolean initialized, final Collection<Long> tagIds) {
-    final List<Long> filteredTagIds;
+  private void setTagInitialized(final boolean initialized, final Collection<HistoryUpdateId> historyUpdateIds) {
+    final List<HistoryUpdateId> filteredDataIds;
     
     if (initialized) {
-      filteredTagIds = new ArrayList<Long>(tagIds.size());
-      for (Long tagId : tagIds) {
-        if (HistoryStore.isTagIdAcceptable(tagId)) {
-          filteredTagIds.add(tagId);
+      filteredDataIds = new ArrayList<HistoryUpdateId>(historyUpdateIds.size());
+      for (HistoryUpdateId historyUpdateId : historyUpdateIds) {
+        if (HistoryStore.isTagIdAcceptable(historyUpdateId)) {
+          filteredDataIds.add(historyUpdateId);
         }
       }
     }
     else {
-      filteredTagIds = null;
+      filteredDataIds = null;
     }
     
     this.initializedTagsLock.writeLock().lock();
     try {
       if (initialized) {
-        this.initializedTags.addAll(filteredTagIds);
+        this.initializedTags.addAll(filteredDataIds);
       }
       else {
-        this.initializedTags.removeAll(tagIds);
+        this.initializedTags.removeAll(historyUpdateIds);
       }
     }
     finally {
@@ -1175,13 +1190,13 @@ public class HistoryStore {
 
   /**
    * 
-   * @param tagId
+   * @param id
    * @return <code>true</code> if the tag id is acceptable, <code>false</code>
    *         if it is isn't i.e. it is <code>-1</code> or <code>0</code>
    */
-  private static boolean isTagIdAcceptable(final Long tagId) {
-    for (final Long illegalId : ILLEGAL_TAG_IDS) {
-      if (tagId.equals(illegalId)) {
+  private static boolean isTagIdAcceptable(final HistoryUpdateId historyUpdateId) {
+    for (final HistoryUpdateId illegalId : ILLEGAL_IDS) {
+      if (historyUpdateId.equals(illegalId)) {
         return false;
       }
     }

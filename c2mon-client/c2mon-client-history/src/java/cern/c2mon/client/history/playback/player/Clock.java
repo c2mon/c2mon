@@ -202,9 +202,6 @@ public class Clock {
     if (doPausing) {
       resume();
     }
-    else {
-      rescheduleEndTimeTimer();
-    }
   }
 
   /**
@@ -312,6 +309,9 @@ public class Clock {
       if (currentTime > getEndDate().getTime()) {
         pause();
         setTime(getEndDate().getTime());
+        for (final ClockListener listener : listeners.getAll()) {
+          listener.onEndTimeReached();
+        }
       }
       return true;
     }

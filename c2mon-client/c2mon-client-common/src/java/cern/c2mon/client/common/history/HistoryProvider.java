@@ -21,8 +21,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 import cern.c2mon.client.common.history.event.HistoryProviderListener;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * Interface that provides functions to get data from the history.<br/>
@@ -121,22 +120,26 @@ public interface HistoryProvider {
 
   /**
    * 
-   * @param id
-   *          the id
-   * @param entity
-   *          the entity
-   * @return a list of supervision events for the given id and entity
+   * @param initializationTime
+   *          the time to get all the intial values for
+   * @param requests
+   *          The supervision events that is requested
+   * @return a list of supervision initial events for the given ids and entities
    */
-  Collection<SupervisionEvent> getSupervisionEvents(final Long id, final SupervisionEntity entity);
+  Collection<HistorySupervisionEvent> getInitialSupervisionEvents(final Timestamp initializationTime, final Collection<SupervisionEventRequest> requests);
 
   /**
    * 
+   * @param from
+   *          the start time
+   * @param to
+   *          the end time
    * @param requests
    *          The supervision events that is requested
    * @return a collection of supervision events which matches any of the ones in
    *         the collection
    */
-  Collection<SupervisionEvent> getSupervisionEvents(final Collection<SupervisionEventRequest> requests);
+  Collection<HistorySupervisionEvent> getSupervisionEvents(final Timestamp from, final Timestamp to, final Collection<SupervisionEventRequest> requests);
 
   /**
    * 

@@ -19,8 +19,8 @@ package cern.c2mon.client.history.dbaccess.beans;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionStatus;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
  * A row from the supervision log is converted into this object
@@ -65,9 +65,10 @@ public class SupervisionRecordBean {
   }
 
   /**
-   * @param date the date to set
+   * @param date
+   *          the date to set
    */
-  public void setDate(Timestamp date) {
+  public void setDate(final Timestamp date) {
     this.date = date;
   }
 
@@ -79,9 +80,10 @@ public class SupervisionRecordBean {
   }
 
   /**
-   * @param status the status to set
+   * @param status
+   *          the status to set
    */
-  public void setStatus(SupervisionStatus status) {
+  public void setStatus(final SupervisionStatus status) {
     this.status = status;
   }
 
@@ -93,9 +95,10 @@ public class SupervisionRecordBean {
   }
 
   /**
-   * @param message the message to set
+   * @param message
+   *          the message to set
    */
-  public void setMessage(String message) {
+  public void setMessage(final String message) {
     this.message = message;
   }
 

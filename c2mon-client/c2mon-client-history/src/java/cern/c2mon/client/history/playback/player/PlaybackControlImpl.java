@@ -99,8 +99,9 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
 
   @Override
   public void setClockTime(final long time) {
+    fireClockTimeChanging(time);
     getClock().setTime(time);
-    fireClockTimeSet(time);
+    fireClockTimeChanged(time);
   }
 
   @Override
@@ -278,14 +279,26 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
   }
 
   /**
-   * Fires the clockTimeSet(newTime) event
+   * Fires the {@link PlaybackControlListener#onClockTimeChanging(long)} event
    * 
    * @param newTime
    *          The new time to tell the listeners
    */
-  protected void fireClockTimeSet(final long newTime) {
+  protected void fireClockTimeChanging(final long newTime) {
     for (final PlaybackControlListener listener : listenersManager.getAll()) {
-      listener.onClockTimeSet(newTime);
+      listener.onClockTimeChanging(newTime);
+    }
+  }
+  
+  /**
+   * Fires the {@link PlaybackControlListener#onClockTimeChanged(long)} event
+   * 
+   * @param newTime
+   *          The new time to tell the listeners
+   */
+  protected void fireClockTimeChanged(final long newTime) {
+    for (final PlaybackControlListener listener : listenersManager.getAll()) {
+      listener.onClockTimeChanged(newTime);
     }
   }
 

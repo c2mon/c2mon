@@ -7,6 +7,10 @@
 
   <!-- the main Spring XML configuration file for starting up the C2MON client core context -->
 
+  <bean id="supervisionManager" class="org.easymock.EasyMock" factory-method="createNiceMock">
+    <constructor-arg value="cern.c2mon.client.core.manager.CoreSupervisionManager"/>
+  </bean>
+
   <bean id="cache" class="org.easymock.EasyMock" factory-method="createMock">
     <constructor-arg value="cern.c2mon.client.core.cache.BasicCacheHandler"/>
   </bean>
@@ -22,6 +26,7 @@
   <bean id="historyManager" class="cern.c2mon.client.core.manager.HistoryManager">
     <constructor-arg value="tagManager"/>
     <constructor-arg value="cache"/>
+    <constructor-arg value="supervisionManager"/>
   </bean>
 
 </beans>

@@ -37,14 +37,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.event.HistoryPlayerAdapter;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.history.dbaccess.HistoryProviderSimpleImpl;
 import cern.c2mon.client.history.playback.schedule.HistoryScheduler;
-import cern.c2mon.client.history.tag.HistoryTagValueUpdateImpl;
 import cern.c2mon.client.history.testUtil.UncaughtExceptionSetup;
+import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
@@ -226,7 +227,12 @@ public class HistoryPlayerImplTest {
   @Test
   public void testPlayback() {
     
-    final HistoryProvider historyProvider = new HistoryProviderSimpleImpl(initialRecords, historyRecords);
+    final HistoryProvider historyProvider = 
+      new HistoryProviderSimpleImpl(
+        initialRecords, 
+        historyRecords,
+        new ArrayList<HistorySupervisionEvent>(),
+        new ArrayList<HistorySupervisionEvent>());
     
     // Sort the records to the correct order
     final TagValueUpdate[] orderedRecords = historyRecords.toArray(new TagValueUpdate[0]);
@@ -255,10 +261,6 @@ public class HistoryPlayerImplTest {
       historyPlayer.registerTagUpdateListener(listenerMock, tagId, null);
     }
     
-    // Loads the data
-    historyPlayer.beginLoading();
-    waitForHistoryToLoad();
-    
     //
     // Record
     //
@@ -269,8 +271,8 @@ public class HistoryPlayerImplTest {
     mockCtrl.checkOrder(false);
     
     for (final TagValueUpdate update : initialRecords) {
-      tagUpdateListenersMock.get(update.getId()).onUpdate(update);
-      EasyMock.expectLastCall().once();
+      tagUpdateListenersMock.get(update.getId()).onUpdate(EasyMock.eq(update));
+      EasyMock.expectLastCall().atLeastOnce();
     }
     
     // Ordered calls, the history
@@ -281,11 +283,31 @@ public class HistoryPlayerImplTest {
       EasyMock.expectLastCall().once();
     }
     
+    // Stubs
+    
+    final TagUpdateListener tagUpdateListenerDelegate = new TagUpdateListener() {
+      @Override
+      public void onUpdate(final TagValueUpdate tagValueUpdate) {
+        if (tagValueUpdate.getDataTagQuality().isInitialised()) {
+          Assert.fail(String.format("Unexpected method call onUpdate(%s)", tagValueUpdate.toString()));
+        }
+      }
+    };
+    
+    for (final TagUpdateListener listener : tagUpdateListenersMock.values()) {
+      listener.onUpdate(EasyMock.<TagValueUpdate>anyObject());
+      EasyMock.expectLastCall().andStubDelegateTo(tagUpdateListenerDelegate);
+    }
+    
     //
     // Replay
     //
     
     mockCtrl.replay();
+    
+    // Loads the data
+    historyPlayer.beginLoading();
+    waitForHistoryToLoad();
     
     // Plays back the data
     historyPlayer.getPlaybackControl().resume();
@@ -336,7 +358,12 @@ public class HistoryPlayerImplTest {
       }
     };
     
-    final HistoryProvider historyProvider = new HistoryProviderSimpleImpl(initialRecords, historyRecords);
+    final HistoryProvider historyProvider = 
+      new HistoryProviderSimpleImpl(
+          initialRecords, 
+          historyRecords,
+          new ArrayList<HistorySupervisionEvent>(),
+          new ArrayList<HistorySupervisionEvent>());
 
     //
     // Configuring the history player, and registering the mock listeners

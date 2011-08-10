@@ -29,7 +29,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
+import cern.c2mon.client.common.history.HistoryUpdate;
+import cern.c2mon.client.common.history.SupervisionEventRequest;
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
+import cern.c2mon.client.common.history.id.SupervisionEventId;
+import cern.c2mon.client.common.history.id.TagValueUpdateId;
 import cern.c2mon.client.history.playback.HistoryConfiguration;
 import cern.c2mon.client.history.playback.data.event.HistoryLoaderListener;
 import cern.c2mon.client.history.playback.data.utilities.MemoryConsumptionAdviser;
@@ -37,7 +44,7 @@ import cern.c2mon.client.history.playback.data.utilities.SpeedEstimate;
 import cern.c2mon.client.history.playback.data.utilities.StopWatch;
 import cern.c2mon.client.history.playback.data.utilities.WorkManager;
 import cern.c2mon.client.history.playback.exceptions.NoHistoryProviderAvailableException;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.c2mon.client.history.util.DataIdUtil;
 
 /**
  * Loads all history data and puts it into a {@link HistoryStore}
@@ -184,17 +191,14 @@ public class HistoryLoader {
    * to load more data.
    */
   public void beginLoading() {
-    initializeTagHistory();
+    initializeData();
   }
   
   /**
-   * Loads initial history data from short term log for the provided collection
-   * of tag IDs. The history is loaded into <code>dataTagHistories</code>.
-   * 
-   * @param tags
-   *          The data tag IDs
+   * Loads initial history data from short term log and the supervision log. The
+   * history is loaded into <code>dataTagHistories</code>.
    */
-  private void initializeTagHistory() {
+  private void initializeData() {
     
     boolean bufferIntervalUpdated = false;
     
@@ -206,13 +210,13 @@ public class HistoryLoader {
         // Notifying listeners that we are starting to initialize history data
         fireInitializingHistoryStarting();
         
-        final List<Long> tags = new ArrayList<Long>(historyStore.getUninitializedTags());
+        final Collection<HistoryUpdateId> historyUpdateIds = historyStore.getUninitializedTags();
         
-        fireInitializingHistoryProgress(String.format("Preparing to initialize history data (%d tags)", tags.size()));
+        fireInitializingHistoryProgress(String.format("Preparing to initialize history data (%d tags)", historyUpdateIds.size()));
         if (LOG.isDebugEnabled()) {
           LOG.debug(
               String.format("Preparing to initialize %d history tags",
-                  tags.size()));
+                  historyUpdateIds.size()));
         }
         
         if (LOG.isDebugEnabled()) {
@@ -231,9 +235,6 @@ public class HistoryLoader {
           fireInitializingHistoryProgress("Requesting initial history data");
         }
         
-        // Adds these tags to be accepted by the history store 
-        this.historyStore.registerTags(tags.toArray(new Long[0]));
-        
         try {
           // Start a batch on the history store (keeps it from updating before the
           // batch is finished)
@@ -244,11 +245,11 @@ public class HistoryLoader {
           }
           
           if (LOG.isDebugEnabled()) {
-            LOG.debug("History player started loading historical data for data tag IDs: " + tags);
+            LOG.debug("History player started loading historical data for data tag IDs: " + historyUpdateIds);
           }
           
           // Loads the data at point 0 in time
-          loadInitialValuesForTags(tags);
+          loadInitialDataValues(historyUpdateIds);
           
           fireInitializingHistoryProgress("Initial history data received, starting the buffering thread.");
           
@@ -510,8 +511,8 @@ public class HistoryLoader {
           
           // Add the collection to the list of records
           recordsRetrieved.addAndGet(historyStore.addHistoryValues(
-              dataTags,
-              Arrays.asList(tagValues.toArray(new TagValueUpdate[0])),
+              DataIdUtil.convertTagIdsToDataIdCollection(dataTags),
+              Arrays.asList(tagValues.toArray(new HistoryUpdate[0])),
               endTime));
         }
         finally {
@@ -576,18 +577,101 @@ public class HistoryLoader {
   }
 
   /**
+   * 
+   * @param historyUpdateIds
+   *          the data ids to load the first value for
+   */
+  private void loadInitialDataValues(final Collection<HistoryUpdateId> historyUpdateIds) {
+    final List<SupervisionEventId> supervisionEventIds = new ArrayList<SupervisionEventId>();
+    final List<TagValueUpdateId> tagValueUpdateId = new ArrayList<TagValueUpdateId>();
+    for (final HistoryUpdateId historyUpdateId : historyUpdateIds) {
+      if (historyUpdateId.isTagValueUpdateId()) {
+        tagValueUpdateId.add(historyUpdateId.getTagValueUpdateId());
+      }
+      else if (historyUpdateId.isSupervisionEventId()) {
+        supervisionEventIds.add(historyUpdateId.getSupervisionEventId());
+      }
+      else {
+        LOG.error(String.format("The HistoryUpdateId type \"%s\" is not supported.", historyUpdateId.getClass().getName()));
+      }
+    }
+    loadInitialSupervisionEvents(supervisionEventIds);
+    loadInitialDataTags(tagValueUpdateId);
+  }
+  
+  /**
+   * 
+   * @param supervisionEventIds
+   *          the supervision events to load
+   */
+  private void loadInitialSupervisionEvents(final Collection<SupervisionEventId> supervisionEventIds) {
+    if (supervisionEventIds == null || supervisionEventIds.size() == 0) {
+      fireInitializingHistoryProgress("No supervision to load");
+      return;
+    }
+    
+    fireInitializingHistoryProgress("Loading supervision events from the short term log");
+    
+    this.historyStore.addInitialTagValueUpdates(
+        Arrays.asList(supervisionEventIds.toArray(new HistoryUpdateId[0])), 
+        Arrays.asList(new HistoryUpdate[0]));
+    
+    final List<SupervisionEventRequest> requests = new ArrayList<SupervisionEventRequest>();
+    for (SupervisionEventId supervisionEventId : supervisionEventIds) {
+      requests.add(new SupervisionEventRequest(supervisionEventId.getEntityId(), supervisionEventId.getEntity()));
+    }
+    
+    HistoryProvider historyProvider = null;
+    
+    try {
+      historyProvider = getHistoryConfiguration().getHistoryProvider();
+    }
+    catch (NoHistoryProviderAvailableException e) {
+      LOG.error("Unable to load the initial values, because no History Provider is available.", e);
+      return;
+    }
+    
+    fireInitializingHistoryProgress("Loading initial supervision events");
+    
+    // Getting initial values
+    final Collection<HistorySupervisionEvent> initialValues = 
+      historyProvider.getInitialSupervisionEvents(historyStore.getStart(), requests);
+    this.historyStore.addInitialTagValueUpdates(
+        Arrays.asList(supervisionEventIds.toArray(new HistoryUpdateId[0])), 
+        Arrays.asList(initialValues.toArray(new HistoryUpdate[0])));
+    
+    fireInitializingHistoryProgress("Loading supervision events");
+    
+    // Getting the rest of the values
+    final Collection<HistorySupervisionEvent> values = 
+      historyProvider.getSupervisionEvents(historyStore.getStart(), historyStore.getEnd(), requests);
+    this.historyStore.addHistoryValues(
+        Arrays.asList(supervisionEventIds.toArray(new HistoryUpdateId[0])), 
+        Arrays.asList(values.toArray(new HistoryUpdate[0])), 
+        getHistoryStore().getEnd());
+    
+    fireInitializingHistoryProgress("Supervision events loaded");
+  }
+  
+  /**
    * Loads the first value of the data tags history from short term log. This is
    * necessary in order to be able to initialize the data tags at time t0. The
    * value is added to the tag in <code>dataTagHistories</code>.
    * 
-   * @param tagIds
-   *          The tag IDs to get the first value for
+   * @param tagValueUpdateIds
+   *          The TagValueUpdateIds to get the first value for
    */
-  private void loadInitialValuesForTags(final Collection<Long> tagIds) {
-    
-    if (tagIds.size() == 0) {
+  private void loadInitialDataTags(final Collection<TagValueUpdateId> tagValueUpdateIds) {
+    if (tagValueUpdateIds == null || tagValueUpdateIds.size() == 0) {
+      fireInitializingHistoryProgress("No tags to load");
       return;
     }
+    
+    final List<Long> tagIds = new ArrayList<Long>();
+    for (final TagValueUpdateId tagValueUpdateId : tagValueUpdateIds) {
+      tagIds.add(tagValueUpdateId.getTagId());
+    }
+    
     
     LOG.debug("Loading initial values from the database");
     fireInitializingHistoryProgress("Loading initial values from the short term log");
@@ -607,7 +691,8 @@ public class HistoryLoader {
     fireInitializingHistoryProgress("Initial data loaded, storing and filtering the data");
     
     // Adds the tags to the history store
-    this.historyStore.addInitialHistoryData(tagIds, Arrays.asList(values.toArray(new TagValueUpdate[0])));
+    this.historyStore.addInitialTagValueUpdates(Arrays.asList(tagValueUpdateIds.toArray(new HistoryUpdateId[0])), 
+        Arrays.asList(values.toArray(new HistoryUpdate[0])));
     
     LOG.debug("Initial data is loaded, notifying view(s)");
     fireInitializingHistoryProgress("Initial data is loaded");
@@ -791,17 +876,17 @@ public class HistoryLoader {
           }
           
           // Finds the tags to load
-          for (final Long tag : historyStore.getRegisteredTags()) {
-            if (historyStore.isTagInitialized(tag)) {
+          for (final HistoryUpdateId historyUpdateId : historyStore.getRegisteredDataIds()) {
+            if (historyUpdateId.isTagValueUpdateId() && historyStore.isTagInitialized(historyUpdateId)) {
               // Don't load the tag if it is not accepted
-              final Timestamp tagIsLoadedUntil = historyStore.getTagHaveRecordsUntilTime(tag);
+              final Timestamp tagIsLoadedUntil = historyStore.getTagHaveRecordsUntilTime(historyUpdateId);
               
               if (tagIsLoadedUntil.before(oldestTimestamp)) {
                 oldestTimestamp = tagIsLoadedUntil;
               }
               
               if (tagIsLoadedUntil.equals(loadedUntilTime)) {
-                tagsWithOldestTime.add(tag);
+                tagsWithOldestTime.add(historyUpdateId.getTagValueUpdateId().getTagId());
               }
             }
           }

@@ -25,18 +25,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.client.common.history.HistoryUpdate;
 import cern.c2mon.client.common.history.event.PlaybackControlAdapter;
-import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
 import cern.c2mon.client.history.playback.HistoryPlayerImpl;
 import cern.c2mon.client.history.playback.HistoryPlayerInternal;
-import cern.c2mon.client.history.playback.components.ListenersManager;
-import cern.c2mon.client.history.playback.schedule.event.HistorySchedulerListener;
-import cern.c2mon.client.history.tag.HistoryTagValueUpdateImpl;
-import cern.c2mon.client.history.util.TagHistory;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.client.history.util.HistoryGroup;
 
 /**
  * 
@@ -59,14 +53,8 @@ public class HistoryScheduler {
   /** A callback for the {@link #timer} to check the time */
   private TimerQueueClock timerQueueClock;
 
-  /** Is a callback for the tim timer for updating the data tags */
-  private final TagUpdateListener updateValueCallback;
-
   /** The history player the events is based on */
   private final HistoryPlayerInternal historyPlayer;
-
-  /** A manager which keeps track of the listeners */
-  private final ListenersManager<HistorySchedulerListener> listenersManager = new ListenersManager<HistorySchedulerListener>();
 
   /** Whether or not rescheduling is needed before playback */
   private AtomicBoolean needsRescheduling = new AtomicBoolean(false);
@@ -81,18 +69,16 @@ public class HistoryScheduler {
     this.timerQueueClock = new TimTimerClockDelegate();
     createTimTimer();
 
-    this.updateValueCallback = new TagUpdateListener() {
-      @Override
-      public void onUpdate(final TagValueUpdate value) {
-        historyPlayer.getPublisher().publish(value);
-      }
-    };
-
     this.historyPlayer.getPlaybackControl().addPlaybackControlListener(new PlaybackControlAdapter() {
       @Override
-      public void onClockTimeSet(final long newTime) {
+      public void onClockTimeChanging(final long newTime) {
+        needsRescheduling.set(false);
+        cancelAllScheduledEvents();
+      }
+      
+      @Override
+      public void onClockTimeChanged(final long newTime) {
         rescheduleEvents();
-        updateDataTagsWithValueAtCurrentTime();
       }
 
       @Override
@@ -106,7 +92,7 @@ public class HistoryScheduler {
    * Cancels all previously scheduled events.
    */
   public void cancelAllScheduledEvents() {
-    this.createTimTimer();
+    this.createTimTimer(false);
   }
 
   /**
@@ -119,6 +105,7 @@ public class HistoryScheduler {
     if (historyPlayer.getPlaybackControl().isPlaying()) {
       rescheduleIfNeeded();
     }
+    this.updateDataTagsWithValueAtCurrentTime();
   }
   
   /**
@@ -131,19 +118,35 @@ public class HistoryScheduler {
         LOG.debug("History player reinitialized at " + new Date(historyPlayer.getPlaybackControl().getClockTime()));
       }
 
-      this.updateDataTagsWithValueAtCurrentTime();
       this.scheduleEvents();
     }
   }
-
+  
   /**
    * Creates an instance of the {@link TimerQueue} and adds a listener to it
    * 
    * @return the created timer
    */
   private TimerQueue createTimTimer() {
-    final TimerQueue newTimer = new TimerQueue(this.timerQueueClock);
-    newTimer.addTimerQueueListener(historyPlayer.getClockSynchronizer());
+    return createTimTimer(true);
+  }
+  
+  /**
+   * Creates an instance of the {@link TimerQueue} and adds a listener to it
+   * 
+   * @param createNew
+   *          <code>true</code> to also create a new timer. (Default)
+   * @return the created timer
+   */
+  private TimerQueue createTimTimer(final boolean createNew) {
+    final TimerQueue newTimer;
+    if (createNew) {
+      newTimer = new TimerQueue(this.timerQueueClock);
+      newTimer.addTimerQueueListener(historyPlayer.getClockSynchronizer());
+    }
+    else {
+      newTimer = null;
+    }
     final TimerQueue oldTimer;
     synchronized (this) {
       oldTimer = this.timer;
@@ -155,48 +158,42 @@ public class HistoryScheduler {
     }
     return newTimer;
   }
-
-  /**
-   * Schedule future events for all data tags
-   */
-  private void scheduleEvents() {
-    final Collection<Long> tagIds = Arrays.asList(historyPlayer.getHistoryLoader().getHistoryStore().getRegisteredTags());
-    scheduleEvents(tagIds);
-  }
   
   /**
-   * Schedule future events for the provided collection of data tag IDs
-   * 
-   * @param tagIDs
-   *          The data tag IDs to schedule update events for
+   * Schedule future events for the provided collection of data ids
    */
-  private synchronized void scheduleEvents(final Collection<Long> tagIDs) {
+  private synchronized void scheduleEvents() {
     LOG.debug("Schedules history events");
 
     final long currentTime = historyPlayer.getPlaybackControl().getClockTime();
 
     final TimerQueue timerQueue = createTimTimer();
     
-    // iterate over the data tags
-    for (final Long tagId : tagIDs) {
-      final TagHistory dataTagHistory = historyPlayer.getHistoryLoader().getHistoryStore().getTagHistory(tagId);
+    // iterate over the data
+    for (final HistoryUpdateId historyUpdateId : historyPlayer.getHistoryLoader().getHistoryStore().getRegisteredDataIds()) {
+      final HistoryGroup dataTagHistory = historyPlayer.getHistoryLoader().getHistoryStore().getHistory(historyUpdateId);
 
       // schedule update tasks for all the records
       if (dataTagHistory != null) {
         Timestamp lastTimestamp = null;
 
-        for (final TagValueUpdate value : dataTagHistory.getHistory()) {
-          if (value != null && value.getServerTimestamp() != null && value.getServerTimestamp().getTime() >= currentTime) {
+        for (final HistoryUpdate value : dataTagHistory.getHistory()) {
+          if (value != null && value.getExecutionTimestamp() != null && value.getExecutionTimestamp().getTime() >= currentTime) {
             Timestamp timestamp = null;
-            if (lastTimestamp != null && value.getServerTimestamp().getTime() < lastTimestamp.getTime()) {
+            if (lastTimestamp != null && value.getExecutionTimestamp().getTime() < lastTimestamp.getTime()) {
               timestamp = new Timestamp(lastTimestamp.getTime() + 1);
             }
             else {
-              timestamp = value.getServerTimestamp();
+              timestamp = value.getExecutionTimestamp();
             }
             if (timestamp != null) {
               try {
-                timerQueue.schedule(new UpdateClientDataTagTask(this.updateValueCallback, value), timestamp);
+                timerQueue.schedule(new UpdateHistoryTagTask(value) {
+                  @Override
+                  public void update(final HistoryUpdate value) {
+                    historyPlayer.getPublisher().publish(value);
+                  }
+                }, timestamp);
               }
               catch (IllegalStateException e) {
                 // If another thread is calling the cancelAllScheduledEvents()
@@ -214,60 +211,52 @@ public class HistoryScheduler {
   }
 
   /**
-   * Updates all registered data tags with the value at the current time of the clock
+   * Updates all registered data with the value at the current time of the clock
    */
   public void updateDataTagsWithValueAtCurrentTime() {
-    final Collection<Long> tagIds = Arrays.asList(historyPlayer.getHistoryLoader().getHistoryStore().getRegisteredTags());
+    final Collection<HistoryUpdateId> tagIds = Arrays.asList(historyPlayer.getHistoryLoader().getHistoryStore().getRegisteredDataIds());
     updateDataTagsWithValueAtCurrentTime(tagIds);
   }
   
   /**
    * Updates all data tags with the value at the current time of the clock
    * 
-   * @param tagIds
+   * @param historyUpdateIds
    *          The tag IDs of the data tags to update
    */
-  public void updateDataTagsWithValueAtCurrentTime(final Collection<Long> tagIds) {
+  public void updateDataTagsWithValueAtCurrentTime(final Collection<HistoryUpdateId> historyUpdateIds) {
 
     if (!historyPlayer.isHistoryPlayerActive()) {
       return;
     }
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug("History player updates the following data tags with the value at the current time of the player's clock: " + tagIds);
+      LOG.debug("History player updates the following data tags with the value at the current time of the player's clock: " + historyUpdateIds);
     }
-
-    // Notifying listeners
-    fireStartingUpdatingOfDataTags(tagIds);
 
     final long currentTime = historyPlayer.getPlaybackControl().getClockTime();
 
     // iterate over the data tag IDs which should be updated
-    for (Long tagId : tagIds) {
-      if (historyPlayer.getHistoryLoader().getHistoryStore().isTagInitialized(tagId)) {
+    for (HistoryUpdateId historyUpdateId : historyUpdateIds) {
+      if (historyPlayer.getHistoryLoader().getHistoryStore().isTagInitialized(historyUpdateId)) {
         // Gets the current value of the tag from the history store
-        TagValueUpdate tagValue = historyPlayer.getHistoryLoader().getHistoryStore().getTagValue(tagId, currentTime);
+        HistoryUpdate historyValue = historyPlayer.getHistoryLoader().getHistoryStore().getTagValue(historyUpdateId, currentTime);
 
         try {
           // update the data tag with the latest value or invalidate it if none
           // was found
-          if (tagValue == null) {
-            final DataTagQualityImpl dataTagQuality = new DataTagQualityImpl(TagQualityStatus.UNDEFINED_TAG,
-                "No history records was found in the short term log at the specified time");
-
-            tagValue = new HistoryTagValueUpdateImpl(tagId, dataTagQuality, null, null, new Timestamp(1), "", TagMode.OPERATIONAL);
+          if (historyValue == null) {
+            historyPlayer.getPublisher().invalidate(historyUpdateId, "No history records was found in the short term log at the specified time");
           }
-
-          historyPlayer.getPublisher().publish(tagValue);
+          else {
+            historyPlayer.getPublisher().publish(historyValue);
+          }
         }
         catch (Exception e) {
-          LOG.error(String.format("Error when updating datatag with id %d", tagId), e);
+          LOG.error(String.format("Error when updating datatag with id %d", historyUpdateId), e);
         }
       }
     }
-
-    // Notifying listeners
-    fireFinishedUpdatingOfDataTags(tagIds);
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("The data tags are updated");
@@ -294,45 +283,4 @@ public class HistoryScheduler {
     }
   }
 
-  /**
-   * Fires the startingUpdatingOfDataTags(tagIds) event
-   * 
-   * @param tagIds
-   *          The tag ids which are updated
-   */
-  private void fireStartingUpdatingOfDataTags(final Collection<Long> tagIds) {
-    for (final HistorySchedulerListener listener : listenersManager.getAll()) {
-      listener.startingUpdatingOfDataTags(tagIds);
-    }
-  }
-
-  /**
-   * Fires the finishedUpdatingOfDataTags(tagIds) event
-   * 
-   * @param tagIds
-   *          The tag ids which are updated
-   */
-  private void fireFinishedUpdatingOfDataTags(final Collection<Long> tagIds) {
-    for (final HistorySchedulerListener listener : listenersManager.getAll()) {
-      listener.finishedUpdatingOfDataTags(tagIds);
-    }
-  }
-
-  /**
-   * 
-   * @param listener
-   *          The listener to add
-   */
-  public void addHistorySchedulerListener(final HistorySchedulerListener listener) {
-    this.listenersManager.add(listener);
-  }
-
-  /**
-   * 
-   * @param listener
-   *          The listener to remove
-   */
-  public void removeHistorySchedulerListener(final HistorySchedulerListener listener) {
-    this.listenersManager.remove(listener);
-  }
 }

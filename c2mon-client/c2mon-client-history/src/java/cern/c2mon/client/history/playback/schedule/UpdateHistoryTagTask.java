@@ -18,33 +18,30 @@
 
 package cern.c2mon.client.history.playback.schedule;
 
-import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.client.common.history.HistoryUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 
 /**
  * Instances of this class are used to schedule an update of a
- * {@link TagValueUpdate}. Tasks can be scheduled with the
- * {@link TimerQueue}.
+ * {@link TagValueUpdate}. Tasks can be scheduled with the {@link TimerQueue}.
  * 
  * @author Michael Berberich
  * @author vdeila
  * @see TimerQueue
  */
-public class UpdateClientDataTagTask extends TimerTask {
-  /** The data tag to update */
-  private TagUpdateListener updateDelegate;
+public abstract class UpdateHistoryTagTask extends TimerTask {
 
   /** The value with that the data tag will be updated */
-  private TagValueUpdate value;
+  private HistoryUpdate value;
 
   /**
    * Constructor
    * 
-   * @param cdt The data tag to update
-   * @param value The value with that the data tag will be updated
+   * @param value
+   *          The value with that will be passed to
+   *          {@link #update(HistoryUpdate)}
    */
-  public UpdateClientDataTagTask(final TagUpdateListener cdt, final TagValueUpdate value) {
-    this.updateDelegate = cdt;
+  public UpdateHistoryTagTask(final HistoryUpdate value) {
     this.value = value;
   }
 
@@ -52,7 +49,15 @@ public class UpdateClientDataTagTask extends TimerTask {
    * The data tag is updated as soon as the timer runs this method.
    */
   @Override
-  public void run() {
-    updateDelegate.onUpdate(value);
+  public final void run() {
+    update(value);
   }
+
+  /**
+   * This method is called when the task should be executed
+   * 
+   * @param value
+   *          the value which were given under construction
+   */
+  public abstract void update(HistoryUpdate value);
 }

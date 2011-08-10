@@ -20,6 +20,9 @@ package cern.c2mon.client.history.playback.data.event;
 import java.sql.Timestamp;
 import java.util.Collection;
 
+import cern.c2mon.client.common.history.id.HistoryUpdateId;
+import cern.c2mon.client.history.playback.data.HistoryStore;
+
 /**
  * Used by {@link HistoryStore} to inform about events
  * 
@@ -30,21 +33,21 @@ import java.util.Collection;
 public interface HistoryStoreListener {
 
   /**
-   * Invoked when one or more tags is changed
+   * Invoked when one or more objects have changed
    * 
-   * @param tagIds
-   *          The tagIds which is changed
+   * @param historyUpdateIds
+   *          The object ids which is changed
    */
-  void onTagCollectionChanged(Collection<Long> tagIds);
+  void onDataCollectionChanged(Collection<HistoryUpdateId> historyUpdateIds);
 
   /**
    * Invoked when one or more tags gets its first record in the store
    * 
-   * @param tagIds
-   *          the tag ids which is initialized by having their first set of
+   * @param historyUpdateIds
+   *          the object ids which is initialized by having their first set of
    *          record(s)
    */
-  void onTagsInitialized(Collection<Long> tagIds);
+  void onDataInitialized(Collection<HistoryUpdateId> historyUpdateIds);
 
   /**
    * Invoked when new data has arrived and makes it possible get data from

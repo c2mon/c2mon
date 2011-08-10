@@ -1,18 +1,31 @@
 package cern.c2mon.client.history.playback.publish;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.client.common.history.HistoryUpdate;
+import cern.c2mon.client.common.history.id.SupervisionEventId;
+import cern.c2mon.client.common.history.id.TagValueUpdateId;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.history.playback.HistoryPlayerImpl;
+import cern.c2mon.client.history.updates.HistorySupervisionEventImpl;
+import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.tim.shared.common.datatag.DataTagQualityImpl;
+import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
- * This class manages the publishing of updates, and the managing of the listeners
+ * This class manage the publishing of updates, and the mapping to the listeners.
+ * 
+ * @see HistoryPlayerImpl
  * 
  * @author vdeila
  * 
@@ -60,7 +73,7 @@ public class HistoryPublisher {
   }
   
   /**
-   * Clears all listeners
+   * Rmoves all listeners from all the managers
    */
   public void clearAll() {
     tagListenersManager.clear();
@@ -69,6 +82,59 @@ public class HistoryPublisher {
     }
   }
 
+  /**
+   * 
+   * @param id
+   *          the object id to invalidate
+   * @param message
+   *          the message to have in the invalidation
+   */
+  public void invalidate(final Object id, final String message) {
+    if (id instanceof TagValueUpdateId) {
+      publish((TagValueUpdate)
+        new HistoryTagValueUpdateImpl(
+          ((TagValueUpdateId) id).getTagId(), 
+          new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, message), 
+          null, 
+          null, 
+          new Timestamp(1), // The data tag is only updated of a value greater than 0
+          "",  
+          TagMode.OPERATIONAL));
+    }
+    else if (id instanceof SupervisionEventId) {
+      publish((SupervisionEvent)
+        new HistorySupervisionEventImpl(
+            (SupervisionEventId) id, 
+            SupervisionStatus.RUNNING,
+            new Timestamp(0),
+            message));
+    }
+    else {
+      LOG.error(String.format("The identifier of class \"%s\" is not supported", id.getClass().getName()));
+    }
+  }
+  
+  /**
+   * Notifies the listeners about a new update
+   * 
+   * @param newValue
+   *          The new value which is given. Is sent to the tags which subscribes
+   *          to the listeners of this value
+   */
+  public void publish(final HistoryUpdate newValue) {
+    if (newValue instanceof TagValueUpdate) {
+      publish((TagValueUpdate) newValue);
+    }
+    else if (newValue instanceof SupervisionEvent) {
+      publish((SupervisionEvent) newValue);
+    }
+    else {
+      final String errorMessage = String.format("The HistoryUpdate of class \"%s\" is not supported..", newValue.getClass().getName());
+      LOG.error(errorMessage);
+      throw new RuntimeException(errorMessage);
+    }
+  }
+  
   /**
    * Notifies the listeners about a new update
    * 
@@ -98,7 +164,12 @@ public class HistoryPublisher {
   public void publish(final SupervisionEvent event) {
     final Collection<SupervisionListener> listeners = getSupervisionManager(event.getEntity()).getValues(event.getEntityId());
     for (final SupervisionListener listener : listeners) {
-      listener.onSupervisionUpdate(event);
+      try {
+        listener.onSupervisionUpdate(event);
+      }
+      catch (Exception e) {
+        LOG.error(String.format("Error when trying to update with a supervision event (%s)", event.toString()), e);
+      }
     }
   }
   
