@@ -34,7 +34,7 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
         RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
 
             @Override
-            public MetricDef mapRow(ResultSet rs, int arg1) throws SQLException {
+            public MetricDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
                 MetricDef def = new MetricDef(rs.getLong("metric_data_tag_id"), rs.getLong("metric_rule_tag_id"), rs.getString("metric_name"));
                 return def;
             }
@@ -54,7 +54,7 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
         RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
 
             @Override
-            public MetricDef mapRow(ResultSet rs, int arg1) throws SQLException {
+            public MetricDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
                 MetricDef def = new MetricDef(null,rs.getLong("equipment_rule_tag_id"), rs.getString("metric_name"));
                 return def;
             }
@@ -75,7 +75,7 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
         RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
 
             @Override
-            public MetricDef mapRow(ResultSet rs, int arg1) throws SQLException {
+            public MetricDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
                 MetricDef def = new MetricDef(rs.getLong("metric_data_tag_id"), rs.getLong("metric_rule_tag_id"), rs.getString("metric_name"));
                 return def;
             }
@@ -95,7 +95,7 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
         RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
 
             @Override
-            public MetricDef mapRow(ResultSet rs, int arg1) throws SQLException {
+            public MetricDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
                 MetricDef def = new MetricDef(null,rs.getLong("equipment_rule_tag_id"), rs.getString("metric_name"));
                 return def;
             }
