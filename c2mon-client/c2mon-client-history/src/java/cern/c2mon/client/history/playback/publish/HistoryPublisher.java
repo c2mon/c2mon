@@ -91,7 +91,7 @@ public class HistoryPublisher {
    */
   public void invalidate(final Object id, final String message) {
     if (id instanceof TagValueUpdateId) {
-      publish((TagValueUpdate)
+      publishInitialValue((TagValueUpdate)
         new HistoryTagValueUpdateImpl(
           ((TagValueUpdateId) id).getTagId(), 
           new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, message), 
@@ -102,7 +102,7 @@ public class HistoryPublisher {
           TagMode.OPERATIONAL));
     }
     else if (id instanceof SupervisionEventId) {
-      publish((SupervisionEvent)
+      publishInitialValue((HistoryUpdate)
         new HistorySupervisionEventImpl(
             (SupervisionEventId) id, 
             SupervisionStatus.RUNNING,
@@ -115,15 +115,41 @@ public class HistoryPublisher {
   }
   
   /**
-   * Notifies the listeners about a new update
+   * Notifies the listeners about the new initial value.
+   * 
+   * @param initialValue
+   *          The initial value which is given. Is sent to the tags which
+   *          subscribes to the listeners of this value.
+   */
+  public void publishInitialValue(final HistoryUpdate initialValue) {
+    publish(initialValue, true);
+  }
+  
+  /**
+   * Notifies the listeners about a new update.
    * 
    * @param newValue
    *          The new value which is given. Is sent to the tags which subscribes
    *          to the listeners of this value
    */
   public void publish(final HistoryUpdate newValue) {
+    publish(newValue, false);
+  }
+  
+  /**
+   * Notifies the listeners about a new update
+   * 
+   * @param newValue
+   *          The new value which is given. Is sent to the tags which subscribes
+   *          to the listeners of this value
+   * @param doClean
+   *          <code>true</code> if the the {@link ClientDataTag#clean()} should
+   *          be called first. Is of course only called if the newValue is a
+   *          {@link TagValueUpdate}
+   */
+  private void publish(final HistoryUpdate newValue, final boolean doClean) {
     if (newValue instanceof TagValueUpdate) {
-      publish((TagValueUpdate) newValue);
+      publish((TagValueUpdate) newValue, doClean);
     }
     else if (newValue instanceof SupervisionEvent) {
       publish((SupervisionEvent) newValue);
@@ -136,16 +162,44 @@ public class HistoryPublisher {
   }
   
   /**
+   * Calls {@link ClientDataTag#clean()} before sending the update. Notifies the
+   * listeners about a new update.
+   * 
+   * @param initialValue
+   *          The new value which is given. Is sent to the tags which subscribes
+   *          to the tag id in the value
+   */
+  public void publishInitialValue(final TagValueUpdate initialValue) {
+    publish(initialValue, true);
+  }
+  
+  /**
    * Notifies the listeners about a new update
+   * 
+   * @param nextValue
+   *          The new value which is given. Is sent to the tags which subscribes
+   *          to the tag id in the value
+   */
+  public void publish(final TagValueUpdate nextValue) {
+    publish(nextValue, false);
+  }
+  
+  /**
+   * Notifies the listeners about a new update. Does only call the
+   * {@link ClientDataTag#clean()} if <code>doClean</code> is <code>true</code>
    * 
    * @param newValue
    *          The new value which is given. Is sent to the tags which subscribes
    *          to the tag id in the value
+   * @param doClean
+   *          <code>true</code> if the the {@link ClientDataTag#clean()} should
+   *          be called first
    */
-  public void publish(final TagValueUpdate newValue) {
+  private void publish(final TagValueUpdate newValue, final boolean doClean) {
     for (final TagUpdateListener listener : this.tagListenersManager.getValues(newValue.getId())) {
       try {
-        if (listener instanceof ClientDataTag) {
+        if (doClean
+            && listener instanceof ClientDataTag) {
           ((ClientDataTag) listener).clean();
         }
         listener.onUpdate(newValue);

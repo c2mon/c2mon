@@ -20,6 +20,7 @@ package cern.c2mon.client.history.playback.schedule;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -59,6 +60,9 @@ public class HistoryScheduler {
   /** Whether or not rescheduling is needed before playback */
   private AtomicBoolean needsRescheduling = new AtomicBoolean(false);
   
+  /** For sorting a list of HistoryUpdateIds, making the supervision events come last */
+  private HistoryUpdateIdSorter historyUpdateIdSorter;
+  
   /**
    * 
    * @param historyPlayer
@@ -69,6 +73,8 @@ public class HistoryScheduler {
     this.timerQueueClock = new TimTimerClockDelegate();
     createTimTimer();
 
+    this.historyUpdateIdSorter = new HistoryUpdateIdSorter();
+    
     this.historyPlayer.getPlaybackControl().addPlaybackControlListener(new PlaybackControlAdapter() {
       @Override
       public void onClockTimeChanging(final long newTime) {
@@ -234,13 +240,19 @@ public class HistoryScheduler {
       LOG.debug("History player updates the following data tags with the value at the current time of the player's clock: " + historyUpdateIds);
     }
 
+    // Sorts the updates so the supervision events comes last.
+    // This is needed since the TagValueUpdates cleans the ClientDataTag, which removes all
+    // supervision data.
+    final HistoryUpdateId[] sortedIds = historyUpdateIds.toArray(new HistoryUpdateId[0]);
+    Arrays.sort(sortedIds, this.historyUpdateIdSorter);
+    
     final long currentTime = historyPlayer.getPlaybackControl().getClockTime();
 
     // iterate over the data tag IDs which should be updated
-    for (HistoryUpdateId historyUpdateId : historyUpdateIds) {
+    for (final HistoryUpdateId historyUpdateId : historyUpdateIds) {
       if (historyPlayer.getHistoryLoader().getHistoryStore().isTagInitialized(historyUpdateId)) {
         // Gets the current value of the tag from the history store
-        HistoryUpdate historyValue = historyPlayer.getHistoryLoader().getHistoryStore().getTagValue(historyUpdateId, currentTime);
+        final HistoryUpdate historyValue = historyPlayer.getHistoryLoader().getHistoryStore().getTagValue(historyUpdateId, currentTime);
 
         try {
           // update the data tag with the latest value or invalidate it if none
@@ -249,7 +261,7 @@ public class HistoryScheduler {
             historyPlayer.getPublisher().invalidate(historyUpdateId, "No history records was found in the short term log at the specified time");
           }
           else {
-            historyPlayer.getPublisher().publish(historyValue);
+            historyPlayer.getPublisher().publishInitialValue(historyValue);
           }
         }
         catch (Exception e) {
@@ -263,6 +275,20 @@ public class HistoryScheduler {
     }
   }
 
+  /** For sorting a list of HistoryUpdateIds, making the supervision events come last */
+  static class HistoryUpdateIdSorter implements Comparator<HistoryUpdateId> {
+    @Override
+    public int compare(final HistoryUpdateId o1, final HistoryUpdateId o2) {
+      if (!o1.isSupervisionEventId() && o2.isSupervisionEventId()) {
+        return -1;
+      }
+      if (o1.isSupervisionEventId() && !o2.isSupervisionEventId()) {
+        return 1;
+      }
+      return 0;
+    }
+  }
+  
   /**
    * Callback for the {@link HistoryPlayerImpl#timer} to get the time, etc.
    */
