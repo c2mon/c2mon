@@ -17,12 +17,9 @@
  ******************************************************************************/
 package cern.c2mon.client.core.cache;
 
-import java.util.Collection;
 import java.util.Set;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
-import cern.c2mon.client.common.tag.ClientDataTag;
-import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.manager.TagManager;
 
 /**
