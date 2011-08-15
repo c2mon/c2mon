@@ -651,11 +651,11 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         switch (supervisionEvent.getEntity()) {
           case PROCESS:
             oldEvent = processSupervisionStatus.put(supervisionEvent.getEntityId(), supervisionEvent);
-            updateProcessStatus(supervisionEvent);
+            updateProcessStatus();
             break;
           case EQUIPMENT:
             oldEvent = equipmentSupervisionStatus.put(supervisionEvent.getEntityId(), supervisionEvent);
-            updateEquipmentStatus(supervisionEvent);
+            updateEquipmentStatus();
             break;
           default:
             String errorMsg = "The supervision event type " + supervisionEvent.getEntity() + " is not supported.";
@@ -679,9 +679,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   /**
    * Inner method for updating the process status of this tag and
    * computing the error message, if one of the linked processes is down.
-   * @param supervisionEvent The process supervision event.
    */
-  private void updateProcessStatus(final SupervisionEvent supervisionEvent) {
+  private void updateProcessStatus() {
     boolean down = false;
     StringBuffer invalidationMessage = new StringBuffer();
     for (SupervisionEvent event : processSupervisionStatus.values()) {
@@ -710,9 +709,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   /**
    * Inner method for updating the equipment status of this tag and
    * computing the error message, if one of the linked equipments is down.
-   * @param supervisionEvent The equipment supervision event.
    */
-  private void updateEquipmentStatus(final SupervisionEvent supervisionEvent) {
+  private void updateEquipmentStatus() {
     boolean down = false;
     StringBuffer invalidationMessage = new StringBuffer();
     for (SupervisionEvent event : equipmentSupervisionStatus.values()) {
