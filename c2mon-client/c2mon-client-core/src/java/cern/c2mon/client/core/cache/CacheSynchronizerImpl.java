@@ -258,7 +258,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
     try {
       if (!liveCache.isEmpty()) {
         final Set<Long> unsynchronizedTagIds;
-        if (pTagIds == null) {
+        if (pTagIds == null || jmsConnectionDown || heartbeatExpired) {
           // Refresh entire cache
           unsynchronizedTagIds = new HashSet<Long>(liveCache.keySet());
         }
