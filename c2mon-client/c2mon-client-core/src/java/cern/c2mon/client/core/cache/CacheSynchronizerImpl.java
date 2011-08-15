@@ -257,10 +257,13 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
 
     try {
       if (!liveCache.isEmpty()) {
-        Set<Long> unsynchronizedTagIds = new HashSet<Long>(pTagIds);
-        if (unsynchronizedTagIds == null) {
+        final Set<Long> unsynchronizedTagIds;
+        if (pTagIds == null) {
           // Refresh entire cache
           unsynchronizedTagIds = new HashSet<Long>(liveCache.keySet());
+        }
+        else {
+          unsynchronizedTagIds = new HashSet<Long>(pTagIds);
         }
         LOG.info("synchronizeCache() - Synchronizing " + unsynchronizedTagIds.size() + " live cache entries with the server.");
         
@@ -293,7 +296,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         synchronizeCacheValues(newKnownTags);
       }
     }
-    catch (JMSException e) {
+    catch (Exception e) {
       LOG.error("synchronizeCache() - Could not refresh tags in the live cache. " + JMS_CONNECTION_LOST_MSG);
       jmsConnectionLost = true;
     }
