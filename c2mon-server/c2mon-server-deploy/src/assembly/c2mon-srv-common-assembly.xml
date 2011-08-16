@@ -7,8 +7,7 @@
       <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
       <fileMode>0644</fileMode>                                                             
       <includes>
-        <!--  define all common modules for both solutions (DMN2 and TIM2) here-->
-        <include>cern.tim2.tim2-server:tim2-server-alarm</include>
+        <!-- define all common modules for both solutions (DMN2 and TIM2) here-->
         <include>cern.tim2.tim2-server:tim2-server-common</include>        
         <include>cern.tim2.tim2-server:tim2-server-cache</include>
         <include>cern.tim2.tim2-server:tim2-server-cacheloading</include>
