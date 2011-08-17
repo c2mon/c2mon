@@ -44,10 +44,10 @@
 			<groupId>cern.tim2.tim2-server</groupId>
 			<artifactId>tim2-server-cachepersistence</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-benchmark</artifactId>
-		</dependency>
+		<!--		<dependency>-->
+		<!--			<groupId>cern.tim2.tim2-server</groupId>-->
+		<!--			<artifactId>tim2-server-benchmark</artifactId>-->
+		<!--		</dependency>-->
 		<dependency>
 			<groupId>cern.tim2.tim2-server</groupId>
 			<artifactId>tim2-server-command</artifactId>
@@ -80,10 +80,10 @@
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-client</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-shorttermlog</artifactId>
-		</dependency>				
+		<!--		<dependency>-->
+		<!--			<groupId>cern.c2mon.c2mon-server</groupId>-->
+		<!--			<artifactId>c2mon-server-shorttermlog</artifactId>-->
+		<!--		</dependency>				-->
 	</dependencies>
 
 	<developers />
