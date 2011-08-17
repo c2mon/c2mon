@@ -67,7 +67,7 @@ COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX
 
 # Run in cluster mode
 #
-if [ "$1" != "single" ]; then
+if [ "$2" != "single" ]; then
     CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 \
                    -Dcom.tc.l1.cachemanager.threshold=70 \
                    -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false \
