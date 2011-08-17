@@ -1,61 +1,45 @@
-<component xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2 http://maven.apache.org/xsd/component-1.1.2.xsd">
+<component
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2 http://maven.apache.org/xsd/component-1.1.2.xsd">
 
-  <dependencySets>
-    <dependencySet>
-      <outputDirectory>/lib</outputDirectory>
-      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
-      <fileMode>0644</fileMode>                                                             
-      <includes>
-        <!-- define all common modules for both solutions (DMN2 and TIM2) here-->
-        <include>cern.tim2.tim2-server:tim2-server-alarm</include>
-        <include>cern.tim2.tim2-server:tim2-server-common</include>        
-        <include>cern.tim2.tim2-server:tim2-server-cache</include>
-        <include>cern.tim2.tim2-server:tim2-server-cacheloading</include>
-        <include>cern.tim2.tim2-server:tim2-server-cachedbaccess</include>
-        <include>cern.tim2.tim2-server:tim2-server-auth</include>
-        <include>cern.tim2.tim2-server:tim2-server-cachepersistence</include>        
-        <include>cern.tim2.tim2-server:tim2-server-benchmark</include>        
-        <include>cern.tim2.tim2-server:tim2-server-command</include>
-        <include>cern.tim2.tim2-server:tim2-server-daqcommunication-in</include>
-        <include>cern.tim2.tim2-server:tim2-server-daqcommunication-out</include>       
-        <include>cern.tim2.tim2-server:tim2-server-supervision</include>        
-        <include>cern.c2mon.c2mon-server:c2mon-server-configuration</include>
-        <include>cern.c2mon.c2mon-server:c2mon-server-lifecycle</include>
-        <include>cern.c2mon.c2mon-server:c2mon-server-client</include>        
-        <include>cern.tim2.tim2-server:tim2-server-rule</include>                                  
-      </includes>      
-    </dependencySet>
-  </dependencySets>
-  
-  <fileSets>
-  
-    <!-- create default tmp and log folders in the assembly -->
-    <fileSet>
-    
-      <includes>
-        <include>tmp/</include>
-	  </includes>
-	  <fileMode>0755</fileMode>
-    </fileSet>
-    <fileSet>
-      <includes>
-         <include>log/</include>
-       </includes>
-       <fileMode>0755</fileMode>
-       <directoryMode>0755</directoryMode>
-    </fileSet>
-      
-  </fileSets>
-  
-  <files>  
-	 <!--  copy she jmx shutdown script -->
-	 <file>
-		<source>${basedir}/bin/jmx-shutdown-script.txt</source>
-		<outputDirectory>bin/</outputDirectory>		
-		<lineEnding>unix</lineEnding>
-		<fileMode>0755</fileMode>
-	</file>
-  </files>
-    
+	<dependencySets>
+
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+			<fileMode>0644</fileMode>
+		</dependencySet>
+
+	</dependencySets>
+
+	<fileSets>
+
+		<!-- create default tmp and log folders in the assembly -->
+		<fileSet>
+			<includes>
+				<include>tmp/</include>
+			</includes>
+			<fileMode>0755</fileMode>
+		</fileSet>
+		<fileSet>
+			<includes>
+				<include>log/</include>
+			</includes>
+			<fileMode>0755</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+
+	</fileSets>
+
+	<files>
+		<!--  copy she jmx shutdown script -->
+		<file>
+			<source>${basedir}/bin/jmx-shutdown-script.txt</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+	</files>
+
 </component>

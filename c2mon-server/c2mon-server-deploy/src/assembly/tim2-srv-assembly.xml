@@ -18,51 +18,8 @@
 		</componentDescriptor>
 	</componentDescriptors>
 
-
-	<!-- list all tim2-srv specific modules here -->
-	<!--
-		NOTE: if the list is empty the whole ependencySets block shall be
-		commented out!
-	-->
-
-	<dependencySets>
-	
-
-		<dependencySet>
-			<outputDirectory>/lib</outputDirectory>
-			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
-			</outputFileNameMapping>
-			<fileMode>0644</fileMode>
-			<includes>
-				<!--
-					define SRV modules used by TIM2 only 
-				-->								
-				<include>cern.c2mon.c2mon-server:c2mon-server-shorttermlog</include>
-			</includes>
-		</dependencySet>
-	
-	
-		<!--
-			this dependency set loads recursively all dependencies of the the
-			c2mon modules. This is a HACK solving the problem described in that
-			event:
-			http://stackoverflow.com/questions/6018174/maven-assembly-dependency-set-with-include-doesnt-pick-up-transitive-dependencie
-		-->
-		<dependencySet>
-			<outputDirectory>/lib</outputDirectory>
-			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
-			</outputFileNameMapping>
-			<fileMode>0644</fileMode>
-			<excludes>
-				<exclude>cern.tim2.tim2-server*:*</exclude>
-				<exclude>cern.c2mon.c2mon-server*:*</exclude>
-			</excludes>
-		</dependencySet>
-
-	</dependencySets>
-
 	<files>
-	
+
 		<!--  copy sthe starting script -->
 		<file>
 			<source>${basedir}/bin/tim2-c2mon.sh</source>
@@ -71,7 +28,7 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0755</fileMode>
 		</file>
-			 
+
 		<!--  copy changelog -->
 		<file>
 			<source>${basedir}/changelog/tim2-srv-changelog.txt</source>
@@ -81,7 +38,7 @@
 			<lineEnding>unix</lineEnding>
 		</file>
 
-        <!--  deployment descriptor -->
+		<!--  deployment descriptor -->
 		<file>
 			<source>${basedir}/conf/tim2-deployment.xml</source>
 			<outputDirectory>/</outputDirectory>
@@ -119,20 +76,20 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-        <file>
+		<file>
 			<source>${basedir}/conf/tim2-modules.xml</source>
 			<outputDirectory>conf/</outputDirectory>
 			<destName>c2mon-modules.xml</destName>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-        <file>
+		<file>
 			<source>${basedir}/conf/tim2-tc-config.xml</source>
 			<outputDirectory>conf/</outputDirectory>
 			<destName>c2mon-tc-config.xml</destName>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
-		</file>		
+		</file>
 	</files>
 
 </assembly>

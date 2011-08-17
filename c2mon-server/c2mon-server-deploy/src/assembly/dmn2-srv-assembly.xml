@@ -18,42 +18,6 @@
 		</componentDescriptor>
 	</componentDescriptors>
 
-
-	<!-- list all tim2-srv specific modules here -->
-	<!--
-		NOTE: if the list is empty the whole ependencySets block shall be
-		commented out!
-	-->
-
-	<dependencySets>
-
-		<!--
-			<dependencySet> <outputDirectory>/lib</outputDirectory>
-			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
-			</outputFileNameMapping> <fileMode>0644</fileMode> <includes>
-			<include>cern.tim2.tim2-server:tim2-server-rule</include> </includes>
-			</dependencySet>
-		-->
-
-		<!--
-			this dependency set loads recursively all dependencies of the the
-			c2mon modules. This is a HACK solving the problem described in that
-			event:
-			http://stackoverflow.com/questions/6018174/maven-assembly-dependency-set-with-include-doesnt-pick-up-transitive-dependencie
-		-->
-		<dependencySet>
-			<outputDirectory>/lib</outputDirectory>
-			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
-			</outputFileNameMapping>
-			<fileMode>0644</fileMode>
-			<excludes>
-				<exclude>cern.tim2.tim2-server*:*</exclude>
-				<exclude>cern.c2mon.c2mon-server*:*</exclude>
-			</excludes>
-		</dependencySet>
-
-	</dependencySets>
-
 	<files>
 
 		<!--  copy sthe starting script -->
