@@ -48,11 +48,11 @@ fi
 ##########################################
 
 #Terracotta server host (must be set if running server cluster)
-TC_HOST=cs-ccr-tim4
+TC_HOST=cs-ccr-tim11
 #Terracotta installation directory
 TERRACOTTA_HOME=$HOME/opt/terracotta
 #second C2MON host (must be set if running server cluster)
-C2MON_SECOND_HOST=cs-ccr-tim8
+C2MON_SECOND_HOST=cs-ccr-tim12
 #terracotta server name (one of them)
 #TC_NAME=server1
 #terracotta DSO port
