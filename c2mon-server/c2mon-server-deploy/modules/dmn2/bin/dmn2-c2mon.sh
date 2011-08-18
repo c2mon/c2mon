@@ -85,4 +85,4 @@ fi
 # Execution of the real program
 #
 cd $C2MON_HOME
-exec -a PROCESS_NAME $JAVA_EXEC -classpath $JARS $JVM_OPTS cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS
+exec -a $PROCESS_NAME $JAVA_EXEC -classpath $JARS $JVM_OPTS cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS
