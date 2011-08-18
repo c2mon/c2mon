@@ -19,8 +19,7 @@ Connection settings for client module
   <property name="brokerURL" value="${jms.broker.url}"/>
   <property name="userName" value="${jms.client.user}"/>
   <property name="password" value="${jms.client.password}"/>
-  <property name="clientIDPrefix" value="C2MON-SERVER"/>
-  <property name="clientID" value="CLIENT-MODULE"/>
+  <property name="clientIDPrefix" value="C2MON-SERVER-CLIENT"/> 
 </bean>
 
 <!-- connection factory used for all connections to the server -->
