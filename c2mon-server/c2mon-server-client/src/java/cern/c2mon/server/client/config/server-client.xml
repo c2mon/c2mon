@@ -19,6 +19,8 @@ Connection settings for client module
   <property name="brokerURL" value="${jms.broker.url}"/>
   <property name="userName" value="${jms.client.user}"/>
   <property name="password" value="${jms.client.password}"/>
+  <property name="clientIDPrefix" value="C2MON-SERVER"/>
+  <property name="clientID" value="CLIENT-MODULE"/>
 </bean>
 
 <!-- connection factory used for all connections to the server -->
@@ -76,7 +78,7 @@ Request from clients
 
 <bean id="clientRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
       <!-- include exception listener here? -->    
-      <property name="connectionFactory" ref="clientPooledConnectionFactory"/>
+      <property name="connectionFactory" ref="clientActiveMQConnectionFactory"/>
       <property name="destination" ref="clientRequestDestination"/>
       <property name="messageListener" ref="clientRequestHandler" />
       <property name="concurrentConsumers" value="1"/>
