@@ -142,11 +142,11 @@
     Define the loggers.
   -->
   <logger name="BenchmarkDataTag"  additivity="false">
-    <level value="warn"/>
+    <level value="info"/>
     <appender-ref ref="BenchmarkDataTagAppender"/>
   </logger>
   <logger name="BenchmarkPriority"  additivity="false">
-    <level value="debug"/>
+    <level value="info"/>
     <appender-ref ref="BenchmarkPriorityAppender"/>
   </logger>
   <logger name="SourceDataTagLogger"  additivity="false">
