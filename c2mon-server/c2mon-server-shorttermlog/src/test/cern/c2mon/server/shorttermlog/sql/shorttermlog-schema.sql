@@ -6,16 +6,18 @@
 -- reserve the tagid range 1-100 for test inserts
                           
 CREATE TABLE shorttermlog (
-logdate            DATE               NOT NULL,
-tagid                NUMBER(9)     NOT NULL,
-tagname          VARCHAR2(60),
+logdate           DATE          NOT NULL,
+tagid             NUMBER(9)     NOT NULL,
+tagname           VARCHAR2(60),
 tagvalue          VARCHAR2(40),
-tagdatatype     VARCHAR2(10),
-tagtime           TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+tagdatatype       VARCHAR2(10),
+tagtime           TIMESTAMP(6)  NOT NULL,
+tagservertime     TIMESTAMP(6),
+tagdaqtime        TIMESTAMP(6),
 tagstatus         NUMBER (3),
-tagstatusdesc  VARCHAR2(100),
-tagmode          NUMBER(1),
-tagdir              VARCHAR2(1))
+tagstatusdesc     VARCHAR2(500),
+tagmode           NUMBER(1),
+tagdir            VARCHAR2(1))
 
 PARTITION BY RANGE (logdate) (
 PARTITION TIMLOG001 VALUES LESS THAN (to_date('22-mar-2006 08:00:00','dd-mon-yyyy hh24:mi:ss')) TABLESPACE LOGDATA,
