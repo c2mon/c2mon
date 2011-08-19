@@ -83,3 +83,27 @@ CREATE TABLE SUPERVISION_LOG(
   SUL_STATUS   VARCHAR(20) NOT NULL,
   SUL_MESSAGE VARCHAR(200)
 )
+
+-- The daily snapshot table keeps the lastest value 
+-- received for a Tag before the end of the LOGDATE day.
+-- Needs a DB job to be filled daily.
+
+CREATE TABLE stl_day_snapshot (
+logdate       DATE
+,tagid         NUMBER(9)      NOT NULL
+,tagname       VARCHAR2(60)
+,tagvalue      VARCHAR2(40)
+,tagdatatype   VARCHAR2(10)
+,tagtime       TIMESTAMP(6)
+,tagservertime TIMESTAMP(6)
+,tagdaqtime    TIMESTAMP(6)
+,tagstatus     number(3)
+,tagstatusdesc VARCHAR2(500)
+,tagmode       NUMBER(1)
+) tablespace LOGDATA;
+
+create index tdl_tagid_ix on stl_day_snapshot(tagid) tablespace LOGINDX;
+
+-- grants for TIM accounts
+grant select on stl_day_snapshot to timref;
+grant select on stl_day_snapshot to timop;
