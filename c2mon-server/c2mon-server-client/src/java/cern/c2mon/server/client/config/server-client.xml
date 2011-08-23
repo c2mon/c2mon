@@ -82,7 +82,7 @@ Request from clients
       <property name="messageListener" ref="clientRequestHandler" />
       <property name="concurrentConsumers" value="1"/>
       <property name="maxConcurrentConsumers" value="5"/>      
-      <property name="sessionTransacted" value="true"/>  
+      <property name="sessionTransacted" value="false"/>      
       <property name="errorHandler" ref="tagRequestErrorHandler"/>
 </bean>
 
