@@ -17,6 +17,9 @@
  ******************************************************************************/
 package cern.c2mon.client.core;
 
+import java.util.Collection;
+
+import cern.c2mon.client.common.history.HistoryLoadingManager;
 import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.common.history.HistoryPlayerEvents;
 import cern.c2mon.client.common.history.HistoryProvider;
@@ -45,7 +48,7 @@ public interface C2monHistoryManager {
    * @param timespan
    *          the time frame to ask for
    */
-  void startHistoryPlayerMode(final HistoryProvider provider, final Timespan timespan);
+  void startHistoryPlayerMode(HistoryProvider provider, Timespan timespan);
 
   /**
    * Stops the history player.
@@ -68,7 +71,7 @@ public interface C2monHistoryManager {
    *           {@link HistoryProvider}. For example if no url, username and
    *           password is given.
    */
-  HistoryProvider getHistoryProvider(final HistoryProviderType type) throws NoHistoryProviderException;
+  HistoryProvider getHistoryProvider(HistoryProviderType type) throws NoHistoryProviderException;
 
   /**
    * 
@@ -76,6 +79,18 @@ public interface C2monHistoryManager {
    *         history providers is available
    */
   HistoryProviderAvailability getHistoryProviderAvailability();
+  
+  /**
+   * Creates a history loading manager which uses the history provider provided
+   * to load the data.
+   * 
+   * @param historyProvider
+   *          the history provider to be used
+   * @param tagIds
+   *          the tag ids which will be added to the manager
+   * @return a history loading manager to load data from a history provider
+   */
+  HistoryLoadingManager createHistoryLoadingManager(HistoryProvider historyProvider, Collection<Long> tagIds);
 
   /**
    * 

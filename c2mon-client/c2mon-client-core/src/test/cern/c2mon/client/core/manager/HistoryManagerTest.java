@@ -55,7 +55,6 @@ import cern.c2mon.client.common.history.event.HistoryProviderListener;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.core.C2monSupervisionManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
@@ -258,6 +257,7 @@ public class HistoryManagerTest {
             Integer.valueOf(i+40000), 
             new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
             new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
+            null,
             "Test tag", 
             TagMode.OPERATIONAL);
       initialHistoryRecord.setDataType("Integer");
@@ -284,6 +284,7 @@ public class HistoryManagerTest {
               Integer.valueOf((int)(currentTime % 100000)), 
               new Timestamp(currentTime - 2 * 60 * 60 * 1000), 
               new Timestamp(currentTime), 
+              null,
               "Test tag", 
               TagMode.OPERATIONAL);
         historyRecord.setDataType("Integer");
@@ -314,7 +315,6 @@ public class HistoryManagerTest {
     
     // HistoryPlayer#beginLoading()
     // HistoryStore#registerTags(Long[])
-    historyPlayerListenerMock.onHistoryDataAvailabilityChanged(timespan.getStart());
     
     // HistoryLoader#beginLoading()
     historyPlayerListenerMock.onInitializingHistoryStarted();
@@ -330,12 +330,12 @@ public class HistoryManagerTest {
     
     // Phase 2
     // Subscribing to more data tags
-    
+//    historyPlayerListenerMock.onHistoryDataAvailabilityChanged(timespan.getStart());
     
     
     // HistoryPlayer#beginLoading()
     // HistoryStore#registerTags(Long[])
-    historyPlayerListenerMock.onHistoryDataAvailabilityChanged(timespan.getStart());
+    //
     
     // HistoryLoader#beginLoading()
     // Loading initial values

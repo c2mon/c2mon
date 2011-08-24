@@ -84,4 +84,9 @@ public class HistoryProviderDummy implements HistoryProvider {
     return null;
   }
 
+  @Override
+  public Collection<HistoryTagValueUpdate> getDailySnapshotRecords(Long[] tagIds, Timestamp from, Timestamp to) {
+    return null;
+  }
+
 }

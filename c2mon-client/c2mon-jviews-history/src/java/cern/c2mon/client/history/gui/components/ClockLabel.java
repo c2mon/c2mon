@@ -24,6 +24,8 @@ import java.util.Date;
 
 import javax.swing.JLabel;
 
+import cern.c2mon.client.common.history.HistoryPlayer;
+import cern.c2mon.client.common.history.PlaybackControl;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
 import cern.c2mon.client.core.C2monServiceGateway;
 
@@ -52,13 +54,26 @@ public class ClockLabel extends JLabel {
    * Updates the label according to the clock's current time.
    */
   public void updateTime() {
-    Long time;
+    HistoryPlayer historyPlayer;
     try {
-      time = C2monServiceGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().getClockTime();
+      historyPlayer = C2monServiceGateway.getHistoryManager().getHistoryPlayer();
     }
     catch (HistoryPlayerNotActiveException e) {
-      time = 0L;
+      historyPlayer = null;
     }
-    this.setText(clockFormatter.format(new Date(time)));
+    
+    if (historyPlayer == null) {
+      this.setText("Uninitialized...");
+    }
+    else {
+      final Long time = historyPlayer.getPlaybackControl().getClockTime();
+      if (time < historyPlayer.getStart().getTime()) {
+        this.setText("Initializing...");
+      }
+      else {
+        this.setText(clockFormatter.format(new Date(time)));
+      }
+    }
+    
   }
 }
