@@ -150,6 +150,10 @@
     <level value="info"/>
     <appender-ref ref="FileAppender"/>
   </logger>
+  <logger name="cern.c2mon"  additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="FileAppender"/>
+  </logger>
   <logger name="cern.tim"  additivity="false">
     <level value="debug"/>
     <appender-ref ref="FileAppender"/>
