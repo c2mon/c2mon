@@ -15,35 +15,33 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.common.history;
-
-import java.sql.Timestamp;
-
-import cern.c2mon.shared.client.tag.TagValueUpdate;
+package cern.c2mon.client.common.history.event;
 
 /**
- * Extension of the {@link TagValueUpdate}
+ * Is used by the {@link cern.c2mon.client.common.history.HistoryLoadingManager}
+ * to inform about events.
  * 
  * @author vdeila
  * 
  */
-public interface HistoryTagValueUpdate extends TagValueUpdate, HistoryUpdate {
+public interface HistoryLoadingManagerListener {
 
   /**
-   * @return the dataType
+   * Invoked when the loading is starting
    */
-  String getDataType();
-  
+  void onLoadingStarting();
+
   /**
+   * Invoked when the loading have progressed
    * 
-   * @return The time the record were put into the database
+   * @param percent
+   *          the percentage currently of the loading process
    */
-  Timestamp getLogTimestamp();
-  
+  void onLoadingProgressed(double percent);
+
   /**
-   * 
-   * @return the daq timestamp
+   * Invoked when all loading is complete.
    */
-  Timestamp getDaqTimestamp();
+  void onLoadingComplete();
 
 }

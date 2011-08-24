@@ -15,35 +15,36 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.common.history;
+package cern.c2mon.client.common.history.exception;
 
-import java.sql.Timestamp;
-
-import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.c2mon.client.common.history.HistoryLoadingConfiguration;
 
 /**
- * Extension of the {@link TagValueUpdate}
+ * Exception which is thrown if any of the parameters in
+ * {@link HistoryLoadingConfiguration} is invalid
  * 
  * @author vdeila
  * 
  */
-public interface HistoryTagValueUpdate extends TagValueUpdate, HistoryUpdate {
+public class LoadingParameterException extends Exception {
 
   /**
-   * @return the dataType
+   * serialVersionUID
    */
-  String getDataType();
-  
-  /**
-   * 
-   * @return The time the record were put into the database
-   */
-  Timestamp getLogTimestamp();
-  
-  /**
-   * 
-   * @return the daq timestamp
-   */
-  Timestamp getDaqTimestamp();
+  private static final long serialVersionUID = -564876438430752111L;
+
+  public LoadingParameterException() { }
+
+  public LoadingParameterException(String message) {
+    super(message);
+  }
+
+  public LoadingParameterException(Throwable cause) {
+    super(cause);
+  }
+
+  public LoadingParameterException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

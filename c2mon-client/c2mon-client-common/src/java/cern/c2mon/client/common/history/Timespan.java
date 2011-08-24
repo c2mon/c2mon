@@ -24,35 +24,49 @@ import java.util.Date;
  * Simple class to represent a time frame
  * 
  * @author vdeila
- *
+ * 
  */
 public class Timespan {
-  
+
   /** The start date */
   private Timestamp start;
-  
+
   /** The end date */
   private Timestamp end;
 
   /**
    * 
-   * @param start The start date
-   * @param end The end date 
+   * @param start
+   *          The start date
+   * @param end
+   *          The end date
    */
   public Timespan(final Timestamp start, final Timestamp end) {
     this.start = start;
     this.end = end;
   }
-  
+
   /**
    * 
-   * @param start The start date
-   * @param end The end date 
+   * @param start
+   *          The start date
+   * @param end
+   *          The end date
    */
   public Timespan(final Date start, final Date end) {
     this(new Timestamp(start.getTime()), new Timestamp(end.getTime()));
   }
 
+  /**
+   * Copy constructor
+   * 
+   * @param timespan
+   *          the timespan to copy
+   */
+  public Timespan(final Timespan timespan) {
+    this.start = timespan.start;
+    this.end = timespan.end;
+  }
 
   /**
    * @return the start time
@@ -62,7 +76,8 @@ public class Timespan {
   }
 
   /**
-   * @param start the start time to set
+   * @param start
+   *          the start time to set
    */
   public void setStart(final Timestamp start) {
     this.start = start;
@@ -76,9 +91,18 @@ public class Timespan {
   }
 
   /**
-   * @param end the end time to set
+   * @param end
+   *          the end time to set
    */
   public void setEnd(final Timestamp end) {
     this.end = end;
+  }
+  
+  /**
+   * 
+   * @return the duration from start to end in milliseconds. (<code>end - start</code>)
+   */
+  public long getDuration() {
+    return getEnd().getTime() - getStart().getTime();
   }
 }

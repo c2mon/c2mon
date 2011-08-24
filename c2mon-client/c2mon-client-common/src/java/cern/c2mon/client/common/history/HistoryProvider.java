@@ -21,7 +21,6 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 import cern.c2mon.client.common.history.event.HistoryProviderListener;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * Interface that provides functions to get data from the history.<br/>
@@ -104,6 +103,21 @@ public interface HistoryProvider {
    */
   Collection<HistoryTagValueUpdate> getHistory(final int maximumRecordsPerTag, final Long[] tagIds);
 
+  /**
+   * 
+   * @param tagIds
+   *          the tag ids to get the data of
+   * @param from
+   *          the start date of the day to get the snapshots for (the time is
+   *          ignored)
+   * @param to
+   *          the end date of the day to get the snapshots for (the time is
+   *          ignored)
+   * @return A collection of all the records for the <code>tagIds</code> between
+   *         the given time span
+   */
+  Collection<HistoryTagValueUpdate> getDailySnapshotRecords(final Long[] tagIds, final Timestamp from, final Timestamp to);
+  
   /**
    * Gets the data tag values for the given time (<code>before</code>)
    * 
