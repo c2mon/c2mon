@@ -19,6 +19,7 @@ package cern.c2mon.client.history;
 
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistoryProviderType;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.history.dbaccess.HistorySessionFactory;
 import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
 
@@ -47,16 +48,20 @@ public final class HistoryProviderFactory {
    * 
    * @param type
    *          The type of HistoryProvider that should be created
+   * @param clientDataTagRequestCallback
+   *          callback for the history provider to get access to attributes in
+   *          the {@link ClientDataTagValue}. Like the
+   *          {@link ClientDataTagValue#getType()}.
    * @return A provider
    * @throws HistoryException
    *           If the provider could not be retrieved
    */
-  public HistoryProvider createHistoryProvider(final HistoryProviderType type) throws HistoryException {
+  public HistoryProvider createHistoryProvider(final HistoryProviderType type, final ClientDataTagRequestCallback clientDataTagRequestCallback) throws HistoryException {
     switch (type) {
     case HISTORY_EVENTS:
-      return HistorySessionFactory.getInstance().createHistoryEventsProvider();
+      return HistorySessionFactory.getInstance().createHistoryEventsProvider(clientDataTagRequestCallback);
     case HISTORY_SHORT_TERM_LOG:
-      return HistorySessionFactory.getInstance().createHistoryProvider();
+      return HistorySessionFactory.getInstance().createHistoryProvider(clientDataTagRequestCallback);
     default:
       throw new HistoryException("Invalid HistoryProviderType");
     }
