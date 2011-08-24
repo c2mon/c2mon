@@ -119,8 +119,14 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   private Collection< ? extends ClientRequestResult> handleClientRequest(@Valid final ClientRequest clientRequest) {
     switch (clientRequest.getRequestType()) {
       case TAG_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Received a client request for " + clientRequest.getTagIds().size() + " tags.");
+        }
         return handleTagRequest(clientRequest);
       case SUPERVISION_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("Received a client request for the current supervision status.");
+        }
         return supervisionFacade.getAllSupervisionStates();
       default:
         LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
