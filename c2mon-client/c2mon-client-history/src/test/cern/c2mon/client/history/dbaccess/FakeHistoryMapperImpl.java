@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import cern.c2mon.client.history.dbaccess.beans.DailySnapshotRequestBean;
 import cern.c2mon.client.history.dbaccess.beans.HistoryRecordBean;
 import cern.c2mon.client.history.dbaccess.beans.InitialRecordHistoryRequestBean;
 import cern.c2mon.client.history.dbaccess.beans.ShortTermLogHistoryRequestBean;
@@ -149,7 +150,12 @@ public class FakeHistoryMapperImpl implements HistoryMapper {
     throw new UnsupportedOperationException("This test function is not yet implemented");
  // Todo implement to test
   }
-  
+
+  @Override
+  public List<HistoryRecordBean> getDailySnapshotRecords(DailySnapshotRequestBean request) {
+    throw new UnsupportedOperationException("This test function is not yet implemented");
+    // Todo implement to test
+  }
   
 
 }

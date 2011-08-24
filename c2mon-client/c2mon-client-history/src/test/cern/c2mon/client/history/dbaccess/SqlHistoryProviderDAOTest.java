@@ -33,7 +33,7 @@ public class SqlHistoryProviderDAOTest {
 
   @Before
   public void setUp() throws Exception {
-    provider = new SqlHistoryProviderDAO(new FakeSqlSessionFactory());
+    provider = new SqlHistoryProviderDAO(new FakeSqlSessionFactory(), null);
     Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(System.currentTimeMillis());
     toTime = new Timestamp(calendar.getTimeInMillis());

@@ -41,6 +41,7 @@ public class HistoryRecordBeanTest {
   @Before
   public void setUp() throws Exception {
     bean = new HistoryRecordBean(TAGID);
+    bean.convertIntoLocalTimeZone();
     bean.setFromInitialSnapshot(FROM_INITIAL_SNAPSHOT);
     bean.setTagTime(new Timestamp(TAG_TIME));
     bean.setDaqTime(new Timestamp(DAQ_TIME));
@@ -70,12 +71,11 @@ public class HistoryRecordBeanTest {
   
   @Test
   public void testToTagValueUpdate() {
-    final TagValueUpdate value = BeanConverterUtil.toTagValueUpdate(bean);
+    final TagValueUpdate value = BeanConverterUtil.toTagValueUpdate(bean, null);
     assertEquals(TAGID, value.getId());
     assertEquals(TAG_TIME, Long.valueOf(value.getSourceTimestamp().getTime()));
     assertEquals(SERVER_TIME, Long.valueOf(value.getServerTimestamp().getTime()));
     assertEquals(TAG_VALUE, value.getValue());
     assertEquals(true, value.getDataTagQuality().isInvalidStatusSet(TAG_QUALITY_STATUS));
-    
   }
 }

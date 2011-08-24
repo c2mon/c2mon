@@ -46,12 +46,12 @@ public class HistorySessionFactoryTest {
   
   @Test
   public void testCreateHistoryProvider() throws HistoryException {
-    HistoryProviderFactory.getInstance().createHistoryProvider(HistoryProviderType.HISTORY_SHORT_TERM_LOG);
+    HistoryProviderFactory.getInstance().createHistoryProvider(HistoryProviderType.HISTORY_SHORT_TERM_LOG, null);
   }
 
   @Test
   public void testRequestFromTest() throws HistoryException {
-    final HistoryProvider provider = HistoryProviderFactory.getInstance().createHistoryProvider(HistoryProviderType.HISTORY_SHORT_TERM_LOG);
+    final HistoryProvider provider = HistoryProviderFactory.getInstance().createHistoryProvider(HistoryProviderType.HISTORY_SHORT_TERM_LOG, null);
 
     final Collection<HistoryTagValueUpdate> values = provider.getHistory(TAG_IDS, MAXIMUM_TOTAL_RECORDS);
     Assert.assertTrue("More records was returned than requested", values.size() <= MAXIMUM_TOTAL_RECORDS);

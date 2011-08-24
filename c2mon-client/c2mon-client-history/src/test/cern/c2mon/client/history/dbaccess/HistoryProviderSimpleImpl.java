@@ -63,8 +63,8 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
   public Collection<HistoryTagValueUpdate> getInitialValuesForTags(final Long[] pTagIds, final Timestamp before) {
     final List<HistoryTagValueUpdate> result = new ArrayList<HistoryTagValueUpdate>();
 
-    fireQueryStarting();
-    fireQueryProgressChanged(0.0);
+    final Object id = fireQueryStarting();
+    fireQueryProgressChanged(id, 0.0);
 
     for (int i = 0; i < pTagIds.length; i++) {
       final Long searchingTagId = pTagIds[i];
@@ -76,20 +76,20 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
       }
       
       emulateWait(1);
-      fireQueryProgressChanged(i / (double) pTagIds.length);
+      fireQueryProgressChanged(id, i / (double) pTagIds.length);
     }
 
-    fireQueryProgressChanged(1.0);
-    fireQueryFinished();
+    fireQueryProgressChanged(id, 1.0);
+    fireQueryFinished(id);
 
     return result;
   }
 
   @Override
   public Collection<HistoryTagValueUpdate> getHistory(final Long[] tagIds, final Timestamp from, final Timestamp to) {
-    fireQueryStarting();
+    final Object id = fireQueryStarting();
 
-    fireQueryProgressChanged(0.0);
+    fireQueryProgressChanged(id, 0.0);
 
     // Filters out the tags and timespan that is asked for.
     final List<HistoryTagValueUpdate> result = new ArrayList<HistoryTagValueUpdate>();
@@ -104,8 +104,8 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
     
     emulateWait(tagIds.length);
 
-    fireQueryProgressChanged(1.0);
-    fireQueryFinished();
+    fireQueryProgressChanged(id, 1.0);
+    fireQueryFinished(id);
     return result;
   }
 
@@ -133,8 +133,8 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
   public Collection<HistorySupervisionEvent> getInitialSupervisionEvents(final Timestamp initializationTime, final Collection<SupervisionEventRequest> requests) {
     final List<HistorySupervisionEvent> result = new ArrayList<HistorySupervisionEvent>();
 
-    fireQueryStarting();
-    fireQueryProgressChanged(0.0);
+    final Object id = fireQueryStarting();
+    fireQueryProgressChanged(id, 0.0);
 
     // Filters out the events that is requested
     for (final SupervisionEventRequest request : requests) {
@@ -147,20 +147,20 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
         }
       }
       emulateWait(1);
-      fireQueryProgressChanged(result.size() / (double) requests.size());
+      fireQueryProgressChanged(id, result.size() / (double) requests.size());
     }
 
-    fireQueryProgressChanged(1.0);
-    fireQueryFinished();
+    fireQueryProgressChanged(id, 1.0);
+    fireQueryFinished(id);
 
     return result;
   }
 
   @Override
   public Collection<HistorySupervisionEvent> getSupervisionEvents(final Timestamp from, final Timestamp to, final Collection<SupervisionEventRequest> requests) {
-    fireQueryStarting();
+    final Object id = fireQueryStarting();
 
-    fireQueryProgressChanged(0.0);
+    fireQueryProgressChanged(id, 0.0);
 
     // Filters out the events that is requested
     final List<HistorySupervisionEvent> result = new ArrayList<HistorySupervisionEvent>();
@@ -176,11 +176,11 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
         }
       }
       emulateWait(1);
-      fireQueryProgressChanged(result.size() / (double) requests.size());
+      fireQueryProgressChanged(id, result.size() / (double) requests.size());
     }
 
-    fireQueryProgressChanged(1.0);
-    fireQueryFinished();
+    fireQueryProgressChanged(id, 1.0);
+    fireQueryFinished(id);
     return result;
   }
 
@@ -213,6 +213,11 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
    */
   public void setEmulatedResponseTime(final Long emulatedResponseTime) {
     this.emulatedResponseTime = emulatedResponseTime;
+  }
+
+  @Override
+  public Collection<HistoryTagValueUpdate> getDailySnapshotRecords(Long[] tagIds, Timestamp from, Timestamp to) {
+    throw new UnsupportedOperationException("Trying to use a method that is not implemented");
   }
 
 }

@@ -104,6 +104,7 @@ public class HistoryPlayerImplTest2 {
           Integer.valueOf(40000), 
           new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000), 
           new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000), 
+          null,
           "Test tag", 
           TagMode.OPERATIONAL);
     initialTagRecords.add(initialHistoryRecord);
@@ -119,6 +120,7 @@ public class HistoryPlayerImplTest2 {
           Integer.valueOf(100000), // Random value
           new Timestamp(historyRecordTime), 
           new Timestamp(historyRecordTime), 
+          null,
           "Test tag", 
           TagMode.OPERATIONAL);
     historyRecord.setDataType("Integer");
@@ -179,7 +181,9 @@ public class HistoryPlayerImplTest2 {
     mockCtrl.checkOrder(false);
     
     supervisionListener.onSupervisionUpdate(EasyMock.eq(initialSupervisionEvent));
+    EasyMock.expectLastCall().atLeastOnce();
     tagUpdateListener.onUpdate(EasyMock.eq(initialHistoryRecord));
+    EasyMock.expectLastCall().atLeastOnce();
     
     
     mockCtrl.checkOrder(true);
@@ -207,12 +211,15 @@ public class HistoryPlayerImplTest2 {
     final SupervisionListener supervisionListenerDelegate = new SupervisionListener() {
       @Override
       public void onSupervisionUpdate(final SupervisionEvent supervisionEvent) {
-        if (supervisionEvent.getEventTime().compareTo(new Timestamp(10)) < 0) {
+        if (supervisionEvent.getEventTime().compareTo(new Timestamp(10)) > 0) {
           Assert.fail(String.format("Unexpected method call onSupervisionUpdate(%s)", supervisionEvent.toString()));
         }
       }
     };
-    supervisionListener.onSupervisionUpdate(EasyMock.<SupervisionEvent>anyObject());
+    supervisionListener.onSupervisionUpdate(
+        EasyMock.and(
+            EasyMock.not(EasyMock.eq(initialSupervisionEvent)), 
+            EasyMock.<SupervisionEvent>anyObject()));
     EasyMock.expectLastCall().andStubDelegateTo(supervisionListenerDelegate);
     
     
