@@ -19,7 +19,9 @@ package cern.c2mon.client.history.dbaccess.beans;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.TimeZone;
 
+import cern.c2mon.client.history.dbaccess.util.TimeZoneUtil;
 import cern.tim.shared.common.datatag.DataTagQuality;
 
 /**
@@ -67,12 +69,56 @@ public class HistoryRecordBean {
    */
   private boolean fromInitialSnapshot;
   
+  /** The time zone that the dates have */
+  private TimeZone timeZone;
+  
   /**
    * 
    * @param tagId The tag id this record will be registered for
    */
   public HistoryRecordBean(final Long tagId) {
     this.tagId = tagId;
+    this.timeZone = TimeZone.getTimeZone("UTC");
+  }
+  
+  /**
+   * Converts all the dates and times into the local time zone
+   */
+  public void convertIntoLocalTimeZone() {
+    convertIntoTimeZone(TimeZone.getDefault());
+  }
+  
+  /**
+   * Converts all the dates and times into the new time zone
+   * 
+   * @param newTimeZone
+   *          the new time zone to set
+   */
+  public void convertIntoTimeZone(final TimeZone newTimeZone) {
+    if (this.timeZone.equals(newTimeZone)) {
+      return;
+    }
+    if (this.logDate != null) {
+      this.logDate = TimeZoneUtil.convertDateTimezone(newTimeZone, this.logDate, timeZone);
+    }
+    if (this.tagTime != null) {
+      this.tagTime = TimeZoneUtil.convertDateTimezone(newTimeZone, this.tagTime, timeZone);
+    }
+    if (this.daqTime != null) {
+      this.daqTime = TimeZoneUtil.convertDateTimezone(newTimeZone, this.daqTime, timeZone);
+    }
+    if (this.serverTime != null) {
+      this.serverTime = TimeZoneUtil.convertDateTimezone(newTimeZone, this.serverTime, timeZone);
+    }
+    this.timeZone = newTimeZone;
+  }
+  
+  /**
+   * 
+   * @return the timezone which are currently used for the dates and times
+   */
+  public TimeZone getTimeZone() {
+    return this.timeZone;
   }
   
   /**

@@ -26,6 +26,8 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.history.ClientDataTagRequestCallback;
 import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
 
 /**
@@ -107,24 +109,34 @@ public final class HistorySessionFactory {
 
   /**
    * 
+   * @param clientDataTagRequestCallback
+   *          callback for the history provider to get access to attributes in
+   *          the {@link ClientDataTagValue}. Like the
+   *          {@link ClientDataTagValue#getType()}.
+   * 
    * @return A {@link HistoryProvider} which can be used to easily get history
    *         data
    * @throws HistoryException
    *           If the configuration file could not be read. Or if the system
    *           properties for the data source is not set.
    */
-  public HistoryProvider createHistoryProvider() throws HistoryException {
-    return new SqlHistoryProviderDAO(getSqlSessionFactory());
+  public HistoryProvider createHistoryProvider(final ClientDataTagRequestCallback clientDataTagRequestCallback) throws HistoryException {
+    return new SqlHistoryProviderDAO(getSqlSessionFactory(), clientDataTagRequestCallback);
   }
   
   /**
    * 
+   * @param clientDataTagRequestCallback
+   *          callback for the history provider to get access to attributes in
+   *          the {@link ClientDataTagValue}. Like the
+   *          {@link ClientDataTagValue#getType()}.
+   *          
    * @return A {@link HistoryProvider} which can be used to easily get event history data
    * @throws HistoryException
    *           If the configuration file could not be read. Or if the system
    *           properties for the data source is not set.
    */
-  public HistoryProvider createHistoryEventsProvider() throws HistoryException {
+  public HistoryProvider createHistoryEventsProvider(final ClientDataTagRequestCallback clientDataTagRequestCallback) throws HistoryException {
     throw new HistoryException("The History Events is not yet supported..");
   }
 

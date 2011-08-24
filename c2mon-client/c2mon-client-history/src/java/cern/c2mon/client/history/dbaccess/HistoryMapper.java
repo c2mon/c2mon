@@ -19,6 +19,7 @@ package cern.c2mon.client.history.dbaccess;
 
 import java.util.List;
 
+import cern.c2mon.client.history.dbaccess.beans.DailySnapshotRequestBean;
 import cern.c2mon.client.history.dbaccess.beans.HistoryRecordBean;
 import cern.c2mon.client.history.dbaccess.beans.InitialRecordHistoryRequestBean;
 import cern.c2mon.client.history.dbaccess.beans.ShortTermLogHistoryRequestBean;
@@ -47,6 +48,15 @@ public interface HistoryMapper {
    */
   HistoryRecordBean getInitialRecord(final InitialRecordHistoryRequestBean request);
 
+  /**
+   * Requests data for a set of tags from the daily snapshot table.
+   * 
+   * @param request
+   *          A request bean describing what to request
+   * @return a list of records that meets criteria of the request bean
+   */
+  List<HistoryRecordBean> getDailySnapshotRecords(final DailySnapshotRequestBean request);
+  
   /**
    * 
    * @param request

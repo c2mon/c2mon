@@ -18,8 +18,6 @@
 package cern.c2mon.client.history.dbaccess.beans;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 
 import cern.c2mon.client.history.dbaccess.HistoryMapper;
 
@@ -34,10 +32,7 @@ import cern.c2mon.client.history.dbaccess.HistoryMapper;
  * 
  */
 public class ShortTermLogHistoryRequestBean {
-
-  /** The format of a string with a date and time */
-  private static final String DATE_TIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
-
+  
   /** The tag ids to request */
   private Long[] tagIds;
 
@@ -49,9 +44,6 @@ public class ShortTermLogHistoryRequestBean {
 
   /** The total maximum amount of records that can be retrieved */
   private Integer maxRecords = null;
-  
-  /** The format used when having date and time */
-  private final SimpleDateFormat dateTimeFormat;
 
   /**
    * @param tagIds
@@ -69,9 +61,6 @@ public class ShortTermLogHistoryRequestBean {
     this.fromTime = fromTime;
     this.toTime = toTime;
     this.maxRecords = maxRecords;
-    
-    this.dateTimeFormat = new SimpleDateFormat(DATE_TIME_FORMAT);
-    this.dateTimeFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
   }
 
   /**
@@ -119,26 +108,6 @@ public class ShortTermLogHistoryRequestBean {
    */
   public void setTagIds(final Long[] tagIds) {
     this.tagIds = tagIds;
-  }
-
-  /**
-   * @return The from time in String format
-   */
-  public String getFromTimeStr() {
-    if (getFromTime() == null) {
-      return null;
-    }
-    return this.dateTimeFormat.format(getFromTime());
-  }
-
-  /**
-   * @return The to time in String format
-   */
-  public String getToTimeStr() {
-    if (getToTime() == null) {
-      return null;
-    }
-    return this.dateTimeFormat.format(getToTime());
   }
 
   /**

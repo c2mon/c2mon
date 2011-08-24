@@ -17,10 +17,14 @@
  *****************************************************************************/
 package cern.c2mon.client.history.dbaccess.util;
 
+import java.sql.Timestamp;
+
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.history.ClientDataTagRequestCallback;
 import cern.c2mon.client.history.dbaccess.beans.HistoryRecordBean;
 import cern.c2mon.client.history.dbaccess.beans.SupervisionRecordBean;
 import cern.c2mon.client.history.updates.HistorySupervisionEventImpl;
@@ -44,10 +48,26 @@ public final class BeanConverterUtil {
   /**
    * Converts a {@link HistoryRecordBean} object to a {@link TagValueUpdate}
    * 
-   * @param bean the bean to convert
+   * @param bean
+   *          the bean to convert
    * @return the converted object
    */
   public static HistoryTagValueUpdate toTagValueUpdate(final HistoryRecordBean bean) {
+    return toTagValueUpdate(bean, null);
+  }
+  
+  /**
+   * Converts a {@link HistoryRecordBean} object to a {@link TagValueUpdate}
+   * 
+   * @param bean
+   *          the bean to convert
+   * @param clientDataTagRequestCallback
+   *          Callback to get access to attributes in the
+   *          {@link ClientDataTagValue}.
+   * @return the converted object
+   */
+  public static HistoryTagValueUpdate toTagValueUpdate(final HistoryRecordBean bean, final ClientDataTagRequestCallback clientDataTagRequestCallback) {
+    bean.convertIntoLocalTimeZone();
     TagMode mode;
     try {
       mode = TagMode.values()[bean.getTagMode()];
@@ -57,17 +77,39 @@ public final class BeanConverterUtil {
       LOG.warn(String.format("Invalid tag mode, \"%d\", for tag %d!", bean.getTagMode(), bean.getTagId()), e);
     }
     
+    String description = "";
+    
+    if (clientDataTagRequestCallback != null) {
+      ClientDataTagValue cdt;
+      try {
+        cdt = clientDataTagRequestCallback.getClientDataTagValue(bean.getTagId());
+      } 
+      catch (Exception e) { 
+        cdt = null;
+      }
+      
+      if (cdt != null) {
+        if (cdt.getDescription() != null) {
+          description = cdt.getDescription();
+        }
+      }
+      else {
+        LOG.debug(String.format("Couldn't get the client data tag value for the tag id %d, some information will not be available", bean.getTagId()));
+      }
+    }
+    
     final HistoryTagValueUpdateImpl value =
       new HistoryTagValueUpdateImpl(
           bean.getTagId(), 
           bean.getDataTagQuality(), 
-          TypeConverter.cast((String) bean.getTagValue(), bean.getTagDataType()), 
+          TypeConverter.cast(bean.getTagValue(), bean.getTagDataType()), 
           bean.getTagTime(), 
           bean.getServerTime(),
-          "",
+          new Timestamp(bean.getLogDate().getTime()),
+          description,
           mode);
     value.setDataType(bean.getTagDataType());
-    
+    value.setDaqTimestamp(bean.getDaqTime());
     return value;
   }
   
@@ -78,6 +120,7 @@ public final class BeanConverterUtil {
    * @return the converted object
    */
   public static HistorySupervisionEvent toSupervisionEvent(final SupervisionRecordBean bean) {
+    bean.convertIntoLocalTimeZone();
     return new HistorySupervisionEventImpl(
         bean.getEntity(), 
         bean.getId(), 

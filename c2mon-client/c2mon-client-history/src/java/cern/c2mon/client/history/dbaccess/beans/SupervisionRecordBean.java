@@ -18,7 +18,9 @@
 package cern.c2mon.client.history.dbaccess.beans;
 
 import java.sql.Timestamp;
+import java.util.TimeZone;
 
+import cern.c2mon.client.history.dbaccess.util.TimeZoneUtil;
 import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
@@ -44,6 +46,9 @@ public class SupervisionRecordBean {
 
   /** an optional text message; can be <code>null</code> */
   private String message;
+  
+  /** The time zone that the dates have */
+  private TimeZone timeZone;
 
   /**
    * 
@@ -55,6 +60,38 @@ public class SupervisionRecordBean {
   public SupervisionRecordBean(final SupervisionEntity entity, final Long id) {
     this.entity = entity;
     this.id = id;
+    this.timeZone = TimeZone.getTimeZone("UTC");
+  }
+  
+  /**
+   * Converts all the dates and times into the local time zone
+   */
+  public void convertIntoLocalTimeZone() {
+    convertIntoTimeZone(TimeZone.getDefault());
+  }
+  
+  /**
+   * Converts all the dates and times into the new time zone
+   * 
+   * @param newTimeZone
+   *          the new time zone to set
+   */
+  public void convertIntoTimeZone(final TimeZone newTimeZone) {
+    if (this.timeZone.equals(newTimeZone)) {
+      return;
+    }
+    if (this.date != null) {
+      this.date = TimeZoneUtil.convertDateTimezone(newTimeZone, this.date, timeZone);
+    }
+    this.timeZone = newTimeZone;
+  }
+  
+  /**
+   * 
+   * @return the timezone which are currently used for the dates and times
+   */
+  public TimeZone getTimeZone() {
+    return this.timeZone;
   }
 
   /**

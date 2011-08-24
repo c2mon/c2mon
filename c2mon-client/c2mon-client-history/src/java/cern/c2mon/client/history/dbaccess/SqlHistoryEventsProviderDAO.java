@@ -7,7 +7,6 @@ import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.SupervisionEventRequest;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * Implementation of the {@link HistoryProvider}<br/>
@@ -67,6 +66,12 @@ class SqlHistoryEventsProviderDAO extends HistoryProviderAbs {
 
   @Override
   public Collection<HistorySupervisionEvent> getSupervisionEvents(Timestamp from, Timestamp to, Collection<SupervisionEventRequest> requests) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Collection<HistoryTagValueUpdate> getDailySnapshotRecords(Long[] tagIds, Timestamp from, Timestamp to) {
     // TODO Auto-generated method stub
     return null;
   }

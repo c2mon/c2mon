@@ -18,7 +18,9 @@
 package cern.c2mon.client.history.dbaccess;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cern.c2mon.client.common.history.HistoryProvider;
@@ -37,13 +39,23 @@ abstract class HistoryProviderAbs implements HistoryProvider {
 
   /** Lock for the listeners */
   private final ReentrantReadWriteLock listenersLock;
+  
+  /** Keeps track of the queries and their progress */
+  private final Map<Object, Double> queries;
+  
+  /** Lock for {@link #queries} */
+  private final ReentrantReadWriteLock queriesLock = new ReentrantReadWriteLock();
 
+  /** A counter for creating unique identifiers */
+  private volatile long uniqueIdentifier = 1L;
+  
   /**
    * Constructor
    */
   public HistoryProviderAbs() {
     this.listeners = new ArrayList<HistoryProviderListener>();
     this.listenersLock = new ReentrantReadWriteLock();
+    this.queries = new HashMap<Object, Double>();
   }
 
   @Override
@@ -84,19 +96,54 @@ abstract class HistoryProviderAbs implements HistoryProvider {
 
   /**
    * Fires the queryStarting() method on all the listeners
+   *
+   * @return the identifier used for the rest of the calls
    */
-  protected void fireQueryStarting() {
+  protected Object fireQueryStarting() {
+    final Object queryId = Long.valueOf(uniqueIdentifier++);
+    int queriesCount;
+    queriesLock.writeLock().lock();
+    try {
+      this.queries.put(queryId, 0.0);
+      queriesCount = queries.size();
+    }
+    finally {
+      queriesLock.writeLock().unlock();
+    }
+    
     for (HistoryProviderListener listener : getHistoryProviderListeners()) {
       listener.queryStarting();
     }
+    if (queriesCount == 1) {
+      fireQueryProgressChanged();
+    }
+    return queryId;
   }
 
   /**
    * Fires the queryFinished() method on all the listeners
+   * 
+   * @param queryId
+   *          an identifier for the query
    */
-  protected void fireQueryFinished() {
-    for (HistoryProviderListener listener : getHistoryProviderListeners()) {
-      listener.queryFinished();
+  protected void fireQueryFinished(final Object queryId) {
+    int queriesCount = 1;
+    queriesLock.writeLock().lock();
+    try {
+      if (this.queries.remove(queryId) != null) {
+        queriesCount = this.queries.size(); 
+      }
+    }
+    finally {
+      queriesLock.writeLock().unlock();
+    }
+    if (queriesCount == 0) {
+      for (HistoryProviderListener listener : getHistoryProviderListeners()) {
+        listener.queryFinished();
+      }
+    }
+    else {
+      fireQueryProgressChanged(queryId, 1.0);
     }
   }
 
@@ -105,8 +152,36 @@ abstract class HistoryProviderAbs implements HistoryProvider {
    * 
    * @param percent
    *          The percentage which is currently loaded. Between 0.0 and 1.0
+   * @param queryId
+   *          an identifier for the query
    */
-  protected void fireQueryProgressChanged(final double percent) {
+  protected void fireQueryProgressChanged(final Object queryId, final double percent) {
+    queriesLock.writeLock().lock();
+    try {
+      this.queries.put(queryId, percent);
+    }
+    finally {
+      queriesLock.writeLock().unlock();
+    }
+    fireQueryProgressChanged();
+  }
+  
+  /**
+   * Fires the queryProgressChanged(percent) method on all the listeners with
+   * the combined percentage of all the concurrent queries.
+   */
+  private void fireQueryProgressChanged() {
+    double percent = 1.0;
+    queriesLock.readLock().lock();
+    try {
+      for (Double singlePercent : this.queries.values()) {
+        percent *= singlePercent;
+      }
+    }
+    finally {
+      queriesLock.readLock().unlock();
+    }
+    
     for (HistoryProviderListener listener : getHistoryProviderListeners()) {
       listener.queryProgressChanged(percent);
     }

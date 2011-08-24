@@ -8,6 +8,7 @@
     <typeAlias alias="ShortTermLogHistoryRequestBean"  type="cern.c2mon.client.history.dbaccess.beans.ShortTermLogHistoryRequestBean" />
     <typeAlias alias="InitialRecordHistoryRequestBean" type="cern.c2mon.client.history.dbaccess.beans.InitialRecordHistoryRequestBean" />
     <typeAlias alias="SupervisionEventRequestBean" type="cern.c2mon.client.history.dbaccess.beans.SupervisionEventRequestBean" />
+    <typeAlias alias="DailySnapshotRequestBean" type="cern.c2mon.client.history.dbaccess.beans.DailySnapshotRequestBean" />
     <typeAlias alias="HistoryRecord" type="cern.c2mon.client.history.dbaccess.beans.HistoryRecordBean" />
     <typeAlias alias="DataTagQuality" type="cern.tim.shared.common.datatag.DataTagQuality" />
     <typeAlias alias="SupervisionRecordBean" type="cern.c2mon.client.history.dbaccess.beans.SupervisionRecordBean" />

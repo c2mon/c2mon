@@ -18,8 +18,6 @@
 package cern.c2mon.client.history.dbaccess.beans;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 /**
  * This class is passed as a parameter when requesting the initial record for a
@@ -30,19 +28,11 @@ import java.util.Calendar;
  */
 public class InitialRecordHistoryRequestBean {
 
-  /**
-   * The format of the string with only the date
-   */
-  private static final String DATE_FORMAT = "dd.MM.yyyy";
-
   /** The tag id for this request */
   private final long tagId;
 
   /** The requested record will be having the value that was on this time */
   private Timestamp beforeTime;
-
-  /** The format used when having only date */
-  private final SimpleDateFormat dateFormat;
 
   /**
    * 
@@ -55,43 +45,6 @@ public class InitialRecordHistoryRequestBean {
   public InitialRecordHistoryRequestBean(final long tagId, final Timestamp beforeTime) {
     this.tagId = tagId;
     this.beforeTime = beforeTime;
-    this.dateFormat = new SimpleDateFormat(DATE_FORMAT);
-  }
-
-  /**
-   * 
-   * @return A Timestamp which have the before date with correct timezone and
-   *         zero hours, minutes and seconds
-   */
-  public Timestamp getLogStart() {
-    final Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(getBeforeTime().getTime());
-    calendar.set(Calendar.HOUR_OF_DAY, 0);
-    calendar.set(Calendar.MINUTE, 0);
-    calendar.set(Calendar.SECOND, 0);
-    calendar.set(Calendar.MILLISECOND, 0);
-    return new Timestamp(calendar.getTimeInMillis());
-  }
-
-  /**
-   * 
-   * @return The day before the <code>beforeTime</code>, which then becomes the
-   *         date which will be compared with to get the value from the snapshot
-   *         table
-   */
-  public Timestamp getLogInitialDay() {
-    final Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(getLogStart().getTime());
-    calendar.add(Calendar.DATE, -1);
-    return new Timestamp(calendar.getTimeInMillis());
-  }
-  
-  /**
-   * 
-   * @return The String version of <code>getLogInitialDay</code>.
-   */
-  public String getLogInitialDayStr() {
-    return this.dateFormat.format(getLogInitialDay());
   }
 
   /*

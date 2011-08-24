@@ -19,7 +19,7 @@
     <constructor>
       <idArg column="TAGID" javaType="Long"/>
     </constructor>
-    <result property="logDate" column="LOGDATE" jdbcType="TIMESTAMP"/>
+    <result property="logDate" column="LOGDATE" jdbcType="TIMESTAMP" />
     <result property="tagName" column="TAGNAME" jdbcType="VARCHAR"/>
     <result property="tagValue" column="TAGVALUE" jdbcType="VARCHAR"/>
     <result property="tagDataType" column="TAGDATATYPE" jdbcType="VARCHAR"/>
@@ -67,16 +67,16 @@
           #{tag}
         </foreach>
       )
-      <if test="fromTimeStr != null">
-        <if test="toTimeStr != null">
-          AND TAGSERVERTIME BETWEEN #{fromTimeStr} AND #{toTime}
+      <if test="fromTime != null">
+        <if test="toTime != null">
+          AND TAGSERVERTIME BETWEEN SYS_EXTRACT_UTC(#{fromTime}) AND SYS_EXTRACT_UTC(#{toTime})
         </if>
       </if>
-    ORDER BY TAGSERVERTIME DESC, TAGDAQTIME DESC, TAGTIME DESC
     
     <if test="maxRecords != null">
-      )
-      WHERE ROWNUM <![CDATA[ <= ]]> #{maxRecords}
+      ORDER BY TAGSERVERTIME DESC, TAGDAQTIME DESC, TAGTIME DESC
+        )
+        WHERE ROWNUM <![CDATA[ <= ]]> #{maxRecords}
     </if>
   </select>
 
@@ -93,17 +93,45 @@
         FROM SHORTTERMLOG
         WHERE
             tagid = #{tagId}
-            AND LOGDATE <![CDATA[ >= ]]> #{logStart}
-            AND LOGDATE <![CDATA[ <= ]]> #{beforeTime}
+            AND
+            (
+              SELECT COUNT(*)
+              FROM STL_DAY_SNAPSHOT SNAPSHOT
+              WHERE SNAPSHOT.TAGID = #{tagId}
+              AND SNAPSHOT.LOGDATE = TRUNC(SYS_EXTRACT_UTC(#{beforeTime}), 'DD')
+              AND SNAPSHOT.TAGSERVERTIME <![CDATA[ < ]]> SNAPSHOT.LOGDATE
+            ) = 0
+            AND TAGSERVERTIME <![CDATA[ >= ]]> TRUNC(SYS_EXTRACT_UTC(#{beforeTime}), 'DD')
+            AND TAGSERVERTIME <![CDATA[ <= ]]> SYS_EXTRACT_UTC(#{beforeTime})
         UNION ALL
-        SELECT LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 1 AS FROMSNAPSHOT
+        SELECT LOGDATE+1 as LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 1 AS FROMSNAPSHOT
         FROM STL_DAY_SNAPSHOT
         WHERE
             tagid = #{tagId}
-            AND LOGDATE = TO_DATE(#{logInitialDayStr}, 'DD.MM.YYYY')
-        ORDER BY 8 DESC, 7 DESC, 1 DESC
+            AND LOGDATE = TRUNC(SYS_EXTRACT_UTC(#{beforeTime}), 'DD') - 1
+        ORDER BY 8 DESC, 7 DESC, 6 DESC, 1 DESC
     )
     WHERE rownum <![CDATA[ <= 1 ]]>
+  </select>
+  
+  <!--
+    Requests all daily snapshot data for the given set of tags, and the given time span.
+    The data is requeted from the daily snapshot table.
+  -->
+  <select   id="getDailySnapshotRecords" 
+            parameterType="DailySnapshotRequestBean"
+            resultMap="historyRecordResultMap">
+    SELECT LOGDATE+1 as LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE, TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE, 1 AS FROMSNAPSHOT
+    FROM STL_DAY_SNAPSHOT
+    WHERE
+        (TAGID in 
+          <foreach item="tag" index="index" collection="tagIds"
+            open="(" separator="," close=")">
+            #{tag}
+          </foreach>
+        )
+        AND LOGDATE <![CDATA[ >= ]]> TRUNC(#{fromTime}, 'DD')
+        AND LOGDATE <![CDATA[ <= ]]> TRUNC(#{toTime}, 'DD')
   </select>
   
   <!--
@@ -119,7 +147,7 @@
         AND (SUL_ENTITY LIKE #{entity})
         <if test="fromTime != null ">
             <if test="toTime != null">
-              AND SUL_DATE BETWEEN #{fromTime} AND #{toTime}
+              AND SUL_DATE BETWEEN SYS_EXTRACT_UTC(#{fromTime}) AND SYS_EXTRACT_UTC(#{toTime})
             </if>
         </if>
     ORDER BY SUL_DATE ASC
@@ -137,7 +165,7 @@
       WHERE
           (SUL_ID = #{id})
           AND (SUL_ENTITY LIKE #{entity})
-          AND SUL_DATE <![CDATA[ <= ]]> #{fromTime}
+          AND SUL_DATE <![CDATA[ <= ]]> SYS_EXTRACT_UTC(#{fromTime})
       ORDER BY SUL_DATE DESC
     )
     WHERE rownum <![CDATA[ <= 1 ]]>
