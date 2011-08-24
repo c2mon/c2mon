@@ -84,6 +84,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   public void onMessage(final Message message, final Session session) throws JMSException {
     ClientRequest clientRequest = ClientRequestMessageConverter.fromMessage(message);
     Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Successully processed client request.");
+    }
  
     // Extract reply topic
     Destination replyDestination = null;
@@ -127,7 +130,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         if (LOG.isDebugEnabled()) {
           LOG.debug("Received a client request for the current supervision status.");
         }
-        return supervisionFacade.getAllSupervisionStates();
+        return supervisionFacade.getAllSupervisionStates();        
       default:
         LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
         return Collections.emptyList();
