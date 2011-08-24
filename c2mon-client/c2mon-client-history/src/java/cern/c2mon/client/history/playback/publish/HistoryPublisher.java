@@ -98,6 +98,7 @@ public class HistoryPublisher {
           null, 
           null, 
           new Timestamp(1), // The data tag is only updated of a value greater than 0
+          null,
           "",  
           TagMode.OPERATIONAL));
     }

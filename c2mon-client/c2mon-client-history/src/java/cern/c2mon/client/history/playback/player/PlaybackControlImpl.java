@@ -99,9 +99,11 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
 
   @Override
   public void setClockTime(final long time) {
-    fireClockTimeChanging(time);
-    getClock().setTime(time);
-    fireClockTimeChanged(time);
+    if (getClock().getTime() != time) {
+      fireClockTimeChanging(time);
+      getClock().setTime(time);
+      fireClockTimeChanged(time);
+    }
   }
 
   @Override
@@ -323,7 +325,12 @@ public class PlaybackControlImpl implements PlaybackControl, PlaybackSynchronize
       getClock().setStartTime(start.getTime());
     }
     if (!getClock().getEndDate().equals(end)) {
-      getClock().setEndTime(end.getTime());
+      if (getClock().getStartTime() > end.getTime()) {
+        getClock().setEndTime(getClock().getStartTime());
+      }
+      else {
+        getClock().setEndTime(end.getTime());
+      }
     }
     long time = getClockTime();
     if (time < start.getTime() || time > end.getTime()) {

@@ -38,10 +38,10 @@ import cern.c2mon.client.common.history.id.SupervisionEventId;
 import cern.c2mon.client.common.history.id.TagValueUpdateId;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.history.data.event.HistoryStoreAdapter;
 import cern.c2mon.client.history.playback.components.ListenersManager;
 import cern.c2mon.client.history.playback.data.HistoryLoader;
 import cern.c2mon.client.history.playback.data.HistoryStore;
-import cern.c2mon.client.history.playback.data.event.HistoryStoreAdapter;
 import cern.c2mon.client.history.playback.exceptions.NoHistoryProviderAvailableException;
 import cern.c2mon.client.history.playback.player.Clock;
 import cern.c2mon.client.history.playback.player.PlaybackControlImpl;
@@ -166,8 +166,6 @@ public class HistoryPlayerImpl
         historyScheduler.rescheduleEvents();
       }
       
-      
-
       @Override
       public void onPlaybackBufferFullyLoaded() {
         if (LOG.isDebugEnabled()) {
@@ -179,8 +177,7 @@ public class HistoryPlayerImpl
       
       @Override
       public void onDataInitialized(final Collection<HistoryUpdateId> historyUpdateIds) {
-        // initialize the new data tags with the value at current time
-        getHistoryScheduler().updateDataTagsWithValueAtCurrentTime(historyUpdateIds);
+        onDataCollectionChanged(historyUpdateIds);
       }
     });
   }
@@ -203,6 +200,7 @@ public class HistoryPlayerImpl
     this.publisher.clearAll();
     
     this.historyLoader.stopLoading();
+    this.historyLoader.clear();
     this.historyLoader.getHistoryStore().clear();
     this.historyScheduler.cancelAllScheduledEvents();
     
@@ -234,7 +232,9 @@ public class HistoryPlayerImpl
         oldHistoryProvider = this.getHistoryConfiguration().getHistoryProvider();
         oldHistoryProvider.removeHistoryProviderListener(this.eventsForwarder);
       }
-      catch (NoHistoryProviderAvailableException e) { }
+      catch (NoHistoryProviderAvailableException e) { 
+        LOG.debug("Isn't possible to remove the history provider listener from the history provider, as non is available.");
+      }
     }
     
     this.historyLoader.setHistoryConfiguration(historyConfiguration);
@@ -339,6 +339,7 @@ public class HistoryPlayerImpl
               currentRealtimeValue.getValue(), 
               currentRealtimeValue.getTimestamp(), 
               currentRealtimeValue.getServerTimestamp(), 
+              null,
               currentRealtimeValue.getDescription(), 
               currentRealtimeValue.getAlarms().toArray(new AlarmValue[0]), 
               currentRealtimeValue.getMode());
@@ -350,7 +351,8 @@ public class HistoryPlayerImpl
               null, 
               null, 
               null, 
-              null, 
+              null,
+              null,
               null, 
               null, 
               null);
@@ -702,6 +704,9 @@ public class HistoryPlayerImpl
     return publisher;
   }
 
+  /**
+   * @return the history provider which is used to load the history data
+   */
   @Override
   public HistoryProvider getHistoryProvider() {
     if (getHistoryConfiguration() != null) {
@@ -709,7 +714,7 @@ public class HistoryPlayerImpl
         return getHistoryConfiguration().getHistoryProvider();
       }
       catch (NoHistoryProviderAvailableException e) {
-        
+        LOG.debug("No history provider is available, returning null.");
       }
     }
     return null;

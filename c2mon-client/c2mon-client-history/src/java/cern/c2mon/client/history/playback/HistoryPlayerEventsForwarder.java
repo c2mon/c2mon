@@ -24,9 +24,9 @@ import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.common.history.event.HistoryPlayerListener;
 import cern.c2mon.client.common.history.event.HistoryProviderListener;
 import cern.c2mon.client.common.history.id.HistoryUpdateId;
+import cern.c2mon.client.history.data.event.HistoryLoaderListener;
+import cern.c2mon.client.history.data.event.HistoryStoreListener;
 import cern.c2mon.client.history.playback.components.ListenersManager;
-import cern.c2mon.client.history.playback.data.event.HistoryLoaderListener;
-import cern.c2mon.client.history.playback.data.event.HistoryStoreListener;
 
 /**
  * This class forwards events from the {@link HistoryLoaderListener},
