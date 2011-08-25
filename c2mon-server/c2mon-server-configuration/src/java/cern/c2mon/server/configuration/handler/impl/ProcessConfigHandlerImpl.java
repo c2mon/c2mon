@@ -35,6 +35,7 @@ import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.ProcessFacade;
 import cern.tim.server.cache.loading.ProcessDAO;
 import cern.tim.server.common.process.Process;
+import cern.tim.server.daqcommunication.in.JmsContainerManager;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 import cern.tim.shared.client.configuration.ConfigConstants.Action;
@@ -80,6 +81,11 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * Reference to ControlTag configuration bean.
    */
   private ControlTagConfigHandler controlTagConfigHandler;
+  
+  /**
+   * Reference to the bean managing DAQ-in JMS connections.
+   */
+  private JmsContainerManager jmsContainerManager;
     
   /**
    * Autowired constructor.
@@ -88,17 +94,19 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * @param processDAO the DAO bean
    * @param equipmentConfigHandler the Equipment configuration bean
    * @param controlTagConfigHandler the ControlTag configuration bean
+   * @param jmsContainerManager JmsContainerManager bean
    */
   @Autowired
   public ProcessConfigHandlerImpl(final ProcessFacade processFacade, final ProcessCache processCache, 
                               final ProcessDAO processDAO, final EquipmentConfigHandler equipmentConfigHandler, 
-                              final ControlTagConfigHandler controlTagConfigHandler) {
+                              final ControlTagConfigHandler controlTagConfigHandler, final JmsContainerManager jmsContainerManager) {
     super();
     this.processFacade = processFacade;
     this.processCache = processCache;
     this.processDAO = processDAO;
     this.equipmentConfigHandler = equipmentConfigHandler;
     this.controlTagConfigHandler = controlTagConfigHandler;
+    this.jmsContainerManager = jmsContainerManager;
   }
 
   /**
@@ -119,9 +127,11 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     try {
       processDAO.insert(process);
       processCache.putQuiet(process);
+      jmsContainerManager.subscribe(process);
     } catch (RuntimeException ex) {
       LOGGER.error("Exception caught while creating a new Process - rolling back DB changes and removing from cache.");
       processCache.remove(process.getId());
+      jmsContainerManager.unsubscribe(process);
       throw new UnexpectedRollbackException("Unexpected error while creating a new Process.", ex);
     }
           
@@ -194,8 +204,9 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
             
       //remove process from cache and DB
       processDAO.deleteProcess(processId);
-      processCache.remove(processId);      
+      processCache.remove(processId);     
       removeProcessControlTags(process, elementReport);
+      jmsContainerManager.unsubscribe(process);
     } catch (RuntimeException ex) {                  
       LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes.", ex);
       processCache.remove(processId);
