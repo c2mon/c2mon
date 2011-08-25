@@ -20,6 +20,11 @@
     <constructor-arg value="cern.tim.server.daqcommunication.out.ProcessCommunicationManager"/>  
   </bean>
   
+  <!-- mock daq-in module dependency -->
+  <bean id="jmsContainerManager" class="org.easymock.EasyMock" factory-method="createStrictMock">
+    <constructor-arg value="cern.tim.server.daqcommunication.in.JmsContainerManager"/>  
+  </bean>
+  
   <bean id="testDataHelper" class="cern.tim.server.cache.dbaccess.test.TestDataHelper"/>
   
   <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor"/>
