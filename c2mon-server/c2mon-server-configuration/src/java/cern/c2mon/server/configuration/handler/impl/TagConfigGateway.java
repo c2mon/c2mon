@@ -40,25 +40,22 @@ import cern.tim.server.common.tag.Tag;
 @Service
 public class TagConfigGateway implements TagConfigHandler<Tag> {
 
+  //autowired fields as circular dependencies (e.g. RuleTagConfigHandler uses config gateway
+  // to run common methods)
+  @Autowired
   private DataTagConfigHandler dataTagConfigHandler;
   
+  @Autowired  
   private ControlTagConfigHandler controlTagConfigHandler;
   
-  /**
-   * Rule config bean uses the gateway for setting rule ids,
-   * so autowire field.
-   */
   @Autowired
   private RuleTagConfigHandler ruleTagConfigHandler;
   
   private TagLocationService tagLocationService;
   
   @Autowired
-  public TagConfigGateway(DataTagConfigHandler dataTagConfigHandler, ControlTagConfigHandler controlTagConfigHandler,
-      TagLocationService tagLocationService) {
-    super();
-    this.dataTagConfigHandler = dataTagConfigHandler;
-    this.controlTagConfigHandler = controlTagConfigHandler;
+  public TagConfigGateway(final TagLocationService tagLocationService) {
+    super();    
     this.tagLocationService = tagLocationService;
   }
 

@@ -12,6 +12,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
+import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.ControlTagCache;
 import cern.tim.server.cache.ControlTagFacade;
@@ -23,6 +24,8 @@ import cern.tim.server.cache.loading.ControlTagLoaderDAO;
 import cern.tim.server.common.control.ControlTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.tim.shared.client.configuration.ConfigConstants.Action;
+import cern.tim.shared.client.configuration.ConfigConstants.Entity;
 import cern.tim.shared.common.ConfigurationException;
 import cern.tim.shared.daq.config.Change;
 import cern.tim.shared.daq.config.DataTagAdd;
@@ -49,16 +52,20 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   
   private SubEquipmentFacade subEquipmentFacade; 
   
+  private RuleTagConfigHandler ruleTagConfigHandler;
+  
   
   @Autowired
   public ControlTagConfigHandlerImpl(ControlTagCache controlTagCache,
       ControlTagFacade controlTagFacade, DataTagFacade dataTagFacade,
       EquipmentFacade equipmentFacade,
-      ControlTagLoaderDAO controlTagLoaderDAO, TagLocationService tagLocationService, SubEquipmentFacade subEquipmentFacade) {
+      ControlTagLoaderDAO controlTagLoaderDAO, TagLocationService tagLocationService, SubEquipmentFacade subEquipmentFacade,
+      final RuleTagConfigHandler ruleTagConfigHandler) {
     super(controlTagLoaderDAO, controlTagFacade, controlTagCache, tagLocationService);    
     this.dataTagFacade = dataTagFacade;
     this.equipmentFacade = equipmentFacade; 
     this.subEquipmentFacade = subEquipmentFacade;
+    this.ruleTagConfigHandler = ruleTagConfigHandler;
   }
 
   /**
@@ -143,7 +150,12 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
     try {
       controlTag.getWriteLock().lock();
       if (!controlTag.getRuleIds().isEmpty()) {
-        tagReport.setFailure("Unable to remove ControlTag with id " + id + " until the following rules have been removed " + controlTag.getRuleIds().toString());      
+        LOGGER.debug("Removing rules dependent on ControlTag " + controlTag.getId());
+        for (Long ruleId : controlTag.getRuleIds()) {
+          ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+          tagReport.addSubReport(newReport);
+          ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
+        }       
       } else if (!controlTag.getAlarmIds().isEmpty()) {
         tagReport.setFailure("Unable to remove ControlTag with id " + id + " until the following alarms have been removed " + controlTag.getAlarmIds().toString()); 
       } else {

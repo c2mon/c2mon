@@ -418,18 +418,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setJapcAddress("testConfigJAPCaddress");
     expectedObject.setRuleText("(#5000000 < 0)|(#5000000 > 200)[1],true[0]");
     
-    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, cacheObject);
-    
-    
-    //test unable to remove tag 5000000 (check XML output for failure)
-    boolean failed = false;
-    try {
-      report = configurationLoader.applyConfiguration(7, timSessionInfo.getSessionId());
-    } catch (cern.tim.shared.client.configuration.ConfigurationException e) {
-      System.out.println(e.getConfigurationReport());
-      failed = true;
-    }   
-    assertTrue(failed);    
+    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, cacheObject);   
     
     //update ruletag
     expectedObject.setJapcAddress("newTestConfigJAPCaddress");
@@ -445,6 +434,35 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(ruleTagCache.hasKey(50100L));
     assertNull(ruleTagMapper.getItem(50100L));
+    verify(mockManager);
+    
+   
+  }
+  
+  /**
+   * Tests a dependent rule is removed when a tag is.
+   */
+  public void testRuleRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+    //insert rule and tag as in previous test
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(mockManager);
+    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
+    //insert datatag to base rule on
+    configurationLoader.applyConfiguration(1, timSessionInfo.getSessionId());
+    configurationLoader.applyConfiguration(10, timSessionInfo.getSessionId());
+    verify(mockManager);
+    
+    //check rule is removed also on tag removal
+    
+    reset(mockManager);
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(mockManager);
+    //test removal of tag 5000000 removes the rule also
+    configurationLoader.applyConfiguration(7, timSessionInfo.getSessionId()); 
+    assertFalse(ruleTagCache.hasKey(50100L));
+    assertNull(ruleTagMapper.getItem(50100L));
+    assertFalse(ruleTagCache.hasKey(5000000L));
+    assertNull(ruleTagMapper.getItem(5000000L));
     verify(mockManager);
   }
   

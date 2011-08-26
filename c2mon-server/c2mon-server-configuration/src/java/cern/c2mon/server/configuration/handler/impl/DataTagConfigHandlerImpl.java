@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
+import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.DataTagCache;
 import cern.tim.server.cache.DataTagFacade;
@@ -40,6 +41,8 @@ import cern.tim.server.cache.loading.DataTagLoaderDAO;
 import cern.tim.server.common.datatag.DataTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.tim.shared.client.configuration.ConfigConstants.Action;
+import cern.tim.shared.client.configuration.ConfigConstants.Entity;
 import cern.tim.shared.common.ConfigurationException;
 import cern.tim.shared.daq.config.Change;
 import cern.tim.shared.daq.config.DataTagAdd;
@@ -66,7 +69,13 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
   /**
    * Reference to the equipment facade.
    */
-  private EquipmentFacade equipmentFacade;  
+  private EquipmentFacade equipmentFacade; 
+  
+  /**
+   * For recursive deletion of rules.
+   */
+  @Autowired
+  private RuleTagConfigHandler ruleTagConfigHandler;
   
   /**
    * Autowired constructor.
@@ -173,9 +182,12 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
     dataTag.getWriteLock().lock();
     try {     
       if (!dataTag.getRuleIds().isEmpty()) {
-        String message = "Unable to remove DataTag with id " + id + " until the following rules have been removed " + dataTag.getRuleIds().toString(); 
-        elementReport.setFailure(message);
-        throw new RuntimeException(message);
+        LOGGER.debug("Removing rules dependent on DataTag " + dataTag.getId());
+        for (Long ruleId : dataTag.getRuleIds()) {
+          ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+          elementReport.addSubReport(newReport);
+          ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
+        }
       } else if (!dataTag.getAlarmIds().isEmpty()) {
         String message = "Unable to remove DataTag with id " + id + " until the following alarms have been removed " + dataTag.getAlarmIds().toString();
         elementReport.setFailure(message); 

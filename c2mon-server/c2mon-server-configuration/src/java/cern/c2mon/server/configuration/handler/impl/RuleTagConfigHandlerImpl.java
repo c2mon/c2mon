@@ -35,6 +35,8 @@ import cern.tim.server.cache.loading.RuleTagLoaderDAO;
 import cern.tim.server.common.rule.RuleTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.tim.shared.client.configuration.ConfigConstants.Action;
+import cern.tim.shared.client.configuration.ConfigConstants.Entity;
 
 /**
  * See interface documentation.
@@ -156,14 +158,16 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
    */
   @Override
   @Transactional("cacheTransactionManager")
-  public void removeRuleTag(Long id, ConfigurationElementReport elementReport) {
+  public void removeRuleTag(final Long id, final ConfigurationElementReport elementReport) {
     RuleTag ruleTag = tagCache.get(id);
     ruleTag.getWriteLock().lock();
     try {     
       if (!ruleTag.getRuleIds().isEmpty()) {
-        String errMessage = "Unable to remove Rule with id " + id + " until the following rules have been removed " + ruleTag.getRuleIds().toString();
-        elementReport.setFailure(errMessage);
-        throw new RuntimeException(errMessage);
+        for (Long ruleId : ruleTag.getRuleIds()) {
+          ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+          elementReport.addSubReport(newReport);
+          removeRuleTag(ruleId, newReport);
+        }                
       } else if (!ruleTag.getAlarmIds().isEmpty()) {
         String errMessage = "Unable to remove Rule with id " + id + " until the following alarms have been removed " + ruleTag.getAlarmIds().toString();
         elementReport.setFailure(errMessage);
