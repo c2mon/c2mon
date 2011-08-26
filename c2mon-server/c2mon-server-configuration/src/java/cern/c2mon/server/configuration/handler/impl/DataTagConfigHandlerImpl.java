@@ -188,7 +188,8 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
           elementReport.addSubReport(newReport);
           ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
         }
-      } else if (!dataTag.getAlarmIds().isEmpty()) {
+      }
+      if (!dataTag.getAlarmIds().isEmpty()) {
         String message = "Unable to remove DataTag with id " + id + " until the following alarms have been removed " + dataTag.getAlarmIds().toString();
         elementReport.setFailure(message); 
         throw new RuntimeException(message);

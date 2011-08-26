@@ -451,6 +451,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     configurationLoader.applyConfiguration(1, timSessionInfo.getSessionId());
     configurationLoader.applyConfiguration(10, timSessionInfo.getSessionId());
     verify(mockManager);
+    assertTrue(ruleTagCache.hasKey(50100L));
+    assertNotNull(ruleTagMapper.getItem(50100L));
+    assertTrue(dataTagCache.hasKey(5000000L));
+    assertNotNull(dataTagMapper.getItem(5000000L));
     
     //check rule is removed also on tag removal
     
@@ -461,8 +465,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     configurationLoader.applyConfiguration(7, timSessionInfo.getSessionId()); 
     assertFalse(ruleTagCache.hasKey(50100L));
     assertNull(ruleTagMapper.getItem(50100L));
-    assertFalse(ruleTagCache.hasKey(5000000L));
-    assertNull(ruleTagMapper.getItem(5000000L));
+    assertFalse(dataTagCache.hasKey(5000000L));
+    assertNull(dataTagMapper.getItem(5000000L));
     verify(mockManager);
   }
   

@@ -163,12 +163,14 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
     ruleTag.getWriteLock().lock();
     try {     
       if (!ruleTag.getRuleIds().isEmpty()) {
+        LOGGER.debug("Removing rules dependent on RuleTag " + ruleTag.getId());
         for (Long ruleId : ruleTag.getRuleIds()) {
           ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
           elementReport.addSubReport(newReport);
           removeRuleTag(ruleId, newReport);
         }                
-      } else if (!ruleTag.getAlarmIds().isEmpty()) {
+      }
+      if (!ruleTag.getAlarmIds().isEmpty()) {
         String errMessage = "Unable to remove Rule with id " + id + " until the following alarms have been removed " + ruleTag.getAlarmIds().toString();
         elementReport.setFailure(errMessage);
         throw new RuntimeException(errMessage);

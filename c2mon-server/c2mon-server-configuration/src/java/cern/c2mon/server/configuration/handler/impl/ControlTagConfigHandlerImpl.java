@@ -156,7 +156,8 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
           tagReport.addSubReport(newReport);
           ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
         }       
-      } else if (!controlTag.getAlarmIds().isEmpty()) {
+      } 
+      if (!controlTag.getAlarmIds().isEmpty()) {
         tagReport.setFailure("Unable to remove ControlTag with id " + id + " until the following alarms have been removed " + controlTag.getAlarmIds().toString()); 
       } else {
         //dataTagFacade.invalidate(controlTag, new DataTagQuality(DataTagQuality.REMOVED, "The ControlTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
