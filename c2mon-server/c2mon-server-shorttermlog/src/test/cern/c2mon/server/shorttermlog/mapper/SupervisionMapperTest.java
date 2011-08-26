@@ -21,12 +21,8 @@ package cern.c2mon.server.shorttermlog.mapper;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
-import java.util.zip.DataFormatException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -36,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
