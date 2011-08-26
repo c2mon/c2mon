@@ -27,8 +27,8 @@
     ,#{tagDataType,jdbcType=VARCHAR},#{tagQualityCode,jdbcType=NUMERIC}
     ,#{tagQualityDesc,jdbcType=VARCHAR},#{tagMode,jdbcType=NUMERIC}
     ,'I',#{sourceTimestamp,jdbcType=TIMESTAMP},
-         #{daqTimestamp,jdbcType=TIMESTAMP},
-         #{serverTimestamp,jdbcType=TIMESTAMP})
+         SYS_EXTRACT_UTC(#{daqTimestamp,jdbcType=TIMESTAMP}),
+         SYS_EXTRACT_UTC(#{serverTimestamp,jdbcType=TIMESTAMP}))
   </insert>
   
   <!-- only used to remove inserts done during testing -->
