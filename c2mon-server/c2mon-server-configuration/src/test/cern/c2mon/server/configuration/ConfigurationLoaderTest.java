@@ -97,7 +97,7 @@ import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-test.xml" })
+@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-oracle-test.xml" })
 @TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
 @Transactional("cacheTransactionManager")
 public class ConfigurationLoaderTest implements ApplicationContextAware {
@@ -471,6 +471,37 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   }
   
   /**
+   * Tests that a tag removal does indeed remove an associated alarm.
+   * @throws NoSimpleValueParseException 
+   * @throws NoSuchFieldException 
+   * @throws TransformerException 
+   * @throws InstantiationException 
+   * @throws IllegalAccessException 
+   * @throws ParserConfigurationException 
+   */
+  @Test  
+  public void testAlarmRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+    
+    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
+        
+    //add alarm
+    ConfigurationReport report = configurationLoader.applyConfiguration(22, timSessionInfo.getSessionId());        
+    
+    //test remove tag    
+    reset(mockManager);    
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(mockManager);
+    
+    //test removal of tag 5000000 removes the alarm also
+    configurationLoader.applyConfiguration(27, timSessionInfo.getSessionId()); 
+    assertFalse(alarmCache.hasKey(300000L));
+    assertNull(alarmMapper.getItem(300000L));
+    assertFalse(dataTagCache.hasKey(200003L));
+    assertNull(dataTagMapper.getItem(200003L));
+    verify(mockManager);
+  }
+  
+  /**
    * Test the creation, update and removal of equipment.
    * @throws NoSimpleValueParseException 
    * @throws NoSuchFieldException 
@@ -696,7 +727,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
     AlarmCacheObject expectedObject = new AlarmCacheObject(300000L);
-    expectedObject.setDataTagId(1222L);  
+    expectedObject.setDataTagId(200003L);  
     expectedObject.setFaultFamily("fault family");
     expectedObject.setFaultMember("fault member");
     expectedObject.setFaultCode(223);

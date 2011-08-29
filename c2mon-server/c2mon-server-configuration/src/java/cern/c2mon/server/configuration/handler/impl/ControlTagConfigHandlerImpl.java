@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
+import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -53,6 +54,9 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   private SubEquipmentFacade subEquipmentFacade; 
   
   private RuleTagConfigHandler ruleTagConfigHandler;
+  
+  @Autowired
+  private AlarmConfigHandler alarmConfigHandler;
   
   
   @Autowired
@@ -158,12 +162,16 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
         }       
       } 
       if (!controlTag.getAlarmIds().isEmpty()) {
-        tagReport.setFailure("Unable to remove ControlTag with id " + id + " until the following alarms have been removed " + controlTag.getAlarmIds().toString()); 
-      } else {
-        //dataTagFacade.invalidate(controlTag, new DataTagQuality(DataTagQuality.REMOVED, "The ControlTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
-        configurableDAO.deleteItem(controlTag.getId());
-        tagCache.remove(controlTag.getId());
-      }
+        LOGGER.debug("Removing Alarms dependent on ControlTag " + controlTag.getId());
+        for (Long alarmId : new ArrayList<Long>(controlTag.getAlarmIds())) {
+          ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
+          tagReport.addSubReport(alarmReport);
+          alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+        } 
+      } 
+      //dataTagFacade.invalidate(controlTag, new DataTagQuality(DataTagQuality.REMOVED, "The ControlTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
+      configurableDAO.deleteItem(controlTag.getId());
+      tagCache.remove(controlTag.getId());    
       //if the ControlTag has no Address, do not send anything to the DAQ so return null
       if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTag)) {
         controlTag.getWriteLock().unlock();

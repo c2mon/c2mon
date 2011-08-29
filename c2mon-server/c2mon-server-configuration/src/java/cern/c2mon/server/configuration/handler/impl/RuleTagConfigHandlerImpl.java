@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
+import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.tim.server.cache.RuleTagCache;
 import cern.tim.server.cache.RuleTagFacade;
@@ -58,6 +60,9 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
    */
   @Autowired
   private TagConfigGateway tagConfigGateway;
+  
+  @Autowired
+  private AlarmConfigHandler alarmConfigHandler;
 
   @Autowired
   public RuleTagConfigHandlerImpl(RuleTagCache ruleTagCache,
@@ -164,20 +169,22 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
     try {     
       if (!ruleTag.getRuleIds().isEmpty()) {
         LOGGER.debug("Removing rules dependent on RuleTag " + ruleTag.getId());
-        for (Long ruleId : ruleTag.getRuleIds()) {
+        for (Long ruleId : ruleTag.getRuleIds()) { //no concurrent modification of this list as no loops in rule dependencies
           ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
           elementReport.addSubReport(newReport);
           removeRuleTag(ruleId, newReport);
         }                
       }
       if (!ruleTag.getAlarmIds().isEmpty()) {
-        String errMessage = "Unable to remove Rule with id " + id + " until the following alarms have been removed " + ruleTag.getAlarmIds().toString();
-        elementReport.setFailure(errMessage);
-        throw new RuntimeException(errMessage);
-      } else {        
-        configurableDAO.deleteItem(ruleTag.getId());
-        tagCache.remove(ruleTag.getId());        
-      }
+        LOGGER.debug("Removing Alarms dependent on RuleTag " + ruleTag.getId());
+        for (Long alarmId : new ArrayList<Long>(ruleTag.getAlarmIds())) { //need copy as modified concurrently by remove alarm
+          ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
+          elementReport.addSubReport(alarmReport);
+          alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+        }        
+      }        
+      configurableDAO.deleteItem(ruleTag.getId());
+      tagCache.remove(ruleTag.getId());        
     }
     catch (RuntimeException rEx) {
       String errMessage = "Exception caught when removing rule tag with id " + id;

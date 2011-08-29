@@ -12,9 +12,6 @@
 <!--  <import resource="classpath:cern/tim/server/cachepersistence/config/server-cachepersistence.xml"/> -->
   <import resource="classpath:cern/tim/server/common/config/server-common.xml"/> 
   
-  <!-- DB connection for this module -->
-  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-db.xml"/>
-  
   <!-- mock the communication bean; needs to be before the configloader class -->
   <bean id="processCommunicationManager" class="org.easymock.EasyMock" factory-method="createStrictMock">
     <constructor-arg value="cern.tim.server.daqcommunication.out.ProcessCommunicationManager"/>  

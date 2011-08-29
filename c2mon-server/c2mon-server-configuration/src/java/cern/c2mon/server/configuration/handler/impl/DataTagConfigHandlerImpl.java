@@ -29,6 +29,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -78,6 +79,12 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
   private RuleTagConfigHandler ruleTagConfigHandler;
   
   /**
+   * For recursive deletion of alarms.
+   */
+  @Autowired
+  private AlarmConfigHandler alarmConfigHandler;
+  
+  /**
    * Autowired constructor.
    * @param dataTagFacade reference to facade bean
    * @param dataTagLoaderDAO reference to DAO
@@ -88,9 +95,9 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
   @Autowired
   public DataTagConfigHandlerImpl(final DataTagFacade dataTagFacade,
       final DataTagLoaderDAO dataTagLoaderDAO, final DataTagCache dataTagCache,
-      final EquipmentFacade equipmentFacade, final TagLocationService tagLocationService) {
+      final EquipmentFacade equipmentFacade, final TagLocationService tagLocationService){
     super(dataTagLoaderDAO, dataTagFacade, dataTagCache, tagLocationService);           
-    this.equipmentFacade = equipmentFacade;    
+    this.equipmentFacade = equipmentFacade;       
   }
 
   /**
@@ -182,7 +189,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
     dataTag.getWriteLock().lock();
     try {     
       if (!dataTag.getRuleIds().isEmpty()) {
-        LOGGER.debug("Removing rules dependent on DataTag " + dataTag.getId());
+        LOGGER.debug("Removing Rules dependent on DataTag " + dataTag.getId());
         for (Long ruleId : dataTag.getRuleIds()) {
           ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
           elementReport.addSubReport(newReport);
@@ -190,15 +197,17 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
         }
       }
       if (!dataTag.getAlarmIds().isEmpty()) {
-        String message = "Unable to remove DataTag with id " + id + " until the following alarms have been removed " + dataTag.getAlarmIds().toString();
-        elementReport.setFailure(message); 
-        throw new RuntimeException(message);
-      } else {
-        //not possible below as removed from the cache by that point!!!
-        //((DataTagFacade) commonTagFacade).invalidate(dataTag, new DataTagQuality(DataTagQuality.REMOVED, "The DataTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
-        configurableDAO.deleteItem(dataTag.getId());
-        tagCache.remove(dataTag.getId());        
-      }
+        LOGGER.debug("Removing Alarms dependent on DataTag " + dataTag.getId());
+        for (Long alarmId : new ArrayList<Long>(dataTag.getAlarmIds())) {
+          ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
+          elementReport.addSubReport(alarmReport);
+          alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+        }        
+      } 
+      //not possible below as removed from the cache by that point!!! (cache persistence is aynchronous)
+      //((DataTagFacade) commonTagFacade).invalidate(dataTag, new DataTagQuality(DataTagQuality.REMOVED, "The DataTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
+      configurableDAO.deleteItem(dataTag.getId());
+      tagCache.remove(dataTag.getId());           
       dataTag.getWriteLock().unlock();
       //outside above lock as locks equipment (lock hierarchy: never lock equipment after tag)
       try {

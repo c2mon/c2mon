@@ -272,7 +272,7 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (22,22,'CREATE','Alarm','300000');
   
-insert into timconfigval (seqid, elementfield, elementvalue) values (22,'dataTagId','1222'); --attached to control tag
+insert into timconfigval (seqid, elementfield, elementvalue) values (22,'dataTagId','200003'); --attached to data tag
 insert into timconfigval (seqid, elementfield, elementvalue) values (22,'faultFamily','fault family');
 insert into timconfigval (seqid, elementfield, elementvalue) values (22,'faultMember','fault member');
 insert into timconfigval (seqid, elementfield, elementvalue) values (22,'faultCode','223');
@@ -291,3 +291,9 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
   values (24,'remove alarm', 'remove alarm 300000', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (24,24,'REMOVE','Alarm','300000');
+  
+--remove tag with attached alarm - should succeed
+insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
+  values (27,'remove tag with alarm', 'remove tag 1222 with alarm', 'mbrightw', '?', sysdate);     
+insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
+  values (27,27,'REMOVE','Tag','200003');
