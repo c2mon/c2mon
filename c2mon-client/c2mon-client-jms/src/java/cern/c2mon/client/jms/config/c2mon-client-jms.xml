@@ -16,7 +16,8 @@
     <property name="brokerURL" value="${c2mon.jms.url}"/>
     <property name="userName" value="${c2mon.jms.user}"/>
     <property name="password" value="${c2mon.jms.passwd}"/>
-    <property name="clientIDPrefix" value="C2MON-CLIENT"/>  
+    <property name="clientIDPrefix" value="C2MON-CLIENT"/>
+    <property name="watchTopicAdvisories" value="false"/>  
   </bean>
   
   <bean id="supervisionTopic" class="org.apache.activemq.command.ActiveMQTopic">
