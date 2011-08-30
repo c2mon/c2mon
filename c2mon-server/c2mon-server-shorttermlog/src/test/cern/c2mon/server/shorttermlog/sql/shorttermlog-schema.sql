@@ -9,7 +9,7 @@ CREATE TABLE shorttermlog (
 logdate           DATE          NOT NULL,
 tagid             NUMBER(9)     NOT NULL,
 tagname           VARCHAR2(60),
-tagvalue          VARCHAR2(40),
+tagvalue          VARCHAR2(4000),
 tagdatatype       VARCHAR2(10),
 tagtime           TIMESTAMP(6)  NOT NULL,
 tagservertime     TIMESTAMP(6),
@@ -92,7 +92,7 @@ CREATE TABLE stl_day_snapshot (
 logdate       DATE
 ,tagid         NUMBER(9)      NOT NULL
 ,tagname       VARCHAR2(60)
-,tagvalue      VARCHAR2(40)
+,tagvalue      VARCHAR2(4000)
 ,tagdatatype   VARCHAR2(10)
 ,tagtime       TIMESTAMP(6)
 ,tagservertime TIMESTAMP(6)
