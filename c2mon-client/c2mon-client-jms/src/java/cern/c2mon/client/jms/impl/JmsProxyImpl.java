@@ -457,9 +457,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         TemporaryQueue replyQueue = session.createTemporaryQueue();
         message.setJMSReplyTo(replyQueue);     
         MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
-        producer.setTimeToLive(timeout);
+        //producer.setTimeToLive(timeout); TODO remove comments - added for testing
         producer.send(message);       
-        MessageConsumer consumer = session.createConsumer(replyQueue);
+        MessageConsumer consumer = session.createConsumer(replyQueue);        
         Message replyMessage = consumer.receive(timeout);
         if (replyMessage == null) {
           LOGGER.error("No reply received from server on ClientRequest.");
