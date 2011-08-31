@@ -36,20 +36,20 @@
                      threshold="info"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <renderer renderedClass="ch.cern.tim.shared.datatag.FilteredDataTagValue"
-          renderingClass="ch.cern.tim.shared.datatag.FilteredDataTagValueRenderer" />
+  <renderer renderedClass="cern.tim.shared.datatag.FilteredDataTagValue"
+          renderingClass="cern.tim.shared.datatag.FilteredDataTagValueRenderer" />
 
-  <renderer  renderedClass="ch.cern.tim.shared.datatag.DataTagCacheObject"
-             renderingClass="ch.cern.tim.shared.datatag.DataTagRenderer" />
+  <renderer  renderedClass="cern.tim.shared.datatag.DataTagCacheObject"
+             renderingClass="cern.tim.shared.datatag.DataTagRenderer" />
 
-  <renderer  renderedClass="ch.cern.tim.shared.datatag.SourceDataTagValue"
-             renderingClass="ch.cern.tim.shared.datatag.SourceDataTagValueRenderer" />
+  <renderer  renderedClass="cern.tim.shared.datatag.SourceDataTagValue"
+             renderingClass="cern.tim.shared.datatag.SourceDataTagValueRenderer" />
 
-  <renderer  renderedClass="ch.cern.tim.shared.commandtag.SourceCommandTagValue"
-             renderingClass="ch.cern.tim.shared.commandtag.SourceCommandTagValueRenderer" />
+  <renderer  renderedClass="cern.tim.shared.commandtag.SourceCommandTagValue"
+             renderingClass="cern.tim.shared.commandtag.SourceCommandTagValueRenderer" />
 
-  <renderer  renderedClass="ch.cern.tim.shared.commandtag.SourceCommandTagReport"
-             renderingClass="ch.cern.tim.shared.commandtag.SourceCommandReportRenderer" />
+  <renderer  renderedClass="cern.tim.shared.commandtag.SourceCommandTagReport"
+             renderingClass="cern.tim.shared.commandtag.SourceCommandReportRenderer" />
 
 
   <!--
