@@ -28,8 +28,7 @@
 			
 			<!--  exclude all oracle stuff - we don't need it -->
 			<excludes>
-			  <exclude>com.oracle:*</exclude>
-			  <exclude>oracle:*</exclude>
+			  <exclude>com.oracle:*</exclude>			  
 			</excludes>
 		</dependencySet>
 
