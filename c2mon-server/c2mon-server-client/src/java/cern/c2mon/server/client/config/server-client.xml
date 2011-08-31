@@ -97,7 +97,8 @@ Request from clients
       <property name="destination" ref="clientRequestDestination"/>
       <property name="messageListener" ref="clientRequestHandler" />
       <property name="concurrentConsumers" value="1"/>
-      <property name="maxConcurrentConsumers" value="5"/>      
+      <property name="maxConcurrentConsumers" value="5"/> 
+      <property name="maxMessagesPerTask" value="1"/>     
       <property name="sessionTransacted" value="false"/>      
       <property name="taskExecutor" ref="clientExecutor"/>
       <property name="errorHandler" ref="tagRequestErrorHandler"/>   
