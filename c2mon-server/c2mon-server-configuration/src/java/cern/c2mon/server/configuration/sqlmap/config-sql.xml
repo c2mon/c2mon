@@ -43,6 +43,19 @@
        WHERE E.CONFIGID = #{configId}
        ORDER BY E.SEQID
     </select>
+    
+    <update id="saveStatusInfo" parameterType="ConfigurationElement">
+      UPDATE TIMCONFIGELT
+         SET AS_STATUS = #{status,jdbcType=VARCHAR},
+             DAQ_STATUS = #{daqStatus,jdbcType=VARCHAR}                        
+       WHERE SEQID=#{sequenceId} 
+    </update>
        
+    <update id="markAsApplied" parameterType="Long">
+      UPDATE TIMCONFIG
+         SET STATUS = 'Y',
+             APPLYDATE = SYSDATE                        
+       WHERE CONFIGID=#{configId} 
+    </update>   
          
   </mapper>

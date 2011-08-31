@@ -14,6 +14,7 @@ import cern.c2mon.server.configuration.mybatis.ConfigurationMapper;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigConstants.Action;
 import cern.tim.shared.client.configuration.ConfigConstants.Entity;
+import cern.tim.shared.client.configuration.ConfigConstants.Status;
 
 /**
  * Integration tests of the configuration Mybatis mapper with
@@ -79,6 +80,26 @@ public class ConfigurationMapperTest {
     assertEquals("updated description", elementLast.getElementProperties().get("description"));
     assertEquals("501", elementLast.getElementProperties().get("aliveTagId"));
      
+  }
+  
+  /**
+   * Checks executes (no check if insertion was successful).
+   */
+  @Test
+  public void testSaveStatusInfo() {
+    List<ConfigurationElement> elements = configurationMapper.getConfigElements(1);
+    ConfigurationElement element = elements.iterator().next();
+    element.setStatus(Status.OK);
+    element.setDaqStatus(Status.RESTART);
+    configurationMapper.saveStatusInfo(element);
+  }
+  
+  /**
+   * Checks execution (no check if insertion was successful).
+   */
+  @Test
+  public void testMarkAsApplied() {   
+    configurationMapper.markAsApplied(1);
   }
   
 }

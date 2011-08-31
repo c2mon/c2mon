@@ -20,6 +20,7 @@ package cern.c2mon.server.configuration.mybatis;
 
 import java.util.List;
 
+import cern.c2mon.server.configuration.dao.ConfigurationDAO;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 
 /**
@@ -45,5 +46,17 @@ public interface ConfigurationMapper {
    * needed to apply them
    */
   List<ConfigurationElement> getConfigElements(int configId);
+  
+  /**
+   * See DAO description {@link ConfigurationDAO}. 
+   * @param configurationElement element to save info for 
+   */
+  void saveStatusInfo(ConfigurationElement configurationElement);
+  
+  /**
+   * See DAO description {@link ConfigurationDAO}
+   * @param id the id of the configuration
+   */
+  void markAsApplied(int id);
   
 }

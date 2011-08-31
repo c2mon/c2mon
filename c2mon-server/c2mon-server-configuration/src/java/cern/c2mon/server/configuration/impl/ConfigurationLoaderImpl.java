@@ -181,8 +181,10 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       
       //map of element reports that need a DAQ child report adding
       Map<Long, ConfigurationElementReport> daqReportPlaceholder = new HashMap<Long, ConfigurationElementReport>();
+      //map of elements themselves elt_seq_id -> element
+      Map<Long, ConfigurationElement> elementPlaceholder = new HashMap<Long, ConfigurationElement>();
       //map of lists, where each list needs sending to a particular DAQ (processId -> List of events)
-      Map<Long, List<Change>> processLists = new HashMap<Long, List<Change>>();       
+      Map<Long, List<Change>> processLists = new HashMap<Long, List<Change>>();                   
       
       report = new ConfigurationReport(configId, 
           configName,
@@ -200,12 +202,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           String errMessage = "Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
             + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")"; 
           LOGGER.error(errMessage, ex);
-          elementReport.setFailure("Exception caught while applying the configuration change.", ex); 
-          throw new RuntimeException(ex);
+          elementReport.setFailure("Exception caught while applying the configuration change.", ex);
+          element.setStatus(Status.FAILURE);          
+          report.setStatus(Status.FAILURE);
         }
         
         report.addElementReport(elementReport);       
-        if (processChanges != null) {
+        if (processChanges != null) { //is null if exception thrown while applying the element at the server level, so no changes sent to DAQ
           for (ProcessChange processChange : processChanges) {
             Long processId = processChange.getProcessId();
             if (!processLists.containsKey(processId)) {
@@ -213,7 +216,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             }
             processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface                  
           } 
-          daqReportPlaceholder.put(element.getSequenceId(), elementReport);     
+          daqReportPlaceholder.put(element.getSequenceId(), elementReport);
+          elementPlaceholder.put(element.getSequenceId(), element);
         }
       }
       
@@ -228,17 +232,26 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);   
             //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
             if (changeReport.isReboot()) {
-              report.addProcessToReboot(processCache.get(processId).getName());
+              report.addProcessToReboot(processCache.get(processId).getName()); 
+              elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
               //TODO set flag & tag to indicate that process restart is needed
             } else if (changeReport.isFail()) {
               report.setStatus(Status.FAILURE);
               report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
+              elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
             }
           }
         } else {
           //TODO set process reconfiguraton tag to restart as not running
         }
-      }      
+      }
+      
+      //save Configuration element status information in the DB tables
+      for (ConfigurationElement element : configElements) {
+        configurationDAO.saveStatusInfo(element);
+      }
+      //mark the Configuration as applied in the DB table, with timestamp set
+      configurationDAO.markAsApplied(configId);
       return report;
     
     } catch (Exception ex) {

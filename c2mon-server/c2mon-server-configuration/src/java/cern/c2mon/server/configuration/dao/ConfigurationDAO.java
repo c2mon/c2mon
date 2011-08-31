@@ -62,4 +62,21 @@ public interface ConfigurationDAO {
    */
   List<ConfigurationDescriptor> getConfigurations();
   
+  /**
+   * Update the status & DAQ status columns of the element in the element table. 
+   * The server status indicates the success/failure of deploying this
+   * configuration to the server. The DAQ status indicates the status of applying
+   * this change to the DAQ (both Failure and Restart mean the DAQ needs restarting).
+   * 
+   * @param configurationElement the element with the status info to persist
+   */
+  void saveStatusInfo(ConfigurationElement configurationElement);
+  
+  /**
+   * Marks the configuration with the passed id as having been applied
+   * (status column) and sets the apply date
+   * @param id of the configuration that has been applied
+   */
+  void markAsApplied(int id);
+  
 }

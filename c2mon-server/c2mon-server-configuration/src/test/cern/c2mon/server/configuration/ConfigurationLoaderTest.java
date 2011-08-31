@@ -631,14 +631,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
     
     //remove (fails to complete - see process comment above)
-    boolean failed = false;
-    try {
-      report = configurationLoader.applyConfiguration(18, timSessionInfo.getSessionId());
-    } catch (cern.tim.shared.client.configuration.ConfigurationException e) {
-      System.out.println(e.getConfigurationReport());
-      failed = true;
-    }      
-    assertTrue(failed);
+    report = configurationLoader.applyConfiguration(18, timSessionInfo.getSessionId());
     assertFalse(processCache.hasKey(2L));
     assertNull(processMapper.getItem(2L));
     verify(mockManager);
@@ -691,7 +684,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
       System.out.println(e.getConfigurationReport());
       failed = true;
     }      
-    assertTrue(failed);   
+    assertFalse(failed);   
     
     //remove subequipment - succeeds
     //(control tags should remain, equipment should go as should commfault and alive cache objects)

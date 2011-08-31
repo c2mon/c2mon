@@ -22,6 +22,7 @@ seqid  NUMBER  NOT NULL
 ,elementtype VARCHAR2(25) NOT NULL
 ,elementpkey VARCHAR2(30) NOT NULL
 ,as_status VARCHAR2(500)
+,daq_status VARCHAR2(20)
 );
 
 ALTER TABLE timconfigelt

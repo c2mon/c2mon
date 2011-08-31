@@ -43,6 +43,7 @@ import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 import cern.tim.shared.client.configuration.ConfigConstants.Action;
 import cern.tim.shared.client.configuration.ConfigConstants.Entity;
+import cern.tim.shared.common.ConfigurationException;
 
 /**
  * See interface documentation.
@@ -106,6 +107,10 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Override
   @Transactional("cacheTransactionManager")
   public List<ProcessChange> updateEquipment(Long equipmentId, Properties properties) throws IllegalAccessException {
+    if (properties.containsKey("processId")) {
+      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
+          "Attempting to change the parent process id of an equipment - this is not currently supported!");
+    }
     Equipment equipment = equipmentCache.get(equipmentId);
     equipment.getWriteLock().lock();
     try {        

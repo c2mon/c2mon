@@ -38,6 +38,7 @@ import cern.tim.server.cache.loading.SubEquipmentDAO;
 import cern.tim.server.common.subequipment.SubEquipment;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.tim.shared.common.ConfigurationException;
 
 /**
  * See interface documentation.
@@ -98,6 +99,10 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   }
   
   public List<ProcessChange> updateSubEquipment(Long subEquipmentId, Properties properties) throws IllegalAccessException {
+    if (properties.containsKey("parent_equip_id")) {
+      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
+          "Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
+    }
     SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
     subEquipment.getWriteLock().lock();
     try {        

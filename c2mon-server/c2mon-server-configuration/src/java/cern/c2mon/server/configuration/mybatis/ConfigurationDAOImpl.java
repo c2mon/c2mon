@@ -51,13 +51,13 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
   @Override
   public ConfigurationDescriptor getConfiguration(int configId) {
     //TODO implement this method for retrieving a configuration from the DB
-    return null;
+    throw new UnsupportedOperationException("Method not implemented yet.");
   }
 
   @Override
   public List<ConfigurationDescriptor> getConfigurations() {
     // TODO implement this method for retrieving a list of configurations from the DB
-    return null;
+    throw new UnsupportedOperationException("Method not implemented yet.");
   }
 
   @Override
@@ -65,6 +65,14 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
     return configurationMapper.getConfigElements(configId);
   }
 
-  
+  @Override
+  public void saveStatusInfo(ConfigurationElement configurationElement) {
+    configurationMapper.saveStatusInfo(configurationElement);
+  }
+
+  @Override
+  public void markAsApplied(int id) {
+    configurationMapper.markAsApplied(id);
+  }
 
 }
