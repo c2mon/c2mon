@@ -18,6 +18,16 @@
 		</componentDescriptor>
 	</componentDescriptors>
 
+	<dependencySets>
+
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+			<fileMode>0644</fileMode>
+		</dependencySet>
+
+	</dependencySets>
+
 	<fileSets>
 		<!--  take the native libraries and copy them to /lib_so -->
 		<fileSet>

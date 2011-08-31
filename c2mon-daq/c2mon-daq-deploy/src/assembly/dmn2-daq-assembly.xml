@@ -17,6 +17,24 @@
 		<componentDescriptor>src/assembly/c2mon-daq-common-assembly.xml
 		</componentDescriptor>
 	</componentDescriptors>
+	
+
+	<dependencySets>
+
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+			<fileMode>0644</fileMode>
+			
+			<!--  exclude all oracle stuff - we don't need it -->
+			<excludes>
+			  <exclude>com.oracle:*</exclude>
+			  <exclude>oracle:*</exclude>
+			</excludes>
+		</dependencySet>
+
+	</dependencySets>	
+
 
 	<files>
 
