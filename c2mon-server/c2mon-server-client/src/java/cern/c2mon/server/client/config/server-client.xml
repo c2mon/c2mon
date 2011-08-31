@@ -76,6 +76,21 @@ Request from clients
    <constructor-arg index="0" value="${jms.client.request.queue}"/>
 </bean>
 
+<!-- thread pool for request containers -->
+<bean id="clientExecutor" class="java.util.concurrent.ThreadPoolExecutor">
+  <constructor-arg value="1"/>      <!-- min threads -->
+  <constructor-arg value="1000"/>   <!-- i.e. unbounded max threads, in fact no more then max consumers in container are requested -->
+  <constructor-arg value="60000"/>  <!-- idle limit in milliseconds -->
+  <constructor-arg>
+    <bean class="java.util.concurrent.TimeUnit" factory-method="valueOf">
+      <constructor-arg value="MILLISECONDS"/>
+    </bean>
+  </constructor-arg>
+  <constructor-arg>
+    <bean class="java.util.concurrent.SynchronousQueue"/>
+  </constructor-arg>
+</bean>
+
 <bean id="clientRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
       <!-- include exception listener here? -->    
       <property name="connectionFactory" ref="clientActiveMQConnectionFactory"/>
@@ -84,7 +99,9 @@ Request from clients
       <property name="concurrentConsumers" value="1"/>
       <property name="maxConcurrentConsumers" value="5"/>      
       <property name="sessionTransacted" value="false"/>      
-      <property name="errorHandler" ref="tagRequestErrorHandler"/>
+      <property name="taskExecutor" ref="clientExecutor"/>
+      <property name="errorHandler" ref="tagRequestErrorHandler"/>   
+      <property name="autoStartup" value="false"/>   
 </bean>
 
 </beans>
