@@ -28,6 +28,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
@@ -457,6 +458,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         TemporaryQueue replyQueue = session.createTemporaryQueue();
         message.setJMSReplyTo(replyQueue);     
         MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
+        producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
         //producer.setTimeToLive(timeout); TODO remove comments - added for testing
         producer.send(message);       
         MessageConsumer consumer = session.createConsumer(replyQueue);        
