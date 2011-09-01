@@ -22,6 +22,9 @@
 			</deployment>
 			<startscript name="C2MON-DMN2-CLIENT-TEST">
 				<main-class name="cern.c2mon.client.apitest.C2MonClientApiTest">
+				    <output>
+							<file name="log/out.log" />
+					</output>
 					<arg></arg>
 					<preExec>
 			        <![CDATA[
