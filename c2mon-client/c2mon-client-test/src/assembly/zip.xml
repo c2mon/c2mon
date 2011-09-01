@@ -37,7 +37,7 @@
 		<!--  jms properties file -->
 	    <file>
 			<source>${basedir}/conf/jms.properties</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>conf/</outputDirectory>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
