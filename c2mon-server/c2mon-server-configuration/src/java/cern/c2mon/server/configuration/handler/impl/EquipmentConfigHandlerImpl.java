@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
 import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
+import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.AliveTimerCache;
@@ -69,6 +71,9 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   private SubEquipmentConfigHandler subEquipmentConfigHandler;
   
   private ProcessCache processCache;
+  
+  @Autowired
+  private ProcessConfigHandler processConfigHandler;
   
   @Autowired
   public EquipmentConfigHandlerImpl(ControlTagConfigHandler controlTagConfigHandler, AliveTimerCache aliveTimerCache,
@@ -155,13 +160,17 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
       equipmentDAO.deleteItem(equipmentid);
       equipmentFacade.removeCacheObject(equipmentCache.get(equipmentid));
       removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them
+      equipment.getWriteLock().unlock();
+      processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());
     } catch (UnexpectedRollbackException ex) {
       equipmentReport.setFailure("Aborting removal of equipment "
           + equipmentid + " as unable to remove all associated datatags."); 
       throw new UnexpectedRollbackException("Aborting removal of Equipment as failed to remove all" 
           + "associated datatags and commandtags.", ex);
     } finally {
-      equipment.getWriteLock().unlock();
+      if (equipment.getWriteLock().isHeldByCurrentThread()) {
+        equipment.getWriteLock().unlock();
+      }      
     }         
   }
 
@@ -178,7 +187,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
    * @param equipmentReport the report at the equipment level
    */
   private void removeSubEquipments(Equipment equipment, ConfigurationElementReport equipmentReport) {
-    for (Long subEquipmentId : equipment.getSubEquipmentIds()) {
+    for (Long subEquipmentId : new ArrayList<Long>(equipment.getSubEquipmentIds())) {
       ConfigurationElementReport subEquipmentReport = new ConfigurationElementReport(Action.REMOVE, Entity.SUBEQUIPMENT, subEquipmentId);
       equipmentReport.addSubReport(subEquipmentReport);
       try {
@@ -200,7 +209,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
    */
   private void removeEquipmentCommands(Equipment equipment, ConfigurationElementReport equipmentReport) {
    
-    for (Long commandTagId : equipment.getCommandTagIds()) {
+    for (Long commandTagId : new ArrayList<Long>(equipment.getCommandTagIds())) { //copy as modified when removing command tag
       ConfigurationElementReport commandReport = new ConfigurationElementReport(Action.REMOVE, Entity.COMMANDTAG, commandTagId);
       equipmentReport.addSubReport(commandReport);
       commandTagConfigHandler.removeCommandTag(commandTagId, commandReport);         
@@ -217,7 +226,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
    * @throws RuntimeException if fail to remove tag
    */
   private void removeEquipmentTags(Equipment equipment, ConfigurationElementReport equipmentReport) {   
-    for (Long dataTagId : equipment.getDataTagIds()) {
+    for (Long dataTagId : new ArrayList<Long>(equipment.getDataTagIds())) { //copy as list is modified by removeDataTag
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       equipmentReport.addSubReport(tagReport);
       dataTagConfigHandler.removeDataTag(dataTagId, tagReport);

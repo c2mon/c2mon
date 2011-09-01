@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -34,6 +35,7 @@ import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.ProcessFacade;
 import cern.tim.server.cache.loading.ProcessDAO;
+import cern.tim.server.common.equipment.Equipment;
 import cern.tim.server.common.process.Process;
 import cern.tim.server.daqcommunication.in.JmsContainerManager;
 import cern.tim.shared.client.configuration.ConfigurationElement;
@@ -189,7 +191,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     try {
       process.getWriteLock().lock();
       //remove all associated equipment from system   
-      for (Long equipmentId : processFacade.getEquipmentIds(processId)) {
+      for (Long equipmentId : new ArrayList<Long>(processFacade.getEquipmentIds(processId))) {
         ConfigurationElementReport childElementReport = new ConfigurationElementReport(Action.REMOVE, Entity.EQUIPMENT, equipmentId);
         try {        
           elementReport.addSubReport(childElementReport);
@@ -234,5 +236,18 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, stateTagId);
     controlTagConfigHandler.removeControlTag(stateTagId, tagReport);
     processReport.addSubReport(tagReport);
+  }
+
+  @Override
+  public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
+    Process process = processCache.get(processId);
+    process.getWriteLock().lock();
+    try {
+      process.getEquipmentIds().remove(equipmentId);
+    } catch (RuntimeException e) {
+      throw new UnexpectedRollbackException("Unable to remove equipment reference in process.", e);
+    } finally {
+      process.getWriteLock().unlock();
+    } 
   }
 }

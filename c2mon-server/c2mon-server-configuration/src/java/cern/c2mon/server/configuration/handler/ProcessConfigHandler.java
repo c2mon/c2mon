@@ -21,6 +21,7 @@ package cern.c2mon.server.configuration.handler;
 import java.util.Properties;
 
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.tim.server.common.equipment.Equipment;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 
@@ -57,5 +58,7 @@ public interface ProcessConfigHandler {
    *         is passed as parameter so cascaded action can attach subreports
    */
   void removeProcess(Long processId, ConfigurationElementReport processReport);
+
+  void removeEquipmentFromProcess(Long equipmentId, Long processId);
 
 }
