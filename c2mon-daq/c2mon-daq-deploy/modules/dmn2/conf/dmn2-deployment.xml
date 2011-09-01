@@ -16,23 +16,27 @@
 					<mail address="timdiamon-developers@cern.ch" />
 				</notification>
 			</deployment>
-		<startscript>
-			<main-class name="cern.tim.driver.common.startup.DaqStartup" >
-				<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
-			<preExec>
-			<![CDATA[
-			[[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
-			[[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
-			[[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
-			[[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
-			[[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-			[[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
-			]]>
-			</preExec>
-			<property name="daq" value="$PROCESS_NAME"/>
-			<property name="tim.log.path" value="$DAQ_LOG_HOME"/>
-			</main-class>
-		</startscript>
+		    <startscript>
+			  <main-class name="cern.tim.driver.common.startup.DaqStartup" >
+				  <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
+			      <preExec>
+			        <![CDATA[
+			          [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
+			          [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
+			          [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
+			          [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
+			          [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+			          [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
+			         ]]>
+			      </preExec>
+			      <property name="daq" value="$PROCESS_NAME"/>
+			      <property name="tim.log.path" value="$DAQ_LOG_HOME"/>
+			
+                  <output>
+				    <file name="log/out.log" />
+			      </output>						
+			  </main-class>
+		  </startscript>
 		</application>
 
 		<application name="c2mon-daq-dmn2-prod" extends="default">
