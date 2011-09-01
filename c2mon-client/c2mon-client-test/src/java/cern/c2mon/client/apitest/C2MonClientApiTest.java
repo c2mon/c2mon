@@ -41,10 +41,10 @@ public class C2MonClientApiTest {
 
 			service = xmlContext.getBean(C2MonClientApiTestService.class);
 			
+			C2monServiceGateway.startC2monClient();
 			
 		} catch (Exception e) {
-			log.error(e);
-			e.printStackTrace();
+			log.error(e);			
 			System.exit(-1);
 		}
 		
@@ -56,7 +56,7 @@ public class C2MonClientApiTest {
 			out.println(format("%d %s",md.getRuleTagId(), md.getMetricName()));
 		}
 		
-		C2monServiceGateway.startC2monClient();
+		
 		
 
 	    C2monTagManager tagManager = C2monServiceGateway.getTagManager();
@@ -80,13 +80,13 @@ public class C2MonClientApiTest {
 	      });		
 	      
 	      	    
-	      while (true) {
-	          try {
-	              Thread.sleep(5000);
-	          }
-	          catch (InterruptedException ex) {	              
-	          }
-	      }
+//	      while (true) {
+//	          try {
+//	              Thread.sleep(5000);
+//	          }
+//	          catch (InterruptedException ex) {	              
+//	          }
+//	      }
 					      	     
 	}
 }
