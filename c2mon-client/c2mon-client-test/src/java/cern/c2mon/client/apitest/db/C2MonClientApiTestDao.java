@@ -14,6 +14,15 @@ public interface C2MonClientApiTestDao {
 
 	List<MetricDef> getAllMetrics();
 	
+	
+	/**
+     * This method returns all registered metrics for a given process
+     * 
+     * @return
+     */
+
+    List<MetricDef> getAllMetrics(String processName);	
+	
 
 	/**
 	 * This method returns all registered device-status rules
