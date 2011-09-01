@@ -29,8 +29,8 @@
 			          [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
 			         ]]>
 			      </preExec>
-			      <property name="daq" value="$PROCESS_NAME"/>
-			      <property name="tim.log.path" value="$DAQ_LOG_HOME"/>
+			      <property name="c2mon.process.name" value="$PROCESS_NAME"/>
+			      <property name="c2mon.log.dir" value="$DAQ_LOG_HOME"/>
 			
                   <output>
 				    <file name="log/out.log" />
