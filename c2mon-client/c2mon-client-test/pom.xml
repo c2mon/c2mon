@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymockclassextension</artifactId>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -37,7 +37,7 @@
 		<!-- SPRING libraries -->
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>			
+			<artifactId>spring-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -53,11 +53,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>		
+			<artifactId>spring-jdbc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>		
+			<artifactId>spring-tx</artifactId>
 		</dependency>
 		<!-- END SPRING libraries -->
 
@@ -68,7 +68,7 @@
 			<version>1.8.0.10</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>oracle</groupId>
 			<artifactId>ojdbc14</artifactId>
@@ -82,17 +82,17 @@
 			<version>1.2.2-201002241055</version>
 		</dependency>
 
-<!--		<dependency>-->
-<!--			<groupId>cern.c2mon.c2mon-client</groupId>-->
-<!--			<artifactId>c2mon-client-core</artifactId>-->
-<!--		</dependency>-->
+		<!--		<dependency>-->
+		<!--			<groupId>cern.c2mon.c2mon-client</groupId>-->
+		<!--			<artifactId>c2mon-client-core</artifactId>-->
+		<!--		</dependency>-->
 
 	</dependencies>
 
 	<developers />
 
 	<build>
-	
+
 		<resources>
 			<resource>
 				<directory>src/java/resources</directory>
@@ -103,8 +103,29 @@
 				<directory>src/test/resources</directory>
 			</testResource>
 		</testResources>
-		
-		
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+
+					<descriptors>
+						<descriptor>src/assembly/zip.xml</descriptor>
+					</descriptors>
+
+				</configuration>
+				<executions>
+					<execution>
+						<id>create-assembly-file</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
 	</build>
 
 </project>

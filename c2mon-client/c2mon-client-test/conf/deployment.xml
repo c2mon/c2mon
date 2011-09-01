@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="c2mon-client-test">
+		
+		<application name="default"> 
+		
+			<deployment>
+				<directory name="conf">
+					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/test/conf/"
+						mask="400" />
+					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/test/conf/"
+						mask="400" />
+					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/test/conf/"
+						mask="400" />
+				</directory>
+			</deployment>		
+		
+			<deployment installLocation="/opt/c2mon-dmn2-cli-test">
+				<backupPolicy keepBackups="2">
+					<preserve type="dir" name="log" />
+				</backupPolicy>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="timdiamon-developers@cern.ch" />
+				</notification>
+			</deployment>
+		    <startscript>
+			  <main-class name="cern.c2mon.client.apitest.C2MonClientApiTest" >
+				  <arg></arg>
+			      <preExec>
+			        <![CDATA[
+			         ]]>
+			      </preExec>
+			      
+			      <property name="c2mon.log.dir" value="log" />
+			      <property name="c2mon.properties.location" value="conf/.c2mon.properties" />
+			      <property name="log4j.configuration" value="conf/log4j.xml" />
+			      
+                  <output>
+				    <file name="log/out.log" />
+			      </output>						
+			  </main-class>
+		  </startscript>
+		</application>
+
+	</product>
+</products>
