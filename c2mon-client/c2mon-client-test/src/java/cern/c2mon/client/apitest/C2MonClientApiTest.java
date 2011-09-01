@@ -33,60 +33,54 @@ public class C2MonClientApiTest {
      */
     public static void main(String[] args) {
 
-		
-		try {
+        try {
 
-			ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(
-					new String[] { "classpath:application-context.xml" });
+            ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(
+                    new String[] { "classpath:application-context.xml" });
 
-			service = xmlContext.getBean(C2MonClientApiTestService.class);
-			
-			C2monServiceGateway.startC2monClient();
-			
-		} catch (Exception e) {
-			log.error(e);			
-			System.exit(-1);
-		}
-		
-		List<MetricDef> metrics = service.getAllDeviceRuleMetrics();
-		
-		
-		Set<Long> tagIds = new HashSet<Long>();
-		for (MetricDef md : metrics ) {
-			out.println(format("%d %s",md.getRuleTagId(), md.getMetricName()));
-		}
-		
-		
-		
+            service = xmlContext.getBean(C2MonClientApiTestService.class);
 
-	    C2monTagManager tagManager = C2monServiceGateway.getTagManager();
-	      tagManager.subscribeDataTags(tagIds, new DataTagUpdateListener() {
-	        @Override
-	        public void onUpdate(ClientDataTagValue tagUpdate) {
-	            	
-	          if (TAG_LOG.isInfoEnabled()) {
-	              TAG_LOG.log(Level.INFO,tagUpdate);
-	          }
-	            
-//	          System.out.println("Update received for tag " + tagUpdate.getId() + ":");
-//	          System.out.println("\ttag name           : " + tagUpdate.getName());
-//	          System.out.println("\tvalue              : " + tagUpdate.getValue());
-//	          System.out.println("\ttype               : " + tagUpdate.getTypeNumeric());
-//	          System.out.println("\tvalue description  : " + tagUpdate.getDescription());
-//	          System.out.println("\tquality Code       : " + tagUpdate.getDataTagQuality().toString());
-//	          System.out.println("\tquality description: " + tagUpdate.getDataTagQuality().getDescription());
-//	          System.out.println();
-	        }
-	      });		
-	      
-	      	    
-//	      while (true) {
-//	          try {
-//	              Thread.sleep(5000);
-//	          }
-//	          catch (InterruptedException ex) {	              
-//	          }
-//	      }
-					      	     
-	}
+            C2monServiceGateway.startC2monClient();
+
+        } catch (Exception e) {
+            log.error(e);
+            System.exit(-1);
+        }
+
+        List<MetricDef> metrics = service.getAllDeviceRuleMetrics();
+
+        Set<Long> tagIds = new HashSet<Long>();
+        for (MetricDef md : metrics) {
+            out.println(format("%d %s", md.getRuleTagId(), md.getMetricName()));
+        }
+
+        C2monTagManager tagManager = C2monServiceGateway.getTagManager();
+        log.info(format("trying to subscribe to %s metrics",tagIds.size()));
+        tagManager.subscribeDataTags(tagIds, new DataTagUpdateListener() {
+            @Override
+            public void onUpdate(ClientDataTagValue tagUpdate) {               
+                if (TAG_LOG.isInfoEnabled()) {
+                    TAG_LOG.log(Level.INFO, tagUpdate);
+                }
+
+                // System.out.println("Update received for tag " + tagUpdate.getId() + ":");
+                // System.out.println("\ttag name           : " + tagUpdate.getName());
+                // System.out.println("\tvalue              : " + tagUpdate.getValue());
+                // System.out.println("\ttype               : " + tagUpdate.getTypeNumeric());
+                // System.out.println("\tvalue description  : " + tagUpdate.getDescription());
+                // System.out.println("\tquality Code       : " + tagUpdate.getDataTagQuality().toString());
+                // System.out.println("\tquality description: " + tagUpdate.getDataTagQuality().getDescription());
+                // System.out.println();
+            }
+        });
+
+        // while (true) {
+        // try {
+        // Thread.sleep(5000);
+        // }
+        // catch (InterruptedException ex) {
+        // }
+        // }
+
+    }
 }
