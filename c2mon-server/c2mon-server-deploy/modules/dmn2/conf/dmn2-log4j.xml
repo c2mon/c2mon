@@ -7,9 +7,9 @@
   Specify the name of the log file in the ${tim.log.file} system property.
   To do this, start your program the following way:
 
-    java -Dc2mon.log.file=c:/tim.log ... YourMainClass
+    java -Dc2mon.log.file=c:/c2mon.log ... YourMainClass
   or
-    java -Dc2mon.log.file=c:/tim.log ... -jar YourRunnableJar.jar
+    java -Dc2mon.log.file=c:/c2mon.log ... -jar YourRunnableJar.jar
 
   If you don't, the log file will be created in the temp directory. If this 
   isn't possible either, log output will be printed on the console.
