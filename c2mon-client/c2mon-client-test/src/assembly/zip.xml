@@ -33,7 +33,15 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-
+		
+		<!--  jms properties file -->
+	    <file>
+			<source>${basedir}/conf/jms.properties.xml</source>
+			<outputDirectory>/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+		
 		<!--  log4j configuration -->
 		<file>
 			<source>${basedir}/conf/log4j.xml</source>
