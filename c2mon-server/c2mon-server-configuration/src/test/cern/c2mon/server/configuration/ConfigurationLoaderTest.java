@@ -13,7 +13,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -332,6 +335,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     //expectedObject.setValueDescription("test config value description");
     expectedObject.setSimulated(false); //null allowed
     expectedObject.setEquipmentId(new Long(150)); //need test equipment inserted 
+    expectedObject.setProcessId(50L);
     expectedObject.setMinValue(new Float(12.2));
     expectedObject.setMaxValue(new Float(23.3));
     expectedObject.setValueDictionary(new DataTagValueDictionary());
@@ -417,12 +421,20 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setDipAddress("testConfigDIPaddress");
     expectedObject.setJapcAddress("testConfigJAPCaddress");
     expectedObject.setRuleText("(#5000000 < 0)|(#5000000 > 200)[1],true[0]");
+    Set<Long> eqIds = new HashSet<Long>();
+    eqIds.add(150L);
+    expectedObject.setEquipmentIds(eqIds);
+    Set<Long> procIds = new HashSet<Long>();
+    procIds.add(50L);
+    expectedObject.setProcessIds(procIds);
     
     ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, cacheObject);   
     
     //update ruletag
     expectedObject.setJapcAddress("newTestConfigJAPCaddress");
-    expectedObject.setRuleText("true[0]");    
+    expectedObject.setRuleText("true[0]");
+    expectedObject.setProcessIds(Collections.EMPTY_SET);
+    expectedObject.setEquipmentIds(Collections.EMPTY_SET);
     report = configurationLoader.applyConfiguration(11, timSessionInfo.getSessionId());
     System.out.println(report.toXML());
     RuleTagCacheObject updatedCacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);

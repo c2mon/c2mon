@@ -11,6 +11,7 @@ import cern.tim.server.common.process.ProcessCacheObject;
 import cern.tim.server.common.rule.RuleTagCacheObject;
 import cern.tim.server.common.subequipment.SubEquipmentCacheObject;
 import cern.tim.server.common.tag.AbstractTagCacheObject;
+import cern.tim.server.common.tag.Tag;
 
 /**
  * Junit helper class for comparing cache objects.
@@ -28,6 +29,7 @@ public class ObjectEqualityComparison {
   public static void assertDataTagConfigEquals(DataTagCacheObject expectedObject, DataTagCacheObject object) {
     assertTagConfigEquals(expectedObject, object);
     assertEquals(expectedObject.getEquipmentId(), object.getEquipmentId());
+    assertEquals(expectedObject.getProcessId(), object.getProcessId());    
     assertEquals(expectedObject.getMinValue(), object.getMinValue());
     assertEquals(expectedObject.getMaxValue(), object.getMaxValue());
     if (expectedObject.getAddress() != null) {
@@ -53,6 +55,8 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getDataTagQuality(), object.getDataTagQuality());  
     assertEquals(expectedObject.getRuleIdsString(), object.getRuleIdsString());
     assertEquals(expectedObject.getRuleIds(), object.getRuleIds());
+    assertEquals(((Tag)expectedObject).getProcessIds(), ((Tag)object).getProcessIds());
+    assertEquals(((Tag)expectedObject).getEquipmentIds(), ((Tag)object).getEquipmentIds());
   }
   
   public static void assertTagValueEquals(AbstractTagCacheObject expectedObject, AbstractTagCacheObject object) {
@@ -81,7 +85,7 @@ public class ObjectEqualityComparison {
 
   public static void assertRuleTagConfigEquals(RuleTagCacheObject expectedObject, RuleTagCacheObject cacheObject) {
     assertTagConfigEquals(expectedObject, cacheObject);
-    assertEquals(expectedObject.getRuleText(), cacheObject.getRuleText());        
+    assertEquals(expectedObject.getRuleText(), cacheObject.getRuleText());    
   }
   
   public static void assertEquipmentEquals(EquipmentCacheObject expectedObject, EquipmentCacheObject actualObject) {
