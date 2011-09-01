@@ -14,8 +14,8 @@
 	<context:annotation-config />
 	<context:component-scan base-package="cern.c2mon.client.apitest" />
 
-    <!--  load jms properties -->
-    <context:property-placeholder location="file:${jms.properties}" />
+    <!--  load db and jms properties -->
+    <context:property-placeholder location="file:${jms.properties},file:${db.properties}" />
 
 	<!-- enable the configuration of transactional behaviour based on annotations. -->
 	<tx:annotation-driven transaction-manager="txManager" />
