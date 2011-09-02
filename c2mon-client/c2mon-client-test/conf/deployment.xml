@@ -2,7 +2,7 @@
 <products>
 	<product name="c2mon-client-test">
 
-		<application name="default">
+		<application name="c2mon-client-test">
 
 			<deployment>
 				<directory name="conf">
