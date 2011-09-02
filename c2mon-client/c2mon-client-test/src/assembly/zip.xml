@@ -23,13 +23,15 @@
 
 	</dependencySets>
 
-	<fileSet>
-		<includes>
-			<include>log/</include>
-		</includes>
-		<fileMode>0755</fileMode>
-		<directoryMode>0755</directoryMode>
-	</fileSet>
+	<fileSets>
+		<fileSet>
+			<includes>
+				<include>log/</include>
+			</includes>
+			<fileMode>0755</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+	</fileSets>
 
 	<files>
 
