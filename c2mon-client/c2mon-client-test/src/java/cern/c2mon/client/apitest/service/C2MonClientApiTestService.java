@@ -8,6 +8,8 @@ public interface C2MonClientApiTestService {
    
 	List<MetricDef> getAllMetrics();
 	
+	List<MetricDef> getAllMetrics(String processName);
+	
     List<MetricDef> getAllDeviceRuleMetrics();
 
     List<MetricDef> getAllRuleMetrics();	

@@ -32,6 +32,13 @@ public class C2MonClientApiTestServiceImpl implements C2MonClientApiTestService 
 
     @Transactional(readOnly = true)
     @Override
+    public List<MetricDef> getAllMetrics(String processName) {
+        log.debug("entering getAllMetrics()");
+        return dao.getAllMetrics(processName);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public List<MetricDef> getAllDeviceRuleMetrics() {
         log.debug("entering getAllDeviceRuleMetrics()");
         return dao.getAllDeviceRuleMetrics();

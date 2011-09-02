@@ -5,6 +5,8 @@ import static java.lang.String.format;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Level;
@@ -37,9 +39,18 @@ public class C2MonClientApiTest {
 
             ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(
                     new String[] { "classpath:application-context.xml" });
-
-            service = xmlContext.getBean(C2MonClientApiTestService.class);
-
+                        
+            service = xmlContext.getBean(C2MonClientApiTestService.class);            
+            
+            log.debug("jms.properties: "+System.getProperty("jms.properties"));
+          
+            //C2monServiceGateway.startC2monClient(System.getProperty("jms.properties"));
+            
+            Properties jmsProperties = (Properties) xmlContext.getBean("jmsProperties");
+            for (Map.Entry<Object, Object> entry : jmsProperties.entrySet()) {
+              System.setProperty((String) entry.getKey(), (String) entry.getValue());
+            }   
+            
             C2monServiceGateway.startC2monClient();
 
         } catch (Exception e) {

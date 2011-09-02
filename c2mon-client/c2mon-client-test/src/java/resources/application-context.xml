@@ -14,14 +14,24 @@
 	<context:annotation-config />
 	<context:component-scan base-package="cern.c2mon.client.apitest" />
 
-    <!--  load db and jms properties -->
-    <context:property-placeholder location="file:${jms.properties},file:${db.properties}" />
+	<!--  load db and jms properties -->
+	<!--	<context:property-placeholder-->
+	<!--		location="file:${jms.properties},file:${db.properties}" />-->
 
-	<!-- enable the configuration of transactional behaviour based on annotations. -->
+
+	<bean id="jmsProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="file:${jms.properties}" />
+	</bean>
+
+	<!--
+		enable the configuration of transactional behaviour based on
+		annotations.
+	-->
 	<tx:annotation-driven transaction-manager="txManager" />
 
 
-    <import resource="db-context.xml" />
+	<import resource="db-context.xml" />
 
 	<bean id="testJdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
 		<constructor-arg ref="ds" />
@@ -34,7 +44,8 @@
 	</bean>
 
 	<!-- create DAO -->
-	<bean id="dao" class="cern.c2mon.client.apitest.db.impl.C2MonClientApiTestDaoImpl" />
+	<bean id="dao"
+		class="cern.c2mon.client.apitest.db.impl.C2MonClientApiTestDaoImpl" />
 
 </beans>
 
