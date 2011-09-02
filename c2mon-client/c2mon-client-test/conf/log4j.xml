@@ -58,10 +58,10 @@
 		<level value="info" />
 		<appender-ref ref="ClientDataTagValueAppender" />
 	</logger>
-	<logger name="RuleTagLogger" additivity="false">
-		<level value="info" />
-		<appender-ref ref="RuleTagAppender" />
-	</logger>
+<!--	<logger name="RuleTagLogger" additivity="false">-->
+<!--		<level value="info" />-->
+<!--		<appender-ref ref="RuleTagAppender" />-->
+<!--	</logger>-->
 	<logger name="org.apache.activemq" additivity="false">
 		<level value="info" />
 		<appender-ref ref="FileAppender" />
