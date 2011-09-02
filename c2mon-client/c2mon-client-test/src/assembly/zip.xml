@@ -23,6 +23,13 @@
 
 	</dependencySets>
 
+	<fileSet>
+		<includes>
+			<include>log/</include>
+		</includes>
+		<fileMode>0755</fileMode>
+		<directoryMode>0755</directoryMode>
+	</fileSet>
 
 	<files>
 
@@ -33,15 +40,15 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-		
+
 		<!--  jms properties file -->
-	    <file>
+		<file>
 			<source>${basedir}/conf/jms.properties</source>
 			<outputDirectory>conf/</outputDirectory>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-		
+
 		<!--  log4j configuration -->
 		<file>
 			<source>${basedir}/conf/log4j.xml</source>
