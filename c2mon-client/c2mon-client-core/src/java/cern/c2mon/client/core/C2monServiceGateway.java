@@ -17,9 +17,17 @@
  ******************************************************************************/
 package cern.c2mon.client.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.PropertiesFactoryBean;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -114,8 +122,34 @@ public final class C2monServiceGateway {
   public static void startC2monClient() {
     LOGGER.info("Starting C2MON client core.");
     final ClassPathXmlApplicationContext xmlContext = 
-                    new ClassPathXmlApplicationContext("cern/c2mon/client/core/config/c2mon-client.xml");
-    xmlContext.start();
+                    new ClassPathXmlApplicationContext("cern/c2mon/client/core/config/c2mon-client.xml");    
+    xmlContext.registerShutdownHook();
+  }
+  
+  /**
+   * Start the C2MON core, importing properties from the specified location.
+   * 
+   * @param propertyFileLocation properties to load into context (eg. file:/user/smith/properties.txt or classpath:properties.txt)
+   */
+  public static void startC2monClient(final String propertyFileLocation) {
+    LOGGER.info("Starting C2MON client core, loading properties from " + propertyFileLocation);    
+
+    GenericBeanDefinition propertiesFactoryBean = new GenericBeanDefinition();
+    propertiesFactoryBean.setBeanClass(PropertiesFactoryBean.class);
+    MutablePropertyValues propertyValues = new MutablePropertyValues();
+    propertyValues.addPropertyValue("location", propertyFileLocation);
+    propertiesFactoryBean.setPropertyValues(propertyValues);    
+
+    //start an initial Spring application context and register properties bean
+    GenericApplicationContext ctx = new GenericApplicationContext();    
+    ctx.registerBeanDefinition("clientProperties", propertiesFactoryBean);        
+    ctx.refresh();
+    
+    String[] springXmlFiles = {"cern/c2mon/client/core/config/c2mon-client.xml",                                         
+                               "cern/c2mon/client/core/config/c2mon-client-properties.xml"}; 
+    
+    final ClassPathXmlApplicationContext xmlContext = 
+                    new ClassPathXmlApplicationContext(springXmlFiles, ctx);    
     xmlContext.registerShutdownHook();
   }
   

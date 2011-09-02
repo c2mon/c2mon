@@ -43,13 +43,20 @@ public class C2monServiceGatewayTest {
   private static final Logger LOG = Logger.getLogger(C2monServiceGatewayTest.class);
   
   @Test
-  public void startClient() {
-    C2monServiceGateway.startC2monClient();
+  public void startClient() throws InterruptedException {
+    C2monServiceGateway.startC2monClient();    
     assertNotNull(C2monServiceGateway.getSessionManager());
     assertNotNull(C2monServiceGateway.getSupervisionManager());
     assertNotNull(C2monServiceGateway.getTagManager());
   }
   
+  @Test
+  public void startClientWithProperties() throws InterruptedException {
+    C2monServiceGateway.startC2monClient("classpath:cern/c2mon/client/core/test-properties.txt");    
+    assertNotNull(C2monServiceGateway.getSessionManager());
+    assertNotNull(C2monServiceGateway.getSupervisionManager());
+    assertNotNull(C2monServiceGateway.getTagManager());
+  }
   
   /**
    * Starts the C2MON client API and registers to some tags
