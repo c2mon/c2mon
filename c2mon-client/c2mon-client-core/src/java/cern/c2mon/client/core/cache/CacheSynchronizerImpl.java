@@ -297,7 +297,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
       }
     }
     catch (Exception e) {
-      LOG.error("synchronizeCache() - Could not refresh tags in the live cache. " + JMS_CONNECTION_LOST_MSG);
+      LOG.error("synchronizeCache() - Could not refresh tags in the live cache.", e);
       jmsConnectionLost = true;
     }
   

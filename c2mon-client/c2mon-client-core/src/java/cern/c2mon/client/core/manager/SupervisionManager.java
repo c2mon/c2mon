@@ -285,7 +285,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
         LOG.info("refreshSupervisionStatus() - supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
       }
       catch (Exception e) {
-        LOG.error("refreshSupervisionStatus() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage());
+        LOG.error("refreshSupervisionStatus() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage(), e);
         c2monConnectionEstablished = false;
       }
     }
