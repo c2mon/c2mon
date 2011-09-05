@@ -169,10 +169,12 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
     try {     
       if (!ruleTag.getRuleIds().isEmpty()) {
         LOGGER.debug("Removing rules dependent on RuleTag " + ruleTag.getId());
-        for (Long ruleId : ruleTag.getRuleIds()) { //no concurrent modification of this list as no loops in rule dependencies
-          ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-          elementReport.addSubReport(newReport);
-          removeRuleTag(ruleId, newReport);
+        for (Long ruleId : new ArrayList<Long>(ruleTag.getRuleIds())) { //concurrent modifcation as a rule is removed from the list during the remove call!
+          if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
+            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+            elementReport.addSubReport(newReport);
+            removeRuleTag(ruleId, newReport);
+          }         
         }                
       }
       if (!ruleTag.getAlarmIds().isEmpty()) {
@@ -182,13 +184,20 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
           elementReport.addSubReport(alarmReport);
           alarmConfigHandler.removeAlarm(alarmId, alarmReport);
         }        
-      }        
+      }
+      for (Long inputTagId : ruleTag.getRuleInputTagIds()) {
+        tagConfigGateway.removeRuleFromTag(inputTagId, id);
+      }
       configurableDAO.deleteItem(ruleTag.getId());
       tagCache.remove(ruleTag.getId());        
     }
     catch (RuntimeException rEx) {
       String errMessage = "Exception caught when removing rule tag with id " + id;
       LOGGER.error(errMessage, rEx);
+      tagCache.remove(id);
+      for (Long inputTagId : ruleTag.getRuleInputTagIds()) {
+        tagLocationService.remove(inputTagId);
+      }
       throw new UnexpectedRollbackException(errMessage, rEx);   
     } finally {
       ruleTag.getWriteLock().unlock();

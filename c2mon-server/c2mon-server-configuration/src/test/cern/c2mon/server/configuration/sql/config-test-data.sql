@@ -238,6 +238,12 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (18,18,'REMOVE','Process','2');
 
+--remove another process with rules & alarms attached (from permanent test data)
+insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
+  values (28,'remove process', 'remove process 50', 'mbrightw', '?', sysdate);     
+insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
+  values (28,28,'REMOVE','Process','50');
+
 --create subequipment (as child of TestHandler03, uses pre-existing control tags ) - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (19,'create subequipment', 'create subequipment 200', 'mbrightw', '?', sysdate);     

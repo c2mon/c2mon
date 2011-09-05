@@ -642,11 +642,44 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
     
-    //remove (fails to complete - see process comment above)
+    //remove succeeds
     report = configurationLoader.applyConfiguration(18, timSessionInfo.getSessionId());
     assertFalse(processCache.hasKey(2L));
     assertNull(processMapper.getItem(2L));
     verify(mockManager);
+  }
+  
+  /**
+   * Tests the removal of a process succeeds, with dependent rules and alarms.
+   * Relies on permanent test data in test account and must be rolled back.
+   * No changes should be sent to the DAQ layer.
+   */
+  @Test
+  public void testRemoveProcess() {
+    replay(mockManager);
+    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
+    ConfigurationReport report = configurationLoader.applyConfiguration(28, timSessionInfo.getSessionId());
+    verify(mockManager);
+    //check process, tag, rules and alarms are gone
+    assertFalse(processCache.hasKey(50L));
+    assertNull(processMapper.getItem(50L));
+    assertFalse(equipmentCache.hasKey(150L));
+    assertNull(equipmentMapper.getItem(150L));
+    //check couple of rules
+    assertFalse(ruleTagCache.hasKey(60010L));
+    assertNull(ruleTagMapper.getItem(60010L));
+    assertFalse(ruleTagCache.hasKey(60002L));
+    assertNull(ruleTagMapper.getItem(60002L));
+    //tags
+    assertFalse(dataTagCache.hasKey(200002L));
+    assertNull(dataTagMapper.getItem(200002L));
+    assertFalse(dataTagCache.hasKey(200003L));
+    assertNull(dataTagMapper.getItem(200003L));
+    //alarms
+    assertFalse(alarmCache.hasKey(350000L));
+    assertNull(alarmMapper.getItem(350000L));
+    assertFalse(alarmCache.hasKey(350001L));
+    assertNull(alarmMapper.getItem(350001L));
   }
   
   /**

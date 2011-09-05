@@ -19,6 +19,7 @@
 package cern.c2mon.server.configuration.handler.impl;
 
 import org.apache.log4j.Logger;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.tim.server.cache.CommonTagFacade;
@@ -112,13 +113,14 @@ abstract class TagConfigHandlerImpl<T extends Tag> implements TagConfigHandler<T
   @Override
   @Transactional("cacheTransactionManager")
   public void addRuleToTag(final Long tagId, final Long ruleId) {
+    LOGGER.trace("Adding rule " + ruleId + " reference from Tag " + tagId);
     T tag = tagCache.get(tagId);
     try {
       tag.getWriteLock().lock();
       if (!tag.getRuleIds().contains(ruleId)) {
         commonTagFacade.addDependentRuleToTag(tag, ruleId);   
         configurableDAO.updateConfig(tag);      
-      }      
+      } 
     } finally {
       tag.getWriteLock().unlock();
     }  
@@ -126,15 +128,16 @@ abstract class TagConfigHandlerImpl<T extends Tag> implements TagConfigHandler<T
   
   @Override
   @Transactional("cacheTransactionManager")
-  public void removeRuleFromTag(Long tagId, Long ruleId) {
+  public void removeRuleFromTag(final Long tagId, final Long ruleId) {
+    LOGGER.trace("Removing rule " + ruleId + " reference from Tag " + tagId);
     T tag = tagCache.get(tagId);
     try {
       tag.getWriteLock().lock();
-      if (!tag.getRuleIds().contains(ruleId)) {
+      if (tag.getRuleIds().contains(ruleId)) {
         commonTagFacade.removeDependentRuleFromTag(tag, ruleId);
         configurableDAO.updateConfig(tag);      
-      }      
-    } finally {
+      }
+    } finally {    
       tag.getWriteLock().unlock();
     }
   }
@@ -142,6 +145,7 @@ abstract class TagConfigHandlerImpl<T extends Tag> implements TagConfigHandler<T
   @Override
   @Transactional("cacheTransactionManager")
   public void addAlarmToTag(final Long tagId, final Long alarmId) {
+    LOGGER.trace("Adding Alarm " + alarmId + " reference from Tag " + tagId);
     T tag = tagCache.get(tagId);
     try {
       tag.getWriteLock().lock();
@@ -153,7 +157,8 @@ abstract class TagConfigHandlerImpl<T extends Tag> implements TagConfigHandler<T
   
   @Override
   @Transactional("cacheTransactionManager")
-  public void removeAlarmFromTag(Long tagId, Long alarmId) {
+  public void removeAlarmFromTag(final Long tagId, final Long alarmId) {
+    LOGGER.trace("Removing Alarm " + alarmId + " reference from Tag " + tagId);
     Tag tag = tagCache.get(tagId);
     try {
       tag.getWriteLock().lock();

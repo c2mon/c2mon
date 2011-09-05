@@ -190,10 +190,12 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
     try {     
       if (!dataTag.getRuleIds().isEmpty()) {
         LOGGER.debug("Removing Rules dependent on DataTag " + dataTag.getId());
-        for (Long ruleId : dataTag.getRuleIds()) {
-          ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-          elementReport.addSubReport(newReport);
-          ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
+        for (Long ruleId : new ArrayList<Long>(dataTag.getRuleIds())) {
+          if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
+            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+            elementReport.addSubReport(newReport);
+            ruleTagConfigHandler.removeRuleTag(ruleId, newReport); 
+          }          
         }
       }
       if (!dataTag.getAlarmIds().isEmpty()) {

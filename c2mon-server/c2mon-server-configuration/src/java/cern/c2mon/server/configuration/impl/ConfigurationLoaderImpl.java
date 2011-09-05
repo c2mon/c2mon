@@ -170,6 +170,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       
       String configName = configurationDAO.getConfigName(configId);    
       if (configName == null) {
+        LOGGER.warn("Unable to locate configuration with id " + configId + " - cannot be applied.");
         return new ConfigurationReport(
             configId, 
             "UNKNOWN", 
