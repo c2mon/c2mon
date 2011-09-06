@@ -655,6 +655,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    * No changes should be sent to the DAQ layer.
    */
   @Test
+  @DirtiesContext
   public void testRemoveProcess() {
     replay(mockManager);
     TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
@@ -675,6 +676,39 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertNull(dataTagMapper.getItem(200002L));
     assertFalse(dataTagCache.hasKey(200003L));
     assertNull(dataTagMapper.getItem(200003L));
+    //alarms
+    assertFalse(alarmCache.hasKey(350000L));
+    assertNull(alarmMapper.getItem(350000L));
+    assertFalse(alarmCache.hasKey(350001L));
+    assertNull(alarmMapper.getItem(350001L));
+  }
+  
+  
+  /**
+   * Tests the removal of a process succeeds, with dependent rules and alarms.
+   * Relies on permanent test data in test account and must be rolled back.
+   * No changes should be sent to the DAQ layer.
+   */
+  @Test
+  @DirtiesContext
+  public void testRemoveEquipment() {
+    replay(mockManager);
+    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
+    ConfigurationReport report = configurationLoader.applyConfiguration(29, timSessionInfo.getSessionId());
+    verify(mockManager);
+    //check equipment, tag, rules and alarms are gone   
+    assertFalse(equipmentCache.hasKey(150L));
+    assertNull(equipmentMapper.getItem(150L));
+    //check couple of rules
+    assertFalse(ruleTagCache.hasKey(60005L));
+    assertNull(ruleTagMapper.getItem(60005L));
+    assertFalse(ruleTagCache.hasKey(60004L));
+    assertNull(ruleTagMapper.getItem(60004L));
+    //tags
+    assertFalse(dataTagCache.hasKey(200001L));
+    assertNull(dataTagMapper.getItem(200001L));
+    assertFalse(dataTagCache.hasKey(200004L));
+    assertNull(dataTagMapper.getItem(200004L));
     //alarms
     assertFalse(alarmCache.hasKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
