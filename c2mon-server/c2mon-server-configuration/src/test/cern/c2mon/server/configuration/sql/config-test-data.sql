@@ -210,6 +210,12 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (15,15,'REMOVE','Equipment','110');
   
+--remove another equipment with rules & alarms attached (from permanent test data)
+insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
+  values (29,'remove equipment', 'remove process 150', 'mbrightw', '?', sysdate);     
+insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
+  values (29,29,'REMOVE','Equipment','150');
+  
  --create process (uses P_TESTHANDLER03 control tag)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (16,'create process', 'create process 2', 'mbrightw', '?', sysdate);     
