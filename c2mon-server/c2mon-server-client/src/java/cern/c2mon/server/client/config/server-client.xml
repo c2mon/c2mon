@@ -24,9 +24,8 @@ Connection settings for client module
 </bean>
 
 <!-- connection factory used for all connections to the server -->
-<bean id="clientPooledConnectionFactory" class="org.jencks.amqpool.PooledConnectionFactory">
-   <constructor-arg ref="clientActiveMQConnectionFactory"/>
-   <property name="maxConnections" value="${jms.client.connections.max}" />   
+<bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">   
+   <property name="targetConnectionFactory" ref="clientActiveMQConnectionFactory" />   
 </bean>
 
 <!-- 
@@ -37,7 +36,7 @@ Publication to Tag updates
 
 <!-- plugged into ActiveJmsSender -->
 <bean id="clientTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-  <property name="connectionFactory" ref="clientPooledConnectionFactory"/>
+  <property name="connectionFactory" ref="singleConnectionFactory"/>
 </bean>
 
 <!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
@@ -57,7 +56,7 @@ Publication of Supervision events
 
 <!-- JmsTemplate for sending supervision events; default destination set -->
 <bean id="supervisionTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-  <property name="connectionFactory" ref="clientPooledConnectionFactory"/>  
+  <property name="connectionFactory" ref="singleConnectionFactory"/>  
   <property name="defaultDestination" ref="supervisionDestination"/>
 </bean>
 
@@ -97,7 +96,7 @@ Request from clients
       <property name="destination" ref="clientRequestDestination"/>
       <property name="messageListener" ref="clientRequestHandler" />
       <property name="concurrentConsumers" value="1"/>
-      <property name="maxConcurrentConsumers" value="5"/> 
+      <property name="maxConcurrentConsumers" value="10"/> 
       <property name="maxMessagesPerTask" value="1"/>
       <property name="receiveTimeout" value="1000"/>
       <property name="idleTaskExecutionLimit" value="10"/>   
