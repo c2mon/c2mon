@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:tc-config xmlns:con="http://www.terracotta.org/config">
+<con:tc-config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:con="http://www.terracotta.org/config" xsi:schemaLocation="http://www.terracotta.org/config terracotta-6.xsd">
   <tc-properties>
      <property name="l2.berkeleydb.je.cleaner.bytesInterval" value="20000000" />
      <property name="l1.objectmanager.remote.maxDNALRUSize" value="200000" />
      <property name="l1.cachemanager.criticalThreshold" value="95" />
      <property name="l1.cachemanager.threshold" value="90" />
      <property name="l2.objectmanager.dgc.young.enabled" value="true" />
-     <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="180000" />     
+     <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="180000" />          
   </tc-properties>  
   <servers>
     <server host="cs-ccr-tim4" name="server1">
@@ -21,7 +22,7 @@
          <enabled>true</enabled>
          <verbose>true</verbose>
          <interval>1200</interval>
-        </garbage-collection>
+        </garbage-collection>        
       </dso>
       <data>%(user.home)/dist/terracotta/log/server-data</data>      
       <logs>%(user.home)/dist/terracotta/log/server-logs</logs>
@@ -30,7 +31,7 @@
         <server host="cs-ccr-tim5" name="server2">
       <dso-port>9511</dso-port>
       <jmx-port>9521</jmx-port>
-      <l2-group-port>9531</l2-group-port>
+      <l2-group-port>9531</l2-group-port>      
       <dso>
         <persistence>
           <mode>permanent-store</mode>
@@ -193,6 +194,9 @@
           <class-expression>cern.tim.server.cache.process.ProcessFacadeImpl</class-expression>
         </include>
         <include>
+          <class-expression>cern.tim.server.cache.process.ProcessXMLProvider</class-expression>
+        </include>
+        <include>
           <class-expression>cern.tim.server.configuration.handler.impl.ProcessConfigHandlerImpl</class-expression>
         </include>
         <!-- Equipment cache -->
@@ -275,6 +279,9 @@
           <class-expression>cern.tim.server.supervision.impl.SupervisionManagerImpl</class-expression>
         </include>
         <include>
+          <class-expression>cern.tim.server.supervision.impl.SupervisionTagNotifier</class-expression>
+        </include>        
+        <include>
           <class-expression>cern.tim.server.supervision.alive.AliveTimerChecker</class-expression>
         </include>    
         <!-- DistributedParams classes -->
@@ -333,6 +340,10 @@
         <root>       
           <field-expression>* cern.tim.server.common.config.DistributedParams.exclusiveConfigLock</field-expression>
           <root-name>exclusiveConfigLock</root-name>
+        </root>
+        <root>       
+          <field-expression>* cern.tim.server.common.config.DistributedParams.initialised</field-expression>
+          <root-name>initialised</root-name>
         </root>
        </roots>
 <!--      <web-applications>-->
