@@ -261,7 +261,10 @@
         <!-- Command cache -->
         <include>
           <class-expression>cern.tim.server.common.command.CommandTagCacheObject</class-expression>
-        </include>        
+        </include>   
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.impl.CommandTagConfigHandler</class-expression>
+        </include>     
         <include>
           <class-expression>cern.tim.shared.daq.command.AuthorizedHosts</class-expression>
           <!-- excludes the regexp; call parsePattern on reload -->
