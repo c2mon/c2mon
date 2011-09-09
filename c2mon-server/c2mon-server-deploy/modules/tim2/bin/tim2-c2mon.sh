@@ -186,7 +186,7 @@ CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cac
 #according to cache mode, set the JAVA args and the startup command (stop is common)
 if [ ! "$2" == "single" ]; then
     C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $CLUSTER_JAVA_ARGS"  
-    C2MON_START_CMD="$TERRACOTTA_HOME/bin/dso-java.sh $C2MON_JAVA_ARGS -classpath ${REQUIRED_LIBS} cern.tim.server.lifecycle.ServerStartup  $C2MON_ARGS"
+    C2MON_START_CMD="$TERRACOTTA_HOME/platform/bin/dso-java.sh $C2MON_JAVA_ARGS -classpath ${REQUIRED_LIBS} cern.tim.server.lifecycle.ServerStartup  $C2MON_ARGS"
     C2MON_STOP_CMD="$JAVA_HOME/jre/bin/java -jar $JMXJAR -i $C2MON_HOME/bin/jmx-shutdown-script.txt -n -e -l localhost:$JMX_PORT  -u $JMX_USER -p $JMX_PASSWORD"
 else
     C2MON_JAVA_ARGS=$COMMON_JAVA_ARGS
