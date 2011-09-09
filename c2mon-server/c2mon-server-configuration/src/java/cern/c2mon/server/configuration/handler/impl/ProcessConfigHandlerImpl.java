@@ -154,6 +154,10 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
       throw new ConfigurationException(ConfigurationException.UNDEFINED, 
           "Attempting to change the process id - this is not currently supported!");
     }
+    if (properties.containsKey("name")) {
+      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
+          "Attempting to change the process name - this is not currently supported!");
+    }
     Change processUpdate;
     Process process = processCache.get(id);
     try {
