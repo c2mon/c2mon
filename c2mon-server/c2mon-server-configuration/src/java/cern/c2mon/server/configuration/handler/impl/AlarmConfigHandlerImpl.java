@@ -66,6 +66,7 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
   /**
    * Reference to gateway to tag configuration beans.
    */
+  @Autowired
   private TagConfigGateway tagConfigGateway;
   
   /**
@@ -77,12 +78,11 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
    */
   @Autowired
   public AlarmConfigHandlerImpl(final AlarmFacade alarmFacade, final AlarmLoaderDAO alarmDAO, 
-                            final AlarmCache alarmCache, final TagConfigGateway tagConfigGateway) {
+                            final AlarmCache alarmCache) {
     super();
     this.alarmFacade = alarmFacade;
     this.alarmDAO = alarmDAO;
     this.alarmCache = alarmCache;
-    this.tagConfigGateway = tagConfigGateway;
   }
 
   /**
