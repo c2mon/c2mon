@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
+import javax.jms.DeliveryMode;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -55,6 +56,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
+
+  /**
+   * Default TTL of replies to client requests
+   */
+  private static final long DEFAULT_REPLY_TTL = 120000;
   
   /**
    * Default Constructor
@@ -97,8 +103,10 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       throw jmse;
     }
     if (replyDestination != null) {
-      MessageProducer messageProducer = session.createProducer(replyDestination);      
-      TextMessage replyMessage = session.createTextMessage();
+      MessageProducer messageProducer = session.createProducer(replyDestination);
+      messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+      messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
+      TextMessage replyMessage = session.createTextMessage();      
       
       // Send response as  Json message
       replyMessage.setText(GSON.toJson(response));
