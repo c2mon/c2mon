@@ -459,7 +459,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         message.setJMSReplyTo(replyQueue);     
         MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
         producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        //producer.setTimeToLive(timeout); TODO remove comments - added for testing
+        producer.setTimeToLive(timeout);
         producer.send(message);       
         MessageConsumer consumer = session.createConsumer(replyQueue);        
         Message replyMessage = consumer.receive(timeout);
