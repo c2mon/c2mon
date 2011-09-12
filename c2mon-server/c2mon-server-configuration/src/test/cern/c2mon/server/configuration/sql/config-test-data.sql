@@ -2,7 +2,7 @@ DELETE FROM timconfigval;
 DELETE FROM timconfigelt;
 DELETE FROM timconfig;
 
--- test data for configuration module junit tests
+-- test data for configuration module tests
 
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
      values (1,'test configuration name', 'test configuration description', 'mbrightw', '?', sysdate);
