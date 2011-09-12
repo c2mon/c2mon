@@ -456,19 +456,23 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       try {
         TextMessage message = session.createTextMessage(jsonRequest.toJson());
         TemporaryQueue replyQueue = session.createTemporaryQueue();
-        message.setJMSReplyTo(replyQueue);     
-        MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
-        producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        producer.setTimeToLive(timeout);
-        producer.send(message);       
-        MessageConsumer consumer = session.createConsumer(replyQueue);        
-        Message replyMessage = consumer.receive(timeout);
-        if (replyMessage == null) {
-          LOGGER.error("No reply received from server on ClientRequest.");
-          throw new RuntimeException("No reply received from server - possible timeout?");
-        }      
-        return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText()); 
-      } finally {       
+        try {
+          message.setJMSReplyTo(replyQueue);     
+          MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
+          producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+          producer.setTimeToLive(timeout);
+          producer.send(message);       
+          MessageConsumer consumer = session.createConsumer(replyQueue);        
+          Message replyMessage = consumer.receive(timeout);
+          if (replyMessage == null) {
+            LOGGER.error("No reply received from server on ClientRequest.");          
+            throw new RuntimeException("No reply received from server - possible timeout?");
+          }
+          return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText()); 
+        } finally {
+          replyQueue.delete();
+        }                        
+      } finally {        
         session.close();
       }       
     } else {
