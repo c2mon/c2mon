@@ -135,9 +135,8 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
             fireEquipmentSupervisionUpdate(supervisionEvent);
             break;
           default:
-            String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client. Needs restarting!";
-            LOG.fatal("onSupervisionUpdate() - " + errMsg);
-            throw new RuntimeException(errMsg);
+            String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client - not taking any action";
+            LOG.debug("onSupervisionUpdate() - " + errMsg);            
         }
       }
       finally {
