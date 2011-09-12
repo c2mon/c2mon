@@ -179,9 +179,8 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
           }
           break;
         default:
-          String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client. Needs restarting!";
-          LOG.fatal("updateEventCache() - " + errMsg);
-          throw new RuntimeException(errMsg);
+          String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client - ignoring the event";
+          LOG.debug("updateEventCache() - " + errMsg);          
       }
     }
     finally {
