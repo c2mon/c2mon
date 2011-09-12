@@ -58,11 +58,12 @@ public class C2MonClientApiTest {
             System.exit(-1);
         }
 
-        List<MetricDef> metrics = service.getAllMetrics("P_CLIC_TEST");
-        // List<MetricDef> metrics = service.getAllDeviceRuleMetrics();
+        //List<MetricDef> metrics = service.getAllMetrics("P_CLIC_TEST");
+        List<MetricDef> metrics = service.getAllDeviceRuleMetrics();
         
         
         log.debug("service.getAllDeviceRuleMetrics returned: "+metrics.size());
+        out.println(format("%d",metrics.size()));
         
         Set<Long> tagIds = new HashSet<Long>();
         for (MetricDef md : metrics) {
