@@ -63,6 +63,7 @@ public class C2MonClientApiTest {
         Set<Long> tagIds = new HashSet<Long>();
         for (MetricDef md : metrics) {
             out.println(format("%d %s", md.getRuleTagId(), md.getMetricName()));
+            tagIds.add(md.getRuleTagId());
         }
 
         C2monTagManager tagManager = C2monServiceGateway.getTagManager();
