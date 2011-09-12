@@ -77,7 +77,10 @@ public class HistoryStore {
    */
   private Map<HistoryUpdateId, Timestamp> tagsHaveRecordsUntilTime;
 
-  /** A lock for tagsHaveRecordsUntilTime list */
+  /**
+   * A lock for tagsHaveRecordsUntilTime list. The {@link #initializedTagsLock}
+   * must be held before locking this lock if used at the same time.
+   */
   private ReentrantReadWriteLock tagsHaveRecordsUntilTimeLock;
 
   /** 
@@ -1129,6 +1132,10 @@ public class HistoryStore {
    *          The id's of the data to remove
    */
   public void unregisterTags(final Collection<HistoryUpdateId> historyUpdateIds) {
+    if (historyUpdateIds == null || historyUpdateIds.size() == 0) {
+      return;
+    }
+    
     this.setBatching(true);
     try {
       // Removes the data from dataTagHistories
@@ -1142,25 +1149,26 @@ public class HistoryStore {
         this.dataTagHistoriesLock.writeLock().unlock();
       }
 
-      // Removes the data from the tagsHaveRecordsUntilTime
-      try {
-        this.tagsHaveRecordsUntilTimeLock.writeLock().lock();
-        for (HistoryUpdateId historyUpdateId : historyUpdateIds) {
-          this.tagsHaveRecordsUntilTime.remove(historyUpdateId);
-        }
-      }
-      finally {
-        this.tagsHaveRecordsUntilTimeLock.writeLock().unlock();
-      }
-      
       try {
         this.initializedTagsLock.writeLock().lock();
         this.initializedTags.removeAll(historyUpdateIds);
+        
+        // Removes the data from the tagsHaveRecordsUntilTime
+        try {
+          this.tagsHaveRecordsUntilTimeLock.writeLock().lock();
+          for (HistoryUpdateId historyUpdateId : historyUpdateIds) {
+            this.tagsHaveRecordsUntilTime.remove(historyUpdateId);
+          }
+        }
+        finally {
+          this.tagsHaveRecordsUntilTimeLock.writeLock().unlock();
+        }
+        
       }
       finally {
         this.initializedTagsLock.writeLock().unlock();
       }
-
+      
       // Notifies that the history is changed
       this.historyChanged();
     }

@@ -540,6 +540,9 @@ public class HistoryLoader {
               Arrays.asList(tagValues.toArray(new HistoryUpdate[0])),
               endTime));
         }
+        catch (Exception e) {
+          LOG.error("Error occured while trying to retrieve history data.", e);
+        }
         finally {
           countDownLatch.countDown();
         }
@@ -674,7 +677,7 @@ public class HistoryLoader {
             loadDailySnapshotRecords(tagValueUpdateIds);
           }
           catch (Exception e) {
-            LOG.error("Error while getting inital data tags", e);
+            LOG.error("Error while getting snapshot records", e);
           }
           finally {
             initialLoadingLatch.countDown();
@@ -691,7 +694,7 @@ public class HistoryLoader {
               fireInitializingHistoryProgress("Loading initialization data..");
             }
             catch (Exception e) {
-              LOG.error("Error while getting inital data tags", e);
+              LOG.error("Error while getting inital data tag values", e);
             }
             finally {
               initialLoadingLatch.countDown();
@@ -724,6 +727,11 @@ public class HistoryLoader {
       return;
     }
     
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(
+          String.format("Loading initial supervision events (%d events)", supervisionEventIds.size()));
+    }
+    
     this.historyStore.addInitialTagValueUpdates(
         Arrays.asList(supervisionEventIds.toArray(new HistoryUpdateId[0])), 
         Arrays.asList(new HistoryUpdate[0]));
@@ -753,10 +761,21 @@ public class HistoryLoader {
     // Getting the rest of the values
     final Collection<HistorySupervisionEvent> values = 
       historyProvider.getSupervisionEvents(historyStore.getStart(), historyStore.getEnd(), requests);
+    
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(
+          String.format("Initial supervision events loaded, adding values (%d values)", values.size()));
+    }
+    
     this.historyStore.addHistoryValues(
         Arrays.asList(supervisionEventIds.toArray(new HistoryUpdateId[0])), 
         Arrays.asList(values.toArray(new HistoryUpdate[0])), 
         getHistoryStore().getEnd());
+    
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(
+          String.format("Initial supervision event values added (%d values)", values.size()));
+    }
   }
   
   /**
@@ -771,7 +790,7 @@ public class HistoryLoader {
     }
     
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Loading daily snapshot records from the database");
+      LOG.debug(String.format("Loading daily snapshot records from the database (for %d tags)", tagIds.size()));
     }
     
     Collection<HistoryTagValueUpdate> values = null;
@@ -784,7 +803,7 @@ public class HistoryLoader {
     }
     
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Daily snapshot records from retrieved, filtering...");
+      LOG.debug("Daily snapshot records retrieved, filtering...");
     }
     
     // Adds the data to the daily snapshot filter
@@ -815,7 +834,7 @@ public class HistoryLoader {
     }
     
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Loading initial values from the database");
+      LOG.debug(String.format("Loading initial values from the database (for %d tags)", tagIds.size()));
     }
     fireInitializingHistoryProgress("Loading initial values from the short term log");
     
@@ -831,7 +850,7 @@ public class HistoryLoader {
     }
     
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Initial data loaded, storing and filtering the data");
+      LOG.debug("Initial values loaded, storing and filtering the data");
     }
     fireInitializingHistoryProgress("Initial data loaded, storing and filtering the data");
     
@@ -840,12 +859,12 @@ public class HistoryLoader {
         Arrays.asList(values.toArray(new HistoryUpdate[0])));
     
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Initial data is loaded, notifying view(s)");
+      LOG.debug("Initial values is filtered, notifying view(s)");
     }
     fireInitializingHistoryProgress("Initial data is loaded");
     
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Initial data loading is complete");
+      LOG.debug("Initial values loading is complete");
     }
   }
   
@@ -983,6 +1002,18 @@ public class HistoryLoader {
     
     @Override
     public void run() {
+      try {
+        runProcess();
+      }
+      catch (Exception e) {
+        LOG.error("An error occured trying to load the history data..", e);
+      }
+    }
+    
+    /**
+     * Starts the loading
+     */
+    private void runProcess() {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Buffering process is started");
       }
@@ -1054,10 +1085,14 @@ public class HistoryLoader {
             // it uses the oldest timestamp
             if (oldestTimestamp.before(getHistoryConfiguration().getTimespan().getEnd())) {
               loadedUntilTime = oldestTimestamp;
-              LOG.debug("Buffering: Didn't find any matching dates, using the oldest timestamp");
+              if (LOG.isDebugEnabled()) {
+                LOG.debug("Buffering: Didn't find any matching dates, using the oldest timestamp");
+              }
             }
             else {
-              LOG.debug("Buffering: The oldest timestamp is the end timestamp.");
+              if (LOG.isDebugEnabled()) {
+                LOG.debug("Buffering: The oldest timestamp is the end timestamp.");
+              }
             }
           }
           
@@ -1076,6 +1111,13 @@ public class HistoryLoader {
               }
             }
           }
+        }
+        
+        if (isStopBufferingThread()) {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Buffering thread were interrupted from the loading loop");
+          }
+          continue;
         }
         
         // Registers that we want to load the given tags.
@@ -1113,10 +1155,10 @@ public class HistoryLoader {
           }
           else {
             endTimestamp = estimateEndTimestamp(tagsToLoad.size(), startTimestamp, TARGET_MS_OF_LOADING_PER_BUNCH);
-          }
-          
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Loading history at speed: %.2f hours of data per second", tagLoadingSpeedEstimate.getSpeed() / (60.0*60.0)));
+            
+            if (LOG.isDebugEnabled()) {
+              LOG.debug(String.format("Loading history at speed: %.2f hours of data per second", tagLoadingSpeedEstimate.getSpeed() / (60.0*60.0)));
+            }
           }
           
           // Loads the history

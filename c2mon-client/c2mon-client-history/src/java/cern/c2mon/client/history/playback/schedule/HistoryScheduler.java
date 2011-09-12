@@ -249,7 +249,7 @@ public class HistoryScheduler {
     final long currentTime = historyPlayer.getPlaybackControl().getClockTime();
 
     // iterate over the data tag IDs which should be updated
-    for (final HistoryUpdateId historyUpdateId : historyUpdateIds) {
+    for (final HistoryUpdateId historyUpdateId : sortedIds) {
       if (historyPlayer.getHistoryLoader().getHistoryStore().isTagInitialized(historyUpdateId)) {
         // Gets the current value of the tag from the history store
         final HistoryUpdate historyValue = historyPlayer.getHistoryLoader().getHistoryStore().getTagValue(historyUpdateId, currentTime);

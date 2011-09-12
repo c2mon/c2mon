@@ -101,9 +101,10 @@ public class HistoryRecordBean {
     if (this.logDate != null) {
       this.logDate = TimeZoneUtil.convertDateTimezone(newTimeZone, this.logDate, timeZone);
     }
-    if (this.tagTime != null) {
-      this.tagTime = TimeZoneUtil.convertDateTimezone(newTimeZone, this.tagTime, timeZone);
-    }
+    // source time always have unknown time zone 
+//    if (this.tagTime != null) {
+//      this.tagTime = TimeZoneUtil.convertDateTimezone(newTimeZone, this.tagTime, timeZone);
+//    }
     if (this.daqTime != null) {
       this.daqTime = TimeZoneUtil.convertDateTimezone(newTimeZone, this.daqTime, timeZone);
     }

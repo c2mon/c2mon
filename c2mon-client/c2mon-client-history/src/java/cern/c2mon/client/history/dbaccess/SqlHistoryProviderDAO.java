@@ -345,24 +345,38 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       return result;
     }
 
+    final List<Long> requests = new ArrayList<Long>(Arrays.asList(tagIds));
+    
     // Opens a session where the data is received from
     final SqlSession session = this.sessionFactory.openSession();
-    final List<HistoryRecordBean> records;
+    final List<HistoryRecordBean> allRecords = new ArrayList<HistoryRecordBean>();
     try {
-      final HistoryMapper historyMapper = getHistoryMapper(session);
-      records = historyMapper.getDailySnapshotRecords(new DailySnapshotRequestBean(tagIds, from, to));
+      while (requests.size() > 0) {
+        final HistoryMapper historyMapper = getHistoryMapper(session);
+        int toIndex = MAXIMUM_NUMBER_OF_TAGS_PER_QUERY;
+        if (toIndex > requests.size()) {
+          toIndex = requests.size();
+        }
+        final List<Long> currentRequest = requests.subList(0, toIndex);
+        final List<HistoryRecordBean> records = historyMapper.getDailySnapshotRecords(new DailySnapshotRequestBean(currentRequest.toArray(new Long[0]), from, to));
+        allRecords.addAll(records);
+        
+        // Removes the requested elements from the list. (Also from the "requests" lists)
+        currentRequest.clear();
+        
+        fireQueryProgressChanged(id, 1.0 - (requests.size() / (double) tagIds.length));
+      }
     }
     finally {
       session.close();
     }
     
     // Converts the tags into TagValueUpdates
-    for (int i = 0; i < records.size(); i++) {
-      final HistoryTagValueUpdate tagValueUpdate = BeanConverterUtil.toTagValueUpdate(records.get(i), this.clientDataTagRequestCallback);
+    for (final HistoryRecordBean bean : allRecords) {
+      final HistoryTagValueUpdate tagValueUpdate = BeanConverterUtil.toTagValueUpdate(bean, this.clientDataTagRequestCallback);
       if (tagValueUpdate != null) {
         result.add(tagValueUpdate);
       }
-      fireQueryProgressChanged(id, i / (double) tagIds.length);
     }
 
     fireQueryProgressChanged(id, 1.0);
