@@ -77,6 +77,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
   /**
    * Reference to Equipment configuration bean.
    */
+  @Autowired
   private EquipmentConfigHandler equipmentConfigHandler;
   
   /**
@@ -100,13 +101,12 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    */
   @Autowired
   public ProcessConfigHandlerImpl(final ProcessFacade processFacade, final ProcessCache processCache, 
-                              final ProcessDAO processDAO, final EquipmentConfigHandler equipmentConfigHandler, 
-                              final ControlTagConfigHandler controlTagConfigHandler, final JmsContainerManager jmsContainerManager) {
+                              final ProcessDAO processDAO, final ControlTagConfigHandler controlTagConfigHandler, 
+                              final JmsContainerManager jmsContainerManager) {
     super();
     this.processFacade = processFacade;
     this.processCache = processCache;
-    this.processDAO = processDAO;
-    this.equipmentConfigHandler = equipmentConfigHandler;
+    this.processDAO = processDAO;    
     this.controlTagConfigHandler = controlTagConfigHandler;
     this.jmsContainerManager = jmsContainerManager;
   }
