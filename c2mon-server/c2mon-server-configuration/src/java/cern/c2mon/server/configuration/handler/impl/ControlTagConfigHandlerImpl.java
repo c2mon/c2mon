@@ -53,6 +53,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   
   private SubEquipmentFacade subEquipmentFacade; 
   
+  @Autowired
   private RuleTagConfigHandler ruleTagConfigHandler;
   
   @Autowired
@@ -63,13 +64,11 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   public ControlTagConfigHandlerImpl(ControlTagCache controlTagCache,
       ControlTagFacade controlTagFacade, DataTagFacade dataTagFacade,
       EquipmentFacade equipmentFacade,
-      ControlTagLoaderDAO controlTagLoaderDAO, TagLocationService tagLocationService, SubEquipmentFacade subEquipmentFacade,
-      final RuleTagConfigHandler ruleTagConfigHandler) {
+      ControlTagLoaderDAO controlTagLoaderDAO, TagLocationService tagLocationService, SubEquipmentFacade subEquipmentFacade) {
     super(controlTagLoaderDAO, controlTagFacade, controlTagCache, tagLocationService);    
     this.dataTagFacade = dataTagFacade;
     this.equipmentFacade = equipmentFacade; 
     this.subEquipmentFacade = subEquipmentFacade;
-    this.ruleTagConfigHandler = ruleTagConfigHandler;
   }
 
   /**
