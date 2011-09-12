@@ -64,10 +64,10 @@ public class C2MonClientApiTestDaoTest {
     
     @Test
     public void testGetDeviceRuleMetric() throws Exception {
-        MetricDef def = dao.getDeviceRuleMetric("P_CLIC01");        
+        MetricDef def = dao.getDeviceRuleMetric("P_CLIC_01");        
         assertEquals(100,def.getRuleTagId());
 
-        def = dao.getDeviceRuleMetric("P_CLIC02");        
+        def = dao.getDeviceRuleMetric("P_CLIC_02");        
         assertEquals(222,def.getRuleTagId());
 
     }

@@ -27,7 +27,7 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
 
         StringBuilder sql = new StringBuilder(
                 "select metric_data_tag_id, device || '/' || property || '/' || field metric_name, metric_rule_tag_id from dmn_metric_v "
-                        + "order by metric_data_tag_id");
+                        + " order by metric_data_tag_id"); 
 
         Object[] args = null;
 
@@ -54,7 +54,7 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
                         + "(select process_id from dmn_process_v where process_name=?)) "
                         + "order by metric_data_tag_id");
 
-        Object[] args = null;
+   //     Object[] args = null;
 
         RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
 

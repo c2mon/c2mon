@@ -7,8 +7,8 @@ CREATE TABLE dmn_equipment_v (
 );
 
 
-INSERT INTO dmn_equipment_v (equipment_name,process_name,equipment_rule_tag_id) VALUES ('TESTDEVICE1','P_CLIC01',100);
-INSERT INTO dmn_equipment_v (equipment_name,process_name,equipment_rule_tag_id) VALUES ('TESTDEVICE2','P_CLIC02',222);
+INSERT INTO dmn_equipment_v (equipment_name,process_name,equipment_rule_tag_id) VALUES ('TESTDEVICE1','P_CLIC_01',100);
+INSERT INTO dmn_equipment_v (equipment_name,process_name,equipment_rule_tag_id) VALUES ('TESTDEVICE2','P_CLIC_02',222);
 
 
 CREATE TABLE dmn_metric_v (    
