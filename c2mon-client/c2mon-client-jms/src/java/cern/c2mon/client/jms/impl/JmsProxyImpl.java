@@ -455,14 +455,14 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
       try {
         TextMessage message = session.createTextMessage(jsonRequest.toJson());
-        TemporaryQueue replyQueue = session.createTemporaryQueue();
+        TemporaryQueue replyQueue = session.createTemporaryQueue();        
+        MessageConsumer consumer = session.createConsumer(replyQueue);
         try {
-          message.setJMSReplyTo(replyQueue);     
+          message.setJMSReplyTo(replyQueue);
           MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
           producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
           producer.setTimeToLive(timeout);
-          producer.send(message);       
-          MessageConsumer consumer = session.createConsumer(replyQueue);        
+          producer.send(message);                         
           Message replyMessage = consumer.receive(timeout);
           if (replyMessage == null) {
             LOGGER.error("No reply received from server on ClientRequest.");          
@@ -470,6 +470,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           }
           return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText()); 
         } finally {
+          if (consumer != null) {
+            consumer.close();
+          }          
           replyQueue.delete();
         }                        
       } finally {        
