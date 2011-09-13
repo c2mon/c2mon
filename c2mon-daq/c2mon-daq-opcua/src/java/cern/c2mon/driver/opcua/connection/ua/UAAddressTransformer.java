@@ -62,7 +62,7 @@ public final class UAAddressTransformer {
     /**
      * The localhost string used in classic OPC DA.
      */
-    private static final String LOCALHOST = "@LOCALHOST";
+    private static final String LOCALHOST = "@LOCALSERVER";
 
     /**
      * Private constructor. There should be no instances of this class.

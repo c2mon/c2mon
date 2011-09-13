@@ -121,7 +121,8 @@ public class EndpointControllerTest {
     
     @Test
     public void testOnNewTagValue() {
-        ISourceDataTag currentTag = new SourceDataTag(1L, "", false);
+        DataTagAddress address = new DataTagAddress();
+        ISourceDataTag currentTag = new SourceDataTag(1L, "", false, (short) 0, "String", address );
         Object tagValue = "asd";
         long milisecTimestamp = 1L;
         expect(sender.sendTagFiltered(currentTag, tagValue, milisecTimestamp))
@@ -281,7 +282,7 @@ public class EndpointControllerTest {
         initializeEndpoint();
         
         expect(endpoint.getState()).andReturn(STATE.INITIALIZED);
-        ISourceCommandTag commandTag = createMock(ISourceCommandTag.class);
+        ISourceCommandTag commandTag = new SourceCommandTag(1L, "asd");
         endpoint.addCommandTag(commandTag);
         
         replay(endpoint);
@@ -296,7 +297,7 @@ public class EndpointControllerTest {
         initializeEndpoint();
         
         expect(endpoint.getState()).andReturn(STATE.INITIALIZED);
-        ISourceCommandTag commandTag = createMock(ISourceCommandTag.class);
+        ISourceCommandTag commandTag = new SourceCommandTag(1L, "asd");
         endpoint.removeCommandTag(commandTag);
         
         replay(endpoint);
@@ -345,9 +346,10 @@ public class EndpointControllerTest {
     public void testOnAddDataTag() {
         initializeEndpoint();
         
-        expect(endpoint.getState()).andReturn(STATE.INITIALIZED);
-        ISourceDataTag dataTag = createMock(ISourceDataTag.class);
+        expect(endpoint.getState()).andReturn(STATE.INITIALIZED).anyTimes();
+        ISourceDataTag dataTag = new SourceDataTag(1L, "asd", false);
         endpoint.addDataTag(dataTag);
+        endpoint.refreshDataTags(isA(Collection.class));
         
         replay(endpoint);
         ChangeReport changeReport = new ChangeReport(1L);
@@ -361,7 +363,7 @@ public class EndpointControllerTest {
         initializeEndpoint();
         
         expect(endpoint.getState()).andReturn(STATE.INITIALIZED);
-        ISourceDataTag dataTag = createMock(ISourceDataTag.class);
+        ISourceDataTag dataTag = new SourceDataTag(1L, "asd", false);
         endpoint.removeDataTag(dataTag);
         
         replay(endpoint);
