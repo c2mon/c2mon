@@ -223,29 +223,29 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       }
       
       //send events to Process, convert the responses and introduce them into the existing report
-      for (Long processId : processLists.keySet()) {
-        List<Change> processChangeEvents = processLists.get(processId);
-        if (processFacade.isRunning(processId)) {
-          ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
-          for (ChangeReport changeReport : processReport.getChangeReports()) {
-            ConfigurationElementReport convertedReport = 
-              ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
-            daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);   
-            //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
-            if (changeReport.isReboot()) {
-              report.addProcessToReboot(processCache.get(processId).getName()); 
-              elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
-              //TODO set flag & tag to indicate that process restart is needed
-            } else if (changeReport.isFail()) {
-              report.setStatus(Status.FAILURE);
-              report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
-              elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
-            }
-          }
-        } else {
-          //TODO set process reconfiguraton tag to restart as not running
-        }
-      }
+//      for (Long processId : processLists.keySet()) {
+//        List<Change> processChangeEvents = processLists.get(processId);
+//        if (processFacade.isRunning(processId)) {
+//          ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
+//          for (ChangeReport changeReport : processReport.getChangeReports()) {
+//            ConfigurationElementReport convertedReport = 
+//              ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
+//            daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);   
+//            //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
+//            if (changeReport.isReboot()) {
+//              report.addProcessToReboot(processCache.get(processId).getName()); 
+//              elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
+//              //TODO set flag & tag to indicate that process restart is needed
+//            } else if (changeReport.isFail()) {
+//              report.setStatus(Status.FAILURE);
+//              report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
+//              elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
+//            }
+//          }
+//        } else {
+//          //TODO set process reconfiguraton tag to restart as not running
+//        }
+//      }
       
       //save Configuration element status information in the DB tables
       for (ConfigurationElement element : configElements) {
