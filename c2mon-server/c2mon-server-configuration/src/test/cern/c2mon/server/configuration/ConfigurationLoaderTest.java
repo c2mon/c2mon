@@ -263,9 +263,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @DirtiesContext
   public void testCreateUpdateRemoveCommandTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //the mocked ProcessCommmunicationManager can return an empty report (expect 3 calls)
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
     TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
     ConfigurationReport report = configurationLoader.applyConfiguration(3, timSessionInfo.getSessionId());
@@ -309,9 +309,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @DirtiesContext
   public void testCreateUpdateRemoveDataTag() throws ConfigurationException, InterruptedException, ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //the mocked ProcessCommmunicationManager can return an empty report (expect 3 calls for create, update and remove)    
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
     TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
     ConfigurationReport report = configurationLoader.applyConfiguration(1, timSessionInfo.getSessionId());
@@ -401,7 +401,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @DirtiesContext
   public void testCreateUpdateRemoveRuleTag() throws InterruptedException, ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //the mocked ProcessCommmunicationManager will be called once when creating the datatag to base the rule on
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
     TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
     //insert datatag to base rule on
@@ -456,7 +456,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   public void testRuleRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //insert rule and tag as in previous test
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
     TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
     //insert datatag to base rule on
@@ -471,7 +471,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     //check rule is removed also on tag removal
     
     reset(mockManager);
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
     //test removal of tag 5000000 removes the rule also
     configurationLoader.applyConfiguration(7, timSessionInfo.getSessionId()); 
@@ -501,7 +501,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     //test remove tag    
     reset(mockManager);    
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
     
     //test removal of tag 5000000 removes the alarm also
@@ -527,7 +527,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   public void testCreateUpdateRemoveEquipment() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //called once when updating the equipment; 
     //mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
+    //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
 
       @Override
       public ConfigurationChangeEventReport answer() throws Throwable {
