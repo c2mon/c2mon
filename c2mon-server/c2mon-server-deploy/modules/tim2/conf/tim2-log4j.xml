@@ -181,11 +181,11 @@
     <appender-ref ref="FileAppender"/>
   </logger>
   <logger name="cern.tim"  additivity="false">
-    <level value="debug"/>
+    <level value="all"/>
     <appender-ref ref="FileAppender"/>
   </logger>
   <logger name="cern.c2mon"  additivity="false">
-    <level value="debug"/>
+    <level value="all"/>
     <appender-ref ref="FileAppender"/>
   </logger>
   <logger name="cern.c2mon.server.shorttermlog"  additivity="false">
