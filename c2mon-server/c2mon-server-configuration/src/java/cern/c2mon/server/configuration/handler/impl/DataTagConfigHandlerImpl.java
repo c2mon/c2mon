@@ -184,55 +184,60 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
    */
   @Transactional("cacheTransactionManager")
   @Override
-  public List<ProcessChange> removeDataTag(final Long id, final ConfigurationElementReport elementReport) {  
-    DataTag dataTag = tagCache.get(id);
-    dataTag.getWriteLock().lock();
-    try {     
-      if (!dataTag.getRuleIds().isEmpty()) {
-        LOGGER.debug("Removing Rules dependent on DataTag " + dataTag.getId());
-        for (Long ruleId : new ArrayList<Long>(dataTag.getRuleIds())) {
-          if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
-            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-            elementReport.addSubReport(newReport);
-            ruleTagConfigHandler.removeRuleTag(ruleId, newReport); 
-          }          
-        }
-      }
-      if (!dataTag.getAlarmIds().isEmpty()) {
-        LOGGER.debug("Removing Alarms dependent on DataTag " + dataTag.getId());
-        for (Long alarmId : new ArrayList<Long>(dataTag.getAlarmIds())) {
-          ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
-          elementReport.addSubReport(alarmReport);
-          alarmConfigHandler.removeAlarm(alarmId, alarmReport);
-        }        
-      } 
-      //not possible below as removed from the cache by that point!!! (cache persistence is aynchronous)
-      //((DataTagFacade) commonTagFacade).invalidate(dataTag, new DataTagQuality(DataTagQuality.REMOVED, "The DataTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
-      configurableDAO.deleteItem(dataTag.getId());
-      tagCache.remove(dataTag.getId());           
-      dataTag.getWriteLock().unlock();
-      //outside above lock as locks equipment (lock hierarchy: never lock equipment after tag)
-      try {
-        equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
-      } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.warn("Unable to locate Equipment with id " + dataTag.getEquipmentId() + "in the cache, when attempting to remove a Tag reference from it.");
-      }      
-    } catch (Exception ex) {
-      //commonTagFacade.setStatus(dataTag, Status.RECONFIGURATION_ERROR);
-      elementReport.setFailure("Exception caught while removing datatag", ex);
-      LOGGER.error("Exception caught while removing datatag with id " + id + "; rolling back DB transaction.", ex);
-      throw new UnexpectedRollbackException("Exception caught while removing datatag.", ex);      
-    } finally {
-      if (dataTag.getWriteLock().isHeldByCurrentThread()) {
-        dataTag.getWriteLock().unlock();
-      }      
-    }
-    //if successful so far add remove event for DAQ layer
-    DataTagRemove removeEvent = new DataTagRemove();  
-    removeEvent.setDataTagId(id);
-    removeEvent.setEquipmentId(dataTag.getEquipmentId());
+  public List<ProcessChange> removeDataTag(final Long id, final ConfigurationElementReport elementReport) {
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), removeEvent));
+    try {
+      DataTag dataTag = tagCache.get(id);
+      dataTag.getWriteLock().lock();
+      try {     
+        if (!dataTag.getRuleIds().isEmpty()) {
+          LOGGER.debug("Removing Rules dependent on DataTag " + dataTag.getId());
+          for (Long ruleId : new ArrayList<Long>(dataTag.getRuleIds())) {
+            if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
+              ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+              elementReport.addSubReport(newReport);
+              ruleTagConfigHandler.removeRuleTag(ruleId, newReport); 
+            }          
+          }
+        }
+        if (!dataTag.getAlarmIds().isEmpty()) {
+          LOGGER.debug("Removing Alarms dependent on DataTag " + dataTag.getId());
+          for (Long alarmId : new ArrayList<Long>(dataTag.getAlarmIds())) {
+            ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
+            elementReport.addSubReport(alarmReport);
+            alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+          }        
+        } 
+        //not possible below as removed from the cache by that point!!! (cache persistence is aynchronous)
+        //((DataTagFacade) commonTagFacade).invalidate(dataTag, new DataTagQuality(DataTagQuality.REMOVED, "The DataTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
+        configurableDAO.deleteItem(dataTag.getId());
+        tagCache.remove(dataTag.getId());           
+        dataTag.getWriteLock().unlock();
+        //outside above lock as locks equipment (lock hierarchy: never lock equipment after tag)
+        try {
+          equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
+        } catch (CacheElementNotFoundException cacheEx) {
+          LOGGER.warn("Unable to locate Equipment with id " + dataTag.getEquipmentId() + "in the cache, when attempting to remove a Tag reference from it.");
+        }      
+      } catch (Exception ex) {
+        //commonTagFacade.setStatus(dataTag, Status.RECONFIGURATION_ERROR);
+        elementReport.setFailure("Exception caught while removing datatag", ex);
+        LOGGER.error("Exception caught while removing datatag with id " + id + "; rolling back DB transaction.", ex);
+        throw new UnexpectedRollbackException("Exception caught while removing datatag.", ex);      
+      } finally {
+        if (dataTag.getWriteLock().isHeldByCurrentThread()) {
+          dataTag.getWriteLock().unlock();
+        }      
+      }
+      //if successful so far add remove event for DAQ layer
+      DataTagRemove removeEvent = new DataTagRemove();  
+      removeEvent.setDataTagId(id);
+      removeEvent.setEquipmentId(dataTag.getEquipmentId());      
+      processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), removeEvent));
+    } catch (CacheElementNotFoundException e) {
+      LOGGER.debug("Attempting to remove a non-existent DataTag - no action taken.");
+      elementReport.setWarning("Attempting to removed a non-existent DataTag");
+    }    
     return processChanges;
   }
   

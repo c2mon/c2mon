@@ -21,6 +21,7 @@ import cern.tim.server.cache.DataTagFacade;
 import cern.tim.server.cache.EquipmentFacade;
 import cern.tim.server.cache.SubEquipmentFacade;
 import cern.tim.server.cache.TagLocationService;
+import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.cache.loading.ControlTagLoaderDAO;
 import cern.tim.server.common.control.ControlTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
@@ -149,48 +150,54 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   @Override
   @Transactional("cacheTransactionManager")
   public List<ProcessChange> removeControlTag(Long id, ConfigurationElementReport tagReport) {
-    ControlTag controlTag = tagCache.get(id);
     try {
+      ControlTag controlTag = tagCache.get(id);
       controlTag.getWriteLock().lock();
-      if (!controlTag.getRuleIds().isEmpty()) {
-        LOGGER.debug("Removing rules dependent on ControlTag " + controlTag.getId());
-        for (Long ruleId : controlTag.getRuleIds()) {
-          ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-          tagReport.addSubReport(newReport);
-          ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
-        }       
-      } 
-      if (!controlTag.getAlarmIds().isEmpty()) {
-        LOGGER.debug("Removing Alarms dependent on ControlTag " + controlTag.getId());
-        for (Long alarmId : new ArrayList<Long>(controlTag.getAlarmIds())) {
-          ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
-          tagReport.addSubReport(alarmReport);
-          alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+      try {        
+        if (!controlTag.getRuleIds().isEmpty()) {
+          LOGGER.debug("Removing rules dependent on ControlTag " + controlTag.getId());
+          for (Long ruleId : controlTag.getRuleIds()) {
+            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+            tagReport.addSubReport(newReport);
+            ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
+          }       
         } 
+        if (!controlTag.getAlarmIds().isEmpty()) {
+          LOGGER.debug("Removing Alarms dependent on ControlTag " + controlTag.getId());
+          for (Long alarmId : new ArrayList<Long>(controlTag.getAlarmIds())) {
+            ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
+            tagReport.addSubReport(alarmReport);
+            alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+          } 
+        } 
+        //dataTagFacade.invalidate(controlTag, new DataTagQuality(DataTagQuality.REMOVED, "The ControlTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
+        configurableDAO.deleteItem(controlTag.getId());
+        tagCache.remove(controlTag.getId());    
+        //if the ControlTag has no Address, do not send anything to the DAQ so return null
+        if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTag)) {
+          controlTag.getWriteLock().unlock();
+          //if the ControlTag is associated to some Equipment(or SubEquipment) inform the DAQ   
+          DataTagRemove removeEvent = new DataTagRemove();
+          removeEvent.setDataTagId(id);
+          return getProcessChanges(removeEvent, id);        
+        } else {
+          return null;     
+        }
+      } catch (Exception ex) {
+        //commonTagFacade.setStatus(controlTag, Status.RECONFIGURATION_ERROR);
+        LOGGER.error("Exception caught while removing a control tag.", ex);
+        tagReport.setFailure("Unable to remove ControlTag with id " + id); 
+        throw new ConfigurationException(ConfigurationException.UNDEFINED, ex);
+      } finally {
+        if (controlTag.getWriteLock().isHeldByCurrentThread()) {
+          controlTag.getWriteLock().unlock();
+        }      
       } 
-      //dataTagFacade.invalidate(controlTag, new DataTagQuality(DataTagQuality.REMOVED, "The ControlTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
-      configurableDAO.deleteItem(controlTag.getId());
-      tagCache.remove(controlTag.getId());    
-      //if the ControlTag has no Address, do not send anything to the DAQ so return null
-      if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTag)) {
-        controlTag.getWriteLock().unlock();
-        //if the ControlTag is associated to some Equipment(or SubEquipment) inform the DAQ   
-        DataTagRemove removeEvent = new DataTagRemove();
-        removeEvent.setDataTagId(id);
-        return getProcessChanges(removeEvent, id);        
-      } else {
-        return null;     
-      }
-    } catch (Exception ex) {
-      //commonTagFacade.setStatus(controlTag, Status.RECONFIGURATION_ERROR);
-      LOGGER.error("Exception caught while removing a control tag.", ex);
-      tagReport.setFailure("Unable to remove ControlTag with id " + id); 
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, ex);
-    } finally {
-      if (controlTag.getWriteLock().isHeldByCurrentThread()) {
-        controlTag.getWriteLock().unlock();
-      }      
-    }       
+    } catch (CacheElementNotFoundException e) {
+      LOGGER.debug("Attempting to remove a non-existent ControlTag - no action taken.");
+      tagReport.setWarning("Attempting to removed a non-existent ControlTag");
+      return null;
+    }          
   }
 
   /**

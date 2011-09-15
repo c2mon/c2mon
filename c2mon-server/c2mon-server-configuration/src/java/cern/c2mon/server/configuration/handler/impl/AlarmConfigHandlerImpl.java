@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.AlarmFacade;
+import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.cache.loading.AlarmLoaderDAO;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.shared.client.configuration.ConfigurationElement;
@@ -149,19 +150,24 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
   @Override
   @Transactional("cacheTransactionManager")
   public void removeAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
-    Alarm alarm = alarmCache.get(alarmId);    
     try {
+      Alarm alarm = alarmCache.get(alarmId);
       alarm.getWriteLock().lock();
-      removeDataTagReference(alarm);
-      alarmDAO.deleteItem(alarmId);
-      alarmCache.remove(alarmId);
-    } catch (Exception ex) {      
-      LOGGER.error("Exception caught while removing Alarm " + alarmId, ex);
-      alarmReport.setFailure("Unable to remove Alarm with id " + alarmId);
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, ex);
-    } finally {
-      alarm.getWriteLock().unlock();
-    }
+      try {        
+        removeDataTagReference(alarm);
+        alarmDAO.deleteItem(alarmId);
+        alarmCache.remove(alarmId);
+      } catch (Exception ex) {      
+        LOGGER.error("Exception caught while removing Alarm " + alarmId, ex);
+        alarmReport.setFailure("Unable to remove Alarm with id " + alarmId);
+        throw new ConfigurationException(ConfigurationException.UNDEFINED, ex);
+      } finally {
+        alarm.getWriteLock().unlock();
+      }
+    } catch (CacheElementNotFoundException e) {
+      LOGGER.debug("Attempting to remove a non-existent Alarm - no action taken.");
+      alarmReport.setWarning("Attempting to removed a non-existent Alarm");
+    }    
   }
 
   /**
