@@ -123,7 +123,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
     this.logTimestamp = logTimestamp;
     this.description = description;
     this.mode = mode;
-    this.isSimulated = true;
+    this.isSimulated = false;
     this.alarms = new ArrayList<AlarmValue>();
     if (alarms != null) {
       this.alarms.addAll(Arrays.asList(alarms));
