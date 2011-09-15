@@ -32,8 +32,8 @@
   parts of the system, change the "level" attribute of the appropriate logger.
 
 -->
-<log4j:configuration debug="true" 
-                     threshold="debug"
+<log4j:configuration debug="false" 
+                     threshold="all"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
   <renderer  renderedClass="cern.tim.shared.daq.datatag.SourceDataTagValue"
