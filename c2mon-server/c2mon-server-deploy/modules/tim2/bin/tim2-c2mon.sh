@@ -413,8 +413,9 @@ silentcheck() {
 #  instruction=${1}
 
   # if not currently on the correct machine, run the command via ssh
-  if [ `hostname -s` != $C2MON_HOST ] ; then    
-    ssh -2 $C2MON_HOST $0 $1 $2
+  if [ `hostname -s` != $C2MON_HOST ] ; then        
+    ssh -2 $C2MON_HOST -o "SendEnv C2MON_PRIMARY_HOST C2MON_SECOND_HOST TC_HOST\
+" "cd '$C2MON_HOME'/bin; ./c2mon.sh $1 $2"
   # else run locally
   else
     #make tmp dir on correct machine  
