@@ -7,7 +7,8 @@
 # When deploying, adjust the variables in the first two sections
 # below.
 #
-# HOME variable must be set before calling this script.
+# HOME variable must be set before calling this script, as must
+# C2MON host variables
 
 ########################
 # DEPLOYMENT VARIABLES #
@@ -38,8 +39,15 @@ C2MON_JMX_REMOTE_PASSWD=$C2MON_HOME/conf/.jmxremote.passwd
 #first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
 # make sure C2MON_PRIMARY_HOST is set correctly
 if [ -z $C2MON_PRIMARY_HOST ]; then 	
-   # use default if not
-   export C2MON_PRIMARY_HOST=cs-ccr-tim11
+   # exit if not
+   echo "C2MON_PRIMARY_HOST variable is not set"
+   exit 1;
+fi
+#warn if second host not set
+if [ -z $C2MON_SECOND_HOST ] && [ "$2" == "second" ]; then 	
+   # exit if not
+   echo "warning: C2MON_SECOND_HOST variable is not set, so cannot run in cluster mode"
+   exit 1
 fi
 
 
@@ -51,8 +59,6 @@ fi
 TC_HOST=cs-ccr-tim11
 #Terracotta installation directory
 TERRACOTTA_HOME=$HOME/opt/terracotta
-#second C2MON host (must be set if running server cluster)
-C2MON_SECOND_HOST=cs-ccr-tim12
 #terracotta server name (one of them)
 #TC_NAME=server1
 #terracotta DSO port
@@ -90,9 +96,7 @@ else
 fi
 
 HOST_TMP_DIR=$C2MON_HOME/tmp/$C2MON_HOST
-if [ ! -d "$HOST_TMP_DIR" ]; then
-    mkdir $HOST_TMP_DIR
-fi
+
   
 #set correct PID file
 C2MON_PIDFILE=$HOST_TMP_DIR/c2mon.pid
@@ -413,6 +417,10 @@ silentcheck() {
     ssh -2 $C2MON_HOST $0 $1 $2
   # else run locally
   else
+    #make tmp dir on correct machine  
+    if [ ! -d "$HOST_TMP_DIR" ]; then
+	mkdir $HOST_TMP_DIR
+    fi
 
     case "$1" in
      'start')
