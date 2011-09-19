@@ -8,13 +8,18 @@
 # below.
 #
 # HOME variable must be set before calling this script, as must
-# C2MON host variables
+# C2MON host variables unless they are set in setenv.sh
 
 ########################
 # DEPLOYMENT VARIABLES #
 ########################
 
 #export Java for TC script also!
+
+#set env. variables if script is available
+if [ -f setenv.sh ] ; then
+  . ./setenv.sh
+fi
 
 # make sure JAVA_HOME is set correctly
 if [ -z $JAVA_HOME ]; then 	
@@ -414,7 +419,7 @@ silentcheck() {
 
   # if not currently on the correct machine, run the command via ssh
   if [ `hostname -s` != $C2MON_HOST ] ; then        
-    ssh -2 $C2MON_HOST -o "SendEnv C2MON_PRIMARY_HOST C2MON_SECOND_HOST TC_HOST" "cd '$C2MON_HOME'/bin; ./c2mon.sh $1 $2"
+    ssh -2 $C2MON_HOST "cd '$C2MON_HOME'/bin; $0 $1 $2"
   # else run locally
   else
     #make tmp dir on correct machine  

@@ -66,6 +66,10 @@
 					<file name=".c2mon.properties" sourceDir="/user/timtest/"
 						mask="400" />
 				</directory>
+        <directory name="bin">        
+          <file name="tim2.sh" sourceDir="/user/timtest/rep/c2mon/server"
+            mask="700" />          
+        </directory>
 			</deployment>
 		</application>
     
