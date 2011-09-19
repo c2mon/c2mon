@@ -80,7 +80,7 @@
             mask="400" />
         </directory>
         <directory name="bin">        
-          <file name="tim2.sh" sourceDir="/user/timtest/dev/rep/c2mon/c2mon/server"
+          <file name="tim2.sh" sourceDir="/user/timtest/dev/rep/c2mon/server"
             mask="700" />          
         </directory>
       </deployment>
