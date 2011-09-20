@@ -18,11 +18,16 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 
 import javax.jms.JMSException;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.math.LongRange;
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,29 +77,68 @@ public class RequestHandlerImplTest {
   /**
    * Checks JmsProxy method is called correctly
    * @throws JMSException
+   * @throws InterruptedException 
    */
   @Test
-  public void getTagValues() throws JMSException {
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(null);
+  public void getTagValues() throws JMSException, InterruptedException {
+    Collection<Object> returnCollection = Arrays.asList(new Object());
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(returnCollection);
     
     EasyMock.replay(jmsProxy);
     
-    requestHandlerImpl.requestTagValues(Collections.EMPTY_LIST);
+    requestHandlerImpl.requestTagValues(Arrays.asList(100L));
+
+    EasyMock.verify(jmsProxy);
+  }
+  
+  /**
+   * Checks JmsProxy method is not called for empty list request.
+   * @throws JMSException
+   * @throws InterruptedException 
+   */
+  @Test
+  public void getNoTagValues() throws JMSException, InterruptedException {    
+    EasyMock.replay(jmsProxy);
     
+    requestHandlerImpl.requestTagValues(Collections.EMPTY_LIST);
+ 
     EasyMock.verify(jmsProxy);
   }
   
   /**
    * Checks JmsProxy method is called correctly
    * @throws JMSException
+   * @throws InterruptedException 
    */
   @Test
-  public void getTags() throws JMSException {
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(null);
+  public void getTags() throws JMSException, InterruptedException {
+    Collection<Object> returnCollection = Arrays.asList(new Object());
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(returnCollection);
     
     EasyMock.replay(jmsProxy);
     
-    requestHandlerImpl.requestTags(Collections.EMPTY_LIST);
+    requestHandlerImpl.requestTags(Arrays.asList(100L));   
+    
+    EasyMock.verify(jmsProxy);
+  }
+  
+  /**
+   * Tests that a request is split into bunches of 250 and results are gathered in the correct way.
+   * @throws JMSException 
+   */
+  @Test
+  public void getManyTags() throws JMSException {
+    Collection<Object> returnCollection = Arrays.asList(new Object(), new Object());
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(returnCollection).times(40);
+    
+    EasyMock.replay(jmsProxy);
+    
+    LongRange range = new LongRange(1, 10000);
+    
+    long[] arrayRange = range.toArray();
+    Collection<Long> ids = Arrays.asList(ArrayUtils.toObject(arrayRange)); 
+    Collection result = requestHandlerImpl.requestTags(ids);
+    Assert.assertEquals(80,result.size());
     
     EasyMock.verify(jmsProxy);
   }

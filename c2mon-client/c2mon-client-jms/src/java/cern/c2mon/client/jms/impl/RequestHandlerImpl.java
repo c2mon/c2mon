@@ -18,16 +18,26 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.jms.JMSException;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
+import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -40,6 +50,37 @@ import cern.tim.shared.client.command.CommandTagHandle;
  *
  */
 public class RequestHandlerImpl implements RequestHandler {
+
+  /**
+   * Class logger.
+   */
+  private static final Logger LOGGER = Logger.getLogger(RequestHandlerImpl.class);
+  
+  /**
+   * The maximum number of tags in a single request. Each request
+   * runs in its own thread on the server.
+   */
+  private static final int MAX_REQUEST_SIZE = 250;
+
+  /**
+   * Core number of threads in executor.
+   */
+  private static final int CORE_POOL_SIZE = 5;
+
+  /**
+   * Max number of exector threads.
+   */
+  private static final int MAX_POOL_SIZE = 10;
+
+  /**
+   * Thread idle timeout in executor (in seconds), including core threads.
+   */
+  private static final long KEEP_ALIVE_TIME = 60;
+
+  /**
+   * Thread pool queue size.
+   */
+  private static final int QUEUE_SIZE = 10;
 
   /**
    * Ref to JmsProxy bean.
@@ -58,6 +99,13 @@ public class RequestHandlerImpl implements RequestHandler {
   private int requestTimeout;
   
   /**
+   * Executor for submitting requests to the server.
+   */
+  private ThreadPoolExecutor executor = 
+    new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS, 
+              new ArrayBlockingQueue<Runnable>(QUEUE_SIZE), new ThreadPoolExecutor.CallerRunsPolicy());
+  
+  /**
    * Constructor.
    * @param jmsProxy the proxy bean
    */
@@ -65,6 +113,7 @@ public class RequestHandlerImpl implements RequestHandler {
   public RequestHandlerImpl(final JmsProxy jmsProxy) {
     super();
     this.jmsProxy = jmsProxy;
+    executor.allowCoreThreadTimeOut(true);
   }
 
   @Override
@@ -82,22 +131,55 @@ public class RequestHandlerImpl implements RequestHandler {
   public Collection<TagUpdate> requestTags(final Collection<Long> tagIds) throws JMSException {
     if (tagIds == null) {
       throw new NullPointerException("requestTags(..) method called with null parameter.");
-    }
-    ClientRequestImpl<TagUpdate> clientRequest = new ClientRequestImpl<TagUpdate>(TagUpdate.class);
-    clientRequest.addTagIds(tagIds);
-    return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
+    }    
+    return executeRequest(tagIds, TagUpdate.class);
   }
   
   @Override
   public Collection<TagValueUpdate> requestTagValues(final Collection<Long> tagIds) throws JMSException {
     if (tagIds == null) {
       throw new NullPointerException("requestTagValues(..) method called with null parameter.");
-    }
-    ClientRequestImpl<TagValueUpdate> clientRequest = new ClientRequestImpl<TagValueUpdate>(TagValueUpdate.class);
-    clientRequest.addTagIds(tagIds);
-    return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
+    }    
+    return executeRequest(tagIds, TagValueUpdate.class);
   }
 
+  /**
+   * Splits and executes a id-base request, splitting the collection into smaller requests.
+   * @param <T> type of request result
+   * @param ids collection of ids to request
+   * @param clazz type of request result
+   * @return the result of the request
+   */
+  private <T extends ClientRequestResult> Collection<T> executeRequest(final Collection<Long> ids, final Class<T> clazz) {
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);    
+    Iterator<Long> it = ids.iterator();
+    Collection<Future<Collection<T>>> results = new ArrayList<Future<Collection<T>>>();
+    int counter = 0;    
+    while (it.hasNext()) {
+      while (it.hasNext() && counter < MAX_REQUEST_SIZE) {
+        clientRequest.addTagId(it.next());
+        counter++;
+      }
+      RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest);
+      results.add(executor.submit(task));
+      new ClientRequestImpl<T>(clazz);
+      counter = 0;
+    }
+    Collection<T> finalCollection = new ArrayList<T>();
+    for (Future<Collection<T>> result : results) {
+      try {
+        finalCollection.addAll(result.get());
+      } catch (InterruptedException e) {
+        LOGGER.error("InterruptedException caught while executing RequestValuesTask.", e);
+        throw new RuntimeException(e);
+      } catch (ExecutionException e) {
+        LOGGER.error("ExecutionException caught while executing RequestValuesTask.", e);
+        throw new RuntimeException(e);        
+      }
+    }
+    return finalCollection;   
+  }
+  
   /**
    * Setter method.
    * @param requestQueue the requestQueue to set
@@ -114,6 +196,27 @@ public class RequestHandlerImpl implements RequestHandler {
   @Required
   public void setRequestTimeout(final int requestTimeout) {
     this.requestTimeout = requestTimeout;
+  }
+  
+  /**
+   * This task calls the JmsProxy with the passed request
+   * and returns the requested collection.
+   * @author Mark Brightwell
+   *
+   */
+  private class RequestValuesTask<T extends ClientRequestResult> implements Callable<Collection<T>> {
+        
+    private ClientRequestImpl<T> clientRequest;
+    
+    public RequestValuesTask(ClientRequestImpl<T> clientRequest) {
+      this.clientRequest = clientRequest;
+    }
+
+    @Override
+    public Collection<T> call() throws Exception {
+      return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
+    }
+    
   }
 
 }
