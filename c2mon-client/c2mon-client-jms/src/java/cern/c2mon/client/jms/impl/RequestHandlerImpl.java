@@ -162,7 +162,7 @@ public class RequestHandlerImpl implements RequestHandler {
       }
       RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest);
       results.add(executor.submit(task));
-      new ClientRequestImpl<T>(clazz);
+      clientRequest = new ClientRequestImpl<T>(clazz);
       counter = 0;
     }
     Collection<T> finalCollection = new ArrayList<T>();
