@@ -40,7 +40,7 @@ public class HistoryProviderAvailabilityImpl implements HistoryProviderAvailabil
   public boolean isAvailable(final HistoryProviderType type) {
     switch (type) {
     case HISTORY_SHORT_TERM_LOG:
-      return DatasourceProperties.getInstance().isDatasourceAvailable();
+      return HistorySessionFactory.getInstance().isDatasourceAvailable();
     case HISTORY_EVENTS:
       return false;
     default:

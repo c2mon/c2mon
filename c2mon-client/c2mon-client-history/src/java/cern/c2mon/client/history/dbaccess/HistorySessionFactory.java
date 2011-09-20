@@ -40,6 +40,9 @@ import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
  */
 public final class HistorySessionFactory {
 
+  /** The default driver used if non is specified */
+  private static final String DEFAULT_JDBC_TIMSTLOG_DRIVER = "oracle.jdbc.OracleDriver";
+  
   /** Singleton instance */
   private static HistorySessionFactory instance = null;
 
@@ -57,7 +60,9 @@ public final class HistorySessionFactory {
    * Is Singleton and therefore private
    */
   private HistorySessionFactory() {
-
+    if (System.getProperty(HistorySystemProperties.JDBC_RO_DRIVER) == null) {
+      System.setProperty(HistorySystemProperties.JDBC_RO_DRIVER, DEFAULT_JDBC_TIMSTLOG_DRIVER);
+    }
   }
 
   /** The file path to the ibatis configuration file */
@@ -82,7 +87,7 @@ public final class HistorySessionFactory {
         Reader reader = null;
         try {
           reader = Resources.getResourceAsReader(CONFIGURATION_FILE);
-          sessionFactory = new SqlSessionFactoryBuilder().build(reader, DatasourceProperties.getInstance().getProperties());
+          sessionFactory = new SqlSessionFactoryBuilder().build(reader, System.getProperties());
         }
         catch (IOException e) {
           throw new HistoryException("Error while reading the iBatis configurations..", e);
@@ -142,10 +147,14 @@ public final class HistorySessionFactory {
 
   /**
    * 
-   * @return <code>true</code> if the data source is available.
+   * @return <code>true</code> if the data source connection string is available
    */
   public boolean isDatasourceAvailable() {
-    return DatasourceProperties.getInstance().isDatasourceAvailable();
+    return 
+      System.getProperty(HistorySystemProperties.JDBC_RO_DRIVER) != null
+      && System.getProperty(HistorySystemProperties.JDBC_RO_URL) != null
+      && System.getProperty(HistorySystemProperties.JDBC_RO_USERNAME) != null
+      && System.getProperty(HistorySystemProperties.JDBC_RO_PASSWORD) != null;
   }
 
 }

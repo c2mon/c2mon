@@ -28,10 +28,10 @@
     <environment id="development">
       <transactionManager type="JDBC" />
       <dataSource type="POOLED">
-        <property name="driver" value="${jdbc.timstlog.driver}" />
-        <property name="url" value="${jdbc.timstlog.url}" />
-        <property name="username" value="${jdbc.timstlog.user}" />
-        <property name="password" value="${jdbc.timstlog.password}" />
+        <property name="driver" value="${jdbc.ro.driver}" />
+        <property name="url" value="${jdbc.ro.url}" />
+        <property name="username" value="${jdbc.ro.user}" />
+        <property name="password" value="${jdbc.ro.password}" />
       </dataSource>
     </environment>
   </environments>
