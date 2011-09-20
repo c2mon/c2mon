@@ -16,7 +16,7 @@
 					<mail address="timdiamon-developers@cern.ch" />
 				</notification>
 			</deployment>
-		    <startscript>
+		    <startscript>        
 			  <main-class name="cern.tim.driver.common.startup.DaqStartup" >
 				  <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
 			      <preExec>
@@ -57,11 +57,15 @@
 			</deployment>
 		</application>
     
-    <application name="c2mon-daq-tim2-dev" extends="default">
-      <deployment installLocation="/user/timtest/dev/c2mon-daq-test">
+    <application name="c2mon-daq-dev" extends="default">
+      <deployment installLocation="/user/timtest/dev/c2mon-daq-dev">
         <directory name="conf">
-          <file name=".c2mon.properties" source="/user/timtest/c2mon/conf/"
+          <file name=".c2mon.properties" source="/user/timtest/dev/rep/c2mon/"
             mask="400" />
+        </directory>
+        <directory name="bin">
+          <file name="setenv.sh" source="/user/timtest/dev/rep/c2mon/daq/"
+            mask="700" />
         </directory>
       </deployment>
     </application>
