@@ -170,11 +170,6 @@
 				<artifactId>activemq-all</artifactId>
 				<version>5.3.2</version>
 			</dependency>
-            <dependency>
-                <groupId>tablelayout</groupId>
-                <artifactId>TableLayout</artifactId>
-                <version>20050920</version>
-            </dependency>
 
 			<!-- test dependencies -->
 			<dependency>
