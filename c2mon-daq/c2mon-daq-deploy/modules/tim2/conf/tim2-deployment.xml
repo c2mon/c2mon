@@ -63,6 +63,8 @@
         <directory name="conf">
           <file name=".c2mon.properties" sourceDir="/user/timtest/dev/rep/c2mon"
             mask="400" />
+          <file name="opcdaqprocess.lst" sourceDir="/user/timtest/dev/rep/c2mon/daq"
+            mask="400" />
         </directory>
         <directory name="bin">
           <file name="setenv.sh" sourceDir="/user/timtest/dev/rep/c2mon/daq"
