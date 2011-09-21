@@ -42,7 +42,7 @@
 		<application name="c2mon-daq-tim2-prod" extends="default">
 			<deployment>
 				<directory name="conf">
-					<file name=".c2mon.properties" source="/user/timoper/c2mon/conf/"
+					<file name=".c2mon.properties" sourceDir="/user/timoper/c2mon/conf/"
 						mask="400" />
 				</directory>
 			</deployment>
@@ -51,7 +51,7 @@
 		<application name="c2mon-daq-tim2-test" extends="default">
 			<deployment installLocation="/opt/c2mon-tim2-test">
 				<directory name="conf">
-					<file name=".c2mon.properties" source="/user/timtest/c2mon/conf/"
+					<file name=".c2mon.properties" sourceDir="/user/timtest/c2mon/conf/"
 						mask="400" />
 				</directory>
 			</deployment>
@@ -60,11 +60,11 @@
     <application name="c2mon-daq-dev" extends="default">
       <deployment installLocation="/user/timtest/dev/c2mon-daq-dev">
         <directory name="conf">
-          <file name=".c2mon.properties" source="/user/timtest/dev/rep/c2mon"
+          <file name=".c2mon.properties" sourceDir="/user/timtest/dev/rep/c2mon"
             mask="400" />
         </directory>
         <directory name="bin">
-          <file name="setenv.sh" source="/user/timtest/dev/rep/c2mon/daq"
+          <file name="setenv.sh" sourceDir="/user/timtest/dev/rep/c2mon/daq"
             mask="700" />
         </directory>
       </deployment>
