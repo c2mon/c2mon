@@ -32,9 +32,10 @@
 			      </preExec>
 			      <property name="c2mon.process.name" value="$PROCESS_NAME"/>
 			      <property name="c2mon.log.dir" value="$DAQ_LOG_HOME"/>
-			
-                  <output>
-				    <file name="log/out.log" />
+            <property name="java.library.path" value="$INSTALL_DIR/lib_so:$INSTALL_DIR/lib_c"/>
+            
+            <output>
+				      <file name="log/out.log" />
 			      </output>						
 			  </main-class>
 		  </startscript>
