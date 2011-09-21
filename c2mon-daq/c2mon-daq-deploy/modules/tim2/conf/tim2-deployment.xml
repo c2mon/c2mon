@@ -60,11 +60,11 @@
     <application name="c2mon-daq-dev" extends="default">
       <deployment installLocation="/user/timtest/dev/c2mon-daq-dev">
         <directory name="conf">
-          <file name=".c2mon.properties" source="/user/timtest/dev/rep/c2mon/"
+          <file name=".c2mon.properties" source="/user/timtest/dev/rep/c2mon"
             mask="400" />
         </directory>
         <directory name="bin">
-          <file name="setenv.sh" source="/user/timtest/dev/rep/c2mon/daq/"
+          <file name="setenv.sh" source="/user/timtest/dev/rep/c2mon/daq"
             mask="700" />
         </directory>
       </deployment>
