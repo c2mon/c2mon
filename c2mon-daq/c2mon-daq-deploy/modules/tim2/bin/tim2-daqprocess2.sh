@@ -59,7 +59,7 @@ DAQ_HOST=`hostname -s`
 TIME=`date +"%F %T.%3N"`
 
 #todo needs this to change according to deployment...
-DAQ_SCRIPT=${DAQ_HOME}/bin/C2MON-DAQ-TIM2-DEV.jvm
+DAQ_SCRIPT=${DAQ_HOME}/bin/C2MON-DAQ-DEV.jvm
 
 export DAQ_LOG_HOME=$DAQ_HOME/log
 export DAQ_CONF_HOME=$DAQ_HOME/conf

@@ -10,6 +10,7 @@
 			<deployment installLocation="/opt/c2mon-daq-tim2/">
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
+          <preserve type="dir" name="tmp" />
 				</backupPolicy>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
