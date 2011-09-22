@@ -27,13 +27,13 @@
 					</output>
 					<arg></arg>
 					<preExec>
-			        <![CDATA[
+			        <![CDATA[			          
 			         ]]>
 					</preExec>
 
 					<property name="c2mon.log.dir" value="log" />
-					<property name="jms.properties" value="conf/jms.properties" />
-					<property name="db.properties" value="conf/db.properties" />
+					<property name="jms.properties" value="${INSTALL_DIR}/conf/jms.properties" />
+					<property name="db.properties" value="${INSTALL_DIR}/conf/db.properties" />
 					<property name="log4j.configuration" value="conf/log4j.xml" />
 
 					<output>
