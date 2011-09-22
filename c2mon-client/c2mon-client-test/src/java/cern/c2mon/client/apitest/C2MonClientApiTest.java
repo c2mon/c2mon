@@ -5,14 +5,12 @@ import static java.lang.String.format;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import cern.c2mon.client.apitest.db.Dmn2DbServiceGateway;
 import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -35,22 +33,15 @@ public class C2MonClientApiTest {
      */
     public static void main(String[] args) {
 
-        try {
-
-            ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(
-                    new String[] { "classpath:application-context.xml" });
-                        
-            service = xmlContext.getBean(C2MonClientApiTestService.class);            
-            
+       try {
+           
+            log.debug("db.properties: "+System.getProperty("db.properties"));
             log.debug("jms.properties: "+System.getProperty("jms.properties"));
-          
-            //C2monServiceGateway.startC2monClient(System.getProperty("jms.properties"));
             
-            Properties jmsProperties = (Properties) xmlContext.getBean("jmsProperties");
-            for (Map.Entry<Object, Object> entry : jmsProperties.entrySet()) {
-              System.setProperty((String) entry.getKey(), (String) entry.getValue());
-            }   
-            
+            service = Dmn2DbServiceGateway.getDbAccessService("file:"+System.getProperty("db.properties"));
+                               
+            C2monServiceGateway.startC2monClient("file:"+System.getProperty("jms.properties"));
+                        
             C2monServiceGateway.startC2monClient();
 
         } catch (Exception e) {
@@ -61,8 +52,7 @@ public class C2MonClientApiTest {
         List<MetricDef> metrics = service.getProcessMetrics("P_CLIC_TEST");
         
         Set<Long> tagIds = new HashSet<Long>();
-        for (MetricDef md : metrics) {
-        	
+        for (MetricDef md : metrics) {        	
         	out.println(format("Metric %d %s", md.getMetricTagId(), md.getName()));
             tagIds.add(md.getMetricTagId());
         }
