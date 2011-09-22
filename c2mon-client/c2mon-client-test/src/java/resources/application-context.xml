@@ -14,10 +14,6 @@
 	<context:annotation-config />
 	<context:component-scan base-package="cern.c2mon.client.apitest" />
 
-	<!--  load db and jms properties -->
-	<!--	<context:property-placeholder-->
-	<!--		location="file:${jms.properties},file:${db.properties}" />-->
-
 
 	<bean id="jmsProperties"
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
