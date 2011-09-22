@@ -98,7 +98,7 @@ Request from clients
       <property name="destination" ref="clientRequestDestination"/>
       <property name="messageListener" ref="clientRequestHandler" />
       <property name="concurrentConsumers" value="1"/>
-      <property name="maxConcurrentConsumers" value="10"/> 
+      <property name="maxConcurrentConsumers" value="${c2mon.jms.client.consumers.max}"/> 
       <property name="maxMessagesPerTask" value="1"/>
       <property name="receiveTimeout" value="1000"/>
       <property name="idleTaskExecutionLimit" value="10"/>   

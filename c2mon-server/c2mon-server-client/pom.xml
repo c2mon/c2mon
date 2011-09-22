@@ -97,10 +97,10 @@
               module properties
             -->
             -Djms.client.user=not-used
-            -Djms.client.password=not-used
-            -Djms.client.connections.max=5
+            -Djms.client.password=not-used           
             -Djms.client.supervision.topic=tim.client.supervision.test
-            -Djms.client.request.queue=tim.client.request.test            
+            -Djms.client.request.queue=tim.client.request.test
+            -Dc2mon.jms.client.consumers.max=2            
             
             <!--
               server core properties for integration testing
