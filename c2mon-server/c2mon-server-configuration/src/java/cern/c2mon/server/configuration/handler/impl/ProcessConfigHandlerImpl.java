@@ -121,6 +121,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    */
   @Transactional("cacheTransactionManager")
   public void createProcess(final ConfigurationElement element) throws IllegalAccessException {
+    LOGGER.debug("Creating process with id " + element.getEntityId());
     if (processCache.hasKey(element.getEntityId())) {
       throw new ConfigurationException(ConfigurationException.ENTITY_EXISTS, 
           "Attempting to create a process with an already existing id: " + element.getEntityId());
@@ -191,6 +192,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
   @Transactional("cacheTransactionManager")
   public void removeProcess(Long processId, ConfigurationElementReport elementReport) {
     
+    LOGGER.debug("Removing process with id " + processId);    
     Process process = processCache.get(processId);
     try {
       process.getWriteLock().lock();
@@ -230,6 +232,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * @param processReport
    */
   private void removeProcessControlTags(Process process, ConfigurationElementReport processReport) {
+    LOGGER.debug("Removing Process control tags for process " + process.getId()); 
     Long aliveTagId = process.getAliveTagId();
     if (aliveTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, aliveTagId);
@@ -244,6 +247,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
   @Override
   public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
+    LOGGER.debug("Removing Process Equipments for process " + processId);
     Process process = processCache.get(processId);
     process.getWriteLock().lock();
     try {

@@ -151,6 +151,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Override
   @Transactional("cacheTransactionManager")
   public void removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
+    LOGGER.debug("Removing Equipment " + equipmentid);
     Equipment equipment = equipmentCache.get(equipmentid);    
     try {
       equipment.getWriteLock().lock();

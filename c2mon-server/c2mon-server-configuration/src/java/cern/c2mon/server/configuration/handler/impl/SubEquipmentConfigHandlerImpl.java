@@ -21,6 +21,7 @@ package cern.c2mon.server.configuration.handler.impl;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -49,6 +50,11 @@ import cern.tim.shared.common.ConfigurationException;
 @Service
 public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<SubEquipment> implements SubEquipmentConfigHandler {
 
+  /**
+   * Class logger.
+   */
+  private static final Logger LOGGER = Logger.getLogger(SubEquipmentConfigHandlerImpl.class);
+  
   /**
    * Facade.
    */
@@ -127,6 +133,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   @Override
   //@Transactional("cacheTransactionManager")
   public void removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
+    LOGGER.debug("Removing SubEquipment " + subEquipmentId);
     SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);    
     try {      
       subEquipment.getWriteLock().lock();      

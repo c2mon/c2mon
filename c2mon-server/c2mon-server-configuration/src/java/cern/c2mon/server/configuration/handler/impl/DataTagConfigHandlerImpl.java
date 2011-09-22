@@ -110,7 +110,8 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
    */
   @Transactional("cacheTransactionManager")
   @Override
-  public List<ProcessChange> createDataTag(final ConfigurationElement element) throws IllegalAccessException {    
+  public List<ProcessChange> createDataTag(final ConfigurationElement element) throws IllegalAccessException {
+    LOGGER.trace("Creating DataTag " + element.getEntityId());
     checkId(element.getEntityId());
     DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
     try {
@@ -147,6 +148,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
   @Transactional(propagation = Propagation.REQUIRED) //("cacheTransactionManager")
   @Override
   public List<ProcessChange> updateDataTag(final Long id, final Properties properties) {
+    LOGGER.trace("Updating DataTag " + id);
     //reject if trying to change equipment it is attached to - not currently allowed
     if (properties.containsKey("equipmentId")) {
       throw new ConfigurationException(ConfigurationException.UNDEFINED, 
@@ -185,13 +187,14 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
   @Transactional("cacheTransactionManager")
   @Override
   public List<ProcessChange> removeDataTag(final Long id, final ConfigurationElementReport elementReport) {
+    LOGGER.trace("Removing DataTag " + id);
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
     try {
       DataTag dataTag = tagCache.get(id);
       dataTag.getWriteLock().lock();
       try {     
         if (!dataTag.getRuleIds().isEmpty()) {
-          LOGGER.debug("Removing Rules dependent on DataTag " + dataTag.getId());
+          LOGGER.trace("Removing Rules dependent on DataTag " + dataTag.getId());
           for (Long ruleId : new ArrayList<Long>(dataTag.getRuleIds())) {
             if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
               ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
@@ -201,7 +204,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
           }
         }
         if (!dataTag.getAlarmIds().isEmpty()) {
-          LOGGER.debug("Removing Alarms dependent on DataTag " + dataTag.getId());
+          LOGGER.trace("Removing Alarms dependent on DataTag " + dataTag.getId());
           for (Long alarmId : new ArrayList<Long>(dataTag.getAlarmIds())) {
             ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
             elementReport.addSubReport(alarmReport);
@@ -235,7 +238,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
       removeEvent.setEquipmentId(dataTag.getEquipmentId());      
       processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), removeEvent));
     } catch (CacheElementNotFoundException e) {
-      LOGGER.debug("Attempting to remove a non-existent DataTag - no action taken.");
+      LOGGER.warn("Attempting to remove a non-existent DataTag - no action taken.");
       elementReport.setWarning("Attempting to removed a non-existent DataTag");
     }    
     return processChanges;

@@ -90,6 +90,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   @Override
   @Transactional("cacheTransactionManager")
   public void createControlTag(ConfigurationElement element) throws IllegalAccessException {
+    LOGGER.trace("Creating ControlTag " + element.getEntityId());
     checkId(element.getEntityId());
     ControlTag controlTag = 
         commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
@@ -112,6 +113,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   @Override
   @Transactional("cacheTransactionManager")
   public List<ProcessChange> updateControlTag(Long id, Properties elementProperties) {
+    LOGGER.trace("Updating ControlTag " + id);
     ControlTag controlTag = tagCache.get(id);
     Change controlTagUpdate;
     try {
@@ -150,12 +152,13 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   @Override
   @Transactional("cacheTransactionManager")
   public List<ProcessChange> removeControlTag(Long id, ConfigurationElementReport tagReport) {
+    LOGGER.trace("Removing DataTag " + id);
     try {
       ControlTag controlTag = tagCache.get(id);
       controlTag.getWriteLock().lock();
       try {        
         if (!controlTag.getRuleIds().isEmpty()) {
-          LOGGER.debug("Removing rules dependent on ControlTag " + controlTag.getId());
+          LOGGER.trace("Removing rules dependent on ControlTag " + controlTag.getId());
           for (Long ruleId : controlTag.getRuleIds()) {
             ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
             tagReport.addSubReport(newReport);
@@ -163,7 +166,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
           }       
         } 
         if (!controlTag.getAlarmIds().isEmpty()) {
-          LOGGER.debug("Removing Alarms dependent on ControlTag " + controlTag.getId());
+          LOGGER.trace("Removing Alarms dependent on ControlTag " + controlTag.getId());
           for (Long alarmId : new ArrayList<Long>(controlTag.getAlarmIds())) {
             ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
             tagReport.addSubReport(alarmReport);
@@ -194,7 +197,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
         }      
       } 
     } catch (CacheElementNotFoundException e) {
-      LOGGER.debug("Attempting to remove a non-existent ControlTag - no action taken.");
+      LOGGER.warn("Attempting to remove a non-existent ControlTag - no action taken.");
       tagReport.setWarning("Attempting to removed a non-existent ControlTag");
       return null;
     }          

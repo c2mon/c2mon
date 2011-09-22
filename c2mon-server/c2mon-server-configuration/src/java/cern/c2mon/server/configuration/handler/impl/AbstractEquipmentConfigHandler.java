@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
@@ -49,6 +50,11 @@ import cern.tim.shared.daq.config.EquipmentConfigurationUpdate;
  */
 public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment> {
 
+  /**
+   * Class logger.
+   */
+  private static final Logger LOGGER = Logger.getLogger(AbstractEquipmentConfigHandler.class); 
+  
   /**
    * The ConfigHandler for ControlTags.
    */
@@ -115,7 +121,8 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    * @return the generated AbstractEquipment object
    * @throws IllegalAccessException should not be thrown here (inherited at interface from Tag creation).
    */
-  protected T createAbstractEquipment(final ConfigurationElement element) throws IllegalAccessException {
+  protected T createAbstractEquipment(final ConfigurationElement element) throws IllegalAccessException {  
+    LOGGER.debug("Creating (Sub)Equipment " + element.getEntityId());
     T abstractEquipment = commonEquipmentFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
     configurableDAO.insert(abstractEquipment);
     
@@ -153,6 +160,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    */
   protected List<ProcessChange> updateAbstractEquipment(final T abstractEquipment, final Properties properties) 
                                     throws IllegalAccessException {
+    LOGGER.debug("Updating (Sub)Equipment " + abstractEquipment.getId());
     //TODO or not todo: warning: can still update commfault, alive and state tag id to non-existent tags (id is NOT checked and exceptions will be thrown!)
     
     //do not allow id changes! (they would not be applied in any case)
@@ -202,6 +210,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    * @param equipmentReport for adding the subreports to
    */
   protected void removeEquipmentControlTags(final T abstractEquipment, final ConfigurationElementReport equipmentReport) {
+    LOGGER.debug("Removing Equipment control tags.");
     Long aliveTagId = abstractEquipment.getAliveTagId();
     if (aliveTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, aliveTagId);
