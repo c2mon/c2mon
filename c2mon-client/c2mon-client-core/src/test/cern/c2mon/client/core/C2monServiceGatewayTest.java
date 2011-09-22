@@ -50,6 +50,11 @@ public class C2monServiceGatewayTest {
     assertNotNull(C2monServiceGateway.getTagManager());
   }
   
+  /**
+   * Needs running without JVM properties set in order to test correct loading
+   * into Spring context.
+   * @throws InterruptedException
+   */
   @Test
   public void startClientWithProperties() throws InterruptedException {
     C2monServiceGateway.startC2monClient("classpath:cern/c2mon/client/core/test-properties.txt");    
