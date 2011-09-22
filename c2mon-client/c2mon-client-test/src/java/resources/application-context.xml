@@ -14,12 +14,6 @@
 	<context:annotation-config />
 	<context:component-scan base-package="cern.c2mon.client.apitest" />
 
-
-	<bean id="jmsProperties"
-		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-		<property name="location" value="file:${jms.properties}" />
-	</bean>
-
 	<!--
 		enable the configuration of transactional behaviour based on
 		annotations.
