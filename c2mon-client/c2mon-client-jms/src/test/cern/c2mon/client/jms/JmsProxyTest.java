@@ -38,11 +38,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.test.annotation.DirtiesContext;
@@ -70,7 +66,8 @@ import cern.tim.util.json.GsonFactory;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml" })
+@ContextConfiguration({ "classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml",
+                         "classpath:cern/c2mon/client/jms/config/c2mon-client-jms-properties.xml" })
 public class JmsProxyTest {
   
   /**
