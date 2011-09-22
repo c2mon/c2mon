@@ -63,7 +63,7 @@ fi
 #Terracotta server host (must be set if running server cluster)
 TC_HOST=cs-ccr-tim11
 #Terracotta installation directory
-TERRACOTTA_HOME=$HOME/opt/terracotta
+TERRACOTTA_HOME=/user/timtest/opt/terracotta
 #terracotta server name (one of them)
 #TC_NAME=server1
 #terracotta DSO port
