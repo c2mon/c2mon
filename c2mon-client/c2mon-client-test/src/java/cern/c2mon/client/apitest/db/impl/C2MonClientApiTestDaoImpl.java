@@ -1,7 +1,9 @@
 package cern.c2mon.client.apitest.db.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
+import cern.c2mon.client.apitest.EquipmentDef;
 import cern.c2mon.client.apitest.MetricDef;
 import cern.c2mon.client.apitest.db.C2MonClientApiTestDao;
 
@@ -11,6 +13,7 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
@@ -23,110 +26,72 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
     }
 
     @Override
-    public List<MetricDef> getAllMetrics() {
+    public List<MetricDef> getProcessMetrics(String processName) {
 
         StringBuilder sql = new StringBuilder(
-                "select metric_data_tag_id, device || '/' || property || '/' || field metric_name, metric_rule_tag_id from dmn_metric_v "
-                        + " order by metric_data_tag_id"); 
-
-        Object[] args = null;
-
-        RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
-
-            @Override
-            public MetricDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
-                MetricDef def = new MetricDef(rs.getLong("metric_data_tag_id"), rs.getLong("metric_rule_tag_id"), rs
-                        .getString("metric_name"));
-                return def;
-            }
-        };
-
-        return this.jdbcTemplate.query(sql.toString(), mapper, args);
-
-    }
-
-    @Override
-    public List<MetricDef> getAllMetrics(String processName) {
-
-        StringBuilder sql = new StringBuilder(
-                "select metric_data_tag_id, device || '/' || property || '/' || field metric_name, metric_rule_tag_id from dmn_metric_v "
-                        + "where equipment_id in ( select equipment_id from dmn_equipment_v where process_id="
+                "select metric_data_tag_id, metric_rule_tag_id, metric_name, display_name, data_type, test_id, description from dmn_metric_v mv "
+                        + "where mv.equipment_id in ( select equipment_id from dmn_equipment_v where process_id="
                         + "(select process_id from dmn_process_v where process_name=?)) "
                         + "order by metric_data_tag_id");
 
-   //     Object[] args = null;
-
         RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
 
             @Override
             public MetricDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
                 MetricDef def = new MetricDef(rs.getLong("metric_data_tag_id"), rs.getLong("metric_rule_tag_id"), rs
-                        .getString("metric_name"));
+                        .getString("metric_name"), rs.getString("display_name"), rs.getString("data_type"), rs
+                        .getInt("test_id"), rs.getString("description"));
                 return def;
             }
         };
 
         return this.jdbcTemplate.query(sql.toString(), mapper, new Object[] { processName });
     }
-    
 
     @Override
-    public List<MetricDef> getAllDeviceRuleMetrics() {
-        StringBuilder sql = new StringBuilder(
-                "select equipment_name||':STATUS' metric_name, equipment_rule_tag_id from dmn_equipment_v order by equipment_rule_tag_id");
-
-        Object[] args = null;
-
-        RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
-
-            @Override
-            public MetricDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
-                MetricDef def = new MetricDef(null, rs.getLong("equipment_rule_tag_id"), rs.getString("metric_name"));
-                return def;
-            }
-        };
-
-        return this.jdbcTemplate.query(sql.toString(), mapper, args);
-    }
-
-    @Override
-    public List<MetricDef> getAllSimpleRuleMetrics() {
+    public List<MetricDef> getEquipmentMetrics(String equipmentName) {
 
         StringBuilder sql = new StringBuilder(
-                "select metric_data_tag_id, device || '/' || property || '/' || field metric_name, metric_rule_tag_id from dmn_metric_v where "
-                        + "metric_rule_tag_id is not null order by metric_rule_tag_id");
-
-        Object[] args = null;
+                "select metric_data_tag_id, metric_rule_tag_id, metric_name, display_name, data_type, test_id, description from dmn_metric_v mv "
+                        + "inner join dmn_equipment_v ev on mv.equipment_id = ev.equipment_id where ev.equipment_name=?");
 
         RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
 
             @Override
             public MetricDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
                 MetricDef def = new MetricDef(rs.getLong("metric_data_tag_id"), rs.getLong("metric_rule_tag_id"), rs
-                        .getString("metric_name"));
+                        .getString("metric_name"), rs.getString("display_name"), rs.getString("data_type"), rs
+                        .getInt("test_id"), rs.getString("description"));
                 return def;
             }
         };
 
-        return this.jdbcTemplate.query(sql.toString(), mapper, args);
+        return this.jdbcTemplate.query(sql.toString(), mapper, new Object[] { equipmentName });
     }
 
     @Override
-    public MetricDef getDeviceRuleMetric(String processName) {
+    public List<EquipmentDef> getEquipments(String... processNames) {
 
-        String sql = "select equipment_name||':STATUS' metric_name, equipment_rule_tag_id from dmn_equipment_v where process_name=?";
+        StringBuilder sql = new StringBuilder(
+                "select e.equipment_name as equipment_name, p.equipment_type_name as equipment_type_name, e.equipment_rule_tag_id as equipment_rule_tag_id "
+                        + "from dmn_equipment_v e inner join dmn_process_v p on e.process_id = p.process_id where e.process_id in "
+                        + "(select process_id from dmn_process_v where process_name in (:pnames))");
 
-        RowMapper<MetricDef> mapper = new RowMapper<MetricDef>() {
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("pnames", Arrays.asList(processNames));
+
+        RowMapper<EquipmentDef> mapper = new RowMapper<EquipmentDef>() {
 
             @Override
-            public MetricDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
-                MetricDef def = new MetricDef(null, rs.getLong("equipment_rule_tag_id"), rs.getString("metric_name"));
+            public EquipmentDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
+                EquipmentDef def = new EquipmentDef(rs.getLong("equipment_rule_tag_id"),
+                        rs.getString("equipment_name"), rs.getString("equipment_type_name"));
                 return def;
             }
         };
 
-        return jdbcTemplate.queryForObject(sql, mapper, new Object[] { processName });
+        return this.jdbcTemplate.query(sql.toString(), mapper, parameters);
 
     }
-
+    
 }

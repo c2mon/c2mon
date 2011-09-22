@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cern.c2mon.client.apitest.EquipmentDef;
 import cern.c2mon.client.apitest.MetricDef;
 import cern.c2mon.client.apitest.db.C2MonClientApiTestDao;
 import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
@@ -25,37 +26,22 @@ public class C2MonClientApiTestServiceImpl implements C2MonClientApiTestService 
 
     @Transactional(readOnly = true)
     @Override
-    public List<MetricDef> getAllMetrics() {
-        log.debug("entering getAllMetrics()");
-        return dao.getAllMetrics();
+    public List<MetricDef> getProcessMetrics(String processName) {
+        log.debug("entering getProcessMetrics()");
+        return dao.getProcessMetrics(processName);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public List<MetricDef> getAllMetrics(String processName) {
-        log.debug("entering getAllMetrics()");
-        return dao.getAllMetrics(processName);
+    public List<MetricDef> getEquipmentMetrics(String equipmentName) {
+        log.debug("entering getEquipmentMetrics()");
+        return dao.getEquipmentMetrics(equipmentName);
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public List<MetricDef> getAllDeviceRuleMetrics() {
-        log.debug("entering getAllDeviceRuleMetrics()");
-        return dao.getAllDeviceRuleMetrics();
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<MetricDef> getAllRuleMetrics() {
-        log.debug("entering getAllRuleMetrics()");
-        return dao.getAllSimpleRuleMetrics();
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public MetricDef getDeviceRuleMetric(String processName) {
-        log.debug("entering getAllRuleMetrics()");
-        return dao.getDeviceRuleMetric(processName);
+    public List<EquipmentDef> getEquipments(String... processNames) {
+        log.debug("entering getEquipments()");
+        return dao.getEquipments(processNames);
     }
 
 }

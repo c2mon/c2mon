@@ -13,7 +13,7 @@ public class EquipmentDef {
         return ruleTagId == null ? 0 : ruleTagId;
     }
 
-    public String getEquipmentName() {
+    public String getName() {
         return name;
     }
     

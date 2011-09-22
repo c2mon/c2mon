@@ -58,18 +58,12 @@ public class C2MonClientApiTest {
             System.exit(-1);
         }
 
-        List<MetricDef> metrics = service.getAllMetrics("P_CLIC_TEST");
-        //List<MetricDef> metrics = service.getAllDeviceRuleMetrics();
+        List<MetricDef> metrics = service.getProcessMetrics("P_CLIC_TEST");
         
         Set<Long> tagIds = new HashSet<Long>();
         for (MetricDef md : metrics) {
-
-//        	out.println(format("Metric %d %s", md.getRuleTagId(), md.getMetricName()));
-//            tagIds.add(md.getRuleTagId());
         	
-     	
-        	
-        	out.println(format("Metric %d %s", md.getMetricTagId(), md.getMetricName()));
+        	out.println(format("Metric %d %s", md.getMetricTagId(), md.getName()));
             tagIds.add(md.getMetricTagId());
         }
 
@@ -80,26 +74,9 @@ public class C2MonClientApiTest {
             public void onUpdate(ClientDataTagValue tagUpdate) {               
                 if (TAG_LOG.isInfoEnabled()) {
                     TAG_LOG.log(Level.INFO, tagUpdate);
-                }
-
-                // System.out.println("Update received for tag " + tagUpdate.getId() + ":");
-                // System.out.println("\ttag name           : " + tagUpdate.getName());
-                // System.out.println("\tvalue              : " + tagUpdate.getValue());
-                // System.out.println("\ttype               : " + tagUpdate.getTypeNumeric());
-                // System.out.println("\tvalue description  : " + tagUpdate.getDescription());
-                // System.out.println("\tquality Code       : " + tagUpdate.getDataTagQuality().toString());
-                // System.out.println("\tquality description: " + tagUpdate.getDataTagQuality().getDescription());
-                // System.out.println();
+                }              
             }
         });
-
-        // while (true) {
-        // try {
-        // Thread.sleep(5000);
-        // }
-        // catch (InterruptedException ex) {
-        // }
-        // }
 
     }
 }
