@@ -10,8 +10,6 @@
   <context:component-scan base-package="cern.c2mon.client.jms"/>
   <context:annotation-config/>
   
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-  
   <bean id="jmsConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
     <property name="brokerURL" value="${c2mon.jms.url}"/>
     <property name="userName" value="${c2mon.jms.user}"/>
