@@ -58,6 +58,10 @@
           <file name=".c2mon.properties" sourceDir="/user/timoper/rep/c2mon"
             mask="400" />
         </directory>
+        <directory name="bin">
+          <file name="setenv.sh" sourceDir="/user/timoper/rep/c2mon/server"
+            mask="700" />
+        </directory>
       </deployment>
     </application>
 
