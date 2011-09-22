@@ -9,6 +9,8 @@
 
   <context:component-scan base-package="cern.c2mon.client.core"/>
   <context:annotation-config/>
+  
+  <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
   <!-- import the XML configuration files for the Client API modules -->
   <import resource="classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml"/>
