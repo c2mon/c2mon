@@ -21,16 +21,16 @@ public class C2MonClientApiTestServiceImplTest {
 	C2MonClientApiTestService service;
 
 	@Test
-	public void getAllDeviceRuleMetrics() throws Exception {
+	public void getAllDeviceRuleMetricsForProcess() throws Exception {
 
-		List<MetricDef> def = service.getAllDeviceRuleMetrics();
+		List<MetricDef> def = service.getProcessMetrics("P_CLIC_01");
 
 		assertEquals(2, def.size());
 		
-		assertEquals("TESTDEVICE1:STATUS", def.get(0).getMetricName());
-		assertEquals(100, def.get(0).getRuleTagId());
+		//assertEquals("TESTDEVICE1:STATUS", def.get(0).getName());
+		//assertEquals(100, def.get(0).getRuleTagId());
 		
-		assertEquals("TESTDEVICE2:STATUS", def.get(1).getMetricName());
-		assertEquals(222, def.get(1).getRuleTagId());
+		//assertEquals("TESTDEVICE2:STATUS", def.get(1).getName());
+		//assertEquals(222, def.get(1).getRuleTagId());
 	}
 }
