@@ -64,6 +64,9 @@ public abstract class TransferObjectFactory {
         RuleTag ruleTag = (RuleTag) tag;
         transferTag.setRuleExpression(ruleTag.getRuleExpression());
       }
+      if (!tag.getRuleIds().isEmpty()) {
+        transferTag.addRuleIds(tag.getRuleIds());
+      }
     }
   
     return transferTag;
