@@ -11,7 +11,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.apitest.db.Dmn2DbServiceGateway;
-import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monServiceGateway;
@@ -25,8 +24,7 @@ public class C2MonClientApiTest {
      * Log4j Logger for logging DataTag values.
      */
     protected static final Logger TAG_LOG = Logger.getLogger("ClientDataTagValueLogger");
-
-    static C2MonClientApiTestService service;
+   
 
     /**
      * @param args
@@ -34,11 +32,11 @@ public class C2MonClientApiTest {
     public static void main(String[] args) {
 
        try {
-           
+                      
             log.debug("db.properties: "+System.getProperty("db.properties"));
             log.debug("jms.properties: "+System.getProperty("jms.properties"));
             
-            service = Dmn2DbServiceGateway.getDbAccessService("file:"+System.getProperty("db.properties"));
+            Dmn2DbServiceGateway.init(); 
                                
             C2monServiceGateway.startC2monClient("file:"+System.getProperty("jms.properties"));
                         
@@ -49,7 +47,7 @@ public class C2MonClientApiTest {
             System.exit(-1);
         }
 
-        List<MetricDef> metrics = service.getProcessMetrics("P_CLIC_TEST");
+        List<MetricDef> metrics = Dmn2DbServiceGateway.getDbAccessService().getProcessMetrics("P_CLIC_TEST");
         
         Set<Long> tagIds = new HashSet<Long>();
         for (MetricDef md : metrics) {        	

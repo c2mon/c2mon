@@ -28,14 +28,17 @@ public class Dmn2DbServiceGateway {
     public static C2MonClientApiTestService getDbAccessService() {
         if (theInstance == null) {
             throw new IllegalStateException(
-                    "Dmn2DbServiceGateway is not initialized. Call getDbAccessService(String dbProperties) first");
+                    "Dmn2DbServiceGateway is not initialized. Call init() first");
         }
 
         return theInstance.dbAccessService;
     }
 
-    public static C2MonClientApiTestService getDbAccessService(final String dbProperties) {
+    public static void init() {
         if (theInstance == null) {
+            
+            String dbProperties = "file:"+System.getProperty("db.properties");
+                       
             LOGGER.info("getDbAccessService(), loading properties from " + dbProperties);
 
             GenericBeanDefinition propertiesFactoryBean = new GenericBeanDefinition();
@@ -53,9 +56,7 @@ public class Dmn2DbServiceGateway {
                     new String[] { "classpath:application-context.xml" }, ctx);
 
             theInstance = new Dmn2DbServiceGateway(xmlContext.getBean(C2MonClientApiTestService.class));
-        }
-
-        return getDbAccessService();
+        }        
     }
 
 }
