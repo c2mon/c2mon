@@ -21,8 +21,11 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
+import cern.c2mon.shared.client.process.ProcessXmlResponse;
+import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.tim.server.cache.ProcessXMLProvider;
 import cern.tim.server.cache.TagFacadeGateway;
 import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.common.alarm.TagWithAlarms;
@@ -54,6 +57,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   /** Reference to the supervision facade service for handling the supervision request */
   private final SupervisionFacade supervisionFacade;
   
+  /** Ref to the the bean providing DAQ XML */
+  private final ProcessXMLProvider processXMLProvider;
+  
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
 
@@ -67,14 +73,17 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @param pTagLocationService Reference to the tag location service singleton
    * @param pTagFacadeGateway Reference to the tag facade gateway singleton
    * @param pSupervisionFacade Reference to the supervision facade singelton
+   * @param pProcessXMLProvider Ref to the process XML provider bean
    */
   @Autowired
   public ClientRequestHandler(final TagLocationService pTagLocationService, 
                               final TagFacadeGateway pTagFacadeGateway,
-                              final SupervisionFacade pSupervisionFacade) {
+                              final SupervisionFacade pSupervisionFacade,
+                              final ProcessXMLProvider pProcessXMLProvider) {
     tagLocationService = pTagLocationService;
     tagFacadeGateway = pTagFacadeGateway;
     supervisionFacade = pSupervisionFacade;
+    processXMLProvider = pProcessXMLProvider;
   }
   
   /**
@@ -138,7 +147,14 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         if (LOG.isDebugEnabled()) {
           LOG.debug("Received a client request for the current supervision status.");
         }
-        return supervisionFacade.getAllSupervisionStates();        
+        return supervisionFacade.getAllSupervisionStates();
+      case DAQ_XML_REQUEST:
+        LOG.debug("Received a client request for a Process configuration XML");
+        Collection<ProcessXmlResponse> singleXML = new ArrayList<ProcessXmlResponse>(1);
+        String xmlString = processXMLProvider.getProcessConfigXML(clientRequest.getRequestParameter());
+        ProcessXmlResponse processXmlResponse = new ProcessXmlResponseImpl();
+        ((ProcessXmlResponseImpl) processXmlResponse).setProcessXML(xmlString);
+        singleXML.add(processXmlResponse);
       default:
         LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
         return Collections.emptyList();
