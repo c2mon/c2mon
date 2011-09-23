@@ -6,7 +6,7 @@
 
 			<deployment>
 				<directory name="conf">
-					<file name="db.properties" sourceDir="/user/diamonop/c2mon/test/conf/"
+					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/test/conf/"
 						mask="400" />
 				</directory>
 			</deployment>
@@ -33,7 +33,7 @@
 
 					<property name="c2mon.log.dir" value="log" />
 					<property name="jms.properties" value="${INSTALL_DIR}/conf/jms.properties" />
-					<property name="db.properties" value="${INSTALL_DIR}/conf/db.properties" />
+					<property name="db.properties" value="${INSTALL_DIR}/conf/.c2mon.properties" />
 					<property name="log4j.configuration" value="conf/log4j.xml" />
 
 					<output>

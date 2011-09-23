@@ -16,9 +16,9 @@
 	<bean id="ds" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
-		<property name="url" value="${dmn2.datasource.url}" />
-		<property name="username" value="${dmn2.datasource.user}" />
-		<property name="password" value="${dmn2.datasource.password}" />
+		<property name="url" value="${jdbc.config.url}" />
+		<property name="username" value="${jdbc.config.user}" />
+		<property name="password" value="${jdbc.config.password}" />
 	</bean>
 
 </beans>
