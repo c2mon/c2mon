@@ -229,7 +229,8 @@ public class ClientDataTagCacheImplTest {
           new Timestamp(System.currentTimeMillis()),
           "Test description",
           "My.data.tag.name",
-          "My.jms.topic");
+          "My.jms.topic",
+          Boolean.FALSE);
     
     return tagUpdate;
   }

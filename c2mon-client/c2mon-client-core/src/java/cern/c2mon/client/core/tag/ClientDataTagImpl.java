@@ -70,6 +70,9 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   /** The current tag mode */
   private TagMode mode = TagMode.TEST;
   
+  /** Flag recording if this Tag is a control tag (alive, status or commfault).*/
+  private Boolean controlTag;
+  
   /** 
    * <code>true</code>, if the tag value is currently simulated and not
    * corresponding to a live event.
@@ -125,6 +128,11 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
   /** In case this data tag is a rule this variable contains its rule expression */
   private RuleExpression ruleExpression = null;
+  
+  /**
+   * Ids of rules using this Tag.
+   */
+  private Collection<Long> ruleIds = new ArrayList<Long>();
 
   /**
    * List of DataTagUpdateListeners registered for updates on this DataTag
@@ -616,7 +624,11 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         tagName = tagUpdate.getName();
         topicName = tagUpdate.getTopicName();
         unit = tagUpdate.getUnit();
-        
+        controlTag = tagUpdate.isControlTag();
+        if (tagUpdate.getRuleIds() != null) {
+          ruleIds.addAll(tagUpdate.getRuleIds());
+        }
+                        
         // Notify all listeners of the update
         notifyListeners();
       }
@@ -964,5 +976,15 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   @Override
   public void onSupervisionUpdate(SupervisionEvent supervisionEvent) {
     update(supervisionEvent);
+  }
+
+  @Override
+  public Boolean isControlTag() {
+    return controlTag;
+  }
+
+  @Override
+  public Collection<Long> getRuleIds() {
+    return ruleIds;
   }
 }

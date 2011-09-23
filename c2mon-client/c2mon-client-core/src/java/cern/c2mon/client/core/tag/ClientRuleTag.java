@@ -20,6 +20,7 @@ package cern.c2mon.client.core.tag;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -463,5 +464,27 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   @Override
   public boolean isValid() {
     return this.ruleQuality.isValid();
+  }
+
+  @Override
+  public String getTopicName() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * @return always returns false, since a client rule cannot be a control tag.
+   */
+  @Override
+  public Boolean isControlTag() {
+    return Boolean.FALSE;
+  }
+
+  /**
+   * @return always returns an empty list
+   */
+  @Override
+  public Collection<Long> getRuleIds() {
+    return Collections.emptyList();
   }
 }
