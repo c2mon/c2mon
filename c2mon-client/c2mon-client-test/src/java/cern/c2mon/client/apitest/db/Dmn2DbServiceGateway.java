@@ -34,17 +34,27 @@ public class Dmn2DbServiceGateway {
         return theInstance.dbAccessService;
     }
 
+    
     public static void init() {
         if (theInstance == null) {
-            
-            String dbProperties = "file:"+System.getProperty("db.properties");
-                       
-            LOGGER.info("getDbAccessService(), loading properties from " + dbProperties);
+                          
+            final ClassPathXmlApplicationContext xmlContext = 
+                new ClassPathXmlApplicationContext("classpath:application-context.xml"); 
+                    
+            theInstance = new Dmn2DbServiceGateway(xmlContext.getBean(C2MonClientApiTestService.class));
+        }
+                
+    }
+    
+    public static void init(final String dbPropertiesURI) {
+        if (theInstance == null) {
+
+            LOGGER.info("getDbAccessService(), loading properties from " + dbPropertiesURI);
 
             GenericBeanDefinition propertiesFactoryBean = new GenericBeanDefinition();
             propertiesFactoryBean.setBeanClass(PropertiesFactoryBean.class);
             MutablePropertyValues propertyValues = new MutablePropertyValues();
-            propertyValues.addPropertyValue("location", dbProperties);
+            propertyValues.addPropertyValue("location", dbPropertiesURI);
             propertiesFactoryBean.setPropertyValues(propertyValues);
 
             // start an initial Spring application context and register properties bean
