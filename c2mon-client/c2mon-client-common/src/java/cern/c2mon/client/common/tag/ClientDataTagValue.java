@@ -162,4 +162,21 @@ public interface ClientDataTagValue extends RuleInputValue {
    * @see TypeNumeric
    */
   TypeNumeric getTypeNumeric();
+  
+  /**
+   * The topic name on which these updates are expected.
+   * 
+   * @return the JMS topic name as String
+   */
+  String getTopicName();
+  
+  /**
+   * @return true if the Tag is a control tag
+   */
+  Boolean isControlTag();
+
+  /**
+   * @return collection of ids of Rules *used by* this Tag
+   */
+  Collection<Long> getRuleIds();
 }
