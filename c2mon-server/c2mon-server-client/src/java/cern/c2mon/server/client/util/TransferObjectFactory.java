@@ -10,6 +10,7 @@ import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
+import cern.tim.server.common.control.ControlTag;
 import cern.tim.server.common.rule.RuleTag;
 import cern.tim.server.common.tag.Tag;
 
@@ -37,6 +38,10 @@ public abstract class TransferObjectFactory {
     Tag tag = tagWithAlarms.getTag();
     TransferTagImpl transferTag = null;
     if (tag != null) {
+      Boolean controlTag = Boolean.FALSE;
+      if (tag instanceof ControlTag) {
+        controlTag = Boolean.TRUE;
+      }
       transferTag =
         new TransferTagImpl(
             tag.getId(),
@@ -47,7 +52,8 @@ public abstract class TransferObjectFactory {
             tag.getCacheTimestamp(),
             tag.getDescription(),
             tag.getName(),
-            tag.getTopic());
+            tag.getTopic(),
+            controlTag);
       
       addAlarmValues(transferTag, tagWithAlarms.getAlarms());
       transferTag.setSimulated(tag.isSimulated());
