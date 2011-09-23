@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.client.jms.JmsProxy;
+import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.JsonRequest;
 
 /**
@@ -157,6 +159,31 @@ public class RequestHandlerImplTest {
   @Test(expected = NullPointerException.class)
   public void testRequestTagValuesWithNull() throws JMSException {
     requestHandlerImpl.requestTagValues(null);
+  }
+  
+  /**
+   * Tests getProcessXml method.
+   * @throws JMSException
+   */
+  @Test
+  public void testGetProcessXml() throws JMSException {
+   String processName = "name";
+   Collection<ProcessXmlResponse> response = new ArrayList<ProcessXmlResponse>();
+   response.add(new ProcessXmlResponse() {
+    
+    @Override
+    public String getProcessXML() {
+      return "process xml";
+    }
+   });
+   EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(response);
+   
+   EasyMock.replay(jmsProxy);
+   
+   String xmlString = requestHandlerImpl.getProcessXml(processName);
+   
+   EasyMock.verify(jmsProxy);
+   Assert.assertEquals("process xml", xmlString);
   }
   
 }

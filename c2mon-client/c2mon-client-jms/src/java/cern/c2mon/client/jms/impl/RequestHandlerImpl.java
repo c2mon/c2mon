@@ -29,6 +29,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.jms.JMSException;
+import javax.management.remote.JMXPrincipal;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
+import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -196,6 +198,15 @@ public class RequestHandlerImpl implements RequestHandler {
   @Required
   public void setRequestTimeout(final int requestTimeout) {
     this.requestTimeout = requestTimeout;
+  }
+  
+  @Override
+  public String getProcessXml(final String processName) throws JMSException {
+    ClientRequestImpl<ProcessXmlResponse> xmlRequest =
+      new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
+    xmlRequest.setRequestParameter("request parameter");
+    //response should have a unique element in
+    return jmsProxy.sendRequest(xmlRequest, requestQueue, requestTimeout).iterator().next().getProcessXML();
   }
   
   /**
