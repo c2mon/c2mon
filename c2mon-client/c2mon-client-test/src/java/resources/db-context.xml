@@ -11,15 +11,15 @@
            http://www.springframework.org/schema/context/spring-context-3.0.xsd
            http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
     
-       	
-       	
-    <bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>	
-    
-    <!-- imports properties passed to client core; id must override existing placeholder configurer in core! -->
+       	       	
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">      
+      <property name="ignoreUnresolvablePlaceholders" value="true"/>      
+    </bean>	         
     <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-      <property name="properties" ref="c2monProperties"/>
+       <property name="ignoreResourceNotFound" value="true"/>
+       <property name="location" value="${db.properties}"/> 
     </bean>	
-		
+    		
 	<bean id="ds" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
