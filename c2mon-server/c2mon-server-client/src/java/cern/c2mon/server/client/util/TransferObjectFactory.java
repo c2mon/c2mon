@@ -11,6 +11,7 @@ import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.common.control.ControlTag;
+import cern.tim.server.common.datatag.DataTag;
 import cern.tim.server.common.rule.RuleTag;
 import cern.tim.server.common.tag.Tag;
 
@@ -59,7 +60,11 @@ public abstract class TransferObjectFactory {
       transferTag.setSimulated(tag.isSimulated());
       transferTag.addEquimpmentIds(tag.getEquipmentIds());
       transferTag.addProcessIds(tag.getProcessIds());
-
+      if (tag instanceof DataTag || tag instanceof ControlTag) {
+        transferTag.setMinValue(((DataTag) tag).getMinValue().toString());
+        transferTag.setMaxValue(((DataTag) tag).getMaxValue().toString());
+      }
+      
       if (tag instanceof RuleTag) {
         RuleTag ruleTag = (RuleTag) tag;
         transferTag.setRuleExpression(ruleTag.getRuleExpression());
