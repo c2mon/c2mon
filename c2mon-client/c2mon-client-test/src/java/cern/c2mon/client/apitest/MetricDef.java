@@ -5,13 +5,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class MetricDef {
 
-    Long metricTagId;
-    Long ruleTagId;
-    String name;
-    String displayName;
-    String type;
-    Integer testId;
-    String description;
+    private Long metricTagId;
+    private Long ruleTagId;
+    private String name;
+    private String displayName;
+    private String type;
+    private Integer testId;
+    private String description;
 
     public long getMetricTagId() {
         return metricTagId == null ? 0 : metricTagId;
@@ -28,7 +28,7 @@ public class MetricDef {
     public String getDisplayName() {
         return displayName;
     }
-    
+
     public String getType() {
         return type;
     }

@@ -5,9 +5,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class EquipmentDef {
    
-    Long ruleTagId;
-    String name;
-    String type;
+    private Long ruleTagId;
+    private String name;
+    private String type;
        
     public long getRuleTagId() {
         return ruleTagId == null ? 0 : ruleTagId;
