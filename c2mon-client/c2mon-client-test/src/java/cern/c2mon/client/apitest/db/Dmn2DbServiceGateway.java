@@ -59,7 +59,7 @@ public class Dmn2DbServiceGateway {
 
             // start an initial Spring application context and register properties bean
             GenericApplicationContext ctx = new GenericApplicationContext();
-            ctx.registerBeanDefinition("dbProperties", propertiesFactoryBean);
+            ctx.registerBeanDefinition("c2monProperties", propertiesFactoryBean);
             ctx.refresh();
 
             ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(

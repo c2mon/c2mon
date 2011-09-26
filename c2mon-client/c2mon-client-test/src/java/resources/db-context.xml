@@ -12,7 +12,13 @@
            http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
     
        	
-    <bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>		
+       	
+    <bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>	
+    
+    <!-- imports properties passed to client core; id must override existing placeholder configurer in core! -->
+    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="properties" ref="c2monProperties"/>
+    </bean>	
 		
 	<bean id="ds" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
