@@ -179,4 +179,14 @@ public interface ClientDataTagValue extends RuleInputValue {
    * @return collection of ids of Rules *used by* this Tag
    */
   Collection<Long> getRuleIds();
+
+  /**
+   * @return min value this Tag can take
+   */
+  String getMinValue();
+
+  /**
+   * @return max value this Tag can take
+   */
+  String getMaxValue();
 }
