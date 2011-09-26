@@ -14,6 +14,8 @@
     <!-- ><context:property-placeholder location="file:${db.properties}" /> -->
     
 		
+   <bean id="dbProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>		
+		
 	<bean id="ds" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
