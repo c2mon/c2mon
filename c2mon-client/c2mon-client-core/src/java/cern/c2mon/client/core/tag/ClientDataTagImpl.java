@@ -117,8 +117,14 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   /** Unit of the tag */
   private String unit = null;
   
-  /** The current tag value description */
+  /** The description of the Tag*/
   private String description = ""; 
+  
+  /**
+   * Min and max values accepted for this Tag.
+   */
+  private String minValue;  
+  private String maxValue;
   
   /**
    * String representation of the JMS destination where the DataTag 
@@ -132,7 +138,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   /**
    * Ids of rules using this Tag.
    */
-  private Collection<Long> ruleIds = new ArrayList<Long>();
+  private ArrayList<Long> ruleIds = new ArrayList<Long>();
 
   /**
    * List of DataTagUpdateListeners registered for updates on this DataTag
@@ -628,6 +634,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         if (tagUpdate.getRuleIds() != null) {
           ruleIds.addAll(tagUpdate.getRuleIds());
         }
+        minValue = tagUpdate.getMinValue();
+        maxValue = tagUpdate.getMaxValue();
                         
         // Notify all listeners of the update
         notifyListeners();
@@ -934,6 +942,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         clone.ruleExpression = (RuleExpression) ruleExpression.clone();
       }
       clone.listeners = new ArrayList<DataTagUpdateListener>();
+      clone.ruleIds = (ArrayList<Long>) ruleIds.clone();
       
       return clone;
     }
@@ -980,11 +989,45 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
   @Override
   public Boolean isControlTag() {
-    return controlTag;
+    updateTagLock.readLock().lock();
+    try {
+      return controlTag;      
+    }
+    finally {
+      updateTagLock.readLock().unlock();
+    }    
   }
 
   @Override
   public Collection<Long> getRuleIds() {
-    return ruleIds;
+    updateTagLock.readLock().lock();
+    try {
+      return ruleIds;     
+    }
+    finally {
+      updateTagLock.readLock().unlock();
+    }    
+  }
+
+  @Override
+  public String getMinValue() {
+    updateTagLock.readLock().lock();
+    try {
+      return minValue;      
+    }
+    finally {
+      updateTagLock.readLock().unlock();
+    }    
+  }
+
+  @Override
+  public String getMaxValue() {
+    updateTagLock.readLock().lock();
+    try {
+      return maxValue;      
+    }
+    finally {
+      updateTagLock.readLock().unlock();
+    }  
   }
 }

@@ -487,4 +487,20 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   public Collection<Long> getRuleIds() {
     return Collections.emptyList();
   }
+
+  /**
+   * @return always returns null for rules
+   */
+  @Override
+  public String getMaxValue() {
+    return null;
+  }
+
+  /**
+   * @return always returns null for rules
+   */
+  @Override
+  public String getMinValue() {    
+    return null;
+  }
 }
