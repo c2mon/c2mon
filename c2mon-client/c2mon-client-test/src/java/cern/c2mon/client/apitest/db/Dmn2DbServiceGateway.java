@@ -1,11 +1,7 @@
 package cern.c2mon.client.apitest.db;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.config.PropertiesFactoryBean;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
 import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
 
 
@@ -37,7 +33,7 @@ public class Dmn2DbServiceGateway {
     
     public static void init() {
         if (theInstance == null) {
-                          
+            LOGGER.info("loading application context from classpath:application-context.xml");
             final ClassPathXmlApplicationContext xmlContext = 
                 new ClassPathXmlApplicationContext("classpath:application-context.xml"); 
                     
@@ -46,27 +42,4 @@ public class Dmn2DbServiceGateway {
                 
     }
     
-    public static void init(final String dbPropertiesURI) {
-        if (theInstance == null) {
-
-            LOGGER.info("getDbAccessService(), loading properties from " + dbPropertiesURI);
-
-            GenericBeanDefinition propertiesFactoryBean = new GenericBeanDefinition();
-            propertiesFactoryBean.setBeanClass(PropertiesFactoryBean.class);
-            MutablePropertyValues propertyValues = new MutablePropertyValues();
-            propertyValues.addPropertyValue("location", dbPropertiesURI);
-            propertiesFactoryBean.setPropertyValues(propertyValues);
-
-            // start an initial Spring application context and register properties bean
-            GenericApplicationContext ctx = new GenericApplicationContext();
-            ctx.registerBeanDefinition("c2monProperties", propertiesFactoryBean);
-            ctx.refresh();
-
-            ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(
-                    new String[] { "classpath:application-context.xml" }, ctx);
-
-            theInstance = new Dmn2DbServiceGateway(xmlContext.getBean(C2MonClientApiTestService.class));
-        }        
-    }
-
 }
