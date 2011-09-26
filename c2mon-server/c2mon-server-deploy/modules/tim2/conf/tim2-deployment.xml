@@ -67,13 +67,13 @@
     </application>
 
     <application name="c2mon-tim2-test" extends="default">
-      <deployment installLocation="/opt/c2mon-tim2-test">
+      <deployment installLocation="/opt/c2mon">
         <directory name="conf">
-          <file name=".jmxremote.passwd" sourceDir="/user/timtest/"
+          <file name=".jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon"
             mask="400" />
-          <file name=".jmxremote.access" sourceDir="/user/timtest/"
+          <file name=".jmxremote.access" sourceDir="/user/timtest/rep/c2mon"
             mask="400" />
-          <file name=".c2mon.properties" sourceDir="/user/timtest/"
+          <file name=".c2mon.properties" sourceDir="/user/timtest/rep/c2mon"
             mask="400" />
         </directory>
         <directory name="bin">
