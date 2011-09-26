@@ -13,15 +13,15 @@
     
        	       	
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">      
-      <property name="ignoreUnresolvablePlaceholders" value="true"/>      
+      <property name="ignoreUnresolvablePlaceholders" value="true"/>             
     </bean>	         
-    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">    
        <property name="ignoreResourceNotFound" value="true"/>
+       <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
        <property name="location" value="${db.properties}"/> 
     </bean>	
     		
-	<bean id="ds" class="org.apache.commons.dbcp.BasicDataSource"
-		destroy-method="close">
+	<bean id="ds" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
 		<property name="url" value="${jdbc.config.url}" />
 		<property name="username" value="${jdbc.config.user}" />

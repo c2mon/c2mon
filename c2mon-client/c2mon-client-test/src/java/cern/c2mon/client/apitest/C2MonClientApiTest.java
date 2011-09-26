@@ -36,11 +36,14 @@ public class C2MonClientApiTest {
             log.debug("db.properties: "+System.getProperty("db.properties"));
             log.debug("jms.properties: "+System.getProperty("jms.properties"));
             
+            log.info("before Dmn2DbServiceGateway.init()");
+            
             Dmn2DbServiceGateway.init(); 
+            
+            log.info("cfter Dmn2DbServiceGateway.init()");
                                
             C2monServiceGateway.startC2monClient("file:"+System.getProperty("jms.properties"));
-                        
-            C2monServiceGateway.startC2monClient();
+                                    
 
         } catch (Exception e) {
             log.error(e);
