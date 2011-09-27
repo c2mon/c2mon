@@ -99,7 +99,7 @@
             -Ddatasource.config.connections.initial=1
             -Ddatasource.config.connections.max=1
             -Djms.config.destination=tim.config.test
-            -Dc2mon.server.daq.config.enabled=true
+            -Dc2mon.server.config.daq.enabled=true
             <!-- cache module properties for integration testing -->
             -Ddatasource.persistence.connections.initial=2
             -Ddatasource.persistence.connections.max=2
