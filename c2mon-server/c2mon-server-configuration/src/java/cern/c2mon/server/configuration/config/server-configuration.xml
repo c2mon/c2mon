@@ -11,6 +11,10 @@
   <!-- DB connection for this module -->
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-db.xml"/>
   
+  <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor">
+    <property name="daqConfigEnabled" value="${c2mon.server.daq.config.enabled}"/>
+  </bean>
+  
   <bean id="configurationRequestConverter" class="cern.tim.shared.client.configuration.ConfigurationRequestConverter" init-method="init"/>
   
    <!-- TODO rename as connection factory all factories in C2MON, and specify one as priority -->

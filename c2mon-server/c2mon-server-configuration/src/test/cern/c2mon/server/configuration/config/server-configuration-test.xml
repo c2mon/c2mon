@@ -24,7 +24,9 @@
   
   <bean id="testDataHelper" class="cern.tim.server.cache.dbaccess.test.TestDataHelper"/>
   
-  <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor"/>
+  <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor">
+    <property name="daqConfigEnabled" value="false"/>
+  </bean>
   <bean id="configurationDAO" class="cern.c2mon.server.configuration.mybatis.ConfigurationDAOImpl"/>
     
   <bean id="dataTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DataTagConfigHandlerImpl" autowire="constructor"/>
