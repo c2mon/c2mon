@@ -131,12 +131,12 @@ public final class OPCDCOMFactory implements IDCOMErrorConstants {
             break;
         case 0x04:
             reason = "Sensor Failure: A sensor failure had been detected (the " 
-                + "’Limits’ field can provide additional diagnostic "
+                + "Limits field can provide additional diagnostic "
                 + "information in some situations.)";
             break;
         case 0x05:
             reason = "Last known value: Communications have failed. However, the last "
-                + "known value is available. Note that the ‘age’ of "
+                + "known value is available. Note that the age of "
                 + "the value may be determined from the "
                 + "TIMESTAMP in the OPCITEMSTATE.";
             break;
