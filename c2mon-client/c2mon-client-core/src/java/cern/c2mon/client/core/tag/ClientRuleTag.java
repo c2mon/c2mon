@@ -20,7 +20,6 @@ package cern.c2mon.client.core.tag;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -466,41 +465,123 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
     return this.ruleQuality.isValid();
   }
 
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
   @Override
   public String getTopicName() {
-    // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
   }
 
   /**
-   * @return always returns false, since a client rule cannot be a control tag.
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
    */
   @Override
   public Boolean isControlTag() {
-    return Boolean.FALSE;
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
   }
 
   /**
-   * @return always returns an empty list
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
    */
   @Override
   public Collection<Long> getRuleIds() {
-    return Collections.emptyList();
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
   }
 
   /**
-   * @return always returns null for rules
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
    */
   @Override
   public String getMaxValue() {
-    return null;
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
   }
 
   /**
-   * @return always returns null for rules
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
    */
   @Override
   public String getMinValue() {    
-    return null;
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public String getValueDescription() {
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public String getDipPublication() {    
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public String getJapcPublication() {
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public String getHardwareAddress() {
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public int getPriority() {
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public int getTimeDeadband() {
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public float getValueDeadband() {
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public short getValueDeadbandType() {
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public boolean isGuaranteedDelivery() {
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
+  }
+
+  /**
+   * @throws UnsupportedOperationException as not available for ClientRuleTags
+   */
+  @Override
+  public Collection<Long> getAlarmids() {
+    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
   }
 }

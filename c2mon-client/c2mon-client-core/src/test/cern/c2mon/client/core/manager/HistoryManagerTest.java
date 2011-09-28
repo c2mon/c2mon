@@ -221,7 +221,8 @@ public class HistoryManagerTest {
       final TransferTagValueImpl value = 
         new TransferTagValueImpl(
             cdt.getId(), 
-            Integer.valueOf(i), 
+            Integer.valueOf(i),
+            "Test tag value description",
             new DataTagQualityImpl(), 
             TagMode.OPERATIONAL, 
             sourceTimestamp, 

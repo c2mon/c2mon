@@ -36,6 +36,7 @@ public class ClientDataTagImplTest {
       new TransferTagImpl(
           tagId,
           value,
+          "test value desc",
           tagQuality,
           TagMode.TEST,
           new Timestamp(System.currentTimeMillis() - 10000L),
@@ -62,6 +63,7 @@ public class ClientDataTagImplTest {
     assertEquals(original.getTypeNumeric(), copy.getTypeNumeric());
     assertEquals(original.getUnit(), copy.getUnit());
     assertEquals(original.getValue(), copy.getValue());
+    assertEquals(original.getValueDescription(), copy.getValueDescription());
   }
   
   private void checkTagCopy(final ClientDataTagImpl original, final ClientDataTagImpl copy) {

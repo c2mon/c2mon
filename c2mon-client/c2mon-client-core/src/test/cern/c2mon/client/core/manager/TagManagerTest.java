@@ -132,6 +132,7 @@ public class TagManagerTest {
       new TransferTagImpl(
           tagId,
           value,
+          "test value desc",
           tagQuality,
           TagMode.TEST,
           new Timestamp(System.currentTimeMillis() - 10000L),
