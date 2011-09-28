@@ -205,7 +205,8 @@ public class JmsProxyTest {
     jmsProxy.registerUpdateListener(listener, details);
     //send update
     jmsSender.sendToTopic(new TransferTagValueImpl(details.getId(), 
-                                                   10L, 
+                                                   10L,
+                                                   "value description",
                                                    new DataTagQualityImpl(),
                                                    TagMode.TEST,
                                                    new Timestamp(System.currentTimeMillis()), 
