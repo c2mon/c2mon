@@ -366,4 +366,9 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
     this.daqTimestamp = daqTimestamp;
   }
 
+  @Override
+  public String getValueDescription() {
+    return this.description;
+  }
+
 }
