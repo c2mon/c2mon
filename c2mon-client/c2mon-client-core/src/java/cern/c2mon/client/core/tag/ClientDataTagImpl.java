@@ -679,13 +679,15 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         minValue = tagUpdate.getMinValue();
         maxValue = tagUpdate.getMaxValue();
         publications.putAll(tagUpdate.getPublications());
-        priority = tagUpdate.getTransferTagAddress().getPriority();
-        valueDeadband = tagUpdate.getTransferTagAddress().getValueDeadband();
-        valueDeadbandType = tagUpdate.getTransferTagAddress().getValueDeadbandType();
-        timeDeadband = tagUpdate.getTransferTagAddress().getTimeDeadband();
-        timeToLive = tagUpdate.getTransferTagAddress().getTimeToLive();
-        hardwareAddress = tagUpdate.getTransferTagAddress().getHardwareAddress();
-        guaranteedDelivery = tagUpdate.getTransferTagAddress().isGuaranteedDelivery();
+        if (tagUpdate.getTransferTagAddress() != null) {
+          priority = tagUpdate.getTransferTagAddress().getPriority();
+          valueDeadband = tagUpdate.getTransferTagAddress().getValueDeadband();
+          valueDeadbandType = tagUpdate.getTransferTagAddress().getValueDeadbandType();
+          timeDeadband = tagUpdate.getTransferTagAddress().getTimeDeadband();
+          timeToLive = tagUpdate.getTransferTagAddress().getTimeToLive();
+          hardwareAddress = tagUpdate.getTransferTagAddress().getHardwareAddress();
+          guaranteedDelivery = tagUpdate.getTransferTagAddress().isGuaranteedDelivery();
+        }       
                         
         // Notify all listeners of the update
         notifyListeners();
