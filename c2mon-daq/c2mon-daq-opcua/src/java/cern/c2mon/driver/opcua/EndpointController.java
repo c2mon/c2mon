@@ -135,8 +135,8 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
             endpoint.addCommandTags(equipmentConfiguration.getSourceCommandTags().values());
             endpoint.registerEndpointListener(this);
             endpoint.registerEndpointListener(logListener);
-            startAliveTimer();
             sender.confirmEquipmentStateOK();
+            startAliveTimer();
             setUpStatusChecker();
         } catch (OPCCommunicationException e) {
             logger.error(
@@ -151,6 +151,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     protected void setUpStatusChecker() {
         stopStatusChecker();
         statusCheckTimer = new Timer("OPCStatusChecker");
+        int serverTimeout = getCurrentOPCAddress().getServerTimeout();
         statusCheckTimer.schedule(new StatusChecker(endpoint) {
             
             @Override
@@ -177,7 +178,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                 logger.error("OPCCommunication exception try to restart.", e);
                 triggerEndpointRestart();
             }
-        }, 0, getCurrentOPCAddress().getServerTimeout());
+        }, serverTimeout, serverTimeout);
     }
 
     /**
