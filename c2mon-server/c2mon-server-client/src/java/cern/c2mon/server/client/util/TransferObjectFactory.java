@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.List;
 
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.tag.Publisher;
 import cern.c2mon.shared.client.tag.TagMode;
+import cern.c2mon.shared.client.tag.TransferTagAddressImpl;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.server.common.alarm.Alarm;
@@ -47,6 +49,7 @@ public abstract class TransferObjectFactory {
         new TransferTagImpl(
             tag.getId(),
             tag.getValue(),
+            tag.getValueDescription(),
             tag.getDataTagQuality(),
             getTagMode(tag),
             tag.getTimestamp(),
@@ -61,8 +64,18 @@ public abstract class TransferObjectFactory {
       transferTag.addEquimpmentIds(tag.getEquipmentIds());
       transferTag.addProcessIds(tag.getProcessIds());
       if (tag instanceof DataTag || tag instanceof ControlTag) {
-        transferTag.setMinValue(((DataTag) tag).getMinValue().toString());
-        transferTag.setMaxValue(((DataTag) tag).getMaxValue().toString());
+        DataTag dataTag = (DataTag) tag;
+        transferTag.setMinValue(dataTag.getMinValue().toString());
+        transferTag.setMaxValue(dataTag.getMaxValue().toString());
+        if (dataTag.getAddress() != null) {
+          transferTag.setTransferTagAddress(new TransferTagAddressImpl(dataTag.getAddress().getTimeToLive(), 
+                                                                       dataTag.getAddress().getValueDeadbandType(),
+                                                                       dataTag.getAddress().getValueDeadband(),
+                                                                       dataTag.getAddress().getTimeDeadband(),
+                                                                       dataTag.getAddress().getPriority(),
+                                                                       dataTag.getAddress().isGuaranteedDelivery(),
+                                                                       dataTag.getAddress().getHardwareAddress().toConfigXML()));
+        }
       }
       
       if (tag instanceof RuleTag) {
@@ -72,6 +85,12 @@ public abstract class TransferObjectFactory {
       if (!tag.getRuleIds().isEmpty()) {
         transferTag.addRuleIds(tag.getRuleIds());
       }
+      if (tag.getDipAddress() != null) {
+        transferTag.addPublication(Publisher.DIP, tag.getDipAddress());
+      }
+      if (tag.getJapcAddress() != null) {
+        transferTag.addPublication(Publisher.JAPC, tag.getJapcAddress());
+      }      
     }
   
     return transferTag;
@@ -90,7 +109,8 @@ public abstract class TransferObjectFactory {
       tagValue = 
         new TransferTagValueImpl(
             tag.getId(), 
-            tag.getValue(), 
+            tag.getValue(),
+            tag.getValueDescription(),
             tag.getDataTagQuality(),
             getTagMode(tag),
             tag.getTimestamp(), 
