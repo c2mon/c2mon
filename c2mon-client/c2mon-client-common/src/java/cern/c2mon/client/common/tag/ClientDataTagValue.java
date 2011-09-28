@@ -54,6 +54,11 @@ public interface ClientDataTagValue extends RuleInputValue {
   Object getValue();
   
   /**
+   * @return the description of the current value
+   */
+  String getValueDescription();
+  
+  /**
    * Returns the unit of the value
    * @return The unit of the value
    */
@@ -189,4 +194,49 @@ public interface ClientDataTagValue extends RuleInputValue {
    * @return max value this Tag can take
    */
   String getMaxValue();
+  
+  /**
+   * @return DIP publication topic
+   */
+  String getDipPublication();
+  
+  /**
+   * @return JAPC publication topic
+   */
+  String getJapcPublication();
+
+  /**
+   * @return true if guaranteed delivery is set
+   */
+  boolean isGuaranteedDelivery();
+
+  /**
+   * @return JMS priority
+   */
+  int getPriority();
+
+  /**
+   * @return Hardware address as string
+   */
+  String getHardwareAddress();
+
+  /**
+   * @return timedead band value
+   */
+  int getTimeDeadband();
+
+  /**
+   * @return value deadband setting
+   */
+  float getValueDeadband();
+
+  /**
+   * @return value deadband type
+   */
+  short getValueDeadbandType();
+
+  /**
+   * @return ids of all Alarms associated to this Tag
+   */
+  Collection<Long> getAlarmids();
 }
