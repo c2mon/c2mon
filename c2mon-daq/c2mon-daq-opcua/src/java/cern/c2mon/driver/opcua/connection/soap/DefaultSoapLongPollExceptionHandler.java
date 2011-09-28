@@ -33,7 +33,7 @@ public class DefaultSoapLongPollExceptionHandler
     /**
      * The timer used to schedule the restart.
      */
-    private final Timer timer = new Timer();
+    private final Timer timer = new Timer(true);
     
     /**
      * The endpoint this handler belongs to.

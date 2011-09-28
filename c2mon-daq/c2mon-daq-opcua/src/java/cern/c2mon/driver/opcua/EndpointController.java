@@ -3,13 +3,16 @@ package cern.c2mon.driver.opcua;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Timer;
 
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpointFactory;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpointListener;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpoint.STATE;
 import cern.c2mon.driver.opcua.connection.common.impl.AliveWriter;
+import cern.c2mon.driver.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCriticalException;
+import cern.c2mon.driver.opcua.connection.common.impl.StatusChecker;
 import cern.tim.driver.common.EquipmentLogger;
 import cern.tim.driver.common.EquipmentLoggerFactory;
 import cern.tim.driver.common.IEquipmentMessageSender;
@@ -34,11 +37,6 @@ import cern.tim.shared.daq.datatag.SourceDataQuality;
  * 
  */
 public class EndpointController implements IOPCEndpointListener, ICommandTagChanger, IDataTagChanger {
-    /**
-     * Time to wait to restart an endpoint after the subscription failed.
-     */
-    public static final long SUBSCRIPTION_RETRY_TIME = 2000L;
-
     /**
      * Properties for the opc endpoint.
      */
@@ -94,6 +92,8 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      * The equipment configuration for his controller.
      */
     private IEquipmentConfiguration equipmentConfiguration;
+    
+    private Timer statusCheckTimer;
 
     /**
      * Creates a new EndpointController
@@ -129,22 +129,76 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      * controller will receive updates.
      */
     public synchronized void startEndpoint() {
-        createEndpoint();
-        endpoint.addDataTags(equipmentConfiguration.getSourceDataTags().values());
-        endpoint.addCommandTags(equipmentConfiguration.getSourceCommandTags().values());
-        endpoint.registerEndpointListener(this);
-        endpoint.registerEndpointListener(logListener);
-        startAliveTimer();
-        sender.confirmEquipmentStateOK();
+        try {
+            createEndpoint();
+            endpoint.addDataTags(equipmentConfiguration.getSourceDataTags().values());
+            endpoint.addCommandTags(equipmentConfiguration.getSourceCommandTags().values());
+            endpoint.registerEndpointListener(this);
+            endpoint.registerEndpointListener(logListener);
+            startAliveTimer();
+            sender.confirmEquipmentStateOK();
+            setUpStatusChecker();
+        } catch (OPCCommunicationException e) {
+            logger.error(
+                    "Endpoint creation failed. Controller will try again. ", e);
+            triggerEndpointRestart();
+        }
+    }
+
+    /**
+     * Sets up and schedules a regular status check.
+     */
+    protected void setUpStatusChecker() {
+        stopStatusChecker();
+        statusCheckTimer = new Timer("OPCStatusChecker");
+        statusCheckTimer.schedule(new StatusChecker(endpoint) {
+            
+            @Override
+            public void onOPCUnknownException(
+                    final IOPCEndpoint endpoint, final Exception e) {
+                // critical should shutdown
+                logger.error("Status of and endpoint could not be determined "
+                        + "because of an unexpected exception. Shutting down.", e);
+                stop();
+            }
+            
+            @Override
+            public void onOPCCriticalException(
+                    final IOPCEndpoint endpoint, final OPCCriticalException e) {
+                // critical should shutdown
+                logger.error("Status of and endpoint could not be determined "
+                        + "because of an critical OPC exception. Shutting down.", e);
+                stop();
+            }
+            
+            @Override
+            public void onOPCCommunicationException(
+                    final IOPCEndpoint endpoint, final OPCCommunicationException e) {
+                logger.error("OPCCommunication exception try to restart.", e);
+                triggerEndpointRestart();
+            }
+        }, 0, getCurrentOPCAddress().getServerTimeout());
+    }
+
+    /**
+     * 
+     */
+    protected void stopStatusChecker() {
+        if (statusCheckTimer != null) {
+            statusCheckTimer.cancel();
+        }
     }
 
     /**
      * Starts the alive timer.
      */
     public synchronized void startAliveTimer() {
-        ISourceDataTag targetTag = equipmentConfiguration.getSourceDataTag(equipmentConfiguration.getAliveTagId());
+        ISourceDataTag targetTag = equipmentConfiguration.getSourceDataTag(
+                equipmentConfiguration.getAliveTagId());
         if (targetTag != null) {
-            writer = new AliveWriter(endpoint, equipmentConfiguration.getAliveTagInterval(), targetTag, factory.getEquipmentLogger(AliveWriter.class));
+            writer = new AliveWriter(
+                    endpoint, equipmentConfiguration.getAliveTagInterval() / 2,
+                    targetTag, factory.getEquipmentLogger(AliveWriter.class));
             writer.startWriter();
         }
     }
@@ -189,6 +243,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      */
     public synchronized void stop() {
         stopAliveTimer();
+        stopStatusChecker();
         if (endpoint != null)
             endpoint.reset();
         currentAddress = null;
@@ -200,7 +255,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      * 
      * @return The next available OPCAddress.
      */
-    private OPCAddress getNextOPCAddress() {
+    private synchronized OPCAddress getNextOPCAddress() {
         if (currentAddress == null) {
             currentAddress = opcAddresses.get(0);
         } else if (opcAddresses.size() > 1) {
@@ -211,6 +266,15 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
             }
         }
         return currentAddress;
+    }
+    
+    /**
+     * Returns the current OPC Address.
+     * 
+     * @return The OPCAddress used at the moment.
+     */
+    private synchronized OPCAddress getCurrentOPCAddress() {
+    	return currentAddress;
     }
 
     /**
@@ -237,6 +301,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
             convertedValue = TIMDriverSimpleTypeConverter.convert(
                     dataTag, tagValue.toString());
         sender.sendTagFiltered(dataTag, convertedValue, timestamp);
+        logger.debug("Tag value sent.");
     }
 
     /**
@@ -272,7 +337,11 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      */
     @Override
     public void onTagInvalidException(final ISourceDataTag dataTag, final Throwable cause) {
-        sender.sendInvalidTag(dataTag, (short) SourceDataQuality.UNKNOWN, "Tag was rejected by endpoint: " + cause.getClass().getSimpleName());
+        String decription = "Tag invalid: " + cause.getClass().getSimpleName() + ": " 
+            + cause.getMessage();
+        logger.debug(decription);
+		sender.sendInvalidTag(dataTag, (short) SourceDataQuality.UNKNOWN,
+        			decription);
     }
 
     /**
@@ -283,7 +352,15 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      *            The cause of the subscription loss.
      */
     @Override
-    public synchronized void onSubscriptionException(final Throwable cause) {
+    public void onSubscriptionException(final Throwable cause) {
+        logger.error("Subscription failed. Restarting endpoint.", cause);
+        triggerEndpointRestart();
+    }
+
+    /**
+     * Triggers the restart of this endpoint.
+     */
+    private synchronized void triggerEndpointRestart() {
         if (reconnectThread == null || !reconnectThread.isAlive()) {
             reconnectThread = new Thread() {
                 @Override
@@ -292,7 +369,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                         endpoint.reset();
                         sender.confirmEquipmentStateIncorrect();
                         try {
-                            Thread.sleep(SUBSCRIPTION_RETRY_TIME);
+                            Thread.sleep(getCurrentOPCAddress().getServerRetryTimeout());
                         } catch (InterruptedException e) {
                             logger.error("Subscription restart interrupted!", e);
                         }

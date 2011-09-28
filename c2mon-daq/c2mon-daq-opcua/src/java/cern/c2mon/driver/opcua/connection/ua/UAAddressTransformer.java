@@ -40,10 +40,6 @@ public final class UAAddressTransformer {
      */
     private static final int SIEMENS_CONNECTION_GROUP = 1;
     
-    /**
-     * Minimum number of groups in the Siemens regular expression.
-     */
-    private static final int SIEMENS_GROUP_COUNT = 4;
 
     /**
      * Siemens classic address regular expression.
@@ -97,7 +93,7 @@ public final class UAAddressTransformer {
         Matcher matcher = SIEMENS_PATTERN.matcher(address);
         StringBuffer transformedAddress = new StringBuffer();
         if (matcher.find()) {
-            transformedAddress.append("s=");
+//            transformedAddress.append("s=");
             String connection = matcher.group(SIEMENS_CONNECTION_GROUP);
             if (connection.equals(LOCALHOST))
                 transformedAddress.append(connection.toLowerCase() + ".");
@@ -109,8 +105,8 @@ public final class UAAddressTransformer {
             transformedAddress.append(byteNumber);
             String dataType = matcher.group(SIEMENS_DATATYPE_GROUP);
             transformedAddress.append("," + transformSiemensDataType(dataType));
-            if (matcher.groupCount() > SIEMENS_GROUP_COUNT) {
-                String bitNumber = matcher.group(SIEMENS_BIT_NUMBER_GROUP);
+            String bitNumber = matcher.group(SIEMENS_BIT_NUMBER_GROUP);
+			if (bitNumber != null) {
                 transformedAddress.append(bitNumber);
             }
         }

@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.opcfoundation.ua.builtintypes.DataValue;
+import org.opcfoundation.ua.builtintypes.DateTime;
 import org.opcfoundation.ua.builtintypes.LocalizedText;
 import org.opcfoundation.ua.builtintypes.NodeId;
 import org.opcfoundation.ua.builtintypes.UnsignedInteger;
@@ -22,6 +23,8 @@ import org.opcfoundation.ua.core.ApplicationDescription;
 import org.opcfoundation.ua.core.ApplicationType;
 import org.opcfoundation.ua.core.CallMethodRequest;
 import org.opcfoundation.ua.core.MonitoredItemNotification;
+import org.opcfoundation.ua.core.ServerState;
+import org.opcfoundation.ua.core.ServerStatusDataType;
 import org.opcfoundation.ua.core.TimestampsToReturn;
 import org.opcfoundation.ua.transport.security.Cert;
 import org.opcfoundation.ua.transport.security.SecurityMode;
@@ -38,6 +41,7 @@ import com.prosysopc.ua.UserIdentity;
 import com.prosysopc.ua.PkiFileBasedCertificateValidator.CertificateCheck;
 import com.prosysopc.ua.PkiFileBasedCertificateValidator.ValidationResult;
 import com.prosysopc.ua.client.MonitoredItem;
+import com.prosysopc.ua.client.ServerConnectionException;
 import com.prosysopc.ua.client.Subscription;
 import com.prosysopc.ua.client.UaClient;
 
@@ -65,7 +69,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
         new HashMap<SubscriptionGroup<UAItemDefintion>, Subscription>();
     
     // TODO should be in configuration file.
-    private static final String PRIVATE_KEY_PASSWORD = "xxx";
+    private static final String PRIVATE_KEY_PASSWORD = "2mbxnK3U";
 
     private static final String PRODUCT_URI = "urn:cern.ch:UA:C2MON";
 
@@ -79,7 +83,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
     /**
      * The base directory of the certificates.	
      */
-    private static final String CERTIFICATE_BASE_DIR = "/some/path";
+    private static final String CERTIFICATE_BASE_DIR = "PKI/CA";
 
     /**
      * Security mode of the application. The mode at the top is the preferred one.
@@ -127,6 +131,8 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
             client = new UaClient(uri);
             setUpSecurity(userName, password);
             setUpApplication();
+            client.connect();
+            ServerState state = client.getServerStatus().getState();
         } catch (Exception e) {
             throw new OPCCommunicationException(e);
         }
@@ -256,6 +262,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
                     definition.getAddress(), valueDeadband, 
                     timeDeadband);
         addToSubscription(subscription, definition, item);
+//        System.out.println(definition.getAddress());
         if (definition.hasRedundantAddress()) {
             MonitoredItem redundantItem = UAObjectFactory.createMonitoredItem(
                     definition.getAddress(), valueDeadband, 
@@ -321,9 +328,11 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
             final MonitoredItem item, final DataValue value) {
         long itemdefintionId = definitionMap.get(
                 item.getClientHandle()).getId();
+        if (!checkError(itemdefintionId, value)) {
         notifyEndpointListenersValueChange(
                 itemdefintionId, value.getSourceTimestamp().getMilliSeconds(),
-                value.toString());
+                value.getValue().getValue());
+        }
     }
     
     /**
@@ -382,9 +391,9 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
      */
     @Override
     protected void onRefresh(final Collection<UAItemDefintion> itemDefintions) {
-        ArrayList<NodeId> items = 
-            new ArrayList<NodeId>(itemDefintions.size());
         for (UAItemDefintion definition : itemDefintions) {
+        	ArrayList<NodeId> items = 
+                    new ArrayList<NodeId>(itemDefintions.size());
             items.add(definition.getAddress());
             if (definition.hasRedundantAddress()) {
                 items.add(definition.getRedundantAddress());
@@ -394,10 +403,20 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
                 DataValue[] values = client.readValues(
                         nodeIdArray, TimestampsToReturn.Both);
                 for (DataValue value : values) {
-                    notifyEndpointListenersValueChange(
-                            definition.getId(),
-                            value.getSourceTimestamp().getTimeInMillis(),
-                            value.getValue().toString());
+                	if (!checkError(definition.getId(), value)) {
+	                    DateTime timestamp = value.getSourceTimestamp();
+	                    if (timestamp == null) {
+	                    	timestamp = value.getServerTimestamp();
+	                    	if (timestamp == null) {
+	                    		timestamp = new DateTime();
+	                    	}
+	                    }
+						long timeInMillis = timestamp.getTimeInMillis();
+						notifyEndpointListenersValueChange(
+	                            definition.getId(),
+	                            timeInMillis,
+	                            value.getValue().getValue());
+                	}
                 }
             } catch (ServiceException e) {
                 throw new OPCCommunicationException(e);
@@ -405,7 +424,17 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
         }
     }
 
-    /**
+    private boolean checkError(long itemdefintionId, DataValue value) {
+    	boolean error = false;
+		if (value.getStatusCode().getValue().intValue() != 0) {
+			notifyEndpointListenersItemError(
+					itemdefintionId, new OPCCommunicationException(value.getStatusCode().toString()));
+			error = true;
+		}
+		return error;
+	}
+
+	/**
      * Method call for OPC UA.
      * 
      * @param itemDefintion The item definiton object which identifies the
@@ -540,6 +569,29 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
                 || (definition.hasRedundantAddress() 
                         && monitoredId.equals(
                                 definition.getRedundantAddress()));
+    }
+    
+    /**
+     * Checks the status of the enpoint. It will throw an exception if something
+     * is wrong.
+     * 
+     * @throws OPCCommunicationException Thrown if the connection is not
+     * reachable but might be back later on.
+     * @throws OPCCriticalException Thrown if the connection is not
+     * reachable and can most likely not be restored.
+     */
+    @Override
+    protected void checkStatus() {
+        try {
+            ServerState state = client.getServerStatus().getState();
+            if (!state.equals(ServerState.Running)) {
+                throw new OPCCommunicationException("OPC server not running.");
+            }
+        } catch (ServerConnectionException e) {
+            throw new OPCCommunicationException(e);
+        } catch (StatusException e) {
+            throw new OPCCommunicationException(e);
+        }
     }
 
 }

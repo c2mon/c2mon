@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.linar.jintegra.AuthInfo;
 import com.linar.jintegra.AutomationException;
@@ -14,6 +16,7 @@ import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
 import cern.c2mon.driver.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCommunicationException;
+import cern.c2mon.driver.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCEndpoint;
 import cern.c2mon.driver.opcua.connection.common.impl.SubscriptionGroup;
 import ch.cern.tim.driver.jintegraInterface.DIOPCGroupEventAdapter;
@@ -26,6 +29,7 @@ import ch.cern.tim.driver.jintegraInterface.OPCGroup;
 import ch.cern.tim.driver.jintegraInterface.OPCItem;
 import ch.cern.tim.driver.jintegraInterface.OPCItems;
 import ch.cern.tim.driver.jintegraInterface.OPCServer;
+import ch.cern.tim.driver.jintegraInterface.OPCServerState;
 
 /**
  * The DADCOMEndpoint represents an endpoint to connect via DCOM to a classic
@@ -35,6 +39,8 @@ import ch.cern.tim.driver.jintegraInterface.OPCServer;
  * 
  */
 public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
+
+    private static final String TIMEOUT = "10000";
 
     /**
      * The OPC server object.
@@ -61,6 +67,8 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      * The authentication info of this endpoint.
      */
     private AuthInfo authInfo;
+    
+    private ExecutorService executorService = Executors.newCachedThreadPool();
 
     /**
      * Creates a new DADCOMEndpoint.
@@ -74,6 +82,8 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             final IItemDefinitionFactory<DADCOMItemDefintion> itemDefinitionFactory, 
             final IGroupProvider<DADCOMItemDefintion> groupProvider) {
         super(itemDefinitionFactory, groupProvider);
+        System.setProperty("JINTEGRA_OUTGOING_CONNECTION_TIMEOUT", TIMEOUT);
+        System.setProperty("JINTEGRA_INCOMING_CONNECTION_TIMEOUT", TIMEOUT);
     }
 
     /**
@@ -116,7 +126,8 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         } else {
             String[] servers = (String[]) server.getOPCServers(host);
             if (servers == null || servers.length == 0) {
-                throw new OPCCommunicationException("No OPC servers on the provided host");
+                throw new OPCCommunicationException("No OPC servers on the"
+                        + "provided host");
             } else {
                 server.connect(servers[0], host);
             }
@@ -164,6 +175,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             public void dataChange(final DIOPCGroupEventDataChangeEvent theEvent) throws IOException {
                 notifyListeners(theEvent);
             }
+            
         });
         group.setIsSubscribed(true);
         return group;
@@ -227,22 +239,27 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      *            The event with the updates.
      */
     private void notifyListeners(final DIOPCGroupEventDataChangeEvent theEvent) {
-        int[] clientHandles = theEvent.getClientHandles();
-        Date[] timestamps = theEvent.getTimeStamps();
-        Object[] values = theEvent.getItemValues();
-        int[] qualities = theEvent.getQualities();
-        for (int i = 0; i < clientHandles.length; i++) {
-            // redundant addresses have negative id
-            long itemAdressId = Math.abs(clientHandles[i]);
-            if (isGoodQuality(qualities[i])) {
-                Object value = values[i];
-                long timestamp = timestamps[i].getTime();
-                notifyEndpointListenersValueChange(itemAdressId, timestamp, value);
-            } else {
-                OPCCommunicationException ex = OPCDCOMFactory.createQualityException(qualities[i]);
-                notifyEndpointListenersItemError(itemAdressId, ex);
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                int[] clientHandles = theEvent.getClientHandles();
+                Date[] timestamps = theEvent.getTimeStamps();
+                Object[] values = theEvent.getItemValues();
+                int[] qualities = theEvent.getQualities();
+                for (int i = 0; i < clientHandles.length; i++) {
+                    // redundant addresses have negative id
+                    long itemAdressId = Math.abs(clientHandles[i]);
+                    if (isGoodQuality(qualities[i])) {
+                        Object value = values[i];
+                        long timestamp = timestamps[i].getTime();
+                        notifyEndpointListenersValueChange(itemAdressId, timestamp, value);
+                    } else {
+                        OPCCommunicationException ex = OPCDCOMFactory.createQualityException(qualities[i]);
+                        notifyEndpointListenersItemError(itemAdressId, ex);
+                    }
+                }
             }
-        }
+        });
     }
 
     /**
@@ -375,6 +392,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         server.release();
         server = null;
         itemHandleOpcItems.clear();
+//        com.linar.jintegra.Cleaner.releaseAll();
     }
 
     /**
@@ -420,6 +438,34 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             throw OPCDCOMFactory.createWrappedAutomationException(e);
         } catch (Exception e) {
             throw new OPCCommunicationException("Problems wih the DCOM connection occured", e);
+        }
+    }
+
+    /**
+     * Checks the status of the enpoint. It will throw an exception if something
+     * is wrong.
+     * 
+     * @throws OPCCommunicationException Thrown if the connection is not
+     * reachable but might be back later on.
+     * @throws OPCCriticalException Thrown if the connection is not
+     * reachable and can most likely not be restored.
+     */
+    @Override
+    protected void checkStatus() {
+        AuthInfo.setThreadDefault(authInfo);
+        try {
+            switch (server.getServerState()) {
+            case OPCServerState.OPCRunning:
+                // fine do nothing
+                break;
+            default:
+                // not fine throw exception
+                throw new OPCCommunicationException("OPC server state wrong.");
+            }
+        } catch (AutomationException e) {
+            throw OPCDCOMFactory.createWrappedAutomationException(e);
+        } catch (IOException e) {
+            throw new OPCCommunicationException(e);
         }
     }
 

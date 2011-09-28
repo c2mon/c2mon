@@ -3,6 +3,7 @@ package cern.c2mon.driver.opcua;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpointListener;
 import cern.tim.driver.common.EquipmentLogger;
 import cern.tim.driver.tools.TIMDriverSimpleTypeConverter;
+import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 
 /**
@@ -77,7 +78,8 @@ public class EndpointEquipmentLogListener implements IOPCEndpointListener {
      */
     @Override
     public void onTagInvalidException(final ISourceDataTag dataTag, final Throwable cause) {
-        logger.warn("Tag with id '" + dataTag.getId() + "' caused exception. " + "Check configuration.", cause);
+        logger.warn("Tag with id '" + dataTag.getId() + "' caused exception. " + "Check configuration. Address: " 
+        		+ ((OPCHardwareAddress)dataTag.getHardwareAddress()).getOPCItemName(), cause);
     }
 
 }

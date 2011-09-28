@@ -134,7 +134,7 @@ public final class SoapObjectFactory {
      */
     public static RequestOptions 
     createDefaultRequestOptions(final String requestHandle) {
-        return new RequestOptions(null, true, false, false, false, false, 
+        return new RequestOptions(null, true, false, true, false, false, 
                 requestHandle, "en");
     }
     

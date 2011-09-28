@@ -407,6 +407,16 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
         }
     }
     
+    @Override
+    public void checkConnection() {
+        requireState(STATE.INITIALIZED);
+        checkStatus();
+    }
+    /**
+     * Checks the status of the endpoint.
+     */
+    protected abstract void checkStatus();
+    
     /**
      * This method should be the first to be called. It gives the endpoint
      * all properties which are specific to the endpoint type.

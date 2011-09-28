@@ -70,7 +70,7 @@ public class OPCMessageHandler extends EquipmentMessageHandler
                     opcAddresses, config);
             getEquipmentLogger().debug("starting endpoint");
             controller.startEndpoint();
-            getEquipmentLogger().debug("endpoint startet");
+            getEquipmentLogger().debug("endpoint started");
         } catch (OPCAddressException e) {
             throw new EqIOException(
                     "OPC address configuration string is invalid.", e);
@@ -78,6 +78,8 @@ public class OPCMessageHandler extends EquipmentMessageHandler
             throw new EqIOException(
                     "The configured protocol(s) could not be matched to an "
                     + "endpoint implementation.", e);
+        } catch (OPCCriticalException e) {
+            throw new EqIOException("Endpoint creation failed.", e);
         }
         getEquipmentCommandHandler().setCommandRunner(this);
         getEquipmentConfigurationHandler().setCommandTagChanger(controller);

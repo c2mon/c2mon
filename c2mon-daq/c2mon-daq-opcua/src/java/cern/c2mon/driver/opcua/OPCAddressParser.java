@@ -97,7 +97,8 @@ public class OPCAddressParser {
                 addresses.add(alternativeAddress);
             }
         } catch (Exception ex) {
-            throw new OPCCriticalException("Address parsing failed.", ex);
+            throw new OPCCriticalException(
+                    "Address parsing failed. Address: " + address, ex);
         }
         return addresses;
     }

@@ -1,4 +1,4 @@
-package cern.c2mon.driver.opcua.common;
+package cern.c2mon.driver.opcua;
 
 import static org.easymock.classextension.EasyMock.*;
 
@@ -8,8 +8,10 @@ import org.junit.Test;
 
 import cern.c2mon.driver.opcua.EndpointEquipmentLogListener;
 import cern.tim.driver.common.EquipmentLogger;
+import cern.tim.shared.common.datatag.DataTagAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 import cern.tim.shared.daq.datatag.SourceDataTag;
+import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
 
 public class EndpointEquipmentLogListenerTest {
     
@@ -59,7 +61,8 @@ public class EndpointEquipmentLogListenerTest {
     @Test
     public void testOnInvalidTagException() {
         Throwable cause = new Throwable();
-        ISourceDataTag dataTag = new SourceDataTag(1L, "asd", false);
+        DataTagAddress address = new DataTagAddress(new OPCHardwareAddressImpl("asd"));
+		SourceDataTag dataTag = new SourceDataTag(1L, "asd", false, (short) 0, "Boolean", address );
         
         logger.warn("Tag with id '" + dataTag.getId() + "' caused exception. "
                 + "Check configuration.", cause);

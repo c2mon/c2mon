@@ -1,4 +1,4 @@
-package cern.c2mon.driver.opcua.common;
+package cern.c2mon.driver.opcua;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URISyntaxException;
@@ -67,7 +67,7 @@ public class EndpointControllerTest {
     @Before
     public void setUp() throws URISyntaxException {
         opcAddress = new OPCAddress.Builder(
-                "test://somhost/somepath", 100, 1000)
+                "test://somhost/somepath", 1000, 1000)
                 .build();
         addresses = new ArrayList<OPCAddress>();
         addresses.add(opcAddress);
@@ -85,12 +85,20 @@ public class EndpointControllerTest {
                 error = e;
             }
         });
+//        reset(endpoint);
     }
     
     @After
     public void tearDown() throws Throwable {
         if (error != null)
             throw error;
+        try {
+        	reset(endpoint);
+        	endpoint.reset();
+        }
+        catch (Exception e) {
+        	
+        }
     }
     
     @Test
@@ -156,7 +164,8 @@ public class EndpointControllerTest {
         endpoint.registerEndpointListener(
                 isA(EndpointEquipmentLogListener.class));
         sender.confirmEquipmentStateOK();
-        
+        endpoint.checkConnection();
+        expectLastCall().anyTimes();
         //refresh
         expect(endpoint.getState()).andReturn(STATE.INITIALIZED);
         endpoint.refreshDataTags(sourceDataTags.values());
@@ -166,7 +175,7 @@ public class EndpointControllerTest {
         
         replay(endpoint, sender, factory, conf);
         controller.onSubscriptionException(new Exception());
-        Thread.sleep(EndpointController.SUBSCRIPTION_RETRY_TIME + 1000L);
+        Thread.sleep(100L + 1000L);
         verify(endpoint, sender, factory, conf);
     }
     
@@ -199,6 +208,8 @@ public class EndpointControllerTest {
         expect(conf.getSourceDataTag(1L)).andReturn(null);
         replay(factory, conf);
         controller.startEndpoint();
+        controller.stopStatusChecker();
+        controller.stopAliveTimer();
         verify(factory, conf);
         reset(endpoint, sender, factory, conf);
     }
@@ -208,9 +219,8 @@ public class EndpointControllerTest {
         ISourceDataTag dataTag = new SourceDataTag(1L, "asd", false);
         Throwable cause = new Exception();
         
-        sender.sendInvalidTag(dataTag, (short) SourceDataQuality.UNKNOWN,
-                "Tag was rejected by endpoint: " 
-                + cause.getClass().getSimpleName());
+        sender.sendInvalidTag(eq(dataTag), eq((short) SourceDataQuality.UNKNOWN),
+                isA(String.class));
         
         replay(sender);
         controller.onTagInvalidException(dataTag, cause);
@@ -240,6 +250,9 @@ public class EndpointControllerTest {
         tags.add(tag);
         endpoint.refreshDataTags(tags);
         
+//        endpoint.checkConnection();
+//        expectLastCall().anyTimes();
+        
         replay(endpoint);
         controller.refresh(tag);
         verify(endpoint);
@@ -256,6 +269,9 @@ public class EndpointControllerTest {
         
         expect(endpoint.getState()).andReturn(STATE.INITIALIZED);
         endpoint.executeCommand(hardwareAddress, sourceCommandTagValue);
+        
+//        endpoint.checkConnection();
+//        expectLastCall().anyTimes();
         
         replay(endpoint);
         controller.runCommand(commandTag, sourceCommandTagValue);
@@ -285,6 +301,9 @@ public class EndpointControllerTest {
         ISourceCommandTag commandTag = new SourceCommandTag(1L, "asd");
         endpoint.addCommandTag(commandTag);
         
+//        endpoint.checkConnection();
+//        expectLastCall().anyTimes();
+        
         replay(endpoint);
         ChangeReport changeReport = new ChangeReport(1L);
         controller.onAddCommandTag(commandTag, changeReport);
@@ -299,6 +318,9 @@ public class EndpointControllerTest {
         expect(endpoint.getState()).andReturn(STATE.INITIALIZED);
         ISourceCommandTag commandTag = new SourceCommandTag(1L, "asd");
         endpoint.removeCommandTag(commandTag);
+        
+        endpoint.checkConnection();
+        expectLastCall().anyTimes();
         
         replay(endpoint);
         ChangeReport changeReport = new ChangeReport(1L);
@@ -334,6 +356,9 @@ public class EndpointControllerTest {
         HardwareAddress address = new OPCHardwareAddressImpl("asd");
         ISourceCommandTag oldTag = new SourceCommandTag(1L, "asd", 100, 1000, address);
         ISourceCommandTag newTag = new SourceCommandTag(1L, "asd", 100, 1000, address);
+        
+        endpoint.checkConnection();
+        expectLastCall().anyTimes();
         
         replay(endpoint);
         ChangeReport changeReport = new ChangeReport(1L);

@@ -1,4 +1,4 @@
-package cern.c2mon.driver.opcua.common;
+package cern.c2mon.driver.opcua;
 
 import java.net.URI;
 import java.net.URISyntaxException;

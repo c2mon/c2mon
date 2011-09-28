@@ -11,9 +11,12 @@ import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
+import org.opcfoundation.webservices.XMLDA._1_0.GetStatus;
+import org.opcfoundation.webservices.XMLDA._1_0.GetStatusResponse;
 import org.opcfoundation.webservices.XMLDA._1_0.ItemValue;
 import org.opcfoundation.webservices.XMLDA._1_0.OPCError;
 import org.opcfoundation.webservices.XMLDA._1_0.OPCXMLDataAccessSoap;
+import org.opcfoundation.webservices.XMLDA._1_0.Read;
 import org.opcfoundation.webservices.XMLDA._1_0.ReadRequestItem;
 import org.opcfoundation.webservices.XMLDA._1_0.ReadResponse;
 import org.opcfoundation.webservices.XMLDA._1_0.RequestOptions;
@@ -21,9 +24,6 @@ import org.opcfoundation.webservices.XMLDA._1_0.Subscribe;
 import org.opcfoundation.webservices.XMLDA._1_0.SubscribeRequestItem;
 import org.opcfoundation.webservices.XMLDA._1_0.SubscribeResponse;
 import org.opcfoundation.webservices.XMLDA._1_0.WriteResponse;
-import org.opcfoundation.webservices.XMLDA._1_0.holders.OPCErrorArrayHolder;
-import org.opcfoundation.webservices.XMLDA._1_0.holders.ReplyBaseHolder;
-import org.opcfoundation.webservices.XMLDA._1_0.holders.ReplyItemListHolder;
 
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
@@ -106,10 +106,17 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
     @Override
     protected synchronized void onInit(final OPCAddress opcAddress) {
         this.address = opcAddress;
-        String domain = opcAddress.getDomain();
-        String user = opcAddress.getUser();
-        String password = opcAddress.getPassword();
+        final String domain = opcAddress.getDomain();
+        final String user = opcAddress.getUser();
+        final String password = opcAddress.getPassword();
         try {
+//        	DefaultHttpParams.getDefaultParams()
+//            .setParameter("http.authentication.credential-provider", new CredentialsProvider() {
+//                @Override
+//                public Credentials getCredentials(AuthScheme arg0, String arg1, int arg2, boolean arg3) throws CredentialsNotAvailableException {
+//                    return new UsernamePasswordCredentials(domain + "\\" + user, password);
+//                }
+//            });
             URL serverURL = opcAddress.getUri().toURL();
             dataAccess = 
                 SoapObjectFactory.createOPCDataAccessSoapInterface(serverURL,
@@ -244,18 +251,13 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
                                 redClientItemHandle, redAddress));
             }
         }
+        
         ReadRequestItem[] itemListArray = 
             itemList.toArray(new ReadRequestItem[itemList.size()]);
-        ReadResponse readResponse = new ReadResponse();
-        ReplyBaseHolder readResult = 
-            new ReplyBaseHolder(readResponse.getReadResult());
-        OPCErrorArrayHolder errors = new OPCErrorArrayHolder();
-        ReplyItemListHolder rItemList = new ReplyItemListHolder(
-                readResponse.getRItemList());
+        Read read = new Read(SoapObjectFactory.createDefaultRequestOptions("read"), itemListArray);
         try {
-            dataAccess.read(options, itemListArray, readResult, rItemList,
-                    errors);
-            checkErrors(errors.value);
+            ReadResponse readResponse = dataAccess.read(read);
+            checkErrors(readResponse.getErrors());
             for (ItemValue value : readResponse.getRItemList()) {
                 String clientItemHandle = value.getClientItemHandle();
                 notifyEndpointListenersValueChange(
@@ -343,9 +345,11 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
      * @param errors The errors which happened.
      */
     private void checkErrors(final OPCError[] errors) {
-        if (errors != null) {
+        if (errors != null && errors.length > 0 
+        		&&  !errors[0].getText().equals(
+        				"The server does not support the requested rate but will use the closest available rate.")) {
             StringBuffer errorString = new StringBuffer();
-            errorString.append("Error(s) writing: ");
+            errorString.append("Error(s): ");
             for (OPCError error : errors) {
                 errorString.append(error.getText());
                 errorString.append(", ");
@@ -406,6 +410,29 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
             final SubscriptionGroup<DASoapItemDefintion> subscriptionGroup) {
         if (polls.containsKey(subscriptionGroup))
             polls.get(subscriptionGroup).release();
+    }
+    
+    /**
+     * Checks the status of the enpoint. It will throw an exception if something
+     * is wrong.
+     * 
+     * @throws OPCCommunicationException Thrown if the connection is not
+     * reachable but might be back later on.
+     * @throws OPCCriticalException Thrown if the connection is not
+     * reachable and can most likely not be restored.
+     */
+    @Override
+    protected void checkStatus() {
+        try {
+            GetStatusResponse response = dataAccess.getStatus(new GetStatus());
+            
+            if (!response.getGetStatusResult().getServerState().getValue().equals("running")) {
+                throw new OPCCommunicationException(
+                        "OPC server not in running state. " + response.getStatus().getStatusInfo());
+            }
+        } catch (RemoteException e) {
+            throw new OPCCommunicationException(e);
+        }
     }
 
 }

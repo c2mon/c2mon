@@ -9,7 +9,7 @@ package org.opcfoundation.webservices.XMLDA._1_0;
 
 public interface OPCXMLDataAccessSoap extends java.rmi.Remote {
     public org.opcfoundation.webservices.XMLDA._1_0.GetStatusResponse getStatus(org.opcfoundation.webservices.XMLDA._1_0.GetStatus parameters) throws java.rmi.RemoteException;
-    public void read(org.opcfoundation.webservices.XMLDA._1_0.RequestOptions options, org.opcfoundation.webservices.XMLDA._1_0.ReadRequestItem[] itemList, org.opcfoundation.webservices.XMLDA._1_0.holders.ReplyBaseHolder readResult, org.opcfoundation.webservices.XMLDA._1_0.holders.ReplyItemListHolder RItemList, org.opcfoundation.webservices.XMLDA._1_0.holders.OPCErrorArrayHolder errors) throws java.rmi.RemoteException;
+    public ReadResponse read(Read parameters) throws java.rmi.RemoteException;
     public org.opcfoundation.webservices.XMLDA._1_0.WriteResponse write(org.opcfoundation.webservices.XMLDA._1_0.Write parameters) throws java.rmi.RemoteException;
     public org.opcfoundation.webservices.XMLDA._1_0.SubscribeResponse subscribe(org.opcfoundation.webservices.XMLDA._1_0.Subscribe parameters) throws java.rmi.RemoteException;
     public org.opcfoundation.webservices.XMLDA._1_0.SubscriptionPolledRefreshResponse subscriptionPolledRefresh(org.opcfoundation.webservices.XMLDA._1_0.SubscriptionPolledRefresh parameters) throws java.rmi.RemoteException;

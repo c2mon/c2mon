@@ -96,7 +96,7 @@ public class AliveWriter extends TimerTask {
         if (timer != null) {
             timer.cancel();
         }
-        timer = new Timer();
+        timer = new Timer("OPCAliveWriter");
         timer.schedule(this, 0, writeTime);
     }
 

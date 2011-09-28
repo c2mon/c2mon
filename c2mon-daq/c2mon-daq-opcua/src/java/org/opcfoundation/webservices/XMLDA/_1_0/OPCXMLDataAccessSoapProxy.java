@@ -50,10 +50,10 @@ public class OPCXMLDataAccessSoapProxy implements org.opcfoundation.webservices.
     return oPCXMLDataAccessSoap.getStatus(parameters);
   }
   
-  public void read(org.opcfoundation.webservices.XMLDA._1_0.RequestOptions options, org.opcfoundation.webservices.XMLDA._1_0.ReadRequestItem[] itemList, org.opcfoundation.webservices.XMLDA._1_0.holders.ReplyBaseHolder readResult, org.opcfoundation.webservices.XMLDA._1_0.holders.ReplyItemListHolder RItemList, org.opcfoundation.webservices.XMLDA._1_0.holders.OPCErrorArrayHolder errors) throws java.rmi.RemoteException{
+  public ReadResponse read(org.opcfoundation.webservices.XMLDA._1_0.Read parameters) throws java.rmi.RemoteException{
     if (oPCXMLDataAccessSoap == null)
       _initOPCXML_DataAccessSoapProxy();
-    oPCXMLDataAccessSoap.read(options, itemList, readResult, RItemList, errors);
+    return oPCXMLDataAccessSoap.read(parameters);
   }
   
   public org.opcfoundation.webservices.XMLDA._1_0.WriteResponse write(org.opcfoundation.webservices.XMLDA._1_0.Write parameters) throws java.rmi.RemoteException{

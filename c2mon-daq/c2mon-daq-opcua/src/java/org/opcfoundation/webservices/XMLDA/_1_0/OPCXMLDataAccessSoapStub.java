@@ -38,24 +38,11 @@ public class OPCXMLDataAccessSoapStub extends org.apache.axis.client.Stub implem
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("Read");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "Options"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "RequestOptions"), org.opcfoundation.webservices.XMLDA._1_0.RequestOptions.class, false, false);
-        param.setOmittable(true);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "Read"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", ">Read"), org.opcfoundation.webservices.XMLDA._1_0.RequestOptions.class, false, false);
         oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ItemList"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReadRequestItemList"), org.opcfoundation.webservices.XMLDA._1_0.ReadRequestItem[].class, false, false);
-        param.setItemQName(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "Items"));
-        param.setOmittable(true);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReadResult"), org.apache.axis.description.ParameterDesc.OUT, new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReplyBase"), org.opcfoundation.webservices.XMLDA._1_0.ReplyBase.class, false, false);
-        param.setOmittable(true);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "RItemList"), org.apache.axis.description.ParameterDesc.OUT, new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReplyItemList"), org.opcfoundation.webservices.XMLDA._1_0.ItemValue[].class, false, false);
-        param.setItemQName(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "Items"));
-        param.setOmittable(true);
-        oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "Errors"), org.apache.axis.description.ParameterDesc.OUT, new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "OPCError"), org.opcfoundation.webservices.XMLDA._1_0.OPCError[].class, false, false);
-        param.setOmittable(true);
-        oper.addParameter(param);
-        oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
+        oper.setReturnType(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", ">ReadResponse"));
+        oper.setReturnClass(org.opcfoundation.webservices.XMLDA._1_0.ReadResponse.class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReadResponse"));
         oper.setStyle(org.apache.axis.constants.Style.DOCUMENT);
         oper.setUse(org.apache.axis.constants.Use.LITERAL);
         _operations[1] = oper;
@@ -479,12 +466,12 @@ public class OPCXMLDataAccessSoapStub extends org.apache.axis.client.Stub implem
             cachedSerFactories.add(enumsf);
             cachedDeserFactories.add(enumdf);
 
-            qName = new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReadRequestItem");
-            cachedSerQNames.add(qName);
-            cls = org.opcfoundation.webservices.XMLDA._1_0.ReadRequestItem.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
+//            qName = new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReadRequestItem");
+//            cachedSerQNames.add(qName);
+//            cls = org.opcfoundation.webservices.XMLDA._1_0.ReadRequestItem.class;
+//            cachedSerClasses.add(cls);
+//            cachedSerFactories.add(beansf);
+//            cachedDeserFactories.add(beandf);
 
             qName = new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReadRequestItemList");
             cachedSerQNames.add(qName);
@@ -682,7 +669,7 @@ public class OPCXMLDataAccessSoapStub extends org.apache.axis.client.Stub implem
 }
     }
 
-    public void read(org.opcfoundation.webservices.XMLDA._1_0.RequestOptions options, org.opcfoundation.webservices.XMLDA._1_0.ReadRequestItem[] itemList, org.opcfoundation.webservices.XMLDA._1_0.holders.ReplyBaseHolder readResult, org.opcfoundation.webservices.XMLDA._1_0.holders.ReplyItemListHolder RItemList, org.opcfoundation.webservices.XMLDA._1_0.holders.OPCErrorArrayHolder errors) throws java.rmi.RemoteException {
+    public ReadResponse read(org.opcfoundation.webservices.XMLDA._1_0.Read parameters) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -695,32 +682,19 @@ public class OPCXMLDataAccessSoapStub extends org.apache.axis.client.Stub implem
         _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
         _call.setOperationName(new javax.xml.namespace.QName("", "Read"));
-
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {options, itemList});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {parameters});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;
         }
         else {
             extractAttachments(_call);
-            java.util.Map _output;
-            _output = _call.getOutputParams();
             try {
-                readResult.value = (org.opcfoundation.webservices.XMLDA._1_0.ReplyBase) _output.get(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReadResult"));
+                return (org.opcfoundation.webservices.XMLDA._1_0.ReadResponse) _resp;
             } catch (java.lang.Exception _exception) {
-                readResult.value = (org.opcfoundation.webservices.XMLDA._1_0.ReplyBase) org.apache.axis.utils.JavaUtils.convert(_output.get(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "ReadResult")), org.opcfoundation.webservices.XMLDA._1_0.ReplyBase.class);
-            }
-            try {
-                RItemList.value = (org.opcfoundation.webservices.XMLDA._1_0.ItemValue[]) _output.get(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "RItemList"));
-            } catch (java.lang.Exception _exception) {
-                RItemList.value = (org.opcfoundation.webservices.XMLDA._1_0.ItemValue[]) org.apache.axis.utils.JavaUtils.convert(_output.get(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "RItemList")), org.opcfoundation.webservices.XMLDA._1_0.ItemValue[].class);
-            }
-            try {
-                errors.value = (org.opcfoundation.webservices.XMLDA._1_0.OPCError[]) _output.get(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "Errors"));
-            } catch (java.lang.Exception _exception) {
-                errors.value = (org.opcfoundation.webservices.XMLDA._1_0.OPCError[]) org.apache.axis.utils.JavaUtils.convert(_output.get(new javax.xml.namespace.QName("http://opcfoundation.org/webservices/XMLDA/1.0/", "Errors")), org.opcfoundation.webservices.XMLDA._1_0.OPCError[].class);
+                return (org.opcfoundation.webservices.XMLDA._1_0.ReadResponse) org.apache.axis.utils.JavaUtils.convert(_resp, org.opcfoundation.webservices.XMLDA._1_0.SubscribeResponse.class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
