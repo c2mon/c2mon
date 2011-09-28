@@ -25,6 +25,11 @@
       <version>1.2.2-2918</version>
     </dependency>
     <dependency>
+      <groupId>org.opcfoundation</groupId>
+      <artifactId>ua-stack</artifactId>
+      <version>1.01.311.2</version>
+    </dependency>
+    <dependency>
       <groupId>com.intrinsyc</groupId>
       <artifactId>j-integra</artifactId>
     </dependency>
