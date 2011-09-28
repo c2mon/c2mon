@@ -657,6 +657,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Test
   @DirtiesContext
   public void testRemoveProcess() {
+    //stop DAQ else remove not allowed
+    processFacade.stop(processCache.get(50L));
+    
     replay(mockManager);
     TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
     ConfigurationReport report = configurationLoader.applyConfiguration(28, timSessionInfo.getSessionId());
