@@ -28,6 +28,7 @@ import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.tim.server.cache.ProcessXMLProvider;
 import cern.tim.server.cache.TagFacadeGateway;
 import cern.tim.server.cache.TagLocationService;
+import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.supervision.SupervisionFacade;
 import cern.tim.util.json.GsonFactory;
@@ -44,7 +45,7 @@ import com.google.gson.Gson;
  */
 @Service("clientRequestHandler")
 public class ClientRequestHandler implements SessionAwareMessageListener<Message> {
-
+  
   /** Private class logger */
   private static final Logger LOG = Logger.getLogger(ClientRequestHandler.class);
   
@@ -151,9 +152,15 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       case DAQ_XML_REQUEST:
         LOG.debug("Received a client request for a Process configuration XML");
         Collection<ProcessXmlResponse> singleXML = new ArrayList<ProcessXmlResponse>(1);
-        String xmlString = processXMLProvider.getProcessConfigXML(clientRequest.getRequestParameter());
-        ProcessXmlResponse processXmlResponse = new ProcessXmlResponseImpl();
-        ((ProcessXmlResponseImpl) processXmlResponse).setProcessXML(xmlString);
+        ProcessXmlResponseImpl processXmlResponse = new ProcessXmlResponseImpl();
+        try {
+          String xmlString = processXMLProvider.getProcessConfigXML(clientRequest.getRequestParameter());
+          processXmlResponse.setProcessXML(xmlString);
+        } catch (CacheElementNotFoundException cacheEx) {
+          String errorMessage = "Requested process not found.";
+          LOG.warn(errorMessage, cacheEx);
+          processXmlResponse.setErrorMessage(errorMessage);
+        }     
         singleXML.add(processXmlResponse);
       default:
         LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
