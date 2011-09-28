@@ -186,44 +186,46 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * not remove an equipment or any associated subequipments if one tag fails to
    * be removed).
    * @param processId
-   * @param elementReport the element report for the removal of the process, to which 
+   * @param processReport the element report for the removal of the process, to which 
    *                          subreports can be attached
    */
   @Transactional("cacheTransactionManager")
-  public void removeProcess(Long processId, ConfigurationElementReport elementReport) {
-    
+  public void removeProcess(Long processId, ConfigurationElementReport processReport) {    
     LOGGER.debug("Removing process with id " + processId);    
     Process process = processCache.get(processId);
     try {
-      process.getWriteLock().lock();
-      //remove all associated equipment from system   
-      for (Long equipmentId : new ArrayList<Long>(processFacade.getEquipmentIds(processId))) {
-        ConfigurationElementReport childElementReport = new ConfigurationElementReport(Action.REMOVE, Entity.EQUIPMENT, equipmentId);
-        try {        
-          elementReport.addSubReport(childElementReport);
-          equipmentConfigHandler.removeEquipment(equipmentId, childElementReport);
-        } catch (RuntimeException ex) {
-          LOGGER.error("Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
-              + Action.REMOVE + "; " + Entity.EQUIPMENT + "; " + equipmentId + ")", ex);
-          childElementReport.setFailure("Exception caught while applying the configuration change.", ex);          
-          throw new UnexpectedRollbackException("Unexpected exception caught while removing an Equipment.", ex);
-        }      
-      }
-            
-      //remove process from cache and DB
-      processDAO.deleteProcess(processId);
-      processCache.remove(processId);     
-      removeProcessControlTags(process, elementReport);
-      jmsContainerManager.unsubscribe(process);
+      process.getWriteLock().lock();      
+      if (processFacade.isRunning(process)) {
+        String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
+        LOGGER.warn(message); 
+        processReport.setFailure(message);
+       } else {
+        //remove all associated equipment from system   
+        for (Long equipmentId : new ArrayList<Long>(processFacade.getEquipmentIds(processId))) {
+          ConfigurationElementReport childElementReport = new ConfigurationElementReport(Action.REMOVE, Entity.EQUIPMENT, equipmentId);
+          try {        
+            processReport.addSubReport(childElementReport);
+            equipmentConfigHandler.removeEquipment(equipmentId, childElementReport);
+          } catch (RuntimeException ex) {
+            LOGGER.error("Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
+                + Action.REMOVE + "; " + Entity.EQUIPMENT + "; " + equipmentId + ")", ex);
+            childElementReport.setFailure("Exception caught while applying the configuration change.", ex);          
+            throw new UnexpectedRollbackException("Unexpected exception caught while removing an Equipment.", ex);
+          }      
+        }             
+        //remove process from cache and DB
+        processDAO.deleteProcess(processId);
+        processCache.remove(processId);     
+        removeProcessControlTags(process, processReport);
+        jmsContainerManager.unsubscribe(process);
+       }
     } catch (RuntimeException ex) {                  
       LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes.", ex);
       processCache.remove(processId);
       throw new UnexpectedRollbackException("Unexpected exception caught while removing Process.", ex);
     } finally {
       process.getWriteLock().unlock();
-    }
-    
-    
+    }  
   }
 
   /**
@@ -232,7 +234,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * @param processReport
    */
   private void removeProcessControlTags(Process process, ConfigurationElementReport processReport) {
-    LOGGER.debug("Removing Process control tags for process " + process.getId()); 
+    LOGGER.debug("Removing Process control tags for process " + process.getId());     
     Long aliveTagId = process.getAliveTagId();
     if (aliveTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, aliveTagId);
@@ -242,7 +244,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     Long stateTagId = process.getStateTagId();
     ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, stateTagId);
     controlTagConfigHandler.removeControlTag(stateTagId, tagReport);
-    processReport.addSubReport(tagReport);
+    processReport.addSubReport(tagReport);  
   }
 
   @Override
