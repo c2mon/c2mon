@@ -81,11 +81,11 @@ public interface RequestHandler {
   Collection<CommandTagHandle> getCommandTagHandles(Collection<Long> commandIds);
 
   /**
-   * Requests the DAQ config XML for a given process.
+   * Requests the DAQ config XML for a given process. Never returns null.
    * @param processName the name of the Process
    * @return the DAQ XML as String 
    * @throws JMSException if JMS problem occurs or not connected at the moment
-   * @throws NullPointerException if null/empty response is returned by the server
+   * @throws RuntimeException if server is unable to answer the request (message contains details)
    */
   String getProcessXml(String processName) throws JMSException;
   

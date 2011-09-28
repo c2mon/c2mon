@@ -175,6 +175,12 @@ public class RequestHandlerImplTest {
     public String getProcessXML() {
       return "process xml";
     }
+
+    @Override
+    public String getErrorMessage() {
+      // TODO Auto-generated method stub
+      return null;
+    }
    });
    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(response);
    
@@ -184,6 +190,34 @@ public class RequestHandlerImplTest {
    
    EasyMock.verify(jmsProxy);
    Assert.assertEquals("process xml", xmlString);
+  }
+  
+  /**
+   * Tests when an error occurs on the server side.
+   * @throws JMSException
+   */
+  @Test(expected=RuntimeException.class)
+  public void testGetProcessXmlError() throws JMSException {
+   String processName = "name";
+   Collection<ProcessXmlResponse> response = new ArrayList<ProcessXmlResponse>();
+   response.add(new ProcessXmlResponse() {
+    
+    @Override
+    public String getProcessXML() {
+      return null;
+    }
+
+    @Override
+    public String getErrorMessage() {
+      return "Error message";
+    }
+   });
+   EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(response);
+   
+   EasyMock.replay(jmsProxy);
+   
+   String xmlString = requestHandlerImpl.getProcessXml(processName);
+   
   }
   
 }

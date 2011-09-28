@@ -29,7 +29,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.jms.JMSException;
-import javax.management.remote.JMXPrincipal;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -206,7 +205,12 @@ public class RequestHandlerImpl implements RequestHandler {
       new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
     xmlRequest.setRequestParameter("request parameter");
     //response should have a unique element in
-    return jmsProxy.sendRequest(xmlRequest, requestQueue, requestTimeout).iterator().next().getProcessXML();
+    ProcessXmlResponse response = jmsProxy.sendRequest(xmlRequest, requestQueue, requestTimeout).iterator().next();
+    if (response.getProcessXML() != null) {
+      return response.getProcessXML();
+    } else {
+      throw new RuntimeException(response.getErrorMessage());
+    }     
   }
   
   /**
