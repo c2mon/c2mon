@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tc:tc-config xmlns:tc="http://www.terracotta.org/config"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.terracotta.org/schema/terracotta-6.xsd">
+<con:tc-config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:con="http://www.terracotta.org/config" xsi:schemaLocation="http://www.terracotta.org/config terracotta-6.xsd">
   <tc-properties>
      <property name="l2.berkeleydb.je.cleaner.bytesInterval" value="20000000" />
      <property name="l1.objectmanager.remote.maxDNALRUSize" value="200000" />
      <property name="l1.cachemanager.criticalThreshold" value="95" />
      <property name="l1.cachemanager.threshold" value="90" />
      <property name="l2.objectmanager.dgc.young.enabled" value="true" />
-     <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="360000" />     
+     <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="180000" />          
   </tc-properties>  
   <servers>
-    <server host="cs-ccr-tim11" name="server1">
-      <data>%(user.home)/dist/terracotta/log/server-data</data>      
-      <logs>%(user.home)/dist/terracotta/log/server-logs</logs>
-      <statistics>%(user.home)/dist/terracotta/log/cluster-statistics</statistics>
+    <server host="cs-ccr-tim4" name="server1">
       <dso-port>9510</dso-port>
       <jmx-port>9520</jmx-port>
       <l2-group-port>9530</l2-group-port>
@@ -25,17 +21,17 @@
         <garbage-collection>
          <enabled>true</enabled>
          <verbose>true</verbose>
-         <interval>7200</interval>
-        </garbage-collection>
+         <interval>1200</interval>
+        </garbage-collection>        
       </dso>
+      <data>%(user.home)/dist/terracotta/log/server-data</data>      
+      <logs>%(user.home)/dist/terracotta/log/server-logs</logs>
+      <statistics>%(user.home)/dist/terracotta/log/cluster-statistics</statistics>
     </server>
-      <server host="cs-ccr-tim5" name="server2">
-      <data>%(user.home)/dist/terracotta/log/server2-data</data>
-      <logs>%(user.home)/dist/terracotta/log/server2-logs</logs>
-      <statistics>%(user.home)/dist/terracotta/log/cluster2-statistics</statistics>
+        <server host="cs-ccr-tim5" name="server2">
       <dso-port>9511</dso-port>
       <jmx-port>9521</jmx-port>
-      <l2-group-port>9531</l2-group-port>
+      <l2-group-port>9531</l2-group-port>      
       <dso>
         <persistence>
           <mode>permanent-store</mode>
@@ -46,6 +42,9 @@
          <interval>1200</interval>
         </garbage-collection>
       </dso>
+      <data>%(user.home)/dist/terracotta/log/server2-data</data>
+      <logs>%(user.home)/dist/terracotta/log/server2-logs</logs>
+      <statistics>%(user.home)/dist/terracotta/log/cluster2-statistics</statistics>
     </server>
     <ha>
     	<mode>networked-active-passive</mode>
@@ -59,11 +58,10 @@
     <modules>
 <!--      <repository>C:\Program Files\terracotta\terracotta-3.2.0\modules</repository>-->
 <!--      <repository>D:\Profiles\mbrightw\terracotta-3.2.0\modules</repository>-->
-      <module group-id="org.terracotta.modules" name="tim-ehcache-2.x" version="1.7.2"/>
-      <module group-id="org.terracotta.modules" name="clustered-surefire-2.3" version="3.5.2"/>
-      <module group-id="org.terracotta.modules" name="tim-ehcache-2.x-hibernate-ui" version="1.7.2"/>
-      <module group-id="org.terracotta.modules" name="tim-ehcache-2.x-ui" version="1.7.2"/>
-      <module group-id="org.terracotta.toolkit" name="terracotta-toolkit-1.3" version="3.2.0"/>
+      <module group-id="org.terracotta.modules" name="tim-ehcache-2.0"/>
+      <module group-id="org.terracotta.modules" name="tim-distributed-cache"/>
+      <module group-id="org.terracotta.modules" name="tim-concurrent-collections"/>
+      <module group-id="org.terracotta.modules" name="tim-tomcat-6.0"/>
     </modules>
     <dso>
       <fault-count>50</fault-count>
@@ -263,7 +261,10 @@
         <!-- Command cache -->
         <include>
           <class-expression>cern.tim.server.common.command.CommandTagCacheObject</class-expression>
-        </include>        
+        </include>   
+        <include>
+          <class-expression>cern.tim.server.configuration.handler.impl.CommandTagConfigHandler</class-expression>
+        </include>     
         <include>
           <class-expression>cern.tim.shared.daq.command.AuthorizedHosts</class-expression>
           <!-- excludes the regexp; call parsePattern on reload -->
@@ -280,6 +281,9 @@
         <include>
           <class-expression>cern.tim.server.supervision.impl.SupervisionManagerImpl</class-expression>
         </include>
+        <include>
+          <class-expression>cern.tim.server.supervision.impl.SupervisionTagNotifier</class-expression>
+        </include>        
         <include>
           <class-expression>cern.tim.server.supervision.alive.AliveTimerChecker</class-expression>
         </include>    
@@ -321,27 +325,27 @@
 <!--      </locks>-->
        <roots>
         <root>       
-          <field-name>cern.tim.server.common.config.DistributedParams.cacheStatus</field-name>
+          <field-expression>* cern.tim.server.common.config.DistributedParams.cacheStatus</field-expression>
           <root-name>cacheStatus</root-name>
         </root>
         <root>       
-          <field-name>cern.tim.server.common.config.DistributedParams.aliveStatus</field-name>
+          <field-expression>* cern.tim.server.common.config.DistributedParams.aliveStatus</field-expression>
           <root-name>aliveStatus</root-name>
         </root>
         <root>       
-          <field-name>cern.tim.server.common.config.DistributedParams.serverMode</field-name>
+          <field-expression>* cern.tim.server.common.config.DistributedParams.serverMode</field-expression>
           <root-name>serverMode</root-name>
         </root>
         <root>       
-          <field-name>cern.tim.server.common.config.DistributedParams.cachePersistenceEnabled</field-name>
+          <field-expression>* cern.tim.server.common.config.DistributedParams.cachePersistenceEnabled</field-expression>
           <root-name>cachePersistenceEnabled</root-name>
         </root>
         <root>       
-          <field-name>cern.tim.server.common.config.DistributedParams.exclusiveConfigLock</field-name>
+          <field-expression>* cern.tim.server.common.config.DistributedParams.exclusiveConfigLock</field-expression>
           <root-name>exclusiveConfigLock</root-name>
         </root>
         <root>       
-          <field-name>cern.tim.server.common.config.DistributedParams.initialised</field-name>
+          <field-expression>* cern.tim.server.common.config.DistributedParams.initialised</field-expression>
           <root-name>initialised</root-name>
         </root>
        </roots>
@@ -356,4 +360,4 @@
 <!--      </app-groups>      -->
     </dso>
   </application>
-</tc:tc-config>
+</con:tc-config>
