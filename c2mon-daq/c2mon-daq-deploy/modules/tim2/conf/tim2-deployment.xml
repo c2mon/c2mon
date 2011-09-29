@@ -65,7 +65,7 @@
 			</deployment>
       <startscript>
         <main-class name="cern.tim.driver.common.startup.DaqStartup" >
-          <arg>-transition</arg>
+          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS} -transition</arg>
         </main-class>
       </startscript>
 		</application>
