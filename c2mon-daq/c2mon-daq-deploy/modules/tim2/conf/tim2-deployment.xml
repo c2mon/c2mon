@@ -41,8 +41,8 @@
 		  </startscript>
 		</application>
 
-		<application name="c2mon-daq-tim2-prod" extends="default">
-			<deployment>
+		<application name="c2mon-daq-prod" extends="default">
+			<deployment>        
 				<directory name="conf">
 					<file name=".c2mon.properties" sourceDir="/user/timoper/c2mon/conf/"
 						mask="400" />
@@ -50,13 +50,24 @@
 			</deployment>
 		</application>
 
-		<application name="c2mon-daq-tim2-test" extends="default">
-			<deployment installLocation="/opt/c2mon-tim2-test">
+		<application name="c2mon-daq-test" extends="default">
+			<deployment installLocation="/user/timtest/dist/daqprocess-mvn">
 				<directory name="conf">
-					<file name=".c2mon.properties" sourceDir="/user/timtest/c2mon/conf/"
+					<file name=".c2mon.properties" sourceDir="/user/timtest/rep/c2mon"
 						mask="400" />
+          <file name="opcdaqprocess.lst" sourceDir="/user/timtest/rep/c2mon/daq"
+            mask="400" />
 				</directory>
+        <directory name="bin">
+          <file name="setenv.sh" sourceDir="/user/timtest/rep/c2mon/daq"
+            mask="700" />
+        </directory>
 			</deployment>
+      <startscript>
+        <main-class name="cern.tim.driver.common.startup.DaqStartup" >
+          <arg>-transition</arg>
+        </main-class>
+      </startscript>
 		</application>
     
     <application name="c2mon-daq-dev" extends="default">
