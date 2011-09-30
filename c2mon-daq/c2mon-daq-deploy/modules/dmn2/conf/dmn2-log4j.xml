@@ -77,7 +77,7 @@
     <param name="Append" value="true" />
     <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.spring.log" />
     <param name="MaxBackupIndex" value="2" />
-    <param name="MaxFileSize" value="3MB" />
+    <param name="MaxFileSize" value="10MB" />
     <param name="BufferedIO" value="false" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
@@ -87,7 +87,7 @@
   <appender name="SourceDataTagLoggerAppender" class="org.apache.log4j.RollingFileAppender">
     <param name="Append" value="true" />
     <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.tag.log" />
-    <param name="MaxFileSize" value="3MB" />
+    <param name="MaxFileSize" value="10MB" />
     <param name="MaxBackupIndex" value ="1" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
@@ -97,7 +97,7 @@
   <appender name="FilteredDataTagLoggerAppender" class="org.apache.log4j.RollingFileAppender">
     <param name="Append" value="true" />
     <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.filter.tag.log" />
-    <param name="MaxFileSize" value="3MB" />
+    <param name="MaxFileSize" value="10MB" />
     <param name="MaxBackupIndex" value ="1" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
@@ -117,7 +117,7 @@
   <appender name="ReconfigurationLogAppender" class="org.apache.log4j.RollingFileAppender">
     <param name="Append" value="true" />
     <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.reconf.log" />
-    <param name="MaxFileSize" value="3MB" />
+    <param name="MaxFileSize" value="10MB" />
     <param name="MaxBackupIndex" value ="1" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
@@ -158,7 +158,7 @@
   </logger>
 
   <logger name="org.springframework" additivity="false">
-    <level value="debug"/>
+    <level value="info"/>
     <appender-ref ref="FileAppender" />
   </logger>
 
@@ -168,28 +168,28 @@
   </logger>
 
   <logger name="cern.tim.driver.common.messaging.impl" additivity="false">
-    <level value="debug"/>
+    <level value="info"/>
     <appender-ref ref="FileAppender" />
   </logger>
 
 
   <logger name="ReconfigurationLogger" additivity="false">
-    <level value="debug"/>
+    <level value="info"/>
     <appender-ref ref="ReconfigurationLogAppender" />
   </logger>
 
   <logger name="cern.tim" additivity="false">
-    <level value="debug"/>
+    <level value="info"/>
     <appender-ref ref="FileAppender" />
   </logger>
 
   <logger name="ch.cern.tim" additivity="false">
-    <level value="debug"/>
+    <level value="info"/>
     <appender-ref ref="FileAppender" />
   </logger>
 
   <root>
-    <level value="debug"/>
+    <level value="info"/>
     <appender-ref ref="FileAppender" />
   </root>
 
