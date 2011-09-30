@@ -65,8 +65,15 @@ public abstract class TransferObjectFactory {
       transferTag.addProcessIds(tag.getProcessIds());
       if (tag instanceof DataTag || tag instanceof ControlTag) {
         DataTag dataTag = (DataTag) tag;
-        transferTag.setMinValue(dataTag.getMinValue().toString());
-        transferTag.setMaxValue(dataTag.getMaxValue().toString());
+        
+        // check if min. value is defined, since it is not mandatory
+        if (dataTag.getMinValue() != null)        
+          transferTag.setMinValue(dataTag.getMinValue().toString());
+        
+        // check if max. value is defined, since it is not mandatory
+        if (dataTag.getMaxValue() != null)
+          transferTag.setMaxValue(dataTag.getMaxValue().toString());
+        
         if (dataTag.getAddress() != null) {
           transferTag.setTransferTagAddress(new TransferTagAddressImpl(dataTag.getAddress().getTimeToLive(), 
                                                                        dataTag.getAddress().getValueDeadbandType(),

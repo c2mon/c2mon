@@ -1,7 +1,5 @@
 package cern.c2mon.server.client.request;
 
-import java.util.Collections;
-
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
