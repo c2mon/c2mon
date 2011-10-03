@@ -9,13 +9,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-import javax.xml.rpc.ServiceException;
-
 import org.easymock.Capture;
 import org.junit.Test;
-import org.opcfoundation.webservices.XMLDA._1_0.OPCXMLDataAccessSoap;
-import org.opcfoundation.webservices.XMLDA._1_0.Subscribe;
-import org.opcfoundation.webservices.XMLDA._1_0.SubscribeResponse;
+import org.opcfoundation.xmlda.OPCXML_DataAccess;
+import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
+import org.opcfoundation.xmlda.Subscribe;
+import org.opcfoundation.xmlda.SubscribeResponse;
 
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
@@ -32,8 +31,8 @@ public class DASoapEndpointTest {
         createMock(IItemDefinitionFactory.class);
     private IGroupProvider groupProvider = createMock(IGroupProvider.class);
     
-    private OPCXMLDataAccessSoap soapAccess = 
-        createMock(OPCXMLDataAccessSoap.class);
+    private OPCXML_DataAccess soapAccess = 
+        createMock(OPCXML_DataAccess.class);
     
     private DASoapEndpoint endpoint = 
         new DASoapEndpoint(itemAddressFactory, groupProvider);
@@ -61,7 +60,7 @@ public class DASoapEndpointTest {
         endpoint.onSubscribe(subscriptionGroups);
         verify(soapAccess);
         Subscribe subscribe = subscribeCapture.getValue();
-        assertEquals(3, subscribe.getItemList().length);
+        assertEquals(3, subscribe.getItemList().getItems().length);
     }
     
     @Test(expected=OPCCriticalException.class)

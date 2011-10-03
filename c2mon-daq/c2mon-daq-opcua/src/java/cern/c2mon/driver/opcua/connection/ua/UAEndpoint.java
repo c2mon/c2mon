@@ -330,7 +330,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
                 item.getClientHandle()).getId();
         if (!checkError(itemdefintionId, value)) {
         notifyEndpointListenersValueChange(
-                itemdefintionId, value.getSourceTimestamp().getMilliSeconds(),
+                itemdefintionId, value.getSourceTimestamp().getTimeInMillis(),
                 value.getValue().getValue());
         }
     }

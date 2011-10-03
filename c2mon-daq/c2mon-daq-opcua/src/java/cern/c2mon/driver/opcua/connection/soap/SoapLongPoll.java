@@ -7,10 +7,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.xml.rpc.ServiceException;
-
-import org.opcfoundation.webservices.XMLDA._1_0.ItemValue;
-import org.opcfoundation.webservices.XMLDA._1_0.OPCXMLDataAccessSoap;
+import org.apache.axis2.AxisFault;
+import org.opcfoundation.xmlda.ItemValue;
+import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
+import org.opcfoundation.xmlda.SubscribePolledRefreshReplyItemList;
 
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCriticalException;
@@ -102,14 +102,14 @@ public class SoapLongPoll {
      */
     public synchronized void startPolling() {
         try {
-            OPCXMLDataAccessSoap access = createSoapAccess();
+            OPCXML_DataAccessStub access = createSoapAccess();
             if (soapLongPollRunnable == null || !isRunning) {
                 soapLongPollRunnable = new SoapLongPollRunnable(
                         holdTime, waitTime, serverSubscriptionHandle,
                         access) {
                             @Override
                             public void newItemValues(
-                                    final ItemValue[] rItemList) {
+                                    final SubscribePolledRefreshReplyItemList[] rItemList) {
                                 notifyListeners(rItemList);
                             }
 
@@ -124,8 +124,9 @@ public class SoapLongPoll {
             }
         } catch (MalformedURLException e) {
             throw new OPCCriticalException(e);
-        } catch (ServiceException e) {
-            pollingThreadFailed(e);
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
     
@@ -134,10 +135,11 @@ public class SoapLongPoll {
      * 
      * @return The access object.
      * @throws MalformedURLException Thrown if the supplied URI is malformed.
+     * @throws AxisFault 
      * @throws ServiceException Thrown if the specified service throws an exception.
      */
-    private OPCXMLDataAccessSoap createSoapAccess() 
-            throws MalformedURLException, ServiceException {
+    private OPCXML_DataAccessStub createSoapAccess() 
+            throws MalformedURLException, AxisFault {
         URL serverURL = address.getUri().toURL();
         String domain = address.getDomain();
         String user = address.getUser();
@@ -214,21 +216,23 @@ public class SoapLongPoll {
      * 
      * @param rItemList List of item vlaues which have changed.
      */
-    public void notifyListeners(final ItemValue[] rItemList) {
+    public void notifyListeners(final SubscribePolledRefreshReplyItemList[] rItemList) {
         EXCUTOR_SERVICE.execute(new Runnable() {
             @Override
             public void run() {
                 if (rItemList != null) {
-                    for (ItemValue itemValue : rItemList) {
-                        String clientItemHandle =
-                            itemValue.getClientItemHandle();
-                        Object value = itemValue.getValue();
-                        long timestamp =
-                            itemValue.getTimestamp().getTimeInMillis();
-                        for (ISoapLongPollListener listener : listeners) {
-                            listener.valueChanged(
-                                    clientItemHandle, timestamp, value);
-                        }
+                    for (SubscribePolledRefreshReplyItemList subscripion : rItemList) {
+                    	for (ItemValue itemValue : subscripion.getItems()) {
+	                        String clientItemHandle =
+	                            itemValue.getClientItemHandle();
+	                        Object value = itemValue.getValue().getText();
+	                        long timestamp =
+	                            itemValue.getTimestamp().getTimeInMillis();
+	                        for (ISoapLongPollListener listener : listeners) {
+	                            listener.valueChanged(
+	                                    clientItemHandle, timestamp, value);
+	                        }
+                    	}
                     }
                 }
             }

@@ -9,21 +9,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.rpc.ServiceException;
-
-import org.opcfoundation.webservices.XMLDA._1_0.GetStatus;
-import org.opcfoundation.webservices.XMLDA._1_0.GetStatusResponse;
-import org.opcfoundation.webservices.XMLDA._1_0.ItemValue;
-import org.opcfoundation.webservices.XMLDA._1_0.OPCError;
-import org.opcfoundation.webservices.XMLDA._1_0.OPCXMLDataAccessSoap;
-import org.opcfoundation.webservices.XMLDA._1_0.Read;
-import org.opcfoundation.webservices.XMLDA._1_0.ReadRequestItem;
-import org.opcfoundation.webservices.XMLDA._1_0.ReadResponse;
-import org.opcfoundation.webservices.XMLDA._1_0.RequestOptions;
-import org.opcfoundation.webservices.XMLDA._1_0.Subscribe;
-import org.opcfoundation.webservices.XMLDA._1_0.SubscribeRequestItem;
-import org.opcfoundation.webservices.XMLDA._1_0.SubscribeResponse;
-import org.opcfoundation.webservices.XMLDA._1_0.WriteResponse;
+import org.apache.axis2.AxisFault;
+import org.opcfoundation.xmlda.GetStatus;
+import org.opcfoundation.xmlda.GetStatusResponse;
+import org.opcfoundation.xmlda.ItemValue;
+import org.opcfoundation.xmlda.OPCError;
+import org.opcfoundation.xmlda.OPCXML_DataAccess;
+import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
+import org.opcfoundation.xmlda.Read;
+import org.opcfoundation.xmlda.ReadRequestItemList;
+import org.opcfoundation.xmlda.ReadResponse;
+import org.opcfoundation.xmlda.Subscribe;
+import org.opcfoundation.xmlda.SubscribeRequestItem;
+import org.opcfoundation.xmlda.SubscribeResponse;
+import org.opcfoundation.xmlda.WriteResponse;
 
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
@@ -62,12 +61,12 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
      * Default Wait time.
      * @see SoapLongPoll
      */
-    private static final int WAIT_TIME = 10000;
+    private static final int WAIT_TIME = 5000;
 
     /**
      * Soap stub object. This is only intended for short calls.
      */
-    private OPCXMLDataAccessSoap dataAccess;
+    private OPCXML_DataAccess dataAccess;
 
     /**
      * The exception handler to handle exceptions inside the polling mechanism.
@@ -110,21 +109,14 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
         final String user = opcAddress.getUser();
         final String password = opcAddress.getPassword();
         try {
-//        	DefaultHttpParams.getDefaultParams()
-//            .setParameter("http.authentication.credential-provider", new CredentialsProvider() {
-//                @Override
-//                public Credentials getCredentials(AuthScheme arg0, String arg1, int arg2, boolean arg3) throws CredentialsNotAvailableException {
-//                    return new UsernamePasswordCredentials(domain + "\\" + user, password);
-//                }
-//            });
             URL serverURL = opcAddress.getUri().toURL();
             dataAccess = 
                 SoapObjectFactory.createOPCDataAccessSoapInterface(serverURL,
                     domain, user, password);
         } catch (MalformedURLException e) {
             throw new OPCCriticalException(e);
-        } catch (ServiceException e) {
-            throw new OPCCommunicationException("OPC XML server threw an excetpion.", e);
+        } catch (AxisFault e) {
+            throw new OPCCommunicationException(e);
         }
     }
 
@@ -186,8 +178,6 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
             checkErrors(subscribeResponse.getErrors());
         } catch (RemoteException e) {
             throw new OPCCommunicationException(e);
-        } catch (ServiceException e) {
-            throw new OPCCommunicationException(e);
         }
     }
 
@@ -196,11 +186,8 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
      * 
      * @param serverSubHandle The subscription handle to poll for updates.
      * @return The poll for this subscription.
-     * @throws ServiceException Throws a service exception if the service is
-     * unreachable.
      */
-    private SoapLongPoll startPoll(final String serverSubHandle) 
-            throws ServiceException {
+    private SoapLongPoll startPoll(final String serverSubHandle) {
         SoapLongPoll soapLongPoll = new SoapLongPoll(
                 address, serverSubHandle, HOLD_TIME, WAIT_TIME);
         soapLongPoll.addListener(new ISoapLongPollListener() {
@@ -219,10 +206,10 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
     /**
      * Sets the data access object.
      * 
-     * @param dataAccess the dataAccess to set
+     * @param soapAccess the dataAccess to set
      */
-    public void setDataAccess(final OPCXMLDataAccessSoap dataAccess) {
-        this.dataAccess = dataAccess;
+    public void setDataAccess(final OPCXML_DataAccess soapAccess) {
+        this.dataAccess = soapAccess;
     }
 
     /**
@@ -233,37 +220,34 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
     @Override
     protected synchronized void onRefresh(
             final Collection<DASoapItemDefintion> itemDefintions) {
-        RequestOptions options =
-            SoapObjectFactory.createDefaultRequestOptions("request");
-        Collection<ReadRequestItem> itemList = new ArrayList<ReadRequestItem>();
+        ReadRequestItemList itemList = new ReadRequestItemList();
         for (DASoapItemDefintion definition : itemDefintions) {
             String clientItemHandle = Long.valueOf(definition.getId()).toString();
             String address = definition.getAddress();
-            itemList.add(
+            itemList.addItems(
                     SoapObjectFactory.createReadRequestItem(
                             clientItemHandle, address));
             if (definition.hasRedundantAddress()) {
                 String redClientItemHandle =
                     Long.valueOf(definition.getId()).toString();
                 String redAddress = definition.getAddress();
-                itemList.add(
+                itemList.addItems(
                         SoapObjectFactory.createReadRequestItem(
                                 redClientItemHandle, redAddress));
             }
         }
-        
-        ReadRequestItem[] itemListArray = 
-            itemList.toArray(new ReadRequestItem[itemList.size()]);
-        Read read = new Read(SoapObjectFactory.createDefaultRequestOptions("read"), itemListArray);
+        Read read = new Read();
+        read.setOptions(SoapObjectFactory.createDefaultRequestOptions("read"));
+        read.setItemList(itemList);
         try {
             ReadResponse readResponse = dataAccess.read(read);
             checkErrors(readResponse.getErrors());
-            for (ItemValue value : readResponse.getRItemList()) {
+            for (ItemValue value : readResponse.getRItemList().getItems()) {
                 String clientItemHandle = value.getClientItemHandle();
                 notifyEndpointListenersValueChange(
                         getDefinitionId(clientItemHandle), 
                         value.getTimestamp().getTimeInMillis(), 
-                        value.getValue());
+                        value.getValue().getText());
             }
             
         } catch (RemoteException e) {
@@ -422,10 +406,9 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
      * reachable and can most likely not be restored.
      */
     @Override
-    protected void checkStatus() {
+    protected synchronized void checkStatus() {
         try {
             GetStatusResponse response = dataAccess.getStatus(new GetStatus());
-            
             if (!response.getGetStatusResult().getServerState().getValue().equals("running")) {
                 throw new OPCCommunicationException(
                         "OPC server not in running state. " + response.getStatus().getStatusInfo());

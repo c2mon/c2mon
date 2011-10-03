@@ -8,12 +8,6 @@ import java.rmi.RemoteException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opcfoundation.webservices.XMLDA._1_0.GetStatus;
-import org.opcfoundation.webservices.XMLDA._1_0.GetStatusResponse;
-import org.opcfoundation.webservices.XMLDA._1_0.OPCXMLDataAccessSoap;
-import org.opcfoundation.webservices.XMLDA._1_0.ReplyBase;
-import org.opcfoundation.webservices.XMLDA._1_0.SubscriptionPolledRefresh;
-import org.opcfoundation.webservices.XMLDA._1_0.SubscriptionPolledRefreshResponse;
 
 import cern.c2mon.driver.opcua.connection.soap.DASoapEndpoint;
 import cern.c2mon.driver.opcua.connection.soap.DefaultSoapLongPollExceptionHandler;

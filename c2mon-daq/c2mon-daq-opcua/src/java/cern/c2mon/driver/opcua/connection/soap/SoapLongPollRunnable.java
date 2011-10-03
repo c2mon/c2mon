@@ -2,13 +2,13 @@ package cern.c2mon.driver.opcua.connection.soap;
 
 import java.util.Calendar;
 
-import org.opcfoundation.webservices.XMLDA._1_0.GetStatus;
-import org.opcfoundation.webservices.XMLDA._1_0.GetStatusResponse;
-import org.opcfoundation.webservices.XMLDA._1_0.ItemValue;
-import org.opcfoundation.webservices.XMLDA._1_0.OPCXMLDataAccessSoap;
-import org.opcfoundation.webservices.XMLDA._1_0.ReplyBase;
-import org.opcfoundation.webservices.XMLDA._1_0.SubscriptionPolledRefresh;
-import org.opcfoundation.webservices.XMLDA._1_0.SubscriptionPolledRefreshResponse;
+import org.opcfoundation.xmlda.GetStatus;
+import org.opcfoundation.xmlda.GetStatusResponse;
+import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
+import org.opcfoundation.xmlda.ReplyBase;
+import org.opcfoundation.xmlda.SubscribePolledRefreshReplyItemList;
+import org.opcfoundation.xmlda.SubscriptionPolledRefresh;
+import org.opcfoundation.xmlda.SubscriptionPolledRefreshResponse;
 
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCommunicationException;
 
@@ -51,7 +51,7 @@ public abstract class SoapLongPollRunnable implements Runnable {
     /**
      * The access stub
      */
-    private OPCXMLDataAccessSoap access;
+    private OPCXML_DataAccessStub access;
     
     /**
      * Creates a new SoapLongPollRunnable.
@@ -64,7 +64,7 @@ public abstract class SoapLongPollRunnable implements Runnable {
     public SoapLongPollRunnable(
             final int holdTime, final int waitTime, 
             final String serverSubscriptionHandle, 
-            final OPCXMLDataAccessSoap access) {
+            final OPCXML_DataAccessStub access) {
         super();
         this.holdTime = holdTime;
         this.waitTime = waitTime;
@@ -84,7 +84,7 @@ public abstract class SoapLongPollRunnable implements Runnable {
         Calendar holdTimeCalendar = subscriptionPolledRefresh.getHoldTime();
         try {
             GetStatusResponse status = 
-                access.getStatus(new GetStatus("en", toString()));
+                access.getStatus(new GetStatus());
             updateTimeDiff(status.getGetStatusResult());
             while (!stop) {
                 updateHoldTime(holdTimeCalendar);
@@ -102,7 +102,7 @@ public abstract class SoapLongPollRunnable implements Runnable {
                         onError(
                                 new OPCCommunicationException(
                                         "OPC error for subscription: " 
-                                        + response.getErrors(0).getText()));
+                                        + response.getErrors()[0].getText()));
                         stop();
                     }
                 }
@@ -143,9 +143,9 @@ public abstract class SoapLongPollRunnable implements Runnable {
     /**
      * Called in case of new item values.
      * 
-     * @param rItemList The new values.
+     * @param subscribePolledRefreshReplyItemLists The new values.
      */
-    public abstract void newItemValues(ItemValue[] rItemList);
+    public abstract void newItemValues(SubscribePolledRefreshReplyItemList[] subscribePolledRefreshReplyItemLists);
 
     /**
      * Called if the polling thread fails.

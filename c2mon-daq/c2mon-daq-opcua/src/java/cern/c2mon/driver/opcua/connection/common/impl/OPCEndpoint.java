@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
@@ -34,13 +35,13 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * Collection of endpoint listeners registered at this endpoint.
      */
     private final Collection<IOPCEndpointListener> listeners =
-        new LinkedList<IOPCEndpointListener>();
+        new ConcurrentLinkedQueue<IOPCEndpointListener>();
     
     /**
      * Maps item defintion ids to data tags.
      */
     private final Map<Long, ISourceDataTag> itemDefintionIdsToDataTags =
-        new HashMap<Long, ISourceDataTag>();
+        new ConcurrentHashMap<Long, ISourceDataTag>();
     
     /**
      * Maps item definiton ids to item definitions.
@@ -92,7 +93,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * @param commandTags The tags to add.
      */
     @Override
-    public synchronized void addCommandTags(
+    public void addCommandTags(
             final Collection<ISourceCommandTag> commandTags) {
         for (ISourceCommandTag commandTag : commandTags) {
             addCommandTag(commandTag);
@@ -170,10 +171,10 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * @param sourceDataTag The data tag to add.
      */
     @Override
-    public void addDataTag(final ISourceDataTag sourceDataTag) {
+    public synchronized void addDataTag(final ISourceDataTag sourceDataTag) {
+    	requireState(STATE.INITIALIZED);
         SubscriptionGroup<ID> subscriptionGroup = processTag(sourceDataTag);
         onSubscribe(subscriptionGroup);
-        
     }
     
     /**
@@ -182,7 +183,8 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * @param dataTag The data tag to remove.
      */
     @Override
-    public void removeDataTag(final ISourceDataTag dataTag) {
+    public synchronized void removeDataTag(final ISourceDataTag dataTag) {
+    	requireState(STATE.INITIALIZED);
         ID definition = tagIdsToItemDefinitions.remove(dataTag.getId());
         itemDefintionIdsToDataTags.remove(definition.getId());
         if (definition != null) {
@@ -274,7 +276,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * @param endpointListener The listener to add.
      */
     @Override
-    public synchronized void registerEndpointListener(
+    public void registerEndpointListener(
             final IOPCEndpointListener endpointListener) {
         listeners.add(endpointListener);
     }
@@ -285,7 +287,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * @param endpointListener The endpoint listener to remove.
      */
     @Override
-    public synchronized void unRegisterEndpointListener(
+    public void unRegisterEndpointListener(
             final IOPCEndpointListener endpointListener) {
         listeners.remove(endpointListener);
     }
@@ -326,7 +328,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * @param timestamp The timestamp of the changed value.
      * @param value The value which changed.
      */
-    public synchronized void notifyEndpointListenersValueChange(
+    public void notifyEndpointListenersValueChange(
             final long itemdefintionId,
             final long timestamp, final Object value) {
         for (IOPCEndpointListener listener : listeners) {
@@ -345,7 +347,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * error.
      * @param ex The exception thrown in the endpoint.
      */
-    public synchronized void notifyEndpointListenersItemError(
+    public void notifyEndpointListenersItemError(
             final long itemdefintionId, final Throwable ex) {
         for (IOPCEndpointListener listener : listeners) {
             ISourceDataTag dataTag =
@@ -362,7 +364,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * 
      * @param ex The exception thrown in the endpoint.
      */
-    public synchronized void notifyEndpointListenersSubscriptionFailed(
+    public void notifyEndpointListenersSubscriptionFailed(
             final Throwable ex) {
         for (IOPCEndpointListener listener : listeners) {
             listener.onSubscriptionException(ex);
@@ -408,7 +410,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     }
     
     @Override
-    public void checkConnection() {
+    public synchronized void checkConnection() {
         requireState(STATE.INITIALIZED);
         checkStatus();
     }

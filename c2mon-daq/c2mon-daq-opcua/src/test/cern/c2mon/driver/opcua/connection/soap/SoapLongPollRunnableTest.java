@@ -10,14 +10,15 @@ import org.easymock.classextension.ConstructorArgs;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opcfoundation.webservices.XMLDA._1_0.GetStatus;
-import org.opcfoundation.webservices.XMLDA._1_0.GetStatusResponse;
-import org.opcfoundation.webservices.XMLDA._1_0.ItemValue;
-import org.opcfoundation.webservices.XMLDA._1_0.OPCError;
-import org.opcfoundation.webservices.XMLDA._1_0.OPCXMLDataAccessSoap;
-import org.opcfoundation.webservices.XMLDA._1_0.ReplyBase;
-import org.opcfoundation.webservices.XMLDA._1_0.SubscriptionPolledRefresh;
-import org.opcfoundation.webservices.XMLDA._1_0.SubscriptionPolledRefreshResponse;
+import org.opcfoundation.xmlda.GetStatus;
+import org.opcfoundation.xmlda.GetStatusResponse;
+import org.opcfoundation.xmlda.ItemValue;
+import org.opcfoundation.xmlda.OPCError;
+import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
+import org.opcfoundation.xmlda.ReplyBase;
+import org.opcfoundation.xmlda.SubscribePolledRefreshReplyItemList;
+import org.opcfoundation.xmlda.SubscriptionPolledRefresh;
+import org.opcfoundation.xmlda.SubscriptionPolledRefreshResponse;
 
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.driver.opcua.connection.soap.SoapLongPollRunnable;
@@ -30,7 +31,7 @@ public class SoapLongPollRunnableTest {
 
     private SoapLongPollRunnable poll;
 
-    private OPCXMLDataAccessSoap access = createMock(OPCXMLDataAccessSoap.class);
+    private OPCXML_DataAccessStub access = createMock(OPCXML_DataAccessStub.class);
     
     private volatile Throwable error;
     
@@ -40,10 +41,10 @@ public class SoapLongPollRunnableTest {
                 new ConstructorArgs(
                         SoapLongPollRunnable.class.getConstructor(
                                 Integer.TYPE, Integer.TYPE, String.class,
-                                OPCXMLDataAccessSoap.class),
+                                OPCXML_DataAccessStub.class),
                                 100, 1000, "asd", access ),
                 SoapLongPollRunnable.class.getMethod(
-                        "newItemValues", ItemValue[].class),
+                        "newItemValues", SubscribePolledRefreshReplyItemList[].class),
                 SoapLongPollRunnable.class.getMethod(
                         "onError", Throwable.class));
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
@@ -68,10 +69,11 @@ public class SoapLongPollRunnableTest {
         replyBase.setReplyTime(new GregorianCalendar());
         statusResponse.setGetStatusResult(replyBase);
         expect(access.getStatus(isA(GetStatus.class))).andReturn(statusResponse);
+        SubscriptionPolledRefreshResponse response = new SubscriptionPolledRefreshResponse();
+        response.setSubscriptionPolledRefreshResult(replyBase);
         expect(access.subscriptionPolledRefresh(
                 isA(SubscriptionPolledRefresh.class))).andReturn(
-                        new SubscriptionPolledRefreshResponse(
-                                replyBase, null, null, null, false)).atLeastOnce();
+                        response ).atLeastOnce();
         poll.newItemValues(null);
         expectLastCall().atLeastOnce();
         
@@ -94,11 +96,15 @@ public class SoapLongPollRunnableTest {
         replyBase.setReplyTime(new GregorianCalendar());
         statusResponse.setGetStatusResult(replyBase);
         expect(access.getStatus(isA(GetStatus.class))).andReturn(statusResponse);
-        OPCError[] errors = { new OPCError("asd", null) };
+        OPCError error = new OPCError();
+        error.setText("asd");
+        OPCError[] errors = { error };
+        SubscriptionPolledRefreshResponse response = new SubscriptionPolledRefreshResponse();
+        response.setSubscriptionPolledRefreshResult(replyBase);
+        response.setErrors(errors);
         expect(access.subscriptionPolledRefresh(
                 isA(SubscriptionPolledRefresh.class))).andReturn(
-                        new SubscriptionPolledRefreshResponse(
-                                replyBase, null, null, errors , false));
+                        response);
         poll.onError(isA(OPCCommunicationException.class));
         replay(access, poll);
         poll.run();

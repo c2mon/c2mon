@@ -7,10 +7,13 @@ import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opcfoundation.webservices.XMLDA._1_0.ItemValue;
+import org.opcfoundation.xmlda.ItemValue;
+import org.opcfoundation.xmlda.SubscribePolledRefreshReplyItemList;
 
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.soap.ISoapLongPollListener;
@@ -56,21 +59,25 @@ public class SoapLongPollTest {
         long timeStamp = 100;
         Calendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(timeStamp);
-        Object value = "asdasdas";
+        OMElement element = createMock(OMElement.class);
         
         ItemValue itemValue = new ItemValue();
         itemValue.setClientItemHandle(clientHandle);
         itemValue.setTimestamp(calendar);
-        itemValue.setValue(value);
-        ItemValue[] values = { itemValue  };
+        itemValue.setValue(element);
+        SubscribePolledRefreshReplyItemList list =
+            new SubscribePolledRefreshReplyItemList();
+        list.addItems(itemValue);
+        SubscribePolledRefreshReplyItemList[] lists = {list};
         
-        
+        String value = "asd";
+        expect(element.getText()).andReturn(value);
         listener.valueChanged(clientHandle, timeStamp, value);
         
-        replay(listener);
-        poll.notifyListeners(values);
+        replay(listener, element);
+        poll.notifyListeners(lists);
         Thread.sleep(100);
-        verify(listener);
+        verify(listener, element);
     }
 
 }

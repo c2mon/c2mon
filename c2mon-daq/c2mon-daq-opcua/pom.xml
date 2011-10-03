@@ -38,20 +38,60 @@
       <artifactId>tim2-shared-daq</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.axis</groupId>
-      <artifactId>axis</artifactId>
-      <version>1.4</version>
+      <groupId>org.apache.axis2</groupId>
+      <artifactId>axis2</artifactId>
+      <version>1.6.1</version>
     </dependency>
     <dependency>
-      <groupId>axis</groupId>
-      <artifactId>axis-jaxrpc</artifactId>
-      <version>1.4</version>
+      <groupId>org.apache.ws.commons.axiom</groupId>
+      <artifactId>axiom-api</artifactId>
+      <version>1.2.12</version>
     </dependency>
     <dependency>
-      <groupId>axis</groupId>
-      <artifactId>axis-wsdl4j</artifactId>
-      <version>1.5.1</version>
+      <groupId>org.apache.ws.commons.axiom</groupId>
+      <artifactId>axiom-impl</artifactId>
+      <version>1.2.12</version>
     </dependency>
+   <dependency>
+     <groupId>axis</groupId>
+     <artifactId>axis-wsdl4j</artifactId>
+     <version>1.5.1</version>
+   </dependency>
+   <dependency>
+	    <groupId>org.apache.ws.commons.schema</groupId>
+	    <artifactId>XmlSchema</artifactId>
+	    <version>1.4.7</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.neethi</groupId>
+	    <artifactId>neethi</artifactId>
+	    <version>3.0.1</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.axis2</groupId>
+	    <artifactId>axis2-transport-http</artifactId>
+	    <version>1.6.1</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.axis2</groupId>
+	    <artifactId>axis2-transport-local</artifactId>
+	    <version>1.6.1</version>
+	</dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.apache.axis</groupId>-->
+<!--      <artifactId>axis</artifactId>-->
+<!--      <version>1.4</version>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>axis</groupId>-->
+<!--      <artifactId>axis-jaxrpc</artifactId>-->
+<!--      <version>1.4</version>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>axis</groupId>-->
+<!--      <artifactId>axis-wsdl4j</artifactId>-->
+<!--      <version>1.5.1</version>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
