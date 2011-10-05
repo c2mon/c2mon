@@ -8,11 +8,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.axis2.AxisFault;
+import org.apache.log4j.Logger;
 import org.opcfoundation.xmlda.ItemValue;
 import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
 import org.opcfoundation.xmlda.SubscribePolledRefreshReplyItemList;
 
 import cern.c2mon.driver.opcua.OPCAddress;
+import cern.c2mon.driver.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCriticalException;
 
 /**
@@ -29,6 +31,8 @@ import cern.c2mon.driver.opcua.connection.common.impl.OPCCriticalException;
  *
  */
 public class SoapLongPoll {
+    
+    private Logger logger = Logger.getLogger(SoapLongPoll.class);
 
     /**
      * Exception Handler if the polling is interrupted.
@@ -43,7 +47,7 @@ public class SoapLongPoll {
     /**
      * An executor service which serves as ThreadPool.
      */
-    private static final ExecutorService EXCUTOR_SERVICE =
+    private static final ExecutorService EXECUTOR_SERVICE =
         Executors.newCachedThreadPool();
 
     /**
@@ -102,6 +106,7 @@ public class SoapLongPoll {
      */
     public synchronized void startPolling() {
         try {
+            logger.debug(this + " Polling started.");
             OPCXML_DataAccessStub access = createSoapAccess();
             if (soapLongPollRunnable == null || !isRunning) {
                 soapLongPollRunnable = new SoapLongPollRunnable(
@@ -119,14 +124,13 @@ public class SoapLongPoll {
                             }
                     
                 };
-                EXCUTOR_SERVICE.execute(soapLongPollRunnable);
+                EXECUTOR_SERVICE.execute(soapLongPollRunnable);
                 isRunning = true;
             }
         } catch (MalformedURLException e) {
             throw new OPCCriticalException(e);
         } catch (AxisFault e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new OPCCommunicationException(e);
         }
     }
     
@@ -135,8 +139,7 @@ public class SoapLongPoll {
      * 
      * @return The access object.
      * @throws MalformedURLException Thrown if the supplied URI is malformed.
-     * @throws AxisFault 
-     * @throws ServiceException Thrown if the specified service throws an exception.
+     * @throws AxisFault Thrown if there is a problem wih Soap
      */
     private OPCXML_DataAccessStub createSoapAccess() 
             throws MalformedURLException, AxisFault {
@@ -208,6 +211,7 @@ public class SoapLongPoll {
         stopPolling();
         listeners.clear();
         exceptionHandler = null;
+        logger.debug(this + " Poll released");
     }
 
     /**
@@ -217,22 +221,21 @@ public class SoapLongPoll {
      * @param rItemList List of item vlaues which have changed.
      */
     public void notifyListeners(final SubscribePolledRefreshReplyItemList[] rItemList) {
-        EXCUTOR_SERVICE.execute(new Runnable() {
+        EXECUTOR_SERVICE.execute(new Runnable() {
             @Override
             public void run() {
+                logger.debug(SoapLongPoll.this + " Poll returned.");
                 if (rItemList != null) {
                     for (SubscribePolledRefreshReplyItemList subscripion : rItemList) {
-                    	for (ItemValue itemValue : subscripion.getItems()) {
-	                        String clientItemHandle =
-	                            itemValue.getClientItemHandle();
-	                        Object value = itemValue.getValue().getText();
-	                        long timestamp =
-	                            itemValue.getTimestamp().getTimeInMillis();
-	                        for (ISoapLongPollListener listener : listeners) {
-	                            listener.valueChanged(
-	                                    clientItemHandle, timestamp, value);
-	                        }
-                    	}
+                        logger.debug(SoapLongPoll.this + " Number of returned items: " + subscripion.getItems().length);
+                        for (ItemValue itemValue : subscripion.getItems()) {
+                            String clientItemHandle = itemValue.getClientItemHandle();
+                            Object value = itemValue.getValue().getText();
+                            long timestamp = itemValue.getTimestamp().getTimeInMillis();
+                            for (ISoapLongPollListener listener : listeners) {
+                                listener.valueChanged(clientItemHandle, timestamp, value);
+                            }
+                        }
                     }
                 }
             }

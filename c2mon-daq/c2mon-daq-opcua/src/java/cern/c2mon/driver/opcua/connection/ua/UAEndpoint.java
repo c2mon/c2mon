@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.opcfoundation.ua.builtintypes.DataValue;
 import org.opcfoundation.ua.builtintypes.DateTime;
@@ -24,7 +26,6 @@ import org.opcfoundation.ua.core.ApplicationType;
 import org.opcfoundation.ua.core.CallMethodRequest;
 import org.opcfoundation.ua.core.MonitoredItemNotification;
 import org.opcfoundation.ua.core.ServerState;
-import org.opcfoundation.ua.core.ServerStatusDataType;
 import org.opcfoundation.ua.core.TimestampsToReturn;
 import org.opcfoundation.ua.transport.security.Cert;
 import org.opcfoundation.ua.transport.security.SecurityMode;
@@ -68,6 +69,12 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
     private Map<SubscriptionGroup<UAItemDefintion>, Subscription> subscrMap = 
         new HashMap<SubscriptionGroup<UAItemDefintion>, Subscription>();
     
+    /**
+     * An executor service which serves as ThreadPool.
+     */
+    private static final ExecutorService EXECUTOR_SERVICE =
+        Executors.newCachedThreadPool();
+    
     // TODO should be in configuration file.
     private static final String PRIVATE_KEY_PASSWORD = "2mbxnK3U";
 
@@ -81,7 +88,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
     private static final String APP_NAME = "c2mon-opc-daq";
 
     /**
-     * The base directory of the certificates.	
+     * The base directory of the certificates.
      */
     private static final String CERTIFICATE_BASE_DIR = "PKI/CA";
 
@@ -132,7 +139,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
             setUpSecurity(userName, password);
             setUpApplication();
             client.connect();
-            ServerState state = client.getServerStatus().getState();
+            client.getServerStatus().getState();
         } catch (Exception e) {
             throw new OPCCommunicationException(e);
         }
@@ -326,13 +333,19 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
      */
     private void notifyEndpointsAboutMonitoredItemChange(
             final MonitoredItem item, final DataValue value) {
-        long itemdefintionId = definitionMap.get(
-                item.getClientHandle()).getId();
-        if (!checkError(itemdefintionId, value)) {
-        notifyEndpointListenersValueChange(
-                itemdefintionId, value.getSourceTimestamp().getTimeInMillis(),
-                value.getValue().getValue());
-        }
+        EXECUTOR_SERVICE.execute(new Runnable() {
+            @Override
+            public void run() {
+                long itemdefintionId = definitionMap.get(
+                        item.getClientHandle()).getId();
+                if (!checkError(itemdefintionId, value)) {
+                notifyEndpointListenersValueChange(
+                        itemdefintionId, 
+                        value.getSourceTimestamp().getTimeInMillis(),
+                        value.getValue().getValue());
+                } 
+            }
+        });
     }
     
     /**

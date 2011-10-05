@@ -2,6 +2,7 @@ package cern.c2mon.driver.opcua.connection.soap;
 
 import java.util.Calendar;
 
+import org.apache.axis2.AxisFault;
 import org.opcfoundation.xmlda.GetStatus;
 import org.opcfoundation.xmlda.GetStatusResponse;
 import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
@@ -94,17 +95,23 @@ public abstract class SoapLongPollRunnable implements Runnable {
                 if (!stop) {
                     if (response.getErrors() == null 
                             || response.getErrors().length == 0) {
-                        newItemValues(response.getRItemList());
                         updateTimeDiff(
                                 response.getSubscriptionPolledRefreshResult());
+                        newItemValues(response.getRItemList());
                     }
                     else {
+                        stop();
                         onError(
                                 new OPCCommunicationException(
                                         "OPC error for subscription: " 
                                         + response.getErrors()[0].getText()));
-                        stop();
                     }
+                }
+                try {
+                    access._getServiceClient().cleanupTransport();
+                } catch (AxisFault e) {
+                    stop();
+                    onError(new OPCCommunicationException(e));
                 }
             }
         } catch (Throwable e) {

@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 
 import com.linar.jintegra.AuthInfo;
 import com.linar.jintegra.AutomationException;
+import com.linar.jintegra.Cleaner;
 
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
@@ -379,20 +380,19 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     protected synchronized void onStop() {
         AuthInfo.setThreadDefault(authInfo);
         try {
+            server.getOPCGroups().removeAll();
             server.disconnect();
+            server.release();
+            opcCommandGroup = null;
         } catch (AutomationException e) {
             throw OPCDCOMFactory.createWrappedAutomationException(e);
         } catch (Exception e) {
             throw new OPCCommunicationException(e);
         }
-        if (opcCommandGroup != null) {
-            opcCommandGroup.release();
-            opcCommandGroup = null;
-        }
-        server.release();
         server = null;
         itemHandleOpcItems.clear();
-//        com.linar.jintegra.Cleaner.releaseAll();
+//        Cleaner.releaseAll();
+//        Cleaner.reset();
     }
 
     /**

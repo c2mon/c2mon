@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
@@ -13,6 +14,9 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HttpTransportProperties;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.opcfoundation.xmlda.ItemValue;
 import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
 import org.opcfoundation.xmlda.ReadRequestItem;
@@ -31,8 +35,23 @@ import org.opcfoundation.xmlda.WriteRequestItemList;
  * 
  */
 public final class SoapObjectFactory {
+    /**
+     * The timeout of a connection if no data is received via the socket.
+     */
+    private static final int SOCKET_TIMEOUT = 30000;
+    
+    /**
+     * The maximum number of connection.
+     */
+    private static final int MAX_CONNECTIONS = 20;
+    /**
+     * The location of the axis2 configuration xml.
+     */
     private static final String AXIS2_CONFIG_FILE_LOCATION = "/axis2.xml";
-    private static final org.apache.axiom.om.OMFactory FACTORY = OMAbstractFactory.getOMFactory();
+    /**
+     * Factory to create axis objects.
+     */
+    private static final OMFactory FACTORY = OMAbstractFactory.getOMFactory();
     /**
      * Private constructor. There should be no instances of this helper class.
      */
@@ -51,12 +70,20 @@ public final class SoapObjectFactory {
      * @param password
      *            The password to use (also NT auth).
      * @return The new data access object.
-     * @throws AxisFault 
+     * @throws AxisFault Throws an axis fault if there is a soap problem.
      */
     public static OPCXML_DataAccessStub createOPCDataAccessSoapInterface(final URL serverURL, final String domain, final String user, final String password) throws AxisFault {
         URL url = SoapObjectFactory.class.getResource(AXIS2_CONFIG_FILE_LOCATION);
         ConfigurationContext config =
             ConfigurationContextFactory.createConfigurationContextFromURIs(url, null);
+        MultiThreadedHttpConnectionManager manager = 
+            new MultiThreadedHttpConnectionManager();
+        HttpConnectionManagerParams params = new HttpConnectionManagerParams();
+        params.setDefaultMaxConnectionsPerHost(MAX_CONNECTIONS);
+        params.setSoTimeout(SOCKET_TIMEOUT);
+        manager.setParams(params);
+        HttpClient client = new HttpClient(manager);
+        config.setProperty(HTTPConstants.CACHED_HTTP_CLIENT, client);
         OPCXML_DataAccessStub stub = 
             new OPCXML_DataAccessStub(config, serverURL.toString());
         Options options = stub._getServiceClient().getOptions();
@@ -67,9 +94,9 @@ public final class SoapObjectFactory {
         auth.setPassword(password);
         auth.setHost(serverURL.getHost());
         if (serverURL.getPort() > -1)
-        	auth.setPort(serverURL.getPort());
+            auth.setPort(serverURL.getPort());
         else
-        	auth.setPort(serverURL.getDefaultPort());
+            auth.setPort(serverURL.getDefaultPort());
         if (domain != null)
             auth.setDomain(domain);
         options.setProperty(HTTPConstants.AUTHENTICATE, auth);
@@ -133,10 +160,13 @@ public final class SoapObjectFactory {
      *            The rate the subscription will be pinged at least.
      * @return The created Subscribe object.
      */
-    public static Subscribe createSubscribe(final String requestHandle, final List<SubscribeRequestItem> subscribeRequestItems, final int subscripionPingRate) {
+    public static Subscribe createSubscribe(final String requestHandle, 
+            final List<SubscribeRequestItem> subscribeRequestItems, 
+            final int subscripionPingRate) {
         Subscribe subscribe = new Subscribe();
         subscribe.setOptions(createDefaultRequestOptions(requestHandle));
         SubscribeRequestItemList list = new SubscribeRequestItemList();
+        list.setEnableBuffering(true);
         for (SubscribeRequestItem item : subscribeRequestItems) {
             list.addItems(item);
         }
@@ -218,7 +248,7 @@ public final class SoapObjectFactory {
      * @return The new ItemValue.
      */
     public static ItemValue createItemValue(
-    		final String clientItemHandle, final String itemName, final Object value) {
+            final String clientItemHandle, final String itemName, final Object value) {
         ItemValue itemValue = new ItemValue();
         itemValue.setClientItemHandle(clientItemHandle);
         itemValue.setItemName(itemName);
@@ -227,12 +257,12 @@ public final class SoapObjectFactory {
         valueElement.declareNamespace(FACTORY.createOMNamespace("http://www.w3.org/2001/XMLSchema", "xsd"));
         String xmlType;
         if (value.getClass().equals(String.class))
-        	xmlType = "xsd:string";
+            xmlType = "xsd:string";
         else
-        	xmlType = "xsd:double";
-		valueElement.addAttribute(
-    			FACTORY.createOMAttribute("type", FACTORY.createOMNamespace(
-    							"http://www.w3.org/2001/XMLSchema-instance",  "xsi"), xmlType));
+            xmlType = "xsd:double";
+        valueElement.addAttribute(
+                FACTORY.createOMAttribute("type", FACTORY.createOMNamespace(
+                        "http://www.w3.org/2001/XMLSchema-instance",  "xsi"), xmlType));
         valueElement.addChild(FACTORY.createOMText(valueElement, value.toString()));
         itemValue.setValue(valueElement);
         return itemValue;

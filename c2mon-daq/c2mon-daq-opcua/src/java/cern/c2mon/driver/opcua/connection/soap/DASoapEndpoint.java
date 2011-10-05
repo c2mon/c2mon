@@ -43,7 +43,7 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
     /**
      * Constant indicating if items should be buffered.
      */
-    private static final boolean BUFFER_ENABLED = false;
+    private static final boolean BUFFER_ENABLED = true;
 
     /**
      * Ping rate of the subscription. This is the maximum time in which 
@@ -61,12 +61,12 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
      * Default Wait time.
      * @see SoapLongPoll
      */
-    private static final int WAIT_TIME = 5000;
+    private static final int WAIT_TIME = 4000;
 
     /**
      * Soap stub object. This is only intended for short calls.
      */
-    private OPCXML_DataAccess dataAccess;
+    private OPCXML_DataAccessStub dataAccess;
 
     /**
      * The exception handler to handle exceptions inside the polling mechanism.
@@ -179,6 +179,13 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
         } catch (RemoteException e) {
             throw new OPCCommunicationException(e);
         }
+        finally {
+            try {
+                dataAccess._getServiceClient().cleanupTransport();
+            } catch (AxisFault e) {
+                throw new OPCCommunicationException(e);
+            }
+        }
     }
 
     /**
@@ -201,15 +208,6 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
         soapLongPoll.setExceptionHandler(exceptionHandler);
         soapLongPoll.startPolling();
         return soapLongPoll;
-    }
-    
-    /**
-     * Sets the data access object.
-     * 
-     * @param soapAccess the dataAccess to set
-     */
-    public void setDataAccess(final OPCXML_DataAccess soapAccess) {
-        this.dataAccess = soapAccess;
     }
 
     /**
@@ -252,6 +250,13 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
             
         } catch (RemoteException e) {
             throw new OPCCommunicationException(e);
+        }
+        finally {
+            try {
+                dataAccess._getServiceClient().cleanupTransport();
+            } catch (AxisFault e) {
+                throw new OPCCommunicationException(e);
+            }
         }
     }
     
@@ -320,7 +325,13 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
         } catch (RemoteException e) {
             throw new OPCCommunicationException(e);
         }
-        
+        finally {
+            try {
+                dataAccess._getServiceClient().cleanupTransport();
+            } catch (AxisFault e) {
+                throw new OPCCommunicationException(e);
+            }
+        }
     }
 
     /**
@@ -330,8 +341,8 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
      */
     private void checkErrors(final OPCError[] errors) {
         if (errors != null && errors.length > 0 
-        		&&  !errors[0].getText().equals(
-        				"The server does not support the requested rate but will use the closest available rate.")) {
+                &&  !errors[0].getText().equals(
+                   "The server does not support the requested rate but will use the closest available rate.")) {
             StringBuffer errorString = new StringBuffer();
             errorString.append("Error(s): ");
             for (OPCError error : errors) {
@@ -415,6 +426,13 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
             }
         } catch (RemoteException e) {
             throw new OPCCommunicationException(e);
+        }
+        finally {
+            try {
+                dataAccess._getServiceClient().cleanupTransport();
+            } catch (AxisFault e) {
+                throw new OPCCommunicationException(e);
+            }
         }
     }
 
