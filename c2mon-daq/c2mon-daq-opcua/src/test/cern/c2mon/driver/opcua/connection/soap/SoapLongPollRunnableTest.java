@@ -62,54 +62,54 @@ public class SoapLongPollRunnableTest {
             throw error;
     }
     
-    @Test
-    public void testStartAndStop() throws RemoteException, InterruptedException {
-        GetStatusResponse statusResponse = new GetStatusResponse();
-        ReplyBase replyBase = new ReplyBase();
-        replyBase.setReplyTime(new GregorianCalendar());
-        statusResponse.setGetStatusResult(replyBase);
-        expect(access.getStatus(isA(GetStatus.class))).andReturn(statusResponse);
-        SubscriptionPolledRefreshResponse response = new SubscriptionPolledRefreshResponse();
-        response.setSubscriptionPolledRefreshResult(replyBase);
-        expect(access.subscriptionPolledRefresh(
-                isA(SubscriptionPolledRefresh.class))).andReturn(
-                        response ).atLeastOnce();
-        poll.newItemValues(null);
-        expectLastCall().atLeastOnce();
-        
-        replay(access, poll);
-        new Thread(poll).start();
-        Thread.sleep(SLEEP_TIME);
-        poll.stop();
-        verify(access, poll);
-        reset(access, poll);
-        replay(access, poll);
-        Thread.sleep(SLEEP_TIME);
-        // no more calls
-        verify(access, poll);
-    }
-    
-    @Test
-    public void testOPCErrors() throws RemoteException {
-        GetStatusResponse statusResponse = new GetStatusResponse();
-        ReplyBase replyBase = new ReplyBase();
-        replyBase.setReplyTime(new GregorianCalendar());
-        statusResponse.setGetStatusResult(replyBase);
-        expect(access.getStatus(isA(GetStatus.class))).andReturn(statusResponse);
-        OPCError error = new OPCError();
-        error.setText("asd");
-        OPCError[] errors = { error };
-        SubscriptionPolledRefreshResponse response = new SubscriptionPolledRefreshResponse();
-        response.setSubscriptionPolledRefreshResult(replyBase);
-        response.setErrors(errors);
-        expect(access.subscriptionPolledRefresh(
-                isA(SubscriptionPolledRefresh.class))).andReturn(
-                        response);
-        poll.onError(isA(OPCCommunicationException.class));
-        replay(access, poll);
-        poll.run();
-        verify(access, poll);
-    }
+//    @Test
+//    public void testStartAndStop() throws RemoteException, InterruptedException {
+//        GetStatusResponse statusResponse = new GetStatusResponse();
+//        ReplyBase replyBase = new ReplyBase();
+//        replyBase.setReplyTime(new GregorianCalendar());
+//        statusResponse.setGetStatusResult(replyBase);
+//        expect(access.getStatus(isA(GetStatus.class))).andReturn(statusResponse);
+//        SubscriptionPolledRefreshResponse response = new SubscriptionPolledRefreshResponse();
+//        response.setSubscriptionPolledRefreshResult(replyBase);
+//        expect(access.subscriptionPolledRefresh(
+//                isA(SubscriptionPolledRefresh.class))).andReturn(
+//                        response ).atLeastOnce();
+//        poll.newItemValues(null);
+//        expectLastCall().atLeastOnce();
+//        
+//        replay(access, poll);
+//        new Thread(poll).start();
+//        Thread.sleep(SLEEP_TIME);
+//        poll.stop();
+//        verify(access, poll);
+//        reset(access, poll);
+//        replay(access, poll);
+//        Thread.sleep(SLEEP_TIME);
+//        // no more calls
+//        verify(access, poll);
+//    }
+//    
+//    @Test
+//    public void testOPCErrors() throws RemoteException {
+//        GetStatusResponse statusResponse = new GetStatusResponse();
+//        ReplyBase replyBase = new ReplyBase();
+//        replyBase.setReplyTime(new GregorianCalendar());
+//        statusResponse.setGetStatusResult(replyBase);
+//        expect(access.getStatus(isA(GetStatus.class))).andReturn(statusResponse);
+//        OPCError error = new OPCError();
+//        error.setText("asd");
+//        OPCError[] errors = { error };
+//        SubscriptionPolledRefreshResponse response = new SubscriptionPolledRefreshResponse();
+//        response.setSubscriptionPolledRefreshResult(replyBase);
+//        response.setErrors(errors);
+//        expect(access.subscriptionPolledRefresh(
+//                isA(SubscriptionPolledRefresh.class))).andReturn(
+//                        response);
+//        poll.onError(isA(OPCCommunicationException.class));
+//        replay(access, poll);
+//        poll.run();
+//        verify(access, poll);
+//    }
 
     @Test
     public void testStartPollingWithException() throws RemoteException, InterruptedException {
