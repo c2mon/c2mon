@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import cern.c2mon.driver.opcua.connection.common.impl.SubscriptionGroup;
 import cern.c2mon.driver.opcua.connection.soap.DASoapEndpoint;
 import cern.c2mon.driver.opcua.connection.soap.DefaultSoapLongPollExceptionHandler;
 import cern.c2mon.driver.opcua.connection.soap.SoapLongPoll;
@@ -22,8 +23,11 @@ public class DefaultSoapLongPollExceptionHandlerTest {
     
     private SoapLongPoll poll = createMock(SoapLongPoll.class);
     
+    private SubscriptionGroup<DASoapItemDefintion> group =
+        new SubscriptionGroup<DASoapItemDefintion>(100, 1000);
+    
     private DefaultSoapLongPollExceptionHandler handler =
-        new DefaultSoapLongPollExceptionHandler(soapEndpoint, 10L);
+        new DefaultSoapLongPollExceptionHandler(soapEndpoint, group, 10L);
     
     private volatile Throwable error;
     
@@ -48,7 +52,7 @@ public class DefaultSoapLongPollExceptionHandlerTest {
         throws RemoteException, InterruptedException {
         Throwable exception = new Exception();
         
-        poll.startPolling();
+        soapEndpoint.onSubscribe(group);
         
         replay(poll);
         handler.onConnectionException(exception, poll);

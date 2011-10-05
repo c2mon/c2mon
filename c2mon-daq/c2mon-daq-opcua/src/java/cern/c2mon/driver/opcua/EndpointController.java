@@ -247,7 +247,6 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         stopStatusChecker();
         if (endpoint != null)
             endpoint.reset();
-        currentAddress = null;
     }
 
     /**
@@ -366,8 +365,8 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
             reconnectThread = new Thread() {
                 @Override
                 public void run() {
+                    EndpointController.this.stop();
                     while (endpoint.getState() != STATE.INITIALIZED) {
-                        endpoint.reset();
                         sender.confirmEquipmentStateIncorrect();
                         try {
                             Thread.sleep(getCurrentOPCAddress().getServerRetryTimeout());

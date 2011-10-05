@@ -31,7 +31,9 @@ import cern.c2mon.driver.opcua.connection.common.impl.OPCCriticalException;
  *
  */
 public class SoapLongPoll {
-    
+    /**
+     * Logger of this class.
+     */
     private Logger logger = Logger.getLogger(SoapLongPoll.class);
 
     /**

@@ -69,12 +69,6 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
     private OPCXML_DataAccessStub dataAccess;
 
     /**
-     * The exception handler to handle exceptions inside the polling mechanism.
-     */
-    private ISoapLongPollExceptionHandler exceptionHandler =
-        new DefaultSoapLongPollExceptionHandler(this);
-
-    /**
      * The OPC address of this endpoint.
      */
     private OPCAddress address;
@@ -84,6 +78,12 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
      */
     private Map<SubscriptionGroup<DASoapItemDefintion>, SoapLongPoll> polls =
         new HashMap<SubscriptionGroup<DASoapItemDefintion>, SoapLongPoll>();
+    
+    /**
+     * Collection of Soap long polls.
+     */
+    private Map<SubscriptionGroup<DASoapItemDefintion>, ISoapLongPollExceptionHandler> exceptionHandlers =
+        new HashMap<SubscriptionGroup<DASoapItemDefintion>, ISoapLongPollExceptionHandler>();
 
     /**
      * Creates a new DASoapEndpoint.
@@ -173,7 +173,8 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
             SubscribeResponse subscribeResponse = 
                 dataAccess.subscribe(subscribe);
             SoapLongPoll poll = 
-                startPoll(subscribeResponse.getServerSubHandle());
+                startPoll(subscribeResponse.getServerSubHandle(),
+                        subscriptionGroup);
             polls.put(subscriptionGroup, poll);
             checkErrors(subscribeResponse.getErrors());
         } catch (RemoteException e) {
@@ -192,9 +193,11 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
      * Starts a poll for this server subscription handle.
      * 
      * @param serverSubHandle The subscription handle to poll for updates.
+     * @param group The subscription group for this poll.
      * @return The poll for this subscription.
      */
-    private SoapLongPoll startPoll(final String serverSubHandle) {
+    private SoapLongPoll startPoll(final String serverSubHandle,
+            final SubscriptionGroup<DASoapItemDefintion> group) {
         SoapLongPoll soapLongPoll = new SoapLongPoll(
                 address, serverSubHandle, HOLD_TIME, WAIT_TIME);
         soapLongPoll.addListener(new ISoapLongPollListener() {
@@ -205,7 +208,15 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
                         timestamp, value);
             }
         });
-        soapLongPoll.setExceptionHandler(exceptionHandler);
+        ISoapLongPollExceptionHandler handler;
+        if (exceptionHandlers.containsKey(group)) {
+            handler = exceptionHandlers.get(group);
+        }
+        else {
+            handler = new DefaultSoapLongPollExceptionHandler(this, group);
+            exceptionHandlers.put(group, handler);
+        }
+        soapLongPoll.setExceptionHandler(handler);
         soapLongPoll.startPolling();
         return soapLongPoll;
     }
@@ -364,6 +375,8 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
         for (SoapLongPoll poll : polls.values()) {
             poll.release();
         }
+        polls.clear();
+        exceptionHandlers.clear();
         address = null;
     }
 
