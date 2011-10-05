@@ -36,17 +36,17 @@
                      threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <renderer  renderedClass="cern.tim.shared.daq.datatag.DataTagCacheObject"
-             renderingClass="cern.tim.shared.daq.datatag.DataTagRenderer" />
+  <renderer renderedClass="cern.tim.shared.daq.filter.FilteredDataTagValue"
+            renderingClass="cern.tim.shared.daq.filter.FilteredDataTagValueRenderer" />
 
   <renderer  renderedClass="cern.tim.shared.daq.datatag.SourceDataTagValue"
              renderingClass="cern.tim.shared.daq.datatag.SourceDataTagValueRenderer" />
 
-  <renderer  renderedClass="cern.tim.shared.daq.commandtag.SourceCommandTagValue"
-             renderingClass="cern.tim.shared.daq.commandtag.SourceCommandTagValueRenderer" />
+  <renderer  renderedClass="cern.tim.shared.daq.command.SourceCommandTagValue"
+             renderingClass="cern.tim.shared.daq.command.SourceCommandTagValueRenderer" />
 
-  <renderer  renderedClass="cern.tim.shared.daq.commandtag.SourceCommandTagReport"
-             renderingClass="cern.tim.shared.daq.commandtag.SourceCommandReportRenderer" />
+  <renderer  renderedClass="cern.tim.shared.daq.command.SourceCommandTagReport"
+             renderingClass="cern.tim.shared.daq.command.SourceCommandReportRenderer" />
 
 
   <!--

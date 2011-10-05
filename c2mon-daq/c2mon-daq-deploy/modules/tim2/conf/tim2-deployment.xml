@@ -10,7 +10,7 @@
 			<deployment installLocation="/opt/c2mon-daq-tim2/">
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
-          <preserve type="dir" name="tmp" />
+                    <preserve type="dir" name="tmp" />
 				</backupPolicy>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
@@ -32,9 +32,14 @@
 			      </preExec>
 			      <property name="c2mon.process.name" value="$PROCESS_NAME"/>
 			      <property name="c2mon.log.dir" value="$DAQ_LOG_HOME"/>
-            <property name="java.library.path" value="$INSTALL_DIR/lib_so:$INSTALL_DIR/lib_c"/>
-            
-            <output>
+                  <property name="cmw.mom.config" value="http://slwww/~alaser/console/laser-new/cmw-mom.properties"/>
+                  <property name="laser.hosts" value="${LASER_HOSTS}"/>
+                  <property name="JINTEGRA_LOG_ROLLOVER_LINECOUNT" value="100000"/>
+                  <property name="JINTEGRA_LOG_FILE" value="${DAQ_LOG_HOME}/${PROCESS_NAME}.jintegra.log"/>
+                  <property name="JINTEGRA_LOG_LEVEL" value="1"/>
+                  <property name="java.security.egd" value="file://dev/urandom"/>
+                  <property name="java.library.path" value="$INSTALL_DIR/lib_so"/>
+                  <output>
 				      <file name="log/out.log" />
 			      </output>						
 			  </main-class>
@@ -44,7 +49,7 @@
 		<application name="c2mon-daq-prod" extends="default">
 			<deployment>        
 				<directory name="conf">
-					<file name=".c2mon.properties" sourceDir="/user/timoper/c2mon/conf/"
+					<file name=".c2mon.properties" sourceDir="/user/timoper/rep/c2mon/"
 						mask="400" />
 				</directory>
 			</deployment>
