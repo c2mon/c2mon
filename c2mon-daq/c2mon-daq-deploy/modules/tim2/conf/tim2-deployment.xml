@@ -53,7 +53,7 @@
 		<application name="c2mon-daq-prod" extends="default">
             <deployment installLocation="~/dist/daqprocess-mvn">
               <directory name="conf">
-                  <file name=".c2mon.properties" sourceDir="~/rep/c2mon/"
+                  <file name=".c2mon.properties" sourceDir="~/rep/c2mon"
                       mask="400" />
               </directory>
             </deployment>
@@ -62,7 +62,7 @@
 		<application name="c2mon-daq-test" extends="default">
 			<deployment installLocation="~/dist/daqprocess-mvn">
                 <directory name="conf">
-                    <file name=".c2mon.properties" sourceDir="~/rep/c2mon/"
+                    <file name=".c2mon.properties" sourceDir="~/rep/c2mon"
                         mask="400" />
                     <file name="opcdaqprocess.lst" sourceDir="~/rep/c2mon/daq"
                         mask="400" />
