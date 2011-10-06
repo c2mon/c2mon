@@ -41,7 +41,7 @@
 
 	<files>
 
-		<!--  copy sthe configuration file -->
+		<!--  copy the configuration file -->
 		<file>
 			<source>${basedir}/conf/tim2-daq.conf</source>
 			<outputDirectory>conf/</outputDirectory>
@@ -49,8 +49,17 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
+    
+        <!--  copy the opc daqlist -->
+        <file>
+            <source>${basedir}/conf/tim2-opcdaqprocess.lst</source>
+            <outputDirectory>conf/</outputDirectory>
+            <destName>opcdaqprocess.lst</destName>
+            <lineEnding>unix</lineEnding>
+            <fileMode>0444</fileMode>
+        </file>
 
-		<!--  copy sthe starting script -->
+		<!--  copy the starting script -->
 		<file>
 			<source>${basedir}/bin/tim2-daqprocess2.sh</source>
 			<outputDirectory>bin/</outputDirectory>

@@ -7,18 +7,26 @@
 			c2mon-tim2-prod and c2mon-tim2-test
 		-->
 		<application name="default">
-			<deployment installLocation="/opt/c2mon-daq-tim2/">
+			<deployment installLocation="~/dist/daqprocess-mvn">
 				<backupPolicy keepBackups="2">
-					<preserve type="dir" name="log" />
                     <preserve type="dir" name="tmp" />
 				</backupPolicy>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
-					<mail address="timdiamon-developers@cern.ch" />
+					<mail address="info-tim-admins@cern.ch" />
 				</notification>
+                <directory name=".">
+                  <link source="log" target="/var/log/$USER/daqprocess-mvn" />
+                </directory>
+                <directory name="conf">
+                    <file name=".c2mon.properties" sourceDir="~/rep/c2mon/"
+                        mask="400" />
+                </directory>
 			</deployment>
 		    <startscript>        
 			  <main-class name="cern.tim.driver.common.startup.DaqStartup" >
+                  <initial-heap-size>256m</initial-heap-size>
+                  <max-heap-size>256m</max-heap-size>
 				  <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
 			      <preExec>
 			        <![CDATA[
@@ -46,25 +54,16 @@
 		  </startscript>
 		</application>
 
-		<application name="c2mon-daq-prod" extends="default">
-			<deployment>        
-				<directory name="conf">
-					<file name=".c2mon.properties" sourceDir="/user/timoper/rep/c2mon/"
-						mask="400" />
-				</directory>
-			</deployment>
-		</application>
+		<application name="c2mon-daq-prod" extends="default" />
 
 		<application name="c2mon-daq-test" extends="default">
-			<deployment installLocation="/user/timtest/dist/daqprocess-mvn">
+			<deployment installLocation="~/dist/daqprocess-mvn">
 				<directory name="conf">
-					<file name=".c2mon.properties" sourceDir="/user/timtest/rep/c2mon"
-						mask="400" />
-          <file name="opcdaqprocess.lst" sourceDir="/user/timtest/rep/c2mon/daq"
-            mask="400" />
+                    <file name="opcdaqprocess.lst" sourceDir="~/rep/c2mon/daq"
+                      mask="400" />
 				</directory>
         <directory name="bin">
-          <file name="setenv.sh" sourceDir="/user/timtest/rep/c2mon/daq"
+          <file name="setenv.sh" sourceDir="~/rep/c2mon/daq"
             mask="700" />
         </directory>
 			</deployment>
@@ -76,15 +75,15 @@
 		</application>
     
     <application name="c2mon-daq-dev" extends="default">
-      <deployment installLocation="/user/timtest/dev/c2mon-daq-dev">
+      <deployment installLocation="~/dev/c2mon-daq-dev">
         <directory name="conf">
-          <file name=".c2mon.properties" sourceDir="/user/timtest/dev/rep/c2mon"
+          <file name=".c2mon.properties" sourceDir="~/dev/rep/c2mon"
             mask="400" />
-          <file name="opcdaqprocess.lst" sourceDir="/user/timtest/dev/rep/c2mon/daq"
+          <file name="opcdaqprocess.lst" sourceDir="~/dev/rep/c2mon/daq"
             mask="400" />
         </directory>
         <directory name="bin">
-          <file name="setenv.sh" sourceDir="/user/timtest/dev/rep/c2mon/daq"
+          <file name="setenv.sh" sourceDir="~/dev/rep/c2mon/daq"
             mask="700" />
         </directory>
       </deployment>
