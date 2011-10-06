@@ -122,7 +122,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         String host = uri.getHost();
         String opcServer = uri.getPath().replaceFirst("/", "");
         server = new OPCServer(host);
-        if (opcServer != null) {
+        if (opcServer != null && !opcServer.equals("")) {
             server.connect(opcServer, host);
         } else {
             String[] servers = (String[]) server.getOPCServers(host);
