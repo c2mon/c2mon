@@ -16,11 +16,7 @@
 					<mail address="info-tim-admins@cern.ch" />
 				</notification>
                 <directory name=".">
-                  <link source="log" target="/var/log/$USER/daqprocess-mvn" />
-                </directory>
-                <directory name="conf">
-                    <file name=".c2mon.properties" sourceDir="~/rep/c2mon/"
-                        mask="400" />
+                    <link source="log" target="/var/log/$USER/daqprocess-mvn" />
                 </directory>
 			</deployment>
 		    <startscript>        
@@ -54,14 +50,23 @@
 		  </startscript>
 		</application>
 
-		<application name="c2mon-daq-prod" extends="default" />
+		<application name="c2mon-daq-prod" extends="default">
+            <deployment installLocation="~/dist/daqprocess-mvn">
+              <directory name="conf">
+                  <file name=".c2mon.properties" sourceDir="~/rep/c2mon/"
+                      mask="400" />
+              </directory>
+            </deployment>
+        </application>
 
 		<application name="c2mon-daq-test" extends="default">
 			<deployment installLocation="~/dist/daqprocess-mvn">
-				<directory name="conf">
+                <directory name="conf">
+                    <file name=".c2mon.properties" sourceDir="~/rep/c2mon/"
+                        mask="400" />
                     <file name="opcdaqprocess.lst" sourceDir="~/rep/c2mon/daq"
-                      mask="400" />
-				</directory>
+                        mask="400" />
+                </directory>
         <directory name="bin">
           <file name="setenv.sh" sourceDir="~/rep/c2mon/daq"
             mask="700" />
