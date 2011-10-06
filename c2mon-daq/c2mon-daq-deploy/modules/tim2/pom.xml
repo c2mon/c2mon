@@ -62,6 +62,10 @@
 			<groupId>cern.tim2.tim2-daq</groupId>
 			<artifactId>tim2-daq-ssh</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>cern.tim2.tim2-daq</groupId>
+            <artifactId>tim2-daq-db</artifactId>
+        </dependency>
 	</dependencies>
 
 	<developers />
