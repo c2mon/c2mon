@@ -15,7 +15,7 @@
 					<!-- you can give more than one mail for deployment notification -->
 					<mail address="info-tim-admins@cern.ch" />
 				</notification>
-                <directory name=".">
+                <directory name="">
                     <link source="log" target="/var/log/$USER/daqprocess-mvn" />
                 </directory>
 			</deployment>
