@@ -1,0 +1,41 @@
+.tagName {
+	font-size: 16px;
+	font-weight: bold;
+	color: black;
+}
+.notFound {
+	font-size: 16px;
+	font-weight: bold;
+	color:#CC0022;
+}
+.instruction {
+	font-size: 14px;
+	font-weight: bold;
+	color: black;
+}
+
+.configViewer_margin{
+	margin: 1em;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.configViewer_header {
+	font-size: 14px;
+	font-weight: bold;
+	color: white;
+	text-align: ;
+	background-image:url(../img/config_viewer_header.png);background-repeat:repeat-x; 
+	/*background-color: #436976;*/
+	height: 30px;
+	padding: 5px 10px;
+}
+
+.column {
+	display: inline-block;
+	width: 500px;
+	margin: 0px 0px 10px 0px;
+	vertical-align: top;
+}

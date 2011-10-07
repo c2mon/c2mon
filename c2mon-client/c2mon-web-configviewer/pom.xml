@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.tim2.tim2-server</groupId>
+		<artifactId>tim2-server-pom</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>cern.tim2.tim2-server</groupId>
+	<artifactId>c2mon-web-configviewer</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>c2mon-web-configviewer</name>
+	<description>C2MON online configuration viewer (datatag, command, alarm, process viewer)</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.5</version>
+		</dependency>
+		
+		<!--		<dependency>-->
+		<!--			<groupId>taglibs</groupId>-->
+		<!--			<artifactId>standard</artifactId>-->
+		<!--			<version>1.1.2</version>-->
+		<!--		</dependency>-->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>compile</scope>
+			<version>4.1.0.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<version>1.5.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>cern.c2mon.c2mon-client</groupId>
+			<artifactId>c2mon-client-core</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+			<type>jar</type>
+			<scope>compile</scope>
+<!--			<exclusions>-->
+<!--	<exclusion>-->
+<!--		<groupId>cern.c2mon.c2mon-client</groupId>-->
+<!--		<artifactId>c2mon-client-history</artifactId>-->
+<!--	</exclusion>-->
+<!--</exclusions>-->
+		</dependency>
+	</dependencies>
+	
+	<build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8</version>
+         <configuration>
+          <argLine>          
+            <!-- needed for the client JMS module -->
+            -Dc2mon.jms.url=tcp://jms-tim-test1:61616
+            -Dc2mon.jms.user=not-used
+            -Dc2mon.jms.passwd=not-used
+            -Dc2mon.client.jms.supervision.topic=tim.client.supervision
+            -Dc2mon.client.jms.heartbeat.topic=tim.client.heartbeat
+            -Dc2mon.client.jms.request.queue=tim.client.request
+          </argLine>
+        </configuration>      
+      </plugin>
+    </plugins>
+  </build>
+	
+
+</project>
