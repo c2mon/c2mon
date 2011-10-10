@@ -34,10 +34,9 @@ import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.common.history.HistoryPlayerEvents;
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistoryProviderAvailability;
-import cern.c2mon.client.common.history.HistoryProviderType;
+import cern.c2mon.client.common.history.HistoryProviderFactory;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
-import cern.c2mon.client.common.history.exception.NoHistoryProviderException;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -45,13 +44,12 @@ import cern.c2mon.client.core.C2monHistoryManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.history.ClientDataTagRequestCallback;
-import cern.c2mon.client.history.HistoryProviderFactory;
+import cern.c2mon.client.history.HistoryProviderFactoryImpl;
 import cern.c2mon.client.history.data.HistoryLoadingManagerImpl;
 import cern.c2mon.client.history.dbaccess.HistoryProviderAvailabilityImpl;
-import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
 import cern.c2mon.client.history.playback.HistoryPlayerCoreAccess;
 import cern.c2mon.client.history.playback.HistoryPlayerImpl;
-import cern.c2mon.client.history.playback.publish.KeyForValuesMap;
+import cern.c2mon.client.history.util.KeyForValuesMap;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
@@ -294,13 +292,8 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   }
 
   @Override
-  public HistoryProvider getHistoryProvider(final HistoryProviderType type) throws NoHistoryProviderException {
-    try {
-      return HistoryProviderFactory.getInstance().createHistoryProvider(type, new ClientDataTagRequester());
-    }
-    catch (final HistoryException e) {
-      throw new NoHistoryProviderException("Failed to get a history provider", e);
-    }
+  public HistoryProviderFactory getHistoryProviderFactory() {
+    return new HistoryProviderFactoryImpl(new ClientDataTagRequester());
   }
 
   @Override
@@ -341,7 +334,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
         cdts.add((ClientDataTag) cdtValue);
       }
       else {
-        throw new RuntimeException(String.format("The %s must be of type %s", ClientDataTagValue.class.getName(), ClientDataTag.class.getName()));
+        throw new RuntimeException(String.format("The '%s' must be of type '%s'", ClientDataTagValue.class.getName(), ClientDataTag.class.getName()));
       }
     }
     manager.addClientDataTagsForLoading(cdts);

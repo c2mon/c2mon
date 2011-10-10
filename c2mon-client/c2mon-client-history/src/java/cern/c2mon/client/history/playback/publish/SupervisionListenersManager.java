@@ -1,5 +1,6 @@
 package cern.c2mon.client.history.playback.publish;
 
+import cern.c2mon.client.history.util.KeyForValuesMap;
 import cern.c2mon.client.jms.SupervisionListener;
 
 /**

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistorySupervisionEvent;
@@ -39,6 +40,8 @@ import cern.c2mon.client.history.dbaccess.beans.ShortTermLogHistoryRequestBean;
 import cern.c2mon.client.history.dbaccess.beans.SupervisionEventRequestBean;
 import cern.c2mon.client.history.dbaccess.beans.SupervisionRecordBean;
 import cern.c2mon.client.history.dbaccess.util.BeanConverterUtil;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 
 /**
  * Implementation of the {@link HistoryProvider}<br/>
@@ -51,6 +54,9 @@ import cern.c2mon.client.history.dbaccess.util.BeanConverterUtil;
  */
 class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
+  /** The logger instance */
+  private static final Logger LOG = Logger.getLogger(SqlHistoryProviderDAO.class);
+  
   /**
    * ORA-01795: maximum number of expressions in a list is 1000
    * 
@@ -186,10 +192,10 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
    *          <code>false</code> if it is max records in total
    * @return A collection of records that meets the condition of the parameters
    */
-  protected Collection<HistoryTagValueUpdate> getHistory(final ShortTermLogHistoryRequestBean providerRequest, final boolean maxRecordsIsPerTag) {
+  private Collection<HistoryTagValueUpdate> getHistory(final ShortTermLogHistoryRequestBean providerRequest, final boolean maxRecordsIsPerTag) {
 
     // Tells the listeners that the query is starting
-    final Object id = fireQueryStarting();
+    final Object queryId = fireQueryStarting();
 
     // If there is no tagIds to fetch, return no elements
     if (providerRequest.getTagIds() == null || providerRequest.getTagIds().length == 0) {
@@ -262,22 +268,27 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
         if (queryResult != null) {
           records.addAll(queryResult);
           for (HistoryRecordBean record : queryResult) {
-            final HistoryTagValueUpdate tagValueUpdate = BeanConverterUtil.toTagValueUpdate(record, this.clientDataTagRequestCallback);
-            result.add(tagValueUpdate);
+            try {
+              final HistoryTagValueUpdate tagValueUpdate = BeanConverterUtil.toTagValueUpdate(record, this.clientDataTagRequestCallback);
+              result.add(tagValueUpdate);
+            }
+            catch (Exception e) {
+              LOG.warn(
+                  String.format("Failed to convert a bean into a %s", TagValueUpdate.class.getSimpleName()), e);
+            }
           }
         }
-        fireQueryProgressChanged(id, queryPlan.get(i + 1) / (double) providerRequest.getTagIds().length);
+        fireQueryProgressChanged(queryId, queryPlan.get(i + 1) / (double) providerRequest.getTagIds().length);
       }
     }
     finally {
       session.close();
+      
+      fireQueryProgressChanged(queryId, 1.0);
+
+      // Tells the listeners that the query is finished
+      fireQueryFinished(queryId);
     }
-
-    fireQueryProgressChanged(id, 1.0);
-
-    // Tells the listeners that the query is finished
-    fireQueryFinished(id);
-
     return result;
   }
 
@@ -296,7 +307,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
   @Override
   public Collection<HistoryTagValueUpdate> getInitialValuesForTags(final Long[] tagIds, final Timestamp before) {
     // Tells the listener that a query is starting
-    final Object id = fireQueryStarting();
+    final Object queryId = fireQueryStarting();
 
     // List for the result
     final ArrayList<HistoryTagValueUpdate> result = new ArrayList<HistoryTagValueUpdate>(tagIds.length);
@@ -313,76 +324,92 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
         final Long tagId = tagIds[i];
         final HistoryRecordBean record = historyMapper.getInitialRecord(new InitialRecordHistoryRequestBean(tagId, before));
         if (record != null) {
-          final HistoryTagValueUpdate dataTagValue = BeanConverterUtil.toTagValueUpdate(record, this.clientDataTagRequestCallback);
-          if (dataTagValue != null) {
-            result.add(dataTagValue);
+          try {
+            final HistoryTagValueUpdate dataTagValue = BeanConverterUtil.toTagValueUpdate(record, this.clientDataTagRequestCallback);
+            if (dataTagValue != null) {
+              result.add(dataTagValue);
+            }
           }
-          fireQueryProgressChanged(id, i / (double) tagIds.length);
+          catch (Exception e) {
+            LOG.warn(
+                String.format("Failed to convert a bean into a %s", TagValueUpdate.class.getSimpleName()), e);
+          }
+          fireQueryProgressChanged(queryId, i / (double) tagIds.length);
         }
       }
     }
     finally {
       session.close();
+      
+      fireQueryProgressChanged(queryId, 1.0);
+
+      // Tells the listener that the query is finished
+      fireQueryFinished(queryId);
     }
-
-    fireQueryProgressChanged(id, 1.0);
-
-    // Tells the listener that the query is finished
-    fireQueryFinished(id);
 
     return result;
   }
   
   @Override
   public Collection<HistoryTagValueUpdate> getDailySnapshotRecords(final Long[] tagIds, final Timestamp from, final Timestamp to) {
-    // Tells the listener that a query is starting
-    final Object id = fireQueryStarting();
-
     // List for the result
     final ArrayList<HistoryTagValueUpdate> result = new ArrayList<HistoryTagValueUpdate>();
-
-    if (tagIds.length == 0) {
-      return result;
-    }
-
-    final List<Long> requests = new ArrayList<Long>(Arrays.asList(tagIds));
     
-    // Opens a session where the data is received from
-    final SqlSession session = this.sessionFactory.openSession();
-    final List<HistoryRecordBean> allRecords = new ArrayList<HistoryRecordBean>();
+    // Tells the listener that a query is starting
+    final Object queryId = fireQueryStarting();
+
     try {
-      while (requests.size() > 0) {
-        final HistoryMapper historyMapper = getHistoryMapper(session);
-        int toIndex = MAXIMUM_NUMBER_OF_TAGS_PER_QUERY;
-        if (toIndex > requests.size()) {
-          toIndex = requests.size();
+    
+      if (tagIds.length == 0) {
+        return result;
+      }
+  
+      final List<Long> requests = new ArrayList<Long>(Arrays.asList(tagIds));
+      
+      // Opens a session where the data is received from
+      final SqlSession session = this.sessionFactory.openSession();
+      final List<HistoryRecordBean> allRecords = new ArrayList<HistoryRecordBean>();
+      try {
+        while (requests.size() > 0) {
+          final HistoryMapper historyMapper = getHistoryMapper(session);
+          int toIndex = MAXIMUM_NUMBER_OF_TAGS_PER_QUERY;
+          if (toIndex > requests.size()) {
+            toIndex = requests.size();
+          }
+          final List<Long> currentRequest = requests.subList(0, toIndex);
+          final List<HistoryRecordBean> records = historyMapper.getDailySnapshotRecords(new DailySnapshotRequestBean(currentRequest.toArray(new Long[0]), from, to));
+          allRecords.addAll(records);
+          
+          // Removes the requested elements from the list. (Also from the "requests" lists)
+          currentRequest.clear();
+          
+          fireQueryProgressChanged(queryId, 1.0 - (requests.size() / (double) tagIds.length));
         }
-        final List<Long> currentRequest = requests.subList(0, toIndex);
-        final List<HistoryRecordBean> records = historyMapper.getDailySnapshotRecords(new DailySnapshotRequestBean(currentRequest.toArray(new Long[0]), from, to));
-        allRecords.addAll(records);
-        
-        // Removes the requested elements from the list. (Also from the "requests" lists)
-        currentRequest.clear();
-        
-        fireQueryProgressChanged(id, 1.0 - (requests.size() / (double) tagIds.length));
+      }
+      finally {
+        session.close();
+      }
+      
+      // Converts the tags into TagValueUpdates
+      for (final HistoryRecordBean bean : allRecords) {
+        try {
+          final HistoryTagValueUpdate tagValueUpdate = BeanConverterUtil.toTagValueUpdate(bean, this.clientDataTagRequestCallback);
+          if (tagValueUpdate != null) {
+            result.add(tagValueUpdate);
+          }
+        }
+        catch (Exception e) {
+          LOG.warn(
+              String.format("Failed to convert a bean into a %s", TagValueUpdate.class.getSimpleName()), e);
+        }
       }
     }
     finally {
-      session.close();
+      fireQueryProgressChanged(queryId, 1.0);
+  
+      // Tells the listener that the query is finished
+      fireQueryFinished(queryId);
     }
-    
-    // Converts the tags into TagValueUpdates
-    for (final HistoryRecordBean bean : allRecords) {
-      final HistoryTagValueUpdate tagValueUpdate = BeanConverterUtil.toTagValueUpdate(bean, this.clientDataTagRequestCallback);
-      if (tagValueUpdate != null) {
-        result.add(tagValueUpdate);
-      }
-    }
-
-    fireQueryProgressChanged(id, 1.0);
-
-    // Tells the listener that the query is finished
-    fireQueryFinished(id);
 
     return result;
   }
@@ -396,7 +423,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     }
 
     // Tells the listeners that a query is starting
-    final Object id = fireQueryStarting();
+    final Object queryId = fireQueryStarting();
 
     // Opens a session where the data is received from
     final SqlSession session = this.sessionFactory.openSession();
@@ -417,23 +444,28 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
         // Adds the records from the query to the result, converted into
         // SupervisionEvent
         for (final SupervisionRecordBean record : records) {
-          result.add(BeanConverterUtil.toSupervisionEvent(record));
+          try {
+            result.add(BeanConverterUtil.toSupervisionEvent(record));
+          }
+          catch (Exception e) {
+            LOG.warn(String.format("Failed to convert a bean into a %s", SupervisionEvent.class.getSimpleName()), e);
+          }
         }
 
         progress++;
-        fireQueryProgressChanged(id, progress / (double) requests.size());
+        fireQueryProgressChanged(queryId, progress / (double) requests.size());
       }
 
     }
     finally {
       session.close();
+      
+      fireQueryProgressChanged(queryId, 1.0);
+
+      // Tells the listener that the query is finished
+      fireQueryFinished(queryId);
     }
-
-    fireQueryProgressChanged(id, 1.0);
-
-    // Tells the listener that the query is finished
-    fireQueryFinished(id);
-
+    
     return result;
   }
   
@@ -458,7 +490,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     }
 
     // Tells the listeners that a query is starting
-    final Object id = fireQueryStarting();
+    final Object queryId = fireQueryStarting();
 
     // Opens a session where the data is received from
     final SqlSession session = this.sessionFactory.openSession();
@@ -479,22 +511,27 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
         // Adds the records from the query to the result, converted into
         // SupervisionEvent
         for (final SupervisionRecordBean record : records) {
-          result.add(BeanConverterUtil.toSupervisionEvent(record));
+          try {
+            result.add(BeanConverterUtil.toSupervisionEvent(record));
+          }
+          catch (Exception e) {
+            LOG.warn(String.format("Failed to convert a bean into a %s", SupervisionEvent.class.getSimpleName()), e);
+          }
         }
 
         progress++;
-        fireQueryProgressChanged(id, progress / (double) requests.size());
+        fireQueryProgressChanged(queryId, progress / (double) requests.size());
       }
 
     }
     finally {
       session.close();
+      
+      fireQueryProgressChanged(queryId, 1.0);
+
+      // Tells the listener that the query is finished
+      fireQueryFinished(queryId);
     }
-
-    fireQueryProgressChanged(id, 1.0);
-
-    // Tells the listener that the query is finished
-    fireQueryFinished(id);
 
     return result;
   }
@@ -508,4 +545,17 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     return session.getMapper(HistoryMapper.class);
   }
 
+  /**
+   * @return the sessionFactory
+   */
+  protected SqlSessionFactory getSessionFactory() {
+    return sessionFactory;
+  }
+
+  /**
+   * @return the clientDataTagRequestCallback
+   */
+  protected ClientDataTagRequestCallback getClientDataTagRequestCallback() {
+    return clientDataTagRequestCallback;
+  }
 }

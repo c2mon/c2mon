@@ -31,7 +31,7 @@ import java.sql.Timestamp;
 public class HistoryLoadingConfiguration {
 
   /** The default value for the earliest timestamp to request data from */
-  private final Timestamp DEFAULT_EARLIEST_TIMESTAMP = new Timestamp(System.currentTimeMillis() - 31L * 24L * 60L * 60L * 1000L);
+  private static final Timestamp DEFAULT_EARLIEST_TIMESTAMP = new Timestamp(System.currentTimeMillis() - 31L * 24L * 60L * 60L * 1000L);
   
   /** The earliest timestamp to request data from */
   private Timestamp earliestTimestamp = DEFAULT_EARLIEST_TIMESTAMP;
@@ -90,8 +90,8 @@ public class HistoryLoadingConfiguration {
   }
 
   /**
-   * This function will edit the start and end time to be correct for the number
-   * of days, starting from the current time.
+   * The number of days to retrieve, starting either from the end time or from
+   * the current time if the end time is not set.
    * 
    * @param days
    *          the number of days to get, beginning from today.
@@ -134,7 +134,8 @@ public class HistoryLoadingConfiguration {
   }
 
   /**
-   * @return the number of days to get, beginning from today.
+   * @return the number of days to get, beginning from the end time or from the
+   *         current time if the end time is not set.
    */
   public Integer getNumberOfDays() {
     return numberOfDays;
@@ -151,7 +152,7 @@ public class HistoryLoadingConfiguration {
   /**
    * @param loadInitialValues
    *          set to <code>true</code> if the initial values at time 0 also
-   *          should be loaded
+   *          should be loaded. (<code>false</code> by default)
    */
   public void setLoadInitialValues(final boolean loadInitialValues) {
     this.loadInitialValues = loadInitialValues;

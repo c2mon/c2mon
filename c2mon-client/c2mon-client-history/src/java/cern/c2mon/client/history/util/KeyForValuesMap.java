@@ -15,13 +15,16 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.history.playback.publish;
+package cern.c2mon.client.history.util;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import cern.c2mon.client.history.playback.publish.SupervisionListenersManager;
+import cern.c2mon.client.history.playback.publish.TagListenersManager;
 
 /**
  * This class make it possible to map keys to a set of values, without needing
@@ -122,7 +125,7 @@ public class KeyForValuesMap<K, V> {
    * 
    * @param key
    *          the key to get the values for
-   * @return the values registered on the key
+   * @return the values registered on the key, or an empty list of there is no values.
    */
   public synchronized Collection<V> getValues(final K key) {
     Set<V> result = getList(key, false);

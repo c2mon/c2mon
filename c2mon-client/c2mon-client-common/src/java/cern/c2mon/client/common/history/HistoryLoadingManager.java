@@ -27,7 +27,6 @@ import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
- * 
  * This interface describes the functions for a history loading manager.
  * 
  * @author vdeila
@@ -129,7 +128,7 @@ public interface HistoryLoadingManager {
    * 
    * @param tagId
    *          the tag id
-   * @return the history of the given tag
+   * @return the history of the given tag, NOT including the supervision events
    */
   Collection<HistoryTagValueUpdate> getHistory(Long tagId);
 

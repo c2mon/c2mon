@@ -54,40 +54,37 @@ public class HistoryPlayerConfigPanel extends JPanel {
   /** The end date chooser */
   private JDateChooser endDateChooser;
   
+  /** <code>true</code> when events should ignore date errors */
+  private boolean ignoreDateEvents = false;
+  
   /**
    * Constructor
    */
   public HistoryPlayerConfigPanel() {
     super(new BorderLayout(PANEL_MARGIN, PANEL_MARGIN));
     
-    final Calendar startDate = Calendar.getInstance();
-    startDate.add(Calendar.HOUR_OF_DAY, -1);
-
-    createComponents(startDate.getTime(), new Date(System.currentTimeMillis()));
+    createComponents();
   }
 
   /**
    * Creates the labels and the calendars components
-   * 
-   * @param startTime The initial start date
-   * @param endTime The initial end date
    */
-  private void createComponents(final Date startTime, final Date endTime) {
+  private void createComponents() {
     final JPanel labelPanel = new JPanel(new GridLayout(2, 1, PANEL_MARGIN, PANEL_MARGIN));
     labelPanel.add(new JLabel("Start date:"));
     labelPanel.add(new JLabel("End date:"));
     
     final JPanel dateChooserPanel = new JPanel(new GridLayout(2, 1, PANEL_MARGIN, PANEL_MARGIN));
-    this.startDateChooser = new JDateChooser(startTime);
+    this.startDateChooser = new JDateChooser();
     this.startDateChooser.setDateFormatString("dd.MM.yyyy HH:mm:ss");
-    this.startDateChooser.setSelectableDateRange(new Date(System.currentTimeMillis() - HISTORY_TIME), new Date(System.currentTimeMillis()));
     dateChooserPanel.add(startDateChooser);
     
-    this.endDateChooser = new JDateChooser(endTime);
+    this.endDateChooser = new JDateChooser();
     this.endDateChooser.setDateFormatString("dd.MM.yyyy HH:mm:ss");
-    this.endDateChooser.setSelectableDateRange(new Date(System.currentTimeMillis() - HISTORY_TIME), new Date(System.currentTimeMillis()));
     dateChooserPanel.add(endDateChooser);
 
+    resetDates();
+    
     this.add(labelPanel, BorderLayout.WEST);
     this.add(dateChooserPanel, BorderLayout.CENTER);
     
@@ -100,7 +97,7 @@ public class HistoryPlayerConfigPanel extends JPanel {
        */
       @Override
       public void propertyChange(final PropertyChangeEvent evt) {
-        if (endDateChooser.getDate().compareTo(startDateChooser.getDate()) < 0)
+        if (!ignoreDateEvents && endDateChooser.getDate().compareTo(startDateChooser.getDate()) < 0)
           endDateChooser.setDate(startDateChooser.getDate());
       }
     });
@@ -111,10 +108,24 @@ public class HistoryPlayerConfigPanel extends JPanel {
        */
       @Override
       public void propertyChange(final PropertyChangeEvent evt) {
-        if (startDateChooser.getDate() != null && endDateChooser.getDate() != null && startDateChooser.getDate().compareTo(endDateChooser.getDate()) > 0)
+        if (ignoreDateEvents && startDateChooser.getDate() != null && endDateChooser.getDate() != null && startDateChooser.getDate().compareTo(endDateChooser.getDate()) > 0)
           startDateChooser.setDate(endDateChooser.getDate());
       }
     });
+  }
+  
+  /**
+   * Resets the dates and the selectable range
+   */
+  public final void resetDates() {
+    final Calendar startDate = Calendar.getInstance();
+    startDate.add(Calendar.HOUR_OF_DAY, -1);
+    
+    setStartDate(startDate.getTime());
+    setEndDate(new Date(System.currentTimeMillis()));
+    
+    this.startDateChooser.setSelectableDateRange(new Date(System.currentTimeMillis() - HISTORY_TIME), new Date(System.currentTimeMillis()));
+    this.endDateChooser.setSelectableDateRange(new Date(System.currentTimeMillis() - HISTORY_TIME), new Date(System.currentTimeMillis()));
   }
 
   /**
@@ -129,5 +140,37 @@ public class HistoryPlayerConfigPanel extends JPanel {
    */
   public Date getEndDate() {
     return this.endDateChooser.getDate();
+  }
+  
+  /**
+   * @param value
+   *          the new date to set
+   */
+  public void setStartDate(final Date value) {
+    this.ignoreDateEvents = true;
+    this.startDateChooser.setDate(value);
+    this.ignoreDateEvents = false;
+  }
+
+  /**
+   * @param value
+   *          the new date to set
+   */
+  public void setEndDate(final Date value) {
+    this.ignoreDateEvents = true;
+    this.endDateChooser.setDate(value);
+    this.ignoreDateEvents = false;
+  }
+  
+  /**
+   * 
+   * @param enable
+   *          <code>true</code> to enable the chooser components,
+   *          <code>false</code> to disable
+   */
+  public void setChoosersEnabled(final boolean enable) {
+    this.startDateChooser.setEnabled(enable);
+    this.endDateChooser.setEnabled(enable);
+    
   }
 }

@@ -15,19 +15,45 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.common.history;
+package cern.c2mon.client.history.gui.components.model;
 
 /**
- * The type of {@link HistoryProvider}s that exists
+ * Used by {@link SearchListModel} to store a match result together with a list
+ * object
+ * 
+ * @author vdeila
  */
-public enum HistoryProviderType {
-  /**
-   * Gets the history from the short term log (30 days)
-   */
-  HISTORY_SHORT_TERM_LOG,
+class MatchedListObject {
+
+  /** the list object */
+  private final Object listObject;
+  
+  /** the match result of the list object */
+  private final int match;
 
   /**
-   * Gets the history from the stored events
+   * 
+   * @param listObject
+   *          the list object
+   * @param match
+   *          the match result of the list object
    */
-  SAVED_HISTORY_EVENTS
+  public MatchedListObject(final Object listObject, final int match) {
+    this.listObject = listObject;
+    this.match = match;
+  }
+
+  /**
+   * @return the list object
+   */
+  public Object getListObject() {
+    return listObject;
+  }
+
+  /**
+   * @return the match result of the list object
+   */
+  public int getMatch() {
+    return match;
+  }
 }

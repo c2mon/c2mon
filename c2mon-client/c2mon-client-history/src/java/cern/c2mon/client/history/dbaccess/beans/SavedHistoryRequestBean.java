@@ -15,19 +15,50 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.common.history;
+package cern.c2mon.client.history.dbaccess.beans;
+
+import java.util.Collection;
+
+import cern.c2mon.client.history.dbaccess.SavedHistoryMapper;
 
 /**
- * The type of {@link HistoryProvider}s that exists
+ * Bean which is passed to the {@link SavedHistoryMapper} as a request.
+ * 
+ * @author vdeila
+ * 
  */
-public enum HistoryProviderType {
-  /**
-   * Gets the history from the short term log (30 days)
-   */
-  HISTORY_SHORT_TERM_LOG,
+public class SavedHistoryRequestBean {
+
+  /** The event id of the data to get */
+  private final long eventId;
+
+  /** the tag ids which is requested */
+  private final Collection<Long> tagIds;
 
   /**
-   * Gets the history from the stored events
+   * 
+   * @param eventId
+   *          the event id of the data to get
+   * @param tagIds
+   *          the tag ids which is requested
    */
-  SAVED_HISTORY_EVENTS
+  public SavedHistoryRequestBean(final long eventId, final Collection<Long> tagIds) {
+    this.eventId = eventId;
+    this.tagIds = tagIds;
+  }
+
+  /**
+   * @return the tag ids which is requested
+   */
+  public Collection<Long> getTagIds() {
+    return tagIds;
+  }
+
+  /**
+   * @return the event id of the data to get
+   */
+  public long getEventId() {
+    return eventId;
+  }
+
 }

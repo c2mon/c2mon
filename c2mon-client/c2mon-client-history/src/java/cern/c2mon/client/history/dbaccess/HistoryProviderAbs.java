@@ -111,12 +111,13 @@ abstract class HistoryProviderAbs implements HistoryProvider {
       queriesLock.writeLock().unlock();
     }
     
-    for (HistoryProviderListener listener : getHistoryProviderListeners()) {
-      listener.queryStarting();
-    }
     if (queriesCount == 1) {
-      fireQueryProgressChanged();
+      for (HistoryProviderListener listener : getHistoryProviderListeners()) {
+        listener.queryStarting();
+      }
     }
+    
+    fireQueryProgressChanged();
     return queryId;
   }
 
@@ -143,7 +144,7 @@ abstract class HistoryProviderAbs implements HistoryProvider {
       }
     }
     else {
-      fireQueryProgressChanged(queryId, 1.0);
+      fireQueryProgressChanged();
     }
   }
 
@@ -171,11 +172,12 @@ abstract class HistoryProviderAbs implements HistoryProvider {
    * the combined percentage of all the concurrent queries.
    */
   private void fireQueryProgressChanged() {
-    double percent = 1.0;
+    double percent = 0.0;
     queriesLock.readLock().lock();
     try {
+      final int numberOfQueries = this.queries.size();
       for (Double singlePercent : this.queries.values()) {
-        percent *= singlePercent;
+        percent += singlePercent / (double) numberOfQueries;
       }
     }
     finally {

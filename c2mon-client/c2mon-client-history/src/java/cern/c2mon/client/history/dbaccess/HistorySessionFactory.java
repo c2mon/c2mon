@@ -26,6 +26,8 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.SavedHistoryEvent;
+import cern.c2mon.client.common.history.SavedHistoryEventsProvider;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.history.ClientDataTagRequestCallback;
 import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
@@ -42,6 +44,9 @@ public final class HistorySessionFactory {
 
   /** The default driver used if non is specified */
   private static final String DEFAULT_JDBC_TIMSTLOG_DRIVER = "oracle.jdbc.OracleDriver";
+  
+  /** The file path to the ibatis configuration file */
+  private static final String CONFIGURATION_FILE = "cern/c2mon/client/history/dbaccess/config/history-ibatis.xml";
   
   /** Singleton instance */
   private static HistorySessionFactory instance = null;
@@ -64,9 +69,6 @@ public final class HistorySessionFactory {
       System.setProperty(HistorySystemProperties.JDBC_RO_DRIVER, DEFAULT_JDBC_TIMSTLOG_DRIVER);
     }
   }
-
-  /** The file path to the ibatis configuration file */
-  private static final String CONFIGURATION_FILE = "cern/c2mon/client/history/dbaccess/config/history-ibatis.xml";
 
   /** Session factory is the factory from apache created from the xml files */
   private SqlSessionFactory sessionFactory = null;
@@ -103,17 +105,6 @@ public final class HistorySessionFactory {
 
   /**
    * 
-   * @return An open session. Must be closed when finished using it.
-   * @throws HistoryException
-   *           If the configuration file could not be read. Or if the system
-   *           properties for the data source is not set.
-   */
-  public SqlSession openSession() throws HistoryException {
-    return getSqlSessionFactory().openSession();
-  }
-
-  /**
-   * 
    * @param clientDataTagRequestCallback
    *          callback for the history provider to get access to attributes in
    *          the {@link ClientDataTagValue}. Like the
@@ -131,18 +122,36 @@ public final class HistorySessionFactory {
   
   /**
    * 
+   * @param event
+   *          the event which will be requested. Can be <code>null</code>, but
+   *          may decrease performance significantly
    * @param clientDataTagRequestCallback
    *          callback for the history provider to get access to attributes in
    *          the {@link ClientDataTagValue}. Like the
    *          {@link ClientDataTagValue#getType()}.
-   *          
-   * @return A {@link HistoryProvider} which can be used to easily get event history data
+   * 
+   * @return A {@link HistoryProvider} which can be used to easily get event
+   *         history data
    * @throws HistoryException
    *           If the configuration file could not be read. Or if the system
    *           properties for the data source is not set.
    */
-  public HistoryProvider createHistoryEventsProvider(final ClientDataTagRequestCallback clientDataTagRequestCallback) throws HistoryException {
-    throw new HistoryException("The History Events is not yet supported..");
+  public HistoryProvider createSavedHistoryProvider(final SavedHistoryEvent event, final ClientDataTagRequestCallback clientDataTagRequestCallback) throws HistoryException {
+    return new SqlHistoryEventsProviderDAO(event.getId(), getSqlSessionFactory(), clientDataTagRequestCallback);
+  }
+  
+  /**
+   * 
+   * @return A {@link SavedHistoryEventProvider} which can be used to easily get
+   *         the list of saved history events
+   * 
+   * @throws HistoryException
+   *           If the configuration file could not be read. Or if the system
+   *           properties for the data source is not set.
+   */
+  public SavedHistoryEventsProvider createSavedHistoryEventsProvider()
+      throws HistoryException {
+    return new SqlSavedHistoryEventsProviderDAO(getSqlSessionFactory());
   }
 
   /**

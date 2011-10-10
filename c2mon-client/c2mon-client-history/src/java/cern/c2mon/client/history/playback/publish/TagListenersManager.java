@@ -3,6 +3,7 @@ package cern.c2mon.client.history.playback.publish;
 import java.util.Collection;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.client.history.util.KeyForValuesMap;
 
 /**
  * This class keeps lists of which listeners is listening on which tag.

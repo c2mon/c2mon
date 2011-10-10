@@ -47,9 +47,8 @@ public class ProgressDialog {
   private static final int PANEL_MARGIN = 4;
 
   /**
-   * The start of the second progress text in the progress dialog when loading
-   * initial historical data. Is put before the progress message coming from
-   * HistoryLoader.
+   * The start of the second progress text in the progress dialog. Is put before
+   * the progress status text when using {@link #setStatus(String)}
    */
   private static final String PROGRESS_STATUS_START = "- ";
 
@@ -125,15 +124,13 @@ public class ProgressDialog {
     if (dialog.isVisible()) {
       return;
     }
-    final Thread progressThread = new Thread(new Runnable() {
+    new Thread("TIM-UI-Progress-Thread") {
       public void run() {
         startProgressBarUpdateThread();
         
         dialog.setVisible(true);
       }
-    });
-    progressThread.setName("TIM-UI-Progress-Thread");
-    progressThread.start();
+    }.start();
   }
 
   /**

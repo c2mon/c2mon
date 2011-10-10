@@ -15,19 +15,51 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.common.history;
+package cern.c2mon.client.common.history.exception;
 
 /**
- * The type of {@link HistoryProvider}s that exists
+ * Exception is threw if something goes wrong in fetching an instance of a
+ * {@link HistoryProvider}
+ * 
+ * @author vdeila
+ * 
  */
-public enum HistoryProviderType {
-  /**
-   * Gets the history from the short term log (30 days)
-   */
-  HISTORY_SHORT_TERM_LOG,
+public class HistoryProviderException extends Exception {
+
+  /** serialVersionUID */
+  private static final long serialVersionUID = 4579433171420826894L;
+
+  /** Empty constructor */
+  public HistoryProviderException() {
+  }
 
   /**
-   * Gets the history from the stored events
+   * 
+   * @param message
+   *          an description of why the exception occurred
    */
-  SAVED_HISTORY_EVENTS
+  public HistoryProviderException(final String message) {
+    super(message);
+  }
+
+  /**
+   * 
+   * @param cause
+   *          the original exception
+   */
+  public HistoryProviderException(final Throwable cause) {
+    super(cause);
+  }
+
+  /**
+   * 
+   * @param message
+   *          an description of why the exception occurred
+   * @param cause
+   *          the original exception
+   */
+  public HistoryProviderException(final String message, final Throwable cause) {
+    super(message, cause);
+  }
+
 }

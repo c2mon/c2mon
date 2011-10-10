@@ -15,19 +15,30 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.common.history;
+package cern.c2mon.client.history.gui.components.model;
 
 /**
- * The type of {@link HistoryProvider}s that exists
+ * Used by {@link SearchListModel} to filter out and order a search in a list.
+ * 
+ * @see SearchListModel
+ * 
+ * @author vdeila
+ * 
+ * @param <T>
+ *          the type of the search
  */
-public enum HistoryProviderType {
-  /**
-   * Gets the history from the short term log (30 days)
-   */
-  HISTORY_SHORT_TERM_LOG,
+public interface Matcher<T> {
 
   /**
-   * Gets the history from the stored events
+   * 
+   * @param listObj
+   *          the object from the list model
+   * @param search
+   *          the search object
+   * @return a positive number if the search matches the listObj, the closer to
+   *         <code>0</code> the better match. A negative number means it doesn't
+   *         match at all.
    */
-  SAVED_HISTORY_EVENTS
+  public int matches(Object listObj, T search);
+
 }

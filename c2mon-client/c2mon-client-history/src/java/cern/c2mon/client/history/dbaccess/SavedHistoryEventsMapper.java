@@ -15,19 +15,28 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.common.history;
+package cern.c2mon.client.history.dbaccess;
+
+import java.util.List;
+
+import cern.c2mon.client.history.dbaccess.beans.SavedHistoryEventBean;
 
 /**
- * The type of {@link HistoryProvider}s that exists
+ * Used to get the list of saved events from the sql server. Instantiated by
+ * iBatis or by {@link HistorySessionFactory}
+ * 
+ * @see HistorySessionFactory
+ * @see SavedHistoryEventBean
+ * 
+ * @author vdeila
+ * 
  */
-public enum HistoryProviderType {
-  /**
-   * Gets the history from the short term log (30 days)
-   */
-  HISTORY_SHORT_TERM_LOG,
+public interface SavedHistoryEventsMapper {
 
   /**
-   * Gets the history from the stored events
+   * 
+   * @return a list of all the saved events stored in the database
    */
-  SAVED_HISTORY_EVENTS
+  List<SavedHistoryEventBean> getSavedEvents();
+
 }

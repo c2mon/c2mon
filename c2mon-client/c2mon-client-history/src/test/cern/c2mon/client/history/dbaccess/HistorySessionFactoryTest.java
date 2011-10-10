@@ -8,16 +8,15 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import cern.c2mon.client.common.history.HistoryProvider;
-import cern.c2mon.client.common.history.HistoryProviderType;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.SupervisionEventRequest;
 import cern.c2mon.client.common.history.Timespan;
-import cern.c2mon.client.history.HistoryProviderFactory;
-import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
+import cern.c2mon.client.common.history.exception.HistoryProviderException;
+import cern.c2mon.client.history.HistoryProviderFactoryImpl;
 import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
- * Tests {@link HistoryProviderFactory} and the myBatis configurations. Tries to
+ * Tests {@link HistoryProviderFactoryImpl} and the myBatis configurations. Tries to
  * retrieve something from the database to test the sql commands.
  * 
  * @author vdeila
@@ -45,13 +44,13 @@ public class HistorySessionFactoryTest {
     }); 
   
   @Test
-  public void testCreateHistoryProvider() throws HistoryException {
-    HistoryProviderFactory.getInstance().createHistoryProvider(HistoryProviderType.HISTORY_SHORT_TERM_LOG, null);
+  public void testCreateHistoryProvider() throws HistoryProviderException {
+    new HistoryProviderFactoryImpl().createHistoryProvider();
   }
 
   @Test
-  public void testRequestFromTest() throws HistoryException {
-    final HistoryProvider provider = HistoryProviderFactory.getInstance().createHistoryProvider(HistoryProviderType.HISTORY_SHORT_TERM_LOG, null);
+  public void testRequestFromTest() throws HistoryProviderException {
+    final HistoryProvider provider = new HistoryProviderFactoryImpl().createHistoryProvider();
 
     final Collection<HistoryTagValueUpdate> values = provider.getHistory(TAG_IDS, MAXIMUM_TOTAL_RECORDS);
     Assert.assertTrue("More records was returned than requested", values.size() <= MAXIMUM_TOTAL_RECORDS);

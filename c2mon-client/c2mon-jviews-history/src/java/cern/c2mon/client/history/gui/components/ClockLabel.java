@@ -25,7 +25,6 @@ import java.util.Date;
 import javax.swing.JLabel;
 
 import cern.c2mon.client.common.history.HistoryPlayer;
-import cern.c2mon.client.common.history.PlaybackControl;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
 import cern.c2mon.client.core.C2monServiceGateway;
 

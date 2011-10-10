@@ -24,11 +24,10 @@ import cern.c2mon.client.common.history.HistoryPlayer;
 import cern.c2mon.client.common.history.HistoryPlayerEvents;
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistoryProviderAvailability;
-import cern.c2mon.client.common.history.HistoryProviderType;
+import cern.c2mon.client.common.history.HistoryProviderFactory;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.event.HistoryPlayerListener;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
-import cern.c2mon.client.common.history.exception.NoHistoryProviderException;
 
 /**
  * This interface describes the methods which are provided by the C2MON history
@@ -62,16 +61,9 @@ public interface C2monHistoryManager {
   boolean isHistoryModeEnabled();
 
   /**
-   * 
-   * @param type
-   *          the type of provider to get
-   * @return a history provider of the given type
-   * @throws NoHistoryProviderException
-   *           is thrown if something goes wrong in fetching the
-   *           {@link HistoryProvider}. For example if no url, username and
-   *           password is given.
+   * @return a history provider factory
    */
-  HistoryProvider getHistoryProvider(HistoryProviderType type) throws NoHistoryProviderException;
+  HistoryProviderFactory getHistoryProviderFactory();
 
   /**
    * 
@@ -85,10 +77,13 @@ public interface C2monHistoryManager {
    * to load the data.
    * 
    * @param historyProvider
-   *          the history provider to be used
+   *          the history provider to be used. Can be retrieved through 
+   *          {@link HistoryProviderFactory#createHistoryProvider()}, a
+   *          {@link HistoryProviderFactory} can be retrieved from
+   *          {@link #getHistoryProviderFactory()}
    * @param tagIds
-   *          the tag ids which will be added to the manager
-   * @return a history loading manager to load data from a history provider
+   *          the tag ids which will be added to the manager for loading.
+   * @return a history loading manager which loads data from a history provider
    */
   HistoryLoadingManager createHistoryLoadingManager(HistoryProvider historyProvider, Collection<Long> tagIds);
 

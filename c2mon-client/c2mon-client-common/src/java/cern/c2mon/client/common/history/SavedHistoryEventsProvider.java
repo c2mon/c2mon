@@ -17,17 +17,20 @@
  *****************************************************************************/
 package cern.c2mon.client.common.history;
 
+import java.util.Collection;
+
 /**
- * The type of {@link HistoryProvider}s that exists
+ * Interface that describes to get the list of {@link SavedHistoryEvent}s from
+ * the database<br/>
+ * 
+ * @author vdeila
+ * 
  */
-public enum HistoryProviderType {
-  /**
-   * Gets the history from the short term log (30 days)
-   */
-  HISTORY_SHORT_TERM_LOG,
+public interface SavedHistoryEventsProvider {
 
   /**
-   * Gets the history from the stored events
+   * @return the list of saved history events, ordered by date descending.
    */
-  SAVED_HISTORY_EVENTS
+  Collection<SavedHistoryEvent> getSavedHistoryEvents();
+
 }
