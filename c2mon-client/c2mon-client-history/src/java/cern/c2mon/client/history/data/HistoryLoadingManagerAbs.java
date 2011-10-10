@@ -319,6 +319,17 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
     return getHistory(new SupervisionEventId(entity, entityId));
   }
   
+  @Override
+  public Collection<Long> getLoadedTagIds() {
+    this.loadedHistoryTagValueUpdatesLock.readLock().lock();
+    try {
+      return Arrays.asList(this.loadedHistoryTagValueUpdates.keySet().toArray(new Long[0]));
+    }
+    finally {
+      this.loadedHistoryTagValueUpdatesLock.readLock().unlock();
+    }
+  }
+
   /**
    * Adds records to the data store
    * 

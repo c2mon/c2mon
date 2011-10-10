@@ -74,8 +74,6 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
   /** The latest time loaded */
   private Timestamp latestTimeLoaded;
   
-  
-  
   /**
    * 
    * @param historyProvider

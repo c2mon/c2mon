@@ -103,7 +103,7 @@ public class HistoryLoadingConfiguration {
   /**
    * 
    * @param maximum
-   *          the maximum amount of records to retrieve. <code>null</code> for
+   *          the maximum amount of records to retrieve in total. <code>null</code> for
    *          no limit
    */
   public void setMaximumRecords(final Integer maximum) {
@@ -112,7 +112,7 @@ public class HistoryLoadingConfiguration {
 
   /**
    * 
-   * @return the maximum amount of records to retrieve. <code>null</code> if
+   * @return the maximum amount of records to retrieve in total. <code>null</code> if
    *         there is no limit
    */
   public Integer getMaximumRecords() {

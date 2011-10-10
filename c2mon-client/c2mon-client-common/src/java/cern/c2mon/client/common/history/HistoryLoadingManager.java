@@ -120,7 +120,10 @@ public interface HistoryLoadingManager {
    *          the tag id
    * @return all history of the tag, where all supervision events is converted
    *         into {@link HistoryTagValueUpdate} containing the value of the
-   *         previous value (sorted by daq time)
+   *         previous value (sorted by server time). Please note that this
+   *         function may return more than
+   *         {@link HistoryLoadingConfiguration#getMaximumRecords()} because it
+   *         adds the supervision events on top.
    */
   Collection<HistoryTagValueUpdate> getAllHistoryConverted(Long tagId);
 
@@ -151,6 +154,11 @@ public interface HistoryLoadingManager {
    */
   Collection<HistorySupervisionEvent> getHistory(SupervisionEntity entity, Long entityId);
 
+  /**
+   * @return the list of tag ids which are loaded
+   */
+  Collection<Long> getLoadedTagIds();
+  
   /**
    * 
    * @return the earliest time which have been loaded (exluding initial data)

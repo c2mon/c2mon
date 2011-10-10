@@ -252,7 +252,24 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
    */
   @Override
   public String toString() {
-    return String.format("Id: %d, Logdate: %s, ServerTime: %s", getId(), getLogTimestamp().toString(), getServerTimestamp().toString());
+    final String logTimestamp;    
+    final String serverTimestamp;
+    
+    if (getLogTimestamp() != null) {
+      logTimestamp = getLogTimestamp().toString();
+    }
+    else {
+      logTimestamp = "";
+    }
+    
+    if (getServerTimestamp() != null) {
+      serverTimestamp = getServerTimestamp().toString();
+    }
+    else {
+      serverTimestamp = "";
+    }
+    
+    return String.format("Id: %d, Logdate: %s, ServerTime: %s", getId(), logTimestamp, serverTimestamp);
   }
 
   /**
