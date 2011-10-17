@@ -85,6 +85,7 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
   @Transactional("cacheTransactionManager")
   @Override
   public void createRuleTag(ConfigurationElement element) throws IllegalAccessException {
+    LOGGER.trace("Creating RuleTag with id " + element.getEntityId());
     checkId(element.getEntityId());
     RuleTag ruleTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
     Collection<Long> tagIds = ruleTag.getRuleInputTagIds();
@@ -99,7 +100,7 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
       LOGGER.error(errMessage, e);
       tagCache.remove(ruleTag.getId());
       for (Long tagId : tagIds) {      
-        tagCache.remove(tagId); 
+        tagCache.remove(tagId); //for removing all references to the rule; tags will be reloaded from DB
       }
       throw new UnexpectedRollbackException(errMessage, e);
     }
@@ -118,7 +119,8 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
    */
   @Override
   @Transactional("cacheTransactionManager")
-  public void updateRuleTag(Long id, Properties properties) throws IllegalAccessException {  
+  public void updateRuleTag(Long id, Properties properties) throws IllegalAccessException {
+    LOGGER.trace("Updating RuleTag " + id);
     RuleTag ruleTag = tagCache.get(id);
     ruleTag.getWriteLock().lock();
     try {
@@ -165,6 +167,7 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
   @Override
   @Transactional("cacheTransactionManager")
   public void removeRuleTag(final Long id, final ConfigurationElementReport elementReport) {
+    LOGGER.trace("Removing RuleTag " + id);
     try {
       RuleTag ruleTag = tagCache.get(id);
       ruleTag.getWriteLock().lock();
