@@ -152,7 +152,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   @Override
   @Transactional("cacheTransactionManager")
   public List<ProcessChange> removeControlTag(Long id, ConfigurationElementReport tagReport) {
-    LOGGER.trace("Removing DataTag " + id);
+    LOGGER.trace("Removing ControlTag " + id);
     try {
       ControlTag controlTag = tagCache.get(id);
       controlTag.getWriteLock().lock();
