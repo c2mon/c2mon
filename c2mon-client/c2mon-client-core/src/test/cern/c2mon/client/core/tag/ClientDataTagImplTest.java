@@ -43,8 +43,7 @@ public class ClientDataTagImplTest {
           new Timestamp(System.currentTimeMillis()),
           "Test description",
           "My.data.tag.name",
-          "My.jms.topic",
-          Boolean.FALSE);
+          "My.jms.topic");
     
     return tagUpdate;
   }

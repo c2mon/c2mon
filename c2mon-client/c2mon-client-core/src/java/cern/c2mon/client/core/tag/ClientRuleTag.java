@@ -294,6 +294,11 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   public String getDescription() {
     return "Client rule: " + rule.getExpression();
   }
+  
+  @Override
+  public String getValueDescription() {
+    return "Client rule result";
+  }
 
   @Override
   public String getUnit() {
@@ -463,125 +468,5 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   @Override
   public boolean isValid() {
     return this.ruleQuality.isValid();
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public String getTopicName() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public Boolean isControlTag() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public Collection<Long> getRuleIds() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public String getMaxValue() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public String getMinValue() {    
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public String getValueDescription() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public String getDipPublication() {    
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public String getJapcPublication() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public String getHardwareAddress() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public int getPriority() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public int getTimeDeadband() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public float getValueDeadband() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public short getValueDeadbandType() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public boolean isGuaranteedDelivery() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
-  }
-
-  /**
-   * @throws UnsupportedOperationException as not available for ClientRuleTags
-   */
-  @Override
-  public Collection<Long> getAlarmids() {
-    throw new UnsupportedOperationException("Not implemented for ClientRuleTags");
   }
 }

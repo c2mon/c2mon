@@ -35,7 +35,6 @@ import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.tag.Publisher;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -70,9 +69,6 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   
   /** The current tag mode */
   private TagMode mode = TagMode.TEST;
-  
-  /** Flag recording if this Tag is a control tag (alive, status or commfault).*/
-  private Boolean controlTag;
   
   /** 
    * <code>true</code>, if the tag value is currently simulated and not
@@ -125,12 +121,6 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private String valueDescription = "";
   
   /**
-   * Min and max values accepted for this Tag.
-   */
-  private String minValue;  
-  private String maxValue;
-  
-  /**
    * String representation of the JMS destination where the DataTag 
    * is published on change.
    */
@@ -138,50 +128,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
   /** In case this data tag is a rule this variable contains its rule expression */
   private RuleExpression ruleExpression = null;
-  
-  /**
-   * Ids of rules using this Tag.
-   */
-  private ArrayList<Long> ruleIds = new ArrayList<Long>();
-  
-  /** Publication topics to which the Tag is republished. */
-  private Map<Publisher, String> publications = new HashMap<Publisher, String>();
 
-  /**
-   * @see DataTagAddress
-   */
-  private int timeToLive;
-  
-  /**
-   * @see DataTagAddress
-   */
-  private short valueDeadbandType;
-  
-  /**
-   * @see DataTagAddress
-   */
-  private float valueDeadband;
-  
-  /**
-   * @see DataTagAddress
-   */
-  private int timeDeadband;
-  
-  /**
-   * @see DataTagAddress
-   */
-  private int priority;
-  
-  /**
-   * @see DataTagAddress
-   */
-  private boolean guaranteedDelivery;
-  
-  /**
-   * Hardware address is transferred as XML String.
-   */
-  private String hardwareAddress;
-  
   /**
    * List of DataTagUpdateListeners registered for updates on this DataTag
    */
@@ -672,23 +619,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         tagName = tagUpdate.getName();
         topicName = tagUpdate.getTopicName();
         unit = tagUpdate.getUnit();
-        controlTag = tagUpdate.isControlTag();
-        if (tagUpdate.getRuleIds() != null) {
-          ruleIds.addAll(tagUpdate.getRuleIds());
-        }
-        minValue = tagUpdate.getMinValue();
-        maxValue = tagUpdate.getMaxValue();
-        publications.putAll(tagUpdate.getPublications());
-        if (tagUpdate.getTransferTagAddress() != null) {
-          priority = tagUpdate.getTransferTagAddress().getPriority();
-          valueDeadband = tagUpdate.getTransferTagAddress().getValueDeadband();
-          valueDeadbandType = tagUpdate.getTransferTagAddress().getValueDeadbandType();
-          timeDeadband = tagUpdate.getTransferTagAddress().getTimeDeadband();
-          timeToLive = tagUpdate.getTransferTagAddress().getTimeToLive();
-          hardwareAddress = tagUpdate.getTransferTagAddress().getHardwareAddress();
-          guaranteedDelivery = tagUpdate.getTransferTagAddress().isGuaranteedDelivery();
-        }       
-                        
+        
         // Notify all listeners of the update
         notifyListeners();
       }
@@ -824,7 +755,6 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     serverTimestamp = tagValueUpdate.getServerTimestamp();
     sourceTimestamp = tagValueUpdate.getSourceTimestamp();
     tagValue = tagValueUpdate.getValue();
-    valueDescription = tagValueUpdate.getValueDescription();
     mode = tagValueUpdate.getMode();
     simulated = tagValueUpdate.isSimulated();
   }
@@ -932,9 +862,16 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     try {
       return this.description;
     }
-    finally {
-      updateTagLock.readLock().unlock();
-    }
+    finally { updateTagLock.readLock().unlock(); }
+  }
+  
+  @Override
+  public String getValueDescription() {
+    updateTagLock.readLock().lock();
+    try {
+      return valueDescription;
+    } 
+    finally { updateTagLock.readLock().unlock(); }
   }
   
   
@@ -995,7 +932,6 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         clone.ruleExpression = (RuleExpression) ruleExpression.clone();
       }
       clone.listeners = new ArrayList<DataTagUpdateListener>();
-      clone.ruleIds = (ArrayList<Long>) ruleIds.clone();
       
       return clone;
     }
@@ -1039,187 +975,4 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public void onSupervisionUpdate(SupervisionEvent supervisionEvent) {
     update(supervisionEvent);
   }
-
-  @Override
-  public Boolean isControlTag() {
-    updateTagLock.readLock().lock();
-    try {
-      return controlTag;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }    
-  }
-
-  @Override
-  public Collection<Long> getRuleIds() {
-    updateTagLock.readLock().lock();
-    try {
-      return ruleIds;     
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }    
-  }
-
-  @Override
-  public String getMinValue() {
-    updateTagLock.readLock().lock();
-    try {
-      return minValue;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }    
-  }
-
-  @Override
-  public String getMaxValue() {
-    updateTagLock.readLock().lock();
-    try {
-      return maxValue;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }  
-  }
-
-
-  @Override
-  public String getValueDescription() {
-    updateTagLock.readLock().lock();
-    try {      
-      return valueDescription;
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }    
-  }
-
-  @Override
-  public String getDipPublication() {
-    updateTagLock.readLock().lock();
-    try {      
-      return publications.get(Publisher.DIP);
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    } 
-  }
-
-  @Override
-  public String getJapcPublication() {
-    updateTagLock.readLock().lock();
-    try {      
-      return publications.get(Publisher.JAPC);
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }    
-  }
-
-
-  /**
-   * @return the timeToLive
-   */
-  public int getTimeToLive() {
-    updateTagLock.readLock().lock();
-    try {
-      return timeToLive;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }    
-  }
-
-
-  /**
-   * @return the valueDeadbandType
-   */
-  @Override
-  public short getValueDeadbandType() {
-    updateTagLock.readLock().lock();
-    try {
-      return valueDeadbandType;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    } 
-  }
-
-
-  /**
-   * @return the valueDeadband
-   */
-  @Override
-  public float getValueDeadband() {
-    updateTagLock.readLock().lock();
-    try {
-      return valueDeadbandType;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }    
-  }
-
-  @Override
-  public int getTimeDeadband() {
-    updateTagLock.readLock().lock();
-    try {
-      return timeDeadband;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-
-  @Override
-  public int getPriority() {
-    updateTagLock.readLock().lock();
-    try {
-      return priority;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }    
-  }
-
-  @Override
-  public boolean isGuaranteedDelivery() {
-    updateTagLock.readLock().lock();
-    try {
-      return guaranteedDelivery;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }    
-  }
-
-  @Override
-  public String getHardwareAddress() {
-    updateTagLock.readLock().lock();
-    try {
-      return hardwareAddress;      
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }   
-  }
-  
-  @Override
-  public Collection<Long> getAlarmids() {
-    updateTagLock.readLock().lock();
-    try {
-      ArrayList<Long> alarmIds = new ArrayList<Long>();
-      for (AlarmValue alarm : alarms) {
-        alarmIds.add(alarm.getId());
-      }
-      return alarmIds;
-    }
-    finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-  
-  
 }
