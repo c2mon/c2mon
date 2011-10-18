@@ -152,6 +152,7 @@ public class RequestHandlerImpl implements RequestHandler {
    * @return the result of the request
    */
   private <T extends ClientRequestResult> Collection<T> executeRequest(final Collection<Long> ids, final Class<T> clazz) {
+    LOGGER.debug("Initiating client request.");
     ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);    
     Iterator<Long> it = ids.iterator();
     Collection<Future<Collection<T>>> results = new ArrayList<Future<Collection<T>>>();
@@ -178,6 +179,7 @@ public class RequestHandlerImpl implements RequestHandler {
         throw new RuntimeException(e);        
       }
     }
+    LOGGER.debug("Client request completed.");
     return finalCollection;   
   }
   
