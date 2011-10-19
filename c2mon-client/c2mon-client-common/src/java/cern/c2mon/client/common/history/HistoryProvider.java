@@ -168,4 +168,12 @@ public interface HistoryProvider {
    *          The listener to remove
    */
   void removeHistoryProviderListener(final HistoryProviderListener listener);
+  
+  /**
+   * @return the time span which can be retrieved using this history provider.
+   *         {@link Timespan#getStart()} is the earliest time which can be
+   *         requested, and {@link Timespan#getEnd()} is the latest time which
+   *         can be requested,
+   */
+  Timespan getDateLimits();
 }

@@ -20,6 +20,8 @@ package cern.c2mon.client.common.history;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import cern.c2mon.client.common.history.exception.IllegalTimespanException;
+
 /**
  * This interface describes the methods which are provided by the history
  * player.
@@ -42,7 +44,7 @@ public interface HistoryPlayer {
   Date getStart();
 
   /**
-   * @return the start time of the time frame
+   * @return the end time of the time frame
    */
   Date getEnd();
 
@@ -57,4 +59,18 @@ public interface HistoryPlayer {
    * @return the history provider which is currently used to fetch data
    */
   HistoryProvider getHistoryProvider();
+  
+  /**
+   * Extends the timespan which will be loaded
+   * 
+   * @param extendedTimespan
+   *          the new extended time span. The timespan must be within the dates
+   *          of {@link HistoryProvider#getDateLimits()}. The start date must
+   *          earlier or equal to {@link #getStart()}, and the end date must be
+   *          equal to {@link #getEnd()} (cannot be extended)
+   * 
+   * @throws IllegalTimespanException
+   *           if the timespan is illegal.
+   */
+  void extendTimespan(final Timespan extendedTimespan) throws IllegalTimespanException;
 }

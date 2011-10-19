@@ -105,4 +105,25 @@ public class Timespan {
   public long getDuration() {
     return getEnd().getTime() - getStart().getTime();
   }
+
+  @Override
+  public String toString() {
+    final String startDate;
+    if (this.start == null) {
+      startDate = "null";
+    }
+    else {
+      startDate = this.start.toString();
+    }
+    final String endDate;
+    if (this.end == null) {
+      endDate = "null";
+    }
+    else {
+      endDate = this.end.toString();
+    }
+    return String.format("Timespan: %s to %s", startDate, endDate);
+  }
+  
+  
 }
