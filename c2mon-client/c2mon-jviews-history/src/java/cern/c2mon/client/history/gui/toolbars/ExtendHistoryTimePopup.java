@@ -177,11 +177,18 @@ public class ExtendHistoryTimePopup {
       }
       
       if (errorMessages.size() > 0) {
-        final StringBuilder message = new StringBuilder(
-            "Some errors occured while trying to apply the new time span for the history playback:");
+        final StringBuilder message = new StringBuilder();
+        
+        if (errorMessages.size() > 1) {
+          message.append(String.format("%d errors ", errorMessages.size()));
+        }
+        else {
+          message.append("An error ");
+        }
+        message.append("occured while trying to apply the new time span for the history playback:");
         
         for (String error : errorMessages) {
-          message.append('\n');
+          message.append("\n- ");
           message.append(error);
         }
         

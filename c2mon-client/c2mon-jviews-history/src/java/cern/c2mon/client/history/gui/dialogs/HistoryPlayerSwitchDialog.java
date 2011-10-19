@@ -20,6 +20,7 @@ package cern.c2mon.client.history.gui.dialogs;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,6 +57,8 @@ public class HistoryPlayerSwitchDialog {
 
   /** The margins for the controls */
   private static final int PANEL_MARGIN = 12;
+  
+  private static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
   
   /** The parent component of the dialog */
   private final Component parent;
@@ -323,6 +326,25 @@ public class HistoryPlayerSwitchDialog {
       JOptionPane.showMessageDialog(
           parent, 
           "The start or end date is not set, the history player can therefore not be started..", 
+          "Cannot start the history player", 
+          JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    
+    final Timespan dateLimits = historyProvider.getDateLimits();
+    if (dateLimits != null && (
+        dateLimits.getStart() != null
+        && start.before(dateLimits.getStart())
+        || 
+        dateLimits.getEnd() != null
+        && end.after(dateLimits.getEnd()))) {
+      LOG.info("Invalid start or end date specified.");
+      final SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+      JOptionPane.showMessageDialog(
+          parent, 
+          String.format("The start and end date must be in the time frame from %s to %s.",
+              formatter.format(dateLimits.getStart()),
+              formatter.format(dateLimits.getEnd())), 
           "Cannot start the history player", 
           JOptionPane.ERROR_MESSAGE);
       return;
