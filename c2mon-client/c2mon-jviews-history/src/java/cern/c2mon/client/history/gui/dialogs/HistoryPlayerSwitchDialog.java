@@ -22,6 +22,8 @@ import java.awt.Component;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -77,7 +79,7 @@ public class HistoryPlayerSwitchDialog {
    * @throws HistoryProviderException
    *           if the events couldn't be retrieved
    */
-  private SavedHistoryEventsDialog getSavedHistoryEventsDialog() throws HistoryProviderException {
+  private synchronized SavedHistoryEventsDialog getSavedHistoryEventsDialog() throws HistoryProviderException {
     if (this.savedHistoryEventsDialog == null) {
       final ProgressDialog progress = new ProgressDialog(
           "Loading saved history events", 
@@ -91,6 +93,7 @@ public class HistoryPlayerSwitchDialog {
         final List<Object> events = new ArrayList<Object>();
         events.add("None");
         events.addAll(savedEvents);
+        Collections.sort(events, new EventComparator());
         
         this.savedHistoryEventsDialog = new SavedHistoryEventsDialog(this.parent, events.toArray());
       }
@@ -99,6 +102,76 @@ public class HistoryPlayerSwitchDialog {
       }
     }
     return this.savedHistoryEventsDialog;
+  }
+  
+  /**
+   * Sorter for sorting a list of {@link SavedHistoryEvent}
+   */
+  class EventComparator implements Comparator<Object> {
+    @Override
+    public int compare(final Object o1, final Object o2) {
+      if (o1 == o2) {
+        return 0;
+      }
+      if (o1 == null) {
+        return 1;
+      }
+      if (o2 == null) {
+        return -1;
+      }
+      
+      final SavedHistoryEvent event1;
+      final SavedHistoryEvent event2;
+      if (o1 instanceof SavedHistoryEvent) {
+        event1 = (SavedHistoryEvent) o1;
+      }
+      else {
+        event1 = null;
+      }
+      if (o2 instanceof SavedHistoryEvent) {
+        event2 = (SavedHistoryEvent) o2;
+      }
+      else {
+        event2 = null;
+      }
+      // Objects which is not a SavedHistoryEvent comes first
+      if (event1 == null || event2 == null) {
+        if (event1 == event2) {
+          return 0;
+        }
+        if (event1 == null) {
+          return -1;
+        }
+        return 1;
+      }
+      
+      // Dates with null values goes last
+      if (event1.getStartDate() == null || event2.getStartDate() == null) {
+        if (event1.getStartDate() != event2.getStartDate()) {
+          if (event1.getStartDate() == null) {
+            return 1;
+          }
+          return -1;
+        }
+      }
+      else {
+        // Start date descending
+        final int dateResult = event1.getStartDate().compareTo(event2.getStartDate());
+        if (dateResult != 0) {
+          return dateResult * -1;
+        }
+      }
+      
+      // By id descending
+      if (event1.getId() < event2.getId()) {
+        return 1;
+      }
+      else if (event1.getId() > event2.getId()) {
+        return -1;
+      }
+      
+      return 0;
+    }
   }
   
   /**
@@ -201,6 +274,9 @@ public class HistoryPlayerSwitchDialog {
           dialog.setSelectedObject(savedHistoryEvent);
           if (dialog.showDialog()) {
             savedHistoryEvent = dialog.getSelectedSavedHistoryEvent();
+            if (savedHistoryEvent == null) {
+              historyPlayerConfigPanel.resetDates();
+            }
           }
         }
         catch (HistoryProviderException e) {
@@ -220,19 +296,16 @@ public class HistoryPlayerSwitchDialog {
     }
     
     final HistoryProviderFactory historyProviderFactory = C2monServiceGateway.getHistoryManager().getHistoryProviderFactory();
+    final HistoryProvider historyProvider;
     
     try {
       if (savedHistoryEvent == null) {
-        startHistoryPlayer(
-            start, 
-            end, 
-            historyProviderFactory.createHistoryProvider());
+        historyProvider = historyProviderFactory.createHistoryProvider();
       }
       else {
-        startHistoryPlayer(
-            savedHistoryEvent.getStartDate(), 
-            savedHistoryEvent.getEndDate(),
-            historyProviderFactory.createSavedHistoryProvider(savedHistoryEvent));
+        start = savedHistoryEvent.getStartDate();
+        end = savedHistoryEvent.getEndDate();
+        historyProvider = historyProviderFactory.createSavedHistoryProvider(savedHistoryEvent);
       }
     }
     catch (HistoryProviderException e) {
@@ -242,14 +315,32 @@ public class HistoryPlayerSwitchDialog {
           "Cannot start the history player because no provider is available. Please see the log for more details.", 
           "Failed to start history player", 
           JOptionPane.ERROR_MESSAGE);
+      return;
     }
+    
+    if (start == null || end == null) {
+      LOG.info("The start or end date is not set, the history player can therefore not be started..");
+      JOptionPane.showMessageDialog(
+          parent, 
+          "The start or end date is not set, the history player can therefore not be started..", 
+          "Cannot start the history player", 
+          JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    
+    startHistoryPlayer(
+        start, 
+        end, 
+        historyProvider);
   }
   
   /**
-   * 
-   * @param start the start time
-   * @param end the end time
-   * @param historyProviderType the history provider type to use
+   * @param start
+   *          the start time
+   * @param end
+   *          the end time
+   * @param historyProviderType
+   *          the history provider type to use
    */
   private void startHistoryPlayer(final Date start, final Date end, final HistoryProvider historyProvider) {
     final Timespan historyTimespan = new Timespan(start, end);
