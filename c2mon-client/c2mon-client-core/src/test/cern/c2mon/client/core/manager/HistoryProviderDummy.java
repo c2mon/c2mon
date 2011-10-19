@@ -24,6 +24,7 @@ import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.SupervisionEventRequest;
+import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.event.HistoryProviderListener;
 
 /**
@@ -86,6 +87,11 @@ public class HistoryProviderDummy implements HistoryProvider {
 
   @Override
   public Collection<HistoryTagValueUpdate> getDailySnapshotRecords(Long[] tagIds, Timestamp from, Timestamp to) {
+    return null;
+  }
+
+  @Override
+  public Timespan getDateLimits() {
     return null;
   }
 
