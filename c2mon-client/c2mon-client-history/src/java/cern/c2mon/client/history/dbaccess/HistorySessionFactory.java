@@ -137,7 +137,7 @@ public final class HistorySessionFactory {
    *           properties for the data source is not set.
    */
   public HistoryProvider createSavedHistoryProvider(final SavedHistoryEvent event, final ClientDataTagRequestCallback clientDataTagRequestCallback) throws HistoryException {
-    return new SqlHistoryEventsProviderDAO(event.getId(), getSqlSessionFactory(), clientDataTagRequestCallback);
+    return new SqlHistoryEventsProviderDAO(event, getSqlSessionFactory(), clientDataTagRequestCallback);
   }
   
   /**

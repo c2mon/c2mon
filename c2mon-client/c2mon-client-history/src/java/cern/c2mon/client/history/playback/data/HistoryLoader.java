@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
@@ -176,6 +178,9 @@ public class HistoryLoader {
   /** The filtering of data tags based on daily snapshot data */
   private final DailySnapshotSmartFilter dailySnapshotFilter;
   
+  /** For how far is the daily snapshot filter loaded until */
+  private final Map<TagValueUpdateId, Timestamp> dailySnapshotFilterIsLoadedUntil;
+  
   /** <code>true</code> if the loading of initial data should be done */
   private boolean loadInitialData;
   
@@ -194,6 +199,7 @@ public class HistoryLoader {
     this.tagsLoading = new WorkManager<Long>();
     this.historyLoaderListenersLock = new ReentrantReadWriteLock();
     this.historyLoaderListeners = new ArrayList<HistoryLoaderListener>();
+    this.dailySnapshotFilterIsLoadedUntil = new HashMap<TagValueUpdateId, Timestamp>(); 
     this.historyBufferingThread = null;
     this.stopBufferingThread = false;
     this.loadInitialData = true;
@@ -204,6 +210,7 @@ public class HistoryLoader {
    */
   public void clear() {
     this.dailySnapshotFilter.clear();
+    this.dailySnapshotFilterIsLoadedUntil.clear();
     this.historyStore.clear();
   }
   
@@ -265,10 +272,6 @@ public class HistoryLoader {
           }
           
           if (LOG.isDebugEnabled()) {
-            LOG.debug("Invalidates the client data tags which are to be loaded");
-          }
-          
-          if (LOG.isDebugEnabled()) {
             LOG.debug("History player started loading historical data for data tag IDs: " + historyUpdateIds);
           }
           
@@ -299,6 +302,9 @@ public class HistoryLoader {
         
         bufferIntervalUpdated = true;
       }
+      
+      // If the time has been changed it checks that the snapshot data is up to date
+      loadDailySnapshotRecords(this.historyStore.getRegisteredTagValueUpdateIds());
       
       if (!historyStore.isLoadingComplete()) {
         // Starting buffering process
@@ -683,7 +689,7 @@ public class HistoryLoader {
             initialLoadingLatch.countDown();
           } 
         }
-      } .start();
+      }.start();
       
       if (loadInitialData) {
         new Thread("Initial-Data-Tags-Loader-Thread") {
@@ -718,6 +724,7 @@ public class HistoryLoader {
   }
   
   /**
+   * Loads all supervision events for the given ids
    * 
    * @param supervisionEventIds
    *          the supervision events to load
@@ -732,9 +739,11 @@ public class HistoryLoader {
           String.format("Loading initial supervision events (%d events)", supervisionEventIds.size()));
     }
     
+    this.historyStore.removeDataTagHistory(new ArrayList<HistoryUpdateId>(supervisionEventIds));
+    
     this.historyStore.addInitialTagValueUpdates(
-        Arrays.asList(supervisionEventIds.toArray(new HistoryUpdateId[0])), 
-        Arrays.asList(new HistoryUpdate[0]));
+        new ArrayList<HistoryUpdateId>(supervisionEventIds), 
+        new ArrayList<HistoryUpdate>());
     
     final List<SupervisionEventRequest> requests = new ArrayList<SupervisionEventRequest>();
     for (SupervisionEventId supervisionEventId : supervisionEventIds) {
@@ -755,8 +764,8 @@ public class HistoryLoader {
     final Collection<HistorySupervisionEvent> initialValues = 
       historyProvider.getInitialSupervisionEvents(historyStore.getStart(), requests);
     this.historyStore.addInitialTagValueUpdates(
-        Arrays.asList(supervisionEventIds.toArray(new HistoryUpdateId[0])), 
-        Arrays.asList(initialValues.toArray(new HistoryUpdate[0])));
+        new ArrayList<HistoryUpdateId>(supervisionEventIds), 
+        new ArrayList<HistoryUpdate>(initialValues));
     
     // Getting the rest of the values
     final Collection<HistorySupervisionEvent> values = 
@@ -768,8 +777,8 @@ public class HistoryLoader {
     }
     
     this.historyStore.addHistoryValues(
-        Arrays.asList(supervisionEventIds.toArray(new HistoryUpdateId[0])), 
-        Arrays.asList(values.toArray(new HistoryUpdate[0])), 
+        new ArrayList<HistoryUpdateId>(supervisionEventIds), 
+        new ArrayList<HistoryUpdate>(values), 
         getHistoryStore().getEnd());
     
     if (LOG.isDebugEnabled()) {
@@ -779,38 +788,56 @@ public class HistoryLoader {
   }
   
   /**
-   * Loads the daily snapshot records and adds them to the {@link #dailySnapshotFilter}.
+   * Loads the daily snapshot records and adds them to the
+   * {@link #dailySnapshotFilter}.
    * 
    * @param tagValueUpdateIds
+   *          the tag value update ids to load
    */
   private void loadDailySnapshotRecords(final Collection<TagValueUpdateId> tagValueUpdateIds) {
+    final Timestamp endTimestamp = this.getHistoryConfiguration().getTimespan().getEnd();
+    
     final List<Long> tagIds = new ArrayList<Long>();
     for (final TagValueUpdateId tagValueUpdateId : tagValueUpdateIds) {
-      tagIds.add(tagValueUpdateId.getTagId());
+      final Timestamp loadedUntil = this.dailySnapshotFilterIsLoadedUntil.get(tagValueUpdateId);
+      if (loadedUntil == null || loadedUntil.before(endTimestamp)) {
+        tagIds.add(tagValueUpdateId.getTagId());
+        this.dailySnapshotFilter.deleteFilter(tagValueUpdateId.getTagId());
+        this.dailySnapshotFilterIsLoadedUntil.put(tagValueUpdateId, endTimestamp);
+      }
     }
     
-    if (LOG.isDebugEnabled()) {
-      LOG.debug(String.format("Loading daily snapshot records from the database (for %d tags)", tagIds.size()));
-    }
-    
-    Collection<HistoryTagValueUpdate> values = null;
-    try {
-      values = getHistoryConfiguration().getHistoryProvider().getDailySnapshotRecords(tagIds.toArray(new Long[0]), this.getHistoryConfiguration().getTimespan().getStart(), this.getHistoryConfiguration().getTimespan().getEnd());
-    }
-    catch (NoHistoryProviderAvailableException e) {
-      LOG.error("Unable to load the daily snaphot records, because no History Provider is available.", e);
-      return;
-    }
-    
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Daily snapshot records retrieved, filtering...");
-    }
-    
-    // Adds the data to the daily snapshot filter
-    this.dailySnapshotFilter.addDailySnapshotValues(values);
-    
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Daily snapshot records is loaded");
+    if (tagIds.size() > 0) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(String.format(
+            "Loading daily snapshot records from the database (for %d tags until '%s')", 
+            tagIds.size(), endTimestamp.toString()));
+      }
+      
+      Collection<HistoryTagValueUpdate> values = null;
+      try {
+        values = getHistoryConfiguration().getHistoryProvider().getDailySnapshotRecords(
+            tagIds.toArray(new Long[0]), 
+            this.getHistoryConfiguration().getTimespan().getStart(), 
+            endTimestamp);
+      }
+      catch (NoHistoryProviderAvailableException e) {
+        LOG.error("Unable to load the daily snaphot records, because no History Provider is available.", e);
+        return;
+      }
+      
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(String.format(
+            "%d daily snapshot records retrieved, filtering...",
+            values.size()));
+      }
+      
+      // Adds the data to the daily snapshot filter
+      this.dailySnapshotFilter.addDailySnapshotValues(values);
+      
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Daily snapshot records is loaded");
+      }
     }
   }
   
@@ -1096,6 +1123,10 @@ public class HistoryLoader {
             }
           }
           
+          // Keeps a list of supervision event ids which are not fully loaded.
+          // This can happen if the user expand the time span for the history playback
+          final List<SupervisionEventId> supervisionIds = new ArrayList<SupervisionEventId>();
+          
           // Finds the tags to load
           for (final HistoryUpdateId historyUpdateId : historyStore.getRegisteredDataIds()) {
             if (historyUpdateId.isTagValueUpdateId() && historyStore.isTagInitialized(historyUpdateId)) {
@@ -1109,6 +1140,40 @@ public class HistoryLoader {
               if (tagIsLoadedUntil.equals(loadedUntilTime)) {
                 tagsWithOldestTime.add(historyUpdateId.getTagValueUpdateId().getTagId());
               }
+            }
+            else if (historyUpdateId.isSupervisionEventId()) {
+              final Timestamp tagIsLoadedUntil = historyStore.getTagHaveRecordsUntilTime(historyUpdateId);
+              if (tagIsLoadedUntil == null || tagIsLoadedUntil.compareTo(historyStore.getEnd()) < 0) {
+                supervisionIds.add(historyUpdateId.getSupervisionEventId());
+              }
+            }
+          }
+          
+          if (!supervisionIds.isEmpty()) {
+            // This can happen if the user expand the time span for the history playback
+            
+            if (LOG.isDebugEnabled()) {
+              LOG.debug(String.format("Loading %d supervision events", supervisionIds.size()));
+            }
+            fireInitializingHistoryStarting();
+            fireInitializingHistoryProgress(String.format(
+                "Loading %d supervision events", supervisionIds.size()));
+            try {
+              loadInitialSupervisionEvents(supervisionIds);
+            }
+            catch (Exception e) {
+              LOG.error(
+                  String.format(
+                      "Something went wrong trying to load %s supervision events",
+                      supervisionIds.size()), 
+                  e);
+              throw new RuntimeException("Something went wrong when trying to load supervision events, no more data will be loaded..");
+            }
+            finally {
+              fireInitializingHistoryFinished();
+            }
+            if (LOG.isDebugEnabled()) {
+              LOG.debug(String.format("Loaded %d supervision events successfully", supervisionIds.size()));
             }
           }
         }

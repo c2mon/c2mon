@@ -15,22 +15,24 @@
       Defines what object every single row will be converted into,
       and how this object is mapped from the sql table
   -->
-  <resultMap id="historyRecordResultMap" type="HistoryRecord">
+  <resultMap id="historyRecordResultMap" type="SavedHistoryEventRecord">
     <constructor>
-      <idArg column="TAGID" javaType="Long"/>
+      <idArg column="RED_ID" javaType="Long"/>
+      <idArg column="RED_TAGID" javaType="Long"/>
     </constructor>
-    <result property="logDate" column="LOGDATE" jdbcType="TIMESTAMP" />
-    <result property="tagName" column="TAGNAME" jdbcType="VARCHAR"/>
-    <result property="tagValue" column="TAGVALUE" jdbcType="VARCHAR"/>
-    <result property="tagDataType" column="TAGDATATYPE" jdbcType="VARCHAR"/>
+    <result property="logDate" column="RED_LOGDATE" jdbcType="TIMESTAMP" />
+    <result property="tagName" column="RED_TAGNAME" jdbcType="VARCHAR"/>
+    <result property="tagValue" column="RED_TAGVALUE" jdbcType="VARCHAR"/>
+    <result property="tagDataType" column="RED_TAGDATATYPE" jdbcType="VARCHAR"/>
     
-    <result property="tagTime" column="TAGTIME" jdbcType="TIMESTAMP"/>
-    <result property="daqTime" column="TAGDAQTIME" jdbcType="TIMESTAMP"/>
-    <result property="serverTime" column="TAGSERVERTIME" jdbcType="TIMESTAMP"/>
+    <result property="tagTime" column="RED_TAGTIME" jdbcType="TIMESTAMP"/>
+    <result property="daqTime" column="RED_TAGDAQTIME" jdbcType="TIMESTAMP"/>
+    <result property="serverTime" column="RED_TAGSERVERTIME" jdbcType="TIMESTAMP"/>
     
-    <result property="dataTagQuality" column="TAGSTATUSDESC" jdbcType="VARCHAR" javaType="DataTagQuality"/>
-    <result property="tagMode" column="TAGMODE"/>
+    <result property="dataTagQuality" column="RED_TAGSTATUSDESC" jdbcType="VARCHAR" javaType="DataTagQuality"/>
+    <result property="tagMode" column="RED_TAGMODE"/>
   </resultMap>
+  
 
   <!--
     Requests the history records of a list of tags from the saved history events data
@@ -39,18 +41,21 @@
             parameterType="SavedHistoryRequestBean"
             resultMap="historyRecordResultMap">
     SELECT 
-        LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE, 
-        TAGTIME, TAGDAQTIME, TAGSERVERTIME, TAGSTATUSDESC, TAGMODE
+        RED_ID, RED_LOGDATE, RED_TAGID, RED_TAGNAME, RED_TAGVALUE, RED_TAGDATATYPE, 
+        sys_extract_utc(RED_TAGTIME) AS RED_TAGTIME, 
+        sys_extract_utc(RED_TAGSERVERTIME) AS RED_TAGSERVERTIME, 
+        sys_extract_utc(RED_TAGDAQTIME) AS RED_TAGDAQTIME, 
+        RED_TAGSTATUSDESC, RED_TAGMODE
     FROM REPLAY_DATA
     WHERE
-      eventId = #{eventId}
-      AND (TAGID IN 
+      RED_ID = #{eventId}
+      AND (RED_TAGID IN 
         <foreach item="tag" index="index" collection="tagIds"
           open="(" separator="," close=")">
           #{tag}
         </foreach>
       )
-    ORDER BY TAGSERVERTIME DESC, TAGDAQTIME DESC, TAGTIME DESC, LOGDATE DESC
+    ORDER BY RED_TAGSERVERTIME DESC, RED_TAGDAQTIME DESC, RED_TAGTIME DESC, RED_LOGDATE DESC
   </select>
   
 </mapper>

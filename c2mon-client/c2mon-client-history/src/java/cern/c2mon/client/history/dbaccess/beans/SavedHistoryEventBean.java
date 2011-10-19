@@ -18,8 +18,10 @@
 package cern.c2mon.client.history.dbaccess.beans;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import cern.c2mon.client.common.history.SavedHistoryEvent;
+import cern.c2mon.client.history.dbaccess.util.TimeZoneUtil;
 
 /**
  * Represents a saved event from the database
@@ -29,6 +31,9 @@ import cern.c2mon.client.common.history.SavedHistoryEvent;
  */
 public class SavedHistoryEventBean implements SavedHistoryEvent {
 
+  /** The timezone which all {@link SavedHistoryEventBean}s will be created with */
+  private static final TimeZone DEFAULT_INITIAL_TIMEZONE = TimeZone.getTimeZone("UTC");
+  
   /** the id */
   private long id;
 
@@ -44,11 +49,15 @@ public class SavedHistoryEventBean implements SavedHistoryEvent {
   /** the end date */
   private Date endDate;
 
+  /** The time zone that the dates have */
+  private TimeZone timeZone;
+  
   /**
    * @param id the id of the history event
    */
   public SavedHistoryEventBean(final Long id) {
     this(id, null, null, null, null);
+    this.timeZone = DEFAULT_INITIAL_TIMEZONE;
   }
 
   /**
@@ -73,6 +82,32 @@ public class SavedHistoryEventBean implements SavedHistoryEvent {
 
   }
 
+  /**
+   * Converts all the dates and times into the local time zone
+   */
+  public void convertIntoLocalTimeZone() {
+    convertIntoTimeZone(TimeZone.getDefault());
+  }
+  
+  /**
+   * Converts all the dates and times into the new time zone
+   * 
+   * @param newTimeZone
+   *          the new time zone to set
+   */
+  public void convertIntoTimeZone(final TimeZone newTimeZone) {
+    if (this.timeZone.equals(newTimeZone)) {
+      return;
+    }
+    if (this.startDate != null) {
+      this.startDate = TimeZoneUtil.convertDateTimezone(newTimeZone, this.startDate, timeZone);
+    }
+    if (this.endDate != null) {
+      this.endDate = TimeZoneUtil.convertDateTimezone(newTimeZone, this.endDate, timeZone);
+    }
+    this.timeZone = newTimeZone;
+  }
+  
   @Override
   public long getId() {
     return id;

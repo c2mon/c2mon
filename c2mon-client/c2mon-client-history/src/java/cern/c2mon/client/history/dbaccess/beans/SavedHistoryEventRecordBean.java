@@ -15,32 +15,35 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.history.dbaccess;
-
-import java.util.List;
-
-import cern.c2mon.client.common.history.SavedHistoryEvent;
-import cern.c2mon.client.history.dbaccess.beans.SavedHistoryEventRecordBean;
-import cern.c2mon.client.history.dbaccess.beans.SavedHistoryRequestBean;
+package cern.c2mon.client.history.dbaccess.beans;
 
 /**
- * Used to get the data of a saved history event from the sql server.
- * Instantiated by iBatis or by {@link HistorySessionFactory}
- * 
- * @see HistorySessionFactory
- * @see SavedHistoryEvent
- * @see SavedHistoryEventRecordBean
+ * When rows from the saved history events table are retrieved from the
+ * database, it is converted into this object.
  * 
  * @author vdeila
- * 
  */
-public interface SavedHistoryMapper {
+public class SavedHistoryEventRecordBean extends HistoryRecordBean {
+
+  /** The event id */
+  private final long eventId;
 
   /**
-   * @param request
-   *          the request specifying which records to get
-   * @return a list of records for the given request
+   * 
+   * @param eventId
+   *          The event id
+   * @param tagId
+   *          the tag id
    */
-  List<SavedHistoryEventRecordBean> getRecords(final SavedHistoryRequestBean request);
+  public SavedHistoryEventRecordBean(final Long eventId, final Long tagId) {
+    super(tagId);
+    this.eventId = eventId;
+  }
 
+  /**
+   * @return the eventId
+   */
+  public long getEventId() {
+    return eventId;
+  }
 }

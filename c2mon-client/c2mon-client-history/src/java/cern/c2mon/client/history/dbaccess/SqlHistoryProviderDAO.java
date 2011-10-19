@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -31,8 +32,10 @@ import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.SupervisionEventRequest;
+import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.history.ClientDataTagRequestCallback;
+import cern.c2mon.client.history.data.utilities.DateUtil;
 import cern.c2mon.client.history.dbaccess.beans.DailySnapshotRequestBean;
 import cern.c2mon.client.history.dbaccess.beans.HistoryRecordBean;
 import cern.c2mon.client.history.dbaccess.beans.InitialRecordHistoryRequestBean;
@@ -56,6 +59,9 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
   /** The logger instance */
   private static final Logger LOG = Logger.getLogger(SqlHistoryProviderDAO.class);
+
+  /** The number of days available from the database */
+  private static final int NUMBER_OF_DAYS_AVAILABLE = 30;
   
   /**
    * ORA-01795: maximum number of expressions in a list is 1000
@@ -89,6 +95,16 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     this.clientDataTagRequestCallback = clientDataTagRequestCallback;
   }
 
+  @Override
+  public Timespan getDateLimits() {
+    return new Timespan(
+        DateUtil.truncateToDay(
+            DateUtil.addDays(
+                System.currentTimeMillis(), 
+                -NUMBER_OF_DAYS_AVAILABLE)),
+        new Date(System.currentTimeMillis()));
+  }
+  
   /**
    * 
    * @param tagIds

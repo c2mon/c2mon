@@ -9,6 +9,7 @@ import java.util.List;
 import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.SupervisionEventRequest;
+import cern.c2mon.client.common.history.Timespan;
 
 /**
  * This implementation uses only data which is given to it when it is
@@ -216,8 +217,13 @@ public class HistoryProviderSimpleImpl extends HistoryProviderAbs {
   }
 
   @Override
-  public Collection<HistoryTagValueUpdate> getDailySnapshotRecords(Long[] tagIds, Timestamp from, Timestamp to) {
+  public Collection<HistoryTagValueUpdate> getDailySnapshotRecords(final Long[] tagIds, final Timestamp from, final Timestamp to) {
     throw new UnsupportedOperationException("Trying to use a method that is not implemented");
+  }
+
+  @Override
+  public Timespan getDateLimits() {
+    throw new RuntimeException("This function is not supported..");
   }
 
 }

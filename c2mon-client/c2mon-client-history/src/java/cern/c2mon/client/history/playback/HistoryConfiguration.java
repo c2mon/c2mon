@@ -33,9 +33,6 @@ public class HistoryConfiguration {
   /** The timespan of the history */
   private Timespan timespan;
 
-  /** The maximum amount the history can be extended to */
-  private Timespan timespanLimit;
-
   /** The history provider which will be used to retrieve the data */
   private HistoryProvider historyProvider;
 
@@ -45,24 +42,10 @@ public class HistoryConfiguration {
    *          The history provider which will be used to retrieve the data
    * @param timespan
    *          The timespan of the history
-   * @param timespanLimit
-   *          The maximum amount the history can be extended to
-   */
-  public HistoryConfiguration(final HistoryProvider historyProvider, final Timespan timespan, final Timespan timespanLimit) {
-    this.historyProvider = historyProvider;
-    this.timespan = timespan;
-    this.timespanLimit = timespanLimit;
-  }
-
-  /**
-   * 
-   * @param historyProvider
-   *          The history provider which will be used to retrieve the data
-   * @param timespan
-   *          The timespan of the history
    */
   public HistoryConfiguration(final HistoryProvider historyProvider, final Timespan timespan) {
-    this(historyProvider, timespan, null);
+    this.historyProvider = historyProvider;
+    this.timespan = timespan;
   }
 
   /**
@@ -78,21 +61,6 @@ public class HistoryConfiguration {
    */
   public void setTimespan(final Timespan timespan) {
     this.timespan = timespan;
-  }
-
-  /**
-   * @return The maximum amount the history can be extended to
-   */
-  public Timespan getTimespanLimit() {
-    return timespanLimit;
-  }
-
-  /**
-   * @param timespanLimit
-   *          The maximum amount the history can be extended to
-   */
-  public void setTimespanLimit(final Timespan timespanLimit) {
-    this.timespanLimit = timespanLimit;
   }
 
   /**

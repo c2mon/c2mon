@@ -25,6 +25,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 
 import cern.c2mon.client.common.history.SavedHistoryEvent;
 import cern.c2mon.client.common.history.SavedHistoryEventsProvider;
+import cern.c2mon.client.history.dbaccess.beans.SavedHistoryEventBean;
 
 /**
  * 
@@ -60,13 +61,20 @@ public class SqlSavedHistoryEventsProviderDAO implements SavedHistoryEventsProvi
 
   @Override
   public Collection<SavedHistoryEvent> getSavedHistoryEvents() {
+    final ArrayList<SavedHistoryEventBean> events;
     final SqlSession session = this.sessionFactory.openSession();
     try {
-      return new ArrayList<SavedHistoryEvent>(getSavedHistoryEventsMapper(session).getSavedEvents());
+      events = new ArrayList<SavedHistoryEventBean>(getSavedHistoryEventsMapper(session).getSavedEvents());
     }
     finally {
       session.close();
     }
+    // Converting dates into local time zone
+    for (SavedHistoryEventBean bean : events) {
+      bean.convertIntoLocalTimeZone();
+    }
+    // Converting the list into a list of SavedHistoryEvent
+    return new ArrayList<SavedHistoryEvent>(events);
   }
 
 }

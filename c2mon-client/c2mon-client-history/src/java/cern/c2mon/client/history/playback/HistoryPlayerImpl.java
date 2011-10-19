@@ -18,6 +18,7 @@
 
 package cern.c2mon.client.history.playback;
 
+import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +34,7 @@ import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.PlaybackControl;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.event.HistoryPlayerListener;
+import cern.c2mon.client.common.history.exception.IllegalTimespanException;
 import cern.c2mon.client.common.history.id.HistoryUpdateId;
 import cern.c2mon.client.common.history.id.SupervisionEventId;
 import cern.c2mon.client.common.history.id.TagValueUpdateId;
@@ -233,7 +235,7 @@ public class HistoryPlayerImpl
         oldHistoryProvider.removeHistoryProviderListener(this.eventsForwarder);
       }
       catch (NoHistoryProviderAvailableException e) { 
-        LOG.debug("Isn't possible to remove the history provider listener from the history provider, as non is available.");
+        LOG.debug("It isn't possible to remove the history provider listener from the history provider, as non is available.");
       }
     }
     
@@ -245,7 +247,7 @@ public class HistoryPlayerImpl
       historyProvider.addHistoryProviderListener(this.eventsForwarder);
     }
     catch (NoHistoryProviderAvailableException e) {
-      LOG.debug("No history provider available, some progressing events will be disabled.", e);
+      LOG.debug("No history provider available, some progress events will be disabled.", e);
     }
     
     if (oldHistoryProvider != historyProvider && historyProvider != null) {
@@ -718,6 +720,69 @@ public class HistoryPlayerImpl
       }
     }
     return null;
+  }
+
+  @Override
+  public void extendTimespan(final Timespan extendedTimespan) throws IllegalTimespanException {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(String.format("Trying to extend to %s", extendedTimespan.toString()));
+    }
+    if (extendedTimespan == null) {
+      throw new InvalidParameterException("'extendedTimespan' cannot be null");
+    }
+    
+    final HistoryConfiguration configuration = getHistoryConfiguration();
+    final HistoryProvider historyProvider = getHistoryProvider();
+    final Timespan currentTimespan = configuration.getTimespan();
+    final Timespan newTimespan = new Timespan(extendedTimespan);
+    
+    if (newTimespan.getStart() == null) {
+      newTimespan.setStart(new Timestamp(currentTimespan.getStart().getTime()));
+    }
+    if (newTimespan.getEnd() == null) {
+      newTimespan.setEnd(new Timestamp(currentTimespan.getEnd().getTime()));
+    }
+    
+    if (newTimespan.getStart().compareTo(currentTimespan.getStart()) != 0) {
+      throw new IllegalTimespanException(
+          "It is not possible to change the start date, only the end date.");
+    }
+    if (newTimespan.getEnd().compareTo(currentTimespan.getEnd()) < 0) {
+      throw new IllegalTimespanException(
+          "It is only possible to extend the time frame, not shrink."
+          + " The new end date cannot be before the current end date");
+    }
+    
+    if (historyProvider != null) {
+      final Timespan provderLimits = historyProvider.getDateLimits();
+      if (provderLimits != null) {
+        if (provderLimits.getStart() != null
+            && provderLimits.getStart().compareTo(newTimespan.getStart()) > 0) {
+          throw new IllegalTimespanException("The provider does not support the suggested start time");
+        }
+        if (provderLimits.getEnd() != null
+            && provderLimits.getEnd().compareTo(newTimespan.getEnd()) < 0) {
+          throw new IllegalTimespanException("The provider does not support the suggested end time");
+        }
+      }
+    }
+    
+    // All checks are fine, extending the history playback time
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(String.format("Configuring the player to %s", extendedTimespan.toString()));
+    }
+    configurePlayer(new HistoryConfiguration(historyProvider, newTimespan));
+    
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Initiates loading");
+    }
+    
+    new Thread("History-Loading-Thread") {
+      @Override
+      public void run() {
+        historyLoader.beginLoading();
+      }
+    }.start();
   }
   
 }

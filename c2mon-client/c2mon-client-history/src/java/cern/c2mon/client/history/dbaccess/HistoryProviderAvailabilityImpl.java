@@ -42,8 +42,7 @@ public class HistoryProviderAvailabilityImpl implements HistoryProviderAvailabil
     case HISTORY_SHORT_TERM_LOG:
       return HistorySessionFactory.getInstance().isDatasourceAvailable();
     case SAVED_HISTORY_EVENTS:
-      return false;
-      // TODO return HistorySessionFactory.getInstance().isDatasourceAvailable();
+      return HistorySessionFactory.getInstance().isDatasourceAvailable();
     default:
       return false;
     }

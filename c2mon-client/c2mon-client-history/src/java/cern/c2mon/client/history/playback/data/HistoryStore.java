@@ -788,7 +788,7 @@ public class HistoryStore {
 
   /**
    * 
-   * @return An array of all the data data ids registered
+   * @return An array of all the data ids registered
    */
   public HistoryUpdateId[] getRegisteredDataIds() {
     try {
@@ -798,6 +798,19 @@ public class HistoryStore {
     finally {
       this.tagsHaveRecordsUntilTimeLock.readLock().unlock();
     }
+  }
+  
+  /**
+   * @return a list of all the tag value update ids that is registered
+   */
+  public Collection<TagValueUpdateId> getRegisteredTagValueUpdateIds() {
+    final List<TagValueUpdateId> result = new ArrayList<TagValueUpdateId>();
+    for (HistoryUpdateId id : getRegisteredDataIds()) {
+      if (id.isTagValueUpdateId()) {
+        result.add(id.getTagValueUpdateId());
+      }
+    }
+    return result;
   }
 
   /**

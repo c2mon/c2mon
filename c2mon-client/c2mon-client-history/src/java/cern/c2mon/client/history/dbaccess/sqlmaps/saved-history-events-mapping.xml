@@ -28,11 +28,16 @@
 
   <!--
     Requests the saved event list from the database
+    
+    The dates stored in the REPLAY_EVENTS is without timezone,
+    but is saved with UTC+1 (without day light savings)
   -->
   <select   id="getSavedEvents" 
             resultMap="savedHistoryEventResultMap">
     SELECT 
-        REE_ID, REE_EVENT_NAME, REE_EVENT_DESCRIPTION, REE_EVENT_START_DATE, REE_EVENT_END_DATE 
+        REE_ID, REE_EVENT_NAME, REE_EVENT_DESCRIPTION, 
+        REE_EVENT_START_DATE - INTERVAL '1' HOUR AS REE_EVENT_START_DATE,
+        REE_EVENT_END_DATE - INTERVAL '1' HOUR AS REE_EVENT_END_DATE
     FROM REPLAY_EVENTS 
     ORDER BY REE_EVENT_START_DATE DESC
   </select>

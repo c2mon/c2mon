@@ -11,6 +11,7 @@
     <typeAlias alias="SavedHistoryRequestBean" type="cern.c2mon.client.history.dbaccess.beans.SavedHistoryRequestBean" />
     <typeAlias alias="DailySnapshotRequestBean" type="cern.c2mon.client.history.dbaccess.beans.DailySnapshotRequestBean" />
     <typeAlias alias="HistoryRecord" type="cern.c2mon.client.history.dbaccess.beans.HistoryRecordBean" />
+    <typeAlias alias="SavedHistoryEventRecord" type="cern.c2mon.client.history.dbaccess.beans.SavedHistoryEventRecordBean" />
     <typeAlias alias="DataTagQuality" type="cern.tim.shared.common.datatag.DataTagQuality" />
     <typeAlias alias="SupervisionRecordBean" type="cern.c2mon.client.history.dbaccess.beans.SupervisionRecordBean" />
     <typeAlias alias="Timestamp" type="java.sql.Timestamp" />
