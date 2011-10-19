@@ -302,6 +302,11 @@ public class HistoryManagerTest {
     // Record
     //
     
+    EasyMock.expect(
+        historyProviderMock.getDailySnapshotRecords(EasyMock.<Long[]>anyObject(), EasyMock.<Timestamp>anyObject(), EasyMock.<Timestamp>anyObject())
+        ).andReturn(new ArrayList<HistoryTagValueUpdate>()).anyTimes();
+    
+    
     // startHistoryPlayerMode
     historyProviderMock.addHistoryProviderListener(EasyMock.<HistoryProviderListener>capture(historyProviderListeners));
     EasyMock.expectLastCall().anyTimes();
