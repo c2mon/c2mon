@@ -106,11 +106,6 @@ public class HistoryProviderDummy implements HistoryProvider {
   }
 
   @Override
-  public int getExecutingJobsCount() {
-    return 0;
-  }
-
-  @Override
   public void resetProgress() {
     
   }
