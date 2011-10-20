@@ -130,8 +130,10 @@ public class TimeSpanChooser extends JPanel {
   @Override
   public void setEnabled(final boolean enabled) {
     this.ignoreEvents = true;
-    startDateChooser.setEnabled(enabled);
-    endDateChooser.setEnabled(enabled);
+    if (startDateChooser != null) {
+      startDateChooser.setEnabled(enabled);
+      endDateChooser.setEnabled(enabled);
+    }
     super.setEnabled(enabled);
     this.ignoreEvents = false;
   }
@@ -249,7 +251,7 @@ public class TimeSpanChooser extends JPanel {
    * @return whether the time span is valid or not. <code>false</code> if the
    *         end date is before the start date
    */
-  public boolean isValid() {
+  public boolean isDatesValid() {
     return valid;
   }
 
