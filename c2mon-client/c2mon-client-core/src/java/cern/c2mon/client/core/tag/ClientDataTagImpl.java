@@ -17,6 +17,9 @@
  ******************************************************************************/
 package cern.c2mon.client.core.tag;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +30,13 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
@@ -56,6 +66,7 @@ import cern.tim.shared.rule.RuleFormatException;
  * @see DataTagUpdateListener
  * @author Matthias Braeger
  */
+@Root(name="ClientDataTag")
 public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetails, SupervisionListener {
   
   /** Log4j instance */
@@ -65,19 +76,23 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private static final String DEFAULT_DESCRIPTION = "Tag not initialised.";
   
   /** The value of the tag */
+  @Element(required=false)
   private Object tagValue;
   
   /** The current tag mode */
+  @Element
   private TagMode mode = TagMode.TEST;
   
   /** 
    * <code>true</code>, if the tag value is currently simulated and not
    * corresponding to a live event.
    */
+  @Element
   private boolean simulated = false;
 
   /** Unique identifier for a DataTag */
-  private final Long id;
+  @Attribute
+  private Long id;
   
   /** 
    * Containing all process id's which are relevant to compute the
@@ -96,6 +111,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private Map<Long, SupervisionEvent> equipmentSupervisionStatus = new HashMap<Long, SupervisionEvent>();
   
   /** The unique name of the tag */
+  @Element(required=false)
   private String tagName = null;
   
   /** The quality of the tag */
@@ -103,30 +119,38 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
   
   /** The alarm objects associated to this data tag */
+  @ElementList
   private ArrayList<AlarmValue> alarms = new ArrayList<AlarmValue>();
   
   /** The source timestamp that indicates when the value change was generated */
+  @Element(required=false)
   private Timestamp sourceTimestamp = null;
   
   /** The server timestamp that indicates when the change message passed the server */
+  @Element
   private Timestamp serverTimestamp = new Timestamp(0L);
 
   /** Unit of the tag */
+  @Element(required=false)
   private String unit = null;
   
   /** The description of the Tag*/
+  @Element(required=false)
   private String description = "";
   
   /** The description of the value */
+  @Element(required=false)
   private String valueDescription = "";
   
   /**
    * String representation of the JMS destination where the DataTag 
    * is published on change.
    */
+  @Element(required=false)
   private String topicName = null;
 
   /** In case this data tag is a rule this variable contains its rule expression */
+  @Element(required=false)
   private RuleExpression ruleExpression = null;
 
   /**
@@ -141,6 +165,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private ReentrantReadWriteLock updateTagLock = new ReentrantReadWriteLock();
 
 
+  protected ClientDataTagImpl() {      
+    this.id = -1L;
+  }
+  
   /**
    * Constructor
    * Creates a ClientDataTag with a tagID and a javax.jms.TopicSession
@@ -975,4 +1003,56 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public void onSupervisionUpdate(SupervisionEvent supervisionEvent) {
     update(supervisionEvent);
   }
+  
+
+  
+  public String getXml() {
+      Serializer serializer = new Persister(new AnnotationStrategy());
+      StringWriter fw = null;
+      String result = null;
+
+      try {
+          fw = new StringWriter();
+          serializer.write(this, fw);
+          result = fw.toString();
+      } catch (Exception e) {
+          e.printStackTrace();
+      } finally {
+          if (fw != null) {
+              try {
+                  fw.close();
+              } catch (IOException e) {
+                  e.printStackTrace();
+              }
+          }
+      }
+      return result;
+  }
+  
+  
+  public static ClientDataTagImpl fromXml(final String xml) throws Exception {
+
+      ClientDataTagImpl cdt = null;
+      StringReader sr = null;
+      Serializer serializer = new Persister(new AnnotationStrategy());
+
+      try {
+          sr = new StringReader(xml);
+          cdt = serializer.read(ClientDataTagImpl.class, new StringReader(xml), false);
+      } finally {
+
+          if (sr != null) {
+              sr.close();
+          }
+      }
+
+      return cdt;
+  }
+  
+  
+  @Override
+  public String toString() {
+      return this.getXml();
+  }  
+  
 }
