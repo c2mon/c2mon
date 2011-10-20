@@ -22,6 +22,9 @@ import java.util.Set;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.tag.TagConfig;
+import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
  * This interface describes the methods which are provided by
@@ -91,6 +94,47 @@ public interface C2monTagManager {
    * @return A collection of all <code>ClientDataTag</code> objects
    */
   Collection<ClientDataTagValue> getDataTags(Collection<Long> tagIds);
+  
+  /**
+   * Returns a TagConfiguration object for every valid id on the list.
+   * The values are fetched from the server.
+   * However, in case of a connection error or an unknown tag id the corresponding
+   * tag might be missing.
+   * 
+   * @param tagIds A collection of data tag id's
+   * @return A collection of all <code>TagConfiguration</code> objects
+   */  
+  Collection<TagConfig> getTagConfigurations(Collection<Long> tagIds);
+  
+  /**
+   * Returns an {@link AlarmValue} object for every valid id on the list.
+   * The values are fetched from the server.
+   * However, in case of a connection error or an unknown tag id the corresponding
+   * tag might be missing.
+   * 
+   * @param alarmIds A collection of alarm id's
+   * @return A collection of all <code>AlarmValue</code> objects
+   */  
+  Collection<AlarmValue> getAlarms(Collection<Long> alarmIds);
+  
+  
+  /**
+   * Returns a Configuration Report object for the requested configurationId.
+   * The values are fetched from the server.
+   * However, in case of a connection error or an unknown tag id the corresponding
+   * tag might be missing.
+   * 
+   * @param configurationId The configuration id used to fetch the Configuration Report object
+   * @return A Configuration Report object
+   */  
+  ConfigurationReport applyConfiguration(Long configurationId);
+  
+  /**
+   * Returns the number of connections in the Cache
+   * @return the number of connections in the Cache
+   */    
+  int getCacheSize();
+  
   
   /**
    * This method is used to synchronize subscribed data tags with the

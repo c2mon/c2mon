@@ -321,4 +321,10 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     
     return newTagIds;
   }
+
+  @Override
+    public int getCacheSize() {
+      
+      return liveCache.size();
+    }
 }

@@ -86,4 +86,6 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    * @throws NullPointerException When the parameter is <code>null</code>
    */
   Set<Long> unsubscribeDataTags(Set<Long> dataTagIds, DataTagUpdateListener listener);
+  
+  int getCacheSize();
 }
