@@ -46,7 +46,8 @@ public class ClientDataTagImplTest {
           "My.jms.topic");
     
     return tagUpdate;
-  }
+  }    
+  
   
   private void checkTagValueCopy(final ClientDataTagValue original, final ClientDataTagValue copy) {
     assertNotSame("The two objects should not point to the same reference in memory!", original, copy);
@@ -216,4 +217,18 @@ public class ClientDataTagImplTest {
     ClientDataTagImpl cdt2 = new ClientDataTagImpl(4321L);
     assertFalse(cdt.equals(cdt2));
   }
+  
+  @Test
+  public void testXMLSerialization() throws Exception {
+      
+      ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
+      cdt.onUpdate(createValidTransferTag(1234L));      
+      
+      ClientDataTagImpl cdt2 = ClientDataTagImpl.fromXml(cdt.toString());
+            
+      assertEquals(cdt.getId(),cdt2.getId());
+      
+      //System.out.println(cdt2.toString());
+  }  
+  
 }
