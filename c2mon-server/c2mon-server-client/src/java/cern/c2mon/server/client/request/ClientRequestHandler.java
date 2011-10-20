@@ -21,16 +21,23 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
+import cern.c2mon.server.configuration.ConfigurationLoader;
+import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.tag.TagConfigImpl;
+import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.ProcessXMLProvider;
 import cern.tim.server.cache.TagFacadeGateway;
 import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.cache.exception.CacheElementNotFoundException;
+import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.supervision.SupervisionFacade;
+import cern.tim.shared.client.configuration.ConfigurationReport;
 import cern.tim.util.json.GsonFactory;
 
 import com.google.gson.Gson;
@@ -45,22 +52,28 @@ import com.google.gson.Gson;
  */
 @Service("clientRequestHandler")
 public class ClientRequestHandler implements SessionAwareMessageListener<Message> {
-  
+
   /** Private class logger */
   private static final Logger LOG = Logger.getLogger(ClientRequestHandler.class);
-  
+
   /** Reference to the tag facade gateway to retrieve a tag copies with the associated alarms */
   private final TagFacadeGateway tagFacadeGateway;
-  
+
   /** Reference to the tag location service to check whether a tag exists */
   private final TagLocationService tagLocationService;
-  
+
+  /** Reference to the AlarmCache */
+  private final AlarmCache alarmCache;
+
+  /** Reference to the ConfigurationLoader */
+  private final ConfigurationLoader configurationLoader;
+
   /** Reference to the supervision facade service for handling the supervision request */
   private final SupervisionFacade supervisionFacade;
-  
+
   /** Ref to the the bean providing DAQ XML */
   private final ProcessXMLProvider processXMLProvider;
-  
+
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
 
@@ -68,25 +81,31 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * Default TTL of replies to client requests
    */
   private static final long DEFAULT_REPLY_TTL = 120000;
-  
+
   /**
    * Default Constructor
    * @param pTagLocationService Reference to the tag location service singleton
    * @param pTagFacadeGateway Reference to the tag facade gateway singleton
-   * @param pSupervisionFacade Reference to the supervision facade singelton
+   * @param pSupervisionFacade Reference to the supervision facade singleton
    * @param pProcessXMLProvider Ref to the process XML provider bean
+   * @param pAlarmCache Reference to the AlarmCache
+   * @param pConfigurationLoader Reference to the ConfigurationLoader
    */
   @Autowired
   public ClientRequestHandler(final TagLocationService pTagLocationService, 
-                              final TagFacadeGateway pTagFacadeGateway,
-                              final SupervisionFacade pSupervisionFacade,
-                              final ProcessXMLProvider pProcessXMLProvider) {
+      final TagFacadeGateway pTagFacadeGateway,
+      final SupervisionFacade pSupervisionFacade,
+      final ProcessXMLProvider pProcessXMLProvider,
+      final AlarmCache pAlarmCache,
+      final ConfigurationLoader pConfigurationLoader) {
     tagLocationService = pTagLocationService;
     tagFacadeGateway = pTagFacadeGateway;
     supervisionFacade = pSupervisionFacade;
     processXMLProvider = pProcessXMLProvider;
+    alarmCache = pAlarmCache;
+    configurationLoader = pConfigurationLoader;
   }
-  
+
   /**
    * This method is called when a C2MON client is sending a <code>ClientRequest</code>
    * to the server. The server retrieves the request Tag and associated alarms information
@@ -103,7 +122,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     if (LOG.isDebugEnabled()) {
       LOG.debug("Successully processed client request.");
     }
- 
+
     // Extract reply topic
     Destination replyDestination = null;
     try {
@@ -117,7 +136,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
       messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
       TextMessage replyMessage = session.createTextMessage();      
-      
+
       // Send response as  Json message
       replyMessage.setText(GSON.toJson(response));
       if (LOG.isDebugEnabled()) {
@@ -129,8 +148,8 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
     }
   }
-  
-  
+
+
   /**
    * Inner method for handling the tag request. Therefore it has to get for all tag ids
    * mentioned in that request the tag and alarm referenses. 
@@ -139,18 +158,36 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    */
   private Collection< ? extends ClientRequestResult> handleClientRequest(@Valid final ClientRequest clientRequest) {
     switch (clientRequest.getRequestType()) {
+
+      case TAG_CONFIGURATION_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " tag configurations.");
+        }
+        return handleTagConfigurationRequest(clientRequest);    
+
+      case APPLY_CONFIGURATION_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " configuration reports.");
+        }
+        return handleConfigurationReportRequest(clientRequest);        
       case TAG_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Received a client request for " + clientRequest.getTagIds().size() + " tags.");
+          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " tags.");
         }
         return handleTagRequest(clientRequest);
+      case ALARM_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          //! TagId field is also used for Alarm ids
+          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " alarms.");
+        }
+        return handleAlarmRequest(clientRequest);        
       case SUPERVISION_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Received a client request for the current supervision status.");
+          LOG.debug("handleClientRequest() - Received a client request for the current supervision status.");
         }
         return supervisionFacade.getAllSupervisionStates();
       case DAQ_XML_REQUEST:
-        LOG.debug("Received a client request for a Process configuration XML");
+        LOG.debug("handleClientRequest() - Received a client request for a Process configuration XML");
         Collection<ProcessXmlResponse> singleXML = new ArrayList<ProcessXmlResponse>(1);
         ProcessXmlResponseImpl processXmlResponse = new ProcessXmlResponseImpl();
         try {
@@ -167,36 +204,133 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         return Collections.emptyList();
     } // end switch
   }
-  
+
+  private int castLongToInt(final long l) {
+
+    if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+      LOG.warn("castLongToInt() - unsafe cast of long " + l + " to int");
+    }
+    return (int) l;
+  }
+
+  /**
+   * Inner method which handles the Configuration Requests
+   * @param configurationRequest The configuration request sent from the client
+   * @return Configuration Report
+   */
+  @SuppressWarnings("unchecked")
+  private Collection< ? extends ClientRequestResult> handleConfigurationReportRequest(final ClientRequest configurationRequest) {
+
+    //!!! TagId field is also used for Configuration Ids
+    final Iterator<Long> iter = configurationRequest.getTagIds().iterator();
+    final Collection reports = new ArrayList(configurationRequest.getTagIds().size());
+
+    while (iter.hasNext()) {
+
+      final int configId = castLongToInt(iter.next());
+
+      switch (configurationRequest.getResultType()) {
+        case TRANSFER_CONFIGURATION_REPORT: 
+          reports.add(configurationLoader.applyConfiguration(configId, null));
+          break;       
+        default:
+          LOG.error("handleConfigurationRequest() - Could not generate response message. Unknown enum ResultType "
+              + configurationRequest.getResultType());
+      }
+    } // end while
+
+    return reports;
+  }   
+
+  /**
+   * Inner method which handles the Tag Configuration Requests
+   * @param tagConfigurationRequest The configuration request sent from the client
+   * @return A tag configuration list
+   */
+  @SuppressWarnings("unchecked")
+  private Collection< ? extends ClientRequestResult> handleTagConfigurationRequest(final ClientRequest tagConfigurationRequest) {
+
+    //!!! TagId field is also used for Configuration Ids
+    final Iterator<Long> iter = tagConfigurationRequest.getTagIds().iterator();
+    final Collection transferTags = new ArrayList(tagConfigurationRequest.getTagIds().size());
+
+    while (iter.hasNext()) {
+
+      final Long tagId = iter.next();
+      final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
+
+      switch (tagConfigurationRequest.getResultType()) {
+        case TRANSFER_TAG_CONFIGURATION_LIST: 
+          transferTags.add(TransferObjectFactory.createTagConfiguration(tagWithAlarms));
+          break;    
+        default:
+          LOG.error("handleConfigurationRequest() - Could not generate response message. Unknown enum ResultType "
+              + tagConfigurationRequest.getResultType());
+      }
+    } // end while
+
+    return transferTags;
+  }      
+
+  /**
+   * Inner method which handles the alarm requests
+   * @param alarmRequest The alarm request sent from the client
+   * @return Collection of alarms
+   */
+  @SuppressWarnings("unchecked")
+  private Collection< ? extends ClientRequestResult> handleAlarmRequest(final ClientRequest alarmRequest) {
+
+    //!!! TagId field is also used for Alarm Ids
+    final Iterator<Long> iter = alarmRequest.getTagIds().iterator();
+    final Collection alarms = new ArrayList(alarmRequest.getTagIds().size());
+
+    while (iter.hasNext()) {
+
+      final Long alarmId = iter.next();
+      final Alarm alarm = alarmCache.get(alarmId);
+
+      switch (alarmRequest.getResultType()) {
+        case TRANSFER_ALARM_LIST: 
+          alarms.add(TransferObjectFactory.createAlarmValue(alarm));
+          break;       
+        default:
+          LOG.error("handleAlarmRequest() - Could not generate response message. Unknown enum ResultType "
+              + alarmRequest.getResultType());
+      }
+    } // end while
+
+    return alarms;
+  }    
+
   /**
    * Inner method which handles the tag requests
-   * @param tagRequest The tag request sent from the flient
+   * @param tagRequest The tag request sent from the client
    * @return Collection of 
    */
   @SuppressWarnings("unchecked")
   private Collection< ? extends ClientRequestResult> handleTagRequest(final ClientRequest tagRequest) {
     final Iterator<Long> iter = tagRequest.getTagIds().iterator();
     final Collection transferTags = new ArrayList(tagRequest.getTagIds().size());
-    
+
     while (iter.hasNext()) {
       final Long tagId = iter.next();
       if (tagLocationService.isInTagCache(tagId)) {
         final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
-        
+
         switch (tagRequest.getResultType()) {
           case TRANSFER_TAG_LIST:
             transferTags.add(TransferObjectFactory.createTransferTag(tagWithAlarms));
             break;
           case TRANSFER_TAG_VALUE_LIST:
             transferTags.add(TransferObjectFactory.createTransferTagValue(tagWithAlarms));
-            break;
+            break; 
           default:
             LOG.error("handleTagRequest() - Could not generate response message. Unknown enum ResultType "
                 + tagRequest.getResultType());
         }
       }
     } // end while
-    
+
     return transferTags;
   }
 }

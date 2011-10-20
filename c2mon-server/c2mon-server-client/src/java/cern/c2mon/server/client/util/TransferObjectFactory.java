@@ -6,8 +6,8 @@ import java.util.List;
 
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.tag.Publisher;
+import cern.c2mon.shared.client.tag.TagConfigImpl;
 import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TransferTagAddressImpl;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.server.common.alarm.Alarm;
@@ -23,159 +23,202 @@ import cern.tim.server.common.tag.Tag;
  * @author Matthias Braeger
  */
 public abstract class TransferObjectFactory {
-  
-  /**
-   * Hidden default constructor
-   */
-  private TransferObjectFactory() {
-    // Do nothing
-  }
 
-  
-  /**
-   * Creates a <code>TransferTagImpl</code> object for the given parameters
-   * @param tagWithAlarms A tag from the cache
-   * @return The resulting <code>TransferTagImpl</code>
-   */
-  public static TransferTagImpl createTransferTag(final TagWithAlarms tagWithAlarms) {
-    Tag tag = tagWithAlarms.getTag();
-    TransferTagImpl transferTag = null;
-    if (tag != null) {
-      Boolean controlTag = Boolean.FALSE;
-      if (tag instanceof ControlTag) {
-        controlTag = Boolean.TRUE;
-      }
-      transferTag =
-        new TransferTagImpl(
-            tag.getId(),
-            tag.getValue(),
-            tag.getValueDescription(),
-            tag.getDataTagQuality(),
-            getTagMode(tag),
-            tag.getTimestamp(),
-            tag.getCacheTimestamp(),
-            tag.getDescription(),
-            tag.getName(),
-            tag.getTopic(),
-            controlTag);
-      
-      addAlarmValues(transferTag, tagWithAlarms.getAlarms());
-      transferTag.setSimulated(tag.isSimulated());
-      transferTag.addEquimpmentIds(tag.getEquipmentIds());
-      transferTag.addProcessIds(tag.getProcessIds());
-      if (tag instanceof DataTag || tag instanceof ControlTag) {
-        DataTag dataTag = (DataTag) tag;
-        
-        // check if min. value is defined, since it is not mandatory
-        if (dataTag.getMinValue() != null)        
-          transferTag.setMinValue(dataTag.getMinValue().toString());
-        
-        // check if max. value is defined, since it is not mandatory
-        if (dataTag.getMaxValue() != null)
-          transferTag.setMaxValue(dataTag.getMaxValue().toString());
-        
-        if (dataTag.getAddress() != null) {
-          transferTag.setTransferTagAddress(new TransferTagAddressImpl(dataTag.getAddress().getTimeToLive(), 
-                                                                       dataTag.getAddress().getValueDeadbandType(),
-                                                                       dataTag.getAddress().getValueDeadband(),
-                                                                       dataTag.getAddress().getTimeDeadband(),
-                                                                       dataTag.getAddress().getPriority(),
-                                                                       dataTag.getAddress().isGuaranteedDelivery(),
-                                                                       dataTag.getAddress().getHardwareAddress().toConfigXML()));
+    /**
+     * Hidden default constructor
+     */
+    private TransferObjectFactory() {
+        // Do nothing
+    }
+
+
+    /**
+     * Creates a <code>TransferTagImpl</code> object for the given parameters
+     * @param tagWithAlarms A tag from the cache
+     * @return The resulting <code>TransferTagImpl</code>
+     */
+    public static TransferTagImpl createTransferTag(final TagWithAlarms tagWithAlarms) {
+        Tag tag = tagWithAlarms.getTag();
+        TransferTagImpl transferTag = null;
+        if (tag != null) {
+            transferTag =
+                new TransferTagImpl(
+                        tag.getId(),
+                        tag.getValue(),
+                        tag.getValueDescription(),
+                        tag.getDataTagQuality(),
+                        getTagMode(tag),
+                        tag.getTimestamp(),
+                        tag.getCacheTimestamp(),
+                        tag.getDescription(),
+                        tag.getName(),
+                        tag.getTopic());
+
+            addAlarmValues(transferTag, tagWithAlarms.getAlarms());
+            transferTag.setSimulated(tag.isSimulated());
+            transferTag.addEquimpmentIds(tag.getEquipmentIds());
+            transferTag.addProcessIds(tag.getProcessIds());
         }
-      }
-      
-      if (tag instanceof RuleTag) {
-        RuleTag ruleTag = (RuleTag) tag;
-        transferTag.setRuleExpression(ruleTag.getRuleExpression());
-      }
-      if (!tag.getRuleIds().isEmpty()) {
-        transferTag.addRuleIds(tag.getRuleIds());
-      }
-      if (tag.getDipAddress() != null) {
-        transferTag.addPublication(Publisher.DIP, tag.getDipAddress());
-      }
-      if (tag.getJapcAddress() != null) {
-        transferTag.addPublication(Publisher.JAPC, tag.getJapcAddress());
-      }      
+
+        return transferTag;
     }
-  
-    return transferTag;
-  }
-  
-  
-  /**
-   * Creates a <code>TransferTagValueImpl</code> object for the given parameters
-   * @param tagWithAlarms A tag from the cache
-   * @return The resulting <code>TransferTagValueImpl</code>
-   */
-  public static TransferTagValueImpl createTransferTagValue(final TagWithAlarms tagWithAlarms) {
-    Tag tag = tagWithAlarms.getTag();
-    TransferTagValueImpl tagValue = null;
-    if (tag != null) {
-      tagValue = 
-        new TransferTagValueImpl(
-            tag.getId(), 
-            tag.getValue(),
-            tag.getValueDescription(),
-            tag.getDataTagQuality(),
-            getTagMode(tag),
-            tag.getTimestamp(), 
-            tag.getCacheTimestamp(), 
-            tag.getDescription());
-      
-      addAlarmValues(tagValue, tagWithAlarms.getAlarms());
-      tagValue.setSimulated(tag.isSimulated());
-    }
-    
-    return tagValue;
-  }
-  
-  /**
-   * Inner method to determine the actual tag mode
-   * @param tag The tag for which the mode has to be determined
-   * @return The tag mode
-   */
-  private static TagMode getTagMode(final Tag tag) {
-    TagMode mode;
-    if (tag.isInOperation()) {
-      mode = TagMode.OPERATIONAL;
-    }
-    else if (tag.isInMaintenance()) {
-      mode = TagMode.MAINTENANCE;
-    }
-    else {
-      mode = TagMode.TEST;
-    }
-    
-    return mode;
-  }
-  
-  
-  /**
-   * Private helper method for creating and adding <code>AlarmValueImpl</code> objects to the
-   * transfer tag.
-   * @param tagValue The tag value to which the alarms will be added
-   * @param alarms The alarms from which the <code>AlarmValueImpl</code> are created from
-   */
-  private static void addAlarmValues(final TransferTagValueImpl tagValue, final Collection<Alarm> alarms) {
-    if (alarms != null) {
-      List<AlarmValueImpl> alarmValues = new ArrayList<AlarmValueImpl>(alarms.size());
-      for (Alarm alarm : alarms) {
-        AlarmValueImpl alarmValue = 
-          new AlarmValueImpl(
-              alarm.getId(),
-              alarm.getFaultCode(),
-              alarm.getFaultMember(),
-              alarm.getFaultFamily(),
-              alarm.getInfo(),
-              alarm.getTagId(),
-              alarm.getTimestamp(),
-              alarm.isActive());
+
+    /**
+     * Creates a <code>TransferTagValueImpl</code> object for the given parameters
+     * @param tagWithAlarms A tag from the cache
+     * @return The resulting <code>TransferTagValueImpl</code>
+     */
+    public static TransferTagValueImpl createTransferTagValue(final TagWithAlarms tagWithAlarms) {
+        Tag tag = tagWithAlarms.getTag();
+        TransferTagValueImpl tagValue = null;
+        if (tag != null) {
+            tagValue = 
+                new TransferTagValueImpl(
+                        tag.getId(), 
+                        tag.getValue(),
+                        tag.getValueDescription(),
+                        tag.getDataTagQuality(),
+                        getTagMode(tag),
+                        tag.getTimestamp(), 
+                        tag.getCacheTimestamp(), 
+                        tag.getDescription());
+
+            addAlarmValues(tagValue, tagWithAlarms.getAlarms());
+            tagValue.setSimulated(tag.isSimulated());
+        }
+
+        return tagValue;
+    }  
+
+    /**
+     * Creates an <code>AlarmValueImpl</code> object for the given parameters
+     * @param alarm Just an alarm object
+     * @return The resulting <code>AlarmValueImpl</code>
+     */
+    public static AlarmValueImpl createAlarmValue(final Alarm alarm) {
         
-        alarmValues.add(alarmValue);
-      }
-      tagValue.addAlarmValues(alarmValues);
+        AlarmValueImpl alarmValueImpl = null;       
+        
+        if (alarm != null) {
+            
+            alarmValueImpl = new AlarmValueImpl(alarm.getId(), 
+                    alarm.getFaultCode(), 
+                    alarm.getFaultMember(), 
+                    alarm.getFaultFamily(), 
+                    alarm.getInfo(), 
+                    alarm.getTagId(), 
+                    alarm.getTimestamp(), 
+                    alarm.isActive());
+        }
+        return alarmValueImpl;
+    }    
+
+    /**
+     * Creates a <code>TagConfigImpl</code> object for the given parameters
+     * @param tagWithAlarms A tag from the cache
+     * @return The resulting <code>TransferTagValueImpl</code>
+     */
+    public static TagConfigImpl createTagConfiguration(final TagWithAlarms tagWithAlarms) {
+
+        Tag tag = tagWithAlarms.getTag();
+        TagConfigImpl tagConfig = null;
+
+        if (tag != null) {
+            
+            tagConfig = new TagConfigImpl(tag.getId());
+            tagConfig.setAlarmIds(new ArrayList<Long>(tag.getAlarmIds()));
+            
+            Boolean controlTag = Boolean.FALSE;
+            if (tag instanceof ControlTag) {
+                controlTag = Boolean.TRUE;
+            }
+            tagConfig.setControlTag(controlTag);
+
+            if (tag instanceof DataTag || tag instanceof ControlTag) {
+                DataTag dataTag = (DataTag) tag;
+
+                // check if min. value is defined, since it is not mandatory
+                if (dataTag.getMinValue() != null)        
+                    tagConfig.setMinValue(dataTag.getMinValue().toString());
+
+                // check if max. value is defined, since it is not mandatory
+                if (dataTag.getMaxValue() != null)
+                    tagConfig.setMaxValue(dataTag.getMaxValue().toString());
+
+                if (dataTag.getAddress() != null) {
+
+                    tagConfig.setValueDeadbandType(dataTag.getAddress().getValueDeadbandType());
+                    tagConfig.setValueDeadband(dataTag.getAddress().getValueDeadband());
+                    tagConfig.setTimeDeadband(dataTag.getAddress().getTimeDeadband());
+                    tagConfig.setGuaranteedDelivery(dataTag.getAddress().isGuaranteedDelivery());
+                    tagConfig.setHardwareAddress(dataTag.getAddress().getHardwareAddress().toConfigXML());
+                    tagConfig.setPriority(dataTag.getAddress().getPriority());
+                }
+            }
+
+            if (tag instanceof RuleTag) {
+                RuleTag ruleTag = (RuleTag) tag;
+                tagConfig.setRuleExpressionStr(ruleTag.getRuleText());
+            }
+            if (!tag.getRuleIds().isEmpty()) {
+                tagConfig.addRuleIds(tag.getRuleIds());
+            }
+            if (tag.getDipAddress() != null) {
+                tagConfig.addPublication(Publisher.DIP, tag.getDipAddress());
+            }
+            if (tag.getJapcAddress() != null) {
+                tagConfig.addPublication(Publisher.JAPC, tag.getJapcAddress());
+            }
+        }
+        return tagConfig;
     }
-  }
+
+    /**
+     * Inner method to determine the actual tag mode
+     * @param tag The tag for which the mode has to be determined
+     * @return The tag mode
+     */
+    private static TagMode getTagMode(final Tag tag) {
+        TagMode mode;
+        if (tag.isInOperation()) {
+            mode = TagMode.OPERATIONAL;
+        }
+        else if (tag.isInMaintenance()) {
+            mode = TagMode.MAINTENANCE;
+        }
+        else {
+            mode = TagMode.TEST;
+        }
+
+        return mode;
+    }
+
+
+
+    /**
+     * Private helper method for creating and adding <code>AlarmValueImpl</code> objects to the
+     * transfer tag.
+     * @param tagValue The tag value to which the alarms will be added
+     * @param alarms The alarms from which the <code>AlarmValueImpl</code> are created from
+     */
+    private static void addAlarmValues(final TransferTagValueImpl tagValue, final Collection<Alarm> alarms) {
+        if (alarms != null) {
+            List<AlarmValueImpl> alarmValues = new ArrayList<AlarmValueImpl>(alarms.size());
+            for (Alarm alarm : alarms) {
+                AlarmValueImpl alarmValue = 
+                    new AlarmValueImpl(
+                            alarm.getId(),
+                            alarm.getFaultCode(),
+                            alarm.getFaultMember(),
+                            alarm.getFaultFamily(),
+                            alarm.getInfo(),
+                            alarm.getTagId(),
+                            alarm.getTimestamp(),
+                            alarm.isActive());
+
+                alarmValues.add(alarmValue);
+            }
+            tagValue.addAlarmValues(alarmValues);
+        }
+    }
 }

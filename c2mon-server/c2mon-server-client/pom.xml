@@ -33,6 +33,10 @@
       <artifactId>tim2-server-alarm</artifactId>
     </dependency>
     <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-configuration</artifactId>
+    </dependency>
+    <dependency>
       <groupId>cern.tim2.tim2-server</groupId>
       <artifactId>tim2-server-cache</artifactId>
     </dependency>
