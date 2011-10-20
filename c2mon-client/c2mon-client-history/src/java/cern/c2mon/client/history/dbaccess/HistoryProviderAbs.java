@@ -38,6 +38,7 @@ import cern.c2mon.client.common.history.event.HistoryProviderListener;
  */
 abstract class HistoryProviderAbs implements HistoryProvider {
 
+  /** What the progress should be set to when it is finish */
   private static final Double PROGRESS_FINISH = 1.0; 
   
   /** A list of the registered listeners */
@@ -231,25 +232,6 @@ abstract class HistoryProviderAbs implements HistoryProvider {
   @Override
   public synchronized void enableProvider() {
     disableProvider = false;
-  }
-
-  @Override
-  public int getExecutingJobsCount() {
-    int numberOfJobs = 0;
-    final Collection<Double> percents;
-    queriesLock.readLock().lock();
-    try {
-      percents = new ArrayList<Double>(this.queries.values());
-    }
-    finally {
-      queriesLock.readLock().unlock();
-    }
-    for (Double percent : percents) {
-      if (percent < 1.0) {
-        numberOfJobs++;
-      }
-    }
-    return numberOfJobs;
   }
 
   @Override
