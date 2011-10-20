@@ -41,11 +41,6 @@ public interface HistoryProvider {
    * Restores the provider after a call to {@link #disableProvider()}.
    */
   void enableProvider();
-  
-  /**
-   * @return the number of jobs which are currently being executed.
-   */
-  int getExecutingJobsCount();
 
   /**
    * 
