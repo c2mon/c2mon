@@ -22,10 +22,13 @@ import java.util.Collection;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.client.command.CommandTagHandle;
+import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
  * Interface to Spring singleton bean proving convenient server
@@ -35,6 +38,47 @@ import cern.tim.shared.client.command.CommandTagHandle;
  *
  */
 public interface RequestHandler {
+    
+
+    /**
+     * Queries the server for the latest values and configuration
+     * details for the request tags.
+     * 
+     * <p>If called with an empty collection returns an empty collection.
+     * 
+     * @param configurationId the id of the configuration report
+     * @return a Configuration Report
+     */
+    ConfigurationReport applyConfiguration(Long configurationId);    
+    
+    /**
+     * Queries the server for the latest values and configuration
+     * details for the request tags.
+     * 
+     * <p>If called with an empty collection returns an empty collection.
+     * 
+     * @param tagIds the ids of the tags
+     * @return a collection of TagConfigurations
+     * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+     * @throws NullPointerException if called with a null argument
+     * @throws RuntimeException if the response from the server is null (probable timeout)
+     */
+    Collection<AlarmValue> requestAlarms(Collection<Long> tagIds) throws JMSException;  
+    
+    /**
+     * Queries the server for the latest values and configuration
+     * details for the request tags.
+     * 
+     * <p>If called with an empty collection returns an empty collection.
+     * 
+     * @param tagIds the ids of the tags
+     * @return a collection of TagConfigurations
+     * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+     * @throws NullPointerException if called with a null argument
+     * @throws RuntimeException if the response from the server is null (probable timeout)
+     */
+    Collection<TagConfig> requestTagConfigurations(Collection<Long> tagIds) throws JMSException;    
+    
 
   /**
    * Queries the server for the latest values and configuration

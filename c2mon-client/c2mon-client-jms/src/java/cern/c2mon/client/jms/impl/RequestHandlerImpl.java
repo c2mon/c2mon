@@ -36,19 +36,23 @@ import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
+import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.client.command.CommandTagHandle;
+import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
  * Implementation of the RequestHandler bean.
- * @see cern.c2mon.client.jms.RequestHandler  
+ * 
+ * @see cern.c2mon.client.jms.RequestHandler
  * @author Mark Brightwell
- *
+ * 
  */
 public class RequestHandlerImpl implements RequestHandler {
 
@@ -56,10 +60,10 @@ public class RequestHandlerImpl implements RequestHandler {
    * Class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(RequestHandlerImpl.class);
-  
+
   /**
-   * The maximum number of tags in a single request. Each request
-   * runs in its own thread on the server.
+   * The maximum number of tags in a single request. Each request runs in its
+   * own thread on the server.
    */
   private static final int MAX_REQUEST_SIZE = 250;
 
@@ -86,29 +90,30 @@ public class RequestHandlerImpl implements RequestHandler {
   /**
    * Ref to JmsProxy bean.
    */
-  private JmsProxy jmsProxy;  
-  
+  private JmsProxy jmsProxy;
+
   /**
    * Name of request queue.
    */
   private String requestQueue;
-  
+
   /**
-   * Default request timeout for requests. NullPointerException is
-   * thrown if timeout occurs.
+   * Default request timeout for requests. NullPointerException is thrown if
+   * timeout occurs.
    */
   private int requestTimeout;
-  
+
   /**
    * Executor for submitting requests to the server.
    */
-  private ThreadPoolExecutor executor = 
-    new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS, 
-              new ArrayBlockingQueue<Runnable>(QUEUE_SIZE), new ThreadPoolExecutor.CallerRunsPolicy());
-  
+  private ThreadPoolExecutor executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+      new ArrayBlockingQueue<Runnable>(QUEUE_SIZE), new ThreadPoolExecutor.CallerRunsPolicy());
+
   /**
    * Constructor.
-   * @param jmsProxy the proxy bean
+   * 
+   * @param jmsProxy
+   *          the proxy bean
    */
   @Autowired
   public RequestHandlerImpl(final JmsProxy jmsProxy) {
@@ -119,12 +124,12 @@ public class RequestHandlerImpl implements RequestHandler {
 
   @Override
   public Collection<CommandTagHandle> getCommandTagHandles(final Collection<Long> commandIds) {
-   throw new UnsupportedOperationException("Not implemented yet!");
+    throw new UnsupportedOperationException("Not implemented yet!");
   }
 
   @Override
   public Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException {
-    ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);    
+    ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);
     return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
   }
 
@@ -132,31 +137,73 @@ public class RequestHandlerImpl implements RequestHandler {
   public Collection<TagUpdate> requestTags(final Collection<Long> tagIds) throws JMSException {
     if (tagIds == null) {
       throw new NullPointerException("requestTags(..) method called with null parameter.");
-    }    
+    }
     return executeRequest(tagIds, TagUpdate.class);
   }
-  
+
+  @Override
+  public Collection<AlarmValue> requestAlarms(final Collection<Long> alarmIds) throws JMSException {
+    if (alarmIds == null) {
+      throw new NullPointerException("requestAlarms(..) method called with null parameter.");
+    }
+    return executeRequest(alarmIds, AlarmValue.class);
+  }
+
+  @Override
+  public ConfigurationReport applyConfiguration(final Long configurationId) {
+    ArrayList<Long> ids = new ArrayList<Long>();
+    ids.add(configurationId);
+
+    Collection<ConfigurationReport> report = executeRequest(ids, ConfigurationReport.class);
+
+    if (report.isEmpty()) {
+      final String errorMsg = "applyConfiguration returned an empty Collection";
+      LOGGER.error(errorMsg);
+      throw new RuntimeException(errorMsg);
+    }
+    if (report.size() > 1) {
+      final String errorMsg = "applyConfiguration returned a Collection with more than 1 result";
+      LOGGER.error(errorMsg);
+      throw new RuntimeException(errorMsg);
+    }
+
+    return report.iterator().next();
+  }
+
+  @Override
+  public Collection<TagConfig> requestTagConfigurations(final Collection<Long> tagIds) throws JMSException {
+    if (tagIds == null) {
+      throw new NullPointerException("requestTagConfigurations(..) method called with null parameter.");
+    }
+    return executeRequest(tagIds, TagConfig.class);
+  }
+
   @Override
   public Collection<TagValueUpdate> requestTagValues(final Collection<Long> tagIds) throws JMSException {
     if (tagIds == null) {
       throw new NullPointerException("requestTagValues(..) method called with null parameter.");
-    }    
+    }
     return executeRequest(tagIds, TagValueUpdate.class);
   }
 
   /**
-   * Splits and executes a id-base request, splitting the collection into smaller requests.
-   * @param <T> type of request result
-   * @param ids collection of ids to request
-   * @param clazz type of request result
+   * Splits and executes a id-base request, splitting the collection into
+   * smaller requests.
+   * 
+   * @param <T>
+   *          type of request result
+   * @param ids
+   *          collection of ids to request
+   * @param clazz
+   *          type of request result
    * @return the result of the request
    */
   private <T extends ClientRequestResult> Collection<T> executeRequest(final Collection<Long> ids, final Class<T> clazz) {
     LOGGER.debug("Initiating client request.");
-    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);    
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);
     Iterator<Long> it = ids.iterator();
     Collection<Future<Collection<T>>> results = new ArrayList<Future<Collection<T>>>();
-    int counter = 0;    
+    int counter = 0;
     while (it.hasNext()) {
       while (it.hasNext() && counter < MAX_REQUEST_SIZE) {
         clientRequest.addTagId(it.next());
@@ -176,16 +223,18 @@ public class RequestHandlerImpl implements RequestHandler {
         throw new RuntimeException(e);
       } catch (ExecutionException e) {
         LOGGER.error("ExecutionException caught while executing RequestValuesTask.", e);
-        throw new RuntimeException(e);        
+        throw new RuntimeException(e);
       }
     }
     LOGGER.debug("Client request completed.");
-    return finalCollection;   
+    return finalCollection;
   }
-  
+
   /**
    * Setter method.
-   * @param requestQueue the requestQueue to set
+   * 
+   * @param requestQueue
+   *          the requestQueue to set
    */
   @Required
   public void setRequestQueue(final String requestQueue) {
@@ -194,37 +243,39 @@ public class RequestHandlerImpl implements RequestHandler {
 
   /**
    * Setter method.
-   * @param requestTimeout the requestTimeout to set
+   * 
+   * @param requestTimeout
+   *          the requestTimeout to set
    */
   @Required
   public void setRequestTimeout(final int requestTimeout) {
     this.requestTimeout = requestTimeout;
   }
-  
+
   @Override
   public String getProcessXml(final String processName) throws JMSException {
-    ClientRequestImpl<ProcessXmlResponse> xmlRequest =
-      new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
+    ClientRequestImpl<ProcessXmlResponse> xmlRequest = new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
     xmlRequest.setRequestParameter("request parameter");
-    //response should have a unique element in
+    // response should have a unique element in
     ProcessXmlResponse response = jmsProxy.sendRequest(xmlRequest, requestQueue, requestTimeout).iterator().next();
     if (response.getProcessXML() != null) {
       return response.getProcessXML();
     } else {
       throw new RuntimeException(response.getErrorMessage());
-    }     
+    }
   }
-  
+
   /**
-   * This task calls the JmsProxy with the passed request
-   * and returns the requested collection.
+   * This task calls the JmsProxy with the passed request and returns the
+   * requested collection.
+   * 
    * @author Mark Brightwell
-   *
+   * 
    */
   private class RequestValuesTask<T extends ClientRequestResult> implements Callable<Collection<T>> {
-        
+
     private ClientRequestImpl<T> clientRequest;
-    
+
     public RequestValuesTask(ClientRequestImpl<T> clientRequest) {
       this.clientRequest = clientRequest;
     }
@@ -233,7 +284,5 @@ public class RequestHandlerImpl implements RequestHandler {
     public Collection<T> call() throws Exception {
       return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
     }
-    
   }
-
 }
