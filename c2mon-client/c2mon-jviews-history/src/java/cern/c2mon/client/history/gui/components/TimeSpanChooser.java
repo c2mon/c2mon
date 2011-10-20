@@ -103,10 +103,10 @@ public class TimeSpanChooser extends JPanel {
       valid = startDateChooser.getDate().compareTo(endDateChooser.getDate()) <= 0;
       if (!valid) {
         if (evt.getSource() == startDateChooser) {
-          startDateChooser.setDate(endDateChooser.getDate());
+          endDateChooser.setDate(startDateChooser.getDate());
         }
         else {
-          endDateChooser.setDate(startDateChooser.getDate());
+          startDateChooser.setDate(endDateChooser.getDate());
         }
       }
       

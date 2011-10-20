@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -154,6 +155,9 @@ public class HistoryLoader {
    */
   private final SpeedEstimate tagLoadingSpeedEstimate;
   
+  /** The manager creating all threads */
+  private final ThreadManager threadManager;
+  
   /** The thread doing the buffering */
   private Thread historyBufferingThread;
   
@@ -184,10 +188,15 @@ public class HistoryLoader {
   /** <code>true</code> if the loading of initial data should be done */
   private boolean loadInitialData;
   
+  /** <code>true</code> if all loading should be stopped */
+  private final AtomicBoolean stopAllLoading;
+  
   /**
    * Constructor
    */
   public HistoryLoader() {
+    this.threadManager = new ThreadManager();
+    this.stopAllLoading = new AtomicBoolean(false);
     this.dailySnapshotFilter = new DailySnapshotSmartFilter();
     this.tagLoadingSpeedEstimate = new SpeedEstimate(STARTING_SPEED);
     this.tagLoadingSpeedEstimate.setNewMeasurementsRatio(3);
@@ -212,6 +221,7 @@ public class HistoryLoader {
     this.dailySnapshotFilter.clear();
     this.dailySnapshotFilterIsLoadedUntil.clear();
     this.historyStore.clear();
+    this.threadManager.clean();
   }
   
   /**
@@ -232,13 +242,20 @@ public class HistoryLoader {
    */
   private void initializeData() {
     
+    try {
+      getHistoryConfiguration().getHistoryProvider().resetProgress();
+    }
+    catch (NoHistoryProviderAvailableException e) {
+      LOG.debug("Weren't able to reset the progress on the history provider", e);
+    }
+    
     // Start a batch on the history store (keeps it from updating before the
     // batch is finished)
     this.historyStore.setBatching(true);
     try {
       boolean bufferIntervalUpdated = false;
       
-      if (historyStore.isUninitializedTags()) {
+      if (historyStore.isUninitializedTags() && !stopAllLoading.get()) {
       
         try {
           this.initializeTagHistoryLock.lock();
@@ -306,6 +323,13 @@ public class HistoryLoader {
       // If the time has been changed it checks that the snapshot data is up to date
       loadDailySnapshotRecords(this.historyStore.getRegisteredTagValueUpdateIds());
       
+      try {
+        getHistoryConfiguration().getHistoryProvider().resetProgress();
+      }
+      catch (NoHistoryProviderAvailableException e) {
+        LOG.debug("Weren't able to reset the progress on the history provider", e);
+      }
+      
       if (!historyStore.isLoadingComplete()) {
         // Starting buffering process
         startBufferingProcess();
@@ -332,11 +356,45 @@ public class HistoryLoader {
       
       if (this.historyBufferingThread == null) {
         this.historyBufferingThread = new HistoryBufferingProcess();
-        this.historyBufferingThread.start();
+        this.threadManager.start(this.historyBufferingThread);
       }
     }
     finally {
       historyBufferingThreadLock.writeLock().unlock();
+    }
+  }
+  
+  /**
+   * Interrupts all loading, and blocks until it have stopped.
+   */
+  public void stopAllLoading() {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Stopping all loading threads");
+    }
+    stopAllLoading.set(true);
+    
+    HistoryProvider historyProvider;
+    try {
+      historyProvider = getHistoryConfiguration().getHistoryProvider();
+    }
+    catch (NoHistoryProviderAvailableException e) {
+      historyProvider = null;
+    }
+    if (historyProvider != null) {
+      historyProvider.disableProvider();
+    }
+    try {
+      stopLoading();
+      threadManager.join();
+    }
+    finally {
+      if (historyProvider != null) {
+        historyProvider.enableProvider();
+      }
+      stopAllLoading.set(false);
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("All loading threads are stopped");
     }
   }
   
@@ -521,7 +579,8 @@ public class HistoryLoader {
    */
   private void loadHistoryAsync(final List<Long> dataTags, final Timestamp startTime, final Timestamp endTime, final CountDownLatch countDownLatch,
       final AtomicInteger errorCount, final AtomicInteger recordsRetrieved) {
-    final Thread loadingThread = new Thread(new Runnable() {
+    
+    threadManager.start("TIM-History-Loader-Buffer-Loading-Thread", new Runnable() {
       @Override
       public void run() {
         try {
@@ -540,11 +599,15 @@ public class HistoryLoader {
               startTime, 
               endTime);
           
-          // Add the collection to the list of records
-          recordsRetrieved.addAndGet(historyStore.addHistoryValues(
-              DataIdUtil.convertTagIdsToDataIdCollection(dataTags),
-              Arrays.asList(tagValues.toArray(new HistoryUpdate[0])),
-              endTime));
+          historyProvider.resetProgress();
+          
+          if (!stopAllLoading.get()) {
+            // Add the collection to the list of records
+            recordsRetrieved.addAndGet(historyStore.addHistoryValues(
+                DataIdUtil.convertTagIdsToDataIdCollection(dataTags),
+                Arrays.asList(tagValues.toArray(new HistoryUpdate[0])),
+                endTime));
+          }
         }
         catch (Exception e) {
           LOG.error("Error occured while trying to retrieve history data.", e);
@@ -554,8 +617,6 @@ public class HistoryLoader {
         }
       }
     });
-    loadingThread.setName("TIM-History-Loader-Buffer-Loading-Thread");
-    loadingThread.start();
   }
 
   /**
@@ -661,7 +722,7 @@ public class HistoryLoader {
       }
       final CountDownLatch initialLoadingLatch = new CountDownLatch(numberOfThreads);
       
-      new Thread("Initial-Supervision-Events-Loader-Thread") {
+      threadManager.start("Initial-Supervision-Events-Loader-Thread", new Runnable() {
         @Override
         public void run() {
           try {
@@ -674,9 +735,9 @@ public class HistoryLoader {
             initialLoadingLatch.countDown();
           }
         }
-      } .start();
+      });
       
-      new Thread("Daily-Snapshot-Records-Loader-Thread") {
+      threadManager.start("Daily-Snapshot-Records-Loader-Thread", new Runnable() {
         @Override
         public void run() {
           try {
@@ -689,10 +750,10 @@ public class HistoryLoader {
             initialLoadingLatch.countDown();
           } 
         }
-      }.start();
+      });
       
       if (loadInitialData) {
-        new Thread("Initial-Data-Tags-Loader-Thread") {
+        threadManager.start("Initial-Data-Tags-Loader-Thread", new Runnable() {
           @Override
           public void run() {
             try {
@@ -706,7 +767,7 @@ public class HistoryLoader {
               initialLoadingLatch.countDown();
             } 
           }
-        } .start();
+        });
       }
       
       try {
@@ -828,8 +889,8 @@ public class HistoryLoader {
       
       if (LOG.isDebugEnabled()) {
         LOG.debug(String.format(
-            "%d daily snapshot records retrieved, filtering...",
-            values.size()));
+            "%d daily snapshot records retrieved for %d tag ids",
+            values.size(), tagIds.size()));
       }
       
       // Adds the data to the daily snapshot filter
@@ -877,13 +938,15 @@ public class HistoryLoader {
     }
     
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Initial values loaded, storing and filtering the data");
+      LOG.debug(String.format(
+          "Initial values loaded, storing and filtering %d records for %d tags", values.size(), tagValueUpdateIds.size()));
     }
     fireInitializingHistoryProgress("Initial data loaded, storing and filtering the data");
     
     // Adds the tags to the history store
-    this.historyStore.addInitialTagValueUpdates(Arrays.asList(tagValueUpdateIds.toArray(new HistoryUpdateId[0])), 
-        Arrays.asList(values.toArray(new HistoryUpdate[0])));
+    this.historyStore.addInitialTagValueUpdates(
+        new ArrayList<HistoryUpdateId>(tagValueUpdateIds), 
+        new ArrayList<HistoryUpdate>(values));
     
     if (LOG.isDebugEnabled()) {
       LOG.debug("Initial values is filtered, notifying view(s)");
@@ -1024,7 +1087,8 @@ public class HistoryLoader {
   /** This threads loads data using the history provider */
   class HistoryBufferingProcess extends Thread {
     public HistoryBufferingProcess() {
-      setName("TIM-History-Buffering");
+      super("TIM-History-Buffering");
+      this.setDaemon(true);
     }
     
     @Override
@@ -1062,7 +1126,8 @@ public class HistoryLoader {
         if (stopLoading
             || isStopBufferingThread() 
             || historyStore.isLoadingComplete()
-            || fireMemoryWarning) {
+            || fireMemoryWarning
+            || stopAllLoading.get()) {
           try {
             historyBufferingThreadLock.writeLock().lock();
             historyBufferingThread = null;

@@ -30,6 +30,22 @@ import cern.c2mon.client.common.history.event.HistoryProviderListener;
  * @author vdeila
  */
 public interface HistoryProvider {
+  
+  /**
+   * Cancels all requests, they will return empty lists.<br/>
+   * Remember to call {@link #enableProvider()} to enable the provider again.
+   */
+  void disableProvider();
+  
+  /**
+   * Restores the provider after a call to {@link #disableProvider()}.
+   */
+  void enableProvider();
+  
+  /**
+   * @return the number of jobs which are currently being executed.
+   */
+  int getExecutingJobsCount();
 
   /**
    * 
@@ -168,6 +184,13 @@ public interface HistoryProvider {
    *          The listener to remove
    */
   void removeHistoryProviderListener(final HistoryProviderListener listener);
+  
+  /**
+   * Removes all progress which are 100 % finish. The progress given by
+   * {@link HistoryProviderListener#queryProgressChanged(double)} will by
+   * affected by this.
+   */
+  void resetProgress();
   
   /**
    * @return the time span which can be retrieved using this history provider.

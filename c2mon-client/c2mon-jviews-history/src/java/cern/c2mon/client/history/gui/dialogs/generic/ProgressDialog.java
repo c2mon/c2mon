@@ -22,11 +22,16 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Dialog.ModalityType;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -66,6 +71,15 @@ public class ProgressDialog {
   
   /** The current value of the progress bar */
   private Double progressBarPercent = null;
+  
+  /** The cancel button */
+  private final JButton cancelButton;
+  
+  /** The cancel delegate */
+  private ProgressDialogActionListener cancelDelegate;
+  
+  /** <code>true</code> when the user have pressed cancel */
+  private boolean isCanceling = false;
 
   /**
    * @param dialogTitle
@@ -74,6 +88,7 @@ public class ProgressDialog {
    *          The message to set for the dialog
    */
   public ProgressDialog(final String dialogTitle, final String message) {
+    this.cancelDelegate = null;
     // set up the progress indicator dialog
     progressBar = new JProgressBar();
     progressBar.setIndeterminate(true);
@@ -81,10 +96,29 @@ public class ProgressDialog {
     progressBar.setMinimum(0);
     messageLabel = new JLabel(message);
     statusLabel = new JLabel(" ");
-
+    
+    cancelButton = new JButton("Cancel");
+    cancelButton.setVisible(false);
+    cancelButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        cancel();
+      }
+    });
+    
     this.dialog = new JDialog();
+    this.dialog.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(final WindowEvent e) {
+        cancel();
+      }
+    });
     final JPanel progressPanel = new JPanel();
     final JPanel mainProgressPanel = new JPanel();
+    final JPanel southPanel = new JPanel(new BorderLayout(PANEL_MARGIN, PANEL_MARGIN));
+    
+    southPanel.add(cancelButton, BorderLayout.EAST);
+    
     mainProgressPanel.setLayout(new BorderLayout(PANEL_MARGIN, PANEL_MARGIN));
     mainProgressPanel.setBorder(BorderFactory.createEmptyBorder(PANEL_MARGIN, PANEL_MARGIN, PANEL_MARGIN, PANEL_MARGIN));
 
@@ -95,7 +129,8 @@ public class ProgressDialog {
     progressPanel.add(Box.createRigidArea(new Dimension(1, PANEL_MARGIN)));
     progressPanel.add(progressBar);
 
-    mainProgressPanel.add(progressPanel);
+    mainProgressPanel.add(progressPanel, BorderLayout.CENTER);
+    mainProgressPanel.add(southPanel, BorderLayout.SOUTH);
 
     this.dialog.setTitle(dialogTitle);
     this.dialog.setModalityType(ModalityType.APPLICATION_MODAL);
@@ -106,8 +141,45 @@ public class ProgressDialog {
     this.dialog.pack();
     //this.dialog.setLocation(500, 500);
     this.dialog.setLocationRelativeTo(null);
+    this.dialog.setAlwaysOnTop(true);
   }
-
+  
+  /**
+   * Notifies the listeners that the user wants to cancel the operation
+   */
+  private void cancel() {
+    final ProgressDialogActionListener delegate = getCancelDelegate();
+    
+    if (delegate != null && !isCanceling) {
+      isCanceling = true;
+      cancelButton.setText("Canceling...");
+      cancelButton.setEnabled(false);
+      setProgress(null);
+      
+      new Thread("Canceling-Progress-Thread") {
+        @Override
+        public void run() {
+          try {
+            delegate.onCancel(ProgressDialog.this);
+          }
+          finally {
+            cancelButton.setEnabled(true);
+            cancelButton.setText("Cancel");
+            isCanceling = false;
+          }
+        }
+      }.start();
+    }
+  }
+  
+  /**
+   * @param enable <code>true</code> to enable the cancel button.
+   */
+  public void setEnableCancelButton(final boolean enable) {
+    cancelButton.setVisible(enable);
+    this.dialog.pack();
+  }
+  
   /**
    * 
    * @param parent
@@ -127,7 +199,6 @@ public class ProgressDialog {
     new Thread("TIM-UI-Progress-Thread") {
       public void run() {
         startProgressBarUpdateThread();
-        
         dialog.setVisible(true);
       }
     }.start();
@@ -206,4 +277,20 @@ public class ProgressDialog {
     }
   }
 
+  /**
+   * @param delegate
+   *          the cancel delegate. The delegate should block until the
+   *          cancelling is finish.
+   */
+  public synchronized void setCancelDelegate(final ProgressDialogActionListener delegate) {
+    this.cancelDelegate = delegate;
+  }
+  
+  /**
+   * @return the cancel delegate
+   */
+  public synchronized ProgressDialogActionListener getCancelDelegate() {
+    return this.cancelDelegate;
+  }
+  
 }

@@ -137,12 +137,18 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
 
   @Override
   public void stopHistoryPlayerMode() {
-    synchronized (cache.getHistoryModeSyncLock()) {
-      if (this.historyPlayer != null) {
-        this.historyPlayer.deactivateHistoryPlayer();
+    if (cache.isHistoryModeEnabled()) {
+      if (historyPlayer != null) {
+        historyPlayer.stopLoading();
       }
+      
+      synchronized (cache.getHistoryModeSyncLock()) {
+        if (historyPlayer != null) {
+          historyPlayer.deactivateHistoryPlayer();
+        }
+      }
+      cache.setHistoryMode(false);
     }
-    cache.setHistoryMode(false);
   }
 
   @Override

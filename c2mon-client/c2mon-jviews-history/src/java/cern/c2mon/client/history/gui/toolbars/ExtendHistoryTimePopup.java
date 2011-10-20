@@ -47,6 +47,7 @@ import cern.c2mon.client.core.C2monHistoryManager;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.history.gui.components.TimeSpanChooser;
 import cern.c2mon.client.history.gui.components.event.TimeSpanChooserListener;
+import cern.c2mon.client.history.gui.dialogs.generic.ProgressDialog;
 
 /**
  * Popup for the user to extend the time periode for the history playback
@@ -198,35 +199,81 @@ public class ExtendHistoryTimePopup {
             JOptionPane.ERROR_MESSAGE);
       }
       else {
-        if (extendedTimespan.getStart().equals(historyPlayer.getStart())
-            && extendedTimespan.getEnd().compareTo(historyPlayer.getEnd()) >= 0) {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Extending the playback by telling the history player");
+        setTimespanChanged(false);
+        final boolean timeSpanChooserWereEnabled = timeSpanChooser.isEnabled();
+        timeSpanChooser.setEnabled(false);
+        final HistoryPlayer hp = historyPlayer;
+        new Thread("Extending-History-Thread") {
+          @Override
+          public void run() {
+            try {
+              extendHistoryTimeNoCheck(extendedTimespan, historyProvider, hp);
+            }
+            finally {
+              timeSpanChooser.setEnabled(timeSpanChooserWereEnabled);
+            }
           }
-          try {
-            historyPlayer.extendTimespan(extendedTimespan);
-          }
-          catch (IllegalTimespanException e) {
-            LOG.error("Couldn't expand the history playback time frame", e);
-            JOptionPane.showMessageDialog(null, 
-                "Failed to extend the history playback time frame. Please see the log for details.", 
-                "History Player Configurations", 
-                JOptionPane.ERROR_MESSAGE);
-          }
-        }
-        else {
-          if (LOG.isDebugEnabled()) {
-            LOG.debug("Stopping history mode");
-          }
-          historyManager.stopHistoryPlayerMode();
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Starting history mode with new timespan (%s)", extendedTimespan));
-          }
-          historyManager.startHistoryPlayerMode(historyProvider, extendedTimespan);
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("History mode is restarted with a new timespan (%s)", extendedTimespan));
-          }
-        }
+        }.start();
+      }
+    }
+  }
+
+  /**
+   * Extend the history time without checking that the timespan is valid first.
+   * 
+   * @param extendedTimespan
+   *          the extended timespan
+   * @param historyProvider
+   *          the history provider
+   * @param historyPlayer
+   *          the history player
+   */
+  private void extendHistoryTimeNoCheck(
+      final Timespan extendedTimespan, 
+      final HistoryProvider historyProvider,
+      final HistoryPlayer historyPlayer) {
+    
+    final ProgressDialog progress = new ProgressDialog(
+        "Changing time frame",
+        "Please wait while changing the history playback time frame");
+    progress.show();
+    
+    if (extendedTimespan.getStart().equals(historyPlayer.getStart())
+        && extendedTimespan.getEnd().compareTo(historyPlayer.getEnd()) >= 0) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Extending the playback by telling the history player");
+      }
+      progress.setStatus("Telling the history player");
+      try {
+        historyPlayer.extendTimespan(extendedTimespan);
+        progress.hide();
+      }
+      catch (IllegalTimespanException e) {
+        LOG.error("Couldn't expand the history playback time frame", e);
+        progress.hide();
+        JOptionPane.showMessageDialog(null, 
+            "Failed to extend the history playback time frame. Please see the log for details.", 
+            "History Player Configurations", 
+            JOptionPane.ERROR_MESSAGE);
+      }
+    }
+    else {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Stopping history mode");
+      }
+      progress.setStatus("Waiting for the history player to stop..");
+      try {
+        historyManager.stopHistoryPlayerMode();
+      }
+      finally {
+        progress.hide();
+      }
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(String.format("Starting history mode with new timespan (%s)", extendedTimespan));
+      }
+      historyManager.startHistoryPlayerMode(historyProvider, extendedTimespan);
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(String.format("History mode is restarted with a new timespan (%s)", extendedTimespan));
       }
     }
   }

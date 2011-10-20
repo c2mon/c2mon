@@ -133,7 +133,7 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
       try {
         final SavedHistoryMapper mapper = getSavedHistoryMapper(session);
         
-        while (!tagIdsToRequest.isEmpty()) {
+        while (!tagIdsToRequest.isEmpty() && !isProviderDisabled()) {
           final int toIndex;
           if (MAXIMUM_NUMBER_OF_TAGS_PER_QUERY <= tagIdsToRequest.size()) {
             toIndex = MAXIMUM_NUMBER_OF_TAGS_PER_QUERY;

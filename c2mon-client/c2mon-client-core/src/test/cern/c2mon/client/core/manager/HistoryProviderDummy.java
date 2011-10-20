@@ -95,4 +95,24 @@ public class HistoryProviderDummy implements HistoryProvider {
     return null;
   }
 
+  @Override
+  public void disableProvider() {
+    
+  }
+
+  @Override
+  public void enableProvider() {
+    
+  }
+
+  @Override
+  public int getExecutingJobsCount() {
+    return 0;
+  }
+
+  @Override
+  public void resetProgress() {
+    
+  }
+
 }

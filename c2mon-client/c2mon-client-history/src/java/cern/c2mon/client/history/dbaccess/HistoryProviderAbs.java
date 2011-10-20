@@ -18,9 +18,13 @@
 package cern.c2mon.client.history.dbaccess;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cern.c2mon.client.common.history.HistoryProvider;
@@ -34,6 +38,8 @@ import cern.c2mon.client.common.history.event.HistoryProviderListener;
  */
 abstract class HistoryProviderAbs implements HistoryProvider {
 
+  private static final Double PROGRESS_FINISH = 1.0; 
+  
   /** A list of the registered listeners */
   private final List<HistoryProviderListener> listeners;
 
@@ -48,6 +54,12 @@ abstract class HistoryProviderAbs implements HistoryProvider {
 
   /** A counter for creating unique identifiers */
   private volatile long uniqueIdentifier = 1L;
+  
+  /**
+   * <code>true</code> if the {@link HistoryProvider#disableProvider()} have
+   * been called
+   */
+  private boolean disableProvider = false;
   
   /**
    * Constructor
@@ -95,23 +107,27 @@ abstract class HistoryProviderAbs implements HistoryProvider {
   }
 
   /**
+   * <code>true</code> if the {@link #fireQueryStarting()} have been fired
+   * without {@link #fireQueryFinished(Object)} have been called
+   */
+  private AtomicBoolean queryStartedNotified = new AtomicBoolean(false);
+  
+  /**
    * Fires the queryStarting() method on all the listeners
    *
    * @return the identifier used for the rest of the calls
    */
   protected Object fireQueryStarting() {
     final Object queryId = Long.valueOf(uniqueIdentifier++);
-    int queriesCount;
     queriesLock.writeLock().lock();
     try {
       this.queries.put(queryId, 0.0);
-      queriesCount = queries.size();
     }
     finally {
       queriesLock.writeLock().unlock();
     }
     
-    if (queriesCount == 1) {
+    if (queryStartedNotified.compareAndSet(false, true)) {
       for (HistoryProviderListener listener : getHistoryProviderListeners()) {
         listener.queryStarting();
       }
@@ -128,24 +144,16 @@ abstract class HistoryProviderAbs implements HistoryProvider {
    *          an identifier for the query
    */
   protected void fireQueryFinished(final Object queryId) {
-    int queriesCount = 1;
     queriesLock.writeLock().lock();
     try {
       if (this.queries.remove(queryId) != null) {
-        queriesCount = this.queries.size(); 
+        this.queries.put(queryId, PROGRESS_FINISH);
       }
     }
     finally {
       queriesLock.writeLock().unlock();
     }
-    if (queriesCount == 0) {
-      for (HistoryProviderListener listener : getHistoryProviderListeners()) {
-        listener.queryFinished();
-      }
-    }
-    else {
-      fireQueryProgressChanged();
-    }
+    fireQueryProgressChanged();
   }
 
   /**
@@ -172,20 +180,96 @@ abstract class HistoryProviderAbs implements HistoryProvider {
    * the combined percentage of all the concurrent queries.
    */
   private void fireQueryProgressChanged() {
+    boolean allIsFinish = true;
+    
+    // Gets the percent
     double percent = 0.0;
     queriesLock.readLock().lock();
     try {
       final int numberOfQueries = this.queries.size();
       for (Double singlePercent : this.queries.values()) {
         percent += singlePercent / (double) numberOfQueries;
+        if (!singlePercent.equals(PROGRESS_FINISH)) {
+          allIsFinish = false;
+        }
       }
     }
     finally {
       queriesLock.readLock().unlock();
     }
     
+    if (percent > 1.0) {
+      percent = 1.0;
+    }
+    
     for (HistoryProviderListener listener : getHistoryProviderListeners()) {
       listener.queryProgressChanged(percent);
     }
+    
+    // Notifies listeners if all queries are finish
+    if (allIsFinish && queryStartedNotified.compareAndSet(true, false)) {
+      for (HistoryProviderListener listener : getHistoryProviderListeners()) {
+        listener.queryFinished();
+      }
+    }
   }
+  
+  /**
+   * 
+   * @return <code>true</code> if the {@link HistoryProvider#disableProvider()}
+   *         have been called
+   */
+  protected synchronized boolean isProviderDisabled() {
+    return disableProvider;
+  }
+  
+  @Override
+  public synchronized void disableProvider() {
+    disableProvider = true;
+  }
+
+  @Override
+  public synchronized void enableProvider() {
+    disableProvider = false;
+  }
+
+  @Override
+  public int getExecutingJobsCount() {
+    int numberOfJobs = 0;
+    final Collection<Double> percents;
+    queriesLock.readLock().lock();
+    try {
+      percents = new ArrayList<Double>(this.queries.values());
+    }
+    finally {
+      queriesLock.readLock().unlock();
+    }
+    for (Double percent : percents) {
+      if (percent < 1.0) {
+        numberOfJobs++;
+      }
+    }
+    return numberOfJobs;
+  }
+
+  @Override
+  public void resetProgress() {
+    queriesLock.readLock().lock();
+    try {
+      final Iterator<Entry<Object, Double>> iterator = this.queries.entrySet().iterator();
+      while (iterator.hasNext()) {
+        final Entry<Object, Double> entry = iterator.next();
+        if (entry.getValue().equals(PROGRESS_FINISH)) {
+          iterator.remove();
+        }
+      }
+    }
+    finally {
+      queriesLock.readLock().unlock();
+    }
+    fireQueryProgressChanged();
+  }
+  
+  
 }
+ 

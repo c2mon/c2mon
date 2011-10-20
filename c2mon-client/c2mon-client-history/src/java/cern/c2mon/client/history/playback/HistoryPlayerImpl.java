@@ -184,6 +184,18 @@ public class HistoryPlayerImpl
     });
   }
   
+  @Override
+  public void stopLoading() {
+    this.getPlaybackControl().pause();
+    
+    // Clears all the listeners
+    this.publisher.clearAll();
+    
+    if (this.historyLoader != null) {
+      this.historyLoader.stopAllLoading();
+    }
+  }
+  
   /**
    * Stops the history player, stops all buffering and clears all loaded data.
    */
@@ -196,12 +208,8 @@ public class HistoryPlayerImpl
     
     this.historyModeActive = false;
     
-    this.getPlaybackControl().pause();
+    stopLoading();
     
-    // Clears all the listeners
-    this.publisher.clearAll();
-    
-    this.historyLoader.stopLoading();
     this.historyLoader.clear();
     this.historyLoader.getHistoryStore().clear();
     this.historyScheduler.cancelAllScheduledEvents();
@@ -784,5 +792,4 @@ public class HistoryPlayerImpl
       }
     }.start();
   }
-  
 }

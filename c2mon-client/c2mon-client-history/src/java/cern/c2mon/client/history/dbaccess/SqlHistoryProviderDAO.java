@@ -209,7 +209,10 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
    * @return A collection of records that meets the condition of the parameters
    */
   private Collection<HistoryTagValueUpdate> getHistory(final ShortTermLogHistoryRequestBean providerRequest, final boolean maxRecordsIsPerTag) {
-
+    if (isProviderDisabled()) {
+      return new ArrayList<HistoryTagValueUpdate>();
+    }
+    
     // Tells the listeners that the query is starting
     final Object queryId = fireQueryStarting();
 
@@ -262,7 +265,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       final HistoryMapper historyMapper = getHistoryMapper(session);
 
       // Does the query / queries to the database
-      for (int i = 0; i < queryPlan.size() - 1; i++) {
+      for (int i = 0; i < queryPlan.size() - 1 && !isProviderDisabled(); i++) {
 
         // Gets the list of tags to query
         final Long[] tagIdsToQuery = Arrays.asList(providerRequest.getTagIds()).subList(queryPlan.get(i), queryPlan.get(i + 1)).toArray(new Long[0]);
@@ -291,6 +294,9 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
             catch (Exception e) {
               LOG.warn(
                   String.format("Failed to convert a bean into a %s", TagValueUpdate.class.getSimpleName()), e);
+            }
+            if (isProviderDisabled()) {
+              break;
             }
           }
         }
@@ -322,6 +328,10 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
    */
   @Override
   public Collection<HistoryTagValueUpdate> getInitialValuesForTags(final Long[] tagIds, final Timestamp before) {
+    if (isProviderDisabled()) {
+      return new ArrayList<HistoryTagValueUpdate>();
+    }
+    
     // Tells the listener that a query is starting
     final Object queryId = fireQueryStarting();
 
@@ -336,7 +346,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     final SqlSession session = this.sessionFactory.openSession();
     try {
       final HistoryMapper historyMapper = getHistoryMapper(session);
-      for (int i = 0; i < tagIds.length; i++) {
+      for (int i = 0; i < tagIds.length && !isProviderDisabled(); i++) {
         final Long tagId = tagIds[i];
         final HistoryRecordBean record = historyMapper.getInitialRecord(new InitialRecordHistoryRequestBean(tagId, before));
         if (record != null) {
@@ -350,8 +360,8 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
             LOG.warn(
                 String.format("Failed to convert a bean into a %s", TagValueUpdate.class.getSimpleName()), e);
           }
-          fireQueryProgressChanged(queryId, i / (double) tagIds.length);
         }
+        fireQueryProgressChanged(queryId, i / (double) tagIds.length);
       }
     }
     finally {
@@ -371,6 +381,10 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     // List for the result
     final ArrayList<HistoryTagValueUpdate> result = new ArrayList<HistoryTagValueUpdate>();
     
+    if (isProviderDisabled()) {
+      return result;
+    }
+    
     // Tells the listener that a query is starting
     final Object queryId = fireQueryStarting();
 
@@ -386,7 +400,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       final SqlSession session = this.sessionFactory.openSession();
       final List<HistoryRecordBean> allRecords = new ArrayList<HistoryRecordBean>();
       try {
-        while (requests.size() > 0) {
+        while (requests.size() > 0 && !isProviderDisabled()) {
           final HistoryMapper historyMapper = getHistoryMapper(session);
           int toIndex = MAXIMUM_NUMBER_OF_TAGS_PER_QUERY;
           if (toIndex > requests.size()) {
@@ -408,6 +422,9 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       
       // Converts the tags into TagValueUpdates
       for (final HistoryRecordBean bean : allRecords) {
+        if (isProviderDisabled()) {
+          break;
+        }
         try {
           final HistoryTagValueUpdate tagValueUpdate = BeanConverterUtil.toTagValueUpdate(bean, this.clientDataTagRequestCallback);
           if (tagValueUpdate != null) {
@@ -434,7 +451,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
   public Collection<HistorySupervisionEvent> getInitialSupervisionEvents(final Timestamp initializationTime, final Collection<SupervisionEventRequest> requests) {
     final List<HistorySupervisionEvent> result = new ArrayList<HistorySupervisionEvent>();
 
-    if (requests == null || requests.size() == 0) {
+    if (requests == null || requests.size() == 0 || isProviderDisabled()) {
       return result;
     }
 
@@ -449,6 +466,10 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       int progress = 0;
 
       for (final SupervisionEventRequest request : requests) {
+        if (isProviderDisabled()) {
+          break;
+        }
+        
         final Collection<SupervisionRecordBean> records = 
           historyMapper.getInitialSupervisionEvents(
               new SupervisionEventRequestBean(
@@ -501,7 +522,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
     final List<HistorySupervisionEvent> result = new ArrayList<HistorySupervisionEvent>();
 
-    if (requests == null || requests.size() == 0) {
+    if (requests == null || requests.size() == 0 || isProviderDisabled()) {
       return result;
     }
 
@@ -516,6 +537,9 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       int progress = 0;
 
       for (final SupervisionEventRequest request : requests) {
+        if (isProviderDisabled()) {
+          break;
+        }
         final Collection<SupervisionRecordBean> records = 
           historyMapper.getSupervisionEvents(
               new SupervisionEventRequestBean(

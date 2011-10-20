@@ -130,4 +130,12 @@ public interface HistoryPlayerCoreAccess extends HistoryPlayer, HistoryPlayerEve
    */
   boolean isHistoryPlayerActive();
 
+  /**
+   * Stops all loading. This will put the history player in an undefined state.
+   * The next call to the history player should be
+   * {@link #deactivateHistoryPlayer()}. Then the history player is ready to use
+   * again.
+   */
+  void stopLoading();
+  
 }
