@@ -13,6 +13,12 @@
   <!-- also needs alarm module -->
   <import resource="classpath:cern/tim/server/alarm/config/server-alarm.xml"/>
   
+  <bean id="configurationLoader" class="org.easymock.EasyMock" factory-method="createMock">
+  	<constructor-arg>
+  		<value>cern.c2mon.server.configuration.ConfigurationLoader</value>
+  	</constructor-arg>
+  </bean>
+  
   <!-- start module -->
   <import resource="classpath:cern/c2mon/server/client/config/server-client.xml"/>
   
