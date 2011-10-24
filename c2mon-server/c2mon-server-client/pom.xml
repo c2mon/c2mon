@@ -104,6 +104,7 @@
             -Djms.client.password=not-used           
             -Djms.client.supervision.topic=tim.client.supervision.test
             -Djms.client.request.queue=tim.client.request.test
+            -Dc2mon.jms.client.consumers.min=1
             -Dc2mon.jms.client.consumers.max=2            
             
             <!--

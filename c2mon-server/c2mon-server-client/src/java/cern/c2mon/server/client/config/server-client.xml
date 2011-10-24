@@ -97,7 +97,7 @@ Request from clients
       <property name="connectionFactory" ref="clientActiveMQConnectionFactory"/>
       <property name="destination" ref="clientRequestDestination"/>
       <property name="messageListener" ref="clientRequestHandler" />
-      <property name="concurrentConsumers" value="3"/>
+      <property name="concurrentConsumers" value="${c2mon.jms.client.consumers.min}"/>
       <property name="maxConcurrentConsumers" value="${c2mon.jms.client.consumers.max}"/> 
       <property name="maxMessagesPerTask" value="1"/>
       <property name="receiveTimeout" value="1000"/>
