@@ -46,4 +46,8 @@ public interface HistoryTagValueUpdate extends TagValueUpdate, HistoryUpdate {
    */
   Timestamp getDaqTimestamp();
 
+  /**
+   * @return <code>true</code> if the record is an initial value
+   */
+  boolean isInitialValue();
 }

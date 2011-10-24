@@ -212,6 +212,8 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
       Timestamp lastestTime = loadingEndTime;
       Timestamp earliestTime = loadingEndTime;
       
+      Timestamp earliestTimeWithData = loadingEndTime;
+      
       while (!maximumRecordsReached
           && !loadingTimesReached
           && !numberOfDaysReached
@@ -270,6 +272,12 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
             if (numberOfRecords != null) {
               numberOfRecords += result.size();
             }
+            
+            if (result.size() > 0) {
+              if (loadingStartTime.compareTo(earliestTimeWithData) < 0) {
+                earliestTimeWithData = loadingStartTime;
+              }
+            }
           }
         }
         if (numberOfDays != null) {
@@ -319,9 +327,13 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
         
         if (getConfiguration().isLoadInitialValues()) {
           // Gets initial records
-          addTagValueUpdates(historyProvider.getInitialValuesForTags(tags.keySet().toArray(new Long[0]), earliestTime));
+          addTagValueUpdates(historyProvider.getInitialValuesForTags(
+              tags.keySet().toArray(new Long[0]), 
+              earliestTimeWithData));
           
-          addSupervisionEvents(historyProvider.getInitialSupervisionEvents(earliestTime, supervisionRequests));
+          addSupervisionEvents(historyProvider.getInitialSupervisionEvents(
+              earliestTimeWithData, 
+              supervisionRequests));
         }
         
         // Loads the supervision events

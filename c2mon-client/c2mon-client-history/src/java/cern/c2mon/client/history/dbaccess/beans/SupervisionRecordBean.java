@@ -50,6 +50,9 @@ public class SupervisionRecordBean {
   /** The time zone that the dates have */
   private TimeZone timeZone;
 
+  /** <code>true</code> if the value is a initial value */
+  private boolean initialValue = false;
+  
   /**
    * 
    * @param entity
@@ -152,4 +155,14 @@ public class SupervisionRecordBean {
   public Long getId() {
     return id;
   }
+
+  public boolean isInitialValue() {
+    return initialValue;
+  }
+
+  public void setInitialValue(final boolean initialValue) {
+    this.initialValue = initialValue;
+  }
+  
+  
 }

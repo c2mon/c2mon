@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cern.c2mon.client.common.history.HistoryProvider;
+import cern.c2mon.client.common.history.HistorySupervisionEvent;
 import cern.c2mon.client.common.history.HistoryUpdate;
 import cern.c2mon.client.common.history.id.HistoryUpdateId;
 import cern.c2mon.client.history.updates.HistorySupervisionEventImpl;
@@ -65,8 +66,19 @@ public final class HistoryDataUtil {
       }
       else if (historyUpdate instanceof SupervisionEvent && historyUpdate.getDataId().isSupervisionEventId()) {
         final SupervisionEvent event = (SupervisionEvent) historyUpdate;
-        history.add(new HistorySupervisionEventImpl(
-            historyUpdate.getDataId().getSupervisionEventId(), event.getStatus(), event.getEventTime(), event.getMessage()));
+        final boolean initialValue;
+        if (event instanceof HistorySupervisionEvent) {
+          final HistorySupervisionEvent historySupervisionEvent = (HistorySupervisionEvent) event;
+          initialValue = historySupervisionEvent.isInitialValue();
+        }
+        else {
+          initialValue = false;
+        }
+        
+        final HistorySupervisionEventImpl historySupervisionEvent = new HistorySupervisionEventImpl(
+            historyUpdate.getDataId().getSupervisionEventId(), event.getStatus(), event.getEventTime(), event.getMessage());
+        historySupervisionEvent.setInitialValue(initialValue);
+        history.add(historySupervisionEvent);
       }
       else {
         throw new RuntimeException(String.format("The HistoryUpdate type is not supported (%s)", historyUpdate.getClass().getName()));

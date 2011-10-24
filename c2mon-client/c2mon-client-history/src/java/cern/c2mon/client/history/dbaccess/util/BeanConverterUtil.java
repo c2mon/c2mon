@@ -110,23 +110,28 @@ public final class BeanConverterUtil {
           mode);
     value.setDataType(bean.getTagDataType());
     value.setDaqTimestamp(bean.getDaqTime());
+    value.setInitialValue(bean.isFromInitialSnapshot());
     return value;
   }
-  
+
   /**
-   * Converts a {@link SupervisionRecordBean} object to a {@link SupervisionEvent}
+   * Converts a {@link SupervisionRecordBean} object to a
+   * {@link SupervisionEvent}
    * 
-   * @param bean the bean to convert
+   * @param bean
+   *          the bean to convert
    * @return the converted object
    */
   public static HistorySupervisionEvent toSupervisionEvent(final SupervisionRecordBean bean) {
     bean.convertIntoLocalTimeZone();
-    return new HistorySupervisionEventImpl(
+    HistorySupervisionEventImpl result = new HistorySupervisionEventImpl(
         bean.getEntity(), 
         bean.getId(), 
         bean.getStatus(), 
         bean.getDate(), 
         bean.getMessage());
+    result.setInitialValue(bean.isInitialValue());
+    return result;
   }
   
 

@@ -28,4 +28,10 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
  */
 public interface HistorySupervisionEvent extends SupervisionEvent, HistoryUpdate {
 
+  /**
+   * 
+   * @return <code>true</code> if the value is an initial value
+   */
+  boolean isInitialValue();
+
 }

@@ -234,6 +234,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
               clientDataTag.getDescription(), 
               clientDataTag.getAlarms().toArray(new AlarmValue[0]), 
               clientDataTag.getMode());
+          update.setInitialValue(historyTagValueUpdate.isInitialValue());
           update.setDataType(dataType);
           update.setDaqTimestamp(historyTagValueUpdate.getDaqTimestamp());
           result.add(update);
@@ -259,6 +260,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
                 clientDataTag.getDescription(), 
                 clientDataTag.getAlarms().toArray(new AlarmValue[0]), 
                 clientDataTag.getMode());
+            update.setInitialValue(historyEvent.isInitialValue());
             update.setDataType(dataType);
             result.add(update);
           }

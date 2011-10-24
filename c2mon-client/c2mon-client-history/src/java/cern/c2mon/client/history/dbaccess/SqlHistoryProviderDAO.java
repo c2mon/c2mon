@@ -481,6 +481,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
         // Adds the records from the query to the result, converted into
         // SupervisionEvent
         for (final SupervisionRecordBean record : records) {
+          record.setInitialValue(true);
           try {
             result.add(BeanConverterUtil.toSupervisionEvent(record));
           }

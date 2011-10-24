@@ -87,6 +87,9 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
   /** The daq time */
   private Timestamp daqTimestamp;
 
+  /** <code>true</code> if the value is an initial value */
+  private boolean initialValue = false;
+  
   /**
    * 
    * @param tagId
@@ -133,7 +136,6 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
   }
 
   /**
-   * 
    * @param tagId
    *          the tag identifier
    * @param dataTagQuality
@@ -176,7 +178,9 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
         tagValueUpdate.getAlarms().toArray(new AlarmValue[0]), 
         tagValueUpdate.getMode());
     if (tagValueUpdate instanceof HistoryTagValueUpdateImpl) {
-      this.dataType = ((HistoryTagValueUpdateImpl) tagValueUpdate).getDataType();
+      HistoryTagValueUpdateImpl historyTagValueUpdate = (HistoryTagValueUpdateImpl) tagValueUpdate;
+      this.dataType = historyTagValueUpdate.getDataType();
+      this.initialValue = historyTagValueUpdate.isInitialValue();
     }
   }
 
@@ -388,4 +392,19 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
     return this.description;
   }
 
+  @Override
+  public boolean isInitialValue() {
+    return initialValue;
+  }
+
+  /**
+   * 
+   * @param initialValue
+   *          <code>true</code> if the value is an initial value
+   */
+  public void setInitialValue(final boolean initialValue) {
+    this.initialValue = initialValue;
+  }
+
+  
 }

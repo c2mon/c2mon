@@ -44,6 +44,9 @@ public class HistorySupervisionEventImpl implements HistorySupervisionEvent {
   /** Free text for describing this event */
   private final String message;
   
+  /** <code>true</code> if the value is an initial value */
+  private boolean initialValue = false;
+  
   /**
    * Constructor.
    * 
@@ -125,7 +128,9 @@ public class HistorySupervisionEventImpl implements HistorySupervisionEvent {
    */
   @Override
   public SupervisionEvent clone() {
-    return new HistorySupervisionEventImpl(id.getEntity(), id.getEntityId(), status, eventTime, message);
+    final HistorySupervisionEventImpl clone = new HistorySupervisionEventImpl(id.getEntity(), id.getEntityId(), status, eventTime, message);
+    clone.initialValue = initialValue;
+    return clone;
   }
 
   /**
@@ -139,6 +144,22 @@ public class HistorySupervisionEventImpl implements HistorySupervisionEvent {
   @Override
   public SupervisionEventId getDataId() {
     return this.id;
+  }
+
+  /**
+   * 
+   * @return <code>true</code> if the value is an initial value
+   */
+  @Override
+  public boolean isInitialValue() {
+    return initialValue;
+  }
+  
+  /**
+   * @param initialValue <code>true</code> if the value is an initial value
+   */
+  public void setInitialValue(final boolean initialValue) {
+    this.initialValue = initialValue;
   }
 
   @Override
