@@ -274,14 +274,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     CommandTagCacheObject cacheObject = (CommandTagCacheObject) commandTagCache.get(10000L);
     
     CommandTagCacheObject expectedObject = new CommandTagCacheObject(10000L, "Test CommandTag", "test description", "String", DataTagConstants.MODE_TEST);
-    expectedObject.setAuthorizedHostsPattern("*");
-    expectedObject.setAuthorizedRolesString("ADMIN;TI_OPERATION");
+    //expectedObject.setAuthorizedHostsPattern("*");    
     expectedObject.setEquipmentId(150L);
     expectedObject.setClientTimeout(30000);
     expectedObject.setExecTimeout(6000);
     expectedObject.setSourceRetries(2);
     expectedObject.setSourceTimeout(200);
-    expectedObject.setHwAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));
+    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObject);
    
     //test update
@@ -292,9 +291,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     CommandTagCacheObject cacheObjectUpdated = (CommandTagCacheObject) commandTagCache.get(10000L);
         
     expectedObject.setName("Test CommandTag Updated");
-    expectedObject.setAuthorizedHostsPattern("tcp*");
-    expectedObject.setAuthorizedRolesString("ADMIN");    
-    expectedObject.setHwAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>"));
+    //expectedObject.setAuthorizedHostsPattern("tcp*");       
+    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>"));
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObjectUpdated);
    
     //test remove

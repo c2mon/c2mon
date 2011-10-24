@@ -72,9 +72,7 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getDescription(), object.getDescription());
     assertEquals(expectedObject.getMode(), object.getMode());
     assertEquals(expectedObject.getDataType(), object.getDataType());
-    assertEquals(expectedObject.getAuthorizedHostsPattern(), object.getAuthorizedHostsPattern());
-    assertNotNull(object.getAuthorizedHosts());
-    assertEquals(expectedObject.getAuthorizedRoles(), object.getAuthorizedRoles());
+    assertEquals(expectedObject.getAuthorizationDetails(), object.getAuthorizationDetails());    
     assertEquals(expectedObject.getSourceRetries(), object.getSourceRetries());
     assertEquals(expectedObject.getSourceTimeout(), object.getSourceTimeout());
     assertEquals(expectedObject.getExecTimeout(), object.getExecTimeout());
