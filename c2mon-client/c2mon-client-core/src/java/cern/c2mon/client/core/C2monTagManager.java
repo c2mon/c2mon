@@ -24,6 +24,9 @@ import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagConfig;
+import cern.tim.shared.client.command.CommandReport;
+import cern.tim.shared.client.command.CommandTagHandle;
+import cern.tim.shared.client.command.CommandTagHandleImpl;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
@@ -93,7 +96,7 @@ public interface C2monTagManager {
    * @param tagIds A collection of data tag id's
    * @return A collection of all <code>ClientDataTag</code> objects
    */
-  Collection<ClientDataTagValue> getDataTags(Collection<Long> tagIds);
+  Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds);
   
   /**
    * Returns a TagConfiguration object for every valid id on the list.
@@ -104,7 +107,7 @@ public interface C2monTagManager {
    * @param tagIds A collection of data tag id's
    * @return A collection of all <code>TagConfiguration</code> objects
    */  
-  Collection<TagConfig> getTagConfigurations(Collection<Long> tagIds);
+  Collection<TagConfig> getTagConfigurations(final Collection<Long> tagIds);
   
   /**
    * Returns an {@link AlarmValue} object for every valid id on the list.
@@ -115,19 +118,39 @@ public interface C2monTagManager {
    * @param alarmIds A collection of alarm id's
    * @return A collection of all <code>AlarmValue</code> objects
    */  
-  Collection<AlarmValue> getAlarms(Collection<Long> alarmIds);
+  Collection<AlarmValue> getAlarms(final Collection<Long> alarmIds);
   
   
   /**
-   * Returns a Configuration Report object for the requested configurationId.
+   * Applies the confifuration and returns a Configuration Report.
    * The values are fetched from the server.
-   * However, in case of a connection error or an unknown tag id the corresponding
+   * However, in case of a connection error or an unknown configuration Id the corresponding
    * tag might be missing.
    * 
    * @param configurationId The configuration id used to fetch the Configuration Report object
    * @return A Configuration Report object
    */  
-  ConfigurationReport applyConfiguration(Long configurationId);
+  ConfigurationReport applyConfiguration(final Long configurationId);
+  
+  /**
+   * Returns an {@link CommandTagHandle} object for every valid id on the list.
+   * However, in case of a connection error or an unknown command id the corresponding
+   * command handle might be missing.
+   * 
+   * @param commandIds A collection of command id's
+   * @return A collection of all <code>CommandTagHandle</code> objects
+   */  
+  Collection<CommandTagHandle> getCommandTagHandles(final Collection<Long> commandIds);
+  
+  /**
+   * Executes the command and returns a {@link CommandReport} object.
+   * However, in case of a connection error or an unknown command id the corresponding
+   * command handle might be missing.
+   * 
+   * @param handle the handle to execute the command
+   * @return the report on the success/failure of the execution
+   */  
+  public CommandReport executeCommand(final CommandTagHandleImpl handle);
   
   /**
    * Returns the number of connections in the Cache
