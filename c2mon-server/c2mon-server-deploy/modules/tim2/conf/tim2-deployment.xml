@@ -39,6 +39,9 @@
           <property name="com.sun.management.jmxremote.ssl"
             value="false" />
           <property name="c2mon.home" value="$INSTALL_DIR" />
+          <!--  LASER TEST ENVIRONMENT -->
+          <property name="laser.hosts" value="laser-test" />
+          <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
           <preExec>
 					<![CDATA[
 		
