@@ -84,6 +84,13 @@
       <artifactId>tim2-server-daqcommunication-out</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>cern.tim2.tim2-server</groupId>
+    	<artifactId>tim2-server-command</artifactId>
+    	<version>1.0.1-SNAPSHOT</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <developers />

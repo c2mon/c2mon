@@ -34,9 +34,12 @@ import cern.tim.server.cache.ProcessXMLProvider;
 import cern.tim.server.cache.TagFacadeGateway;
 import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.cache.exception.CacheElementNotFoundException;
+import cern.tim.server.command.CommandExecutionManager;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.supervision.SupervisionFacade;
+import cern.tim.shared.client.command.CommandReport;
+import cern.tim.shared.client.command.CommandTagHandle;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 import cern.tim.util.json.GsonFactory;
 
@@ -67,6 +70,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /** Reference to the ConfigurationLoader */
   private final ConfigurationLoader configurationLoader;
+  
+  /** Reference to the CommandExecutionManager */
+  private final CommandExecutionManager commandExecutionManager;
 
   /** Reference to the supervision facade service for handling the supervision request */
   private final SupervisionFacade supervisionFacade;
@@ -90,6 +96,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @param pProcessXMLProvider Ref to the process XML provider bean
    * @param pAlarmCache Reference to the AlarmCache
    * @param pConfigurationLoader Reference to the ConfigurationLoader
+   * @param pCommandExecutionManager Reference to the CommandExecutionManager
    */
   @Autowired
   public ClientRequestHandler(final TagLocationService pTagLocationService, 
@@ -97,13 +104,15 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       final SupervisionFacade pSupervisionFacade,
       final ProcessXMLProvider pProcessXMLProvider,
       final AlarmCache pAlarmCache,
-      final ConfigurationLoader pConfigurationLoader) {
+      final ConfigurationLoader pConfigurationLoader,
+      final CommandExecutionManager pCommandExecutionManager) {
     tagLocationService = pTagLocationService;
     tagFacadeGateway = pTagFacadeGateway;
     supervisionFacade = pSupervisionFacade;
     processXMLProvider = pProcessXMLProvider;
     alarmCache = pAlarmCache;
     configurationLoader = pConfigurationLoader;
+    commandExecutionManager = pCommandExecutionManager;
   }
 
   /**
@@ -151,7 +160,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
 
   /**
-   * Inner method for handling the tag request. Therefore it has to get for all tag ids
+   * Inner method for handling requests. Therefore it has to get for all tag ids
    * mentioned in that request the tag and alarm referenses. 
    * @param clientRequest The request
    * @return The response that shall be transfered back to the C2MON client layer
@@ -186,12 +195,22 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
           LOG.debug("handleClientRequest() - Received a client request for the current supervision status.");
         }
         return supervisionFacade.getAllSupervisionStates();
+      case COMMAND_HANDLE_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " command handles.");
+        }
+        return handleCommandHandleRequest(clientRequest);
+      case EXECUTE_COMMAND_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " command handles.");
+        }
+        return handleExecuteCommandRequest(clientRequest);
       case DAQ_XML_REQUEST:
         LOG.debug("handleClientRequest() - Received a client request for a Process configuration XML");
         Collection<ProcessXmlResponse> singleXML = new ArrayList<ProcessXmlResponse>(1);
         ProcessXmlResponseImpl processXmlResponse = new ProcessXmlResponseImpl();
         try {
-          String xmlString = processXMLProvider.getProcessConfigXML(clientRequest.getRequestParameter());
+          String xmlString = processXMLProvider.getProcessConfigXML((String) clientRequest.getRequestParameter());
           processXmlResponse.setProcessXML(xmlString);
         } catch (CacheElementNotFoundException cacheEx) {
           String errorMessage = "Requested process not found.";
@@ -211,6 +230,18 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       LOG.warn("castLongToInt() - unsafe cast of long " + l + " to int");
     }
     return (int) l;
+  }
+  
+  private Collection<? extends ClientRequestResult> handleCommandHandleRequest(final ClientRequest commandRequest) {
+    
+      switch (commandRequest.getResultType()) {
+        case TRANSFER_COMMAND_HANDLES_LIST: 
+          return commandExecutionManager.processRequest(commandRequest.getTagIds());
+        default:
+          LOG.error("handleCommandHandleRequest() - Could not generate response message. Unknown enum ResultType "
+              + commandRequest.getResultType());
+      }
+      return null;
   }
 
   /**
@@ -241,6 +272,19 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
     return reports;
   }   
+  
+  /**
+   * Inner method which handles the Execute Command Request
+   * @param executeCommandRequest The command request send from the client
+   * @return A command report
+   */
+  @SuppressWarnings("unchecked")
+  private Collection< ? extends ClientRequestResult> handleExecuteCommandRequest(final ClientRequest executeCommandRequest) {
+    
+    final Collection commandReports = new ArrayList(1);
+    commandReports.add(commandExecutionManager.execute((CommandTagHandle) executeCommandRequest.getObjectParameter()));
+    return commandReports;
+  }
 
   /**
    * Inner method which handles the Tag Configuration Requests

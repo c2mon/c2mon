@@ -2,6 +2,7 @@ package cern.c2mon.server.client.request;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.ObjectMessage;
 import javax.jms.TextMessage;
 
 import org.apache.log4j.Logger;
@@ -39,10 +40,12 @@ abstract class ClientRequestMessageConverter {
    * @throws MessageConversionException In case of problems while deserializing the JMS message
    */
   public static final ClientRequest fromMessage(final Message message) throws JMSException, MessageConversionException {
+    
     if (message instanceof TextMessage) {
       String json = ((TextMessage) message).getText();
       try {
         return ClientRequestImpl.fromJson(json);
+       
       }
       catch (JsonSyntaxException jse) {
         StringBuffer str = new StringBuffer("fromMessage() : Unsupported JSON message (");
@@ -51,7 +54,18 @@ abstract class ClientRequestMessageConverter {
         LOG.error(str); 
         throw new MessageConversionException("Unsupported JSON message received on tag request connection.");
       }   
-    } else {
+    } 
+    
+    else if (message instanceof ObjectMessage) { 
+      
+      ObjectMessage oMessage = (ObjectMessage) message;
+      
+      Object object = oMessage.getObject(); 
+      
+      return ClientRequestImpl.fromObject(object);
+    }
+    
+    else {
       StringBuffer str = new StringBuffer("fromMessage() : Unsupported message type(");
       str.append(message.getClass().getName());
       str.append(") : Message discarded.");
