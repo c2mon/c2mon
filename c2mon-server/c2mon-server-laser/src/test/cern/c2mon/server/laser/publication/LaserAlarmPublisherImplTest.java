@@ -83,6 +83,7 @@ public class LaserAlarmPublisherImplTest {
 		//expectLastCall().once();
 		
 		Alarm alarmMock = mockControl.createMock(Alarm.class);
+		expect(alarmMock.isActive()).andReturn(Boolean.FALSE);
 		expect(alarmMock.getFaultCode()).andReturn(1).anyTimes();
 		expect(alarmMock.getFaultFamily()).andReturn("TESTALARM").anyTimes();
 		expect(alarmMock.getFaultMember()).andReturn("TEST-MEMBER").anyTimes();
