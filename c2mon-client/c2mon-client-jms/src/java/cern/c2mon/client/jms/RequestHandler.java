@@ -27,7 +27,9 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.tim.shared.client.command.CommandReport;
 import cern.tim.shared.client.command.CommandTagHandle;
+import cern.tim.shared.client.command.CommandTagHandleImpl;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
@@ -118,11 +120,17 @@ public interface RequestHandler {
   Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException;
   
   /**
-   * Not implemented yet: can remove the CommandTagHandle completely when using RBAC?
    * @param commandIds
    * @return
    */
-  Collection<CommandTagHandle> getCommandTagHandles(Collection<Long> commandIds);
+  Collection<CommandTagHandle> requestCommandTagHandles(Collection<Long> commandIds);
+  
+  /**
+   * @param 
+   * @return
+   * @throws JMSException 
+   */
+  <T> CommandReport executeCommand(CommandTagHandle<T> handle) throws JMSException;
 
   /**
    * Requests the DAQ config XML for a given process. Never returns null.

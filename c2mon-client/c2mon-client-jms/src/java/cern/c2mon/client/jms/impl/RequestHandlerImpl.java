@@ -44,7 +44,9 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.tim.shared.client.command.CommandReport;
 import cern.tim.shared.client.command.CommandTagHandle;
+import cern.tim.shared.client.command.CommandTagHandleImpl;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
@@ -121,11 +123,7 @@ public class RequestHandlerImpl implements RequestHandler {
     this.jmsProxy = jmsProxy;
     executor.allowCoreThreadTimeOut(true);
   }
-
-  @Override
-  public Collection<CommandTagHandle> getCommandTagHandles(final Collection<Long> commandIds) {
-    throw new UnsupportedOperationException("Not implemented yet!");
-  }
+  
 
   @Override
   public Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException {
@@ -148,7 +146,15 @@ public class RequestHandlerImpl implements RequestHandler {
     }
     return executeRequest(alarmIds, AlarmValue.class);
   }
-
+  
+  @Override
+  public Collection<CommandTagHandle> requestCommandTagHandles(final Collection<Long> commandIds) {
+    if (commandIds == null) {
+      throw new NullPointerException("requestTags(..) method called with null parameter.");
+    }
+    return executeRequest(commandIds, CommandTagHandle.class);
+  }
+  
   @Override
   public ConfigurationReport applyConfiguration(final Long configurationId) {
     ArrayList<Long> ids = new ArrayList<Long>();
@@ -263,6 +269,17 @@ public class RequestHandlerImpl implements RequestHandler {
     } else {
       throw new RuntimeException(response.getErrorMessage());
     }
+  }
+  
+  public CommandReport executeCommand(final CommandTagHandle handle) throws JMSException {
+    
+    ClientRequestImpl clientRequest = new ClientRequestImpl(CommandReport.class);
+    clientRequest.setObjectParameter(handle);
+    
+    Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
+    CommandReport report = c.iterator().next();
+    
+    return report;
   }
 
   /**

@@ -35,6 +35,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 import javax.jms.TextMessage;
@@ -54,6 +55,8 @@ import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
+import cern.tim.shared.client.command.CommandTagHandle;
+import cern.tim.shared.client.command.CommandTagHandleImpl;
 
 /**
  * Implementation of the JmsProxy singleton bean. Also see the interface
@@ -454,7 +457,23 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (connected) {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
       try {
-        TextMessage message = session.createTextMessage(jsonRequest.toJson());
+        
+        Message message = null ;
+        
+        if (jsonRequest.isObjectRequest()) { // used for EXECUTE_COMMAND_REQUESTS
+          
+          // send only the object
+          CommandTagHandleImpl o = (CommandTagHandleImpl) jsonRequest.getObjectParameter();
+          message = session.createObjectMessage(o);
+
+        }
+        else { // used for all other request types
+          
+          // send the Client Request as a Json Text Message
+          message = session.createTextMessage(jsonRequest.toJson());
+        }
+        
+        
         TemporaryQueue replyQueue = session.createTemporaryQueue();        
         MessageConsumer consumer = session.createConsumer(replyQueue);
         try {
@@ -468,7 +487,17 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
             LOGGER.error("No reply received from server on ClientRequest.");          
             throw new RuntimeException("No reply received from server - possible timeout?");
           }
-          return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText()); 
+          
+          if (replyMessage instanceof ObjectMessage) {
+            
+            return (Collection<T>)((ObjectMessage) replyMessage).getObject() ;
+          
+          }
+          
+          else // replyMessage is an instanceof TextMessage
+
+            return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText()); 
+          
         } finally {
           if (consumer != null) {
             consumer.close();
