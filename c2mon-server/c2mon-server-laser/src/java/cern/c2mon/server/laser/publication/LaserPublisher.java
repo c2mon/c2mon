@@ -1,6 +1,7 @@
 package cern.c2mon.server.laser.publication;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -14,12 +15,6 @@ import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterfaceFactory;
 import cern.laser.source.alarmsysteminterface.FaultState;
-//import cern.laser.source.ext.AlarmInstance;
-//import cern.laser.source.ext.AlarmInstanceBuilder;
-//import cern.laser.source.ext.AlarmInstanceManager;
-//import cern.laser.source.ext.AlarmSourceFactory;
-//import cern.laser.source.ext.AlarmSourceManager;
-//import cern.laser.source.ext.impl.FaultStateEncoder;
 import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.cache.TimCacheListener;
 import cern.tim.server.common.alarm.Alarm;
@@ -30,7 +25,7 @@ import cern.tim.server.common.config.ServerConstants;
  */
 // starts as singleton bean in Spring context
 @Service
-public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle {
+public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean {
 
 	/**
 	 * The alarm source name this publisher is called.
@@ -57,6 +52,10 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle {
 	 */
 	private CacheRegistrationService cacheRegistrationService;
 
+	/**
+	 */
+	private StatisticsModule stats = new StatisticsModule();
+	
 	/**
 	 * Autowired constructor.
 	 * 
@@ -96,11 +95,6 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle {
 	@PostConstruct
 	public void init() throws Exception {
 		cacheRegistrationService.registerToAlarms(this);
-//		sourceManager = AlarmSourceFactory.getSourceManager();
-//		sourceManager.setEnabled(true);
-//		sourceManager.setSourceName(getSourceName());
-//		sourceManager.init();
-
 		asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
 	}
 
@@ -108,7 +102,9 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle {
 	public void notifyElementUpdated(Alarm cacheable) {
 
 		FaultState fs = null;
-		fs = AlarmSystemInterfaceFactory.createFaultState(cacheable.getFaultFamily(), cacheable.getFaultMember(), cacheable.getFaultCode()); 
+		fs = AlarmSystemInterfaceFactory.createFaultState(cacheable.getFaultFamily(), cacheable.getFaultMember(), cacheable.getFaultCode());
+	
+		stats.update(cacheable);
 		
 		if (cacheable.isActive()){
 			fs.setDescriptor(cacheable.getState());
@@ -205,6 +201,35 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle {
 	@Override
 	public int getPhase() {
 		return ServerConstants.PHASE_STOP_LAST;
+	}
+
+	@Override
+	public long getProcessedAlarms() {
+		return stats.getTotalProcessed();
+	}
+
+	@Override
+	public void resetStatistics() {
+		stats.resetStatistics();	
+	}
+
+	@Override
+	public void resetStatistics(String alarmID) {
+		stats.resetStatistics(alarmID);
+	}
+
+	@Override
+	public List<String> getRegisteredAlarms() {
+		return stats.getStatsList();
+	}
+
+	@Override
+	public String getStatsForAlarm(String id) {
+		if (stats.getStatsForAlarm(id) == null){
+			return "Not found!";
+		}else {
+			return stats.getStatsForAlarm(id).toString();
+		}
 	}
 
 }
