@@ -1,10 +1,18 @@
 package cern.c2mon.server.laser.publication;
 
+import java.lang.management.ManagementFactory;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +74,14 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 	public LaserPublisher(final CacheRegistrationService cacheRegistrationService) {
 		super();
 		this.cacheRegistrationService = cacheRegistrationService;
-
+		MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+		try {
+			StandardMBean mbean = new StandardMBean(this, LaserPublisherMBean.class);
+			server.registerMBean(mbean, new ObjectName("cern.c2mon:type=LaserPublisher,name=" + LaserPublisher.class.getName()));
+		} catch (Exception e) {
+			log.error("Can't register for JMX : " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	/**
