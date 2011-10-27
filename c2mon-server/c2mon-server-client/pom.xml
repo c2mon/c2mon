@@ -87,8 +87,8 @@
     <dependency>
     	<groupId>cern.tim2.tim2-server</groupId>
     	<artifactId>tim2-server-command</artifactId>
-    	<version>1.0.1-SNAPSHOT</version>
-    	<type>jar</type>
+    	<version>1.0.1-20110519.092359-1</version>
+    	<type>pom</type>
     	<scope>compile</scope>
     </dependency>
   </dependencies>
