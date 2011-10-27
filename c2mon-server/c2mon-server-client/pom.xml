@@ -86,10 +86,7 @@
     </dependency>
     <dependency>
     	<groupId>cern.tim2.tim2-server</groupId>
-    	<artifactId>tim2-server-command</artifactId>
-    	<version>1.0.1-20110519.092359-1</version>
-    	<type>pom</type>
-    	<scope>compile</scope>
+    	<artifactId>tim2-server-command</artifactId>    	
     </dependency>
   </dependencies>
 
