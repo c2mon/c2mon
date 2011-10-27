@@ -292,23 +292,6 @@ public class TagManager implements CoreTagManager {
     }
     return new ArrayList<AlarmValue>();
   }
-  
-  @Override
-  public Collection<CommandTagHandle> getCommandTagHandles(final Collection<Long> commandIds) {
-
-    return clientRequestHandler.requestCommandTagHandles(commandIds);
-  }  
-  
-  @Override
-  public CommandReport executeCommand(final CommandTagHandleImpl handle) {
-
-    try {
-      return clientRequestHandler.executeCommand(handle);
-    } catch (JMSException e) {
-      LOG.error("getAlarms() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
-    }
-    return null;
-  }    
 
   @Override
   public ConfigurationReport applyConfiguration(Long configurationId) {
