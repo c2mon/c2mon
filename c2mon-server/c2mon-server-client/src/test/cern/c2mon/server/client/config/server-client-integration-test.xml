@@ -19,6 +19,13 @@
   	</constructor-arg>
   </bean>
   
+  
+    <bean id="commandExecutionManager" class="org.easymock.EasyMock" factory-method="createMock">
+  	<constructor-arg>
+  		<value>cern.tim.server.command.CommandExecutionManager</value>
+  	</constructor-arg>
+  </bean>
+  
   <!-- start module -->
   <import resource="classpath:cern/c2mon/server/client/config/server-client.xml"/>
   
