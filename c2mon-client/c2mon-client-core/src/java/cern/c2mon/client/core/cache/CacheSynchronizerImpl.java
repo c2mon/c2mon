@@ -289,8 +289,22 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         }
 
         // Set all tags to unknown which were not returned by the C2MON server
+        // Please note that we do not touch at this point the history cache.
         for (Long tagId : unsynchronizedTagIds) {
-          liveCache.get(tagId).getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
+          final ClientDataTagImpl liveTag = liveCache.get(tagId);
+          if (liveTag.getDataTagQuality().isExistingTag()) {
+            try {
+              jmsProxy.unregisterUpdateListener(liveTag);
+            }
+            catch (Exception e) {
+              LOG.warn("removeTags() - Could not unregister tag " + tagId + " from JmsProxy. Reason: " + e.getMessage());
+            }
+            supervisionManager.removeSupervisionListener(liveTag);
+            final ClientDataTagImpl unkownTag = new ClientDataTagImpl(tagId);
+            unkownTag.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
+            unkownTag.addUpdateListeners(liveTag.getUpdateListeners());
+            liveCache.put(tagId, unkownTag);
+          }
         }
         
         synchronizeCacheValues(newKnownTags);

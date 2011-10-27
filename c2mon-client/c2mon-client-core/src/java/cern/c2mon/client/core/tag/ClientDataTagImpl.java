@@ -76,7 +76,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private static final String DEFAULT_DESCRIPTION = "Tag not initialised.";
   
   /** The value of the tag */
-  @Element(required=false)
+  @Element(required = false)
   private Object tagValue;
   
   /** The current tag mode */
@@ -706,7 +706,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       updateTagLock.writeLock().unlock();
     }
   }
-  
+
   /**
    * Inner method for updating the process status of this tag and
    * computing the error message, if one of the linked processes is down.
@@ -985,18 +985,21 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
   @Override
   public void clean() {
-    this.alarms.clear();
-    this.description = DEFAULT_DESCRIPTION;
-    this.tagQuality.setInvalidStatus(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
-    this.serverTimestamp = new Timestamp(0L);
-    this.sourceTimestamp = null;
-    this.tagValue = null;
-    for (Long id : processSupervisionStatus.keySet()) {
-      processSupervisionStatus.put(id, null);
-    }
-    for (Long id : equipmentSupervisionStatus.keySet()) {
-      equipmentSupervisionStatus.put(id, null);
-    }
+    updateTagLock.writeLock().lock();
+    try {
+      this.alarms.clear();
+      this.description = DEFAULT_DESCRIPTION;
+      this.tagQuality.setInvalidStatus(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
+      this.serverTimestamp = new Timestamp(0L);
+      this.sourceTimestamp = null;
+      this.tagValue = null;
+      for (Long id : processSupervisionStatus.keySet()) {
+        processSupervisionStatus.put(id, null);
+      }
+      for (Long id : equipmentSupervisionStatus.keySet()) {
+        equipmentSupervisionStatus.put(id, null);
+      }
+    } finally { updateTagLock.writeLock().unlock(); }
   }
 
   @Override
