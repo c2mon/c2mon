@@ -61,7 +61,6 @@ public final class OPCDCOMFactory implements IDCOMErrorConstants {
         IOPCGroup group = opcGroups.add(groupName);
         group.setDeadBand(valueDeadband);
         group.setUpdateRate(updateRate);
-        group.setTimeBias(1000 * 60 * 60 * 2);
         return group;
     }
 
