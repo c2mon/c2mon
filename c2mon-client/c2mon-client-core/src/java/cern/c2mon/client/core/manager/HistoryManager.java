@@ -244,8 +244,13 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
 //              clientDataTag.getSubEquipmentIds());
       }
       
-      // Begins the loading process
-      this.historyPlayer.beginLoading();
+      new Thread("History-Player-Begin-Loading-Thread") {
+        @Override
+        public void run() {
+          // Begins the loading process
+          historyPlayer.beginLoading();
+        }
+      }.start();
     }
   }
 
