@@ -469,12 +469,6 @@ public class HistoryManagerTest {
     
     historyManager.onNewTagSubscriptions(new HashSet<Long>(secondInitialTagIds));
     
-    // Checks that it asked for the correct tag ids from the cache.get(Set<Long>)
-    final Collection<Long> cacheGetParameterValues = Arrays.asList(initalRecordRequest.getValue());
-    Assert.assertTrue("When requesting the new client data tags from the cache, it didn't ask for the expected list of tag ids.",
-        cacheGetParameterValues.containsAll(secondInitialTagIds)
-        && secondInitialTagIds.containsAll(cacheGetParameterValues));
-    
     // Wait for the loading to finish
     if (LOADING_TIMEOUT != null) {
       timeout = System.currentTimeMillis() + LOADING_TIMEOUT;
@@ -488,6 +482,12 @@ public class HistoryManagerTest {
     }
     
     Assert.assertTrue("The history is not fully loaded..", historyPlayer.getHistoryLoadedUntil().compareTo(historyPlayer.getEnd()) >= 0);
+    
+    // Checks that it asked for the correct tag ids from the cache.get(Set<Long>)
+    final Collection<Long> cacheGetParameterValues = Arrays.asList(initalRecordRequest.getValue());
+    Assert.assertTrue("When requesting the new client data tags from the cache, it didn't ask for the expected list of tag ids.",
+        cacheGetParameterValues.containsAll(secondInitialTagIds)
+        && secondInitialTagIds.containsAll(cacheGetParameterValues));
     
     // Phase 3
     // Unsubscribe from data tags
