@@ -535,11 +535,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
               startReconnectThread();            
             } finally {
               sessions.remove(wrapper);            
-              topicToWrapper.remove(subsribedToTag.getTopicName());
-              registeredListeners.remove(serverUpdateListener);
-              listenerLocks.remove(serverUpdateListener);
+              topicToWrapper.remove(subsribedToTag.getTopicName());              
             }
           }
+          registeredListeners.remove(serverUpdateListener);
+          listenerLocks.remove(serverUpdateListener);
         } 
       } finally {
         listenerLock.unlock();
