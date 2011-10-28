@@ -1,5 +1,7 @@
 package cern.c2mon.driver.opcua;
 
+import java.util.Date;
+
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpointListener;
 import cern.tim.driver.common.EquipmentLogger;
 import cern.tim.driver.tools.TIMDriverSimpleTypeConverter;
@@ -53,7 +55,7 @@ public class EndpointEquipmentLogListener implements IOPCEndpointListener {
             logger.debug("Original value: '" + (tagValue != null ? tagValue.toString() : "null") + "', Tag type: '" + dataTag.getDataType() + "', Original type: '"
                     + (tagValue != null ? tagValue.getClass().getSimpleName() : "null") + "'");
             logger.debug("New tag value (ID: '" + dataTag.getId() + "'," + " converted value: '" + convertedValue + "', converted type: '"
-                    + (convertedValue != null ? convertedValue.getClass().getSimpleName() : "null") + "', Timestamp: '" + timestamp + "').");
+                    + (convertedValue != null ? convertedValue.getClass().getSimpleName() : "null") + "', Timestamp: '" + timestamp +  " " + new Date(timestamp) + "').");
         }
     }
 

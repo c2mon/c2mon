@@ -76,7 +76,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
         Executors.newCachedThreadPool();
     
     // TODO should be in configuration file.
-    private static final String PRIVATE_KEY_PASSWORD = "2mbxnK3U";
+    private static final String PRIVATE_KEY_PASSWORD = "password";
 
     private static final String PRODUCT_URI = "urn:cern.ch:UA:C2MON";
 

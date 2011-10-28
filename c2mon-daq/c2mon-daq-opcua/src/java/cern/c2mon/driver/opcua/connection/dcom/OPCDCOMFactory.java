@@ -44,7 +44,7 @@ public final class OPCDCOMFactory implements IDCOMErrorConstants {
      * Creates a new IOPCGroup.
      * 
      * @param opcGroups The opc groups object the new group will belong to.
-     * @param groupName The namefor the new group.
+     * @param groupName The name for the new group.
      * @param updateRate The update rate for all items in the group. The update
      * rate specifies how often the cache on the server is updated. This means
      * taht updates happen not more often than this time.
@@ -61,6 +61,7 @@ public final class OPCDCOMFactory implements IDCOMErrorConstants {
         IOPCGroup group = opcGroups.add(groupName);
         group.setDeadBand(valueDeadband);
         group.setUpdateRate(updateRate);
+        group.setTimeBias(1000 * 60 * 60 * 2);
         return group;
     }
 

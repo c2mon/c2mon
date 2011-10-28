@@ -106,8 +106,17 @@ public class OPCMessageHandler extends EquipmentMessageHandler
      */
     @Override
     public synchronized void refreshAllDataTags() {
-        getEquipmentLogger().debug("refreshing data tags");
-        controller.refresh();
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    getEquipmentLogger().debug("refreshing data tags");
+                    controller.refresh();
+                } catch (Exception e) {
+                    getEquipmentLogger().error("Refresh of OPC data failed", e);
+                }
+            }
+        }.start();
     }
 
     /**

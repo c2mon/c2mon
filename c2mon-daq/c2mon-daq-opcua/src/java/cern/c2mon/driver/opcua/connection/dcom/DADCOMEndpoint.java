@@ -6,18 +6,19 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
+
 import com.linar.jintegra.AuthInfo;
 import com.linar.jintegra.AutomationException;
-import com.linar.jintegra.Cleaner;
 
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
 import cern.c2mon.driver.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCommunicationException;
-import cern.c2mon.driver.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCEndpoint;
 import cern.c2mon.driver.opcua.connection.common.impl.SubscriptionGroup;
 import ch.cern.tim.driver.jintegraInterface.DIOPCGroupEventAdapter;
@@ -41,6 +42,9 @@ import ch.cern.tim.driver.jintegraInterface.OPCServerState;
  */
 public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
+    /**
+     * Timeout of the DCOM connection.
+     */
     private static final String TIMEOUT = "10000";
 
     /**
@@ -69,7 +73,15 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      */
     private AuthInfo authInfo;
     
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    /**
+     * Thread pool for incomming data.
+     */
+    private ExecutorService executorService;
+    
+    /**
+     * logger of this class.
+     */
+    private Logger logger = Logger.getLogger(DADCOMEndpoint.class);
 
     /**
      * Creates a new DADCOMEndpoint.
@@ -100,6 +112,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         String user = opcAddress.getUser();
         String password = opcAddress.getPassword();
         authInfo = new AuthInfo(domain, user, password);
+        executorService = Executors.newFixedThreadPool(5);
         try {
             setUpConnection(uri);
         } catch (AutomationException e) {
@@ -253,7 +266,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                     if (isGoodQuality(qualities[i])) {
                         Object value = values[i];
                         long timestamp = timestamps[i].getTime();
-                        notifyEndpointListenersValueChange(itemAdressId, timestamp, value);
+                        notifyEndpointListenersValueChange(itemAdressId, timestamp + getTimezoneAdjustment(), value);
                     } else {
                         OPCCommunicationException ex = OPCDCOMFactory.createQualityException(qualities[i]);
                         notifyEndpointListenersItemError(itemAdressId, ex);
@@ -262,6 +275,14 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             }
         });
     }
+    
+    /**
+     * Returns  the timezone adjustment.
+     * @return The timezone adjustment in ms.
+     */
+    private int getTimezoneAdjustment() {
+		return TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings();
+	}
 
     /**
      * True for a good quality.
@@ -287,6 +308,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     protected synchronized void onRefresh(
             final Collection<DADCOMItemDefintion> itemDefintions) {
         AuthInfo.setThreadDefault(authInfo);
+        logger.debug("Enter refresh");
         for (DADCOMItemDefintion definition : itemDefintions) {
             long itemDefinitionId = definition.getId();
             int clientHandle = Long.valueOf(itemDefinitionId).intValue();
@@ -296,14 +318,15 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                 Object[] quality = new Object[1];
                 Object[] timeStamp = new Object[1];
                 try {
-                    item.read((short) OPCDataSource.OPCDevice, value, quality, timeStamp);
+                	logger.debug("Reading from OPC for item: " + item.getItemID());
+                    item.read((short) OPCDataSource.OPCCache, value, quality, timeStamp);
                     notifyEndpointListenersValueChange(
-                            itemDefinitionId, ((Date) timeStamp[0]).getTime(), value[0]);
+                            itemDefinitionId, ((Date) timeStamp[0]).getTime() + getTimezoneAdjustment(), value[0]);
                     if (definition.hasRedundantAddress()) {
                         clientHandle = -Long.valueOf(definition.getId()).intValue();
                         item = itemHandleOpcItems.get(clientHandle);
-                        item.read((short) OPCDataSource.OPCDevice, value, quality, timeStamp);
-                        notifyEndpointListenersValueChange(itemDefinitionId, ((Date) timeStamp[0]).getTime(), value[0]);
+                        item.read((short) OPCDataSource.OPCCache, value, quality, timeStamp);
+                        notifyEndpointListenersValueChange(itemDefinitionId, ((Date) timeStamp[0]).getTime() + getTimezoneAdjustment(), value[0]);
                     }
                 } catch (AutomationException e) {
                     RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e);
@@ -313,6 +336,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                 }
             }
         }
+        logger.debug("Finished refresh");
     }
 
     /**
@@ -384,6 +408,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             server.disconnect();
             server.release();
             opcCommandGroup = null;
+            executorService.shutdown();
         } catch (AutomationException e) {
             throw OPCDCOMFactory.createWrappedAutomationException(e);
         } catch (Exception e) {
