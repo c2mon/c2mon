@@ -198,8 +198,8 @@ public class ProgressDialog {
     }
     new Thread("TIM-UI-Progress-Thread") {
       public void run() {
-        startProgressBarUpdateThread();
         dialog.setVisible(true);
+        startProgressBarUpdateThread();
       }
     }.start();
   }
@@ -208,8 +208,8 @@ public class ProgressDialog {
    * Hides the dialog
    */
   public synchronized void hide() {
-    dialog.setVisible(false);
     progressBarUpdateThreadRun.set(false);
+    dialog.setVisible(false);
   }
 
   /**
@@ -231,29 +231,29 @@ public class ProgressDialog {
    * Starts the progress bar update thread
    */
   private void startProgressBarUpdateThread() {
-    progressBarUpdateThreadRun.set(true);
-    final Thread thread = new Thread(new Runnable() {
-      
-      @Override
-      public void run() {
-        while (progressBarUpdateThreadRun.get()) {
-          final Double percent = progressBarPercent;
-          if (percent == null) {
-            progressBar.setIndeterminate(true);
+    if (progressBarUpdateThreadRun.compareAndSet(false, true)) {
+      final Thread thread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+          while (progressBarUpdateThreadRun.get()) {
+            final Double percent = progressBarPercent;
+            if (percent == null) {
+              progressBar.setIndeterminate(true);
+            }
+            else {
+              progressBar.setIndeterminate(false);
+              progressBar.setValue((int) (percent * progressBar.getMaximum()));
+            }
+            try {
+              Thread.sleep(PROGRESS_VALUE_UPDATE_INTERVAL_MS);
+            }
+            catch (InterruptedException e) { }
           }
-          else {
-            progressBar.setIndeterminate(false);
-            progressBar.setValue((int) (percent * progressBar.getMaximum()));
-          }
-          try {
-            Thread.sleep(PROGRESS_VALUE_UPDATE_INTERVAL_MS);
-          }
-          catch (InterruptedException e) { }
         }
-      }
-    });
-    thread.setName("Progress-bar-update-Thread");
-    thread.start();
+      });
+      thread.setName("Progress-bar-update-Thread");
+      thread.start();
+    }
   }
 
   /**

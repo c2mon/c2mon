@@ -24,8 +24,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -41,6 +41,7 @@ import org.simpleframework.xml.core.Persister;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.TypeNumeric;
+import cern.c2mon.client.common.util.ConcurrentIdentitySet;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -154,12 +155,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private RuleExpression ruleExpression = null;
 
   /**
-   * List of DataTagUpdateListeners registered for updates on this DataTag
+   * Concurrent modifiable collection of DataTagUpdateListeners registered for
+   * updates on this DataTag
    */
-  private List<DataTagUpdateListener> listeners = new ArrayList<DataTagUpdateListener>();
-
-  /** Thread lock for access to the <code>DataTagUpdateListener</code> list */
-  private ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
+  private Set<DataTagUpdateListener> listeners = new ConcurrentIdentitySet<DataTagUpdateListener>();
   
   /** Lock to prevent more than one thread at a time to update the value */
   private ReentrantReadWriteLock updateTagLock = new ReentrantReadWriteLock();
@@ -394,19 +393,13 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private void notifyListeners() {
     try {
       final ClientDataTag clone = this.clone();
-      listenersLock.readLock().lock();
-      try {
-        for (DataTagUpdateListener updateListener : listeners) { 
-          try { 
-            updateListener.onUpdate(clone);
-          }
-          catch (Exception e) {
-            LOG.error("notifyListeners() : error notifying DataTagUpdateListeners", e);
-          }
+      for (DataTagUpdateListener updateListener : listeners) { 
+        try { 
+          updateListener.onUpdate(clone);
         }
-      }
-      finally {
-        listenersLock.readLock().unlock();
+        catch (Exception e) {
+          LOG.error("notifyListeners() : error notifying DataTagUpdateListeners", e);
+        }
       }
     }
     catch (CloneNotSupportedException cloneException) {
@@ -430,24 +423,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     if (LOG.isDebugEnabled()) {
       LOG.debug("addUpdateListener() called.");
     }
-    try {
-      listenersLock.writeLock().lock();
-      boolean isRegistered = false;
-      // Search for pListener by reference
-      for (DataTagUpdateListener listener : listeners) {
-        if (listener == pListener) {
-          isRegistered = true;
-          break;
-        }
-      }
-      
-      if (!isRegistered) {
-        listeners.add(pListener);
-      }
-    }
-    finally {
-      listenersLock.writeLock().unlock();
-    }
+    listeners.add(pListener);
     
     try {
       pListener.onUpdate(this.clone());
@@ -478,13 +454,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @return All listeners registered to this data tag
    */
   public Collection<DataTagUpdateListener> getUpdateListeners() {
-    try {
-      listenersLock.readLock().lock();
-      return new ArrayList<DataTagUpdateListener>(listeners);
-    }
-    finally {
-      listenersLock.readLock().unlock();
-    }
+    return new ArrayList<DataTagUpdateListener>(listeners);
   }
   
   /**
@@ -495,15 +465,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * for receiving updates of that tag.
    */
   public boolean isUpdateListenerRegistered(final DataTagUpdateListener pListener) {
-    boolean isRegistered = false;
-    try {
-      listenersLock.readLock().lock();
-      isRegistered = listeners.contains(pListener);
-    }
-    finally {
-      listenersLock.readLock().unlock();
-    }
-    
+    boolean isRegistered = listeners.contains(pListener);
     return isRegistered;
   }
 
@@ -513,26 +475,14 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @param pListener The listener that shall be unregistered
    */
   public void removeUpdateListener(final DataTagUpdateListener pListener) {
-    try {
-      listenersLock.writeLock().lock();
-      listeners.remove(pListener);
-    }
-    finally {
-      listenersLock.writeLock().unlock();
-    }
+    listeners.remove(pListener);
   }
 
   /**
    * Removes all previously registered <code>DataTagUpdateListener</code>
    */
   public void removeAllUpdateListeners() {
-    listenersLock.writeLock().lock();
-    try {
-      listeners.clear();
-    }
-    finally {
-      listenersLock.writeLock().unlock();
-    }
+    listeners.clear();
   }
   
   /**
@@ -542,14 +492,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    *         update listeners registered.
    */
   public boolean hasUpdateListeners() {
-    boolean isEmpty = false;
-    try {
-      listenersLock.readLock().lock();
-      isEmpty = !listeners.isEmpty();
-    }
-    finally {
-      listenersLock.readLock().unlock();
-    }
+    boolean isEmpty = !listeners.isEmpty();
     return isEmpty;
   }
   
@@ -671,9 +614,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     if (supervisionEvent == null) {
       return false;
     }
+    boolean validUpdate = false;
+    final boolean notifyListener;
     updateTagLock.writeLock().lock();
     try {
-      boolean validUpdate = false;
       validUpdate |= equipmentSupervisionStatus.containsKey(supervisionEvent.getEntityId());
       validUpdate |= processSupervisionStatus.containsKey(supervisionEvent.getEntityId());
 
@@ -694,17 +638,20 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
             throw new IllegalArgumentException(errorMsg);
         }
         
-        if (oldEvent == null || !supervisionEvent.equals(oldEvent)) {
-          // Notify all listeners of the update
-          notifyListeners();
-        }
+        notifyListener = oldEvent == null || !supervisionEvent.equals(oldEvent);
       }
-
-      return validUpdate;
+      else {
+        notifyListener = false;
+      }
     }
     finally {
       updateTagLock.writeLock().unlock();
     }
+    if (notifyListener) {
+      // Notify all listeners of the update
+      notifyListeners();
+    }
+    return validUpdate;
   }
 
   /**
@@ -919,7 +866,6 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     try {
       ClientDataTagImpl clone = (ClientDataTagImpl) super.clone();
       
-      clone.listenersLock = new ReentrantReadWriteLock();
       clone.updateTagLock = new ReentrantReadWriteLock();
       
       // clone the process id map
@@ -959,7 +905,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       if (ruleExpression != null) {
         clone.ruleExpression = (RuleExpression) ruleExpression.clone();
       }
-      clone.listeners = new ArrayList<DataTagUpdateListener>();
+      clone.listeners = new ConcurrentIdentitySet<DataTagUpdateListener>();
       
       return clone;
     }
