@@ -25,6 +25,12 @@
 			<groupId>cern.tim2.tim2-shared</groupId>
 			<artifactId>tim2-shared-common</artifactId>
 		</dependency>
+    
+        <!-- test dependencies -->
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </dependency>
 	</dependencies>
 	<developers />
 </project>
