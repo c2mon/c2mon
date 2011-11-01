@@ -6,16 +6,13 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -89,6 +86,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 	 * @param sourceName
 	 *            the alarm source name this publisher should be called.
 	 */
+	@Required
 	public void setSourceName(String sourceName) {
 		this.sourceName = sourceName;
 	}
