@@ -16,9 +16,14 @@
 
 #export Java for TC script also!
 
+# get the current location 
+SCRIPT=`readlink -f $(which $0)`
+SCRIPTPATH=`dirname $SCRIPT`
+C2MON_HOME=$SCRIPTPATH/..
+
 #set env. variables if script is available
-if [ -f setenv.sh ] ; then
-  . ./setenv.sh
+if [ -f $C2MON_HOME/bin/setenv.sh ] ; then
+  . $C2MON_HOME/bin/setenv.sh
 fi
 
 # make sure JAVA_HOME is set correctly
@@ -26,13 +31,6 @@ if [ -z $JAVA_HOME ]; then
    # use default if not
    export JAVA_HOME=/usr/java/jdk1.6.0_11
 fi
-
-# get the current location 
-C2MON_HOME=`dirname $0`
-
-#set server home
-[[ $C2MON_HOME == "." ]] && C2MON_HOME=$PWD
-C2MON_HOME=$C2MON_HOME/../
 
 #.c2mon.properties location
 C2MON_PROPERTIES=$C2MON_HOME/conf/.c2mon.properties
@@ -188,7 +186,7 @@ C2MON_ARGS=
 #property triggering cache clustering
 CACHE_MODE_PROPERTY="-Dcern.c2mon.cache.mode=multi"
 
-COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$C2MON_JMX_REMOTE_PASSWD -Dcom.sun.management.jmxremote.access.file=$C2MON_JMX_REMOTE_ACCESS -Dcom.sun.management.jmxremote.ssl=false"
+COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$C2MON_JMX_REMOTE_PASSWD -Dcom.sun.management.jmxremote.access.file=$C2MON_JMX_REMOTE_ACCESS -Dcom.sun.management.jmxremote.ssl=false -Dlaser.hosts=laser-test -Dcmw.mom.brokerlist=jms-diamon-test:2506"
 
 CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dtc.config=$TERRACOTTA_CONFIG $CACHE_MODE_PROPERTY"
 
