@@ -40,7 +40,7 @@ public class HistoryPlayerConfigPanel extends JPanel {
   private static final int PANEL_MARGIN = 12;
   
   /** The amount of milliseconds that can be retrieved from history from today */
-  private static final long HISTORY_TIME = 1L * 1000 * 60 * 60 * 24 * 30;
+  private static final long HISTORY_TIME = 1L * 1000 * 60 * 60 * 24 * 15;
   
   /** The panel where the user can choose the date and time */
   private final TimeSpanChooser chooser; 
