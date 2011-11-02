@@ -28,8 +28,6 @@ import cern.tim.server.common.config.ServerConstants;
 /**
  * Bean responsible for submitting C2MON alarms to LASER.
  */
-// starts as singleton bean in Spring context
-@Service
 public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean {
 
 	/**
