@@ -17,6 +17,7 @@ import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.client.command.CommandReport;
+import cern.tim.shared.client.command.CommandReportImpl;
 import cern.tim.shared.client.command.CommandTagHandle;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
@@ -144,7 +145,7 @@ public class ClientRequestMessageConverterTest {
   
   @Test
   public void testExecuteCommandMessageConversion() {
-    JsonRequest<CommandReport> request = new ClientRequestImpl<CommandReport>(CommandReport.class);
+    JsonRequest<CommandReportImpl> request = new ClientRequestImpl<CommandReportImpl>(CommandReportImpl.class);
 
     TextMessage message = new ActiveMQTextMessage();
     try {
