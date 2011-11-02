@@ -38,6 +38,7 @@ import cern.tim.server.command.CommandExecutionManager;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.supervision.SupervisionFacade;
+import cern.tim.shared.client.command.CommandExecuteRequest;
 import cern.tim.shared.client.command.CommandReport;
 import cern.tim.shared.client.command.CommandTagHandle;
 import cern.tim.shared.client.configuration.ConfigurationReport;
@@ -282,7 +283,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   private Collection< ? extends ClientRequestResult> handleExecuteCommandRequest(final ClientRequest executeCommandRequest) {
     
     final Collection commandReports = new ArrayList(1);
-    commandReports.add(commandExecutionManager.execute((CommandTagHandle) executeCommandRequest.getObjectParameter()));
+    commandReports.add(commandExecutionManager.execute((CommandExecuteRequest) executeCommandRequest.getObjectParameter()));
     return commandReports;
   }
 
