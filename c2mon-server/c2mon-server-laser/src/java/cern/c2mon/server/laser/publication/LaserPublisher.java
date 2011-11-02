@@ -88,6 +88,9 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 	 */
 	@Required
 	public void setSourceName(String sourceName) {
+		if(log.isInfoEnabled()){
+			log.info("Setting Alarm Sourcename to " + sourceName);
+		}
 		this.sourceName = sourceName;
 	}
 
@@ -202,11 +205,17 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 
 	@Override
 	public void start() {
+		if(log.isInfoEnabled()){
+			log.info("Starting" + LaserPublisher.class.getName());
+		}
 		running = true;
 	}
 
 	@Override
 	public void stop() {
+		if(log.isInfoEnabled()){
+			log.info("Stopping " + LaserPublisher.class.getName());
+		}
 		asi.close();
 		running = false;
 	}
@@ -223,16 +232,25 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 
 	@Override
 	public void resetStatistics() {
+		if(log.isTraceEnabled()){
+			log.trace("Entering resetStatistics()");
+		}
 		stats.resetStatistics();	
 	}
 
 	@Override
 	public void resetStatistics(String alarmID) {
+		if(log.isTraceEnabled()){
+			log.trace("Entering resetStatistics('" + alarmID + "')");
+		}
 		stats.resetStatistics(alarmID);
 	}
 
 	@Override
 	public List<String> getRegisteredAlarms() {
+		if(log.isTraceEnabled()){
+			log.trace("Entering getRegisteredAlarms()");
+		}
 		return stats.getStatsList();
 	}
 
