@@ -301,15 +301,18 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     while (iter.hasNext()) {
 
       final Long tagId = iter.next();
-      final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
-
-      switch (tagConfigurationRequest.getResultType()) {
-        case TRANSFER_TAG_CONFIGURATION_LIST: 
-          transferTags.add(TransferObjectFactory.createTagConfiguration(tagWithAlarms));
-          break;    
-        default:
-          LOG.error("handleConfigurationRequest() - Could not generate response message. Unknown enum ResultType "
-              + tagConfigurationRequest.getResultType());
+      if (tagLocationService.isInTagCache(tagId)) {
+        final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
+        switch (tagConfigurationRequest.getResultType()) {
+          case TRANSFER_TAG_CONFIGURATION_LIST: 
+            transferTags.add(TransferObjectFactory.createTagConfiguration(tagWithAlarms));
+            break;    
+          default:
+            LOG.error("handleConfigurationRequest() - Could not generate response message. Unknown enum ResultType "
+                + tagConfigurationRequest.getResultType());
+        }
+      } else {
+        LOG.warn("Received client request (TagConfigRequest) for unrecognized Tag with id " + tagId);
       }
     } // end while
 
@@ -372,6 +375,8 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
             LOG.error("handleTagRequest() - Could not generate response message. Unknown enum ResultType "
                 + tagRequest.getResultType());
         }
+      } else {
+        LOG.warn("Received client request (TagRequest) for unrecognized Tag with id " + tagId);
       }
     } // end while
 
