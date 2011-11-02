@@ -12,4 +12,8 @@
   <context:annotation-config/>
   <context:component-scan base-package="cern.c2mon.server.laser.publication"/>  
   
-</beans>
+  <bean id="idAlarmPublisher" class="cern.c2mon.server.laser.publisher.LaserPublisher" >
+  	<constructor-arg index="0" value="${cern.c2mon.laser.sourceName}"/>
+  </bean>
+  
+  </beans>
