@@ -37,7 +37,9 @@ import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.JsonRequest;
+import cern.tim.shared.client.command.CommandExecutionStatus;
 import cern.tim.shared.client.command.CommandReport;
+import cern.tim.shared.client.command.CommandReportImpl;
 import cern.tim.shared.client.command.CommandTagHandleImpl;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
@@ -232,7 +234,7 @@ public class RequestHandlerImplTest {
 
     CommandTagHandleImpl handle = (CommandTagHandleImpl) clientRequest.getObjectParameter() ;
 
-    CommandReport report = new CommandReport(handle.getId(), (short)666,"test report") ;
+    CommandReport report = new CommandReportImpl(handle.getId(), CommandExecutionStatus.STATUS_EXECUTION_FAILED, "test report") ;
     return report;
   }
 
