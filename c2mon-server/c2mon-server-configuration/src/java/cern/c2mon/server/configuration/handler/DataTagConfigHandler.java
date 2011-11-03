@@ -37,25 +37,26 @@ public interface DataTagConfigHandler {
    * Creates a DataTag in the C2MON server.
    * 
    * @param element contains details of the Tag
-   * @return list of creation events to send to the DAQ layer
+   * @return creation event to send to the DAQ layer
    * @throws IllegalAccessException
    */
-  List<ProcessChange> createDataTag(ConfigurationElement element) throws IllegalAccessException;
+  ProcessChange createDataTag(ConfigurationElement element) throws IllegalAccessException;
   
   /**
-   * Updates a DataTag in the C2MON server.
+   * Updates a DataTag in the C2MON server. Always results in a event being
+   * send to the DAQ layer.
    * @param id the id of the Tag to update
    * @param elementProperties details of the fields to modify
-   * @return a list of changes to send to the DAQ layer
+   * @return the change to send to the DAQ layer
    */
-  List<ProcessChange> updateDataTag(Long id, Properties elementProperties);
+  ProcessChange updateDataTag(Long id, Properties elementProperties);
   
   /**
    * Removes a DataTag from the C2MON server.
    * @param id the id of the Tag to remove
    * @param tagReport the report for this event; 
    *         is passed as parameter so cascaded action can attach subreports
-   * @return a list of changes to send to the DAQ layer
+   * @return a list of changes to send to the DAQ layer; can be null
    */
   List<ProcessChange> removeDataTag(Long id, ConfigurationElementReport tagReport);
 

@@ -37,9 +37,10 @@ public interface ProcessConfigHandler {
    * Creates a Process in the C2MON server.
    * 
    * @param element contains details of the Process
+   * @return a ProcessChange containing only the id for restarting
    * @throws IllegalAccessException
    */
-  void createProcess(ConfigurationElement element) throws IllegalAccessException;
+  ProcessChange createProcess(ConfigurationElement element) throws IllegalAccessException;
 
   /**
    * Updates a Process in the C2MON server.
@@ -56,8 +57,9 @@ public interface ProcessConfigHandler {
    * @param processId the id of the Process to remove
    * @param processReport the report for this event; 
    *         is passed as parameter so cascaded action can attach subreports
+   * @return change event indicating DAQ restart is necessary (in fact shutdown in this case)
    */
-  void removeProcess(Long processId, ConfigurationElementReport processReport);
+  ProcessChange removeProcess(Long processId, ConfigurationElementReport processReport);
 
   void removeEquipmentFromProcess(Long equipmentId, Long processId);
 

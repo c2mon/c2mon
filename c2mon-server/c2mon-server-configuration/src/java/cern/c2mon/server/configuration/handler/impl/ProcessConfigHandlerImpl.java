@@ -120,7 +120,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * @throws IllegalAccessException not thrown (inherited from common facade interface) 
    */
   @Transactional("cacheTransactionManager")
-  public void createProcess(final ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange createProcess(final ConfigurationElement element) throws IllegalAccessException {
     LOGGER.debug("Creating process with id " + element.getEntityId());
     if (processCache.hasKey(element.getEntityId())) {
       throw new ConfigurationException(ConfigurationException.ENTITY_EXISTS, 
@@ -131,6 +131,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
       processDAO.insert(process);
       processCache.putQuiet(process);
       jmsContainerManager.subscribe(process);
+      return new ProcessChange(process.getId());
     } catch (RuntimeException ex) {
       LOGGER.error("Exception caught while creating a new Process - rolling back DB changes and removing from cache.");
       processCache.remove(process.getId());
@@ -146,7 +147,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * and hence ignored in the {@link ConfigurationLoader}).
    * @param id
    * @param properties
-   * @return currently not used DAQ configuration object
+   * @return change requiring DAQ reboot, but not to be sent to the DAQ layer (not supported)
    * @throws IllegalAccessException
    */
   @Transactional("cacheTransactionManager")
@@ -171,8 +172,8 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
       throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);      
     } finally {
       process.getWriteLock().unlock();     
-    }    
-    return new ProcessChange(process.getId(), processUpdate);
+    } 
+    return new ProcessChange(process.getId());    
   }
   
   /**
@@ -190,7 +191,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    *                          subreports can be attached
    */
   @Transactional("cacheTransactionManager")
-  public void removeProcess(Long processId, ConfigurationElementReport processReport) {    
+  public ProcessChange removeProcess(Long processId, ConfigurationElementReport processReport) {    
     LOGGER.debug("Removing process with id " + processId);    
     Process process = processCache.get(processId);
     try {
@@ -217,8 +218,9 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
         processDAO.deleteProcess(processId);
         processCache.remove(processId);     
         removeProcessControlTags(process, processReport);
-        jmsContainerManager.unsubscribe(process);
+        jmsContainerManager.unsubscribe(process);        
        }
+      return new ProcessChange();
     } catch (RuntimeException ex) {                  
       LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes.", ex);
       processCache.remove(processId);

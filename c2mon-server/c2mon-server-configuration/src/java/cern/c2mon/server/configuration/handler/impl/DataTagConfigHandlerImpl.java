@@ -110,7 +110,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
    */
   @Transactional("cacheTransactionManager")
   @Override
-  public List<ProcessChange> createDataTag(final ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange createDataTag(final ConfigurationElement element) throws IllegalAccessException {
     LOGGER.trace("Creating DataTag " + element.getEntityId());
     checkId(element.getEntityId());
     DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
@@ -119,10 +119,8 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
       tagCache.putQuiet(dataTag);
       equipmentFacade.addTagToEquipment(dataTag.getEquipmentId(), dataTag.getId());
       DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), 
-                                      ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));
-      ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-      processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagAdd));    
-      return processChanges;
+                                      ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));      
+      return new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagAdd);          
     } catch (Exception ex) {
       LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
       tagCache.remove(dataTag.getId());
@@ -147,7 +145,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
    */
   @Transactional(propagation = Propagation.REQUIRED) //("cacheTransactionManager")
   @Override
-  public List<ProcessChange> updateDataTag(final Long id, final Properties properties) {
+  public ProcessChange updateDataTag(final Long id, final Properties properties) {
     LOGGER.trace("Updating DataTag " + id);
     //reject if trying to change equipment it is attached to - not currently allowed
     if (properties.containsKey("equipmentId")) {
@@ -159,10 +157,8 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
     try {
       dataTag.getWriteLock().lock();
       dataTagUpdate = commonTagFacade.updateConfig(dataTag, properties); //TODO returns DAQ config report or null  
-      configurableDAO.updateConfig(dataTag);      
-      ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-      processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagUpdate));
-      return processChanges;
+      configurableDAO.updateConfig(dataTag);            
+      return new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagUpdate);      
     } catch (Exception ex) {
       //((DataTagFacade) commonTagFacade).setStatus(dataTag, Status.RECONFIGURATION_ERROR);
       LOGGER.error("Exception caught while updating a datatag. Rolling back transaction and removing from cache.", ex);     

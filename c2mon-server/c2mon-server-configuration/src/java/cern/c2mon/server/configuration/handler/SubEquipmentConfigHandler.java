@@ -37,9 +37,10 @@ public interface SubEquipmentConfigHandler {
    * Creates a SubEquipment in the C2MON server.
    * 
    * @param element contains details of the SubEquipment
+   * @return change indicating a DAQ restart
    * @throws IllegalAccessException
    */
-  void createSubEquipment(ConfigurationElement element) throws IllegalAccessException;
+  ProcessChange createSubEquipment(ConfigurationElement element) throws IllegalAccessException;
   
   /**
    * Updates an SubEquipment in the C2MON server.
@@ -56,7 +57,8 @@ public interface SubEquipmentConfigHandler {
    * @param subEquipmentId the id of the Equipment to remove
    * @param subEquipmentReport the report for this event; 
    *         is passed as parameter so cascaded actions can attach subreports
+   * @return always returns a change object requiring restart (remove not supported on DAQ layer so far)
    */
-  void removeSubEquipment(Long subEquipmentId, ConfigurationElementReport subEquipmentReport);
+  ProcessChange removeSubEquipment(Long subEquipmentId, ConfigurationElementReport subEquipmentReport);
 
 }

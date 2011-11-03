@@ -41,9 +41,33 @@ public class ProcessChange {
    * The Change event itself (the object sent to the DAQ layer via JMS).
    */
   private IChange changeEvent;
-
+  
   /**
-   * Unique constructor.
+   * Flag indicating that this change requires a process reboot.   
+   */
+  private boolean requiresReboot = false;
+
+  
+  /**
+   * When no action should be taken on the DAQ layer use this
+   * constructor (i.e. not reconfiguration, no reboot).
+   */
+  public ProcessChange() {
+    this.requiresReboot = false;    
+  }
+  
+  /**
+   * Use this constructor if no change needs sending to
+   * the DAQ layer. Sets reboot flag to true.
+   * @param processId id of affected process
+   */
+  public ProcessChange(final Long processId){
+    this.processId = processId;
+    this.requiresReboot = true;
+  }
+  
+  /**
+   * Constructor.
    * @param processId the id of the Process this change should be sent to
    * @param changeEvent the Change event itself
    */
@@ -67,6 +91,38 @@ public class ProcessChange {
    */
   public Long getProcessId() {
     return processId;
+  }
+  
+  /**
+   * Returns true if the change needs sending to the process.
+   * If false, the processId field points to the affected
+   * process: a restart is required.
+   * @return true if DAQ action required
+   */
+  public boolean processActionRequired() {
+    return changeEvent != null;
+  }
+  
+  /**
+   * Indicates if the Process needs rebooting for the changes
+   * to apply. Only available for changes that do not need propagating
+   * to the DAQ (for these changes, the DAQ makes the reboot decision).
+   * @return true if Process reboot required
+   */
+  public boolean requiresReboot() {
+    if (processActionRequired()) {
+      throw new UnsupportedOperationException("The method is not available for configuration changes that need sending to the DAQ!");
+    } else {
+      return requiresReboot;
+    }    
+  }
+  
+  /**
+   * Set the reboot flag for this Process change.
+   * @param reboot true if the DAQ should be restarted
+   */
+  public void requiresReboot(boolean reboot){
+    requiresReboot = reboot;
   }
     
   

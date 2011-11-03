@@ -62,9 +62,9 @@ public final class ConfigurationReportConverter {
       default : LOGGER.warn("Unrecognized Process status received - setting the report to failure!");
                 changeReport.appendWarn("Server failed to recognized the Process status flag - setting the report to failure.");
     }
-    String statusMessage = "INFO: " + changeReport.getInfoMessage() + "\n"
-                         + "WARN: " + changeReport.getWarnMessage() + "\n"
-                         + "ERROR: " + changeReport.getErrorMessage();
+    String statusMessage = "DAQ INFO REPORT: " + changeReport.getInfoMessage() + "\n"
+                         + "DAQ WARNING: " + changeReport.getWarnMessage() + "\n"
+                         + "DAQ ERROR: " + changeReport.getErrorMessage();
     
     return new ConfigurationElementReport(parentReport.getAction(), 
                                           parentReport.getEntity(), 

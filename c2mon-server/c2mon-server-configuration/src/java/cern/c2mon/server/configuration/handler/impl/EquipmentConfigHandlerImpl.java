@@ -104,9 +104,10 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
    * @throws IllegalAccessException 
    */
   @Override
-  public void createEquipment(ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange createEquipment(ConfigurationElement element) throws IllegalAccessException {
     Equipment equipment = super.createAbstractEquipment(element);
     equipmentFacade.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
+    return new ProcessChange(equipment.getProcessId());
   }
   
   @Override
@@ -147,10 +148,11 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
    * 
    * @param equipmentid the id of the equipment to be removed
    * @param equipmentReport the equipment-level configuration report
+   * @return always returns a change object requiring restart (remove not supported on DAQ layer so far)
    */
   @Override
   @Transactional("cacheTransactionManager")
-  public void removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
+  public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
     LOGGER.debug("Removing Equipment " + equipmentid);
     Equipment equipment = equipmentCache.get(equipmentid);    
     try {
@@ -163,6 +165,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
       removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them
       equipment.getWriteLock().unlock();
       processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());
+      return new ProcessChange(equipment.getProcessId());
     } catch (UnexpectedRollbackException ex) {
       equipmentReport.setFailure("Aborting removal of equipment "
           + equipmentid + " as unable to remove all associated datatags."); 

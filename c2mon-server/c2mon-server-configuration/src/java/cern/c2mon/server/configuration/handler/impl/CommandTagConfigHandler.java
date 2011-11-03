@@ -66,6 +66,7 @@ public class CommandTagConfigHandler {
   private EquipmentFacade equipmentFacade;
   
   public List<ProcessChange> createCommandTag(ConfigurationElement element) throws IllegalAccessException {
+    LOGGER.trace("Creating CommandTag " + element.getEntityId());
     CommandTag commandTag = commandTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
     commandTagDAO.insertCommandTag(commandTag);
     commandTagCache.putQuiet(commandTag);
@@ -79,6 +80,7 @@ public class CommandTagConfigHandler {
   }
   
   public List<ProcessChange> updateCommandTag(Long id, Properties properties) throws IllegalAccessException {
+    LOGGER.trace("Updating CommandTag " + id);
     //reject if trying to change equipment it is attached to - not currently allowed
     if (properties.containsKey("equipmentId")) {
       throw new ConfigurationException(ConfigurationException.UNDEFINED, 
@@ -109,6 +111,7 @@ public class CommandTagConfigHandler {
    * @return a ProcessChange event to send to the DAQ if no error occurred
    */
   public List<ProcessChange> removeCommandTag(final Long id, final ConfigurationElementReport elementReport) {
+    LOGGER.trace("Removing CommandTag " + id);
     CommandTag commandTag = commandTagCache.get(id);
     try {
       commandTag.getWriteLock().lock();            

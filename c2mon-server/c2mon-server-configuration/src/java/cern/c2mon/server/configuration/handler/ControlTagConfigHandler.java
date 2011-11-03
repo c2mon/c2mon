@@ -39,15 +39,15 @@ public interface ControlTagConfigHandler {
    * @param element contains details of the Tag 
    * @throws IllegalAccessException
    */
-  void createControlTag(ConfigurationElement element) throws IllegalAccessException;
+  ProcessChange createControlTag(ConfigurationElement element) throws IllegalAccessException;
 
   /**
    * Updates a Control tag in the C2MON server.
    * @param id the id of the Tag to update
    * @param elementProperties details of the fields to modify
-   * @return a list of changes to send to the DAQ layer
+   * @return change to send to the DAQ layer
    */
-  List<ProcessChange> updateControlTag(Long id, Properties elementProperties);
+  ProcessChange updateControlTag(Long id, Properties elementProperties);
 
   /**
    * Removes a Control tag from the C2MON server.
@@ -56,7 +56,7 @@ public interface ControlTagConfigHandler {
    *         is passed as parameter so cascaded action can attach subreports
    * @return a list of changes to send to the DAQ layer
    */
-  List<ProcessChange> removeControlTag(Long id, ConfigurationElementReport tagReport);
+  ProcessChange removeControlTag(Long id, ConfigurationElementReport tagReport);
 
   /**
    * Given a ControlTag id, returns a create event for sending

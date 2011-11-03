@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
@@ -98,10 +99,11 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
    * @throws IllegalAccessException should not be thrown here (in common interface for Tags)
    */
   @Override
-  //@Transactional("cacheTransactionManager")
-  public void createSubEquipment(final ConfigurationElement element) throws IllegalAccessException {
+  @Transactional("cacheTransactionManager")
+  public ProcessChange createSubEquipment(final ConfigurationElement element) throws IllegalAccessException {
     SubEquipment subEquipment = super.createAbstractEquipment(element);
     subEquipmentFacade.addSubEquipmentToEquipment(subEquipment.getId(), subEquipment.getParentId());
+    return new ProcessChange(subEquipmentFacade.getEquipmentForSubEquipment(subEquipment.getId()).getProcessId());
   }
   
   public List<ProcessChange> updateSubEquipment(Long subEquipmentId, Properties properties) throws IllegalAccessException {
@@ -131,8 +133,8 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
    * @param subEquipmentReport to which subreports may be added
    */
   @Override
-  //@Transactional("cacheTransactionManager")
-  public void removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
+  @Transactional("cacheTransactionManager")
+  public ProcessChange removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
     LOGGER.debug("Removing SubEquipment " + subEquipmentId);
     SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);    
     try {      
@@ -140,6 +142,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       subEquipmentDAO.deleteItem(subEquipmentId);
       subEquipmentFacade.removeCacheObject(subEquipmentCache.get(subEquipmentId));
       removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB
+      return new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId());
     } finally {
       subEquipment.getWriteLock().unlock();
     }    

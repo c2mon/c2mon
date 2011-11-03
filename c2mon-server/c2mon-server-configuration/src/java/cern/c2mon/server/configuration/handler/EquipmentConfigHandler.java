@@ -37,9 +37,11 @@ public interface EquipmentConfigHandler {
    * Creates an Equipment in the C2MON server.
    * 
    * @param element contains details of the Equipment
+   * @return ProcessChange with id of Process that requires restart (not currently
+   *        supported by DAQ layer)
    * @throws IllegalAccessException
    */
-  void createEquipment(ConfigurationElement element) throws IllegalAccessException;
+  ProcessChange createEquipment(ConfigurationElement element) throws IllegalAccessException;
 
   /**
    * Updates an Equipment in the C2MON server.
@@ -54,7 +56,8 @@ public interface EquipmentConfigHandler {
    * @param equipmentId the id of the Equipment to remove
    * @param equipmentReport the report for this event; 
    *         is passed as parameter so cascaded actions can attach subreports
+   * @return always returns a change object requiring restart (remove not supported on DAQ layer so far)
    */
-  void removeEquipment(Long equipmentId, ConfigurationElementReport equipmentReport);
+  ProcessChange removeEquipment(Long equipmentId, ConfigurationElementReport equipmentReport);
 
 }

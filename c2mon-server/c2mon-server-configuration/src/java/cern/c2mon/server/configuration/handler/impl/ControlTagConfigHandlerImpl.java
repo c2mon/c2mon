@@ -1,6 +1,7 @@
 package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -19,6 +20,7 @@ import cern.tim.server.cache.ControlTagCache;
 import cern.tim.server.cache.ControlTagFacade;
 import cern.tim.server.cache.DataTagFacade;
 import cern.tim.server.cache.EquipmentFacade;
+import cern.tim.server.cache.ProcessFacade;
 import cern.tim.server.cache.SubEquipmentFacade;
 import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.cache.exception.CacheElementNotFoundException;
@@ -54,6 +56,8 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   
   private SubEquipmentFacade subEquipmentFacade; 
   
+  private ProcessFacade processFacade;
+  
   @Autowired
   private RuleTagConfigHandler ruleTagConfigHandler;
   
@@ -65,11 +69,13 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   public ControlTagConfigHandlerImpl(ControlTagCache controlTagCache,
       ControlTagFacade controlTagFacade, DataTagFacade dataTagFacade,
       EquipmentFacade equipmentFacade,
-      ControlTagLoaderDAO controlTagLoaderDAO, TagLocationService tagLocationService, SubEquipmentFacade subEquipmentFacade) {
+      ControlTagLoaderDAO controlTagLoaderDAO, TagLocationService tagLocationService,
+      SubEquipmentFacade subEquipmentFacade, ProcessFacade processFacade) {
     super(controlTagLoaderDAO, controlTagFacade, controlTagCache, tagLocationService);    
     this.dataTagFacade = dataTagFacade;
     this.equipmentFacade = equipmentFacade; 
     this.subEquipmentFacade = subEquipmentFacade;
+    this.processFacade = processFacade;
   }
 
   /**
@@ -84,19 +90,25 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
    * when the Equipment is updated to point to these new tags.
    * 
    * @param element contains the properties needed to create the control tag
+   * @return change event requiring reboot but not sent to DAQ layer 
    * @throws IllegalAccessException if an error occurs when initializing the 
    *          HardwareAddress  
    */
   @Override
   @Transactional("cacheTransactionManager")
-  public void createControlTag(ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange createControlTag(ConfigurationElement element) throws IllegalAccessException {
     LOGGER.trace("Creating ControlTag " + element.getEntityId());
     checkId(element.getEntityId());
     ControlTag controlTag = 
         commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
     try {
       configurableDAO.insert(controlTag);
-      tagCache.putQuiet(controlTag);   
+      tagCache.putQuiet(controlTag);
+      ProcessChange processChange = new ProcessChange();
+      if (processFacade.getProcessFromControlTag(controlTag.getId()) != null) {
+        processChange = new ProcessChange(processFacade.getProcessFromControlTag(controlTag.getId()));
+      }
+      return processChange;
     } catch (Exception e) {
       LOGGER.error("Exception caught while creating a ControlTag in cache - "
           + "rolling back DB transaction and removing from cache.", e);
@@ -112,7 +124,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
    */
   @Override
   @Transactional("cacheTransactionManager")
-  public List<ProcessChange> updateControlTag(Long id, Properties elementProperties) {
+  public ProcessChange updateControlTag(Long id, Properties elementProperties) {
     LOGGER.trace("Updating ControlTag " + id);
     ControlTag controlTag = tagCache.get(id);
     Change controlTagUpdate;
@@ -123,8 +135,8 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
       if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTag)) {
         controlTag.getWriteLock().unlock();
         return getProcessChanges((DataTagUpdate) controlTagUpdate, id);  
-      } else {
-        return null;
+      } else {        
+        return new ProcessChange(); //no event for DAQ layer
       }           
     } catch (Exception ex) {
       LOGGER.error("Exception caught while updating a ControlTag - rolling back DB"
@@ -151,7 +163,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
    */
   @Override
   @Transactional("cacheTransactionManager")
-  public List<ProcessChange> removeControlTag(Long id, ConfigurationElementReport tagReport) {
+  public ProcessChange removeControlTag(Long id, ConfigurationElementReport tagReport) {
     LOGGER.trace("Removing ControlTag " + id);
     try {
       ControlTag controlTag = tagCache.get(id);
@@ -184,7 +196,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
           removeEvent.setDataTagId(id);
           return getProcessChanges(removeEvent, id);        
         } else {
-          return null;     
+          return new ProcessChange();     
         }
       } catch (Exception ex) {
         //commonTagFacade.setStatus(controlTag, Status.RECONFIGURATION_ERROR);
@@ -199,7 +211,7 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
     } catch (CacheElementNotFoundException e) {
       LOGGER.warn("Attempting to remove a non-existent ControlTag - no action taken.");
       tagReport.setWarning("Attempting to removed a non-existent ControlTag");
-      return null;
+      return new ProcessChange();
     }          
   }
 
@@ -210,25 +222,21 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
    * is always linked to the Equipment, not the SubEquipment which
    * has no associated ControlTags on the DAQ layer).
    * 
-   * @param tagChange DAQ change event with Equipment id 
-   * @return returns null if ControlTag is not associated to a (Sub)Equipment
+   * @param tagChange DAQ change event with Equipment id
    */
-  private List<ProcessChange> getProcessChanges(ITagChange tagChange, Long tagId) {          
-    ArrayList<ProcessChange> processChanges  = new ArrayList<ProcessChange>();
+  private ProcessChange getProcessChanges(ITagChange tagChange, Long tagId) {              
     Map<Long, Long> equipmentControlTags = equipmentFacade.getAbstractEquipmentControlTags();
     Map<Long, Long> subEquipmentControlTags = subEquipmentFacade.getAbstractEquipmentControlTags(); 
     if (equipmentControlTags.containsKey(tagId)) {
       Long equipmentId = equipmentControlTags.get(tagId);
       tagChange.setEquipmentId(equipmentId);
-      processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(equipmentId).getId(), tagChange));
-      return processChanges;
+      return new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(equipmentId).getId(), tagChange);      
     } else if (subEquipmentControlTags.containsKey(tagId)) {
       Long subEquipmentId = subEquipmentControlTags.get(tagId);
       tagChange.setEquipmentId(subEquipmentFacade.getEquipmentForSubEquipment(subEquipmentId).getId());
-      processChanges.add(new ProcessChange(subEquipmentFacade.getProcessForAbstractEquipment(subEquipmentId).getId(), tagChange));
-      return processChanges;
-    } else {
-      return null;
+      return new ProcessChange(subEquipmentFacade.getProcessForAbstractEquipment(subEquipmentId).getId(), tagChange);      
+    } else {      
+      return new ProcessChange();
     } 
   }
   

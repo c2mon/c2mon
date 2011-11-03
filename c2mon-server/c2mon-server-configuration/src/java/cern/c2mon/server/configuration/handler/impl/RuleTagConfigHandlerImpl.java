@@ -148,7 +148,7 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
         tagCache.remove(id);
         if (oldTagIds != null) {
           for (Long oldTagId : oldTagIds) {
-            tagCache.remove(oldTagId);
+            tagCache.remove(oldTagId); //TODO: wrong cache here ?!
           }
           for (Long newTagId : ruleTag.getRuleInputTagIds()) {
             tagCache.remove(newTagId);   
