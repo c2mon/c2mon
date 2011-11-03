@@ -240,7 +240,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       if (daqConfigEnabled) {
         for (Long processId : processLists.keySet()) {
           List<Change> processChangeEvents = processLists.get(processId);
-          if (processFacade.isRunning(processId) && !processFacade.requiresReboot(processId)) {
+          if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
             ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
             for (ChangeReport changeReport : processReport.getChangeReports()) {
               ConfigurationElementReport convertedReport = 
@@ -262,7 +262,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
               }
             }
           } else {
-            processFacade.requiresReboot(processId);
+            processFacade.isRebootRequired(processId);
             report.addProcessToReboot(processCache.get(processId).getName());
             report.setStatus(Status.RESTART);
           }
@@ -270,7 +270,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       } else {
         report.setStatus(Status.RESTART);
         for (Long processId : processLists.keySet()) {
-          processFacade.requiresReboot(processId);
+          processFacade.isRebootRequired(processId);
           report.addProcessToReboot(processCache.get(processId).getName());          
         }
       }
