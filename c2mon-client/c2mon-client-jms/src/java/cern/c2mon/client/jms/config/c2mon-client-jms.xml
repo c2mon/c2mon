@@ -28,7 +28,7 @@
   
   <bean class="cern.c2mon.client.jms.impl.RequestHandlerImpl" autowire="constructor">
     <property name="requestQueue" value="${c2mon.client.jms.request.queue}"/>
-    <property name="requestTimeout" value="15000"/>
+    <property name="requestTimeout" value="30000"/>
   </bean>
 
 </beans>
