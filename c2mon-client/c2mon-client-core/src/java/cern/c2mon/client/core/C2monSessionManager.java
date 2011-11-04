@@ -17,8 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.client.core;
 
-import cern.c2mon.client.auth.SessionListener;
-import cern.tim.shared.client.auth.SessionInfo;
+import cern.c2mon.client.common.listener.SessionListener;
 
 /**
  * This interface describes the methods which are provided by
@@ -50,10 +49,9 @@ public interface C2monSessionManager {
    * 
    * @param pUserName The user name
    * @param pPassword The password of the user
-   * @return A <code>SessionInfo</code> that informs you whether the
-   *         authentication was successful or not.
+   * @return <code>true</code>, if the authentication was successful.
    */
-  SessionInfo login(final String pUserName, final String pPassword);
+  boolean login(final String pUserName, final String pPassword);
 
   /**
    * Closes the current session.
@@ -63,8 +61,12 @@ public interface C2monSessionManager {
   boolean logout();
   
   /**
-   * @return The information about the current session, or
-   *         <code>null</code>, if user is not logged in.
+   * @return <code>true</code>, if a user is logged in, otherwise <code>false</code>
    */
-  SessionInfo getSessionInfo();
+  boolean isUserLogged();
+  
+  /**
+   * @return The user name or <code>null</code>, if no user is logged on.
+   */
+  String getUserName();
 }

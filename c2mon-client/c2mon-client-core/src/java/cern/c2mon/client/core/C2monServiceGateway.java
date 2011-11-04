@@ -17,10 +17,6 @@
  ******************************************************************************/
 package cern.c2mon.client.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +41,9 @@ public final class C2monServiceGateway {
   /** Class logger */
   private static final Logger LOGGER = Logger.getLogger(C2monServiceGateway.class);
   
+  /** Static reference to the <code>C2monSessionManager</code> singleton instance */
+  private static C2monSessionManager sessionManager = null;
+  
   /** Static reference to the <code>C2monCommandManager</code> singleton instance */
   private static C2monCommandManager commandManager = null;
   
@@ -53,9 +52,6 @@ public final class C2monServiceGateway {
   
   /** Static reference to the <code>C2monTagManager</code> singleton instance */
   private static C2monTagManager tagManager = null;
-  
-  /** Static reference to the <code>C2monSessionManager</code> singleton instance */
-  private static C2monSessionManager sessionManager = null;
   
   /** Static reference to the <code>C2monSupervisionManager</code> singleton instance */
   private static C2monSupervisionManager supervisionManager = null;
@@ -67,6 +63,13 @@ public final class C2monServiceGateway {
     // Do nothing
   }
 
+  /**
+   * @return The C2MON tag manager, which is managing
+   *         the command tags
+   */
+  public static C2monSessionManager getSessionManager() {
+    return sessionManager;
+  }
   
   /**
    * @return The C2MON tag manager, which is managing
@@ -93,15 +96,6 @@ public final class C2monServiceGateway {
   public static C2monHistoryManager getHistoryManager() {
     return historyManager;
   }
-
-  
-  /**
-   * @return the sessionManager
-   */
-  public static C2monSessionManager getSessionManager() {
-    return sessionManager;
-  }
-
   
   /**
    * @return the heartbeatManager
@@ -165,22 +159,24 @@ public final class C2monServiceGateway {
     
     /**
      * Default Constructor used by the Spring container
+     * @param pSessionManager The C2MON session manager
      * @param pTagManager The tag manager singleton 
-     * @param pSessionManager The session manager singleton
-     * @param pHeartbeatManager The heartbeat singleton
+     * @param psupervisionManager The supervision singleton
      * @param pHistoryManager The history manager
+     * @param pCommandManager The command manager
      */
     @Autowired
     private SpringGatewayInitializer(
-        final C2monTagManager pTagManager,
         final C2monSessionManager pSessionManager,
-        final C2monSupervisionManager pHeartbeatManager,
-        final C2monHistoryManager pHistoryManager) {
+        final C2monTagManager pTagManager,
+        final C2monSupervisionManager psupervisionManager,
+        final C2monHistoryManager pHistoryManager,
+        final C2monCommandManager pCommandManager) {
       
       tagManager = pTagManager;
-      sessionManager = pSessionManager;
-      supervisionManager = pHeartbeatManager;
+      supervisionManager = psupervisionManager;
       historyManager = pHistoryManager;
+      commandManager = pCommandManager;
     }
   }
 }

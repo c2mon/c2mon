@@ -21,7 +21,7 @@ package cern.c2mon.client.common.listener;
 import java.util.EventListener;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.tim.shared.client.command.CommandReport;
+import cern.tim.shared.client.command.CommandReportImpl;
 
 /**
  * You can register a <code>ClientCommandTagReportListener</code> with a 
@@ -29,5 +29,5 @@ import cern.tim.shared.client.command.CommandReport;
  */
 public interface ClientCommandTagReportListener extends EventListener
 {
-  public void onCommandReport(final ClientCommandTag pCommand, final CommandReport pReport);
+  public void onCommandReport(final ClientCommandTag pCommand, final CommandReportImpl pReport);
 }

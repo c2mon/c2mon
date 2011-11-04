@@ -45,7 +45,7 @@ public class C2monServiceGatewayTest {
   @Test
   public void startClient() throws InterruptedException {
     C2monServiceGateway.startC2monClient();    
-    assertNotNull(C2monServiceGateway.getSessionManager());
+    assertNotNull(C2monServiceGateway.getCommandManager());
     assertNotNull(C2monServiceGateway.getSupervisionManager());
     assertNotNull(C2monServiceGateway.getTagManager());
   }
@@ -58,7 +58,7 @@ public class C2monServiceGatewayTest {
   @Test
   public void startClientWithProperties() throws InterruptedException {
     C2monServiceGateway.startC2monClient("classpath:cern/c2mon/client/core/test-properties.txt");    
-    assertNotNull(C2monServiceGateway.getSessionManager());
+    assertNotNull(C2monServiceGateway.getCommandManager());
     assertNotNull(C2monServiceGateway.getSupervisionManager());
     assertNotNull(C2monServiceGateway.getTagManager());
   }

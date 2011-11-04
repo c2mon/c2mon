@@ -73,26 +73,27 @@ public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, Cl
   boolean update(final TagValueUpdate tagValueUpdate) throws RuleFormatException;
 
   
-  /**
-   * This thread safe method updates the accessible state of the given
-   * <code>ClientDataTag</code> object. Once the accessibility has been updated
-   * it notifies the registered listener about the update by providing a copy of
-   * the <code>ClientDataTag</code> object.
-   * 
-   * @param supervisionEvent The supervision event which contains the current
-   *                         status of the process or the equipment.
-   * @return <code>true</code>, if the update was successful. The returning value
-   *         is <code>false</code>, if the supervision event is <code>null</code>
-   *         or the tag is not linked to the given equipment or process.
-   */
-  boolean update(SupervisionEvent supervisionEvent);
+//  /**
+//   * This thread safe method updates the accessible state of the given
+//   * <code>ClientDataTag</code> object. Once the accessibility has been updated
+//   * it notifies the registered listener about the update by providing a copy of
+//   * the <code>ClientDataTag</code> object.
+//   * 
+//   * @param supervisionEvent The supervision event which contains the current
+//   *                         status of the process or the equipment.
+//   * @return <code>true</code>, if the update was successful. The returning value
+//   *         is <code>false</code>, if the supervision event is <code>null</code>
+//   *         or the tag is not linked to the given equipment or process.
+//   */
+//  boolean update(SupervisionEvent supervisionEvent);
   
   
   /**
    * Creates a clone of the this object. The only difference is that
    * it does not copy the registered listeners. If you are only interested
    * in the static information of the object you should call after cloning
-   * the {@link #clean()} method.
+   * the {@link #clean()} method.<br>
+   * Please note that this method won't notify the registered listeners!
    * @return The clone of this object
    * @throws CloneNotSupportedException Thrown, if one of the field does not support cloning.
    * @see #clean()

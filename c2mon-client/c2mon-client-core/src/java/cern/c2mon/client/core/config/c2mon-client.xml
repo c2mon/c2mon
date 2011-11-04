@@ -14,5 +14,6 @@
 
   <!-- import the XML configuration files for the Client API modules -->
   <import resource="classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml"/>
+  <import resource="classpath:cern/c2mon/client/auth/config/c2mon-client-auth.xml"/>
 
 </beans>

@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.tim.shared.client.command.CommandReport;
+import cern.tim.shared.client.command.CommandReportImpl;
 import cern.tim.shared.client.command.CommandTagHandle;
 import cern.tim.shared.client.command.CommandTagHandleImpl;
 import cern.c2mon.client.core.cache.ClientDataTagCache;

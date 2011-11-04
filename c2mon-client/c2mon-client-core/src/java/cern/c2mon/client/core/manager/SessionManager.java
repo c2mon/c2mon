@@ -20,23 +20,29 @@ package cern.c2mon.client.core.manager;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.auth.SessionListener;
+import cern.accsoft.security.rba.util.gui.AuthenticationListener;
+import cern.accsoft.security.rba.util.gui.RBAIntegrator;
+import cern.c2mon.client.auth.AuthorizationManager;
+import cern.c2mon.client.common.listener.SessionListener;
 import cern.c2mon.client.core.C2monSessionManager;
-import cern.tim.shared.client.auth.SessionInfo;
 
+/**
+ * The session manager handles the user authentication and
+ * allows registering SessionListener.
+ *
+ * @author Matthias Braeger
+ */
 @Service
-public class SessionManager implements C2monSessionManager {
+public class SessionManager implements C2monSessionManager, AuthenticationListener {
 
   /** Log4j instance */
   private static final Logger LOG = Logger.getLogger(SessionManager.class);
-
-  /**
-   * Information about the current session.
-   */
-  private SessionInfo currentSession = null;
 
   /**
    * Collection of listeners that will be notified whenever a login/logout
@@ -44,34 +50,79 @@ public class SessionManager implements C2monSessionManager {
    */
   private Collection<SessionListener> sessionListeners = new ArrayList<SessionListener>();
   
+  /**
+   * RBA integrator singleton. Used for checking RBAC authorization details
+   */
+  private static final RBAIntegrator RBA = RBAIntegrator.getInstance();
+  
+  /** The authorization manager */
+  private final AuthorizationManager authorizationManager;
+  
+  /**
+   * Default Constructor
+   * @param pAuthorizationManager The authorization manager to use
+   */
+  @Autowired
+  public SessionManager(final AuthorizationManager pAuthorizationManager) {
+    this.authorizationManager = pAuthorizationManager;
+  }
+  
+  @PostConstruct
+  private void init() {
+    RBA.setAuthenticationListener(this);
+  }
+  
   @Override
   public void addSessionListener(SessionListener pListener) {
-    // TODO Auto-generated method stub
-    
+    if (pListener != null && !sessionListeners.contains(pListener)) {
+      sessionListeners.add(pListener);
+    }
   }
 
   @Override
-  public SessionInfo login(String pUserName, String pPassword) {
-    // TODO Auto-generated method stub
-    return null;
+  public boolean login(final String pUserName, final String pPassword) {
+    throw new UnsupportedOperationException("This method is not supported, yet");
   }
 
   @Override
   public boolean logout() {
-    // TODO Auto-generated method stub
-    return false;
+    throw new UnsupportedOperationException("This method is not supported, yet");
   }
 
   @Override
-  public void removeSessionListener(SessionListener pListener) {
-    // TODO Auto-generated method stub
-    
+  public void removeSessionListener(final SessionListener pListener) {
+    if (pListener != null) {
+      sessionListeners.remove(pListener);
+    }
+  }
+  
+  @Override
+  public boolean isUserLogged() {
+    return authorizationManager.isUserLogged();
   }
 
   @Override
-  public SessionInfo getSessionInfo() {
-    return currentSession;
+  public void loginPerformed() {
+    String userName = RBA.getLoggedUsername();
+    for (SessionListener listener : sessionListeners) {
+      listener.onLogin(userName);
+    }
   }
-  
-  
+
+  @Override
+  public void logoutPerformed() {
+    for (SessionListener listener : sessionListeners) {
+      listener.onLogout();
+    } 
+  }
+
+  @Override
+  public void tokenExpired() {
+    LOG.warn("RBAC token has expired!");
+  }
+
+  @Override
+  public String getUserName() {
+    return RBA.getLoggedUsername();
+  }
 }

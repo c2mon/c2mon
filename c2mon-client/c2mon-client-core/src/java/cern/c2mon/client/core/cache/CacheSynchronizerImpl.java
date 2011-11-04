@@ -293,11 +293,13 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         for (Long tagId : unsynchronizedTagIds) {
           final ClientDataTagImpl liveTag = liveCache.get(tagId);
           if (liveTag.getDataTagQuality().isExistingTag()) {
-            try {
-              jmsProxy.unregisterUpdateListener(liveTag);
-            }
-            catch (Exception e) {
-              LOG.warn("removeTags() - Could not unregister tag " + tagId + " from JmsProxy. Reason: " + e.getMessage());
+            if (jmsProxy.isRegisteredListener(liveTag)) {
+              try {
+                jmsProxy.unregisterUpdateListener(liveTag);
+              }
+              catch (Exception e) {
+                LOG.warn("removeTags() - Could not unregister tag " + tagId + " from JmsProxy. Reason: " + e.getMessage());
+              }
             }
             supervisionManager.removeSupervisionListener(liveTag);
             final ClientDataTagImpl unkownTag = new ClientDataTagImpl(tagId);

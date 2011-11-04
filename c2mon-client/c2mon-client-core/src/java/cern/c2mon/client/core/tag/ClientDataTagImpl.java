@@ -603,58 +603,6 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
   
   /**
-   * Update method for the supervision events.
-   * 
-   * @param supervisionEvent The supervision update event
-   * @return <code>true</code>, if the <code>ClientDataTag</code> has
-   *         successfully being updated.
-   */
-  @Override
-  public boolean update(final SupervisionEvent supervisionEvent) {
-    if (supervisionEvent == null) {
-      return false;
-    }
-    boolean validUpdate = false;
-    final boolean notifyListener;
-    updateTagLock.writeLock().lock();
-    try {
-      validUpdate |= equipmentSupervisionStatus.containsKey(supervisionEvent.getEntityId());
-      validUpdate |= processSupervisionStatus.containsKey(supervisionEvent.getEntityId());
-
-      if (validUpdate) {
-        SupervisionEvent oldEvent;
-        switch (supervisionEvent.getEntity()) {
-          case PROCESS:
-            oldEvent = processSupervisionStatus.put(supervisionEvent.getEntityId(), supervisionEvent);
-            updateProcessStatus();
-            break;
-          case EQUIPMENT:
-            oldEvent = equipmentSupervisionStatus.put(supervisionEvent.getEntityId(), supervisionEvent);
-            updateEquipmentStatus();
-            break;
-          default:
-            String errorMsg = "The supervision event type " + supervisionEvent.getEntity() + " is not supported.";
-            LOG.error("update(SupervisionEvent) - " + errorMsg);
-            throw new IllegalArgumentException(errorMsg);
-        }
-        
-        notifyListener = oldEvent == null || !supervisionEvent.equals(oldEvent);
-      }
-      else {
-        notifyListener = false;
-      }
-    }
-    finally {
-      updateTagLock.writeLock().unlock();
-    }
-    if (notifyListener) {
-      // Notify all listeners of the update
-      notifyListeners();
-    }
-    return validUpdate;
-  }
-
-  /**
    * Inner method for updating the process status of this tag and
    * computing the error message, if one of the linked processes is down.
    */
@@ -948,13 +896,60 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     } finally { updateTagLock.writeLock().unlock(); }
   }
 
+  /**
+  * This thread safe method updates the accessible state of the given
+  * <code>ClientDataTag</code> object. Once the accessibility has been updated
+  * it notifies the registered listener about the update by providing a copy of
+  * the <code>ClientDataTag</code> object.
+  * 
+  * @param supervisionEvent The supervision event which contains the current
+  *                         status of the process or the equipment.
+  */
   @Override
   public void onSupervisionUpdate(SupervisionEvent supervisionEvent) {
-    update(supervisionEvent);
+    if (supervisionEvent == null) {
+      return;
+    }
+    updateTagLock.writeLock().lock();
+    try {
+      boolean validUpdate = false;
+      validUpdate |= equipmentSupervisionStatus.containsKey(supervisionEvent.getEntityId());
+      validUpdate |= processSupervisionStatus.containsKey(supervisionEvent.getEntityId());
+
+      if (validUpdate) {
+        SupervisionEvent oldEvent;
+        switch (supervisionEvent.getEntity()) {
+          case PROCESS:
+            oldEvent = processSupervisionStatus.put(supervisionEvent.getEntityId(), supervisionEvent);
+            updateProcessStatus();
+            break;
+          case EQUIPMENT:
+            oldEvent = equipmentSupervisionStatus.put(supervisionEvent.getEntityId(), supervisionEvent);
+            updateEquipmentStatus();
+            break;
+          default:
+            String errorMsg = "The supervision event type " + supervisionEvent.getEntity() + " is not supported.";
+            LOG.error("update(SupervisionEvent) - " + errorMsg);
+            throw new IllegalArgumentException(errorMsg);
+        }
+        
+        if (oldEvent == null || !supervisionEvent.equals(oldEvent)) {
+          // Notify all listeners of the update
+          notifyListeners();
+        }
+      }
+    }
+    finally {
+      updateTagLock.writeLock().unlock();
+    }
   }
   
-
-  
+  /**
+   * Creates a XML representation of this class by making use of
+   * the simpleframework XML library.
+   * @return The XML representation of this class
+   * @see #fromXml(String)
+   */
   public String getXml() {
       Serializer serializer = new Persister(new AnnotationStrategy());
       StringWriter fw = null;
@@ -978,7 +973,14 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       return result;
   }
   
-  
+  /**
+   * Static method for creating a <code>ClientDataTagImpl</code> object
+   * from a XML String by making use of the simpleframework XML library.
+   * @param xml The XML representation of a <code>ClientDataTagImpl</code> object
+   * @return <code>ClientDataTagImpl</code> object created from the given XML String
+   * @throws Exception In case of a parsing error or a wrong XML definition
+   * @see #getXml()
+   */
   public static ClientDataTagImpl fromXml(final String xml) throws Exception {
 
       ClientDataTagImpl cdt = null;
@@ -997,11 +999,12 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
       return cdt;
   }
-  
-  
+   
+  /**
+   * @return A XML representation of this class instance.
+   */
   @Override
   public String toString() {
       return this.getXml();
   }  
-  
 }
