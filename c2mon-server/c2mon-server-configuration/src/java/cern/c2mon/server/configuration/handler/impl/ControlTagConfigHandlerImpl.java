@@ -99,11 +99,10 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   public ProcessChange createControlTag(ConfigurationElement element) throws IllegalAccessException {
     LOGGER.trace("Creating ControlTag " + element.getEntityId());
     checkId(element.getEntityId());
-    ControlTag controlTag = 
-        commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+    ControlTag controlTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
     try {
       configurableDAO.insert(controlTag);
-      tagCache.putQuiet(controlTag);
+      tagCache.putQuiet(controlTag);      
       ProcessChange processChange = new ProcessChange();
       if (processFacade.getProcessFromControlTag(controlTag.getId()) != null) {
         processChange = new ProcessChange(processFacade.getProcessFromControlTag(controlTag.getId()));

@@ -208,6 +208,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           if (processChanges != null) { //is null if exception thrown while applying the element at the server level, so no changes sent to DAQ
             element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ, set to OK
             for (ProcessChange processChange : processChanges) {
+              
               Long processId = processChange.getProcessId();
               if (processChange.processActionRequired()) {
                 if (!processLists.containsKey(processId)) {
@@ -219,6 +220,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                 report.setStatus(Status.RESTART);
                 report.addProcessToReboot(processCache.get(processId).getName());
                 element.setStatus(Status.RESTART);
+                processFacade.requiresReboot(processId, true);
               }
             } 
             daqReportPlaceholder.put(element.getSequenceId(), elementReport);
@@ -262,17 +264,19 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
               }
             }
           } else {
-            processFacade.isRebootRequired(processId);
+            processFacade.requiresReboot(processId, true);
             report.addProcessToReboot(processCache.get(processId).getName());
             report.setStatus(Status.RESTART);
           }
         }
       } else {
-        report.setStatus(Status.RESTART);
-        for (Long processId : processLists.keySet()) {
-          processFacade.isRebootRequired(processId);
-          report.addProcessToReboot(processCache.get(processId).getName());          
-        }
+        if (!processLists.isEmpty()){
+          report.setStatus(Status.RESTART);
+          for (Long processId : processLists.keySet()) {
+            processFacade.requiresReboot(processId, true);
+            report.addProcessToReboot(processCache.get(processId).getName());          
+          }
+        }        
       }
       
       

@@ -586,6 +586,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     //also check that the process, commfault and alive cache were updated
     Process process = processCache.get(expectedObject.getProcessId());
+    //check process is running
+    ((ProcessCacheObject) process).setRequiresReboot(false);
+    assertFalse(process.getRequiresReboot());
     assertTrue(process.getEquipmentIds().contains(expectedObject.getId()));
     //the alivetimer and commfault have overriden those already in the cache (check reference to the equipment has changed)   
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));

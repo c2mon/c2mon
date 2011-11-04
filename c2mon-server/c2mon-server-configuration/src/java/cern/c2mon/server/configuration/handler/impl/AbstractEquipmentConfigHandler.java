@@ -126,17 +126,21 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     T abstractEquipment = commonEquipmentFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
     configurableDAO.insert(abstractEquipment);
     
-    //clear alive and commfault caches
+    //clear alive and commfault caches and refresh
     //(synch ok as locked equipment so no changes to these ids)
     if (abstractEquipment.getAliveTagId() != null) {
       aliveTimerCache.remove(abstractEquipment.getAliveTagId());
+      aliveTimerCache.get(abstractEquipment.getAliveTagId());
     }
     if (abstractEquipment.getCommFaultTagId() != null) {
       commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
+      commFaultTagCache.get(abstractEquipment.getCommFaultTagId());
     }
+    
+    abstractEquipmentCache.putQuiet(abstractEquipment);
        
     //TODO necessary to use DB loading or not?? to check...
-    //removed as now rely on automatic cache loading from DB
+    //removed as now rely on automatic cache loading from DB: problem: also used in checking if tag is alive or commfault, so added again
 //    abstractEquipmentCache.putQuiet(abstractEquipment);    
 //    aliveTimerFacade.generateFromEquipment(abstractEquipment); 
 //    commFaultTagFacade.generateFromEquipment(abstractEquipment);
