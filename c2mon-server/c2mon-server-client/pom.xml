@@ -88,6 +88,10 @@
     	<groupId>cern.tim2.tim2-server</groupId>
     	<artifactId>tim2-server-command</artifactId>    	
     </dependency>
+    <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-all</artifactId>
+      </dependency>
   </dependencies>
 
   <developers />

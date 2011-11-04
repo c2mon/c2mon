@@ -19,6 +19,7 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.client.command.CommandReport;
 import cern.tim.shared.client.command.CommandReportImpl;
 import cern.tim.shared.client.command.CommandTagHandle;
+import cern.tim.shared.client.command.CommandTagHandleImpl;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 public class ClientRequestMessageConverterTest {
@@ -137,6 +138,7 @@ public class ClientRequestMessageConverterTest {
 
       assertTrue(receivedRequest.getRequestType() == ClientRequest.RequestType.COMMAND_HANDLE_REQUEST);
       assertTrue(receivedRequest.getResultType() == ClientRequest.ResultType.TRANSFER_COMMAND_HANDLES_LIST);
+      assertTrue(receivedRequest.requiresObjectResponse());
     }
     catch (JMSException e) {
       assertTrue(e.getMessage(), false);
@@ -159,4 +161,5 @@ public class ClientRequestMessageConverterTest {
       assertTrue(e.getMessage(), false);
     }
   }
+  
 }
