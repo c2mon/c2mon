@@ -44,6 +44,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.tim.shared.client.command.CommandExecuteRequest;
 import cern.tim.shared.client.command.CommandReport;
 import cern.tim.shared.client.command.CommandReportImpl;
 import cern.tim.shared.client.command.CommandTagHandle;
@@ -271,10 +272,12 @@ public class RequestHandlerImpl implements RequestHandler {
     }
   }
   
-  public CommandReport executeCommand(final CommandTagHandle handle) throws JMSException {
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> CommandReport executeCommand(CommandExecuteRequest<T> commandExecuteRequest) throws JMSException {
     
     ClientRequestImpl clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
-    clientRequest.setObjectParameter(handle);
+    clientRequest.setObjectParameter(commandExecuteRequest);
     
     Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
     CommandReport report = c.iterator().next();

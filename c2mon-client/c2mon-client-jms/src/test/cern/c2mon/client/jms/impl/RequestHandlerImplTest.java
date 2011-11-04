@@ -37,6 +37,8 @@ import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.JsonRequest;
+import cern.tim.shared.client.command.CommandExecuteRequest;
+import cern.tim.shared.client.command.CommandExecuteRequestImpl;
 import cern.tim.shared.client.command.CommandExecutionStatus;
 import cern.tim.shared.client.command.CommandReport;
 import cern.tim.shared.client.command.CommandReportImpl;
@@ -210,9 +212,8 @@ public class RequestHandlerImplTest {
 
     ClientRequestImpl<CommandReport> executeCommandRequest =
       new ClientRequestImpl<CommandReport>(CommandReport.class);
-    
-    CommandTagHandleImpl commandTagHandle = createCommandTagHandleImpl(id);
-    executeCommandRequest.setObjectParameter(commandTagHandle);
+    CommandExecuteRequest<Boolean> executeRequest = new CommandExecuteRequestImpl<Boolean>(id, Boolean.TRUE);
+    executeCommandRequest.setObjectParameter(executeRequest);
     
     Collection<CommandReport> response = new ArrayList<CommandReport>();
     response.add(createCommandReport(executeCommandRequest));
@@ -221,7 +222,7 @@ public class RequestHandlerImplTest {
 
     EasyMock.replay(jmsProxy);
 
-    CommandReport report = requestHandlerImpl.executeCommand(commandTagHandle);
+    CommandReport report = requestHandlerImpl.executeCommand(executeRequest);
 
     EasyMock.verify(jmsProxy);
     Assert.assertEquals(id, report.getId());
@@ -232,7 +233,7 @@ public class RequestHandlerImplTest {
 
   private CommandReport createCommandReport(final ClientRequest clientRequest) {
 
-    CommandTagHandleImpl handle = (CommandTagHandleImpl) clientRequest.getObjectParameter() ;
+    CommandExecuteRequest handle = (CommandExecuteRequest) clientRequest.getObjectParameter() ;
 
     CommandReport report = new CommandReportImpl(handle.getId(), CommandExecutionStatus.STATUS_EXECUTION_FAILED, "test report") ;
     return report;

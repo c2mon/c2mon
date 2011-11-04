@@ -27,9 +27,9 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.tim.shared.client.command.CommandExecuteRequest;
 import cern.tim.shared.client.command.CommandReport;
 import cern.tim.shared.client.command.CommandTagHandle;
-import cern.tim.shared.client.command.CommandTagHandleImpl;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
@@ -130,7 +130,7 @@ public interface RequestHandler {
    * @return
    * @throws JMSException 
    */
-  <T> CommandReport executeCommand(CommandTagHandle<T> handle) throws JMSException;
+  <T> CommandReport executeCommand(CommandExecuteRequest<T> commandExecuteRequest) throws JMSException;
 
   /**
    * Requests the DAQ config XML for a given process. Never returns null.
