@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cern.c2mon.server.video.VideoConnectionMapper">
+
+  <!-- Use type aliases to avoid typing the full class name every time. -->
+  <!-- <typeAlias alias="VideoConnectionProperties" type="cern.c2mon.client.video.VideoConnectionProperties"/>  
+  -->
+  <!-- Result maps describe the mapping between the columns returned
+       from a query, and the class properties.  A result map isn't
+       necessary if the columns (or aliases) match to the properties 
+       exactly. -->
+  <resultMap id="VideoConnectionPropertiesResult" type="cern.c2mon.client.video.VideoConnectionProperties">
+    <result property="id"              column="TIV_ID"/>
+    <result property="host"            column="TIV_HOST"/>
+    <result property="camera"          column="TIV_CAMERA"/>
+    <result property="login"           column="TIV_LOGIN"/>
+    <result property="password"        column="TIV_PASSWORD"/>
+    <result property="description"     column="TIV_DESCRIPTION"/>
+    <result property="queueingTagId"   column="TIV_REGISTRATIONDATA_TAGID"/>
+    <result property="activationTagId" column="TIV_ACTIVATIONDATA_TAGID"/>
+    <result property="keysTakenTagId"  column="TIV_KEYSTAKENDATA_TAGID"/>
+  </resultMap>
+
+
+  <!-- Sends a query to the database that returns all video connection
+       properties of a specific video system. -->
+  <select id="selectAllVideoConnectionProperties" parameterType="String" resultMap="VideoConnectionPropertiesResult">
+    select V.* 
+    from TIM_VIDEOS V, TIM_VIDEO_SYSTEMS VS 
+    where V.TIV_VIDEO_SYSTEM_ID = VS.TVS_VIDEO_SYSTEM_ID 
+          and VS.TVS_VIDEO_SYSTEM_NAME=#{videoSystemName}
+  </select>
+
+  <!-- Sends a query to the database that returns all user roles that are
+       privileged to connect to a specific video system.  -->
+  <select id="selectAllPermitedRoleNames" parameterType="String" resultType="String">
+    select R.ROLENAME 
+    from 
+    	SEC_ROLE R,
+    	TIM_VIDEO_RESTRICTIONS VR, TIM_VIDEO_SYSTEMS VS 
+    where VS.TVS_VIDEO_SYSTEM_NAME=#{videoSystemName}
+          and VR.TVR_ROLE_ID=R.ROLEID
+          and VR.TVR_VIDEO_SYSTEM_ID=VS.TVS_VIDEO_SYSTEM_ID
+  </select>
+
+</mapper>

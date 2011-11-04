@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+<!-- scan the package for Spring annotations -->
+<context:annotation-config/>
+<context:component-scan base-package="cern.c2mon.server.video"/>
+
+<!--
+
+Connection settings for client module
+
+-->
+
+<bean id="clientActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+  <property name="brokerURL" value="${jms.broker.url}"/>
+  <property name="userName" value="${jms.client.user}"/>
+  <property name="password" value="${jms.client.password}"/>
+  <property name="clientIDPrefix" value="C2MON-SERVER-VIDEO"/> 
+  <property name="watchTopicAdvisories" value="false"/>
+</bean>
+
+<!-- connection factory used for all connections to the server -->
+<bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">   
+   <property name="targetConnectionFactory" ref="clientActiveMQConnectionFactory" />   
+</bean>
+
+<!-- 
+
+Publication to Tag updates
+
+ -->
+
+<!-- plugged into ActiveJmsSender -->
+<bean id="clientTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+  <property name="connectionFactory" ref="singleConnectionFactory"/>
+</bean>
+
+<!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
+<bean name="clientTopicPublisher" class="cern.tim.util.jms.ActiveJmsSender">
+  <property name="jmsTemplate" ref="clientTopicPublisherJmsTemplate"></property>
+</bean>
+
+<!-- 
+
+Publication of Supervision events
+
+ -->
+
+<!-- 
+
+Request from clients
+
+ -->
+
+<bean id="clientRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+   <constructor-arg index="0" value="${jms.client.request.queue}"/>
+</bean>
+
+<!-- thread pool for request containers -->
+<bean id="clientExecutor" class="java.util.concurrent.ThreadPoolExecutor">
+  <constructor-arg value="1"/>      <!-- min threads -->
+  <constructor-arg value="1000"/>   <!-- i.e. unbounded max threads, in fact no more then max consumers in container are requested -->
+  <constructor-arg value="60000"/>  <!-- idle limit in milliseconds -->
+  <constructor-arg>
+    <bean class="java.util.concurrent.TimeUnit" factory-method="valueOf">
+      <constructor-arg value="MILLISECONDS"/>
+    </bean>
+  </constructor-arg>
+  <constructor-arg>
+    <bean class="java.util.concurrent.SynchronousQueue"/>
+  </constructor-arg>
+</bean>
+
+<bean id="clientRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+      <!-- include exception listener here? -->    
+      <property name="connectionFactory" ref="clientActiveMQConnectionFactory"/>
+      <property name="destination" ref="clientRequestDestination"/>
+      <property name="messageListener" ref="videoRequestHandler" />
+      <property name="concurrentConsumers" value="${c2mon.jms.client.consumers.min}"/>
+      <property name="maxConcurrentConsumers" value="${c2mon.jms.client.consumers.max}"/> 
+      <property name="maxMessagesPerTask" value="1"/>
+      <property name="receiveTimeout" value="1000"/>
+      <property name="idleTaskExecutionLimit" value="600"/>   
+      <property name="sessionTransacted" value="false"/>      
+      <property name="taskExecutor" ref="clientExecutor"/>  
+      <property name="autoStartup" value="false"/>
+      <property name="phase">
+        <util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_START_LAST"/>
+      </property>  
+</bean>
+
+</beans>
