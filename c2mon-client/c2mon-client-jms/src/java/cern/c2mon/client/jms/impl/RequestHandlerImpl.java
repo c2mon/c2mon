@@ -273,7 +273,7 @@ public class RequestHandlerImpl implements RequestHandler {
   
   public CommandReport executeCommand(final CommandTagHandle handle) throws JMSException {
     
-    ClientRequestImpl clientRequest = new ClientRequestImpl<CommandReportImpl>(CommandReportImpl.class);
+    ClientRequestImpl clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
     clientRequest.setObjectParameter(handle);
     
     Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
