@@ -147,7 +147,7 @@ public class ClientRequestMessageConverterTest {
   
   @Test
   public void testExecuteCommandMessageConversion() {
-    JsonRequest<CommandReportImpl> request = new ClientRequestImpl<CommandReportImpl>(CommandReportImpl.class);
+    JsonRequest<CommandReport> request = new ClientRequestImpl<CommandReport>(CommandReport.class);
 
     TextMessage message = new ActiveMQTextMessage();
     try {
