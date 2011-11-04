@@ -208,8 +208,8 @@ public class RequestHandlerImplTest {
     
     Long id = 123L;
 
-    ClientRequestImpl<CommandReportImpl> executeCommandRequest =
-      new ClientRequestImpl<CommandReportImpl>(CommandReportImpl.class);
+    ClientRequestImpl<CommandReport> executeCommandRequest =
+      new ClientRequestImpl<CommandReport>(CommandReport.class);
     
     CommandTagHandleImpl commandTagHandle = createCommandTagHandleImpl(id);
     executeCommandRequest.setObjectParameter(commandTagHandle);
