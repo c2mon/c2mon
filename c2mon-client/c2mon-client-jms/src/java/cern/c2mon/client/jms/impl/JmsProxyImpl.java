@@ -458,7 +458,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
       try {
         
-        Message message = null ;
+        Message message = null;
         
         if (jsonRequest.isObjectRequest()) { // used for EXECUTE_COMMAND_REQUESTS
           
