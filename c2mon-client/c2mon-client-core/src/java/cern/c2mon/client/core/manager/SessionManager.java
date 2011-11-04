@@ -20,8 +20,6 @@ package cern.c2mon.client.core.manager;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,7 +51,7 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
   /**
    * RBA integrator singleton. Used for checking RBAC authorization details
    */
-  private static final RBAIntegrator RBA = RBAIntegrator.getInstance();
+  private static RBAIntegrator rba;
   
   /** The authorization manager */
   private final AuthorizationManager authorizationManager;
@@ -67,9 +65,13 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
     this.authorizationManager = pAuthorizationManager;
   }
   
-  @PostConstruct
-  private void init() {
-    RBA.setAuthenticationListener(this);
+  @Override
+  public void init() {
+    if (rba == null) {
+      LOG.debug("init() - Registering SessionManager as RBAC authentication listener.");
+      rba = RBAIntegrator.getInstance();
+      rba.setAuthenticationListener(this);
+    }
   }
   
   @Override
@@ -103,7 +105,8 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
 
   @Override
   public void loginPerformed() {
-    String userName = RBA.getLoggedUsername();
+    rba = RBAIntegrator.getInstance();
+    String userName = rba.getLoggedUsername();
     for (SessionListener listener : sessionListeners) {
       listener.onLogin(userName);
     }
@@ -123,6 +126,6 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
 
   @Override
   public String getUserName() {
-    return RBA.getLoggedUsername();
+    return rba.getLoggedUsername();
   }
 }
