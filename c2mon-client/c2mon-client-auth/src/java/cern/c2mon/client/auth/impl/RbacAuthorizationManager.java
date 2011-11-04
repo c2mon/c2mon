@@ -1,7 +1,5 @@
 package cern.c2mon.client.auth.impl;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.stereotype.Service;
 
 import cern.accsoft.security.rba.util.gui.RBAIntegrator;
@@ -17,11 +15,6 @@ import cern.tim.shared.common.command.AuthorizationDetails;
  */
 @Service
 public class RbacAuthorizationManager implements AuthorizationManager {
-
-  /**
-   * RBA integrator singleton. Used for checking RBAC authorization details
-   */
-  private static final RBAIntegrator rba = RBAIntegrator.getInstance();
   
   /**
    * Default Constructor
@@ -42,6 +35,7 @@ public class RbacAuthorizationManager implements AuthorizationManager {
           + " is not supported. Please get the latest JARs");
     }              
 
+    final RBAIntegrator rba = RBAIntegrator.getInstance();
     if (rba.isUserLogged()) {
       return rba.isAuthorized(rbacDetails.getRbacClass(), rbacDetails.getRbacDevice(), rbacDetails.getRbacProperty());
     }
@@ -52,6 +46,7 @@ public class RbacAuthorizationManager implements AuthorizationManager {
 
   @Override
   public boolean isUserLogged() {
+    final RBAIntegrator rba = RBAIntegrator.getInstance();
     return rba.isUserLogged();
   }
 }
