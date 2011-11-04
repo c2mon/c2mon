@@ -54,7 +54,7 @@ public class MetricDef {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof EquipmentDef))
+        if (obj == null || !(obj instanceof MetricDef))
             return false;
 
         MetricDef other = (MetricDef) obj;

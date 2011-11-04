@@ -16,6 +16,8 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
 
+
+
 public class C2MonClientApiTest {
 
     private static Logger log = Logger.getLogger(C2MonClientApiTest.class);

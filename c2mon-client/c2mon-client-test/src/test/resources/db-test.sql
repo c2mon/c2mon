@@ -44,3 +44,32 @@ VALUES (10002,1,'CLIC:CS-CCR-DEV2:METRIC2','METRIC2',188864,'Integer',1,'descrip
 
 INSERT INTO dmn_metric_v (metric_data_tag_id,equipment_id,metric_name,display_name,metric_rule_tag_id,data_type,test_id,description) 
 VALUES (10003,3,'CLIC:CS-CCR-DEV2:METRIC3','METRIC3',null,'Integer',1,'description metric3');
+
+
+
+CREATE TABLE dmn_computers_v (    
+    entity_id INTEGER NOT NULL PRIMARY KEY,    
+    computer_name VARCHAR(4000) NOT NULL,   
+    CONSTRAINT TUC_COMP_DEF_1 UNIQUE (computer_name)
+);
+
+
+INSERT INTO dmn_computers_v (entity_id,computer_name) VALUES (19675,'cs-ccr-dev1');
+INSERT INTO dmn_computers_v (entity_id,computer_name) VALUES (19676,'cs-ccr-dev2');
+
+
+CREATE TABLE dmn_commands_v (                  
+    command_unique_name VARCHAR(4000) NOT NULL,
+    command_type   VARCHAR(100) NOT NULL,
+    command_data_type VARCHAR(100) NOT NULL,
+    command_tag_id INTEGER NOT NULL,
+    entity_id INTEGER NOT NULL,
+    CONSTRAINT TUC_COM_DEF_1 UNIQUE (command_unique_name),
+    CONSTRAINT TUC_COM_DEF_2 UNIQUE (command_tag_id)
+);
+
+
+INSERT INTO dmn_commands_v (command_unique_name,command_type,command_data_type,command_tag_id,entity_id) VALUES ('CS-CCR-DEV1:PROCESSES','GET','String',196793,19675);
+INSERT INTO dmn_commands_v (command_unique_name,command_type,command_data_type,command_tag_id,entity_id) VALUES ('CS-CCR-DEV1:VERSION','GET','String',198908,19675);
+
+

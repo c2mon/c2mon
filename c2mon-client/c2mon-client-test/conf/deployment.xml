@@ -2,7 +2,11 @@
 <products>
 	<product name="c2mon-client-test">
 
-		<application name="c2mon-client-test">
+		<!--
+			this application section is a parent configuration for both
+			c2mon-dmn2-prod and c2mon-dmn2-test
+		-->
+		<application name="default">
 
 			<deployment>
 				<directory name="conf">
@@ -19,11 +23,15 @@
 					<!-- you can give more than one mail for deployment notification -->
 					<mail address="timdiamon-developers@cern.ch" />
 				</notification>
-			</deployment>
+			</deployment>			
+		</application>
+
+		<application name="c2mon-client-test" extends="default">
+
 			<startscript name="C2MON-DMN2-CLIENT-TEST">
 				<main-class name="cern.c2mon.client.apitest.C2MonClientApiTest">
-				    <output>
-							<file name="log/out.log" />
+					<output>
+						<file name="log/out.log" />
 					</output>
 					<arg></arg>
 					<preExec>
@@ -42,6 +50,32 @@
 				</main-class>
 			</startscript>
 		</application>
+
+		<application name="c2mon-client-commands-test" extends="default">
+
+			<startscript name="C2MON-DMN2-CLIENT-COMMANDS-TEST">
+				<main-class name="cern.c2mon.client.apitest.C2MONClientCommandExecutionTest">
+					<output>
+						<file name="log/out.log" />
+					</output>
+					<arg></arg>
+					<preExec>
+			        <![CDATA[			          
+			         ]]>
+					</preExec>
+
+					<property name="c2mon.log.dir" value="log" />
+					<property name="jms.properties" value="conf/jms.properties" />
+					<property name="db.properties" value="conf/.c2mon.properties" />
+					<property name="log4j.configuration" value="conf/log4j.xml" />
+
+					<output>
+						<file name="log/out.log" />
+					</output>
+				</main-class>
+			</startscript>
+		</application>
+
 
 	</product>
 </products>

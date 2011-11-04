@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.client.apitest.CommandDef;
 import cern.c2mon.client.apitest.EquipmentDef;
 import cern.c2mon.client.apitest.MetricDef;
 import cern.c2mon.client.apitest.db.C2MonClientApiTestDao;
@@ -76,5 +77,20 @@ public class C2MonClientApiTestDaoTest {
         assertEquals("CLIC",ed.getType());
         assertEquals(223L,ed.getRuleTagId());                
     }
+    
+    
+    @Test
+    public void getRegisteredCommands() throws Exception {
+        List<CommandDef> defs = dao.getRegisteredCommands("cs-ccr-dev1");                        
+        assertEquals(2,defs.size());
+        
+        //List<EquipmentDef> defs2 = dao.getEquipments("P_CLIC_02");
+        //assertEquals(1,defs2.size());
+        
+        //EquipmentDef ed = defs2.get(0);
+        //assertEquals("TESTDEVICE3",ed.getName());
+        //assertEquals("CLIC",ed.getType());
+        //assertEquals(223L,ed.getRuleTagId());                
+    }    
     
 }

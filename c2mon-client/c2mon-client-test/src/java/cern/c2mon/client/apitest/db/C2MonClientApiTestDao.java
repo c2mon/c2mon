@@ -2,6 +2,7 @@ package cern.c2mon.client.apitest.db;
 
 import java.util.List;
 
+import cern.c2mon.client.apitest.CommandDef;
 import cern.c2mon.client.apitest.EquipmentDef;
 import cern.c2mon.client.apitest.MetricDef;
 
@@ -29,5 +30,12 @@ public interface C2MonClientApiTestDao {
      * @return
      */
     List<EquipmentDef> getEquipments(String... processNames);
+    
+    
+    /**
+     * This method returns a list of registered commands for given computer
+     * @return
+     */
+    List<CommandDef> getRegisteredCommands(String computerName);    
 
 }

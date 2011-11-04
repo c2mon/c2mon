@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cern.c2mon.client.apitest.CommandDef;
 import cern.c2mon.client.apitest.EquipmentDef;
 import cern.c2mon.client.apitest.MetricDef;
 import cern.c2mon.client.apitest.db.C2MonClientApiTestDao;
@@ -42,6 +43,12 @@ public class C2MonClientApiTestServiceImpl implements C2MonClientApiTestService 
     public List<EquipmentDef> getEquipments(String... processNames) {
         log.debug("entering getEquipments()");
         return dao.getEquipments(processNames);
+    }
+
+    @Override
+    public List<CommandDef> getRegisteredCommands(String computer) {
+        log.debug("entering getEquipments()");
+        return dao.getRegisteredCommands(computer);
     }
 
 }

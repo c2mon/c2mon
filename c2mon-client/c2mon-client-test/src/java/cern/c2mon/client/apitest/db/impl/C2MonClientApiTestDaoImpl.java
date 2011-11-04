@@ -3,6 +3,7 @@ package cern.c2mon.client.apitest.db.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import cern.c2mon.client.apitest.CommandDef;
 import cern.c2mon.client.apitest.EquipmentDef;
 import cern.c2mon.client.apitest.MetricDef;
 import cern.c2mon.client.apitest.db.C2MonClientApiTestDao;
@@ -93,5 +94,25 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
         return this.jdbcTemplate.query(sql.toString(), mapper, parameters);
 
     }
-    
+
+    @Override
+    public List<CommandDef> getRegisteredCommands(String computer) {
+        StringBuilder sql = new StringBuilder(
+                "select command_tag_id, command_unique_name, command_type, command_data_type from dmn_commands_v commands "
+                        + "inner join dmn_computers_v computers on commands.entity_id=computers.entity_id where "
+                        + "computers.computer_name=?");
+                        
+
+        RowMapper<CommandDef> mapper = new RowMapper<CommandDef>() {
+
+            @Override
+            public CommandDef mapRow(ResultSet rs, @SuppressWarnings("unused") int arg1) throws SQLException {
+                CommandDef def = new CommandDef(rs.getLong("command_tag_id"), rs.getString("command_unique_name"), rs
+                        .getString("command_type"), rs.getString("command_data_type"));
+                return def;
+            }
+        };
+
+        return this.jdbcTemplate.query(sql.toString(), mapper, new Object[] { computer });
+    }
 }
