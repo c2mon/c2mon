@@ -177,6 +177,7 @@ public final class C2monServiceGateway {
       supervisionManager = psupervisionManager;
       historyManager = pHistoryManager;
       commandManager = pCommandManager;
+      sessionManager = pSessionManager;
     }
   }
 }
