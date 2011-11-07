@@ -36,6 +36,7 @@ public class C2MONClientCommandExecutionTest {
 
     static Map<Long, ClientCommandTag<?>> clientCommandsMap = new HashMap<Long, ClientCommandTag<?>>();
 
+    static C2monSessionManager sessionManager;
     static C2monCommandManager commandsManager;
 
     /**
@@ -89,7 +90,11 @@ public class C2MONClientCommandExecutionTest {
             log.info(format("getting db. list of registered commands for computer: %s", args[0]));
             List<CommandDef> commands = Dmn2DbServiceGateway.getDbAccessService().getRegisteredCommands(args[0]);
 
-            // C2monSessionManager
+            sessionManager = C2monServiceGateway.getSessionManager();
+
+            log.info(format("sessionManager user: %s isLogged: %s", sessionManager.isUserLogged(), sessionManager
+                    .getUserName()));
+
             commandsManager = C2monServiceGateway.getCommandManager();
 
             Set<Long> cmdIds = new HashSet<Long>();
