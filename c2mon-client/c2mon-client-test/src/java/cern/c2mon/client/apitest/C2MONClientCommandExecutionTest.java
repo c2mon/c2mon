@@ -34,7 +34,7 @@ public class C2MONClientCommandExecutionTest {
 
     static Console console = null;
 
-    static Map<Long, ClientCommandTag> clientCommandsMap = new HashMap<Long, ClientCommandTag>();
+    static Map<Long, ClientCommandTag<?>> clientCommandsMap = new HashMap<Long, ClientCommandTag<?>>();
 
     static C2monCommandManager commandsManager;
 
