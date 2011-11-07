@@ -1,9 +1,9 @@
 package cern.c2mon.server.client.request;
 
+import static junit.framework.Assert.assertTrue;
+
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
-
-import static junit.framework.Assert.*;
 
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.junit.Test;
@@ -17,9 +17,7 @@ import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.client.command.CommandReport;
-import cern.tim.shared.client.command.CommandReportImpl;
 import cern.tim.shared.client.command.CommandTagHandle;
-import cern.tim.shared.client.command.CommandTagHandleImpl;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 public class ClientRequestMessageConverterTest {
