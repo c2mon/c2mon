@@ -22,6 +22,7 @@ import cern.c2mon.client.apitest.db.Dmn2DbServiceGateway;
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.core.C2monSessionManager;
 import cern.rba.util.holder.ClientTierSubjectHolder;
 import cern.tim.shared.client.command.CommandReport;
 
@@ -34,6 +35,8 @@ public class C2MONClientCommandExecutionTest {
     static Console console = null;
 
     static Map<Long, ClientCommandTag> clientCommandsMap = new HashMap<Long, ClientCommandTag>();
+
+    static C2monCommandManager commandsManager;
 
     /**
      * Performs login from the command line.
@@ -76,7 +79,8 @@ public class C2MONClientCommandExecutionTest {
 
             Dmn2DbServiceGateway.init();
             log.info("after Dmn2DbServiceGateway.init()");
-            C2monServiceGateway.startC2monClient("file:" + System.getProperty("jms.properties"));
+
+            // C2monServiceGateway.startC2monClient("file:" + System.getProperty("jms.properties"));
 
             log.info("authenticate with RBAC..");
             ClientTierSubjectHolder.setRBASubject(login());
@@ -85,7 +89,8 @@ public class C2MONClientCommandExecutionTest {
             log.info(format("getting db. list of registered commands for computer: %s", args[0]));
             List<CommandDef> commands = Dmn2DbServiceGateway.getDbAccessService().getRegisteredCommands(args[0]);
 
-            C2monCommandManager commandsManager = C2monServiceGateway.getCommandManager();
+            // C2monSessionManager
+            commandsManager = C2monServiceGateway.getCommandManager();
 
             Set<Long> cmdIds = new HashSet<Long>();
 
@@ -97,7 +102,7 @@ public class C2MONClientCommandExecutionTest {
 
             log.info("requesting client command-tag objects from C2MON srv..");
 
-            for (ClientCommandTag ct : commandsManager.getCommandTags(cmdIds)) {
+            for (ClientCommandTag<?> ct : commandsManager.getCommandTags(cmdIds)) {
                 clientCommandsMap.put(ct.getId(), ct);
 
             }
@@ -108,7 +113,7 @@ public class C2MONClientCommandExecutionTest {
                 String idStr = console.readLine("Enter command id to execute: ");
                 Long id = Long.parseLong(idStr);
 
-                ClientCommandTag ct = clientCommandsMap.get(id);
+                ClientCommandTag<?> ct = clientCommandsMap.get(id);
 
                 try {
 
@@ -135,7 +140,7 @@ public class C2MONClientCommandExecutionTest {
                     }
 
                     log.info(format("executing command: %d, value:%s", id, val));
-                    CommandReport rep = ct.setValue(val);
+                    CommandReport rep = commandsManager.executeCommand(ct.getId(), val);
                     log.info("done, report received");
                     console.printf("command report status: %d, txt: %s, report-txt: %s", rep.getStatus().getStatus(),
                             rep.getStatusText(), rep.getReportText());
@@ -149,6 +154,6 @@ public class C2MONClientCommandExecutionTest {
             log.error(e);
             System.exit(-1);
         }
-       
+
     }
 }
