@@ -55,6 +55,7 @@ import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
+import cern.tim.shared.client.command.CommandExecuteRequest;
 import cern.tim.shared.client.command.CommandTagHandle;
 import cern.tim.shared.client.command.CommandTagHandleImpl;
 
@@ -463,7 +464,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         if (jsonRequest.isObjectRequest()) { // used for EXECUTE_COMMAND_REQUESTS
           
           // send only the object
-          CommandTagHandleImpl o = (CommandTagHandleImpl) jsonRequest.getObjectParameter();
+          CommandExecuteRequest o = (CommandExecuteRequest) jsonRequest.getObjectParameter();
           message = session.createObjectMessage(o);
 
         }
@@ -491,7 +492,6 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           if (replyMessage instanceof ObjectMessage) {
             
             return (Collection<T>)((ObjectMessage) replyMessage).getObject() ;
-          
           }
           
           else // replyMessage is an instanceof TextMessage

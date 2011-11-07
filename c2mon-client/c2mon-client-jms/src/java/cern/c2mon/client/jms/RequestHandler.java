@@ -120,6 +120,7 @@ public interface RequestHandler {
   Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException;
   
   /**
+   * 
    * @param commandIds
    * @return
    */
