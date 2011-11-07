@@ -294,7 +294,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
       switch (configurationRequest.getResultType()) {
         case TRANSFER_CONFIGURATION_REPORT:
-          reports.add(configurationLoader.applyConfiguration(configId, null));
+          reports.add(configurationLoader.applyConfiguration(configId));
           break;
         default:
           LOG.error("handleConfigurationRequest() - Could not generate response message. Unknown enum ResultType " + configurationRequest.getResultType());
