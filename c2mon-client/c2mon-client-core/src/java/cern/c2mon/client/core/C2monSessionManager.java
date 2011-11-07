@@ -30,13 +30,6 @@ import cern.c2mon.client.common.listener.SessionListener;
 public interface C2monSessionManager {
   
   /**
-   * This method shall be called after RBAC has been initialized. The
-   * sessin manager will then be registered as <code>AuthenticationListener</code>
-   * to RBAC.
-   */
-  void init();
-  
-  /**
    * Registers a listener for receiving event updates from the
    * <code>SessionManager</code>.
    * 

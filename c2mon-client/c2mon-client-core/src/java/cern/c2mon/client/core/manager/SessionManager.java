@@ -65,19 +65,33 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
     this.authorizationManager = pAuthorizationManager;
   }
   
-  @Override
-  public void init() {
+  /**
+   * This method has to be called in order to initialize the communication with the RBAIntegrator. 
+   * The sessin manager will then be registered as <code>AuthenticationListener</code>
+   * to RBAC.
+   */
+  private boolean init() {
     if (rba == null) {
       LOG.debug("init() - Registering SessionManager as RBAC authentication listener.");
       rba = RBAIntegrator.getInstance();
-      rba.setAuthenticationListener(this);
+      if (rba != null) {
+        rba.setAuthenticationListener(this);
+      }
+      else {
+        throw new IllegalStateException(
+            "Could not get a valid RBAIntegrator object. Please create first a RBAIntegratorContext before using the SessionManager.");
+      }
     }
+    
+    return (rba != null);
   }
   
   @Override
   public void addSessionListener(SessionListener pListener) {
-    if (pListener != null && !sessionListeners.contains(pListener)) {
-      sessionListeners.add(pListener);
+    if (init()) {
+      if (pListener != null && !sessionListeners.contains(pListener)) {
+        sessionListeners.add(pListener);
+      }
     }
   }
 
@@ -100,23 +114,30 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
   
   @Override
   public boolean isUserLogged() {
-    return authorizationManager.isUserLogged();
+    if (init()) {
+      return authorizationManager.isUserLogged();
+    }
+
+    return false;
   }
 
   @Override
   public void loginPerformed() {
-    rba = RBAIntegrator.getInstance();
-    String userName = rba.getLoggedUsername();
-    for (SessionListener listener : sessionListeners) {
-      listener.onLogin(userName);
+    if (init()) {
+      String userName = rba.getLoggedUsername();
+      for (SessionListener listener : sessionListeners) {
+        listener.onLogin(userName);
+      }
     }
   }
 
   @Override
   public void logoutPerformed() {
-    for (SessionListener listener : sessionListeners) {
-      listener.onLogout();
-    } 
+    if (init()) {
+      for (SessionListener listener : sessionListeners) {
+        listener.onLogout();
+      }
+    }
   }
 
   @Override
@@ -126,6 +147,10 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
 
   @Override
   public String getUserName() {
-    return rba.getLoggedUsername();
+    if (init()) {
+      return rba.getLoggedUsername();
+    }
+    
+    return null;
   }
 }
