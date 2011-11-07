@@ -36,6 +36,12 @@
         <property name="url" value="${jdbc.ro.url}" />
         <property name="username" value="${jdbc.ro.user}" />
         <property name="password" value="${jdbc.ro.password}" />
+        <property name="poolPingEnabled" value="true"/>
+        <property name="poolPingQuery" value="SELECT 1 FROM DUAL"/>
+        <!-- <property name="poolPingConnectionsNotUsedFor" value=""/>  -->
+        
+        <property name="poolMaximumIdleConnections" value="3"/>
+        <property name="poolMaximumCheckoutTime" value="60000"/>
       </dataSource>
     </environment>
   </environments>
