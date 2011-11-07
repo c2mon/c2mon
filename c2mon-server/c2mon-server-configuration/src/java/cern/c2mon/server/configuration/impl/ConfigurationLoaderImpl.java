@@ -41,8 +41,6 @@ import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.ProcessFacade;
 import cern.tim.server.common.config.DistributedParams;
 import cern.tim.server.daqcommunication.out.ProcessCommunicationManager;
-import cern.tim.shared.client.auth.TimSessionInfo;
-import cern.tim.shared.client.auth.impl.TimSessionInfoImpl;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 import cern.tim.shared.client.configuration.ConfigurationException;
@@ -140,37 +138,16 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
 
   @Override
-  public ConfigurationReport applyConfiguration(final int configId, final String sessionId) {
-    TimSessionInfo sessionInfo = null;
+  public ConfigurationReport applyConfiguration(final int configId) {
+    
     ConfigurationReport report = null;
     try {
       exclusiveConfigLock.lock();
-      //TODO get session info from authentication cache...
-      sessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"}); //TODO faked user so far
-      if (sessionInfo == null){
-        return new ConfigurationReport(
-            configId, 
-            "UNKNOWN", 
-            "UNKNOWN",
-            Status.FAILURE,
-            "No session info set in request!"
-          ); 
-      }
-      
+          
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug(
-          new StringBuffer("applyConfiguration(configId: ").append(configId).append(", sessionId: ").append(sessionInfo.getSessionId()).append(") called.")
+          new StringBuffer("applyConfiguration(configId: ").append(configId).append(") called.")
         );
-      }
-      
-      if (!sessionInfo.hasPrivilege("WEBCONFIG_USER")) {
-        return new ConfigurationReport(
-            configId, 
-            "UNKNOWN", 
-            sessionInfo.getUserName(),
-            Status.FAILURE,
-            "Insufficient user privileges to carry out reconfigurations!"
-          );      
       }
       
       String configName = configurationDAO.getConfigName(configId);    
@@ -178,8 +155,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         LOGGER.warn("Unable to locate configuration with id " + configId + " - cannot be applied.");
         return new ConfigurationReport(
             configId, 
-            "UNKNOWN", 
-            sessionInfo.getUserName(),
+            "UNKNOWN",
+            "", //TODO set user name through RBAC once available
             Status.FAILURE,
             "Configuration with id <" + configId + "> not found. Please try again with a valid configuration id"
           );
@@ -194,7 +171,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       
       report = new ConfigurationReport(configId, 
           configName,
-          sessionInfo.getUserName());      
+          "");      
       List<ConfigurationElement> configElements = configurationDAO.getConfigElements(configId);            
       for (ConfigurationElement element : configElements) {
         //initialize success report
@@ -291,14 +268,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     } catch (Exception ex) {
       LOGGER.error("Exception caught while applying configuration " + configId, ex); 
       if (report == null) {
-        String userName = null;
-        if (sessionInfo != null) {
-          userName = sessionInfo.getUserName();
-        }
+        String userName = null;       
         report = new ConfigurationReport(
             configId, 
             "UNKNOWN", 
-            userName,
+            "",
             Status.FAILURE,
             "Exception caught when applying configuration with id <" + configId + ">."
           ); 

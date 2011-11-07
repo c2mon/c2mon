@@ -56,10 +56,9 @@ public interface ConfigurationLoader {
    * the state tag is set to RECONFIGURED until a new successful reconfiguration is applied.
    * 
    * @param configId the id of the configuration to apply to the server
-   * @param sessionId authorization to run the config loader
    * @return a report with details of the success/failure of the reconfiguration
    * @throws ConfigurationException if the configuration fails (report is attached)
    */
-  ConfigurationReport applyConfiguration(int configId, String sessionId);
+  ConfigurationReport applyConfiguration(int configId);
   
 }

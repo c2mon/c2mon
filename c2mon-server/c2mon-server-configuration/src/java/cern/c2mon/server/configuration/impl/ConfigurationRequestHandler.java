@@ -74,7 +74,7 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
     LOGGER.info("Reconfiguration request received for configuration with id " + configRequest.getConfigId());
     ConfigurationReport configurationReport;
     try {
-       configurationReport = configurationLoader.applyConfiguration(configRequest.getConfigId(), configRequest.getSessionId());
+       configurationReport = configurationLoader.applyConfiguration(configRequest.getConfigId());
     } catch (ConfigurationException ex) {
       configurationReport = ex.getConfigurationReport();
     }    

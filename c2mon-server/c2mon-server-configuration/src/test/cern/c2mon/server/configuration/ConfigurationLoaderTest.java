@@ -72,8 +72,6 @@ import cern.tim.server.common.rule.RuleTagCacheObject;
 import cern.tim.server.common.subequipment.SubEquipmentCacheObject;
 import cern.tim.server.common.tag.Tag;
 import cern.tim.server.daqcommunication.out.ProcessCommunicationManager;
-import cern.tim.shared.client.auth.TimSessionInfo;
-import cern.tim.shared.client.auth.impl.TimSessionInfoImpl;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
 import cern.tim.shared.client.configuration.ConfigConstants;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
@@ -226,8 +224,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @DirtiesContext //TODO why?
   public void testCreateUpdateRemoveControlTag() {
     //create
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
-    ConfigurationReport report = configurationLoader.applyConfiguration(2, timSessionInfo.getSessionId());
+    ConfigurationReport report = configurationLoader.applyConfiguration(2);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
@@ -252,7 +249,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject); //object correctly loaded to cache
     
     //test update of control tag
-    report = configurationLoader.applyConfiguration(6, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(6);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
@@ -262,7 +259,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
     
     //remove
-    report = configurationLoader.applyConfiguration(8, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(8);
     System.out.println(report.toXML());
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty()); //empty because no process/equipment points to this control tag
@@ -278,8 +275,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
-    ConfigurationReport report = configurationLoader.applyConfiguration(3, timSessionInfo.getSessionId());
+   
+    ConfigurationReport report = configurationLoader.applyConfiguration(3);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     CommandTagCacheObject cacheObject = (CommandTagCacheObject) commandTagCache.get(10000L);
@@ -300,7 +297,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObject);
    
     //test update
-    report = configurationLoader.applyConfiguration(5, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(5);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     
@@ -313,7 +310,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObjectUpdated);
    
     //test remove
-    report = configurationLoader.applyConfiguration(9, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(9);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(commandTagCache.hasKey(10000L));
     assertNull(commandTagMapper.getItem(10000L));
@@ -328,8 +325,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
-    ConfigurationReport report = configurationLoader.applyConfiguration(1, timSessionInfo.getSessionId());
+    
+    ConfigurationReport report = configurationLoader.applyConfiguration(1);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
@@ -372,7 +369,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     equipment.getWriteLock().unlock();
     
     //test update of this datatag
-    report = configurationLoader.applyConfiguration(4, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(4);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
@@ -391,7 +388,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     System.out.println(equipmentCache.get(cacheObject.getEquipmentId()).getDataTagIds().toString());    
     equipment.getWriteLock().unlock(); 
     //test remove    
-    report = configurationLoader.applyConfiguration(7, timSessionInfo.getSessionId());    
+    report = configurationLoader.applyConfiguration(7);    
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
@@ -425,10 +422,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     //the mocked ProcessCommmunicationManager will be called once when creating the datatag to base the rule on
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
+    
     //insert datatag to base rule on
-    configurationLoader.applyConfiguration(1, timSessionInfo.getSessionId());
-    ConfigurationReport report = configurationLoader.applyConfiguration(10, timSessionInfo.getSessionId());
+    configurationLoader.applyConfiguration(1);
+    ConfigurationReport report = configurationLoader.applyConfiguration(10);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     RuleTagCacheObject cacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
@@ -457,13 +454,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setRuleText("true[0]");
     expectedObject.setProcessIds(Collections.EMPTY_SET);
     expectedObject.setEquipmentIds(Collections.EMPTY_SET);
-    report = configurationLoader.applyConfiguration(11, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(11);
     System.out.println(report.toXML());
     RuleTagCacheObject updatedCacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
     ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, updatedCacheObject); 
     
     //remove ruletag
-    report = configurationLoader.applyConfiguration(12, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(12);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(ruleTagCache.hasKey(50100L));
@@ -480,10 +477,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     //insert rule and tag as in previous test
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
+   
     //insert datatag to base rule on
-    configurationLoader.applyConfiguration(1, timSessionInfo.getSessionId());
-    configurationLoader.applyConfiguration(10, timSessionInfo.getSessionId());
+    configurationLoader.applyConfiguration(1);
+    configurationLoader.applyConfiguration(10);
     verify(mockManager);
     assertTrue(ruleTagCache.hasKey(50100L));
     assertNotNull(ruleTagMapper.getItem(50100L));
@@ -496,7 +493,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     //expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
     //test removal of tag 5000000 removes the rule also
-    configurationLoader.applyConfiguration(7, timSessionInfo.getSessionId()); 
+    configurationLoader.applyConfiguration(7); 
     assertFalse(ruleTagCache.hasKey(50100L));
     assertNull(ruleTagMapper.getItem(50100L));
     assertFalse(dataTagCache.hasKey(5000000L));
@@ -516,10 +513,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Test  
   public void testAlarmRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});
-        
+       
     //add alarm
-    ConfigurationReport report = configurationLoader.applyConfiguration(22, timSessionInfo.getSessionId());        
+    ConfigurationReport report = configurationLoader.applyConfiguration(22);        
     
     //test remove tag    
     reset(mockManager);    
@@ -527,7 +523,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
     
     //test removal of tag 5000000 removes the alarm also
-    configurationLoader.applyConfiguration(27, timSessionInfo.getSessionId()); 
+    configurationLoader.applyConfiguration(27); 
     assertFalse(alarmCache.hasKey(300000L));
     assertNull(alarmMapper.getItem(300000L));
     assertFalse(dataTagCache.hasKey(200003L));
@@ -565,8 +561,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     });
     
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
-    ConfigurationReport report = configurationLoader.applyConfiguration(13, timSessionInfo.getSessionId());
+    
+    ConfigurationReport report = configurationLoader.applyConfiguration(13);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.RESTART, report.getStatus());
     assertTrue(report.getProcessesToReboot().contains("P_TESTHANDLER03")); //empty because no process/equipment points to this control tag
@@ -595,7 +591,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
     
     //update (creates controltag and updates equipment) - should succeed 
-    report = configurationLoader.applyConfiguration(25, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(25);
     System.out.println(report.toXML());
     //expect 2 top elements (control and equipment, with control first)
     //  equipment report should have 2 sub-reports, control report none
@@ -629,7 +625,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     //remove equipment
     //remove completes successfully; both Equipment and ControlTags are removed
-    report = configurationLoader.applyConfiguration(15, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(15);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));    
     assertEquals(Status.RESTART, report.getStatus());
@@ -647,8 +643,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   public void testCreateUpdateRemoveProcess() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //currently no configuration required on DAQ layer for Process configuration options
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
-    ConfigurationReport report = configurationLoader.applyConfiguration(16, timSessionInfo.getSessionId());
+    
+    ConfigurationReport report = configurationLoader.applyConfiguration(16);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     
@@ -666,7 +662,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
     
     //update    
-    report = configurationLoader.applyConfiguration(17, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(17);
     System.out.println(report.toXML());
     
     cacheObject = (ProcessCacheObject) processCache.get(2L);
@@ -676,7 +672,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
     
     //remove succeeds
-    report = configurationLoader.applyConfiguration(18, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(18);
     assertFalse(processCache.hasKey(2L));
     assertNull(processMapper.getItem(2L));
     verify(mockManager);
@@ -694,8 +690,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     processFacade.stop(processCache.get(50L));
     
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
-    ConfigurationReport report = configurationLoader.applyConfiguration(28, timSessionInfo.getSessionId());
+    
+    ConfigurationReport report = configurationLoader.applyConfiguration(28);
     verify(mockManager);
     //check process, tag, rules and alarms are gone
     assertFalse(processCache.hasKey(50L));
@@ -729,8 +725,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @DirtiesContext
   public void testRemoveEquipment() {
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
-    ConfigurationReport report = configurationLoader.applyConfiguration(29, timSessionInfo.getSessionId());
+    
+    ConfigurationReport report = configurationLoader.applyConfiguration(29);
     verify(mockManager);
     //check equipment, tag, rules and alarms are gone   
     assertFalse(equipmentCache.hasKey(150L));
@@ -760,8 +756,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   public void testCreateUpdateRemoveSubEquipment() {
     //update unsuccessful so no message sent to DAQ
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
-    ConfigurationReport report = configurationLoader.applyConfiguration(19, timSessionInfo.getSessionId());
+   
+    ConfigurationReport report = configurationLoader.applyConfiguration(19);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));    
     
@@ -794,7 +790,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     //update should fail as try to change parent id 
     boolean failed = false;
     try {
-      report = configurationLoader.applyConfiguration(20, timSessionInfo.getSessionId());     
+      report = configurationLoader.applyConfiguration(20);     
     } catch (cern.tim.shared.client.configuration.ConfigurationException e) {
       System.out.println(e.getConfigurationReport());
       failed = true;
@@ -803,7 +799,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     //remove subequipment - succeeds
     //(control tags should remain, equipment should go as should commfault and alive cache objects)
-    report = configurationLoader.applyConfiguration(21, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(21);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(subEquipmentCache.hasKey(200L));
@@ -828,8 +824,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Test
   public void testCreateUpdateRemoveAlarm() {
     replay(mockManager);
-    TimSessionInfo timSessionInfo = new TimSessionInfoImpl(null, 0, null, null, null, new String[] {"WEBCONFIG_USER"});      
-    ConfigurationReport report = configurationLoader.applyConfiguration(22, timSessionInfo.getSessionId());
+    
+    ConfigurationReport report = configurationLoader.applyConfiguration(22);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));    
     
@@ -848,7 +844,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertTrue(tag.getAlarmIds().contains(expectedObject.getId()));    
     
     //update should succeed
-    report = configurationLoader.applyConfiguration(23, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(23);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));    
     cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
@@ -857,7 +853,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     
     //remove alarm - should succeed 
-    report = configurationLoader.applyConfiguration(24, timSessionInfo.getSessionId());
+    report = configurationLoader.applyConfiguration(24);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(alarmCache.hasKey(300000L));
