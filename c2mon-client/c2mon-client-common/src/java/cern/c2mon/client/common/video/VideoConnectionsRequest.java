@@ -28,9 +28,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import cern.c2mon.shared.client.tag.TagConfigImpl;
-import cern.tim.shared.client.auth.SessionInfo;
-import cern.tim.shared.client.auth.TimSessionInfo;
-import cern.tim.shared.client.auth.impl.TimSessionInfoImpl;
 import cern.tim.util.json.GsonFactory;
 
 
@@ -64,7 +61,7 @@ public class VideoConnectionsRequest {
   private static final long serialVersionUID = 4009739147206968637L;
 
   /** The session information that contains the user's privileges */
-  private final TimSessionInfoImpl sessionInfo;
+//  private final TimSessionInfoImpl sessionInfo;
   
   /** The name of the video system whose connection list is requested */
   private final String videoSystemName;
@@ -77,8 +74,9 @@ public class VideoConnectionsRequest {
    * @param sessionInfo  The session information that contains the user's privileges
    * @param videoSystemName The name of the video system whose connection list is requested
    */
-  public VideoConnectionsRequest(final TimSessionInfoImpl sessionInfo, final  String videoSystemName ) {
-    this.sessionInfo = sessionInfo;
+  public VideoConnectionsRequest(final  String videoSystemName ) {
+    
+//    this.sessionInfo = sessionInfo;
     this.videoSystemName = videoSystemName;
   }
   
@@ -88,7 +86,8 @@ public class VideoConnectionsRequest {
    * @return true, if the role name is part of the internal TimSessionInfo
    */
   public final boolean hasPrivilege(String pPrivName) {
-    return sessionInfo.hasPrivilege(pPrivName);
+//    return sessionInfo.hasPrivilege(pPrivName);
+    throw new UnsupportedOperationException () ;
   }
 
   /**
