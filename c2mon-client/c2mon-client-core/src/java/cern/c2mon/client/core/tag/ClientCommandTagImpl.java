@@ -6,7 +6,7 @@ import cern.tim.shared.client.command.CommandTagValueException;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
 import cern.tim.shared.common.command.AuthorizationDetails;
 
-public class ClientCommandTagImpl<T> implements ClientCommandTag<T> {
+public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
 
   static final String CMD_UNKNOWN = "UNKNOWN";
 

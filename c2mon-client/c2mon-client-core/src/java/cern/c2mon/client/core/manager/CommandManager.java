@@ -250,10 +250,18 @@ public class CommandManager implements C2monCommandManager {
     if (!commandCache.containsKey(commandId)) {
       getCommandTag(commandId);
     }
-      
-    ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
-    if (cct.isExistingCommand()) {
-      return authorizationManager.isAuthorized(cct.getAuthorizationDetails());
+    
+    if (sessionManager.isUserLogged()) {
+      ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
+      if (cct.isExistingCommand()) {
+        if (cct.getAuthorizationDetails() != null) {
+          return authorizationManager.isAuthorized(cct.getAuthorizationDetails());
+        }
+        else {
+          LOG.warn("isAuthorized() - No authorization details received for command "
+              + commandId + ". Please contact the support team to solve this problem!");
+        }
+      }
     }
     
     return false;
