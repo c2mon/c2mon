@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+	<!--
+		Configure a built-in transaction manager. In this case we will use the
+		server transaction manager
+	-->
+
+	<transactionManager type="JDBC">
+		<dataSource type="SIMPLE">
+		  <property name="JDBC.Driver" value="oracle.jdbc.driver.OracleDriver" />
+			<property name="JDBC.ConnectionURL" value="${c2mon.jdbc.statistics.url}" />
+			<property name="JDBC.Username" value="${c2mon.jdbc.statistics.user}" />
+			<property name="JDBC.Password" value="${c2mon.jdbc.statistics.pwd}" />
+		</dataSource>
+	</transactionManager>
+
+	<!--
+		List the SQL Map XML files. They can be loaded from the classpath, as
+		they are here (sqlmap.maps...)
+	-->
+	<sqlMap resource="sqlmap/maps/FilterSqlMap.xml" />
+	<!--
+		List more here... <sqlMap resource="com/mydomain/data/Order.xml"/>
+		<sqlMap resource="com/mydomain/data/Documents.xml"/>
+	-->
+
+</sqlMapConfig>

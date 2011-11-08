@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jms="http://www.springframework.org/schema/jms" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!--  process annotations -->
+	<context:annotation-config />
+
+	<import resource="classpath:resources/consumer-activemq.xml" />
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>file:${consumer.home}/conf/c2mon.properties</value>
+				<value>file:${consumer.home}/conf/consumer.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dataTagValueBuffer" class="cern.c2mon.statistics.consumer.DataTagValueBuffer">
+		<property name="bufferMinWindow" value="${buffer.min.window}" />
+		<property name="bufferMaxWindow" value="${buffer.max.window}" />
+		<property name="bufferWindowGrowth" value="${buffer.window.growth}" />
+		<property name="bufferCapacity" value="${buffer.capacity}" />
+		<property name="fallbackFile" value="${fallback.file}"/>
+	</bean>
+
+	<bean id="messageReceiver" class="cern.c2mon.statistics.consumer.ActiveMqMessageReceiver" />
+
+</beans>

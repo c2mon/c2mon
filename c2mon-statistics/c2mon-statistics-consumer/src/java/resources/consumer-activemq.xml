@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+<!-- scan the package for Spring annotations -->
+<context:annotation-config/>
+<context:component-scan base-package="cern.c2mon.server.client"/>
+
+<!--
+
+Connection settings for consumer
+
+-->
+
+<bean id="consumerConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+  <property name="brokerURL" value="${c2mon.jms.broker.url}"/>
+  <property name="userName" value="${c2mon.jms.consumer.user}"/>
+  <property name="password" value="${c2mon.jms.consumer.pwd}"/>
+  <property name="clientIDPrefix" value="C2MON-STATISTICS-CONSUMER"/> 
+  <property name="watchTopicAdvisories" value="false"/>
+</bean>
+
+<!-- connection factory used for all connections to the server -->
+<bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">   
+   <property name="targetConnectionFactory" ref="consumerConnectionFactory" />   
+</bean>
+
+<!-- 
+
+Container listening for filtered updates
+
+ -->
+
+<bean id="filterDestination" class="org.apache.activemq.command.ActiveMQQueue">
+   <constructor-arg index="0" value="${c2mon.filter.queue}"/>
+</bean>
+
+<!-- thread pool for request containers -->
+<bean id="consumerExecutor" class="java.util.concurrent.ThreadPoolExecutor">
+  <constructor-arg value="1"/>      <!-- min threads -->
+  <constructor-arg value="100"/>   <!-- i.e. unbounded max threads, in fact no more then max consumers in container are requested -->
+  <constructor-arg value="60000"/>  <!-- idle limit in milliseconds -->
+  <constructor-arg>
+    <bean class="java.util.concurrent.TimeUnit" factory-method="valueOf">
+      <constructor-arg value="MILLISECONDS"/>
+    </bean>
+  </constructor-arg>
+  <constructor-arg>
+    <bean class="java.util.concurrent.SynchronousQueue"/>
+  </constructor-arg>
+</bean>
+
+<bean id="clientRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+      <!-- include exception listener here? -->    
+      <property name="connectionFactory" ref="singleConnectionFactory"/>
+      <property name="destination" ref="filterDestination"/>
+      <property name="messageListener" ref="messageReceiver" />
+      <property name="concurrentConsumers" value="${c2mon.consumer.consumers.min}"/>
+      <property name="maxConcurrentConsumers" value="${c2mon.consumer.consumers.max}"/> 
+      <property name="maxMessagesPerTask" value="100"/>
+      <property name="receiveTimeout" value="1000"/>
+      <property name="idleTaskExecutionLimit" value="600"/>   
+      <property name="sessionTransacted" value="false"/>      
+      <property name="taskExecutor" ref="consumerExecutor"/>
+<!--      <property name="errorHandler" ref="tagRequestErrorHandler"/>   -->
+      <property name="autoStartup" value="true"/>
+<!--      <property name="phase">-->
+<!--        <util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_START_LAST"/>-->
+<!--      </property>  -->
+</bean>
+
+</beans>

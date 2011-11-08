@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern</groupId>
+		<artifactId>parent-pom</artifactId>
+		<version>1.0.5-SNAPSHOT</version>
+	</parent>
+	<groupId>cern.c2mon.c2mon-statistics</groupId>
+	<artifactId>c2mon-statistics-consumer</artifactId>
+	<version>1.0.1-SNAPSHOT</version>
+	<name>c2mon-statistics-consumer</name>
+	<packaging>jar</packaging>
+	<description>Consumer application for reading filtered data from the DAQ and writing it to the database.</description>
+	<url>http://timweb.cern.ch</url>
+	<properties>
+		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+			<version>1.5.8</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>[4.8.1, 5.0.0)</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymockclassextension</artifactId>
+			<version>3.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-daq</artifactId>
+			<version>[1.0.0,2.0.0)</version>
+		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-persistence-manager</artifactId>
+			<version>[1.0.0,2.0.0)</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ibatis</groupId>
+			<artifactId>ibatis2-sqlmap</artifactId>
+			<version>2.1.7.597</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.jms</groupId>
+			<artifactId>jms</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-all</artifactId>
+			<version>5.5.0-fuse-00-43</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<version>1.2</version>
+		</dependency>
+	</dependencies>
+
+	<developers />
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.8</version>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

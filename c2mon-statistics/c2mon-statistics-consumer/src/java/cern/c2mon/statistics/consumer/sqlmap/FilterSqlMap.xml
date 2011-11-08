@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Filter">
+
+  <!-- Use type aliases to avoid typing the full class name every time. -->
+  <typeAlias alias="FilteredDataTagValue" type="ch.cern.tim.shared.datatag.FilteredDataTagValue"/>
+
+  <!-- inserts a FilteredDataTagValue as a new row into the filtered values table -->
+  <insert id="insertTagValue" parameterClass="FilteredDataTagValue">
+            INSERT INTO filterlog (LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGDATATYPE, TAGSTATUS, TAGSTATUSDESC, DYNAMICFILTER, FILTERTYPE ,TAGTIME)
+            VALUES (SYS_EXTRACT_UTC(SYSTIMESTAMP),#id#,#name#,#value#,#dataType#,#qualityCode#,#qualityDescription#,#dynamicFiltered#,#filterApplied#,FROM_TZ(#timestamp#, DBTIMEZONE))   
+  </insert>   
+  
+</sqlMap>
