@@ -101,8 +101,11 @@ public class C2MonClientApiTestDaoImpl implements C2MonClientApiTestDao {
                 "select command_tag_id, command_unique_name, command_type, command_data_type from dmn_commands_v commands "
                         + "inner join dmn_computers_v computers on commands.entity_id=computers.entity_id where "
                         + "computers.computer_name=?");
-                        
 
+        System.out.println(sql.toString());
+
+        System.out.println(jdbcTemplate == null);
+        
         RowMapper<CommandDef> mapper = new RowMapper<CommandDef>() {
 
             @Override

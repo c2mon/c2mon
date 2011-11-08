@@ -49,10 +49,7 @@
 		<application name="c2mon-client-commands-test" extends="default">
 
 			<startscript name="C2MON-DMN2-CLIENT-COMMANDS-TEST">
-				<main-class name="cern.c2mon.client.apitest.C2MONClientCommandExecutionTest">
-<!--					<output>-->
-<!--						<file name="log/out.log" />-->
-<!--					</output>-->
+				<main-class name="cern.c2mon.client.apitest.C2MONClientCommandExecutionTest">	
 			        <arg>$1</arg>					
 					<preExec>
 			        <![CDATA[			          
@@ -64,9 +61,9 @@
 					<property name="db.properties" value="conf/.c2mon.properties" />
 					<property name="log4j.configuration" value="conf/log4j.xml" />
 
-					<output>
-						<file name="log/out.log" />
-					</output>
+<!--					<output>-->
+<!--						<file name="log/out.log" />-->
+<!--					</output>-->
 				</main-class>
 			</startscript>
 		</application>
