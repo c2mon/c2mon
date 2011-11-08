@@ -47,7 +47,7 @@ public class C2MonClientApiTestServiceImpl implements C2MonClientApiTestService 
 
     @Override
     public List<CommandDef> getRegisteredCommands(String computer) {
-        log.debug("entering getEquipments()");
+        log.debug("entering getRegisteredCommands()");
         return dao.getRegisteredCommands(computer);
     }
 

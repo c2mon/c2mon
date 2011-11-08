@@ -50,9 +50,9 @@
 
 			<startscript name="C2MON-DMN2-CLIENT-COMMANDS-TEST">
 				<main-class name="cern.c2mon.client.apitest.C2MONClientCommandExecutionTest">
-					<output>
-						<file name="log/out.log" />
-					</output>
+<!--					<output>-->
+<!--						<file name="log/out.log" />-->
+<!--					</output>-->
 			        <arg>$1</arg>					
 					<preExec>
 			        <![CDATA[			          
