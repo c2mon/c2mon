@@ -24,10 +24,33 @@
 
 	<modules>
 		<module>modules/tim2</module>
-<!--		<module>modules/dmn2</module>-->
+		<!--		<module>modules/dmn2</module>-->
 	</modules>
 
-	<build />
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!--
+					NOTE: Unless specified directly we don't need a groupId
+					specification because the group is org.apache.maven.plugins
+					...which is assumed by default.
+				-->
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.2.1</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>1.6</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.8.1</version>
+				</plugin>
+			</plugins>
+
+		</pluginManagement>
+	</build>
 
 
 
