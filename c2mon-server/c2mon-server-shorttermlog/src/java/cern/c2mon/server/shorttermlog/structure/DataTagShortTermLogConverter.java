@@ -29,6 +29,7 @@ import cern.tim.server.common.datatag.DataTag;
 import cern.tim.server.common.tag.Tag;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagValueDictionary;
+import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.common.type.TypeConverter;
 import cern.tim.util.json.GsonFactory;
 
@@ -53,13 +54,6 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
      * Gson object used for converting DataTagQuality to String.
      */
     private Gson gson = GsonFactory.createGson();
-    
-    /**
-     * Private constructor to prevent the class from being instantiated
-     */
-    private DataTagShortTermLogConverter() {
-        
-    }
          
     /**
      * Creates a DataTagValue object from the info stored in the
@@ -181,11 +175,17 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
       }        
       dtSTLog.setTagDataType(tag.getDataType());
       if (tag instanceof DataTag || tag instanceof ControlTag) {
-        dtSTLog.setSourceTimestamp(((DataTag)tag).getSourceTimestamp());
-        dtSTLog.setDaqTimestamp(((DataTag)tag).getDaqTimestamp());
+        dtSTLog.setSourceTimestamp(((DataTag) tag).getSourceTimestamp());
+        dtSTLog.setDaqTimestamp(((DataTag) tag).getDaqTimestamp());
       }
-      dtSTLog.setServerTimestamp(tag.getCacheTimestamp());      
-      dtSTLog.setTagQualityCode(0); //all set to 0 now; TODO remove column from DB at some point
+      dtSTLog.setServerTimestamp(tag.getCacheTimestamp());
+      int code = 0;
+      if (tag.getDataTagQuality() != null) {
+        for (TagQualityStatus status : tag.getDataTagQuality().getInvalidQualityStates().keySet()) {
+          code = (int) (code + Math.pow(2, status.getCode())); 
+        }
+      }      
+      dtSTLog.setTagQualityCode(code); //for longterm log and statistics purpose
       dtSTLog.setTagQualityDesc(gson.toJson(tag.getDataTagQuality().getInvalidQualityStates()));      
       if (dtSTLog.getTagQualityDesc() != null && dtSTLog.getTagQualityDesc().length() > MAX_LENGTH) {
           dtSTLog.setTagQualityDesc("{\"UNKNOWN_REASON\":\"Invalid quality String was too long: unable to store in ShortTermLog table.\"}");

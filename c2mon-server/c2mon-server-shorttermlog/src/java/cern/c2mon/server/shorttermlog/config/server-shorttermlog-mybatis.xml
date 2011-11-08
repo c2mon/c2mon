@@ -13,6 +13,7 @@
     <property name="username" value="${jdbc.stl.user}"/>
     <property name="password" value="${jdbc.stl.password}"/>
     <property name="defaultAutoCommit" value="false"/>
+    <property name="validationQuery" value="SELECT 0 FROM DUAL"/>
 <!--    <property name="logWriter" value=""/>-->
     <property name="initialSize" value="${datasource.stl.connections.initial}"/>
     <property name="maxActive" value="${datasource.stl.connections.max}"/>
