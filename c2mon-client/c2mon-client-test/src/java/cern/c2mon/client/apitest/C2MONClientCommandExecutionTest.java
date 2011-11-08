@@ -66,18 +66,24 @@ public class C2MONClientCommandExecutionTest {
     public static void main(String[] args) {
 
         try {
-
-            log.debug("db.properties: " + System.getProperty("db.properties"));
-            log.debug("jms.properties: " + System.getProperty("jms.properties"));
-
-            log.info("before Dmn2DbServiceGateway.init()");
-
+            
             console = System.console();
             if (console == null) {
                 log.error("No console, can not read username and passwd from the command line.");
                 System.exit(1);
+            }            
+            
+            if (args.length < 1) {
+               log.error("No console, can not read username and passwd from the command line.");
+               console.printf("computer name expected!");
+               System.exit(1);
             }
+            
+            log.debug("db.properties: " + System.getProperty("db.properties"));
+            log.debug("jms.properties: " + System.getProperty("jms.properties"));
 
+            log.info("before Dmn2DbServiceGateway.init()");
+            
             Dmn2DbServiceGateway.init();
             log.info("after Dmn2DbServiceGateway.init()");
 

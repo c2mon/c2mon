@@ -33,11 +33,6 @@
 					<output>
 						<file name="log/out.log" />
 					</output>
-					<arg></arg>
-					<preExec>
-			        <![CDATA[			          
-			         ]]>
-					</preExec>
 
 					<property name="c2mon.log.dir" value="log" />
 					<property name="jms.properties" value="conf/jms.properties" />
@@ -58,7 +53,7 @@
 					<output>
 						<file name="log/out.log" />
 					</output>
-					<arg></arg>
+			        <arg>$1</arg>					
 					<preExec>
 			        <![CDATA[			          
 			         ]]>
