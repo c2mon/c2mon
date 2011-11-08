@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <product name="c2mon">
+
+    <!--
+      this application section is a parent configuration for both
+      c2mon-tim2-prod and c2mon-tim2-test
+    -->
+    <application name="default">
+      <deployment installLocation="/opt/japc-publisher/">
+        <backupPolicy keepBackups="2">
+          <preserve type="dir" name="log" />
+          <preserve type="dir" name="tmp" />
+        </backupPolicy>
+        <notification>
+          <!-- you can give more than one mail for deployment notification -->
+          <mail address="timdiamon-developers@cern.ch" />
+        </notification>
+      </deployment>
+    </application>
+
+    <application name="c2mon-japcpublisher-prod" extends="default">
+      <deployment installLocation="/opt/japc-publisher">
+      <!-- Copy over the c2mon.properties file into the /conf directory  -->
+      </deployment>
+    </application>
+
+    <application name="c2mon-japcpublisher-test" extends="default">
+      <deployment installLocation="/opt/japc-publisher-test">
+        <!-- Copy over the c2mon.properties file into the /conf directory  -->
+      </deployment>
+    </application>
+  </product>
+</products>

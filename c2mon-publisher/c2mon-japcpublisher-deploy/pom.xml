@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cern.c2mon.c2mon-client</groupId>
+		<artifactId>c2mon-client-pom</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>cern.c2mon.c2mon-client</groupId>
+	<artifactId>c2mon-japcpublisher-deploy</artifactId>
+	<version>1.0.1-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<description>
+		C2MON japc publisher assembling all required modules and configuration files for TIM2
+    </description>
+	<url></url>
+
+	<developers />
+
+	<modules>
+		<module>modules/tim2</module>
+	</modules>
+
+	<build />
+
+
+
+</project>
