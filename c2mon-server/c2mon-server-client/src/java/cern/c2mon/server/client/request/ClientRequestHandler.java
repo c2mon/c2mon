@@ -12,7 +12,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
@@ -23,13 +22,10 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.configuration.ConfigurationLoader;
-import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.c2mon.shared.client.tag.TagConfigImpl;
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.ProcessXMLProvider;
 import cern.tim.server.cache.TagFacadeGateway;
@@ -40,9 +36,6 @@ import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.supervision.SupervisionFacade;
 import cern.tim.shared.client.command.CommandExecuteRequest;
-import cern.tim.shared.client.command.CommandReport;
-import cern.tim.shared.client.command.CommandTagHandle;
-import cern.tim.shared.client.configuration.ConfigurationReport;
 import cern.tim.util.json.GsonFactory;
 
 import com.google.gson.Gson;
@@ -145,7 +138,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
     ClientRequest clientRequest = ClientRequestMessageConverter.fromMessage(message);
-    Collection<? extends ClientRequestResult> response = handleClientRequest(clientRequest);
+    Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest);
     if (LOG.isDebugEnabled()) {
       LOG.debug("Successully processed client request.");
     }
@@ -196,7 +189,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @return The response that shall be transfered back to the C2MON client
    *         layer
    */
-  private Collection<? extends ClientRequestResult> handleClientRequest(@Valid final ClientRequest clientRequest) {
+  private Collection< ? extends ClientRequestResult> handleClientRequest(@Valid final ClientRequest clientRequest) {
     switch (clientRequest.getRequestType()) {
 
       case TAG_CONFIGURATION_REQUEST:
@@ -255,6 +248,12 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     } // end switch
   }
 
+  /**
+   * Helper method. Casts to an int. 
+   * Logs a warning if the cast is unsafe.
+   * @param l long
+   * @return int
+   */
   private int castLongToInt(final long l) {
 
     if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
@@ -262,8 +261,15 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     }
     return (int) l;
   }
-
-  private Collection<? extends ClientRequestResult> handleCommandHandleRequest(final ClientRequest commandRequest) {
+  
+  /**
+   * Inner method which handles the CommandTagHandle Requests
+   * 
+   * @param commandRequest
+   *          The command request sent from the client
+   * @return a Collection of CommandTagHandles
+   */ 
+  private Collection< ? extends ClientRequestResult> handleCommandHandleRequest(final ClientRequest commandRequest) {
 
     switch (commandRequest.getResultType()) {
       case TRANSFER_COMMAND_HANDLES_LIST:
@@ -282,7 +288,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @return Configuration Report
    */
   @SuppressWarnings("unchecked")
-  private Collection<? extends ClientRequestResult> handleConfigurationReportRequest(final ClientRequest configurationRequest) {
+  private Collection< ? extends ClientRequestResult> handleConfigurationReportRequest(final ClientRequest configurationRequest) {
 
     // !!! TagId field is also used for Configuration Ids
     final Iterator<Long> iter = configurationRequest.getTagIds().iterator();
@@ -312,7 +318,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @return A command report
    */
   @SuppressWarnings("unchecked")
-  private Collection<? extends ClientRequestResult> handleExecuteCommandRequest(final ClientRequest executeCommandRequest) {
+  private Collection< ? extends ClientRequestResult> handleExecuteCommandRequest(final ClientRequest executeCommandRequest) {
 
     final Collection commandReports = new ArrayList(1);
     commandReports.add(commandExecutionManager.execute((CommandExecuteRequest) executeCommandRequest.getObjectParameter()));
@@ -327,7 +333,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @return A tag configuration list
    */
   @SuppressWarnings("unchecked")
-  private Collection<? extends ClientRequestResult> handleTagConfigurationRequest(final ClientRequest tagConfigurationRequest) {
+  private Collection< ? extends ClientRequestResult> handleTagConfigurationRequest(final ClientRequest tagConfigurationRequest) {
 
     // !!! TagId field is also used for Configuration Ids
     final Iterator<Long> iter = tagConfigurationRequest.getTagIds().iterator();
@@ -361,7 +367,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @return Collection of alarms
    */
   @SuppressWarnings("unchecked")
-  private Collection<? extends ClientRequestResult> handleAlarmRequest(final ClientRequest alarmRequest) {
+  private Collection< ? extends ClientRequestResult> handleAlarmRequest(final ClientRequest alarmRequest) {
 
     // !!! TagId field is also used for Alarm Ids
     final Iterator<Long> iter = alarmRequest.getTagIds().iterator();
@@ -392,7 +398,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @return Collection of
    */
   @SuppressWarnings("unchecked")
-  private Collection<? extends ClientRequestResult> handleTagRequest(final ClientRequest tagRequest) {
+  private Collection< ? extends ClientRequestResult> handleTagRequest(final ClientRequest tagRequest) {
     final Iterator<Long> iter = tagRequest.getTagIds().iterator();
     final Collection transferTags = new ArrayList(tagRequest.getTagIds().size());
 
