@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="c2mon-statistics-consumer">
+
+		<!--
+			this application section is a parent configuration for both
+			c2mon-tim2-prod and c2mon-tim2-test
+		-->
+		<application name="default">
+			<deployment installLocation="/opt/statistics-consumer-not-used/">
+				<backupPolicy keepBackups="2">
+					<preserve type="dir" name="log" />
+					<preserve type="dir" name="tmp" />
+				</backupPolicy>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="timdiamon-developers@cern.ch" />
+				</notification>
+
+				<startscript name="C2MON-STATISTICS-CONSUMER">
+					<main-class
+						name="ch.cern.tim.statistics.consumer.startup.ConsumerStartup">
+						<arg>-l ${LOG4J_CONF_FILE} -p ${PROCESS_NAME} -c ${CONSUMER_CONF_FILE}</arg>
+						<output>
+							<file name="log/out.log" />
+						</output>
+					</main-class>
+					<property name="tim.log.path" value="${CONSUMER_LOG_HOME}" />
+					<property name="c2mon.properties" value="${C2MON_PROPERTIES_LOCATION}" />
+				</startscript>
+				
+			</deployment>
+		</application>
+
+		<application name="c2mon-consumer-prod" extends="default">
+			<deployment installLocation="/opt/statistics-consumer">
+				<directory name="conf">
+					<file name="c2mon-consumer.properties" sourceDir="/user/timoper/rep/c2mon/statistics"
+						mask="400" />
+				</directory>
+			</deployment>
+		</application>
+
+		<application name="c2mon-tim2-test" extends="default">
+			<deployment installLocation="/opt/statistics-consumer-test">
+				<directory name="conf">
+					<file name="c2mon-consumer.properties" sourceDir="/user/timtest/rep/c2mon/statistics"
+						mask="400" />
+				</directory>
+			</deployment>
+		</application>
+
+		<application name="c2mon-tim2-dev" extends="default">
+			<deployment installLocation="/user/timtest/dev/statistics-consumer-dev">
+				<directory name="conf">
+					<file name="c2mon-consumer.properties" sourceDir="/user/timtest/rep/c2mon/statistics"
+						mask="400" />
+				</directory>
+			</deployment>
+		</application>
+
+	</product>
+</products>
