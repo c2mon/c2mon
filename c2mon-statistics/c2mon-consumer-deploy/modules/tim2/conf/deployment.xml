@@ -32,7 +32,7 @@
 			</deployment>
 		</application>
 
-		<application name="c2mon-consumer-prod" extends="default">
+		<application name="consumer-tim2-prod" extends="default">
 			<deployment installLocation="/opt/statistics-consumer">
 				<directory name="conf">
 					<file name="c2mon-consumer.properties" sourceDir="/user/timoper/rep/c2mon/statistics"
@@ -41,7 +41,7 @@
 			</deployment>
 		</application>
 
-		<application name="c2mon-consumer-test" extends="default">
+		<application name="consumer-tim2-test" extends="default">
 			<deployment installLocation="/opt/statistics-consumer-test">
 				<directory name="conf">
 					<file name="c2mon-consumer.properties" sourceDir="/user/timtest/rep/c2mon/statistics"
@@ -50,7 +50,7 @@
 			</deployment>
 		</application>
 
-		<application name="c2mon-consumer-dev" extends="default">
+		<application name="consumer-tim2-dev" extends="default">
 			<deployment installLocation="/user/timtest/dev/statistics-consumer-dev">
 				<directory name="conf">
 					<file name="c2mon-consumer.properties" sourceDir="/user/timtest/rep/c2mon/statistics"
