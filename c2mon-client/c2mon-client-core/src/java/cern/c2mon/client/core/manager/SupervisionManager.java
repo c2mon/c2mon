@@ -38,6 +38,15 @@ import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
+/**
+ * The supervision manager allows registering listeners to get informed about
+ * the connection state to the JMS brokers and the heartbeat of the C2MON server.
+ * Furthermore it manages the supervision status information of the DAQ processes
+ * and their equipment. Those information are only accessible through the
+ * {@link CoreSupervisionManager} interface for other C2MON managers in the core API. 
+ *
+ * @author Matthias Braeger
+ */
 @Service
 public class SupervisionManager implements CoreSupervisionManager, SupervisionListener, ConnectionListener, HeartbeatListener {
 
@@ -131,7 +140,6 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
             fireProcessSupervisionUpdate(supervisionEvent);
             break;
           case EQUIPMENT:
-            equipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
             fireEquipmentSupervisionUpdate(supervisionEvent);
             break;
           default:
@@ -160,7 +168,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
           if (!processEventCache.containsKey(id)) {
             processEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
           }
-          else if (processEventCache.get(id).getEventTime().before(supervisionEvent.getEventTime())) {
+          else if (!processEventCache.get(id).equals(supervisionEvent)) {
             processEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
           }
           else {
@@ -171,7 +179,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
           if (!equipmentEventCache.containsKey(id)) {
             equipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
           }
-          else if (equipmentEventCache.get(id).getEventTime().before(supervisionEvent.getEventTime())) {
+          else if (!equipmentEventCache.get(id).equals(supervisionEvent)) {
             equipmentEventCache.put(supervisionEvent.getEntityId(), supervisionEvent);
           }
           else {
@@ -180,7 +188,8 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
           break;
         default:
           String errMsg = supervisionEvent.getEntity() + " SupervisionEvent is not supported by this client - ignoring the event";
-          LOG.debug("updateEventCache() - " + errMsg);          
+          LOG.debug("updateEventCache() - " + errMsg);
+          updated = false;
       }
     }
     finally {
@@ -225,22 +234,22 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
         if (!processSupervisionListeners.containsKey(processId)) {
           processSupervisionListeners.put(processId, new HashSet<SupervisionListener>());
         }
-        Collection<SupervisionListener> listeners = processSupervisionListeners.get(processId);
-        listeners.add(listener);
-        
-        // Inform listener about the latest process event
-        listener.onSupervisionUpdate(processEventCache.get(processId));
+        Set<SupervisionListener> listeners = processSupervisionListeners.get(processId);
+        if (listeners.add(listener)) {
+          // Inform listener about the latest process event
+          listener.onSupervisionUpdate(processEventCache.get(processId));
+        }
       }
       
       for (Long equipmentId : equipmentIds) {
         if (!equipmentSupervisionListeners.containsKey(equipmentId)) {
           equipmentSupervisionListeners.put(equipmentId, new HashSet<SupervisionListener>());
         }
-        Collection<SupervisionListener> listeners = equipmentSupervisionListeners.get(equipmentId);
-        listeners.add(listener);
-        
-        // Inform listener about the latest process event
-        listener.onSupervisionUpdate(equipmentEventCache.get(equipmentId));
+        Set<SupervisionListener> listeners = equipmentSupervisionListeners.get(equipmentId);
+        if (listeners.add(listener)) {
+          // Inform listener about the latest equipment event
+          listener.onSupervisionUpdate(equipmentEventCache.get(equipmentId));
+        }
       }
     }
     finally {
@@ -269,23 +278,24 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   @Override
   public void onConnection() {
     jmsConnectionUp = true;
-    refreshSupervisionStatus();
+    if (!c2monConnectionEstablished) {
+      refreshSupervisionStatus();
+    }
   }
   
-  private void refreshSupervisionStatus() {
-    if (!c2monConnectionEstablished) {
-      try {
-        Collection<SupervisionEvent> allCurrentEvents = clientRequestHandler.getCurrentSupervisionStatus();
-        for (SupervisionEvent event : allCurrentEvents) {
-          onSupervisionUpdate(event);
-        }
-        c2monConnectionEstablished = true;
-        LOG.info("refreshSupervisionStatus() - supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
+  @Override
+  public void refreshSupervisionStatus() {
+    try {
+      Collection<SupervisionEvent> allCurrentEvents = clientRequestHandler.getCurrentSupervisionStatus();
+      for (SupervisionEvent event : allCurrentEvents) {
+        onSupervisionUpdate(event);
       }
-      catch (Exception e) {
-        LOG.error("refreshSupervisionStatus() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage(), e);
-        c2monConnectionEstablished = false;
-      }
+      c2monConnectionEstablished = true;
+      LOG.info("refreshSupervisionStatus() - supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
+    }
+    catch (Exception e) {
+      LOG.error("refreshSupervisionStatus() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage(), e);
+      c2monConnectionEstablished = false;
     }
   }
 
@@ -307,11 +317,15 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
 
   @Override
   public void onHeartbeatReceived(Heartbeat pHeartbeat) {
-    refreshSupervisionStatus();
+    if (!c2monConnectionEstablished) {
+      refreshSupervisionStatus();
+    }
   }
 
   @Override
   public void onHeartbeatResumed(Heartbeat pHeartbeat) {
-    refreshSupervisionStatus();
+    if (!c2monConnectionEstablished) {
+      refreshSupervisionStatus();
+    }
   }
 }

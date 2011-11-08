@@ -147,6 +147,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
 
   @Override
   public void refresh(final Set<Long> tagIds) {
+    supervisionManager.refreshSupervisionStatus();
     synchronized (refreshLiveCacheSyncLock) {
       synchronizeCache(tagIds);
     } // end synchronized block

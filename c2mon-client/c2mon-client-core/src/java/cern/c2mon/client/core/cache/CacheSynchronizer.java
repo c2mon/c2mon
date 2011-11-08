@@ -65,7 +65,8 @@ interface CacheSynchronizer {
 
   
   /**
-   * Synchronizes the live cache with the C2MON server
+   * Synchronizes the live cache with the C2MON server. At the same time the
+   * supervision status cache is also refreshed.
    * @param tagIds Set of tag id's that shall be refreshed. If the parameter
    *        is <code>null</code>, the entire cache is updated.
    */

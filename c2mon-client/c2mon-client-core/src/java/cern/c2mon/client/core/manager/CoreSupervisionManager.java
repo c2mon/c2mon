@@ -48,4 +48,9 @@ public interface CoreSupervisionManager extends C2monSupervisionManager {
    * @param listener The listener that shall be removed
    */
   void removeSupervisionListener(SupervisionListener listener);
+
+  /**
+   * Synchronizes all supervision status with the C2MON server 
+   */
+  void refreshSupervisionStatus();
 }

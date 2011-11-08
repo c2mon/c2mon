@@ -266,4 +266,11 @@ public class CommandManager implements C2monCommandManager {
     
     return false;
   }
+  
+  @Override
+  public void refreshCommandCache() {
+    Set<Long> commandIds = commandCache.keySet();
+    commandCache.clear();
+    getCommandTags(commandIds);
+  }
 }

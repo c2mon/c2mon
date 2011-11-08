@@ -56,4 +56,10 @@ public interface C2monCommandManager {
    *         parameter.
    */
   boolean isAuthorized(Long commandId);
+
+  /**
+   * Refreshes the entire local command tag cache with the latest
+   * command tag information from the C2MON server.
+   */
+  void refreshCommandCache();
 }
