@@ -20,14 +20,13 @@
 				<startscript name="C2MON-STATISTICS-CONSUMER">
 					<main-class
 						name="ch.cern.tim.statistics.consumer.startup.ConsumerStartup">
-						<arg>-l ${LOG4J_CONF_FILE} -p ${PROCESS_NAME} -c ${CONSUMER_CONF_FILE}</arg>
+						<arg>-l ${LOG4J_CONF_FILE}</arg>
 						<output>
 							<file name="log/out.log" />
 						</output>
 					</main-class>
 					<property name="tim.log.path" value="${CONSUMER_LOG_HOME}" />
-					<property name="tim.process.name" value="statistics-consumer" />
-					<property name="c2mon.properties" value="${C2MON_PROPERTIES_LOCATION}" />
+					<property name="tim.process.name" value="statistics-consumer" />					
 				</startscript>
 				
 			</deployment>
