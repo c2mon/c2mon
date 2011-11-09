@@ -47,9 +47,6 @@ CONSUMER_CONF_HOME=$CONSUMER_HOME/conf
 #log4j configuration file
 LOG4J_CONF_FILE=$CONSUMER_CONF_HOME/log4j.xml
 
-#consumer process configuration file
-CONSUMER_CONF_FILE=$CONSUMER_CONF_HOME/consumer.conf
-
 
 ###########
 # PROCESS #
@@ -141,12 +138,13 @@ really_start() {
     export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH
     export PATH=${CONSUMER_HOME}/bin:$PATH
     export CONSUMER_LOG_HOME
-    export LOG4J_CONF_FILE
-    export PROCESS_NAME
-    export CONSUMER_CONF_FILE
-    export C2MON_PROPERTIES_LOCATION=$CONSUMER_HOME/conf/c2mon-consumer.properties
+    export CONSUMER_HOME
+    export LOG4J_CONF_FILE    
     
-    . C2MON-STATISTICS-CONSUMER
+    #need to be in bin directory for startup script
+    cd $CONSUMER_HOME/bin
+
+    . C2MON-STATISTICS-CONSUMER.jvm &
 
     echo -n "Starting a Consumer Process on host ${CONSUMER_HOST} ..."
 
