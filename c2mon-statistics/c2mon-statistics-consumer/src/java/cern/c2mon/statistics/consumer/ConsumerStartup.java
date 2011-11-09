@@ -13,8 +13,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * The main Consumer start up class. Loads the Spring ApplicationContext.
  * 
- * Runs with options: -l log4j XML config file 
- *                    -c configfiel configuration file
+ * Runs with options: -l log4j XML config file  *                    
  *                    -p the process name
  *                    
  * Can specify c2mon.properties file using -Dc2mon.properties
@@ -43,23 +42,18 @@ public final class ConsumerStartup {
     public static void main(String [] args) {
         
         // the command line options
-        Options options = new Options();
-        options.addOption("c", true, "filter configuration file");
+        Options options = new Options();        
         options.addOption("l", true, "the log4j XML configuration file");
-        options.addOption("p", true, "the process name");
-
+        
         // the command line option Strings
         String loggerConfig = null;
-        String kernelConfig = null;
-        String processName = null;
-
+               
         // try to parse the commandline
         try {
             CommandLineParser parser = new PosixParser();
             CommandLine cmd = parser.parse(options, args);
-            loggerConfig = cmd.getOptionValue("l");
-            kernelConfig = cmd.getOptionValue("c");
-            processName = cmd.getOptionValue("p");
+            loggerConfig = cmd.getOptionValue("l");            
+           
         } catch (ParseException ex) {  // parsing fails
             System.err.print("error in parsing the command line arguments");
             System.err.print("error: " + ex);
@@ -67,14 +61,11 @@ public final class ConsumerStartup {
         }
 
         // check command line options are not null
-        if (kernelConfig == null || loggerConfig == null) { 
+        if (loggerConfig == null) { 
             System.err.print("missing command line options");
             System.err.print("exiting...");
             throw new RuntimeException("Missing command line options.");
         } 
-        
-        //set the name of the process for use in log4j configuration file
-        System.setProperty("tim.process.name", processName);
         
         // try to configure the logger
         try {

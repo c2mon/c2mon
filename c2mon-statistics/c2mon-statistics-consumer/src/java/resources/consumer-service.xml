@@ -18,7 +18,7 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<list>
-				<value>file:${consumer.home}/conf/c2mon.properties</value>
+				<value>file:${consumer.home}/conf/c2mon-consumer.properties</value>
 				<value>file:${consumer.home}/conf/consumer.properties</value>
 			</list>
 		</property>
