@@ -13,16 +13,20 @@
 	<context:annotation-config />
 
 	<import resource="classpath:resources/consumer-activemq.xml" />
-
+  
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="ignoreResourceNotFound" value="true" />
-		<property name="locations">
-			<list>
-				<value>file:${consumer.home}/conf/c2mon-consumer.properties</value>
-				<value>file:${consumer.home}/conf/consumer.properties</value>
-			</list>
-		</property>
-	</bean>
+	  <property name="ignoreUnresolvablePlaceholders" value="true" />	  
+  </bean>
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="ignoreResourceNotFound" value="true" />
+    <property name="locations">
+      <list>
+        <value>file:${consumer.home}/conf/consumer.properties</value>
+        <value>file:${consumer.home}/conf/c2mon-consumer.properties</value>
+        <value>file:${c2mon.properties}</value>        
+      </list>        
+    </property>    
+  </bean>
 
 	<bean id="dataTagValueBuffer" class="cern.c2mon.statistics.consumer.DataTagValueBuffer">
 		<property name="bufferMinWindow" value="${buffer.min.window}" />
