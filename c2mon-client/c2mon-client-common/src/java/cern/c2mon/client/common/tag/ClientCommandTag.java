@@ -46,9 +46,11 @@ public interface ClientCommandTag<T> {
   /**
    * Returns the type of the tagValue attribute
    * @see #getValue
-   * @return the class of the tag value
+   * @see #isExistingCommand()
+   * @return the class of the tag value, or <code>null</code> if
+   *         the command is not existing. 
    */
-  Class< ? > getType();
+  Class< ? > getValueType();
 
   /**
    * Returns the minimum value for this command.

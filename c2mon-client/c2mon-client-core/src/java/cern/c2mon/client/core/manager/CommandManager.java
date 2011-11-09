@@ -25,7 +25,6 @@ import cern.tim.shared.client.command.CommandReport;
 import cern.tim.shared.client.command.CommandReportImpl;
 import cern.tim.shared.client.command.CommandTagHandle;
 import cern.tim.shared.client.command.CommandTagValueException;
-import cern.tim.shared.common.command.AuthorizationDetails;
 
 @Service
 public class CommandManager implements C2monCommandManager {
@@ -193,8 +192,8 @@ public class CommandManager implements C2monCommandManager {
       throw new CommandTagValueException("Null value : command values cannot be set to null");
     }
 
-    if (!value.getClass().equals(commandTag.getType())) {
-      throw new CommandTagValueException("Data type : " + commandTag.getType() + " expected. Cannot set value of type " + value.getClass().getName() + ".");
+    if (value.getClass() != commandTag.getValueType()) {
+      throw new CommandTagValueException("Data type : " + commandTag.getValueType().getName() + " expected. Cannot set value of type " + value.getClass().getName() + ".");
     }
 
     try {
@@ -203,7 +202,7 @@ public class CommandManager implements C2monCommandManager {
       }
     }
     catch (ClassCastException ce) {
-      throw new CommandTagValueException("CONFIGURATION ERROR: The minValue for the command is of type " + commandTag.getType().getName()
+      throw new CommandTagValueException("CONFIGURATION ERROR: The minValue for the command is of type " + commandTag.getValueType().getName()
           + ". It cannot be compared to a value of type " + value.getClass().getName() + ". Contact the configuration responsible for correcting this problem");
     }
 
@@ -213,27 +212,11 @@ public class CommandManager implements C2monCommandManager {
       }
     }
     catch (ClassCastException ce) {
-      throw new CommandTagValueException("CONFIGURATION ERROR: The minValue for the command is of type " + commandTag.getType().getName()
+      throw new CommandTagValueException("CONFIGURATION ERROR: The minValue for the command is of type " + commandTag.getValueType().getName()
           + ". It cannot be compared to a value of type " + value.getClass().getName() + ". Contact the configuration responsible for correcting this problem");
     }
     
     return new CommandExecuteRequestImpl<T>(commandTag.getId(), value);
-  }
-  
-  /**
-   * @param commandTag the command to be checked
-   * @param <T> The value type of the command
-   * @return <code>true</code>, if the user who requested the command
-   *         tag from the server is authorised to execute the command. 
-   */
-  private <T> boolean isAuthorized(final ClientCommandTag<T> commandTag) {
-    AuthorizationDetails authorizationDetails = commandTag.getAuthorizationDetails();
-    if (authorizationDetails != null) {
-      return authorizationManager.isAuthorized(commandTag.getAuthorizationDetails());
-    }
-    else {
-      return false;
-    }
   }
 
   @Override

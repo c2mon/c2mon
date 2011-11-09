@@ -1,14 +1,32 @@
 package cern.c2mon.client.core.tag;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
+import cern.c2mon.client.core.manager.CommandManager;
 import cern.tim.shared.client.command.CommandTagHandle;
 import cern.tim.shared.client.command.CommandTagValueException;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
 import cern.tim.shared.common.command.AuthorizationDetails;
 
+/**
+ * This class is used by the {@link CommandManager} to cache
+ * locally on the C2MON client API information about commands.
+ * A command is updated by the {@link CommandTagHandle} object
+ * which is sent by the C2MON server.
+ *
+ * @param <T> The class type of the command value
+ * @author Matthias Braeger
+ * @see CommandManager
+ */
 public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
 
-  static final String CMD_UNKNOWN = "UNKNOWN";
+  /** standard String used for unknown commands */
+  private static final String CMD_UNKNOWN = "UNKNOWN";
+  
+  /** 
+   * The prefix is needed to convert the data type string of the 
+   * {@link CommandTagHandle} update into a class type
+   */
+  private static final String VALUE_TYPE_PREFIX = "java.lang.";
 
   /**
    * Unique numeric identifier of the CommandTag represented by the 
@@ -28,10 +46,10 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
   private String description;
 
   /**
-   * Name of the data type of the present CommandTagHandle object. Only values 
+   * class type of the present CommandTagHandle object. Only values 
    * of this data type can be set using setValue().
    */
-  private String dataType;
+  private Class< ? > valueType;
 
   /**
    * Client timeout in milliseconds.
@@ -85,14 +103,34 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
     this.id = pId;
     this.name = CMD_UNKNOWN;
     this.description = CMD_UNKNOWN;
-    this.dataType = CMD_UNKNOWN;
   }
   
+  /**
+   * This method is used by the {@link CommandManager} to update the client command cache
+   * object with the information received from the C2MON server.
+   * 
+   * @param commandTagHandle The update sent by the C2MON server
+   * @throws RuntimeException In case that the command value data type class cannot be
+   *                          determined.
+   */
   public void update(final CommandTagHandle<T> commandTagHandle) {
-    if (commandTagHandle != null && commandTagHandle.getId().equals(id)) {
+    if (commandTagHandle != null && commandTagHandle.getId().equals(id) && commandTagHandle.isExistingCommand()) {
       this.name = commandTagHandle.getName();
       this.description = commandTagHandle.getDescription();
-      this.dataType = commandTagHandle.getDataType();
+      
+      String dataType = commandTagHandle.getDataType();
+      if (dataType != null && !dataType.equalsIgnoreCase(CMD_UNKNOWN)) {
+        if (!dataType.startsWith(VALUE_TYPE_PREFIX)) {
+          dataType = VALUE_TYPE_PREFIX.concat(dataType);
+        }
+        try {
+          valueType = Class.forName(dataType);
+        }
+        catch (ClassNotFoundException e) {
+          throw new RuntimeException("Cannot find value type class " + dataType + " for command " + id);
+        }
+      }
+      
       this.clientTimeout = commandTagHandle.getClientTimeout();
       this.minValue = commandTagHandle.getMinValue();
       this.maxValue = commandTagHandle.getMaxValue();
@@ -125,14 +163,6 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    */
   public String getDescription() {
     return this.description;
-  }
-
-  /**
-   * Get the name of the data type of the present CommandTagHandle object.
-   * Only values of this data type can be set using setValue().
-   */
-  public String getDataType() {
-    return this.dataType;
   }
 
   /**
@@ -191,7 +221,21 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * <LI>the set value is not between the authorized minimum and maximum values
    */
   public void setValue(T value) throws CommandTagValueException {
-    this.value = value;
+    if (isExistingCommand()) {
+      if (value == null) {
+        throw new NullPointerException("It not possible to set the value to null");
+      }
+      if (value.getClass() == valueType) {
+        this.value = value;
+      }
+      else {
+        throw new CommandTagValueException(
+            "Wrong value type! Only values of type " + valueType.getName() + " are allowed.");
+      }
+    }
+    else {
+      throw new IllegalStateException("The command " + id + " is not known to the system.");
+    }
   }
 
   @Override
@@ -201,12 +245,8 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
 
 
   @Override
-  public Class< ? > getType() {
-    if (value == null) {
-      return null;
-    }
-    
-    return value.getClass();
+  public Class< ? > getValueType() {
+    return valueType;
   }
 
   /**
