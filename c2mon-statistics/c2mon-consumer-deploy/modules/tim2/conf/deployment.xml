@@ -19,7 +19,7 @@
 
 				<startscript name="C2MON-STATISTICS-CONSUMER">
 					<main-class
-						name="ch.cern.tim.statistics.consumer.startup.ConsumerStartup">
+						name="cern.c2mon.statistics.consumer.ConsumerStartup">
 						<arg>-l ${LOG4J_CONF_FILE}</arg>
 						<output>
 							<file name="log/out.log" />
