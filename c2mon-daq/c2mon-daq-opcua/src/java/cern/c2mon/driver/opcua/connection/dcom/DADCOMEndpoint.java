@@ -289,7 +289,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      * @param opcTimestamp The GMT timestamp received from the OPC
      * @return The adjusted timestamp in milliseconds.
      */
-    private long getAdjustedTimestamp(long opcTimestamp) {
+    private synchronized long getAdjustedTimestamp(long opcTimestamp) {
       gregorianCalendar.setTimeInMillis(opcTimestamp);
       int timezoneAdjustment = 
         gregorianCalendar.get(GregorianCalendar.ZONE_OFFSET) + gregorianCalendar.get(GregorianCalendar.DST_OFFSET);
