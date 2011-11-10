@@ -4,21 +4,19 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
-import com.linar.jintegra.AuthInfo;
-import com.linar.jintegra.AutomationException;
-
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
 import cern.c2mon.driver.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCommunicationException;
+import cern.c2mon.driver.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCEndpoint;
 import cern.c2mon.driver.opcua.connection.common.impl.SubscriptionGroup;
 import ch.cern.tim.driver.jintegraInterface.DIOPCGroupEventAdapter;
@@ -32,6 +30,9 @@ import ch.cern.tim.driver.jintegraInterface.OPCItem;
 import ch.cern.tim.driver.jintegraInterface.OPCItems;
 import ch.cern.tim.driver.jintegraInterface.OPCServer;
 import ch.cern.tim.driver.jintegraInterface.OPCServerState;
+
+import com.linar.jintegra.AuthInfo;
+import com.linar.jintegra.AutomationException;
 
 /**
  * The DADCOMEndpoint represents an endpoint to connect via DCOM to a classic
@@ -77,6 +78,11 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      * Thread pool for incomming data.
      */
     private ExecutorService executorService;
+    
+    /**
+     * Calendar to correct GMT time given by OPC server to local time
+     */
+    private final GregorianCalendar gregorianCalendar = new GregorianCalendar();
     
     /**
      * logger of this class.
@@ -266,7 +272,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                     if (isGoodQuality(qualities[i])) {
                         Object value = values[i];
                         long timestamp = timestamps[i].getTime();
-                        notifyEndpointListenersValueChange(itemAdressId, timestamp + getTimezoneAdjustment(), value);
+                        notifyEndpointListenersValueChange(itemAdressId, getAdjustedTimestamp(timestamp), value);
                     } else {
                         OPCCommunicationException ex = OPCDCOMFactory.createQualityException(qualities[i]);
                         notifyEndpointListenersItemError(itemAdressId, ex);
@@ -277,12 +283,18 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     }
     
     /**
-     * Returns  the timezone adjustment.
-     * @return The timezone adjustment in ms.
+     * Returns the adjusted OPC timestamp to the time zone 
+     * of the DAQ server.
+     * 
+     * @param opcTimestamp The GMT timestamp received from the OPC
+     * @return The adjusted timestamp in milliseconds.
      */
-    private int getTimezoneAdjustment() {
-		return TimeZone.getDefault().getRawOffset() + TimeZone.getDefault().getDSTSavings();
-	}
+    private long getAdjustedTimestamp(long opcTimestamp) {
+      gregorianCalendar.setTimeInMillis(opcTimestamp);
+      int timezoneAdjustment = 
+        gregorianCalendar.get(GregorianCalendar.ZONE_OFFSET) + gregorianCalendar.get(GregorianCalendar.DST_OFFSET);
+      return opcTimestamp + (long) timezoneAdjustment;
+    }
 
     /**
      * True for a good quality.
@@ -321,12 +333,12 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                 	logger.debug("Reading from OPC for item: " + item.getItemID());
                     item.read((short) OPCDataSource.OPCCache, value, quality, timeStamp);
                     notifyEndpointListenersValueChange(
-                            itemDefinitionId, ((Date) timeStamp[0]).getTime() + getTimezoneAdjustment(), value[0]);
+                            itemDefinitionId, getAdjustedTimestamp(((Date) timeStamp[0]).getTime()), value[0]);
                     if (definition.hasRedundantAddress()) {
                         clientHandle = -Long.valueOf(definition.getId()).intValue();
                         item = itemHandleOpcItems.get(clientHandle);
                         item.read((short) OPCDataSource.OPCCache, value, quality, timeStamp);
-                        notifyEndpointListenersValueChange(itemDefinitionId, ((Date) timeStamp[0]).getTime() + getTimezoneAdjustment(), value[0]);
+                        notifyEndpointListenersValueChange(itemDefinitionId, getAdjustedTimestamp(((Date) timeStamp[0]).getTime()), value[0]);
                     }
                 } catch (AutomationException e) {
                     RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e);
