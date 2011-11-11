@@ -36,6 +36,7 @@ import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.supervision.SupervisionFacade;
 import cern.tim.shared.client.command.CommandExecuteRequest;
+import cern.tim.shared.client.command.CommandReport;
 import cern.tim.util.json.GsonFactory;
 
 import com.google.gson.Gson;
@@ -320,7 +321,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   @SuppressWarnings("unchecked")
   private Collection< ? extends ClientRequestResult> handleExecuteCommandRequest(final ClientRequest executeCommandRequest) {
 
-    final Collection commandReports = new ArrayList(1);
+    final Collection<CommandReport> commandReports = new ArrayList<CommandReport>(1);
     commandReports.add(commandExecutionManager.execute((CommandExecuteRequest) executeCommandRequest.getObjectParameter()));
     return commandReports;
   }
@@ -376,15 +377,19 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     while (iter.hasNext()) {
 
       final Long alarmId = iter.next();
-      final Alarm alarm = alarmCache.get(alarmId);
-
-      switch (alarmRequest.getResultType()) {
-        case TRANSFER_ALARM_LIST:
-          alarms.add(TransferObjectFactory.createAlarmValue(alarm));
-          break;
-        default:
-          LOG.error("handleAlarmRequest() - Could not generate response message. Unknown enum ResultType " + alarmRequest.getResultType());
+      if (alarmCache.hasKey(alarmId)) {
+        final Alarm alarm = alarmCache.get(alarmId);
+        switch (alarmRequest.getResultType()) {
+          case TRANSFER_ALARM_LIST:
+            alarms.add(TransferObjectFactory.createAlarmValue(alarm));
+            break;
+          default:
+            LOG.error("handleAlarmRequest() - Could not generate response message. Unknown enum ResultType " + alarmRequest.getResultType());
+        }
+      } else {
+        LOG.warn("handleAlarmRequest() - request for unknown alarm with id " + alarmId);
       }
+      
     } // end while
 
     return alarms;
