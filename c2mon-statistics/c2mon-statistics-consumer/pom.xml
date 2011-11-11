@@ -87,13 +87,31 @@
 
 	<developers />
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.8</version>
-			</plugin>
-		</plugins>
+	<plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>          
+        <version>2.8.1</version>    
+        <configuration>
+          <argLine>
+            -Dc2mon.filter.queue=tim.filter.test
+            -Dc2mon.consumer.consumers.min=1
+            -Dc2mon.consumer.consumers.max=1
+            -Dbuffer.max.window=500
+            -Dbuffer.min.window=100
+            -Dbuffer.window.growth=100
+            -Dbuffer.capacity=50000
+            -Dfallback.file=fallback.txt
+            -Dc2mon.jms.broker.url=vm://localhost
+            -Dc2mon.jms.consumer.user=
+            -Dc2mon.jms.consumer.pwd=
+            -Dc2mon.jdbc.statistics.url=
+            -Dc2mon.jdbc.statistics.user=
+            -Dc2mon.jdbc.statistics.pwd=
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>		
 	</build>
 
 </project>
