@@ -1,19 +1,12 @@
 /*******************************************************************************
- * This file is part of the Technical Infrastructure Monitoring (TIM) project.
- * See http://ts-project-tim.web.cern.ch
- * 
- * Copyright (C) 2004 - 2011 CERN. This program is free software; you can
- * redistribute it and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation; either version 2 of the
- * License, or (at your option) any later version. This program is distributed
- * in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
- * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details. You should have received
- * a copy of the GNU General Public License along with this program; if not,
- * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
- * 
- * Author: TIM team, tim.support@cern.ch
+ * This file is part of the Technical Infrastructure Monitoring (TIM) project. See http://ts-project-tim.web.cern.ch
+ * Copyright (C) 2004 - 2011 CERN. This program is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+ * the GNU General Public License for more details. You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307, USA. Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.client.core.manager;
 
@@ -23,134 +16,102 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import cern.accsoft.security.rba.util.gui.AuthenticationListener;
-import cern.accsoft.security.rba.util.gui.RBAIntegrator;
+import cern.accsoft.security.rba.RBAToken;
+import cern.accsoft.security.rba.TokenExpiredException;
+import cern.accsoft.security.rba.TokenFormatException;
 import cern.c2mon.client.auth.AuthorizationManager;
 import cern.c2mon.client.common.listener.SessionListener;
 import cern.c2mon.client.core.C2monSessionManager;
+import cern.rba.util.holder.ClientTierRbaTokenChangeListener;
+import cern.rba.util.holder.ClientTierSubjectHolder;
 
 /**
- * The session manager handles the user authentication and
- * allows registering SessionListener.
- *
+ * The session manager handles the user authentication and allows registering SessionListener.
+ * 
  * @author Matthias Braeger
  */
 @Service
-public class SessionManager implements C2monSessionManager, AuthenticationListener {
+public class SessionManager implements C2monSessionManager, ClientTierRbaTokenChangeListener {
 
-  /** Log4j instance */
-  private static final Logger LOG = Logger.getLogger(SessionManager.class);
+    /** Log4j instance */
+    private static final Logger LOG = Logger.getLogger(SessionManager.class);
 
-  /**
-   * Collection of listeners that will be notified whenever a login/logout
-   * action completes successfully.
-   */
-  private Collection<SessionListener> sessionListeners = new ArrayList<SessionListener>();
-  
-  /**
-   * RBA integrator singleton. Used for checking RBAC authorization details
-   */
-  private static RBAIntegrator rba;
-  
-  /** The authorization manager */
-  private final AuthorizationManager authorizationManager;
-  
-  /**
-   * Default Constructor
-   * @param pAuthorizationManager The authorization manager to use
-   */
-  @Autowired
-  public SessionManager(final AuthorizationManager pAuthorizationManager) {
-    this.authorizationManager = pAuthorizationManager;
-  }
-  
-  /**
-   * This method has to be called in order to initialize the communication with the RBAIntegrator. 
-   * The sessin manager will then be registered as <code>AuthenticationListener</code>
-   * to RBAC.
-   */
-  private boolean init() {
-    if (rba == null) {
-      LOG.debug("init() - Registering SessionManager as RBAC authentication listener.");
-      rba = RBAIntegrator.getInstance();
-      if (rba != null) {
-        rba.setAuthenticationListener(this);
-      }
-      else {
-        throw new IllegalStateException(
-            "Could not get a valid RBAIntegrator object. Please create first a RBAIntegratorContext before using the SessionManager.");
-      }
-    }
-    
-    return (rba != null);
-  }
-  
-  @Override
-  public void addSessionListener(SessionListener pListener) {
-    if (init()) {
-      if (pListener != null && !sessionListeners.contains(pListener)) {
-        sessionListeners.add(pListener);
-      }
-    }
-  }
+    /**
+     * Collection of listeners that will be notified whenever a login/logout action completes successfully.
+     */
+    private Collection<SessionListener> sessionListeners = new ArrayList<SessionListener>();
 
-  @Override
-  public boolean login(final String pUserName, final String pPassword) {
-    throw new UnsupportedOperationException("This method is not supported, yet");
-  }
+    /** The authorization manager */
+    private final AuthorizationManager authorizationManager;
 
-  @Override
-  public boolean logout() {
-    throw new UnsupportedOperationException("This method is not supported, yet");
-  }
+    /**
+     * RBA token associated with current session
+     */
+    private RBAToken rbaToken;
 
-  @Override
-  public void removeSessionListener(final SessionListener pListener) {
-    if (pListener != null) {
-      sessionListeners.remove(pListener);
-    }
-  }
-  
-  @Override
-  public boolean isUserLogged() {
-    if (init()) {
-      return authorizationManager.isUserLogged();
+    /**
+     * Default Constructor
+     * 
+     * @param pAuthorizationManager The authorization manager to use
+     */
+    @Autowired
+    public SessionManager(final AuthorizationManager pAuthorizationManager) {
+        this.authorizationManager = pAuthorizationManager;
+        ClientTierSubjectHolder.addRbaTokenChangeListener(this);
     }
 
-    return false;
-  }
-
-  @Override
-  public void loginPerformed() {
-    if (init()) {
-      String userName = rba.getLoggedUsername();
-      for (SessionListener listener : sessionListeners) {
-        listener.onLogin(userName);
-      }
+    @Override
+    public void addSessionListener(SessionListener pListener) {
+        if (pListener != null && !sessionListeners.contains(pListener)) {
+            sessionListeners.add(pListener);
+        }
     }
-  }
 
-  @Override
-  public void logoutPerformed() {
-    if (init()) {
-      for (SessionListener listener : sessionListeners) {
-        listener.onLogout();
-      }
+    @Override
+    public boolean login(@SuppressWarnings("unused") final String pUserName,
+            @SuppressWarnings("unused") final String pPassword) {
+        throw new UnsupportedOperationException("This method is not supported, yet");
     }
-  }
 
-  @Override
-  public void tokenExpired() {
-    LOG.warn("RBAC token has expired!");
-  }
-
-  @Override
-  public String getUserName() {
-    if (init()) {
-      return rba.getLoggedUsername();
+    @Override
+    public boolean logout() {
+        throw new UnsupportedOperationException("This method is not supported, yet");
     }
-    
-    return null;
-  }
+
+    @Override
+    public void removeSessionListener(final SessionListener pListener) {
+        if (pListener != null) {
+            sessionListeners.remove(pListener);
+        }
+    }
+
+    @Override
+    public boolean isUserLogged() {
+        return authorizationManager.isUserLogged();
+    }
+
+    @Override
+    public String getUserName() {
+        return rbaToken == null ? null : rbaToken.getUser().getName();
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public void rbaTokenChanged(RBAToken rbaToken) throws TokenFormatException, TokenExpiredException {
+        this.rbaToken = rbaToken;
+
+        if (rbaToken == null || rbaToken.isEmpty() || !rbaToken.isValid()) {
+            // the user has logged out
+            for (SessionListener listener : sessionListeners) {
+                listener.onLogout();
+            }
+        } else {
+            String userName = rbaToken.getUser().getName();
+            for (SessionListener listener : sessionListeners) {
+                listener.onLogin(userName);
+            }
+
+        }
+    }
+
 }
