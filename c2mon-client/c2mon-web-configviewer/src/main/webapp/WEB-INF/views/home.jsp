@@ -5,6 +5,6 @@
 		<title>Home</title>
 	</head>
 	<body>
-		<h1>Hello world!</h1>
+		<h1>Welcome to Online Config Viewer</h1>
 	</body>
 </html>

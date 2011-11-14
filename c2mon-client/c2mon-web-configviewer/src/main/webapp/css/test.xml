@@ -1,0 +1,62 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<?xml-stylesheet type="text/xsl" href="/css/tag.xsl"?>-->
+<?xml-stylesheet type="text/xsl" href="tag.xsl" ?>
+
+<TagInfo>
+
+	<ClientDataTag id="137242">
+   <tagValue class="java.lang.Float">13.7</tagValue>
+   <mode>OPERATIONAL</mode>
+   <simulated>false</simulated>
+   <tagName>UV.MEY.UATT-02696_UBTR-900:TEMPERATURE_EXTERIEUR</tagName>
+   <alarms/>
+   <sourceTimestamp>2011-11-02 12:18:45.387 CET</sourceTimestamp>
+   <serverTimestamp>2011-11-02 12:18:45.652 CET</serverTimestamp>
+   <description>TEMPERATURE EXTERIEURE</description>
+   <valueDescription></valueDescription>
+   <topicName>tim.tag.4187</topicName>
+</ClientDataTag>
+
+
+
+	<TagConfig id="137242">
+   <valueDeadbandType>1</valueDeadbandType>
+   <valueDeadband>0.5</valueDeadband>
+   <timeDeadband>10000</timeDeadband>
+   <priority>2</priority>
+   <guaranteedDelivery>false</guaranteedDelivery>
+   <hardwareAddress><![CDATA[        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl">
+          <namespace>0</namespace>
+          <opc-item-name>S7:[PLCCOMVENT513]DB233,REAL664</opc-item-name>
+          <command-pulse-length>0</command-pulse-length>
+          <address-type>STRING</address-type>
+          <command-type>CLASSIC</command-type>
+        </HardwareAddress>
+]]></hardwareAddress>
+   <ruleIds/>
+   <alarmIds/>
+   <controlTag>false</controlTag>
+   <minValue>-30.0</minValue>
+   <maxValue>70.0</maxValue>
+   <publications class="java.util.LinkedHashMap"/>
+</TagConfig>
+
+<AlarmValue id="144849">
+   <faultCode>12274</faultCode>
+   <faultFamily>ACCE_ZORA_LHC</faultFamily>
+   <faultMemeber>TED.TI8</faultMemeber>
+   <info>[T]</info>
+   <tagId>137241</tagId>
+   <timestamp>2011-09-13 09:09:11.0 CEST</timestamp>
+   <active>false</active>
+</AlarmValue>
+
+	<p><a href="https://oraweb.cern.ch/pls/timw3_oper/helpalarm.AlarmList?p_pointid1=137242">
+		Display additional information from HelpAlarm for this DataTag
+	</a>
+	</p>
+
+
+
+</TagInfo>
