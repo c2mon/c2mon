@@ -687,7 +687,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @DirtiesContext
   public void testRemoveProcess() {
     //stop DAQ else remove not allowed
-    processFacade.stop(processCache.get(50L));
+    processFacade.stop(processCache.get(50L), new Timestamp(System.currentTimeMillis()));
     
     replay(mockManager);
     
