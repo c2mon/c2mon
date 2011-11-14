@@ -28,4 +28,9 @@ public interface AuthorizationManager {
    * @return <code>true</code>, if a user is logged in, otherwise <code>false</code>
    */
   boolean isUserLogged();
+  
+  /**
+   * @return The user name, or <code>null</code>, if no user is logged in.
+   */
+  String getUserName();
 }

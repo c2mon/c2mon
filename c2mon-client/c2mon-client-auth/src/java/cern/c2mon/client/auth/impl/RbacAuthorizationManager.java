@@ -14,7 +14,7 @@ import cern.tim.shared.common.command.AuthorizationDetails;
 /**
  * This class implements the {@link AuthorizationManager} interface for RBAC authentication/authorization.
  * 
- * @author Matthias Braeger
+ * @author Matthias Braeger, Wojtek Buczak
  */
 @Service
 public class RbacAuthorizationManager implements AuthorizationManager {
@@ -57,5 +57,15 @@ public class RbacAuthorizationManager implements AuthorizationManager {
     public boolean isUserLogged() {
         final RBAToken token = RbaTokenLookup.findClientTierRbaToken();
         return token != null && token.isValid();
+    }
+
+    @Override
+    public String getUserName() {
+      final RBAToken token = RbaTokenLookup.findClientTierRbaToken();
+      if (token != null) {
+        return token.getUser().getName();
+      }
+      
+      return null;
     }
 }

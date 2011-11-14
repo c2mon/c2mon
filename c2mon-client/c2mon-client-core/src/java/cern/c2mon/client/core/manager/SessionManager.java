@@ -45,11 +45,6 @@ public class SessionManager implements C2monSessionManager, ClientTierRbaTokenCh
     private final AuthorizationManager authorizationManager;
 
     /**
-     * RBA token associated with current session
-     */
-    private RBAToken rbaToken;
-
-    /**
      * Default Constructor
      * 
      * @param pAuthorizationManager The authorization manager to use
@@ -61,7 +56,7 @@ public class SessionManager implements C2monSessionManager, ClientTierRbaTokenCh
     }
 
     @Override
-    public void addSessionListener(SessionListener pListener) {
+    public void addSessionListener(final SessionListener pListener) {
         if (pListener != null && !sessionListeners.contains(pListener)) {
             sessionListeners.add(pListener);
         }
@@ -92,14 +87,19 @@ public class SessionManager implements C2monSessionManager, ClientTierRbaTokenCh
 
     @Override
     public String getUserName() {
-        return rbaToken == null ? null : rbaToken.getUser().getName();
+        return authorizationManager.getUserName();
     }
 
-    @SuppressWarnings("unused")
+    /**
+     * This listener method is called every time, when somebody is logging
+     * in or out. The SessionManager will accordingly inform all registered
+     * {@link SessionListener}.
+     * 
+     * @param rbaToken The RBAC token
+     * @throws TokenFormatException In case of problems with the token.
+     */
     @Override
-    public void rbaTokenChanged(RBAToken rbaToken) throws TokenFormatException, TokenExpiredException {
-        this.rbaToken = rbaToken;
-
+    public void rbaTokenChanged(final RBAToken rbaToken) throws TokenFormatException, TokenExpiredException {
         if (rbaToken == null || rbaToken.isEmpty() || !rbaToken.isValid()) {
             // the user has logged out
             for (SessionListener listener : sessionListeners) {
@@ -110,8 +110,6 @@ public class SessionManager implements C2monSessionManager, ClientTierRbaTokenCh
             for (SessionListener listener : sessionListeners) {
                 listener.onLogin(userName);
             }
-
         }
     }
-
 }
