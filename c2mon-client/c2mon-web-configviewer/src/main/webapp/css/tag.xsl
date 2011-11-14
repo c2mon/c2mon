@@ -105,7 +105,7 @@
 			</tr>
 			<tr>
 				<td class="bold"> Data Type </td>
-				<td><xsl:value-of select="../ClientDataTag/tagValue[@class]"/></td>
+				<td><xsl:value-of select="../ClientDataTag/tagValue/@class"/></td>
 			</tr>
 			<tr>
 				<td class="bold"> Value dictionary </td>
