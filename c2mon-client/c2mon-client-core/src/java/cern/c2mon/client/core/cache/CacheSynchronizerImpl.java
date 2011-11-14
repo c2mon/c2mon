@@ -237,11 +237,17 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   private boolean handleLiveTagRegistration(final ClientDataTagImpl liveTag) throws JMSException {
     final DataTagQuality tagQuality = liveTag.getDataTagQuality();
     
-    if (tagQuality.isInitialised() && tagQuality.isExistingTag()) {
+    if (tagQuality.isExistingTag()) {
       supervisionManager.addSupervisionListener(liveTag, liveTag.getProcessIds(), liveTag.getEquipmentIds());
       if (!jmsProxy.isRegisteredListener(liveTag)) {
         jmsProxy.registerUpdateListener(liveTag, liveTag);
         return true;
+      }
+    }
+    else {
+      supervisionManager.removeSupervisionListener(liveTag);
+      if (jmsProxy.isRegisteredListener(liveTag)) {
+        jmsProxy.unregisterUpdateListener(liveTag);
       }
     }
     
