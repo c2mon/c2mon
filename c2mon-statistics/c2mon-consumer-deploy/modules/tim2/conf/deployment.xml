@@ -53,7 +53,7 @@
 		<application name="consumer-tim2-dev" extends="default">
 			<deployment installLocation="/user/timtest/dev/statistics-consumer-dev">
 				<directory name="conf">
-					<file name="c2mon-consumer.properties" sourceDir="/user/timtest/rep/c2mon/statistics"
+					<file name="c2mon-consumer.properties" sourceDir="/user/timtest/dev/rep/c2mon/statistics"
 						mask="400" />
 				</directory>
 			</deployment>
