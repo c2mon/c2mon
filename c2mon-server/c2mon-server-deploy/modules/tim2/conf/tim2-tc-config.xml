@@ -190,6 +190,9 @@
         </include>              
         <!-- Process cache -->
         <include>
+          <class-expression>cern.tim.server.common.equipment.AbstractSupervisedCacheObject</class-expression>
+        </include>
+        <include>
           <class-expression>cern.tim.server.common.process.ProcessCacheObject</class-expression>
         </include>
         <include>
@@ -263,15 +266,11 @@
         <!-- Command cache -->
         <include>
           <class-expression>cern.tim.server.common.command.CommandTagCacheObject</class-expression>
-        </include>        
-        <include>
-          <class-expression>cern.tim.shared.daq.command.AuthorizedHosts</class-expression>
-          <!-- excludes the regexp; call parsePattern on reload -->
           <honor-transient>true</honor-transient>
-          <on-load>
-            <method>parsePattern</method>
-          </on-load>
-        </include>         
+        </include>
+        <include>
+          <class-expression>cern.tim.shared.client.command.RbacAuthorizationDetails</class-expression>
+        </include>                 
         <!-- configuration module -->
         <include>
           <class-expression>cern.tim.server.configuration.impl.ConfigurationLoaderImpl</class-expression>
@@ -343,6 +342,10 @@
         <root>       
           <field-name>cern.tim.server.common.config.DistributedParams.initialised</field-name>
           <root-name>initialised</root-name>
+        </root>
+         <root>       
+          <field-name>cern.tim.server.common.config.DistributedParams.cacheLoadingLocks</field-name>
+          <root-name>cacheLoadingLocks</root-name>
         </root>
        </roots>
 <!--      <web-applications>-->
