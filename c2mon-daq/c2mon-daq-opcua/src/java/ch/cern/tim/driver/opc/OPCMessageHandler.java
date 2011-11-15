@@ -33,6 +33,15 @@ public class OPCMessageHandler extends EquipmentMessageHandler
         implements ICommandRunner, IEquipmentConfigurationChanger {
     
     /**
+     * This boolean tells the message handler that it is the first
+     * call of the refresh method which the Kernel does by default
+     * after having called the {@link #connectToDataSource()} method.
+     * For OPC we do not want to have a direct refresh after connection
+     * since this is causing problem in the communication.
+     */
+    private boolean firstRefresh = true;
+  
+    /**
      * Delay to restart the DAQ after an equipment change.
      */
     private static final long RESTART_DELAY = 2000L;
@@ -106,17 +115,22 @@ public class OPCMessageHandler extends EquipmentMessageHandler
      */
     @Override
     public synchronized void refreshAllDataTags() {
+      if (!firstRefresh) {
         new Thread() {
             @Override
             public void run() {
                 try {
-                    getEquipmentLogger().debug("refreshing data tags");
+                    getEquipmentLogger().debug("refreshAllDataTags() - refreshing data tags");
                     controller.refresh();
                 } catch (Exception e) {
-                    getEquipmentLogger().error("Refresh of OPC data failed", e);
+                    getEquipmentLogger().error("refreshAllDataTags() - Refresh of OPC data failed", e);
                 }
             }
         }.start();
+      }
+      else {
+        firstRefresh = false;
+      }
     }
 
     /**
