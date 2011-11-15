@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Statistics">
+
+  <!-- Use type aliases to avoid typing the full class name every time. -->
+  <typeAlias alias="BarChartValue" type="ch.cern.tim.statistics.generator.values.BarChartValue"/>
+  <typeAlias alias="PieChartValue" type="ch.cern.tim.statistics.generator.values.PieChartValue"/>
+  <typeAlias alias="StackedBarChartValue" type="ch.cern.tim.statistics.generator.values.StackedBarChartValue"/>
+  <typeAlias alias="BarChartCollectionValue" type="ch.cern.tim.statistics.generator.values.BarChartCollectionValue"/>
+  <typeAlias alias="StackedBarChartCollectionValue" type="ch.cern.tim.statistics.generator.values.StackedBarChartCollectionValue"/>
+  <typeAlias alias="PieChartCollectionValue" type="ch.cern.tim.statistics.generator.values.PieChartCollectionValue"/>
+  
+
+  <!-- retrieves the bar chart data -->
+  <resultMap id="bar-chart-result" class="BarChartValue">
+    <result property="value" column="d_value"/>
+    <result property="seriesKey" column="series"/>
+    <result property="categoryKey" column="category"/>
+  </resultMap>
+  
+  <select id="getBarChartData" parameterClass="java.lang.String" resultMap="bar-chart-result">
+    SELECT d_value,series,category
+    FROM $value$
+    <!-- ORDER BY d_value DESC -->
+  </select>
+  
+  <resultMap id="stacked-bar-chart-result" class="StackedBarChartValue">
+    <result property="value" column="d_value"/>
+    <result property="seriesKey" column="series"/>
+    <result property="categoryKey" column="category"/>
+    <result property="group" column="series_group"/>
+  </resultMap>
+  
+  <select id="getStackedBarChartData" parameterClass="java.lang.String" resultMap="stacked-bar-chart-result">
+    SELECT d_value,series,category,series_group
+    FROM $value$
+    <!-- ORDER BY d_value DESC -->
+  </select>
+  
+  <!-- retrieves the pie chart data -->
+  <resultMap id="pie-chart-result" class="PieChartValue">
+    <result property="value" column="data_value"/>
+    <result property="key" column="data_key"/>
+  </resultMap>
+  
+  <select id="getPieChartData" parameterClass="java.lang.String" resultMap="pie-chart-result">
+    SELECT data_value,data_key
+    FROM $value$
+    <!-- ORDER BY d_value DESC -->
+  </select>
+  
+  <resultMap id="bar-chart-collection-result" class="BarChartCollectionValue">
+    <result property="memberName" column="member_name"/>
+    <result property="value" column="d_value"/>
+    <result property="seriesKey" column="series"/>
+    <result property="categoryKey" column="category"/>
+  </resultMap>
+  
+  <select id="getBarChartCollectionData" parameterClass="java.lang.String" resultMap="bar-chart-collection-result">
+    SELECT member_name,d_value,series,category
+    FROM $value$ 
+  </select>
+  
+  <resultMap id="pie-chart-collection-result" class="PieChartCollectionValue">
+    <result property="memberName" column="member_name"/>
+    <result property="value" column="data_value"/>
+    <result property="key" column="data_key"/>
+  </resultMap>
+  
+  <select id="getPieChartCollectionData" parameterClass="java.lang.String" resultMap="pie-chart-collection-result">
+    SELECT member_name,data_value,data_key
+    FROM $value$ 
+  </select>
+  
+  <resultMap id="stacked-bar-chart-collection-result" class="StackedBarChartCollectionValue">
+    <result property="memberName" column="member_name"/>
+    <result property="value" column="d_value"/>
+    <result property="seriesKey" column="series"/>
+    <result property="group" column="series_group"/>
+    <result property="categoryKey" column="category"/>
+  </resultMap>
+  
+  <select id="getStackedBarChartCollectionData" parameterClass="java.lang.String" resultMap="stacked-bar-chart-collection-result">
+    SELECT member_name,d_value,series,category,series_group
+    FROM $value$ 
+  </select>
+  
+</sqlMap>

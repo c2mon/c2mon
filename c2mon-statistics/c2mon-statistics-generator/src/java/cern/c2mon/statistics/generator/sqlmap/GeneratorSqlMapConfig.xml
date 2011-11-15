@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+
+	<transactionManager type="JDBC">
+		<dataSource type="SIMPLE">
+		        <property name="JDBC.Driver" value="oracle.jdbc.driver.OracleDriver" />
+			<property name="JDBC.ConnectionURL" value="${jdbc.statistics.url}" />
+			<property name="JDBC.Username" value="${jdbc.statistics.user}" />
+			<property name="JDBC.Password" value="${jdbc.statistics.password}" />
+		</dataSource>
+	</transactionManager>
+
+	<!--
+		List the SQL Map XML files.
+	-->
+	<sqlMap resource="cern/c2mon/statistis/generator/sqlmap/GeneratorSqlMap.xml" />
+	
+
+</sqlMapConfig>
