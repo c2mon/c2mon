@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="c2mon-statistics-generator">
+
+		<!--
+			this application section is a parent configuration for both
+			c2mon-tim2-prod and c2mon-tim2-test
+		-->
+		<application name="default">
+			<deployment installLocation="/opt/statistics-generator-not-used/">
+				<backupPolicy keepBackups="2">
+					<preserve type="dir" name="log" />					
+				</backupPolicy>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="timdiamon-developers@cern.ch" />
+				</notification>
+
+				<startscript name="C2MON-STATISTICS-GENERATOR">
+					<main-class name="cern.c2mon.statistics.generator.GraphDeployer">						
+						<arg>--log4j ${LOG4J_CONF_FILE}</arg>    
+						<arg>--graphconfig ${GRAPH_CONF_FILE}</arg>
+						<arg>--imagedir ${IMAGE_DIR}</arg>
+						<arg>--htmldir ${HTML_DIR}</arg>
+						<arg>--deployhome ${DEPLOY_HOME}</arg>
+						<arg>--webhome ${WEB_HOME}</arg>
+						<arg>-R</arg>
+						<output>
+							<file name="log/out.log" />
+						</output>
+					</main-class>
+					<property name="tim.log.path" value="${STATISTICS_GENERATOR_LOG_HOME}" />					
+				</startscript>
+
+			</deployment>
+		</application>
+
+		<application name="generator-tim2-prod" extends="default">
+			<deployment installLocation="/opt/statistics-generator">
+				<directory name="conf">
+					<file name="webconfig.xml" sourceDir="/user/timoper/rep/c2mon/statistics"
+						mask="400" />
+				  <file name="c2mon-generator.properties" sourceDir="/user/timoper/rep/c2mon/statistics"
+            mask="400" />
+				</directory>				
+			</deployment>
+		</application>
+
+		<application name="generator-tim2-test" extends="default">
+			<deployment installLocation="/opt/statistics-generator-test">
+				<directory name="conf">
+					<file name="webconfig.xml" sourceDir="/user/timtest/rep/c2mon/statistics"
+						mask="400" />
+				  <file name="c2mon-generator.properties" sourceDir="/user/timtest/rep/c2mon/statistics"
+            mask="400" />
+				</directory>
+			</deployment>
+		</application>
+
+		<application name="generator-tim2-dev" extends="default">
+			<deployment installLocation="/user/timtest/dev/statistics-generator-dev">
+				<directory name="conf">
+					<file name="webconfig.xml" sourceDir="/user/timtest/dev/rep/c2mon/statistics"
+						mask="400" />
+					<file name="c2mon-generator.properties" sourceDir="/user/timtest/dev/rep/c2mon/statistics"
+            mask="400" />
+				</directory>
+			</deployment>
+		</application>
+
+	</product>
+</products>

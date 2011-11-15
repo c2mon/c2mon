@@ -1,0 +1,234 @@
+<statistics>
+ <pie-chart-style>
+   <colours>
+     <rgb>
+       <r>105</r><g>42</g><b>66</b>
+     </rgb>
+     <rgb>
+       <r>209</r><g>54</g><b>84</b>
+     </rgb>
+     <rgb>
+       <r>199</r><g>113</g><b>92</b>
+     </rgb>
+     <rgb>
+       <r>184</r><g>159</g><b>129</b>
+     </rgb>
+     <rgb>
+       <r>151</r><g>179</g><b>185</b>
+     </rgb>
+   </colours>
+ </pie-chart-style> 
+ <bar-chart-style>
+   <colours>
+     <rgb>
+       <r>105</r><g>42</g><b>66</b>
+     </rgb>
+     <rgb>
+       <r>209</r><g>54</g><b>84</b>
+     </rgb>
+     <rgb>
+       <r>199</r><g>113</g><b>92</b>
+     </rgb>
+     <rgb>
+       <r>184</r><g>159</g><b>129</b>
+     </rgb>
+     <rgb>
+       <r>151</r><g>179</g><b>185</b>
+     </rgb>     
+   </colours>
+ </bar-chart-style> 
+  <chart-group id-pref="last7" class="cern.c2mon.statistics.generator.charts.JFreeStackedBarChartCollection">
+   <paragraph-title></paragraph-title>
+   <description>Displays the number of updates filtered and received by the application server for each of the past 7 days.</description>
+   <category>DAQ.$CHART_NAME$</category>
+   <x-pixels>550</x-pixels>
+   <y-pixels>350</y-pixels>
+   <title>Updates for DAQ $CHART_NAME$</title>
+   <domain-name>Date</domain-name>
+   <range-name>Number of updates</range-name>
+   <orientation>vertical</orientation>
+   <database-table>VSTAT_DAQ_LAST7_COLL</database-table>
+ </chart-group>
+ <chart-group id-pref="fil" class="cern.c2mon.statistics.generator.charts.JFreePieChartCollection">
+   <paragraph-title></paragraph-title>
+   <description>This chart gives the breakdown of the reasons updates were filtered out at the DAQ layer over the past 7 days, for DAQ $CHART_NAME$.</description>
+   <category>DAQ.$CHART_NAME$</category>
+   <x-pixels>510</x-pixels>
+   <y-pixels>350</y-pixels>
+   <title>Breakdown of filtering reasons for DAQ $CHART_NAME$ over past 7 days</title>
+   <database-table>VSTAT_DAQ_FIL_COLL</database-table>
+ </chart-group>
+ <chart-group id-pref="fil_qual" class="cern.c2mon.statistics.generator.charts.JFreePieChartCollection">
+   <paragraph-title></paragraph-title>
+   <description>This chart gives the breakdown of the quality of invalid tag updates filtered out at the DAQ layer over the last 7 days, for DAQ $CHART_NAME$.</description>
+   <category>DAQ.$CHART_NAME$</category>
+   <x-pixels>510</x-pixels>
+   <y-pixels>350</y-pixels>
+   <title>Quality of invalid updates filtered out for DAQ $CHART_NAME$ over past 7 days</title>
+   <database-table>VSTAT_DAQ_FIL_QUAL_COLL</database-table>
+ </chart-group>
+ <chart-group id-pref="inv" class="cern.c2mon.statistics.generator.charts.JFreePieChartCollection">
+   <paragraph-title></paragraph-title>
+   <description>This chart shows the proportion of invalid updates received from the equipment over the past 7 days (more precisely, it calculates the proportion of invalid updates amongst updates to the AS and those filtered out.)</description>
+   <category>DAQ.$CHART_NAME$</category>
+   <x-pixels>510</x-pixels>
+   <y-pixels>350</y-pixels>
+   <title>Proportion of invalid updates for DAQ $CHART_NAME$ over past 7 days.</title>
+   <database-table>VSTAT_DAQ_INV_COLL</database-table>
+ </chart-group>
+<chart-group id-pref="qual" class="cern.c2mon.statistics.generator.charts.JFreePieChartCollection">
+   <paragraph-title></paragraph-title>
+   <description>This chart gives the breakdown of the quality of invalid tag values held by the application server over the last 7 days, for DAQ $CHART_NAME$.</description>
+   <category>DAQ.$CHART_NAME$</category>
+   <x-pixels>510</x-pixels>
+   <y-pixels>350</y-pixels>
+   <title>Quality of invalid updates to AS for DAQ $CHART_NAME$ over past 7 days</title>
+   <database-table>VSTAT_DAQ_QUAL_COLL</database-table>
+ </chart-group>
+  <chart id="4" class="cern.c2mon.statistics.generator.charts.JFreePieChart">
+   <paragraph-title>Breakdown of the filtering reasons for the DAQ.</paragraph-title>
+    <description>The DAQ layer filters out tag updates for a number of reasons. This chart shows the breakdown of the reasons updates were filtered out over the past 7 days.</description>
+    <category>P_CVRMTVENTLHC01</category>
+    <x-pixels>510</x-pixels>
+    <y-pixels>350</y-pixels>
+    <title>DAQ filtering reasons</title>
+    <database-table>VSTAT_FIL_P_CVRMTVENTLHC01</database-table>
+ </chart>
+ <chart id="5" class="cern.c2mon.statistics.generator.charts.JFreeBarChart">
+   <paragraph-title>Total updates sent to the Application Server for each of the past 10 days</paragraph-title>
+    <description>Shows the total number of tag updates sent to the application server for each of the past 10 days (these are the non-filtered values).</description>
+    <category>application-server</category>
+    <x-pixels>650</x-pixels>
+    <y-pixels>350</y-pixels>
+    <title>Total updates to AS</title>
+    <domain-name>Last 10 days</domain-name>
+    <range-name>Number of updates</range-name>
+    <orientation>vertical</orientation>
+    <database-table>VSTAT_TOTAL_UPDATES_TO_AS</database-table>
+ </chart>
+ <chart id="6" class="cern.c2mon.statistics.generator.charts.JFreeBarChart">
+   <paragraph-title>Total updates filtered out at the DAQ layer for each of the past 10 days</paragraph-title>
+    <description>Shows the total number of tag updates filtered out at the DAQ layer for each of the past 10 days</description>
+    <category>application-server</category>
+    <x-pixels>650</x-pixels>
+    <y-pixels>350</y-pixels>
+    <title>Total updates filtered at DAQ layer</title>
+    <domain-name>Last 10 days</domain-name>
+    <range-name>Number of updates</range-name>
+    <orientation>vertical</orientation>
+    <database-table>VSTAT_TOTAL_UPDATES_TO_FIL</database-table>
+ </chart>
+
+ <chart id="14" class="cern.c2mon.statistics.generator.charts.JFreeStackedBarChart">
+   <paragraph-title>Updates to the application server by DAQ.</paragraph-title>
+    <description>This chart shows the 30 DAQs that sent the most updates to the application server yesterday.</description>
+    <category>DAQs</category>
+    <x-pixels>700</x-pixels>
+    <y-pixels>800</y-pixels>
+    <title>DAQs to application server</title>
+    <domain-name>DAQs</domain-name>
+    <range-name>Number of updates</range-name>
+    <orientation>horizontal</orientation>
+    <database-table>VSTAT_DAQ_AS</database-table>
+ </chart>
+ <chart id="15" class="cern.c2mon.statistics.generator.charts.JFreeStackedBarChart">
+   <paragraph-title>For yesterday: breakdown of the activity of all DAQs.</paragraph-title>
+    <description>This chart shows the number of updates sent yesterday to the application server and filter module for each DAQ.</description>
+    <category>DAQs</category>
+    <x-pixels>700</x-pixels>
+    <y-pixels>900</y-pixels>
+    <title>Updates by DAQ</title>
+    <domain-name>DAQs</domain-name>
+    <range-name>Number of updates</range-name>
+    <orientation>horizontal</orientation>
+    <database-table>VSTAT_DAQ_ACTIVITY</database-table>
+ </chart>
+ <chart id="13" class="cern.c2mon.statistics.generator.charts.JFreeStackedBarChart">
+   <paragraph-title>Behavior of P_CVRMTVENTLHC01 over the past 7 days</paragraph-title>
+    <description>This chart gives a breakdown of the tags sent by the DAQ P_CVRMTVENTLHC01 to the application server and filter module over the past 7 days.</description>
+    <category>P_CVRMTVENTLHC01</category>
+    <x-pixels>550</x-pixels>
+    <y-pixels>350</y-pixels>
+    <title>DAQ</title>
+    <domain-name>Last 7 days</domain-name>
+    <range-name>Number of updates</range-name>
+    <orientation>vertical</orientation>
+    <database-table>VSTAT_DAQ_CVRMTVENTLHC01_LAST7</database-table>
+ </chart>
+ <chart id="33" class="cern.c2mon.statistics.generator.charts.JFreePieChart">
+   <paragraph-title>Quality of the application server values for the DAQ.</paragraph-title>
+    <description>This chart gives a breakdown of the invalid quality codes for this DAQ over the past 7 days. The meaning of the quality codes is obtained by unique binary decomposition! (0=UNINITIALISED, 1=INACCESSIBLE, 2=VALUE_EXPIRED, 3=VALUE_OUT_OF_BOUNDS, 4=INVALID_TAG, 5=VALUE_UNDEFINED, 6=UNKNOWN) </description>
+    <category>P_CVRMTVENTLHC01</category>
+    <x-pixels>550</x-pixels>
+    <y-pixels>350</y-pixels>
+    <title>DAQ quality codes</title>
+    <database-table>VSTAT_QUAL_CVRMTVENTLHC01</database-table>
+ </chart>
+   <chart id="16" class="cern.c2mon.statistics.generator.charts.JFreeBarChart">
+   <paragraph-title>Most out-of-bounds tags over past 7 days.</paragraph-title>
+    <description>Displays the tags with the highest proportion of out-of-bounds values arriving from the equipment over the past 7 days. May indicate badly configured min-max range.</description>
+    <category>out-of-bounds-tags</category>
+    <x-pixels>600</x-pixels>
+    <y-pixels>500</y-pixels>
+    <title>Top out-of-bounds percentages.</title>
+    <domain-name>Tag id</domain-name>
+    <range-name>Percentage out-of-bounds</range-name>
+    <orientation>horizontal</orientation>
+    <database-table>VSTAT_RATIO_OOB</database-table>
+ </chart>
+ <chart id="17" class="cern.c2mon.statistics.generator.charts.JFreeBarChart">
+   <paragraph-title>Most invalid tags.</paragraph-title>
+    <description>Displays the tags with the highest proportion of invalid values arriving from the equipment over the last 7 days (only tags with at least 10 updates over this period are considered). May indicate badly configured tags.</description>
+    <category>invalid-tags</category>
+    <x-pixels>600</x-pixels>
+    <y-pixels>500</y-pixels>
+    <title>Top invalid percentages.</title>
+    <domain-name>Tag id</domain-name>
+    <range-name>Percentage invalid</range-name>
+    <orientation>horizontal</orientation>
+    <database-table>VSTAT_RATIO_INV</database-table>
+ </chart>
+  <chart id="18" class="cern.c2mon.statistics.generator.charts.JFreeBarChart">
+   <paragraph-title>Most invalid tags: breakdown of invalidity</paragraph-title>
+    <description>This chart gives the breakdown of the invalidity codes for the tags in the "Top invalid percentages" chart, for those values sent to the application server (1=UNINITIALISED, 2=INACCESSIBLE, 4=VALUE_EXPIRED, 8=VALUE_OUT_OF_BOUNDS, 16=INVALID_TAG, 32=VALUE_UNDEFINED, 64=UNKNOWN).</description>
+    <category>invalid-tags</category>
+    <x-pixels>600</x-pixels>
+    <y-pixels>500</y-pixels>
+    <title>Quality code breakdown for top invalid tags.</title>
+    <domain-name>Tag id</domain-name>
+    <range-name>Percentage of values with the given quality code.</range-name>
+    <orientation>horizontal</orientation>
+    <database-table>VSTAT_RATIO_INV_B</database-table>
+ </chart>
+  <chart id="20" class="cern.c2mon.statistics.generator.charts.JFreeStackedBarChart">
+   <paragraph-title>Behavior of P_ENS01 over the past 7 days</paragraph-title>
+    <description>This chart gives a breakdown of the tags sent by the DAQ to the application server and filter module over the past 7 days.</description>
+    <category>P_ENS01</category>
+    <x-pixels>550</x-pixels>
+    <y-pixels>350</y-pixels>
+    <title>DAQ P_ENS01</title>
+    <domain-name>Last 7 days</domain-name>
+    <range-name>Number of updates</range-name>
+    <orientation>vertical</orientation>
+    <database-table>VSTAT_P_ENS01_LAST7</database-table>
+ </chart>
+ <chart id="21" class="cern.c2mon.statistics.generator.charts.JFreePieChart">
+   <paragraph-title>Breakdown of the filtering reasons for the DAQ.</paragraph-title>
+    <description>The DAQ layer filters out tag updates for a number of reasons. This chart shows the breakdown of the reasons updates were filtered out over the past 7 days.</description>
+    <category>P_ENS01</category>
+    <x-pixels>550</x-pixels>
+    <y-pixels>350</y-pixels>
+    <title>DAQ filtering reasons</title>
+    <database-table>VSTAT_FIL_P_ENS01</database-table>
+ </chart>
+  <chart id="22" class="cern.c2mon.statistics.generator.charts.JFreePieChart">
+   <paragraph-title>Quality of the application server values for the DAQ.</paragraph-title>
+    <description>This chart gives a breakdown of the invalid quality codes for this DAQ over the past 7 days. The meaning of the quality codes is obtained by unique binary decomposition! (1=UNINITIALISED, 2=INACCESSIBLE, 4=VALUE_EXPIRED, 8=VALUE_OUT_OF_BOUNDS, 16=INVALID_TAG, 32=VALUE_UNDEFINED, 64=UNKNOWN) </description>
+    <category>P_ENS01</category>
+    <x-pixels>550</x-pixels>
+    <y-pixels>350</y-pixels>
+    <title>DAQ quality codes</title>
+    <database-table>VSTAT_QUAL_P_ENS01</database-table>
+ </chart>
+ 
+</statistics>
