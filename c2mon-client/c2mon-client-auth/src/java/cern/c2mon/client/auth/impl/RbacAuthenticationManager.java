@@ -37,6 +37,7 @@ import cern.accsoft.security.rba.login.RBALoginContext;
 import cern.c2mon.client.auth.AuthenticationListener;
 import cern.c2mon.client.auth.AuthenticationManager;
 import cern.rba.util.holder.ClientTierRbaTokenChangeListener;
+import cern.rba.util.holder.ClientTierSubjectHolder;
 import cern.rba.util.lookup.RbaTokenLookup;
 
 /**
@@ -60,6 +61,14 @@ public class RbacAuthenticationManager implements AuthenticationManager, ClientT
   private Set<AuthenticationListener> authenticationListeners =
     Collections.synchronizedSet(new HashSet<AuthenticationListener>());
 
+  /**
+   * Registering this class as {@link ClientTierRbaTokenChangeListener}
+   */
+  @PostConstruct
+  protected void init() {
+    ClientTierSubjectHolder.addRbaTokenChangeListener(this);
+  }
+  
   /**
    * This method is called by SPRING before this Service gets destroyed 
    */
