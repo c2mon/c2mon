@@ -35,7 +35,7 @@
 				<configuration>
 
 					<descriptors>
-						<descriptor>src/assembly/tim2-consumer-assembly.xml</descriptor>
+						<descriptor>src/assembly/tim2-generator-assembly.xml</descriptor>
 					</descriptors>
 
 				</configuration>
