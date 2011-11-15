@@ -35,12 +35,7 @@
 			<version>3.0</version>
 			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-daq</artifactId>
-			<version>[1.0.0,2.0.0)</version>
-		</dependency>		
+	
 		<dependency>
 			<groupId>org.apache.ibatis</groupId>
 			<artifactId>ibatis-sqlmap</artifactId>
@@ -82,17 +77,6 @@
         <version>2.8.1</version>    
         <configuration>
           <argLine>
-            -Dc2mon.filter.queue=tim.filter.test
-            -Dc2mon.consumer.consumers.min=1
-            -Dc2mon.consumer.consumers.max=1
-            -Dbuffer.max.window=500
-            -Dbuffer.min.window=100
-            -Dbuffer.window.growth=100
-            -Dbuffer.capacity=50000
-            -Dfallback.file=fallback.txt
-            -Dc2mon.jms.broker.url=vm://localhost
-            -Dc2mon.jms.consumer.user=
-            -Dc2mon.jms.consumer.pwd=
             -Dc2mon.jdbc.statistics.url=
             -Dc2mon.jdbc.statistics.user=
             -Dc2mon.jdbc.statistics.pwd=
