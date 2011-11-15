@@ -18,6 +18,7 @@
 package cern.c2mon.client.core;
 
 import cern.c2mon.client.common.listener.SessionListener;
+import cern.tim.shared.common.command.AuthorizationDetails;
 
 /**
  * This interface describes the methods which are provided by
@@ -45,21 +46,33 @@ public interface C2monSessionManager {
   void removeSessionListener(final SessionListener pListener);
 
   /**
-   * Use this message to authenticate the TIM client instance at the server with
-   * a given user name and password
+   * Use this message to authenticate with
+   * a given user name and password. The {@link SessionManager} will then 
+   * use your (valid) session for all authorization checks.
    * 
    * @param pUserName The user name
    * @param pPassword The password of the user
    * @return <code>true</code>, if the authentication was successful.
    */
   boolean login(final String pUserName, final String pPassword);
+  
+  /**
+   * Use this message to authenticate a user for a given application name.
+   * The {@link SessionManager} will then use your (valid) session for
+   * all authorization checks.
+   * 
+   * @param appName The name of the application from which you are performing the
+   *                authentication.
+   * @param pUserName The user name
+   * @param pPassword The password of the user
+   * @return <code>true</code>, if the authentication was successful.
+   */
+  boolean login(final String appName, final String pUserName, final String pPassword);
 
   /**
    * Closes the current session.
-   * 
-   * @return true, if the logout was successful
    */
-  boolean logout();
+  void logout();
   
   /**
    * @return <code>true</code>, if a user is logged in, otherwise <code>false</code>
@@ -70,4 +83,16 @@ public interface C2monSessionManager {
    * @return The user name or <code>null</code>, if no user is logged on.
    */
   String getUserName();
+
+  /**
+   * Checks whether the logged person has the required authorization rights
+   * as specified by the given {@link AuthorizationDetails}. Note that the
+   * {@link AuthorizationDetails} are specific to the used authorization
+   * method, e.g. RBAC. 
+   * @param authorizationDetails The authorization details against which
+   *        the user's priviledges shall be checked.
+   * @return <code>true</code>, if the user is has the authorized required
+   *         prviledges. 
+   */
+  boolean isAuthorized(AuthorizationDetails authorizationDetails);
 }

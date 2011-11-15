@@ -10,20 +10,23 @@
  ******************************************************************************/
 package cern.c2mon.client.core.manager;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import cern.accsoft.security.rba.RBAToken;
-import cern.accsoft.security.rba.TokenExpiredException;
-import cern.accsoft.security.rba.TokenFormatException;
+
+import cern.c2mon.client.auth.AuthenticationListener;
+import cern.c2mon.client.auth.AuthenticationManager;
 import cern.c2mon.client.auth.AuthorizationManager;
 import cern.c2mon.client.common.listener.SessionListener;
 import cern.c2mon.client.core.C2monSessionManager;
-import cern.rba.util.holder.ClientTierRbaTokenChangeListener;
-import cern.rba.util.holder.ClientTierSubjectHolder;
+import cern.tim.shared.common.command.AuthorizationDetails;
 
 /**
  * The session manager handles the user authentication and allows registering SessionListener.
@@ -31,7 +34,7 @@ import cern.rba.util.holder.ClientTierSubjectHolder;
  * @author Matthias Braeger
  */
 @Service
-public class SessionManager implements C2monSessionManager, ClientTierRbaTokenChangeListener {
+public class SessionManager implements C2monSessionManager, AuthenticationListener {
 
     /** Log4j instance */
     private static final Logger LOG = Logger.getLogger(SessionManager.class);
@@ -39,77 +42,114 @@ public class SessionManager implements C2monSessionManager, ClientTierRbaTokenCh
     /**
      * Collection of listeners that will be notified whenever a login/logout action completes successfully.
      */
-    private Collection<SessionListener> sessionListeners = new ArrayList<SessionListener>();
+    private Set<SessionListener> sessionListeners = Collections.synchronizedSet(new HashSet<SessionListener>());
 
+    /** The authentication manager */
+    private final AuthenticationManager authenticationManager;
+    
     /** The authorization manager */
     private final AuthorizationManager authorizationManager;
 
     /**
      * Default Constructor
      * 
+     * @param pAuthenticationManager Reference to the authentication manager
      * @param pAuthorizationManager The authorization manager to use
      */
     @Autowired
-    public SessionManager(final AuthorizationManager pAuthorizationManager) {
+    public SessionManager(final AuthenticationManager pAuthenticationManager, 
+                          final AuthorizationManager pAuthorizationManager) {
+        this.authenticationManager = pAuthenticationManager;
         this.authorizationManager = pAuthorizationManager;
-        ClientTierSubjectHolder.addRbaTokenChangeListener(this);
+    }
+    
+    /**
+     * Registeres this class as {@link AuthenticationListener}
+     */
+    @PostConstruct
+    protected void init() {
+      authenticationManager.addAuthenticationListener(this);
+    }
+    
+    /**
+     * Removes the sessionListener from the list.
+     */
+    @PreDestroy
+    protected void cleanup() {
+      sessionListeners.clear();
     }
 
     @Override
     public void addSessionListener(final SessionListener pListener) {
-        if (pListener != null && !sessionListeners.contains(pListener)) {
-            sessionListeners.add(pListener);
-        }
+      if (pListener != null && !sessionListeners.contains(pListener)) {
+          sessionListeners.add(pListener);
+      }
+    }
+
+    /**
+     * Use this message to authenticate with
+     * a given user name and password. The {@link SessionManager} will then 
+     * use your (valid) session for all authorization checks. <p>
+     * Please notice that when using RBAC the mandatory 
+     * application name parameter is set to <code>c2mon-client-api</code>.
+     * 
+     * @param pUserName The user name
+     * @param pPassword The password of the user
+     * @return <code>true</code>, if the authentication was successful.
+     */
+    @Override
+    public boolean login(final String pUserName, final String pPassword) {
+      return authenticationManager.login(pUserName, pPassword);
+    }
+    
+    @Override
+    public boolean login(final String appName, final String pUserName, final String pPassword) {
+      return authenticationManager.login(appName, pUserName, pPassword);
     }
 
     @Override
-    public boolean login(@SuppressWarnings("unused") final String pUserName,
-            @SuppressWarnings("unused") final String pPassword) {
-        throw new UnsupportedOperationException("This method is not supported, yet");
-    }
-
-    @Override
-    public boolean logout() {
-        throw new UnsupportedOperationException("This method is not supported, yet");
+    public void logout() {
+      authenticationManager.logout();
     }
 
     @Override
     public void removeSessionListener(final SessionListener pListener) {
-        if (pListener != null) {
-            sessionListeners.remove(pListener);
-        }
+      if (pListener != null) {
+          sessionListeners.remove(pListener);
+      }
     }
 
     @Override
     public boolean isUserLogged() {
-        return authorizationManager.isUserLogged();
+      return authenticationManager.isUserLogged();
     }
 
     @Override
     public String getUserName() {
-        return authorizationManager.getUserName();
+      return authenticationManager.getUserName();
+    }
+    
+    @Override
+    public boolean isAuthorized(final AuthorizationDetails authorizationDetails) {
+      if (authenticationManager.isUserLogged()) {
+        return authorizationManager.isAuthorized(authorizationDetails);
+      }
+      else {
+        return false;
+      }
     }
 
-    /**
-     * This listener method is called every time, when somebody is logging
-     * in or out. The SessionManager will accordingly inform all registered
-     * {@link SessionListener}.
-     * 
-     * @param rbaToken The RBAC token
-     * @throws TokenFormatException In case of problems with the token.
-     */
     @Override
-    public void rbaTokenChanged(final RBAToken rbaToken) throws TokenFormatException, TokenExpiredException {
-        if (rbaToken == null || rbaToken.isEmpty() || !rbaToken.isValid()) {
-            // the user has logged out
-            for (SessionListener listener : sessionListeners) {
-                listener.onLogout();
-            }
-        } else {
-            String userName = rbaToken.getUser().getName();
-            for (SessionListener listener : sessionListeners) {
-                listener.onLogin(userName);
-            }
-        }
+    public void onLogin(String userName) {
+      for (SessionListener listener : sessionListeners) {
+        listener.onLogin(userName);
+      }
+    }
+
+    @Override
+    public void onLogout() {
+      for (SessionListener listener : sessionListeners) {
+        listener.onLogout();
+      }
     }
 }
