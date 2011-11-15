@@ -14,7 +14,7 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<componentDescriptors>
-		<componentDescriptor>src/assembly/c2mon-consumer-common-assembly.xml
+		<componentDescriptor>src/assembly/c2mon-generator-common-assembly.xml
 		</componentDescriptor>
 	</componentDescriptors>
 
