@@ -11,7 +11,7 @@
 		        <property name="JDBC.Driver" value="oracle.jdbc.driver.OracleDriver" />
 			<property name="JDBC.ConnectionURL" value="${c2mon.jdbc.statistics.url}" />
 			<property name="JDBC.Username" value="${c2mon.jdbc.statistics.user}" />
-			<property name="JDBC.Password" value="${c2mon.jdbc.statistics.password}" />
+			<property name="JDBC.Password" value="${c2mon.jdbc.statistics.pwd}" />
 		</dataSource>
 	</transactionManager>
 
