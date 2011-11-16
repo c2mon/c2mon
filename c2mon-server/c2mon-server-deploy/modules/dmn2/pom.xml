@@ -84,6 +84,10 @@
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-shorttermlog</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-laser</artifactId>
+		</dependency>
 	</dependencies>
 
 	<developers />
