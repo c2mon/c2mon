@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
 
 import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
@@ -30,89 +29,89 @@ import cern.tim.server.common.config.ServerConstants;
  */
 public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean {
 
-	/**
-	 * The alarm source name this publisher is called.
+    /**
+     * The alarm source name this publisher is called.
+     */
+    private String sourceName;
+
+    /**
+     * Our Logger
+     */
+    private Logger log = Logger.getLogger(LaserPublisher.class);
+
+    /**
+     * yet another logger, that will be configured to output to a file every alarm pushed to LASER
+     */
+    private Logger laserLog = Logger.getLogger("LaserAlarmsLogger");
+
+
+    /** Reference to the LASER alarm system interface. */
+    private AlarmSystemInterface asi = null;
+
+    /**
+     * Flag for lifecycle calls.
+     */
+    private volatile boolean running = false;
+
+    /**
+     * Service for registering as listener to C2MON caches.
+     */
+    private CacheRegistrationService cacheRegistrationService;
+
+    /**
 	 */
-	private String sourceName;
+    private StatisticsModule stats = new StatisticsModule();
 
-	/**
-	 * Our Logger
-	 */
-	private Logger log = Logger.getLogger(LaserPublisher.class);
+    /**
+     * Autowired constructor.
+     * 
+     * @param cacheRegistrationService the C2MON cache registration service bean
+     */
+    @Autowired
+    public LaserPublisher(final CacheRegistrationService cacheRegistrationService) {
+        super();
+        this.cacheRegistrationService = cacheRegistrationService;
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        try {
+            StandardMBean mbean = new StandardMBean(this, LaserPublisherMBean.class);
+            server.registerMBean(mbean, new ObjectName("cern.c2mon:type=LaserPublisher,name="
+                    + LaserPublisher.class.getName()));
+        } catch (Exception e) {
+            log.error("Can't register for JMX : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
-//	private AlarmSourceManager sourceManager = null;
+    /**
+     * @param sourceName the alarm source name this publisher should be called.
+     */
+    @Required
+    public void setSourceName(String sourceName) {
+        if (log.isInfoEnabled()) {
+            log.info("Setting Alarm Sourcename to " + sourceName);
+        }
+        this.sourceName = sourceName;
+    }
 
-	/** Reference to the LASER alarm system interface. */
-	private AlarmSystemInterface asi = null;
+    /**
+     * @return the alarm source name this publisher is called.
+     */
+    public String getSourceName() {
+        return sourceName;
+    }
 
-	/**
-	 * Flag for lifecycle calls.
-	 */
-	private volatile boolean running = false;
+    /**
+     * Called at server startup.
+     * 
+     * @throws Exception in case the underlying alarm system could not be initiated.
+     */
+    @PostConstruct
+    public void init() throws Exception {
+        cacheRegistrationService.registerToAlarms(this);
+        asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
+    }
 
-	/**
-	 * Service for registering as listener to C2MON caches.
-	 */
-	private CacheRegistrationService cacheRegistrationService;
-
-	/**
-	 */
-	private StatisticsModule stats = new StatisticsModule();
-	
-	/**
-	 * Autowired constructor.
-	 * 
-	 * @param cacheRegistrationService
-	 *            the C2MON cache registration service bean
-	 */
-	@Autowired
-	public LaserPublisher(final CacheRegistrationService cacheRegistrationService) {
-		super();
-		this.cacheRegistrationService = cacheRegistrationService;
-		MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-		try {
-			StandardMBean mbean = new StandardMBean(this, LaserPublisherMBean.class);
-			server.registerMBean(mbean, new ObjectName("cern.c2mon:type=LaserPublisher,name=" + LaserPublisher.class.getName()));
-		} catch (Exception e) {
-			log.error("Can't register for JMX : " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * 
-	 * @param sourceName
-	 *            the alarm source name this publisher should be called.
-	 */
-	@Required
-	public void setSourceName(String sourceName) {
-		if(log.isInfoEnabled()){
-			log.info("Setting Alarm Sourcename to " + sourceName);
-		}
-		this.sourceName = sourceName;
-	}
-
-	/**
-	 * 
-	 * @return the alarm source name this publisher is called.
-	 */
-	public String getSourceName() {
-		return sourceName;
-	}
-
-	/**
-	 * Called at server startup.
-	 * 
-	 * @throws Exception
-	 *             in case the underlying alarm system could not be initiated.
-	 */
-	@PostConstruct
-	public void init() throws Exception {
-		cacheRegistrationService.registerToAlarms(this);
-		asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
-	}
-
-	@Override
+    @Override
 	public void notifyElementUpdated(Alarm cacheable) {
 
 		FaultState fs = null;
@@ -140,6 +139,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 		boolean result = true;
 		try {
 			asi.push(fs);
+			log(cacheable);			    
 		} catch (ASIException e) {
 			// Ooops, didn't work. log the exception.
 			result = false;
@@ -183,82 +183,89 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 			log.error(str);
 	}
 
-	// below server lifecycle methods: complete start/stop (no need to allow for
-	// stop/restart, just final shutdown)
-	@Override
-	public boolean isAutoStartup() {
-		return true;
-	}
+    // below server lifecycle methods: complete start/stop (no need to allow for
+    // stop/restart, just final shutdown)
+    @Override
+    public boolean isAutoStartup() {
+        return true;
+    }
 
-	@Override
-	public void stop(Runnable callback) {
-		stop();
-		callback.run();
-	}
+    @Override
+    public void stop(Runnable callback) {
+        stop();
+        callback.run();
+    }
 
-	@Override
-	public boolean isRunning() {
-		return running;
-	}
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
 
-	@Override
-	public void start() {
-		if(log.isInfoEnabled()){
-			log.info("Starting" + LaserPublisher.class.getName());
-		}
-		running = true;
-	}
+    @Override
+    public void start() {
+        if (log.isInfoEnabled()) {
+            log.info("Starting" + LaserPublisher.class.getName());
+        }
+        running = true;
+    }
 
-	@Override
-	public void stop() {
-		if(log.isInfoEnabled()){
-			log.info("Stopping " + LaserPublisher.class.getName());
-		}
-		asi.close();
-		running = false;
-	}
+    @Override
+    public void stop() {
+        if (log.isInfoEnabled()) {
+            log.info("Stopping " + LaserPublisher.class.getName());
+        }
+        asi.close();
+        running = false;
+    }
 
-	@Override
-	public int getPhase() {
-		return ServerConstants.PHASE_STOP_LAST;
-	}
+    @Override
+    public int getPhase() {
+        return ServerConstants.PHASE_STOP_LAST;
+    }
 
-	@Override
-	public long getProcessedAlarms() {
-		return stats.getTotalProcessed();
-	}
+    @Override
+    public long getProcessedAlarms() {
+        return stats.getTotalProcessed();
+    }
 
-	@Override
-	public void resetStatistics() {
-		if(log.isTraceEnabled()){
-			log.trace("Entering resetStatistics()");
-		}
-		stats.resetStatistics();	
-	}
+    @Override
+    public void resetStatistics() {
+        if (log.isTraceEnabled()) {
+            log.trace("Entering resetStatistics()");
+        }
+        stats.resetStatistics();
+    }
 
-	@Override
-	public void resetStatistics(String alarmID) {
-		if(log.isTraceEnabled()){
-			log.trace("Entering resetStatistics('" + alarmID + "')");
-		}
-		stats.resetStatistics(alarmID);
-	}
+    @Override
+    public void resetStatistics(String alarmID) {
+        if (log.isTraceEnabled()) {
+            log.trace("Entering resetStatistics('" + alarmID + "')");
+        }
+        stats.resetStatistics(alarmID);
+    }
 
-	@Override
-	public List<String> getRegisteredAlarms() {
-		if(log.isTraceEnabled()){
-			log.trace("Entering getRegisteredAlarms()");
-		}
-		return stats.getStatsList();
-	}
+    @Override
+    public List<String> getRegisteredAlarms() {
+        if (log.isTraceEnabled()) {
+            log.trace("Entering getRegisteredAlarms()");
+        }
+        return stats.getStatsList();
+    }
 
-	@Override
-	public String getStatsForAlarm(String id) {
-		if (stats.getStatsForAlarm(id) == null){
-			return "Not found!";
-		}else {
-			return stats.getStatsForAlarm(id).toString();
-		}
-	}
+    @Override
+    public String getStatsForAlarm(String id) {
+        if (stats.getStatsForAlarm(id) == null) {
+            return "Not found!";
+        } else {
+            return stats.getStatsForAlarm(id).toString();
+        }
+    }
+
+    
+    private void log(final Alarm alarm) {
+        if (laserLog != null && laserLog.isInfoEnabled()) {
+            laserLog.info(alarm);
+        }
+    }
 
 }
