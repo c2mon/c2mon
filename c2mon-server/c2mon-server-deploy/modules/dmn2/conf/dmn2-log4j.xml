@@ -43,8 +43,8 @@
              renderingClass="cern.tim.server.common.rule.RuleTagRenderer" />   
   
   <renderer  renderedClass="cern.tim.server.common.alarm.Alarm"
-             renderingClass="cern.tim.server.common.alarm.renderer.RuleTagRenderer" />                       
-  
+             renderingClass="cern.tim.server.common.alarm.renderer.AlarmRenderer" />
+             
              
   <appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
     <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
