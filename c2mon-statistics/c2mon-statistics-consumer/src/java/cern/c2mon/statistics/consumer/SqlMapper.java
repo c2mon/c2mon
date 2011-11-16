@@ -99,7 +99,7 @@ public final class SqlMapper {
             }
             
             //construct the SqlMap from the XML file, using the tim.properties DB settings
-            String resource = "c2mon/cern/statistics/consumer/sqlmap/FilterSqlMapConfig.xml";
+            String resource = "cern/c2mon/statistics/consumer/sqlmap/FilterSqlMapConfig.xml";
             Reader reader = Resources.getResourceAsReader(resource);
             SQLMAP = SqlMapClientBuilder.buildSqlMapClient(reader, properties);
         } catch (Exception e) {
