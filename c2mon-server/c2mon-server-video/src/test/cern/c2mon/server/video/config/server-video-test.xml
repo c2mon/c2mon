@@ -24,8 +24,8 @@
     
       <!-- HSQL embedded in-memory db for tests -->
       <jdbc:embedded-database id="cacheDataSource">
-            <jdbc:script location="classpath:cern/c2mon/server/video/config/test/db-create.sql" />
-			<jdbc:script location="classpath:cern/c2mon/server/video/config/test/data.sql"/>
+            <jdbc:script location="classpath:cern/c2mon/server/video/config/db-create.sql" />
+			<jdbc:script location="classpath:cern/c2mon/server/video/config/data.sql"/>
       </jdbc:embedded-database>
       
   	<bean id="vsfSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

@@ -117,6 +117,14 @@
     	<version>2.0</version>
     	<scope>compile</scope>
     </dependency>
+    <dependency>
+    	<groupId>cern.tim2.tim2-shared</groupId>
+    	<artifactId>tim2-shared-common</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>cern.tim2.tim2-shared</groupId>
+    	<artifactId>tim2-shared-client</artifactId>
+    </dependency>
   </dependencies>
 
   <developers />
@@ -132,11 +140,8 @@
             
             <!--
               module properties
-            -->
-            -Djms.client.user=not-used
-            -Djms.client.password=not-used           
-            -Djms.client.supervision.topic=tim.client.supervision.test
-            -Djms.client.request.queue=tim.client.request.test
+            -->           
+            -Djms.video.request.queue=tim.video.request
             -Dc2mon.jms.client.consumers.min=1
             -Dc2mon.jms.client.consumers.max=2            
             

@@ -16,31 +16,22 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.server.video.test;
+package cern.c2mon.server.video;
 
 import java.sql.SQLException;
 
-import java.sql.Time;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 
-import javax.annotation.PostConstruct;
-
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.client.common.video.VideoConnectionProperties;
-import cern.c2mon.client.common.video.VideoConnectionPropertiesCollection;
 import cern.c2mon.server.video.VideoConnectionMapper;
-import cern.c2mon.server.video.VideoConnectionPropertiesDAO;
+import cern.c2mon.shared.video.VideoConnectionProperties;
+import cern.tim.shared.client.command.RbacAuthorizationDetails;
 
 /**
  * Tests the iBatis mapper against the Oracle DB.
@@ -49,10 +40,11 @@ import cern.c2mon.server.video.VideoConnectionPropertiesDAO;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/video/config/test/server-video-test.xml"})
+@ContextConfiguration({"classpath:cern/c2mon/server/video/config/server-video-test.xml" })
 public class VideoConnectionPropertiesDAOTest {
 
-  private static String VIDEOSYSTEMNAME = "MANOS";
+  /** the video system name used in the queries */
+  private final String VIDEOSYSTEMNAME = "MANOS";
   
   /**
    * To test.
@@ -60,29 +52,6 @@ public class VideoConnectionPropertiesDAOTest {
   @Autowired
   private VideoConnectionMapper videoConnectionMapper;    
   
-  /**
-   * Removes test values from previous tests in case clean up failed.
-   */
-  @Before
-  public void beforeTest() {
-    removeTestData();
-  }
-  
-  /**
-   * Removes test values after test.
-   */
-  @After
-  public void afterTest() {
-    removeTestData();
-  }
-  
-  /**
-   * Removes test data.
-   */
-  private void removeTestData() {
-    
-//    videoConnectionMapper.deleteDataTagLog(ID);
-  }
   
   /**
    * Tests selectAllVideoConnectionProperties
@@ -91,28 +60,22 @@ public class VideoConnectionPropertiesDAOTest {
   @Test
   public void testSelectAllVideoConnectionProperties()  {
     
-    List roleNamesList = null;
+    List vcpList = null;
     
     try {
-      roleNamesList = videoConnectionMapper.selectAllVideoConnectionProperties(VIDEOSYSTEMNAME);
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    
-    Iterator iter = roleNamesList.iterator();
-    
-    assert (roleNamesList.size()==2); // the query returns 2 valid results (defined in data.sql)
-    
-    while (iter.hasNext()) {
+      vcpList = videoConnectionMapper.selectAllVideoConnectionProperties(VIDEOSYSTEMNAME);
       
-      Object o = iter.next();
+      assert (vcpList.size() == 2); // the query must return 2 valid VCP's (defined in data.sql)
       
-      assert (o instanceof VideoConnectionProperties);
-      if (o instanceof VideoConnectionProperties) {
+      Iterator iter = vcpList.iterator();
+      while (iter.hasNext()) {
         
-        System.out.println(((VideoConnectionProperties) o).getLogin());
+        Object o = iter.next();
+        
+        assert (o instanceof VideoConnectionProperties);
       }
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
   }
   
@@ -121,23 +84,19 @@ public class VideoConnectionPropertiesDAOTest {
    * @throws SQLException 
    */
   @Test
-  public void testSelectAllPermitedRoleNames()  {
+  public void testselectRbacDetails()  {
     
-    List roleNamesList = null;
+    RbacAuthorizationDetails details = null;
     
     try {
-      roleNamesList = videoConnectionMapper.selectAllPermitedRoleNames(VIDEOSYSTEMNAME);
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    
-    Iterator iter = roleNamesList.iterator();
-    
-    while (iter.hasNext()) {
+      details = videoConnectionMapper.selectAuthorizationDetails(VIDEOSYSTEMNAME);
       
-        Object o = iter.next();
-        System.out.println(o.toString());
+      // the correct query results (defined in data.sql)
+      assert (details.getRbacDevice().equals("DEVICE3"));
+      assert (details.getRbacProperty().equals("PROPERTY3"));
+      assert (details.getRbacClass().equals("Class3"));
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
   }
 }

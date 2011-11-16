@@ -22,8 +22,6 @@ package cern.c2mon.server.video;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -32,10 +30,7 @@ import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.jms.TopicConnection;
-import javax.jms.TopicConnectionFactory;
-import javax.jms.TopicPublisher;
-import javax.jms.TopicSession;
+import javax.management.RuntimeErrorException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,27 +38,31 @@ import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.video.VideoConnectionPropertiesCollection;
-import cern.c2mon.client.common.video.VideoConnectionsRequest;
+import com.google.gson.Gson;
+
+import cern.c2mon.shared.video.VideoConnectionProperties;
+import cern.c2mon.shared.video.VideoRequest;
+import cern.c2mon.shared.video.VideoRequest.RequestType;
+import cern.tim.shared.client.command.RbacAuthorizationDetails;
+import cern.tim.shared.common.command.AuthorizationDetails;
+import cern.tim.util.json.GsonFactory;
 
 
 /**
  * This message-driven bean handles all requests sent by the TIM video clients.
- * Requests are expected to be of VideoConnectionsRequest type.
+ * Requests are expected to be of {@link VideoRequest} type.
  *
- * @author Matthias Braeger
+ * @author Matthias Braeger, Emmanouil Koufakis
  */
 @Service("videoRequestHandler")
 public class VideoRequestHandler implements SessionAwareMessageListener<Message> {
-  
-  /**
-   * The generated serial version UID
-   */
-  private static final long serialVersionUID = 1686542119946353745L;
 
   /** Log4j Logger for this class */
   private static final Logger LOG = Logger.getLogger(VideoRequestHandler.class);
-  
+
+  /** Json message serializer/deserializer */
+  private static final Gson GSON = GsonFactory.createGson();
+
   /**
    * The hashcode will allow us to uniquely link requests to responses in the 
    * log files. Seeing that one bean instance can only process one request at
@@ -71,57 +70,84 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
    * parallel, this kind of link is necessary.
    */
   private int hashCode = hashCode();
-   
-  /** JMS factory name for the reply connection */
-  private String jmsFactoryName;
 
-  /** JMS user name for the reply connection */
-  private String jmsUser;
-
-  /** JMS password for the reply connection */
-  private String jmsPassword;
-
-  /** JMS ConnectionFactory for publishing replies to the drivers' requests */
-  private TopicConnectionFactory factory;
-
-  /** JMS Connection for publishing replies to the drivers' requests */
-  private TopicConnection connection;
-
-  /** TopicPublisher for publishing replies to the drivers' requests */
-  private TopicPublisher publisher;
-
-  /** JMS Session for publishing replies to the drivers' requests */
-  private TopicSession session;
-
-  /** Flag indicating whether the "reply" connection has been established */
-  private boolean connected;
-  
-  /** A mutex flag */
-  private Boolean connection_mutex = Boolean.FALSE;
-  
   /** used to make property queries */
-  private VideoConnectionPropertiesDAO videoConnectionDAO;
-  
-  // --- //
-  
+  private VideoConnectionMapper videoConnectionDAO;
+
   /**
    * Default TTL of replies to client requests
    */
   private static final long DEFAULT_REPLY_TTL = 120000;
-  
-  // -- //
-  
+
   /**
    * Default Constructor
    * @param pVideoConnectionDAO VideoConnectionPropertiesDAO used to make property queries
    */
   @Autowired
-  public VideoRequestHandler(final VideoConnectionPropertiesDAO pVideoConnectionDAO) {
-    
+  public VideoRequestHandler(final VideoConnectionMapper pVideoConnectionDAO) {
+
     this.videoConnectionDAO = pVideoConnectionDAO;
   }
 
-  
+  /**
+   * Inner method for handling video requests. Responses are sent back as JSON messages.
+   * 
+   * @param videoRequest The request. Can either be an AUTHORIZATION_DETAILS_REQUEST or a
+   * VIDEO_CONNECTION_PROPERTIES_REQUEST.
+   * @return The response that shall be transfered back to the video client. 
+   * In case of an AUTHORIZATION_DETAILS_REQUEST the response is RbacAuthorizationDetails. 
+   * In case of an VIDEO_CONNECTION_PROPERTIES_REQUEST the response is VideoConnectionPropertiesCollection. 
+   */
+  public String handleVideoRequest(final VideoRequest videoRequest) {
+
+    String messageText = null; // JSON reply
+
+    try {
+      if (videoRequest.getRequestType() == RequestType.AUTHORIZATION_DETAILS_REQUEST) {
+        RbacAuthorizationDetails d = handleAuthorisationDetailsRequest(videoRequest);
+        messageText = GSON.toJson(d);
+      }
+      else if (videoRequest.getRequestType() == RequestType.VIDEO_CONNECTION_PROPERTIES_REQUEST) {
+        Collection<VideoConnectionProperties> p = handleVideoConnectionRequest(videoRequest);
+        messageText = GSON.toJson(p); 
+      }
+    } catch (SQLException sqle) {
+      LOG.error("onMessage() : handleVideoRequest(): Unable to get connection to data base: ", sqle);
+    }
+
+    return messageText;
+  }
+
+  /**
+   * Inner method for handling AUTHORIZATION_DETAILS_REQUEST.
+   * 
+   * @param videoRequest A AUTHORIZATION_DETAILS_REQUEST.
+   * @return a VideoConnectionPropertiesCollection
+   * @throws SQLException In case an error occurs during the query
+   */
+  private RbacAuthorizationDetails handleAuthorisationDetailsRequest(final VideoRequest videoRequest) throws SQLException {
+
+    String videoName = videoRequest.getVideoSystemName();
+    RbacAuthorizationDetails authDetails = videoConnectionDAO.selectAuthorizationDetails(videoName);
+
+    return authDetails;
+  }
+
+  /**
+   * Inner method for handling VIDEO_CONNECTION_PROPERTIES_REQUEST.
+   * 
+   * @param videoRequest A VIDEO_CONNECTION_PROPERTIES_REQUEST.
+   * @return a collection of VideoConnectionProperties
+   * @throws SQLException In case an error occurs during the query
+   */
+  private Collection<VideoConnectionProperties> handleVideoConnectionRequest(final VideoRequest videoRequest) throws SQLException {
+
+    String videoName = videoRequest.getVideoSystemName();
+    Collection<VideoConnectionProperties> properties = videoConnectionDAO.selectAllVideoConnectionProperties(videoName);
+
+    return properties;
+  }
+
   /**
    * This method is called when the Video client is sending a Video Request
    * to the server. The server retrieves the information 
@@ -131,42 +157,23 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
    * @throws JMSException Is thrown, e.g. if the reply destination topic is not set.
    * @see ClientRequest
    */
-  // TODO @Override
+  @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
-    
-    VideoConnectionsRequest videoConnectionRequest = VideoRequestMessageConverter.fromMessage(message);
-   
+
+    VideoRequest videoRequest = VideoRequestMessageConverter.fromMessage(message);
+
     if (LOG.isDebugEnabled()) {
       LOG.debug("Successully processed client request.");
     }
-    
-    // -- // 
-    
-    if (videoConnectionRequest == null)
-      return;
-    
-    VideoConnectionPropertiesCollection propertiesList = new VideoConnectionPropertiesCollection();
-    
-    try {
-      List roleNamesList = videoConnectionDAO.selectAllPermitedRoleNames(videoConnectionRequest.getVideoSystemName());
-      
-      Iterator iter = roleNamesList.iterator();
-      boolean videoConnsAdded = false;
-      while (iter.hasNext() && !videoConnsAdded) {
-        String roleName = (String) iter.next();
-        if (videoConnectionRequest.hasPrivilege(roleName)) {
-          Collection connList = 
-            videoConnectionDAO.selectAllVideoConnectionProperties(videoConnectionRequest.getVideoSystemName());
-          propertiesList.addAll(connList);
-          videoConnsAdded = true;
-        }
-      }
-      
-    } catch (SQLException sqle) {
-      LOG.error("onMessage() : Unable to get connection to data base: ", sqle);
+
+    if (videoRequest == null) {
+      LOG.error("onMessage() : videoRequest is null - cannot send reply.");
+      throw new RuntimeErrorException(new Error("onMessage() : videoRequest is null - cannot send reply."));
     }
-    
-    // -- //
+
+    String messageText = handleVideoRequest(videoRequest); // JSON response
+
+    // Sent the response
 
     // Extract reply topic
     Destination replyDestination = null;
@@ -182,8 +189,7 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
       messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
       TextMessage replyMessage = session.createTextMessage();      
 
-      // Send response as  Json message
-      replyMessage.setText(propertiesList.toJson());
+      replyMessage.setText(messageText);
       if (LOG.isDebugEnabled()) {
         LOG.debug(new StringBuffer("onMessage() : Video connection response sent : ").append(hashCode));
       }

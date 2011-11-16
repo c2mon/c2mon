@@ -7,16 +7,24 @@ import javax.jms.TextMessage;
 import org.apache.log4j.Logger;
 import org.springframework.jms.support.converter.MessageConversionException;
 
+import cern.c2mon.shared.video.VideoRequest;
+import cern.tim.util.json.GsonFactory;
+
+import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-import cern.c2mon.client.common.video.VideoConnectionsRequest;
-import cern.c2mon.shared.client.request.ClientRequest;
-
-
+/**
+ * This abstract class provides a static method for converting a VideoRequest.
+ * 
+ * @author ekoufaki
+ */
 public abstract class VideoRequestMessageConverter {
   
   /** Class logger */
   private static final Logger LOG = Logger.getLogger(VideoRequestMessageConverter.class);
+  
+  /** Json message serializer/deserializer */
+  private static final Gson GSON = GsonFactory.createGson();
   
   /**
    * Hidden default constructor
@@ -26,21 +34,19 @@ public abstract class VideoRequestMessageConverter {
   }
 
   /**
-   * Converts the received JMS message to a <code>VideoConnectionsRequest</code> object.
+   * Converts the received JMS message to a <code>VideoRequest</code> object.
    * @param message The received JMS message
-   * @return The deserialized <code>VideoConnectionsRequest</code>
+   * @return The deserialized <code>VideoRequest</code>
    * @throws JMSException In case of problems when getting the text from the JMS text message
    * @throws MessageConversionException In case of problems while deserializing the JMS message
    */
-  public static final VideoConnectionsRequest fromMessage(final Message message) throws JMSException, MessageConversionException {
+  public static final VideoRequest fromMessage(final Message message) throws JMSException, MessageConversionException {
     
     if (message instanceof TextMessage) {
       String json = ((TextMessage) message).getText();
       
       try {
-        
-        return VideoConnectionsRequest.fromJsonResponse(json);
-        
+        return GSON.fromJson(json, VideoRequest.class);
       }
       catch (JsonSyntaxException jse) {
         StringBuffer str = new StringBuffer("fromMessage() : Unsupported JSON message (");
