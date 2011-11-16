@@ -9,9 +9,9 @@
 	<transactionManager type="JDBC">
 		<dataSource type="SIMPLE">
 		        <property name="JDBC.Driver" value="oracle.jdbc.driver.OracleDriver" />
-			<property name="JDBC.ConnectionURL" value="${jdbc.statistics.url}" />
-			<property name="JDBC.Username" value="${jdbc.statistics.user}" />
-			<property name="JDBC.Password" value="${jdbc.statistics.password}" />
+			<property name="JDBC.ConnectionURL" value="${c2mon.jdbc.statistics.url}" />
+			<property name="JDBC.Username" value="${c2mon.jdbc.statistics.user}" />
+			<property name="JDBC.Password" value="${c2mon.jdbc.statistics.password}" />
 		</dataSource>
 	</transactionManager>
 

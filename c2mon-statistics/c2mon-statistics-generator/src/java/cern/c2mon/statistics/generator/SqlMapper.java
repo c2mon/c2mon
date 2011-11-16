@@ -72,7 +72,7 @@ public final class SqlMapper {
       try {
         timPropertiesFile = new FileInputStream(timPropertiesLocation);
       } catch (java.io.FileNotFoundException ex) {
-        LOGGER.error("FileNotFoundException caught when looking for tim.properties: " + ex.getMessage());
+        LOGGER.error("FileNotFoundException caught when looking for c2mon.properties: " + ex.getMessage());
         ex.printStackTrace();
         throw new RuntimeException(ex);
       }
