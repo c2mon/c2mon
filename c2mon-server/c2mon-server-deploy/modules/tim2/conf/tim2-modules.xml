@@ -17,6 +17,7 @@
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml"/>
   <import resource="classpath:cern/c2mon/server/client/config/server-client.xml"/>
   <import resource="classpath:cern/c2mon/server/laser/config/server-laser.xml"/>
+  <import resource="classpath:cern/c2mon/server/video/config/server-video.xml"/>
   
   
 
