@@ -76,4 +76,13 @@ HTML_DIR=chart-html
 
 #run the java package
 
-. C2MON-STATISTICS-GENERATOR.jvm &
+export LOG4J_CONF_FILE    
+export GRAPH_CONF_FILE
+export IMAGE_DIR
+export HTML_DIR
+export DEPLOY_HOME
+export WEB_HOME
+export STATISTICS_GENERATOR_HOME
+export STATISTICS_GENERATOR_LOG_HOME
+
+. C2MON-STATISTICS-GENERATOR.jvm >${STATISTICS_GENERATOR_LOG_HOME}/statistics-generator.out.log 2>&1 &
