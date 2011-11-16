@@ -69,7 +69,7 @@ public final class SqlMapper {
             //get c2mon.properties file containing DB access details
             String timPropertiesLocation;
             if (System.getProperty("c2mon.properties") == null) {
-                timPropertiesLocation = System.getProperty("consumer_home") + "/conf/.c2mon.properties"; 
+                timPropertiesLocation = System.getProperty("consumer.home") + "/conf/.c2mon-consumer.properties"; 
             }
             else {
                 timPropertiesLocation = System.getProperty("c2mon.properties");
