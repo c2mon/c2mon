@@ -59,7 +59,7 @@ public final class SqlMapper {
       String timPropertiesLocation;
       if (System.getProperty("c2mon.properties") == null) {
           //if not set as option, then get from user home
-          timPropertiesLocation = System.getProperty("user.home") + "/c2mon-generator.properties"; 
+          timPropertiesLocation = System.getProperty("user.home") + "/c2mon.properties"; 
       }
       else {
           //else use the specified tim.properties
