@@ -46,7 +46,15 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-				
+
+		<!--  file used for locking chart access -->
+		<file>
+			<source>${basedir}/charts/charts.lck</source>
+			<outputDirectory>charts/</outputDirectory>
+			<destName>charts.lck</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
 	</files>
 
 </assembly>
