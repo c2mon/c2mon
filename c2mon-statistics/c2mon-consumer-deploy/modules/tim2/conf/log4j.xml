@@ -36,8 +36,8 @@
                      threshold="warn"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
    
-  <renderer renderedClass="ch.cern.tim.shared.datatag.FilteredDataTagValue"
-          renderingClass="ch.cern.tim.shared.datatag.FilteredDataTagValueRenderer" />
+  <renderer renderedClass="cern.tim.shared.daq.filter.FilteredDataTagValue"
+          renderingClass="cern.tim.shared.daq.filter.FilteredDataTagValueRenderer" />
 
 
   <!--
