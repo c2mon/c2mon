@@ -144,7 +144,7 @@ really_start() {
     #need to be in bin directory for startup script
     cd $CONSUMER_HOME/bin
 
-    . C2MON-STATISTICS-CONSUMER.jvm &
+    . C2MON-STATISTICS-CONSUMER.jvm >${CONSUMER_LOG_HOME}/${PROCESS_NAME}.out.log 2>&1 &
 
     echo -n "Starting a Consumer Process on host ${CONSUMER_HOST} ..."
 
