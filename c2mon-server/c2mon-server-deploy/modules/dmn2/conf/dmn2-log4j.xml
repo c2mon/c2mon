@@ -40,7 +40,11 @@
              renderingClass="cern.tim.shared.daq.datatag.SourceDataTagValueRenderer" />
              
   <renderer  renderedClass="cern.tim.server.common.rule.RuleTag"
-             renderingClass="cern.tim.server.common.rule.RuleTagRenderer" />             
+             renderingClass="cern.tim.server.common.rule.RuleTagRenderer" />   
+  
+  <renderer  renderedClass="cern.tim.server.common.alarm.Alarm"
+             renderingClass="cern.tim.server.common.alarm.renderer.RuleTagRenderer" />                       
+  
              
   <appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
     <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
@@ -72,7 +76,7 @@
     </layout>
   </appender>
   
-   <appender name="LoggingAppender" class="org.apache.log4j.RollingFileAppender">
+  <appender name="LoggingAppender" class="org.apache.log4j.RollingFileAppender">
     <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
     <root-ref/>
       <appender-ref ref="FallbackConsoleAppender"/>
@@ -87,7 +91,7 @@
     </layout>
   </appender>
   
-   <appender name="FallbackConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+  <appender name="FallbackConsoleAppender" class="org.apache.log4j.ConsoleAppender">
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
     </layout> 
@@ -108,7 +112,7 @@
     </layout>
   </appender>
   
-   <appender name="RuleTagAppender" class="org.apache.log4j.RollingFileAppender">
+  <appender name="RuleTagAppender" class="org.apache.log4j.RollingFileAppender">
     <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
       <root-ref/>
       <appender-ref ref="FallbackConsoleAppender"/>
@@ -123,7 +127,7 @@
     </layout>
   </appender>
   
-   <appender name="BenchmarkDataTagAppender" class="org.apache.log4j.RollingFileAppender">
+  <appender name="BenchmarkDataTagAppender" class="org.apache.log4j.RollingFileAppender">
     <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
       <root-ref/>
       <appender-ref ref="FallbackConsoleAppender"/>
@@ -153,6 +157,21 @@
     </layout>
   </appender>
   
+  <appender name="LaserAlarmsAppender" class="org.apache.log4j.RollingFileAppender">
+    <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
+      <root-ref/>
+      <appender-ref ref="FallbackConsoleAppender"/>
+    </errorHandler>
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/laser.log" />
+    <param name="MaxBackupIndex" value="1" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="BufferedIO" value="false" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
+    </layout>
+  </appender>  
+    
   <!-- 
     Define the loggers.
   -->
@@ -172,6 +191,10 @@
     <level value="info"/>
     <appender-ref ref="RuleTagAppender"/>
   </logger>
+  <logger name="LaserAlarmsLogger"  additivity="false">
+    <level value="info"/>
+    <appender-ref ref="LaserAlarmsAppender"/>
+  </logger>    
   <logger name="org.apache.activemq"  additivity="false">
     <level value="info"/>
     <appender-ref ref="FileAppender"/>
