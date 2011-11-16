@@ -18,7 +18,7 @@
 	<!--
 		List the SQL Map XML files.
 	-->
-	<sqlMap resource="cern/c2mon/statistis/generator/sqlmap/GeneratorSqlMap.xml" />
+	<sqlMap resource="cern/c2mon/statistics/generator/sqlmap/GeneratorSqlMap.xml" />
 	
 
 </sqlMapConfig>

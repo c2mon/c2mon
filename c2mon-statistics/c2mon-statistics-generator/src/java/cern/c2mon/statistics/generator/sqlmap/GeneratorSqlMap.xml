@@ -7,12 +7,12 @@
 <sqlMap namespace="Statistics">
 
   <!-- Use type aliases to avoid typing the full class name every time. -->
-  <typeAlias alias="BarChartValue" type="ch.cern.tim.statistics.generator.values.BarChartValue"/>
-  <typeAlias alias="PieChartValue" type="ch.cern.tim.statistics.generator.values.PieChartValue"/>
-  <typeAlias alias="StackedBarChartValue" type="ch.cern.tim.statistics.generator.values.StackedBarChartValue"/>
-  <typeAlias alias="BarChartCollectionValue" type="ch.cern.tim.statistics.generator.values.BarChartCollectionValue"/>
-  <typeAlias alias="StackedBarChartCollectionValue" type="ch.cern.tim.statistics.generator.values.StackedBarChartCollectionValue"/>
-  <typeAlias alias="PieChartCollectionValue" type="ch.cern.tim.statistics.generator.values.PieChartCollectionValue"/>
+  <typeAlias alias="BarChartValue" type="cern.c2mon.statistics.generator.values.BarChartValue"/>
+  <typeAlias alias="PieChartValue" type="cern.c2mon.statistics.generator.values.PieChartValue"/>
+  <typeAlias alias="StackedBarChartValue" type="cern.c2mon.statistics.generator.values.StackedBarChartValue"/>
+  <typeAlias alias="BarChartCollectionValue" type="cern.c2mon.statistics.generator.values.BarChartCollectionValue"/>
+  <typeAlias alias="StackedBarChartCollectionValue" type="cern.c2mon.statistics.generator.values.StackedBarChartCollectionValue"/>
+  <typeAlias alias="PieChartCollectionValue" type="cern.c2mon.statistics.generator.values.PieChartCollectionValue"/>
   
 
   <!-- retrieves the bar chart data -->
