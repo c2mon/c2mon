@@ -17,6 +17,32 @@
 	<properties>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 	</properties>
+	<profiles>
+    <profile>
+      <id>win</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
+      <properties>
+        <c2mon.properties.location>T:\.c2mon.test.properties</c2mon.properties.location>
+      </properties>
+    </profile>
+    <profile>
+      <id>lin</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <c2mon.properties.location>/user/timtest/.c2mon.test.properties</c2mon.properties.location>
+      </properties>
+    </profile>
+  </profiles>
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -93,12 +119,21 @@
 	<developers />
 	<build>
 	<plugins>
+	    <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2.1</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>          
         <version>2.8.1</version>    
         <configuration>
           <argLine>
+            -Dc2mon.properties=${c2mon.properties.location}
             -Dc2mon.filter.queue=tim.filter.test
             -Dc2mon.consumer.consumers.min=1
             -Dc2mon.consumer.consumers.max=1
@@ -106,13 +141,7 @@
             -Dbuffer.min.window=100
             -Dbuffer.window.growth=100
             -Dbuffer.capacity=50000
-            -Dfallback.file=fallback.txt
-            -Dc2mon.jms.broker.url=vm://localhost
-            -Dc2mon.jms.consumer.user=
-            -Dc2mon.jms.consumer.pwd=
-            -Dc2mon.jdbc.statistics.url=
-            -Dc2mon.jdbc.statistics.user=
-            -Dc2mon.jdbc.statistics.pwd=
+            -Dfallback.file=fallback.txt            
           </argLine>
         </configuration>
       </plugin>

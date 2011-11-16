@@ -7,7 +7,7 @@
 <sqlMap namespace="Filter">
 
   <!-- Use type aliases to avoid typing the full class name every time. -->
-  <typeAlias alias="FilteredDataTagValue" type="ch.cern.tim.shared.datatag.FilteredDataTagValue"/>
+  <typeAlias alias="FilteredDataTagValue" type="cern.tim.shared.daq.filter.FilteredDataTagValue"/>
 
   <!-- inserts a FilteredDataTagValue as a new row into the filtered values table -->
   <insert id="insertTagValue" parameterClass="FilteredDataTagValue">

@@ -24,7 +24,7 @@
 		List the SQL Map XML files. They can be loaded from the classpath, as
 		they are here (sqlmap.maps...)
 	-->
-	<sqlMap resource="sqlmap/maps/FilterSqlMap.xml" />
+	<sqlMap resource="cern/c2mon/statistics/consumer/sqlmap/FilterSqlMap.xml" />
 	<!--
 		List more here... <sqlMap resource="com/mydomain/data/Order.xml"/>
 		<sqlMap resource="com/mydomain/data/Documents.xml"/>
