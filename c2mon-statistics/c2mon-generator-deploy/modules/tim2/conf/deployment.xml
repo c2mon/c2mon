@@ -29,8 +29,8 @@
 							<file name="log/out.log" />
 						</output>
 					</main-class>
-					<property name="tim.log.path" value="${STATISTICS_GENERATOR_LOG_HOME}" />
-					<property name="c2mon.properties" value="${STATISTICS_GENERATOR_HOME}/c2mon-generator.properties" />					
+					<property name="tim.log.path" value="${STATISTICS_GENERATOR_HOME}/log" />
+					<property name="c2mon.properties" value="${STATISTICS_GENERATOR_HOME}/conf/c2mon-generator.properties" />					
 				</startscript>
 
 			</deployment>
