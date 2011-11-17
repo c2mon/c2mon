@@ -52,6 +52,10 @@ if [ -z $C2MON_SECOND_HOST ] && [ "$2" == "second" ]; then
    echo "warning: C2MON_SECOND_HOST variable is not set, so cannot run in cluster mode"
    exit 1
 fi
+if ([ ! "$2" == "single" ] && ([ -z $TERRACOTTA_HOME ] || [ -z $TERRACOTTA_HOST ] || [ -z $TERRACOTTA_PORT ])); then     
+   echo "warning: unable to start in distributed cache mode since Terracotta environment variables are not set."
+   exit 1
+fi
 
 #################
 # COMMON SETUP  #
