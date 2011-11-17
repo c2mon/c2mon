@@ -76,6 +76,8 @@ HTML_DIR=chart-html
 
 #run the java package
 
+cd $STATISTICS_GENERATOR_HOME/bin
+
 export LOG4J_CONF_FILE    
 export GRAPH_CONF_FILE
 export IMAGE_DIR
