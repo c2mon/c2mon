@@ -54,9 +54,9 @@
     <application name="c2mon-tim2-prod" extends="default">
       <deployment installLocation="/opt/c2mon">
         <directory name="conf">
-          <file name=".jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon"
+          <file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
             mask="400" />
-          <file name=".jmxremote.access" sourceDir="/user/timoper/rep/c2mon"
+          <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
             mask="400" />
           <file name="c2mon.properties" sourceDir="/user/timoper/rep/c2mon/server"
             mask="400" />
@@ -71,9 +71,9 @@
     <application name="c2mon-tim2-test" extends="default">
       <deployment installLocation="/opt/c2mon">
         <directory name="conf">
-          <file name=".jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon"
+          <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
-          <file name=".jmxremote.access" sourceDir="/user/timtest/rep/c2mon"
+          <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
           <file name="c2mon.properties" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
@@ -88,9 +88,9 @@
     <application name="c2mon-tim2-dev" extends="default">
       <deployment installLocation="/user/timtest/dev/c2mon-server-dev">
         <directory name="conf">
-          <file name=".jmxremote.passwd" sourceDir="/user/timtest/dev/rep/c2mon"
+          <file name="jmxremote.passwd" sourceDir="/user/timtest/dev/rep/c2mon/server"
             mask="400" />
-          <file name=".jmxremote.access" sourceDir="/user/timtest/dev/rep/c2mon"
+          <file name="jmxremote.access" sourceDir="/user/timtest/dev/rep/c2mon/server"
             mask="400" />
           <file name="c2mon.properties" sourceDir="/user/timtest/dev/rep/c2mon/server"
             mask="400" />

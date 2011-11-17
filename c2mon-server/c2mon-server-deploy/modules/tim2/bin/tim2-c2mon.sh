@@ -33,10 +33,10 @@ if [ -z $JAVA_HOME ]; then
 fi
 
 #.c2mon.properties location
-C2MON_PROPERTIES=$C2MON_HOME/conf/.c2mon.properties
+C2MON_PROPERTIES=$C2MON_HOME/conf/c2mon.properties
 
-C2MON_JMX_REMOTE_ACCESS=$C2MON_HOME/conf/.jmxremote.access
-C2MON_JMX_REMOTE_PASSWD=$C2MON_HOME/conf/.jmxremote.passwd
+C2MON_JMX_REMOTE_ACCESS=$C2MON_HOME/conf/jmxremote.access
+C2MON_JMX_REMOTE_PASSWD=$C2MON_HOME/conf/jmxremote.passwd
 
 
 #first C2MON host (must always be set; in non-clustered mode, the server will be started on this machine)
