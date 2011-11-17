@@ -60,7 +60,7 @@ public class RbacAuthorizationManager implements AuthorizationManager {
         } else if (token.isValid()) {
             try {
                 result = new AccessChecker().isAuthorized(token, rbacDetails.getRbacClass(), rbacDetails
-                        .getRbacDevice(), rbacDetails.getRbacProperty());
+                        .getRbacDevice(), rbacDetails.getRbacProperty(),"set");
             } catch (AccessException e) {
                 result = false;
             }
