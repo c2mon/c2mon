@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+      xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
+      xsi:schemaLocation="
+             http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd                       
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd           
+           http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+           http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.1.xsd">           
+  
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="locations" >
+      <list>
+        <value>file:${c2mon.properties.location}</value>
+      </list>
+    </property>   
+  </bean>
+    
+      <!-- HSQL embedded in-memory db for tests -->
+      <jdbc:embedded-database id="cacheDataSource">
+            <jdbc:script location="classpath:cern/c2mon/server/video/config/db-create.sql" />
+			<jdbc:script location="classpath:cern/c2mon/server/video/config/data.sql"/>
+      </jdbc:embedded-database>
+      
+  	<bean id="vsfSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+	  <property name="configLocation" value="classpath:cern/c2mon/server/video/sqlmap/SqlMapVideoConfig.xml"/>
+	  <property name="dataSource" ref="cacheDataSource"/>    
+	</bean>
+
+  <bean id="videoConnectionMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="vsfSqlSessionFactory"/>        
+    <property name="mapperInterface" value="cern.c2mon.server.video.VideoConnectionMapper"/>
+  </bean>
+ 
+</beans>

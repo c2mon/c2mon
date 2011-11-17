@@ -32,7 +32,7 @@
 	</bean>
 
 	<!-- connection factory used for all connections to the server -->
-	<bean id="singleConnectionFactory"
+	<bean id="videoSingleConnectionFactory"
 		class="org.springframework.jms.connection.SingleConnectionFactory">
 		<property name="targetConnectionFactory" ref="videoClientActiveMQConnectionFactory" />
 	</bean>
@@ -64,7 +64,7 @@
 	<bean id="videoClientRequestJmsContainer"
 		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
 		<!-- include exception listener here? -->
-		<property name="connectionFactory" ref="videoClientActiveMQConnectionFactory" />
+		<property name="connectionFactory" ref="videoSingleConnectionFactory" />
 		<property name="destination" ref="videoClientRequestDestination" />
 		<property name="messageListener" ref="videoRequestHandler" />
 		<property name="concurrentConsumers" value="1" />
