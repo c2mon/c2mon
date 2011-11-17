@@ -53,28 +53,12 @@ if [ -z $C2MON_SECOND_HOST ] && [ "$2" == "second" ]; then
    exit 1
 fi
 
-
-##########################################
-# DEPLOYMENT VARIABLES: CLUSTERED CONFIG #
-##########################################
-
-#Terracotta server host (must be set if running server cluster)
-TC_HOST=cs-ccr-tim11
-#Terracotta installation directory
-TERRACOTTA_HOME=/user/timtest/opt/terracotta
-#terracotta server name (one of them)
-#TC_NAME=server1
-#terracotta DSO port
-TC_PORT=9510
-
 #################
 # COMMON SETUP  #
 #################
 
-#config home
-CONF_HOME=$C2MON_HOME/conf
 #log4j configuration file
-LOG4J_CONF_FILE=$CONF_HOME/log4j.xml
+LOG4J_CONF_FILE=$C2MON_HOME/conf/log4j.xml
 #log directory
 LOG_DIR=$C2MON_HOME/log
 #directory of shared libraries
@@ -85,7 +69,7 @@ SHARED_LIB_HOME=$HOME/dist/libs
 ###################
 
 #Terracotta configuration location (either file or host:port)
-TERRACOTTA_CONFIG=$TC_HOST:$TC_PORT
+TERRACOTTA_CONFIG=$TERRACOTTA_HOST:$TERRACOTTA_PORT
 
 ####################
 # MORE SETTINGS... #
@@ -100,17 +84,8 @@ fi
 
 HOST_TMP_DIR=$C2MON_HOME/tmp/$C2MON_HOST
 
-  
 #set correct PID file
 C2MON_PIDFILE=$HOST_TMP_DIR/c2mon.pid
-
-# jmx admin user name for shutdown
-# !!! before production, move these to external script in home directory !!!
-JMX_USER=timjmx
-# jmx admin password
-JMX_PASSWORD=jmxtim
-# server port
-JMX_PORT=9523
 
 # The JAPC device name were the heartbeat is published on.
 # This variable must be different in TEST and Operation to
@@ -127,84 +102,39 @@ JMX_PORT=9523
 # Email address for notifications sent out by the silentcheck function
 #NOTIFY=tim.support@cern.ch
 
-# SSH user name for copying files from the shared directory structure
-#SSH_USER=timtest
-
-#if [ "$USER" == "root" ]; then
-#  echo "The OC4J service must not be started as root. Use the script oc4.service instead."
-#  exit 1
-#fi
-
 ##############
 # LIBRAIRIES #
 ##############
 
-#librairies (links to required libs)
-APP_LIB_DIR=$C2MON_HOME/lib
-APP_LIBS=$APP_LIB_DIR/*
-
-#Terracotta module libraries
-TC_MOD_HOME=$TERRACOTTA_HOME/platform/modules/org/terracotta
-#TERRACOTTA_MODULES=$TC_MOD_HOME/tim-distributed-cache/1.3.2/tim-distributed-cache-1.3.2.jar:$TC_MOD_HOME/tim-ehcache-2.0/1.5.2/tim-ehcache-2.0-1.5.2.jar:$TC_MOD_HOME/tim-concurrent-collections/1.3.2/tim-concurrent-collections-1.3.2.jar:$TC_MOD_HOME/tim-async-processing/1.3.2/tim-async-processing-1.3.2.jar:$TC_MOD_HOME/tim-annotations/1.5.1/tim-annotations-1.5.1.jar
-TERRACOTTA_MODULES=$TC_MOD_HOME/modules/tim-ehcache-2.x/1.7.2/tim-ehcache-2.x-1.7.2.jar:$TC_MOD_HOME/toolkit/terracotta-toolkit-1.3/3.2.0/terracotta-toolkit-1.3-3.2.0.jar
-
-#Spring modules
-SPRING_MODULES=$SHARED_LIB_HOME/spring-modules/spring-modules-cache
-
-#libs for Ehcache
-#EHCACHE_LIBS=$SHARED_LIB_HOME/ehcache/ehcache-core-2.0.1.jar:$SHARED_LIB_HOME/slf4j/slf4j-api-1.5.8.jar:$SHARED_LIB_HOME/slf4j/slf4j-jdk14-1.5.8.jar
-#$SHARED_LIB_HOME/ehcache/ehcache-terracotta-2.0.1.jar:
-
-#other libs
-#OTHER_LIBS=$SHARED_LIB_HOME/jta/jta-1.1.jar:$SHARED_LIB_HOME/fuse/jencks-amqpool-2.2.jar:$SHARED_LIB_HOME/jencks/jencks-2.1.jar:$SHARED_LIB_HOME/apache-activemq/activemq-ra-5.3.0.jar
-
-#apache commons libs
-#APACHE_COMMONS_LIBS=$SHARED_LIB_HOME/apache-commons/commons-cli-1.1.jar:$SHARED_LIB_HOME/apache-commons/commons-io-1.4.jar
-
 #for jmx lifecycle
 JMXJAR=$SHARED_LIB_HOME/jmxterm/jmxterm-1.0-alpha-4-uber.jar
-
-#all needed librairies (including cachetest)
-if [ ! "$2" == "single" ]; then
-    REQUIRED_LIBS=$APP_LIBS:$TERRACOTTA_MODULES
-else
-    REQUIRED_LIBS=$APP_LIBS:
-fi
-
-#:$EHCACHE_LIBS
-#echo required libs: $REQUIRED_LIBS
 
 #######################
 # start/stop commands #
 #######################
 
-#OC4J_ARGS="-verbosity 9 -userThreads -out timlog/out.log -err timlog/err.log -config timconfig/server.xml "
-C2MON_ARGS=
+CLASSPATH=`ls $INSTALL_DIR/lib/*.jar | tr -s '\n' ':'`
 
-#OC4J_JAVA_ARGS="-server -Xmx1024m -Xms1024m -DKeepWrapperCode=false -Drmi.debug=true -Drmi.verbose=true -DDBEntityObjectDebug=false -Djdbc.debug=false -Doracle.mdb.fastUndeploy=30 -Ddatasource.verbose=false  -Doracle.jdbc.LogFile=timlog/jdbc.log -Doracle.ias.jcache=true -Doracle.dms.sensors=none -Doracle.jdbc.Trace=false -Dtim.log.file=./timlog/tim.log -Dtim.log.fallback.file=$TIM_LOG_FALLBACK_FILE -Dtim.log.fallback.counter.file=$TIM_LOG_FALLBACK_COUNTER_FILE"
+
+#-Dtim.log.fallback.file=$TIM_LOG_FALLBACK_FILE -Dtim.log.fallback.counter.file=$TIM_LOG_FALLBACK_COUNTER_FILE"
 
 #property triggering cache clustering
 CACHE_MODE_PROPERTY="-Dcern.c2mon.cache.mode=multi"
 
-COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$C2MON_JMX_REMOTE_PASSWD -Dcom.sun.management.jmxremote.access.file=$C2MON_JMX_REMOTE_ACCESS -Dcom.sun.management.jmxremote.ssl=false -Dlaser.hosts=laser-test -Dcmw.mom.brokerlist=jms-diamon-test:2506"
+COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=9523 -Dcom.sun.management.jmxremote.password.file=$C2MON_JMX_REMOTE_PASSWD -Dcom.sun.management.jmxremote.access.file=$C2MON_JMX_REMOTE_ACCESS -Dcom.sun.management.jmxremote.ssl=false -Dlaser.hosts=$LASER_HOSTS -Dcmw.mom.brokerlist=$CMW_BROKER_LIST"
 
 CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dtc.config=$TERRACOTTA_CONFIG $CACHE_MODE_PROPERTY"
 
 #according to cache mode, set the JAVA args and the startup command (stop is common)
 if [ ! "$2" == "single" ]; then
     C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $CLUSTER_JAVA_ARGS"  
-    C2MON_START_CMD="$TERRACOTTA_HOME/platform/bin/dso-java.sh $C2MON_JAVA_ARGS -classpath ${REQUIRED_LIBS} cern.tim.server.lifecycle.ServerStartup  $C2MON_ARGS"
+    C2MON_START_CMD="$TERRACOTTA_HOME/platform/bin/dso-java.sh $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.tim.server.lifecycle.ServerStartup  $C2MON_ARGS"
     C2MON_STOP_CMD="$JAVA_HOME/jre/bin/java -jar $JMXJAR -i $C2MON_HOME/bin/jmx-shutdown-script.txt -n -e -l localhost:$JMX_PORT  -u $JMX_USER -p $JMX_PASSWORD"
 else
     C2MON_JAVA_ARGS=$COMMON_JAVA_ARGS
-    C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -classpath $REQUIRED_LIBS  cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS"
+    C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS"
     C2MON_STOP_CMD="echo \"attempting to shutdown the server with kill call\""
 fi
-    
-
-
-#export LD_LIBRARY_PATH=/opt/oc4j/jdbc/lib
-#export PATH=$JAVA_HOME/jre/bin:$JAVA_HOME/bin:$LD_LIBRARY_PATH:$PATH
 
 #if [ "$3" != "" ] ; then
 #  echo "JAVA_HOME       : $JAVA_HOME"
@@ -264,9 +194,6 @@ start() {
             if [ $? -eq 1 ] ; then
               # It is not running --> remove PID file and LOCK file
               rm $C2MON_PIDFILE
-#              if [ -f $OC4J_LOCKFILE ] ; then
-#                rm $OC4J_LOCKFILE
-#              fi
                
               really_start 
             else
@@ -373,12 +300,6 @@ stop() {
         return $RETVAL
 }	
 
-#restart() {
-#	stop
-#	start
-#}	
-
-
 status() {
         pid=
         if [ -f $C2MON_PIDFILE ]; then
@@ -412,9 +333,6 @@ silentcheck() {
   fi
 }
 
-#C2MON_executeRemoteCmd() {
-#  instruction=${1}
-
   # if not currently on the correct machine, run the command via ssh
   if [ `hostname -s` != $C2MON_HOST ] ; then        
     ssh -2 $C2MON_HOST "cd '$C2MON_HOME'/bin; $0 $1 $2"
@@ -447,29 +365,6 @@ silentcheck() {
 	exit 1
     esac
   fi
-#}
 
-#case "$1" in
-#  start)
-#  	start
-#	;; 
-#  stop)
-#  	stop
-#	;;
-#  restart)
-#  	restart
-#	;;
-#  status)
-#  	status
-#	;;
-#  silentcheck)
-#        silentcheck
-#	;;
-#  *)
-#	echo $"Usage: $0 {start|stop|restart|status}"
-#	echo $"start [second] - Starts C2MON server if it is not running"
-#	echo $"stop  - Shuts down C2MON if it is running. If a gentle shutdown fails, the process is killed after 30 seconds."
-#	exit 1
-#esac
 
 exit $?

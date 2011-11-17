@@ -25,10 +25,10 @@
           </main-class>
           <vm-args>-Xms2048m -Xmx2048m -XX:+PrintGCDetails
             -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</vm-args>
-          <property name="server.process.name" value="C2MON-SERVER-DMN2" />
-          <property name="c2mon.home" value="$INSTALL_PATH" />
+          <property name="server.process.name" value="C2MON-SERVER-TIM2" />
+          <property name="c2mon.home" value="$C2MON_HOME" />
           <property name="c2mon.log.dir" value="log" />
-          <property name="c2mon.properties.location" value="conf/.c2mon.properties" />
+          <property name="c2mon.properties.location" value="conf/c2mon.properties" />
           <property name="log4j.configuration" value="conf/log4j.xml" />
           <property name="com.sun.management.jmxremote.port"
             value="9523" />
@@ -37,8 +37,7 @@
           <property name="com.sun.management.jmxremote.access.file"
             value="conf/.jmxremote.access" />
           <property name="com.sun.management.jmxremote.ssl"
-            value="false" />
-          <property name="c2mon.home" value="$INSTALL_DIR" />
+            value="false" />          
           <!--  LASER TEST ENVIRONMENT -->
           <property name="laser.hosts" value="laser-test" />
           <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
@@ -59,7 +58,7 @@
             mask="400" />
           <file name=".jmxremote.access" sourceDir="/user/timoper/rep/c2mon"
             mask="400" />
-          <file name=".c2mon.properties" sourceDir="/user/timoper/rep/c2mon"
+          <file name="c2mon.properties" sourceDir="/user/timoper/rep/c2mon/server"
             mask="400" />
         </directory>
         <directory name="bin">
@@ -76,7 +75,7 @@
             mask="400" />
           <file name=".jmxremote.access" sourceDir="/user/timtest/rep/c2mon"
             mask="400" />
-          <file name=".c2mon.properties" sourceDir="/user/timtest/rep/c2mon"
+          <file name="c2mon.properties" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
         </directory>
         <directory name="bin">
@@ -93,7 +92,7 @@
             mask="400" />
           <file name=".jmxremote.access" sourceDir="/user/timtest/dev/rep/c2mon"
             mask="400" />
-          <file name=".c2mon.properties" sourceDir="/user/timtest/dev/rep/c2mon"
+          <file name="c2mon.properties" sourceDir="/user/timtest/dev/rep/c2mon/server"
             mask="400" />
         </directory>
         <directory name="bin">
