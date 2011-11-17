@@ -171,8 +171,17 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       
       report = new ConfigurationReport(configId, 
           configName,
-          "");      
-      List<ConfigurationElement> configElements = configurationDAO.getConfigElements(configId);            
+          "");  
+      
+      List<ConfigurationElement> configElements;
+      try {
+        configElements = configurationDAO.getConfigElements(configId);            
+      } catch (Exception e) {
+        String message = "Exception caught while loading the configuration from the DB, so unable to apply any elements of this configuration."; 
+        LOGGER.error(message, e);
+        throw new RuntimeException(message, e);
+      }
+      
       for (ConfigurationElement element : configElements) {
         //initialize success report
         ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
