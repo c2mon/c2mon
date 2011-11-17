@@ -232,7 +232,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                     itemHandleOpcItems.put(redundantClientHandle, item);
                 }
             } catch (AutomationException e) {
-                RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e);
+                RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e, itemAddress);
                 notifyEndpointListenersItemError(itemDefinitionId, ex);
             } catch (Throwable e) {
                 notifyEndpointListenersItemError(itemDefinitionId, e);
@@ -341,7 +341,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                         notifyEndpointListenersValueChange(itemDefinitionId, getAdjustedTimestamp(((Date) timeStamp[0]).getTime()), value[0]);
                     }
                 } catch (AutomationException e) {
-                    RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e);
+                    RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e, definition.getAddress());
                     notifyEndpointListenersItemError(itemDefinitionId, ex);
                 } catch (Exception e) {
                     notifyEndpointListenersItemError(itemDefinitionId, e);
@@ -388,7 +388,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             }
             item.write(value);
         } catch (AutomationException e) {
-            throw OPCDCOMFactory.createWrappedAutomationException(e);
+            throw OPCDCOMFactory.createWrappedAutomationException(e, itemDefintion.getAddress());
         } catch (Exception e) {
             throw new OPCCommunicationException("Problems wih the DCOM connection occured", e);
         }
@@ -451,7 +451,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                 int[] serverHandles = { item.getServerHandle() };
                 group.getOPCItems().remove(1, serverHandles, new int[0][0]);
             } catch (AutomationException e) {
-                throw OPCDCOMFactory.createWrappedAutomationException(e);
+                throw OPCDCOMFactory.createWrappedAutomationException(e, removedDefinition.getAddress());
             } catch (Exception e) {
                 throw new OPCCommunicationException(
                         "Problems wih the DCOM connection occured", e);

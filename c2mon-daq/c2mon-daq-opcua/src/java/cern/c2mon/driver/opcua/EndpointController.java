@@ -131,10 +131,10 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     public synchronized void startEndpoint() {
         try {
             createEndpoint();
+            endpoint.registerEndpointListener(logListener);
+            endpoint.registerEndpointListener(this);
             endpoint.addDataTags(equipmentConfiguration.getSourceDataTags().values());
             endpoint.addCommandTags(equipmentConfiguration.getSourceCommandTags().values());
-            endpoint.registerEndpointListener(this);
-            endpoint.registerEndpointListener(logListener);
             sender.confirmEquipmentStateOK();
             startAliveTimer();
             setUpStatusChecker();
@@ -340,8 +340,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         String decription = "Tag invalid: " + cause.getClass().getSimpleName() + ": " 
             + cause.getMessage();
         logger.debug(decription);
-		sender.sendInvalidTag(dataTag, (short) SourceDataQuality.UNKNOWN,
-        			decription);
+        sender.sendInvalidTag(dataTag, (short) SourceDataQuality.DATA_UNAVAILABLE, cause.getMessage());
     }
 
     /**
