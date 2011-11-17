@@ -113,7 +113,7 @@ JMXJAR=$SHARED_LIB_HOME/jmxterm/jmxterm-1.0-alpha-4-uber.jar
 # start/stop commands #
 #######################
 
-CLASSPATH=`ls $INSTALL_DIR/lib/*.jar | tr -s '\n' ':'`
+CLASSPATH=`ls $C2MON_HOME/lib/*.jar | tr -s '\n' ':'`
 
 
 #-Dtim.log.fallback.file=$TIM_LOG_FALLBACK_FILE -Dtim.log.fallback.counter.file=$TIM_LOG_FALLBACK_COUNTER_FILE"
