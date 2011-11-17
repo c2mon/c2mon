@@ -2,8 +2,6 @@ package cern.c2mon.server.video;
 
 import static junit.framework.Assert.assertTrue;
 
-import java.sql.Timestamp;
-
 import javax.jms.JMSException;
 import javax.jms.TextMessage;
 
@@ -17,7 +15,6 @@ import cern.c2mon.shared.video.VideoConnectionProperties;
 import cern.c2mon.shared.video.VideoRequest;
 import cern.c2mon.shared.video.VideoRequest.RequestType;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
-import cern.tim.shared.common.command.AuthorizationDetails;
 import cern.tim.util.json.GsonFactory;
 
 public class VideoConnectionsRequestJsonTest {

@@ -39,7 +39,7 @@
     <!-- Sends a query to the database that returns all user roles that are
        privileged to connect to a specific video system.  -->
   <select id="selectAuthorizationDetails" parameterType="String" resultMap="RbacAuthorizationDetailsResult">
-    select VS.TVR_RBAC_CLASS,VS.TVR_RBAC_DEVICE,VS.TVR_RBAC_PROPERTY
+    select VS.TVS_RBAC_CLASS,VS.TVS_RBAC_DEVICE,VS.TVS_RBAC_PROPERTY
     from TIM_VIDEO_SYSTEMS VS
     where VS.TVS_VIDEO_SYSTEM_NAME=#{videoSystemName}
   </select>

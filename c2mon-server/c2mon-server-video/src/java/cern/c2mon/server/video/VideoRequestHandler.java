@@ -44,7 +44,6 @@ import cern.c2mon.shared.video.VideoConnectionProperties;
 import cern.c2mon.shared.video.VideoRequest;
 import cern.c2mon.shared.video.VideoRequest.RequestType;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
-import cern.tim.shared.common.command.AuthorizationDetails;
 import cern.tim.util.json.GsonFactory;
 
 

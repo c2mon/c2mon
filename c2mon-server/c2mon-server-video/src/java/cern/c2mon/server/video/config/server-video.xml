@@ -23,8 +23,7 @@
 	<!--
 		Connection settings for client module
 	-->
-
-	<bean id="clientActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+	<bean id="videoClientActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
 		<property name="brokerURL" value="${jms.broker.url}" />
 		<property name="userName" value="${jms.client.user}" />
 		<property name="password" value="${jms.client.password}" />
@@ -35,16 +34,16 @@
 	<!-- connection factory used for all connections to the server -->
 	<bean id="singleConnectionFactory"
 		class="org.springframework.jms.connection.SingleConnectionFactory">
-		<property name="targetConnectionFactory" ref="clientActiveMQConnectionFactory" />
+		<property name="targetConnectionFactory" ref="videoClientActiveMQConnectionFactory" />
 	</bean>
 
 
-	<bean id="clientRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+	<bean id="videoClientRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
 		<constructor-arg index="0" value="${jms.video.request.queue}" />
 	</bean>
 
 	<!-- thread pool for request containers -->
-	<bean id="clientExecutor" class="java.util.concurrent.ThreadPoolExecutor">
+	<bean id="videoClientExecutor" class="java.util.concurrent.ThreadPoolExecutor">
 		<constructor-arg value="1" />      <!-- min threads -->
 		<constructor-arg value="1000" />
 		<!--
@@ -62,11 +61,11 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="clientRequestJmsContainer"
+	<bean id="videoClientRequestJmsContainer"
 		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
 		<!-- include exception listener here? -->
-		<property name="connectionFactory" ref="clientActiveMQConnectionFactory" />
-		<property name="destination" ref="clientRequestDestination" />
+		<property name="connectionFactory" ref="videoClientActiveMQConnectionFactory" />
+		<property name="destination" ref="videoClientRequestDestination" />
 		<property name="messageListener" ref="videoRequestHandler" />
 		<property name="concurrentConsumers" value="1" />
 		<property name="maxConcurrentConsumers" value="2" />
@@ -74,7 +73,7 @@
 		<property name="receiveTimeout" value="1000" />
 		<property name="idleTaskExecutionLimit" value="600" />
 		<property name="sessionTransacted" value="false" />
-		<property name="taskExecutor" ref="clientExecutor" />
+		<property name="taskExecutor" ref="videoClientExecutor" />
 		<property name="autoStartup" value="false" />
 		<property name="phase">
 			<util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_START_LAST" />
