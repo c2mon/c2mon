@@ -217,10 +217,10 @@ public class EndpointControllerTest {
     @Test
     public void testOnTagInvalidException() {
         ISourceDataTag dataTag = new SourceDataTag(1L, "asd", false);
-        Throwable cause = new Exception();
+        Throwable cause = new Exception("The cause of the problem");
         
-        sender.sendInvalidTag(eq(dataTag), eq((short) SourceDataQuality.UNKNOWN),
-                isA(String.class));
+        sender.sendInvalidTag(eq(dataTag), eq((short) SourceDataQuality.DATA_UNAVAILABLE),
+                eq(cause.getMessage()));
         
         replay(sender);
         controller.onTagInvalidException(dataTag, cause);
