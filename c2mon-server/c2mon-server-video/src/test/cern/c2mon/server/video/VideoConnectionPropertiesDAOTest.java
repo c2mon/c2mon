@@ -91,7 +91,17 @@ public class VideoConnectionPropertiesDAOTest {
     try {
       details = videoConnectionMapper.selectAuthorizationDetails(VIDEOSYSTEMNAME);
       
+      assert (details != null);
+      assert (details.getRbacDevice() != null);
+      assert (details.getRbacProperty() != null);
+      assert (details.getRbacClass() != null);
+      
+      details.getRbacDevice();
+      details.getRbacProperty();
+      details.getRbacClass();
+      
       // the correct query results (defined in data.sql)
+      
       assert (details.getRbacDevice().equals("DEVICE3"));
       assert (details.getRbacProperty().equals("PROPERTY3"));
       assert (details.getRbacClass().equals("Class3"));

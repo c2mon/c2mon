@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
   <description>The TIM2 server video module.</description>
   <url>http://timweb.cern.ch</url>
-
+  
   <dependencies>
     <dependency>
       <groupId>org.jencks</groupId>
@@ -116,14 +116,6 @@
     	<artifactId>jdbc</artifactId>
     	<version>2.0</version>
     	<scope>compile</scope>
-    </dependency>
-    <dependency>
-    	<groupId>cern.tim2.tim2-shared</groupId>
-    	<artifactId>tim2-shared-common</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>cern.tim2.tim2-shared</groupId>
-    	<artifactId>tim2-shared-client</artifactId>
     </dependency>
   </dependencies>
 

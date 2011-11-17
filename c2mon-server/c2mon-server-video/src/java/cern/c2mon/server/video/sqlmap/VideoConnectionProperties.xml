@@ -22,9 +22,9 @@
   </resultMap>
 
   <resultMap id="RbacAuthorizationDetailsResult" type="cern.tim.shared.client.command.RbacAuthorizationDetails">
-    <result property="rbacClass"             column="TVR_RBAC_CLASS"/>
-    <result property="rbacDevice"            column="TVR_RBAC_DEVICE"/>
-    <result property="rbacProperty"          column="TVR_RBAC_PROPERTY"/>
+    <result property="rbacClass"             column="TVS_RBAC_CLASS"/>
+    <result property="rbacDevice"            column="TVS_RBAC_DEVICE"/>
+    <result property="rbacProperty"          column="TVS_RBAC_PROPERTY"/>
   </resultMap>
 
   <!-- Sends a query to the database that returns all video connection
