@@ -9,12 +9,9 @@
 #If both nodes of the cluster fail, the "init" option must be used to start the initial node of the cluster (if this
 # fails, the file DB may need deleting under $TC_LOG_DIR/server-data, possibly on both node machines)
 
-#C2MON config directory contains TC config file
-C2MON_HOME=~/dev/newserver
-C2MON_CONFIG_DIR=$C2MON_HOME/conf
-
-TC_CONFIG_FILE=$C2MON_CONFIG_DIR/c2mon-tc-config.xml
-TC_HOME=~/opt/terracotta
+TC_CONFIG_DIR=~/dist/terracotta/conf
+TC_CONFIG_FILE=$TC_CONFIG_DIR/c2mon-tc-config.xml
+TC_HOME=/opt/terracotta
 TC_LOG_DIR=~/dist/terracotta/log
 TC_MAIN_HOST=cs-ccr-tim11
 TC_MAIN_NAME=server1
