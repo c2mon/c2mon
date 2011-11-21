@@ -53,7 +53,7 @@
     </errorHandler>
     <param name="Append" value="true" />
     <param name="File" value="${c2mon.log.dir}/c2mon.log" />
-    <param name="MaxBackupIndex" value="5" />
+    <param name="MaxBackupIndex" value="10" />
     <param name="MaxFileSize" value="50MB" />
     <param name="BufferedIO" value="false" />
     <layout class="org.apache.log4j.PatternLayout">
@@ -104,7 +104,7 @@
     </errorHandler>
     <param name="Append" value="true" />
     <param name="File" value="${c2mon.log.dir}/IncomingSourceTag.log" />
-    <param name="MaxBackupIndex" value="1" />
+    <param name="MaxBackupIndex" value="10" />
     <param name="MaxFileSize" value="5MB" />
     <param name="BufferedIO" value="false" />
     <layout class="org.apache.log4j.PatternLayout">
