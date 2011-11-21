@@ -192,42 +192,48 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    */
   @Transactional("cacheTransactionManager")
   public ProcessChange removeProcess(Long processId, ConfigurationElementReport processReport) {    
-    LOGGER.debug("Removing process with id " + processId);    
-    Process process = processCache.get(processId);
-    try {
-      process.getWriteLock().lock();      
-      if (processFacade.isRunning(process)) {
-        String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
-        LOGGER.warn(message); 
-        processReport.setFailure(message);
-       } else {
-        //remove all associated equipment from system   
-        for (Long equipmentId : new ArrayList<Long>(processFacade.getEquipmentIds(processId))) {
-          ConfigurationElementReport childElementReport = new ConfigurationElementReport(Action.REMOVE, Entity.EQUIPMENT, equipmentId);
-          try {        
-            processReport.addSubReport(childElementReport);
-            equipmentConfigHandler.removeEquipment(equipmentId, childElementReport);
-          } catch (RuntimeException ex) {
-            LOGGER.error("Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
-                + Action.REMOVE + "; " + Entity.EQUIPMENT + "; " + equipmentId + ")", ex);
-            childElementReport.setFailure("Exception caught while applying the configuration change.", ex);          
-            throw new UnexpectedRollbackException("Unexpected exception caught while removing an Equipment.", ex);
-          }      
-        }             
-        //remove process from cache and DB
-        processDAO.deleteProcess(processId);
-        processCache.remove(processId);     
-        removeProcessControlTags(process, processReport);
-        jmsContainerManager.unsubscribe(process);        
-       }
+    LOGGER.debug("Removing process with id " + processId);
+    if (processCache.hasKey(processId)) {
+      Process process = processCache.get(processId);
+      try {
+        process.getWriteLock().lock();      
+        if (processFacade.isRunning(process)) {
+          String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
+          LOGGER.warn(message); 
+          processReport.setFailure(message);
+         } else {
+          //remove all associated equipment from system   
+          for (Long equipmentId : new ArrayList<Long>(processFacade.getEquipmentIds(processId))) {
+            ConfigurationElementReport childElementReport = new ConfigurationElementReport(Action.REMOVE, Entity.EQUIPMENT, equipmentId);
+            try {        
+              processReport.addSubReport(childElementReport);
+              equipmentConfigHandler.removeEquipment(equipmentId, childElementReport);
+            } catch (RuntimeException ex) {
+              LOGGER.error("Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
+                  + Action.REMOVE + "; " + Entity.EQUIPMENT + "; " + equipmentId + ")", ex);
+              childElementReport.setFailure("Exception caught while applying the configuration change.", ex);          
+              throw new UnexpectedRollbackException("Unexpected exception caught while removing an Equipment.", ex);
+            }      
+          }             
+          //remove process from cache and DB
+          processDAO.deleteProcess(processId);
+          processCache.remove(processId);     
+          removeProcessControlTags(process, processReport);
+          jmsContainerManager.unsubscribe(process);        
+         }
+        return new ProcessChange();
+      } catch (RuntimeException ex) {                  
+        LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes.", ex);
+        processCache.remove(processId);
+        throw new UnexpectedRollbackException("Unexpected exception caught while removing Process.", ex);
+      } finally {
+        process.getWriteLock().unlock();
+      } 
+    } else {
+      LOGGER.debug("Process not found in cache - unable to remove it.");
+      processReport.setWarning("Process not found in cache so cannot be removed.");
       return new ProcessChange();
-    } catch (RuntimeException ex) {                  
-      LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes.", ex);
-      processCache.remove(processId);
-      throw new UnexpectedRollbackException("Unexpected exception caught while removing Process.", ex);
-    } finally {
-      process.getWriteLock().unlock();
-    }  
+    }     
   }
 
   /**

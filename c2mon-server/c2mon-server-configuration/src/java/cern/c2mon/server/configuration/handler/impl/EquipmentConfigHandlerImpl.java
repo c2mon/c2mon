@@ -154,28 +154,35 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Transactional("cacheTransactionManager")
   public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
     LOGGER.debug("Removing Equipment " + equipmentid);
-    Equipment equipment = equipmentCache.get(equipmentid);    
-    try {
-      equipment.getWriteLock().lock();
-      removeEquipmentTags(equipment, equipmentReport);
-      removeEquipmentCommands(equipment, equipmentReport);
-      removeSubEquipments(equipment, equipmentReport);
-      equipmentDAO.deleteItem(equipmentid);
-      equipmentFacade.removeCacheObject(equipmentCache.get(equipmentid));
-      removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them
-      equipment.getWriteLock().unlock();
-      processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());
-      return new ProcessChange(equipment.getProcessId());
-    } catch (UnexpectedRollbackException ex) {
-      equipmentReport.setFailure("Aborting removal of equipment "
-          + equipmentid + " as unable to remove all associated datatags."); 
-      throw new UnexpectedRollbackException("Aborting removal of Equipment as failed to remove all" 
-          + "associated datatags and commandtags.", ex);
-    } finally {
-      if (equipment.getWriteLock().isHeldByCurrentThread()) {
+    if (equipmentCache.hasKey(equipmentid)) {
+      Equipment equipment = equipmentCache.get(equipmentid);    
+      try {
+        equipment.getWriteLock().lock();
+        removeEquipmentTags(equipment, equipmentReport);
+        removeEquipmentCommands(equipment, equipmentReport);
+        removeSubEquipments(equipment, equipmentReport);
+        equipmentDAO.deleteItem(equipmentid);
+        equipmentFacade.removeCacheObject(equipmentCache.get(equipmentid));
+        removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them
         equipment.getWriteLock().unlock();
-      }      
-    }         
+        processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());
+        return new ProcessChange(equipment.getProcessId());
+      } catch (UnexpectedRollbackException ex) {
+        equipmentReport.setFailure("Aborting removal of equipment "
+            + equipmentid + " as unable to remove all associated datatags."); 
+        throw new UnexpectedRollbackException("Aborting removal of Equipment as failed to remove all" 
+            + "associated datatags and commandtags.", ex);
+      } finally {
+        if (equipment.getWriteLock().isHeldByCurrentThread()) {
+          equipment.getWriteLock().unlock();
+        }      
+      }
+    } else {
+      LOGGER.debug("Equipment not found in cache - unable to remove it.");
+      equipmentReport.setWarning("Equipment not found in cache so cannot be removed.");
+      return new ProcessChange();
+    }
+             
   }
 
   

@@ -187,10 +187,10 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
             element.getEntity(),
             element.getEntityId());
+        report.addElementReport(elementReport);       
         List<ProcessChange> processChanges = null; 
         try {
-          processChanges = applyConfigElement(element, elementReport);
-          report.addElementReport(elementReport);       
+          processChanges = applyConfigElement(element, elementReport);          
           if (processChanges != null) { //is null if exception thrown while applying the element at the server level, so no changes sent to DAQ
             element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ, set to OK
             for (ProcessChange processChange : processChanges) {

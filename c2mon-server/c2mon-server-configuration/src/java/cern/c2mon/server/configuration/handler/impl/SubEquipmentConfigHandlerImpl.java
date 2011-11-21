@@ -136,16 +136,22 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   @Transactional("cacheTransactionManager")
   public ProcessChange removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
     LOGGER.debug("Removing SubEquipment " + subEquipmentId);
-    SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);    
-    try {      
-      subEquipment.getWriteLock().lock();      
-      subEquipmentDAO.deleteItem(subEquipmentId);
-      subEquipmentFacade.removeCacheObject(subEquipmentCache.get(subEquipmentId));
-      removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB
-      return new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId());
-    } finally {
-      subEquipment.getWriteLock().unlock();
-    }    
+    if (subEquipmentCache.hasKey(subEquipmentId)) {
+      SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);    
+      try {      
+        subEquipment.getWriteLock().lock();      
+        subEquipmentDAO.deleteItem(subEquipmentId);
+        subEquipmentFacade.removeCacheObject(subEquipmentCache.get(subEquipmentId));
+        removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB
+        return new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId());
+      } finally {
+        subEquipment.getWriteLock().unlock();
+      } 
+    } else {
+      LOGGER.debug("SubEquipment not found in cache - unable to remove it.");
+      subEquipmentReport.setWarning("SubEquipment not found in cache so cannot be removed.");
+      return new ProcessChange(); 
+    }      
   }
 
 }
