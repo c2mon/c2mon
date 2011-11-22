@@ -23,60 +23,60 @@ import com.google.gson.reflect.TypeToken;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:cern/c2mon/server/video/config/server-video-test.xml" })
 public class VideoRequestHandlerTest {
-  
+
   private final String VIDEO_SYSTEM_NAME = "MANOS";
-  
+
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
-  
+
   @Autowired
   private VideoConnectionMapper videoConnectionMapper;    
-  
+
   private VideoRequestHandler requestHandler;
 
   @Before
   public void setUp() {
-    
+
     requestHandler = new VideoRequestHandler(videoConnectionMapper);
   }
 
   @Test
   public void testConnectionPropertiesRequest() throws SQLException {
-    
+
     VideoRequest request = new VideoRequest(VIDEO_SYSTEM_NAME, VideoConnectionProperties.class);
-    
+
     String response = requestHandler.handleVideoRequest(request);
-    System.out.println("testConnectionPropertiesRequest requestHandler:"+ response);
-    
+    System.out.println("testConnectionPropertiesRequest requestHandler:" + response);
+
     Type collectionType = new TypeToken<Collection<VideoConnectionProperties>>() { } .getType();
     Collection<VideoConnectionProperties> vcpList = GSON.fromJson(response, collectionType);
-    
+
     assert (vcpList.size() == 2); // the query must return 2 valid VCP's (defined in data.sql)
-    
+
     Iterator iter = vcpList.iterator();
     while (iter.hasNext()) {
-      
+
       Object o = iter.next();
-      
+
       assert (o instanceof VideoConnectionProperties);
       if (o instanceof VideoConnectionProperties) {
-        
+
         System.out.println(((VideoConnectionProperties) o).getLogin());
       }
     }
   }  
-  
+
   @Test
   public void testAuthorizationDetailsRequest() throws SQLException {
-    
+
     VideoRequest request = new VideoRequest(VIDEO_SYSTEM_NAME, RbacAuthorizationDetails.class);
-    
+
     String response = requestHandler.handleVideoRequest(request);
-    
+
     System.out.println("requestHandler:" + response);
-    
+
     RbacAuthorizationDetails details = GSON.fromJson(response, RbacAuthorizationDetails.class);
-    
+
     assert (details.getRbacDevice().equals("DEVICE3"));
     assert (details.getRbacProperty().equals("PROPERTY3"));
     assert (details.getRbacClass().equals("Class3"));

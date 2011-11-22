@@ -18,6 +18,8 @@
  *****************************************************************************/
 package cern.c2mon.server.video;
 
+import static org.junit.Assert.assertTrue;
+
 import java.sql.SQLException;
 
 import java.util.Iterator;
@@ -91,10 +93,10 @@ public class VideoConnectionPropertiesDAOTest {
     try {
       details = videoConnectionMapper.selectAuthorizationDetails(VIDEOSYSTEMNAME);
       
-      assert (details != null);
-      assert (details.getRbacDevice() != null);
-      assert (details.getRbacProperty() != null);
-      assert (details.getRbacClass() != null);
+      assertTrue (details != null);
+      assertTrue (details.getRbacDevice() != null);
+      assertTrue (details.getRbacProperty() != null);
+      assertTrue (details.getRbacClass() != null);
       
       details.getRbacDevice();
       details.getRbacProperty();

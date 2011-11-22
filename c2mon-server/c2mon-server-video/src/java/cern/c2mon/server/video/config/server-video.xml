@@ -19,7 +19,7 @@
 		<property name="sqlSessionFactory" ref="vsfSqlSessionFactory" />
 		<property name="mapperInterface" value="cern.c2mon.server.video.VideoConnectionMapper" />
 	</bean>
-
+	
 	<!--
 		Connection settings for client module
 	-->

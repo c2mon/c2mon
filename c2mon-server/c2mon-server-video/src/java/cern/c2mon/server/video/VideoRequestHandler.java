@@ -40,6 +40,8 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 
+import cern.c2mon.shared.client.request.ClientRequestErrorReport;
+import cern.c2mon.shared.client.request.ClientRequestErrorReportImpl;
 import cern.c2mon.shared.video.VideoConnectionProperties;
 import cern.c2mon.shared.video.VideoRequest;
 import cern.c2mon.shared.video.VideoRequest.RequestType;
@@ -94,24 +96,21 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
    * @param videoRequest The request. Can either be an AUTHORIZATION_DETAILS_REQUEST or a
    * VIDEO_CONNECTION_PROPERTIES_REQUEST.
    * @return The response that shall be transfered back to the video client. 
-   * In case of an AUTHORIZATION_DETAILS_REQUEST the response is RbacAuthorizationDetails. 
-   * In case of an VIDEO_CONNECTION_PROPERTIES_REQUEST the response is VideoConnectionPropertiesCollection. 
+   * In case of an AUTHORIZATION_DETAILS_REQUEST the response is <code>RbacAuthorizationDetails</code>. 
+   * In case of an VIDEO_CONNECTION_PROPERTIES_REQUEST the response is <code>VideoConnectionPropertiesCollection</code>. 
+   * @throws SQLException In case an error occurs during the query
    */
-  public String handleVideoRequest(final VideoRequest videoRequest) {
+  public String handleVideoRequest(final VideoRequest videoRequest) throws SQLException {
 
     String messageText = null; // JSON reply
 
-    try {
-      if (videoRequest.getRequestType() == RequestType.AUTHORIZATION_DETAILS_REQUEST) {
-        RbacAuthorizationDetails d = handleAuthorisationDetailsRequest(videoRequest);
-        messageText = GSON.toJson(d);
-      }
-      else if (videoRequest.getRequestType() == RequestType.VIDEO_CONNECTION_PROPERTIES_REQUEST) {
-        Collection<VideoConnectionProperties> p = handleVideoConnectionRequest(videoRequest);
-        messageText = GSON.toJson(p); 
-      }
-    } catch (SQLException sqle) {
-      LOG.error("onMessage() : handleVideoRequest(): Unable to get connection to data base: ", sqle);
+    if (videoRequest.getRequestType() == RequestType.AUTHORIZATION_DETAILS_REQUEST) {
+      RbacAuthorizationDetails d = handleAuthorisationDetailsRequest(videoRequest);
+      messageText = GSON.toJson(d);
+    }
+    else if (videoRequest.getRequestType() == RequestType.VIDEO_CONNECTION_PROPERTIES_REQUEST) {
+      Collection<VideoConnectionProperties> p = handleVideoConnectionRequest(videoRequest);
+      messageText = GSON.toJson(p); 
     }
 
     return messageText;
@@ -159,21 +158,57 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
 
-    VideoRequest videoRequest = VideoRequestMessageConverter.fromMessage(message);
+    VideoRequest videoRequest;
+    try {
+      videoRequest = VideoRequestMessageConverter.fromMessage(message);
+    } catch (MessageConversionException e) {
+      ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(false, e.getMessage());
+      sentMessage(message, session, GSON.toJson(errorReport));
+      return;      
+    } 
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Successully processed client request.");
+      LOG.debug("Successully processed video request.");
     }
 
     if (videoRequest == null) {
-      LOG.error("onMessage() : videoRequest is null - cannot send reply.");
-      throw new RuntimeErrorException(new Error("onMessage() : videoRequest is null - cannot send reply."));
+      final String errorMessage = "videoRequest is null - cannot send reply";
+      LOG.error("onMessage() : " + errorMessage);
+      ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(false, errorMessage);
+      sentMessage(message, session, GSON.toJson(errorReport));
+      return;
     }
 
-    String messageText = handleVideoRequest(videoRequest); // JSON response
+    String result = null;
+    try {
+      result = handleVideoRequest(videoRequest);
+    }  
+    catch (SQLException sqle) {
+      final String errorMessage = "Unable to get connection to data base";
+      LOG.error("onMessage() : handleVideoRequest():" + errorMessage + " :", sqle);
+      ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(false, errorMessage);
+      sentMessage(message, session, GSON.toJson(errorReport));
+      return;
+    } 
 
     // Sent the response
-
+    
+    // sent the error report first
+    ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(true, null);
+    sentMessage(message, session, GSON.toJson(errorReport));
+    
+    // if the request executed successfully, sent the result
+    if (errorReport.executedSuccessfully()) {
+      sentMessage(message, session, result);
+    }
+  }
+  
+  /**
+   * Private helper method.
+   * Sends Messages.
+   */
+  private void sentMessage(final Message message, final Session session, final String messageText) throws JMSException {
+    
     // Extract reply topic
     Destination replyDestination = null;
     try {
@@ -196,6 +231,6 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
     } else {
       LOG.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
       throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
-    }
+    }    
   }
 }
