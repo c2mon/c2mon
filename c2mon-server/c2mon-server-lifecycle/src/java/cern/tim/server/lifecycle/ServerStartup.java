@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -145,7 +146,15 @@ public final class ServerStartup {
     
     coreModules.addAll(cacheModeModules);
     
-    final ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(coreModules.toArray(new String[0]), ctx);
+    final ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(coreModules.toArray(new String[0]), ctx) {
+      
+      protected DefaultListableBeanFactory createBeanFactory() {
+        final DefaultListableBeanFactory vResult = super.createBeanFactory();
+        vResult.setAllowBeanDefinitionOverriding(false);
+        return vResult;
+        };
+    
+    };
        
     logger.info("Starting the beans in application context.");
     //start all components that need manually starting
