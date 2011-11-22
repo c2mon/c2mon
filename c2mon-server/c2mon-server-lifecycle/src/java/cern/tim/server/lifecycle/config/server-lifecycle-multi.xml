@@ -8,6 +8,6 @@
   <import resource="classpath:cern/tim/server/lifecycle/config/server-lifecycle-common.xml"/>
   
   <!-- import JMX configuration -->
-  <import resource="classpath:cern/tim/server/lifecycle/config/server-lifecycle-jmx-multi.xml"/>
+<!--  <import resource="classpath:cern/tim/server/lifecycle/config/server-lifecycle-jmx-multi.xml"/>-->
   
 </beans>

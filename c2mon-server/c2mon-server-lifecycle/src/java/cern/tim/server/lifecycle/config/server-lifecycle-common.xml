@@ -16,5 +16,14 @@
     <!-- timeout value in milliseconds -->
     <property name="timeoutPerShutdownPhase" value="60000"/>    
   </bean>
+  
+  <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
+    <property name="beans">
+      <map>
+        <entry key="cern.c2mon:name=lifeCycleController" value-ref="lifeCycleController"/>
+        <entry key="cern.c2mon:name=supervisionNotifier" value-ref="supervisionNotifier"/>
+      </map>
+    </property>     
+  </bean>
 
 </beans>
