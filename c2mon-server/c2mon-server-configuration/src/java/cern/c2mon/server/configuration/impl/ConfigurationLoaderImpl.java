@@ -219,6 +219,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           elementReport.setFailure("Exception caught while applying the configuration change.", ex);
           element.setStatus(Status.FAILURE);          
           report.setStatus(Status.FAILURE);
+          report.setStatusDescription("Failure: see details below.");
         }
         
         
