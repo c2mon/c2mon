@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultLifecycleProcessor;
 import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 /**
@@ -45,6 +46,7 @@ import org.springframework.stereotype.Service;
  *
  */
 @Service
+@ManagedResource(objectName="cern.c2mon:name=lifeCycleController")
 public class LifeCycleController {
 
   /**

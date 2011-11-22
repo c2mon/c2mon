@@ -18,12 +18,25 @@
   </bean>
   
   <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
-    <property name="beans">
-      <map>
-        <entry key="cern.c2mon:name=lifeCycleController" value-ref="lifeCycleController"/>
-        <entry key="cern.c2mon:name=supervisionNotifier" value-ref="supervisionNotifier"/>
-      </map>
-    </property>     
+<!--    <property name="beans">-->
+<!--      <map>-->
+<!--        <entry key="cern.c2mon:name=lifeCycleController" value-ref="lifeCycleController"/>-->
+<!--        <entry key="cern.c2mon:name=supervisionNotifier" value-ref="supervisionNotifier"/>-->
+<!--      </map>-->
+<!--    </property> -->
+    <property name="assembler" ref="assembler"/>
+    <property name="autodetectModeName" value="AUTODETECT_ASSEMBLER"/>
+    <property name="namingStrategy" ref="namingStrategy"/>    
+  </bean>
+  
+  <bean id="assembler" class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+    <property name="attributeSource" ref="attributeSource"/>
+  </bean>
+  
+  <bean id="attributeSource" class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+  
+  <bean id="namingStrategy" class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+    <property name="attributeSource" ref="attributeSource"/>
   </bean>
 
 </beans>
