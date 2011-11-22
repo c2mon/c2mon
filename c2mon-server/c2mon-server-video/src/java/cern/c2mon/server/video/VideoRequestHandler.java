@@ -42,6 +42,7 @@ import com.google.gson.Gson;
 
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestErrorReportImpl;
+import cern.c2mon.shared.client.request.ServerRequestException;
 import cern.c2mon.shared.video.VideoConnectionProperties;
 import cern.c2mon.shared.video.VideoRequest;
 import cern.c2mon.shared.video.VideoRequest.RequestType;
@@ -99,8 +100,15 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
    * In case of an AUTHORIZATION_DETAILS_REQUEST the response is <code>RbacAuthorizationDetails</code>. 
    * In case of an VIDEO_CONNECTION_PROPERTIES_REQUEST the response is <code>VideoConnectionPropertiesCollection</code>. 
    * @throws SQLException In case an error occurs during the query
+   * @throws ServerRequestException In case a null VideoRequest is received
    */
-  public String handleVideoRequest(final VideoRequest videoRequest) throws SQLException {
+  public String handleVideoRequest(final VideoRequest videoRequest) throws SQLException, ServerRequestException {
+    
+    if (videoRequest == null) {      
+      final String errorMessage = "videoRequest is null - cannot send reply";
+      LOG.error("onMessage() -> handleVideoRequest()" + errorMessage);
+      throw new ServerRequestException(errorMessage);
+    }
 
     String messageText = null; // JSON reply
 
@@ -158,57 +166,53 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
 
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Received video request.");
+    }
+
     VideoRequest videoRequest;
     try {
       videoRequest = VideoRequestMessageConverter.fromMessage(message);
     } catch (MessageConversionException e) {
       ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(false, e.getMessage());
-      sentMessage(message, session, GSON.toJson(errorReport));
+      sendMessage(message, session, GSON.toJson(errorReport));
       return;      
     } 
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Successully processed video request.");
-    }
-
-    if (videoRequest == null) {
-      final String errorMessage = "videoRequest is null - cannot send reply";
-      LOG.error("onMessage() : " + errorMessage);
-      ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(false, errorMessage);
-      sentMessage(message, session, GSON.toJson(errorReport));
-      return;
-    }
 
     String result = null;
     try {
       result = handleVideoRequest(videoRequest);
-    }  
-    catch (SQLException sqle) {
-      final String errorMessage = "Unable to get connection to data base";
-      LOG.error("onMessage() : handleVideoRequest():" + errorMessage + " :", sqle);
+    } 
+    catch (Exception e) {
+      final String errorMessage = "Runtime exception on the server! " + e.getMessage();
+      LOG.error("onMessage() : handleVideoRequest():" + errorMessage + " :", e);
       ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(false, errorMessage);
-      sentMessage(message, session, GSON.toJson(errorReport));
+      sendMessage(message, session, GSON.toJson(errorReport));
       return;
     } 
 
-    // Sent the response
-    
+    // No error occured => Sent the response
+
     // sent the error report first
     ClientRequestErrorReport errorReport = new ClientRequestErrorReportImpl(true, null);
-    sentMessage(message, session, GSON.toJson(errorReport));
-    
-    // if the request executed successfully, sent the result
-    if (errorReport.executedSuccessfully()) {
-      sentMessage(message, session, result);
+    sendMessage(message, session, GSON.toJson(errorReport));    
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Error report sent (no errors).");
+    }
+
+    // sent the result
+    sendMessage(message, session, result);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Video request result sent. Succesfully processed request result.");
     }
   }
-  
+
   /**
    * Private helper method.
    * Sends Messages.
    */
-  private void sentMessage(final Message message, final Session session, final String messageText) throws JMSException {
-    
+  private void sendMessage(final Message message, final Session session, final String messageText) throws JMSException {
+
     // Extract reply topic
     Destination replyDestination = null;
     try {

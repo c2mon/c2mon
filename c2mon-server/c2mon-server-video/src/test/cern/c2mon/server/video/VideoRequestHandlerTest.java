@@ -1,5 +1,7 @@
 package cern.c2mon.server.video;
 
+import static org.junit.Assert.assertTrue;
+
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.shared.client.request.ServerRequestException;
 import cern.c2mon.shared.video.VideoConnectionProperties;
 import cern.c2mon.shared.video.VideoRequest;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
@@ -39,6 +42,16 @@ public class VideoRequestHandlerTest {
 
     requestHandler = new VideoRequestHandler(videoConnectionMapper);
   }
+  
+  /**
+   * ServerRequestException must be thrown in case of a null video request.
+   */
+  @Test(expected=ServerRequestException.class)
+  public void testServerRequestException() throws SQLException {
+
+    VideoRequest request = null;
+    requestHandler.handleVideoRequest(request);
+  }  
 
   @Test
   public void testConnectionPropertiesRequest() throws SQLException {
@@ -51,21 +64,21 @@ public class VideoRequestHandlerTest {
     Type collectionType = new TypeToken<Collection<VideoConnectionProperties>>() { } .getType();
     Collection<VideoConnectionProperties> vcpList = GSON.fromJson(response, collectionType);
 
-    assert (vcpList.size() == 2); // the query must return 2 valid VCP's (defined in data.sql)
+    assertTrue (vcpList.size() == 2); // the query must return 2 valid VCP's (defined in data.sql)
 
     Iterator iter = vcpList.iterator();
     while (iter.hasNext()) {
 
       Object o = iter.next();
 
-      assert (o instanceof VideoConnectionProperties);
+      assertTrue (o instanceof VideoConnectionProperties);
       if (o instanceof VideoConnectionProperties) {
 
         System.out.println(((VideoConnectionProperties) o).getLogin());
       }
     }
   }  
-
+  
   @Test
   public void testAuthorizationDetailsRequest() throws SQLException {
 
@@ -77,8 +90,8 @@ public class VideoRequestHandlerTest {
 
     RbacAuthorizationDetails details = GSON.fromJson(response, RbacAuthorizationDetails.class);
 
-    assert (details.getRbacDevice().equals("DEVICE3"));
-    assert (details.getRbacProperty().equals("PROPERTY3"));
-    assert (details.getRbacClass().equals("Class3"));
+    assertTrue (details.getRbacDevice().equals("DEVICE3"));
+    assertTrue (details.getRbacProperty().equals("PROPERTY3"));
+    assertTrue (details.getRbacClass().equals("Class3"));
   }  
 }
