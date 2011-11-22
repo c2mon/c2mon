@@ -87,5 +87,10 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    */
   Set<Long> unsubscribeDataTags(Set<Long> dataTagIds, DataTagUpdateListener listener);
   
+  /**
+   * Returns the cache size.
+   * @return the cache size (this is the number of subscribed data 
+   * tags contained in the cache).
+   */
   int getCacheSize();
 }
