@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+<import resource="classpath:resources/daq-core-common.xml"/>
+
+<!-- initialize the ProcessRequestSender; can switch here between implementations (No dummy implementation needed if local conf used)-->
+<!--<bean id="processRequestSender" class="cern.tim.driver.common.messaging.impl.SonicRequestSender"/>-->
+<bean id="processRequestSender" class="cern.tim.driver.common.messaging.impl.ActiveRequestSender"/>
+
+<!-- initialize the ProcessMessageReceiver; switch here between implementations (Dummy implementation available) -->
+<!--<bean id="processMessageReceiver" class="cern.tim.driver.common.messaging.impl.SonicMessageReceiver"/>-->
+<!--<bean id="processMessageReceiver" class="cern.tim.driver.common.messaging.impl.DirectoryMessageReceiver"/>-->
+<bean id="processMessageReceiver" class="cern.tim.driver.common.messaging.impl.ActiveMessageReceiver"/>
+
+<!-- initialize the FilterMessageSender; switch here between implementations (Dummy implementation available) -->
+<!--<bean id="filterMessageSender" class="cern.tim.driver.filter.impl.SonicFilterSender"/>-->
+<bean id="filterMessageSender" class="cern.tim.driver.filter.impl.DummyFilterSender"/>
+
+<!-- initialize the JmsSenders; any number of these can be plugged into the ProcessMessageSender below -->
+<!--<bean id="sonicJmsSender" class="cern.tim.driver.common.messaging.impl.SonicJmsSender"/>-->
+<bean id="activeJmsSender" class="cern.tim.driver.common.messaging.impl.ActiveJmsSender"/>
+
+<!-- use proxyJmsSender in processMessageSender to shield DAQ from this connection -->
+<bean id="proxyJmsSender" class="cern.tim.driver.common.messaging.impl.ProxyJmsSender">
+  <property name="wrappedSender" ref="activeJmsSender"/>
+</bean>
+
+<!-- set the JMS message senders that will be used; both SonicMQ and ActiveMQ beans are initialized
+     automatically and can be wired in here -->
+<bean id="processMessageSender" class="cern.tim.driver.common.messaging.impl.ProcessMessageSender">
+  <property name="jmsSenders">
+    <list>
+<!--      <ref bean="sonicJmsSender"/>-->
+<!--      <ref bean="proxyJmsSender"/>-->
+      <ref bean="activeJmsSender"/>
+    </list>
+  </property>
+</bean>
+
+<!--<bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">-->
+<!--  <property name="location">-->
+<!--    <util:constant static-field="ch.cern.tim.driver.common.startup.DAQStartup.basicConf"/>-->
+<!--  </property>-->
+<!--</bean>-->
+
+</beans>

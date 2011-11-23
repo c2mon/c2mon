@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+	<id>install</id>
+
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+
+	<!--  do not include base directory -->
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<dependencySets>
+
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+			<fileMode>0644</fileMode>
+		</dependencySet>
+
+	</dependencySets>
+
+	<fileSets>
+
+		<!-- create default tmp and log folders in the assembly -->
+		<fileSet>
+			<includes>
+				<include>tmp/</include>
+			</includes>
+			<fileMode>0755</fileMode>
+		</fileSet>
+
+		<!--  take the native libraries and copy them to /lib_so -->
+		<fileSet>
+			<outputDirectory>/lib_so</outputDirectory>
+			<includes>
+				<include>*.so</include>
+			</includes>
+			<directory>${project.build.directory}/lib_so/lib/i386-SLC5-gpp/shared</directory>
+			<fileMode>0444</fileMode>
+		</fileSet>
+	</fileSets>
+
+	<files>
+
+		<file>
+			<source>conf/P_YourProcessName_log4j.xml_Debug</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>P_YourProcessName_log4j.xml_Debug</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  copy sthe configuration file -->
+		<file>
+			<source>conf/daq.conf</source>
+			<outputDirectory>conf/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  include the spring core services descriptor -->
+		<file>
+			<source>conf/daq-core-service.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  copy the opc daqlist -->
+		<file>
+			<source>conf/opcdaqprocess.lst</source>
+			<outputDirectory>conf/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  copy sthe starting script -->
+		<file>
+			<source>bin/daqprocess2.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+
+		<file>
+			<source>bin/cleanpids2.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+		<file>
+			<source>bin/restart-all2.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+		<file>
+			<source>bin/setenv.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+		<file>
+			<source>bin/stop-all-tim1_2.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+		<file>
+			<source>bin/stop-all-tim6_2.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+		<file>
+			<source>bin/stop-all-tim9_2.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+		<file>
+			<source>bin/stop-all2.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+
+		<!--  copy changelog -->
+		<file>
+			<source>changelog/changelog.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  deployment descriptor -->
+		<file>
+			<source>conf/deployment.xml</source>
+			<outputDirectory>/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  log4j configuration -->
+		<file>
+			<source>conf/log4j.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>log4j.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+	</files>
+
+</assembly>
