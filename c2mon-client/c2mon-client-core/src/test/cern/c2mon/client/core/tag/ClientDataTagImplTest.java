@@ -226,9 +226,7 @@ public class ClientDataTagImplTest {
       
       ClientDataTagImpl cdt2 = ClientDataTagImpl.fromXml(cdt.toString());
             
-      assertEquals(cdt.getId(),cdt2.getId());
-      
-      //System.out.println(cdt2.toString());
+      assertEquals(cdt.getId(), cdt2.getId());
   }  
   
 }

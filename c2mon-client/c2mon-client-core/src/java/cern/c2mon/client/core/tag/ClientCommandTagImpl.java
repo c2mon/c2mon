@@ -1,7 +1,21 @@
 package cern.c2mon.client.core.tag;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.manager.CommandManager;
+import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.tim.shared.client.command.CommandTagHandle;
 import cern.tim.shared.client.command.CommandTagValueException;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
@@ -21,7 +35,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
 
   /** standard String used for unknown commands */
   private static final String CMD_UNKNOWN = "UNKNOWN";
-  
+
   /** 
    * The prefix is needed to convert the data type string of the 
    * {@link CommandTagHandle} update into a class type
@@ -32,23 +46,30 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * Unique numeric identifier of the CommandTag represented by the 
    * present CommandTagHandle object.
    */
+  @NotNull @Min(1)
+  @Attribute
   private Long id;
 
   /**
    * Name of the CommandTag represented by the present CommandTagHandle object.
    */
+  @NotNull
+  @Element
   private String name;
 
   /**
    * (Optional) free-text description of the CommandTag represented by 
    * the present CommandTagHandle object.
    */
+  @Element(required=false)
   private String description;
 
   /**
    * class type of the present CommandTagHandle object. Only values 
    * of this data type can be set using setValue().
    */
+  @NotNull
+  @Element
   private Class< ? > valueType;
 
   /**
@@ -57,6 +78,8 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * has not received a CommandTagReport after 'clientTimeout' milliseconds,
    * it should consider the command execution as failed.
    */
+  @NotNull
+  @Element @Min(0)
   private int clientTimeout;
 
   /**
@@ -66,6 +89,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * is null, it is not taken into account. The minValue will always be null
    * for non-numeric commands.
    */
+  @Element(required=false)
   private Comparable<T> minValue;
 
   /**
@@ -75,6 +99,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * is null, it is not taken into account. The maxValue will always be null
    * for non-numeric commands.
    */
+  @Element(required=false)
   private Comparable<T> maxValue;
 
   /**
@@ -82,8 +107,10 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * This field will always be null before the user executes the setValue()
    * method.
    */
+  @NotNull
+  @Element
   private T value;
-  
+
   /**
    * Details needed to authorise the command on the client.
    */
@@ -94,7 +121,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    */
   public ClientCommandTagImpl() {    
   }
-  
+
   /**
    * Default Constructor
    * @param pId The command tag id
@@ -104,7 +131,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
     this.name = CMD_UNKNOWN;
     this.description = CMD_UNKNOWN;
   }
-  
+
   /**
    * This method is used by the {@link CommandManager} to update the client command cache
    * object with the information received from the C2MON server.
@@ -117,7 +144,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
     if (commandTagHandle != null && commandTagHandle.getId().equals(id) && commandTagHandle.isExistingCommand()) {
       this.name = commandTagHandle.getName();
       this.description = commandTagHandle.getDescription();
-      
+
       String dataType = commandTagHandle.getDataType();
       if (dataType != null && !dataType.equalsIgnoreCase(CMD_UNKNOWN)) {
         if (!dataType.startsWith(VALUE_TYPE_PREFIX)) {
@@ -130,7 +157,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
           throw new RuntimeException("Cannot find value type class " + dataType + " for command " + id);
         }
       }
-      
+
       this.clientTimeout = commandTagHandle.getClientTimeout();
       this.minValue = commandTagHandle.getMinValue();
       this.maxValue = commandTagHandle.getMaxValue();
@@ -259,7 +286,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
   public AuthorizationDetails getAuthorizationDetails() {
     return authorizationDetails;
   }
-  
+
   /**
    * This method overwrites the standard clone method. It generates a clone
    * of this class instance but leaves the authorizationDetails to null.
@@ -275,5 +302,56 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
     ClientCommandTagImpl<T> clone = (ClientCommandTagImpl<T>) super.clone();
     clone.authorizationDetails = null;
     return clone;
+  }
+
+  /**
+   * 
+   * @return an Xml representation of this ClientCommandTag
+   */
+  public String getXml() {
+    Serializer serializer = new Persister(new AnnotationStrategy());
+    StringWriter fw = null;
+    String result = null;
+
+    try {
+      fw = new StringWriter();
+      serializer.write(this, fw);
+      result = fw.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      if (fw != null) {
+        try {
+          fw.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return result;
+  }
+
+  public static ClientCommandTagImpl fromXml(final String xml) throws Exception {
+
+    ClientCommandTagImpl commandTag = null;
+    StringReader sr = null;
+    Serializer serializer = new Persister(new AnnotationStrategy());
+
+    try {
+      sr = new StringReader(xml);
+      commandTag = serializer.read(ClientCommandTagImpl.class, new StringReader(xml), false);
+    } finally {
+
+      if (sr != null) {
+        sr.close();
+      }
+    }
+
+    return commandTag;
+  }
+
+  @Override
+  public String toString() {
+    return this.getXml();
   }
 }
