@@ -1,0 +1,12 @@
+<config>
+	<property name="treeOpen" type="java.lang.Boolean" value="true"/>
+	<property name="nominalValuesVisible" type="java.lang.Boolean" value="false"/>
+	<property name="linksVisible" type="java.lang.Boolean" value="true"/>
+	<property name="fitToContent" type="java.lang.Boolean" value="true"/>
+	<property name="keepAspectRatio" type="java.lang.Boolean" value="true"/>
+      	<property name="viewerhelpdir" type="java.lang.String" value="http://timweb.cern.ch/wiki/doku.php?id=documentation:timviewer"/>
+        <property name="viewshelpdir" type="java.lang.String" value="http://timweb.cern.ch/wiki/doku.php?id=documentation:viewer:views:"/>
+     	<property name="viewsNavigationTreeCreator" type="java.lang.String" value="http://timweb.cern.ch/javaws/tim-viewer/cgi-bin/viewlist.cgi"/>
+	<property name="viewsNavigationTreeRootPath" type="java.lang.String" value="Production/Bat_513"/>
+	<property name="consoleLoggerConfiguration" type="java.lang.String" value="DEBUG_ENABLED=false;TIMESTAMP_ENABLED=false;BUFFER_SIZE=3000;STACK_TRACE_DEPTH=4"/>
+</config>
