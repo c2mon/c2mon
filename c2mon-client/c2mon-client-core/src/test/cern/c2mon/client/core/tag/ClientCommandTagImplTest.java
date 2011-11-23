@@ -24,7 +24,6 @@ public class ClientCommandTagImplTest {
     assertTrue(commandTag.getClientTimeout() == newCommandTag.getClientTimeout());
     assertTrue(commandTag.getId().equals(newCommandTag.getId()));
     assertTrue(commandTag.getMaxValue().equals(newCommandTag.getMaxValue()));
-    assertTrue(commandTag.getValue().equals(newCommandTag.getValue()));
   }  
   
   /**

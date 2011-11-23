@@ -68,8 +68,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * class type of the present CommandTagHandle object. Only values 
    * of this data type can be set using setValue().
    */
-  @NotNull
-  @Element
+  @Element(required=false)
   private Class< ? > valueType;
 
   /**
@@ -107,8 +106,6 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * This field will always be null before the user executes the setValue()
    * method.
    */
-  @NotNull
-  @Element
   private T value;
 
   /**
