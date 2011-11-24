@@ -7,11 +7,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpoint;
 import cern.tim.driver.common.EquipmentLogger;
 import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
-import cern.tim.shared.common.type.TypeConverter;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 
 /**
- * Regulary writes to a value in the OPC server to simulate an alive.
+ * Regularly writes to a value in the OPC server to simulate an alive.
  * 
  * @author Andreas Lang
  * 
@@ -71,8 +70,8 @@ public class AliveWriter extends TimerTask {
     public void run() {
         OPCHardwareAddress hardwareAddress =
             (OPCHardwareAddress) targetTag.getHardwareAddress();
-        Object castedValue = TypeConverter.cast(
-                writeCounter.toString(), targetTag.getDataType());
+        // We send an Integer since Long could cause problems to the OPC
+        Object castedValue = Integer.valueOf(writeCounter.intValue());
         logger.debug("Writing value: " + castedValue 
                 + " type: " + castedValue.getClass().getName());
         try {

@@ -35,13 +35,17 @@ public class AliveWriterTest {
     }
     @Test
     public void testRun() {
-        endpoint.write(hardwareAddress, Integer.valueOf(0));
-        endpoint.write(hardwareAddress, Integer.valueOf(1));
-        endpoint.write(hardwareAddress, Integer.valueOf(2));
+        for (int k=0; k < 3; k++) {
+          for (int i=0; i < Byte.MAX_VALUE; i++) {
+            endpoint.write(hardwareAddress, Integer.valueOf(i));
+          }
+        }
         replay(endpoint);
-        aliveWriter.run();
-        aliveWriter.run();
-        aliveWriter.run();
+        for (int k=0; k < 3; k++) {
+          for (int i=0; i < Byte.MAX_VALUE; i++) {
+            aliveWriter.run();
+          }
+        }
         verify(endpoint);
     }
 
