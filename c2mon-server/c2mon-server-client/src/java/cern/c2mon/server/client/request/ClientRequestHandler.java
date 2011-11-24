@@ -141,7 +141,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     ClientRequest clientRequest = ClientRequestMessageConverter.fromMessage(message);
     Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest);
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Successully processed client request.");
+      LOG.debug("onMessage() : Client request received.");
     }
 
     // Extract reply topic
@@ -172,7 +172,8 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       }
 
       if (LOG.isDebugEnabled()) {
-        LOG.debug("onMessage() : Sending ClientRequest response with " + response.size() + " tags to client.");
+        LOG.debug("onMessage() : Responded to ClientRequest: "+ clientRequest.getRequestType() + ". " + response.size() 
+            + " tags included in the response.");
       }
       messageProducer.send(replyMessage);
     } else {
@@ -195,43 +196,43 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
       case TAG_CONFIGURATION_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " tag configurations.");
+          LOG.debug("handleClientRequest() - Received a TAG_CONFIGURATION_REQUEST for " + clientRequest.getTagIds().size() + " tag configurations.");
         }
         return handleTagConfigurationRequest(clientRequest);
 
       case APPLY_CONFIGURATION_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " configuration reports.");
+          LOG.debug("handleClientRequest() - Received an APPLY_CONFIGURATION_REQUEST for " + clientRequest.getTagIds().size() + " tag Ids.");
         }
         return handleConfigurationReportRequest(clientRequest);
       case TAG_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " tags.");
+          LOG.debug("handleClientRequest() - Received a TAG_REQUEST for " + clientRequest.getTagIds().size() + " tags.");
         }
         return handleTagRequest(clientRequest);
       case ALARM_REQUEST:
         if (LOG.isDebugEnabled()) {
           // ! TagId field is also used for Alarm ids
-          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " alarms.");
+          LOG.debug("handleClientRequest() - Received an ALARM_REQUEST for " + clientRequest.getTagIds().size() + " alarms.");
         }
         return handleAlarmRequest(clientRequest);
       case SUPERVISION_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received a client request for the current supervision status.");
+          LOG.debug("handleClientRequest() - Received a SUPERVISION_REQUEST.");
         }
         return supervisionFacade.getAllSupervisionStates();
       case COMMAND_HANDLE_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " command handles.");
+          LOG.debug("handleClientRequest() - Received a COMMAND_HANDLE_REQUEST " + clientRequest.getTagIds().size() + " command handles.");
         }
         return handleCommandHandleRequest(clientRequest);
       case EXECUTE_COMMAND_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received a client request for " + clientRequest.getTagIds().size() + " command handles.");
+          LOG.debug("handleClientRequest() - Received an EXECUTE_COMMAND_REQUEST for " + clientRequest.getTagIds().size() + " command handles.");
         }
         return handleExecuteCommandRequest(clientRequest);
       case DAQ_XML_REQUEST:
-        LOG.debug("handleClientRequest() - Received a client request for a Process configuration XML");
+        LOG.debug("handleClientRequest() - Received a DAQ_XML_REQUEST");
         Collection<ProcessXmlResponse> singleXML = new ArrayList<ProcessXmlResponse>(1);
         ProcessXmlResponseImpl processXmlResponse = new ProcessXmlResponseImpl();
         try {
