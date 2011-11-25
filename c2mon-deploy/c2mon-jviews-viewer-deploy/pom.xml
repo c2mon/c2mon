@@ -9,7 +9,7 @@
 		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 
-	<groupId>cern.tim.tim-client</groupId>
+	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-jviews-viewer-deploy</artifactId>
 	<name>C2MON jviews viewer deployment module</name>
 	<version>1.0.1-SNAPSHOT</version>
