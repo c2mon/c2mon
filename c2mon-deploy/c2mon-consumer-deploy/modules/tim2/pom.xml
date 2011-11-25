@@ -4,13 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>cern.c2mon.c2mon-statistics</groupId>
+		<groupId>cern.c2mon.c2mon-deploy</groupId>
     <artifactId>c2mon-consumer-deploy</artifactId>
     <version>1.0.1-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<groupId>cern.c2mon.c2mon-statistics</groupId>
+	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-consumer-tim2</artifactId>
 	<name>The TIM2 consumer module</name>
 	<version>1.0.1-SNAPSHOT</version>
