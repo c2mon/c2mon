@@ -5,12 +5,12 @@
 
 	<parent>
 		<artifactId>c2mon-server-deploy</artifactId>
-		<groupId>cern.c2mon.c2mon-server</groupId>
+		<groupId>cern.c2mon.c2mon-deploy</groupId>
 		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<groupId>cern.c2mon.c2mon-server</groupId>
+	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-srv-tim2</artifactId>
 	<name>The TIM2 SRV module</name>
 	<version>1.0.1-SNAPSHOT</version>
