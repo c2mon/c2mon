@@ -107,3 +107,21 @@ create index tdl_tagid_ix on stl_day_snapshot(tagid) tablespace LOGINDX;
 -- grants for TIM accounts
 grant select on stl_day_snapshot to timref;
 grant select on stl_day_snapshot to timop;
+
+-- create commandtaglog table
+
+CREATE TABLE commandtaglog (
+cmdid           NUMBER(9)       NOT NULL,
+cmdname         VARCHAR2(60)    NOT NULL,
+cmdmode         NUMBER(1)       NOT NULL,
+cmdtime         TIMESTAMP(6)    NOT NULL, --currently log start time here
+cmdvalue        VARCHAR2(4000),
+cmddatatype     VARCHAR2(10),
+cmduser         VARCHAR2(25),
+cmdhost         VARCHAR2(60),
+cmdreporttime   TIMESTAMP(6),
+cmdreportstatus VARCHAR2(50),
+cmdreportdesc   VARCHAR2(100)
+);
+
+)

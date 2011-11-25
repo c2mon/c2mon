@@ -14,12 +14,8 @@
   
   <tx:annotation-driven transaction-manager="stlTransactionManager"/>
   
-    <!-- to be able to use the server properties in this file -->
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="properties" ref="serverProperties"/>
-  </bean>
-  
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mybatis.xml"/>
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-tag.xml"/>
+  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-command.xml"/>
     
 </beans>

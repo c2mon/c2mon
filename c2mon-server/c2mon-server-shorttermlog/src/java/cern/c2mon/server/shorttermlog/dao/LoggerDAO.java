@@ -26,12 +26,12 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
+import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.shorttermlog.mapper.LoggerMapper;
-import cern.c2mon.server.shorttermlog.structure.Loggable;
 
 /**
  * Common DAO implementation for objects that need storing in a STL table using
@@ -41,7 +41,7 @@ import cern.c2mon.server.shorttermlog.structure.Loggable;
  *
  * @param <T> the object that is being logged in the STL table
  */
-public class LoggerDAO<T extends Loggable> implements IDBPersistenceHandler {
+public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
 
   /**
    * Private class logger.
@@ -130,8 +130,7 @@ public class LoggerDAO<T extends Loggable> implements IDBPersistenceHandler {
               if (data.get(i) != null) {
                   dtShortTermLog = (T) data.get(i);
                   if (LOGGER.isDebugEnabled()) {
-                      LOGGER.debug("Logging object with ID: " + dtShortTermLog.getId()
-                              + " value " + dtShortTermLog.getValue());
+                      LOGGER.debug("Logging object with ID: " + dtShortTermLog.getId());
                   }
                   persistenceMapper.insertLog(dtShortTermLog);                  
               }
@@ -170,9 +169,22 @@ public class LoggerDAO<T extends Loggable> implements IDBPersistenceHandler {
   }
 
   @Override
+  @Transactional("stlTransactionManager")
   public void storeData(IFallback object) throws SQLException {
-    LoggerMapper<T> loggerMapper = sqlSessionFactory.openSession().getMapper(mapperInterface);
-    loggerMapper.insertLog((T) object);
+    SqlSession session = sqlSessionFactory.openSession();
+    try {
+      LoggerMapper<T> loggerMapper = session.getMapper(mapperInterface);
+      loggerMapper.insertLog((T) object);
+      session.commit();
+    } catch (DataAccessException e) {
+      String message = "Exception caught while writing to short-term-log";
+      LOGGER.error(message, e);
+      session.rollback();
+      throw new SQLException(message, e);
+    } finally {
+      session.close();
+    }
+   
   }
   
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- Command logging beans -->
+	<bean id="commandLoggerDAO" class="cern.c2mon.server.shorttermlog.dao.LoggerDAO">
+		<constructor-arg ref="stlSqlSessionFactory" />
+		<constructor-arg value="cern.c2mon.server.shorttermlog.mapper.CommandTagLogMapper" />
+	</bean>
+
+	<bean id="commandPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
+		<constructor-arg ref="commandLoggerDAO" />
+		<constructor-arg value="${c2mon.command.log.fallback.file}" />
+		<constructor-arg>
+			<bean class="cern.c2mon.server.shorttermlog.alarm.DummyAlarmListener" />
+		</constructor-arg>
+		<constructor-arg>
+			<bean class="cern.tim.shared.client.command.CommandTagLog" />
+		</constructor-arg>
+	</bean>
+
+</beans>

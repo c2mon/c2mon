@@ -44,7 +44,7 @@ import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-test.xml"})
+@ContextConfiguration({"classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mapper-test.xml"})
 public class SupervisionMapperTest {
 
   /**

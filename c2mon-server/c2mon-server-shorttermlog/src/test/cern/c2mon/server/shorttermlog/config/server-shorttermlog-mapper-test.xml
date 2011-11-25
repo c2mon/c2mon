@@ -22,4 +22,9 @@
     <property name="mapperInterface" value="cern.c2mon.server.shorttermlog.mapper.DataTagLogMapper"/>
   </bean>
   
+  <bean id="commandTagLogMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="stlSqlSessionFactory"/>
+    <property name="mapperInterface" value="cern.c2mon.server.shorttermlog.mapper.CommandTagLogMapper"/>
+  </bean>
+  
 </beans>

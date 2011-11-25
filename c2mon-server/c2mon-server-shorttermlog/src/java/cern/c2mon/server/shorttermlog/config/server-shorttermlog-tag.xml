@@ -21,7 +21,7 @@
     <constructor-arg>
       <bean class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
         <constructor-arg ref="tagLoggerDAO"/>
-        <constructor-arg value="${c2mon.log.fallback.file}"/>
+        <constructor-arg value="${c2mon.tag.log.fallback.file}"/>
         <constructor-arg>
           <bean class="cern.c2mon.server.shorttermlog.alarm.DummyAlarmListener"/>
         </constructor-arg>

@@ -18,7 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.shorttermlog.mapper;
 
-import cern.c2mon.server.shorttermlog.structure.Loggable;
+import cern.c2mon.pmanager.IFallback;
 
 /**
  * Mapper interface that must be implemented for objects
@@ -28,7 +28,7 @@ import cern.c2mon.server.shorttermlog.structure.Loggable;
  *
  * @param <T> the class that is to be logged
  */
-public interface LoggerMapper<T extends Loggable> {
+public interface LoggerMapper<T extends IFallback> {
 
   /**
    * Inserts the Loggable object into the STL table.

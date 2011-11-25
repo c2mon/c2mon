@@ -18,12 +18,8 @@
  *****************************************************************************/
 package cern.c2mon.server.shorttermlog.mapper;
 
-import java.sql.Time;
 import java.util.TimeZone;
 
-import javax.annotation.PostConstruct;
-
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.shorttermlog.mapper.DataTagLogMapper;
 import cern.c2mon.server.shorttermlog.structure.TagShortTermLog;
 
 /**
@@ -42,7 +37,7 @@ import cern.c2mon.server.shorttermlog.structure.TagShortTermLog;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-test.xml"})
+@ContextConfiguration({"classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mapper-test.xml"})
 public class DataTagLogMapperTest {
 
   /**
