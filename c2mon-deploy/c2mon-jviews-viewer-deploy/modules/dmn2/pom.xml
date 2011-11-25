@@ -4,13 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>cern.tim.tim-client</groupId>
+		<groupId>cern.c2mon.c2mon-deploy</groupId>
 		<artifactId>c2mon-jviews-viewer-deploy</artifactId>
 		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<groupId>cern.tim.tim-client</groupId>
+	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-jviews-viewer-dmn2</artifactId>
 	<name>The DMN2 jviews-viewer deployment module</name>
 	<version>1.0.1-SNAPSHOT</version>

@@ -5,12 +5,12 @@
 
 	<parent>
 		<artifactId>c2mon-jviews-viewer-deploy</artifactId>
-		<groupId>cern.tim.tim-client</groupId>
+		<groupId>cern.c2mon.c2mon-deploy</groupId>
 		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<groupId>cern.tim.tim-client</groupId>
+	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-jviews-viewer-tim2</artifactId>
 	<name>The TIM2 jviews-viewer deployment module</name>
 	<version>1.0.1-SNAPSHOT</version>
