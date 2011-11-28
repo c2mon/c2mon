@@ -8,7 +8,7 @@
     -->
     <application name="default">
       <deployment installLocation="~/dist/daqprocess-mvn">
-        <backupPolicy keepBackups="2">
+        <backupPolicy keepBackups="10">
           <preserve type="dir" name="tmp" />
           <preserve type="dir" name="conf/local" />
         </backupPolicy>
