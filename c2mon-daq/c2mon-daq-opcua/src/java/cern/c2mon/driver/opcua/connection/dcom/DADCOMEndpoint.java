@@ -123,7 +123,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         String user = opcAddress.getUser();
         String password = opcAddress.getPassword();
         authInfo = new AuthInfo(domain, user, password);
-        executorService = Executors.newFixedThreadPool(5);
+        executorService = Executors.newFixedThreadPool(1);
         try {
             setUpConnection(uri);
         } catch (AutomationException e) {
