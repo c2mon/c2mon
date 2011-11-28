@@ -198,6 +198,8 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             
         });
         group.setIsSubscribed(true);
+        int[] cancelid = new int[1];
+        group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, cancelid);
         return group;
     }
 
