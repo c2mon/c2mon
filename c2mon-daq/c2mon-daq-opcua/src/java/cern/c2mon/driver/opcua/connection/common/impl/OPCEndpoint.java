@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.log4j.Logger;
+
 import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
 import cern.c2mon.driver.opcua.connection.common.IItemDefinitionFactory;
@@ -30,7 +32,12 @@ import cern.tim.shared.daq.datatag.ISourceDataTag;
  */
 public abstract class OPCEndpoint<ID extends ItemDefinition< ? > > 
         implements IOPCEndpoint {
-    
+      
+    /**
+     * logger of this class.
+     */
+    private final static Logger LOG = Logger.getLogger(OPCEndpoint.class);
+  
     /**
      * Collection of endpoint listeners registered at this endpoint.
      */
@@ -331,12 +338,16 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     public void notifyEndpointListenersValueChange(
             final long itemdefintionId,
             final long timestamp, final Object value) {
-        for (IOPCEndpointListener listener : listeners) {
-            ISourceDataTag dataTag =
-                itemDefintionIdsToDataTags.get(itemdefintionId);
-            if (dataTag != null) {
-                listener.onNewTagValue(dataTag, timestamp, value);
+        ISourceDataTag dataTag = itemDefintionIdsToDataTags.get(itemdefintionId);
+        if (dataTag != null) {
+          if (!listeners.isEmpty()) {
+            for (IOPCEndpointListener listener : listeners) {
+              listener.onNewTagValue(dataTag, timestamp, value);
             }
+          }
+          else {
+            LOG.warn("notifyEndpointListenersValueChange() - No endpoint listeners registerd! Nobody got informed about update for datatag " + dataTag.getId());
+          }
         }
     }
     
@@ -349,13 +360,18 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      */
     public void notifyEndpointListenersItemError(
             final long itemdefintionId, final Throwable ex) {
-        for (IOPCEndpointListener listener : listeners) {
-            ISourceDataTag dataTag =
-                itemDefintionIdsToDataTags.get(itemdefintionId);
-            if (dataTag != null) {
-                listener.onTagInvalidException(dataTag, ex);
-            }
+        
+      ISourceDataTag dataTag = itemDefintionIdsToDataTags.get(itemdefintionId);
+      if (dataTag != null) {
+        if (!listeners.isEmpty()) {
+          for (IOPCEndpointListener listener : listeners) {
+            listener.onTagInvalidException(dataTag, ex);
+          }
         }
+        else {
+          LOG.warn("notifyEndpointListenersItemError() - No endpoint listeners registerd! Nobody got informed about invalidation of datatag " + dataTag.getId());
+        }
+      }
     }
     
     /**
@@ -366,9 +382,14 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      */
     public void notifyEndpointListenersSubscriptionFailed(
             final Throwable ex) {
+      if (!listeners.isEmpty()) {
         for (IOPCEndpointListener listener : listeners) {
             listener.onSubscriptionException(ex);
         }
+      }
+      else {
+        LOG.warn("notifyEndpointListenersSubscriptionFailed() - No endpoint listeners registerd! Nobody gets informed about exeption:", ex);
+      }
     }
     
     /**

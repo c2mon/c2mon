@@ -47,6 +47,11 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      * Timeout of the DCOM connection.
      */
     private static final String TIMEOUT = "10000";
+    
+    /**
+     * The cancel ID for async refreshes
+     */
+    private static final int[] CANCEL_ID = new int[1];
 
     /**
      * The OPC server object.
@@ -198,8 +203,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             
         });
         group.setIsSubscribed(true);
-        int[] cancelid = new int[1];
-        group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, cancelid);
+        group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
         return group;
     }
 
