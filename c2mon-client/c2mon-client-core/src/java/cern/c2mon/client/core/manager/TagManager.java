@@ -278,6 +278,17 @@ public class TagManager implements CoreTagManager {
     }
     return new ArrayList<TagConfig>();
   }
+  
+  @Override
+  public String getProcessXml(final String processName) {
+
+    try {
+      return clientRequestHandler.getProcessXml(processName);
+    } catch (JMSException e) {
+      LOG.error("getProcessXml() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+    }
+    return null;
+  }
 
   @Override
   public Collection<AlarmValue> getAlarms(final Collection<Long> alarmIds) {

@@ -48,7 +48,7 @@ public interface C2monTagManager {
    *  
    * @param dataTagIds A collection of data tag IDs
    * @param listener the listener which shall be registered
-   * @return <code>true</code>, if the registration was successfull, otherwhise <code>false</code>
+   * @return <code>true</code>, if the registration was succesfull, otherwhise <code>false</code>
    */
   boolean subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
   
@@ -131,6 +131,14 @@ public interface C2monTagManager {
    * @return A Configuration Report object
    */  
   ConfigurationReport applyConfiguration(final Long configurationId);
+  
+  /**
+   * Requests the DAQ config XML for a given process.
+   * 
+   * @param processName the name of the Process
+   * @return the DAQ XML as String 
+   */    
+  String getProcessXml(final String processName);
   
   /**
    * Returns the number of connections in the Cache
