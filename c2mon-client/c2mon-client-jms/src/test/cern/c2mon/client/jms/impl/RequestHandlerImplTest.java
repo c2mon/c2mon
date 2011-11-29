@@ -202,7 +202,7 @@ public class RequestHandlerImplTest {
   }
 
   /**
-   * Tests getProcessXml method.
+   * Tests testExecuteCommand method.
    * @throws JMSException
    */
   @Test
@@ -226,8 +226,6 @@ public class RequestHandlerImplTest {
 
     EasyMock.verify(jmsProxy);
     Assert.assertEquals(id, report.getId());
-    
-    System.out.println("id=" + id + " id=" + report.getId());
   }
 
 

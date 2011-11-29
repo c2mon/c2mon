@@ -56,8 +56,6 @@ import cern.c2mon.client.jms.TopicRegistrationDetails;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 import cern.tim.shared.client.command.CommandExecuteRequest;
-import cern.tim.shared.client.command.CommandTagHandle;
-import cern.tim.shared.client.command.CommandTagHandleImpl;
 
 /**
  * Implementation of the JmsProxy singleton bean. Also see the interface

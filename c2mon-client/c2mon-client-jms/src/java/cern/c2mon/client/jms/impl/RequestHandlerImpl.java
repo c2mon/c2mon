@@ -262,7 +262,7 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public String getProcessXml(final String processName) throws JMSException {
     ClientRequestImpl<ProcessXmlResponse> xmlRequest = new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
-    xmlRequest.setRequestParameter("request parameter");
+    xmlRequest.setRequestParameter(processName);
     // response should have a unique element in
     ProcessXmlResponse response = jmsProxy.sendRequest(xmlRequest, requestQueue, requestTimeout).iterator().next();
     if (response.getProcessXML() != null) {
