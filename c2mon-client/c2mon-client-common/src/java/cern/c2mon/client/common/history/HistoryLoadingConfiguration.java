@@ -50,12 +50,16 @@ public class HistoryLoadingConfiguration {
 
   /** <code>true</code> if the initial values at time 0 also should be loaded */
   private boolean loadInitialValues;
+  
+  /** <code>true</code> if the supervision events should be loaded */
+  private boolean loadSupervisionEvents;
 
   /**
    * Constructor
    */
   public HistoryLoadingConfiguration() {
-    loadInitialValues = false;
+    this.loadInitialValues = false;
+    this.loadSupervisionEvents = true;
   }
 
   /**
@@ -69,6 +73,7 @@ public class HistoryLoadingConfiguration {
     this.numberOfDays = historyLoadingConfiguration.numberOfDays;
     this.maximumRecords = historyLoadingConfiguration.maximumRecords;
     this.loadInitialValues = historyLoadingConfiguration.loadInitialValues;
+    this.loadSupervisionEvents = historyLoadingConfiguration.loadSupervisionEvents;
   }
 
   /**
@@ -176,6 +181,82 @@ public class HistoryLoadingConfiguration {
     }
     this.earliestTimestamp = earliestTimestamp;
   }
+  
+  /**
+   * @return <code>true</code> if the supervision events will be loaded
+   *         (default)
+   */
+  public boolean isLoadSupervisionEvents() {
+    return loadSupervisionEvents;
+  }
 
+  /**
+   * @param loadSupervisionEvents
+   *          <code>true</code> if the supervision events should be loaded,
+   *          <code>false</code> otherwise
+   */
+  public void setLoadSupervisionEvents(final boolean loadSupervisionEvents) {
+    this.loadSupervisionEvents = loadSupervisionEvents;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((earliestTimestamp == null) ? 0 : earliestTimestamp.hashCode());
+    result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
+    result = prime * result + (loadInitialValues ? 1231 : 1237);
+    result = prime * result + (loadSupervisionEvents ? 1231 : 1237);
+    result = prime * result + ((maximumRecords == null) ? 0 : maximumRecords.hashCode());
+    result = prime * result + ((numberOfDays == null) ? 0 : numberOfDays.hashCode());
+    result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!(obj instanceof HistoryLoadingConfiguration))
+      return false;
+    HistoryLoadingConfiguration other = (HistoryLoadingConfiguration) obj;
+    if (earliestTimestamp == null) {
+      if (other.earliestTimestamp != null)
+        return false;
+    }
+    else if (!earliestTimestamp.equals(other.earliestTimestamp))
+      return false;
+    if (endTime == null) {
+      if (other.endTime != null)
+        return false;
+    }
+    else if (!endTime.equals(other.endTime))
+      return false;
+    if (loadInitialValues != other.loadInitialValues)
+      return false;
+    if (loadSupervisionEvents != other.loadSupervisionEvents)
+      return false;
+    if (maximumRecords == null) {
+      if (other.maximumRecords != null)
+        return false;
+    }
+    else if (!maximumRecords.equals(other.maximumRecords))
+      return false;
+    if (numberOfDays == null) {
+      if (other.numberOfDays != null)
+        return false;
+    }
+    else if (!numberOfDays.equals(other.numberOfDays))
+      return false;
+    if (startTime == null) {
+      if (other.startTime != null)
+        return false;
+    }
+    else if (!startTime.equals(other.startTime))
+      return false;
+    return true;
+  }
   
 }

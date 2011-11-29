@@ -319,10 +319,12 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
       HistoryLoadingManagerImpl.this.latestTimeLoaded = lastestTime;
       
       if (isLoading()) {
-        // Gets supervision events
         final List <SupervisionEventRequest> supervisionRequests = new ArrayList<SupervisionEventRequest>();
-        for (SupervisionEventId id : getSupervisionEventsToLoad()) {
-          supervisionRequests.add(new SupervisionEventRequest(id.getEntityId(), id.getEntity()));
+        if (getConfiguration().isLoadSupervisionEvents()) {
+          // Gets supervision events
+          for (SupervisionEventId id : getSupervisionEventsToLoad()) {
+            supervisionRequests.add(new SupervisionEventRequest(id.getEntityId(), id.getEntity()));
+          }
         }
         
         if (getConfiguration().isLoadInitialValues()) {
