@@ -232,22 +232,38 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         }
         return handleExecuteCommandRequest(clientRequest);
       case DAQ_XML_REQUEST:
-        LOG.debug("handleClientRequest() - Received a DAQ_XML_REQUEST");
-        Collection<ProcessXmlResponse> singleXML = new ArrayList<ProcessXmlResponse>(1);
-        ProcessXmlResponseImpl processXmlResponse = new ProcessXmlResponseImpl();
-        try {
-          String xmlString = processXMLProvider.getProcessConfigXML((String) clientRequest.getRequestParameter());
-          processXmlResponse.setProcessXML(xmlString);
-        } catch (CacheElementNotFoundException cacheEx) {
-          String errorMessage = "Requested process not found.";
-          LOG.warn(errorMessage, cacheEx);
-          processXmlResponse.setErrorMessage(errorMessage);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("handleClientRequest() - Received a DAQ_XML_REQUEST");
         }
-        singleXML.add(processXmlResponse);
+        return handleDaqXmlRequest(clientRequest);
       default:
         LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
         return Collections.emptyList();
     } // end switch
+  }
+  
+   
+  /**
+   * Inner method which handles the Daq Xml Requests
+   * 
+   * @param daqXmlRequest
+   *          The daq Xml Request sent from the client
+   * @return a ProcessXmlResponse
+   */ 
+  private Collection< ? extends ClientRequestResult> handleDaqXmlRequest(final ClientRequest daqXmlRequest) {
+
+    Collection<ProcessXmlResponse> singleXML = new ArrayList<ProcessXmlResponse>(1);
+    ProcessXmlResponseImpl processXmlResponse = new ProcessXmlResponseImpl();
+    try {
+      String xmlString = processXMLProvider.getProcessConfigXML((String) daqXmlRequest.getRequestParameter());
+      processXmlResponse.setProcessXML(xmlString);
+    } catch (CacheElementNotFoundException cacheEx) {
+      String errorMessage = "Requested process not found.";
+      LOG.warn(errorMessage, cacheEx);
+      processXmlResponse.setErrorMessage(errorMessage);
+    }
+    singleXML.add(processXmlResponse);
+    return singleXML;
   }
 
   /**
