@@ -143,30 +143,33 @@ public class BufferedSlider extends JSlider {
    * 
    * @param newBufferedValue How far the buffer is loaded
    */
-  public synchronized void setBufferedValue(final int newBufferedValue) {
+  public void setBufferedValue(final int newBufferedValue) {
     int newValue = newBufferedValue;
     if (newValue < 0) {
       newValue = 0;
     }
     boolean isValueForced = false;
-    double oldBufferedValue = bufferedSliderUI.getBufferedValue();
-    this.bufferedSliderUI.setBufferedValue(newValue);
+    synchronized (this) {
+      double oldBufferedValue = bufferedSliderUI.getBufferedValue();
+      this.bufferedSliderUI.setBufferedValue(newValue);
+      
+      // If the new value is less than the old value the time slider thumb must
+      // be checked if it is in a legal position
+      if (newValue < oldBufferedValue && getValue() > newValue) {
+        this.setValueIsAdjusting(true);
+        
+        // If the slider is beyond what is loaded
+        super.setValue(newValue);
+        
+        this.setValueIsAdjusting(false);
+        
+        isValueForced = true;
+      }
     
-    // If the new value is less than the old value the time slider thumb must
-    // be checked if it is in a legal position
-    if (newValue < oldBufferedValue && getValue() > newValue) {
-      this.setValueIsAdjusting(true);
-      
-      // If the slider is beyond what is loaded
-      super.setValue(newValue);
-      
-      this.setValueIsAdjusting(false);
-      
-      isValueForced = true;
+      // Limits the thumb to be moved after what is loaded
+      this.setExtent(getMaximum() - newValue - 1);
+    
     }
-    
-    // Limits the thumb to be moved after what is loaded
-    this.setExtent(getMaximum() - newValue - 1);
     
     if (isValueForced) {
       // Tells the listeners about the event
