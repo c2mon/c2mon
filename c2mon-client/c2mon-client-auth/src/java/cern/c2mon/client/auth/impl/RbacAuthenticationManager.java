@@ -116,6 +116,9 @@ public class RbacAuthenticationManager implements AuthenticationManager, ClientT
           ctx = new RBALoginContext(LoginPolicy.EXPLICIT,
               new DefaultCallbackHandler(appName, userName, userPassw.toCharArray()));
           ctx.login();
+          // pass the RBA subject to the ClientTierSubjectHolder which is also
+          // used by the RbaTokenLookup
+          ClientTierSubjectHolder.setRBASubject(ctx.getRBASubject());
           validSession = ctx.getRBASubject().getAppToken().isValid();
         }
         catch (LoginException e) {
@@ -133,6 +136,7 @@ public class RbacAuthenticationManager implements AuthenticationManager, ClientT
       if (ctx != null) {
         try {
           ctx.logout();
+          ClientTierSubjectHolder.clear();
         }
         catch (LoginException e) {
           LOG.warn("User logout was unsuccessul. Reason: " + e.getMessage());
@@ -167,6 +171,7 @@ public class RbacAuthenticationManager implements AuthenticationManager, ClientT
    */
   @Override
   public void rbaTokenChanged(final RBAToken rbaToken) throws TokenFormatException, TokenExpiredException {
+    
     if (rbaToken == null || rbaToken.isEmpty() || !rbaToken.isValid()) {
       // the user has logged out
       for (AuthenticationListener listener : authenticationListeners) {
