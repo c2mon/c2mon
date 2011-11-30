@@ -148,6 +148,10 @@
             -Djms.request.consumers.initial=1
             -Djms.request.consumers.max=1
             -Djms.request.transacted=false
+            -Dc2mon.jms.update.task.idle.limit=1
+            -Dc2mon.jms.update.task.max.messages=1
+            -Dc2mon.jms.update.executor.threads=1
+            -Dc2mon.jms.update.task.timeout=50  
 
             <!-- daq out -->
             -Djms.daq.out.connections=1
