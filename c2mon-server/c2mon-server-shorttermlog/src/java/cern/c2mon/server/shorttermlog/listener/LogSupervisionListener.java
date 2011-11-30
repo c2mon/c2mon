@@ -83,9 +83,9 @@ public class LogSupervisionListener implements SupervisionListener {
   @Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.DEFAULT)
   @Override
   public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
-    if (LOGGER.isDebugEnabled()){
+    if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Logging supervision status " + supervisionEvent.getStatus() 
-            + " for " + supervisionEvent.getEntityId() 
+            + " for " + supervisionEvent.getEntity() 
             + " " + supervisionEvent.getEntityId());
     }
     supervisionMapper.logSupervisionEvent(supervisionEvent);
