@@ -9,6 +9,7 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 import org.junit.Test;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.JsonRequest;
@@ -160,4 +161,20 @@ public class ClientRequestMessageConverterTest {
     }
   }
   
+  @Test
+  public void testProcessNamesMessageConversion() {
+    JsonRequest<ProcessNameResponse> request = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
+
+    TextMessage message = new ActiveMQTextMessage();
+    try {
+      message.setText(request.toJson());
+      ClientRequest receivedRequest = ClientRequestMessageConverter.fromMessage(message);
+
+      assertTrue(receivedRequest.getRequestType() == ClientRequest.RequestType.PROCESS_NAMES_REQUEST);
+      assertTrue(receivedRequest.getResultType() == ClientRequest.ResultType.TRANSFER_PROCESS_NAMES);
+    }
+    catch (JMSException e) {
+      assertTrue(e.getMessage(), false);
+    }
+  }
 }

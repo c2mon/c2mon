@@ -22,11 +22,14 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.configuration.ConfigurationLoader;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
+import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.tim.server.cache.AlarmCache;
+import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.ProcessXMLProvider;
 import cern.tim.server.cache.TagFacadeGateway;
 import cern.tim.server.cache.TagLocationService;
@@ -34,6 +37,7 @@ import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.command.CommandExecutionManager;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
+import cern.tim.server.common.process.Process;
 import cern.tim.server.supervision.SupervisionFacade;
 import cern.tim.shared.client.command.CommandExecuteRequest;
 import cern.tim.shared.client.command.CommandReport;
@@ -73,6 +77,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /** Reference to the CommandExecutionManager */
   private final CommandExecutionManager commandExecutionManager;
+  
+  /** Reference to the Process cache that provides a list of all the process names */
+  private final ProcessCache processCache;
 
   /**
    * Reference to the supervision facade service for handling the supervision
@@ -112,7 +119,8 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   @Autowired
   public ClientRequestHandler(final TagLocationService pTagLocationService, final TagFacadeGateway pTagFacadeGateway,
       final SupervisionFacade pSupervisionFacade, final ProcessXMLProvider pProcessXMLProvider, final AlarmCache pAlarmCache,
-      final ConfigurationLoader pConfigurationLoader, final CommandExecutionManager pCommandExecutionManager) {
+      final ConfigurationLoader pConfigurationLoader, final CommandExecutionManager pCommandExecutionManager,
+      final ProcessCache pProcessCache) {
     tagLocationService = pTagLocationService;
     tagFacadeGateway = pTagFacadeGateway;
     supervisionFacade = pSupervisionFacade;
@@ -120,6 +128,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     alarmCache = pAlarmCache;
     configurationLoader = pConfigurationLoader;
     commandExecutionManager = pCommandExecutionManager;
+    processCache = pProcessCache;
   }
 
   /**
@@ -236,18 +245,41 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
           LOG.debug("handleClientRequest() - Received a DAQ_XML_REQUEST");
         }
         return handleDaqXmlRequest(clientRequest);
+      case PROCESS_NAMES_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("handleClientRequest() - Received a PROCESS_NAMES_REQUEST");
+        }
+        return handleProcessNamesRequest(clientRequest);
       default:
         LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
         return Collections.emptyList();
     } // end switch
   }
   
-   
+  /**
+   * Inner method which handles the process names request
+   * 
+   * @param clientRequest A process name sent from the client
+   * @return a Collection of all available process names
+   */ 
+  private Collection<? extends ClientRequestResult> handleProcessNamesRequest(ClientRequest clientRequest) {
+
+    Collection<ProcessNameResponse> names = new ArrayList<ProcessNameResponse>();
+    
+    Iterator<Long> iterator = processCache.getKeys().iterator();
+    
+    while (iterator.hasNext()) {
+      
+      cern.tim.server.common.process.Process o = processCache.get((Long) iterator.next());
+      names.add(new ProcessNameResponseImpl(o.getName()));
+    }
+    return names;    
+  }
+
   /**
    * Inner method which handles the Daq Xml Requests
    * 
-   * @param daqXmlRequest
-   *          The daq Xml Request sent from the client
+   * @param daqXmlRequest The daq Xml Request sent from the client
    * @return a ProcessXmlResponse
    */ 
   private Collection< ? extends ClientRequestResult> handleDaqXmlRequest(final ClientRequest daqXmlRequest) {
