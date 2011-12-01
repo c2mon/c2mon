@@ -20,9 +20,12 @@ package cern.c2mon.client.core;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.jms.JMSException;
+
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.tim.shared.client.command.CommandReportImpl;
 import cern.tim.shared.client.command.CommandTagHandle;
@@ -139,6 +142,13 @@ public interface C2monTagManager {
    * @return the DAQ XML as String 
    */    
   String getProcessXml(final String processName);
+  
+  /**
+   * Requests a list of Names for all the existing processes.
+   * 
+   * @return a list of all process names 
+   */      
+  public Collection<ProcessNameResponse> getProcessNames();
   
   /**
    * Returns the number of connections in the Cache

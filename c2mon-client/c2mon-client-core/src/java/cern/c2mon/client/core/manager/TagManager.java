@@ -39,6 +39,7 @@ import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.tim.shared.client.configuration.ConfigurationReport;
@@ -305,6 +306,17 @@ public class TagManager implements CoreTagManager {
   public ConfigurationReport applyConfiguration(Long configurationId) {
 
     return clientRequestHandler.applyConfiguration(configurationId);
+  }
+  
+  @Override
+  public Collection<ProcessNameResponse> getProcessNames() {
+
+    try {
+      return clientRequestHandler.getProcessNames();
+    } catch (JMSException e) {
+      LOG.error("getProcessNames() - JMS connection lost -> Could not retrieve process names from the C2MON server.", e);
+    }
+    return  new ArrayList<ProcessNameResponse>();
   }
 
   @Override
