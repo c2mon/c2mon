@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Required;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.ClientRequestResult;
@@ -176,6 +177,14 @@ public class RequestHandlerImpl implements RequestHandler {
 
     return report.iterator().next();
   }
+  
+  @Override
+  public Collection<ProcessNameResponse> getProcessNames() throws JMSException {
+    
+    ClientRequestImpl<ProcessNameResponse> xmlRequest = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
+    
+    return jmsProxy.sendRequest(xmlRequest, requestQueue, requestTimeout);
+  }
 
   @Override
   public Collection<TagConfig> requestTagConfigurations(final Collection<Long> tagIds) throws JMSException {
@@ -305,4 +314,5 @@ public class RequestHandlerImpl implements RequestHandler {
       return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
     }
   }
+
 }

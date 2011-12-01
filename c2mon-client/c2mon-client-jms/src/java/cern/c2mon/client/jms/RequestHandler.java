@@ -23,6 +23,7 @@ import java.util.Collection;
 import javax.jms.JMSException;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -141,5 +142,12 @@ public interface RequestHandler {
    * @throws RuntimeException if server is unable to answer the request (message contains details)
    */
   String getProcessXml(String processName) throws JMSException;
-  
+
+  /**
+   * Requests a list of Names for all the existing processes.
+   * 
+   * @return a list of all process names 
+   * @throws JMSException if JMS problem occurs or not connected at the moment
+   */      
+  Collection<ProcessNameResponse> getProcessNames() throws JMSException;
 }
