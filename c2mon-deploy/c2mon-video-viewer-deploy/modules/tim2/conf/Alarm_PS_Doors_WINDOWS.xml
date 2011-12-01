@@ -1,0 +1,30 @@
+<config>
+   <!-- The display title of the TIM Video Viewer -->
+   <property name="video-viewer-title" type="java.lang.String" value="Alarm PS Doors"/>
+   
+   <!-- 
+     The name of the video system that must also be defined in the database. Due to this
+     information it is possible to determine the relevant data tag IDs.
+    -->
+   <property name="video-system-name" type="java.lang.String" value="PS_ALARM"/>
+
+
+   <!-- Put here the web link to the help page for the specific video viewer configuration -->
+   <property name="help-web-page" type="java.lang.String" value="http://timweb/wiki/doku.php?id=documentation:tim-video-viewer"/>
+   
+   <!-- 
+     The amount of video viewer that shall be displayed on the right side of the TIM Video viewer. 
+     The number shall be between 2 and 6. The default is 4, in case this variable is not specified 
+    -->
+   <property name="video-queue-size" type="java.lang.Integer" value="4"/>
+   
+   <!-- Set this variable to true, in case you want a display for the taken keys on the access doors -->
+   <property name="keys-taken-counter" type="java.lang.Boolean" value="false"/>
+
+   <!-- 
+     Set this variable to true, if you want to ensure that the TIM Video Viewer
+     is only listening to requests of a specific host. The user will in this case 
+     be prompted at startup to enter a host name for the requester.
+   -->
+   <property name="single-host-controller" type="java.lang.Boolean" value="false"/>
+</config>
