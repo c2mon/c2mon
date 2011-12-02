@@ -74,12 +74,12 @@ public class RequestHandlerImpl implements RequestHandler {
   /**
    * Core number of threads in executor.
    */
-  private static final int CORE_POOL_SIZE = 20;
+  private static final int CORE_POOL_SIZE = 40;
 
   /**
    * Max number of exector threads.
    */
-  private static final int MAX_POOL_SIZE = 40;
+  private static final int MAX_POOL_SIZE = 100;
 
   /**
    * Thread idle timeout in executor (in seconds), including core threads.
