@@ -69,7 +69,7 @@ public class RequestHandlerImpl implements RequestHandler {
    * The maximum number of tags in a single request. Each request runs in its
    * own thread on the server and is sent in a single JMS message.
    */
-  private static final int MAX_REQUEST_SIZE = 250;
+  private static final int MAX_REQUEST_SIZE = 1000;
 
   /**
    * Core number of threads in executor.
