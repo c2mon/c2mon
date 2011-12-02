@@ -7,7 +7,7 @@ use Config::Properties;
 ##
 # Definition of global variables
 ##
-my $jardir = "../libs";
+my $jardir = "../lib";
 my $appdir = "tim2-video-viewer/";
 my $codebase = "http://timweb.cern.ch/test/javaws";
 
@@ -82,7 +82,7 @@ sub jarlist {
 
 print "Content-type: application/x-java-jnlp-file" , "\n\n";
 print "<?xml version = '1.0' encoding = 'utf-8'?>
-	<jnlp spec=\"1.0+\" codebase=\"http://timweb.cern.ch/javaws/\">
+	<jnlp spec=\"1.0+\" codebase=\"$codebase\">
 	<information>
       		<title>TIM Video Viewer</title>
       		<vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
@@ -118,6 +118,6 @@ if (param('configurl')) {
 }
 
 print "	</resources>
-	<application-desc main-class=\"ch.cern.tim.client.video.TimVideoViewer\">
+	<application-desc main-class=\"cern.c2mon.client.video.TimVideoViewer\">
 	</application-desc>
 </jnlp>" , "\n";
