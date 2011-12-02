@@ -9,7 +9,7 @@
 #########################################################################
 
 HOST=timweb
-USER=timoper
+USER=timtest
 DEST_FOLDER=/tmp
 TAR_FILE=./modules/tim2/build/c2mon-dashboard-editor-tim2-tim2.tar.gz
 
