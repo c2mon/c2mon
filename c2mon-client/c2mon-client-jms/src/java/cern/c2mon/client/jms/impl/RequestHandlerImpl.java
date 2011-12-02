@@ -69,17 +69,17 @@ public class RequestHandlerImpl implements RequestHandler {
    * The maximum number of tags in a single request. Each request runs in its
    * own thread on the server and is sent in a single JMS message.
    */
-  private static final int MAX_REQUEST_SIZE = 100;
+  private static final int MAX_REQUEST_SIZE = 250;
 
   /**
    * Core number of threads in executor.
    */
-  private static final int CORE_POOL_SIZE = 10;
+  private static final int CORE_POOL_SIZE = 20;
 
   /**
    * Max number of exector threads.
    */
-  private static final int MAX_POOL_SIZE = 20;
+  private static final int MAX_POOL_SIZE = 30;
 
   /**
    * Thread idle timeout in executor (in seconds), including core threads.
@@ -89,7 +89,7 @@ public class RequestHandlerImpl implements RequestHandler {
   /**
    * Thread pool queue size.
    */
-  private static final int QUEUE_SIZE = 10;
+  private static final int QUEUE_SIZE = 20;
 
   /**
    * Ref to JmsProxy bean.
