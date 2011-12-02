@@ -125,7 +125,7 @@
             <!--
               module properties
             -->           
-            -Djms.video.request.queue=tim.video.request
+            -Dc2mon.client.jms.video.request.queue=tim.video.request
             -Dc2mon.jms.client.consumers.min=1
             -Dc2mon.jms.client.consumers.max=2            
             
