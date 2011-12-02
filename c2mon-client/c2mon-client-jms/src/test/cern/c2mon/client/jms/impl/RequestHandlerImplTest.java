@@ -140,7 +140,7 @@ public class RequestHandlerImplTest {
   @Test
   public void getManyTags() throws JMSException {
     Collection<Object> returnCollection = Arrays.asList(new Object(), new Object());
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(returnCollection).times(10);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(returnCollection).times(100);
 
     EasyMock.replay(jmsProxy);
 
@@ -149,7 +149,7 @@ public class RequestHandlerImplTest {
     long[] arrayRange = range.toArray();
     Collection<Long> ids = Arrays.asList(ArrayUtils.toObject(arrayRange)); 
     Collection result = requestHandlerImpl.requestTags(ids);
-    Assert.assertEquals(20,result.size());
+    Assert.assertEquals(200,result.size());
 
     EasyMock.verify(jmsProxy);
   }
