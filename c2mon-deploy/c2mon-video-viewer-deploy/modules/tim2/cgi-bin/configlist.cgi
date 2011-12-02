@@ -29,10 +29,10 @@ print p("If you need an additional configuration, please contact ",
        a({-href=>"mailto:tim.support\@cern.ch"}, "tim.support\@cern.ch"),
        ".");
 	   
-print "<p><p>"	   
+print "<p><p>";
 print h1('TIM Video Viewer Configurations (Windows)');
 opendir DIR, $configdir  . "/windows";
-my @files = sort grep !/^\.\.?$/, readdir DIR;
+@files = sort grep !/^\.\.?$/, readdir DIR;
 closedir DIR;
 print p("To launch the TIM Video Viewer, choose one of the configurations below ",font({-color=>"#FF0000"},"(NOTE: For security reasons, the TIM Video Viewer only works on the Technical Network)"),":");  
 print "<UL>";
