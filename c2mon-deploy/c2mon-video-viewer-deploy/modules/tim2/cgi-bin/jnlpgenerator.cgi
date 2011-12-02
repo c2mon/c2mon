@@ -23,10 +23,6 @@ open PROPS, "< /user/timoper/rep/c2mon/client/c2mon-client.properties"
   or die "Unable to open configuration file /user/timoper/rep/c2mon/client/c2mon-client.properties";
 my $c2monProperties = new Config::Properties();
 $c2monProperties->load(*PROPS);
-my $jdbcDriver = $c2monProperties->getProperty("jdbc.driver");
-my $jdbcRoUrl = $c2monProperties->getProperty("jdbc.ro.url");
-my $jdbcRoUser = $c2monProperties->getProperty("jdbc.ro.user");
-my $jdbcRoPassword = $c2monProperties->getProperty("jdbc.ro.password");
 my $jmsUrl = $c2monProperties->getProperty("jms.broker.url");
 my $jmsUser = $c2monProperties->getProperty("jms.client.user");
 my $jmsPassword = $c2monProperties->getProperty("jms.client.password");
