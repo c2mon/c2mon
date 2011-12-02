@@ -40,6 +40,7 @@ $jmsProperties->load(*JMSPROPS);
 my $jmsSupervisionTopic = $jmsProperties->getProperty("jms.client.supervision.topic");
 my $jmsHeartbeatTopic = $jmsProperties->getProperty("c2mon.jms.heartbeat.topic");
 my $jmsRequestQueue = $jmsProperties->getProperty("jms.client.request.queue");
+my $jmsVideoRequestQueue = $jmsProperties->getProperty("jms.video.request.queue");
 close JMSPROPS;
 
 
@@ -112,6 +113,7 @@ print "   <property name=\"c2mon.jms.passwd\" value=\"$jmsPassword\"/>\n";
 print "   <property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
 print "   <property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
 print "   <property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
+print "   <property name=\"c2mon.client.jms.video.request.queue\" value=\"$jmsVideoRequestQueue\"/>\n";
 
 if (param('configurl')) {
 	print "		<property name=\"configurationFilePath\" value=\"", param('configurl'), "\"/>", "\n";
