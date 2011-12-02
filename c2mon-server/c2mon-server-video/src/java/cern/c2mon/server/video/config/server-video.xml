@@ -39,7 +39,7 @@
 
 
 	<bean id="videoClientRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
-		<constructor-arg index="0" value="${jms.video.request.queue}" />
+		<constructor-arg index="0" value="${c2mon.client.jms.video.request.queue}" />
 	</bean>
 
 	<!-- thread pool for request containers -->
