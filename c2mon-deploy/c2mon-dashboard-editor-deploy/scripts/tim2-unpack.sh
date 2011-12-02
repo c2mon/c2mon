@@ -10,7 +10,7 @@
 #########################################################################
 
 # folder where tim2-dashboard-editor should be unpacked
-DEST_FOLDER=~/dist/public/test/html/javaws/tim2-dashboard-editor
+DEST_FOLDER=~/dist/public/html/javaws/tim2-dashboard-editor
 PREV_FOLDER=${DEST_FOLDER}-prev
 
 #expected location of tar.gz file
