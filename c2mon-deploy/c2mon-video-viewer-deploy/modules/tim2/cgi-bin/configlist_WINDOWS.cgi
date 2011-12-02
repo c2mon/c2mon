@@ -3,7 +3,7 @@ use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 
-my $configsubdir = "/javaws/tim-video-viewer/configFiles";
+my $configsubdir = "/javaws/tim2-video-viewer/conf/windows";
 my $configdir = $ENV{DOCUMENT_ROOT} . $configsubdir;
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
 
