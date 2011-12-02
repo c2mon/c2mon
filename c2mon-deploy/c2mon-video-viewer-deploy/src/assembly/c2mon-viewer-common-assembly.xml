@@ -26,14 +26,24 @@
 		</fileSet>
 
 		<fileSet>
-			<outputDirectory>/conf</outputDirectory>
+			<outputDirectory>/conf/windows</outputDirectory>
 			<includes>
 				<include>*.xml</include>
 			</includes>
 			<fileMode>0444</fileMode>
 			<directoryMode>0755</directoryMode>
-			<directory>${project.basedir}/conf/</directory>
+			<directory>${project.basedir}/conf/windows/</directory>
 		</fileSet>
+		
+		<fileSet>
+      <outputDirectory>/conf/linux</outputDirectory>
+      <includes>
+        <include>*.xml</include>
+      </includes>
+      <fileMode>0444</fileMode>
+      <directoryMode>0755</directoryMode>
+      <directory>${project.basedir}/conf/linux/</directory>
+    </fileSet>
 
 	</fileSets>
 
