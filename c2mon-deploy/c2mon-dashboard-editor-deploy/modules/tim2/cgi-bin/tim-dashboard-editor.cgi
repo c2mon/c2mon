@@ -20,7 +20,7 @@ chomp $viewerVersion; # removes new line character
 close VFILE;
 
 # In case of a SNAPSHOT the codebase will point to test
-if ($version =~ /-SNAPSHOT/) {
+if ($viewerVersion =~ /-SNAPSHOT/) {
   $codebase = "http://timweb.cern.ch/test/javaws";
 }
 
@@ -118,6 +118,6 @@ print " </resources>
         <resources os=\"Windows\" >
                 <property name=\"tim.log.file\" value=\"c:\\temp\\tim-dashboard-editor.log\"/>
         </resources>
-        <application-desc main-class=\"ch.cern.tim.jviews.TimDashboardEditor\">
+        <application-desc main-class=\"ch.cern.tim.jviews.TimDashboardEditorMain\">
         </application-desc>
 </jnlp>" , "\n";
