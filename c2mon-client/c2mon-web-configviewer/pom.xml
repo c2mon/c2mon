@@ -2,14 +2,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>cern.tim2.tim2-server</groupId>
-		<artifactId>tim2-server-pom</artifactId>
+		<groupId>cern.c2mon.c2mon-client</groupId>
+		<artifactId>c2mon-client-pom</artifactId>
 		<version>1.0.1-SNAPSHOT</version>
 	</parent>
-
-	<groupId>cern.tim2.tim2-server</groupId>
+	
+	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-web-configviewer</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>c2mon-web-configviewer</name>
 	<description>C2MON online configuration viewer (datatag, command, alarm, process viewer)</description>
@@ -56,11 +56,12 @@
 			<version>1.5.6</version>
 		</dependency>
 		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-client</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>cern.c2mon.c2mon-client</groupId>
 			<artifactId>c2mon-client-core</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	
@@ -73,7 +74,7 @@
          <configuration>
           <argLine>          
             <!-- needed for the client JMS module -->
-            -Dc2mon.jms.url=tcp://jms-tim-pro1:61616
+            -Dc2mon.jms.url=tcp://jms-tim-test1:61616
             -Dc2mon.jms.user=not-used
             -Dc2mon.jms.passwd=not-used
             -Dc2mon.client.jms.supervision.topic=tim.client.supervision
@@ -82,8 +83,15 @@
           </argLine>
         </configuration>      
       </plugin>
+      
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <configuration>
+            <webXml>src\main\webapp\WEB-INF\WEB-INF\web.xml</webXml>
+          </configuration>
+        </plugin>
     </plugins>
   </build>
 	
-
 </project>
