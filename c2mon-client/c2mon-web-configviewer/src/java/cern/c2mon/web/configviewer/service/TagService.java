@@ -1,5 +1,6 @@
 package cern.c2mon.web.configviewer.service;
 
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -9,17 +10,11 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.core.C2monCommandManager;
-import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.C2monTagManager;
-import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagConfigImpl;
+import cern.c2mon.web.configviewer.service.ServiceGateway;
 
 /**
  * Datatag service providing the XML representation of a given datatag

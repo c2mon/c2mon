@@ -10,10 +10,6 @@
 </head>
 
 <body>
-<!--<div id="header" class="configViewer_header">-->
-<!--	C2MON Online configuration viewer	-->
-<!--</div>-->
-<!--<br/>-->
 <h1>${title}</h1>
 
 <p class="instruction">${instruction}</p>
@@ -22,7 +18,11 @@
 <c:url var="submitUrl" value="${formSubmitUrl}"/>
 
 <form:form action="${submitUrl}" method="post">
-	<input type="text" name="id" value="${formTagValue}" size="10" /> 
+	<select>
+		<c:forEach items="${processNames}" var="processName">  
+  			<option>${processName}</option>
+    	</c:forEach>  
+	</select>
 	<input type="submit" />
 </form:form>
 </p>

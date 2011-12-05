@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.web.configviewer.service.TagService;
 
 /**
  * Service gateway wrapper for C2monServiceGateway

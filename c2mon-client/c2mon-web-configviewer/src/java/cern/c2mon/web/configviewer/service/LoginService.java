@@ -18,12 +18,12 @@ import cern.c2mon.web.configviewer.service.TagIdException;
  * Alarm service providing the XML representation of a given alarm
  * */
 @Service
-public class AlarmService {
+public class LoginService {
 
     /**
      * AlarmService logger
      * */
-    private static Logger logger = Logger.getLogger(AlarmService.class);
+    private static Logger logger = Logger.getLogger(LoginService.class);
     
     /**
      * Gateway to C2monService 
@@ -38,7 +38,7 @@ public class AlarmService {
      * @throws Exception if alarm was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
      * thrown by the underlying service gateway.
      * */
-    public String getAlarmTagXml(final String alarmId) throws Exception {
+    public String isAuthorised(final String alarmId) throws Exception {
         try { 
             AlarmValueImpl alarm = (AlarmValueImpl) getAlarmValue(Long.parseLong(alarmId));
             if (alarm != null)

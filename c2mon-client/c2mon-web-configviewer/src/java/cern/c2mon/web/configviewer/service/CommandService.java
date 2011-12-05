@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
+import cern.c2mon.web.configviewer.service.ServiceGateway;
+import cern.c2mon.web.configviewer.service.TagIdException;
 
 /**
  * Command service providing the XML representation of a given alarm
@@ -33,10 +35,9 @@ public class CommandService {
      * */
     public String getCommandTagXml(final String commandId) throws Exception {
         try {
-            ClientCommandTagImpl<Object> command = (ClientCommandTagImpl<Object>) getCommandTag(Long.parseLong(commandId));
+            ClientCommandTagImpl command = (ClientCommandTagImpl) getCommandTag(Long.parseLong(commandId));
             if (command.isExistingCommand()) 
-                //TODO: return command.getXml();
-                return "commandXml";
+                return command.getXml();
             else
                 throw new TagIdException("No command found");
         } catch (NumberFormatException e) {
@@ -51,7 +52,6 @@ public class CommandService {
      * */
     private ClientCommandTag<Object> getCommandTag(final long commandId) {
         ClientCommandTag<Object> ct = gateway.getCommandManager().getCommandTag(commandId); 
-            //commandManager.getCommandTag(commandId);
         logger.debug("Command fetch for command " + commandId + ": " + (ct == null ? "NULL" : "SUCCESS"));
         return ct;
     }
