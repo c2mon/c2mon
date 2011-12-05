@@ -131,13 +131,17 @@ COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:NewRatio=3 -XX:+PrintGCDetails -XX:+Us
 
 CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dtc.config=$TERRACOTTA_CONFIG $CACHE_MODE_PROPERTY"
 
+if [ "$1" == "recover" ]; then
+    C2MON_RECOVERY_ARG="-Dc2mon.recovery=true"
+fi
+
 #according to cache mode, set the JAVA args and the startup command (stop is common)
 if [ ! "$2" == "single" ]; then
-    C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $CLUSTER_JAVA_ARGS"  
+    C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $CLUSTER_JAVA_ARGS $C2MON_RECOVERY_ARG"  
     C2MON_START_CMD="$TERRACOTTA_HOME/platform/bin/dso-java.sh $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.tim.server.lifecycle.ServerStartup  $C2MON_ARGS"
     C2MON_STOP_CMD="$JAVA_HOME/jre/bin/java -jar $JMXJAR -i $C2MON_HOME/bin/jmx-shutdown-script.txt -n -e -l localhost:$JMX_PORT  -u $JMX_USER -p $JMX_PASSWORD"
 else
-    C2MON_JAVA_ARGS=$COMMON_JAVA_ARGS
+    C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $C2MON_RECOVERY_ARG"
     C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS"
     C2MON_STOP_CMD="echo \"attempting to shutdown the server with kill call\""
 fi
@@ -354,6 +358,10 @@ silentcheck() {
          start
      ;;
 
+     'recover')
+         start
+     ;;
+
      'stop')
          stop
      ;;
@@ -364,8 +372,9 @@ silentcheck() {
 	
      *)
 	echo
-	echo $"Usage: $0 {start|stop|restart|status} [second|single]"
+	echo $"Usage: $0 {start|stop|recover|status} [second|single]"
 	echo $"start [second|single] - Starts C2MON [second] server on the appropriate machine, if it is not running. If single is used, a single (non-clustered) server is started."
+	echo $"recover [second|single] - Same as start command, but with extra functionality for recovering after a server crash."
 	echo $"status [second] - Checks the status (running/stopped) of the C2MON [second] server."
 	echo $"stop [second] - Stops the C2MON [second] server on the appropriate host, if it is running. If a gentle shutdown fails, the process is killed after 30 seconds."
 	exit 1
