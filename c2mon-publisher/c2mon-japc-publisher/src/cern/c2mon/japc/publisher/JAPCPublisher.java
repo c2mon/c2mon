@@ -26,6 +26,7 @@ import cern.japc.ext.remote.ServerRemoteFactory;
 import cern.japc.factory.ParameterValueFactory;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.C2monServiceGateway;
 
 /**
  * This Singleton class provides a method to publish <code>ClientDataTag</code> objects
@@ -77,11 +78,15 @@ public class JAPCPublisher {
    * Hidden Default Constructor
    */
   private JAPCPublisher() {
+    
     this.serverRemoteFactory = new ServerRemoteFactory("no", SERVICE_NAME);
     this.selector = ParameterValueFactory.newSelector("");
+    
+    C2monServiceGateway.startC2monClient();
   }
   
   public static JAPCPublisher getInstance() {
+    
     if (japcPublisher == null)
       japcPublisher = new JAPCPublisher();
     
