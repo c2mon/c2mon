@@ -29,7 +29,7 @@ fi
 # make sure JAVA_HOME is set correctly
 if [ -z $JAVA_HOME ]; then 	
    # use default if not
-   export JAVA_HOME=/usr/java/jdk1.6.0_11
+   export JAVA_HOME=/usr/java/jdk
 fi
 
 #.c2mon.properties location
