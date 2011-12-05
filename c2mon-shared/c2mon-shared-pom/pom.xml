@@ -17,7 +17,10 @@
     </description>
 	<url>http://timweb.cern.ch</url>
 
-
+    <scm>
+		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-shared/c2mon-shared-pom</developerConnection>
+	</scm>
+	
 	<!-- Shared version number properties -->
 	<properties>
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
