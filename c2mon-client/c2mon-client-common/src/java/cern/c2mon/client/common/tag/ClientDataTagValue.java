@@ -120,8 +120,8 @@ public interface ClientDataTagValue extends RuleInputValue {
   RuleExpression getRuleExpression();
   
   /**
-   * Returns the tag value description
-   * @return the tag value description
+   * Returns the description of the tag
+   * @return the tag description
    */
   String getDescription();
 
