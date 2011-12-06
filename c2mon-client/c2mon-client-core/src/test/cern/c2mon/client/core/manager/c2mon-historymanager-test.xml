@@ -23,10 +23,15 @@
     <constructor-arg value="cern.c2mon.client.core.manager.CoreTagManager"/>
   </bean>
   
+  <bean id="historyTagManager" class="org.easymock.EasyMock" factory-method="createNiceMock" >
+    <constructor-arg value="cern.c2mon.client.common.history.tag.HistoryTagManager"/>
+  </bean>
+  
   <bean id="historyManager" class="cern.c2mon.client.core.manager.HistoryManager">
     <constructor-arg value="tagManager"/>
     <constructor-arg value="cache"/>
     <constructor-arg value="supervisionManager"/>
+    <constructor-arg value="historyTagManager"/>
   </bean>
 
 </beans>
