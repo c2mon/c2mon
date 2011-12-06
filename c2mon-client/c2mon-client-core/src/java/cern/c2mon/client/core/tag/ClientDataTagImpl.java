@@ -675,6 +675,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     alarms.addAll(tagValueUpdate.getAlarms());
     
     description = tagValueUpdate.getDescription();
+    valueDescription = tagValueUpdate.getValueDescription();
     serverTimestamp = tagValueUpdate.getServerTimestamp();
     sourceTimestamp = tagValueUpdate.getSourceTimestamp();
     tagValue = tagValueUpdate.getValue();
