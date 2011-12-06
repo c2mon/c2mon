@@ -17,8 +17,6 @@
  *****************************************************************************/
 package cern.c2mon.japc.publisher;
 
-import org.junit.Test;
-
 import cern.japc.AcquiredParameterValue;
 import cern.japc.Parameter;
 import cern.japc.ParameterException;

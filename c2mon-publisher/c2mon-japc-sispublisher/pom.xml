@@ -5,10 +5,24 @@
     <artifactId>c2mon-client-pom</artifactId>
     <version>1.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>c2mon-japc-publisher</groupId>
-  <artifactId>c2mon-japc-publisher</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <groupId>cern.c2mon.c2mon-publisher</groupId>
+  <artifactId>c2mon-japc-sispublisher</artifactId>
+  <name>C2MON client JAPC Pulisher for Saftey Interlock System (SIS)</name>
+  <version>1.0.1-SNAPSHOT</version>
+  <description>This project is used to publish on a regular basis (every 30 sec) boolean data from C2MON via JAPC to the Safety Interlock System (SIS).</description>
   <dependencies>
+  
+    <!-- C2MON Client API dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-common</artifactId>
+    </dependency>
+  
+    <!-- CERN 3rd party dependencies -->
   	<dependency>
   		<groupId>cern.japc</groupId>
   		<artifactId>japc</artifactId>
@@ -30,10 +44,8 @@
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
-  	<dependency>
-  		<groupId>cern.tim2.tim2-shared</groupId>
-  		<artifactId>tim2-shared-common</artifactId>
-  	</dependency>
+  	
+  	<!-- Test dependencies -->
   	<dependency>
   		<groupId>junit</groupId>
   		<artifactId>junit</artifactId>
