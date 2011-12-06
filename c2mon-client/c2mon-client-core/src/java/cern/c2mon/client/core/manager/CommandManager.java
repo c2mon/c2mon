@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.auth.AuthorizationManager;
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monSessionManager;
@@ -52,37 +51,30 @@ public class CommandManager implements C2monCommandManager {
    * an execute request to the C2MON server.
    */
   private final RequestHandler clientRequestHandler;
-  
-  /**
-   * The authorization manager is needed for checking 
-   * whether the logged user is allowed to execute a given command.
-   */
-  private final AuthorizationManager authorizationManager;
+
   
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
    * 
+   * @param pSessionManager The session Manager which is needed for checking the
+   *                        user authorization.
    * @param pRequestHandler
    *          Provides methods for requesting tag information from the C2MON
    *          server
-   *          
-   * @param pAuthorizationManager The authorization manager which is needed to 
-   *        check whether the logged user is allowed to execute a given command.
    */
   @Autowired
-  protected CommandManager(final C2monSessionManager pSessionManager, final RequestHandler pRequestHandler, final AuthorizationManager pAuthorizationManager) {
+  protected CommandManager(final C2monSessionManager pSessionManager, final RequestHandler pRequestHandler) {
     this.sessionManager = pSessionManager;
     this.clientRequestHandler = pRequestHandler;
-    this.authorizationManager = pAuthorizationManager;
   }
   
   @Override
-  public CommandReport executeCommand(Long commandId, Object value) throws CommandTagValueException {
-    if (!sessionManager.isUserLogged()) {
+  public CommandReport executeCommand(final String userName, final Long commandId, final Object value) throws CommandTagValueException {
+    if (!sessionManager.isUserLogged(userName)) {
       return new CommandReportImpl(commandId, 
           CommandExecutionStatus.STATUS_AUTHORISATION_FAILED, "No user is logged-in.");
     }
-    else if (!isAuthorized(commandId)) {
+    else if (!isAuthorized(userName, commandId)) {
       return new CommandReportImpl(commandId,
           CommandExecutionStatus.STATUS_AUTHORISATION_FAILED,
           "The logged user has not the priviledges to execute command " + commandId + ".");
@@ -95,6 +87,7 @@ public class CommandManager implements C2monCommandManager {
       ClientCommandTag<Object> cct = commandCache.get(commandId);
       CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, value);
       try {
+        LOG.info("executeCommand() - Executing command " + commandId + " for authorized user " + userName);
         return clientRequestHandler.executeCommand(executeRequest);
       }
       catch (JMSException e) {
@@ -229,16 +222,16 @@ public class CommandManager implements C2monCommandManager {
   }
 
   @Override
-  public boolean isAuthorized(final Long commandId) {
+  public boolean isAuthorized(final String userName, final Long commandId) {
     if (!commandCache.containsKey(commandId)) {
       getCommandTag(commandId);
     }
     
-    if (sessionManager.isUserLogged()) {
+    if (sessionManager.isUserLogged(userName)) {
       ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
       if (cct.isExistingCommand()) {
         if (cct.getAuthorizationDetails() != null) {
-          return authorizationManager.isAuthorized(cct.getAuthorizationDetails());
+          return sessionManager.isAuthorized(userName, cct.getAuthorizationDetails());
         }
         else {
           LOG.warn("isAuthorized() - No authorization details received for command "

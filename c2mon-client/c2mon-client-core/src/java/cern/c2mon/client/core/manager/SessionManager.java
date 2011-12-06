@@ -108,8 +108,8 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
     }
 
     @Override
-    public void logout() {
-      authenticationManager.logout();
+    public boolean logout(final String userName) {
+      return authenticationManager.logout(userName);
     }
 
     @Override
@@ -120,19 +120,19 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
     }
 
     @Override
-    public boolean isUserLogged() {
-      return authenticationManager.isUserLogged();
+    public boolean isUserLogged(final String userName) {
+      return authenticationManager.isUserLogged(userName);
     }
 
     @Override
-    public String getUserName() {
-      return authenticationManager.getUserName();
+    public Set<String> getLoggedUserNames() {
+      return authenticationManager.getLoggedUserNames();
     }
     
     @Override
-    public boolean isAuthorized(final AuthorizationDetails authorizationDetails) {
-      if (authenticationManager.isUserLogged()) {
-        return authorizationManager.isAuthorized(authorizationDetails);
+    public boolean isAuthorized(final String userName, final AuthorizationDetails authorizationDetails) {
+      if (authenticationManager.isUserLogged(userName)) {
+        return authorizationManager.isAuthorized(userName, authorizationDetails);
       }
       else {
         return false;
@@ -140,16 +140,27 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
     }
 
     @Override
-    public void onLogin(String userName) {
+    public void onLogin(final String userName) {
       for (SessionListener listener : sessionListeners) {
         listener.onLogin(userName);
       }
     }
 
     @Override
-    public void onLogout() {
+    public void onLogout(final String userName) {
       for (SessionListener listener : sessionListeners) {
-        listener.onLogout();
+        listener.onLogout(userName);
       }
+    }
+
+    @Override
+    public boolean isAnyUserLogged() {
+      for (String user : authenticationManager.getLoggedUserNames()) {
+        if (isUserLogged(user)) {
+          return true;
+        }
+      }
+      
+      return false;
     }
 }

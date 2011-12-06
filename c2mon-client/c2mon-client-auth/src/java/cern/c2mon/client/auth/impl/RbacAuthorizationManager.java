@@ -17,6 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.client.auth.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.accsoft.security.rba.RBAToken;
@@ -35,15 +36,21 @@ import cern.tim.shared.common.command.AuthorizationDetails;
 @Service
 public class RbacAuthorizationManager implements AuthorizationManager {
 
+    /** The token manager */
+    private final RbaTokenManager tokenManager;
+  
     /**
      * Default Constructor
+     * @param pTokenManager The token manager which is needed to get the
+     *                      token for a given user.
      */
-    public RbacAuthorizationManager() {
-        // do nothing
+    @Autowired
+    public RbacAuthorizationManager(final RbaTokenManager pTokenManager) {
+        tokenManager = pTokenManager;
     }
 
     @Override
-    public boolean isAuthorized(final AuthorizationDetails authorizationDetails) {
+    public boolean isAuthorized(final String userName, final AuthorizationDetails authorizationDetails) {
         RbacAuthorizationDetails rbacDetails;
         boolean result = false;
 
@@ -54,16 +61,18 @@ public class RbacAuthorizationManager implements AuthorizationManager {
                     + authorizationDetails.getClass() + " is not supported. Please get the latest JARs");
         }
 
-        RBAToken token = RbaTokenLookup.findClientTierRbaToken();
-        if (token == null) {
-            result = false;
-        } else if (token.isValid()) {
-            try {
-                result = new AccessChecker().isAuthorized(token, rbacDetails.getRbacClass(), rbacDetails
-                        .getRbacDevice(), rbacDetails.getRbacProperty(),"set");
-            } catch (AccessException e) {
-                result = false;
-            }
+        if (userName != null) {
+          RBAToken token = tokenManager.findRbaToken(userName);
+          if (token == null) {
+              result = false;
+          } else if (token.isValid()) {
+              try {
+                  result = new AccessChecker().isAuthorized(token, rbacDetails.getRbacClass(), rbacDetails
+                          .getRbacDevice(), rbacDetails.getRbacProperty(), "set");
+              } catch (AccessException e) {
+                  result = false;
+              }
+          }
         }
 
         return result;

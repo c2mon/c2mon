@@ -31,6 +31,7 @@ public interface AuthorizationManager {
    * Checks whether the logged in user is authorized against the given
    * authorization details.
    * 
+   * @param userName The name of the user for which we have to check privileges
    * @param authorizationDetails The authorization details that shall be checked
    * @return <code>true</code>, if the logged in user is authorized for the
    *         given authorization details.
@@ -39,5 +40,5 @@ public interface AuthorizationManager {
    *         <code>RbacAuthorizationDetails</code>
    * @throws NullPointerException In case of a <code>null</code> parameter 
    */
-  boolean isAuthorized(AuthorizationDetails authorizationDetails);
+  boolean isAuthorized(String userName, AuthorizationDetails authorizationDetails);
 }

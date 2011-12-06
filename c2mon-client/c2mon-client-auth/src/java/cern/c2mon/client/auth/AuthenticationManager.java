@@ -17,6 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.client.auth;
 
+import java.util.Set;
+
 /**
  * The authentication manager interface provides
  * methods to handle the user's authentication.
@@ -47,19 +49,24 @@ public interface AuthenticationManager {
   
   /**
    * Performs a user logout
+   * @param userName The user to be logged out
+   * @return <code>true</code>, if log out was unsuccessful
    */
-  void logout();
+  boolean logout(String userName);
   
   /**
+   * Checks whether a given user is logged in.
+   * @param userName The name of the user for which we want to check the
+   *                 valid authentication.
    * @return <code>true</code>, if a user is logged.
    */
-  boolean isUserLogged();
+  boolean isUserLogged(String userName);
   
   /**
-   * @return The name of the user, or <code>null</code>
-   *         if no user is currently logged in.
+   * @return The name of the users which are currently
+   *         logged in.
    */
-  String getUserName();
+  Set<String> getLoggedUserNames();
   
   /**
    * Registers an {@link AuthenticationListener} for getting a

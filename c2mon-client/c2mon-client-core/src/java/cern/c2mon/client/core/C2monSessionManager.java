@@ -17,6 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.client.core;
 
+import java.util.Set;
+
 import cern.c2mon.client.common.listener.SessionListener;
 import cern.tim.shared.common.command.AuthorizationDetails;
 
@@ -70,29 +72,47 @@ public interface C2monSessionManager {
   boolean login(final String appName, final String pUserName, final String pPassword);
 
   /**
-   * Closes the current session.
+   * Performs a user logout. Please notice that this method should only
+   * be used in combination with the {@link #login(String, String, String)}
+   * method provided by the {@link C2monSessionManager}. If a user did login
+   * through the RBAC GUI tool bar it should also use this way to log out. 
+   * @param userName The user to be logged out
+   * @return <code>true</code>, if log out was unsuccessful
    */
-  void logout();
+  boolean logout(String userName);
   
   /**
-   * @return <code>true</code>, if a user is logged in, otherwise <code>false</code>
+   * Checks whether a given user is logged in.
+   * @param userName The name of the user for which we want to check the
+   *                 valid authentication.
+   * @return <code>true</code>, if a user is logged.
    */
-  boolean isUserLogged();
+  boolean isUserLogged(String userName);
   
   /**
-   * @return The user name or <code>null</code>, if no user is logged on.
+   * Checks whether there is at least one user logged
+   * @return <code>true</code>, if at least one user is
+   *         currently logged in.
    */
-  String getUserName();
+  boolean isAnyUserLogged();
+  
+  /**
+   * @return The name of the users which are currently
+   *         logged in.
+   */
+  Set<String> getLoggedUserNames();
 
   /**
    * Checks whether the logged person has the required authorization rights
    * as specified by the given {@link AuthorizationDetails}. Note that the
    * {@link AuthorizationDetails} are specific to the used authorization
    * method, e.g. RBAC. 
+   * @param userName The name of the user for which we need to check the
+   *                 privileges.
    * @param authorizationDetails The authorization details against which
-   *        the user's priviledges shall be checked.
+   *        the user's privileges shall be checked.
    * @return <code>true</code>, if the user is has the authorized required
-   *         prviledges. 
+   *         privileges. 
    */
-  boolean isAuthorized(AuthorizationDetails authorizationDetails);
+  boolean isAuthorized(String userName, AuthorizationDetails authorizationDetails);
 }

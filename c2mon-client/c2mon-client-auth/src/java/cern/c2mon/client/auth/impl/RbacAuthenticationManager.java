@@ -19,7 +19,9 @@ package cern.c2mon.client.auth.impl;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -46,16 +48,18 @@ import cern.rba.util.lookup.RbaTokenLookup;
  * @author Matthias Braeger
  */
 @Service
-public class RbacAuthenticationManager implements AuthenticationManager, ClientTierRbaTokenChangeListener {
+public class RbacAuthenticationManager implements AuthenticationManager, RbaTokenManager, ClientTierRbaTokenChangeListener {
   
   /** Log4j logger instance */
   private static final Logger LOG = Logger.getLogger(RbacAuthenticationManager.class);
   
-  /** Used to synchonize login and logout requests */
+  /** Used to synchronize login and logout requests */
   private static final Object SYNC_LOCK = new Object(); 
   
-  /** The RBAC login context */
-  private static volatile RBALoginContext ctx = null;
+  /**
+   * This Map keeps a reference to the RBALoginContext for each authenticated user (key)
+   */
+  private final Map<String, RBALoginContext> userContexts = new ConcurrentHashMap<String, RBALoginContext>();
   
   /** The list of registered {@link AuthenticationListener} instances */
   private Set<AuthenticationListener> authenticationListeners =
@@ -74,24 +78,54 @@ public class RbacAuthenticationManager implements AuthenticationManager, ClientT
    */
   @PreDestroy
   protected void cleanup() {
-    logout();
     authenticationListeners.clear();
+    userContexts.clear();
   }
   
+  /**
+   * To check, if the user is logged, we have to have
+   * a valid token from the user.
+   * @param userName The name of the user
+   */
   @Override
-  public boolean isUserLogged() {
-    final RBAToken token = RbaTokenLookup.findClientTierRbaToken();
-    return token != null && token.isValid();
-  }
-
-  @Override
-  public String getUserName() {
-    final RBAToken token = RbaTokenLookup.findClientTierRbaToken();
-    if (token != null) {
-      return token.getUser().getName();
+  public boolean isUserLogged(final String userName) {
+    RBAToken token;
+    boolean tokenValid = false;
+    if (userName != null) {
+      RBALoginContext ctx = userContexts.get(userName); 
+      if (ctx != null) {
+        token  = ctx.getRBASubject().getAppToken();
+        if (token != null) {
+          tokenValid = token.isValid();
+        }
+      }
+      else {
+        token = RbaTokenLookup.findClientTierRbaToken();
+        if (token != null && token.getUser().getName().equalsIgnoreCase(userName)) {
+          tokenValid = token.isValid();
+        }
+      }
     }
     
-    return null;
+    return tokenValid;
+  }
+
+  /**
+   * Returns all user names which for which the <code>AuthenticationManager</code>
+   * has a registered context. Additionally it checks with an <code>RbaTokenLookup</code>
+   * whether someone has logged in through the RBAC GUI tool bar.
+   * 
+   * @return The list of logged users
+   */
+  @Override
+  public Set<String> getLoggedUserNames() {
+    Set<String> userNames = new HashSet<String>(userContexts.keySet());
+    RBAToken token = RbaTokenLookup.findClientTierRbaToken();
+    if (token != null) {
+      userNames.add(token.getUser().getName());
+    }
+    
+    return userNames;
   }
 
   /**
@@ -110,40 +144,40 @@ public class RbacAuthenticationManager implements AuthenticationManager, ClientT
   @Override
   public boolean login(final String appName, final String userName, final String userPassw) {
     synchronized (SYNC_LOCK) {
-      boolean validSession = false;
-      if (ctx == null) {
-        try {
-          ctx = new RBALoginContext(LoginPolicy.EXPLICIT,
-              new DefaultCallbackHandler(appName, userName, userPassw.toCharArray()));
-          ctx.login();
-          // pass the RBA subject to the ClientTierSubjectHolder which is also
-          // used by the RbaTokenLookup
-          ClientTierSubjectHolder.setRBASubject(ctx.getRBASubject());
-          validSession = ctx.getRBASubject().getAppToken().isValid();
-        }
-        catch (LoginException e) {
-          LOG.info("login() - Login attempt for user " + userName + " failed. Reason: " + e.getMessage());
-        }
+      boolean validToken = false;
+
+      try {
+        RBALoginContext ctx = new RBALoginContext(LoginPolicy.EXPLICIT,
+            new DefaultCallbackHandler(appName, userName, userPassw.toCharArray()));
+        userContexts.put(userName, ctx);
+        ctx.login();
+        validToken = ctx.getRBASubject().getAppToken().isValid();
+      }
+      catch (LoginException e) {
+        LOG.info("login() - Login attempt for user " + userName + " failed. Reason: " + e.getMessage());
       }
       
-      return validSession;
+      return validToken;
     }
   }
 
   @Override
-  public synchronized void logout() {
+  public boolean logout(final String userName) {
     synchronized (SYNC_LOCK) {
+      RBALoginContext ctx = userContexts.get(userName);
       if (ctx != null) {
         try {
           ctx.logout();
           ClientTierSubjectHolder.clear();
+          userContexts.remove(userName);
         }
         catch (LoginException e) {
           LOG.warn("User logout was unsuccessul. Reason: " + e.getMessage());
+          return false;
         }
-        ctx = null;
       }
     }
+    return true;
   }
 
   @Override
@@ -171,18 +205,43 @@ public class RbacAuthenticationManager implements AuthenticationManager, ClientT
    */
   @Override
   public void rbaTokenChanged(final RBAToken rbaToken) throws TokenFormatException, TokenExpiredException {
-    
-    if (rbaToken == null || rbaToken.isEmpty() || !rbaToken.isValid()) {
-      // the user has logged out
-      for (AuthenticationListener listener : authenticationListeners) {
-        listener.onLogout();
+    if (rbaToken != null) {
+      String userName = rbaToken.getUser().getName();
+      if (rbaToken.isEmpty() || !rbaToken.isValid()) {
+        LOG.info("User " + userName + " has logged out.");
+        // Remove the context, if not yet done
+        userContexts.remove(userName);
+        // the user has logged out
+        for (AuthenticationListener listener : authenticationListeners) {
+          listener.onLogout(userName);
+        }
+      }
+      else {
+        LOG.info("User " + userName + " has successfully logged in.");
+        for (AuthenticationListener listener : authenticationListeners) {
+          listener.onLogin(userName);
+        }
       }
     }
     else {
-      String userName = rbaToken.getUser().getName();
-      for (AuthenticationListener listener : authenticationListeners) {
-        listener.onLogin(userName);
+      LOG.warn("rbaTokenChanged() - Listener called with null RBAToken! Nobody got informed.");
+    }
+  }
+
+  @Override
+  public RBAToken findRbaToken(final String userName) {
+    RBAToken token = null;
+    RBALoginContext ctx = userContexts.get(userName); 
+    if (ctx != null) {
+      token  = ctx.getRBASubject().getAppToken();
+    }
+    else {
+      RBAToken clientTierToken = RbaTokenLookup.findClientTierRbaToken();
+      if (clientTierToken != null && clientTierToken.getUser().getName().equalsIgnoreCase(userName)) {
+        token = clientTierToken;
       }
     }
+    
+    return token;
   }
 }

@@ -34,7 +34,9 @@ public interface AuthenticationListener {
   
   /**
    * This method is called when a previously logged user
-   * sucessfully logged out.
+   * successfully logged out.
+   * 
+   * @param userName The name of the user that has been logged out.
    */
-  void onLogout();
+  void onLogout(String userName);
 }
