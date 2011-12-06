@@ -15,8 +15,9 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.core.tag.history;
+package cern.c2mon.client.core.tag;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,33 +38,35 @@ import cern.c2mon.client.common.history.HistoryLoadingManager;
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.exception.HistoryProviderException;
+import cern.c2mon.client.common.history.tag.HistoryTagConfiguration;
+import cern.c2mon.client.common.history.tag.HistoryTagManagerListener;
+import cern.c2mon.client.common.history.tag.HistoryTagRecord;
 import cern.c2mon.client.core.C2monHistoryManager;
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.tag.HistoryTag;
-import cern.c2mon.client.core.tag.history.HistoryTagConfigurationStatus.LoadingStatus;
+import cern.c2mon.client.core.tag.HistoryTagConfigurationStatus.LoadingStatus;
 
 /**
- * This class manages the {@link HistoryTag} with the different
- * {@link HistoryTagConfiguration}s to keep it from loading the same data over
- * and over again.
+ * This class manages the {@link HistoryTagManagerListener}s with the different
+ * {@link HistoryTagConfiguration}s to keep it from loading the same data
+ * several times.
  * 
  * @author vdeila
  */
-public final class HistoryTagManager {
+public final class HistoryTagLoadingManager {
 
   /** Log4j instance */
-  private static final Logger LOG = Logger.getLogger(HistoryTagManager.class);
+  private static final Logger LOG = Logger.getLogger(HistoryTagLoadingManager.class);
   
   /** The instance, if any */
-  private static HistoryTagManager instance = null;
+  private static HistoryTagLoadingManager instance = null;
   
   /**
    * @return the instance of a HistoryTagManager 
    */
-  public static synchronized HistoryTagManager getInstance() {
+  public static synchronized HistoryTagLoadingManager getInstance() {
     if (instance == null) {
       LOG.debug("New instance is being created.");
-      instance = new HistoryTagManager();
+      instance = new HistoryTagLoadingManager();
     }
     return instance;
   }
@@ -93,18 +96,26 @@ public final class HistoryTagManager {
   private final C2monHistoryManager historyManager;
   
   /** Singelton */
-  private HistoryTagManager() {
+  private HistoryTagLoadingManager() {
     this.historyManager = C2monServiceGateway.getHistoryManager();
   }
   
   /**
    * @param configuration
-   *          the configurations to subscribe to
-   * @param historyTag
-   *          the history tag which subscribes
+   *          the configuration to subscribe to
+   * @param listener
+   *          the listener that subscribes to the data
    */
-  public void subscribe(final HistoryTagConfiguration configuration, final HistoryTag historyTag) {
-    HistoryTag otherHistoryTag = null;
+  public void subscribe(final HistoryTagConfiguration configuration, final HistoryTagManagerListener listener) {
+    if (configuration == null) {
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(String.format("The %s '%s' was not subscribed", 
+            HistoryTagManagerListener.class.getSimpleName(), listener.toString()));
+      }
+      return;
+    }
+    
+    HistoryTagManagerListener otherSubscriber = null;
     boolean didAdd = false;
     statesLock.writeLock().lock();
     try {
@@ -113,12 +124,12 @@ public final class HistoryTagManager {
         didAdd = true;
       }
       else {
-        final Iterator<HistoryTag> historyTagIterator = states.get(configuration).getHistoryTagsIterator();
-        if (historyTagIterator.hasNext()) {
-          otherHistoryTag = historyTagIterator.next();
+        final Iterator<HistoryTagManagerListener> subscribersIterator = states.get(configuration).getSubscribersIterator();
+        if (subscribersIterator.hasNext()) {
+          otherSubscriber = subscribersIterator.next();
         } 
       }
-      states.get(configuration).addHistoryTag(historyTag);
+      states.get(configuration).addSubscriber(listener);
     }
     finally {
       statesLock.writeLock().unlock();
@@ -131,11 +142,13 @@ public final class HistoryTagManager {
     final HistoryTagConfigurationStatus state = states.get(configuration);
     switch (state.getStatus()) {
     case Ready:
-      if (otherHistoryTag != null) {
-        historyTag.onLoaded(configuration, otherHistoryTag.getData());
+      if (otherSubscriber != null) {
+        listener.onLoaded(configuration, otherSubscriber.getCurrentData(configuration));
       }
       else {
-        LOG.warn("Were not able to get the history data from another history tag, reloading data..");
+        // If there isn't any other HistoryTagManagerListener tag to get the data from it must be retrieved again,
+        // ensuring that it has the latest data
+        LOG.warn("Were not able to get the history data from another listener, reloading data..");
         statesLock.readLock().lock();
         try {
           states.get(configuration).compareAndSetStatus(state.getStatus(), LoadingStatus.NotInitialized);
@@ -147,7 +160,9 @@ public final class HistoryTagManager {
       }
       break;
     case Invalid:
-      historyTag.onCancelled(configuration);
+      listener.onCancelled(configuration);
+      break;
+    case Loading:
       break;
     default:
       considerStartingThread();
@@ -157,17 +172,17 @@ public final class HistoryTagManager {
   
   /**
    * @param configuration
-   *          the configuration to unsubscribe from
-   * @param historyTag
-   *          the history tag to unsubscribe
+   *          the configuration to subscribe to
+   * @param listener
+   *          the listener that subscribes to the data
    */
-  public synchronized void unsubscribe(final HistoryTagConfiguration configuration, final HistoryTag historyTag) {
+  public void unsubscribe(final HistoryTagConfiguration configuration, final HistoryTagManagerListener listener) {
     statesLock.writeLock().lock();
     try {
       final HistoryTagConfigurationStatus state = states.get(configuration);
       if (state != null) {
-        state.removeHistoryTag(historyTag);
-        if (state.getHistoryTagCount() == 0) {
+        state.removeSubscriber(listener);
+        if (state.getSubscribersCount() == 0) {
           states.remove(configuration).compareAndSetStatus(LoadingStatus.NotInitialized, LoadingStatus.Invalid);
         }
       }
@@ -239,8 +254,9 @@ public final class HistoryTagManager {
               if (configuration.getRecords() != null) {
                 downloaderConfiguration.setMaximumRecords(configuration.getRecords());
               }
-              if (configuration.getDays() != null) {
-                downloaderConfiguration.setNumberOfDays(configuration.getDays());
+              if (configuration.getTotalMilliseconds() != null) {
+                final Timestamp startTime = new Timestamp(System.currentTimeMillis() - configuration.getTotalMilliseconds());
+                downloaderConfiguration.setStartTime(startTime);
               }
               
               downloader.setConfiguration(downloaderConfiguration);
@@ -255,7 +271,7 @@ public final class HistoryTagManager {
               state.compareAndSetStatus(LoadingStatus.Loading, LoadingStatus.Invalid);
               
               // Tells the listeners about the canceled download
-              final Iterator<HistoryTag> iterator = state.getHistoryTagsIterator();
+              final Iterator<HistoryTagManagerListener> iterator = state.getSubscribersIterator();
               while (iterator.hasNext()) {
                 try {
                   iterator.next().onCancelled(configuration);
@@ -274,16 +290,16 @@ public final class HistoryTagManager {
               convertedData.add(new HistoryTagRecord(tagValueUpdate));
             }
             
-            state.compareAndSetStatus(LoadingStatus.Loading, LoadingStatus.Ready);
-            
-            // Tells the listeners about the data
-            final Iterator<HistoryTag> iterator = state.getHistoryTagsIterator();
-            while (iterator.hasNext()) {
-              try {
-                iterator.next().onLoaded(configuration, convertedData);
-              }
-              catch (Exception e) {
-                LOG.error("Something went wrong when trying to update a history tag.", e);
+            if (state.compareAndSetStatus(LoadingStatus.Loading, LoadingStatus.Ready)) {
+              // Tells the listeners about the data
+              final Iterator<HistoryTagManagerListener> iterator = state.getSubscribersIterator();
+              while (iterator.hasNext()) {
+                try {
+                  iterator.next().onLoaded(configuration, convertedData);
+                }
+                catch (Exception e) {
+                  LOG.error("Something went wrong when trying to update a history tag.", e);
+                }
               }
             }
           }

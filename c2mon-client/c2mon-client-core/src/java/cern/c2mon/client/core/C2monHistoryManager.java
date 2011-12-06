@@ -28,6 +28,8 @@ import cern.c2mon.client.common.history.HistoryProviderFactory;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.event.HistoryPlayerListener;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
+import cern.c2mon.client.common.history.tag.HistoryTag;
+import cern.c2mon.client.common.history.tag.HistoryTagManager;
 
 /**
  * This interface describes the methods which are provided by the C2MON history
@@ -106,4 +108,9 @@ public interface C2monHistoryManager {
    *         <code>null</code>.
    */
   HistoryPlayerEvents getHistoryPlayerEvents();
+  
+  /**
+   * @return a history tag manager that can be used for handling {@link HistoryTag}s.
+   */
+  HistoryTagManager getHistoryTagManager();
 }

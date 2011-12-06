@@ -15,20 +15,20 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.core.tag.history;
+package cern.c2mon.client.core.tag;
 
 import java.util.Iterator;
 import java.util.Set;
 
+import cern.c2mon.client.common.history.tag.HistoryTagManagerListener;
 import cern.c2mon.client.common.util.ConcurrentIdentitySet;
-import cern.c2mon.client.core.tag.HistoryTag;
 
 /**
- * Used by the {@link HistoryTagManager} to keep track of what history data is
+ * Used by the {@link HistoryTagLoadingManager} to keep track of what history data is
  * loaded.
  * 
- * @see HistoryTagManager
- * @see HistoryTag
+ * @see HistoryTagLoadingManager
+ * @see HistoryTagManagerListener
  * 
  * @author vdeila
  */
@@ -38,7 +38,7 @@ class HistoryTagConfigurationStatus {
   private LoadingStatus status = LoadingStatus.NotInitialized;
   
   /** List of history tags */
-  private final Set<HistoryTag> historyTags = new ConcurrentIdentitySet<HistoryTag>();
+  private final Set<HistoryTagManagerListener> subscribers = new ConcurrentIdentitySet<HistoryTagManagerListener>();
   
   /**
    * Creates an instance with an empty tag id list, and {@link #getStatus()} set
@@ -69,31 +69,31 @@ class HistoryTagConfigurationStatus {
   }
   
   /** 
-   * @param historyTag the history tag to add
+   * @param listener the history tag to add
    */
-  public void addHistoryTag(final HistoryTag historyTag) {
-    this.historyTags.add(historyTag);
+  public void addSubscriber(final HistoryTagManagerListener listener) {
+    this.subscribers.add(listener);
   }
   
   /** 
-   * @param historyTag the history tag to remove
+   * @param listener the history tag to remove
    */
-  public void removeHistoryTag(final HistoryTag historyTag) {
-    this.historyTags.remove(historyTag);
+  public void removeSubscriber(final HistoryTagManagerListener listener) {
+    this.subscribers.remove(listener);
   }
   
   /**
    * @return an iterator for the history tags
    */
-  public Iterator<HistoryTag> getHistoryTagsIterator() {
-    return this.historyTags.iterator();
+  public Iterator<HistoryTagManagerListener> getSubscribersIterator() {
+    return this.subscribers.iterator();
   }
   
   /**
    * @return the number of history tags
    */
-  public int getHistoryTagCount() {
-    return this.historyTags.size();
+  public int getSubscribersCount() {
+    return this.subscribers.size();
   }
   
   /** Loading statuses */

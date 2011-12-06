@@ -37,6 +37,7 @@ import cern.c2mon.client.common.history.HistoryProviderAvailability;
 import cern.c2mon.client.common.history.HistoryProviderFactory;
 import cern.c2mon.client.common.history.Timespan;
 import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
+import cern.c2mon.client.common.history.tag.HistoryTagManager;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -69,6 +70,9 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   /** Reference to the <code>C2monSupervisionManager</code> */
   private final CoreSupervisionManager supervisionManager;
   
+  /** Reference to the {@link HistoryTagManager} */
+  private final HistoryTagManager historyTagManager;
+  
   /** the history player */
   private HistoryPlayerCoreAccess historyPlayer = null;
   
@@ -80,12 +84,13 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
   
   /** A connection listener checking if the connection to the JMS is lost. */
   private ConnectionListener jmsConnectionListener = null;
-
+ 
   @Autowired
-  protected HistoryManager(final CoreTagManager pTagManager, final BasicCacheHandler pCache, final CoreSupervisionManager pSupervisionManager) {
+  protected HistoryManager(final CoreTagManager pTagManager, final BasicCacheHandler pCache, final CoreSupervisionManager pSupervisionManager, final HistoryTagManager historyTagManager) {
     this.tagManager = pTagManager;
     this.cache = pCache;
     this.supervisionManager = pSupervisionManager;
+    this.historyTagManager = historyTagManager;
   }
 
   /**
@@ -362,6 +367,11 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
       }
       return tagValues.iterator().next();
     }
+  }
+
+  @Override
+  public HistoryTagManager getHistoryTagManager() {
+    return this.historyTagManager;
   }
   
 }
