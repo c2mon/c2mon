@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-pom</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+  </parent>
+  <groupId>c2mon-dip-publisher</groupId>
+  <artifactId>c2mon-dip-publisher</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <dependencies>
+  	<dependency>
+  		<groupId>cern.c2mon.c2mon-client</groupId>
+  		<artifactId>c2mon-client-common</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>log4j</groupId>
+  		<artifactId>log4j</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>cern.en.ice</groupId>
+  		<artifactId>dip</artifactId>
+  		<version>5.4.2</version>
+  		<scope>compile</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>cern.c2mon.c2mon-client</groupId>
+  		<artifactId>c2mon-client-core</artifactId>
+  	</dependency>
+  </dependencies>
+</project>
