@@ -20,7 +20,6 @@ package cern.c2mon.client.common.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +34,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * is supported.<br/>
  * <br/>
  * 
- * This is a wrapper around an {@link IdentityHashMap} plus it supports
+ * This is a wrapper around an {@link HashMap} plus it supports
  * concurrency.
  * 
  * @author vdeila
