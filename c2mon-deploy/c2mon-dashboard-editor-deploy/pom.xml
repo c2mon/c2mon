@@ -37,6 +37,7 @@
 
 	<modules>
 		<module>modules/tim2</module>
+		<module>modules/dmn2</module>
 	</modules>
 
 	<build/>
