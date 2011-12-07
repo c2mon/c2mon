@@ -37,6 +37,7 @@ open JMSPROPS, "< ../jms.properties"
   or die "Unable to open configuration file ../jms.properties";
 my $jmsProperties = new Config::Properties();
 $jmsProperties->load(*JMSPROPS);
+my $jmsAdminMessageTopic = $jmsProperties->getProperty("jms.client.adminmessage.topic");
 my $jmsSupervisionTopic = $jmsProperties->getProperty("jms.client.supervision.topic");
 my $jmsHeartbeatTopic = $jmsProperties->getProperty("c2mon.jms.heartbeat.topic");
 my $jmsRequestQueue = $jmsProperties->getProperty("jms.client.request.queue");
@@ -106,6 +107,7 @@ print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 print "		<property name=\"c2mon.jms.url\" value=\"$jmsUrl\"/>\n";
 print "		<property name=\"c2mon.jms.user\" value=\"$jmsUser\"/>\n";
 print "		<property name=\"c2mon.jms.passwd\" value=\"$jmsPassword\"/>\n";
+print "   <property name=\"c2mon.client.jms.adminmessage.topic\" value=\"$jmsAdminMessageTopic\"/>\n";
 print "		<property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
 print "		<property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
 print "		<property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
