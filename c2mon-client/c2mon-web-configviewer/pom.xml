@@ -80,6 +80,7 @@
             -Dc2mon.client.jms.supervision.topic=tim.client.supervision
             -Dc2mon.client.jms.heartbeat.topic=tim.client.heartbeat
             -Dc2mon.client.jms.request.queue=tim.client.request
+            -Dc2mon.client.jms.adminmessage.topic=tim.client.adminmessage
           </argLine>
         </configuration>      
       </plugin>
