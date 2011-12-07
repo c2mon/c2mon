@@ -20,11 +20,6 @@ my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
 
-# In case of a SNAPSHOT the codebase will point to test
-if ($viewerVersion =~ /-SNAPSHOT/) {
-  $codebase = "http://timweb.cern.ch/test/javaws";
-}
-
 # Reading property file ~/rep/c2mon/test/conf/.c2mon.properties #
 open PROPS, "< /user/diamonop/c2mon/test/conf/.c2mon.properties"
   or die "Unable to open configuration file ~diamonop/c2mon/test/conf/.c2mon.properties";
