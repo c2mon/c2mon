@@ -146,7 +146,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
  
 
   @Override
-  public void refresh(final Set<Long> tagIds) {
+  public void refresh(final Set<Long> tagIds) throws CacheSynchronizationException {
     supervisionManager.refreshSupervisionStatus();
     synchronized (refreshLiveCacheSyncLock) {
       synchronizeCache(tagIds);
@@ -155,7 +155,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   
 
   @Override
-  public void createTags(final Set<Long> tagIds) {
+  public void createTags(final Set<Long> tagIds) throws CacheSynchronizationException {
     if (tagIds.size() > 0) {
       ClientDataTagImpl cdt = null;
       for (Long tagId : tagIds) {
@@ -166,7 +166,6 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         }
       }
       synchronizeCache(tagIds);
-      finalizeTagIntitialization();
     }
   }
   
@@ -258,10 +257,10 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    * Inner method which synchronizes the live cache with the C2MON server
    * @param pTagIds Set of tag id's that shall be refreshed. If the parameter
    *        is <code>null</code>, the entire cache is updated.
+   * @throws CacheSynchronizationException In case a problem during the cache synchronization
+   *         with the C2MON server. 
    */
-  private void synchronizeCache(final Set<Long> pTagIds) {
-    boolean jmsConnectionLost = false;
-
+  private void synchronizeCache(final Set<Long> pTagIds) throws CacheSynchronizationException {
     try {
       if (!liveCache.isEmpty()) {
         final Set<Long> unsynchronizedTagIds;
@@ -305,7 +304,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
                 jmsProxy.unregisterUpdateListener(liveTag);
               }
               catch (Exception e) {
-                LOG.warn("removeTags() - Could not unregister tag " + tagId + " from JmsProxy. Reason: " + e.getMessage());
+                LOG.warn("synchronizeCache() - Could not unregister tag " + tagId + " from JmsProxy. Reason: " + e.getMessage());
               }
             }
             supervisionManager.removeSupervisionListener(liveTag);
@@ -318,22 +317,16 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         
         synchronizeCacheValues(newKnownTags);
       }
+      
+      // Checks, if there are tags which needs to be synchronized with the history cache.
+      synchronizeHistoryCache();
+      // Reset JMS and Heartbeat problem flags
+      jmsConnectionDown = false;
+      heartbeatExpired = false;
     }
     catch (Exception e) {
-      LOG.error("synchronizeCache() - Could not refresh tags in the live cache.", e);
-      jmsConnectionLost = true;
+      throw new CacheSynchronizationException("Could not refresh tags in the live cache.", e);
     }
-  
-    if (jmsConnectionLost) {
-      invalidateLiveCache(TagQualityStatus.JMS_CONNECTION_DOWN, JMS_CONNECTION_LOST_MSG);
-    }
-    else {
-      // Checks, if there are tags which needs to be synchronized with the history cache.
-      finalizeTagIntitialization();
-    }
-    
-    this.jmsConnectionDown = jmsConnectionLost;
-    this.heartbeatExpired = jmsConnectionLost;
   }
   
   /**
@@ -362,12 +355,12 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   }
   
   /**
-   * This method is called by the <code>TagManager</code> after new tags were created with the
-   * {@link ClientDataTagCache#create(Long)} method and initialized with the static information
+   * This inner method is called after new tags were created with the
+   * {@link #synchronizeCache(Set)} method and initialized with the static information
    * from the C2MON server. This call is then updating the history cache with the cloned tags
    * from the live cache, but only if the cache is currently set to history mode. 
    */
-  private void finalizeTagIntitialization() {
+  private void synchronizeHistoryCache() {
     if (controller.isHistoryModeEnabled()) {
       try {
         ClientDataTagImpl cdt = null;
@@ -380,7 +373,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         }
       }
       catch (CloneNotSupportedException e) {
-        LOG.error("finishedTagIntitialization() - ClientDataTag is not clonable. Please check the code!", e);
+        LOG.error("synchronizeHistoryCache() - ClientDataTag is not clonable. Please check the code!", e);
         throw new RuntimeException(e);
       }
       historyCacheUpdateList.clear();
@@ -419,7 +412,12 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
       
       if (heartbeatExpired || jmsConnectionDown) {
         LOG.info("onHeartbeatResumed() - Server heartbeat is resumed -> refreshing the live cache.");
-        synchronizeCache(null);
+        try {
+          synchronizeCache(null);
+        }
+        catch (CacheSynchronizationException e) {
+          LOG.error("onHeartbeatResumed() - Error occurred while trying to refresh the live cache.", e);
+        }
       }
     }
   }
@@ -435,7 +433,14 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
       
       if (jmsConnectionDown || heartbeatExpired) {
         LOG.info("onConnection() - JMS connection is now up -> refreshing the live cache.");
-        synchronizeCache(null);
+        
+        try {
+          synchronizeCache(null);
+        }
+        catch (CacheSynchronizationException e) {
+          LOG.error("onConnection() - Error occurred while trying to refresh the live cache.", e);
+        }
+        
       }
     }
   }

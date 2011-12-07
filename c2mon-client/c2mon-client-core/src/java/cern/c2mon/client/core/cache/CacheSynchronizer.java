@@ -48,8 +48,10 @@ interface CacheSynchronizer {
    * @param tagIds The ids of the <code>ClientDataTag</code> objects that shall be
    *                      added to the cache.
    * @see ClientDataTagCache#addDataTagUpdateListener(Set, DataTagUpdateListener)
+   * @throws CacheSynchronizationException In case of communication problems with
+   *         the C2MON server during the tag creation.
    */
-  void createTags(final Set<Long> tagIds);
+  void createTags(final Set<Long> tagIds) throws CacheSynchronizationException;
   
   
   /** 
@@ -69,6 +71,8 @@ interface CacheSynchronizer {
    * supervision status cache is also refreshed.
    * @param tagIds Set of tag id's that shall be refreshed. If the parameter
    *        is <code>null</code>, the entire cache is updated.
+   * @throws CacheSynchronizationException In case of communication problems with
+   *         the C2MON server during the cache refresh.
    */
-  void refresh(Set<Long> tagIds);
+  void refresh(Set<Long> tagIds) throws CacheSynchronizationException;
 }

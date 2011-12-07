@@ -20,16 +20,13 @@ package cern.c2mon.client.core;
 import java.util.Collection;
 import java.util.Set;
 
-import javax.jms.JMSException;
-
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.cache.CacheSynchronizationException;
+import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
-import cern.tim.shared.client.command.CommandReportImpl;
-import cern.tim.shared.client.command.CommandTagHandle;
-import cern.tim.shared.client.command.CommandTagHandleImpl;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
@@ -52,8 +49,11 @@ public interface C2monTagManager {
    * @param dataTagIds A collection of data tag IDs
    * @param listener the listener which shall be registered
    * @return <code>true</code>, if the registration was succesfull, otherwhise <code>false</code>
+   * @throws CacheSynchronizationException In case a communicatin problem with the C2MON server
+   *         occurs while subscribing to the tags. In that case the {@link TagManager} will
+   *         rollback the subscription.
    */
-  boolean subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
+  boolean subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException;
   
   /**
    * Use this method for unregistering a listener from receiving updates for specific data tags.
@@ -162,8 +162,10 @@ public interface C2monTagManager {
    * server. It will ask the server to send the actual tag information for
    * all subscribed data tags. The C2MON client API will then send an update
    * to all subscribed listeners.
+   * @throws CacheSynchronizationException In case a communicatin problem with the C2MON server
+   *         occurs while refreshing to the tags.
    */
-  void refreshDataTags();
+  void refreshDataTags() throws CacheSynchronizationException;
   
   /**
    * This method is used to synchronize a list subscribed data tags with the
@@ -173,6 +175,8 @@ public interface C2monTagManager {
    * 
    * @param tagIds A collection of data tag id's
    * @throws NullPointerException if the Collection is <code>null</code>.
+   * @throws CacheSynchronizationException In case a communicatin problem with the C2MON server
+   *         occurs while refreshing to the tags.
    */
-  void refreshDataTags(Collection<Long> tagIds);
+  void refreshDataTags(Collection<Long> tagIds) throws CacheSynchronizationException;
 }

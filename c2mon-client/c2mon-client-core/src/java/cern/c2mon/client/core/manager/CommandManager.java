@@ -157,12 +157,15 @@ public class CommandManager implements C2monCommandManager {
     
     // Clone command tags for result set
     for (Long commandId : pIds) {
-      try {
-        resultSet.add((ClientCommandTag<T>) commandCache.get(commandId).clone());
-      }
-      catch (CloneNotSupportedException e) {
-        LOG.error("getCommandTags() - Error while cloning command tag with id " + commandId);
-        throw new RuntimeException("Cloning not supported by ClientCommandTagImpl with id " + commandId, e);
+      // skip all fake tags
+      if (!commandId.equals(UNKNOWN_TAG_ID)) {
+        try {
+          resultSet.add((ClientCommandTag<T>) commandCache.get(commandId).clone());
+        }
+        catch (CloneNotSupportedException e) {
+          LOG.error("getCommandTags() - Error while cloning command tag with id " + commandId);
+          throw new RuntimeException("Cloning not supported by ClientCommandTagImpl with id " + commandId, e);
+        }
       }
     }
  

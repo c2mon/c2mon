@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
@@ -146,10 +147,18 @@ public class TagManager implements CoreTagManager {
       LOG.debug(new StringBuffer("subscribeDataTags() : called for ").append(tagIds.size()).append(" tags."));
     }
 
-    // add listener to tags and subscribe them to the live topics
-    Set<Long> newTags = cache.addDataTagUpdateListener(tagIds, listener);
-    // Inform listeners (e.g. HistoryManager) about new subscriptions
-    fireOnNewTagSubscriptionsEvent(newTags);
+    try {
+      // add listener to tags and subscribe them to the live topics
+      Set<Long> newTags = cache.addDataTagUpdateListener(tagIds, listener);
+      // Inform listeners (e.g. HistoryManager) about new subscriptions
+      fireOnNewTagSubscriptionsEvent(newTags);
+    }
+    catch (CacheSynchronizationException cse) {
+      // Rollback the subscription
+      LOG.error("subscribeDataTags() : Cache error occured while subscribing to data tags ==> Rolling back subscription.");
+      cache.unsubscribeDataTags(tagIds, listener);
+      throw cse;
+    }
 
     return true;
   }

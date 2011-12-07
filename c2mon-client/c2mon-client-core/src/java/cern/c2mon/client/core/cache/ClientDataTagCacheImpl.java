@@ -203,12 +203,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   
   
   @Override
-  public void refresh() {
+  public void refresh() throws CacheSynchronizationException {
     cacheSynchronizer.refresh(null);
   }
   
   @Override
-  public void refresh(final Set<Long> tagIds) {
+  public void refresh(final Set<Long> tagIds) throws CacheSynchronizationException {
     cacheSynchronizer.refresh(tagIds);
   }
 
@@ -294,7 +294,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Set<Long> addDataTagUpdateListener(final Set<Long> tagIds, final DataTagUpdateListener listener) {
+  public Set<Long> addDataTagUpdateListener(final Set<Long> tagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException {
     Set<Long> newTagIds = new HashSet<Long>();
     synchronized (getHistoryModeSyncLock()) {
       cacheWriteLock.lock();

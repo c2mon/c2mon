@@ -45,17 +45,21 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    * @return Set of id's from all tags which have been added to the cache. 
    * @throws NullPointerException If one of the parameter is <code>null</code> or if one of 
    *                              the tags is not present in the cache
+   * @throws CacheSynchronizationException In case of communication problems with the C2MON
+   *         server during the refresh process.
    * @see #getHistoryModeSyncLock();
    */
-  Set<Long> addDataTagUpdateListener(Set<Long> tagIds, DataTagUpdateListener listener);
+  Set<Long> addDataTagUpdateListener(Set<Long> tagIds, DataTagUpdateListener listener) throws CacheSynchronizationException;
   
   /**
    * This method synchronizes subscribed data tags with the server.
    * It will ask the server to send the actual tag information for all subscribed data tags.
    * Once the cache is synchronized, all subscribed <code>DataTagUpdateListener</code> will
    * be notified.
+   * @throws CacheSynchronizationException In case of communication problems with the C2MON
+   *         server during the refresh process.
    */
-  void refresh();
+  void refresh() throws CacheSynchronizationException;
   
   /**
    * This method synchronizes subscribed data tags with the server.
@@ -64,8 +68,10 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    * be notified.
    * 
    * @param tagIds A set of data tag id's
+   * @throws CacheSynchronizationException In case of communication problems with the C2MON
+   *         server during the refresh process.
    */
-  void refresh(Set<Long> tagIds);
+  void refresh(Set<Long> tagIds) throws CacheSynchronizationException;
   
   /**
    * Unsubscribes the given listener from all cache objects. 
