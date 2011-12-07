@@ -16,29 +16,37 @@ import javax.validation.Valid;
 
 public class LoginController {
   
-        @RequestMapping(method = RequestMethod.GET)
-        public String showForm(final Map model) {
-                LoginForm loginForm = new LoginForm();
-                model.put("loginForm", loginForm);
-                return "loginform";
-        }
-//        
-//        C2monServiceGateway.getSessionManager().isAuthorized
+  private final static String APP_NAME = "c2mon-web-configviewer:Login-Controller";
 
-        @RequestMapping(method = RequestMethod.POST)
-        public String processForm(@Valid LoginForm loginForm, final BindingResult result,
-                  final Map model) {
-                String userName = "UserName";
-                String password = "password";
-                if (result.hasErrors()) {
-                        return "loginform";
-                }
-                loginForm = (LoginForm) model.get("loginForm");
-                if (!loginForm.getUserName().equals(userName)
-                                || !loginForm.getPassword().equals(password)) {
-                        return "loginform";
-                }
-                model.put("loginForm", loginForm);
-                return "loginsuccess";
-        }
+  @RequestMapping(method = RequestMethod.GET)
+  public String showForm(final Map model) {
+    LoginForm loginForm = new LoginForm();
+    model.put("loginForm", loginForm);
+    return "loginform";
+  }
+  
+  @RequestMapping(method = RequestMethod.POST)
+  public String processForm(@Valid LoginForm loginForm, final BindingResult result,
+      final Map model) {
+    
+    if (result.hasErrors()) {
+      return "loginform";
+    }
+
+    loginForm = (LoginForm) model.get("loginForm");
+    
+    String username = loginForm.getUserName();
+    String password = loginForm.getPassword();
+    
+    if (!C2monServiceGateway.getSessionManager().login(APP_NAME, username, password)) {
+      return "loginform";
+    }
+    
+    if (!C2monServiceGateway.getSessionManager().isAuthorized(userName, authorizationDetails)) {
+      return "loginform";
+    }    
+    
+    model.put("loginForm", loginForm);
+    return "loginsuccess";
+  }
 }
