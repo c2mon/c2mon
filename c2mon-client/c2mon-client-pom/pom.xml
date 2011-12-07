@@ -134,6 +134,13 @@
 				<version>[1.0.0,2.0.0)</version>
 			</dependency>
 
+			<!-- C2MON publisher -->
+			<dependency>
+				<groupId>cern.c2mon.c2mon-publisher</groupId>
+				<artifactId>c2mon-japc-sispublisher</artifactId>
+				<version>[1.0.0,2.0.0)</version>
+			</dependency>
+
 			<!-- RBAC libraries -->
 			<dependency>
 				<groupId>cern.accsoft.security</groupId>
@@ -187,11 +194,11 @@
 				<artifactId>simple-xml</artifactId>
 				<version>2.6.1</version>
 			</dependency>
-            <dependency>
-              <groupId>jep</groupId>
-              <artifactId>jep</artifactId>
-              <version>2.24</version>
-            </dependency>
+			<dependency>
+				<groupId>jep</groupId>
+				<artifactId>jep</artifactId>
+				<version>2.24</version>
+			</dependency>
 
 			<!-- test dependencies -->
 			<dependency>
