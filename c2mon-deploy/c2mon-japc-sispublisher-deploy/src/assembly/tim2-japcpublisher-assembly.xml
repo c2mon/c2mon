@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+	<id>tim2</id>
+
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+
+	<!--  do not include base directory -->
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<componentDescriptors>
+		<componentDescriptor>src/assembly/c2mon-japcpublisher-common-assembly.xml
+		</componentDescriptor>
+	</componentDescriptors>
+
+	<files>
+
+		<!--  copy the starting script -->
+		<file>
+			<source>${basedir}/bin/japc-sispublisher.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<destName>japc-sispublisher.sh</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+		
+		<!--  deployment descriptor -->
+    <file>
+      <source>${basedir}/conf/tim2-deployment.xml</source>
+      <outputDirectory>/</outputDirectory>
+      <destName>deployment.xml</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
+		<!--  copy TID list to which the japc publisher has to subscribe -->
+		<file>
+			<source>${basedir}/conf/publisher.tid</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>publisher.tid</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  log4j configuration -->
+		<file>
+			<source>${basedir}/conf/log4j.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>log4j.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+		
+		<!-- copy the client JMS properties -->
+		<file>
+      <source>${basedir}/conf/tim2-jms.properties</source>
+      <outputDirectory>conf/</outputDirectory>
+      <destName>c2mon-jms.properties</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+	</files>
+
+</assembly>

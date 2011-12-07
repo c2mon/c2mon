@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cern.c2mon.c2mon-deploy</groupId>
+		<artifactId>c2mon-japcpublisher-deploy</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
+	<groupId>cern.c2mon.c2mon-deploy</groupId>
+	<artifactId>c2mon-japc-sispublisher-tim2</artifactId>
+	<name>The TIM2 JAPC Publisher module for SIS</name>
+	<version>1.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<description>C2MON JAPC publisher assembling all required modules and configuration files for TIM2</description>
+	<url></url>
+
+	<dependencies>
+	</dependencies>
+
+	<developers />
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+
+					<descriptors>
+						<descriptor>src/assembly/tim2-japcpublisher-assembly.xml</descriptor>
+					</descriptors>
+
+				</configuration>
+				<executions>
+					<execution>
+						<id>create-assembly-file</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
