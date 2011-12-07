@@ -9,7 +9,7 @@
 #                                                                       #
 #########################################################################
 
-# folder where tim2-jviews-viewer should be unpacked
+# folder where dmn2-dashboard-editor should be unpacked
 DEST_FOLDER=~/public_html/dmn2-dashboard-editor
 PREV_FOLDER=${DEST_FOLDER}-prev
 
