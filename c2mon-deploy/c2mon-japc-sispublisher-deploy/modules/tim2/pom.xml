@@ -5,7 +5,7 @@
 
 	<parent>
 		<groupId>cern.c2mon.c2mon-deploy</groupId>
-		<artifactId>c2mon-japcpublisher-deploy</artifactId>
+		<artifactId>c2mon-japc-sispublisher-deploy</artifactId>
 		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
