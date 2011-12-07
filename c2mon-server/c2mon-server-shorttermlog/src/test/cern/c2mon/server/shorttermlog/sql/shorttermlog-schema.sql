@@ -15,7 +15,7 @@ tagtime           TIMESTAMP(6),
 tagservertime     TIMESTAMP(6) NOT NULL,
 tagdaqtime        TIMESTAMP(6),
 tagstatus         NUMBER (3),
-tagstatusdesc     VARCHAR2(500),
+tagstatusdesc     VARCHAR2(1000),
 tagmode           NUMBER(1),
 tagdir            VARCHAR2(1))
 
