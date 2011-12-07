@@ -1,4 +1,5 @@
 #!/usr/bin/perl -wT
+use lib '/user/alaser/perllib/Config-Properties-1.71/blib/lib';
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
