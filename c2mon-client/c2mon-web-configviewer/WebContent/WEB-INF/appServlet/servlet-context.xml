@@ -28,7 +28,7 @@
 <!--	<bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">-->
 <!--		<property name="providerClass" value="HibernateValidator.class"/>-->
 <!--	</bean>-->
-	
+
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
