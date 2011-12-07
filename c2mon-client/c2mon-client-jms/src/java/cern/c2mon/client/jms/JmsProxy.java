@@ -121,6 +121,18 @@ public interface JmsProxy {
   void replaceListener(TagUpdateListener registeredListener, TagUpdateListener replacementListener);
   
   /**
+   * Sends a message to the given topic.
+   * 
+   * @param message the message to send
+   * @param queueName the name of the queue on which to send this request
+   * @param timeToLive how long the message will live on the broker
+   * @throws JMSException if not currently connected or 
+   *                      if a JMS problem occurs while making the request (reconnection is handled by the JmsProxy)
+   * @throws NullPointerException thrown if either argument is null
+   */
+  void publish(final String message, final String queueName, final long timeToLive) throws JMSException;
+  
+  /**
    * Send a request to the server and wait "timeout" milliseconds for a response.
    * 
    * <p>Never returns null.
@@ -163,6 +175,24 @@ public interface JmsProxy {
    * @throws NullPointerException if argument is null
    */
   void unregisterSupervisionListener(SupervisionListener supervisionListener);
+  
+  /**
+   * Register a listener to be notified of AdminMessage events received
+   * from the server.
+   * 
+   * @param AdminMessageListener the listener to register
+   * @throws NullPointerException if argument is null
+   */
+  void registerAdminMessageListener(AdminMessageListener AdminMessageListener);
+  
+  /**
+   * Unregister the listener from receiving AdminMessage updates.
+   * 
+   * @param AdminMessageListener the listener to remove
+   * @throws NullPointerException if argument is null
+   */
+  void unregisterAdminMessageListener(AdminMessageListener AdminMessageListener);
+
   
   /**
    * Register a listener to be notified of heartbeat events incoming

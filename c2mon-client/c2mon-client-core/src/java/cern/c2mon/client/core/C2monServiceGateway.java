@@ -56,6 +56,9 @@ public final class C2monServiceGateway {
   /** Static reference to the <code>C2monSupervisionManager</code> singleton instance */
   private static C2monSupervisionManager supervisionManager = null;
   
+  /** Static reference to the {@link C2monAdminMessageManager} singleton instance */
+  private static C2monAdminMessageManager adminMessageManager = null;
+  
   /**
    * Hidden constructor
    */
@@ -98,10 +101,17 @@ public final class C2monServiceGateway {
   }
   
   /**
-   * @return the heartbeatManager
+   * @return the supervision manager
    */
   public static C2monSupervisionManager getSupervisionManager() {
     return supervisionManager;
+  }
+  
+  /**
+   * @return the admin message manager
+   */
+  public static C2monAdminMessageManager getAdminMessageManager() {
+    return adminMessageManager;
   }
 
   /**
@@ -161,7 +171,8 @@ public final class C2monServiceGateway {
      * Default Constructor used by the Spring container
      * @param pSessionManager The C2MON session manager
      * @param pTagManager The tag manager singleton 
-     * @param psupervisionManager The supervision singleton
+     * @param pSupervisionManager The supervision singleton
+     * @param pAdminMessageManager The admin message manager 
      * @param pHistoryManager The history manager
      * @param pCommandManager The command manager
      */
@@ -169,12 +180,14 @@ public final class C2monServiceGateway {
     private SpringGatewayInitializer(
         final C2monSessionManager pSessionManager,
         final C2monTagManager pTagManager,
-        final C2monSupervisionManager psupervisionManager,
+        final C2monSupervisionManager pSupervisionManager,
+        final C2monAdminMessageManager pAdminMessageManager,
         final C2monHistoryManager pHistoryManager,
         final C2monCommandManager pCommandManager) {
       
       tagManager = pTagManager;
-      supervisionManager = psupervisionManager;
+      supervisionManager = pSupervisionManager;
+      adminMessageManager = pAdminMessageManager;
       historyManager = pHistoryManager;
       commandManager = pCommandManager;
       sessionManager = pSessionManager;

@@ -42,12 +42,14 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.client.jms.AdminMessageListener;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.HeartbeatListener;
 import cern.c2mon.client.jms.JmsProxy;
@@ -139,6 +141,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private SupervisionListenerWrapper supervisionListenerWrapper;
   
   /**
+   * Subscribes to the admin messages topic and notifies any registered listeners. 
+   */
+  private AdminMessageListenerWrapper adminMessageListenerWrapper;
+  
+  /**
    *  Subscribes to the Supervision topic and notifies any registered listeners.
    */
   private HeartbeatListenerWrapper heartbeatListenerWrapper;
@@ -177,6 +184,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Topic on which supervision events arrive from server.
    */
   private Destination supervisionTopic;
+  
+  /**
+   * Topic on which admin messages are being sent, and on which it arrives
+   */
+  private Destination adminMessageTopic;
     
   /**
    * Topic on which server heartbeat messages are arriving.
@@ -189,11 +201,14 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * @param supervisionTopic topic on which supervision events arrive from server
    */
   @Autowired
-  public JmsProxyImpl(final ConnectionFactory connectionFactory, @Qualifier("supervisionTopic") final Destination supervisionTopic,
-                      @Qualifier("heartbeatTopic") final Destination heartbeatTopic) {
+  public JmsProxyImpl(final ConnectionFactory connectionFactory, 
+      @Qualifier("supervisionTopic") final Destination supervisionTopic,
+      @Qualifier("heartbeatTopic") final Destination heartbeatTopic, 
+      @Qualifier("adminMessageTopic") final Destination adminMessageTopic) {
     this.jmsConnectionFactory = connectionFactory;
     this.supervisionTopic = supervisionTopic;
     this.heartbeatTopic = heartbeatTopic;
+    this.adminMessageTopic = adminMessageTopic;
     
     
     connected = false;
@@ -208,6 +223,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     connectionListeners = new ArrayList<ConnectionListener>(); 
     connectionListenersLock = new ReentrantReadWriteLock();
     supervisionListenerWrapper = new SupervisionListenerWrapper();
+    adminMessageListenerWrapper = new AdminMessageListenerWrapper();
     heartbeatListenerWrapper = new HeartbeatListenerWrapper();
   }
   
@@ -326,6 +342,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       } 
       //refresh supervision subscription
       subscribeToSupervisionTopic();
+      subscribeToAdminMessageTopic();
       subscribeToHeartbeatTopic();
     } catch (JMSException e) {
       LOGGER.error("Did not manage to refresh Topic subscriptions.", e);
@@ -333,7 +350,6 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     } finally {
       refreshLock.writeLock().unlock();
     }
-    
   }
   
   /**
@@ -346,8 +362,18 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     consumer.setMessageListener(heartbeatListenerWrapper);
   }
 
-
-
+  /**
+   * Called when refreshing subscriptions at start up and again
+   * if the connection goes down.
+   * 
+   * @throws JMSException if unable to subsribe
+   */
+  private void subscribeToAdminMessageTopic() throws JMSException {
+    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    final MessageConsumer consumer = session.createConsumer(adminMessageTopic);
+    consumer.setMessageListener(adminMessageListenerWrapper);
+  }
+  
   /**
    * Called when refreshing subscriptions at start up and again
    * if the connection goes down.
@@ -355,9 +381,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * @throws JMSException if unable to subsribe
    */
   private void subscribeToSupervisionTopic() throws JMSException {   
-      Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);                           
-      MessageConsumer consumer = session.createConsumer(supervisionTopic);                 
-      consumer.setMessageListener(supervisionListenerWrapper);           
+    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    MessageConsumer consumer = session.createConsumer(supervisionTopic);                 
+    consumer.setMessageListener(supervisionListenerWrapper);           
   }
 
   @Override
@@ -441,6 +467,33 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     }    
   }
 
+  @Override
+  public void publish(final String message, final String topicName, final long timeToLive) throws JMSException {
+    if (topicName == null) {
+      throw new NullPointerException("publish(..) method called with null queue name argument");
+    }
+    if (message == null) {
+      throw new NullPointerException("publish(..) method called with null message argument");
+    }
+    if (connected) {
+      final Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+      try {
+        final Message messageObj = session.createTextMessage(message);
+  
+        final MessageProducer producer = session.createProducer(new ActiveMQTopic(topicName));
+        producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+        producer.setTimeToLive(timeToLive);
+        producer.send(messageObj);
+      }
+      finally {
+        session.close();
+      }
+    }
+    else {
+      throw new JMSException("Not currently connected: unable to send message at this time.");
+    }
+  }
+  
   /**
    * ActiveMQ-specific implementation since need to create topic.
    */
@@ -583,6 +636,22 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       throw new NullPointerException("Trying to unregister null Supervision listener from JmsProxy.");
     }
     supervisionListenerWrapper.removeListener(supervisionListener);        
+  }
+  
+  @Override
+  public void registerAdminMessageListener(AdminMessageListener AdminMessageListener) {
+    if (AdminMessageListener == null) {
+      throw new NullPointerException("Trying to register null AdminMessage listener with JmsProxy.");
+    }
+    adminMessageListenerWrapper.addListener(AdminMessageListener);           
+  }
+
+  @Override
+  public void unregisterAdminMessageListener(final AdminMessageListener AdminMessageListener) { 
+    if (AdminMessageListener == null) {
+      throw new NullPointerException("Trying to unregister null AdminMessage listener from JmsProxy.");
+    }
+    adminMessageListenerWrapper.removeListener(AdminMessageListener);        
   }
 
   @Override

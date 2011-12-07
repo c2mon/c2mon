@@ -34,6 +34,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
+import cern.c2mon.client.common.admin.AdminMessage;
+import cern.c2mon.client.common.admin.AdminMessageDeliveryException;
+import cern.c2mon.client.common.admin.AdminMessageImpl;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -47,7 +50,6 @@ import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.client.command.CommandExecuteRequest;
 import cern.tim.shared.client.command.CommandReport;
-import cern.tim.shared.client.command.CommandReportImpl;
 import cern.tim.shared.client.command.CommandTagHandle;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
@@ -100,12 +102,18 @@ public class RequestHandlerImpl implements RequestHandler {
    * Name of request queue.
    */
   private String requestQueue;
-
+  
   /**
    * Default request timeout for requests. NullPointerException is thrown if
    * timeout occurs.
    */
   private int requestTimeout;
+  
+  /** The name of the admin message topic */
+  private String adminMessageTopic;
+  
+  /** The time to live after an admin message is sent */
+  private long adminMessageTimeout;
 
   /**
    * Executor for submitting requests to the server.
@@ -247,6 +255,29 @@ public class RequestHandlerImpl implements RequestHandler {
   }
 
   /**
+   * Sends the admin message to the {@link #adminMessageTopic}
+   * 
+   * @param adminMessage the admin message to send
+   * @throws AdminMessageDeliveryException if it fails to deliver the admin message for any reason
+   */
+  @Override
+  public void publishAdminMessage(final AdminMessage adminMessage) throws AdminMessageDeliveryException {
+    final AdminMessageImpl message;
+    if (adminMessage instanceof AdminMessageImpl) {
+      message = (AdminMessageImpl) adminMessage;
+    }
+    else {
+      message = new AdminMessageImpl(adminMessage);
+    }
+    try {
+      jmsProxy.publish(message.toJson(), adminMessageTopic, adminMessageTimeout);
+    }
+    catch (JMSException e) {
+      throw new AdminMessageDeliveryException("Failed to deliver the admin message", e);
+    }
+  }
+  
+  /**
    * Setter method.
    * 
    * @param requestQueue
@@ -256,6 +287,27 @@ public class RequestHandlerImpl implements RequestHandler {
   public void setRequestQueue(final String requestQueue) {
     this.requestQueue = requestQueue;
   }
+  
+  /**
+   * Setter method
+   * 
+   * @param adminMessageQueue the adminMessageQueue to set
+   */
+  @Required
+  public void setAdminMessageTopic(final String adminMessageTopic) {
+    this.adminMessageTopic = adminMessageTopic;
+  }
+
+  /**
+   * Setter method
+   * 
+   * @param adminMessageTimeout the adminMessageTimeout to set
+   */
+  @Required
+  public void setAdminMessageTimeout(final long adminMessageTimeout) {
+    this.adminMessageTimeout = adminMessageTimeout;
+  }
+
 
   /**
    * Setter method.

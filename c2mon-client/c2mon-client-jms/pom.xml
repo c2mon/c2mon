@@ -76,6 +76,7 @@
             -Dc2mon.client.jms.supervision.topic=c2mon.JmsProxy.test.supervision.topic
             -Dc2mon.client.jms.heartbeat.topic=c2mon.JmsProxy.test.heartbeat.topic
             -Dc2mon.client.jms.request.queue=c2mon.JmsProxy.test.request.queue
+            -Dc2mon.client.jms.adminmessage.topic=JmsProxy.test.adminmessage
           </argLine>
         </configuration>
       </plugin>

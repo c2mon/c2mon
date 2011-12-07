@@ -22,6 +22,10 @@
     <constructor-arg value="${c2mon.client.jms.supervision.topic}"/>
   </bean>
   
+  <bean id="adminMessageTopic" class="org.apache.activemq.command.ActiveMQTopic">
+    <constructor-arg value="${c2mon.client.jms.adminmessage.topic}"/>
+  </bean>
+  
   <bean id="heartbeatTopic" class="org.apache.activemq.command.ActiveMQTopic">
     <constructor-arg value="${c2mon.client.jms.heartbeat.topic}"/>
   </bean>
@@ -29,6 +33,8 @@
   <bean class="cern.c2mon.client.jms.impl.RequestHandlerImpl" autowire="constructor">
     <property name="requestQueue" value="${c2mon.client.jms.request.queue}"/>
     <property name="requestTimeout" value="30000"/>
+    <property name="adminMessageTopic" value="${c2mon.client.jms.adminmessage.topic}"/>
+    <property name="adminMessageTimeout" value="60000"/>
   </bean>
 
 </beans>

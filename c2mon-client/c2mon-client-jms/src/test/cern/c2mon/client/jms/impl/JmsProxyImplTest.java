@@ -61,12 +61,13 @@ public class JmsProxyImplTest {
   
   @Before
   public void setUp() {
-    connectionFactory = EasyMock.createMock(ConnectionFactory.class);
-    connection = EasyMock.createMock(Connection.class);
-    session = EasyMock.createMock(Session.class);
-    Destination supervisionTopic = EasyMock.createMock(Destination.class);
-    Destination heartbeatTopic = EasyMock.createMock(Destination.class);
-    jmsProxy = new JmsProxyImpl(connectionFactory, supervisionTopic, heartbeatTopic);
+    connectionFactory = EasyMock.createNiceMock(ConnectionFactory.class);
+    connection = EasyMock.createNiceMock(Connection.class);
+    session = EasyMock.createNiceMock(Session.class);
+    Destination supervisionTopic = EasyMock.createNiceMock(Destination.class);
+    Destination adminMessageTopic = EasyMock.createNiceMock(Destination.class);
+    Destination heartbeatTopic = EasyMock.createNiceMock(Destination.class);
+    jmsProxy = new JmsProxyImpl(connectionFactory, supervisionTopic, heartbeatTopic, adminMessageTopic);
   }
   
   /**

@@ -22,6 +22,8 @@ import java.util.Collection;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.common.admin.AdminMessage;
+import cern.c2mon.client.common.admin.AdminMessageDeliveryException;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -134,6 +136,14 @@ public interface RequestHandler {
    */
   <T> CommandReport executeCommand(CommandExecuteRequest<T> commandExecuteRequest) throws JMSException;
 
+  /**
+   * Sends the admin message to the admin message topic
+   * 
+   * @param adminMessage the admin message to send
+   * @throws AdminMessageDeliveryException if it fails to deliver the admin message for any reason
+   */
+  void publishAdminMessage(final AdminMessage adminMessage) throws AdminMessageDeliveryException;
+  
   /**
    * Requests the DAQ config XML for a given process. Never returns null.
    * @param processName the name of the Process
