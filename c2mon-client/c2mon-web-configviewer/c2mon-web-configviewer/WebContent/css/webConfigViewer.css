@@ -1,0 +1,76 @@
+.tagName {
+	font-size: 16px;
+	font-weight: bold;
+	color: black;
+}
+.notFound {
+	font-size: 16px;
+	font-weight: bold;
+	color:#CC0022;
+}
+.instruction {
+	font-size: 14px;
+	font-weight: bold;
+	color: black;
+}
+
+.configViewer_margin{
+	margin: 1em;
+}
+
+.bold {
+	font-weight: bold;
+	width: 150px;
+}
+
+.configViewer_header {
+	font-size: 14px;
+	font-weight: bold;
+	color: white;
+	text-align: ;
+	background-image:url(../img/config_viewer_header.png);background-repeat:repeat-x; 
+	height: 30px;
+	padding: 5px 10px;
+}
+
+.column {
+	width: 800px;
+	margin: 0px 0px 50px 0px;
+	vertical-align: top;
+}
+
+.columnA {
+	display: inline-block;
+	/* the following yanked from Hedger Wang to give inline-block to natively block elements. */
+	/*display:-moz-inline-stack;/*Firefox need this to simulate display:inline-block*/
+	/*display:inline-block; /*IE does not apply this to Block Element, and Firefox does not render this, too*/
+	zoom:1;/*trigger hasLayout*/
+	*display:inline;/*once hasLayout is true, set display:inline to block element will make display:inline behave like display:inline-block*/
+	width: 500px;
+	margin: 0px 0px 10px 0px;
+	vertical-align: top;
+}
+
+.columnB {
+	display: inline-block;
+	zoom: 1;			/*trigger hasLayout*/
+    *display: inline;	/*once hasLayout is true, set display:inline to block element will make display:inline behave like display:inline-block*/
+	width: 800px;
+	margin: 0px 0px 10px 0px;
+	vertical-align: top;
+}
+
+iframe {
+	width: 100%;
+	height: 800px;
+	background: #FFF;
+}
+/*.xmlViewport {
+	position: absolute; 
+	left: 10px;
+	top: 150px; 
+	right: 10px;
+	bottom: 0px;
+	background: #FFF;
+}*/
+
