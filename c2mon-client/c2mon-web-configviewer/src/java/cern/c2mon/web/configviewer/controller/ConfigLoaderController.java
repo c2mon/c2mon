@@ -68,12 +68,7 @@ public class ConfigLoaderController {
     public String viewCommand(@PathVariable final String id, final Model model) {
         logger.info("/configloader/{id} " + id);
         model.addAllAttributes(getConfigurationReport(id));
-        
-        LoginForm loginForm = new LoginForm();
-        ((Map<String, Object>) model).put("loginForm", loginForm);
-        return "loginform";
-        
-//        return "tagInfo";
+        return "tagInfo";
     }
     
     /**
