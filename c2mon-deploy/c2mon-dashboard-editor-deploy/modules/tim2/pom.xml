@@ -11,12 +11,12 @@
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
-	<artifactId>c2mon-dashboard-editor-tim2</artifactId>
-	<name>TIM2 Dashboard Editor deployment module</name>
+	<artifactId>c2mon-dashboard-editor-dmn2</artifactId>
+	<name>DIAMON2 Dashboard Editor deployment module</name>
 	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<description>The TIM2 Dashboard Editor deployment module</description>
+	<description>The TIM Dashboard Editor deployment module for DIAMON</description>
 	<url></url>
 
 	<dependencies>
@@ -109,7 +109,7 @@
 				<configuration>
 
 					<descriptors>
-						<descriptor>src/assembly/tim2-dashboard-editor-assembly.xml</descriptor>
+						<descriptor>src/assembly/dmn2-dashboard-editor-assembly.xml</descriptor>
 					</descriptors>
 
 				</configuration>
