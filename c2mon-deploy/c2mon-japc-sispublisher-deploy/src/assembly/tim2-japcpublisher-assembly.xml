@@ -41,7 +41,7 @@
 		<!--  copy TID list to which the japc publisher has to subscribe -->
 		<file>
 			<source>${basedir}/conf/publisher.tid</source>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory>conf/</outputDirectory>
 			<destName>publisher.tid</destName>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
