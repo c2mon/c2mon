@@ -42,9 +42,9 @@ public class LoginController {
       return "loginform";
     }
     
-    if (!C2monServiceGateway.getSessionManager().isAuthorized(userName, authorizationDetails)) {
-      return "loginform";
-    }    
+//    if (!C2monServiceGateway.getSessionManager().isAuthorized(userName, authorizationDetails)) {
+//      return "loginform";
+//    }    
     
     model.put("loginForm", loginForm);
     return "loginsuccess";
