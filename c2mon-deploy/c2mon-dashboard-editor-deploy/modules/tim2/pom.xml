@@ -20,10 +20,6 @@
 	<url></url>
 
 	<dependencies>
-		<dependency>
-			<groupId>cern.tim.tim-client</groupId>
-			<artifactId>tim-dashboard-editor</artifactId>
-		</dependency>
 	</dependencies>
 
 	<developers />

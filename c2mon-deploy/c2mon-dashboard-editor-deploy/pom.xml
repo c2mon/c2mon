@@ -20,6 +20,13 @@
 		C2MON module assembling all required modules and configuration files for tim-dashboard-editor
         </description>
 	<url></url>
+	
+	<dependencies>
+    <dependency>
+      <groupId>cern.tim.tim-client</groupId>
+      <artifactId>tim-dashboard-editor</artifactId>
+    </dependency>
+  </dependencies>
 
 	<properties>
 		<c2mon.jarsigner.key>/user/pcrops/production/cmmnbuild/cmmnbuild/build/dist/cmmnbuild/includes/slcerts
