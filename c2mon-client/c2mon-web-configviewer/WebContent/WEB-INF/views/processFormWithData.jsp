@@ -18,7 +18,7 @@
 <c:url var="submitUrl" value="${formSubmitUrl}"/>
 
 <form:form action="${submitUrl}" method="post">
-	<select>
+	<select name="id">
 		<c:forEach items="${processNames}" var="processName">  
   			<option>${processName}</option>
     	</c:forEach>  

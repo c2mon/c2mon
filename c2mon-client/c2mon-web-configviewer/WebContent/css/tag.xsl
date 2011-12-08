@@ -22,7 +22,7 @@
 	</xsl:template>
 	
 	<!--  link variables  -->
-	<xsl:variable name="base_url">http://tim11:8080/c2mon-web-configviewer/</xsl:variable>
+	<xsl:variable name="base_url">/c2mon-web-configviewer/</xsl:variable>
 	<xsl:variable name="alarm_url">alarmviewer/</xsl:variable>
 	<xsl:variable name="datatag_url">tagviewer/</xsl:variable>
 	<xsl:variable name="process_xml_url">process/xml/</xsl:variable>
@@ -402,8 +402,8 @@
 		<p class="tagName"> 
 					DAQ Process XML Viewer 
 					<br></br><br></br>
-					Process: <xsl:value-of select="jms-user"/>
-					<a href="{$base_url}{$process_xml_url}{jms-user}/">(view as xml)</a>
+					<p>Process: <xsl:value-of select="jms-user"/>
+					<a href="{$base_url}{$process_xml_url}{jms-user}/">(view as xml)</a></p>
 		</p>
 	<div class="column">
 		<table class="inline">

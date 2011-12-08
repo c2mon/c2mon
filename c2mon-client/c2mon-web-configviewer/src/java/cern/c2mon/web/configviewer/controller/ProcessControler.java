@@ -105,7 +105,7 @@ public class ProcessControler {
   }
 
   /**
-   * Displays an input form, and if a POST was made, also the process xmld ata.
+   * Displays an input form, and if a POST was made, also the process xml data.
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
