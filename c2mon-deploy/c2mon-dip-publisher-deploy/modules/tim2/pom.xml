@@ -30,7 +30,7 @@
 				<configuration>
 
 					<descriptors>
-						<descriptor>src/assembly/tim2-japcpublisher-assembly.xml</descriptor>
+						<descriptor>src/assembly/tim2-dippublisher-assembly.xml</descriptor>
 					</descriptors>
 
 				</configuration>
