@@ -203,12 +203,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   @Autowired
   public JmsProxyImpl(final ConnectionFactory connectionFactory, 
       @Qualifier("supervisionTopic") final Destination supervisionTopic,
-      @Qualifier("heartbeatTopic") final Destination heartbeatTopic, 
-      @Qualifier("adminMessageTopic") final Destination adminMessageTopic) {
+      @Qualifier("heartbeatTopic") final Destination heartbeatTopic) {
     this.jmsConnectionFactory = connectionFactory;
     this.supervisionTopic = supervisionTopic;
     this.heartbeatTopic = heartbeatTopic;
-    this.adminMessageTopic = adminMessageTopic;
+    this.adminMessageTopic = null;
     
     
     connected = false;
@@ -342,8 +341,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       } 
       //refresh supervision subscription
       subscribeToSupervisionTopic();
-      subscribeToAdminMessageTopic();
       subscribeToHeartbeatTopic();
+      subscribeToAdminMessageTopic();
     } catch (JMSException e) {
       LOGGER.error("Did not manage to refresh Topic subscriptions.", e);
       throw e;
@@ -369,9 +368,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * @throws JMSException if unable to subsribe
    */
   private void subscribeToAdminMessageTopic() throws JMSException {
-    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-    final MessageConsumer consumer = session.createConsumer(adminMessageTopic);
-    consumer.setMessageListener(adminMessageListenerWrapper);
+    if (adminMessageTopic != null) {
+      Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+      final MessageConsumer consumer = session.createConsumer(adminMessageTopic);
+      consumer.setMessageListener(adminMessageListenerWrapper);
+    }
   }
   
   /**
@@ -639,19 +640,23 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
   
   @Override
-  public void registerAdminMessageListener(AdminMessageListener AdminMessageListener) {
-    if (AdminMessageListener == null) {
+  public void registerAdminMessageListener(final AdminMessageListener adminMessageListener) {
+    if (adminMessageListener == null) {
       throw new NullPointerException("Trying to register null AdminMessage listener with JmsProxy.");
     }
-    adminMessageListenerWrapper.addListener(AdminMessageListener);           
+    if (adminMessageTopic == null) {
+      throw new IllegalStateException(String.format("Cannot register '%s' without having the admin message topic", 
+          AdminMessageListener.class.getSimpleName()));
+    }
+    adminMessageListenerWrapper.addListener(adminMessageListener);           
   }
 
   @Override
-  public void unregisterAdminMessageListener(final AdminMessageListener AdminMessageListener) { 
-    if (AdminMessageListener == null) {
+  public void unregisterAdminMessageListener(final AdminMessageListener adminMessageListener) { 
+    if (adminMessageListener == null) {
       throw new NullPointerException("Trying to unregister null AdminMessage listener from JmsProxy.");
     }
-    adminMessageListenerWrapper.removeListener(AdminMessageListener);        
+    adminMessageListenerWrapper.removeListener(adminMessageListener);        
   }
 
   @Override
@@ -670,6 +675,22 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     heartbeatListenerWrapper.removeListener(heartbeatListener);
   }
   
+  @Override
+  public synchronized void setAdminMessageTopic(final Destination adminMessageTopic) {
+    if (this.adminMessageTopic != null) {
+      throw new IllegalStateException("Cannot set the admin message topic more than one time");
+    }
+    this.adminMessageTopic = adminMessageTopic;
+    if (this.adminMessageTopic != null && this.connected) {
+      try {
+        subscribeToAdminMessageTopic();
+      }
+      catch (JMSException e) {
+        LOGGER.error("Unable to subscribe to the admin message topic, this functionality may not function properly.", e);
+      }
+    }
+  }
+
   @PostConstruct
   public void init() {
     //thread starting connection; is stopped when calling shutdown method

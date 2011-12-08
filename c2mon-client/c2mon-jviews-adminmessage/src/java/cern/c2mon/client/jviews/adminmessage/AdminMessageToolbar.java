@@ -40,10 +40,10 @@ import org.apache.log4j.Logger;
 import cern.c2mon.client.common.admin.AdminMessage;
 import cern.c2mon.client.common.admin.AdminMessageDeliveryException;
 import cern.c2mon.client.common.listener.SessionListener;
-import cern.c2mon.client.core.C2monAdminMessageManager;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monSessionManager;
 import cern.c2mon.client.jms.AdminMessageListener;
+import cern.c2mon.client.module.C2monAdminMessageManager;
 
 /**
  * This toolbar allows administrators to send a broadcast message

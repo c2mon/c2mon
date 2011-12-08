@@ -30,7 +30,6 @@ import javax.jms.Session;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.SmartLifecycle;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.jms.JmsProxy;
@@ -65,9 +64,8 @@ public class JmsProxyImplTest {
     connection = EasyMock.createNiceMock(Connection.class);
     session = EasyMock.createNiceMock(Session.class);
     Destination supervisionTopic = EasyMock.createNiceMock(Destination.class);
-    Destination adminMessageTopic = EasyMock.createNiceMock(Destination.class);
     Destination heartbeatTopic = EasyMock.createNiceMock(Destination.class);
-    jmsProxy = new JmsProxyImpl(connectionFactory, supervisionTopic, heartbeatTopic, adminMessageTopic);
+    jmsProxy = new JmsProxyImpl(connectionFactory, supervisionTopic, heartbeatTopic);
   }
   
   /**

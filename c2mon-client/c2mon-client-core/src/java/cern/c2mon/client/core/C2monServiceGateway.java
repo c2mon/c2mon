@@ -17,14 +17,17 @@
  ******************************************************************************/
 package cern.c2mon.client.core;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.stereotype.Service;
+
+import cern.c2mon.client.module.C2monAdminMessageManager;
 
 /**
  * This class is the main facade for all applications using the
@@ -40,6 +43,12 @@ public final class C2monServiceGateway {
   
   /** Class logger */
   private static final Logger LOGGER = Logger.getLogger(C2monServiceGateway.class);
+  
+  /** The path to the core Spring XML */
+  private static final String APPLICATION_SPRING_XML_PATH = "cern/c2mon/client/core/config/c2mon-client.xml";
+  
+  /** The path to the admin message Spring XML */
+  private static final String ADMIN_MESSAGE_SPRING_XML_PATH = "cern/c2mon/client/module/adminmessage/config/c2mon-client-adminmessage.xml";
   
   /** Static reference to the <code>C2monSessionManager</code> singleton instance */
   private static C2monSessionManager sessionManager = null;
@@ -111,6 +120,9 @@ public final class C2monServiceGateway {
    * @return the admin message manager
    */
   public static C2monAdminMessageManager getAdminMessageManager() {
+    if (adminMessageManager == null) {
+      throw new RuntimeException("The admin message module is not enabled. When starting the C2mon client, please specify in the parameters to enable the admin message module.");
+    }
     return adminMessageManager;
   }
 
@@ -122,11 +134,21 @@ public final class C2monServiceGateway {
    * thread, and will return once the core is ready for use. Notice
    * that the method will return even if the core cannot connect to
    * JMS (reconnection attempts will be made until successful).
+   * 
+   * @param modules the modules that should be supported by the service gateway
    */
-  public static void startC2monClient() {
+  public static void startC2monClient(final Module ... modules) {
     LOGGER.info("Starting C2MON client core.");
+    
+    final Set<String> springXmlFiles = getSpringXmlPathsOfModules(modules);
+    springXmlFiles.add(APPLICATION_SPRING_XML_PATH);
+    
     final ClassPathXmlApplicationContext xmlContext = 
-                    new ClassPathXmlApplicationContext("cern/c2mon/client/core/config/c2mon-client.xml");    
+                    new ClassPathXmlApplicationContext(springXmlFiles.toArray(new String[0]));
+    
+    initiateGatewayFields(xmlContext);
+    registerModules(xmlContext, modules);
+    
     xmlContext.registerShutdownHook();
   }
   
@@ -134,8 +156,9 @@ public final class C2monServiceGateway {
    * Start the C2MON core, importing properties from the specified location.
    * 
    * @param propertyFileLocation properties to load into context (eg. file:/user/smith/properties.txt or classpath:properties.txt)
+   * @param modules the modules that should be supported by the service gateway
    */
-  public static void startC2monClient(final String propertyFileLocation) {
+  public static void startC2monClient(final String propertyFileLocation, final Module ... modules) {
     LOGGER.info("Starting C2MON client core, loading properties from " + propertyFileLocation);    
 
     GenericBeanDefinition propertiesFactoryBean = new GenericBeanDefinition();
@@ -149,48 +172,76 @@ public final class C2monServiceGateway {
     ctx.registerBeanDefinition("clientProperties", propertiesFactoryBean);        
     ctx.refresh();
     
-    String[] springXmlFiles = {"cern/c2mon/client/core/config/c2mon-client.xml",                                         
-                               "cern/c2mon/client/core/config/c2mon-client-properties.xml"}; 
+    final Set<String> springXmlFiles = getSpringXmlPathsOfModules(modules);
+    springXmlFiles.add(APPLICATION_SPRING_XML_PATH);
+    springXmlFiles.add("cern/c2mon/client/core/config/c2mon-client-properties.xml");
     
     final ClassPathXmlApplicationContext xmlContext = 
-                    new ClassPathXmlApplicationContext(springXmlFiles, ctx);    
+                    new ClassPathXmlApplicationContext(springXmlFiles.toArray(new String[0]), ctx);
+    
+    initiateGatewayFields(xmlContext);
+    registerModules(xmlContext, modules);
+    
     xmlContext.registerShutdownHook();
   }
   
   /**
-   * The lifecycle of this inner class is managed by the Spring
-   * context. It's purpose is to set the static fields of the
-   * gateway.
-   *
-   * @author Matthias Braeger
+   * Initiate the static fields, retrieving it from the <code>xmlContext</code>
+   * 
+   * @param xmlContext the application context
    */
-  @Service
-  private static class SpringGatewayInitializer {
-    
-    /**
-     * Default Constructor used by the Spring container
-     * @param pSessionManager The C2MON session manager
-     * @param pTagManager The tag manager singleton 
-     * @param pSupervisionManager The supervision singleton
-     * @param pAdminMessageManager The admin message manager 
-     * @param pHistoryManager The history manager
-     * @param pCommandManager The command manager
-     */
-    @Autowired
-    private SpringGatewayInitializer(
-        final C2monSessionManager pSessionManager,
-        final C2monTagManager pTagManager,
-        final C2monSupervisionManager pSupervisionManager,
-        final C2monAdminMessageManager pAdminMessageManager,
-        final C2monHistoryManager pHistoryManager,
-        final C2monCommandManager pCommandManager) {
-      
-      tagManager = pTagManager;
-      supervisionManager = pSupervisionManager;
-      adminMessageManager = pAdminMessageManager;
-      historyManager = pHistoryManager;
-      commandManager = pCommandManager;
-      sessionManager = pSessionManager;
+  private static void initiateGatewayFields(final ClassPathXmlApplicationContext xmlContext) {
+    sessionManager = xmlContext.getBean(C2monSessionManager.class);
+    tagManager = xmlContext.getBean(C2monTagManager.class);
+    supervisionManager = xmlContext.getBean(C2monSupervisionManager.class);
+    historyManager = xmlContext.getBean(C2monHistoryManager.class);
+    commandManager = xmlContext.getBean(C2monCommandManager.class);
+  }
+  
+  /**
+   * Gets beans from the XML context 
+   * 
+   * @param xmlContext the xml context to get the beans from
+   * @param modules the modules to load
+   */
+  private static void registerModules(final ClassPathXmlApplicationContext xmlContext, final Module ... modules) {
+    for (Module module : modules) {
+      switch (module) {
+      case ADMIN_MESSAGE:
+        adminMessageManager = xmlContext.getBean(C2monAdminMessageManager.class);
+        break;
+      default:
+        throw new RuntimeException(String.format("The Spring module '%s' is unknown.", module.toString()));
+      }
     }
   }
+  
+  /**
+   * Gives the spring XML paths for the given <code>modules</code>
+   * 
+   * @param modules the modules to get the context paths for
+   * @return the spring context paths of the given modules
+   */
+  private static Set<String> getSpringXmlPathsOfModules(final Module ... modules) {
+    final Set<String> contexts = new HashSet<String>();
+    for (Module module : modules) {
+      switch (module) {
+      case ADMIN_MESSAGE:
+        contexts.add(ADMIN_MESSAGE_SPRING_XML_PATH);
+        break;
+      default:
+        throw new RuntimeException(String.format("The Spring xml path of module '%s' is unknown.", module.toString()));
+      }
+    }
+    return contexts;
+  }
+  
+  /**
+   * Optional modules that can be included in the service gateway
+   */
+  public enum Module {
+    /** The {@link C2monServiceGateway#getAdminMessageManager()} is supported */
+    ADMIN_MESSAGE
+  }
+  
 }

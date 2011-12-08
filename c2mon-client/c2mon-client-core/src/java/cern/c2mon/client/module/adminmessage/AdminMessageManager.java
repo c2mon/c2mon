@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.core.manager;
+package cern.c2mon.client.module.adminmessage;
 
 import java.sql.Timestamp;
 import java.util.Iterator;
@@ -31,11 +31,10 @@ import cern.c2mon.client.common.admin.AdminMessage;
 import cern.c2mon.client.common.admin.AdminMessageDeliveryException;
 import cern.c2mon.client.common.admin.AdminMessageImpl;
 import cern.c2mon.client.common.util.ConcurrentSet;
-import cern.c2mon.client.core.C2monAdminMessageManager;
 import cern.c2mon.client.core.C2monSessionManager;
 import cern.c2mon.client.jms.AdminMessageListener;
-import cern.c2mon.client.jms.JmsProxy;
-import cern.c2mon.client.jms.RequestHandler;
+import cern.c2mon.client.module.C2monAdminMessageManager;
+import cern.c2mon.client.module.adminmessage.handler.AdminMessageHandler;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
 import cern.tim.shared.common.command.AuthorizationDetails;
 
@@ -64,19 +63,21 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
   /** A set of listeners */
   private final Set<AdminMessageListener> adminMessageListeners;
   
-  /** Instance of the jms proxy */
-  private final JmsProxy jmsProxy;
-  
-  /** Instance of the request handler */
-  private final RequestHandler requestHandler;
+  /** Instance of the admin message handler */
+  private final AdminMessageHandler adminMessageHandler;
   
   /** Instance of the session manager */
   private final C2monSessionManager sessionManager;
   
+  /**
+   * Constructor
+   * 
+   * @param adminMessageHandler the admin message handler
+   * @param sessionManager the session manager
+   */
   @Autowired
-  protected AdminMessageManager(final JmsProxy jmsProxy, final RequestHandler requestHandler, final C2monSessionManager sessionManager) {
-    this.jmsProxy = jmsProxy;
-    this.requestHandler = requestHandler;
+  protected AdminMessageManager(final AdminMessageHandler adminMessageHandler, final C2monSessionManager sessionManager) {
+    this.adminMessageHandler = adminMessageHandler;
     this.sessionManager = sessionManager;
     this.adminMessageListeners = new ConcurrentSet<AdminMessageListener>();
   }
@@ -87,7 +88,7 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
   @SuppressWarnings("unused")
   @PostConstruct
   private void init() {
-    jmsProxy.registerAdminMessageListener(this);
+    adminMessageHandler.registerAdminMessageListener(this);
   }
 
   @Override
@@ -106,7 +107,7 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
   public void sendAdminMessage(final String userName, final AdminMessage.AdminMessageType type, final String message) throws AdminMessageDeliveryException {
     if (isUserAllowedToSend(userName)) {
       final AdminMessage adminMessage = new AdminMessageImpl(type, userName, message, new Timestamp(System.currentTimeMillis()));
-      requestHandler.publishAdminMessage(adminMessage);
+      adminMessageHandler.publishAdminMessage(adminMessage);
     }
     else {
       throw new AdminMessageDeliveryException(String.format(

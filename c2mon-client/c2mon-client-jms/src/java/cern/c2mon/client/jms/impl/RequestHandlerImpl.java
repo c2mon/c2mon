@@ -34,9 +34,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
-import cern.c2mon.client.common.admin.AdminMessage;
-import cern.c2mon.client.common.admin.AdminMessageDeliveryException;
-import cern.c2mon.client.common.admin.AdminMessageImpl;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -109,12 +106,6 @@ public class RequestHandlerImpl implements RequestHandler {
    */
   private int requestTimeout;
   
-  /** The name of the admin message topic */
-  private String adminMessageTopic;
-  
-  /** The time to live after an admin message is sent */
-  private long adminMessageTimeout;
-
   /**
    * Executor for submitting requests to the server.
    */
@@ -253,29 +244,6 @@ public class RequestHandlerImpl implements RequestHandler {
     LOGGER.debug("Client request completed.");
     return finalCollection;
   }
-
-  /**
-   * Sends the admin message to the {@link #adminMessageTopic}
-   * 
-   * @param adminMessage the admin message to send
-   * @throws AdminMessageDeliveryException if it fails to deliver the admin message for any reason
-   */
-  @Override
-  public void publishAdminMessage(final AdminMessage adminMessage) throws AdminMessageDeliveryException {
-    final AdminMessageImpl message;
-    if (adminMessage instanceof AdminMessageImpl) {
-      message = (AdminMessageImpl) adminMessage;
-    }
-    else {
-      message = new AdminMessageImpl(adminMessage);
-    }
-    try {
-      jmsProxy.publish(message.toJson(), adminMessageTopic, adminMessageTimeout);
-    }
-    catch (JMSException e) {
-      throw new AdminMessageDeliveryException("Failed to deliver the admin message", e);
-    }
-  }
   
   /**
    * Setter method.
@@ -287,27 +255,6 @@ public class RequestHandlerImpl implements RequestHandler {
   public void setRequestQueue(final String requestQueue) {
     this.requestQueue = requestQueue;
   }
-  
-  /**
-   * Setter method
-   * 
-   * @param adminMessageQueue the adminMessageQueue to set
-   */
-  @Required
-  public void setAdminMessageTopic(final String adminMessageTopic) {
-    this.adminMessageTopic = adminMessageTopic;
-  }
-
-  /**
-   * Setter method
-   * 
-   * @param adminMessageTimeout the adminMessageTimeout to set
-   */
-  @Required
-  public void setAdminMessageTimeout(final long adminMessageTimeout) {
-    this.adminMessageTimeout = adminMessageTimeout;
-  }
-
 
   /**
    * Setter method.

@@ -19,6 +19,7 @@ package cern.c2mon.client.jms;
  *****************************************************************************/
 import java.util.Collection;
 
+import javax.jms.Destination;
 import javax.jms.JMSException;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
@@ -177,21 +178,31 @@ public interface JmsProxy {
   void unregisterSupervisionListener(SupervisionListener supervisionListener);
   
   /**
+   * Sets the admin message topic on which admin messages will be received.
+   * This method can only be called once!
+   * 
+   * @param adminMessageTopic the adminMessageTopic to set
+   * @throws IllegalStateException if trying to set the admin message topic a second time
+   */
+  void setAdminMessageTopic(final Destination adminMessageTopic);
+  
+  /**
    * Register a listener to be notified of AdminMessage events received
    * from the server.
    * 
-   * @param AdminMessageListener the listener to register
+   * @param adminMessageListener the listener to register
    * @throws NullPointerException if argument is null
+   * @throws IllegalStateException if 
    */
-  void registerAdminMessageListener(AdminMessageListener AdminMessageListener);
+  void registerAdminMessageListener(AdminMessageListener adminMessageListener);
   
   /**
    * Unregister the listener from receiving AdminMessage updates.
    * 
-   * @param AdminMessageListener the listener to remove
+   * @param adminMessageListener the listener to remove
    * @throws NullPointerException if argument is null
    */
-  void unregisterAdminMessageListener(AdminMessageListener AdminMessageListener);
+  void unregisterAdminMessageListener(AdminMessageListener adminMessageListener);
 
   
   /**

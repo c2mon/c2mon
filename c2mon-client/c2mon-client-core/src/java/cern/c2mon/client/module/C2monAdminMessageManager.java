@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.client.core;
+package cern.c2mon.client.module;
 
 import cern.c2mon.client.common.admin.AdminMessage;
 import cern.c2mon.client.common.admin.AdminMessageDeliveryException;
