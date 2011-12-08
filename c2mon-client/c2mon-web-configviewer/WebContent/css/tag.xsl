@@ -22,7 +22,7 @@
 	</xsl:template>
 	
 	<!--  link variables  -->
-	<xsl:variable name="base_url">http://localhost:8080/c2mon-web-configviewer/</xsl:variable>
+	<xsl:variable name="base_url">http://tim11:8080/c2mon-web-configviewer/</xsl:variable>
 	<xsl:variable name="alarm_url">alarmviewer/</xsl:variable>
 	<xsl:variable name="datatag_url">tagviewer/</xsl:variable>
 	<xsl:variable name="process_xml_url">process/xml/</xsl:variable>
