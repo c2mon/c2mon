@@ -115,8 +115,10 @@ public class ProcessControler {
     logger.info("/process/form " + id);
     if (id == null)
       model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, null, null));
-    else
-      model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, id, PROCESS_URL + id));
+    else {
+      return ("redirect:"+PROCESS_URL+id);
+//      model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_URL + id, id, PROCESS_URL + id));
+    }
 
     return "processFormWithData";
   }

@@ -13,7 +13,7 @@
 				<li><a href="alarmviewer/form"> Alarm Viewer </a>	</li>
 				<li><a href="commandviewer/form"> Command Viewer </a>	</li>
 				<li><a href="configloader/form"> Config Loader </a>	</li>
-				<li><a href="process/P_GTCCHILLSU6"> DAQ XML Viewer </a>	</li>
+				<li><a href="process/form"> DAQ XML Viewer </a>	</li>
 			</ul>
 	</body>
 </html>
