@@ -88,14 +88,9 @@ public class AdminMessageToolbar extends JToolBar {
     sendButton = createButton();
     historyButton = createButton();
     
-    Image image = Toolkit.getDefaultToolkit().getImage(AdminMessageToolbar.class.getClassLoader().getResource("message.gif"));
-    image = image.getScaledInstance(20, 20, Image.SCALE_AREA_AVERAGING);
-    ImageIcon imgIcon = new ImageIcon(image);
-
-    //sendButton.setText("Send message");
-    sendButton.setIcon(imgIcon);
+    sendButton.setIcon(loadImage("Message_write.gif"));
     sendButton.setToolTipText("Send administrator message");
-    historyButton.setText("...");
+    historyButton.setIcon(loadImage("Message_receieved.gif"));
     historyButton.setToolTipText("Read old administrator messages.");
       
     this.historyButton.addActionListener(new HistoryButtonEventHandler());
@@ -108,6 +103,24 @@ public class AdminMessageToolbar extends JToolBar {
     this.sessionManager.addSessionListener(new SessionEventHandler());
     
     checkAccessRights(getFirstUsername());
+  }
+  
+  /**
+   * @param name the file name of the icon to load
+   * @return the image
+   */
+  private static ImageIcon loadImage(final String name) {
+    try {
+      Image image = Toolkit.getDefaultToolkit().getImage(AdminMessageToolbar.class.getClassLoader().getResource(name));
+      image = image.getScaledInstance(16, 16, Image.SCALE_AREA_AVERAGING);
+      return new ImageIcon(image);
+    }
+    catch (Exception e) {
+      LOG.error(String.format(
+          "Unable to load image '%s'", name
+          ), e);
+      return null;
+    }
   }
   
   /**

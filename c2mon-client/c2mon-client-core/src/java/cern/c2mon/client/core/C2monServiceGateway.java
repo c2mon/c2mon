@@ -47,9 +47,6 @@ public final class C2monServiceGateway {
   /** The path to the core Spring XML */
   private static final String APPLICATION_SPRING_XML_PATH = "cern/c2mon/client/core/config/c2mon-client.xml";
   
-  /** The path to the admin message Spring XML */
-  private static final String ADMIN_MESSAGE_SPRING_XML_PATH = "cern/c2mon/client/module/adminmessage/config/c2mon-client-adminmessage.xml";
-  
   /** Static reference to the <code>C2monSessionManager</code> singleton instance */
   private static C2monSessionManager sessionManager = null;
   
@@ -225,13 +222,7 @@ public final class C2monServiceGateway {
   private static Set<String> getSpringXmlPathsOfModules(final Module ... modules) {
     final Set<String> contexts = new HashSet<String>();
     for (Module module : modules) {
-      switch (module) {
-      case ADMIN_MESSAGE:
-        contexts.add(ADMIN_MESSAGE_SPRING_XML_PATH);
-        break;
-      default:
-        throw new RuntimeException(String.format("The Spring xml path of module '%s' is unknown.", module.toString()));
-      }
+      contexts.add(module.getXmlPath());
     }
     return contexts;
   }
@@ -241,7 +232,22 @@ public final class C2monServiceGateway {
    */
   public enum Module {
     /** The {@link C2monServiceGateway#getAdminMessageManager()} is supported */
-    ADMIN_MESSAGE
+    ADMIN_MESSAGE("cern/c2mon/client/module/adminmessage/config/c2mon-client-adminmessage.xml");
+    
+    /** The path to the spring xml file for the module */
+    private final String xmlPath;
+    
+    /**
+     * @param xmlPath The path to the spring xml file for the module
+     */
+    private Module(final String xmlPath) {
+      this.xmlPath = xmlPath;
+    }
+
+    /** @return The path to the spring xml file for the module */
+    protected String getXmlPath() {
+      return xmlPath;
+    }
   }
   
 }
