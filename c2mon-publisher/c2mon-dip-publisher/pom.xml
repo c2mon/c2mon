@@ -5,27 +5,34 @@
     <artifactId>c2mon-client-pom</artifactId>
     <version>1.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>c2mon-dip-publisher</groupId>
+  <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-dip-publisher</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <name>The DIP Publisher based on the C2MON Client API</name>
+  <version>1.0.1-SNAPSHOT</version>
+  <description>The DIP Publisher for C2MON registeres to a given list of tags and publishes them on well defined DIP addresses.</description>
   <dependencies>
+  
+    <!-- C2MON Client API dependencies -->
   	<dependency>
   		<groupId>cern.c2mon.c2mon-client</groupId>
   		<artifactId>c2mon-client-common</artifactId>
   	</dependency>
   	<dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-core</artifactId>
+    </dependency>
+  	
+  	<!-- CERN 3rd party dependencies -->
+  	<dependency>
+      <groupId>cern.en.ice</groupId>
+      <artifactId>dip</artifactId>
+      <version>5.4.2</version>
+    </dependency>
+  	
+  	<!-- 3rd party dependencies -->
+  	<dependency>
   		<groupId>log4j</groupId>
   		<artifactId>log4j</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>cern.en.ice</groupId>
-  		<artifactId>dip</artifactId>
-  		<version>5.4.2</version>
-  		<scope>compile</scope>
-  	</dependency>
-  	<dependency>
-  		<groupId>cern.c2mon.c2mon-client</groupId>
-  		<artifactId>c2mon-client-core</artifactId>
   	</dependency>
   </dependencies>
 </project>
