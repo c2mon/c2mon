@@ -1,0 +1,5 @@
+<!ELEMENT DataTags (DataTag*)>
+<!ELEMENT DataTag (id,dip-topic,comment?)>
+<!ELEMENT id (#PCDATA)>
+<!ELEMENT dip-topic (#PCDATA)>
+<!ELEMENT comment (#PCDATA)>
