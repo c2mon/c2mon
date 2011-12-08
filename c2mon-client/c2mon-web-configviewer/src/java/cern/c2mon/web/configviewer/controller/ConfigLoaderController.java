@@ -34,7 +34,7 @@ public class ConfigLoaderController {
     /**
      * A URL to the config report viewer with input form
      * */
-    public static final String CONFIG_LOADER_FORM_URL = CONFIG_LOADER_URL+"form";
+    public static final String CONFIG_LOADER_FORM_URL = CONFIG_LOADER_URL + "form";
     
     /**
      * Title for the config form page
@@ -64,7 +64,7 @@ public class ConfigLoaderController {
      * @param model Spring MVC Model instance to be filled in before jsp processes it
      * @return name of a jsp page which will be displayed
      * */
-    @RequestMapping(value = CONFIG_LOADER_URL+"{id}", method = { RequestMethod.GET })
+    @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
     public String viewCommand(@PathVariable final String id, final Model model) {
         logger.info("/configloader/{id} " + id);
         model.addAllAttributes(getConfigurationReport(id));
@@ -77,7 +77,7 @@ public class ConfigLoaderController {
      * @param model Spring MVC Model instance to be filled in before jsp processes it
      * @return name of a jsp page which will be displayed
      * */
-    @RequestMapping(value = CONFIG_LOADER_FORM_URL+"/{id}", method = { RequestMethod.GET })
+    @RequestMapping(value = CONFIG_LOADER_FORM_URL + "/{id}", method = { RequestMethod.GET })
     public String viewCommandWithForm(@PathVariable final String id, final Model model) {
         logger.info("/configloader/form/{id} " + id);
         model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
@@ -102,7 +102,7 @@ public class ConfigLoaderController {
     
     /**
      * A helper method to get the xml and build a map of values for the MVC model.
-     * @param commandId id of a command
+     * @param configurationId id of a configuration
      * @return a map of values to include in the model for a jsp page.
      * */
     private Map<String, String> getConfigurationReport(final String configurationId) {

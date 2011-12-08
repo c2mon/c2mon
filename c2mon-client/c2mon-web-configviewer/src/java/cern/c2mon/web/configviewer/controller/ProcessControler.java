@@ -32,24 +32,29 @@ public class ProcessControler {
    * A REST-style URL 
    * */
   public static final String PROCESS_URL = "/process/";
+  
+  /**
+   * A URL to the process viewer with input form
+   * */
+  public static final String PROCESS_XML_URL = PROCESS_URL + "xml";
 
   /**
-   * A URL to the config report viewer with input form
+   * A URL to the process viewer with input form
    * */
   public static final String PROCESS_FORM_URL = PROCESS_URL + "form";
 
   /**
-   * Title for the config form page
+   * Title for the process form page
    * */
   public static final String PROCESS_FORM_TITLE = "Process";
 
   /**
-   * Description for the config form page
+   * Description for the process form page
    * */
   public static final String PROCESS_FORM_INSTR = "Select process Name.";
 
   /**
-   * A config loader service
+   * A process loader service
    * */
   @Autowired
   private ProcessService service;
@@ -74,7 +79,7 @@ public class ProcessControler {
   }
 
   /**
-   * Displays configuration of a command with the given id together with a form
+   * Displays configuration of a process with the given id together with a form
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
@@ -84,6 +89,19 @@ public class ProcessControler {
     logger.info("/process/form/{id} " + id);
     model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, id, PROCESS_URL + id));
     return "processFormWithData";
+  }
+  
+  /**
+   * Displays configuration of a process with the given id together with a form
+   * @param id command id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = PROCESS_XML_URL + "/{id}", method = { RequestMethod.GET })
+  public String viewXml(@PathVariable final String id,  final Model model) {
+    logger.info("/process/xml/{id} " + id);
+    model.addAllAttributes(getProcessModel(id));
+    return "processXml";
   }
 
   /**
@@ -147,10 +165,10 @@ public class ProcessControler {
     Map<String, Object> model = new HashMap<String, Object>();
 
     try {
-      String commandXml = service.getProcessXml(processName);
+      String processXml = service.getProcessXml(processName);
       Collection<String> names = service.getProcessNames();
 
-      model.put("processXml", commandXml);
+      model.put("processXml", processXml);
       model.put("processNames", names);
 
     } catch (TagIdException e) {

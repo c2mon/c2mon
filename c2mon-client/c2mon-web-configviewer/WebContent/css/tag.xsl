@@ -3,13 +3,17 @@
 	
 	<xsl:template match="TagInfo">
 		<!-- print the html header with css links -->
-		<html>
+		<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
+		  <html>
 			<head>
 				<title>Configuration viewer</title>
 <!--				<link rel="stylesheet" type="text/css" href="tim.css" />-->
 <!--				<link rel="stylesheet" type="text/css" href="webConfigViewer.css" />-->
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css" />
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css" />
+				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
+				<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
+
 			</head>
 			<body>
 				<xsl:apply-templates />
@@ -21,6 +25,7 @@
 	<xsl:variable name="base_url">http://localhost:8080/c2mon-web-configviewer/</xsl:variable>
 	<xsl:variable name="alarm_url">alarmviewer/</xsl:variable>
 	<xsl:variable name="datatag_url">tagviewer/</xsl:variable>
+	<xsl:variable name="process_xml_url">process/xml/</xsl:variable>
 
 
 	<!--  leave the paragraphs untouched -->
@@ -393,8 +398,12 @@
 
 	<!-- process the XML element ProcessConfiguration -->
 	<xsl:template match="ProcessConfiguration">
+		<div id="top"></div>
 		<p class="tagName"> 
-					(<xsl:value-of select="@process-id"/>)
+					DAQ Process XML Viewer 
+					<br></br><br></br>
+					Process: <xsl:value-of select="jms-user"/>
+					<a href="{$base_url}{$process_xml_url}{jms-user}/">(view as xml)</a>
 		</p>
 	<div class="column">
 		<table class="inline">
@@ -445,8 +454,20 @@
 	</xsl:template>
 	
 <xsl:template match="EquipmentUnits">
+
+	<div class="message"> Scroll to <a href="#top"> top</a>, EquipmentUnit:
+	
+	<xsl:for-each select="EquipmentUnit">
+	
+	   <a href="#{@name}"> <xsl:value-of select="@name"/> </a>
+	   
+    </xsl:for-each>
+	
+	 </div>
+	
 		<xsl:apply-templates select="EquipmentUnit"/>
 </xsl:template>
+
 	
 <xsl:template match="EquipmentUnit">
 		<p class="tagName"> 
@@ -498,10 +519,10 @@
 
 <xsl:template match="DataTag">
 		<p class="tagName"> 
-					<xsl:value-of select="@name"/>:(<xsl:value-of select="@id"/>) 
+					<a href="{$base_url}{$datatag_url}{@id}/"><xsl:value-of select="@name"/>:(<xsl:value-of select="@id"/>)</a>&#160;
 		</p>
 		<p>
-					DataTag #<xsl:number value="position()" format="1" /> for Equipment 
+					This DataTag belongs to Equipment 
 					<a href="#{../../@name}"><xsl:value-of select="../../@name" /></a> 
 		</p>
 	<div class="column">
@@ -629,7 +650,7 @@
 			</xsl:if>  
 			
 			<xsl:if test="field-index!=''">
-			<tr>
+			<tr>-
 				<td class="bold"> field-index </td>
 				<td><xsl:value-of select="field-index"/></td>
 			</tr>

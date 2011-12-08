@@ -5,8 +5,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.validation.BindingResult;
 
+import cern.c2mon.client.auth.AuthorizationManager;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.web.configviewer.util.LoginForm;
+import cern.tim.shared.client.command.RbacAuthorizationDetails;
+import cern.tim.shared.common.command.AuthorizationDetails;
 
 import java.util.Map;
 import javax.validation.Valid;
@@ -38,13 +41,9 @@ public class LoginController {
     String username = loginForm.getUserName();
     String password = loginForm.getPassword();
     
-    if (!C2monServiceGateway.getSessionManager().login(APP_NAME, username, password)) {
-      return "loginform";
-    }
-    
-//    if (!C2monServiceGateway.getSessionManager().isAuthorized(userName, authorizationDetails)) {
+//    if (!C2monServiceGateway.getSessionManager().login(APP_NAME, username, password)) {
 //      return "loginform";
-//    }    
+//    }
     
     model.put("loginForm", loginForm);
     return "loginsuccess";
