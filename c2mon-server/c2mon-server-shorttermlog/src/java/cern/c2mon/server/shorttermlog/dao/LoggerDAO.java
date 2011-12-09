@@ -21,6 +21,7 @@ package cern.c2mon.server.shorttermlog.dao;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -138,7 +139,7 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
           // Commit the transaction
           session.commit();
           commited = size;          
-      } catch (DataAccessException e) {
+      } catch (PersistenceException e) {
           LOGGER.error(
                   "storeData([Collection]) : Error executing/closing prepared statement for "
                   + data.size() + " dataTags", e);
@@ -153,8 +154,7 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
           }
           throw new IDBPersistenceException(e.getMessage(), commited);            
       } finally {
-          try {
-              session.rollback();
+          try {              
               session.close();
           } catch (Exception e) {
               LOGGER.error("storeData([Collection]) : Error rolling back transaction.", e);
