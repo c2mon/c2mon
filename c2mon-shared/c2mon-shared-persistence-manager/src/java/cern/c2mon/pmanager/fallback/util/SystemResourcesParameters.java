@@ -17,9 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.pmanager.fallback.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.File;
 
 import org.apache.log4j.Logger;
 
@@ -37,7 +35,7 @@ public final class SystemResourcesParameters {
     public static final String[] CMD_FREE_SPACE = {"sh", "-c", "df -m . | tail -n 1 | awk '{print $4}'"};
     
     /** Log4j logger for this class*/
-    private static final Logger LOG = Logger.getLogger(SystemResourcesParameters.class);
+    private static final Logger LOGGER = Logger.getLogger(SystemResourcesParameters.class);
     
     /** 
      * Private constructor to prevent the class from being instantiated
@@ -50,27 +48,14 @@ public final class SystemResourcesParameters {
      * It returns the number of bytes that are still free in the server's disc 
      * @return A value indicating the free space in the disc
      */
-    public static int getFreeSpace() {        
-        String line = null;
-        int free = -1;
-        Process p = null;
+    public static long getFreeSpace() {             
+        long free = -1;
+        File currentDir = new File(".");
         try {
-            p = Runtime.getRuntime().exec(CMD_FREE_SPACE);
-            BufferedReader input = new BufferedReader(new InputStreamReader(p
-                    .getInputStream()));
-            line = input.readLine();
-            if (line != null) {
-                free = Integer.valueOf(line).intValue();
-                LOG.debug("getFreeSpace() : The free space in bytes is " + free);
-            }
-        } catch (IOException e) {
-            LOG
-                    .error("getFreeSpace() : Error while trying to determine the amount of free space "
-                            + e.getMessage());
-        } finally {
-            if (p != null)
-                p.destroy();
-        }
+          free = currentDir.getFreeSpace();
+        } catch (Exception e) {
+          LOGGER.error("Exception caught while querying free disk space", e);
+        }        
         return free;
     }
 }

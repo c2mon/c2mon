@@ -166,7 +166,7 @@ public class FallbackFileManager {
                                 + fFileController.getNumberOfLines()
                                 + " and the current value for nextcheck is "
                                 + nextCheckFallbackData);
-            int freeSpace = SystemResourcesParameters.getFreeSpace();
+            long freeSpace = SystemResourcesParameters.getFreeSpace();
             if (freeSpace < minimumFreeSpace
                     && freeSpace != FallbackProperties.CMD_FREE_SPACE_ERROR) {
                 throw new SystemDiskSpaceException("Reached the limit of free space of "
