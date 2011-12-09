@@ -358,7 +358,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
             alarmSender.diskFull(ACTIVATED, fallbackManager.getFallbackFileController()
                     .getDataFile().getParentFile().getAbsolutePath());
         } catch (Exception e) {
-            FALLBACK_LOG.error("RuntimeException : " + e.getMessage());
+            FALLBACK_LOG.error("RuntimeException : " + e.getMessage(), e);
         }
         return notLog4j;
     }
