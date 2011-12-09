@@ -29,6 +29,10 @@ open PROPS, "< /user/timoper/rep/c2mon/client/c2mon-client.properties"
   or die "Unable to open configuration file /user/timoper/rep/c2mon/client/c2mon-client.properties";
 my $c2monProperties = new Config::Properties();
 $c2monProperties->load(*PROPS);
+my $jdbcDriver = $c2monProperties->getProperty("jdbc.driver");
+my $jdbcRoUrl = $c2monProperties->getProperty("jdbc.ro.url");
+my $jdbcRoUser = $c2monProperties->getProperty("jdbc.ro.user");
+my $jdbcRoPassword = $c2monProperties->getProperty("jdbc.ro.password");
 my $jmsUrl = $c2monProperties->getProperty("jms.broker.url");
 my $jmsUser = $c2monProperties->getProperty("jms.client.user");
 my $jmsPassword = $c2monProperties->getProperty("jms.client.password");
@@ -114,6 +118,11 @@ print "   <property name=\"c2mon.jms.passwd\" value=\"$jmsPassword\"/>\n";
 print "   <property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
 print "   <property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
 print "   <property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
+# C2MON read-only credentials to STL database, needed for the history player and charts
+print "   <property name=\"jdbc.driver\" value=\"$jdbcDriver\"/>\n";
+print "   <property name=\"jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
+print "   <property name=\"jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
+print "   <property name=\"jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
 print " </resources>
         <resources os=\"Windows\" >
                 <property name=\"tim.log.file\" value=\"c:\\temp\\tim-dashboard-editor.log\"/>
