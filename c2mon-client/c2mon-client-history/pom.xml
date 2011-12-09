@@ -71,7 +71,7 @@
         <configuration>
           <argLine>
             <!-- for the tests -->
-            -Djdbc.ro.driver=oracle.jdbc.OracleDriver
+            -Djdbc.driver=oracle.jdbc.OracleDriver
             -Djdbc.ro.url="jdbc:oracle:thin:@( DESCRIPTION= (ADDRESS= (PROTOCOL=TCP) (HOST=dbsrva3202.cern.ch) (PORT=1574) ) (ENABLE=BROKEN) (CONNECT_DATA= (SID=TIMTST)))"
             -Djdbc.ro.user=timop
             -Djdbc.ro.password=optim1954
