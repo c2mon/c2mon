@@ -42,10 +42,11 @@
             resultMap="historyRecordResultMap">
     SELECT 
         RED_ID, RED_LOGDATE, RED_TAGID, RED_TAGNAME, RED_TAGVALUE, RED_TAGDATATYPE, 
-        sys_extract_utc(RED_TAGTIME) AS RED_TAGTIME, 
-        sys_extract_utc(RED_TAGSERVERTIME) AS RED_TAGSERVERTIME, 
-        sys_extract_utc(RED_TAGDAQTIME) AS RED_TAGDAQTIME, 
-        RED_TAGSTATUSDESC, RED_TAGMODE
+        RED_TAGTIME AS RED_TAGTIME, 
+        RED_TAGSERVERTIME, 
+        RED_TAGDAQTIME, 
+        RED_TAGSTATUSDESC, 
+        RED_TAGMODE
     FROM REPLAY_DATA
     WHERE
       RED_ID = #{eventId}
