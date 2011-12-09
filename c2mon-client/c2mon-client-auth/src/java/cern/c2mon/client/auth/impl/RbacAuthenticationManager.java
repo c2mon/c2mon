@@ -40,7 +40,6 @@ import cern.c2mon.client.auth.AuthenticationListener;
 import cern.c2mon.client.auth.AuthenticationManager;
 import cern.rba.util.holder.ClientTierRbaTokenChangeListener;
 import cern.rba.util.holder.ClientTierSubjectHolder;
-import cern.rba.util.lookup.RbaTokenLookup;
 
 /**
  * The RBAC implementation of the {@link AuthenticationManager}.
@@ -60,6 +59,13 @@ public class RbacAuthenticationManager implements AuthenticationManager, RbaToke
    * This Map keeps a reference to the RBALoginContext for each authenticated user (key)
    */
   private final Map<String, RBALoginContext> userContexts = new ConcurrentHashMap<String, RBALoginContext>();
+  
+  /**
+   * This variable points to the {@link RBAToken} that is provided by a
+   * user login through the RBAC GUI. Since RBAC allows only one user being
+   * logged at the same time we do not need a Map for this.
+   */
+  private RBAToken rbaGUILoginToken = null;
   
   /** The list of registered {@link AuthenticationListener} instances */
   private Set<AuthenticationListener> authenticationListeners =
@@ -100,9 +106,8 @@ public class RbacAuthenticationManager implements AuthenticationManager, RbaToke
         }
       }
       else {
-        token = RbaTokenLookup.findClientTierRbaToken();
-        if (token != null && token.getUser().getName().equalsIgnoreCase(userName)) {
-          tokenValid = token.isValid();
+        if (rbaGUILoginToken != null && rbaGUILoginToken.getUser().getName().equalsIgnoreCase(userName)) {
+          tokenValid = rbaGUILoginToken.isValid();
         }
       }
     }
@@ -120,9 +125,8 @@ public class RbacAuthenticationManager implements AuthenticationManager, RbaToke
   @Override
   public Set<String> getLoggedUserNames() {
     Set<String> userNames = new HashSet<String>(userContexts.keySet());
-    RBAToken token = RbaTokenLookup.findClientTierRbaToken();
-    if (token != null) {
-      userNames.add(token.getUser().getName());
+    if (rbaGUILoginToken != null) {
+      userNames.add(rbaGUILoginToken.getUser().getName());
     }
     
     return userNames;
@@ -211,6 +215,12 @@ public class RbacAuthenticationManager implements AuthenticationManager, RbaToke
         LOG.info("User " + userName + " has logged out.");
         // Remove the context, if not yet done
         userContexts.remove(userName);
+        
+        // remove GUI login token reference, if it is from the same user  
+        if (rbaGUILoginToken != null && rbaGUILoginToken.getUser().getName().equalsIgnoreCase(userName)) {
+          rbaGUILoginToken = null;
+        }
+        
         // the user has logged out
         for (AuthenticationListener listener : authenticationListeners) {
           listener.onLogout(userName);
@@ -218,13 +228,16 @@ public class RbacAuthenticationManager implements AuthenticationManager, RbaToke
       }
       else {
         LOG.info("User " + userName + " has successfully logged in.");
+        if (userContexts.get(userName) == null) {
+          rbaGUILoginToken = rbaToken;
+        }
         for (AuthenticationListener listener : authenticationListeners) {
           listener.onLogin(userName);
         }
       }
     }
     else {
-      LOG.warn("rbaTokenChanged() - Listener called with null RBAToken! Nobody got informed.");
+      LOG.debug("rbaTokenChanged() - Unsuccessful login attempt. Nobody got informed.");
     }
   }
 
@@ -236,9 +249,8 @@ public class RbacAuthenticationManager implements AuthenticationManager, RbaToke
       token  = ctx.getRBASubject().getAppToken();
     }
     else {
-      RBAToken clientTierToken = RbaTokenLookup.findClientTierRbaToken();
-      if (clientTierToken != null && clientTierToken.getUser().getName().equalsIgnoreCase(userName)) {
-        token = clientTierToken;
+      if (rbaGUILoginToken != null && rbaGUILoginToken.getUser().getName().equalsIgnoreCase(userName)) {
+        token = rbaGUILoginToken;
       }
     }
     
