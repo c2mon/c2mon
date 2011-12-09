@@ -32,7 +32,7 @@
     <environment id="development">
       <transactionManager type="JDBC" />
       <dataSource type="POOLED">
-        <property name="driver" value="${jdbc.ro.driver}" />
+        <property name="driver" value="${jdbc.driver}" />
         <property name="url" value="${jdbc.ro.url}" />
         <property name="username" value="${jdbc.ro.user}" />
         <property name="password" value="${jdbc.ro.password}" />

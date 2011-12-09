@@ -65,8 +65,8 @@ public final class HistorySessionFactory {
    * Is Singleton and therefore private
    */
   private HistorySessionFactory() {
-    if (System.getProperty(HistorySystemProperties.JDBC_RO_DRIVER) == null) {
-      System.setProperty(HistorySystemProperties.JDBC_RO_DRIVER, DEFAULT_JDBC_TIMSTLOG_DRIVER);
+    if (System.getProperty(HistorySystemProperties.JDBC_DRIVER) == null) {
+      System.setProperty(HistorySystemProperties.JDBC_DRIVER, DEFAULT_JDBC_TIMSTLOG_DRIVER);
     }
   }
 
@@ -160,7 +160,7 @@ public final class HistorySessionFactory {
    */
   public boolean isDatasourceAvailable() {
     return 
-      System.getProperty(HistorySystemProperties.JDBC_RO_DRIVER) != null
+      System.getProperty(HistorySystemProperties.JDBC_DRIVER) != null
       && System.getProperty(HistorySystemProperties.JDBC_RO_URL) != null
       && System.getProperty(HistorySystemProperties.JDBC_RO_USERNAME) != null
       && System.getProperty(HistorySystemProperties.JDBC_RO_PASSWORD) != null;

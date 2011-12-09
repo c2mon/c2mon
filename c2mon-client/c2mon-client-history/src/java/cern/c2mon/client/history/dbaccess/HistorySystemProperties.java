@@ -30,7 +30,7 @@ public final class HistorySystemProperties {
   public static final String JDBC_RO_URL = "jdbc.ro.url";
   
   /** The jdbc read only driver. */
-  public static final String JDBC_RO_DRIVER = "jdbc.ro.driver";
+  public static final String JDBC_DRIVER = "jdbc.driver";
   
   /** The jdbc read only username */
   public static final String JDBC_RO_USERNAME = "jdbc.ro.user";
