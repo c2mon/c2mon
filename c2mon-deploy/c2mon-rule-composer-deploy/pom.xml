@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cern.tim.tim-client</groupId>
+		<artifactId>tim-client-pom</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>cern.c2mon.c2mon-deploy</groupId>
+	<artifactId>c2mon-rule-composer-deploy</artifactId>
+	<name>C2MON Rule Composer Deploy</name>
+	<version>1.0.1-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<description>
+		C2MON module assembling all required modules and configuration files for tim-rule-composer
+        </description>
+	<url></url>
+	
+	<dependencies>
+    <dependency>
+      <groupId>cern.tim.tim-client</groupId>
+      <artifactId>tim-rule-composer</artifactId>
+    </dependency>
+  </dependencies>
+
+	<properties>
+		<c2mon.jarsigner.key>/user/pcrops/production/cmmnbuild/cmmnbuild/build/dist/cmmnbuild/includes/slcerts
+		</c2mon.jarsigner.key>
+	</properties>
+
+	<developers />
+
+	<modules>
+		<module>modules/tim2</module>
+	</modules>
+
+	<build/>
+
+</project>
