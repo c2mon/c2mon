@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.client.jms.JmsProxy;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
@@ -187,7 +188,6 @@ public class RequestHandlerImplTest {
 
       @Override
       public String getErrorMessage() {
-        // TODO Auto-generated method stub
         return null;
       }
     });
@@ -199,6 +199,36 @@ public class RequestHandlerImplTest {
 
     EasyMock.verify(jmsProxy);
     Assert.assertEquals("process xml", xmlString);
+  }
+  
+  /**
+   * Tests getProcessXml method.
+   * @throws JMSException
+   */
+  @Test
+  public void testGetProcessNames() throws JMSException {
+    
+    Collection<ProcessNameResponse> response = new ArrayList<ProcessNameResponse>();
+    response.add(new ProcessNameResponse() {
+
+      @Override
+      public String getErrorMessage() {
+        return null;
+      }
+
+      @Override
+      public String getProcessName() {
+        return "name";
+      }
+    });
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(response);
+
+    EasyMock.replay(jmsProxy);
+
+    Collection<ProcessNameResponse> xmlString = requestHandlerImpl.getProcessNames();
+
+    EasyMock.verify(jmsProxy);
+    Assert.assertEquals("name", ((ProcessNameResponse)(xmlString.iterator().next())).getProcessName());
   }
 
   /**

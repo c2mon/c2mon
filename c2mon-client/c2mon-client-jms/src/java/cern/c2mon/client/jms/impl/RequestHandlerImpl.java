@@ -176,14 +176,6 @@ public class RequestHandlerImpl implements RequestHandler {
 
     return report.iterator().next();
   }
-  
-  @Override
-  public Collection<ProcessNameResponse> getProcessNames() throws JMSException {
-    
-    ClientRequestImpl<ProcessNameResponse> xmlRequest = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
-    
-    return jmsProxy.sendRequest(xmlRequest, requestQueue, requestTimeout);
-  }
 
   @Override
   public Collection<TagConfig> requestTagConfigurations(final Collection<Long> tagIds) throws JMSException {
@@ -278,6 +270,14 @@ public class RequestHandlerImpl implements RequestHandler {
     } else {
       throw new RuntimeException(response.getErrorMessage());
     }
+  }
+  
+  @Override
+  public Collection<ProcessNameResponse> getProcessNames() throws JMSException {
+    
+    ClientRequestImpl<ProcessNameResponse> namesRequest = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
+
+    return jmsProxy.sendRequest(namesRequest, requestQueue, requestTimeout);
   }
   
   @SuppressWarnings("unchecked")
