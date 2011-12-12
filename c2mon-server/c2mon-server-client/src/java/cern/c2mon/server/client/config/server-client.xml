@@ -22,12 +22,12 @@ Connection settings for client module
   <property name="userName" value="${jms.client.user}"/>
   <property name="password" value="${jms.client.password}"/>
   <property name="clientIDPrefix" value="C2MON-SERVER-CLIENT"/> 
-  <property name="watchTopicAdvisories" value="false"/>
+  <property name="watchTopicAdvisories" value="false"/>  
 </bean>
 
 <!-- connection factory used for all connections to the server -->
-<bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">   
-   <property name="targetConnectionFactory" ref="clientActiveMQConnectionFactory" />   
+<bean id="clientSingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">   
+   <property name="targetConnectionFactory" ref="clientActiveMQConnectionFactory" />    
 </bean>
 
 <!-- 
@@ -38,7 +38,7 @@ Publication to Tag updates
 
 <!-- plugged into ActiveJmsSender -->
 <bean id="clientTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-  <property name="connectionFactory" ref="singleConnectionFactory"/>
+  <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
 </bean>
 
 <!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
@@ -58,7 +58,7 @@ Publication of Supervision events
 
 <!-- JmsTemplate for sending supervision events; default destination set -->
 <bean id="supervisionTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-  <property name="connectionFactory" ref="singleConnectionFactory"/>  
+  <property name="connectionFactory" ref="clientSingleConnectionFactory"/>  
   <property name="defaultDestination" ref="supervisionDestination"/>
 </bean>
 
@@ -92,6 +92,7 @@ Request from clients
   </constructor-arg>
 </bean>
 
+<!-- set phase to intermediate, as shutdown is managed in ClientModuleLifecycle, so do to wish this bean to shutdown before then -->
 <bean id="clientRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
       <!-- include exception listener here? -->    
       <property name="connectionFactory" ref="clientActiveMQConnectionFactory"/>
@@ -107,7 +108,7 @@ Request from clients
       <property name="errorHandler" ref="tagRequestErrorHandler"/>   
       <property name="autoStartup" value="false"/>
       <property name="phase">
-        <util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_START_LAST"/>
+        <util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_INTERMEDIATE"/>
       </property>  
 </bean>
 
