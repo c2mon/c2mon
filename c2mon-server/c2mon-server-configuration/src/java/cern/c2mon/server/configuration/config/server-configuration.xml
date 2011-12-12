@@ -17,25 +17,22 @@
   
   <bean id="configurationRequestConverter" class="cern.tim.shared.client.configuration.ConfigurationRequestConverter" init-method="init"/>
   
-   <!-- TODO rename as connection factory all factories in C2MON, and specify one as priority -->
-  <bean id="configRequestConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
-    <property name="brokerURL" value="${jms.broker.url}"/>
-    <property name="userName" value="${jms.config.user}" />
-    <property name="password" value="${jms.config.password}" />
-  </bean>
-  
   <bean id="configRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
    <constructor-arg index="0" value="${jms.config.destination}"/>
   </bean>
     
   <bean id="configRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
       <!-- include exception listener here? -->    
-      <property name="connectionFactory" ref="configRequestConnectionFactory"/>
+      <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
       <property name="destination" ref="configRequestDestination"/>
       <property name="messageListener" ref="configurationRequestHandler" />
       <property name="concurrentConsumers" value="1"/>
       <property name="maxConcurrentConsumers" value="1"/>      
-      <property name="sessionTransacted" value="false"/>  
+      <property name="sessionTransacted" value="false"/>
+      <property name="taskExecutor" ref="clientExecutor"/>
+      <property name="phase">
+      	 <util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_START_LAST"/>
+      </property>     
 <!--      <property name="errorHandler" ref="processRequestHandler"/>         -->
   </bean>
 
