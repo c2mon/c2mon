@@ -18,12 +18,15 @@
  *****************************************************************************/
 package cern.c2mon.server.shorttermlog.listener;
 
+import java.util.Collection;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.shorttermlog.logger.BatchLogger;
+import cern.tim.server.cache.BufferedTimCacheListener;
 import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.common.tag.Tag;
 import cern.tim.util.buffer.PullEvent;
@@ -38,7 +41,7 @@ import cern.tim.util.buffer.SynchroBufferListener;
  *
  */
 @Service
-public class TagLogCacheListener implements SynchroBufferListener {
+public class TagLogCacheListener implements BufferedTimCacheListener<Tag> {
 
   /**
    * Reference to registration service.
@@ -72,8 +75,13 @@ public class TagLogCacheListener implements SynchroBufferListener {
   }
 
   @Override
-  public void pull(PullEvent event) throws PullException {
-    tagLogger.log(event.getPulled());
+  public void confirmStatus(Collection<Tag> cacheables) {
+    //do not log confirm callbacks (STL data not essential)
+  }
+
+  @Override
+  public void notifyElementUpdated(Collection<Tag> cacheables) {    
+    tagLogger.log(cacheables);
   }
  
 
