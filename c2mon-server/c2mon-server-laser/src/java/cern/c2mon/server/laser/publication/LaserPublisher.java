@@ -268,4 +268,9 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
         }
     }
 
+    @Override
+    public void confirmStatus(Alarm cacheable) {
+      notifyElementUpdated(cacheable);
+    }
+
 }
