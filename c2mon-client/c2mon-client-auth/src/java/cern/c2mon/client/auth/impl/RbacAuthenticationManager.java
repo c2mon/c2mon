@@ -236,6 +236,16 @@ public class RbacAuthenticationManager implements AuthenticationManager, RbaToke
         }
       }
     }
+    else if (rbaGUILoginToken != null) {
+      LOG.debug("rbaTokenChanged() - Received logout notification from the RBAC toolbar.");
+      String userName = rbaGUILoginToken.getUser().getName();
+      // remove GUI login token reference
+      rbaGUILoginToken = null;
+      // the user has logged out
+      for (AuthenticationListener listener : authenticationListeners) {
+        listener.onLogout(userName);
+      }
+    }
     else {
       LOG.debug("rbaTokenChanged() - Unsuccessful login attempt. Nobody got informed.");
     }
