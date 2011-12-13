@@ -32,6 +32,11 @@
       <artifactId>spring-beans</artifactId>
     </dependency>     
 
+    
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-supervision</artifactId>
+    </dependency>
     <dependency>
       <groupId>cern.tim2.tim2-server</groupId>
       <artifactId>tim2-server-daqcommunication-in</artifactId>
