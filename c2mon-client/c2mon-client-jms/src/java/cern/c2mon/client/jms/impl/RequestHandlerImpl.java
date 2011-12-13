@@ -287,7 +287,7 @@ public class RequestHandlerImpl implements RequestHandler {
     ClientRequestImpl clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
     clientRequest.setObjectParameter(commandExecuteRequest);
     
-    Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
+    Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, requestQueue, commandExecuteRequest.getTimeout());
     CommandReport report = c.iterator().next();
     
     return report;

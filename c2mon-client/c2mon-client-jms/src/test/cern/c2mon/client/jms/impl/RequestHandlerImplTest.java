@@ -242,7 +242,7 @@ public class RequestHandlerImplTest {
 
     ClientRequestImpl<CommandReport> executeCommandRequest =
       new ClientRequestImpl<CommandReport>(CommandReport.class);
-    CommandExecuteRequest<Boolean> executeRequest = new CommandExecuteRequestImpl<Boolean>(id, Boolean.TRUE);
+    CommandExecuteRequest<Boolean> executeRequest = new CommandExecuteRequestImpl<Boolean>(id, Boolean.TRUE, 1000);
     executeCommandRequest.setObjectParameter(executeRequest);
     
     Collection<CommandReport> response = new ArrayList<CommandReport>();
