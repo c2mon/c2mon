@@ -121,16 +121,21 @@ public interface RequestHandler {
   Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException;
   
   /**
-   * 
-   * @param commandIds
-   * @return
+   * Request CommandTags from the server.
+   * @param commandIds ids of desired command tags
+   * @return a collection of command handle objects
+   * @throws JMSException if a JMS problems occurs or if not connected at the moment
+   * @throws RuntimeException if no response is received from the server (probably timeout)
    */
   Collection<CommandTagHandle> requestCommandTagHandles(Collection<Long> commandIds);
   
   /**
-   * @param 
-   * @return
-   * @throws JMSException 
+   * 
+   * @param <T> the value type of the command
+   * @param commandExecuteRequest the request details for executing this command
+   * @return a report about this execution
+   * @throws JMSException if a JMS problems occurs or if not connected at the moment
+   * @throws RuntimeException if no response is received from the server (probably timeout)
    */
   <T> CommandReport executeCommand(CommandExecuteRequest<T> commandExecuteRequest) throws JMSException;
   
