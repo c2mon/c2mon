@@ -41,7 +41,7 @@ public class ConfigLoaderService {
           if (report != null)
             return report.toXML();
         else
-            throw new TagIdException("No luck. Try another id.");
+            throw new TagIdException("Id not found.");
         } catch (NumberFormatException e) {
             throw new TagIdException("Invalid configuration Id");
         }

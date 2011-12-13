@@ -24,6 +24,7 @@
 	<!--  link variables  -->
 	<xsl:variable name="base_url">/c2mon-web-configviewer/</xsl:variable>
 	<xsl:variable name="alarm_url">alarmviewer/</xsl:variable>
+	<xsl:variable name="command_url">commandviewer/</xsl:variable>
 	<xsl:variable name="datatag_url">tagviewer/</xsl:variable>
 	<xsl:variable name="process_xml_url">process/xml/</xsl:variable>
 
@@ -429,15 +430,7 @@
 	
 <xsl:template match="EquipmentUnits">
 
-	<div class="message"> Scroll to <a href="#top"> top</a>, EquipmentUnit:
-	
-	<xsl:for-each select="EquipmentUnit">
-	
-	   <a href="#{@name}"> <xsl:value-of select="@name"/> </a>
-	   
-    </xsl:for-each>
-	
-	 </div>
+	<div class="message"> Scroll to <a href="#top"> top</a></div>
 	
 		<xsl:apply-templates select="EquipmentUnit"/>
 </xsl:template>
@@ -469,6 +462,45 @@
 		</table>
 		</div>
 		<xsl:apply-templates select="DataTags"/>
+		<xsl:apply-templates select="CommandTags"/>
+</xsl:template>
+
+<xsl:template match="CommandTags">
+		<xsl:apply-templates select="CommandTag"/>
+</xsl:template>
+
+<xsl:template match="CommandTag">
+		<p class="tagName"> 
+					<a href="{$base_url}{$command_url}{@id}/"><xsl:value-of select="@name"/>:(<xsl:value-of select="@id"/>)</a>&#160;
+		</p>
+		<p>
+					This CommandTag belongs to Equipment 
+					<a href="#{../../@name}"><xsl:value-of select="../../@name" /></a> 
+		</p>
+	<div class="column">
+		<table class="inline">
+			<th colspan="2">CommandTag</th>
+			
+		<tr>
+			<td class="bold">  id </td>
+			<td><xsl:value-of select="@id"/></td>
+		</tr>
+		<tr>
+			<td class="bold">  name </td>
+			<td><xsl:value-of select="@name"/></td>
+		</tr>
+
+		<xsl:for-each select="*">
+		
+		<TR>
+			<TD><xsl:value-of select="local-name()"/></TD>
+			<TD><xsl:value-of select="."/></TD>
+		</TR>
+        </xsl:for-each>
+		
+		</table>
+		<xsl:apply-templates select="HardwareAddress"/>
+		</div>
 </xsl:template>
 
 <xsl:template match="DataTags">
