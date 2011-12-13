@@ -50,17 +50,8 @@ public class RecoveryManager implements SmartLifecycle {
   /**
    * Refresh the supervision status.
    */
-  private void refreshSupervisionStatus() {
+  private void refreshSupervisionStatus() {        
     LOGGER.info("Notifying all supervision listeners of current status.");
-    int i = 0;                    
-    while (i < INITIAL_LOGGING_DELAY && recoveryRunning) {
-      try {            
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {             
-        LOGGER.error("InterruptedException caught during initial supervision logging.", e);
-      }
-      i++;
-    }  
     supervisionFacade.refreshAllSupervisionStatus();
   } 
   
