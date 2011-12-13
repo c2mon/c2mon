@@ -85,7 +85,8 @@ public class RecoveryManager implements SmartLifecycle {
     if (!running && System.getProperty("c2mon.recovery") != null && System.getProperty("c2mon.recovery").equals("true")) {
       new Thread(new Runnable() {        
         @Override
-        public void run() {                  
+        public void run() {
+          LOGGER.info("Running server recovery tasks.");
           refreshSupervisionStatus();                    
           recoveryRunning = false;
         }
