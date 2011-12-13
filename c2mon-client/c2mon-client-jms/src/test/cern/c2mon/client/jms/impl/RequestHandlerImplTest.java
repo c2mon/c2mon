@@ -248,7 +248,7 @@ public class RequestHandlerImplTest {
     Collection<CommandReport> response = new ArrayList<CommandReport>();
     response.add(createCommandReport(executeCommandRequest));
     
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(response);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(1000))).andReturn(response);
 
     EasyMock.replay(jmsProxy);
 
