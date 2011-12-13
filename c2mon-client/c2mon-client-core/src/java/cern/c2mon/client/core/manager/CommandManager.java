@@ -84,7 +84,7 @@ public class CommandManager implements C2monCommandManager {
         getCommandTag(commandId);
       }
         
-      ClientCommandTag<Object> cct = commandCache.get(commandId);
+      ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
       CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, value);
       try {
         LOG.info("executeCommand() - Executing command " + commandId + " for authorized user " + userName);
@@ -182,7 +182,7 @@ public class CommandManager implements C2monCommandManager {
    * @return An instance of {@link CommandExecuteRequest}
    * @throws CommandTagValueException Thrown in case an incompatible value type.
    */
-  private <T> CommandExecuteRequest<T> createCommandExecuteRequest(final ClientCommandTag<T> commandTag, T value) throws CommandTagValueException {
+  private <T> CommandExecuteRequest<T> createCommandExecuteRequest(final ClientCommandTagImpl<T> commandTag, T value) throws CommandTagValueException {
     // Check if value is NOT NULL
     if (value == null) {
       throw new CommandTagValueException("Null value : command values cannot be set to null");
@@ -212,7 +212,7 @@ public class CommandManager implements C2monCommandManager {
           + ". It cannot be compared to a value of type " + value.getClass().getName() + ". Contact the configuration responsible for correcting this problem");
     }
     
-    return new CommandExecuteRequestImpl<T>(commandTag.getId(), value);
+    return new CommandExecuteRequestImpl<T>(commandTag.getId(), value, commandTag.getClientTimeout());
   }
 
   @Override
