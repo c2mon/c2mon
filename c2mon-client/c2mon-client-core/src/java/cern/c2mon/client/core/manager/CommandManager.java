@@ -90,7 +90,7 @@ public class CommandManager implements C2monCommandManager {
         LOG.info("executeCommand() - Executing command " + commandId + " for authorized user " + userName);
         return clientRequestHandler.executeCommand(executeRequest);
       }
-      catch (JMSException e) {
+      catch (Exception e) {
         LOG.error("executeCommand() - Catched JMS execption while trying to execute command "
                   + commandId + ". ", e);
         return new CommandReportImpl(commandId,
