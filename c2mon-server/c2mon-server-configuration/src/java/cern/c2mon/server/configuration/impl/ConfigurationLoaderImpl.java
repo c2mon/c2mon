@@ -18,6 +18,10 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,6 +114,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * Flag recording if configuration events should be sent to the DAQ layer (set in XML).
    */
   private boolean daqConfigEnabled;
+  
+  /**
+   * The directory name in C2MON home where the configreports will be saved.
+   */
+  private String reportDirectory; 
     
   @Autowired
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
@@ -230,26 +239,35 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         for (Long processId : processLists.keySet()) {
           List<Change> processChangeEvents = processLists.get(processId);
           if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
-            ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
-            for (ChangeReport changeReport : processReport.getChangeReports()) {
-              ConfigurationElementReport convertedReport = 
-                ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
-              daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);   
-              //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
-              if (changeReport.isReboot()) {
-                report.addProcessToReboot(processCache.get(processId).getName()); 
-                elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
-                //TODO set flag & tag to indicate that process restart is needed
-              } else if (changeReport.isFail()) {
-                report.setStatus(Status.FAILURE);
-                report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
-                elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
-              } else { //success, override default failure
-                if (elementPlaceholder.get(changeReport.getChangeId()).getDaqStatus().equals(Status.RESTART)) {
-                  elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.OK);
-                }                
+            try {
+              ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
+              for (ChangeReport changeReport : processReport.getChangeReports()) {
+                ConfigurationElementReport convertedReport = 
+                  ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
+                daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);   
+                //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
+                if (changeReport.isReboot()) {
+                  report.addProcessToReboot(processCache.get(processId).getName()); 
+                  elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
+                  //TODO set flag & tag to indicate that process restart is needed
+                } else if (changeReport.isFail()) {
+                  report.setStatus(Status.FAILURE);
+                  report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
+                  elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
+                } else { //success, override default failure
+                  if (elementPlaceholder.get(changeReport.getChangeId()).getDaqStatus().equals(Status.RESTART)) {
+                    elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.OK);
+                  }                
+                }
               }
-            }
+            } catch (Exception e) {
+              String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration to Process (possible timeout)" + processCache.get(processId).getName();
+              LOGGER.error(errorMessage, e);
+              processFacade.requiresReboot(processId, true);
+              report.addProcessToReboot(processCache.get(processId).getName());
+              report.setStatus(Status.FAILURE);
+              report.setStatusDescription(errorMessage);
+            }            
           } else {
             processFacade.requiresReboot(processId, true);
             report.addProcessToReboot(processCache.get(processId).getName());
@@ -293,6 +311,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       }
       throw new ConfigurationException(report, ex);
     } finally {
+      if (report != null) {
+        archiveReport(configId, report.toXML());
+      }
       exclusiveConfigLock.unlock();
     }
   }
@@ -397,12 +418,39 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   }
 
 
+  /**
+   * Save the report to disk.
+   * @param configId id of the config
+   * @param xmlReport the XML report in String format
+   */
+  private void archiveReport(int configId, String xmlReport) {
+    try {
+      File outFile = new File(reportDirectory, "report_" + configId + ".xml");
+      FileWriter fileWriter;    
+      fileWriter = new FileWriter(outFile);    
+      BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+      bufferedWriter.write(xmlReport);
+      bufferedWriter.close();
+    } catch (Exception e) {
+      LOGGER.error("Exception caught while writing configuration report to directory: " 
+          + reportDirectory, e);
+    }
+  }
+  
 
   /**
    * @param daqConfigEnabled the daqConfigEnabled to set
    */
-  public void setDaqConfigEnabled(boolean daqConfigEnabled) {
+  public void setDaqConfigEnabled(final boolean daqConfigEnabled) {
     this.daqConfigEnabled = daqConfigEnabled;
+  }
+
+  /**
+   * Set the (absolute) directory where the config reports should be saved.
+   * @param reportDirectory report directory
+   */
+  public void setReportDirectory(final String reportDirectory) {
+    this.reportDirectory = reportDirectory;
   }
 
 }

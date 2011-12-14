@@ -15,6 +15,7 @@
   
   <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor">
     <property name="daqConfigEnabled" value="${c2mon.server.config.daq.enabled}"/>
+    <property name="reportDirectory" value="${c2mon.home}/reports"/>    
   </bean>
   
   <bean id="configurationRequestConverter" class="cern.tim.shared.client.configuration.ConfigurationRequestConverter" init-method="init"/>
