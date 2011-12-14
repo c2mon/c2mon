@@ -275,9 +275,9 @@ public class TagShortTermLog implements IFallback, Loggable {
                 dtShortTermLog.setTagValue(tagValue);    
             }            
             dtShortTermLog.setTagDataType(value[j++]);
-            dtShortTermLog.setSourceTimestamp(Timestamp.valueOf(value[j++]));
-            dtShortTermLog.setDaqTimestamp(Timestamp.valueOf(value[j++]));
-            dtShortTermLog.setServerTimestamp(Timestamp.valueOf(value[j++]));            
+            dtShortTermLog.setSourceTimestamp(value[j++].equals("null") ? null : Timestamp.valueOf(value[j++]));
+            dtShortTermLog.setDaqTimestamp(value[j++].equals("null") ? null : Timestamp.valueOf(value[j++]));
+            dtShortTermLog.setServerTimestamp(value[j++].equals("null") ? null : Timestamp.valueOf(value[j++]));            
             dtShortTermLog.setTagQualityCode(new Integer(value[j++]).shortValue());
             String description = (String)value[j++];
             if (description.equalsIgnoreCase("null")) {
@@ -285,16 +285,16 @@ public class TagShortTermLog implements IFallback, Loggable {
             } else {
                 dtShortTermLog.setTagQualityDesc(description);
             }            
-            dtShortTermLog.setTagMode(new Integer(value[j++]).shortValue());
+            dtShortTermLog.setTagMode(value[j++].equals("null") ? null : new Integer(value[j++]).shortValue());
             dtShortTermLog.setTagDir(value[j++]);
-            dtShortTermLog.setLogDate(Timestamp.valueOf(value[j++]));
+            dtShortTermLog.setLogDate(value[j++].equals("null") ? null : Timestamp.valueOf(value[j++]));
             dtShortTermLog.setTimezone(TimeZone.getDefault().getID());
         } catch (Exception e) {
             // If one of the conversions can not be done, as for example to
             // treat the IlegalArgumentException that may happen
             // when the string with the timestamp has not the correct argument
             throw new DataFallbackException(
-                    "Error with the format of some of the file's lines " + value[0] + e.getMessage());
+                    "Error with the format of some of the file's lines (id: " + value[0] + ") - " + e.getMessage());
         }
         return dtShortTermLog;
     }
