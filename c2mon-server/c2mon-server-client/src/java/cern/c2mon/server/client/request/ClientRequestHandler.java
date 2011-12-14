@@ -206,13 +206,13 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
       case TAG_CONFIGURATION_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received a TAG_CONFIGURATION_REQUEST for " + clientRequest.getTagIds().size() + " tag configurations.");
+          LOG.debug("handleClientRequest() - Received a TAG_CONFIGURATION_REQUEST for " + clientRequest.getTagIds().size() + " tag (with configuration details).");
         }
         return handleTagConfigurationRequest(clientRequest);
 
       case APPLY_CONFIGURATION_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received an APPLY_CONFIGURATION_REQUEST for " + clientRequest.getTagIds().size() + " tag Ids.");
+          LOG.debug("handleClientRequest() - Received an APPLY_CONFIGURATION_REQUEST with " + clientRequest.getTagIds().size() + " configurations.");
         }
         return handleConfigurationReportRequest(clientRequest);
       case TAG_REQUEST:
@@ -233,12 +233,12 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         return supervisionFacade.getAllSupervisionStates();
       case COMMAND_HANDLE_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received a COMMAND_HANDLE_REQUEST " + clientRequest.getTagIds().size() + " command handles.");
+          LOG.debug("handleClientRequest() - Received a for command tag details for " + clientRequest.getTagIds().size() + " commands.");
         }
         return handleCommandHandleRequest(clientRequest);
       case EXECUTE_COMMAND_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received an EXECUTE_COMMAND_REQUEST for " + clientRequest.getTagIds().size() + " command handles.");
+          LOG.debug("handleClientRequest() - Received an command execution request for " + clientRequest.getTagIds().size() + " commands.");
         }
         return handleExecuteCommandRequest(clientRequest);
       case DAQ_XML_REQUEST:
@@ -324,6 +324,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
     switch (commandRequest.getResultType()) {
       case TRANSFER_COMMAND_HANDLES_LIST:
+        
         return commandExecutionManager.processRequest(commandRequest.getTagIds());
       default:
         LOG.error("handleCommandHandleRequest() - Could not generate response message. Unknown enum ResultType " + commandRequest.getResultType());
@@ -352,12 +353,14 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       switch (configurationRequest.getResultType()) {
         case TRANSFER_CONFIGURATION_REPORT:
           reports.add(configurationLoader.applyConfiguration(configId));
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Finished processing reconfiguration request with id " + configId);
+          }
           break;
         default:
           LOG.error("handleConfigurationRequest() - Could not generate response message. Unknown enum ResultType " + configurationRequest.getResultType());
       }
-    } // end while
-
+    } // end while   
     return reports;
   }
 
@@ -446,7 +449,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       }
       
     } // end while
-
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Finished processing Alarm request: returning " + alarms.size() + " Alarms");
+    }
     return alarms;
   }
 
