@@ -15,10 +15,16 @@
 
 	<fileSets>
 
-		<!-- create default tmp and log folders in the assembly -->
+		<!-- create default tmp, log and reports folders in the assembly -->
 		<fileSet>
 			<includes>
 				<include>tmp/</include>
+			</includes>
+			<fileMode>0755</fileMode>
+		</fileSet>
+		<fileSet>
+			<includes>
+				<include>reports/</include>
 			</includes>
 			<fileMode>0755</fileMode>
 		</fileSet>
