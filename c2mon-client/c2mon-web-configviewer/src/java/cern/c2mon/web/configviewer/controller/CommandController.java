@@ -94,7 +94,7 @@ public class CommandController {
         if (id == null)
             model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR, COMMAND_FORM_URL, null, null));
         else
-            model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR, COMMAND_FORM_URL, id, COMMAND_URL + id));
+           return ("redirect:" + COMMAND_URL + id);
         return "formWithData";
     }
     

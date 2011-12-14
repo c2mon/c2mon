@@ -96,7 +96,8 @@ public class DataTagController {
         if (id == null)
             model.addAllAttributes(FormUtility.getFormModel(TAG_FORM_TITLE, TAG_FORM_INSTR, TAG_FORM_URL, null, null));
         else
-            model.addAllAttributes(FormUtility.getFormModel(TAG_FORM_TITLE, TAG_FORM_INSTR, TAG_FORM_URL, id, TAG_URL + id));
+          return ("redirect:" + TAG_URL + id);
+          
         return "formWithData";
     }
     

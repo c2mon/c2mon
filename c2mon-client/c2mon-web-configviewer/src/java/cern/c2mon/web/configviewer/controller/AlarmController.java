@@ -66,7 +66,7 @@ public class AlarmController {
      * @param model Spring MVC Model instance to be filled in before jsp processes it
      * @return name of a jsp page which will be displayed
      * */
-    @RequestMapping(value = "/alarmviewer/{id}", method = { RequestMethod.GET })
+    @RequestMapping(value = ALARM_URL + "{id}", method = { RequestMethod.GET })
     public String viewAlarm(@PathVariable final String id, final Model model) {
         logger.info("/alarmviewer/{id} " + id);
         model.addAllAttributes(getAlarmModel(id));
@@ -98,7 +98,8 @@ public class AlarmController {
         if (id == null)
             model.addAllAttributes(FormUtility.getFormModel(ALARM_FORM_TITLE, ALARM_FORM_INSTR, ALARM_FORM_URL, null, null));
         else
-            model.addAllAttributes(FormUtility.getFormModel(ALARM_FORM_TITLE, ALARM_FORM_INSTR, ALARM_FORM_URL, id, ALARM_URL + id));
+          return ("redirect:" + ALARM_URL + id);
+          
         return "formWithData";
     }
     
