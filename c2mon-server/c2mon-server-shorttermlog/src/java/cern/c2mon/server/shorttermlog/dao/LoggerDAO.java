@@ -144,8 +144,9 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
                   "storeData([Collection]) : Error executing/closing prepared statement for "
                   + data.size() + " dataTags", e);
           try {
-              session.rollback();
-              session.close();
+              if (session != null) {
+                session.rollback();
+              }              
           } catch (Exception sql) {
               LOGGER
               .error(
@@ -154,10 +155,12 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
           }
           throw new IDBPersistenceException(e.getMessage(), commited);            
       } finally {
-          try {              
-              session.close();
+          try { 
+              if (session != null) {
+                session.close();
+              }              
           } catch (Exception e) {
-              LOGGER.error("storeData([Collection]) : Error rolling back transaction.", e);
+              LOGGER.error("storeData([Collection]) : Error closing session.", e);
           }
       }
   }
