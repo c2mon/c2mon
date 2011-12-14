@@ -147,48 +147,49 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    */
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
-    ClientRequest clientRequest = ClientRequestMessageConverter.fromMessage(message);
-    Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest);
     if (LOG.isDebugEnabled()) {
       LOG.debug("onMessage() : Client request received.");
     }
-
-    // Extract reply topic
-    Destination replyDestination = null;
+    ClientRequest clientRequest = ClientRequestMessageConverter.fromMessage(message);
     try {
-      replyDestination = message.getJMSReplyTo();
-    } catch (JMSException jmse) {
-      LOG.error("onMessage() : Cannot extract ReplyTo from message.", jmse);
-      throw jmse;
-    }
-    if (replyDestination != null) {
+      Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest);   
+      Destination replyDestination = null;
+      try {
+        replyDestination = message.getJMSReplyTo();
+      } catch (JMSException jmse) {
+        LOG.error("onMessage() : Cannot extract ReplyTo from message.", jmse);
+        throw jmse;
+      }
+      if (replyDestination != null) {
 
-      MessageProducer messageProducer = session.createProducer(replyDestination);
-      messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-      messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
+        MessageProducer messageProducer = session.createProducer(replyDestination);
+        messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+        messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
 
-      Message replyMessage = null;
+        Message replyMessage = null;
 
-      if (clientRequest.requiresObjectResponse()) {
+        if (clientRequest.requiresObjectResponse()) {
 
-        // Send response as an Object message
-        replyMessage = session.createObjectMessage((Serializable) response);
+          // Send response as an Object message
+          replyMessage = session.createObjectMessage((Serializable) response);
 
+        } else {
+
+          // Send response as Json message
+          replyMessage = session.createTextMessage(GSON.toJson(response));
+        }
+
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("onMessage() : Responded to ClientRequest.");
+        }
+        messageProducer.send(replyMessage);
       } else {
-
-        // Send response as Json message
-        replyMessage = session.createTextMessage(GSON.toJson(response));
+        LOG.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
+        throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
       }
-
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("onMessage() : Responded to ClientRequest: "+ clientRequest.getRequestType() + ". " + response.size() 
-            + " tags included in the response.");
-      }
-      messageProducer.send(replyMessage);
-    } else {
-      LOG.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
-      throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
-    }
+    } catch (Exception e) {
+      LOG.error("Exception caught while processing client request - unable to process it; request will time out", e);
+    }    
   }
 
   /**
@@ -372,6 +373,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
     final Collection<CommandReport> commandReports = new ArrayList<CommandReport>(1);
     commandReports.add(commandExecutionManager.execute((CommandExecuteRequest) executeCommandRequest.getObjectParameter()));
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Finished executing command - returning report.");
+    }
     return commandReports;
   }
 
@@ -405,7 +409,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         LOG.warn("Received client request (TagConfigRequest) for unrecognized Tag with id " + tagId);
       }
     } // end while
-
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Finished processing Tag request (with config info): returning " + transferTags.size() + " Tags");
+    }
     return transferTags;
   }
 
@@ -475,7 +481,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         LOG.warn("Received client request (TagRequest) for unrecognized Tag with id " + tagId);
       }
     } // end while
-
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Finished processing Tag request (values only): returning " + transferTags.size() + " Tags");
+    }
     return transferTags;
   }
 }
