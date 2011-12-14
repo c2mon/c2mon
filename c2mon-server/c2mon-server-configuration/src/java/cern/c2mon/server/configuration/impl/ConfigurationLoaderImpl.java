@@ -149,16 +149,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   @Override
   public ConfigurationReport applyConfiguration(final int configId) {
     
+    LOGGER.info("Applying configuration " + configId);
     ConfigurationReport report = null;
     try {
       exclusiveConfigLock.lock();
-          
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug(
-          new StringBuffer("applyConfiguration(configId: ").append(configId).append(") called.")
-        );
-      }
-      
+                
       String configName = configurationDAO.getConfigName(configId);    
       if (configName == null) {
         LOGGER.warn("Unable to locate configuration with id " + configId + " - cannot be applied.");
@@ -291,6 +286,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       }
       //mark the Configuration as applied in the DB table, with timestamp set
       configurationDAO.markAsApplied(configId);
+      LOGGER.info("Finished applying configuraton " + configId);
       return report;
     
     } catch (Exception ex) {
