@@ -207,7 +207,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                 processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface                  
               } else if (processChange.requiresReboot()) {              
                 elementReport.requiresReboot();
-                report.setStatus(Status.RESTART);
+                report.addStatus(Status.RESTART);
                 report.addProcessToReboot(processCache.get(processId).getName());
                 element.setStatus(Status.RESTART);
                 processFacade.requiresReboot(processId, true);
@@ -222,7 +222,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           LOGGER.error(errMessage, ex);
           elementReport.setFailure("Exception caught while applying the configuration change.", ex);
           element.setStatus(Status.FAILURE);          
-          report.setStatus(Status.FAILURE);
+          report.addStatus(Status.FAILURE);
           report.setStatusDescription("Failure: see details below.");
         }
         
@@ -246,7 +246,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                   elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
                   //TODO set flag & tag to indicate that process restart is needed
                 } else if (changeReport.isFail()) {
-                  report.setStatus(Status.FAILURE);
+                  report.addStatus(Status.FAILURE);
                   report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
                   elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
                 } else { //success, override default failure
@@ -260,18 +260,18 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
               LOGGER.error(errorMessage, e);
               processFacade.requiresReboot(processId, true);
               report.addProcessToReboot(processCache.get(processId).getName());
-              report.setStatus(Status.FAILURE);
+              report.addStatus(Status.FAILURE);
               report.setStatusDescription(errorMessage);
             }            
           } else {
             processFacade.requiresReboot(processId, true);
             report.addProcessToReboot(processCache.get(processId).getName());
-            report.setStatus(Status.RESTART);
+            report.addStatus(Status.RESTART);
           }
         }
       } else {
         if (!processLists.isEmpty()){
-          report.setStatus(Status.RESTART);
+          report.addStatus(Status.RESTART);
           for (Long processId : processLists.keySet()) {
             processFacade.requiresReboot(processId, true);
             report.addProcessToReboot(processCache.get(processId).getName());          
@@ -302,7 +302,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           ); 
         report.setExceptionTrace(ex);
       } else {
-        report.setStatus(Status.FAILURE);
+        report.addStatus(Status.FAILURE);
         report.setExceptionTrace(ex);
       }
       throw new ConfigurationException(report, ex);
