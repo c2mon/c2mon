@@ -262,7 +262,7 @@ public class TagShortTermLog implements IFallback, Loggable {
 
         TagShortTermLog dtShortTermLog;
         try {
-
+            String currentValue;
             dtShortTermLog = new TagShortTermLog();
             dtShortTermLog.setTagId(new Long(value[j++]).longValue());
             dtShortTermLog.setTagName(value[j++]);
@@ -275,19 +275,24 @@ public class TagShortTermLog implements IFallback, Loggable {
                 dtShortTermLog.setTagValue(tagValue);    
             }            
             dtShortTermLog.setTagDataType(value[j++]);
-            dtShortTermLog.setSourceTimestamp(value[j++].equals("null") ? null : Timestamp.valueOf(value[j++]));
-            dtShortTermLog.setDaqTimestamp(value[j++].equals("null") ? null : Timestamp.valueOf(value[j++]));
-            dtShortTermLog.setServerTimestamp(value[j++].equals("null") ? null : Timestamp.valueOf(value[j++]));            
+            currentValue = value[j++];
+            dtShortTermLog.setSourceTimestamp(currentValue.equals("null") ? null : Timestamp.valueOf(currentValue));
+            currentValue = value[j++];
+            dtShortTermLog.setDaqTimestamp(currentValue.equals("null") ? null : Timestamp.valueOf(currentValue));
+            currentValue = value[j++];
+            dtShortTermLog.setServerTimestamp(currentValue.equals("null") ? null : Timestamp.valueOf(currentValue));            
             dtShortTermLog.setTagQualityCode(new Integer(value[j++]).shortValue());
             String description = (String)value[j++];
             if (description.equalsIgnoreCase("null")) {
                 dtShortTermLog.setTagQualityDesc("");
             } else {
                 dtShortTermLog.setTagQualityDesc(description);
-            }            
-            dtShortTermLog.setTagMode(value[j++].equals("null") ? null : new Integer(value[j++]).shortValue());
+            }
+            currentValue = value[j++];
+            dtShortTermLog.setTagMode(currentValue.equals("null") ? null : new Integer(currentValue).shortValue());
             dtShortTermLog.setTagDir(value[j++]);
-            dtShortTermLog.setLogDate(value[j++].equals("null") ? null : Timestamp.valueOf(value[j++]));
+            currentValue = value[j++];
+            dtShortTermLog.setLogDate(currentValue.equals("null") ? null : Timestamp.valueOf(currentValue));
             dtShortTermLog.setTimezone(TimeZone.getDefault().getID());
         } catch (Exception e) {
             // If one of the conversions can not be done, as for example to
