@@ -11,6 +11,7 @@
         <backupPolicy keepBackups="2">
           <preserve type="dir" name="log" />
           <preserve type="dir" name="tmp" />
+          <preserve type="dir" name="reports" />
         </backupPolicy>
         <notification>
           <!-- you can give more than one mail for deployment notification -->
