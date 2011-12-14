@@ -20,18 +20,14 @@
 
 package cern.c2mon.server.shorttermlog.structure;
 
-import java.util.ResourceBundle.Control;
-
-import com.google.gson.Gson;
-
 import cern.tim.server.common.control.ControlTag;
 import cern.tim.server.common.datatag.DataTag;
 import cern.tim.server.common.tag.Tag;
-import cern.tim.shared.common.datatag.DataTagQuality;
-import cern.tim.shared.common.datatag.DataTagValueDictionary;
 import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.common.type.TypeConverter;
 import cern.tim.util.json.GsonFactory;
+
+import com.google.gson.Gson;
 
 /**
  *This class is in charge of all objects transformations that may involved the
@@ -45,7 +41,7 @@ import cern.tim.util.json.GsonFactory;
 public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> {
 
     /** The maximum length for the reportText */
-    private static final int MAX_LENGTH = 100;
+    private static final int MAX_LENGTH = 1000;
     
     /** The index to which the text will be significative */
     private static final int SPLIT_INDEX = 99;
