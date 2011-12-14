@@ -68,14 +68,20 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
    * The mapper class name used for creating the batch logger mapper from the session.
    */
   private Class< ? extends LoggerMapper<T>> mapperInterface;
+  
+  /**
+   * Information in order to identify the DB.
+   */
+  private String dbUrl;
     
   /**
    * 
    * @param sqlSessionFactory
    * @param loggerMapper the auto-commit mapper for single queries/inserts
+   * @param dbUrl only used for logging error messages
    * @throws ClassNotFoundException 
    */
-  public LoggerDAO(SqlSessionFactory sqlSessionFactory, String mapperInterface) throws ClassNotFoundException {
+  public LoggerDAO(SqlSessionFactory sqlSessionFactory, String mapperInterface, String dbUrl) throws ClassNotFoundException {
     super();
     this.sqlSessionFactory = sqlSessionFactory;   
     Class< ? > tmpInterface = Class.forName(mapperInterface);
@@ -84,7 +90,7 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
     } else {
       throw new IllegalArgumentException("Unexpected class name passed to LoggerDAO constructor - unable to instantiate.");
     }
-
+    this.dbUrl = dbUrl;
 //    if (tmpInterface instanceof LoggerMapper) {
 //      Class<? extends LoggerMapper> mappper = tmpInterface;
 //    }
@@ -167,8 +173,7 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
 
   @Override
   public String getDBInfo() {
-    // TODO Auto-generated method stub
-    return null;
+    return "C2MON Short-Term-Log account on DB with URL: " + dbUrl;    
   }
 
   @Override

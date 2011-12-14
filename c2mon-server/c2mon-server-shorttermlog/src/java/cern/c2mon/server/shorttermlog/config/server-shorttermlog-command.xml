@@ -7,13 +7,14 @@
 	<bean id="commandLoggerDAO" class="cern.c2mon.server.shorttermlog.dao.LoggerDAO">
 		<constructor-arg ref="stlSqlSessionFactory" />
 		<constructor-arg value="cern.c2mon.server.shorttermlog.mapper.CommandTagLogMapper" />
+		<constructor-arg value="${jdbc.stl.url}"/>
 	</bean>
 
 	<bean id="commandPersistenceManager" class="cern.c2mon.pmanager.persistence.impl.TimPersistenceManager">
 		<constructor-arg ref="commandLoggerDAO" />
 		<constructor-arg value="${c2mon.command.log.fallback.file}" />
 		<constructor-arg>
-			<bean class="cern.c2mon.server.shorttermlog.alarm.DummyAlarmListener" />
+			<bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener" />
 		</constructor-arg>
 		<constructor-arg>
 			<bean class="cern.tim.shared.client.command.CommandTagLog" />

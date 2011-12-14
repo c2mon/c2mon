@@ -2,16 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
-
-  <!-- helper blends persistence manager into STL logging -->
-<!--  <bean id="shortTermLogHelper" class="cern.c2mon.server.shorttermlog.dao.ShortTermLogHelper">-->
-<!--    <property name="dataTagsPersistenceMng"></property>-->
-<!--  </bean>-->
   
   <!-- LoggerDAOs contain the logic for storing data into the STL, including batch processing -->
   <bean id="tagLoggerDAO" class="cern.c2mon.server.shorttermlog.dao.LoggerDAO">
     <constructor-arg ref="stlSqlSessionFactory"/>
     <constructor-arg value="cern.c2mon.server.shorttermlog.mapper.DataTagLogMapper"/>
+    <constructor-arg value="${jdbc.stl.url}"/>
   </bean>
   
   <bean id="tagLogger" class="cern.c2mon.server.shorttermlog.logger.DefaultLogger">
@@ -23,7 +19,7 @@
         <constructor-arg ref="tagLoggerDAO"/>
         <constructor-arg value="${c2mon.tag.log.fallback.file}"/>
         <constructor-arg>
-          <bean class="cern.c2mon.server.shorttermlog.alarm.DummyAlarmListener"/>
+          <bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener"/>
         </constructor-arg>
         <constructor-arg><bean class="cern.c2mon.server.shorttermlog.structure.TagShortTermLog"/></constructor-arg>
       </bean>
