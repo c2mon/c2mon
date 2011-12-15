@@ -181,6 +181,20 @@
   	  <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
   	</layout>
   	<filter class="org.apache.log4j.varia.LevelRangeFilter">
+    	<param name="LevelMin" value="warn" />
+    	<param name="LevelMax" value="fatal" />
+  	</filter>
+  </appender>
+  
+  <appender name="AdminSmsAppender" class="org.apache.log4j.net.SMTPAppender">  
+  	<param name="SMTPHost" value="cernmx.cern.ch" />
+  	<param name="From" value="tim.support@cern.ch" />
+  	<param name="To" value="0041764878739@mail2sms.cern.ch" />
+  	<param name="Subject" value="C2MON server warning" />
+  	<layout class="org.apache.log4j.PatternLayout">
+  	  <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
+  	</layout>
+  	<filter class="org.apache.log4j.varia.LevelRangeFilter">
     	<param name="LevelMin" value="error" />
     	<param name="LevelMax" value="fatal" />
   	</filter>
@@ -220,29 +234,41 @@
   <logger name="cern.tim"  additivity="false">
     <level value="all"/>
     <appender-ref ref="FileAppender"/>
+    <appender-ref ref="AdministratorEmail"/>
   </logger>
   <logger name="cern.c2mon"  additivity="false">
     <level value="all"/>
     <appender-ref ref="FileAppender"/>
+    <appender-ref ref="AdministratorEmail"/>
   </logger>
   <logger name="cern.c2mon.server.shorttermlog"  additivity="false">
     <level value="info"/>
     <appender-ref ref="LoggingAppender"/>
+    <appender-ref ref="AdministratorEmail"/>
   </logger>
   <logger name="cern.c2mon.pmanager"  additivity="false">
     <level value="info"/>
+    <appender-ref ref="AdministratorEmail"/>
     <appender-ref ref="LoggingAppender"/>
   </logger>
   <logger name="cern.tim.server.cachepersistence"  additivity="false">
     <level value="debug"/>
+    <appender-ref ref="AdministratorEmail"/>
     <appender-ref ref="PersistenceAppender"/>
   </logger>
   <logger name="AdminMailLogger"  additivity="false">
     <level value="error"/>
     <appender-ref ref="AdministratorEmail"/>
+    <appender-ref ref="FileAppender"/>
+  </logger>  
+  <logger name="AdminSmsLogger"  additivity="false">
+    <level value="error"/>
+    <appender-ref ref="AdminSmsAppender"/>
+    <appender-ref ref="FileAppender"/>
   </logger>
   <root>
     <level value="info"/>
     <appender-ref ref="FileAppender" />
+    <appender-ref ref="AdministratorEmail"/>
   </root>
 </log4j:configuration>
