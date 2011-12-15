@@ -17,7 +17,12 @@ public class AlarmListener implements IAlarmListener {
   /**
    * Mail logger.
    */
-  private final static Logger LOGGER = Logger.getLogger("AdminMailLogger");
+  private final static Logger EMAIL_LOGGER = Logger.getLogger("AdminMailLogger");
+  
+  /**
+   * SMS logger.
+   */
+  private final static Logger SMS_LOGGER = Logger.getLogger("AdminSmsLogger");
   
   /**
    * Flags for not sending repeated error messages.
@@ -31,10 +36,12 @@ public class AlarmListener implements IAlarmListener {
   public void dbUnavailable(boolean alarmUp, String exceptionMsg, String dbInfo) {
     if (alarmUp && !dbAlarm) {
       dbAlarm = true;
-      LOGGER.error("Error in logging to Short-Term-Log: DB unavailable with error message " + exceptionMsg + ", for DB " + dbInfo);
+      EMAIL_LOGGER.error("Error in logging to Short-Term-Log: DB unavailable with error message " + exceptionMsg + ", for DB " + dbInfo);
+      SMS_LOGGER.error("Error in logging to Short-Term-Log: DB unavailable. See email for details.");
     } else if (!alarmUp && dbAlarm) {
       dbAlarm = false;
-      LOGGER.error("DB unavailable error has resolved itself");
+      EMAIL_LOGGER.error("DB unavailable error has resolved itself");
+      SMS_LOGGER.error("DB unavailable error has resolved itself");
     }    
   }
 
@@ -42,10 +49,12 @@ public class AlarmListener implements IAlarmListener {
   public void diskFull(boolean alarmUp, String directoryName) {   
     if (alarmUp && !diskAlarm) {
       diskAlarm = true;
-      LOGGER.error("Error in logging to Short-Term-Log - the following directory is full: " + directoryName);
+      EMAIL_LOGGER.error("Error in logging to Short-Term-Log fallback - the disk is nearly full, directory is " + directoryName);
+      SMS_LOGGER.error("Error in logging to Short-Term-Log fallback - the disk nearly is full.");
     } else if (!alarmUp && diskAlarm) {
       diskAlarm = false;
-      LOGGER.error("Disk full error has resolved itself");
+      EMAIL_LOGGER.error("Disk full error has resolved itself");
+      SMS_LOGGER.error("Disk full error has resolved itself");
     }    
   }
 
@@ -53,10 +62,12 @@ public class AlarmListener implements IAlarmListener {
   public void fileNotReachable(boolean alarmUp, File file) {
     if (alarmUp && !fileAlarm) {
       fileAlarm = true;
-      LOGGER.error("Error in logging to Short-Term-Log - the following file is not reachable: " + file.getName());
+      EMAIL_LOGGER.error("Error in logging to Short-Term-Log - the following file is not reachable: " + file.getName());
+      SMS_LOGGER.error("Error in logging to Short-Term-Log - the following file is not reachable: " + file.getName());
     } else if (!alarmUp && fileAlarm) {
       fileAlarm = false;
-      LOGGER.error("File unreachable error has resolved itself");
+      EMAIL_LOGGER.error("File unreachable error has resolved itself");
+      SMS_LOGGER.error("File unreachable error has resolved itself");
     }
   }
 
