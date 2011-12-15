@@ -98,23 +98,24 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 jarlist ("$jardir");
 
 # Defines the version number that is shown in the DMN2 Viewer about dialog
-print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
+print "	    <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
+print "	    <property name=\"rbac.app.name\" value=\"diamon-console\"/>\n";
 # JMS configuration parameters needed by C2MON client API
-print "		<property name=\"c2mon.jms.url\" value=\"$jmsUrl\"/>\n";
-print "		<property name=\"c2mon.jms.user\" value=\"$jmsUser\"/>\n";
-print "		<property name=\"c2mon.jms.passwd\" value=\"$jmsPassword\"/>\n";
-print "   <property name=\"c2mon.client.jms.adminmessage.topic\" value=\"$jmsAdminMessageTopic\"/>\n";
-print "		<property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
-print "		<property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
-print "		<property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
+print "     <property name=\"c2mon.jms.url\" value=\"$jmsUrl\"/>\n";
+print "     <property name=\"c2mon.jms.user\" value=\"$jmsUser\"/>\n";
+print "     <property name=\"c2mon.jms.passwd\" value=\"$jmsPassword\"/>\n";
+print "     <property name=\"c2mon.client.jms.adminmessage.topic\" value=\"$jmsAdminMessageTopic\"/>\n";
+print "	    <property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
+print "	    <property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
+print "	    <property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
 # C2MON read-only credentials to STL database, needed for the history player and charts
-print "		<property name=\"jdbc.driver\" value=\"$jdbcDriver\"/>\n";
-print "		<property name=\"jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
-print "		<property name=\"jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
-print "		<property name=\"jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
+print "	    <property name=\"jdbc.driver\" value=\"$jdbcDriver\"/>\n";
+print "	    <property name=\"jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
+print "	    <property name=\"jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
+print "	    <property name=\"jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
 
 if (param('configurl')) {
-	print "		<property name=\"configurationFilePath\" value=\"", param('configurl'), "\"/>", "\n";
+	print "	    <property name=\"configurationFilePath\" value=\"", param('configurl'), "\"/>", "\n";
 }
 
 print "	</resources>
