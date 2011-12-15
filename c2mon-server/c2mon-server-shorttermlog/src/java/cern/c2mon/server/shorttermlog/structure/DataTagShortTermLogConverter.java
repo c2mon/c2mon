@@ -186,6 +186,7 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
       if (dtSTLog.getTagQualityDesc() != null && dtSTLog.getTagQualityDesc().length() > MAX_LENGTH) {
           dtSTLog.setTagQualityDesc("{\"UNKNOWN_REASON\":\"Invalid quality String was too long: unable to store in ShortTermLog table.\"}");
       }
+      dtSTLog.setTagDir("I");
       return dtSTLog;
     }
 

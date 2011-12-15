@@ -266,8 +266,9 @@ public class TagShortTermLog implements IFallback, Loggable {
             dtShortTermLog = new TagShortTermLog();
             dtShortTermLog.setTagId(new Long(value[j++]).longValue());
             dtShortTermLog.setTagName(value[j++]);
-            String tagValue = value[j++];
-            if (tagValue.length() >= MAX_VALUE_LENGTH) {
+            currentValue = value[j++];
+            String tagValue = currentValue.equals("null") ? null : currentValue;
+            if (tagValue != null && tagValue.length() >= MAX_VALUE_LENGTH) {
                 LOG.warn("The value " + tagValue + " of the tag " + dtShortTermLog.getTagId() + " has been truncated. It is too long for the database");
                 dtShortTermLog.setTagValue(tagValue.substring(0, MAX_VALUE_LENGTH -1));
                  
@@ -283,7 +284,7 @@ public class TagShortTermLog implements IFallback, Loggable {
             dtShortTermLog.setServerTimestamp(currentValue.equals("null") ? null : Timestamp.valueOf(currentValue));            
             dtShortTermLog.setTagQualityCode(new Integer(value[j++]).shortValue());
             String description = (String)value[j++];
-            if (description.equalsIgnoreCase("null")) {
+            if (description != null && description.equalsIgnoreCase("null")) {
                 dtShortTermLog.setTagQualityDesc("");
             } else {
                 dtShortTermLog.setTagQualityDesc(description);
@@ -298,6 +299,7 @@ public class TagShortTermLog implements IFallback, Loggable {
             // If one of the conversions can not be done, as for example to
             // treat the IlegalArgumentException that may happen
             // when the string with the timestamp has not the correct argument
+            LOG.error("Error while decoding object from file", e);
             throw new DataFallbackException(
                     "Error with the format of some of the file's lines (id: " + value[0] + ") - " + e.getMessage());
         }
@@ -339,7 +341,7 @@ public class TagShortTermLog implements IFallback, Loggable {
         str.append('\t');
         str.append(getTagMode());
         str.append('\t');
-        str.append("I");
+        str.append(getTagDir());
         str.append('\t');
         str.append(new Timestamp(System.currentTimeMillis()));
         return str.toString();
