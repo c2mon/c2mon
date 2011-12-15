@@ -37,7 +37,7 @@ public class AlarmListener implements IAlarmListener {
     if (alarmUp && !dbAlarm) {
       dbAlarm = true;
       EMAIL_LOGGER.error("Error in logging to Short-Term-Log: DB unavailable with error message " + exceptionMsg + ", for DB " + dbInfo);
-      SMS_LOGGER.error("Error in logging to Short-Term-Log: DB unavailable. See email for details.");
+      SMS_LOGGER.error("Error in STL logging: DB unavailable. See email for details.");
     } else if (!alarmUp && dbAlarm) {
       dbAlarm = false;
       EMAIL_LOGGER.error("DB unavailable error has resolved itself");
@@ -50,7 +50,7 @@ public class AlarmListener implements IAlarmListener {
     if (alarmUp && !diskAlarm) {
       diskAlarm = true;
       EMAIL_LOGGER.error("Error in logging to Short-Term-Log fallback - the disk is nearly full, directory is " + directoryName);
-      SMS_LOGGER.error("Error in logging to Short-Term-Log fallback - the disk is nearly full.");
+      SMS_LOGGER.error("Error in STL fallback - the disk is nearly full.");
     } else if (!alarmUp && diskAlarm) {
       diskAlarm = false;
       EMAIL_LOGGER.error("Disk full error has resolved itself");
@@ -63,7 +63,7 @@ public class AlarmListener implements IAlarmListener {
     if (alarmUp && !fileAlarm) {
       fileAlarm = true;
       EMAIL_LOGGER.error("Error in logging to Short-Term-Log - the following file is not reachable: " + file.getName());
-      SMS_LOGGER.error("Error in logging to Short-Term-Log - following file is not reachable: " + file.getName());
+      SMS_LOGGER.error("Error in STL fallback - file not reachable: " + file.getName());
     } else if (!alarmUp && fileAlarm) {
       fileAlarm = false;
       EMAIL_LOGGER.error("File unreachable error has resolved itself");
