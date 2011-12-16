@@ -115,7 +115,7 @@ public class RecoveryManager implements SmartLifecycle {
    */
   private void refreshDataTags() {
     LOGGER.info("Recovery task: refreshing DataTags from DAQ (using DAQ cache).");
-    dataRefreshManager.refreshTagForAllProcess();    
+    dataRefreshManager.refreshTagsForAllProcess();    
   }
   
   /**
