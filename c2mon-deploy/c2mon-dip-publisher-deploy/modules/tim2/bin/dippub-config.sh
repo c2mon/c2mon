@@ -18,6 +18,13 @@ PRGDIR=`dirname "$PRG"`
 # Set DIP_PUBLISHER_HOME
 DIP_PUBLISHER_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 
+##
+# Read property variables from C2MON Client Properties file
+#
+C2MON_PROPS=$DIP_PUBLISHER_HOME/conf/c2mon-client.properties
+JDBC_RO_USER=`sed '/^\#/d' ${C2MON_PROPS} | grep 'c2mon.jdbc.ro.user'  | tail -n 1 | cut -d "=" -f2-`
+JDBC_RO_PASSWORD=`sed '/^\#/d' ${C2MON_PROPS} | grep 'c2mon.jdbc.ro.password'  | tail -n 1 | cut -d "=" -f2-`
+
 FILE_ROOT=$1
 FILE_STUB="DataTags"
 CONF_FILE=$DIP_PUBLISHER_HOME/conf/$FILE_ROOT$FILE_STUB.xml
@@ -31,7 +38,7 @@ if [ "$FILE_ROOT" = "" ] ; then
   echo "please supply the DIP publisher name as a parameter"
   echo "* * * * * * * * * * * * * * * * * * * * * * * * * *"
 else
-  sqlplus -S timop/optim@timdb @$DIP_PUBLISHER_HOME/bin/dipconf.sql $FILE_ROOT >$TEMP_FILE
+  sqlplus -S $JDBC_RO_USER/$JDBC_RO_PASSWORD@timdb11 @$DIP_PUBLISHER_HOME/bin/dipconf.sql $FILE_ROOT >$TEMP_FILE
 
 # If the new configuration is different from the old one:
 # (1) create a backup of the current configuration

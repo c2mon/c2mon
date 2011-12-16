@@ -39,9 +39,9 @@ open JMSPROPS, "< ../jms.properties"
   or die "Unable to open configuration file ../jms.properties";
 my $jmsProperties = new Config::Properties();
 $jmsProperties->load(*JMSPROPS);
-my $jmsSupervisionTopic = $jmsProperties->getProperty("jms.client.supervision.topic");
-my $jmsHeartbeatTopic = $jmsProperties->getProperty("c2mon.jms.heartbeat.topic");
-my $jmsRequestQueue = $jmsProperties->getProperty("jms.client.request.queue");
+my $jmsSupervisionTopic = $jmsProperties->getProperty("c2mon.client.jms.supervision.topic");
+my $jmsHeartbeatTopic = $jmsProperties->getProperty("c2mon.client.jms.heartbeat.topic");
+my $jmsRequestQueue = $jmsProperties->getProperty("c2mon.client.jms.request.queue");
 close JMSPROPS;
 
 
@@ -108,17 +108,17 @@ jarlist ("$jardir");
 # Defines the version number that is shown in the TIM Viewer about dialog
 print "   <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
-print "   <property name=\"c2mon.jms.url\" value=\"$jmsUrl\"/>\n";
-print "   <property name=\"c2mon.jms.user\" value=\"$jmsUser\"/>\n";
-print "   <property name=\"c2mon.jms.passwd\" value=\"$jmsPassword\"/>\n";
+print "   <property name=\"c2mon.client.jms.url\" value=\"$jmsUrl\"/>\n";
+print "   <property name=\"c2mon.client.jms.user\" value=\"$jmsUser\"/>\n";
+print "   <property name=\"c2mon.client.jms.password\" value=\"$jmsPassword\"/>\n";
 print "   <property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
 print "   <property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
 print "   <property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
 # C2MON read-only credentials to STL database, needed for the history player and charts
-print "   <property name=\"jdbc.driver\" value=\"$jdbcDriver\"/>\n";
-print "   <property name=\"jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
-print "   <property name=\"jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
-print "   <property name=\"jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
+print "   <property name=\"c2mon.jdbc.driver\" value=\"$jdbcDriver\"/>\n";
+print "   <property name=\"c2mon.jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
+print "   <property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
+print "   <property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
 print " </resources>
         <resources os=\"Windows\" >
                 <property name=\"tim.log.file\" value=\"c:\\temp\\dmn2-dashboard-editor.log\"/>

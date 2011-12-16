@@ -10,6 +10,7 @@ use Config::Properties;
 my $jardir = "../lib";
 my $appdir = "tim2-video-viewer/";
 my $codebase = "http://timweb.cern.ch/test/javaws";
+my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties"
 
 #Reading version number from ../version.txt
 open VFILE, "< ../version.txt"
@@ -18,26 +19,20 @@ my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
 
-# Reading property file ~/rep/c2mon/.c2mon.properties #
-open PROPS, "< /user/timoper/rep/c2mon/client/c2mon-client.properties"
-  or die "Unable to open configuration file /user/timoper/rep/c2mon/client/c2mon-client.properties";
+# Reading property file $c2monClientPropertiesFile #
+open PROPS, "< $c2monClientPropertiesFile"
+  or die "Unable to open configuration file $c2monClientPropertiesFile";
 my $c2monProperties = new Config::Properties();
 $c2monProperties->load(*PROPS);
-my $jmsUrl = $c2monProperties->getProperty("jms.broker.url");
-my $jmsUser = $c2monProperties->getProperty("jms.client.user");
-my $jmsPassword = $c2monProperties->getProperty("jms.client.password");
+my $jmsUrl               = $c2monProperties->getProperty("c2mon.client.jms.url");
+my $jmsUser              = $c2monProperties->getProperty("c2mon.client.jms.user");
+my $jmsPassword          = $c2monProperties->getProperty("c2mon.client.jms.password");
+my $jmsAdminMessageTopic = $c2monProperties->getProperty("c2mon.client.jms.adminmessage.topic");
+my $jmsSupervisionTopic  = $c2monProperties->getProperty("c2mon.client.jms.supervision.topic");
+my $jmsHeartbeatTopic    = $c2monProperties->getProperty("c2mon.client.jms.heartbeat.topic");
+my $jmsRequestQueue      = $c2monProperties->getProperty("c2mon.client.jms.request.queue");
+my $jmsVideoRequestQueue = $c2monProperties->getProperty("c2mon.client.jms.video.request.queue");
 close PROPS;
-
-# Reading property file ../jms.properties #
-open JMSPROPS, "< ../jms.properties"
-  or die "Unable to open configuration file ../jms.properties";
-my $jmsProperties = new Config::Properties();
-$jmsProperties->load(*JMSPROPS);
-my $jmsSupervisionTopic = $jmsProperties->getProperty("jms.client.supervision.topic");
-my $jmsHeartbeatTopic = $jmsProperties->getProperty("c2mon.jms.heartbeat.topic");
-my $jmsRequestQueue = $jmsProperties->getProperty("jms.client.request.queue");
-my $jmsVideoRequestQueue = $jmsProperties->getProperty("jms.video.request.queue");
-close JMSPROPS;
 
 
 ##
@@ -103,16 +98,17 @@ jarlist ("$jardir");
 # Defines the version number that is shown in the TIM Viewer about dialog
 print "   <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
-print "   <property name=\"c2mon.jms.url\" value=\"$jmsUrl\"/>\n";
-print "   <property name=\"c2mon.jms.user\" value=\"$jmsUser\"/>\n";
-print "   <property name=\"c2mon.jms.passwd\" value=\"$jmsPassword\"/>\n";
+print "   <property name=\"c2mon.client.jms.url\" value=\"$jmsUrl\"/>\n";
+print "   <property name=\"c2mon.client.jms.user\" value=\"$jmsUser\"/>\n";
+print "   <property name=\"c2mon.client.jms.password\" value=\"$jmsPassword\"/>\n";
+print "   <property name=\"c2mon.client.jms.adminmessage.topic\" value=\"$jmsAdminMessageTopic\"/>\n";
 print "   <property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
 print "   <property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
 print "   <property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
 print "   <property name=\"c2mon.client.jms.video.request.queue\" value=\"$jmsVideoRequestQueue\"/>\n";
 
 if (param('configurl')) {
-	print "		<property name=\"configurationFilePath\" value=\"", param('configurl'), "\"/>", "\n";
+	print "		<property name=\"tim.conf.file.url\" value=\"", param('configurl'), "\"/>", "\n";
 }
 
 print "	</resources>

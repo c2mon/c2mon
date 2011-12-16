@@ -11,6 +11,24 @@
 # everywhere but from the APP_HOME directory.  
 
 
+# resolve links - $0 may be a softlink
+PRG="$0"
+
+while [ -h "$PRG" ] ; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+
+PRGDIR=`dirname "$PRG"`
+
+# application home which shall contain a /bin and /conf directory
+APP_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
+
 
 ##############################
 # PROCESS specific variables #
@@ -19,11 +37,11 @@
 PROCESS_NAME=japc-sispublisher
 PROCESS_COMMAND=$1
 
-#application home which shall contain a bin and conf directory
-APP_HOME=/opt/tim-japc-sispublisher
+# configuration directory location
+PROCESS_CONF_HOME=$APP_HOME/conf
 
 #The file that contains the Data Tag IDs which shall be published
-TID_FILE=$APP_HOME/conf/publisher.tid
+TID_FILE=$PROCESS_CONF_HOME/publisher.tid
 
 TIME=`date +"%F %T.%3N"`
 
@@ -40,7 +58,7 @@ JAVA_BIN=$JAVA_HOME/jre/bin
 ###############
 
 #log director
-APP_LOG_HOME=/var/log/$USER/$PROCESS_NAME
+APP_LOG_HOME=$APP_HOME/log
 if [ ! -d ${APP_LOG_HOME} ] ; then
     mkdir ${APP_LOG_HOME}
 fi
@@ -51,9 +69,6 @@ PROCESS_SCRIPT_LOG=$SCRIPT_LOG_DIR/$PROCESS_NAME.log
 if [ ! -d ${SCRIPT_LOG_DIR} ] ; then
     mkdir ${SCRIPT_LOG_DIR}
 fi
-
-#graph configuration directory location
-PROCESS_CONF_HOME=$APP_HOME/conf
 
 #directory containing the libraries
 REP_LIB_HOME=$APP_HOME/lib

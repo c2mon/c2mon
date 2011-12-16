@@ -55,15 +55,6 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-		
-		<!-- copy the client JMS properties -->
-		<file>
-      <source>${basedir}/conf/tim2-jms.properties</source>
-      <outputDirectory>conf/</outputDirectory>
-      <destName>c2mon-jms.properties</destName>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
-    </file>
 	</files>
 
 </assembly>
