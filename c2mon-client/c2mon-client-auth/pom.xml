@@ -21,10 +21,6 @@
 			<artifactId>log4j</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>cern.tim2.tim2-shared</groupId>
 			<artifactId>tim2-shared-client</artifactId>
 		</dependency>
@@ -33,11 +29,17 @@
 			<artifactId>tim2-shared-util</artifactId>
 		</dependency>
 
+    	<!-- RBAC dependencies -->
 		<dependency>
 			<groupId>cern.accsoft.security</groupId>
 			<artifactId>accsoft-security-rba-util</artifactId>
 		</dependency>
-
+		
+		<!-- Test dependencies -->
+		<dependency>
+      		<groupId>junit</groupId>
+	      <artifactId>junit</artifactId>
+    	</dependency>
 	</dependencies>
 
 	<developers />

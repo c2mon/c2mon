@@ -89,9 +89,9 @@ public class JmsProxyTest {
    */
   @Before
   public void setUp() throws InterruptedException {
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(System.getProperty("c2mon.jms.user"), 
-                                                                                System.getProperty("c2mon.jms.passwd"),
-                                                                                System.getProperty("c2mon.jms.url")); 
+    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(System.getProperty("c2mon.client.jms.user"), 
+                                                                                System.getProperty("c2mon.client.jms.password"),
+                                                                                System.getProperty("c2mon.client.jms.url")); 
     jmsSender = new ActiveJmsSender();
     jmsSender.setJmsTemplate(new JmsTemplate(connectionFactory));
     serverTemplate = new JmsTemplate(connectionFactory);    

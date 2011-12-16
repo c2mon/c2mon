@@ -32,10 +32,10 @@
     <environment id="development">
       <transactionManager type="JDBC" />
       <dataSource type="POOLED">
-        <property name="driver" value="${jdbc.driver}" />
-        <property name="url" value="${jdbc.ro.url}" />
-        <property name="username" value="${jdbc.ro.user}" />
-        <property name="password" value="${jdbc.ro.password}" />
+        <property name="driver" value="${c2mon.jdbc.driver}" />
+        <property name="url" value="${c2mon.jdbc.ro.url}" />
+        <property name="username" value="${c2mon.jdbc.ro.user}" />
+        <property name="password" value="${c2mon.jdbc.ro.password}" />
         <property name="poolPingEnabled" value="true"/>
         <property name="poolPingQuery" value="SELECT 1 FROM DUAL"/>
         <!-- <property name="poolPingConnectionsNotUsedFor" value=""/>  -->

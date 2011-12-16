@@ -27,16 +27,16 @@ package cern.c2mon.client.history.dbaccess;
 public final class HistorySystemProperties {
   
   /** The jdbc read only url. */
-  public static final String JDBC_RO_URL = "jdbc.ro.url";
+  public static final String JDBC_RO_URL = "c2mon.jdbc.ro.url";
   
   /** The jdbc read only driver. */
-  public static final String JDBC_DRIVER = "jdbc.driver";
+  public static final String JDBC_DRIVER = "c2mon.jdbc.driver";
   
   /** The jdbc read only username */
-  public static final String JDBC_RO_USERNAME = "jdbc.ro.user";
+  public static final String JDBC_RO_USERNAME = "c2mon.jdbc.ro.user";
   
   /** The jdbc read only password */
-  public static final String JDBC_RO_PASSWORD = "jdbc.ro.password";
+  public static final String JDBC_RO_PASSWORD = "c2mon.jdbc.ro.password";
   
   
   /** Private constructor, no instance is necessary */

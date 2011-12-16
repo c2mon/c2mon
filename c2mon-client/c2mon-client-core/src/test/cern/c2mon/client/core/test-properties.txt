@@ -1,6 +1,6 @@
-c2mon.jms.url=tcp://timjms1:61616
-c2mon.jms.user=not-used
-c2mon.jms.passwd=not-used
+c2mon.client.jms.url=tcp://timjms1:61616
+c2mon.client.jms.user=not-used
+c2mon.client.jms.password=not-used
 c2mon.client.jms.supervision.topic=tim.client.supervision.test
 c2mon.client.jms.heartbeat.topic=tim.client.heartbeat.test
 c2mon.client.jms.request.queue=tim.client.request.test
