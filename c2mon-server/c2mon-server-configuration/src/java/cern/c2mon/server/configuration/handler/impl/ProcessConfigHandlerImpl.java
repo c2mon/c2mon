@@ -51,7 +51,6 @@ import cern.tim.shared.daq.config.Change;
  * @author Mark Brightwell
  *
  */
-@Service
 public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
   /**
@@ -89,6 +88,8 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * Reference to the bean managing DAQ-in JMS connections.
    */
   private JmsContainerManager jmsContainerManager;
+  
+  private boolean allowRunningProcessRemoval = false;
     
   /**
    * Autowired constructor.
@@ -197,7 +198,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
       Process process = processCache.get(processId);
       try {
         process.getWriteLock().lock();      
-        if (processFacade.isRunning(process)) {
+        if (processFacade.isRunning(process) && !allowRunningProcessRemoval) {
           String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
           LOGGER.warn(message); 
           processReport.setFailure(message);
@@ -267,5 +268,12 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     } finally {
       process.getWriteLock().unlock();
     } 
+  }
+
+  /**
+   * @param allowRunningProcessRemoval the allowRunningProcessRemoval to set
+   */
+  public void setAllowRunningProcessRemoval(boolean allowRunningProcessRemoval) {
+    this.allowRunningProcessRemoval = allowRunningProcessRemoval;
   }
 }

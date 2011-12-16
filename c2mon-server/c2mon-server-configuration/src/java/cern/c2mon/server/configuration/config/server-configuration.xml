@@ -38,5 +38,9 @@
       </property>     
 <!--      <property name="errorHandler" ref="processRequestHandler"/>         -->
   </bean>
+  
+  <bean class="cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl">
+  	<property name="allowRunningProcessRemoval" value="${c2mon.server.config.running.process.removal}"/>
+  </bean>
 
 </beans>

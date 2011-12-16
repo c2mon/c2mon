@@ -270,6 +270,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           }
         }
       } else {
+        LOGGER.debug("DAQ runtime reconfiguration not enable - setting required restart flags");
         if (!processLists.isEmpty()){
           report.addStatus(Status.RESTART);
           for (Long processId : processLists.keySet()) {
