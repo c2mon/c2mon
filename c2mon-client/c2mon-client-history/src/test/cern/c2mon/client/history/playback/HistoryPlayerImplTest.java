@@ -70,7 +70,7 @@ public class HistoryPlayerImplTest {
         new GregorianCalendar(2011, 06, 07, 12, 00).getTime());
   
   /** The number of tags which will be generated */
-  private static final int NUMBER_OF_TAGS = 100;
+  private static final int NUMBER_OF_TAGS = 10;
   
   /**
    * The maximum number of milliseconds to wait for the loading to finish
