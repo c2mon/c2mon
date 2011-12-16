@@ -2,12 +2,12 @@ package cern.tim.server.lifecycle;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.tim.server.cache.ControlTagCache;
 import cern.tim.server.cache.DataTagCache;
-import cern.tim.server.cache.RuleTagCache;
 import cern.tim.server.common.config.ServerConstants;
 import cern.tim.server.daqcommunication.out.DataRefreshManager;
 import cern.tim.server.supervision.SupervisionFacade;
@@ -39,7 +39,7 @@ public class RecoveryManager implements SmartLifecycle {
   /**
    * Flag for interrupting the initial logging thread if shutdown requested.
    */
-  private volatile boolean recoveryRunning = true;  
+  private volatile boolean stopRequested = false;  
   
   /**
    * Lifecycle flag.
@@ -56,6 +56,9 @@ public class RecoveryManager implements SmartLifecycle {
    */
   private DataRefreshManager dataRefreshManager;
   
+  /**
+   * Caches for notifying listeners.
+   */
   private DataTagCache dataTagCache;  
   private ControlTagCache controlTagCache;
    
@@ -77,16 +80,12 @@ public class RecoveryManager implements SmartLifecycle {
 
   @Override
   public void start() {
-    if (!running && System.getProperty("c2mon.recovery") != null && System.getProperty("c2mon.recovery").equals("true")) {
+    if (!running && !stopRequested && System.getProperty("c2mon.recovery") != null && System.getProperty("c2mon.recovery").equals("true")) {
       new Thread(new Runnable() {        
         @Override
         public void run() {
           LOGGER.info("Running server recovery tasks.");
-          refreshSupervisionStatus(); //includes alarm callbacks!
-          refreshStateTags();
-          refreshDataTags(); //gets latest values from DAQ cache
-          notifyAllTagCacheListeners(); //also refreshes rules and alarms!
-          recoveryRunning = false;
+          refresh();          
         }
       }).start();      
       running = true;
@@ -94,9 +93,29 @@ public class RecoveryManager implements SmartLifecycle {
   }
 
   /**
+   * Runs all refresh actions.
+   */
+  @ManagedOperation(description="Runs all refresh actions.")
+  public void refresh() {
+    if (!stopRequested) {
+      refreshSupervisionStatus(); //includes alarm callbacks!
+    }
+    if (!stopRequested) {
+      refreshStateTags();
+    }
+    if (!stopRequested) {
+      refreshDataTags(); //gets latest values from DAQ cache
+    }
+    if (!stopRequested) {      
+      notifyAllTagCacheListeners(); //also refreshes rules and alarms!
+    }    
+  }
+  
+  /**
    * Refresh the supervision status.
    */
-  private void refreshSupervisionStatus() {        
+  @ManagedOperation(description="Refreshes all supervision status.")
+  public void refreshSupervisionStatus() {        
     LOGGER.info("Recovery task: notifying all supervision listeners of current status.");
     supervisionFacade.refreshAllSupervisionStatus();
   } 
@@ -104,7 +123,8 @@ public class RecoveryManager implements SmartLifecycle {
   /**
    * Refresh all state tags with new timestamps.
    */
-  private void refreshStateTags() {
+  @ManagedOperation(description="Refreshes all state tags (new timestamp).")
+  public void refreshStateTags() {
     LOGGER.info("Recovery task: refreshing Process state tags.");
     supervisionFacade.refreshStateTags();
   }
@@ -113,7 +133,8 @@ public class RecoveryManager implements SmartLifecycle {
    * Asks for tag refresh from DAQ level (DAQ cache refresh).
    * Value already in cache will be filtered out.
    */
-  private void refreshDataTags() {
+  @ManagedOperation(description="Refreshes DataTags from DAQ cache.")
+  public void refreshDataTags() {
     LOGGER.info("Recovery task: refreshing DataTags from DAQ (using DAQ cache).");
     dataRefreshManager.refreshTagsForAllProcess();    
   }
@@ -126,7 +147,8 @@ public class RecoveryManager implements SmartLifecycle {
    * out here, as all rules are refreshes through DataTag and ControlTag
    * status confirmations).
    */
-  private void notifyAllTagCacheListeners() {
+  @ManagedOperation(description="Notifies all Tag cache listeners (status confirmation).")
+  public void notifyAllTagCacheListeners() {
     for (Long key : dataTagCache.getKeys()) {
       dataTagCache.notifyListenerStatusConfirmation(dataTagCache.get(key));
     }
@@ -136,8 +158,7 @@ public class RecoveryManager implements SmartLifecycle {
   }
 
   @Override
-  public void stop() {
-    recoveryRunning = false;
+  public void stop() {    
     running = false;
   }
 
