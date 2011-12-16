@@ -29,7 +29,7 @@ public class SqlHistoryProviderDAOTest {
   private Timestamp fromTime;
   private Timestamp toTime;
 
-  private static final int MAXIMUM_NUMBER_OF_RECORDS = 4000;
+  private static final int MAXIMUM_NUMBER_OF_RECORDS = 40;
 
   @Before
   public void setUp() throws Exception {

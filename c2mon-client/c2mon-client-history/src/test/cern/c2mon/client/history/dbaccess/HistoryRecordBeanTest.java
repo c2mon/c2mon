@@ -34,7 +34,7 @@ public class HistoryRecordBeanTest {
   private static final boolean FROM_INITIAL_SNAPSHOT = false;
   private static final String TAG_VALUE = "The tag value";
   private static final String TAG_DATA_TYPE = "String";
-  private static final short TAG_MODE = 4;
+  private static final short TAG_MODE = 1;
   private static final String TAG_NAME = "A name-2345-dsfh";
   private static final TagQualityStatus TAG_QUALITY_STATUS = TagQualityStatus.PROCESS_DOWN;
   
