@@ -118,16 +118,16 @@ public class HistoryManagerTest {
    * The number of tags which were subscribed to before the history player were
    * started
    */
-  private static final int NUMBER_OF_INITIAL_TAGS = 100;
+  private static final int NUMBER_OF_INITIAL_TAGS = 8;
   
   /**
    * The number of tags that will have real time timestamps earlier than the
    * start date (which will then be filtered)
    */
-  private static final int NUMBER_FILTERED_TAGS = 10;
+  private static final int NUMBER_FILTERED_TAGS = 3;
   
   /** The number of tags which will be added later */
-  private static final int NUMBER_OF_ADDED_TAGS = 50;
+  private static final int NUMBER_OF_ADDED_TAGS = 8;
   
   /** The number of milliseconds to wait for the initialization */
   private static final int INITIALIZE_TIMEOUT = 10000;
