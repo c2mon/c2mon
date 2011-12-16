@@ -1,6 +1,7 @@
 package cern.tim.server.lifecycle;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -23,7 +24,7 @@ import cern.tim.server.supervision.SupervisionFacade;
  *
  */
 @Service
-@ManagedResource(objectName="cern.c2mon:name=recoveryManager")
+@ManagedResource(objectName = "cern.c2mon:name=recoveryManager")
 public class RecoveryManager implements SmartLifecycle {
 
   /**
@@ -62,6 +63,26 @@ public class RecoveryManager implements SmartLifecycle {
   private DataTagCache dataTagCache;  
   private ControlTagCache controlTagCache;
    
+  
+  /**
+   * Constructor
+   * @param supervisionFacade facade
+   * @param dataRefreshManager refresh manager
+   * @param dataTagCache datatag cache
+   * @param controlTagCache controltag cache
+   */
+  @Autowired
+  public RecoveryManager(final SupervisionFacade supervisionFacade, 
+                          final DataRefreshManager dataRefreshManager, 
+                          final DataTagCache dataTagCache, 
+                          final ControlTagCache controlTagCache) {
+    super();
+    this.supervisionFacade = supervisionFacade;
+    this.dataRefreshManager = dataRefreshManager;
+    this.dataTagCache = dataTagCache;
+    this.controlTagCache = controlTagCache;
+  }
+
   @Override
   public boolean isAutoStartup() {    
     return false;
@@ -95,7 +116,7 @@ public class RecoveryManager implements SmartLifecycle {
   /**
    * Runs all refresh actions.
    */
-  @ManagedOperation(description="Runs all refresh actions.")
+  @ManagedOperation(description = "Runs all refresh actions.")
   public void refresh() {
     if (!stopRequested) {
       refreshSupervisionStatus(); //includes alarm callbacks!
@@ -114,7 +135,7 @@ public class RecoveryManager implements SmartLifecycle {
   /**
    * Refresh the supervision status.
    */
-  @ManagedOperation(description="Refreshes all supervision status.")
+  @ManagedOperation(description = "Refreshes all supervision status.")
   public void refreshSupervisionStatus() {        
     LOGGER.info("Recovery task: notifying all supervision listeners of current status.");
     supervisionFacade.refreshAllSupervisionStatus();
@@ -123,7 +144,7 @@ public class RecoveryManager implements SmartLifecycle {
   /**
    * Refresh all state tags with new timestamps.
    */
-  @ManagedOperation(description="Refreshes all state tags (new timestamp).")
+  @ManagedOperation(description = "Refreshes all state tags (new timestamp).")
   public void refreshStateTags() {
     LOGGER.info("Recovery task: refreshing Process state tags.");
     supervisionFacade.refreshStateTags();
@@ -133,7 +154,7 @@ public class RecoveryManager implements SmartLifecycle {
    * Asks for tag refresh from DAQ level (DAQ cache refresh).
    * Value already in cache will be filtered out.
    */
-  @ManagedOperation(description="Refreshes DataTags from DAQ cache.")
+  @ManagedOperation(description = "Refreshes DataTags from DAQ cache.")
   public void refreshDataTags() {
     LOGGER.info("Recovery task: refreshing DataTags from DAQ (using DAQ cache).");
     dataRefreshManager.refreshTagsForAllProcess();    
@@ -147,7 +168,7 @@ public class RecoveryManager implements SmartLifecycle {
    * out here, as all rules are refreshes through DataTag and ControlTag
    * status confirmations).
    */
-  @ManagedOperation(description="Notifies all Tag cache listeners (status confirmation).")
+  @ManagedOperation(description = "Notifies all Tag cache listeners (status confirmation).")
   public void notifyAllTagCacheListeners() {
     for (Long key : dataTagCache.getKeys()) {
       dataTagCache.notifyListenerStatusConfirmation(dataTagCache.get(key));
@@ -158,7 +179,8 @@ public class RecoveryManager implements SmartLifecycle {
   }
 
   @Override
-  public void stop() {    
+  public void stop() {
+    stopRequested = true;
     running = false;
   }
 
