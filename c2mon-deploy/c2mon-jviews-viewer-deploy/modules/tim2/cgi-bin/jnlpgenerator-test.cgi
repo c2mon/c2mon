@@ -10,8 +10,8 @@ use Config::Properties;
 my $jardir = "../lib";
 my $appdir = "tim2-jviews-viewer/";
 my $codebase = "http://timweb.cern.ch/test/javaws";
-my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties"
-my $timViewerPropertiesFile = "../tim-viewer.properties"
+my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
+my $timViewerPropertiesFile = "../tim-viewer.properties";
 
 ##
 # Reading version number from ../version.txt
