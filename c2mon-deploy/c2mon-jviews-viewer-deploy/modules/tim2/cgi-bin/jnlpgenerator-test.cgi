@@ -112,7 +112,7 @@ jarlist ("$jardir");
 
 # Defines the version number that is shown in the TIM Viewer about dialog
 print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
-print "		<property name=\"tim.app.title\" value=\"$appName\"/>\n";
+print "		<property name=\"tim.app.title\" value=\"$appName (TEST)\"/>\n";
 # JMS configuration parameters needed by C2MON client API
 print "		<property name=\"c2mon.client.jms.url\" value=\"$jmsUrl\"/>\n";
 print "		<property name=\"c2mon.client.jms.user\" value=\"$jmsUser\"/>\n";
