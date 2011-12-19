@@ -8,10 +8,12 @@
     -->
     <application name="default">
       <deployment installLocation="/opt/c2mon-tim2/">
+      	<directory>
+      		<link source="reports" target="~/config-reports"/>
+      	</directory>
         <backupPolicy keepBackups="2">
           <preserve type="dir" name="log" />
-          <preserve type="dir" name="tmp" />
-          <preserve type="dir" name="reports" />
+          <preserve type="dir" name="tmp" />          
         </backupPolicy>
         <notification>
           <!-- you can give more than one mail for deployment notification -->
