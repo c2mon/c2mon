@@ -125,5 +125,4 @@ public class DataTagController {
         }
         return model;
     }
-    
 }

@@ -28,6 +28,11 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     
+	
+	 <listener>
+     <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+ 	</listener>
+    
 	<!-- Processes application requests -->
 	<servlet>
 		<servlet-name>appServlet</servlet-name>
@@ -37,11 +42,18 @@
 			<param-value>/WEB-INF/appServlet/servlet-context.xml</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
-	</servlet>		
+	</servlet>	
+	
+	<session-config>
+  		<session-timeout>10</session-timeout>
+  		<!-- 1440 for one day -->
+	</session-config>	
 
 	<servlet-mapping>
 		<servlet-name>appServlet</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
+	
+	
 		
 </web-app>

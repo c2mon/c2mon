@@ -16,19 +16,36 @@
         <protect-pointcut expression="execution(* bigbank.*Service.post*(..))" access="ROLE_TELLER"/>
         -->
     </global-method-security>
-
+    
+    
+     <!--
+    <bean id="customAuthListener" 
+    class="cern.c2mon.web.configviewer.security.CustomAuthListener">    
+    </bean>
+    -->
+    
     <http use-expressions="true">
-        <intercept-url pattern="/secure/extreme/**" access="hasRole('ROLE_SUPERVISOR')"/>
-        <intercept-url pattern="/secure/**" access="isAuthenticated()" />
+    
         <!-- Disable web URI authorization, as we're using <global-method-security> and have @Secured the services layer instead
         <intercept-url pattern="/listAccounts.html" access="isRememberMe()" />
         <intercept-url pattern="/post.html" access="hasRole('ROLE_TELLER')" />
+        <intercept-url pattern="/secure/**" access="isAuthenticated()" />
+        <intercept-url pattern="/*/**" access="isAuthorized()" />
         -->
-        <intercept-url pattern="/configloader/**" access="isAuthenticated()" />
+        <intercept-url pattern="/configloader/**" access="hasAnyRole('ROLE_ADMIN')" />
+        <intercept-url pattern="/process/**" access="hasAnyRole('ROLE_PROCESS_VIEWER','ROLE_ADMIN')" />
         <intercept-url pattern="/**" access="permitAll" />
-        <form-login />
+       <form-login/>
+       <logout logout-success-url="/" />
+       
+       <!--
+       <form-login/>
+        <form-login login-page="/loginform.html" default-target-url="/home.do"/>
+        <security:custom-filter ref="authenticationFilter" position="FORM_LOGIN_FILTER"/>
+        
         <logout />
         <remember-me />
+        -->
 <!--
     Uncomment to enable X509 client authentication support
         <x509 />
@@ -37,8 +54,38 @@
         <session-management invalid-session-url="/timeout.jsp">
             <concurrency-control max-sessions="1" error-if-maximum-exceeded="true" />
         </session-management>
-
+        
     </http>
+    
+    
+    <!--
+    <beans:bean id="customAuthenticationProvider" 
+    class="cern.c2mon.web.configviewer.security.CustomAuthenticationProvider" />  
+    -->
+    
+    <beans:bean id="propertyPlaceholderConfigurer" 
+    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
+    <beans:bean id="customAuthenticationProvider" 
+    	class="cern.c2mon.web.configviewer.security.CustomAuthenticationProvider" >
+    	<!--  # RBAC class/device/property for C2MON  -->
+    	<beans:constructor-arg name="adminDetails" value="${c2mon.web.rbac.admin}"/>
+    	<beans:constructor-arg name="processViewerDetails" value="${c2mon.web.rbac.user}"/>
+    </beans:bean> 
+    
+  <!--      
+    <bean id="customAuthenticationProvider" 
+    class="cern.c2mon.web.configviewer.security.CustomAuthenticationProvider">  
+    </bean>
+    -->
+ 
+ <!--   
+    <property name="requestQueue" value="${c2mon.client.jms.request.queue}"/>
+ -->
+    
+    <authentication-manager alias="authenticationManager">
+     <authentication-provider ref="customAuthenticationProvider"/>
+ 	</authentication-manager>
 
     <!--
     Usernames/Passwords are
@@ -46,7 +93,8 @@
         dianne/emu
         scott/wombat
         peter/opal
-    -->
+	-->
+	<!--
     <authentication-manager>
         <authentication-provider>
             <password-encoder hash="md5"/>
@@ -58,5 +106,5 @@
             </user-service>
         </authentication-provider>
     </authentication-manager>
-
+    -->
 </beans:beans>
