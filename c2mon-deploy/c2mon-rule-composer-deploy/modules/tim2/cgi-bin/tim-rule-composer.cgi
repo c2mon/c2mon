@@ -11,7 +11,7 @@ my $jardir = "../lib";
 my $appdir = "tim2-rule-composer/";
 # Default codebase points to operation
 my $codebase = "http://timweb.cern.ch/javaws";
-my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties" 
+my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
 
 ##
 # Reading version number from ../version.txt
