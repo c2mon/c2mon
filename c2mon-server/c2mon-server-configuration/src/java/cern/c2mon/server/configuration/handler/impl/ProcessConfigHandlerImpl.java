@@ -225,8 +225,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
             }      
           }             
           //remove process from cache and DB
-          processDAO.deleteProcess(processId);
-          processCache.remove(processId);     
+          processDAO.deleteProcess(processId);             
           removeProcessControlTags(process, processReport);
           jmsContainerManager.unsubscribe(process);            
          }
