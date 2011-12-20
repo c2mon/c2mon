@@ -387,6 +387,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         }
         for (OPCGroup group : opcGroups) {
           try {
+            logger.debug("onRefresh() - trigger async refresh for group " + group.getName()); 
             group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
           } catch (AutomationException e) {
               throw OPCDCOMFactory.createWrappedAutomationException(e);

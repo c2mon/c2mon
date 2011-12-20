@@ -152,7 +152,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         stopStatusChecker();
         statusCheckTimer = new Timer("OPCStatusChecker");
         int serverTimeout = getCurrentOPCAddress().getServerTimeout();
-        logger.info("Starting OPCStatusChecker for endpoint address: " + getCurrentOPCAddress());
+        logger.info("Starting OPCStatusChecker for endpoint address: " + getCurrentOPCAddress().getUriString());
         statusCheckTimer.schedule(new StatusChecker(endpoint) {
             
             @Override
