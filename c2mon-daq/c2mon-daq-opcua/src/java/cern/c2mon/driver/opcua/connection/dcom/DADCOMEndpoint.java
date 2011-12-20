@@ -6,7 +6,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -172,7 +174,6 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             for (SubscriptionGroup<DADCOMItemDefintion> subscritionGroup : subscriptionGroups) {
                 processGroup(subscritionGroup);
             }
-            server.getOPCGroups();
         } catch (AutomationException e) {
             throw OPCDCOMFactory.createWrappedAutomationException(e);
         } catch (Exception e) {
@@ -203,7 +204,6 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             
         });
         group.setIsSubscribed(true);
-        group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
         return group;
     }
 
@@ -316,6 +316,47 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         return (quality & 0xC0) == 0xC0;
     }
 
+//    /**
+//     * Refreshes the values of a collection of item definitions.
+//     * 
+//     * @param itemDefintions
+//     *            The item definitions to refresh.
+//     */
+//    @Override
+//    protected synchronized void onRefresh(
+//            final Collection<DADCOMItemDefintion> itemDefintions) {
+//        AuthInfo.setThreadDefault(authInfo);
+//        logger.debug("Enter refresh");
+//        for (DADCOMItemDefintion definition : itemDefintions) {
+//            long itemDefinitionId = definition.getId();
+//            int clientHandle = Long.valueOf(itemDefinitionId).intValue();
+//            OPCItem item = itemHandleOpcItems.get(clientHandle);
+//            if (item != null) {
+//                Object[] value = new Object[1];
+//                Object[] quality = new Object[1];
+//                Object[] timeStamp = new Object[1];
+//                try {
+//                	logger.debug("Reading from OPC for item: " + item.getItemID());
+//                    item.read((short) OPCDataSource.OPCCache, value, quality, timeStamp);
+//                    notifyEndpointListenersValueChange(
+//                            itemDefinitionId, getAdjustedTimestamp(((Date) timeStamp[0]).getTime()), value[0]);
+//                    if (definition.hasRedundantAddress()) {
+//                        clientHandle = -Long.valueOf(definition.getId()).intValue();
+//                        item = itemHandleOpcItems.get(clientHandle);
+//                        item.read((short) OPCDataSource.OPCCache, value, quality, timeStamp);
+//                        notifyEndpointListenersValueChange(itemDefinitionId, getAdjustedTimestamp(((Date) timeStamp[0]).getTime()), value[0]);
+//                    }
+//                } catch (AutomationException e) {
+//                    RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e, definition.getAddress());
+//                    notifyEndpointListenersItemError(itemDefinitionId, ex);
+//                } catch (Exception e) {
+//                    notifyEndpointListenersItemError(itemDefinitionId, e);
+//                }
+//            }
+//        }
+//        logger.debug("Finished refresh");
+//    }    
+    
     /**
      * Refreshes the values of a collection of item definitions.
      * 
@@ -327,25 +368,14 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             final Collection<DADCOMItemDefintion> itemDefintions) {
         AuthInfo.setThreadDefault(authInfo);
         logger.debug("Enter refresh");
+        Set<OPCGroup> opcGroups = new HashSet<OPCGroup>();
         for (DADCOMItemDefintion definition : itemDefintions) {
             long itemDefinitionId = definition.getId();
             int clientHandle = Long.valueOf(itemDefinitionId).intValue();
             OPCItem item = itemHandleOpcItems.get(clientHandle);
             if (item != null) {
-                Object[] value = new Object[1];
-                Object[] quality = new Object[1];
-                Object[] timeStamp = new Object[1];
                 try {
-                	logger.debug("Reading from OPC for item: " + item.getItemID());
-                    item.read((short) OPCDataSource.OPCCache, value, quality, timeStamp);
-                    notifyEndpointListenersValueChange(
-                            itemDefinitionId, getAdjustedTimestamp(((Date) timeStamp[0]).getTime()), value[0]);
-                    if (definition.hasRedundantAddress()) {
-                        clientHandle = -Long.valueOf(definition.getId()).intValue();
-                        item = itemHandleOpcItems.get(clientHandle);
-                        item.read((short) OPCDataSource.OPCCache, value, quality, timeStamp);
-                        notifyEndpointListenersValueChange(itemDefinitionId, getAdjustedTimestamp(((Date) timeStamp[0]).getTime()), value[0]);
-                    }
+                  opcGroups.add(item.getParent());
                 } catch (AutomationException e) {
                     RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e, definition.getAddress());
                     notifyEndpointListenersItemError(itemDefinitionId, ex);
@@ -353,6 +383,15 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                     notifyEndpointListenersItemError(itemDefinitionId, e);
                 }
             }
+        }
+        for (OPCGroup group : opcGroups) {
+          try {
+            group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
+          } catch (AutomationException e) {
+              throw OPCDCOMFactory.createWrappedAutomationException(e);
+          } catch (Exception e) {
+              throw new OPCCommunicationException("Problems wih the async DCOM group refresh occured", e);
+          }
         }
         logger.debug("Finished refresh");
     }
@@ -497,13 +536,34 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     protected void checkStatus() {
         AuthInfo.setThreadDefault(authInfo);
         try {
-            switch (server.getServerState()) {
-            case OPCServerState.OPCRunning:
+            String state = "OK";
+            int stateId = server.getServerState();
+            switch (stateId) {
+              case OPCServerState.OPCRunning:
                 // fine do nothing
                 break;
-            default:
-                // not fine throw exception
-                throw new OPCCommunicationException("OPC server state wrong.");
+              case OPCServerState.OPCDisconnected:
+                state = "OPC disconnected";
+                break;
+              case OPCServerState.OPCFailed:
+                state = "OPC failed";
+                break;
+              case OPCServerState.OPCNoconfig:
+                state = "OPC has no configuration";
+                break;
+              case OPCServerState.OPCSuspended:
+                state = "OPC suspended";
+                break;
+              case OPCServerState.OPCTest:
+                state = "OPC in TEST state";
+                break;
+              default:
+                state = "OPC state unknown";
+            }
+            
+            if (stateId != OPCServerState.OPCRunning) {
+              // not fine throw exception
+              throw new OPCCommunicationException("OPC server state wrong: " + state);
             }
         } catch (AutomationException e) {
             throw OPCDCOMFactory.createWrappedAutomationException(e);

@@ -376,7 +376,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                             startEndpoint();
                             refresh();
                         } catch (Exception e) {
-                            logger.error("Error restarting subscription");
+                            logger.error("Error restarting subscription", e);
                         }
                     }
                 }
