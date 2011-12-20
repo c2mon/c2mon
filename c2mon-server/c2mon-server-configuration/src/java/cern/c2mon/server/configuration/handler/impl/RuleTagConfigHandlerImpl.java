@@ -177,9 +177,7 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
       try {
         ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();        
         Collection<Long> ruleIds = ruleTag.getCopyRuleIds();  
-        Collection<Long> alarmIds = ruleTag.getCopyAlarmIds();          
-        configurableDAO.deleteItem(ruleTag.getId());
-        tagCache.remove(ruleTag.getId());
+        Collection<Long> alarmIds = ruleTag.getCopyAlarmIds();                  
         if (!alarmIds.isEmpty()) {
           LOGGER.debug("Removing Alarms dependent on RuleTag " + id);
           for (Long alarmId : alarmIds) { //need copy as modified concurrently by remove alarm
@@ -191,6 +189,8 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
         for (Long inputTagId : ruleInputTagIds) {
           tagConfigGateway.removeRuleFromTag(inputTagId, id); //allowed to lock tag below the rule...
         }
+        configurableDAO.deleteItem(ruleTag.getId());
+        tagCache.remove(ruleTag.getId());
         ruleTag.getWriteLock().unlock(); //.. but not rules "above"!
         //unlock before removing rules
         if (!ruleIds.isEmpty()) {

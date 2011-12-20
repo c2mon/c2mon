@@ -189,9 +189,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
     try {
       DataTag dataTag = tagCache.get(id);
       dataTag.getWriteLock().lock();
-      try {
-        configurableDAO.deleteItem(dataTag.getId());
-        tagCache.remove(dataTag.getId());
+      try {        
         Collection<Long> ruleIds = dataTag.getCopyRuleIds();  
         Collection<Long> alarmIds = dataTag.getCopyAlarmIds();
         if (!alarmIds.isEmpty()) {
@@ -202,6 +200,8 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
             alarmConfigHandler.removeAlarm(alarmId, alarmReport);
           }        
         }
+        configurableDAO.deleteItem(dataTag.getId());
+        tagCache.remove(dataTag.getId());
         dataTag.getWriteLock().unlock();        
         //release lock here, as not rules above tag cannot be locked while tag is!
         if (!ruleIds.isEmpty()) {
