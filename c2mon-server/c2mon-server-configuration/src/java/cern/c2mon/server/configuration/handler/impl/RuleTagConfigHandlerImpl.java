@@ -20,6 +20,7 @@ package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -163,6 +164,7 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
   
   /**
    * Note DB delete is rolled back if cache remove fails.
+   * TODO revisit locking here; either remove as config single threaded or fix order of rule locks...
    */
   @Override
   @Transactional("cacheTransactionManager")
@@ -171,41 +173,49 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
     try {
       RuleTag ruleTag = tagCache.get(id);
       ruleTag.getWriteLock().lock();
-      try {     
-        if (!ruleTag.getRuleIds().isEmpty()) {
-          LOGGER.debug("Removing rules dependent on RuleTag " + ruleTag.getId());
-          for (Long ruleId : new ArrayList<Long>(ruleTag.getRuleIds())) { //concurrent modifcation as a rule is removed from the list during the remove call!
+      Collection<Long> ruleInputTagIds = Collections.EMPTY_LIST;
+      try {
+        ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();        
+        Collection<Long> ruleIds = ruleTag.getCopyRuleIds();  
+        Collection<Long> alarmIds = ruleTag.getCopyAlarmIds();          
+        configurableDAO.deleteItem(ruleTag.getId());
+        tagCache.remove(ruleTag.getId());
+        if (!alarmIds.isEmpty()) {
+          LOGGER.debug("Removing Alarms dependent on RuleTag " + id);
+          for (Long alarmId : alarmIds) { //need copy as modified concurrently by remove alarm
+            ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
+            elementReport.addSubReport(alarmReport);
+            alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+          }        
+        }
+        for (Long inputTagId : ruleInputTagIds) {
+          tagConfigGateway.removeRuleFromTag(inputTagId, id); //allowed to lock tag below the rule...
+        }
+        ruleTag.getWriteLock().unlock(); //.. but not rules "above"!
+        //unlock before removing rules
+        if (!ruleIds.isEmpty()) {
+          LOGGER.debug("Removing rules dependent on RuleTag " + id);
+          for (Long ruleId : ruleIds) { //concurrent modifcation as a rule is removed from the list during the remove call!
             if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
               ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
               elementReport.addSubReport(newReport);
               removeRuleTag(ruleId, newReport);
             }         
           }                
-        }
-        if (!ruleTag.getAlarmIds().isEmpty()) {
-          LOGGER.debug("Removing Alarms dependent on RuleTag " + ruleTag.getId());
-          for (Long alarmId : new ArrayList<Long>(ruleTag.getAlarmIds())) { //need copy as modified concurrently by remove alarm
-            ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
-            elementReport.addSubReport(alarmReport);
-            alarmConfigHandler.removeAlarm(alarmId, alarmReport);
-          }        
-        }
-        for (Long inputTagId : ruleTag.getRuleInputTagIds()) {
-          tagConfigGateway.removeRuleFromTag(inputTagId, id);
-        }
-        configurableDAO.deleteItem(ruleTag.getId());
-        tagCache.remove(ruleTag.getId());        
+        }                               
       }
       catch (RuntimeException rEx) {
         String errMessage = "Exception caught when removing rule tag with id " + id;
         LOGGER.error(errMessage, rEx);
         tagCache.remove(id);
-        for (Long inputTagId : ruleTag.getRuleInputTagIds()) {
+        for (Long inputTagId : ruleInputTagIds) {
           tagLocationService.remove(inputTagId);
-        }
+        }            
         throw new UnexpectedRollbackException(errMessage, rEx);   
       } finally {
-        ruleTag.getWriteLock().unlock();
+        if (ruleTag.getWriteLock().isHeldByCurrentThread()) {
+          ruleTag.getWriteLock().unlock();
+        }        
       }
     } catch (CacheElementNotFoundException e) {
       LOGGER.debug("Attempting to remove a non-existent RuleTag - no action taken.");

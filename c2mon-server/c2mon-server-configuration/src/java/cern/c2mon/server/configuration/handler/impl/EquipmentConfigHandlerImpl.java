@@ -162,9 +162,12 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
         removeEquipmentCommands(equipment, equipmentReport);
         removeSubEquipments(equipment, equipmentReport);
         equipmentDAO.deleteItem(equipmentid);
-        equipmentFacade.removeCacheObject(equipmentCache.get(equipmentid));
+        equipmentCache.remove(equipmentid);
         removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them
-        equipment.getWriteLock().unlock();
+        equipment.getWriteLock().unlock();   
+        //unlock before removing changing process and removing alive timers (lock hierarchy)
+        equipmentFacade.removeAliveTimer(equipmentid);
+        equipmentFacade.removeCommFault(equipmentid);
         processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());
         return new ProcessChange(equipment.getProcessId());
       } catch (UnexpectedRollbackException ex) {

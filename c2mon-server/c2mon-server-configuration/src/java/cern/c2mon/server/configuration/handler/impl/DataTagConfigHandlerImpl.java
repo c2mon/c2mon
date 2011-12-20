@@ -19,6 +19,7 @@
 package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -188,10 +189,24 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
     try {
       DataTag dataTag = tagCache.get(id);
       dataTag.getWriteLock().lock();
-      try {     
-        if (!dataTag.getRuleIds().isEmpty()) {
-          LOGGER.trace("Removing Rules dependent on DataTag " + dataTag.getId());
-          for (Long ruleId : new ArrayList<Long>(dataTag.getRuleIds())) {
+      try {
+        configurableDAO.deleteItem(dataTag.getId());
+        tagCache.remove(dataTag.getId());
+        Collection<Long> ruleIds = dataTag.getCopyRuleIds();  
+        Collection<Long> alarmIds = dataTag.getCopyAlarmIds();
+        if (!alarmIds.isEmpty()) {
+          LOGGER.trace("Removing Alarms dependent on DataTag " + id);
+          for (Long alarmId : new ArrayList<Long>(alarmIds)) {
+            ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
+            elementReport.addSubReport(alarmReport);
+            alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+          }        
+        }
+        dataTag.getWriteLock().unlock();        
+        //release lock here, as not rules above tag cannot be locked while tag is!
+        if (!ruleIds.isEmpty()) {
+          LOGGER.trace("Removing Rules dependent on DataTag " + id);
+          for (Long ruleId : new ArrayList<Long>(ruleIds)) {
             if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
               ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
               elementReport.addSubReport(newReport);
@@ -199,19 +214,8 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
             }          
           }
         }
-        if (!dataTag.getAlarmIds().isEmpty()) {
-          LOGGER.trace("Removing Alarms dependent on DataTag " + dataTag.getId());
-          for (Long alarmId : new ArrayList<Long>(dataTag.getAlarmIds())) {
-            ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
-            elementReport.addSubReport(alarmReport);
-            alarmConfigHandler.removeAlarm(alarmId, alarmReport);
-          }        
-        } 
-        //not possible below as removed from the cache by that point!!! (cache persistence is aynchronous)
-        //((DataTagFacade) commonTagFacade).invalidate(dataTag, new DataTagQuality(DataTagQuality.REMOVED, "The DataTag has been removed from the system and is no longer monitored."), new Timestamp(System.currentTimeMillis()));
-        configurableDAO.deleteItem(dataTag.getId());
-        tagCache.remove(dataTag.getId());           
-        dataTag.getWriteLock().unlock();
+         
+        
         //outside above lock as locks equipment (lock hierarchy: never lock equipment after tag)
         try {
           equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());

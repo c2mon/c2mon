@@ -153,16 +153,19 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
     try {
       Alarm alarm = alarmCache.get(alarmId);
       alarm.getWriteLock().lock();
-      try {        
-        removeDataTagReference(alarm);
+      try {                
         alarmDAO.deleteItem(alarmId);
         alarmCache.remove(alarmId);
+        alarm.getWriteLock().unlock(); //unlock before locking tag
+        removeDataTagReference(alarm);
       } catch (Exception ex) {      
         LOGGER.error("Exception caught while removing Alarm " + alarmId, ex);
         alarmReport.setFailure("Unable to remove Alarm with id " + alarmId);
         throw new ConfigurationException(ConfigurationException.UNDEFINED, ex);
       } finally {
-        alarm.getWriteLock().unlock();
+        if (alarm.getWriteLock().isHeldByCurrentThread()) {
+          alarm.getWriteLock().unlock();
+        }        
       }
     } catch (CacheElementNotFoundException e) {
       LOGGER.debug("Attempting to remove a non-existent Alarm - no action taken.");

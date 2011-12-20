@@ -220,7 +220,9 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
           processDAO.deleteProcess(processId);
           processCache.remove(processId);     
           removeProcessControlTags(process, processReport);
-          jmsContainerManager.unsubscribe(process);        
+          jmsContainerManager.unsubscribe(process);
+          process.getWriteLock().unlock(); //before removing alives
+          processFacade.removeAliveTimer(processId);
          }
         return new ProcessChange();
       } catch (RuntimeException ex) {                  
@@ -228,7 +230,9 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
         processCache.remove(processId);
         throw new UnexpectedRollbackException("Unexpected exception caught while removing Process.", ex);
       } finally {
-        process.getWriteLock().unlock();
+        if (process.getWriteLock().isHeldByCurrentThread()) {
+          process.getWriteLock().unlock();
+        }        
       } 
     } else {
       LOGGER.debug("Process not found in cache - unable to remove it.");
