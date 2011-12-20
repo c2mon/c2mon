@@ -372,12 +372,16 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         logger.debug("Enter refresh");
         Set<OPCGroup> opcGroups = new HashSet<OPCGroup>();
         for (DADCOMItemDefintion definition : itemDefintions) {
+            logger.debug("onRefresh() - Trying to determine group for definition " + definition.getAddress());
             long itemDefinitionId = definition.getId();
             int clientHandle = Long.valueOf(itemDefinitionId).intValue();
             OPCItem item = itemHandleOpcItems.get(clientHandle);
             if (item != null) {
                 try {
-                  opcGroups.add(item.getParent());
+                  OPCGroup group = item.getParent();
+                  if (opcGroups.add(group)) {
+                    logger.debug("onRefresh() - Added group " + group.getName());
+                  }
                 } catch (AutomationException e) {
                     RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e, definition.getAddress());
                     notifyEndpointListenersItemError(itemDefinitionId, ex);
