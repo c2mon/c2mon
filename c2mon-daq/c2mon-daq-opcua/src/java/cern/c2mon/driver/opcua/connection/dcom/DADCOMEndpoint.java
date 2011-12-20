@@ -1,6 +1,7 @@
 package cern.c2mon.driver.opcua.connection.dcom;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
@@ -483,6 +484,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         finally {
             server = null;
             itemHandleOpcItems.clear();
+            logger.debug("Release COM object references that have not been released through GC");
             // Release COM object references that have not been released through GC
             Cleaner.releaseAll();
         }

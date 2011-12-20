@@ -375,6 +375,9 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                     while (endpoint.getState() != STATE.INITIALIZED) {
                         sender.confirmEquipmentStateIncorrect();
                         try {
+                            logger.debug("Sleeping for " 
+                                + getCurrentOPCAddress().getServerRetryTimeout() 
+                                + " ms ...");
                             Thread.sleep(getCurrentOPCAddress().getServerRetryTimeout());
                         } catch (InterruptedException e) {
                             logger.error("Subscription restart interrupted!", e);
