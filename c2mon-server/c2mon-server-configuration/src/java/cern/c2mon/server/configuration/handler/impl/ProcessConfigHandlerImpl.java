@@ -23,8 +23,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.ConfigurationLoader;
@@ -35,7 +35,6 @@ import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.ProcessFacade;
 import cern.tim.server.cache.loading.ProcessDAO;
-import cern.tim.server.common.equipment.Equipment;
 import cern.tim.server.common.process.Process;
 import cern.tim.server.daqcommunication.in.JmsContainerManager;
 import cern.tim.shared.client.configuration.ConfigurationElement;
@@ -187,12 +186,19 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    * this is not quite exact: the server will attempt to remove all tags, but will
    * not remove an equipment or any associated subequipments if one tag fails to
    * be removed).
-   * @param processId
+   * @param processId id of process
    * @param processReport the element report for the removal of the process, to which 
    *                          subreports can be attached
    */
-  @Transactional("cacheTransactionManager")
-  public ProcessChange removeProcess(Long processId, ConfigurationElementReport processReport) {    
+  @Override
+  public ProcessChange removeProcess(final Long processId, final ConfigurationElementReport processReport) {   
+    ProcessChange change = doRemoveProcess(processId, processReport);
+    processCache.remove(processId);    
+    return change;
+  }
+      
+  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
+  public ProcessChange doRemoveProcess(final Long processId, final ConfigurationElementReport processReport) {    
     LOGGER.debug("Removing process with id " + processId);
     if (processCache.hasKey(processId)) {
       Process process = processCache.get(processId);

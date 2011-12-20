@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
@@ -122,7 +123,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       subEquipment.getWriteLock().unlock();
     }
   }
-
+  
   /**
    * First removes the SubEquipment from the DB and cache. If successful,
    * removes the associated control tags. 
@@ -133,8 +134,14 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
    * @param subEquipmentReport to which subreports may be added
    */
   @Override
-  @Transactional("cacheTransactionManager")
-  public ProcessChange removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
+  public ProcessChange removeSubEquipment(final Long subEquipmentid, final ConfigurationElementReport equipmentReport) {
+    ProcessChange change = doRemoveSubEquipment(subEquipmentid, equipmentReport);
+    subEquipmentCache.remove(subEquipmentid);    
+    return change;
+  }
+ 
+  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
+  public ProcessChange doRemoveSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
     LOGGER.debug("Removing SubEquipment " + subEquipmentId);
     if (subEquipmentCache.hasKey(subEquipmentId)) {
       SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);    
@@ -143,8 +150,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
         subEquipmentFacade.removeAliveTimer(subEquipmentId);
         subEquipmentFacade.removeCommFault(subEquipmentId);
         subEquipment.getWriteLock().lock();      
-        subEquipmentDAO.deleteItem(subEquipmentId);
-        subEquipmentCache.remove(subEquipmentId);
+        subEquipmentDAO.deleteItem(subEquipmentId);     
         removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB        
         return new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId());
       } finally {

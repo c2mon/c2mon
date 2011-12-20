@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
@@ -130,29 +131,21 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   }
   
   /**
-   * Rules need to be removed before this operation can complete successfully
-   * (DataTags on which rules depend will be left in place, consistently in cache
-   * and DB; DAQ will continue to function as expected, but with the RECONFIGURED
-   * process state).
-   * 
-   * <p>In general, if a DataTag cannot be removed, the operation will keep Equipment
-   * SubEquipment and Processes in place (including ControlTags).
-   *
-   * <p>Any failure when removing the SubEquipments will interrupt the Equipment removal
-   * and leave it in the current state (no rollback of SubEquipment removals).
-   * 
-   * <p>Remove operations should always succeed as a last resort to restoring a consistent
-   * configuration. Will only fail to complete if alarms or rules are associated to tags
-   * managed by this equipment. In this case these should be removed first.
-   * 
    * 
    * @param equipmentid the id of the equipment to be removed
    * @param equipmentReport the equipment-level configuration report
    * @return always returns a change object requiring restart (remove not supported on DAQ layer so far)
    */
   @Override
-  @Transactional("cacheTransactionManager")
   public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
+    ProcessChange change = doRemoveEquipment(equipmentid, equipmentReport);
+    equipmentCache.remove(equipmentid);
+    return change;
+  }
+  
+    
+  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
+  private ProcessChange doRemoveEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
     LOGGER.debug("Removing Equipment " + equipmentid);
     if (equipmentCache.hasKey(equipmentid)) {
       Equipment equipment = equipmentCache.get(equipmentid);    
@@ -164,8 +157,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
         removeEquipmentTags(equipment, equipmentReport);
         removeEquipmentCommands(equipment, equipmentReport);
         removeSubEquipments(equipment, equipmentReport);
-        equipmentDAO.deleteItem(equipmentid);
-        equipmentCache.remove(equipmentid);
+        equipmentDAO.deleteItem(equipmentid);        
         removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them
         equipment.getWriteLock().unlock();           
         processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());

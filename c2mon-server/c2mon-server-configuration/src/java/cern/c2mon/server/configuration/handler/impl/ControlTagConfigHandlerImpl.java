@@ -2,8 +2,6 @@ package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -11,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
@@ -153,8 +152,10 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   
   /**
    * Removes the control tag and fills in the passed report in case
-   * of failure. When removing from DB and cache, unexpected exceptions
-   * are caught and the tag is invalidated.
+   * of failure. The control tag removed is commited if successful.
+   * If it fails, a rollback exception is throw and all *local* changes
+   * are rolled back (the calling method needs to handle the thrown 
+   * UnexpectedRollbackException appropriately.
    * 
    * @param id the id of the tag to remove
    * @param tagReport the report for this removal
@@ -162,8 +163,16 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
    *          needs informing (i.e. if has Address) , else return null
    */
   @Override
-  @Transactional("cacheTransactionManager")
   public ProcessChange removeControlTag(Long id, ConfigurationElementReport tagReport) {
+    ProcessChange change = doRemoveControlTag(id, tagReport);    
+    tagCache.remove(id); //will be skipped if rollback exception thrown in do method
+    return change;
+  }
+  
+  
+  
+  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
+  public ProcessChange doRemoveControlTag(Long id, ConfigurationElementReport tagReport) {
     LOGGER.trace("Removing ControlTag " + id);
     try {
       ControlTag controlTag = tagCache.get(id);

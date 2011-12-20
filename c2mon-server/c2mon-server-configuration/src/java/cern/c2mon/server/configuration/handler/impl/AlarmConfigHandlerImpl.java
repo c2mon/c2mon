@@ -23,6 +23,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
@@ -141,15 +142,17 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
    * tag, removes the alarm from the DB and removes the alarm form the cache,
    * in that order.
    * 
-   * <p>Ready to be called when removing a datatag (not currently done as require
-   * manual removal of alarms first).
-   * 
    * @param alarmId the id of the alarm to remove
    * @param alarmReport the configuration report for the alarm removal
    */
   @Override
-  @Transactional("cacheTransactionManager")
   public void removeAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
+    doRemoveAlarm(alarmId, alarmReport);    
+    alarmCache.remove(alarmId); //will be skipped if rollback exception thrown in do method    
+  }
+ 
+  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
+  public void doRemoveAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
     try {
       Alarm alarm = alarmCache.get(alarmId);
       alarm.getWriteLock().lock();

@@ -19,7 +19,6 @@
 package cern.c2mon.server.configuration.handler.impl;
 
 import org.apache.log4j.Logger;
-import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.tim.server.cache.CommonTagFacade;
@@ -28,9 +27,6 @@ import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.cache.TimCache;
 import cern.tim.server.cache.loading.ConfigurableDAO;
 import cern.tim.server.common.tag.Tag;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.client.configuration.ConfigConstants.Action;
-import cern.tim.shared.client.configuration.ConfigConstants.Entity;
 import cern.tim.shared.common.ConfigurationException;
 
 /**

@@ -18,7 +18,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
@@ -27,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
@@ -162,13 +162,14 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
     }    
   }
   
-  /**
-   * Note DB delete is rolled back if cache remove fails.
-   * TODO revisit locking here; either remove as config single threaded or fix order of rule locks...
-   */
   @Override
-  @Transactional("cacheTransactionManager")
-  public void removeRuleTag(final Long id, final ConfigurationElementReport elementReport) {
+  public void removeRuleTag(final Long id, final ConfigurationElementReport elementReport) {    
+    doRemoveRuleTag(id, elementReport);    
+    tagCache.remove(id); //will be skipped if rollback exception thrown in do method    
+  }
+   
+  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
+  private void doRemoveRuleTag(final Long id, final ConfigurationElementReport elementReport) {
     LOGGER.trace("Removing RuleTag " + id);
     try {
       RuleTag ruleTag = tagCache.get(id);

@@ -171,19 +171,26 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
   }
   
   /**
-   * If the tag has no associated alarms or rules, it is removed
-   * from the database and cache. The reference to this tag in the
-   * Equipment is also removed.
-   * 
-   * @param id the id of the DataTag to remove
-   * @param elementReport is updated if removing is not possible
-   * @return the DAQ change event, used if called directly from ConfigurationLoader 
-   *      (not as consequence of Process removal for instance); IMPORTANT: config
-   *      id of event still needs setting
-   */
-  @Transactional("cacheTransactionManager")
+  * If the tag has no associated alarms or rules, it is removed
+  * from the database and cache. The reference to this tag in the
+  * Equipment is also removed.
+  * 
+  * @param id the id of the DataTag to remove
+  * @param elementReport is updated if removing is not possible
+  * @return the DAQ change event, used if called directly from ConfigurationLoader 
+  *      (not as consequence of Process removal for instance); IMPORTANT: config
+  *      id of event still needs setting
+  */
   @Override
-  public List<ProcessChange> removeDataTag(final Long id, final ConfigurationElementReport elementReport) {
+  public List<ProcessChange> removeDataTag(final Long id, final ConfigurationElementReport elementReport) {    
+    List<ProcessChange> changes = doRemoveDataTag(id, elementReport);    
+    tagCache.remove(id); //will be skipped if rollback exception thrown in do method; needs to be outside DB commit to ensure the tag is definitely removed
+    return changes;
+  }
+  
+  
+  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)  //requires new: tag is removed successfully even if all process is not
+  private List<ProcessChange> doRemoveDataTag(final Long id, final ConfigurationElementReport elementReport) {
     LOGGER.trace("Removing DataTag " + id);
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
     try {
@@ -210,8 +217,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
             alarmConfigHandler.removeAlarm(alarmId, alarmReport);
           }        
         }
-        configurableDAO.deleteItem(dataTag.getId());
-        tagCache.remove(dataTag.getId());
+        configurableDAO.deleteItem(dataTag.getId());        
         dataTag.getWriteLock().unlock();                
         //outside above lock as locks equipment (lock hierarchy: never lock equipment after tag)
         try {
