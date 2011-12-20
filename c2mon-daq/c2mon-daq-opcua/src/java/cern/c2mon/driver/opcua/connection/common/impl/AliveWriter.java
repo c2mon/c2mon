@@ -96,6 +96,7 @@ public class AliveWriter extends TimerTask {
             timer.cancel();
         }
         timer = new Timer("OPCAliveWriter");
+        logger.info("Starting OPCAliveWriter...");
         timer.schedule(this, writeTime, writeTime);
     }
 
@@ -104,6 +105,7 @@ public class AliveWriter extends TimerTask {
      */
     public synchronized void stopWriter() {
         if (timer != null) {
+            logger.info("Stopping OPCAliveWriter...");
             timer.cancel();
             timer = null;
         }

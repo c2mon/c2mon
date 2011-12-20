@@ -35,6 +35,7 @@ import ch.cern.tim.driver.jintegraInterface.OPCServerState;
 
 import com.linar.jintegra.AuthInfo;
 import com.linar.jintegra.AutomationException;
+import com.linar.jintegra.Cleaner;
 
 /**
  * The DADCOMEndpoint represents an endpoint to connect via DCOM to a classic
@@ -94,7 +95,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     /**
      * logger of this class.
      */
-    private Logger logger = Logger.getLogger(DADCOMEndpoint.class);
+    private final static Logger logger = Logger.getLogger(DADCOMEndpoint.class);
 
     /**
      * Creates a new DADCOMEndpoint.
@@ -464,17 +465,26 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             server.getOPCGroups().removeAll();
             server.disconnect();
             server.release();
+        } catch (AutomationException e) {
+            logger.error("Exception disconnecting from OPC server: "
+                + OPCDCOMFactory.createWrappedAutomationException(e));
+        }
+        catch (Exception ex) {
+            logger.error("Exception disconnecting from OPC server: " + ex);
+        }
+        
+        try {
             opcCommandGroup = null;
             executorService.shutdown();
-        } catch (AutomationException e) {
-            throw OPCDCOMFactory.createWrappedAutomationException(e);
         } catch (Exception e) {
             throw new OPCCommunicationException(e);
         }
-        server = null;
-        itemHandleOpcItems.clear();
-//        Cleaner.releaseAll();
-//        Cleaner.reset();
+        finally {
+            server = null;
+            itemHandleOpcItems.clear();
+            // Release COM object references that have not been released through GC
+            Cleaner.releaseAll();
+        }
     }
 
     /**

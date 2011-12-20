@@ -152,6 +152,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         stopStatusChecker();
         statusCheckTimer = new Timer("OPCStatusChecker");
         int serverTimeout = getCurrentOPCAddress().getServerTimeout();
+        logger.info("Starting OPCStatusChecker for endpoint address: " + getCurrentOPCAddress());
         statusCheckTimer.schedule(new StatusChecker(endpoint) {
             
             @Override
@@ -168,7 +169,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                     final IOPCEndpoint endpoint, final OPCCriticalException e) {
                 // critical should shutdown
                 logger.error("Status of and endpoint could not be determined "
-                        + "because of an critical OPC exception. Shutting down.", e);
+                        + "because of a critical OPC exception. Shutting down.", e);
                 stop();
             }
             
@@ -186,6 +187,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      */
     protected void stopStatusChecker() {
         if (statusCheckTimer != null) {
+            logger.info("Stopping OPCStatusChecker...");
             statusCheckTimer.cancel();
         }
     }
@@ -367,8 +369,8 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                     try {
                       EndpointController.this.stop();
                     }
-                    catch (Exception e1) {
-                      logger.warn("Error stopping endpoint subscription", e1);
+                    catch (Exception ex) {
+                      logger.warn("Error stopping endpoint subscription", ex);
                     }
                     while (endpoint.getState() != STATE.INITIALIZED) {
                         sender.confirmEquipmentStateIncorrect();
@@ -384,6 +386,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                             logger.error("Error restarting subscription", e);
                         }
                     }
+                    logger.info("Exiting OPC Endpoint restart procedure");
                 }
             };
             reconnectThread.start();

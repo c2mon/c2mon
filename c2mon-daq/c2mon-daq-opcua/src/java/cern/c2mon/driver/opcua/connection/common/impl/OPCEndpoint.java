@@ -15,6 +15,7 @@ import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
 import cern.c2mon.driver.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpointListener;
+import cern.c2mon.driver.opcua.connection.dcom.DADCOMEndpoint;
 import cern.tim.shared.common.datatag.address.HardwareAddress;
 import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
 import cern.tim.shared.common.type.TypeConverter;
@@ -69,6 +70,11 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * The current state of the endpoint.
      */
     private STATE currentState = STATE.NOT_INITIALIZED;
+    
+    /**
+     * logger of this class.
+     */
+    private final static Logger logger = Logger.getLogger(OPCEndpoint.class);
 
     /**
      * Creates a new OPCEndpoint.
@@ -320,7 +326,12 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     @Override
     public synchronized void reset() {
         if (currentState != STATE.NOT_INITIALIZED) {
-            onStop();
+            try {
+              onStop();
+            }
+            catch (Exception ex) {
+              logger.error("Exception while stopping endpoint", ex);
+            }
             listeners.clear();
             itemDefintionIdsToDataTags.clear();
             tagIdsToItemDefinitions.clear();
