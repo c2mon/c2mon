@@ -364,7 +364,12 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
             reconnectThread = new Thread() {
                 @Override
                 public void run() {
-                    EndpointController.this.stop();
+                    try {
+                      EndpointController.this.stop();
+                    }
+                    catch (Exception e1) {
+                      logger.warn("Error stopping endpoint subscription", e1);
+                    }
                     while (endpoint.getState() != STATE.INITIALIZED) {
                         sender.confirmEquipmentStateIncorrect();
                         try {
