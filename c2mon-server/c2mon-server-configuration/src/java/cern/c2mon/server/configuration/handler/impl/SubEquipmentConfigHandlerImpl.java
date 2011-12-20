@@ -138,15 +138,14 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
     LOGGER.debug("Removing SubEquipment " + subEquipmentId);
     if (subEquipmentCache.hasKey(subEquipmentId)) {
       SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);    
-      try {      
+      try {
+        //remove alive and commfault before locking (lock hierarchy)
+        subEquipmentFacade.removeAliveTimer(subEquipmentId);
+        subEquipmentFacade.removeCommFault(subEquipmentId);
         subEquipment.getWriteLock().lock();      
         subEquipmentDAO.deleteItem(subEquipmentId);
         subEquipmentCache.remove(subEquipmentId);
-        removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB
-        subEquipment.getWriteLock().unlock();
-        //unlock before touching alive and commfault
-        subEquipmentFacade.removeAliveTimer(subEquipmentId);
-        subEquipmentFacade.removeCommFault(subEquipmentId);
+        removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB        
         return new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId());
       } finally {
         if (subEquipment.getWriteLock().isHeldByCurrentThread()) {

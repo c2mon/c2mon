@@ -188,9 +188,19 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
     try {
       DataTag dataTag = tagCache.get(id);
+      Collection<Long> ruleIds = dataTag.getCopyRuleIds();  
+      if (!ruleIds.isEmpty()) {
+        LOGGER.trace("Removing Rules dependent on DataTag " + id);
+        for (Long ruleId : new ArrayList<Long>(ruleIds)) {
+          if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
+            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+            elementReport.addSubReport(newReport);
+            ruleTagConfigHandler.removeRuleTag(ruleId, newReport); 
+          }          
+        }
+      }
       dataTag.getWriteLock().lock();
-      try {        
-        Collection<Long> ruleIds = dataTag.getCopyRuleIds();  
+      try {                
         Collection<Long> alarmIds = dataTag.getCopyAlarmIds();
         if (!alarmIds.isEmpty()) {
           LOGGER.trace("Removing Alarms dependent on DataTag " + id);
@@ -202,20 +212,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
         }
         configurableDAO.deleteItem(dataTag.getId());
         tagCache.remove(dataTag.getId());
-        dataTag.getWriteLock().unlock();        
-        //release lock here, as not rules above tag cannot be locked while tag is!
-        if (!ruleIds.isEmpty()) {
-          LOGGER.trace("Removing Rules dependent on DataTag " + id);
-          for (Long ruleId : new ArrayList<Long>(ruleIds)) {
-            if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
-              ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-              elementReport.addSubReport(newReport);
-              ruleTagConfigHandler.removeRuleTag(ruleId, newReport); 
-            }          
-          }
-        }
-         
-        
+        dataTag.getWriteLock().unlock();                
         //outside above lock as locks equipment (lock hierarchy: never lock equipment after tag)
         try {
           equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());

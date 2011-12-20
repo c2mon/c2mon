@@ -1,6 +1,7 @@
 package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -166,16 +167,17 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
     LOGGER.trace("Removing ControlTag " + id);
     try {
       ControlTag controlTag = tagCache.get(id);
+      Collection<Long> ruleIds = controlTag.getCopyRuleIds();
+      if (!ruleIds.isEmpty()) {
+        LOGGER.trace("Removing rules dependent on ControlTag " + controlTag.getId());
+        for (Long ruleId : ruleIds) {
+          ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+          tagReport.addSubReport(newReport);
+          ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
+        }       
+      }
       controlTag.getWriteLock().lock();
-      try {        
-        if (!controlTag.getRuleIds().isEmpty()) {
-          LOGGER.trace("Removing rules dependent on ControlTag " + controlTag.getId());
-          for (Long ruleId : controlTag.getRuleIds()) {
-            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-            tagReport.addSubReport(newReport);
-            ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
-          }       
-        } 
+      try {                 
         if (!controlTag.getAlarmIds().isEmpty()) {
           LOGGER.trace("Removing Alarms dependent on ControlTag " + controlTag.getId());
           for (Long alarmId : new ArrayList<Long>(controlTag.getAlarmIds())) {

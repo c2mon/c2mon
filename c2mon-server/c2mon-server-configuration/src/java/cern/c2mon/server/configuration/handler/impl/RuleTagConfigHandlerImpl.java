@@ -172,11 +172,21 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
     LOGGER.trace("Removing RuleTag " + id);
     try {
       RuleTag ruleTag = tagCache.get(id);
+      Collection<Long> ruleIds = ruleTag.getCopyRuleIds();  
+      if (!ruleIds.isEmpty()) {
+        LOGGER.debug("Removing rules dependent on RuleTag " + id);
+        for (Long ruleId : ruleIds) { //concurrent modifcation as a rule is removed from the list during the remove call!
+          if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
+            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+            elementReport.addSubReport(newReport);
+            removeRuleTag(ruleId, newReport);
+          }         
+        }                
+      }
       ruleTag.getWriteLock().lock();
       Collection<Long> ruleInputTagIds = Collections.EMPTY_LIST;
       try {
-        ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();        
-        Collection<Long> ruleIds = ruleTag.getCopyRuleIds();  
+        ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();                
         Collection<Long> alarmIds = ruleTag.getCopyAlarmIds();                  
         if (!alarmIds.isEmpty()) {
           LOGGER.debug("Removing Alarms dependent on RuleTag " + id);
@@ -190,19 +200,7 @@ public class RuleTagConfigHandlerImpl extends TagConfigHandlerImpl<RuleTag> impl
           tagConfigGateway.removeRuleFromTag(inputTagId, id); //allowed to lock tag below the rule...
         }
         configurableDAO.deleteItem(ruleTag.getId());
-        tagCache.remove(ruleTag.getId());
-        ruleTag.getWriteLock().unlock(); //.. but not rules "above"!
-        //unlock before removing rules
-        if (!ruleIds.isEmpty()) {
-          LOGGER.debug("Removing rules dependent on RuleTag " + id);
-          for (Long ruleId : ruleIds) { //concurrent modifcation as a rule is removed from the list during the remove call!
-            if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
-              ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-              elementReport.addSubReport(newReport);
-              removeRuleTag(ruleId, newReport);
-            }         
-          }                
-        }                               
+        tagCache.remove(ruleTag.getId());                                      
       }
       catch (RuntimeException rEx) {
         String errMessage = "Exception caught when removing rule tag with id " + id;

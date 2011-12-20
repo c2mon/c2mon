@@ -197,6 +197,8 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     if (processCache.hasKey(processId)) {
       Process process = processCache.get(processId);
       try {
+        //remove alive before lock 
+        processFacade.removeAliveTimer(processId);
         process.getWriteLock().lock();      
         if (processFacade.isRunning(process) && !allowRunningProcessRemoval) {
           String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
@@ -220,9 +222,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
           processDAO.deleteProcess(processId);
           processCache.remove(processId);     
           removeProcessControlTags(process, processReport);
-          jmsContainerManager.unsubscribe(process);
-          process.getWriteLock().unlock(); //before removing alives
-          processFacade.removeAliveTimer(processId);
+          jmsContainerManager.unsubscribe(process);            
          }
         return new ProcessChange();
       } catch (RuntimeException ex) {                  
