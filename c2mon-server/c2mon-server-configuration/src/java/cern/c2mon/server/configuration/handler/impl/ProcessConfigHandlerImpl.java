@@ -109,6 +109,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     this.processDAO = processDAO;    
     this.controlTagConfigHandler = controlTagConfigHandler;
     this.jmsContainerManager = jmsContainerManager;
+    
   }
 
   /**
@@ -130,6 +131,8 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     try {
       processDAO.insert(process);
       processCache.putQuiet(process);
+      //load & status into cache
+      processFacade.loadAndStartAliveTag(process.getId());
       jmsContainerManager.subscribe(process);
       return new ProcessChange(process.getId());
     } catch (RuntimeException ex) {
@@ -160,18 +163,31 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
       throw new ConfigurationException(ConfigurationException.UNDEFINED, 
           "Attempting to change the process name - this is not currently supported!");
     }
+    boolean aliveConfigure = false;
+    if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
+      aliveConfigure = true;
+    }
     Change processUpdate;
-    Process process = processCache.get(id);
+    Process process = processCache.get(id);    
     try {
       process.getWriteLock().lock();
+      if (aliveConfigure){
+        processFacade.removeAliveTimer(process.getId());
+      }
       processUpdate = processFacade.updateConfig(process, properties); //return always empty
-      processDAO.updateConfig(process);      
+      processDAO.updateConfig(process);
+      process.getWriteLock().unlock();
+      if (aliveConfigure){
+        processFacade.loadAndStartAliveTag(process.getId());
+      }
     } catch (RuntimeException e) {
       LOGGER.error("Exception caught while updating a new Process - rolling back DB changes and removing from cache.");
       processCache.remove(id);
       throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);      
     } finally {
-      process.getWriteLock().unlock();     
+      if (process.getWriteLock().isHeldByCurrentThread()) {
+        process.getWriteLock().unlock();     
+      }      
     } 
     return new ProcessChange(process.getId());    
   }
@@ -203,7 +219,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     if (processCache.hasKey(processId)) {
       Process process = processCache.get(processId);
       try {
-        //remove alive before lock 
+        //remove alive before lock (no longer necessary)
         processFacade.removeAliveTimer(processId);
         process.getWriteLock().lock();      
         if (processFacade.isRunning(process) && !allowRunningProcessRemoval) {
@@ -223,7 +239,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
               childElementReport.setFailure("Exception caught while applying the configuration change.", ex);          
               throw new UnexpectedRollbackException("Unexpected exception caught while removing an Equipment.", ex);
             }      
-          }             
+          }          
           //remove process from cache and DB
           processDAO.deleteProcess(processId);             
           removeProcessControlTags(process, processReport);

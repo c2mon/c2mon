@@ -128,9 +128,8 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     
     //clear alive and commfault caches and refresh
     //(synch ok as locked equipment so no changes to these ids)
-    if (abstractEquipment.getAliveTagId() != null) {
-      aliveTimerCache.remove(abstractEquipment.getAliveTagId());
-      aliveTimerCache.get(abstractEquipment.getAliveTagId());
+    if (abstractEquipment.getAliveTagId() != null) {      
+      commonEquipmentFacade.loadAndStartAliveTag(abstractEquipment.getId());      
     }
     if (abstractEquipment.getCommFaultTagId() != null) {
       commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
@@ -173,10 +172,34 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
           "Attempting to change the (sub)equipment id - this is not currently supported!");
     }    
   
+    boolean aliveConfigure = false;
+    if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
+      aliveConfigure = true;
+    }    
+    
+    boolean commFaultConfigure = false;
+    if (properties.containsKey("commFaultTagId")) {
+      commFaultConfigure = true;
+    }
+    
     EquipmentConfigurationUpdate equipmentUpdate;
-    try {    
+    try {
+      if (aliveConfigure && abstractEquipment.getAliveTagId() != null){
+        commonEquipmentFacade.removeAliveTimer(abstractEquipment.getId());
+      }
+      if (commFaultConfigure){
+        if (abstractEquipment.getCommFaultTagId() != null) {
+          commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
+        }          
+      }
       equipmentUpdate = (EquipmentConfigurationUpdate) commonEquipmentFacade.updateConfig(abstractEquipment, properties);
-      configurableDAO.updateConfig(abstractEquipment);      
+      configurableDAO.updateConfig(abstractEquipment); 
+      if (aliveConfigure && abstractEquipment.getAliveTagId() != null){
+        commonEquipmentFacade.loadAndStartAliveTag(abstractEquipment.getId());
+      }
+      if (commFaultConfigure && abstractEquipment.getCommFaultTagId() != null){
+          commFaultTagCache.get(abstractEquipment.getCommFaultTagId());        
+      }
     } catch (Exception ex) {
       //if failure, remove equipment from cache; also clean Process, AliveTimer and CommFaultTag caches
       abstractEquipmentCache.remove(abstractEquipment.getId());      

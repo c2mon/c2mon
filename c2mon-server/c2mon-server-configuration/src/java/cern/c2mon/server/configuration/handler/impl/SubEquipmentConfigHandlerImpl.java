@@ -141,7 +141,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   }
  
   @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
-  public ProcessChange doRemoveSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
+  private ProcessChange doRemoveSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
     LOGGER.debug("Removing SubEquipment " + subEquipmentId);
     if (subEquipmentCache.hasKey(subEquipmentId)) {
       SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);    

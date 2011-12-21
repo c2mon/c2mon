@@ -16,6 +16,8 @@ import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.tim.server.cache.AliveTimerCache;
+import cern.tim.server.cache.CommFaultTagCache;
 import cern.tim.server.cache.ControlTagCache;
 import cern.tim.server.cache.ControlTagFacade;
 import cern.tim.server.cache.DataTagFacade;
@@ -64,18 +66,25 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
   @Autowired
   private AlarmConfigHandler alarmConfigHandler;
   
+  private AliveTimerCache aliveTimerCache;
+  
+  private CommFaultTagCache commFaultTagCache;
+  
   
   @Autowired
   public ControlTagConfigHandlerImpl(ControlTagCache controlTagCache,
       ControlTagFacade controlTagFacade, DataTagFacade dataTagFacade,
       EquipmentFacade equipmentFacade,
       ControlTagLoaderDAO controlTagLoaderDAO, TagLocationService tagLocationService,
-      SubEquipmentFacade subEquipmentFacade, ProcessFacade processFacade) {
+      SubEquipmentFacade subEquipmentFacade, ProcessFacade processFacade,
+      AliveTimerCache aliveTimerCache, CommFaultTagCache commFaultTagCache) {
     super(controlTagLoaderDAO, controlTagFacade, controlTagCache, tagLocationService);    
     this.dataTagFacade = dataTagFacade;
     this.equipmentFacade = equipmentFacade; 
     this.subEquipmentFacade = subEquipmentFacade;
     this.processFacade = processFacade;
+    this.aliveTimerCache = aliveTimerCache;
+    this.commFaultTagCache = commFaultTagCache;
   }
 
   /**
@@ -284,6 +293,6 @@ public class ControlTagConfigHandlerImpl extends TagConfigHandlerImpl<ControlTag
     } finally {
       controlTag.getWriteLock().unlock();
     }    
-  }
+  } 
  
 }
