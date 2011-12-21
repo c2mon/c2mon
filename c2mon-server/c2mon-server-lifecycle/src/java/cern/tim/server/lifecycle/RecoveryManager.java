@@ -170,12 +170,13 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description = "Notifies all Tag cache listeners (status confirmation).")
   public void notifyAllTagCacheListeners() {
-    for (Long key : dataTagCache.getKeys()) {
-      dataTagCache.notifyListenerStatusConfirmation(dataTagCache.get(key));
-    }
+    LOGGER.info("Recovery task: notifying all tag listeners.");
     for (Long key : controlTagCache.getKeys()) {
       controlTagCache.notifyListenerStatusConfirmation(controlTagCache.get(key));
     }
+    for (Long key : dataTagCache.getKeys()) {
+      dataTagCache.notifyListenerStatusConfirmation(dataTagCache.get(key));
+    }    
   }
 
   @Override
