@@ -226,7 +226,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
           processReport.setFailure(message);
          } else {
           //remove all associated equipment from system   
-          for (Long equipmentId : new ArrayList<Long>(processFacade.getEquipmentIds(processId))) {
+          for (Long equipmentId : new ArrayList<Long>(process.getEquipmentIds())) {
             ConfigurationElementReport childElementReport = new ConfigurationElementReport(Action.REMOVE, Entity.EQUIPMENT, equipmentId);
             try {        
               processReport.addSubReport(childElementReport);
