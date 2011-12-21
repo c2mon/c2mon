@@ -222,7 +222,15 @@
   <logger name="cern.tim.server.cachepersistence"  additivity="false">
     <level value="debug"/>
     <appender-ref ref="PersistenceAppender"/>
+  </logger>
+  <logger name="AdminMailLogger"  additivity="false">
+    <level value="error"/>
+    <appender-ref ref="FileAppender"/>
   </logger>   
+  <logger name="AdminSmsLogger"  additivity="false">
+    <level value="error"/>    
+    <appender-ref ref="FileAppender"/>
+  </logger>
   <root>
     <level value="info"/>
     <appender-ref ref="FileAppender" />
