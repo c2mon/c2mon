@@ -45,7 +45,11 @@ public interface IOPCEndpoint {
         /**
          * Endpoint has been injected with the OPCaddress. It can be used.
          */
-        INITIALIZED
+        INITIALIZED,
+        /**
+         * Endpoint is correctly injected and subscribed to OPC items
+         */
+        OPERATIONAL
     }
     
     /**
@@ -54,6 +58,12 @@ public interface IOPCEndpoint {
      * @return The current state of the endpoint.
      */
     STATE getState();
+    
+    /**
+     * Sets the state of the endpoint to operational which means that the 
+     * Endpoint is correctly injected and subscribed to OPC items
+     */
+    void setStateOperational();
     
     /**
      * Checks the connection of the endpoint. Will return without exception if
@@ -165,5 +175,4 @@ public interface IOPCEndpoint {
      * Stops everything in the endpoint and clears all configuration states.
      */
     void reset();
-
 }

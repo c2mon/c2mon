@@ -29,6 +29,7 @@ import ch.cern.tim.driver.jintegraInterface.IOPCGroup;
 import ch.cern.tim.driver.jintegraInterface.IOPCGroups;
 import ch.cern.tim.driver.jintegraInterface.OPCDataSource;
 import ch.cern.tim.driver.jintegraInterface.OPCGroup;
+import ch.cern.tim.driver.jintegraInterface.OPCGroups;
 import ch.cern.tim.driver.jintegraInterface.OPCItem;
 import ch.cern.tim.driver.jintegraInterface.OPCItems;
 import ch.cern.tim.driver.jintegraInterface.OPCServer;
@@ -173,9 +174,13 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     protected synchronized void onSubscribe(final Collection<SubscriptionGroup<DADCOMItemDefintion>> subscriptionGroups) {
         AuthInfo.setThreadDefault(authInfo);
         try {
+            if (subscriptionGroups.isEmpty()) {
+              logger.warn("onSubscribe() - No subscription groups defined -> DAQ won't be subscribed to OPC items!");
+            }
             for (SubscriptionGroup<DADCOMItemDefintion> subscritionGroup : subscriptionGroups) {
                 processGroup(subscritionGroup);
             }
+            server.getOPCGroups();
         } catch (AutomationException e) {
             throw OPCDCOMFactory.createWrappedAutomationException(e);
         } catch (Exception e) {
@@ -206,6 +211,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             
         });
         group.setIsSubscribed(true);
+        group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
         return group;
     }
 
@@ -361,6 +367,8 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     
     /**
      * Refreshes the values of a collection of item definitions.
+     * TODO: This method needs to be rewritten since it does not work
+     *       most of the time, especially after an OPC reboot!
      * 
      * @param itemDefintions
      *            The item definitions to refresh.
@@ -401,6 +409,38 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
           }
         }
         logger.debug("Finished refresh");
+    }
+    
+    protected synchronized void onRefreshAll() {
+      AuthInfo.setThreadDefault(authInfo);
+      logger.debug("Enter refresh");
+      try {
+        OPCGroups groups = server.getOPCGroups();
+      }
+      catch (AutomationException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
+      catch (IOException e1) {
+        // TODO Auto-generated catch block
+        e1.printStackTrace();
+      }
+      Set<OPCGroup> opcGroups = new HashSet<OPCGroup>();
+      
+      try {
+        OPCGroups groups = server.getOPCGroups();
+        for (OPCGroup group : opcGroups) {
+          logger.debug("onRefresh() - trigger async refresh for group " + group.getName());
+          group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
+        }
+      }
+      catch (AutomationException e) {
+        throw OPCDCOMFactory.createWrappedAutomationException(e);
+      }
+      catch (Exception e) {
+        throw new OPCCommunicationException("Problems wih the async DCOM group refresh occured", e);
+      }
+      logger.debug("Finished refresh");
     }
 
     /**
@@ -488,9 +528,6 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         finally {
             server = null;
             itemHandleOpcItems.clear();
-            logger.debug("Release COM object references that have not been released through GC");
-            // Release COM object references that have not been released through GC
-            Cleaner.releaseAll();
         }
     }
 

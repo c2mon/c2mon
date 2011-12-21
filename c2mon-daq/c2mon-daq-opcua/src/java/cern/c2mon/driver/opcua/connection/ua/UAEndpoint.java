@@ -294,6 +294,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
         UnsignedInteger itemId = item.getClientHandle();
         definitionMap.put(itemId, definition);
         subscription.addItem(item);
+        definition.setSubscribed(true);
     }
 
     /**

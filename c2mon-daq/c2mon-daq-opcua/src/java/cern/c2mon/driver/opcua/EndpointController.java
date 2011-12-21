@@ -138,6 +138,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
             sender.confirmEquipmentStateOK();
             startAliveTimer();
             setUpStatusChecker();
+            endpoint.setStateOperational();
         } catch (OPCCommunicationException e) {
             logger.error(
                     "Endpoint creation failed. Controller will try again. ", e);
@@ -361,19 +362,22 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     /**
      * Triggers the restart of this endpoint.
      */
-    private synchronized void triggerEndpointRestart() {
+    private synchronized void triggerEndpointRestart() {      
         if (reconnectThread == null || !reconnectThread.isAlive()) {
             reconnectThread = new Thread() {
                 @Override
                 public void run() {
-                    try {
-                      EndpointController.this.stop();
-                    }
-                    catch (Exception ex) {
-                      logger.warn("Error stopping endpoint subscription", ex);
-                    }
-                    while (endpoint.getState() != STATE.INITIALIZED) {
-                        sender.confirmEquipmentStateIncorrect();
+                    do {
+                        try {
+                          EndpointController.this.stop();
+                        }
+                        catch (Exception ex) {
+                          logger.warn("Error stopping endpoint subscription", ex);
+                        }
+                        finally {
+                          sender.confirmEquipmentStateIncorrect();
+                        }
+                        
                         try {
                             logger.debug("Sleeping for " 
                                 + getCurrentOPCAddress().getServerRetryTimeout() 
@@ -388,7 +392,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                         } catch (Exception e) {
                             logger.error("Error restarting subscription", e);
                         }
-                    }
+                    } while (endpoint.getState() != STATE.OPERATIONAL);
                     logger.info("Exiting OPC Endpoint restart procedure");
                 }
             };

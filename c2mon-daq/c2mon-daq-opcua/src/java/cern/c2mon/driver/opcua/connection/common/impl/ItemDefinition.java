@@ -27,7 +27,7 @@ public class ItemDefinition<A> {
     /**
      * Flag if the item is subscribed on the server.
      */
-    private boolean subscribed;
+    private boolean subscribed = false;
 
     /**
      * Creates a new item defintion with the provided address.

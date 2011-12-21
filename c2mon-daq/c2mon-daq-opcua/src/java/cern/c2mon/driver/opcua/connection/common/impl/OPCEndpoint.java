@@ -1,6 +1,7 @@
 package cern.c2mon.driver.opcua.connection.common.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +16,6 @@ import cern.c2mon.driver.opcua.connection.common.IGroupProvider;
 import cern.c2mon.driver.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpointListener;
-import cern.c2mon.driver.opcua.connection.dcom.DADCOMEndpoint;
 import cern.tim.shared.common.datatag.address.HardwareAddress;
 import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
 import cern.tim.shared.common.type.TypeConverter;
@@ -99,6 +99,11 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     public synchronized STATE getState() {
         return currentState;
     }
+    
+    @Override
+    public synchronized final void setStateOperational() {
+      currentState = STATE.OPERATIONAL;
+    }
 
     /**
      * Adds the provided command tags to this endpoint.
@@ -175,6 +180,9 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
             itemDefintionIdsToDataTags.put(definition.getId(), dataTag);
             tagIdsToItemDefinitions.put(dataTag.getId(), definition);
         }
+        else {
+          logger.warn("processTag() - itemDefinitionFactory returned no item definition -> No subscription to data tag " + dataTag.getId() + " possible!");
+        }
         return subscriptionGroup;
     }
     
@@ -185,7 +193,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      */
     @Override
     public synchronized void addDataTag(final ISourceDataTag sourceDataTag) {
-    	requireState(STATE.INITIALIZED);
+    	requireState(STATE.INITIALIZED, STATE.OPERATIONAL);
         SubscriptionGroup<ID> subscriptionGroup = processTag(sourceDataTag);
         onSubscribe(subscriptionGroup);
     }
@@ -197,7 +205,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      */
     @Override
     public synchronized void removeDataTag(final ISourceDataTag dataTag) {
-    	requireState(STATE.INITIALIZED);
+    	requireState(STATE.OPERATIONAL);
         ID definition = tagIdsToItemDefinitions.remove(dataTag.getId());
         itemDefintionIdsToDataTags.remove(definition.getId());
         if (definition != null) {
@@ -215,7 +223,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     @Override
     public synchronized void refreshDataTags(
             final Collection<ISourceDataTag> dataTags) {
-        requireState(STATE.INITIALIZED);
+        requireState(STATE.OPERATIONAL);
         final Collection<ID> itemDefintions = new ArrayList<ID>(dataTags.size());
         for (ISourceDataTag dataTag : dataTags) {
             ID itemDefinition = tagIdsToItemDefinitions.get(dataTag.getId());
@@ -235,7 +243,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     public synchronized void executeCommand(
             final OPCHardwareAddress hardwareAddress,
             final SourceCommandTagValue command) {
-        requireState(STATE.INITIALIZED);
+        requireState(STATE.OPERATIONAL);
         ID itemDefintion = 
             tagIdsToItemDefinitions.get(command.getId());
         if (itemDefintion != null) {
@@ -276,11 +284,17 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * 
      * @param requiredState The state which is required at this point.
      */
-    private void requireState(final STATE requiredState) {
-        if (currentState != requiredState)
-            throw new OPCCriticalException("Endpoint has wrong state!"
-                    + " Should have: " + requiredState.toString());
-        
+    private void requireState(STATE... requiredStates) {
+      boolean hasState = false;
+      for (STATE requiredState : requiredStates) {
+        if (currentState == requiredState) {
+          hasState = true;
+        }
+      } 
+      
+      if (!hasState)
+        throw new OPCCriticalException("Endpoint has wrong state!"
+                + " Should have at least one of the follwing states: " + Arrays.toString(requiredStates));
     }
 
     /**
@@ -433,7 +447,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     @Override
     public synchronized void write(
             final OPCHardwareAddress address, final Object value) {
-        requireState(STATE.INITIALIZED);
+        requireState(STATE.OPERATIONAL);
         ID itemDefinition = 
             itemDefinitionFactory.createItemDefinition(1L, address);
         if (itemDefinition != null) {
@@ -443,7 +457,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
     
     @Override
     public synchronized void checkConnection() {
-        requireState(STATE.INITIALIZED);
+        requireState(STATE.INITIALIZED, STATE.OPERATIONAL);
         checkStatus();
     }
     /**

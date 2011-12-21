@@ -229,6 +229,7 @@ public class OPCEndpointTest {
         
         replay(endpoint, factory, provider);
         endpoint.addDataTags(dataTags);
+        endpoint.setStateOperational();
         endpoint.refreshDataTags(dataTags);
         verify(endpoint, factory, provider);
         assertEquals(2, capture.getValue().size());
@@ -251,6 +252,7 @@ public class OPCEndpointTest {
         endpoint.onRefresh(capture(capture));
         
         replay(endpoint, factory, provider);
+        endpoint.setStateOperational();
         endpoint.refreshDataTags(dataTags);
         verify(endpoint, factory, provider);
         assertEquals(0, capture.getValue().size());
@@ -272,6 +274,7 @@ public class OPCEndpointTest {
         
         replay(endpoint, factory);
         endpoint.addCommandTag(commandTag);
+        endpoint.setStateOperational();
         endpoint.executeCommand(address, sctValue);
         verify(endpoint, factory);
     }
@@ -293,6 +296,7 @@ public class OPCEndpointTest {
         
         replay(endpoint, factory);
         endpoint.addCommandTag(commandTag);
+        endpoint.setStateOperational();
         endpoint.executeCommand(address, sctValue);
         Thread.sleep(5);
         verify(endpoint, factory);
@@ -314,6 +318,7 @@ public class OPCEndpointTest {
         
         replay(endpoint, factory);
         endpoint.addCommandTag(commandTag);
+        endpoint.setStateOperational();
         endpoint.executeCommand(address, sctValue);
         verify(endpoint, factory);
     }
@@ -398,6 +403,7 @@ public class OPCEndpointTest {
         endpoint.onWrite(isA(ItemDefinition.class), eq(true));
         
         replay(factory, endpoint);
+        endpoint.setStateOperational();
         endpoint.write(hwimpl, true);
         verify(factory, endpoint);
     }
