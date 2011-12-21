@@ -218,9 +218,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     LOGGER.debug("Removing process with id " + processId);
     if (processCache.hasKey(processId)) {
       Process process = processCache.get(processId);
-      try {
-        //remove alive before lock (no longer necessary)
-        processFacade.removeAliveTimer(processId);
+      try {        
         process.getWriteLock().lock();      
         if (processFacade.isRunning(process) && !allowRunningProcessRemoval) {
           String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
@@ -243,6 +241,9 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
           //remove process from cache and DB
           processDAO.deleteProcess(processId);             
           removeProcessControlTags(process, processReport);
+          process.getWriteLock().unlock();
+          //remove alive out of lock (in fact no longer necessary); always after removing control tags, or could be pulled back in from DB to cache
+          processFacade.removeAliveTimer(processId);
           jmsContainerManager.unsubscribe(process);            
          }
         return new ProcessChange();
