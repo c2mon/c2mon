@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.shorttermlog.listener;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +30,7 @@ import cern.c2mon.server.shorttermlog.logger.BatchLogger;
 import cern.tim.server.cache.BufferedTimCacheListener;
 import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.common.tag.Tag;
+import cern.tim.server.common.thread.Event;
 import cern.tim.util.buffer.PullEvent;
 import cern.tim.util.buffer.PullException;
 import cern.tim.util.buffer.SynchroBufferListener;
@@ -75,13 +77,17 @@ public class TagLogCacheListener implements BufferedTimCacheListener<Tag> {
   }
 
   @Override
-  public void confirmStatus(Collection<Tag> cacheables) {
+  public void confirmStatus(Collection<Event<Tag>> eventCollection) {
     //do not log confirm callbacks (STL data not essential)
   }
 
   @Override
-  public void notifyElementUpdated(Collection<Tag> cacheables) {    
-    tagLogger.log(cacheables);
+  public void notifyElementUpdated(Collection<Event<Tag>> eventCollection) { 
+    Collection<Tag> tags = new ArrayList<Tag>(eventCollection.size());
+    for (Event<Tag> event : eventCollection) {
+      tags.add(event.getReturnValue());
+    }
+    tagLogger.log(tags);
   }
  
 
