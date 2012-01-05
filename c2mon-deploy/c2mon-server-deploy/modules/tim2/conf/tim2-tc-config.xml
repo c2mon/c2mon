@@ -347,6 +347,14 @@
           <field-name>cern.tim.server.common.config.DistributedParams.cacheLoadingLocks</field-name>
           <root-name>cacheLoadingLocks</root-name>
         </root>
+        <root>       
+          <field-name>cern.tim.server.supervision.impl.SupervisionManagerImpl.processControlTagEventTime</field-name>
+          <root-name>processControlTagEventTime</root-name>
+        </root>
+        <root>       
+          <field-name>cern.tim.server.supervision.impl.SupervisionManagerImpl.controlMapSynchLock</field-name>
+          <root-name>controlMapSynchLock</root-name>
+        </root>
        </roots>
 <!--      <web-applications>-->
 <!--        <web-application>viewTags</web-application>-->
