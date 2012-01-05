@@ -112,7 +112,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     }
 
     @Override
-	public void notifyElementUpdated(Alarm cacheable) {
+	public void notifyElementUpdated(Alarm cacheable, long timestamp) {
 
 		FaultState fs = null;
 		fs = AlarmSystemInterfaceFactory.createFaultState(cacheable.getFaultFamily(), cacheable.getFaultMember(), cacheable.getFaultCode());
@@ -269,8 +269,8 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     }
 
     @Override
-    public void confirmStatus(Alarm cacheable) {
-      notifyElementUpdated(cacheable);
+    public void confirmStatus(Alarm cacheable, long timestamp) {
+      notifyElementUpdated(cacheable, timestamp);
     }
 
 }

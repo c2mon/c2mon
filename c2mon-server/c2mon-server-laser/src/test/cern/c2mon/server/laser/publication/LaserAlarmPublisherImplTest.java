@@ -68,7 +68,7 @@ public class LaserAlarmPublisherImplTest {
 			fail(e.getMessage());
 			e.printStackTrace();
 		}
-		publisher.notifyElementUpdated(alarmMock);
+		publisher.notifyElementUpdated(alarmMock, 0);
 		verify(alarmMock);
 	}
 	
@@ -100,7 +100,7 @@ public class LaserAlarmPublisherImplTest {
 			fail(e.getMessage());
 			e.printStackTrace();
 		}
-		publisher.notifyElementUpdated(alarmMock);
+		publisher.notifyElementUpdated(alarmMock, 0);
 		verify(alarmMock);
 	}
 	
