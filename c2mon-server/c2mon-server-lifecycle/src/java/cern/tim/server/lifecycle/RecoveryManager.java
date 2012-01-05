@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import cern.tim.server.cache.ControlTagCache;
 import cern.tim.server.cache.DataTagCache;
 import cern.tim.server.common.config.ServerConstants;
+import cern.tim.server.common.control.ControlTag;
+import cern.tim.server.common.datatag.DataTag;
+import cern.tim.server.common.thread.Event;
 import cern.tim.server.daqcommunication.out.DataRefreshManager;
 import cern.tim.server.supervision.SupervisionFacade;
 
@@ -172,10 +175,24 @@ public class RecoveryManager implements SmartLifecycle {
   public void notifyAllTagCacheListeners() {
     LOGGER.info("Recovery task: notifying all tag listeners.");
     for (Long key : controlTagCache.getKeys()) {
-      controlTagCache.notifyListenerStatusConfirmation(controlTagCache.get(key));
+      ControlTag controlTag = controlTagCache.get(key);
+      controlTag.getWriteLock().lock();      
+      try {        
+        long eventTime = System.currentTimeMillis();
+        controlTagCache.notifyListenerStatusConfirmation(controlTag, eventTime);
+      } finally {
+        controlTag.getWriteLock().unlock();
+      }      
     }
     for (Long key : dataTagCache.getKeys()) {
-      dataTagCache.notifyListenerStatusConfirmation(dataTagCache.get(key));
+      DataTag dataTag = dataTagCache.get(key);
+      dataTag.getWriteLock().lock();
+      try {
+        long eventTime = System.currentTimeMillis();
+        dataTagCache.notifyListenerStatusConfirmation(dataTag, eventTime);
+      } finally {
+        dataTag.getWriteLock().unlock();
+      }      
     }    
   }
 
