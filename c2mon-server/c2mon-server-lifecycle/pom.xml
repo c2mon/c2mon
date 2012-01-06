@@ -1,54 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>cern.tim2.tim2-server</groupId>
-    <artifactId>tim2-server-pom</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
-  </parent>
-  <groupId>cern.c2mon.c2mon-server</groupId>
-  <artifactId>c2mon-server-lifecycle</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
-  <name>c2mon-server-lifecycle</name>
-  <packaging>jar</packaging>
-  <description>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.tim2.tim2-server</groupId>
+		<artifactId>tim2-server-pom</artifactId>
+		<version>1.0.1</version>
+	</parent>
+	<groupId>cern.c2mon.c2mon-server</groupId>
+	<artifactId>c2mon-server-lifecycle</artifactId>
+	<version>1.0.1</version>
+	<name>c2mon-server-lifecycle</name>
+	<packaging>jar</packaging>
+	<description>
     	C2MON module managing the lifecycle of the server
   </description>
-  <url>http://timweb.cern.ch</url>
+	<url>http://timweb.cern.ch</url>
 
-  <dependencies>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-    </dependency>    
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-lifecycle</developerConnection>
+	</scm>
+	
+	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-beans</artifactId>
-    </dependency>     
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
 
-    
-    <dependency>
-      <groupId>cern.tim2.tim2-server</groupId>
-      <artifactId>tim2-server-supervision</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.tim2.tim2-server</groupId>
-      <artifactId>tim2-server-daqcommunication-in</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-server</groupId>
-      <artifactId>c2mon-server-configuration</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
 
-  <developers />
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-supervision</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-server</groupId>
+			<artifactId>tim2-server-daqcommunication-in</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-configuration</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+
+	<developers />
 
 </project>
