@@ -537,7 +537,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           producer.send(message);                         
           Message replyMessage = consumer.receive(timeout);
           if (replyMessage == null) {
-            LOGGER.error("No reply received from server on ClientRequest.");          
+            LOGGER.error("No reply received from server on ClientRequest. I was waiting for " + timeout + " milliseconds..");          
             throw new RuntimeException("No reply received from server - possible timeout?");
           }
           

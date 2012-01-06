@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -37,6 +38,7 @@ import org.springframework.beans.factory.annotation.Required;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
@@ -101,12 +103,6 @@ public class RequestHandlerImpl implements RequestHandler {
   private String requestQueue;
   
   /**
-   * Default request timeout for requests. NullPointerException is thrown if
-   * timeout occurs.
-   */
-  private int requestTimeout;
-  
-  /**
    * Executor for submitting requests to the server.
    */
   private ThreadPoolExecutor executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
@@ -129,7 +125,7 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException {
     ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);
-    return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
+    return jmsProxy.sendRequest(clientRequest, requestQueue, clientRequest.getTimeout());
   }
 
   @Override
@@ -146,6 +142,28 @@ public class RequestHandlerImpl implements RequestHandler {
       throw new NullPointerException("requestAlarms(..) method called with null parameter.");
     }
     return executeRequest(alarmIds, AlarmValue.class);
+  }
+  
+  @Override
+  public Collection<AlarmValue> requestAllActiveAlarms() throws JMSException {
+    
+    java.util.Date today = new java.util.Date();
+
+    AlarmValue a = new AlarmValueImpl((Long)100L, 55, 
+        "", 
+        "", 
+        "", 
+        (Long)888L, 
+        new Timestamp(today.getTime()),
+        true);
+    
+    Collection<AlarmValue> activeAlarmCollection = new ArrayList<AlarmValue>();
+    
+    activeAlarmCollection.add(a);
+    activeAlarmCollection.add(a);
+    activeAlarmCollection.add(a);
+    
+    return activeAlarmCollection;
   }
   
   @Override
@@ -248,23 +266,12 @@ public class RequestHandlerImpl implements RequestHandler {
     this.requestQueue = requestQueue;
   }
 
-  /**
-   * Setter method.
-   * 
-   * @param requestTimeout
-   *          the requestTimeout to set
-   */
-  @Required
-  public void setRequestTimeout(final int requestTimeout) {
-    this.requestTimeout = requestTimeout;
-  }
-
   @Override
   public String getProcessXml(final String processName) throws JMSException {
     ClientRequestImpl<ProcessXmlResponse> xmlRequest = new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
     xmlRequest.setRequestParameter(processName);
     // response should have a unique element in
-    ProcessXmlResponse response = jmsProxy.sendRequest(xmlRequest, requestQueue, requestTimeout).iterator().next();
+    ProcessXmlResponse response = jmsProxy.sendRequest(xmlRequest, requestQueue, xmlRequest.getTimeout()).iterator().next();
     if (response.getProcessXML() != null) {
       return response.getProcessXML();
     } else {
@@ -277,7 +284,7 @@ public class RequestHandlerImpl implements RequestHandler {
     
     ClientRequestImpl<ProcessNameResponse> namesRequest = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
 
-    return jmsProxy.sendRequest(namesRequest, requestQueue, requestTimeout);
+    return jmsProxy.sendRequest(namesRequest, requestQueue, namesRequest.getTimeout());
   }
   
   @SuppressWarnings("unchecked")
@@ -310,7 +317,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
     @Override
     public Collection<T> call() throws Exception {
-      return jmsProxy.sendRequest(clientRequest, requestQueue, requestTimeout);
+      return jmsProxy.sendRequest(clientRequest, requestQueue, clientRequest.getTimeout());
     }
   }
 

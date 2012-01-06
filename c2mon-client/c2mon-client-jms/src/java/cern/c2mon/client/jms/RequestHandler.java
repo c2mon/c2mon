@@ -61,12 +61,22 @@ public interface RequestHandler {
      * <p>If called with an empty collection returns an empty collection.
      * 
      * @param tagIds the ids of the tags
-     * @return a collection of TagConfigurations
+     * @return a collection of Alarms ({@link AlarmValue})
      * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
      * @throws NullPointerException if called with a null argument
      * @throws RuntimeException if the response from the server is null (probable timeout)
      */
     Collection<AlarmValue> requestAlarms(Collection<Long> tagIds) throws JMSException;  
+    
+    /**
+     * Queries the server for a collection of the (latest) active alarms.
+     * 
+     * @return a collection of active alarms ({@link AlarmValue})
+     * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+     * @throws NullPointerException if called with a null argument
+     * @throws RuntimeException if the response from the server is null (probable timeout)
+     */
+    Collection<AlarmValue> requestAllActiveAlarms() throws JMSException;  
     
     /**
      * Queries the server for the latest values and configuration

@@ -68,7 +68,6 @@ public class RequestHandlerImplTest {
     jmsProxy = EasyMock.createMock(JmsProxy.class);    
     requestHandlerImpl = new RequestHandlerImpl(jmsProxy);
     requestHandlerImpl.setRequestQueue("request queue");
-    requestHandlerImpl.setRequestTimeout(10);
   }
 
   /**
@@ -77,7 +76,7 @@ public class RequestHandlerImplTest {
    */
   @Test
   public void getCurrentSupervisionStatus() throws JMSException {
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(null);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(null);
 
     EasyMock.replay(jmsProxy);
 
@@ -94,7 +93,7 @@ public class RequestHandlerImplTest {
   @Test
   public void getTagValues() throws JMSException, InterruptedException {
     Collection<Object> returnCollection = Arrays.asList(new Object());
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(returnCollection);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(returnCollection);
 
     EasyMock.replay(jmsProxy);
 
@@ -125,7 +124,7 @@ public class RequestHandlerImplTest {
   @Test
   public void getTags() throws JMSException, InterruptedException {
     Collection<Object> returnCollection = Arrays.asList(new Object());
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(returnCollection);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(returnCollection);
 
     EasyMock.replay(jmsProxy);
 
@@ -141,7 +140,7 @@ public class RequestHandlerImplTest {
   @Test
   public void getManyTags() throws JMSException {
     Collection<Object> returnCollection = Arrays.asList(new Object(), new Object());
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(returnCollection).times(100);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(returnCollection).times(100);
 
     EasyMock.replay(jmsProxy);
 
@@ -191,7 +190,7 @@ public class RequestHandlerImplTest {
         return null;
       }
     });
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(response);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(120000))).andReturn(response);
 
     EasyMock.replay(jmsProxy);
 
@@ -221,7 +220,7 @@ public class RequestHandlerImplTest {
         return "name";
       }
     });
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(response);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(response);
 
     EasyMock.replay(jmsProxy);
 
@@ -301,7 +300,7 @@ public class RequestHandlerImplTest {
         return "Error message";
       }
     });
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10))).andReturn(response);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(120000))).andReturn(response);
 
     EasyMock.replay(jmsProxy);
 
