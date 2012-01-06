@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>cern.tim2.tim2-server</groupId>
 		<artifactId>tim2-server-pom</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1</version>
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-server-deploy</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 
 	<packaging>pom</packaging>
 
@@ -19,6 +19,10 @@
 		C2MON server assembling all required modules and configuration files for TIM2 and DMN2 solutions
     </description>
 	<url></url>
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-deploy</developerConnection>
+  </scm>
 
 	<developers />
 
