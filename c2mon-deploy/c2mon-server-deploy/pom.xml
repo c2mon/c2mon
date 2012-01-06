@@ -21,7 +21,7 @@
 	<url></url>
 
   <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-deploy</developerConnection>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-server-deploy</developerConnection>
   </scm>
 
 	<developers />
