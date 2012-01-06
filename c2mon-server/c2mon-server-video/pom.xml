@@ -5,15 +5,19 @@
   <parent>
     <groupId>cern.tim2.tim2-server</groupId>
     <artifactId>tim2-server-pom</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-video</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>c2mon-server-video</name>
   <packaging>jar</packaging>
   <description>The TIM2 server video module.</description>
   <url>http://timweb.cern.ch</url>
+  
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-video</developerConnection>
+  </scm>
   
   <dependencies>
     <dependency>
