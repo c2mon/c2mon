@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-common</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<name>c2mon-client-common</name>
 	<packaging>jar</packaging>
 	<description>
@@ -33,4 +33,8 @@
         </dependency>
 	</dependencies>
 	<developers />
+	
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-common</developerConnection>
+	</scm>
 </project>
