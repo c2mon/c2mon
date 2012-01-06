@@ -5,16 +5,20 @@
   <parent>
     <groupId>cern.tim2.tim2-server</groupId>
     <artifactId>tim2-server-pom</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>c2mon-server-configuration</name>
   <artifactId>c2mon-server-configuration</artifactId>
   <packaging>jar</packaging>
   <description>C2MON server configuration module implementing cache runtime reconfiguration functionality</description>
   <url>http://timweb.cern.ch</url>
 
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-configuration</developerConnection>
+  </scm>
+  
   <dependencies>
     <!-- test dependencies -->
     <dependency>
