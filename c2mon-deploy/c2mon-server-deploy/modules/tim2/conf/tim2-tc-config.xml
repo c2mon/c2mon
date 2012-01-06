@@ -29,7 +29,7 @@
         </garbage-collection>
       </dso>
     </server>
-      <server host="cs-ccr-tim5" name="server2">
+      <server host="cs-ccr-tim12" name="server2">
       <data>%(user.home)/dist/terracotta/log/server2-data</data>
       <logs>%(user.home)/dist/terracotta/log/server2-logs</logs>
       <statistics>%(user.home)/dist/terracotta/log/cluster2-statistics</statistics>
@@ -55,7 +55,7 @@
     </ha>
   </servers>
   <clients>
-    <logs>%(user.home)/dist/terracotta/log/client-logs-%(server.process.name)</logs>
+    <logs>%(c2mon.home)/log/TC-client-logs-%(server.process.name)</logs>
     <modules>
 <!--      <repository>C:\Program Files\terracotta\terracotta-3.2.0\modules</repository>-->
 <!--      <repository>D:\Profiles\mbrightw\terracotta-3.2.0\modules</repository>-->
