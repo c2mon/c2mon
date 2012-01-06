@@ -10,7 +10,7 @@
 
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-pom</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<packaging>pom</packaging>
 
 	<description>
@@ -258,4 +258,9 @@
 		<plugins />
 
 	</build>
+	
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-pom</developerConnection>
+	</scm>
+	
 </project>
