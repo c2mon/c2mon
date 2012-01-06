@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-client</groupId>
 		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-auth</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<name>c2mon-client-auth</name>
 	<packaging>jar</packaging>
 	<description>The C2MON Client Authentication module</description>
@@ -51,5 +51,9 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-auth</developerConnection>
+  </scm>
 
 </project>
