@@ -44,7 +44,7 @@ public enum HistoryTagResultType {
   /**
    * The result is only defined by {@link HistoryTagParameter#LoadingValue},
    * {@link HistoryTagParameter#FailedValue} and
-   * {@link HistoryTagParameter#LoadedValue}
+   * {@link HistoryTagParameter#ActiveValue}
    */
   Conditional(Object.class);
   
