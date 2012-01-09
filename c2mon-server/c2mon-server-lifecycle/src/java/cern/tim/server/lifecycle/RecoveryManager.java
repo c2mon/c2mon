@@ -142,6 +142,8 @@ public class RecoveryManager implements SmartLifecycle {
   public void refreshSupervisionStatus() {        
     LOGGER.info("Recovery task: notifying all supervision listeners of current status.");
     supervisionFacade.refreshAllSupervisionStatus();
+    LOGGER.info("Recovery task: finished notifying supervision status (notice all alarms are now re-evaluated on a separate thread"
+    		+ " - this may take some time!)");
   } 
   
   /**
@@ -151,6 +153,7 @@ public class RecoveryManager implements SmartLifecycle {
   public void refreshStateTags() {
     LOGGER.info("Recovery task: refreshing Process state tags.");
     supervisionFacade.refreshStateTags();
+    LOGGER.info("Recovery task: finished refreshing state tags.");
   }
   
   /**
@@ -160,7 +163,8 @@ public class RecoveryManager implements SmartLifecycle {
   @ManagedOperation(description = "Refreshes DataTags from DAQ cache.")
   public void refreshDataTags() {
     LOGGER.info("Recovery task: refreshing DataTags from DAQ (using DAQ cache).");
-    dataRefreshManager.refreshTagsForAllProcess();    
+    dataRefreshManager.refreshTagsForAllProcess();  
+    LOGGER.info("Recovery task: finished refreshing all DataTags from DAQ.");
   }
   
   /**
@@ -193,7 +197,8 @@ public class RecoveryManager implements SmartLifecycle {
       } finally {
         dataTag.getWriteLock().unlock();
       }      
-    }    
+    }
+    LOGGER.info("Recovery task: finished notifying all tag listeners.");
   }
 
   @Override
