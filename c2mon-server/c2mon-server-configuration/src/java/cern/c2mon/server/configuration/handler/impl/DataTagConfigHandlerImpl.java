@@ -242,7 +242,7 @@ public class DataTagConfigHandlerImpl extends TagConfigHandlerImpl<DataTag> impl
       processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), removeEvent));
     } catch (CacheElementNotFoundException e) {
       LOGGER.warn("Attempting to remove a non-existent DataTag - no action taken.");
-      elementReport.setWarning("Attempting to removed a non-existent DataTag");
+      elementReport.setWarning("Attempting to remove a non-existent DataTag");
     }    
     return processChanges;
   }

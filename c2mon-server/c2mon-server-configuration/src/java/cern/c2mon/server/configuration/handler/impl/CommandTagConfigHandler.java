@@ -30,6 +30,7 @@ import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.CommandTagCache;
 import cern.tim.server.cache.CommandTagFacade;
 import cern.tim.server.cache.EquipmentFacade;
+import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.cache.loading.CommandTagDAO;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
@@ -111,29 +112,34 @@ public class CommandTagConfigHandler {
    * @return a ProcessChange event to send to the DAQ if no error occurred
    */
   public List<ProcessChange> removeCommandTag(final Long id, final ConfigurationElementReport elementReport) {
-    LOGGER.trace("Removing CommandTag " + id);
-    CommandTag commandTag = commandTagCache.get(id);
-    try {
-      commandTag.getWriteLock().lock();            
-      commandTagDAO.deleteCommandTag(commandTag.getId());
-      commandTagCache.remove(commandTag.getId());
-      commandTag.getWriteLock().unlock();
-      //unlock before accessing equipment
-      equipmentFacade.removeCommandFromEquipment(commandTag.getEquipmentId(), commandTag.getId());
-    } catch (Exception ex) {      
-      elementReport.setFailure("Exception caught while removing a commandtag.", ex);
-      LOGGER.error("Exception caught while removing a commandtag (id: " + id + ")", ex);
-      throw new RuntimeException(ex);
-    } finally {
-      if (commandTag.getWriteLock().isHeldByCurrentThread()) {
-        commandTag.getWriteLock().unlock();
-      }      
-    }      
-    CommandTagRemove removeEvent = new CommandTagRemove();  
-    removeEvent.setCommandTagId(id);
-    removeEvent.setEquipmentId(commandTag.getEquipmentId());
+    LOGGER.trace("Removing CommandTag " + id); 
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(commandTag.getEquipmentId()).getId(), removeEvent));
+    try {
+      CommandTag commandTag = commandTagCache.get(id);
+      try {
+        commandTag.getWriteLock().lock();            
+        commandTagDAO.deleteCommandTag(commandTag.getId());
+        commandTagCache.remove(commandTag.getId());
+        commandTag.getWriteLock().unlock();
+        //unlock before accessing equipment
+        equipmentFacade.removeCommandFromEquipment(commandTag.getEquipmentId(), commandTag.getId());
+      } catch (Exception ex) {      
+        elementReport.setFailure("Exception caught while removing a commandtag.", ex);
+        LOGGER.error("Exception caught while removing a commandtag (id: " + id + ")", ex);
+        throw new RuntimeException(ex);
+      } finally {
+        if (commandTag.getWriteLock().isHeldByCurrentThread()) {
+          commandTag.getWriteLock().unlock();
+        }      
+      }      
+      CommandTagRemove removeEvent = new CommandTagRemove();  
+      removeEvent.setCommandTagId(id);
+      removeEvent.setEquipmentId(commandTag.getEquipmentId());     
+      processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(commandTag.getEquipmentId()).getId(), removeEvent));
+    } catch (CacheElementNotFoundException e) {
+      LOGGER.warn("Attempting to remove a non-existent Command - no action taken.");
+      elementReport.setWarning("Attempting to remove a non-existent CommandTag");
+    } 
     return processChanges;    
   }
   
