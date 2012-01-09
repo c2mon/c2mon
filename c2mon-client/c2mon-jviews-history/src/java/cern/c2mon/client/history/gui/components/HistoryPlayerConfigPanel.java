@@ -40,7 +40,7 @@ public class HistoryPlayerConfigPanel extends JPanel {
   private static final int PANEL_MARGIN = 12;
   
   /** The amount of milliseconds that can be retrieved from history from today */
-  private static final long HISTORY_TIME = 1L * 1000 * 60 * 60 * 24 * 15;
+  private static final long HISTORY_TIME = 1L * 1000 * 60 * 60 * 24 * 30;
   
   /** The panel where the user can choose the date and time */
   private final TimeSpanChooser chooser; 
@@ -69,8 +69,16 @@ public class HistoryPlayerConfigPanel extends JPanel {
     setStartDate(startDate.getTime());
     setEndDate(new Date(System.currentTimeMillis()));
     
+    final Calendar c = Calendar.getInstance();
+    c.setTimeInMillis(System.currentTimeMillis() - HISTORY_TIME);
+    c.add(Calendar.DATE, 1);
+    c.set(Calendar.HOUR_OF_DAY, 0);
+    c.set(Calendar.MINUTE, 0);
+    c.set(Calendar.SECOND, 0);
+    c.set(Calendar.MILLISECOND, 0);
+    
     this.chooser.setSelectableDateRange(
-        new Date(System.currentTimeMillis() - HISTORY_TIME),
+        c.getTime(),
         new Date(System.currentTimeMillis()));
   }
 
