@@ -328,7 +328,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
    */
   @Override
   public Collection<HistoryTagValueUpdate> getInitialValuesForTags(final Long[] tagIds, final Timestamp before) {
-    if (isProviderDisabled()) {
+    if (isProviderDisabled() || tagIds.length == 0) {
       return new ArrayList<HistoryTagValueUpdate>();
     }
     
@@ -342,12 +342,18 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       return result;
     }
 
+    if (LOG.isDebugEnabled()) {
+      LOG.debug(String.format("Retrieving %d initial data tags", tagIds.length));
+    }
+    final long startTimeTotal = System.currentTimeMillis();
+    
     // Opens a session where the data is received from
     final SqlSession session = this.sessionFactory.openSession();
     try {
       final HistoryMapper historyMapper = getHistoryMapper(session);
       for (int i = 0; i < tagIds.length && !isProviderDisabled(); i++) {
         final Long tagId = tagIds[i];
+        final long startTime = System.currentTimeMillis();
         final HistoryRecordBean record = historyMapper.getInitialRecord(new InitialRecordHistoryRequestBean(tagId, before));
         if (record != null) {
           try {
@@ -360,6 +366,11 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
             LOG.warn(
                 String.format("Failed to convert a bean into a %s", TagValueUpdate.class.getSimpleName()), e);
           }
+          if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("Initial record for tag id %d took %.3f seconds", 
+                tagId, 
+                (System.currentTimeMillis() - startTime) / 1000.0 ));
+          }
         }
         fireQueryProgressChanged(queryId, i / (double) tagIds.length);
       }
@@ -371,6 +382,12 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
       // Tells the listener that the query is finished
       fireQueryFinished(queryId);
+      
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(String.format("Retrieved %d initial data tags. It took %.3f seconds", 
+            tagIds.length, 
+            (System.currentTimeMillis() - startTimeTotal) / 1000.0 ));
+      }
     }
 
     return result;
