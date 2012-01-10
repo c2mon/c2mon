@@ -51,12 +51,16 @@ elif [ "$1" == "join" ]; then
 elif [ "$1" == "stop" ]; then
     echo "Stopping the Terracotta server on host $TC_HOST"
     ssh $TC_HOST "source ~/.profile; $TC_HOME/bin/stop-tc-server.sh $TC_HOST $TC_JMX_PORT" > /dev/null 2>&1
+elif [ "$1" == "clean" ]; then
+    echo "Cleaning the Terracotta cache on host $TC_HOST"
+    ssh $TC_HOST "cd $TC_LOG_DIR; rm -R server-data" > /dev/null 2>&1
 else
 
     echo "Usage: terracotta {start,join,stop} [standby]"
     echo " start [standby] - start the initial TC server in a cluster ([standby] for starting the usual mirror as the main server)"
     echo " join [standby] - start a TC server to join an existing cluster ([standby] for starting the second TC server)"
     echo " stop [standby] - for stopping the [standby] server"
+    echo " clean [standby] - for cleaning the *stopped* Terracotta [standby] server cache"
 
 fi
 exit 0
