@@ -7,7 +7,8 @@
 
 		<dependencySet>
 			<outputDirectory>/lib</outputDirectory>
-			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}
+			</outputFileNameMapping>
 			<fileMode>0644</fileMode>
 		</dependencySet>
 
@@ -29,7 +30,16 @@
 			<fileMode>0755</fileMode>
 			<directoryMode>0755</directoryMode>
 		</fileSet>
-
+		<!--  take the native libraries and copy them to /lib_so -->
+		<fileSet>
+			<outputDirectory>/lib_so</outputDirectory>
+			<includes>
+				<include>*.so</include>
+			</includes>
+			<directory>${project.build.directory}/lib_so/lib/i386-SLC5-gpp/shared
+			</directory>
+			<fileMode>0444</fileMode>
+		</fileSet>
 	</fileSets>
 
 </component>

@@ -16,9 +16,30 @@
 				</backupPolicy>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
-					<mail address="timdiamon-developers@cern.ch" />
+					<mail address="tim-admin@cern.ch" />
 				</notification>
 			</deployment>
+			<startscript name="dip-publisher-startup">
+				<main-class name="ch.cern.tim.dippublisher.DIPPublisherKernel">
+					<initial-heap-size>256m</initial-heap-size>
+					<max-heap-size>256m</max-heap-size>
+					<arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -processName
+						${PROCESS_NAME} -dataTags
+						${INSTALL_DIR}/conf/${PROCESS_NAME}DataTags.xml</arg>
+					<preExec>
+                    <![CDATA[
+                      [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+                     ]]>
+					</preExec>
+					<property name="tim.driver.log" value="${INSTALL_DIR}/log/${PROCESS_NAME}.log" />
+					<property name="java.library.path" value="${INSTALL_DIR}/lib_so" />
+					<property name="c2mon.client.conf.url"
+						value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+					<output>
+						<file name="${INSTALL_DIR}/log/${PROCESS_NAME}.out.log" />
+					</output>
+				</main-class>
+			</startscript>
 		</application>
 
 		<application name="tim-dip-publisher-prod" extends="default">
@@ -34,10 +55,10 @@
 		<application name="tim-dip-publisher-test" extends="default">
 			<deployment installLocation="/opt/tim-dip-publisher-test">
 				<directory name="conf">
-          <!-- Copy over the c2mon.properties file into the /conf directory  -->
-          <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client"
-            mask="400" />
-        </directory>
+					<!-- Copy over the c2mon.properties file into the /conf directory  -->
+					<file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client"
+						mask="400" />
+				</directory>
 			</deployment>
 		</application>
 	</product>

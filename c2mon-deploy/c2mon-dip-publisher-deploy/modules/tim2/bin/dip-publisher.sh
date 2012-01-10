@@ -28,6 +28,12 @@ PRGDIR=`dirname "$PRG"`
 # Set DIP_PUBLISHER_HOME
 DIP_PUBLISHER_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 
+#name of the DIP publisher passed as second argument
+PROCESS_NAME=$2
+
+# The script which is actually calling the DIP publisher
+STARTUP_SCRIPT=${DAQ_HOME}/bin/dip-publisher-startup.jvm
+
 # change into DIP_PUBLISHER_HOME
 cd $DIP_PUBLISHER_HOME
 
@@ -35,6 +41,9 @@ SHARED_LIB_HOME=$HOME/dist/libs
 TIM_LIB_HOME=$HOME/dist/libs/tim
 DIP_PUBLISHER_LIB_HOME=$HOME/dist/libs/tim/dippublisher
 
+########
+# JAVA #
+########
 # Make sure the JAVA_BIN variable points to the java bin directory on Your machine
 JAVA_BIN=/usr/java/jdk/jre/bin
 
@@ -47,9 +56,6 @@ SHARED_LIBS=$SHARED_LIB_HOME/oc4j/oc4jclient.jar:$SHARED_LIB_HOME/oc4j/oc4jclien
 
 # Make sure all required libraries are specified in REQUIRED_LIBRARIES
 REQUIRED_LIBS=$TIM_LIBS:$DIP_PUBLISHER_LIBS:$SHARED_LIBS:$DIP_PUBLISHER_HOME/conf/jndi.properties
-
-#name of the DIP publisher passed as second argument
-PROCESS_NAME=$2
 
 #name of the XML file containing the datatags to be published
 DIP_PUBLISHER_XML=${PROCESS_NAME}DataTags.xml
@@ -86,7 +92,8 @@ DIPPublisher_start() {
    export DIM_DNS_PORT=2506
 
    echo "Starting DIP Publisher ${PROCESS_NAME}.."
-   java -Djava.library.path=${SHARED_LIB_HOME}/dip -Dtim.driver.log=${DIP_PUBLISHER_HOME}/log/${PROCESS_NAME}.log -classpath ${REQUIRED_LIBS} ch.cern.tim.dippublisher.DIPPublisherKernel -log4j ${DIP_PUBLISHER_HOME}/conf/log4j.xml -processName ${PROCESS_NAME} -dataTags ${DIP_PUBLISHER_HOME}/conf/${DIP_PUBLISHER_XML} > /dev/null &
+   ${STARTUP_SCRIPT} 2>&1 &
+   # java ${JAVA_OPTS} -classpath ${REQUIRED_LIBS} ch.cern.tim.dippublisher.DIPPublisherKernel -log4j ${DIP_PUBLISHER_HOME}/conf/log4j.xml -processName ${PROCESS_NAME} -dataTags ${DIP_PUBLISHER_HOME}/conf/${DIP_PUBLISHER_XML} > /dev/null &
    echo "$!" > ${PID_FILE}
   fi
 
