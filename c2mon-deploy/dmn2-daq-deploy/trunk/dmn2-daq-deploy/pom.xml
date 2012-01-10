@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cern.tim2.tim2-daq</groupId>
+		<artifactId>tim2-daq-pom</artifactId>
+		<version>1.0.2</version>
+	</parent>
+
+	<groupId>cern.dmn2.dmn2-daq</groupId>
+	<artifactId>dmn2-daq-deploy</artifactId>
+	<name>DMN2 DAQ deployment module</name>
+	<version>1.0.3-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<description>
+		DMN2 DAQ assembling all required modules and configuration files for DMN2
+        </description>
+	<url></url>
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/acc-co/trunk/accsoft/diamon/dmn2-daq-deploy</developerConnection>
+	</scm>
+
+	<developers />
+
+
+	<dependencies>
+		<dependency>
+			<groupId>cern.tim2.tim2-daq</groupId>
+			<artifactId>tim2-daq-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-daq</groupId>
+			<artifactId>tim2-daq-jmx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-daq</groupId>
+			<artifactId>tim2-daq-japc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-daq</groupId>
+			<artifactId>tim2-daq-testhandler</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-daq</groupId>
+			<artifactId>tim2-daq-ssh</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/assembly/assembly.xml</descriptor>
+					</descriptors>
+
+				</configuration>
+				<executions>
+					<execution>
+						<id>create-assembly-file</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
