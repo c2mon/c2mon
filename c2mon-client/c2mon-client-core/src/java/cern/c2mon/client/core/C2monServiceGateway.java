@@ -21,11 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.config.PropertiesFactoryBean;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
 
 import cern.c2mon.client.module.C2monAdminMessageManager;
 
@@ -36,6 +32,8 @@ import cern.c2mon.client.module.C2monAdminMessageManager;
  * The C2MON service gateway provides access to the different
  * C2MON manager singleton instances. A client application should
  * only use functionality which are provided by these classes.
+ * <p>
+ * 
  *
  * @author Matthias Braeger
  */
@@ -142,39 +140,6 @@ public final class C2monServiceGateway {
     
     final ClassPathXmlApplicationContext xmlContext = 
                     new ClassPathXmlApplicationContext(springXmlFiles.toArray(new String[0]));
-    
-    initiateGatewayFields(xmlContext);
-    registerModules(xmlContext, modules);
-    
-    xmlContext.registerShutdownHook();
-  }
-  
-  /**
-   * Start the C2MON core, importing properties from the specified location.
-   * 
-   * @param propertyFileLocation properties to load into context (eg. file:/user/smith/properties.txt or classpath:properties.txt)
-   * @param modules the modules that should be supported by the service gateway
-   */
-  public static void startC2monClient(final String propertyFileLocation, final Module ... modules) {
-    LOGGER.info("Starting C2MON client core, loading properties from " + propertyFileLocation);    
-
-    GenericBeanDefinition propertiesFactoryBean = new GenericBeanDefinition();
-    propertiesFactoryBean.setBeanClass(PropertiesFactoryBean.class);
-    MutablePropertyValues propertyValues = new MutablePropertyValues();
-    propertyValues.addPropertyValue("location", propertyFileLocation);
-    propertiesFactoryBean.setPropertyValues(propertyValues);    
-
-    //start an initial Spring application context and register properties bean
-    GenericApplicationContext ctx = new GenericApplicationContext();    
-    ctx.registerBeanDefinition("clientProperties", propertiesFactoryBean);        
-    ctx.refresh();
-    
-    final Set<String> springXmlFiles = getSpringXmlPathsOfModules(modules);
-    springXmlFiles.add(APPLICATION_SPRING_XML_PATH);
-    springXmlFiles.add("cern/c2mon/client/core/config/c2mon-client-properties.xml");
-    
-    final ClassPathXmlApplicationContext xmlContext = 
-                    new ClassPathXmlApplicationContext(springXmlFiles.toArray(new String[0]), ctx);
     
     initiateGatewayFields(xmlContext);
     registerModules(xmlContext, modules);

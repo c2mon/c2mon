@@ -9,9 +9,22 @@
 
   <context:component-scan base-package="cern.c2mon.client.core"/>
   <context:annotation-config/>
-  
-  <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
+  <!-- 
+    The first definition enables basic property resolution through system properties
+    (in fallback mode). The second bean loads the resource from the location resolved
+    from the system property -Dc2mon.client.conf.url. All spring resource urls are
+    supported, making this very flexible. For more information, please have a look at
+    the following home page: http://springtips.blogspot.com/
+  -->
+	<bean	class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	  <property name="ignoreUnresolvablePlaceholders" value="true" />
+  </bean>
+	<bean	class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="location" value="${c2mon.client.conf.url}" />
+	</bean>
+	
   <!-- import the XML configuration files for the Client API modules -->
   <import resource="classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml"/>
   <import resource="classpath:cern/c2mon/client/auth/config/c2mon-client-auth.xml"/>
