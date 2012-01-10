@@ -46,6 +46,7 @@
 							<groupId>cern.en.ice</groupId>
 							<artifactId>dip</artifactId>
 							<classifier>i386-SLC5-gpp-shared</classifier>
+							<version>5.4.2</version>
 							<type>nar</type>
 
 							<overWrite>true</overWrite>
