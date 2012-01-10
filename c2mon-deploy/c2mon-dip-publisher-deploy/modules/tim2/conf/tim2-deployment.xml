@@ -23,9 +23,7 @@
 				<main-class name="ch.cern.tim.dippublisher.DIPPublisherKernel">
 					<initial-heap-size>256m</initial-heap-size>
 					<max-heap-size>256m</max-heap-size>
-					<arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -processName
-						${PROCESS_NAME} -dataTags
-						${INSTALL_DIR}/conf/${PROCESS_NAME}DataTags.xml</arg>
+					<arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -processName ${PROCESS_NAME} -dataTags ${INSTALL_DIR}/conf/${PROCESS_NAME}DataTags.xml</arg>
 					<preExec>
                     <![CDATA[
                       [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
