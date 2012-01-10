@@ -151,7 +151,7 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description = "Refreshes all state tags (new timestamp).")
   public void refreshStateTags() {
-    LOGGER.info("Recovery task: refreshing Process state tags.");
+    LOGGER.info("Recovery task: refreshing state tags.");
     supervisionFacade.refreshStateTags();
     LOGGER.info("Recovery task: finished refreshing state tags.");
   }
