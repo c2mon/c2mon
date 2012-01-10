@@ -10,7 +10,7 @@ use Config::Properties;
 my $jardir = "../lib";
 my $appdir = "tim2-jviews-viewer/";
 my $codebase = "http://timweb.cern.ch/test/javaws";
-my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
+my $c2monClientPropertiesFile = "/user/timtest/rep/c2mon/client/c2mon-client.properties";
 my $timViewerPropertiesFile = "../tim-viewer.properties";
 
 ##
@@ -128,7 +128,7 @@ print "		<property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
 print "		<property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
 
 if (param('configurl')) {
-	print "		<property name=\"tim.conf.file.url\" value=\"", param('configurl'), "\"/>", "\n";
+	print "		<property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";
 }
 
 print "	</resources>

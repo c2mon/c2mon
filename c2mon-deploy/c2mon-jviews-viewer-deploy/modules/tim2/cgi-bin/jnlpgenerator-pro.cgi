@@ -128,7 +128,7 @@ print "		<property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
 print "		<property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
 
 if (param('configurl')) {
-	print "		<property name=\"tim.conf.file.url\" value=\"", param('configurl'), "\"/>", "\n";
+	print "		<property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";
 }
 
 print "	</resources>
