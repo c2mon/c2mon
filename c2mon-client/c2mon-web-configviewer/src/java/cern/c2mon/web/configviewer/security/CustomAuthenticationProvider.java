@@ -25,47 +25,15 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
   private RbacAuthorizationDetails adminAuthDetails;
   private RbacAuthorizationDetails processViewerAuthDetails;
 
-
   /**
    * CustomAuthenticationProvider logger
    * */
   private static Logger logger = Logger.getLogger(CustomAuthenticationProvider.class);
 
   /**
-   * 
-   * @param adminDetails contains comma-seperated RbacAuthorizationDetails for the admin role
-   * @param processViewerDetails contains comma-seperated RbacAuthorizationDetails for the process viewer role
-   */
+   * */
   @Autowired
-  public CustomAuthenticationProvider(
-      final String processViewerDetails,
-      final String adminDetails) {
-
-    logger.debug(
-        "CustomAuthenticationProvider:"
-                + "received processViewerDetails: " + processViewerDetails
-        + "received adminDetails " + adminDetails
-    );
-
-//    String[] splitAdminDetails = adminDetails.replace(" ", "").split( ",\\s*" ); // split on commas
-//
-//    if (splitAdminDetails.length < 3)
-//      logger.error(new Error("CustomAuthenticationProvider: error splitting Admin Details!:"
-//          + adminDetails + ". Splitted in:" + splitAdminDetails
-//      ));
-//
-//    if (splitAdminDetails.length == 3) {
-//      adminAuthDetails = new RbacAuthorizationDetails();
-//      adminAuthDetails.setRbacClass(splitAdminDetails[0]);
-//      adminAuthDetails.setRbacDevice(splitAdminDetails[1]);
-//      adminAuthDetails.setRbacProperty(splitAdminDetails[2]);
-//
-//      String[] splitDaqDetails = processViewerDetails.split(",\\s*"); // split on commas
-//      processViewerAuthDetails = new RbacAuthorizationDetails();
-//      processViewerAuthDetails.setRbacClass(splitDaqDetails[0]);
-//      processViewerAuthDetails.setRbacDevice(splitDaqDetails[1]);
-//      processViewerAuthDetails.setRbacProperty(splitDaqDetails[2]);
-//    }
+  public CustomAuthenticationProvider() {
   }
 
   /**
@@ -83,11 +51,13 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
     if (!C2monServiceGateway.getSessionManager().login(APP_NAME, username, password))
       throw new BadCredentialsException("Invalid username/password"); // failed to login
 
-    // login successful => check if Authorized
-    String role = getRole(username);
+// login successful => check if Authorized
+//    String role = getRole(username);
+    String role = "ROLE_ADMIN";
 
     Authentication customAuthentication =
       new CustomUserAuthentication(role, authentication);
+    
     customAuthentication.setAuthenticated(true);
 
     return customAuthentication;
@@ -102,15 +72,15 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
 
     String role = "ROLE_GUEST";
 
-//    C2monSessionManager sessionManager = C2monServiceGateway.getSessionManager();
-//
-//    if (sessionManager.isAuthorized(username, adminAuthDetails))
-//      role = "ROLE_ADMIN";
-//        else {
-//          if (sessionManager.isAuthorized(username, processViewerAuthDetails)) {
-//            role = "ROLE_PROCESS_VIEWER";
-//          }
-//        }
+    C2monSessionManager sessionManager = C2monServiceGateway.getSessionManager();
+
+    if (sessionManager.isAuthorized(username, adminAuthDetails))
+      role = "ROLE_ADMIN";
+        else {
+          if (sessionManager.isAuthorized(username, processViewerAuthDetails)) {
+            role = "ROLE_PROCESS_VIEWER";
+          }
+        }
     
     role = "ROLE_ADMIN";
     return role;

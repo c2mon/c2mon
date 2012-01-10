@@ -55,6 +55,6 @@ public class CustomUserAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        return this.getClass().getSimpleName();
+        return (String) authentication.getPrincipal();
     }
 }

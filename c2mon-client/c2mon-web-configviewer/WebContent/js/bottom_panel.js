@@ -16,3 +16,8 @@ $(function () {
 		}, 100);
 	});
 });
+
+$(function () { 
+
+	   $("tr:even").addClass("even");
+});

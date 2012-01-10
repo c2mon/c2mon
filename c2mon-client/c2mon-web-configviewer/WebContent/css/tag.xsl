@@ -39,159 +39,145 @@
 					<xsl:value-of select="tagName"/>
 					(<xsl:value-of select="@id"/>)
 		</p>
-		<div class="columnA">
 		<table class="inline">
-			<th colspan="2">ClientDataTag</th>
+			<th colspan="4">ClientDataTag</th>
+			
 			<tr>
-				<td class="bold"> Value </td>
-				<td><xsl:value-of select="tagValue"/></td>
+				<td class="bold">Tag id </td>
+				<td><xsl:value-of select="@id"/></td>
+				<td class="bold">Tag name </td>
+				<td><xsl:value-of select="tagName"/></td>
 			</tr>
-			<tr>
-				<td class="bold"> Value description </td>
-				<td><xsl:value-of select="valueDescription"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Source timestamp </td>
-				<td><xsl:value-of select="sourceTimestamp"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Server timestamp </td>
-				<td><xsl:value-of select="serverTimestamp"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Quality code </td>
-				<td style="background:red;"><xsl:value-of select="'missing in XML'"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Quality description </td>
-				<td style="background:red;"><xsl:value-of select="'missing in XML'"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Simulated </td>
-				<td><xsl:value-of select="simulated"/></td>
-			</tr>
+			
+			<xsl:for-each select="*[not(local-name() = 'alarms' or local-name() = 'tagName')]">
+			
+				<xsl:if test="position() mod 2 = 1">
+					<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>
+				</xsl:if>
+				
+				<xsl:if  test="position() mod 2 = 0">
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>		
+					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
+				</xsl:if>
+				
+			</xsl:for-each>
+		
 		</table>
-		</div>
+		<xsl:apply-templates select="alarms"/>
+	</xsl:template>
+	
+	<xsl:template match="alarms">
+		<xsl:apply-templates select="alarmValue"/>
 	</xsl:template>
 
 	<!--  process the XML element TagConfig - take missing information from the element ClientDataTag -->
 	<xsl:template match="TagConfig">
-		<div class="columnA">
 		<table class="inline">
-			<th colspan="2">Tag Configuration</th>
+			<th colspan="4">Tag Configuration</th>
 			<tr>
 				<td class="bold">Tag id </td>
 				<td><xsl:value-of select="@id"/></td>
-			</tr>
-			<tr>
 				<td class="bold">Tag name </td>
 				<td><xsl:value-of select="../ClientDataTag/tagName"/></td>
 			</tr>
 			<tr>
 				<td class="bold">Description </td>
 				<td><xsl:value-of select="../ClientDataTag/description"/></td>
-			</tr>
-			<tr>
-				<td class="bold">Control tag </td>
-				<td><xsl:value-of select="controlTag"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Unit </td>
-				<td style="background:red;"><xsl:value-of select="'missing in XML'"/></td>
-			</tr>
-			<tr>
 				<td class="bold"> Mode </td>
 				<td><xsl:value-of select="../ClientDataTag/mode"/></td>
 			</tr>
 			<tr>
-				<td class="bold"> Min value</td>
-				<td><xsl:value-of select="minValue"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Max value</td>
-				<td><xsl:value-of select="maxValue"/></td>
-			</tr>
-			<tr>
 				<td class="bold"> JMS Topic name </td>
 				<td><xsl:value-of select="../ClientDataTag/topicName"/></td>
-			</tr>
-			<tr>
 				<td class="bold"> Data Type </td>
 				<td><xsl:value-of select="../ClientDataTag/tagValue/@class"/></td>
 			</tr>
-			<tr>
-				<td class="bold"> Value dictionary </td>
-				<td style="background:red;"><xsl:value-of select="'missing in XML'"/></td>
-			</tr>
+			
+			<xsl:for-each select="*[not(local-name() = 'alarmIds' or local-name() = 'hardwareAddress')]">
+
+				<xsl:if test="position() mod 2 = 1">
+					<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>
+				</xsl:if>
+				
+				<xsl:if  test="position() mod 2 = 0">
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>		
+					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
+				</xsl:if>
+				
+			</xsl:for-each>
+			
 			<tr>
 				<td class="bold"> Alarms </td>
 				<td>
-					 <xsl:for-each select="alarms/alarmValue">
-							<a href="{$base_url}{$alarm_url}{faultCode}/"><xsl:value-of select="faultCode"/></a>&#160;
+					 <xsl:for-each select="alarmIds">
+							<a href="{$base_url}{$alarm_url}{long}/"><xsl:value-of select="long"/></a>&#160;
 					</xsl:for-each>
 				</td>
 			</tr>
+			
 			<tr>
-				<td class="bold"> Rules </td>
-				<td><xsl:value-of select="ruleIds"/></td>
+				<td class="bold align_center" colspan="4" >Hardware Address</td>
 			</tr>
+			<tr>
+				<td colspan="4"><xsl:value-of select="hardwareAddress"/></td>
+			</tr>
+			
+			<!--
 			<tr>
 				<td class="bold" style="background:red;"> Publications - no JAPC and DIP</td>
 				<td><xsl:value-of select="publications"/></td>
 			</tr>
+			-->
 			
 		</table>
-	</div>
 	<!--  address configuration -->
-	<div class="columnB">
 		<table class="inline">
-			<th colspan="2">Address Configuration</th>
+			<th colspan="4">Address Configuration</th>
+
+			<xsl:for-each select="*[not(local-name() = 'hardwareAddress')]">
+				<xsl:if test="position() mod 2 = 1">
+					<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>
+				</xsl:if>
+				
+				<xsl:if  test="position() mod 2 = 0">
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>		
+					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
+				</xsl:if>
+			</xsl:for-each>
+			
 			<tr>
-				<td class="bold"> JMS Priority </td>
-				<td><xsl:value-of select="priority"/></td>
-			</tr>
-			<tr style="background:green;">
-				<td class="bold"> Guaranteed delivery - NEW </td>
-				<td><xsl:value-of select="guaranteedDelivery"/></td>
-			</tr>
-		
-			<tr>
-				<td class="bold"> Time deadband (ms) </td>
-				<td><xsl:value-of select="timeDeadband"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Time to Live (ms)  </td>
-				<td style="background:red;"><xsl:value-of select="'missing in XML'"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Value deadband </td>
-				<td><xsl:value-of select="valueDeadband"/></td>
+				<td class="bold align_center" colspan="4" >Hardware Address</td>
 			</tr>
 			<tr>
-				<td class="bold"> Value deadband type </td>
-				<td><xsl:value-of select="valueDeadbandType"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Hardware address </td>
-				<td><pre><xsl:value-of select="hardwareAddress"/></pre></td>
+				<td colspan="4"><xsl:value-of select="hardwareAddress"/></td>
 			</tr>
 
 		</table>
-		</div>
 	
 	</xsl:template>
 
 	<!-- process the XML element AlarmValue -->
-	<xsl:template match="AlarmValue">
+	<xsl:template match="AlarmValue | alarmValue">
 		<p class="tagName"> 
 					<xsl:value-of select="faultFamily"/>
 					:<xsl:value-of select="faultMemeber"/>
 					:<xsl:value-of select="faultCode"/>
 		</p>
-		<div class="column">
 		<table class="inline">
-			<th colspan="2">Alarm Value</th>
+			<th colspan="4">Alarm Value</th>
+			
 			<tr>
+				<td class="bold">Alarm id</td>
+				<td><xsl:value-of select="@id"/></td>	
 				<td class="bold"> State </td>
 				<td>
 					<xsl:choose>
@@ -204,54 +190,53 @@
 					</xsl:choose>
 				</td>
 			</tr>
-			<tr>
-				<td class="bold"> Timestamp of last change </td>
-				<td><xsl:value-of select="timestamp"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Info </td>
-				<td><xsl:value-of select="info"/></td>
-			</tr>
+			
+			<xsl:for-each select="*">
+				
+				<xsl:if  test="position() mod 2 = 0">
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>		
+					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
+				</xsl:if>
+				
+				<xsl:if test="position() mod 2 = 1">
+					<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>
+				</xsl:if>
+				
+			</xsl:for-each>
 			
 		</table>
-	</div>
-	<div class="column">
 		<table class="inline">
-			<th colspan="2">Alarm Configuration</th>
+			<th colspan="4">Alarm Configuration</th>
 			<tr>
 				<td class="bold"> Alarm id </td>
-				<td><xsl:value-of select="@id"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Fault Family </td>
-				<td><xsl:value-of select="faultFamily"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Fault member </td>
-				<td><xsl:value-of select="faultMemeber"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Fault code </td>
-				<td><xsl:value-of select="faultCode"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Problem description </td>
-				<td style="background:red;"><xsl:value-of select="'missing in XML'"/></td>
-			</tr>
-			<tr>
+				<td ><xsl:value-of select="@id"/></td>
 				<td class="bold"> DataTag </td>
-				<td>
+				<td >
 					<a href="{$base_url}{$datatag_url}{tagId}/"><xsl:value-of select="tagId"/></a>
 				</td>
 			</tr>
-			<tr>
-				<td class="bold"> Activation condition </td>
-				<td style="background:red;"><xsl:value-of select="'missing in XML'"/></td>
-			</tr>
+			
+			<xsl:for-each select="*[not(local-name() = 'tagId')]">
+				
+				<xsl:if  test="position() mod 2 = 0">
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>		
+					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
+				</xsl:if>
+				
+				<xsl:if test="position() mod 2 = 1">
+					<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>
+				</xsl:if>
+				
+			</xsl:for-each>
+			
 		</table>
-		</div>
 	</xsl:template>
-	
 	
 	
 	<!-- process the XML element ClientCommandTagImpl -->
@@ -263,26 +248,19 @@
 	<div class="column">
 		<table class="inline">
 			<th colspan="2">Command Tag</th>
+			
 			<tr>
 				<td class="bold"> Command id </td>
 				<td><xsl:value-of select="@id"/></td>
 			</tr>
-			<tr>
-				<td class="bold"> Name </td>
-				<td><xsl:value-of select="name"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> Description </td>
-				<td><xsl:value-of select="description"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> ValueType </td>
-				<td><xsl:value-of select="valueType"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> ClientTimeout </td>
-				<td><xsl:value-of select="clientTimeout"/></td>
-			</tr>
+
+			<xsl:for-each select="*">
+				<TR>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD><xsl:value-of select="."/></TD>
+				</TR>
+			</xsl:for-each>
+			
 		</table>
 		</div>
 	</xsl:template>
@@ -293,23 +271,23 @@
      <h2>Overview</h2>
      <table class="inline" border="1">
        <tr>
-         <th>Identifier</th>
+         <th class="bold">Identifier</th>
          <td><xsl:value-of select="id" /></td>
        </tr>
        <tr>
-         <th>Name</th>
+         <th class="bold">Name</th>
          <td><xsl:value-of select="name" /></td>
        </tr>
        <tr>
-         <th>Applied by</th>
+         <th class="bold">Applied by</th>
          <td><xsl:value-of select="user" /></td>
        </tr>
        <tr>
-         <th>Applied on</th>
+         <th class="bold">Applied on</th>
          <td><xsl:value-of select="timestamp" /></td>
        </tr>
        <tr>
-         <th>Status</th>
+         <th class="bold">Status</th>
          <xsl:choose>
          <xsl:when test="status='OK'">
            <td bgcolor="green"><xsl:value-of select="status" /></td>
@@ -323,11 +301,11 @@
          </xsl:choose>
        </tr>
        <tr>
-         <th>Message</th>
+         <th class="bold">Message</th>
          <td><pre><xsl:value-of select="status-description" /></pre></td>
        </tr>
        <tr>
-         <th>DAQs to reboot</th>
+         <th class="bold">DAQs to reboot</th>
          <td><xsl:value-of select="daq-reboot" /></td>
        </tr>
      </table>
@@ -342,11 +320,11 @@
      <h2>Detailed Report</h2>
      <table class="inline" border="1">
        <tr>
-         <th>Action</th>
-         <th>Entity</th>
-         <th>Id</th>
-         <th>Status</th>
-         <th>Report</th>
+         <th class="bold">Action</th>
+         <th class="bold">Entity</th>
+         <th class="bold">Id</th>
+         <th class="bold">Status</th>
+         <th class="bold">Report</th>
        </tr>
        <xsl:for-each select="ConfigurationElementReport">
          <tr>
@@ -418,7 +396,7 @@
 
 		<xsl:for-each select="*[not(local-name() = 'EquipmentUnits')]">
 		<TR>
-			<TD><xsl:value-of select="local-name()"/></TD>
+			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 			<TD><xsl:value-of select="."/></TD>
 		</TR>
         </xsl:for-each>
@@ -454,7 +432,7 @@
 
 		<xsl:for-each select="*[not(local-name() = 'DataTags')]">
 		<TR>
-			<TD><xsl:value-of select="local-name()"/></TD>
+			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 			<TD><xsl:value-of select="."/></TD>
 		</TR>
         </xsl:for-each>
@@ -493,7 +471,7 @@
 		<xsl:for-each select="*">
 		
 		<TR>
-			<TD><xsl:value-of select="local-name()"/></TD>
+			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 			<TD><xsl:value-of select="."/></TD>
 		</TR>
         </xsl:for-each>
@@ -529,7 +507,7 @@
 
 		<xsl:for-each select="*[not(local-name() = 'DataTagAddress')]">
 		<TR>
-			<TD><xsl:value-of select="local-name()"/></TD>
+			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 			<TD><xsl:value-of select="."/></TD>
 		</TR>
         </xsl:for-each>
@@ -548,14 +526,15 @@
 		<xsl:for-each select="*[not(local-name() = 'HardwareAddress')]">
 		
 		<TR>
-			<TD><xsl:value-of select="local-name()"/></TD>
+			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 			<TD><xsl:value-of select="."/></TD>
 		</TR>
         </xsl:for-each>
-		
 		</table>
+		
 		<xsl:apply-templates select="HardwareAddress"/>
 		</div>
+		
 </xsl:template>
 
 <xsl:template match="HardwareAddress">
@@ -566,7 +545,7 @@
 
         <xsl:for-each select="*">
 		<TR>
-			<TD><xsl:value-of select="local-name()"/></TD>
+			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 			<TD><xsl:value-of select="."/></TD>
 		</TR>
         </xsl:for-each>
@@ -574,5 +553,6 @@
 </table>
 </div>
 </xsl:template>
+
 
 </xsl:stylesheet>

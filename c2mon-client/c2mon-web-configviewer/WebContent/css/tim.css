@@ -9,9 +9,11 @@ body {
 }
 
 table {
+	
   font-size: 12px;
   padding:0;
   margin:0;
+  margin-bottom:20px;
 }
 
  p {padding:0; margin: 0 0 1.0em 0;font-size: 12px;}

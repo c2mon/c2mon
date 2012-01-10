@@ -10,35 +10,31 @@
 <body>
 <h1>Welcome to the Online Config Viewer</h1>
 
+<sec:authorize ifAnyGranted="ROLE_ANONYMOUS"> Hi stranger! You are not logged in yet. </sec:authorize>
+<sec:authorize ifNotGranted="ROLE_ANONYMOUS"> Hi 
+	<span style="color: #708090; font-size: 14pt">${username}!</span>  
+	It's nice to see you again! 
+</sec:authorize>
+
 <ul>
 	<li><a href="tagviewer/form">Tag Viewer</a></li>
-	<li><a href="alarmviewer/form"> Alarm
-	Viewer </a></li>
-	<li><a href="commandviewer/form"> Command
-	Viewer </a></li>
-	<li><a href="configloader/form"> Config
-	Loader </a></li>
-	<li><a href="process/form"> DAQ XML
-	Viewer </a></li>
+	<li><a href="alarmviewer/form"> Alarm Viewer </a></li>
+	<li><a href="commandviewer/form"> Command Viewer </a></li>
+	<li><a href="configloader/form"> Config Loader </a></li>
+	<li><a href="process/form"> DAQ XML Viewer </a></li>
 </ul>
 
-<sec:authorize ifAnyGranted="ROLE_ADMIN">
-You are currently authorised
-
-<p><a href="<c:url value="/j_spring_security_logout"/>">Logout</a>
+<sec:authorize ifNotGranted="ROLE_ANONYMOUS">
+<p>You are currently logged in. <a href="/c2mon-web-configviewer/j_spring_security_logout">Logout</a>
 </sec:authorize>
 
-<sec:authorize ifNotGranted="ROLE_ADMIN">
-You are not authorised
-</sec:authorize>
-
-<p><sec:authorize url='/configloader/form'>
-					You are currently authorised to access the 
-					<a href="configloader/form"> Config Loader </a>.
-				</sec:authorize></p>
+<p><sec:authorize url='/configloader/form'>You are currently authorised to access the 
+<a href="configloader/form"> Config Loader </a>.
+</sec:authorize></p>
 
 <p><sec:authorize url='/process/form'>
-					You are currently authorised to access the DAQ XML Viewer.
-				</sec:authorize></p>
+You are currently authorised to access the <a href="process/form"> DAQ XML Viewer </a>.
+</sec:authorize></p>
+
 </body>
 </html>
