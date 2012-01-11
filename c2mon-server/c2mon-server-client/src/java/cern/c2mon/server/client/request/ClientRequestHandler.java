@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -38,6 +39,7 @@ import cern.tim.server.command.CommandExecutionManager;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.common.process.Process;
+import cern.tim.server.common.thread.Event;
 import cern.tim.server.supervision.SupervisionFacade;
 import cern.tim.shared.client.command.CommandExecuteRequest;
 import cern.tim.shared.client.command.CommandReport;
@@ -226,6 +228,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
           LOG.debug("handleClientRequest() - Received an ALARM_REQUEST for " + clientRequest.getTagIds().size() + " alarms.");
         }
         return handleAlarmRequest(clientRequest);
+      case ACTIVE_ALARMS_REQUEST:  
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("handleClientRequest() - Received an ACTIVE_ALARMS_REQUEST.");
+        }
+        return handleActiveAlarmRequest(clientRequest);
       case SUPERVISION_REQUEST:
         if (LOG.isDebugEnabled()) {
           LOG.debug("handleClientRequest() - Received a SUPERVISION_REQUEST.");
@@ -417,9 +424,36 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     }
     return transferTags;
   }
+  
+  /**
+   * Inner method which handles the active alarm request.
+   * @param alarmRequest The alarm request sent from the client. It doesn't really contain any information
+   * other than the fact that this is an Active Alarms request.
+   * 
+   * @return Collection of all the active alarms
+   */
+  @SuppressWarnings("unchecked")
+  private Collection< ? extends ClientRequestResult> handleActiveAlarmRequest(final ClientRequest alarmRequest) {  
+    
+    final Collection activeAlarms = new ArrayList();
+    List<Long> alarmKeys = alarmCache.getKeys();
+    
+    for (Long alarmKey: alarmKeys) {
+      
+      final Event alarmEvent =  alarmCache.getCopy(alarmKey);
+      final Alarm alarm = (Alarm) alarmEvent.getReturnValue();
+      
+      if (alarm.isActive())
+        activeAlarms.add(alarm);
+    }
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Finished processing ACTIVE alarms request: returning " + activeAlarms.size() + " active alarms");
+    }
+    return activeAlarms;
+  }
 
   /**
-   * Inner method which handles the alarm requests
+   * Inner method which handles the alarm request.
    * 
    * @param alarmRequest
    *          The alarm request sent from the client

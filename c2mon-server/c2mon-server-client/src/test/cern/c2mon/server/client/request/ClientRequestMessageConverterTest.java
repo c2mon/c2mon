@@ -39,6 +39,26 @@ public class ClientRequestMessageConverterTest {
     }
   }
 
+  @Test
+  public void testActiveAlarmsMessageConversion() {
+    JsonRequest<AlarmValue> request = new ClientRequestImpl<AlarmValue>(
+        ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST,
+        ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
+        10000);
+
+    TextMessage message = new ActiveMQTextMessage();
+    try {
+      message.setText(request.toJson());
+      ClientRequest receivedRequest = ClientRequestMessageConverter.fromMessage(message);
+
+      assertTrue(receivedRequest.getRequestType() == ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST);
+      assertTrue(receivedRequest.getResultType() == ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST);
+      assertTrue(receivedRequest.getTimeout() == 10000);
+    }
+    catch (JMSException e) {
+      assertTrue(e.getMessage(), false);
+    }
+  }
 
   @Test
   public void testTransferTagMessageConversion() {
@@ -163,7 +183,8 @@ public class ClientRequestMessageConverterTest {
   
   @Test
   public void testProcessNamesMessageConversion() {
-    JsonRequest<ProcessNameResponse> request = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
+    
+    ClientRequestImpl<ProcessNameResponse> request = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
 
     TextMessage message = new ActiveMQTextMessage();
     try {
