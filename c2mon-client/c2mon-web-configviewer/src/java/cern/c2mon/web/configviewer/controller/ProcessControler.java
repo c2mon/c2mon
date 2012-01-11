@@ -1,7 +1,9 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -147,6 +149,16 @@ public class ProcessControler {
 
     try {
       Collection<String> names = service.getProcessNames();
+      
+      if (names instanceof List) {
+        Collections.sort((List)names, String.CASE_INSENSITIVE_ORDER);
+      } else {
+        logger.warn(new String("getProcessFormModel(): getProcessNames() does not return " +
+        		"a list anymore! " +
+        		"This means you should provide some other way to sort the Collection returned" +
+        		"by this call."));
+      }
+      
       model.put("processNames", names);
 
     } catch (Exception e) {
