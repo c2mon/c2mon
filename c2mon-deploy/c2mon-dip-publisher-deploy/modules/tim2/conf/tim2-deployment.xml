@@ -24,11 +24,11 @@
 					<initial-heap-size>256m</initial-heap-size>
 					<max-heap-size>256m</max-heap-size>
 					<arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -processName ${PROCESS_NAME} -dataTags ${INSTALL_DIR}/conf/${PROCESS_NAME}DataTags.xml</arg>
-					<preExec>
-                    <![CDATA[
-                      [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-                     ]]>
-					</preExec>
+          <preExec>
+<![CDATA[
+  [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+ ]]>
+          </preExec>
 					<property name="tim.driver.log" value="${INSTALL_DIR}/log/${PROCESS_NAME}.log" />
 					<property name="java.library.path" value="${INSTALL_DIR}/lib_so" />
 					<property name="c2mon.client.conf.url"

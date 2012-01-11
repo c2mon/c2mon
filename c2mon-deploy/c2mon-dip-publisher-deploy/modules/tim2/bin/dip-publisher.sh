@@ -10,6 +10,19 @@
 # Email address for notifications sent out by the silentcheck function
 NOTIFY=tim.support@cern.ch,ti.operation@cern.ch
 
+#####################
+# DIP configuration #
+#####################
+export DIPNS=dipns1,dipns2
+export DIM_DNS_NODE=dipns1,dipns2
+export DIM_DNS_PORT=2506
+
+########
+# JAVA #
+########
+# Make sure the JAVA_BIN variable points to the java bin directory on Your machine
+JAVA_BIN=/usr/java/jdk/jre/bin
+
 # resolve links - $0 may be a softlink
 PRG="$0"
 
@@ -29,19 +42,13 @@ PRGDIR=`dirname "$PRG"`
 DIP_PUBLISHER_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 
 #name of the DIP publisher passed as second argument
-PROCESS_NAME=$2
+export PROCESS_NAME=$2
 
 # The script which is actually calling the DIP publisher
 STARTUP_SCRIPT=${DIP_PUBLISHER_HOME}/bin/DIP-PUBLISHER-STARTUP.jvm
 
 # change into DIP_PUBLISHER_HOME
 cd $DIP_PUBLISHER_HOME
-
-########
-# JAVA #
-########
-# Make sure the JAVA_BIN variable points to the java bin directory on Your machine
-JAVA_BIN=/usr/java/jdk/jre/bin
 
 PID_FILE="${DIP_PUBLISHER_HOME}/tmp/dippublisher_${PROCESS_NAME}.pid"
 
@@ -70,10 +77,6 @@ DIPPublisher_start() {
     echo "Could not start DIP Publisher ${PROCESS_NAME} !"
     echo "DipPublisher with that name is already running. Stop it first, please";
   else
-   export DIPNS=dipns1,dipns2
-   export DIM_DNS_NODE=dipns1,dipns2
-   export DIM_DNS_PORT=2506
-
    echo "Starting DIP Publisher ${PROCESS_NAME}.."
    ${STARTUP_SCRIPT} 2>&1 &
    echo "$!" > ${PID_FILE}
