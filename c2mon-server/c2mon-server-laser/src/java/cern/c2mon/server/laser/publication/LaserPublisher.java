@@ -130,7 +130,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 			}
 		}else{
 			fs.setDescriptor(FaultState.TERMINATE);
-		    fs.setUserTimestamp(new Timestamp(System.currentTimeMillis()));
+		  fs.setUserTimestamp(cacheable.getTimestamp());
 		}
 		
 		if (log.isDebugEnabled()) {
