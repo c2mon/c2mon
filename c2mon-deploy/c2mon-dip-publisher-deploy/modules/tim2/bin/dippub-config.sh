@@ -61,5 +61,5 @@ fi
 
 # The dippublisher is restarted
 echo "restart publisher..."
-dippublisher restart $FILE_ROOT 
+$DIP_PUBLISHER_HOME/bin/dip-publisher.sh restart $FILE_ROOT 
 
