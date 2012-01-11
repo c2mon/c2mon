@@ -41,6 +41,7 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
+import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -147,23 +148,15 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public Collection<AlarmValue> requestAllActiveAlarms() throws JMSException {
     
-    java.util.Date today = new java.util.Date();
-
-    AlarmValue a = new AlarmValueImpl((Long)100L, 55, 
-        "", 
-        "", 
-        "", 
-        (Long)888L, 
-        new Timestamp(today.getTime()),
-        true);
+    ClientRequestImpl<ClientRequestResult> activeAlarmsRequest = new ClientRequestImpl<ClientRequestResult>
+      (ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST,
+          ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
+          10000); // == timeout
     
-    Collection<AlarmValue> activeAlarmCollection = new ArrayList<AlarmValue>();
+    Collection c = jmsProxy.sendRequest(activeAlarmsRequest , requestQueue, 
+        activeAlarmsRequest.getTimeout());
     
-    activeAlarmCollection.add(a);
-    activeAlarmCollection.add(a);
-    activeAlarmCollection.add(a);
-    
-    return activeAlarmCollection;
+    return c;
   }
   
   @Override
