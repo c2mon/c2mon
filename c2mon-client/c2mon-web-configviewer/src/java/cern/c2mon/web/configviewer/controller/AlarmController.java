@@ -113,8 +113,8 @@ public class AlarmController {
         try {
             String alarmXml = service.getAlarmTagXml(alarmId);
             model.put("alarmXml", alarmXml);
-            model.put("url", HELPALARM_FORM + alarmId);
-            model.put("urlText", "Display HelpAlarm information for this alarm");
+//            model.put("url", HELPALARM_FORM + alarmId);
+//            model.put("urlText", "Display HelpAlarm information for this alarm");
         } catch (TagIdException e) {
             model.put("tagErr", e.getMessage());
             logger.error(e);
