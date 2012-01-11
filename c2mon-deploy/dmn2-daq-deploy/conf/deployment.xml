@@ -13,7 +13,7 @@
 				</backupPolicy>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
-					<mail address="timdiamon-developers@cern.ch" />
+					<mail address="project-diamon-core@cern.ch" />
 				</notification>
 			</deployment>
 		    <startscript>
