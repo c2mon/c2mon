@@ -22,7 +22,7 @@
 	<url></url>
 
 	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/acc-co/trunk/accsoft/diamon/dmn2-daq-deploy</developerConnection>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/dmn2-daq-deploy</developerConnection>
 	</scm>
 
 	<developers />
