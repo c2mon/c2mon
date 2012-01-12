@@ -215,7 +215,11 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
     
     clientDataTag.clean();
     
+    final boolean removeRedundantData = configuration.isRemoveRedundantData();
+    
     final List<HistoryTagValueUpdate> result = new ArrayList<HistoryTagValueUpdate>();
+    
+    HistoryTagValueUpdateImpl previousAddedValue = null;
     
     for (int index = 0; index < historyUpdates.length; index++) {
       final HistoryUpdate historyUpdate = historyUpdates[index];
@@ -238,6 +242,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
           update.setDataType(dataType);
           update.setDaqTimestamp(historyTagValueUpdate.getDaqTimestamp());
           result.add(update);
+          previousAddedValue = update;
         }
         catch (CloneNotSupportedException e) {
           LOG.error("Failed to create history record.", e);
@@ -262,7 +267,10 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
                 clientDataTag.getMode());
             update.setInitialValue(historyEvent.isInitialValue());
             update.setDataType(dataType);
-            result.add(update);
+            if (!removeRedundantData || !isRedundantData(previousAddedValue, update)) {
+              result.add(update);
+              previousAddedValue = update;
+            }
           }
           catch (CloneNotSupportedException e) {
             LOG.error("Failed to create history record.", e);
@@ -274,6 +282,42 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
       }
     }
     return result;
+  }
+  
+  /**
+   * @param previousRecord the previous record
+   * @param newRecord the record to check if it is redundant.
+   * @return <code>true</code> of the <code>newRecord</code> is redundant because of the previous record
+   */
+  private static boolean isRedundantData(final HistoryTagValueUpdate previousRecord, final HistoryTagValueUpdate newRecord) {
+    return 
+      newRecord == null // Returns true if the value is null.
+      ||
+      previousRecord != null
+      && objEquals(previousRecord.getValue(), newRecord.getValue())
+      && objEquals(previousRecord.getDescription(), newRecord.getDescription())
+      && objEquals(previousRecord.getValueDescription(), newRecord.getValueDescription())
+      && objEquals(previousRecord.getMode(), newRecord.getMode())
+      && (
+          previousRecord.getDataTagQuality() == newRecord.getDataTagQuality()
+          ||
+          previousRecord.getDataTagQuality() != null 
+          && newRecord.getDataTagQuality() != null
+          && objEquals(previousRecord.getDataTagQuality().getDescription(), newRecord.getDataTagQuality().getDescription())
+          );
+  }
+  
+  /**
+   * @param obj1 an object
+   * @param obj2 another object
+   * @return <code>true</code> if the two objects is the same (includes if both are null)
+   */
+  private static boolean objEquals(final Object obj1, final Object obj2) {
+    return obj1 == obj2
+      || 
+      obj1 != null 
+      && obj2 != null 
+      && obj1.equals(obj2);
   }
 
   @Override

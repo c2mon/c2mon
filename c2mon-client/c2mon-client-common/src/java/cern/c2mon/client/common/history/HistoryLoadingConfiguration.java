@@ -20,7 +20,6 @@ package cern.c2mon.client.common.history;
 import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 
-
 /**
  * This is supplied to a {@link HistoryLoadingManager} to set the parameters for
  * the loading
@@ -32,10 +31,10 @@ public class HistoryLoadingConfiguration {
 
   /** The default value for the earliest timestamp to request data from */
   private static final Timestamp DEFAULT_EARLIEST_TIMESTAMP = new Timestamp(System.currentTimeMillis() - 31L * 24L * 60L * 60L * 1000L);
-  
+
   /** The earliest timestamp to request data from */
   private Timestamp earliestTimestamp = DEFAULT_EARLIEST_TIMESTAMP;
-  
+
   /** the start time from where to retrieve data */
   private Timestamp startTime;
 
@@ -50,9 +49,15 @@ public class HistoryLoadingConfiguration {
 
   /** <code>true</code> if the initial values at time 0 also should be loaded */
   private boolean loadInitialValues;
-  
+
   /** <code>true</code> if the supervision events should be loaded */
   private boolean loadSupervisionEvents;
+
+  /**
+   * <code>true</code> to remove the last record when two records appear twice in
+   * a row
+   */
+  private boolean removeRedundantData;
 
   /**
    * Constructor
@@ -60,12 +65,14 @@ public class HistoryLoadingConfiguration {
   public HistoryLoadingConfiguration() {
     this.loadInitialValues = false;
     this.loadSupervisionEvents = true;
+    this.removeRedundantData = true;
   }
 
   /**
    * Copy constructor
    * 
-   * @param historyLoadingConfiguration the historyLoadingParameters to copy
+   * @param historyLoadingConfiguration
+   *          the historyLoadingParameters to copy
    */
   public HistoryLoadingConfiguration(final HistoryLoadingConfiguration historyLoadingConfiguration) {
     this.startTime = historyLoadingConfiguration.startTime;
@@ -74,6 +81,7 @@ public class HistoryLoadingConfiguration {
     this.maximumRecords = historyLoadingConfiguration.maximumRecords;
     this.loadInitialValues = historyLoadingConfiguration.loadInitialValues;
     this.loadSupervisionEvents = historyLoadingConfiguration.loadSupervisionEvents;
+    this.removeRedundantData = historyLoadingConfiguration.removeRedundantData;
   }
 
   /**
@@ -108,8 +116,8 @@ public class HistoryLoadingConfiguration {
   /**
    * 
    * @param maximum
-   *          the maximum amount of records to retrieve in total. <code>null</code> for
-   *          no limit
+   *          the maximum amount of records to retrieve in total.
+   *          <code>null</code> for no limit
    */
   public void setMaximumRecords(final Integer maximum) {
     this.maximumRecords = maximum;
@@ -117,8 +125,8 @@ public class HistoryLoadingConfiguration {
 
   /**
    * 
-   * @return the maximum amount of records to retrieve in total. <code>null</code> if
-   *         there is no limit
+   * @return the maximum amount of records to retrieve in total.
+   *         <code>null</code> if there is no limit
    */
   public Integer getMaximumRecords() {
     return this.maximumRecords;
@@ -181,7 +189,7 @@ public class HistoryLoadingConfiguration {
     }
     this.earliestTimestamp = earliestTimestamp;
   }
-  
+
   /**
    * @return <code>true</code> if the supervision events will be loaded
    *         (default)
@@ -199,6 +207,23 @@ public class HistoryLoadingConfiguration {
     this.loadSupervisionEvents = loadSupervisionEvents;
   }
 
+  /**
+   * @return <code>true</code> if removing the last record when two records
+   *         appears twice in a row
+   */
+  public boolean isRemoveRedundantData() {
+    return removeRedundantData;
+  }
+
+  /**
+   * @param removeRedundantData
+   *          <code>true</code> to remove the last record when two records
+   *          appear twice in a row, <code>false</code> to keep all.
+   */
+  public void setRemoveRedundantData(final boolean removeRedundantData) {
+    this.removeRedundantData = removeRedundantData;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -207,6 +232,7 @@ public class HistoryLoadingConfiguration {
     result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
     result = prime * result + (loadInitialValues ? 1231 : 1237);
     result = prime * result + (loadSupervisionEvents ? 1231 : 1237);
+    result = prime * result + (removeRedundantData ? 1231 : 1237);
     result = prime * result + ((maximumRecords == null) ? 0 : maximumRecords.hashCode());
     result = prime * result + ((numberOfDays == null) ? 0 : numberOfDays.hashCode());
     result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
@@ -238,6 +264,8 @@ public class HistoryLoadingConfiguration {
       return false;
     if (loadSupervisionEvents != other.loadSupervisionEvents)
       return false;
+    if (removeRedundantData != other.removeRedundantData)
+      return false;
     if (maximumRecords == null) {
       if (other.maximumRecords != null)
         return false;
@@ -258,5 +286,5 @@ public class HistoryLoadingConfiguration {
       return false;
     return true;
   }
-  
+
 }
