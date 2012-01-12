@@ -101,7 +101,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 jarlist ("$jardir");
 
 # Defines the version number that is shown in the DMN2 Viewer about dialog
-print "		<property name=\"tim.app.name\" value=\"$appName\"/>\n";
+print "		<property name=\"tim.app.title\" value=\"$appName\"/>\n";
 print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 print "		<property name=\"rbac.app.name\" value=\"diamon-console\"/>\n";
 # JMS configuration parameters needed by C2MON client API
