@@ -75,7 +75,7 @@ public class HistoryPlayerImplTest {
   /**
    * The maximum number of milliseconds to wait for the loading to finish
    */
-  private static final Long LOADING_TIMEOUT = 10000L;
+  private static final Long LOADING_TIMEOUT = 15000L;
   
   /** The maximum number of milliseconds to wait for the playback to finish */
   private static final Long PLAYBACK_TIMEOUT = 40000L;

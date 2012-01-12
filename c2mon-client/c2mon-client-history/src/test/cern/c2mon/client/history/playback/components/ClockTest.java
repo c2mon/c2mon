@@ -58,7 +58,7 @@ public class ClockTest {
   private static final long RUN_TIME = 1000;
 
   /** How many milliseconds that the measurement can miss with */
-  private static final long ACCEPTED_TIME_ERROR = 100;
+  private static final long ACCEPTED_TIME_ERROR = 300;
 
   
   @Before
