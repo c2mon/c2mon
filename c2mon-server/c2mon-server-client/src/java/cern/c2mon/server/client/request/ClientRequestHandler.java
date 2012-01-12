@@ -439,9 +439,8 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     List<Long> alarmKeys = alarmCache.getKeys();
     
     for (Long alarmKey: alarmKeys) {
-      
-      final Event alarmEvent =  alarmCache.getCopy(alarmKey);
-      final Alarm alarm = (Alarm) alarmEvent.getReturnValue();
+            
+      final Alarm alarm = alarmCache.getCopy(alarmKey);
       
       if (alarm.isActive())
         activeAlarms.add(alarm);
