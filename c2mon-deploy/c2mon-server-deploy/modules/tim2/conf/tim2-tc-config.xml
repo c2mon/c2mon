@@ -280,6 +280,9 @@
           <class-expression>cern.tim.server.supervision.impl.SupervisionManagerImpl</class-expression>
         </include>
         <include>
+          <class-expression>cern.tim.server.supervision.impl.SupervisionTagNotifier</class-expression>
+        </include>
+        <include>
           <class-expression>cern.tim.server.supervision.alive.AliveTimerChecker</class-expression>
         </include>    
         <!-- DistributedParams classes -->
@@ -354,6 +357,14 @@
         <root>       
           <field-name>cern.tim.server.supervision.impl.SupervisionManagerImpl.controlMapSynchLock</field-name>
           <root-name>controlMapSynchLock</root-name>
+        </root>
+         <root>       
+          <field-name>cern.tim.server.supervision.impl.SupervisionTagNotifier.processEventTimes</field-name>
+          <root-name>processEventTimes</root-name>
+        </root>
+         <root>       
+          <field-name>cern.tim.server.supervision.impl.SupervisionTagNotifier.equipmentEventTimes</field-name>
+          <root-name>equipmentEventTimes</root-name>
         </root>
        </roots>
 <!--      <web-applications>-->
