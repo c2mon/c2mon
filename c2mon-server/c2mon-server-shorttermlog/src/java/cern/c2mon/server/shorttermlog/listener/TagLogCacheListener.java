@@ -77,17 +77,13 @@ public class TagLogCacheListener implements BufferedTimCacheListener<Tag> {
   }
 
   @Override
-  public void confirmStatus(Collection<Event<Tag>> eventCollection) {
+  public void confirmStatus(Collection<Tag> tagCollection) {
     //do not log confirm callbacks (STL data not essential)
   }
 
   @Override
-  public void notifyElementUpdated(Collection<Event<Tag>> eventCollection) { 
-    Collection<Tag> tags = new ArrayList<Tag>(eventCollection.size());
-    for (Event<Tag> event : eventCollection) {
-      tags.add(event.getReturnValue());
-    }
-    tagLogger.log(tags);
+  public void notifyElementUpdated(Collection<Tag> tagCollection) { 
+    tagLogger.log(tagCollection);
   }
  
 
