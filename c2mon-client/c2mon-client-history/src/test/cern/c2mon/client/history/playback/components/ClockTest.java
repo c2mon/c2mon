@@ -55,10 +55,10 @@ public class ClockTest {
         new GregorianCalendar(2011, 06, 12, 00, 00).getTime());
   
   /** The time to sleep */
-  private static final long RUN_TIME = 1000;
+  private static final long RUN_TIME = 2000;
 
   /** How many milliseconds that the measurement can miss with */
-  private static final long ACCEPTED_TIME_ERROR = 300;
+  private static final long ACCEPTED_TIME_ERROR = 1000;
 
   
   @Before
