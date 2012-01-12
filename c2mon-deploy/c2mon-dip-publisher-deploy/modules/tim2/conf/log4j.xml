@@ -7,15 +7,15 @@
   Specify the name of the log file in the ${tim.log.filename} system property.
   To do this, start your program the following way:
 
-    java -Dtim.log.path=c:/  ... YourMainClass
+    java -Dtim.log.file=c:/tim.log ... YourMainClass
   or
-    java -Dtim.log.path=c:/  ... -jar YourRunnableJar.jar
+    java -Dtim.log.file=c:/tim.log ... -jar YourRunnableJar.jar
 
-  If you don't, the log file will be created in the temp directory. If this
+  If you don't, the log file will be created in the temp directory. If this 
   isn't possible either, log output will be printed on the console.
 
   Messages are written to the log file in an asynchronous way (no flush after
-  every line). To avoid losing messages when the program exits, you have to
+  every line). To avoid losing messages when the program exits, you have to 
   shutdown the loggers properly before the program terminates. The statement
 
     LogManager.getLoggerRepository.shutdown();
@@ -25,22 +25,22 @@
 
 -->
 
-<!--
+<!-- 
 
-  Set the threshold to "info" in production system. This will filter out all
+  Set the threshold to "info" in production system. This will filter out all 
   debug messages. If you only want to enable/disable debugging for certain
   parts of the system, change the "level" attribute of the appropriate logger.
 
 -->
-<log4j:configuration debug="false"
+<log4j:configuration debug="false" 
                      threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <!--
-    Create a RollingFileAppender.
+   <!-- 
+    Create a RollingFileAppender. 
     Log messages are written to the file specified in the ${tim.log.file}
     system property. The file size is limited to 10MB; once this size is reached
-    the file is truncated and backed up and a new file is started.
+    the file is truncated and backed up and a new file is started. 
     If the specified file cannot be opened or the ${tim.log.file} property
     has not been specified on the command line, the FallbackFileAppender is used
     instead.
@@ -51,26 +51,48 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.path}/${tim.process.name}.log" />
+    <param name="File" value="${tim.driver.log}" />
     <param name="MaxBackupIndex" value="1" />
     <param name="MaxFileSize" value="10MB" />
     <param name="BufferedIO" value="false" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
-    </layout>
+    </layout> 
   </appender>
 
-<!--
-    Create a ConsoleAppender.
+ <!--
+  <appender name="DataTagLoggerAppender" class="org.apache.log4j.FileAppender">
+    <param name="Append" value="true" />
+    <param name="File" value="log/DataTag.log" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
+    </layout>
+  </appender>
+ -->
+
+  <!-- 
+    Create a ConsoleAppender. 
     Log messages are written to the console in case neither the FileAppender
     nor the FallbackFileAppender work.
   -->
   <appender name="FallbackConsoleAppender" class="org.apache.log4j.ConsoleAppender">
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
-    </layout>
+    </layout> 
   </appender>
 
+  <!-- 
+    Define the root logger.
+    Debug messages are enabled on the root logger level. The AsyncAppender is
+    used for all log output.
+  -->
+  <!--
+  <logger name="DataTagLogger">
+    <level value="info"/>
+    <appender-ref ref="DataTagLoggerAppender" />
+  </logger>
+  -->
+  
   <root>
     <level value="debug"/>
     <appender-ref ref="FileAppender" />
