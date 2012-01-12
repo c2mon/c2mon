@@ -71,7 +71,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       List<Alarm> alarmList = new ArrayList<Alarm>();
       for (Long alarmId : alarmCache.getKeys()) {
         try {
-          Alarm alarm = alarmCache.getCopy(alarmId).getReturnValue();
+          Alarm alarm = alarmCache.getCopy(alarmId);
           if (alarm.isActive()) {
             alarmList.add(alarm);
           }
