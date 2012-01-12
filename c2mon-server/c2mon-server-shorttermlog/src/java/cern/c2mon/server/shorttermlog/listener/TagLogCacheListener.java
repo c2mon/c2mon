@@ -30,10 +30,6 @@ import cern.c2mon.server.shorttermlog.logger.BatchLogger;
 import cern.tim.server.cache.BufferedTimCacheListener;
 import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.common.tag.Tag;
-import cern.tim.server.common.thread.Event;
-import cern.tim.util.buffer.PullEvent;
-import cern.tim.util.buffer.PullException;
-import cern.tim.util.buffer.SynchroBufferListener;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO
@@ -82,8 +78,13 @@ public class TagLogCacheListener implements BufferedTimCacheListener<Tag> {
   }
 
   @Override
-  public void notifyElementUpdated(Collection<Tag> tagCollection) { 
-    tagLogger.log(tagCollection);
+  public void notifyElementUpdated(Collection<Tag> tagCollection) {
+    ArrayList<Tag> tagsToLog = new ArrayList<Tag>(tagCollection.size());
+    for (Tag tag : tagCollection) {
+      if (tag.isLogged())
+        tagsToLog.add(tag);
+    }
+    tagLogger.log(tagsToLog);
   }
  
 
