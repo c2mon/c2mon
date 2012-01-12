@@ -78,7 +78,7 @@ DIPPublisher_start() {
     echo "DipPublisher with that name is already running. Stop it first, please";
   else
    echo "Starting DIP Publisher ${PROCESS_NAME}.."
-   ${STARTUP_SCRIPT} 2>&1 &
+   ${STARTUP_SCRIPT} > ${DIP_PUBLISHER_HOME}/log/${PROCESS_NAME}.out.log 2>&1 &
    echo "$!" > ${PID_FILE}
   fi
 
@@ -143,7 +143,7 @@ DIPPublisher_silentcheck() {
     runs $pid
     if [ $? -ne 0 ]; then
       cp -Rfp ${DIP_PUBLISHER_HOME}/log ${DIP_PUBLISHER_HOME}/`date +log_%Y-%m-%d_%H:%M:%S`
-      rm ${DIP_PUBLISHER_HOME}/log/${PROCESS_NAME}.log*
+      rm ${DIP_PUBLISHER_HOME}/log/${PROCESS_NAME}.*
       DIPPublisher_restart
       echo "The status check script has restarted the dippublisher process $PROCESS_NAME on $HOSTNAME. Please check why the process was down (crash) and if it is starting up correctly. A backup of the log files was created in ${DIP_PUBLISHER_HOME}/`date +log_%Y-%m-%d_%H:%M:%S`" | mail -s "Automatic dippublisher restart on $HOSTNAME" $NOTIFY
     fi
