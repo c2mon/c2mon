@@ -14,6 +14,7 @@ table {
   padding:0;
   margin:0;
   margin-bottom:20px;
+  width:100%
 }
 
  p {padding:0; margin: 0 0 1.0em 0;font-size: 12px;}
@@ -130,21 +131,26 @@ li.closed {
  table.inline {
   background-color: #fff;
   border-spacing: 0px;
-  border-collapse: collapse;
+    border-collapse: collapse;
 }
 
  table.inline th {
   padding: 3px;
   border: 1px solid #436976;
   background-color: #bdd1d7;
+  
 }
 
  table.inline td {
   padding: 3px;
   border: 1px solid #436976;
-  
 }
  table.inline tr {
+  padding: 3px;
+  border: 1px solid #436976;
+}
+
+ table.inline td.bold {
   padding: 3px;
   border: 1px solid #436976;
 }

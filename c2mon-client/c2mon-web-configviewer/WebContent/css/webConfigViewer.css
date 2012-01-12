@@ -1,5 +1,8 @@
 
 table tr:hover { background: #b0e0e6; }
+table tr.highlight:hover { background: #b0e0e6; font-size:110%;  }
+table td:hover  { background: #A2B5CD; text-decoration:underline; }
+table td.bold:hover  { background: #A2B5CD; text-decoration:underline; }
 
 .even {
 
@@ -127,3 +130,4 @@ iframe {
 }
 
 
+	
