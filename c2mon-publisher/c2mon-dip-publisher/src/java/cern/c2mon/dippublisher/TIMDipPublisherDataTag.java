@@ -9,11 +9,10 @@
 
 package cern.c2mon.dippublisher;
 
-import org.w3c.dom.Element;
-
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Vector;
+
+import org.w3c.dom.Element;
 
 /**
 This class represents a tag-definition read from the TIMDipPublisher's xml
@@ -38,7 +37,7 @@ public class TIMDipPublisherDataTag {
    */
   private String dipPublicationTopic;
 
-  private static Set registeredTagsIDs = null;
+  private static Set<Long> registeredTagsIDs = null;
 
   /**
   The constructor (from XML block)
@@ -47,7 +46,7 @@ public class TIMDipPublisherDataTag {
   public static final TIMDipPublisherDataTag createFromXML(final Element tagNode) {
 
      if (registeredTagsIDs == null) {
-       registeredTagsIDs = new HashSet();
+       registeredTagsIDs = new HashSet<Long>();
      }
      
      TIMDipPublisherDataTag dt = null;
@@ -74,7 +73,7 @@ public class TIMDipPublisherDataTag {
    * 
    * @return a set of all registered tag ids
    */
-  public static Set getRegisteredTagsIDs() {
+  public static Set<Long> getRegisteredTagsIDs() {
     return registeredTagsIDs;
   }
 

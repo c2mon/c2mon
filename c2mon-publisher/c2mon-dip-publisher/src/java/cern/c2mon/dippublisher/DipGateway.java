@@ -18,7 +18,6 @@
 
 package cern.c2mon.dippublisher;
 
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Set;
 
@@ -65,8 +64,6 @@ public class DipGateway implements DataTagUpdateListener {
    A list of registered DIP publications
    */
   private TIMDriverHashtable dipPublications = new TIMDriverHashtable();
-
-  private Collection tagCollection = null;
 
   private DipFactory dip = null;
 
@@ -164,18 +161,26 @@ public class DipGateway implements DataTagUpdateListener {
    * @param dataTagSet a file that contains a list of data tag IDs
    * @return true, if subscription was successful
    */
-  public final boolean subscribeDataTags(final Set dataTagSet) {
+  public final boolean subscribeDataTags(final Set<Long> dataTagSet) {
     
     logger.debug("subscribing DataTags..");
-    boolean retval = false;
+    boolean tagSubscriptionSuccessful = false;
     
-    if (dataTagSet != null) {    
-      tagManager.subscribeDataTags(dataTagSet, this);
-      retval = true;
+    if (dataTagSet != null) {
+      while(!tagSubscriptionSuccessful) {
+        try {
+          tagSubscriptionSuccessful = tagManager.subscribeDataTags(dataTagSet, this);
+        }
+        catch (Exception ex) {
+          logger.error("error occured while trying to subscribe to the list of data tags.", ex);
+          logger.debug("retrying tag subscription in 5 seconds ...");
+          try { Thread.sleep(5000); } catch (InterruptedException ie) { /* Do nothing */ }
+        }
+      }
     }
     
     logger.debug("subscribed DataTags");
-    return retval;
+    return tagSubscriptionSuccessful;
   }
 
 
