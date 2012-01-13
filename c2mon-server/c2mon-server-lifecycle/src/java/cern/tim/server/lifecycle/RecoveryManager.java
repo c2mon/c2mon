@@ -12,7 +12,6 @@ import cern.tim.server.cache.DataTagCache;
 import cern.tim.server.common.config.ServerConstants;
 import cern.tim.server.common.control.ControlTag;
 import cern.tim.server.common.datatag.DataTag;
-import cern.tim.server.common.thread.Event;
 import cern.tim.server.daqcommunication.out.DataRefreshManager;
 import cern.tim.server.supervision.SupervisionFacade;
 
