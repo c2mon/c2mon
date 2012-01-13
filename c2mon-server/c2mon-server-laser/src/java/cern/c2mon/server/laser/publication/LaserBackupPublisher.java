@@ -12,6 +12,10 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
+import cern.laser.source.alarmsysteminterface.ASIException;
+import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
+import cern.laser.source.alarmsysteminterface.AlarmSystemInterfaceFactory;
+import cern.laser.source.alarmsysteminterface.FaultState;
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.common.alarm.Alarm;
@@ -56,16 +60,29 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * Ref to alarm cache.
    */
   private AlarmCache alarmCache;
-
+  
+  /**
+   * Our reference to the {@link LaserPublisher} as we need it to 
+   * use the {@link LaserPublisher#getSourceName()} method.<br>
+   * <br>
+   * This is because we want to be aligned (sourcename-wise) with the LaserPublisher instance. 
+   * Otherwise we may end up sending backups with a different sourcename. 
+   */
+  private LaserPublisher publisher = null;
+  
+  /** Reference to the LASER alarm system interface. */
+  private AlarmSystemInterface asi = null;
+  
   /**
    * Constructor.
    * 
    * @param alarmCache ref to Alarm cache bean
    */
   @Autowired
-  public LaserBackupPublisher(AlarmCache alarmCache) {
+  public LaserBackupPublisher(AlarmCache alarmCache, LaserPublisher publisher) {
     super();
     this.alarmCache = alarmCache;
+    this.publisher = publisher;
   }
 
   @Override
@@ -97,6 +114,20 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    */
   private void publishAlarmBackUp(List<Alarm> alarmList) {
     // TODO publish alarms: * use alarm.getTimestamp() as LASER user timestamp! *
+	  ArrayList<FaultState> toSend = new ArrayList<FaultState>();
+	  
+	  for(Alarm timAlarm : alarmList){
+		  FaultState fs = null;
+			fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
+			fs.setUserTimestamp(timAlarm.getTimestamp());
+			toSend.add(fs);
+	  }
+	  try {
+		asi.pushActiveList(toSend);
+	} catch (ASIException e) {
+		LOGGER.error("Cannot create backup list : " + e.getMessage());
+		e.printStackTrace();
+	}
   }
 
   @Override
@@ -119,18 +150,24 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   @ManagedOperation(description="starts the backups publisher.")
   public void start() {
     LOGGER.info("Starting LASER backup mechanism.");
-    // DOES ANYTHING ELSE NEEDS STARTING?
-    timer = new Timer();
-    timer.scheduleAtFixedRate(this, INITIAL_BACKUP_DELAY, BACKUP_INTERVAL);
-    running = true;
+    try {
+		asi = AlarmSystemInterfaceFactory.createSource(publisher.getSourceName());
+		timer = new Timer();
+	    timer.scheduleAtFixedRate(this, INITIAL_BACKUP_DELAY, BACKUP_INTERVAL);
+	    running = true;
+	} catch (ASIException e) {
+		stop();
+	}
   }
 
   @Override
   @ManagedOperation(description="Stops the backups publisher.")
   public void stop() {
     LOGGER.info("Stopping LASER backup mechanism.");
-    // DOES ANYTHING ELSE NEEDS STOPPING?
     timer.cancel();
+    if (asi != null) { 
+    	asi.close();
+    }
     running = false;
   }
 
