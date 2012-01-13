@@ -9,7 +9,7 @@ use Config::Properties;
 ##
 my $jardir = "../lib";
 my $appdir = "tim2-video-viewer/";
-my $codebase = "http://timweb.cern.ch/test/javaws";
+my $codebase = "http://timweb.cern.ch/javaws";
 my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
 
 #Reading version number from ../version.txt
@@ -18,6 +18,13 @@ open VFILE, "< ../version.txt"
 my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
+
+##
+# In case of a SNAPSHOT the codebase will point to test
+#
+if ($viewerVersion =~ /-SNAPSHOT/) {
+  $codebase = "http://timweb.cern.ch/test/javaws";
+}
 
 # Reading property file $c2monClientPropertiesFile #
 open PROPS, "< $c2monClientPropertiesFile"

@@ -3,8 +3,33 @@ use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 
-my $configsubdir = "/test/javaws/tim2-video-viewer/conf";
-my $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-video-viewer/conf";
+
+
+
+##
+# Default variable definition for production
+#
+my $configsubdir = "/javaws/tim2-video-viewer/conf";
+my $configdir = "/user/timoper/dist/public/html/javaws/tim2-video-viewer/conf";
+
+
+##
+# Reading version number from ../version.txt
+#
+open VFILE, "< ../version.txt"
+  or die "Unable to open version file ../version.txt";
+my $viewerVersion = <VFILE>;
+chomp $viewerVersion; # removes new line character
+close VFILE;
+
+##
+# In case of a SNAPSHOT the codebase will point to test
+#
+if ($viewerVersion =~ /-SNAPSHOT/) {
+  $configsubdir = "/test/javaws/tim2-video-viewer/conf";
+  $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-video-viewer/conf"; 
+}
+
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
 
 # Determine the client operating system
