@@ -49,8 +49,19 @@ public class JAPCGateway  implements DataTagUpdateListener, HeartbeatListener {
   private Timestamp lastHartbeat = null;
   
   /** The C2MON tag manager */
-  private final C2monTagManager tagManager = C2monServiceGateway.getTagManager();
+  private final C2monTagManager tagManager;
 
+  /**
+   * Default Constructor
+   */
+  public JAPCGateway() {
+    // Initialize global Tag Manager variable
+    tagManager = C2monServiceGateway.getTagManager();
+    
+    // Register JAPC publisher for receiving C2MON heartbeat notifications
+    C2monServiceGateway.getSupervisionManager().addHeartbeatListener(this);
+  }
+  
   /**
    * Used to subscribe all data tags IDs that are specified in the
    * file.
