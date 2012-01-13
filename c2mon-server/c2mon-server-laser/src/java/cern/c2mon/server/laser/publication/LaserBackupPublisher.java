@@ -101,7 +101,9 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
           // should only happen if concurrent re-configuration of the server
           LOGGER.warn("Unable to locate alarm " + alarmId + " in cache during LASER backup: not included in backup.", e);
         }
-        if (!alarmList.isEmpty())
+      }
+      LOGGER.debug("Sending LASER active alarm backup.");
+      if (!alarmList.isEmpty()) {
           publishAlarmBackUp(alarmList);
       }
       LOGGER.debug("Finished sending LASER active alarm backup.");
