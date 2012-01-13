@@ -37,31 +37,18 @@ APP_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 PROCESS_NAME=japc-sispublisher
 PROCESS_COMMAND=$1
 
-# configuration directory location
-PROCESS_CONF_HOME=$APP_HOME/conf
-
-#The file that contains the Data Tag IDs which shall be published
-TID_FILE=$PROCESS_CONF_HOME/publisher.tid
+# The script which is actually calling the JAPC publisher
+STARTUP_SCRIPT=${$APP_HOME}/bin/JAPC-PUBLISHER-STARTUP.jvm
 
 TIME=`date +"%F %T.%3N"`
 
-########
-# JAVA #
-########
-
-export JAVA_HOME=/usr/java/jdk
-export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH/
-JAVA_BIN=$JAVA_HOME/jre/bin
 
 ###############
 # DIRECTORIES #
 ###############
 
-#log director
-APP_LOG_HOME=$APP_HOME/log
-if [ ! -d ${APP_LOG_HOME} ] ; then
-    mkdir ${APP_LOG_HOME}
-fi
+# configuration directory location
+PROCESS_CONF_HOME=$APP_HOME/conf
 
 #log file for this script
 SCRIPT_LOG_DIR=${APP_HOME}/script-log
@@ -70,12 +57,13 @@ if [ ! -d ${SCRIPT_LOG_DIR} ] ; then
     mkdir ${SCRIPT_LOG_DIR}
 fi
 
-#directory containing the libraries
-REP_LIB_HOME=$APP_HOME/lib
+########
+# JAVA #
+########
 
-#log4j configuration file
-LOG4J_CONF_FILE=$PROCESS_CONF_HOME/log4j.xml
-
+export JAVA_HOME=/usr/java/jdk
+export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH/
+JAVA_BIN=$JAVA_HOME/jre/bin
 
 ############################
 # PID file and directories #
@@ -89,14 +77,6 @@ if [ ! -d ${APP_HOME}/tmp/${PROCESS_HOST} ] ; then
 fi
 
 PID_FILE=$APP_HOME/tmp/$PROCESS_HOST/$PROCESS_NAME.pid
-
-
-##############
-# LIBRAIRIES #
-##############
-
-# This command builds up a string that contains all jar file from $REP_LIB_HOME
-REP_LIBS=`/bin/ls $REP_LIB_HOME | awk -v lib_home="$REP_LIB_HOME" 'BEGIN {OFS = ""; ORS = ":"} {print lib_home "/" $0}'`
 
 ########################### 
 # Source function library #
@@ -161,10 +141,8 @@ PROCESS_start() {
 # start a process on the local machine on which the script is running
 #--------------------------------------------------------------------
 really_start() {
-
-    $JAVA_BIN/java -Dtim.log.path=$APP_LOG_HOME -Dtim.process.name=$PROCESS_NAME -classpath ${REP_LIBS} ch.cern.tim.japc.publisher.JAPCPublisherKernel -dataTags $TID_FILE -log4j $LOG4J_CONF_FILE &
-
     echo -n "Starting a $PROCESS_NAME Process on host ${PROCESS_HOST} ..."
+    ${STARTUP_SCRIPT} > ${APP_HOME}/log/${PROCESS_NAME}.out.log 2>&1 &
 
     pid="$!"
     sleep 5

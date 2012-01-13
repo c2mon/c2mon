@@ -11,12 +11,31 @@
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
 					<preserve type="dir" name="tmp" />
+					<preserve type="file" name="conf/publisher.tid" />
 				</backupPolicy>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
-					<mail address="timdiamon-developers@cern.ch" />
+					<mail address="tim-admin@cern.ch" />
 				</notification>
 			</deployment>
+			<startscript name="japc-publisher-startup">
+        <main-class name="cern.c2mon.japc.publisher.JAPCPublisherKernel">
+          <initial-heap-size>256m</initial-heap-size>
+          <max-heap-size>256m</max-heap-size>
+          <arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -dataTags ${INSTALL_DIR}/conf/publisher.tid</arg>
+          <preExec>
+<![CDATA[
+  [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+ ]]>
+          </preExec>
+          <property name="tim.log.path" value="${INSTALL_DIR}/log" />
+          <property name="tim.process.name" value="${PROCESS_NAME}" />
+          <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+          <output>
+            <logrotate fileSize="100M" files="3" name="${INSTALL_DIR}/log/${PROCESS_NAME}.out.log" />
+          </output>
+        </main-class>
+      </startscript>
 		</application>
 
 		<application name="tim-japc-sispublisher-prod" extends="default">
