@@ -284,7 +284,10 @@
         </include>
         <include>
           <class-expression>cern.tim.server.supervision.alive.AliveTimerChecker</class-expression>
-        </include>    
+        </include>
+        <include>
+          <class-expression>cern.c2mon.shared.client.supervision.SupervisionEventImpl</class-expression>
+        </include>   
         <!-- DistributedParams classes -->
         <include>
           <class-expression>cern.tim.server.common.config.CacheStatus</class-expression>
@@ -359,13 +362,17 @@
           <root-name>controlMapSynchLock</root-name>
         </root>
          <root>       
-          <field-name>cern.tim.server.supervision.impl.SupervisionTagNotifier.processEventTimes</field-name>
-          <root-name>processEventTimes</root-name>
+          <field-name>cern.tim.server.supervision.impl.SupervisionTagNotifier.processEvents</field-name>
+          <root-name>processEvents</root-name>
         </root>
          <root>       
-          <field-name>cern.tim.server.supervision.impl.SupervisionTagNotifier.equipmentEventTimes</field-name>
-          <root-name>equipmentEventTimes</root-name>
+          <field-name>cern.tim.server.supervision.impl.SupervisionTagNotifier.equipmentEvents</field-name>
+          <root-name>equipmentEvents</root-name>
         </root>
+        <root>       
+          <field-name>cern.tim.server.supervision.impl.SupervisionTagNotifier.eventLock</field-name>
+          <root-name>eventLock</root-name>
+        </root>         
        </roots>
 <!--      <web-applications>-->
 <!--        <web-application>viewTags</web-application>-->
