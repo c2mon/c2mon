@@ -2,6 +2,7 @@ package cern.c2mon.server.laser.publication;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -113,14 +114,23 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * @param alarmList list of active alarms
    */
   private void publishAlarmBackUp(List<Alarm> alarmList) {
-    // TODO publish alarms: * use alarm.getTimestamp() as LASER user timestamp! *
 	  ArrayList<FaultState> toSend = new ArrayList<FaultState>();
 	  
+	  // iterate over list and transform them into Laser fault states 
 	  for(Alarm timAlarm : alarmList){
-		  FaultState fs = null;
-			fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
-			fs.setUserTimestamp(timAlarm.getTimestamp());
-			toSend.add(fs);
+		FaultState fs = null;
+		
+		fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
+		fs.setUserTimestamp(timAlarm.getTimestamp());
+		fs.setDescriptor(timAlarm.getState());
+		if (timAlarm.getInfo() != null) {
+			Properties prop = null;
+	        prop = fs.getUserProperties();
+	        prop.put(FaultState.ASI_PREFIX_PROPERTY, timAlarm.getInfo());
+	        fs.setUserProperties(prop);
+	    }
+		
+		toSend.add(fs);
 	  }
 	  try {
 		asi.pushActiveList(toSend);

@@ -101,6 +101,10 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
         start();
     }
 
+
+    /**
+     * 
+     */
     @Override
 	public void notifyElementUpdated(Alarm cacheable) {
     	
@@ -120,7 +124,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 			}
 		}else{
 			fs.setDescriptor(FaultState.TERMINATE);
-		  fs.setUserTimestamp(cacheable.getTimestamp());
+			fs.setUserTimestamp(cacheable.getTimestamp());
 		}
 		
 		if (log.isDebugEnabled()) {
@@ -212,7 +216,9 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
         if (log.isInfoEnabled()) {
             log.info("Stopping " + LaserPublisher.class.getName());
         }
-        asi.close();
+        if (asi != null) { 
+        	asi.close();
+        }
         running = false;
     }
 
