@@ -298,7 +298,10 @@
         <!-- Alarm aggregator (not core so may wish to move to TIM module!) -->
         <include>
           <class-expression>cern.tim.server.alarm.impl.AlarmAggregatorImpl</class-expression>
-        </include>    
+        </include> 
+        <include>
+          <class-expression>cern.c2mon.server.laser.publication.LaserBackupPublisher</class-expression>
+        </include>   
       </instrumented-classes>
 <!--      <locks>      -->
 <!--        <autolock auto-synchronized="false">-->
@@ -372,6 +375,10 @@
         <root>       
           <field-name>cern.tim.server.supervision.impl.SupervisionTagNotifier.eventLock</field-name>
           <root-name>eventLock</root-name>
+        </root>
+        <root>       
+          <field-name>cern.c2mon.server.laser.publication.LaserBackupPublisher.backupLock</field-name>
+          <root-name>LASER module backup lock</root-name>
         </root>         
        </roots>
 <!--      <web-applications>-->
