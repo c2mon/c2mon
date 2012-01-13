@@ -270,7 +270,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @param clientRequest A process name sent from the client
    * @return a Collection of all available process names
    */ 
-  private Collection<? extends ClientRequestResult> handleProcessNamesRequest(ClientRequest clientRequest) {
+  private Collection< ? extends ClientRequestResult> handleProcessNamesRequest(ClientRequest clientRequest) {
 
     Collection<ProcessNameResponse> names = new ArrayList<ProcessNameResponse>();
     
@@ -441,12 +441,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     for (Long alarmKey : alarmKeys) {
             
       final Alarm alarm = alarmCache.getCopy(alarmKey);
-      final Alarm alarm2 = alarmCache.get(alarmKey);
       
       if (alarm.isActive()) {
-        activeAlarms.add(alarm);
-        LOG.debug("adding active alarm with tagId= " + alarm.getTagId());
-        LOG.debug("adding active alarmWithoutGetCopy with tagId= " + alarm2.getTagId());
+        activeAlarms.add(TransferObjectFactory.createAlarmValue(alarm));
       }
     }
     if (LOG.isDebugEnabled()) {
