@@ -34,11 +34,11 @@ APP_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 # PROCESS specific variables #
 ##############################
 
-PROCESS_NAME=japc-sispublisher
+export PROCESS_NAME=japc-sispublisher
 PROCESS_COMMAND=$1
 
 # The script which is actually calling the JAPC publisher
-STARTUP_SCRIPT=${$APP_HOME}/bin/JAPC-PUBLISHER-STARTUP.jvm
+STARTUP_SCRIPT=${APP_HOME}/bin/JAPC-PUBLISHER-STARTUP.jvm
 
 TIME=`date +"%F %T.%3N"`
 
@@ -283,8 +283,8 @@ PROCESS_silentcheck() {
 #----------------------------------------------------------------
 PROCESS_printBasicUsageInfo() {
     echo "*****************************************************************"
-    echo " usage:                                                          "
-    echo " $PROCESS_NAME [start|stop|restart|status|silentcheck]           "
+    echo " usage:"
+    echo " $0 [start|stop|restart|status|silentcheck]"
     echo "*****************************************************************"
 }
 
