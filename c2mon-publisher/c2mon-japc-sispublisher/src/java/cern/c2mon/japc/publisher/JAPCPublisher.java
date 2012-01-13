@@ -81,8 +81,6 @@ public class JAPCPublisher {
     
     this.serverRemoteFactory = new ServerRemoteFactory("no", SERVICE_NAME);
     this.selector = ParameterValueFactory.newSelector("");
-    
-    C2monServiceGateway.startC2monClient();
   }
   
   public static JAPCPublisher getInstance() {

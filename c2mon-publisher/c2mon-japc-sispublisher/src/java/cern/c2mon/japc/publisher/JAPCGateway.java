@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.shared.client.supervision.Heartbeat;
@@ -47,7 +48,8 @@ public class JAPCGateway  implements DataTagUpdateListener, HeartbeatListener {
   /** Used to remember when the last heartbeat was received */
   private Timestamp lastHartbeat = null;
   
-  private C2monTagManager tagManager = null;
+  /** The C2MON tag manager */
+  private final C2monTagManager tagManager = C2monServiceGateway.getTagManager();
 
   /**
    * Used to subscribe all data tags IDs that are specified in the
@@ -57,15 +59,23 @@ public class JAPCGateway  implements DataTagUpdateListener, HeartbeatListener {
    * @return true, if subscription was successful
    */
   public final boolean subscribeDataTags(final File dataTagList) {
-    boolean retval = false;
+    boolean tagSubscriptionSuccessful = false;
     
     Set<Long> tagIds = parseDataTags(dataTagList); 
     if (tagIds != null) {    
-      tagManager.subscribeDataTags(tagIds,this);
-      retval = true;
+      while (!tagSubscriptionSuccessful) {
+        try {
+          tagSubscriptionSuccessful = tagManager.subscribeDataTags(tagIds, this);
+        }
+        catch (Exception ex) {
+          LOG.error("error occured while trying to subscribe to the list of data tags.", ex);
+          LOG.debug("retrying tag subscription in 5 seconds ...");
+          try { Thread.sleep(5000); } catch (InterruptedException ie) { /* Do nothing */ }
+        }
+      }
     }
     
-    return retval;
+    return tagSubscriptionSuccessful;
   }
   
   

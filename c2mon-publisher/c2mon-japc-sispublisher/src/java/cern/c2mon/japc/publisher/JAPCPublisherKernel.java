@@ -23,6 +23,8 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
+import cern.c2mon.client.core.C2monServiceGateway;
+
 /**
  * The TIM JAPCPublisher main class
  * 
@@ -106,6 +108,9 @@ public final class JAPCPublisherKernel {
        logger.fatal("Unable to load log4j configuration file : " + ex.getMessage());          
        System.exit(-1);
      }
+     
+     // Initialize C2MON Gateway
+     C2monServiceGateway.startC2monClient();
      
      logger.info("Starting JAPCGateway...");
      final JAPCGateway gateway = new JAPCGateway();
