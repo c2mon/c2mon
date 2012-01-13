@@ -50,16 +50,17 @@ else
       echo "copying file..."
       cp $CONF_FILE $CONF_FILE.`date +%y%m%d_%k%M%S`
       mv $TEMP_FILE $CONF_FILE
+      
+      echo "Configuration has changed! Restarting DIP publisher..."
+      $DIP_PUBLISHER_HOME/bin/dip-publisher.sh restart $FILE_ROOT
     else
-      echo "removing file..."
+      echo "The configuration has not changed since the last update!"
       rm $TEMP_FILE 	
     fi
   else
     mv $TEMP_FILE $CONF_FILE
+    echo "Restarting DIP publisher..."
+    $DIP_PUBLISHER_HOME/bin/dip-publisher.sh restart $FILE_ROOT
   fi
-fi
-
-# The dippublisher is restarted
-echo "restart publisher..."
-$DIP_PUBLISHER_HOME/bin/dip-publisher.sh restart $FILE_ROOT 
+fi 
 
