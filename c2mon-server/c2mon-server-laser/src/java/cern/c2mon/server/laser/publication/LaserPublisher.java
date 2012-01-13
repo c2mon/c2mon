@@ -1,19 +1,17 @@
 package cern.c2mon.server.laser.publication;
 
-import java.lang.management.ManagementFactory;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.management.StandardMBean;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Service;
 
 import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
@@ -27,6 +25,8 @@ import cern.tim.server.common.config.ServerConstants;
 /**
  * Bean responsible for submitting C2MON alarms to LASER.
  */
+@Service
+@ManagedResource(objectName = "cern.c2mon:name=LaserPublisher")
 public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean {
 
     /**
@@ -71,15 +71,6 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     public LaserPublisher(final CacheRegistrationService cacheRegistrationService) {
         super();
         this.cacheRegistrationService = cacheRegistrationService;
-        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        try {
-            StandardMBean mbean = new StandardMBean(this, LaserPublisherMBean.class);
-            server.registerMBean(mbean, new ObjectName("cern.c2mon:type=LaserPublisher,name="
-                    + LaserPublisher.class.getName()));
-        } catch (Exception e) {
-            log.error("Can't register for JMX : " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -108,12 +99,12 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     @PostConstruct
     public void init() throws Exception {
         cacheRegistrationService.registerToAlarms(this);
-        asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
+        start();
     }
 
     @Override
 	public void notifyElementUpdated(Alarm cacheable) {
-
+    	
 		FaultState fs = null;
 		fs = AlarmSystemInterfaceFactory.createFaultState(cacheable.getFaultFamily(), cacheable.getFaultMember(), cacheable.getFaultCode());
 	
@@ -202,14 +193,22 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     }
 
     @Override
+    @ManagedOperation(description="Starts the alarm publisher.")
     public void start() {
         if (log.isInfoEnabled()) {
-            log.info("Starting" + LaserPublisher.class.getName());
+            log.info("Starting " + LaserPublisher.class.getName());
         }
-        running = true;
+        try {
+			asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
+			running = true;
+		} catch (ASIException e) {
+			stop();
+			running = false;
+		}
     }
 
     @Override
+    @ManagedOperation(description="Stops the alarm publisher.")
     public void stop() {
         if (log.isInfoEnabled()) {
             log.info("Stopping " + LaserPublisher.class.getName());
@@ -224,11 +223,13 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     }
 
     @Override
+    @ManagedOperation(description="Return the total number of alarms processed since last reset().")
     public long getProcessedAlarms() {
         return stats.getTotalProcessed();
     }
 
     @Override
+    @ManagedOperation(description="Resets the internal statistics for all alarms.")
     public void resetStatistics() {
         if (log.isTraceEnabled()) {
             log.trace("Entering resetStatistics()");
@@ -237,6 +238,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     }
 
     @Override
+    @ManagedOperation(description="Resets the internal statistics for a specific alarm.")
     public void resetStatistics(String alarmID) {
         if (log.isTraceEnabled()) {
             log.trace("Entering resetStatistics('" + alarmID + "')");
@@ -245,6 +247,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     }
 
     @Override
+    @ManagedOperation(description="Return a list of alarm for which statistics are collected.")
     public List<String> getRegisteredAlarms() {
         if (log.isTraceEnabled()) {
             log.trace("Entering getRegisteredAlarms()");
@@ -253,6 +256,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     }
 
     @Override
+    @ManagedOperation(description="Returns a string representation of the statistics for an alarm.")
     public String getStatsForAlarm(String id) {
         if (stats.getStatsForAlarm(id) == null) {
             return "Not found!";
@@ -268,7 +272,6 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
         }
     }
 
-    @Override
     public void confirmStatus(Alarm cacheable) {
       notifyElementUpdated(cacheable);
     }
