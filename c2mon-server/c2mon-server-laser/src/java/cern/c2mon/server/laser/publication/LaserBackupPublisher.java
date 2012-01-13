@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,11 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   private static final int INITIAL_BACKUP_DELAY = BACKUP_INTERVAL;
 
   /**
+   * Lock used to only allow one backup to run at any time across a server cluster.
+   */
+  private ReentrantReadWriteLock backupLock = new ReentrantReadWriteLock();
+  
+  /**
    * Flag for lifecycle calls.
    */
   private volatile boolean running = false;
@@ -88,6 +94,8 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
   @Override
   public void run() {
+    //lock to only allow a single backup at a time
+    backupLock.writeLock().lock();
     try {
       LOGGER.debug("Sending LASER active alarm backup.");
       List<Alarm> alarmList = new ArrayList<Alarm>();
@@ -109,6 +117,8 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       LOGGER.debug("Finished sending LASER active alarm backup.");
     } catch (Exception e) {
       LOGGER.error("Exception caught while publishing active Alarm backup list", e);
+    } finally {
+      backupLock.writeLock().unlock();
     }
   }
 
