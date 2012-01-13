@@ -31,7 +31,7 @@
 		
 		<!-- copy update script -->
 		<file>
-      <source>${basedir}/bin/japc-sispublisher.sh</source>
+      <source>${basedir}/bin/update-config.sh</source>
       <outputDirectory>bin/</outputDirectory>
       <destName>update-config.sh</destName>
       <lineEnding>unix</lineEnding>
