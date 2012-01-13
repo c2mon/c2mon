@@ -8,6 +8,8 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.tim.server.cache.AlarmCache;
@@ -22,6 +24,7 @@ import cern.tim.server.common.config.ServerConstants;
  * 
  */
 @Service
+@ManagedResource(objectName = "cern.c2mon:name=LaserPublisher")
 public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
   /**
@@ -113,6 +116,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   }
 
   @Override
+  @ManagedOperation(description="starts the backups publisher.")
   public void start() {
     LOGGER.info("Starting LASER backup mechanism.");
     // DOES ANYTHING ELSE NEEDS STARTING?
@@ -122,6 +126,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   }
 
   @Override
+  @ManagedOperation(description="Stops the backups publisher.")
   public void stop() {
     LOGGER.info("Stopping LASER backup mechanism.");
     // DOES ANYTHING ELSE NEEDS STOPPING?
