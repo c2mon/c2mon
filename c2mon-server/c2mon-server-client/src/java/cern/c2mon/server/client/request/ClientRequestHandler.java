@@ -438,12 +438,14 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     final Collection activeAlarms = new ArrayList();
     List<Long> alarmKeys = alarmCache.getKeys();
     
-    for (Long alarmKey: alarmKeys) {
+    for (Long alarmKey : alarmKeys) {
             
       final Alarm alarm = alarmCache.getCopy(alarmKey);
       
-      if (alarm.isActive())
+      if (alarm.isActive()) {
         activeAlarms.add(alarm);
+        LOG.debug("adding active alarm with tagId= " + alarm.getTagId());
+      }
     }
     if (LOG.isDebugEnabled()) {
       LOG.debug("Finished processing ACTIVE alarms request: returning " + activeAlarms.size() + " active alarms");
