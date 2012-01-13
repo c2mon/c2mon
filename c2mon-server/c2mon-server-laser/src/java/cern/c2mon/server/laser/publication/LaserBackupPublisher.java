@@ -89,6 +89,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   @Override
   public void run() {
     try {
+      LOGGER.debug("Sending LASER active alarm backup.");
       List<Alarm> alarmList = new ArrayList<Alarm>();
       for (Long alarmId : alarmCache.getKeys()) {
         try {
@@ -103,6 +104,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
         if (!alarmList.isEmpty())
           publishAlarmBackUp(alarmList);
       }
+      LOGGER.debug("Finished sending LASER active alarm backup.");
     } catch (Exception e) {
       LOGGER.error("Exception caught while publishing active Alarm backup list", e);
     }
