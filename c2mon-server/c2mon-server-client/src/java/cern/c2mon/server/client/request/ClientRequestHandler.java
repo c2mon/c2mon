@@ -441,10 +441,12 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     for (Long alarmKey : alarmKeys) {
             
       final Alarm alarm = alarmCache.getCopy(alarmKey);
+      final Alarm alarm2 = alarmCache.get(alarmKey);
       
       if (alarm.isActive()) {
         activeAlarms.add(alarm);
         LOG.debug("adding active alarm with tagId= " + alarm.getTagId());
+        LOG.debug("adding active alarmWithoutGetCopy with tagId= " + alarm2.getTagId());
       }
     }
     if (LOG.isDebugEnabled()) {
