@@ -203,5 +203,12 @@ public class OPCMessageHandler extends EquipmentMessageHandler
         }
         changeReport.setState(CHANGE_STATE.SUCCESS);
     }
+    
+    @Override
+    public void shutdown() throws EqIOException {
+      super.shutdown();
+      // Release COM object references that have not been released through GC
+      com.linar.jintegra.Cleaner.releaseAll();
+    }
 
 }

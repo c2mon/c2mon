@@ -1,15 +1,12 @@
 package cern.c2mon.driver.opcua.connection.dcom;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,7 +26,6 @@ import ch.cern.tim.driver.jintegraInterface.IOPCGroup;
 import ch.cern.tim.driver.jintegraInterface.IOPCGroups;
 import ch.cern.tim.driver.jintegraInterface.OPCDataSource;
 import ch.cern.tim.driver.jintegraInterface.OPCGroup;
-import ch.cern.tim.driver.jintegraInterface.OPCGroups;
 import ch.cern.tim.driver.jintegraInterface.OPCItem;
 import ch.cern.tim.driver.jintegraInterface.OPCItems;
 import ch.cern.tim.driver.jintegraInterface.OPCServer;
@@ -37,7 +33,6 @@ import ch.cern.tim.driver.jintegraInterface.OPCServerState;
 
 import com.linar.jintegra.AuthInfo;
 import com.linar.jintegra.AutomationException;
-import com.linar.jintegra.Cleaner;
 
 /**
  * The DADCOMEndpoint represents an endpoint to connect via DCOM to a classic
@@ -152,6 +147,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         String opcServer = uri.getPath().replaceFirst("/", "");
         server = new OPCServer(host);
         if (opcServer != null && !opcServer.equals("")) {
+            logger.info("Trying to connect to OPC Server " + opcServer + " on host " + host);
             server.connect(opcServer, host);
         } else {
             String[] servers = (String[]) server.getOPCServers(host);
@@ -159,6 +155,10 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
                 throw new OPCCommunicationException("No OPC servers on the"
                         + "provided host");
             } else {
+                for (int i = 0; i < servers.length; i++) {
+                  logger.info("Host " + host + " : Found OPC server named " + servers[i]);
+                }
+                logger.info("Trying to connect to OPC Server " + servers[0] + " on host " + host);
                 server.connect(servers[0], host);
             }
         }
@@ -189,7 +189,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     }
 
     /**
-     * Processes a subscription group which means subsribes for it and
+     * Processes a subscription group which means subscribes for it and
      * adds a listener.
      * 
      * @param subscritionGroup The group to subscribe to.
@@ -211,7 +211,12 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             
         });
         group.setIsSubscribed(true);
-        group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
+        try {
+          group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
+        }
+        catch (Exception ex) {
+          logger.warn("processGroup() - Asynchronous refresh failed!", ex);
+        }
         return group;
     }
 
@@ -376,71 +381,42 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     @Override
     protected synchronized void onRefresh(
             final Collection<DADCOMItemDefintion> itemDefintions) {
-        AuthInfo.setThreadDefault(authInfo);
-        logger.debug("Enter refresh");
-        Set<OPCGroup> opcGroups = new HashSet<OPCGroup>();
-        for (DADCOMItemDefintion definition : itemDefintions) {
-            logger.debug("onRefresh() - Trying to determine group for definition " + definition.getAddress());
-            long itemDefinitionId = definition.getId();
-            int clientHandle = Long.valueOf(itemDefinitionId).intValue();
-            OPCItem item = itemHandleOpcItems.get(clientHandle);
-            if (item != null) {
-                try {
-                  OPCGroup group = item.getParent();
-                  if (opcGroups.add(group)) {
-                    logger.debug("onRefresh() - Added group " + group.getName());
-                  }
-                } catch (AutomationException e) {
-                    RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e, definition.getAddress());
-                    notifyEndpointListenersItemError(itemDefinitionId, ex);
-                } catch (Exception e) {
-                    notifyEndpointListenersItemError(itemDefinitionId, e);
-                }
-            }
-        }
-        for (OPCGroup group : opcGroups) {
-          try {
-            logger.debug("onRefresh() - trigger async refresh for group " + group.getName()); 
-            group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
-          } catch (AutomationException e) {
-              throw OPCDCOMFactory.createWrappedAutomationException(e);
-          } catch (Exception e) {
-              throw new OPCCommunicationException("Problems wih the async DCOM group refresh occured", e);
-          }
-        }
-        logger.debug("Finished refresh");
-    }
-    
-    protected synchronized void onRefreshAll() {
-      AuthInfo.setThreadDefault(authInfo);
-      logger.debug("Enter refresh");
-      try {
-        OPCGroups groups = server.getOPCGroups();
-      }
-      catch (AutomationException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }
-      catch (IOException e1) {
-        // TODO Auto-generated catch block
-        e1.printStackTrace();
-      }
-      Set<OPCGroup> opcGroups = new HashSet<OPCGroup>();
       
-      try {
-        OPCGroups groups = server.getOPCGroups();
-        for (OPCGroup group : opcGroups) {
-          logger.debug("onRefresh() - trigger async refresh for group " + group.getName());
-          group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
-        }
-      }
-      catch (AutomationException e) {
-        throw OPCDCOMFactory.createWrappedAutomationException(e);
-      }
-      catch (Exception e) {
-        throw new OPCCommunicationException("Problems wih the async DCOM group refresh occured", e);
-      }
-      logger.debug("Finished refresh");
+      logger.debug("onRefresh() - Method call is disabled for DCOM. An async refresh is triggered at initialization by processGroup() method");
+
+//        AuthInfo.setThreadDefault(authInfo);
+//        logger.debug("Enter refresh");
+//        Set<OPCGroup> opcGroups = new HashSet<OPCGroup>();
+//        for (DADCOMItemDefintion definition : itemDefintions) {
+//            logger.debug("onRefresh() - Trying to determine group for definition " + definition.getAddress());
+//            long itemDefinitionId = definition.getId();
+//            int clientHandle = Long.valueOf(itemDefinitionId).intValue();
+//            OPCItem item = itemHandleOpcItems.get(clientHandle);
+//            if (item != null) {
+//                try {
+//                  OPCGroup group = item.getParent();
+//                  if (opcGroups.add(group)) {
+//                    logger.debug("onRefresh() - Added group " + group.getName());
+//                  }
+//                } catch (AutomationException e) {
+//                    RuntimeException ex = OPCDCOMFactory.createWrappedAutomationException(e, definition.getAddress());
+//                    notifyEndpointListenersItemError(itemDefinitionId, ex);
+//                } catch (Exception e) {
+//                    notifyEndpointListenersItemError(itemDefinitionId, e);
+//                }
+//            }
+//        }
+//        for (OPCGroup group : opcGroups) {
+//          try {
+//            logger.debug("onRefresh() - trigger async refresh for group " + group.getName()); 
+//            group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
+//          } catch (AutomationException e) {
+//              throw OPCDCOMFactory.createWrappedAutomationException(e);
+//          } catch (Exception e) {
+//              throw new OPCCommunicationException("Problems wih the async DCOM group refresh occured", e);
+//          }
+//        }
+//        logger.debug("Finished refresh");
     }
 
     /**
