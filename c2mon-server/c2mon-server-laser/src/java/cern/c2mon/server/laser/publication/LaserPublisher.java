@@ -26,7 +26,7 @@ import cern.tim.server.common.config.ServerConstants;
  * Bean responsible for submitting C2MON alarms to LASER.
  */
 @Service
-@ManagedResource(objectName = "cern.c2mon:name=LaserPublisher")
+@ManagedResource(objectName = "cern.c2mon:type=LaserPublisher,name=LaserPublisher")
 public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean {
 
     /**

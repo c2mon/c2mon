@@ -24,7 +24,7 @@ import cern.tim.server.common.config.ServerConstants;
  * 
  */
 @Service
-@ManagedResource(objectName = "cern.c2mon:name=LaserPublisher")
+@ManagedResource(objectName = "cern.c2mon:type=LaserPublisher,name=LaserBackupPublisher")
 public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
   /**
