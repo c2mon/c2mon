@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
 
 import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
