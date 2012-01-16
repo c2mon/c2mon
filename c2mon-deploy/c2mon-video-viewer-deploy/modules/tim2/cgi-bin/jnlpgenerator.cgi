@@ -115,7 +115,7 @@ print "   <property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQ
 print "   <property name=\"c2mon.client.jms.video.request.queue\" value=\"$jmsVideoRequestQueue\"/>\n";
 
 if (param('configurl')) {
-	print "		<property name=\"tim.conf.file.url\" value=\"", param('configurl'), "\"/>", "\n";
+	print "		<property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";
 }
 
 print "	</resources>
