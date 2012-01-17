@@ -18,7 +18,7 @@ export DAQ_LOG_HOME=${DAQ_HOME}/log
 export DAQ_CONF_HOME=${DAQ_HOME}/conf
 DAQ_LOG_FILE=${DAQ_LOG_HOME}/daqprocess.log
 
-export C2MON_PROPERTIES_FILE=${DAQ_CONF_HOME}/.c2mon.properties
+export C2MON_PROPERTIES_FILE=${DAQ_CONF_HOME}/daq.properties
 
 # the name of the parameter determining that the DAQ start-up script
 # should output only XML feedback messages
