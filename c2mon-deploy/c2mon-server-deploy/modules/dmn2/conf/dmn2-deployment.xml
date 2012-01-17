@@ -61,11 +61,11 @@
 		<application name="c2mon-dmn2-test" extends="default">
 			<deployment installLocation="/opt/c2mon-dmn2-test">
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/test/server"
+					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/dev/server"
 						mask="400" />
-					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/test/server"
+					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/dev/server"
 						mask="400" />
-					<file name="c2mon.properties" sourceDir="/user/diamonop/c2mon/test/server"
+					<file name="c2mon.properties" sourceDir="/user/diamonop/c2mon/dev/server"
 						mask="400" />
 				</directory>
 			</deployment>
