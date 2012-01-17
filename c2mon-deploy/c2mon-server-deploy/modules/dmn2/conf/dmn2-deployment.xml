@@ -59,7 +59,7 @@
 		</application>
 
 		<application name="c2mon-dmn2-dev" extends="default">
-			<deployment installLocation="/opt/c2mon-dmn2-test">
+			<deployment installLocation="/opt/c2mon-dmn2-dev">
 				<directory name="conf">
 					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/dev/server"
 						mask="400" />
