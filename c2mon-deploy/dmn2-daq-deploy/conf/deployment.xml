@@ -58,11 +58,11 @@
 			
 			<deployment installLocation="/opt/dmn2-daq-test">
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/test/dev/"
+					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/dev/daq"
 						mask="400" />
-					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/test/dev/"
+					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/dev/daq"
 						mask="400" />
-					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/test/dev/"
+					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/dev/daq"
 						mask="400" />
 				</directory>
 			</deployment>
