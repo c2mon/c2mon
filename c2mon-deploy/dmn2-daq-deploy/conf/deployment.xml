@@ -44,25 +44,25 @@
 		
 			<deployment>
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/prod/conf/"
+					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/prod/daq/"
 						mask="400" />
-					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/prod/conf/"
+					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/prod/daq/"
 						mask="400" />
-					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/prod/conf/"
+					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/prod/daq/"
 						mask="400" />
 				</directory>
 			</deployment>
 		</application>
 
-		<application name="dmn2-daq-test" extends="default" >
+		<application name="dmn2-daq-dev" extends="default" >
 			
 			<deployment installLocation="/opt/dmn2-daq-test">
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/test/conf/"
+					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/test/dev/"
 						mask="400" />
-					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/test/conf/"
+					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/test/dev/"
 						mask="400" />
-					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/test/conf/"
+					<file name=".c2mon.properties" sourceDir="/user/diamonop/c2mon/test/dev/"
 						mask="400" />
 				</directory>
 			</deployment>
