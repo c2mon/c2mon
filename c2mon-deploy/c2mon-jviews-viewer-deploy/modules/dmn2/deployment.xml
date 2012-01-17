@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="dmn2-viewer">
+
+		<!--
+			this application section is a parent configuration for both
+			c2mon-dmn2-prod and c2mon-dmn2-dev
+		-->
+		<application name="dmn2-viewer">
+			<deployment installLocation="/user/diamonop/public_html/dmn2-viewer" >
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="project-diamon-core@cern.ch" />
+				</notification>
+			</deployment>
+		</application>
+		
+		<application name="dmn2-viewer-snapshot">
+			<deployment installLocation="/user/diamonop/public_html/dmn2-viewer-snapshot" >
+			</deployment>
+		</application>
+	</product>
+</products>

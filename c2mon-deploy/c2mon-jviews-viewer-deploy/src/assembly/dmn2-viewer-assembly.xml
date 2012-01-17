@@ -20,6 +20,7 @@
 	<files>
 
 		<!--  copy the properties file -->
+		<!-- 
 		<file>
 			<source>${basedir}/dmn2-jms.properties</source>
 			<outputDirectory>/</outputDirectory>
@@ -27,6 +28,14 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
+		-->
+		
+		<file>
+			<source>deployment.xml</source>
+			<outputDirectory>/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>		
 	</files>
 
 </assembly>
