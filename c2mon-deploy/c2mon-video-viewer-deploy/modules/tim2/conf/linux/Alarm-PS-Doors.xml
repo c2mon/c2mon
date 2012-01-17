@@ -10,7 +10,7 @@
 
 
    <!-- Put here the web link to the help page for the specific video viewer configuration -->
-   <property name="viewerhelpdir" type="java.lang.String" value="http://timweb/wiki/doku.php?id=documentation:tim-video-viewer"/>
+   <property name="viewerhelpdir" type="java.lang.String" value="http://wikis/display/TIM/TIM+Video+Viewer"/>
    
    <!-- 
      The amount of video viewer that shall be displayed on the right side of the TIM Video viewer. 
