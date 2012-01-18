@@ -53,7 +53,7 @@
 			<outputDirectory>charts/</outputDirectory>
 			<destName>charts.lck</destName>
 			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
+			<fileMode>0700</fileMode>
 		</file>
 	</files>
 
