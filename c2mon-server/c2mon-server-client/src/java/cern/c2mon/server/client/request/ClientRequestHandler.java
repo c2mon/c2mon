@@ -240,12 +240,12 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         return supervisionFacade.getAllSupervisionStates();
       case COMMAND_HANDLE_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received a for command tag details for " + clientRequest.getTagIds().size() + " commands.");
+          LOG.debug("handleClientRequest() - Received a COMMAND_HANDLE_REQUEST for " + clientRequest.getTagIds().size() + " commands.");
         }
         return handleCommandHandleRequest(clientRequest);
       case EXECUTE_COMMAND_REQUEST:
         if (LOG.isDebugEnabled()) {
-          LOG.debug("handleClientRequest() - Received an command execution request for " + clientRequest.getTagIds().size() + " commands.");
+          LOG.debug("handleClientRequest() - Received an EXECUTE_COMMAND_REQUEST.");
         }
         return handleExecuteCommandRequest(clientRequest);
       case DAQ_XML_REQUEST:
@@ -270,7 +270,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @param clientRequest A process name sent from the client
    * @return a Collection of all available process names
    */ 
-  private Collection< ? extends ClientRequestResult> handleProcessNamesRequest(ClientRequest clientRequest) {
+  private Collection< ? extends ClientRequestResult> handleProcessNamesRequest(final ClientRequest clientRequest) {
 
     Collection<ProcessNameResponse> names = new ArrayList<ProcessNameResponse>();
     
