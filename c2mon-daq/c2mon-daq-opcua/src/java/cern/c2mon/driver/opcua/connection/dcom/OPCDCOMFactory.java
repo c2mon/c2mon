@@ -2,7 +2,7 @@ package cern.c2mon.driver.opcua.connection.dcom;
 
 import java.io.IOException;
 
-import com.linar.jintegra.AutomationException;
+import org.apache.log4j.Logger;
 
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.driver.opcua.connection.common.impl.OPCCriticalException;
@@ -13,6 +13,8 @@ import ch.cern.tim.driver.jintegraInterface.OPCItem;
 import ch.cern.tim.driver.jintegraInterface.OPCItems;
 import ch.cern.tim.driver.jintegraInterface.OPCServer;
 
+import com.linar.jintegra.AutomationException;
+
 /**
  * Helper class to create initialized DCOM objects.
  * 
@@ -21,6 +23,11 @@ import ch.cern.tim.driver.jintegraInterface.OPCServer;
  */
 public final class OPCDCOMFactory implements IDCOMErrorConstants {
     
+    /**
+     * logger of this class.
+     */
+    private final static Logger logger = Logger.getLogger(OPCDCOMFactory.class);
+  
     /**
      * There should be no instances of this class. This is why it is made 
      * private.
@@ -58,6 +65,9 @@ public final class OPCDCOMFactory implements IDCOMErrorConstants {
     public static IOPCGroup createOPCGroup(final IOPCGroups opcGroups, 
             final String groupName, final int updateRate,
             final float valueDeadband) throws IOException {
+        logger.debug("Creating OPC Group: name=" + groupName 
+                     + ", value-deadband=" + valueDeadband
+                     + ", update-rate(ms)=" + updateRate);
         IOPCGroup group = opcGroups.add(groupName);
         group.setDeadBand(valueDeadband);
         group.setUpdateRate(updateRate);
