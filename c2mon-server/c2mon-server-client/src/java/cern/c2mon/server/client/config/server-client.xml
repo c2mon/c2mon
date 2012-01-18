@@ -32,6 +32,27 @@ Connection settings for client module
 
 <!-- 
 
+Alarm Publications
+
+ -->
+ 
+<bean id="alarmDestination" class="org.apache.activemq.command.ActiveMQTopic">
+  <constructor-arg value="${jms.client.alarm.topic:c2mon.client.alarm}"/>
+</bean>
+
+<!-- plugged into ActiveJmsSender -->
+<bean id="alarmTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+  <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
+  <property name="defaultDestination" ref="alarmDestination"/>
+</bean>
+
+<!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
+<bean name="alarmTopicPublisher" class="cern.tim.util.jms.ActiveJmsSender">
+  <property name="jmsTemplate" ref="alarmTopicPublisherJmsTemplate"></property>
+</bean>
+
+<!-- 
+
 Publication to Tag updates
 
  -->
