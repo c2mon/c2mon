@@ -50,6 +50,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.jms.AdminMessageListener;
+import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.HeartbeatListener;
 import cern.c2mon.client.jms.JmsProxy;
@@ -151,6 +152,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private HeartbeatListenerWrapper heartbeatListenerWrapper;
   
   /**
+   *  Subscribes to the alarm topic and notifies any registered listeners.
+   */
+  private AlarmListenerWrapper alarmListenerWrapper;
+  
+  /**
    * Recording connection status to JMS.
    * Only set in connect and startReconnectThread methods.
    */
@@ -196,17 +202,26 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private Destination heartbeatTopic;
   
   /**
+   * Topic on which server alarm messages are arriving.
+   */
+  private Destination alarmTopic;
+  
+  /**
    * Constructor.
    * @param connectionFactory the JMS connection factory
    * @param supervisionTopic topic on which supervision events arrive from server
+   * @param alarmTopic topic on which alarm messages arrive from server
+   * @param heartbeatTopic topic on which heartbeat messages arrive from server
    */
   @Autowired
   public JmsProxyImpl(final ConnectionFactory connectionFactory, 
       @Qualifier("supervisionTopic") final Destination supervisionTopic,
+      @Qualifier("alarmTopic") final Destination alarmTopic,
       @Qualifier("heartbeatTopic") final Destination heartbeatTopic) {
     this.jmsConnectionFactory = connectionFactory;
     this.supervisionTopic = supervisionTopic;
     this.heartbeatTopic = heartbeatTopic;
+    this.alarmTopic = alarmTopic;
     this.adminMessageTopic = null;
     
     
@@ -343,12 +358,22 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       subscribeToSupervisionTopic();
       subscribeToHeartbeatTopic();
       subscribeToAdminMessageTopic();
+      subscribeToAlarmTopic();
     } catch (JMSException e) {
       LOGGER.error("Did not manage to refresh Topic subscriptions.", e);
       throw e;
     } finally {
       refreshLock.writeLock().unlock();
     }
+  }
+  
+  /**
+   * Subscribes to the alarm topic. 
+   */
+  private void subscribeToAlarmTopic() throws JMSException {
+    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);                           
+    MessageConsumer consumer = session.createConsumer(alarmTopic);                 
+    consumer.setMessageListener(alarmListenerWrapper);
   }
   
   /**
@@ -497,6 +522,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   
   /**
    * ActiveMQ-specific implementation since need to create topic.
+   * @return a Collection of ClientRequestResults
    */
   @Override
   public <T extends ClientRequestResult> Collection<T> sendRequest(final JsonRequest<T> jsonRequest, 
@@ -548,6 +574,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           
           else // replyMessage is an instanceof TextMessage
 
+            System.out.println(((TextMessage) replyMessage).getText());
             return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText()); 
           
         } finally {
@@ -657,6 +684,22 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       throw new NullPointerException("Trying to unregister null AdminMessage listener from JmsProxy.");
     }
     adminMessageListenerWrapper.removeListener(adminMessageListener);        
+  }
+  
+  @Override
+  public void registerAlarmListener(final AlarmListener alarmListener) {
+    if (alarmListener == null) {
+      throw new NullPointerException("Trying to register null alarm listener with JmsProxy.");
+    }
+    alarmListenerWrapper.addListener(alarmListener);
+  }
+  
+  @Override
+  public void unregisterAlarmListener(final AlarmListener alarmListener) {
+    if (alarmListener == null) {
+      throw new NullPointerException("Trying to unregister null alarm listener from JmsProxy.");
+    }
+    alarmListenerWrapper.removeListener(alarmListener);
   }
 
   @Override

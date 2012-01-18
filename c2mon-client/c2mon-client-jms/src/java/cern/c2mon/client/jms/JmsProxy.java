@@ -187,6 +187,23 @@ public interface JmsProxy {
   void setAdminMessageTopic(final Destination adminMessageTopic);
   
   /**
+   * Register a listener to be notified of alarm messages received
+   * from the server.
+   * 
+   * @param alarmListener the listener to register
+   * @throws NullPointerException if argument is null
+   */
+  void registerAlarmListener(final AlarmListener alarmListener);
+   
+  /**
+   * Unregister the listener from receiving alarm updates.
+   * 
+   * @param alarmListener the listener to remove
+   * @throws NullPointerException if argument is null
+   */
+  void unregisterAlarmListener(final AlarmListener alarmListener);
+  
+  /**
    * Register a listener to be notified of AdminMessage events received
    * from the server.
    * 

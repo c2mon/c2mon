@@ -260,9 +260,9 @@ public class RequestHandlerImplTest {
 
   private CommandReport createCommandReport(final ClientRequest clientRequest) {
 
-    CommandExecuteRequest handle = (CommandExecuteRequest) clientRequest.getObjectParameter() ;
+    CommandExecuteRequest handle = (CommandExecuteRequest) clientRequest.getObjectParameter();
 
-    CommandReport report = new CommandReportImpl(handle.getId(), CommandExecutionStatus.STATUS_EXECUTION_FAILED, "test report") ;
+    CommandReport report = new CommandReportImpl(handle.getId(), CommandExecutionStatus.STATUS_EXECUTION_FAILED, "test report");
     return report;
   }
 

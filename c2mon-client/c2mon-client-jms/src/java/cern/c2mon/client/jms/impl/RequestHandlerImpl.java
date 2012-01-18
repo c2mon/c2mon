@@ -148,12 +148,12 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public Collection<AlarmValue> requestAllActiveAlarms() throws JMSException {
     
-    ClientRequestImpl<ClientRequestResult> activeAlarmsRequest = new ClientRequestImpl<ClientRequestResult>
-      (ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST,
+    ClientRequestImpl<AlarmValue> activeAlarmsRequest = new ClientRequestImpl<AlarmValue>(
+        ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST,
           ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
           10000); // == timeout
     
-    Collection c = jmsProxy.sendRequest(activeAlarmsRequest , requestQueue, 
+    Collection<AlarmValue> c = jmsProxy.sendRequest(activeAlarmsRequest , requestQueue, 
         activeAlarmsRequest.getTimeout());
     
     return c;
@@ -282,7 +282,7 @@ public class RequestHandlerImpl implements RequestHandler {
   
   @SuppressWarnings("unchecked")
   @Override
-  public <T> CommandReport executeCommand(CommandExecuteRequest<T> commandExecuteRequest) throws JMSException {
+  public <T> CommandReport executeCommand(final CommandExecuteRequest<T> commandExecuteRequest) throws JMSException {
     
     ClientRequestImpl clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
     clientRequest.setObjectParameter(commandExecuteRequest);
