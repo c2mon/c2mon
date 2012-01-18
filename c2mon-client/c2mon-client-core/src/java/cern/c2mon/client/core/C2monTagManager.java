@@ -123,6 +123,13 @@ public interface C2monTagManager {
    */  
   Collection<AlarmValue> getAlarms(final Collection<Long> alarmIds);
   
+  /**
+   * Returns an {@link AlarmValue} object for every active alarm found
+   * in the server.
+   * 
+   * @return A collection of all active <code>AlarmValue</code> objects
+   */  
+  Collection<AlarmValue> getAllActiveAlarms();
   
   /**
    * Applies the confifuration and returns a Configuration Report.

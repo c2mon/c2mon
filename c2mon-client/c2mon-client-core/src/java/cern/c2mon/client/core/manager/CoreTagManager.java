@@ -19,6 +19,7 @@ package cern.c2mon.client.core.manager;
 
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
+import cern.c2mon.client.jms.AlarmListener;
 
 /**
  * This interface extends the <code>C2monTagManager</code>
@@ -28,7 +29,7 @@ import cern.c2mon.client.core.listener.TagSubscriptionListener;
  *
  * @author Matthias Braeger
  */
-interface CoreTagManager extends C2monTagManager {
+interface CoreTagManager extends C2monTagManager, AlarmListener {
   
   /**
    * Registers a <code>TagSubscriptionListener</code> to the <code>TagManager</code>. 
@@ -43,4 +44,16 @@ interface CoreTagManager extends C2monTagManager {
    * @throws NullPointerException In case that the parameter is <code>null</code>.
    */
   void removeTagSubscriptionListener(TagSubscriptionListener listener);
+
+  /**
+   * Unregisters an <code>AlarmListener</code> from the <code>TagManager</code>. 
+   * @param listener The listener to be unregistered
+   */
+  void removeAlarmListener(AlarmListener listener);
+
+  /**
+   * Registers an <code>AlarmListener</code> to the <code>TagManager</code>. 
+   * @param listener The listener to be registered
+   */
+  void addAlarmListener(AlarmListener listener);
 }

@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
 import org.apache.log4j.Logger;
@@ -38,6 +39,7 @@ import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
+import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
@@ -73,7 +75,13 @@ public class TagManager implements CoreTagManager {
   private final RequestHandler clientRequestHandler;
 
   /** Lock for accessing the <code>listeners</code> variable */
+  private ReentrantReadWriteLock alarmListenersLock = new ReentrantReadWriteLock();
+
+  /** Lock for accessing the <code>listeners</code> variable */
   private ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
+
+  /** List of subscribed alarm listeners */
+  private final Set<AlarmListener> alarmListeners = new HashSet<AlarmListener>();
 
   /** List of subscribed listeners */
   private final Set<TagSubscriptionListener> tagSubscriptionListeners = new HashSet<TagSubscriptionListener>();
@@ -89,7 +97,9 @@ public class TagManager implements CoreTagManager {
    *          server
    */
   @Autowired
-  protected TagManager(final ClientDataTagCache pCache, final RequestHandler pRequestHandler) {
+  protected TagManager(final ClientDataTagCache pCache,
+      final RequestHandler pRequestHandler) {
+
     this.cache = pCache;
     this.clientRequestHandler = pRequestHandler;
   }
@@ -173,6 +183,26 @@ public class TagManager implements CoreTagManager {
   public void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
     Set<Long> unsubscribedTagIds = cache.unsubscribeDataTags(dataTagIds, listener);
     fireOnUnsubscribeEvent(unsubscribedTagIds);
+  }
+
+  @Override
+  public void addAlarmListener(final AlarmListener listener) {
+    alarmListenersLock.writeLock().lock();
+    try {
+      alarmListeners.add(listener);
+    } finally {
+      alarmListenersLock.writeLock().unlock();
+    }
+  }
+
+  @Override
+  public void removeAlarmListener(final AlarmListener listener) {
+    alarmListenersLock.writeLock().lock();
+    try {
+      alarmListeners.remove(listener);
+    } finally {
+      alarmListenersLock.writeLock().unlock();
+    }
   }
 
   @Override
@@ -288,7 +318,7 @@ public class TagManager implements CoreTagManager {
     }
     return new ArrayList<TagConfig>();
   }
-  
+
   @Override
   public String getProcessXml(final String processName) {
 
@@ -298,6 +328,17 @@ public class TagManager implements CoreTagManager {
       LOG.error("getProcessXml() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
     }
     return null;
+  }
+
+  @Override
+  public Collection<AlarmValue> getAllActiveAlarms() {
+
+    try {
+      return clientRequestHandler.requestAllActiveAlarms();
+    } catch (JMSException e) {
+      LOG.error("getAllActiveAlarms() - JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+    }
+    return new ArrayList<AlarmValue>();
   }
 
   @Override
@@ -312,11 +353,11 @@ public class TagManager implements CoreTagManager {
   }
 
   @Override
-  public ConfigurationReport applyConfiguration(Long configurationId) {
+  public ConfigurationReport applyConfiguration(final Long configurationId) {
 
     return clientRequestHandler.applyConfiguration(configurationId);
   }
-  
+
   @Override
   public Collection<ProcessNameResponse> getProcessNames() {
 
@@ -332,5 +373,26 @@ public class TagManager implements CoreTagManager {
   public int getCacheSize() {
 
     return cache.getCacheSize();
+  }
+
+  private void notifyAlarmListeners (final AlarmValue alarm) {
+
+    for (AlarmListener listener:alarmListeners) {
+
+      listener.onAlarmUpdate(alarm);
+    }
+  }
+
+  @Override
+  public void onAlarmUpdate(final AlarmValue alarm) {
+
+    alarmListenersLock.readLock().lock();
+
+    try {
+      notifyAlarmListeners(alarm);
+    }
+    finally {
+      alarmListenersLock.readLock().unlock();
+    }
   }
 }
