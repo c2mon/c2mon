@@ -97,7 +97,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
     //lock to only allow a single backup at a time
     backupLock.writeLock().lock();
     try {
-      LOGGER.debug("Sending LASER active alarm backup.");
+      LOGGER.debug("Creating LASER active alarm backup list.");
       List<Alarm> alarmList = new ArrayList<Alarm>();
       for (Long alarmId : alarmCache.getKeys()) {
         try {
@@ -110,7 +110,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
           LOGGER.warn("Unable to locate alarm " + alarmId + " in cache during LASER backup: not included in backup.", e);
         }
       }
-      LOGGER.debug("Sending LASER active alarm backup.");
+      LOGGER.debug("Sending active alarm backup to LASER.");
       if (!alarmList.isEmpty()) {
           publishAlarmBackUp(alarmList);
       }
