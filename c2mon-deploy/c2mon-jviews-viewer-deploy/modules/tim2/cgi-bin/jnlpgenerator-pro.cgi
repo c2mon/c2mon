@@ -7,11 +7,12 @@ use Config::Properties;
 ##
 # Definition of global variables
 #
-my $jardir = "../lib";
-my $appdir = "tim2-jviews-viewer/";
-my $codebase = "http://timweb.cern.ch/javaws";
+my $jardir                    = "../lib";
+my $appdir                    = "tim2-jviews-viewer/";
+my $codebase                  = "http://timweb.cern.ch/javaws";
 my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
-my $timViewerPropertiesFile = "../tim-viewer.properties";
+my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
+my $timViewerPropertiesFile   = "../tim-viewer.properties";
 
 ##
 # Reading version number from ../version.txt
@@ -40,13 +41,6 @@ my $jdbcDriver           = $c2monProperties->getProperty("c2mon.jdbc.driver");
 my $jdbcRoUrl            = $c2monProperties->getProperty("c2mon.jdbc.ro.url");
 my $jdbcRoUser           = $c2monProperties->getProperty("c2mon.jdbc.ro.user");
 my $jdbcRoPassword       = $c2monProperties->getProperty("c2mon.jdbc.ro.password");
-my $jmsUrl               = $c2monProperties->getProperty("c2mon.client.jms.url");
-my $jmsUser              = $c2monProperties->getProperty("c2mon.client.jms.user");
-my $jmsPassword          = $c2monProperties->getProperty("c2mon.client.jms.password");
-my $jmsAdminMessageTopic = $c2monProperties->getProperty("c2mon.client.jms.adminmessage.topic");
-my $jmsSupervisionTopic  = $c2monProperties->getProperty("c2mon.client.jms.supervision.topic");
-my $jmsHeartbeatTopic    = $c2monProperties->getProperty("c2mon.client.jms.heartbeat.topic");
-my $jmsRequestQueue      = $c2monProperties->getProperty("c2mon.client.jms.request.queue");
 close PROPS;
 
 ##
@@ -121,13 +115,7 @@ jarlist ("$jardir");
 print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 print "		<property name=\"tim.app.title\" value=\"$appTitle\"/>\n";
 # JMS configuration parameters needed by C2MON client API
-print "		<property name=\"c2mon.client.jms.url\" value=\"$jmsUrl\"/>\n";
-print "		<property name=\"c2mon.client.jms.user\" value=\"$jmsUser\"/>\n";
-print "		<property name=\"c2mon.client.jms.password\" value=\"$jmsPassword\"/>\n";
-print "		<property name=\"c2mon.client.jms.adminmessage.topic\" value=\"$jmsAdminMessageTopic\"/>\n";
-print "		<property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
-print "		<property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
-print "		<property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
+print "		<property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
 # C2MON read-only credentials to STL database, needed for the history player and charts
 print "		<property name=\"c2mon.jdbc.driver\" value=\"$jdbcDriver\"/>\n";
 print "		<property name=\"c2mon.jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
