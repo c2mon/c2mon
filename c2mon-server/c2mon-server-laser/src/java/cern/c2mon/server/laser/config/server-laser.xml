@@ -16,4 +16,8 @@
   	<property name="sourceName" value="${cern.c2mon.laser.sourceName}"/>
   </bean>
   
+  <bean class="cern.c2mon.server.laser.publication.LaserBackupPublisher">
+  	<property name="backupInterval" value="600000"/>
+  </bean>
+  
   </beans>

@@ -9,10 +9,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
 
 import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
@@ -29,7 +29,6 @@ import cern.tim.server.common.config.ServerConstants;
  * @author Mark Brightwell
  * 
  */
-@Service
 @ManagedResource(objectName = "cern.c2mon:type=LaserPublisher,name=LaserBackupPublisher")
 public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
@@ -41,12 +40,12 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   /**
    * Time (ms) between backups.
    */
-  private static final int BACKUP_INTERVAL = 60000;
+  private int backupInterval;
 
   /**
-   * Initial delay before sending backups (ms).
+   * Initial delay before sending first backup (ms).
    */
-  private static final int INITIAL_BACKUP_DELAY = BACKUP_INTERVAL;
+  private static final int INITIAL_BACKUP_DELAY = 60000;
 
   /**
    * Lock used to only allow one backup to run at any time across a server cluster.
@@ -177,7 +176,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
     try {
 		asi = AlarmSystemInterfaceFactory.createSource(publisher.getSourceName());
 		timer = new Timer();
-	    timer.scheduleAtFixedRate(this, INITIAL_BACKUP_DELAY, BACKUP_INTERVAL);
+	    timer.scheduleAtFixedRate(this, INITIAL_BACKUP_DELAY, backupInterval);
 	    running = true;
 	} catch (ASIException e) {
 		stop();
@@ -198,6 +197,23 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   @Override
   public int getPhase() {
     return ServerConstants.PHASE_START_LAST;
+  }
+
+  /**
+   * Setter method
+   * @param backupInterval the time between successive LASER backups (in milliseconds)
+   */
+  @Required
+  public void setBackupInterval(int backupInterval) {
+    this.backupInterval = backupInterval;
+  }
+
+  /**
+   * Getter method.
+   * @return the backupInterval
+   */
+  public int getBackupInterval() {
+    return backupInterval;
   }
 
 }
