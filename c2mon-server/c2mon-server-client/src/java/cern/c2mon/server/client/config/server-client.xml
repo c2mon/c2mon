@@ -37,7 +37,7 @@ Alarm Publications
  -->
  
 <bean id="alarmDestination" class="org.apache.activemq.command.ActiveMQTopic">
-  <constructor-arg value="${jms.client.alarm.topic:c2mon.client.alarm}"/>
+  <constructor-arg value="${jms.client.alarm.topic}"/>
 </bean>
 
 <!-- plugged into ActiveJmsSender -->
