@@ -574,7 +574,6 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           
           else // replyMessage is an instanceof TextMessage
 
-            System.out.println(((TextMessage) replyMessage).getText());
             return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText()); 
           
         } finally {
