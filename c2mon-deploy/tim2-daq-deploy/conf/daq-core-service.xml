@@ -12,24 +12,24 @@
 
 <bean id="driverKernel" class="cern.tim.driver.common.DriverKernel">
   <property name="primaryRequestSender" ref="primaryRequestSender"/>
-<!--  <property name="secondaryRequestSender" ref="secondaryRequestSender"/>-->
+  <property name="secondaryRequestSender" ref="secondaryRequestSender"/>
   <property name="processMessageReceivers">
     <list>
-<!--      <ref bean="sonicMessageReceiver"/>-->
+      <ref bean="sonicMessageReceiver"/>
       <ref bean="activeMessageReceiver"/>              
     </list>
   </property>
 </bean>
 
 <!-- initialize the ProcessRequestSender; can switch here between implementations (No dummy implementation needed if local conf used)-->
-<!--<bean id="secondaryRequestSender" class="cern.tim.driver.common.messaging.impl.SonicRequestSender"/>-->
+<bean id="secondaryRequestSender" class="cern.tim.driver.common.messaging.impl.SonicRequestSender"/>
 <bean id="primaryRequestSender" class="cern.tim.driver.common.messaging.impl.ActiveRequestSender"/>
 
 <!-- 
 Initialize the ProcessMessageReceiver; switch here between implementations (Dummy implementation available) 
 Several can be wired into DriverKernel
 -->
-<!--<bean id="sonicMessageReceiver" class="cern.tim.driver.common.messaging.impl.SonicMessageReceiver"/>-->
+<bean id="sonicMessageReceiver" class="cern.tim.driver.common.messaging.impl.SonicMessageReceiver"/>
 <bean id="activeMessageReceiver" class="cern.tim.driver.common.messaging.impl.ActiveMessageReceiver"/>
 
 <!-- initialize the FilterMessageSender; switch here between implementations (Dummy implementation available) -->
