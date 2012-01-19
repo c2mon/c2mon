@@ -165,33 +165,37 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       if (replyDestination != null) {
 
         MessageProducer messageProducer = session.createProducer(replyDestination);
-        messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
+        try {
+          messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+          messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
 
-        Message replyMessage = null;
+          Message replyMessage = null;
 
-        if (clientRequest.requiresObjectResponse()) {
+          if (clientRequest.requiresObjectResponse()) {
 
-          // Send response as an Object message
-          replyMessage = session.createObjectMessage((Serializable) response);
+            // Send response as an Object message
+            replyMessage = session.createObjectMessage((Serializable) response);
 
-        } else {
+          } else {
 
-          // Send response as Json message
-          replyMessage = session.createTextMessage(GSON.toJson(response));
-        }
+            // Send response as Json message
+            replyMessage = session.createTextMessage(GSON.toJson(response));
+          }
 
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("onMessage() : Responded to ClientRequest.");
-        }
-        messageProducer.send(replyMessage);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("onMessage() : Responded to ClientRequest.");
+          }
+          messageProducer.send(replyMessage);
+        } finally {          
+          messageProducer.close();
+        }        
       } else {
         LOG.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
         throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
       }
     } catch (Exception e) {
       LOG.error("Exception caught while processing client request - unable to process it; request will time out", e);
-    }    
+    }
   }
 
   /**
