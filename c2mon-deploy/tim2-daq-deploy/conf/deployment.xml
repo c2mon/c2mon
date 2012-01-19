@@ -87,6 +87,7 @@
       <startscript name="TIM2-DAQ-STARTUP">
         <main-class name="cern.tim.driver.common.startup.DaqStartup">
           <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS} -transition</arg>
+          <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml"/>
         </main-class>
       </startscript>
     </application>
@@ -104,8 +105,7 @@
       </deployment>
       <startscript name="TIM2-DAQ-STARTUP">
         <main-class name="cern.tim.driver.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
-          <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml"/>
+          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>          
         </main-class>
       </startscript>
     </application>
