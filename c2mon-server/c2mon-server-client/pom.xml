@@ -117,7 +117,7 @@
             -Djms.client.supervision.topic=tim.client.supervision.test
             -Djms.client.request.queue=tim.client.request.test
             -Dc2mon.jms.client.consumers.min=1
-            -Dc2mon.jms.client.consumers.max=2            
+            -Dc2mon.jms.client.consumers.max=2    
             
             <!--
               server core properties for integration testing
@@ -136,6 +136,9 @@
             -Dc2mon.jms.heartbeat.topic=test.tim.sys.hearbeat
             -Dc2mon.jms.heartbeat.user=not-used
             -Dc2mon.jms.heartbeat.password=not-used  
+            
+            <!-- alarm topic -->
+            -Djms.client.alarm.topic=tim.client.alarm        
               
             <!--
               daq communication in
