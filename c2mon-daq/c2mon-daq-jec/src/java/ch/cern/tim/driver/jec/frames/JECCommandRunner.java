@@ -22,7 +22,6 @@ import cern.tim.driver.common.ICommandRunner;
 import cern.tim.driver.common.conf.equipment.IEquipmentConfiguration;
 import cern.tim.driver.tools.equipmentexceptions.EqCommandTagException;
 import cern.tim.shared.common.datatag.address.PLCHardwareAddress;
-import cern.tim.shared.common.type.TagDataType;
 import cern.tim.shared.daq.command.ISourceCommandTag;
 import cern.tim.shared.daq.command.SourceCommandTagValue;
 import ch.cern.tim.driver.jec.PLCObjectFactory;
@@ -117,16 +116,16 @@ public class JECCommandRunner extends AbstractJECPFrameProcessor implements ICom
         JECPFrames commandFrame = getPlcFactory().getRawSendFrame();
         commandFrame.SetDataStartNumber((short) cmdTagAddress.getWordId());
         commandFrame.SetSequenceNumber(cmdSeqNumber);
-        switch (sourceCommandTagValue.getDataTypeNumeric()) {
-        case TagDataType.TYPE_BOOLEAN:
+        switch (cmdTagAddress.getBlockType()) {
+        case PLCHardwareAddress.STRUCT_DIAG_BOOLEAN_COMMAND:
+        case PLCHardwareAddress.STRUCT_BOOLEAN_COMMAND:
             prepareBooleanCommandFrame(commandFrame, sourceCommandTagValue, cmdTagAddress);
             break;
-        case TagDataType.TYPE_INTEGER:
-        case TagDataType.TYPE_FLOAT:
+        case PLCHardwareAddress.STRUCT_ANALOG_COMMAND:
             prepareAnalogCommandFrame(commandFrame, sourceCommandTagValue, cmdTagAddress);
             break;
         default:
-            throw new EqCommandTagException("Invalid Data Type for this command tag");
+            throw new EqCommandTagException("Invalid Block Type "+ cmdTagAddress.getBlockType() +" for command tag " + sourceCommandTagValue.getId());
         }
         getEquipmentLogger().debug("Putting sendCommand thread in WAIT mode. Waiting Command Confirm...");
         int commandReportCode = sendAndWaitForCommandReply(sourceCommandTag, commandFrame);
@@ -198,7 +197,7 @@ public class JECCommandRunner extends AbstractJECPFrameProcessor implements ICom
     private void prepareBooleanCommandFrame(final JECPFrames booleanCommandFrame, final SourceCommandTagValue sourceCommandTagValue,
             final PLCHardwareAddress cmdTagAddress) throws EqCommandTagException {
         booleanCommandFrame.SetMessageIdentifier(StdConstants.BOOL_CMD_MSG);
-        booleanCommandFrame.SetDataType(StdConstants.BOOL_CMD_VALUE);
+        booleanCommandFrame.SetDataType((byte) cmdTagAddress.getBlockType());
         booleanCommandFrame.SetDataOffset((short) cmdTagAddress.getBitId());
         short boolValue;
         if (sourceCommandTagValue.getValue().equals(Boolean.FALSE)) {
