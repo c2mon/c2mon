@@ -1,23 +1,23 @@
 <config>
-    <!-- 
+  <!-- 
 	<view>
-  		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Process_State/ProcessState.ivl"/>
+  	<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Process_State/ProcessState.ivl"/>
 		<property name="external" type="java.lang.Boolean" value="false"/>
 	</view>
 	-->
-	<property name="treeOpen" type="java.lang.Boolean" value="true"/>
-	<property name="nominalValuesVisible" type="java.lang.Boolean" value="false"/>
-	<property name="linksVisible" type="java.lang.Boolean" value="true"/>
-	<property name="fitToContent" type="java.lang.Boolean" value="true"/>
-	<property name="keepAspectRatio" type="java.lang.Boolean" value="true"/>
-    <property name="viewerhelpdir" type="java.lang.String" value="http://timweb.cern.ch/wiki/doku.php?id=documentation:timviewer"/>
-    <property name="viewshelpdir" type="java.lang.String" value="http://timweb.cern.ch/wiki/doku.php?id=documentation:viewer:views:"/>
-    <property name="viewsNavigationTreeCreator" type="java.lang.String" value="http://cs-ccr-www1.cern.ch/~alaser/dmn2-jviews-viewer/cgi-bin/viewlist.cgi"/>
-	<property name="consoleLoggerConfiguration" type="java.lang.String" value="DEBUG_ENABLED = false; TIMESTAMP_ENABLED=false; BUFFER_SIZE=3000;STACK_TRACE_DEPTH=4"/>
+	<property name="tree-open" type="java.lang.Boolean" value="true"/>
+	<property name="nominal-values-visible" type="java.lang.Boolean" value="false"/>
+	<property name="links-visible" type="java.lang.Boolean" value="true"/>
+	<property name="fit-to-content" type="java.lang.Boolean" value="true"/>
+	<property name="keep-aspect-ratio" type="java.lang.Boolean" value="true"/>
+  <property name="viewer-help-dir" type="java.lang.String" value="http://timweb.cern.ch/wiki/doku.php?id=documentation:timviewer"/>
+  <property name="views-help-dir" type="java.lang.String" value="http://timweb.cern.ch/wiki/doku.php?id=documentation:viewer:views:"/>
+  <property name="views-navigation-tree-creator" type="java.lang.String" value="http://cs-ccr-www1.cern.ch/~alaser/dmn2-jviews-viewer/cgi-bin/viewlist.cgi"/>
+	<property name="console-logger-configuration" type="java.lang.String" value="DEBUG_ENABLED = false; TIMESTAMP_ENABLED=false; BUFFER_SIZE=3000;STACK_TRACE_DEPTH=4"/>
 	
 	<!-- 
 	  This property can be used to load the TIM Viewer with different palettes.
 	  If not specified, the TIM Viewer looks into the standard URL directory: "http://timweb.cern.ch/Views/palettes/"
 	-->
-	<property name="dashboardPalettesDir" type="java.lang.String" value="http://timweb.cern.ch/Views/palettes/"/>
+	<property name="dashboard-palettes-dir" type="java.lang.String" value="http://timweb.cern.ch/Views/palettes/"/>
  </config>
