@@ -74,6 +74,24 @@
       </startscript>
     </application>
 
+	<application name="tim2-daq-prod-new" extends="default">
+      <deployment installLocation="~/dist/daqprocess-mvn-new">
+        <directory name="conf">
+          <file name=".c2mon.properties" sourceDir="~/rep/c2mon/daq"
+            mask="400" />
+        </directory>
+        <directory name="bin">
+          <file name="setenv.sh" sourceDir="~/rep/c2mon/daq" mask="700" />
+        </directory>
+      </deployment>
+      <startscript name="TIM2-DAQ-STARTUP">
+        <main-class name="cern.tim.driver.common.startup.DaqStartup">
+          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS} -transition</arg>
+          <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml"/>
+        </main-class>
+      </startscript>
+    </application>
+    
     <application name="tim2-daq-test" extends="default">
       <deployment installLocation="~/dist/daqprocess-mvn">
         <directory name="conf">
