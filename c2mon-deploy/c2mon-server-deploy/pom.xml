@@ -20,9 +20,9 @@
     </description>
 	<url></url>
 
-  <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-server-deploy</developerConnection>
-  </scm>
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-server-deploy</developerConnection>
+	</scm>
 
 	<developers />
 
@@ -31,8 +31,14 @@
 		<module>modules/dmn2</module>
 	</modules>
 
-	<build />
-
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>cern.devtools</groupId>
+				<artifactId>cern-maven-plugin</artifactId>
+				<version>0.0.5-SNAPSHOT</version>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
