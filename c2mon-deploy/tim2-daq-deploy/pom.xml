@@ -30,6 +30,10 @@
 		</dependency>
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
+			<artifactId>tim2-daq-jec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-daq</groupId>
 			<artifactId>tim2-daq-dip</artifactId>
 		</dependency>
 		<dependency>
@@ -39,10 +43,6 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-daq</groupId>
 			<artifactId>c2mon-daq-opcua</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-daq</groupId>
-			<artifactId>c2mon-daq-jec</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
