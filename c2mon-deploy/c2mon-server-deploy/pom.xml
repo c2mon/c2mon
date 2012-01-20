@@ -31,14 +31,14 @@
 		<module>modules/dmn2</module>
 	</modules>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>cern.devtools</groupId>
-				<artifactId>cern-maven-plugin</artifactId>
-				<version>0.0.5-SNAPSHOT</version>
-			</plugin>
-		</plugins>
-	</build>
+<!--	<build>-->
+<!--		<plugins>-->
+<!--			<plugin>-->
+<!--				<groupId>cern.devtools</groupId>-->
+<!--				<artifactId>cern-maven-plugin</artifactId>-->
+<!--				<version>0.0.5-SNAPSHOT</version>-->
+<!--			</plugin>-->
+<!--		</plugins>-->
+<!--	</build>-->
 
 </project>
