@@ -11,22 +11,20 @@ use File::Path;
 ##
 
 my $basedir = "/user/diamonop/public_html/dmn2-views";
-my $baseurl = "http://cs-ccr-www1.cern.ch/~diamonop/dmn2-views";
+my $baseurl = "http://abwww/~diamonop/dmn2-views";
 
 # Reading property file ~/rep/c2mon/.c2mon.properties #
-open PROPS, "< /user/diamonop/c2mon/prod/server/c2mon.properties"
+open PROPS, "< /user/diamonop/c2mon/prod/client/client.properties"
   or die
-"Unable to open configuration file ~diamonop/c2mon/prod/server/c2mon.properties";
+"Unable to open configuration file ~diamonop/c2mon/prod/client/client.properties";
 my $c2monProperties = new Config::Properties();
 $c2monProperties->load(*PROPS);
 
 # Separate database connection URL is neccesary for the perl DBI connector
 
-my $dbiUrl = "dbi:Oracle:dbabco";
-
-
 my $dbiUser     = $c2monProperties->getProperty("jdbc.config.user");
 my $dbiPassword = $c2monProperties->getProperty("jdbc.config.password");
+my $dbiUrl = $c2monProperties->getProperty("dbi.url");
 
 my $dbh = DBI->connect( $dbiUrl, $dbiUser, $dbiPassword )
   || die( $DBI::errstr . "\n" );
