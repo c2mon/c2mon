@@ -78,7 +78,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 	codebase=\"$codebase\"
 	>
 	<information>
-		<title>$appName (TEST C2MON SERVER)</title>
+		<title>TIM Viewer (TEST C2MON SERVER)</title>
 	        <vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
 	        <homepage href=\"tim-viewer/index.html\"/>
 	        <description>The combined GTPM and synoptic viewer</description>

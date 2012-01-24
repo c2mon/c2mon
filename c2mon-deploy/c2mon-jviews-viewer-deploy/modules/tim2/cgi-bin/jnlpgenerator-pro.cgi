@@ -85,7 +85,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 	codebase=\"$codebase\"
 	>
 	<information>
-		<title>$appTitle</title>
+		<title>TIM Viewer</title>
 	        <vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
 	        <homepage href=\"tim-viewer/index.html\"/>
 	        <description>The combined GTPM and synoptic viewer</description>
