@@ -99,15 +99,20 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       LOGGER.debug("Creating LASER active alarm backup list.");
       List<Alarm> alarmList = new ArrayList<Alarm>();
       for (Long alarmId : alarmCache.getKeys()) {
-        try {
-          Alarm alarm = alarmCache.getCopy(alarmId);
-          if (alarm.isActive()) {
-            alarmList.add(alarm);
+        if (running) {
+          try {
+            Alarm alarm = alarmCache.getCopy(alarmId);
+            if (alarm.isActive()) {
+              alarmList.add(alarm);
+            }
+          } catch (CacheElementNotFoundException e) {
+            // should only happen if concurrent re-configuration of the server
+            LOGGER.warn("Unable to locate alarm " + alarmId + " in cache during LASER backup: not included in backup.", e);
           }
-        } catch (CacheElementNotFoundException e) {
-          // should only happen if concurrent re-configuration of the server
-          LOGGER.warn("Unable to locate alarm " + alarmId + " in cache during LASER backup: not included in backup.", e);
-        }
+        } else {
+          //interrupt alarm sending as shutting down
+          return;
+        }        
       }
       LOGGER.debug("Sending active alarm backup to LASER.");
       if (!alarmList.isEmpty()) {
@@ -187,11 +192,11 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   @ManagedOperation(description="Stops the backups publisher.")
   public void stop() {
     LOGGER.info("Stopping LASER backup mechanism.");
+    running = false;
     timer.cancel();
     if (asi != null) { 
     	asi.close();
-    }
-    running = false;
+    }    
   }
 
   @Override
