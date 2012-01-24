@@ -3,8 +3,8 @@ use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 
-my $configsubdir = "/~diamonop/dmn2-viewer/conf";
-my $configdir = "/user/diamonop/public_html/dmn2-viewer/conf";
+my $configsubdir = "/~diamondev/dmn2-viewer/conf";
+my $configdir = "/user/diamondev/public_html/dmn2-viewer/conf";
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
 
 ##
@@ -17,8 +17,8 @@ chomp $viewerVersion; # removes new line character
 close VFILE;
 
 print header;
-print start_html(-title=>'DMN2 Viewer [PROD]', -style=>"/css/tim.css");
-print h1('DMN2 Viewer [PROD] version: ${viewerVersion} connects to the DMN2 PROD server');
+print start_html(-title=>'DMN2 Viewer [DEV]', -style=>"/css/tim.css");
+print h1('DMN2 Viewer [DEV] version: ${viewerVersion} connects to the DMN2 DEV server');
 print p("To launch the DMN2 Viewer, choose one of the configurations below ",font({-color=>"#FF0000"},"(NOTE: the DMN2 Viewer works correctly only on Technical Network)"),":"); 
 opendir DIR, $configdir;
 my @files = sort grep !/^\.\.?$/, readdir DIR;

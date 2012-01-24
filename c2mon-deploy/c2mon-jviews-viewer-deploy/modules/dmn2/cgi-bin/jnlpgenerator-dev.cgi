@@ -8,11 +8,11 @@ use Config::Properties;
 ##
 # Definition of global variables
 ##
-my $viewerVersion = "1.0.1-SNAPSHOT";
 my $jardir = "../lib";
-my $appdir = "dmn2-jviews-viewer/";
-my $codebase = "http://bewww/~diamonop";
-my $c2monPropertyFile = "$codebase/c2mon/$c2monEnv/client.properties";
+my $appdir = "dmn2-viewer";
+my $codebase = "http://bewww/~diamondev";
+my $c2monClientPropertiesFile = "../conf/client.properties";
+my $c2monClientPropertiesURL = "${codebase}/${appdir}/conf/client.properties";
 
 ##
 # Reading version number from ../version.txt
@@ -23,26 +23,21 @@ my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
 
-#
-# Reading client property file, still needed to read iBatis jdbc config
 ##
-my $c2monPropertyFileLocal = "/user/diamonop/public_html/c2mon/$c2monEnv/client.properties";
-open PROPS, "< $c2monPropertyFileLocal"
-  or die "Unable to open configuration file $c2monPropertyFileLocal";
+# Reading the C2MON client properties file #
+#
+open PROPS, "< $c2monClientPropertiesFile"
+  or die "Unable to open configuration file $c2monClientPropertiesFile";
+
 
 my $c2monProperties = new Config::Properties();
+$c2monProperties->load(*PROPS);
+
 $c2monProperties->load(*PROPS);
 my $jdbcDriver           = $c2monProperties->getProperty("c2mon.jdbc.driver");
 my $jdbcRoUrl            = $c2monProperties->getProperty("c2mon.jdbc.ro.url");
 my $jdbcRoUser           = $c2monProperties->getProperty("c2mon.jdbc.ro.user");
 my $jdbcRoPassword       = $c2monProperties->getProperty("c2mon.jdbc.ro.password");
-my $jmsUrl               = $c2monProperties->getProperty("c2mon.client.jms.url");
-my $jmsUser              = $c2monProperties->getProperty("c2mon.client.jms.user");
-my $jmsPassword          = $c2monProperties->getProperty("c2mon.client.jms.password");
-my $jmsAdminMessageTopic = $c2monProperties->getProperty("c2mon.client.jms.adminmessage.topic");
-my $jmsSupervisionTopic  = $c2monProperties->getProperty("c2mon.client.jms.supervision.topic");
-my $jmsHeartbeatTopic    = $c2monProperties->getProperty("c2mon.client.jms.heartbeat.topic");
-my $jmsRequestQueue      = $c2monProperties->getProperty("c2mon.client.jms.request.queue");
 close PROPS;
 
 ##
@@ -86,8 +81,8 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 	codebase=\"$codebase\"
 	>
 	<information>
-		<title>DMN2 Viewer</title>
-	        <vendor>BE/CO-IN DIAMON Team</vendor>
+		<title>DMN2 Viewer [DEV]</title>
+	        <vendor>BE/CO-IN DIAMON2 Team</vendor>
 	        <homepage href=\"tim-viewer/index.html\"/>
 	        <description>The synoptic viewer</description>
 	        <icon kind=\"splash\" href=\"http://timweb.cern.ch/img/tim-animated-320x200.gif\"/>
@@ -104,13 +99,7 @@ jarlist ("$jardir");
 # Defines the version number that is shown in the DMN2 Viewer about dialog
 print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
-print "		<property name=\"c2mon.client.jms.url\" value=\"$jmsUrl\"/>\n";
-print "		<property name=\"c2mon.client.jms.user\" value=\"$jmsUser\"/>\n";
-print "		<property name=\"c2mon.client.jms.password\" value=\"$jmsPassword\"/>\n";
-print "		<property name=\"c2mon.client.jms.adminmessage.topic\" value=\"$jmsAdminMessageTopic\"/>\n";
-print "		<property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
-print "		<property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
-print "		<property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
+print "		<property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
 
 # C2MON read-only credentials to STL database, needed for the history player and charts
 print "		<property name=\"c2mon.jdbc.driver\" value=\"$jdbcDriver\"/>\n";
@@ -124,7 +113,7 @@ if (param('configurl')) {
 
 print "	</resources>
 	<resources os=\"Windows\" > 
-		<property name=\"tim.log.file\" value=\"c:\\temp\\dm2-viewer.log\"/>
+		<property name=\"tim.log.file\" value=\"c:\\temp\\dmn2-viewer.log\"/>
 	</resources> 
 	<application-desc main-class=\"ch.cern.tim.client.jviews.Main\">
 	</application-desc>
