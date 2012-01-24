@@ -19,23 +19,6 @@
 	</componentDescriptors>
 
 	<files>
-
-		<!--  copy the properties file -->
-		<file>
-			<source>${basedir}/tim2-tim-viewer.properties</source>
-			<outputDirectory>/</outputDirectory>
-			<destName>tim-viewer.properties</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-
-<!--		  copy the version file -->
-<!--		<file>-->
-<!--			<source>${project.build.directory}/version.txt</source>-->
-<!--			<outputDirectory>/</outputDirectory>			-->
-<!--			<lineEnding>unix</lineEnding>-->
-<!--			<fileMode>0444</fileMode>-->
-<!--		</file>-->
 	</files>
 
 </assembly>
