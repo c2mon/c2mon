@@ -15,7 +15,7 @@
 		<application name="dmn2-viewer-prod" extends="default">
 			<deployment installLocation="/user/diamonop/public_html/dmn2-viewer">
 				<directory name="conf">
-					<file name="client.properties" sourceDir="/user/diamonoop/c2mon/dev/client"
+					<file name="client.properties" sourceDir="/user/diamonop/c2mon/prod/client"
 						mask="400" />
 				</directory>
 			</deployment>
@@ -24,7 +24,7 @@
 		<application name="dmn2-viewer-dev" extends="default">
 			<deployment installLocation="/user/diamondev/public_html/dmn2-viewer">
 				<directory name="conf">
-					<file name="client.properties" sourceDir="/user/diamonondev/c2mon/dev/client"
+					<file name="client.properties" sourceDir="/user/diamononop/c2mon/dev/client"
 						mask="400" />
 				</directory>
 			</deployment>
