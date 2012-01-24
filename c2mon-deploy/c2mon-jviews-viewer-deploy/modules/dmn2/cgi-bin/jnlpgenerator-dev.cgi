@@ -23,10 +23,6 @@ my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
 
-# the title name of the application
-my $appName="DMN2 Viewer (dev)";
-
-
 #
 # Reading client property file, still needed to read iBatis jdbc config
 ##
@@ -106,10 +102,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 jarlist ("$jardir");
 
 # Defines the version number that is shown in the DMN2 Viewer about dialog
-print "		<property name=\"tim.app.title\" value=\"$appName\"/>\n";
 print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
-print "		<property name=\"rbac.app.name\" value=\"diamon-console\"/>\n";
-
 # JMS configuration parameters needed by C2MON client API
 print "		<property name=\"c2mon.client.jms.url\" value=\"$jmsUrl\"/>\n";
 print "		<property name=\"c2mon.client.jms.user\" value=\"$jmsUser\"/>\n";

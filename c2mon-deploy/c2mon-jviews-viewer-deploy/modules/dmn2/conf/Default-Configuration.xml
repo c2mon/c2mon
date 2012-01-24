@@ -5,14 +5,23 @@
 		<property name="external" type="java.lang.Boolean" value="false"/>
 	</view>
 	-->
-	<property name="tree-open" type="java.lang.Boolean" value="true"/>
-	<property name="nominal-values-visible" type="java.lang.Boolean" value="false"/>
-	<property name="links-visible" type="java.lang.Boolean" value="true"/>
-	<property name="fit-to-content" type="java.lang.Boolean" value="true"/>
-	<property name="keep-aspect-ratio" type="java.lang.Boolean" value="true"/>
-  <property name="viewer-help-dir" type="java.lang.String" value="http://timweb.cern.ch/wiki/doku.php?id=documentation:timviewer"/>
-  <property name="views-help-dir" type="java.lang.String" value="http://timweb.cern.ch/wiki/doku.php?id=documentation:viewer:views:"/>
+	
+  <!-- 
+     This variable determines the global title that is given to
+     the application and which is displayed e.g. in the task bar 
+  -->
+  <property name="viewer-title" type="java.lang.String" value="DMN2 Viewer" />
+  
+  <!-- Application name which is used to register the TIM Viewer in RBAC -->
+  <property name="rbac-app-name" type="java.lang.String" value="diamon-console" />
+  
+  <!-- 
+     Defines URL to the XML file that shall be used to create the
+     navigation tree. This URL can also point to a Perl script. 
+  -->
   <property name="views-navigation-tree-creator" type="java.lang.String" value="http://cs-ccr-www1.cern.ch/~alaser/dmn2-jviews-viewer/cgi-bin/viewlist.cgi"/>
+  
+  <!-- Defines the initialization parameter for the cern.accsoft.gui.frame.Console -->
 	<property name="console-logger-configuration" type="java.lang.String" value="DEBUG_ENABLED = false; TIMESTAMP_ENABLED=false; BUFFER_SIZE=3000;STACK_TRACE_DEPTH=4"/>
 	
 	<!-- 
@@ -20,4 +29,5 @@
 	  If not specified, the TIM Viewer looks into the standard URL directory: "http://timweb.cern.ch/Views/palettes/"
 	-->
 	<property name="dashboard-palettes-dir" type="java.lang.String" value="http://timweb.cern.ch/Views/palettes/"/>
- </config>
+
+</config>
