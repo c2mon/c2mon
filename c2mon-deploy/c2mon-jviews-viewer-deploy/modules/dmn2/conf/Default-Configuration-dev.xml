@@ -33,4 +33,11 @@
 	<property name="dashboard-palettes-dir" type="java.lang.String"
 		value="http://timweb.cern.ch/Views/palettes/" />
 
+	<!--
+		Defines the URL of the C2MON Tag Viewer. The Viewer will append a Tag
+		ID at the end of the URL to retrieve more information.
+	-->
+	<property name="tag-viewer-url" type="java.lang.String"
+		value="http://cs-ccr-lasertest:8080/c2mon-web-configviewer/tagviewer/" />
+
 </config>
