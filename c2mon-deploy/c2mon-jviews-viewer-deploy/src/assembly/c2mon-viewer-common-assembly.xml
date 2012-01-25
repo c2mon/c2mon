@@ -35,6 +35,25 @@
 			<directory>${project.basedir}/conf/</directory>
 		</fileSet>
 
+		<fileSet>
+			<outputDirectory>/conf/pro</outputDirectory>
+			<includes>
+				<include>*.xml</include>
+			</includes>
+			<fileMode>0444</fileMode>
+			<directoryMode>0755</directoryMode>
+			<directory>${project.basedir}/conf/pro</directory>
+		</fileSet>
+
+		<fileSet>
+			<outputDirectory>/conf/dev</outputDirectory>
+			<includes>
+				<include>*.xml</include>
+			</includes>
+			<fileMode>0444</fileMode>
+			<directoryMode>0755</directoryMode>
+			<directory>${project.basedir}/conf/dev</directory>
+		</fileSet>		
 	</fileSets>
 
 	<files>

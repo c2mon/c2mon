@@ -17,25 +17,14 @@
 		<componentDescriptor>src/assembly/c2mon-viewer-common-assembly.xml
 		</componentDescriptor>
 	</componentDescriptors>
+	
 	<files>
-
-		<!--  copy the properties file -->
-		<!-- 
-		<file>
-			<source>${basedir}/dmn2-jms.properties</source>
-			<outputDirectory>/</outputDirectory>
-			<destName>jms.properties</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		-->
-		
 		<file>
 			<source>deployment.xml</source>
 			<outputDirectory>/</outputDirectory>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
-		</file>		
+		</file>
 	</files>
 
 </assembly>
