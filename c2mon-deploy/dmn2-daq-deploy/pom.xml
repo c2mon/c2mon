@@ -49,6 +49,10 @@
 			<groupId>cern.tim2.tim2-daq</groupId>
 			<artifactId>tim2-daq-ssh</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>cern.dmn2.dmn2-daq</groupId>
+			<artifactId>dmn2-daq-cmwadmin</artifactId>			
+		</dependency>
 	</dependencies>
 
 	<build>
