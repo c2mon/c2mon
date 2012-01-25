@@ -42,7 +42,7 @@
 			</includes>
 			<fileMode>0444</fileMode>
 			<directoryMode>0755</directoryMode>
-			<directory>${project.basedir}/conf/pro</directory>
+			<directory>${project.basedir}/conf/pro/</directory>
 		</fileSet>
 
 		<fileSet>
@@ -52,7 +52,7 @@
 			</includes>
 			<fileMode>0444</fileMode>
 			<directoryMode>0755</directoryMode>
-			<directory>${project.basedir}/conf/dev</directory>
+			<directory>${project.basedir}/conf/dev/</directory>
 		</fileSet>		
 	</fileSets>
 
