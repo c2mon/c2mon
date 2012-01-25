@@ -436,8 +436,8 @@ TIMDAQ_executeRemoteCmd() {
     if [ $USE_XML_PROTOCOL -eq 1 ] ; then
       CMD="-xml $CMD"
     fi
-
-    ssh -2 $DAQ_HOST "cd '$DAQ_HOME'/bin; $0 $CMD"
+    #override the trap on the shell EXIT to prevent "logout" output
+    ssh -2 $DAQ_HOST "trap '' EXIT; cd '$DAQ_HOME'/bin; $0 $CMD"
   else
     case "$instruction" in
      'start')
