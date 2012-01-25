@@ -53,7 +53,7 @@ sub jarlist {
     		readdir DIR;
   	closedir DIR;
   	foreach (@contents) {
-              my $htmldir = $appName."/".substr($_, 3, length($_));
+              my $htmldir = $appdir."/".substr($_, 3, length($_));
     		if (!-l && -d) {
 			&jarlist($_);
 		}

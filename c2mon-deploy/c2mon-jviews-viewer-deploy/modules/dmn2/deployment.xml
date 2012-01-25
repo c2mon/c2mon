@@ -16,7 +16,7 @@
 			<deployment installLocation="/user/diamonop/public_html/dmn2-viewer">
 				<directory name="conf">
 					<file name="client.properties" sourceDir="/user/diamonop/c2mon/prod/client"
-						mask="400" />
+						mask="444" />
 				</directory>
 			</deployment>
 		</application>
@@ -25,7 +25,7 @@
 			<deployment installLocation="/user/diamondev/public_html/dmn2-viewer">
 				<directory name="conf">
 					<file name="client.properties" sourceDir="/user/diamononop/c2mon/dev/client"
-						mask="400" />
+						mask="444" />
 				</directory>
 			</deployment>
 		</application>
