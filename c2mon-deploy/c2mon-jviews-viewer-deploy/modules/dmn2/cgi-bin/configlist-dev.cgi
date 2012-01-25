@@ -3,7 +3,7 @@ use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 
-my $configsubdir = "/~diamondev/dmn2-viewer/conf";
+my $configsubdir = "/~diamondev/dmn2-viewer/conf/dev";
 my $configdir = "/user/diamondev/public_html/dmn2-viewer/conf/dev";
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
 
