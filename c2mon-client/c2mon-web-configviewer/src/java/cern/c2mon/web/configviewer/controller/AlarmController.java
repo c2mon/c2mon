@@ -46,7 +46,7 @@ public class AlarmController {
     /**
      * A link to the helpalarm
      * */
-    public static final String HELPALARM_FORM = "http://oraweb.cern.ch/pls/timw3_oper/helpalarm.AlarmForm?p_alarmid=";
+    public static final String HELPALARM_FORM = "http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=";
     
     /**
      * An alarm service

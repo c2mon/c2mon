@@ -1,24 +1,27 @@
 package cern.c2mon.web.configviewer.controller;
 
-import java.security.Principal;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Handles requests for the application home page.
  */
 @Controller
-@RequestMapping(value="/")
+@RequestMapping(value = "/")
 public class MainController {
     
-    @RequestMapping(method=RequestMethod.GET)
-    public String getCreateForm(Model model, HttpServletRequest request) {
+    /**
+     * This is the application home page.
+     * @param model Spring MVC Model instance to be filled in before jsp processes it
+     * @param request Used to get the username
+     * @return name of a jsp page which will be displayed
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public String getCreateForm(final Model model, final HttpServletRequest request) {
       
         String username = "";
 
@@ -28,5 +31,5 @@ public class MainController {
 
         model.addAttribute("username", username);
         return "home";
-    }
+    } 
 }

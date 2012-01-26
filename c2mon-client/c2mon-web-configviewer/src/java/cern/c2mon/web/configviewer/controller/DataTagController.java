@@ -25,7 +25,7 @@ public class DataTagController {
     /**
      * A link to the helpalarm
      * */
-    public static final String HELPALARM_LIST = "https://oraweb.cern.ch/pls/timw3_oper/helpalarm.AlarmList?p_pointid1=";
+    public static final String HELPALARM_LIST = "https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=";
 
     /**
      * A REST-style URL to tagviewer, combined with tag id displays datatag configuration
