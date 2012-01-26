@@ -22,6 +22,10 @@
         </description>
 	<url></url>
 
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-jviews-viewer-deploy</developerConnection>
+	</scm>
+
 	<properties>
 		<c2mon.jarsigner.key>/user/pcrops/production/cmmnbuild/cmmnbuild/build/dist/cmmnbuild/includes/slcerts
 		</c2mon.jarsigner.key>
@@ -33,7 +37,17 @@
 		<module>modules/tim2</module>
 		<module>modules/dmn2</module>
 	</modules>
+	
+	<build>
+	    <!--  this plugin is used for releasing multimodule projects -->
+		<plugins>
+			<plugin>
+				<groupId>cern.devtools</groupId>
+				<artifactId>cern-maven-plugin</artifactId>
+				<version>0.0.5-SNAPSHOT</version>
+			</plugin>
+		</plugins>
+	</build>
 
-	<build/>
 
 </project>
