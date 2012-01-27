@@ -378,7 +378,7 @@
         </root>
         <root>       
           <field-name>cern.c2mon.server.laser.publication.LaserBackupPublisher.backupLock</field-name>
-          <root-name>LASER module backup lock</root-name>
+          <root-name>laserModuleBackupLock</root-name>
         </root>         
        </roots>
 <!--      <web-applications>-->
