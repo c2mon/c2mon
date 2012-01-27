@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>c2mon-server-deploy</artifactId>
 		<groupId>cern.c2mon.c2mon-deploy</groupId>
-		<version>1.0.7-SNAPSHOT</version>
+		<version>1.0.7</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
