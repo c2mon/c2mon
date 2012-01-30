@@ -111,15 +111,14 @@ iframe {
 	margin-top: -80px; /* = height + preferred bottom margin */
  
 	/* link is centered */
-	left: 50%;
-	margin-left: -400px; /* = half of width */
+	margin-left: 80%; /* = half of width */
  
 	/* round the corners (to your preference) */
 	-moz-border-radius: 24px;
 	-webkit-border-radius: 24px;
  
 	/* make it big and easy to see (size, style to preferences) */
-	width: 800px;
+	width: 75px;
 	line-height: 48px;
 	height: 48px;
 	padding: 10px;
