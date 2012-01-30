@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.tim2.tim2-server</groupId>
     <artifactId>tim2-server-pom</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-video</artifactId>
@@ -82,16 +82,12 @@
     </dependency>
     <dependency>
     	<groupId>cern.tim2.tim2-server</groupId>
-    	<artifactId>tim2-server-command</artifactId>
-    	<version>1.0.1-20110519.092359-1</version>
-    	<type>pom</type>
+    	<artifactId>tim2-server-command</artifactId>    	
     	<scope>compile</scope>
     </dependency>
     <dependency>
     	<groupId>cern.tim2.tim2-shared</groupId>
-    	<artifactId>tim2-shared-util</artifactId>
-    	<version>1.0.1-20111025.112414-21</version>
-    	<type>pom</type>
+    	<artifactId>tim2-shared-util</artifactId>    	
     	<scope>compile</scope>
     </dependency>
     <dependency>
