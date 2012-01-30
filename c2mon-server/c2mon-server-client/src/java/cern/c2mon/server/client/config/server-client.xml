@@ -44,6 +44,10 @@ Alarm Publications
 <bean id="alarmTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
   <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
   <property name="defaultDestination" ref="alarmDestination"/>
+  <property name="explicitQosEnabled" value="true"/>
+  <property name="timeToLive" value="60000"/>
+  <property name="deliveryPersistent" value="false" />
+  <property name="sessionTransacted" value="false" />
 </bean>
 
 <!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
@@ -60,6 +64,10 @@ Publication to Tag updates
 <!-- plugged into ActiveJmsSender -->
 <bean id="clientTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
   <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
+  <property name="explicitQosEnabled" value="true"/>
+  <property name="timeToLive" value="60000"/>
+  <property name="deliveryPersistent" value="false" /> 
+  <property name="sessionTransacted" value="false" />
 </bean>
 
 <!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
@@ -81,6 +89,10 @@ Publication of Supervision events
 <bean id="supervisionTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
   <property name="connectionFactory" ref="clientSingleConnectionFactory"/>  
   <property name="defaultDestination" ref="supervisionDestination"/>
+  <property name="explicitQosEnabled" value="true"/>
+  <property name="timeToLive" value="60000"/>
+  <property name="deliveryPersistent" value="false" />
+  <property name="sessionTransacted" value="false" />  
 </bean>
 
 <!-- JmsSender for publishing to supervision events to the client  -->
