@@ -27,257 +27,278 @@ import cern.tim.server.common.config.ServerConstants;
 @ManagedResource(objectName = "cern.c2mon:type=LaserPublisher,name=LaserPublisher")
 public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean {
 
-    /**
-     * The alarm source name this publisher is called.
-     */
-    private String sourceName;
+  /**
+   * Time between connection attempts at start-up (in millis)
+   */
+  private static final long SLEEP_BETWEEN_CONNECT = 3000;
 
-    /**
-     * Our Logger
-     */
-    private Logger log = Logger.getLogger(LaserPublisher.class);
+  /**
+   * The alarm source name this publisher is called.
+   */
+  private String sourceName;
 
-    /**
-     * yet another logger, that will be configured to output to a file every alarm pushed to LASER
-     */
-    private Logger laserLog = Logger.getLogger("LaserAlarmsLogger");
+  /**
+   * Our Logger
+   */
+  private Logger log = Logger.getLogger(LaserPublisher.class);
 
+  /**
+   * yet another logger, that will be configured to output to a file every alarm
+   * pushed to LASER
+   */
+  private Logger laserLog = Logger.getLogger("LaserAlarmsLogger");
 
-    /** Reference to the LASER alarm system interface. */
-    private AlarmSystemInterface asi = null;
+  /** Reference to the LASER alarm system interface. */
+  private AlarmSystemInterface asi = null;
 
-    /**
-     * Flag for lifecycle calls.
-     */
-    private volatile boolean running = false;
+  /**
+   * Flag for lifecycle calls.
+   */
+  private volatile boolean running = false;
+  
+  /**
+   * Module shutdown request (on server shutdown f.eg.)
+   */
+  private volatile boolean shutdownRequested = false;
 
-    /**
-     * Service for registering as listener to C2MON caches.
-     */
-    private CacheRegistrationService cacheRegistrationService;
+  /**
+   * Service for registering as listener to C2MON caches.
+   */
+  private CacheRegistrationService cacheRegistrationService;
 
-    /**
+  /**
 	 */
-    private StatisticsModule stats = new StatisticsModule();
+  private StatisticsModule stats = new StatisticsModule();
 
-    /**
-     * Autowired constructor.
-     * 
-     * @param cacheRegistrationService the C2MON cache registration service bean
-     */
-    @Autowired
-    public LaserPublisher(final CacheRegistrationService cacheRegistrationService) {
-        super();
-        this.cacheRegistrationService = cacheRegistrationService;
+  /**
+   * Autowired constructor.
+   * 
+   * @param cacheRegistrationService the C2MON cache registration service bean
+   */
+  @Autowired
+  public LaserPublisher(final CacheRegistrationService cacheRegistrationService) {
+    super();
+    this.cacheRegistrationService = cacheRegistrationService;
+  }
+
+  /**
+   * @param sourceName the alarm source name this publisher should be called.
+   */
+  @Required
+  public void setSourceName(String sourceName) {
+    if (log.isInfoEnabled()) {
+      log.info("Setting Alarm Sourcename to " + sourceName);
     }
+    this.sourceName = sourceName;
+  }
 
-    /**
-     * @param sourceName the alarm source name this publisher should be called.
-     */
-    @Required
-    public void setSourceName(String sourceName) {
-        if (log.isInfoEnabled()) {
-            log.info("Setting Alarm Sourcename to " + sourceName);
-        }
-        this.sourceName = sourceName;
-    }
+  /**
+   * @return the alarm source name this publisher is called.
+   */
+  public String getSourceName() {
+    return sourceName;
+  }
 
-    /**
-     * @return the alarm source name this publisher is called.
-     */
-    public String getSourceName() {
-        return sourceName;
-    }
+  /**
+   * Called at server startup.
+   * 
+   * @throws Exception in case the underlying alarm system could not be initiated.
+   */
+  @PostConstruct
+  public void init() throws Exception {
+    cacheRegistrationService.registerToAlarms(this);    
+  }
 
-    /**
-     * Called at server startup.
-     * 
-     * @throws Exception in case the underlying alarm system could not be initiated.
-     */
-    @PostConstruct
-    public void init() throws Exception {
-        cacheRegistrationService.registerToAlarms(this);
-        start();
-    }
-
-
-    /**
+  /**
      * 
      */
-    @Override
-	public void notifyElementUpdated(Alarm cacheable) {
-    	
-		FaultState fs = null;
-		fs = AlarmSystemInterfaceFactory.createFaultState(cacheable.getFaultFamily(), cacheable.getFaultMember(), cacheable.getFaultCode());
-	
-		stats.update(cacheable);
-		
-		if (cacheable.isActive()){
-			fs.setDescriptor(cacheable.getState());
-			fs.setUserTimestamp(cacheable.getTimestamp());
-	
-			if (cacheable.getInfo() != null) {
-				Properties prop = fs.getUserProperties();
-				prop.put(FaultState.ASI_PREFIX_PROPERTY, cacheable.getInfo());
-				fs.setUserProperties(prop);
-			}
-		}else{
-			fs.setDescriptor(FaultState.TERMINATE);
-			fs.setUserTimestamp(cacheable.getTimestamp());
-		}
-		
-		if (log.isDebugEnabled()) {
-			log.debug("Pushing alarm to LASER :\n" + fs);
-		}
-		boolean result = true;
-		try {
-			asi.push(fs);
-			log(cacheable);			    
-		} catch (ASIException e) {
-			// Ooops, didn't work. log the exception.
-			result = false;
-			StringBuilder str = new StringBuilder("Alarm System Interface Exception. Unable to send FaultState ");
-			str.append(cacheable.getFaultFamily());
-			str.append(':');
-			str.append(cacheable.getFaultMember());
-			str.append(':');
-			str.append(cacheable.getFaultCode());
-			str.append(" to LASER.");
-			log.error(str, e);
-		} catch (Exception e) {
-			result = false;
-			StringBuilder str = new StringBuilder("sendFaultState() : Unexpected Exception. Unable to send FaultState ");
-			str.append(cacheable.getFaultFamily());
-			str.append(':');
-			str.append(cacheable.getFaultMember());
-			str.append(':');
-			str.append(cacheable.getFaultCode());
-			str.append(" to LASER.");
-			log.error(str, e);
-		}
-		// Keep track of the sent alarm in the Alarm log
-		StringBuilder str = new StringBuilder();
-		str.append(cacheable.getTimestamp());
-		str.append("\t");
-		str.append(cacheable.getFaultFamily());
-		str.append(':');
-		str.append(cacheable.getFaultMember());
-		str.append(':');
-		str.append(cacheable.getFaultCode());
-		str.append('\t');
-		str.append(cacheable.getState());
-		if (cacheable.getInfo() != null) {
-			str.append('\t');
-			str.append(cacheable.getInfo());
-		}
-		if (result)
-			log.info(str);
-		else
-			log.error(str);
-	}
+  @Override
+  public void notifyElementUpdated(Alarm cacheable) {
+    if (running) {
+      FaultState fs = null;
+      fs = AlarmSystemInterfaceFactory.createFaultState(cacheable.getFaultFamily(), cacheable.getFaultMember(), cacheable.getFaultCode());
 
-    // below server lifecycle methods: complete start/stop (no need to allow for
-    // stop/restart, just final shutdown)
-    @Override
-    public boolean isAutoStartup() {
-        return true;
-    }
+      stats.update(cacheable);
 
-    @Override
-    public void stop(Runnable callback) {
-        stop();
-        callback.run();
-    }
+      if (cacheable.isActive()) {
+        fs.setDescriptor(cacheable.getState());
+        fs.setUserTimestamp(cacheable.getTimestamp());
 
-    @Override
-    public boolean isRunning() {
-        return running;
-    }
-
-    @Override
-    @ManagedOperation(description="Starts the alarm publisher.")
-    public void start() {
-        if (log.isInfoEnabled()) {
-            log.info("Starting " + LaserPublisher.class.getName());
+        if (cacheable.getInfo() != null) {
+          Properties prop = fs.getUserProperties();
+          prop.put(FaultState.ASI_PREFIX_PROPERTY, cacheable.getInfo());
+          fs.setUserProperties(prop);
         }
-        try {
-			asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
-			running = true;
-		} catch (ASIException e) {
-			stop();
-			running = false;
-		}
-    }
+      } else {
+        fs.setDescriptor(FaultState.TERMINATE);
+        fs.setUserTimestamp(cacheable.getTimestamp());
+      }
 
-    @Override
-    @ManagedOperation(description="Stops the alarm publisher.")
-    public void stop() {
-        if (log.isInfoEnabled()) {
-            log.info("Stopping " + LaserPublisher.class.getName());
+      if (log.isDebugEnabled()) {
+        log.debug("Pushing alarm to LASER :\n" + fs);
+      }        
+      try {
+        asi.push(fs);     
+        log(cacheable);
+        // Keep track of the sent alarm in the Alarm log
+        StringBuilder str = new StringBuilder();
+        str.append(cacheable.getTimestamp());
+        str.append("\t");
+        str.append(cacheable.getFaultFamily());
+        str.append(':');
+        str.append(cacheable.getFaultMember());
+        str.append(':');
+        str.append(cacheable.getFaultCode());
+        str.append('\t');
+        str.append(cacheable.getState());
+        if (cacheable.getInfo() != null) {
+          str.append('\t');
+          str.append(cacheable.getInfo());
         }
-        if (asi != null) { 
-        	asi.close();
-        }
-        running = false;
-    }
+        log.info(str);      
+      } catch (ASIException e) {
+        // Ooops, didn't work. log the exception.
+        StringBuilder str = new StringBuilder("Alarm System Interface Exception. Unable to send FaultState ");
+        str.append(cacheable.getFaultFamily());
+        str.append(':');
+        str.append(cacheable.getFaultMember());
+        str.append(':');
+        str.append(cacheable.getFaultCode());
+        str.append(" to LASER.");
+        log.error(str, e);
+      } catch (Exception e) {
+        StringBuilder str = new StringBuilder("sendFaultState() : Unexpected Exception. Unable to send FaultState ");
+        str.append(cacheable.getFaultFamily());
+        str.append(':');
+        str.append(cacheable.getFaultMember());
+        str.append(':');
+        str.append(cacheable.getFaultCode());
+        str.append(" to LASER.");
+        log.error(str, e);
+      } 
+    } else {
+      log.warn("Unable to publish alarm as LASER publisher module not running: alarm id " + cacheable.getId());
+    }               
+  }
 
-    @Override
-    public int getPhase() {
-        return ServerConstants.PHASE_STOP_LAST;
-    }
+  // below server lifecycle methods: complete start/stop (no need to allow for
+  // stop/restart, just final shutdown)
+  @Override
+  public boolean isAutoStartup() {
+    return true;
+  }
 
-    @Override
-    @ManagedOperation(description="Return the total number of alarms processed since last reset().")
-    public long getProcessedAlarms() {
-        return stats.getTotalProcessed();
-    }
+  @Override
+  public void stop(Runnable callback) {
+    stop();
+    callback.run();
+  }
 
-    @Override
-    @ManagedOperation(description="Resets the internal statistics for all alarms.")
-    public void resetStatistics() {
-        if (log.isTraceEnabled()) {
-            log.trace("Entering resetStatistics()");
-        }
-        stats.resetStatistics();
-    }
+  @Override
+  public boolean isRunning() {
+    return running;
+  }
 
-    @Override
-    @ManagedOperation(description="Resets the internal statistics for a specific alarm.")
-    public void resetStatistics(String alarmID) {
-        if (log.isTraceEnabled()) {
-            log.trace("Entering resetStatistics('" + alarmID + "')");
-        }
-        stats.resetStatistics(alarmID);
-    }
+  @Override
+  @ManagedOperation(description = "Starts the alarm publisher (will continue in own thread until successful)")
+  public void start() {    
+    new Thread(new Runnable() {
+      @Override
+      public void run() {        
+        while (!running && !shutdownRequested) {
+          try {
+            if (log.isInfoEnabled()) {
+              log.info("Starting " + LaserPublisher.class.getName() + " (in own thread)");
+            }
+            asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
+            running = true;
+          } catch (ASIException e) {
+            log.error("Failed to start LASER publisher - will try again in 5 seconds", e);
+            try {
+              Thread.sleep(SLEEP_BETWEEN_CONNECT);
+            } catch (InterruptedException e1) {
+              log.error("Interrupted during sleep", e1);
+            }            
+          }
+        }        
+      }
+    }).start();   
+  }
 
-    @Override
-    @ManagedOperation(description="Return a list of alarm for which statistics are collected.")
-    public List<String> getRegisteredAlarms() {
-        if (log.isTraceEnabled()) {
-            log.trace("Entering getRegisteredAlarms()");
-        }
-        return stats.getStatsList();
+  @Override
+  @ManagedOperation(description = "Stops the alarm publisher.")
+  public void stop() {
+    log.info("Stopping LASER publisher" + LaserPublisher.class.getName());   
+    shutdownRequested = true;
+    //wait for connect thread to end
+    try {
+      Thread.sleep(SLEEP_BETWEEN_CONNECT);
+    } catch (InterruptedException e) {
+      log.error("Interrupted during sleep", e);
+    } 
+    if (asi != null) {
+      asi.close();
     }
+    running = false;
+    shutdownRequested = false;
+  }
 
-    @Override
-    @ManagedOperation(description="Returns a string representation of the statistics for an alarm.")
-    public String getStatsForAlarm(String id) {
-        if (stats.getStatsForAlarm(id) == null) {
-            return "Not found!";
-        } else {
-            return stats.getStatsForAlarm(id).toString();
-        }
-    }
+  @Override
+  public int getPhase() {
+    return ServerConstants.PHASE_STOP_LAST;
+  }
 
-    
-    private void log(final Alarm alarm) {
-        if (laserLog != null && laserLog.isInfoEnabled()) {
-            laserLog.info(alarm);
-        }
-    }
+  @Override
+  @ManagedOperation(description = "Return the total number of alarms processed since last reset().")
+  public long getProcessedAlarms() {
+    return stats.getTotalProcessed();
+  }
 
-    public void confirmStatus(Alarm cacheable) {
-      notifyElementUpdated(cacheable);
+  @Override
+  @ManagedOperation(description = "Resets the internal statistics for all alarms.")
+  public void resetStatistics() {
+    if (log.isTraceEnabled()) {
+      log.trace("Entering resetStatistics()");
     }
+    stats.resetStatistics();
+  }
+
+  @Override
+  @ManagedOperation(description = "Resets the internal statistics for a specific alarm.")
+  public void resetStatistics(String alarmID) {
+    if (log.isTraceEnabled()) {
+      log.trace("Entering resetStatistics('" + alarmID + "')");
+    }
+    stats.resetStatistics(alarmID);
+  }
+
+  @Override
+  @ManagedOperation(description = "Return a list of alarm for which statistics are collected.")
+  public List<String> getRegisteredAlarms() {
+    if (log.isTraceEnabled()) {
+      log.trace("Entering getRegisteredAlarms()");
+    }
+    return stats.getStatsList();
+  }
+
+  @Override
+  @ManagedOperation(description = "Returns a string representation of the statistics for an alarm.")
+  public String getStatsForAlarm(String id) {
+    if (stats.getStatsForAlarm(id) == null) {
+      return "Not found!";
+    } else {
+      return stats.getStatsForAlarm(id).toString();
+    }
+  }
+
+  private void log(final Alarm alarm) {
+    if (laserLog != null && laserLog.isInfoEnabled()) {
+      laserLog.info(alarm);
+    }
+  }
+
+  public void confirmStatus(Alarm cacheable) {
+    notifyElementUpdated(cacheable);
+  }
 
 }

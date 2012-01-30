@@ -36,6 +36,11 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * Class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(LaserBackupPublisher.class);
+  
+  /**
+   * Time between connection attempts at start-up (in millis)
+   */
+  private static final long SLEEP_BETWEEN_CONNECT = 3000;
 
   /**
    * Time (ms) between backups.
@@ -48,15 +53,21 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   private static final int INITIAL_BACKUP_DELAY = 60000;
 
   /**
-   * Lock used to only allow one backup to run at any time across a server cluster.
+   * Lock used to only allow one backup to run at any time across a server
+   * cluster.
    */
   private ReentrantReadWriteLock backupLock = new ReentrantReadWriteLock();
-  
+
   /**
    * Flag for lifecycle calls.
    */
   private volatile boolean running = false;
 
+  /**
+   * Module shutdown request (on server shutdown f.eg.)
+   */
+  private volatile boolean shutdownRequested = false;
+  
   /**
    * Timer scheduling publication.
    */
@@ -66,23 +77,25 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * Ref to alarm cache.
    */
   private AlarmCache alarmCache;
-  
+
   /**
-   * Our reference to the {@link LaserPublisher} as we need it to 
-   * use the {@link LaserPublisher#getSourceName()} method.<br>
+   * Our reference to the {@link LaserPublisher} as we need it to use the
+   * {@link LaserPublisher#getSourceName()} method.<br>
    * <br>
-   * This is because we want to be aligned (sourcename-wise) with the LaserPublisher instance. 
-   * Otherwise we may end up sending backups with a different sourcename. 
+   * This is because we want to be aligned (sourcename-wise) with the
+   * LaserPublisher instance. Otherwise we may end up sending backups with a
+   * different sourcename.
    */
   private LaserPublisher publisher = null;
-  
+
   /** Reference to the LASER alarm system interface. */
   private AlarmSystemInterface asi = null;
-  
+
   /**
    * Constructor.
    * 
-   * @param alarmCache ref to Alarm cache bean
+   * @param alarmCache
+   *          ref to Alarm cache bean
    */
   @Autowired
   public LaserBackupPublisher(AlarmCache alarmCache, LaserPublisher publisher) {
@@ -93,37 +106,41 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
   @Override
   public void run() {
-    //lock to only allow a single backup at a time
-    backupLock.writeLock().lock();
-    try {
-      LOGGER.debug("Creating LASER active alarm backup list.");
-      List<Alarm> alarmList = new ArrayList<Alarm>();
-      for (Long alarmId : alarmCache.getKeys()) {
-        if (running) {
-          try {
-            Alarm alarm = alarmCache.getCopy(alarmId);
-            if (alarm.isActive()) {
-              alarmList.add(alarm);
+    // lock to only allow a single backup at a time
+    if (running){
+      backupLock.writeLock().lock();
+      try {
+        LOGGER.debug("Creating LASER active alarm backup list.");
+        List<Alarm> alarmList = new ArrayList<Alarm>();
+        for (Long alarmId : alarmCache.getKeys()) {
+          if (!shutdownRequested) {
+            try {
+              Alarm alarm = alarmCache.getCopy(alarmId);
+              if (alarm.isActive()) {
+                alarmList.add(alarm);
+              }
+            } catch (CacheElementNotFoundException e) {
+              // should only happen if concurrent re-configuration of the server
+              LOGGER.warn("Unable to locate alarm " + alarmId + " in cache during LASER backup: not included in backup.", e);
             }
-          } catch (CacheElementNotFoundException e) {
-            // should only happen if concurrent re-configuration of the server
-            LOGGER.warn("Unable to locate alarm " + alarmId + " in cache during LASER backup: not included in backup.", e);
+          } else {
+            // interrupt alarm sending as shutting down
+            return;
           }
-        } else {
-          //interrupt alarm sending as shutting down
-          return;
-        }        
-      }
-      LOGGER.debug("Sending active alarm backup to LASER.");
-      if (!alarmList.isEmpty()) {
+        }
+        LOGGER.debug("Sending active alarm backup to LASER.");
+        if (!alarmList.isEmpty()) {
           publishAlarmBackUp(alarmList);
+        }
+        LOGGER.debug("Finished sending LASER active alarm backup.");
+      } catch (Exception e) {
+        LOGGER.error("Exception caught while publishing active Alarm backup list", e);
+      } finally {
+        backupLock.writeLock().unlock();
       }
-      LOGGER.debug("Finished sending LASER active alarm backup.");
-    } catch (Exception e) {
-      LOGGER.error("Exception caught while publishing active Alarm backup list", e);
-    } finally {
-      backupLock.writeLock().unlock();
-    }
+    } else {
+      LOGGER.warn("Unable to publish LASER backup as module not running.");
+    }    
   }
 
   /**
@@ -132,30 +149,30 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * @param alarmList list of active alarms
    */
   private void publishAlarmBackUp(List<Alarm> alarmList) {
-	  ArrayList<FaultState> toSend = new ArrayList<FaultState>();
-	  
-	  // iterate over list and transform them into Laser fault states 
-	  for(Alarm timAlarm : alarmList){
-		FaultState fs = null;
-		
-		fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
-		fs.setUserTimestamp(timAlarm.getTimestamp());
-		fs.setDescriptor(timAlarm.getState());
-		if (timAlarm.getInfo() != null) {
-			Properties prop = null;
-	        prop = fs.getUserProperties();
-	        prop.put(FaultState.ASI_PREFIX_PROPERTY, timAlarm.getInfo());
-	        fs.setUserProperties(prop);
-	    }
-		
-		toSend.add(fs);
-	  }
-	  try {
-		asi.pushActiveList(toSend);
-	} catch (ASIException e) {
-		LOGGER.error("Cannot create backup list : " + e.getMessage());
-		e.printStackTrace();
-	}
+    ArrayList<FaultState> toSend = new ArrayList<FaultState>();
+
+    // iterate over list and transform them into Laser fault states
+    for (Alarm timAlarm : alarmList) {
+      FaultState fs = null;
+
+      fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
+      fs.setUserTimestamp(timAlarm.getTimestamp());
+      fs.setDescriptor(timAlarm.getState());
+      if (timAlarm.getInfo() != null) {
+        Properties prop = null;
+        prop = fs.getUserProperties();
+        prop.put(FaultState.ASI_PREFIX_PROPERTY, timAlarm.getInfo());
+        fs.setUserProperties(prop);
+      }
+
+      toSend.add(fs);
+    }
+    try {
+      asi.pushActiveList(toSend);
+    } catch (ASIException e) {
+      LOGGER.error("Cannot create backup list : ", e);
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -175,28 +192,50 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   }
 
   @Override
-  @ManagedOperation(description="starts the backups publisher.")
+  @ManagedOperation(description = "starts the backups publisher.")
   public void start() {
-    LOGGER.info("Starting LASER backup mechanism.");
-    try {
-		asi = AlarmSystemInterfaceFactory.createSource(publisher.getSourceName());
-		timer = new Timer();
-	    timer.scheduleAtFixedRate(this, INITIAL_BACKUP_DELAY, backupInterval);
-	    running = true;
-	} catch (ASIException e) {
-		stop();
-	}
+    new Thread(new Runnable() {
+      @Override
+      public void run() {        
+        while (!running && !shutdownRequested) {
+          try {
+            LOGGER.info("Starting LASER backup mechanism.");
+            asi = AlarmSystemInterfaceFactory.createSource(publisher.getSourceName());            
+            timer = new Timer();
+            timer.scheduleAtFixedRate(LaserBackupPublisher.this, INITIAL_BACKUP_DELAY, backupInterval);
+            running = true;
+          } catch (ASIException e) {
+            LOGGER.error("Failed to start LASER backup publisher - will try again in 5 seconds", e);
+            try {
+              Thread.sleep(SLEEP_BETWEEN_CONNECT);
+            } catch (InterruptedException e1) {
+              LOGGER.error("Interrupted during sleep", e1);
+            }            
+          }
+        }        
+      }
+    }).start();    
   }
 
   @Override
-  @ManagedOperation(description="Stops the backups publisher.")
+  @ManagedOperation(description = "Stops the backups publisher.")
   public void stop() {
     LOGGER.info("Stopping LASER backup mechanism.");
-    running = false;
-    timer.cancel();
-    if (asi != null) { 
-    	asi.close();
+    shutdownRequested = true;
+    //wait for connect thread to end
+    try {
+      Thread.sleep(SLEEP_BETWEEN_CONNECT);
+    } catch (InterruptedException e) {
+      LOGGER.error("Interrupted during sleep", e);
+    } 
+    if (timer != null){
+      timer.cancel();
     }    
+    if (asi != null) {
+      asi.close();
+    }
+    running = false;
+    shutdownRequested = false;
   }
 
   @Override
@@ -206,6 +245,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
   /**
    * Setter method
+   * 
    * @param backupInterval the time between successive LASER backups (in milliseconds)
    */
   @Required
@@ -215,6 +255,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
   /**
    * Getter method.
+   * 
    * @return the backupInterval
    */
   public int getBackupInterval() {
