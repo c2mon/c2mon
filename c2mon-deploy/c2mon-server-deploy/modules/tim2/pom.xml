@@ -38,10 +38,6 @@
 		</dependency>
 		<dependency>
 			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-auth</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
 			<artifactId>tim2-server-cachepersistence</artifactId>
 		</dependency>
 		<dependency>
