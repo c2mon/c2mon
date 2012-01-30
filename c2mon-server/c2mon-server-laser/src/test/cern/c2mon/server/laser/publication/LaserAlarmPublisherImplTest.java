@@ -42,7 +42,7 @@ public class LaserAlarmPublisherImplTest {
 	}
 	
 	@Test
-	public void testSendActiveAlarmFaultState() {
+	public void testSendActiveAlarmFaultState() throws InterruptedException {
 		
 		LaserPublisher publisher = null;
 		
@@ -64,17 +64,20 @@ public class LaserAlarmPublisherImplTest {
 		publisher.setSourceName("TEST-SOURCE");
 		try {
 			publisher.init();
+			publisher.start();
 		} catch (Exception e) {
 			fail(e.getMessage());
 			e.printStackTrace();
 		}
+		//wait as LASER connection done in separate thread
+		Thread.sleep(3000);
 		publisher.notifyElementUpdated(alarmMock);
 		verify(alarmMock);
 	}
 	
 	
 	@Test
-	public void testSendTerninatedAlarmFaultState() {
+	public void testSendTerninatedAlarmFaultState() throws InterruptedException {
 		
 		LaserPublisher publisher = null;
 		
@@ -96,10 +99,13 @@ public class LaserAlarmPublisherImplTest {
 		publisher.setSourceName("TEST-SOURCE");
 		try {
 			publisher.init();
+			publisher.start();
 		} catch (Exception e) {
 			fail(e.getMessage());
 			e.printStackTrace();
 		}
+		//wait as LASER connection done in separate thread
+		Thread.sleep(3000);
 		publisher.notifyElementUpdated(alarmMock);
 		verify(alarmMock);
 	}
