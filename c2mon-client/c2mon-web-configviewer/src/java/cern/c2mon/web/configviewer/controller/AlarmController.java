@@ -91,7 +91,7 @@ public class AlarmController {
         e.printStackTrace();
         logger.error(e.getMessage());
       } catch (TagIdException e) {
-        return ("redirect:" + "/alarmviewer/form");
+        return ("redirect:" + "/alarmviewer/errorform/" + id);
       }
       return null;
     }
@@ -107,6 +107,21 @@ public class AlarmController {
         logger.info("/alarmviewer/form/{id} " + id);
         model.addAllAttributes(FormUtility.getFormModel(ALARM_FORM_TITLE, ALARM_FORM_INSTR, ALARM_FORM_URL, id, ALARM_URL + id));
         return "formWithData";
+    }
+    
+    /**
+     * Displays an input form for an alarm id, and if a POST was made with an alarm id, also the alarm data.
+     * @param id alarm id
+     * @param model Spring MVC Model instance to be filled in before jsp processes it
+     * @return name of a jsp page which will be displayed
+     * */
+    @RequestMapping(value = "/alarmviewer/errorform/{id}")
+    public String viewAlarmErrorForm(@PathVariable(value = "id") final String id, final Model model) {
+        logger.info("/alarmviewer/errorform " + id);
+        
+       model.addAllAttributes(FormUtility.getFormModel(ALARM_FORM_TITLE, ALARM_FORM_INSTR, ALARM_FORM_URL, null, null));
+       model.addAttribute("err", id);
+       return "errorFormWithData";
     }
     
     /**

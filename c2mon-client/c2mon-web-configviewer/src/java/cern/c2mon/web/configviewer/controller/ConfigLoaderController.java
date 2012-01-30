@@ -29,117 +29,132 @@ import cern.c2mon.web.configviewer.util.LoginForm;
 @Controller
 public class ConfigLoaderController {
 
-    /**
-     * A REST-style URL 
-     * */
-    public static final String CONFIG_LOADER_URL = "/configloader/";
-    
-    /**
-     * A URL to the config report viewer with input form
-     * */
-    public static final String CONFIG_LOADER_FORM_URL = CONFIG_LOADER_URL + "form";
-    
-    /**
-     * Title for the config form page
-     * */
-    public static final String CONFIG_LOADER_FORM_TITLE = "Config Loader";
-    
-    /**
-     * Description for the config form page
-     * */
-    public static final String CONFIG_LOADER_FORM_INSTR = "Enter configuration id.";
-    
-    /**
-     * A config loader service
-     * */
-    @Autowired
-    private ConfigLoaderService service;
+  /**
+   * A REST-style URL 
+   * */
+  public static final String CONFIG_LOADER_URL = "/configloader/";
 
-    /**
-     * CommandController logger
-     * */
-    private static Logger logger = Logger.getLogger(ConfigLoaderController.class);
-    
-    
-//    /**
-//     * Displays configuration of a command with the given id
-//     * @param id command id
-//     * @param model Spring MVC Model instance to be filled in before jsp processes it
-//     * @return name of a jsp page which will be displayed
-//     * */
-//    @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
-//    public String viewCommand(@PathVariable final String id, final Model model) {
-//        logger.info("/configloader/{id} " + id);
-//        model.addAllAttributes(getConfigurationReport(id));
-//        return "tagInfo";
-//    }
-    
-    /**
-     * Displays configuration of a process with the given process name
-     * @param id alarm id
-     * @param response we write the html result to that HttpServletResponse response
-     * */
-    @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
-    public String helloWorld(@PathVariable(value = "id") final String id, final HttpServletResponse response)  {
-      logger.info("/configloader/{id} " + id);
-      try {
-        response.getWriter().println(service.generateHtmlResponse(id));
-      } catch (IOException e) {
-        e.printStackTrace();
-        logger.error(e.getMessage());
-      } catch (TagIdException e) {
-        return ("redirect:" + "/configloader/form");
-      }
-      return null;
+  /**
+   * A URL to the config report viewer with input form
+   * */
+  public static final String CONFIG_LOADER_FORM_URL = CONFIG_LOADER_URL + "form";
+
+  /**
+   * Title for the config form page
+   * */
+  public static final String CONFIG_LOADER_FORM_TITLE = "Config Loader";
+
+  /**
+   * Description for the config form page
+   * */
+  public static final String CONFIG_LOADER_FORM_INSTR = "Enter configuration id.";
+
+  /**
+   * A config loader service
+   * */
+  @Autowired
+  private ConfigLoaderService service;
+
+  /**
+   * CommandController logger
+   * */
+  private static Logger logger = Logger.getLogger(ConfigLoaderController.class);
+
+
+  //    /**
+  //     * Displays configuration of a command with the given id
+  //     * @param id command id
+  //     * @param model Spring MVC Model instance to be filled in before jsp processes it
+  //     * @return name of a jsp page which will be displayed
+  //     * */
+  //    @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
+  //    public String viewCommand(@PathVariable final String id, final Model model) {
+  //        logger.info("/configloader/{id} " + id);
+  //        model.addAllAttributes(getConfigurationReport(id));
+  //        return "tagInfo";
+  //    }
+
+  /**
+   * Displays configuration of a process with the given process name
+   * @param id config id
+   * @param response we write the html result to that HttpServletResponse response
+   * */
+  @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
+  public String helloWorld(@PathVariable(value = "id") final String id, final HttpServletResponse response)  {
+    logger.info("/configloader/{id} " + id);
+    try {
+      response.getWriter().println(service.generateHtmlResponse(id));
+    } catch (IOException e) {
+      e.printStackTrace();
+      logger.error(e.getMessage());
+    } catch (TagIdException e) {
+      return ("redirect:" + "/configloader/errorform/" + id);
     }
-    
-    /**
-     * Displays configuration of a command with the given id together with a form
-     * @param id command id
-     * @param model Spring MVC Model instance to be filled in before jsp processes it
-     * @return name of a jsp page which will be displayed
-     * */
-    @RequestMapping(value = CONFIG_LOADER_FORM_URL + "/{id}", method = { RequestMethod.GET })
-    public String viewCommandWithForm(@PathVariable final String id, final Model model) {
-        logger.info("/configloader/form/{id} " + id);
-        model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
-        return "formWithData";
+    return null;
+  }
+
+  /**
+   * Displays an input form for an alarm id, and if a POST was made with an alarm id, also the alarm data.
+   * @param id alarm id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = "/configloader/errorform/{id}")
+  public String viewConfigLoaderErrorForm(@PathVariable(value = "id") final String id, final Model model) {
+    logger.info("/configloader/errorform " + id);
+
+    model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
+    model.addAttribute("err", id);
+    return "errorFormWithData";
+  }
+
+  /**
+   * Displays configuration of a command with the given id together with a form
+   * @param id command id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = CONFIG_LOADER_FORM_URL + "/{id}", method = { RequestMethod.GET })
+  public String viewCommandWithForm(@PathVariable final String id, final Model model) {
+    logger.info("/configloader/form/{id} " + id);
+    model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
+    return "formWithData";
+  }
+
+  /**
+   * Displays an input form for a command id, and if a POST was made with a command id, also the command data.
+   * @param id command id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = CONFIG_LOADER_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
+  public String viewCommandFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
+    logger.info("/configloader/form " + id);
+    if (id == null)
+      model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, null, null));
+    else
+      return ("redirect:"+CONFIG_LOADER_URL+id);
+    //            model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
+    return "formWithData";
+  }
+
+  /**
+   * A helper method to get the xml and build a map of values for the MVC model.
+   * @param configurationId id of a configuration
+   * @return a map of values to include in the model for a jsp page.
+   * */
+  private Map<String, String> getConfigurationReport(final String configurationId) {
+    Map<String, String> model = new HashMap<String, String>();
+    try {
+      String commandXml = service.getConfigurationReportXml(configurationId);
+      model.put("reportXml", commandXml);
+    } catch (TagIdException e) {
+      model.put("tagErr", e.getMessage());
+      logger.error(e);
+    } catch (Exception e) {
+      model.put("tagErr", "Unexpected problem occured. Try again or contact C2MON support");
+      logger.error("Unexpected problem occured while getting the XML:", e);
     }
-    
-    /**
-     * Displays an input form for a command id, and if a POST was made with a command id, also the command data.
-     * @param id command id
-     * @param model Spring MVC Model instance to be filled in before jsp processes it
-     * @return name of a jsp page which will be displayed
-     * */
-    @RequestMapping(value = CONFIG_LOADER_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
-    public String viewCommandFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
-        logger.info("/configloader/form " + id);
-        if (id == null)
-            model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, null, null));
-        else
-          return ("redirect:"+CONFIG_LOADER_URL+id);
-//            model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
-        return "formWithData";
-    }
-    
-    /**
-     * A helper method to get the xml and build a map of values for the MVC model.
-     * @param configurationId id of a configuration
-     * @return a map of values to include in the model for a jsp page.
-     * */
-    private Map<String, String> getConfigurationReport(final String configurationId) {
-        Map<String, String> model = new HashMap<String, String>();
-        try {
-            String commandXml = service.getConfigurationReportXml(configurationId);
-            model.put("reportXml", commandXml);
-        } catch (TagIdException e) {
-            model.put("tagErr", e.getMessage());
-            logger.error(e);
-        } catch (Exception e) {
-            model.put("tagErr", "Unexpected problem occured. Try again or contact C2MON support");
-            logger.error("Unexpected problem occured while getting the XML:", e);
-        }
-        return model;
-    }
+    return model;
+  }
 }

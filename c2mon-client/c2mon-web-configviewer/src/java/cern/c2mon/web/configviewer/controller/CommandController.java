@@ -74,7 +74,7 @@ public class CommandController {
     
     /**
      * Displays configuration of a process with the given process name
-     * @param id alarm id
+     * @param id command id
      * @param response we write the html result to that HttpServletResponse response
      * */
     @RequestMapping(value = "/commandviewer/{id}", method = { RequestMethod.GET })
@@ -86,9 +86,24 @@ public class CommandController {
         e.printStackTrace();
         logger.error(e.getMessage());
       } catch (TagIdException e) {
-        return ("redirect:" + "/commandviewer/form");
+        return ("redirect:" + "/commandviewer/errorform/" + id);
       }
       return null;
+    }
+    
+    /**
+     * Displays an input form for an alarm id, and if a POST was made with an alarm id, also the alarm data.
+     * @param id alarm id
+     * @param model Spring MVC Model instance to be filled in before jsp processes it
+     * @return name of a jsp page which will be displayed
+     * */
+    @RequestMapping(value = "/commandviewer/errorform/{id}")
+    public String viewCommandErrorForm(@PathVariable(value = "id") final String id, final Model model) {
+        logger.info("/commandviewer/errorform " + id);
+        
+        model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR, COMMAND_FORM_URL, id, COMMAND_URL + id));
+        model.addAttribute("err", id);
+       return "errorFormWithData";
     }
     
     /**
