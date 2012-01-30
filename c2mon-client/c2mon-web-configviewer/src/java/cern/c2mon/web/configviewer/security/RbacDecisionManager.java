@@ -27,15 +27,14 @@ public class RbacDecisionManager implements AccessDecisionManager {
   /** A map of (PageUrls, AuthorizationDetails) required to access each page. */
   private Map<String, String> authorizationDetails;
 
-  @Autowired
   /**
    * 
    */
+  @Autowired
   public RbacDecisionManager(Map<String, String> authorizationDetails) {
 
     this.authorizationDetails = authorizationDetails;
   }
-
 
   /**
    * RbacDecisionManager logger
@@ -74,11 +73,6 @@ public class RbacDecisionManager implements AccessDecisionManager {
     
     logger.info(username + 
         " succesfully authorised to access:" + pageUrl);
-
-    //    boolean authorized = true;
-    //    if (!authorized) {
-    //      throw new AccessDeniedException("go away");
-    //    }
   }
 
   /**
@@ -107,7 +101,7 @@ public class RbacDecisionManager implements AccessDecisionManager {
    * @param stringEncodedAuthDetails a String that contains the RbacAuthorizationDetails
    * @return an RbacAuthorizationDetails Object
    */
-  private RbacAuthorizationDetails splitDetails (final String stringEncodedAuthDetails) {
+  private RbacAuthorizationDetails splitDetails(final String stringEncodedAuthDetails) {
 
     String[] splitedDetails = stringEncodedAuthDetails.replace(" ", "").split( ",\\s*" ); // split on commas
 

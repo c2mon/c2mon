@@ -1,7 +1,10 @@
 package cern.c2mon.web.configviewer.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,17 +63,37 @@ public class AlarmController {
     private static Logger logger = Logger.getLogger(AlarmController.class);
     
     
+//    /**
+//     * Displays configuration of an alarm with the given id
+//     * @param id alarm id
+//     * @param model Spring MVC Model instance to be filled in before jsp processes it
+//     * @return name of a jsp page which will be displayed
+//     * */
+//    @RequestMapping(value = ALARM_URL + "{id}", method = { RequestMethod.GET })
+//    public String viewAlarm(@PathVariable final String id, final Model model) {
+//        logger.info("/alarmviewer/{id} " + id);
+//        model.addAllAttributes(getAlarmModel(id));
+//        return "tagInfo";
+//    }
+    
     /**
-     * Displays configuration of an alarm with the given id
+     * Displays configuration of a process with the given process name
      * @param id alarm id
-     * @param model Spring MVC Model instance to be filled in before jsp processes it
-     * @return name of a jsp page which will be displayed
+     * @param response we write the html result to that HttpServletResponse response
      * */
-    @RequestMapping(value = ALARM_URL + "{id}", method = { RequestMethod.GET })
-    public String viewAlarm(@PathVariable final String id, final Model model) {
-        logger.info("/alarmviewer/{id} " + id);
-        model.addAllAttributes(getAlarmModel(id));
-        return "tagInfo";
+    @RequestMapping(value = ALARM_URL + "/{id}", method = { RequestMethod.GET })
+    public String helloWorld(@PathVariable(value = "id") final String id, final HttpServletResponse response)  {
+      logger.info(ALARM_URL + id);
+      try {
+        response.getWriter().println(service.generateHtmlResponse(id));
+        return null;
+      } catch (IOException e) {
+        e.printStackTrace();
+        logger.error(e.getMessage());
+      } catch (TagIdException e) {
+        return ("redirect:" + "/alarmviewer/form");
+      }
+      return null;
     }
     
     /**

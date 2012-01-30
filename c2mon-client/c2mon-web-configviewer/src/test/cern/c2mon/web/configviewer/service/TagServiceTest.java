@@ -46,6 +46,20 @@ public class TagServiceTest {
   @Test
   public void test() {
   }
+  
+  @Test
+  public void testProcessHtml() {
+
+    try {
+
+      String response = serviceP.generateHtmlResponse("P_GTCCHILLSU6");
+      System.out.println(response);
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+      e.printStackTrace();
+      Assert.assertTrue(false);
+    }
+  }
 
   @Test
   public void testProcessNames() {

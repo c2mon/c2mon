@@ -1,13 +1,26 @@
 package cern.c2mon.web.configviewer.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,7 +47,7 @@ public class ProcessControler {
    * A REST-style URL 
    * */
   public static final String PROCESS_URL = "/process/";
-  
+
   /**
    * A URL to the process viewer with input form
    * */
@@ -66,18 +79,34 @@ public class ProcessControler {
    * */
   private static Logger logger = Logger.getLogger(ProcessControler.class);
 
-
+/* OLD WAY -- NO LONGER USED */
+//  /**
+//   * Displays configuration of a command with the given id
+//   * @param id command id
+//   * @param model Spring MVC Model instance to be filled in before jsp processes it
+//   * @return name of a jsp page which will be displayed
+//   * */
+//  @RequestMapping(value = PROCESS_URL + "{id}", method = { RequestMethod.GET })
+//  public String viewCommand(@PathVariable final String id, final Model model) {
+//    logger.info("/process/{id} " + id);
+//    model.addAllAttributes(getProcessModel(id));
+//    return "tagInfo";
+//  }
+  
   /**
-   * Displays configuration of a command with the given id
-   * @param id command id
-   * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
+   * Displays configuration of a process with the given process name
+   * @param processName the process name
+   * @param response we write the html result to that HttpServletResponse response
    * */
-  @RequestMapping(value = PROCESS_URL + "{id}", method = { RequestMethod.GET })
-  public String viewCommand(@PathVariable final String id, final Model model) {
-    logger.info("/process/{id} " + id);
-    model.addAllAttributes(getProcessModel(id));
-    return "tagInfo";
+  @RequestMapping(value = PROCESS_URL + "/{processName}", method = { RequestMethod.GET })
+  public void helloWorld(@PathVariable(value = "processName") final String processName, final HttpServletResponse response)  {
+    logger.info(PROCESS_URL + processName);
+    try {
+      response.getWriter().println(service.generateHtmlResponse(processName));
+    } catch (IOException e) {
+      e.printStackTrace();
+      logger.error(e.getMessage());
+    }
   }
 
   /**
@@ -92,7 +121,7 @@ public class ProcessControler {
     model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, id, PROCESS_URL + id));
     return "processFormWithData";
   }
-  
+
   /**
    * Displays configuration of a process with the given id together with a form
    * @param id command id
@@ -105,6 +134,8 @@ public class ProcessControler {
     model.addAllAttributes(getProcessModel(id));
     return "processXml";
   }
+  
+
 
   /**
    * Displays an input form, and if a POST was made, also the process xml data.
@@ -119,12 +150,11 @@ public class ProcessControler {
       model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, null, null));
     else {
       return ("redirect:"+PROCESS_URL+id);
-//      model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_URL + id, id, PROCESS_URL + id));
+      //      model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_URL + id, id, PROCESS_URL + id));
     }
 
     return "processFormWithData";
   }
-
 
   /**
    * Gets a map of values to include later in the MVC model processed by a jsp.
@@ -149,16 +179,16 @@ public class ProcessControler {
 
     try {
       Collection<String> names = service.getProcessNames();
-      
+
       if (names instanceof List) {
         Collections.sort((List)names, String.CASE_INSENSITIVE_ORDER);
       } else {
         logger.warn(new String("getProcessFormModel(): getProcessNames() does not return " +
-        		"a list anymore! " +
-        		"This means you should provide some other way to sort the Collection returned" +
-        		"by this call."));
+            "a list anymore! " +
+            "This means you should provide some other way to sort the Collection returned" +
+        "by this call."));
       }
-      
+
       model.put("processNames", names);
 
     } catch (Exception e) {

@@ -1,7 +1,10 @@
 package cern.c2mon.web.configviewer.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,17 +61,36 @@ public class ConfigLoaderController {
     private static Logger logger = Logger.getLogger(ConfigLoaderController.class);
     
     
+//    /**
+//     * Displays configuration of a command with the given id
+//     * @param id command id
+//     * @param model Spring MVC Model instance to be filled in before jsp processes it
+//     * @return name of a jsp page which will be displayed
+//     * */
+//    @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
+//    public String viewCommand(@PathVariable final String id, final Model model) {
+//        logger.info("/configloader/{id} " + id);
+//        model.addAllAttributes(getConfigurationReport(id));
+//        return "tagInfo";
+//    }
+    
     /**
-     * Displays configuration of a command with the given id
-     * @param id command id
-     * @param model Spring MVC Model instance to be filled in before jsp processes it
-     * @return name of a jsp page which will be displayed
+     * Displays configuration of a process with the given process name
+     * @param id alarm id
+     * @param response we write the html result to that HttpServletResponse response
      * */
     @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
-    public String viewCommand(@PathVariable final String id, final Model model) {
-        logger.info("/configloader/{id} " + id);
-        model.addAllAttributes(getConfigurationReport(id));
-        return "tagInfo";
+    public String helloWorld(@PathVariable(value = "id") final String id, final HttpServletResponse response)  {
+      logger.info("/configloader/{id} " + id);
+      try {
+        response.getWriter().println(service.generateHtmlResponse(id));
+      } catch (IOException e) {
+        e.printStackTrace();
+        logger.error(e.getMessage());
+      } catch (TagIdException e) {
+        return ("redirect:" + "/configloader/form");
+      }
+      return null;
     }
     
     /**
