@@ -200,26 +200,30 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   @ManagedOperation(description = "starts the backups publisher.")
   public void start() {
     if (!running && !connectThreadRunning){
+      connectThreadRunning = true;
       new Thread(new Runnable() {
         @Override
-        public void run() {      
-          while (!running && !shutdownRequested) {
-            try {
-              LOGGER.info("Starting LASER backup mechanism.");
-              asi = AlarmSystemInterfaceFactory.createSource(publisher.getSourceName());            
-              timer = new Timer();
-              timer.scheduleAtFixedRate(LaserBackupPublisher.this, INITIAL_BACKUP_DELAY, backupInterval);
-              running = true;              
-            } catch (ASIException e) {
-              LOGGER.error("Failed to start LASER backup publisher - will try again in 5 seconds", e);
+        public void run() {
+          try {
+            while (!running && !shutdownRequested) {
               try {
-                Thread.sleep(SLEEP_BETWEEN_CONNECT);
-              } catch (InterruptedException e1) {
-                LOGGER.error("Interrupted during sleep", e1);
-              }            
+                LOGGER.info("Starting LASER backup mechanism.");
+                asi = AlarmSystemInterfaceFactory.createSource(publisher.getSourceName());            
+                timer = new Timer();
+                timer.scheduleAtFixedRate(LaserBackupPublisher.this, INITIAL_BACKUP_DELAY, backupInterval);
+                running = true;              
+              } catch (ASIException e) {
+                LOGGER.error("Failed to start LASER backup publisher - will try again in 5 seconds", e);
+                try {
+                  Thread.sleep(SLEEP_BETWEEN_CONNECT);
+                } catch (InterruptedException e1) {
+                  LOGGER.error("Interrupted during sleep", e1);
+                }            
+              }
             }
-          } 
-          connectThreadRunning = false;
+          } finally {
+            connectThreadRunning = false;
+          }           
         }
       }).start();
     }       
