@@ -57,6 +57,11 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * cluster.
    */
   private ReentrantReadWriteLock backupLock = new ReentrantReadWriteLock();
+  
+  /**
+   * Is the connect thread already running?
+   */
+  private volatile boolean connectThreadRunning = false;
 
   /**
    * Flag for lifecycle calls.
@@ -194,27 +199,30 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   @Override
   @ManagedOperation(description = "starts the backups publisher.")
   public void start() {
-    new Thread(new Runnable() {
-      @Override
-      public void run() {        
-        while (!running && !shutdownRequested) {
-          try {
-            LOGGER.info("Starting LASER backup mechanism.");
-            asi = AlarmSystemInterfaceFactory.createSource(publisher.getSourceName());            
-            timer = new Timer();
-            timer.scheduleAtFixedRate(LaserBackupPublisher.this, INITIAL_BACKUP_DELAY, backupInterval);
-            running = true;
-          } catch (ASIException e) {
-            LOGGER.error("Failed to start LASER backup publisher - will try again in 5 seconds", e);
+    if (!running && !connectThreadRunning){
+      new Thread(new Runnable() {
+        @Override
+        public void run() {      
+          while (!running && !shutdownRequested) {
             try {
-              Thread.sleep(SLEEP_BETWEEN_CONNECT);
-            } catch (InterruptedException e1) {
-              LOGGER.error("Interrupted during sleep", e1);
-            }            
-          }
-        }        
-      }
-    }).start();    
+              LOGGER.info("Starting LASER backup mechanism.");
+              asi = AlarmSystemInterfaceFactory.createSource(publisher.getSourceName());            
+              timer = new Timer();
+              timer.scheduleAtFixedRate(LaserBackupPublisher.this, INITIAL_BACKUP_DELAY, backupInterval);
+              running = true;              
+            } catch (ASIException e) {
+              LOGGER.error("Failed to start LASER backup publisher - will try again in 5 seconds", e);
+              try {
+                Thread.sleep(SLEEP_BETWEEN_CONNECT);
+              } catch (InterruptedException e1) {
+                LOGGER.error("Interrupted during sleep", e1);
+              }            
+            }
+          } 
+          connectThreadRunning = false;
+        }
+      }).start();
+    }       
   }
 
   @Override
