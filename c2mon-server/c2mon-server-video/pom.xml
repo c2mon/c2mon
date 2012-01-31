@@ -85,10 +85,6 @@
     	<artifactId>tim2-server-command</artifactId>    	
     </dependency>
     <dependency>
-    	<groupId>cern.tim2.tim2-shared</groupId>
-    	<artifactId>tim2-shared-util</artifactId>    	    
-    </dependency>
-    <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis-spring</artifactId>      
     </dependency>    
