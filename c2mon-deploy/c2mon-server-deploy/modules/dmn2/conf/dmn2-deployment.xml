@@ -53,6 +53,9 @@
 						mask="400" />
 					<file name="c2mon.properties" sourceDir="/user/diamonop/c2mon/prod/server"
 						mask="400" />
+					<!-- copy over pro. server's log4j configuration -->
+					<file name="log4j.xml" sourceDir="/user/diamonop/c2mon/prod/server"
+						mask="444" />						
 				</directory>
 
 			</deployment>
@@ -67,6 +70,9 @@
 						mask="400" />
 					<file name="c2mon.properties" sourceDir="/user/diamonop/c2mon/dev/server"
 						mask="400" />
+					<!-- copy over pro. server's log4j configuration -->
+					<file name="log4j.xml" sourceDir="/user/diamonop/c2mon/dev/server"
+						mask="444" />												
 				</directory>
 			</deployment>
 		</application>
