@@ -83,26 +83,21 @@
     <dependency>
     	<groupId>cern.tim2.tim2-server</groupId>
     	<artifactId>tim2-server-command</artifactId>    	
-    	<scope>compile</scope>
     </dependency>
     <dependency>
     	<groupId>cern.tim2.tim2-shared</groupId>
-    	<artifactId>tim2-shared-util</artifactId>    	
-    	<scope>compile</scope>
+    	<artifactId>tim2-shared-util</artifactId>    	    
     </dependency>
     <dependency>
-    	<groupId>org.apache.ibatis</groupId>
-    	<artifactId>ibatis-sqlmap</artifactId>
-    	<version>2.3.0</version>
-    	<type>jar</type>
-    	<scope>compile</scope>
-    </dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis-spring</artifactId>      
+    </dependency>    
     <dependency>
-         <groupId>org.hsqldb</groupId>
-         <artifactId>hsqldb</artifactId>
-         <version>2.2.4</version>
-         <scope>test</scope>
-         </dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>2.2.4</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
     	<groupId>jdbc</groupId>
     	<artifactId>jdbc</artifactId>

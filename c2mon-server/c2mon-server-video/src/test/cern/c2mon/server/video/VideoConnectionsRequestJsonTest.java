@@ -8,10 +8,6 @@ import javax.jms.TextMessage;
 import org.apache.activemq.command.ActiveMQTextMessage;
 import org.junit.Test;
 
-import com.google.gson.Gson;
-import com.ibatis.sqlmap.engine.scope.RequestScope;
-
-import cern.c2mon.server.video.VideoRequestMessageConverter;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestErrorReportImpl;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport.RequestExecutionStatus;
@@ -20,6 +16,8 @@ import cern.c2mon.shared.video.VideoRequest;
 import cern.c2mon.shared.video.VideoRequest.RequestType;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
 import cern.tim.util.json.GsonFactory;
+
+import com.google.gson.Gson;
 
 public class VideoConnectionsRequestJsonTest {
 
