@@ -73,6 +73,17 @@ public class ConfigLoaderController {
   //        model.addAllAttributes(getConfigurationReport(id));
   //        return "tagInfo";
   //    }
+  
+  /**
+   * Displays configuration of an alarm with the given id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = CONFIG_LOADER_URL, method = { RequestMethod.GET })
+  public String viewAlarm(final Model model) {
+    logger.info(CONFIG_LOADER_URL);
+    return ("redirect:" + "/configloader/form");
+  }    
 
   /**
    * Displays configuration of a process with the given process name

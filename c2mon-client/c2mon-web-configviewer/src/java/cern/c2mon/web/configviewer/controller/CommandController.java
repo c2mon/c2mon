@@ -73,6 +73,17 @@ public class CommandController {
 //    }
     
     /**
+     * Displays configuration of an alarm with the given id
+     * @param model Spring MVC Model instance to be filled in before jsp processes it
+     * @return name of a jsp page which will be displayed
+     * */
+    @RequestMapping(value = "/commandviewer/", method = { RequestMethod.GET })
+    public String viewAlarm(final Model model) {
+      logger.info("/commandviewer/");
+      return ("redirect:" + "/commandviewer/form");
+    }    
+    
+    /**
      * Displays configuration of a process with the given process name
      * @param id command id
      * @param response we write the html result to that HttpServletResponse response

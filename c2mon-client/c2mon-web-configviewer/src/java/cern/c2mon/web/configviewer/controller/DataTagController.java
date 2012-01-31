@@ -72,6 +72,17 @@ public class DataTagController {
     }
     
     /**
+     * Displays configuration of an alarm with the given id
+     * @param model Spring MVC Model instance to be filled in before jsp processes it
+     * @return name of a jsp page which will be displayed
+     * */
+    @RequestMapping(value = "/tagviewer/", method = { RequestMethod.GET })
+    public String viewAlarm(final Model model) {
+      logger.info("/tagviewer/");
+      return ("redirect:" + "/tagviewer/form");
+    }    
+    
+    /**
      * Displays configuration of a datatag with the given id together with a form
      * @param id datatag id
      * @param model Spring MVC Model instance to be filled in before jsp processes it
