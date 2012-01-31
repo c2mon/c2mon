@@ -52,6 +52,11 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
   private AlarmSystemInterface asi = null;
 
   /**
+   * Is the connect thread already running?
+   */
+  private volatile boolean connectThreadRunning = false;
+  
+  /**
    * Flag for lifecycle calls.
    */
   private volatile boolean running = false;
@@ -201,46 +206,53 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 
   @Override
   @ManagedOperation(description = "Starts the alarm publisher (will continue in own thread until successful)")
-  public void start() {    
-    new Thread(new Runnable() {
-      @Override
-      public void run() {        
-        while (!running && !shutdownRequested) {
+  public void start() {
+    if (!running && !connectThreadRunning) {
+      connectThreadRunning = true;
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
           try {
-            if (log.isInfoEnabled()) {
-              log.info("Starting " + LaserPublisher.class.getName() + " (in own thread)");
+            while (!running && !shutdownRequested) {
+              try {
+                log.info("Starting " + LaserPublisher.class.getName() + " (in own thread)");
+                asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
+                running = true;
+              } catch (ASIException e) {
+                log.error("Failed to start LASER publisher - will try again in 5 seconds", e);
+                try {
+                  Thread.sleep(SLEEP_BETWEEN_CONNECT);
+                } catch (InterruptedException e1) {
+                  log.error("Interrupted during sleep", e1);
+                }            
+              }
             }
-            asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
-            running = true;
-          } catch (ASIException e) {
-            log.error("Failed to start LASER publisher - will try again in 5 seconds", e);
-            try {
-              Thread.sleep(SLEEP_BETWEEN_CONNECT);
-            } catch (InterruptedException e1) {
-              log.error("Interrupted during sleep", e1);
-            }            
-          }
-        }        
-      }
-    }).start();   
+          } finally {
+            connectThreadRunning = false;
+          }                  
+        }
+      }).start();
+    }      
   }
 
   @Override
   @ManagedOperation(description = "Stops the alarm publisher.")
   public void stop() {
-    log.info("Stopping LASER publisher" + LaserPublisher.class.getName());   
-    shutdownRequested = true;
-    //wait for connect thread to end
-    try {
-      Thread.sleep(SLEEP_BETWEEN_CONNECT);
-    } catch (InterruptedException e) {
-      log.error("Interrupted during sleep", e);
-    } 
-    if (asi != null) {
-      asi.close();
-    }
-    running = false;
-    shutdownRequested = false;
+    if (running) {
+      log.info("Stopping LASER publisher" + LaserPublisher.class.getName());   
+      shutdownRequested = true;
+      //wait for connect thread to end
+      try {
+        Thread.sleep(SLEEP_BETWEEN_CONNECT);
+      } catch (InterruptedException e) {
+        log.error("Interrupted during sleep", e);
+      } 
+      if (asi != null) {
+        asi.close();
+      }
+      running = false;
+      shutdownRequested = false;
+    }    
   }
 
   @Override
