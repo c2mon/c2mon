@@ -67,6 +67,41 @@
 		
 		</table>
 		<xsl:apply-templates select="alarms"/>
+		<xsl:apply-templates select="tagQuality"/>
+	</xsl:template>
+	
+		<xsl:template match="tagQuality">
+		<xsl:apply-templates select="invalidQualityStates"/>
+	</xsl:template>
+	
+	<xsl:template match="invalidQualityStates">
+		<xsl:apply-templates select="entry"/>
+	</xsl:template>
+	
+		<!-- process the XML element AlarmValue -->
+	<xsl:template match="entry">
+		<div class="column">
+		<table class="inline">
+			<th colspan="4">invalidQualityState</th>
+			
+			<xsl:for-each select="*[not(local-name() = 'active')]">
+				
+				<xsl:if test="position() mod 2 = 1">
+					<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
+					<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>
+				</xsl:if>
+				
+				<xsl:if  test="position() mod 2 = 0">
+					<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>		
+					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
+				</xsl:if>
+				
+			</xsl:for-each>
+			
+		</table>
+	</div>
 	</xsl:template>
 	
 	<xsl:template match="alarms">
