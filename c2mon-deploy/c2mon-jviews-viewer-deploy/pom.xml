@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>cern.tim.tim-client</groupId>
 		<artifactId>tim-client-pom</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1</version>
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-jviews-viewer-deploy</artifactId>
 	<name>C2MON jviews viewer deployment module</name>
-	<version>1.0.2-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
@@ -39,15 +39,6 @@
 	</modules>
 	
 	<build>
-	    <!--  this plugin is used for releasing multimodule projects -->
-		<plugins>
-			<plugin>
-				<groupId>cern.devtools</groupId>
-				<artifactId>cern-maven-plugin</artifactId>
-				<version>0.0.5-SNAPSHOT</version>
-			</plugin>
-		</plugins>
 	</build>
-
 
 </project>
