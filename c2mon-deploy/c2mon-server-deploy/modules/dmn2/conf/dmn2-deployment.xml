@@ -64,14 +64,14 @@
 		<application name="c2mon-dmn2-dev" extends="default">
 			<deployment installLocation="/opt/c2mon-dmn2-dev">
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/dev/server"
+					<file name=".jmxremote.passwd" sourceDir="/afs/cern.ch/user/d/dmndev/c2mon/dev/server"
 						mask="400" />
-					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/dev/server"
+					<file name=".jmxremote.access" sourceDir="/afs/cern.ch/user/d/dmndev/c2mon/dev/server"
 						mask="400" />
-					<file name="c2mon.properties" sourceDir="/user/diamonop/c2mon/dev/server"
+					<file name="c2mon.properties" sourceDir="/afs/cern.ch/user/d/dmndev/c2mon/dev/server"
 						mask="400" />
 					<!-- copy over pro. server's log4j configuration -->
-					<file name="log4j.xml" sourceDir="/user/diamonop/c2mon/dev/server"
+					<file name="log4j.xml" sourceDir="/afs/cern.ch/user/d/dmndev/c2mon/dev/server"
 						mask="444" />												
 				</directory>
 			</deployment>
