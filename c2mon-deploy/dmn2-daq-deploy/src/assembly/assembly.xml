@@ -103,13 +103,14 @@
 		</file>
 
 		<!--  log4j configuration -->
-		<file>
-			<source>conf/log4j.xml</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>log4j.xml</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
+<!--	log4j is now deployed by deployment tool-->
+<!--		<file>-->
+<!--			<source>conf/log4j.xml</source>-->
+<!--			<outputDirectory>conf/</outputDirectory>-->
+<!--			<destName>log4j.xml</destName>-->
+<!--			<lineEnding>unix</lineEnding>-->
+<!--			<fileMode>0444</fileMode>-->
+<!--		</file>-->
 
 	</files>
 
