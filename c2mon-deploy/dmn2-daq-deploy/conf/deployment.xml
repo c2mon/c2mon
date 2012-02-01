@@ -40,7 +40,7 @@
 		  </startscript>
 		</application>
 
-		<application name="dmn2-daq-prod" extends="default">
+		<application name="dmn2-daq-pro" extends="default">
 		
 			<deployment>
 				<directory name="conf">
