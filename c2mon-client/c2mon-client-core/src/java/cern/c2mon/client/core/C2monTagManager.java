@@ -42,7 +42,7 @@ public interface C2monTagManager {
   /**
    * Use this method for registering a listener and to receive updates for specific data tags.
    * The C2MON client API will handle for you in the background the initialization of the data
-   * tags with the C2MON server, if this was not already done before.
+   * tags with the C2MON server, if this was not already done before. <p>
    * You will be informed about new updates via the <code>onUpdate(ClientDataTagValue)</code>
    * method.
    *  
@@ -52,6 +52,7 @@ public interface C2monTagManager {
    * @throws CacheSynchronizationException In case a communicatin problem with the C2MON server
    *         occurs while subscribing to the tags. In that case the {@link TagManager} will
    *         rollback the subscription.
+   * @see C2monSupervisionManager#isServerConnectionWorking();
    */
   boolean subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException;
   
@@ -94,10 +95,17 @@ public interface C2monTagManager {
    * Returns for every valid id of the list a copy of the cached data tag.
    * If the value is not in the cache it will try to fetch it from the server.
    * However, in case of a connection error or an unknown tag id the corresponding
-   * tag might be missing.
+   * tag might be missing.<p>
+   * Please notice, that this method call does not write anything to the local
+   * cache. This means that you might increase the server load when asking constantly
+   * for tags on which no {@link DataTagUpdateListener} is subscribed to. 
    * 
    * @param tagIds A collection of data tag id's
    * @return A collection of all <code>ClientDataTag</code> objects
+   * @throws RuntimeException In case a communicatin problems with JMS or the C2MON server
+   *         occurs while trying to retrieve tag information.
+   * @see #subscribeDataTags(Set, DataTagUpdateListener)
+   * @see C2monSupervisionManager#isServerConnectionWorking();
    */
   Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds);
   

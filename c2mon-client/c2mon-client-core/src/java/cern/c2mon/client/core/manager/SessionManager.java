@@ -83,6 +83,12 @@ public class SessionManager implements C2monSessionManager, AuthenticationListen
     public void addSessionListener(final SessionListener pListener) {
       if (pListener != null && !sessionListeners.contains(pListener)) {
           sessionListeners.add(pListener);
+          
+          if (isAnyUserLogged()) {
+            for (String user : getLoggedUserNames()) {
+              pListener.onLogin(user);
+            }
+          }
       }
     }
 

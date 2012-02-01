@@ -34,7 +34,12 @@ public interface C2monSessionManager {
   
   /**
    * Registers a listener for receiving event updates from the
-   * <code>SessionManager</code>.
+   * <code>C2monSessionManager</code> about users that have logged
+   * in or out. <p>
+   * In case that somebody is already logged, the new listener will
+   * directly be informed. This might for instance happen at startup
+   * of the application when RBAC did performe an automatic
+   * authentication by location before the listener has been registered. 
    * 
    * @param pListener The listener instance to register
    */
