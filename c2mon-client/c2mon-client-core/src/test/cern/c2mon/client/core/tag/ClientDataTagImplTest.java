@@ -30,8 +30,12 @@ public class ClientDataTagImplTest {
   }
   
   private TagUpdate createValidTransferTag(final Long tagId, Object value) {
-    DataTagQuality tagQuality = new DataTagQualityImpl();
+    DataTagQuality tagQuality = new DataTagQualityImpl(
+        TagQualityStatus.EQUIPMENT_DOWN, "its down!");
+    
+    tagQuality.addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, "its down!");
     tagQuality.validate();
+    
     TagUpdate tagUpdate = 
       new TransferTagImpl(
           tagId,
@@ -222,10 +226,12 @@ public class ClientDataTagImplTest {
   public void testXMLSerialization() throws Exception {
       
       ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
-      cdt.onUpdate(createValidTransferTag(1234L));      
+      cdt.onUpdate(createValidTransferTag(1234L));  
+      cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_OUT_OF_BOUNDS,"Value is over 9000!");
+      cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE,"It's down!");
       
       ClientDataTagImpl cdt2 = ClientDataTagImpl.fromXml(cdt.toString());
-            
+      
       assertEquals(cdt.getId(), cdt2.getId());
   }  
   

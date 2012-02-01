@@ -61,14 +61,14 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * (Optional) free-text description of the CommandTag represented by 
    * the present CommandTagHandle object.
    */
-  @Element(required=false)
+  @Element(required = false)
   private String description;
 
   /**
    * class type of the present CommandTagHandle object. Only values 
    * of this data type can be set using setValue().
    */
-  @Element(required=false)
+  @Element(required = false)
   private Class< ? > valueType;
 
   /**
@@ -88,7 +88,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * is null, it is not taken into account. The minValue will always be null
    * for non-numeric commands.
    */
-  @Element(required=false)
+  @Element(required = false)
   private Comparable<T> minValue;
 
   /**
@@ -98,7 +98,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * is null, it is not taken into account. The maxValue will always be null
    * for non-numeric commands.
    */
-  @Element(required=false)
+  @Element(required = false)
   private Comparable<T> maxValue;
 
   /**

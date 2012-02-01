@@ -52,8 +52,6 @@ public class ClientCommandTagImplTest {
         "test description", new String("LALA").getClass().getName(), 666, "666", "666"
         , "test Host Name", createAuthDetails());
     
-    
-    
     return commandTagHandle;
   }
   

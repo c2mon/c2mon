@@ -112,10 +112,11 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private Map<Long, SupervisionEvent> equipmentSupervisionStatus = new HashMap<Long, SupervisionEvent>();
   
   /** The unique name of the tag */
-  @Element(required=false)
+  @Element(required = false)
   private String tagName = null;
   
   /** The quality of the tag */
+  @Element(required = false)
   private DataTagQuality tagQuality = 
     new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
   
@@ -124,7 +125,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private ArrayList<AlarmValue> alarms = new ArrayList<AlarmValue>();
   
   /** The source timestamp that indicates when the value change was generated */
-  @Element(required=false)
+  @Element(required = false)
   private Timestamp sourceTimestamp = null;
   
   /** The server timestamp that indicates when the change message passed the server */
@@ -132,26 +133,26 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private Timestamp serverTimestamp = new Timestamp(0L);
 
   /** Unit of the tag */
-  @Element(required=false)
+  @Element(required = false)
   private String unit = null;
   
   /** The description of the Tag*/
-  @Element(required=false)
+  @Element(required = false)
   private String description = "";
   
   /** The description of the value */
-  @Element(required=false)
+  @Element(required = false)
   private String valueDescription = "";
   
   /**
    * String representation of the JMS destination where the DataTag 
    * is published on change.
    */
-  @Element(required=false)
+  @Element(required = false)
   private String topicName = null;
 
   /** In case this data tag is a rule this variable contains its rule expression */
-  @Element(required=false)
+  @Element(required = false)
   private RuleExpression ruleExpression = null;
 
   /**
@@ -178,6 +179,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public ClientDataTagImpl(final Long tagId) {
     id = tagId;
   }  
+  
 
   
   /* (non-Javadoc)
