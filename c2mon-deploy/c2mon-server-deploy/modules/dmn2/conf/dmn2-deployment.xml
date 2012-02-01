@@ -16,7 +16,7 @@
 					<!-- you can give more than one mail for deployment notification -->
 					<mail address="timdiamon-developers@cern.ch" />
 				</notification>
-				<startscript name="C2MON-SERVER-DMN2">
+				<startscript name="DMN2-SRV">
 					<main-class name="cern.tim.server.lifecycle.ServerStartup">
 						<output>
 							<file name="log/out.log" />
