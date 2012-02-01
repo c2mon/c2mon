@@ -12,7 +12,7 @@ DAQ_HOME=${DAQ_HOME}/..
 
 DAQ_HOST=`hostname -s`
 
-DAQ_SCRIPT=${DAQ_HOME}/bin/DMN2-DAQ-TEST.jvm
+DAQ_SCRIPT=${DAQ_HOME}/bin/DMN2-DAQ.jvm
 
 export DAQ_LOG_HOME=${DAQ_HOME}/log
 export DAQ_CONF_HOME=${DAQ_HOME}/conf
