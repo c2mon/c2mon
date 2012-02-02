@@ -10,7 +10,7 @@ use Config::Properties;
 ##
 my $jardir = "../lib";
 my $appdir = "dmn2-viewer";
-my $codebase = "http://bewww/~diamondev";
+my $codebase = "http://bewww/~dmndev";
 my $c2monClientPropertiesFile = "../conf/client.properties";
 my $c2monClientPropertiesURL = "${codebase}/${appdir}/conf/client.properties";
 
