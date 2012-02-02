@@ -9,7 +9,7 @@ use Config::Properties;
 # Definition of global variables
 ##
 my $jardir = "../lib";
-my $appdir = "dmn2-viewer";
+my $appdir = "dmn2-viewer-dev";
 my $codebase = "http://bewww/~dmndev";
 my $c2monClientPropertiesFile = "../conf/client.properties";
 my $c2monClientPropertiesURL = "${codebase}/${appdir}/conf/client.properties";
