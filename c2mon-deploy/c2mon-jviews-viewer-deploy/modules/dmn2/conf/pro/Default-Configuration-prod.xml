@@ -4,7 +4,7 @@
 		This variable determines the global title that is given to the
 		application and which is displayed e.g. in the task bar
 	-->
-	<property name="viewer-title" type="java.lang.String" value="DMN2 Viewer [PROD]" />
+	<property name="viewer-title" type="java.lang.String" value="DMN2 Viewer [PRO]" />
 
 	<!--
 		Application name which is used to register the TIM Viewer in RBAC
@@ -16,7 +16,7 @@
 		navigation tree. This URL can also point to a Perl script.
 	-->
 	<property name="views-navigation-tree-creator" type="java.lang.String"
-		value="http://bewww/~diamonop/dmn2-viewer/cgi-bin/viewlist-pro.cgi" />
+		value="http://bewww/~diamonop/dmn2-viewer-pro/cgi-bin/viewlist-pro.cgi" />
 
 	<!--
 		Defines the initialization parameter for the

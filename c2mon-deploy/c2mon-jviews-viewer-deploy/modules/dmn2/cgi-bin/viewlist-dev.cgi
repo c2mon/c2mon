@@ -10,8 +10,8 @@ use File::Path;
 # Definition of global variables
 ##
 
-my $basedir = "/user/diamondev/public_html/dmn2-views";
-my $baseurl = "http://bewww/~diamondev/dmn2-views";
+my $basedir = "/user/dmndev/public_html/dmn2-views";
+my $baseurl = "http://bewww/~dmndev/dmn2-views";
 
 # Reading property file client.properties
 open PROPS, "< ../conf/client.properties"

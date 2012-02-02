@@ -16,7 +16,7 @@
 		navigation tree. This URL can also point to a Perl script.
 	-->
 	<property name="views-navigation-tree-creator" type="java.lang.String"
-		value="http://bewww/~diamondev/dmn2-viewer/cgi-bin/viewlist-dev.cgi" />
+		value="http://bewww/~dmndev/dmn2-viewer-dev/cgi-bin/viewlist-dev.cgi" />
 
 	<!--
 		Defines the initialization parameter for the
