@@ -81,7 +81,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 	codebase=\"$codebase\"
 	>
 	<information>
-		<title>DMN2 Viewer [DEV]</title>
+		<title>DMN2 Viewer [PRO]</title>
 	        <vendor>BE/CO-IN DIAMON2 Team</vendor>
 	        <homepage href=\"tim-viewer/index.html\"/>
 	        <description>The synoptic viewer</description>
