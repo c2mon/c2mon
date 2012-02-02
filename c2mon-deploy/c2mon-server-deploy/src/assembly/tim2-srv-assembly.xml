@@ -97,6 +97,15 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0755</fileMode>
 		</file>
+		
+		<!--  copy the version file -->
+		<file>
+			<source>${project.build.outputDirectory}/version.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+				
 	</files>
 
 </assembly>

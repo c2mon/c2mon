@@ -35,7 +35,7 @@
 		<dependency>
 			<groupId>cern.tim2.tim2-server</groupId>
 			<artifactId>tim2-server-cachedbaccess</artifactId>
-		</dependency>	
+		</dependency>
 		<dependency>
 			<groupId>cern.tim2.tim2-server</groupId>
 			<artifactId>tim2-server-cachepersistence</artifactId>
@@ -108,6 +108,40 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.outputDirectory}
+							</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>version.txt</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>${basedir}</directory>
+									<filtering>false</filtering>
+									<excludes>
+										<exclude>version.txt</exclude>
+									</excludes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
