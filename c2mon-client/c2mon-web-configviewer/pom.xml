@@ -121,6 +121,10 @@
             -Dc2mon.client.jms.heartbeat.topic=tim.client.heartbeat
             -Dc2mon.client.jms.request.queue=tim.client.request
             -Dc2mon.client.jms.adminmessage.topic=tim.client.adminmessage
+            -Dc2mon.jdbc.driver=oracle.jdbc.OracleDriver
+            -Dc2mon.jdbc.ro.url="jdbc:oracle:thin:@( DESCRIPTION= (ADDRESS= (PROTOCOL=TCP) (HOST=dbsrva3202.cern.ch) (PORT=1574) ) (ENABLE=BROKEN) (CONNECT_DATA= (SID=TIMTST)))"
+            -Dc2mon.jdbc.ro.user=timop
+            -Dc2mon.jdbc.ro.password=optim1954
           </argLine>
         </configuration>      
       </plugin>
