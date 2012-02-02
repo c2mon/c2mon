@@ -69,7 +69,7 @@
     </application>
 
     <application name="c2mon-tim2-test" extends="default">
-      <deployment installLocation="/opt/c2mon">
+      <deployment installLocation="/opt/c2mon-test">
         <directory name="conf">
           <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
@@ -86,7 +86,7 @@
     </application>
 
     <application name="c2mon-tim2-dev" extends="default">
-      <deployment installLocation="/user/timtest/dev/c2mon-server-dev">
+      <deployment installLocation="/opt/c2mon-dev">
         <directory name="conf">
           <file name="jmxremote.passwd" sourceDir="/user/timtest/dev/rep/c2mon/server"
             mask="400" />
