@@ -21,6 +21,7 @@
 <h4>Please select an option:</h4>
 <ul>
 	<li><a href="tagviewer/form">Tag Viewer</a></li>
+	<li><a href="historyviewer/form"> Tag History Viewer </a></li>
 	<li><a href="alarmviewer/form"> Alarm Viewer </a></li>
 	<li><a href="commandviewer/form"> Command Viewer </a></li>
 	<li><a href="configloader/form"> Config Loader </a></li>

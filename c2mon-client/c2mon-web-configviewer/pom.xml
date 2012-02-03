@@ -96,6 +96,10 @@
 			<artifactId>tim2-shared-client</artifactId>
 		</dependency>
 		<dependency>
+  			<groupId>cern.c2mon.c2mon-client</groupId>
+  			<artifactId>c2mon-client-history</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>cern.c2mon.c2mon-client</groupId>
 			<artifactId>c2mon-client-core</artifactId>
 		</dependency>

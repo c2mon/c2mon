@@ -5,6 +5,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.Collection;
 
+import javax.validation.constraints.AssertTrue;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.web.configviewer.service.AlarmService;
 import cern.c2mon.web.configviewer.service.CommandService;
 import cern.c2mon.web.configviewer.service.TagService;
+import cern.tim.shared.common.datatag.TagQualityStatus;
 
 
 @ContextConfiguration(locations = {"test-context.xml"} )
@@ -28,13 +32,16 @@ public class TagServiceTest {
   @Autowired
   CommandService serviceC;
   @Autowired
-  ConfigLoaderService serviceL;    
+  ConfigLoaderService serviceL;
   @Autowired
-  ProcessService serviceP;    
+  ProcessService serviceP;
+  @Autowired
+  HistoryService serviceH;
 
   final String dataTagWithUnits = "44906";
   final String dataTagWithAlarms = "142097";
   final String dataTag = "145800";
+  final String historyTag = "107202";
 
   final String configurationId_FAIL = "666666";
   final String configurationId_SUCCESS = "10000";
@@ -48,40 +55,76 @@ public class TagServiceTest {
   }
   
   @Test
-  public void testProcessHtml() {
+  public void testHistory() throws Exception {
 
-    try {
+    String xml = serviceH.getHistoryXml(dataTagWithAlarms, 10);
+    System.out.println(xml);
+    
+    Assert.assertTrue(xml.contains("HistoryTag"));
+    
+    String html = serviceH.generateHtmlResponse(dataTagWithAlarms, 10);
+    
+    System.out.println(html);
+  }  
 
-      String response = serviceP.generateHtmlResponse("P_GTCCHILLSU6");
-      System.out.println(response);
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
-      e.printStackTrace();
-      Assert.assertTrue(false);
-    }
-  }
+  //  @Test
+  //  public void testProcessHtml() {
+  //
+  //    try {
+  //
+  //      String response = serviceP.generateHtmlResponse("P_GTCCHILLSU6");
+  //    } catch (Exception e) {
+  //      System.out.println(e.getMessage());
+  //      e.printStackTrace();
+  //      Assert.assertTrue(false);
+  //    }
+  //  }
+  //  
+  //
 
   @Test
-  public void testProcessNames() {
+  public void testTagQualityIsIncludedInXml() throws Exception {
 
-    Collection names;
+    ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
+    cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_OUT_OF_BOUNDS, "Value is over 9000!");
+    cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE, "It's down!");
 
-    try {
+    cdt.toString().contains("tagQuality");
+  }  
 
-      names = serviceP.getProcessNames();
-      System.out.println(names);
-      Assert.assertNotNull(names);
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
-      e.printStackTrace();
-      Assert.assertTrue(false);
-    }
-  }
+//  @Test
+//  public void DataTagValueNotEmpty() {
+//    String tagXml;
+//    try {
+//      tagXml = service.getDataTagValueXml(dataTagWithAlarms);
+//      System.out.println(tagXml);
+//      Assert.assertNotNull(tagXml);
+//      Assert.assertTrue(tagXml.contains("<tagValue"));
+//    } catch (Exception e) {
+//      Assert.assertTrue(false);
+//    }
+//  }
+
+//  @Test
+//  public void testProcessNames() {
+//
+//    Collection names;
+//
+//    try {
+//
+//      names = serviceP.getProcessNames();
+//      Assert.assertNotNull(names);
+//    } catch (Exception e) {
+//      System.out.println(e.getMessage());
+//      e.printStackTrace();
+//      Assert.assertTrue(false);
+//    }
+//  }
 
   //
   //    @Test
   //    public void testProcessXmlService() {
-    //        String pXml;
+  //        String pXml;
   //        try {
   //            pXml = serviceP.getProcessXml(processName);
   ////            System.out.println(pXml);
@@ -150,18 +193,6 @@ public class TagServiceTest {
         }
     }
 
-    @Test
-    public void DataTagValueNotEmpty() {
-        String tagXml;
-        try {
-            tagXml = service.getDataTagValueXml(dataTagWithAlarms);
-            System.out.println(tagXml);
-            Assert.assertNotNull(tagXml);
-            Assert.assertTrue(tagXml.contains("<tagValue"));
-        } catch (Exception e) {
-            Assert.assertTrue(false);
-        }
-    }
 
     @Test
     public void DataTagConfigNotEmpty() {
