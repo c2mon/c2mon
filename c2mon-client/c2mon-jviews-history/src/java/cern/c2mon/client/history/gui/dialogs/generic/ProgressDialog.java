@@ -21,7 +21,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -133,7 +132,7 @@ public class ProgressDialog {
     mainProgressPanel.add(southPanel, BorderLayout.SOUTH);
 
     this.dialog.setTitle(dialogTitle);
-    this.dialog.setModalityType(ModalityType.APPLICATION_MODAL);
+//    this.dialog.setModalityType(ModalityType.APPLICATION_MODAL);
     this.dialog.getContentPane().add(mainProgressPanel);
     this.dialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     this.dialog.setResizable(false);
@@ -141,7 +140,7 @@ public class ProgressDialog {
     this.dialog.pack();
     //this.dialog.setLocation(500, 500);
     this.dialog.setLocationRelativeTo(null);
-    this.dialog.setAlwaysOnTop(true);
+    this.dialog.setModal(true);
   }
   
   /**
@@ -210,6 +209,7 @@ public class ProgressDialog {
   public synchronized void hide() {
     progressBarUpdateThreadRun.set(false);
     dialog.setVisible(false);
+    dialog.dispose();
   }
 
   /**
