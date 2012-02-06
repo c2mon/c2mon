@@ -24,8 +24,8 @@ $c2monProperties->load(*PROPS);
 
 # Separate database connection URL is neccesary for the perl DBI connector
 
-my $dbiUser = $c2monProperties->getProperty("jdbc.config.user");
-my $dbiPassword = $c2monProperties->getProperty("jdbc.config.password");
+my $dbiUser = $c2monProperties->getProperty("c2mon.jdbc.config.user");
+my $dbiPassword = $c2monProperties->getProperty("c2mon.jdbc.config.password");
 my $dbiUrl = $c2monProperties->getProperty("dbi.url");
 
 my $dbh = DBI->connect( $dbiUrl, $dbiUser, $dbiPassword )
