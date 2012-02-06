@@ -13,9 +13,9 @@
 
 		<application name="dmn2-viewer-pro" extends="default">
 			<deployment installLocation="~diamonop/public_html/dmn2-viewer-pro">
-				<signJars keyStore="~diamonop/client/jarsign.properties" />
+				<signJars keyStore="~diamonop/c2mon/client/jarsign.properties" />
 				<directory name="conf">
-					<file name="client.properties" sourceDir="~diamonop/c2mon/prod/client"
+					<file name="client.properties" sourceDir="~diamonop/c2mon/client"
 						mask="444" />
 				</directory>
 			</deployment>
@@ -23,9 +23,9 @@
 
 		<application name="dmn2-viewer-dev" extends="default">
 			<deployment installLocation="~dmndev/public_html/dmn2-viewer-dev">
-				<signJars keyStore="~dmndev/client/jarsign.properties" />
+				<signJars keyStore="~dmndev/c2mon/client/jarsign.properties" />
 				<directory name="conf">
-					<file name="client.properties" sourceDir="~dmndev/c2mon/dev/client"
+					<file name="client.properties" sourceDir="~dmndev/c2mon/client"
 						mask="444" />
 				</directory>
 			</deployment>
