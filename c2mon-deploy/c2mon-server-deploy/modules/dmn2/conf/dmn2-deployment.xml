@@ -53,14 +53,14 @@
 		<application name="c2mon-dmn2-pro" extends="default">
 			<deployment>
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/prod/server"
+					<file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/server"
 						mask="400" />
-					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/prod/server"
+					<file name=".jmxremote.access" sourceDir="~diamonop/c2mon/server"
 						mask="400" />
-					<file name="c2mon.properties" sourceDir="/user/diamonop/c2mon/prod/server"
+					<file name="c2mon.properties" sourceDir="~diamonop/c2mon/server"
 						mask="400" />
 					<!-- copy over pro. server's log4j configuration -->
-					<file name="log4j.xml" sourceDir="/user/diamonop/c2mon/prod/server"
+					<file name="log4j.xml" sourceDir="~diamonop/c2mon/server"
 						mask="444" />
 				</directory>
 
@@ -70,15 +70,14 @@
 		<application name="c2mon-dmn2-dev" extends="default">
 			<deployment installLocation="/opt/c2mon-dmn2-dev">
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="/user/dmndev/c2mon/dev/server"
+					<file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/server"
 						mask="400" />
-					<file name=".jmxremote.access" sourceDir="/user/dmndev/c2mon/dev/server"
+					<file name=".jmxremote.access" sourceDir="~dmndev/c2mon/server"
 						mask="400" />
-					<file name="c2mon.properties" sourceDir="/user/dmndev/c2mon/dev/server"
+					<file name="c2mon.properties" sourceDir="~dmndev/c2mon/server"
 						mask="400" />
 					<!-- copy over pro. server's log4j configuration -->
-					<file name="log4j.xml" sourceDir="/user/dmndev/c2mon/dev/server"
-						mask="444" />
+					<file name="log4j.xml" sourceDir="~dmndev/c2mon/server" mask="444" />
 				</directory>
 			</deployment>
 		</application>
