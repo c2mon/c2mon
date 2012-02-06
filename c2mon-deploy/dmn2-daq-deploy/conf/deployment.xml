@@ -44,14 +44,14 @@
 		
 			<deployment>
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="/user/diamonop/c2mon/prod/daq"
+					<file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/daq"
 						mask="400" />
-					<file name=".jmxremote.access" sourceDir="/user/diamonop/c2mon/prod/daq"
+					<file name=".jmxremote.access" sourceDir="~diamonop/c2mon/daq"
 						mask="400" />
-					<file name="daq.properties" sourceDir="/user/diamonop/c2mon/prod/daq"
+					<file name="daq.properties" sourceDir="~diamonop/c2mon/daq"
 						mask="400" />
 					<!-- copy over pro. daq log4j configuration -->
-					<file name="log4j.xml" sourceDir="/user/diamonop/c2mon/prod/daq"
+					<file name="log4j.xml" sourceDir="~diamonop/c2mon/daq"
 						mask="444" />						
 				</directory>
 			</deployment>
@@ -61,14 +61,14 @@
 			
 			<deployment installLocation="/opt/dmn2-daq-dev">
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="/user/dmndev/c2mon/dev/daq"
+					<file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/daq"
 						mask="400" />
-					<file name=".jmxremote.access" sourceDir="/user/dmndev/c2mon/dev/daq"
+					<file name=".jmxremote.access" sourceDir="~dmndev/c2mon/daq"
 						mask="400" />
-					<file name="daq.properties" sourceDir="/user/dmndev/c2mon/dev/daq"
+					<file name="daq.properties" sourceDir="~dmndev/c2mon/daq"
 						mask="400" />
 					<!-- copy over dev. daq log4j configuration -->
-					<file name="log4j.xml" sourceDir="/user/dmndev/c2mon/dev/daq"
+					<file name="log4j.xml" sourceDir="~dmndev/c2mon/daq"
 						mask="444" />												
 				</directory>
 			</deployment>
