@@ -227,12 +227,21 @@ public class RbacAuthenticationManager implements AuthenticationManager, RbaToke
         }
       }
       else {
-        LOG.info("User " + userName + " has successfully logged in.");
+        boolean onRbaGUITokenRenew = false;
+        
         if (userContexts.get(userName) == null) {
+          // if we had already a RBA GUI login token, then we do not 
+          // need to inform again the registered listeners about it.
+          onRbaGUITokenRenew = rbaGUILoginToken != null;
+          
           rbaGUILoginToken = rbaToken;
         }
-        for (AuthenticationListener listener : authenticationListeners) {
-          listener.onLogin(userName);
+        
+        if (!onRbaGUITokenRenew) {
+          LOG.info("User " + userName + " has successfully logged in.");
+          for (AuthenticationListener listener : authenticationListeners) {
+            listener.onLogin(userName);
+          }
         }
       }
     }
