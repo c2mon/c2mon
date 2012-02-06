@@ -3,8 +3,7 @@
 	<product name="dmn2-viewer">
 
 		<application name="default">
-
-			<deployment installLocation="/user/diamondev/public_html/dmn2-viewer">
+			<deployment>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
 					<mail address="project-diamon-core@cern.ch" />
@@ -13,18 +12,20 @@
 		</application>
 
 		<application name="dmn2-viewer-pro" extends="default">
-			<deployment installLocation="/user/diamonop/public_html/dmn2-viewer-pro">
+			<deployment installLocation="~diamonop/public_html/dmn2-viewer-pro">
+				<signJars keyStore="~diamonop/client/jarsign.properties" />
 				<directory name="conf">
-					<file name="client.properties" sourceDir="/user/diamonop/c2mon/prod/client"
+					<file name="client.properties" sourceDir="~diamonop/c2mon/prod/client"
 						mask="444" />
 				</directory>
 			</deployment>
 		</application>
 
 		<application name="dmn2-viewer-dev" extends="default">
-			<deployment installLocation="/user/dmndev/public_html/dmn2-viewer-dev">
+			<deployment installLocation="~dmndev/public_html/dmn2-viewer-dev">
+				<signJars keyStore="~diamonop/client/jarsign.properties" />
 				<directory name="conf">
-					<file name="client.properties" sourceDir="/user/dmndev/c2mon/dev/client"
+					<file name="client.properties" sourceDir="~dmndev/c2mon/dev/client"
 						mask="444" />
 				</directory>
 			</deployment>
