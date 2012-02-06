@@ -5,7 +5,7 @@
   <parent>
     <artifactId>c2mon-client-pom</artifactId>
     <groupId>cern.c2mon.c2mon-client</groupId>
-    <version>1.0.1</version>
+    <version>1.0.3</version>
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-jms</artifactId>
@@ -44,6 +44,11 @@
       <groupId>cern.tim2.tim2-shared</groupId>
       <artifactId>tim2-shared-util</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cern.accsoft.commons</groupId>
+      <artifactId>accsoft-commons-util</artifactId>      
+    </dependency>
+
 
     <!-- test dependencies -->
     <dependency>
@@ -86,5 +91,5 @@
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-jms</developerConnection>
   </scm>
-	
+
 </project>

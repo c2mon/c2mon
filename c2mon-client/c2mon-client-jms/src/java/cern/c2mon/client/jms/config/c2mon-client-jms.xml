@@ -13,8 +13,7 @@
   <bean id="jmsConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
     <property name="brokerURL" value="${c2mon.client.jms.url}"/>
     <property name="userName" value="${c2mon.client.jms.user}"/>
-    <property name="password" value="${c2mon.client.jms.password}"/>
-    <property name="clientIDPrefix" value="C2MON-CLIENT"/>
+    <property name="password" value="${c2mon.client.jms.password}"/>   
     <property name="watchTopicAdvisories" value="false"/>  
   </bean>
   

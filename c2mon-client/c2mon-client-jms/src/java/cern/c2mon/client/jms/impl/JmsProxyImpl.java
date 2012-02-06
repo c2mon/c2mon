@@ -41,6 +41,7 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 
+import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.log4j.Logger;
@@ -48,6 +49,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import cern.accsoft.commons.util.proc.ProcUtils;
+import cern.accsoft.commons.util.proc.ProcessInfo;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.jms.AdminMessageListener;
 import cern.c2mon.client.jms.AlarmListener;
@@ -241,7 +244,16 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     heartbeatListenerWrapper = new HeartbeatListenerWrapper();
   }
   
- 
+  /**
+   * Sets the prefix id on the JMS connection factory.
+   * Only works if JMS connection factory is ActiveMQ.
+   */
+  private void setActiveMQConnectionPrefix() {
+    ProcessInfo procInfo = ProcUtils.get().getProcessInfo();
+    String clientIdPrefix = "C2MON-CLIENT-" + procInfo.getUserId() + "@" + procInfo.getHostName() 
+        + "[" + procInfo.getPid() + "]"; 
+    ((ActiveMQConnectionFactory) jmsConnectionFactory).setClientIDPrefix(clientIdPrefix);
+  }
 
   /**
    * Runs until (re)connected. Should only be called by one thread.
@@ -734,11 +746,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
 
   @PostConstruct
-  public void init() {
+  public void init() {    
     //thread starting connection; is stopped when calling shutdown method
     new Thread(new Runnable() {      
       @Override
       public void run() {
+        setActiveMQConnectionPrefix();
         connect();
       }
     }).start();
