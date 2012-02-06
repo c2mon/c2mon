@@ -85,30 +85,6 @@
 				</executions>
 			</plugin>
 
-<!--			<plugin>-->
-<!--				<artifactId>maven-antrun-plugin</artifactId>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<id>sign-jars</id>-->
-<!--						<phase>package</phase>-->
-<!--						<goals>-->
-<!--							<goal>run</goal>-->
-<!--						</goals>-->
-<!--						<configuration>-->
-<!--							<target>-->
-<!--								<echo message="Signing libs. in folder: ${project.build.directory}/lib" />-->
-<!--								<echo message="Using key: ${c2mon.jarsigner.key}" />-->
-<!--								<signjar alias="cernslcert" keystore="${c2mon.jarsigner.key}"-->
-<!--									storepass="itutez" keypass="tuwasmamha" lazy="true">-->
-<!---->
-<!--									<fileset dir="${project.build.directory}/lib" includes="**/*.jar" />-->
-<!--								</signjar>-->
-<!--							</target>-->
-<!--						</configuration>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
-
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
