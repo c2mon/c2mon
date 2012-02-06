@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="tim2-viewer">
+
+		<application name="default">
+			<deployment>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="project-diamon-core@cern.ch" />
+				</notification>
+			</deployment>
+		</application>
+
+		<application name="tim2-viewer-pro" extends="default">
+			<deployment installLocation="~timoper/public_html/dmn2-viewer-pro">
+				<signJars keyStore="~timoper/rep/c2mon/client/jarsign.properties" />
+				<directory name="conf">
+					<file name="c2mon-client.properties" sourceDir="~diamonop/c2mon/client"
+						mask="444" />
+				</directory>
+			</deployment>
+		</application>
+
+		<application name="tim2-viewer-dev" extends="default">
+			<deployment installLocation="~timtest/public_html/dmn2-viewer-dev">
+				<signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
+				<directory name="conf">
+					<file name="c2mon-client.properties" sourceDir="~dmndev/c2mon/client"
+						mask="444" />
+				</directory>
+			</deployment>
+		</application>
+
+	</product>
+</products>
