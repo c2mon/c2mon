@@ -223,15 +223,19 @@ public class VideoRequestHandler implements SessionAwareMessageListener<Message>
     }
     if (replyDestination != null) {
       MessageProducer messageProducer = session.createProducer(replyDestination);
-      messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-      messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
-      TextMessage replyMessage = session.createTextMessage();      
+      try {
+        messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+        messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
+        TextMessage replyMessage = session.createTextMessage();      
 
-      replyMessage.setText(messageText);
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(new StringBuffer("onMessage() : Video connection response sent : ").append(hashCode));
-      }
-      messageProducer.send(replyMessage);
+        replyMessage.setText(messageText);
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(new StringBuffer("onMessage() : Video connection response sent : ").append(hashCode));
+        }
+        messageProducer.send(replyMessage);
+      } finally {
+        messageProducer.close();
+      }      
     } else {
       LOG.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
       throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
