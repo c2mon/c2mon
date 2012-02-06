@@ -33,8 +33,8 @@ open PROPS, "< $c2monClientPropertiesFile"
 my $c2monProperties = new Config::Properties();
 $c2monProperties->load(*PROPS);
 
-$c2monProperties->load(*PROPS);
 my $jdbcDriver           = $c2monProperties->getProperty("c2mon.jdbc.driver");
+
 my $jdbcRoUrl            = $c2monProperties->getProperty("c2mon.jdbc.ro.url");
 my $jdbcRoUser           = $c2monProperties->getProperty("c2mon.jdbc.ro.user");
 my $jdbcRoPassword       = $c2monProperties->getProperty("c2mon.jdbc.ro.password");
