@@ -7,6 +7,37 @@
 			c2mon-dmn2-prod and c2mon-dmn2-test
 		-->
 		<application name="default">
+
+			<startscript name="DMN2-SRV">
+				<main-class name="cern.tim.server.lifecycle.ServerStartup">
+					<output>
+						<file name="log/out.log" />
+					</output>
+				</main-class>
+				<vm-args>-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC
+					-XX:MaxGCPauseMillis=100</vm-args>
+				<property name="server.process.name" value="C2MON-SERVER-DMN2" />
+				<property name="c2mon.home" value="$INSTALL_PATH" />
+				<property name="c2mon.log.dir" value="log" />
+				<property name="c2mon.properties.location" value="conf/c2mon.properties" />
+				<property name="log4j.configuration" value="conf/log4j.xml" />
+				<property name="com.sun.management.jmxremote.port" value="9523" />
+				<property name="com.sun.management.jmxremote.password.file"
+					value="conf/.jmxremote.passwd" />
+				<property name="com.sun.management.jmxremote.access.file"
+					value="conf/.jmxremote.access" />
+				<property name="com.sun.management.jmxremote.ssl" value="false" />
+				<property name="c2mon.home" value="$INSTALL_DIR" />
+				<property name="laser.hosts" value="laser-test" />
+				<property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
+				<preExec>
+					<![CDATA[
+		
+                    ]]>
+				</preExec>
+			</startscript>
+
+
 			<deployment installLocation="/opt/c2mon-dmn2">
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
@@ -16,31 +47,6 @@
 					<!-- you can give more than one mail for deployment notification -->
 					<mail address="timdiamon-developers@cern.ch" />
 				</notification>
-				<startscript name="DMN2-SRV">
-					<main-class name="cern.tim.server.lifecycle.ServerStartup">
-						<output>
-							<file name="log/out.log" />
-						</output>
-					</main-class>
-					<vm-args>-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC	-XX:MaxGCPauseMillis=100</vm-args>
-					<property name="server.process.name" value="C2MON-SERVER-DMN2" />
-					<property name="c2mon.home" value="$INSTALL_PATH" />
-					<property name="c2mon.log.dir" value="log" />
-					<property name="c2mon.properties.location" value="conf/c2mon.properties" />
-					<property name="log4j.configuration" value="conf/log4j.xml" />
-					<property name="com.sun.management.jmxremote.port" value="9523" />
-					<property name="com.sun.management.jmxremote.password.file" value="conf/.jmxremote.passwd" />
-					<property name="com.sun.management.jmxremote.access.file" value="conf/.jmxremote.access" />
-					<property name="com.sun.management.jmxremote.ssl" value="false" />
-					<property name="c2mon.home" value="$INSTALL_DIR" />
-					<property name="laser.hosts" value="laser-test" />
-          			<property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
-					<preExec>
-					<![CDATA[
-		
-                    ]]>
-					</preExec>
-				</startscript>
 			</deployment>
 		</application>
 
@@ -55,7 +61,7 @@
 						mask="400" />
 					<!-- copy over pro. server's log4j configuration -->
 					<file name="log4j.xml" sourceDir="/user/diamonop/c2mon/prod/server"
-						mask="444" />						
+						mask="444" />
 				</directory>
 
 			</deployment>
@@ -72,7 +78,7 @@
 						mask="400" />
 					<!-- copy over pro. server's log4j configuration -->
 					<file name="log4j.xml" sourceDir="/user/dmndev/c2mon/dev/server"
-						mask="444" />												
+						mask="444" />
 				</directory>
 			</deployment>
 		</application>
