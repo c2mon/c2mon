@@ -23,7 +23,7 @@
 
 		<application name="dmn2-viewer-dev" extends="default">
 			<deployment installLocation="~dmndev/public_html/dmn2-viewer-dev">
-				<signJars keyStore="~diamonop/client/jarsign.properties" />
+				<signJars keyStore="~dmndev/client/jarsign.properties" />
 				<directory name="conf">
 					<file name="client.properties" sourceDir="~dmndev/c2mon/dev/client"
 						mask="444" />
