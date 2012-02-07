@@ -393,7 +393,7 @@
 					DAQ Process XML Viewer 
 					<br></br><br></br>
 					<p>Process: <xsl:value-of select="jms-user"/>
-					<a href="{$base_url}{$process_xml_url}{jms-user}/">(view as xml)</a></p>
+					<a href="{$base_url}{$process_xml_url}{jms-user}/" target="_blank">(view as xml)</a></p>
 		</p>
 	<div class="column">
 		<table class="inline">
