@@ -5,11 +5,11 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.3</version>
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-core</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.3-SNAPSHOT</version>
   <name>c2mon-client-core</name>
   <packaging>jar</packaging>
   <description>The C2MON Client API which handles the communication to the C2MON server.</description>
