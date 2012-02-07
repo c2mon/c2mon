@@ -4,10 +4,6 @@
 
 		<application name="default">
 			<deployment>
-				<notification>
-					<!-- you can give more than one mail for deployment notification -->
-					<mail address="project-diamon-core@cern.ch" />
-				</notification>
 			</deployment>
 		</application>
 
@@ -18,6 +14,10 @@
 					<file name="client.properties" sourceDir="~diamonop/c2mon/client"
 						mask="444" />
 				</directory>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="project-diamon-core@cern.ch" />
+				</notification>
 			</deployment>
 		</application>
 
