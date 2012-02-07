@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="tim2-video-viewer">
+
+		<application name="default">
+			<deployment>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="tim-admin@cern.ch" />
+				</notification>
+			</deployment>
+		</application>
+
+		<application name="tim2-video-viewer-pro" extends="default">
+			<deployment installLocation="~timoper/dist/public/html/javaws/tim2-video-viewer">
+				<signJars keyStore="~timoper/rep/c2mon/client/jarsign.properties" />
+			</deployment>
+		</application>
+
+		<application name="tim2-video-viewer-test" extends="default">
+			<deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-video-viewer">
+				<signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
+			</deployment>
+		</application>
+
+	</product>
+</products>

@@ -18,7 +18,12 @@
 		</componentDescriptor>
 	</componentDescriptors>
 
-	<files>
-	</files>
-
+  <files>
+    <file>
+      <source>deployment.xml</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+  </files>
 </assembly>
