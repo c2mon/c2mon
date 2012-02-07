@@ -12,7 +12,7 @@
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-video-viewer-deploy</artifactId>
 	<name>c2mon-video-viewer-deploy</name>
-	<version>1.0.1</version>
+	<version>1.0.2-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
@@ -20,11 +20,6 @@
 		C2MON module assembling all required modules and configuration files for tim-client-video
         </description>
 	<url></url>
-
-	<properties>
-		<c2mon.jarsigner.key>/user/pcrops/production/cmmnbuild/cmmnbuild/build/dist/cmmnbuild/includes/slcerts
-		</c2mon.jarsigner.key>
-	</properties>
 
 	<developers />
 
