@@ -383,8 +383,11 @@
 				<title>Configuration viewer</title>
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
+				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
+				
 				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
 				<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
+				
 			</head>
 			<body>
 	
@@ -393,7 +396,10 @@
 					DAQ Process XML Viewer 
 					<br></br><br></br>
 					<p>Process: <xsl:value-of select="jms-user"/>
-					<a href="{$base_url}{$process_xml_url}{jms-user}/" target="_blank">(view as xml)</a></p>
+					<A href="{$base_url}{$process_xml_url}{jms-user}/" 
+						class="large blue awesome xml_button" target="_blank">View as XML »
+						</A>
+					</p>
 		</p>
 	<div class="column">
 		<table class="inline">

@@ -1,0 +1,125 @@
+DIV.wrapper {
+	POSITION: relative; PADDING-BOTTOM: 36px; MARGIN: 0px auto; PADDING-LEFT: 30px; WIDTH: 940px; PADDING-RIGHT: 30px; PADDING-TOP: 0px
+}
+
+.xml_button {
+
+	float:right;	
+}
+
+xml_button a { color: white; text-decoration:none;}
+xml_button a:link    { color: white; text-decoration:none }
+xml_button a:visited { color: white; text-decoration:none }
+xml_button a:hover   { color: white; text-decoration:underline }
+
+DIV#header {
+	BORDER-BOTTOM: #eee 1px solid; MARGIN: 0px; BACKGROUND: #f5f5f5; HEIGHT: 72px
+}
+DIV#header H4 {
+	POSITION: absolute; BORDER-LEFT: #ddd 1px solid; PADDING-LEFT: 14px; FLOAT: left; TOP: 24px; LEFT: 145px
+}
+DIV#header H4 SMALL {
+	FONT-SIZE: 14px; FONT-WEIGHT: normal
+}
+DIV#header H4 A {
+	FONT-WEIGHT: normal
+}
+DIV#header H4 A:visited {
+	FONT-WEIGHT: normal
+}
+DIV.page-header {
+	BORDER-BOTTOM: #ddd 1px solid; PADDING-BOTTOM: 8px; MARGIN: 18px 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; PADDING-TOP: 0px
+}
+DIV.page-header H1 {
+	PADDING-BOTTOM: 0px; LINE-HEIGHT: 27px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; LETTER-SPACING: 0px; FONT-SIZE: 24px; PADDING-TOP: 0px
+}
+.awesome {
+	POSITION: relative; PADDING-BOTTOM: 6px; PADDING-LEFT: 10px; PADDING-RIGHT: 10px; DISPLAY: inline-block; BACKGROUND: url(/images/alert-overlay.png) #222 repeat-x; COLOR: #fff; CURSOR: pointer; TEXT-DECORATION: none; PADDING-TOP: 5px; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25); -webkit-border-radius: 5px; -moz-border-radius: 5px; -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5)
+}
+.awesome:visited {
+	POSITION: relative; PADDING-BOTTOM: 6px; PADDING-LEFT: 10px; PADDING-RIGHT: 10px; DISPLAY: inline-block; BACKGROUND: url(/images/alert-overlay.png) #222 repeat-x; COLOR: #fff; CURSOR: pointer; TEXT-DECORATION: none; PADDING-TOP: 5px; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25); -webkit-border-radius: 5px; -moz-border-radius: 5px; -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5)
+}
+.awesome:hover {
+	BACKGROUND-COLOR: #111; COLOR: #fff
+}
+.awesome:active {
+	TOP: 1px
+}
+.awesome.small {
+	FONT-SIZE: 11px
+}
+.awesome.small:visited {
+	FONT-SIZE: 11px
+}
+.awesome {
+	LINE-HEIGHT: 1; FONT-SIZE: 13px; FONT-WEIGHT: bold; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25)
+}
+.awesome:visited {
+	LINE-HEIGHT: 1; FONT-SIZE: 13px; FONT-WEIGHT: bold; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25)
+}
+.awesome.medium {
+	LINE-HEIGHT: 1; FONT-SIZE: 13px; FONT-WEIGHT: bold; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25)
+}
+.awesome.medium:visited {
+	LINE-HEIGHT: 1; FONT-SIZE: 13px; FONT-WEIGHT: bold; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25)
+}
+.awesome.large {
+	PADDING-BOTTOM: 9px; PADDING-LEFT: 14px; PADDING-RIGHT: 14px; FONT-SIZE: 14px; PADDING-TOP: 8px
+}
+.awesome.large:visited {
+	PADDING-BOTTOM: 9px; PADDING-LEFT: 14px; PADDING-RIGHT: 14px; FONT-SIZE: 14px; PADDING-TOP: 8px
+}
+.awesome.green {
+	BACKGROUND-COLOR: #91bd09
+}
+.awesome.green:visited {
+	BACKGROUND-COLOR: #91bd09
+}
+.awesome.green:hover {
+	BACKGROUND-COLOR: #749a02
+}
+.awesome.blue {
+	BACKGROUND-COLOR: #2daebf
+}
+.awesome.blue:visited {
+	BACKGROUND-COLOR: #2daebf
+}
+.awesome.blue:hover {
+	BACKGROUND-COLOR: #007d9a
+}
+.awesome.red {
+	BACKGROUND-COLOR: #e33100
+}
+.awesome.red:visited {
+	BACKGROUND-COLOR: #e33100
+}
+.awesome.red:hover {
+	BACKGROUND-COLOR: #872300
+}
+.awesome.magenta {
+	BACKGROUND-COLOR: #a9014b
+}
+.awesome.magenta:visited {
+	BACKGROUND-COLOR: #a9014b
+}
+.awesome.magenta:hover {
+	BACKGROUND-COLOR: #630030
+}
+.awesome.orange {
+	BACKGROUND-COLOR: #ff5c00
+}
+.awesome.orange:visited {
+	BACKGROUND-COLOR: #ff5c00
+}
+.awesome.orange:hover {
+	BACKGROUND-COLOR: #d45500
+}
+.awesome.yellow {
+	BACKGROUND-COLOR: #ffb515
+}
+.awesome.yellow:visited {
+	BACKGROUND-COLOR: #ffb515
+}
+.awesome.yellow:hover {
+	BACKGROUND-COLOR: #fc9200
+}
