@@ -8,7 +8,7 @@
 		-->
 		<application name="default">
 
-			<startscript name="DMN2-SRV">
+			<startscript name="DMN2-SRV.jvm">
 				<main-class name="cern.tim.server.lifecycle.ServerStartup">
 					<output>
 						<file name="log/out.log" />
