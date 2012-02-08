@@ -43,10 +43,6 @@
 					<preserve type="dir" name="log" />
 					<preserve type="dir" name="reports" />
 				</backupPolicy>
-				<notification>
-					<!-- you can give more than one mail for deployment notification -->
-					<mail address="timdiamon-developers@cern.ch" />
-				</notification>
 			</deployment>
 		</application>
 
@@ -64,6 +60,11 @@
 						mask="444" />
 				</directory>
 
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="project-diamon-core@cern.ch" />
+				</notification>
+				
 			</deployment>
 		</application>
 
