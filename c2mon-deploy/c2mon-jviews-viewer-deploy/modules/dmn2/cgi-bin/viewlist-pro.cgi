@@ -10,13 +10,16 @@ use File::Path;
 # Definition of global variables
 ##
 
+my $appdir = "dmn2-viewer-pro";
 my $basedir = "/user/diamonop/public_html/dmn2-views";
-my $baseurl = "http://bewww/~diamonop/dmn2-views";
+my $codebase = "http://bewww/~diamonop";
+my $baseurl = "${codebase}/dmn2-views";
+
+my $c2monClientPropertiesFile= "/user/diamonop/public_html/${appdir}/conf/client.properties";
 
 # Reading property file client.properties
 open PROPS, "< ../conf/client.properties"
-  or die
-"Unable to open configuration file ${baseurl}/conf/client.properties";
+  or die "Unable to open configuration file $c2monClientPropertiesFile";
 
 my $c2monProperties = new Config::Properties();
 
