@@ -19,14 +19,14 @@
    <property name="video-queue-size" type="java.lang.Integer" value="4"/>
    
    <!-- Set this variable to true, in case you want a display for the taken keys on the access doors -->
-   <property name="keys-taken-counter" type="java.lang.Boolean" value="true"/>
+   <property name="keys-taken-counter" type="java.lang.Boolean" value="false"/>
 
    <!-- 
      Set this variable to true, if you want to ensure that the TIM Video Viewer
      is only listening to requests of a specific host. The user will in this case 
      be prompted at startup to enter a host name for the requester.
    -->
-   <property name="single-host-controller" type="java.lang.Boolean" value="false"/>
+   <property name="single-host-controller" type="java.lang.Boolean" value="true"/>
    
    <!--
      This variable must be set to true, if you want to start the TIM video viewer with VLC.
