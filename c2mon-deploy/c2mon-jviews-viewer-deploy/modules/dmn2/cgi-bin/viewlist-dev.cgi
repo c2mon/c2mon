@@ -18,7 +18,7 @@ my $baseurl = "${codebase}/dmn2-views";
 my $c2monClientPropertiesFile= "/user/dmndev/public_html/${appdir}/conf/client.properties";
 
 # Reading property file client.properties
-open PROPS, "< ../conf/client.properties"
+open PROPS, "< $c2monClientPropertiesFile"
   or die "Unable to open configuration file $c2monClientPropertiesFile";
 
 my $c2monProperties = new Config::Properties();
