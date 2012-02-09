@@ -95,7 +95,7 @@ public abstract class TransferObjectFactory {
 
     /**
      * Creates an <code>AlarmValueImpl</code> object for the given parameters
-     * @param alarm Just an alarm object
+     * @param alarm An alarm object
      * @return The resulting <code>AlarmValueImpl</code>
      */
     public static AlarmValueImpl createAlarmValue(final Alarm alarm) {
@@ -110,11 +110,38 @@ public abstract class TransferObjectFactory {
                     alarm.getFaultFamily(), 
                     alarm.getInfo(), 
                     alarm.getTagId(), 
+                    
                     alarm.getTimestamp(), 
                     alarm.isActive());
         }
         return alarmValueImpl;
     }    
+    
+    /**
+     * Creates an <code>AlarmValueImpl</code> object.
+     * Also adds Tag Description information.
+     * @param alarm An alarm object
+     * @param tag A tag object. Used to get Tag Description information.
+     * @return The resulting <code>AlarmValueImpl</code>
+     */
+    public static AlarmValueImpl createAlarmValue(Alarm alarm, Tag tag) {
+      
+      AlarmValueImpl alarmValueImpl = null;       
+      
+      if (alarm != null && tag != null) {
+          
+          alarmValueImpl = new AlarmValueImpl(alarm.getId(), 
+                  alarm.getFaultCode(), 
+                  alarm.getFaultMember(), 
+                  alarm.getFaultFamily(), 
+                  alarm.getInfo(), 
+                  alarm.getTagId(), 
+                  tag.getDescription(),
+                  alarm.getTimestamp(), 
+                  alarm.isActive());
+      }
+      return alarmValueImpl;
+    }
 
     /**
      * Creates a <code>TagConfigImpl</code> object for the given parameters

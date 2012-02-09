@@ -12,8 +12,10 @@ import com.google.gson.Gson;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.tim.server.cache.CacheRegistrationService;
+import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.cache.TimCacheListener;
 import cern.tim.server.common.alarm.Alarm;
+import cern.tim.server.common.tag.Tag;
 import cern.tim.util.jms.JmsSender;
 import cern.tim.util.json.GsonFactory;
 
@@ -31,20 +33,27 @@ public class AlarmPublisher implements TimCacheListener<Alarm>  {
   /** Used to register to Alarm updates */
   private CacheRegistrationService cacheRegistrationService;
   
+  /** Reference to the tag location service to check whether a tag exists */
+  private final TagLocationService tagLocationService;
+  
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
   
   /**
    * Default Constructor
-   * @param pJmsSender Used for sending JMS messages and waiting for a response
-   * @param pCacheRegistrationService Used to register to Alarm updates
+   * @param pJmsSender Used for sending JMS messages and waiting for a response.
+   * @param pCacheRegistrationService Used to register to Alarm updates.
+   * @param pTagLocationService Reference to the tag location service singleton.
+   * Used to add tag information to the AlarmValue object.
    */
   @Autowired
   public AlarmPublisher(@Qualifier("alarmTopicPublisher") final JmsSender pJmsSender
-      , final CacheRegistrationService pCacheRegistrationService) {
+      , final CacheRegistrationService pCacheRegistrationService
+      , final TagLocationService pTagLocationService) {
     
     jmsSender = pJmsSender;
     cacheRegistrationService = pCacheRegistrationService;
+    tagLocationService = pTagLocationService;
   }
   
   /**
@@ -68,8 +77,20 @@ public class AlarmPublisher implements TimCacheListener<Alarm>  {
    */
   @Override
   public void notifyElementUpdated(final Alarm alarm) {
+    
+    Long tagId = alarm.getTagId();
+    AlarmValue alarmValue = null;
+    
+    if (tagLocationService.isInTagCache(tagId)) {
+      Tag tag = tagLocationService.getCopy(tagId);
+      alarmValue = (TransferObjectFactory.createAlarmValue(alarm, tag));
+    }
+    else {
+      LOGGER.warn("notifyElementUpdated() - unrecognized Tag with id " + tagId);
+      alarmValue = (TransferObjectFactory.createAlarmValue(alarm));
+    }
 
-    AlarmValue alarmValue = TransferObjectFactory.createAlarmValue(alarm);
+    alarmValue = TransferObjectFactory.createAlarmValue(alarm);
     String jsonAlarm = GSON.toJson(alarmValue);
     LOGGER.debug("Publishing alarm: " + jsonAlarm);
     jmsSender.send(jsonAlarm);

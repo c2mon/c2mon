@@ -35,7 +35,7 @@ public class SupervisionEventPublisher implements SupervisionListener {
   /**
    * Default Constructor
    * @param pJmsSender Used for sending JMS messages and waiting for a response
-   * @param pTimCache Used for registering this class as listener
+   * @param pSupervisionNotifier Used for registering this class as listener
    */
   @Autowired
   public SupervisionEventPublisher(@Qualifier("supervisionTopicPublisher") final JmsSender pJmsSender,

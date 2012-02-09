@@ -39,6 +39,7 @@ import cern.tim.server.command.CommandExecutionManager;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.common.process.Process;
+import cern.tim.server.common.tag.Tag;
 import cern.tim.server.common.thread.Event;
 import cern.tim.server.supervision.SupervisionFacade;
 import cern.tim.shared.client.command.CommandExecuteRequest;
@@ -79,7 +80,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /** Reference to the CommandExecutionManager */
   private final CommandExecutionManager commandExecutionManager;
-  
+
   /** Reference to the Process cache that provides a list of all the process names */
   private final ProcessCache processCache;
 
@@ -117,6 +118,8 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    *          Reference to the ConfigurationLoader
    * @param pCommandExecutionManager
    *          Reference to the CommandExecutionManager
+   * @param pProcessCache
+   *          Reference to the ProcessCache          
    */
   @Autowired
   public ClientRequestHandler(final TagLocationService pTagLocationService, final TagFacadeGateway pTagFacadeGateway,
@@ -164,7 +167,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       }
       if (replyDestination != null) {
 
-        MessageProducer messageProducer = session.createProducer(replyDestination);
+        MessageProducer messageProducer = session.createProducer(replyDestination);    
         try {
           messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
           messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
@@ -188,14 +191,14 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
           messageProducer.send(replyMessage);
         } finally {          
           messageProducer.close();
-        }        
+        }     
       } else {
         LOG.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
         throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
       }
     } catch (Exception e) {
       LOG.error("Exception caught while processing client request - unable to process it; request will time out", e);
-    }
+    }    
   }
 
   /**
@@ -267,7 +270,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         return Collections.emptyList();
     } // end switch
   }
-  
+
   /**
    * Inner method which handles the process names request
    * 
@@ -277,11 +280,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   private Collection< ? extends ClientRequestResult> handleProcessNamesRequest(final ClientRequest clientRequest) {
 
     Collection<ProcessNameResponse> names = new ArrayList<ProcessNameResponse>();
-    
+
     Iterator<Long> iterator = processCache.getKeys().iterator();
-    
+
     while (iterator.hasNext()) {
-      
+
       cern.tim.server.common.process.Process o = processCache.get((Long) iterator.next());
       names.add(new ProcessNameResponseImpl(o.getName()));
     }
@@ -323,7 +326,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     }
     return (int) l;
   }
-  
+
   /**
    * Inner method which handles the CommandTagHandle Requests
    * 
@@ -335,7 +338,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
     switch (commandRequest.getResultType()) {
       case TRANSFER_COMMAND_HANDLES_LIST:
-        
+
         return commandExecutionManager.processRequest(commandRequest.getTagIds());
       default:
         LOG.error("handleCommandHandleRequest() - Could not generate response message. Unknown enum ResultType " + commandRequest.getResultType());
@@ -428,7 +431,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     }
     return transferTags;
   }
-  
+
   /**
    * Inner method which handles the active alarm request.
    * @param alarmRequest The alarm request sent from the client. It doesn't really contain any information
@@ -438,16 +441,25 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    */
   @SuppressWarnings("unchecked")
   private Collection< ? extends ClientRequestResult> handleActiveAlarmRequest(final ClientRequest alarmRequest) {  
-    
+
     final Collection activeAlarms = new ArrayList();
     List<Long> alarmKeys = alarmCache.getKeys();
-    
+
     for (Long alarmKey : alarmKeys) {
-            
+
       final Alarm alarm = alarmCache.getCopy(alarmKey);
-      
+
       if (alarm.isActive()) {
-        activeAlarms.add(TransferObjectFactory.createAlarmValue(alarm));
+        
+        Long tagId = alarm.getTagId();
+        if (tagLocationService.isInTagCache(tagId)) {
+          Tag tag = tagLocationService.getCopy(tagId);
+          activeAlarms.add(TransferObjectFactory.createAlarmValue(alarm, tag));
+        }
+        else {
+          LOG.warn("handleActiveAlarmRequest() - unrecognized Tag with id " + tagId);
+          activeAlarms.add(TransferObjectFactory.createAlarmValue(alarm));
+        }
       }
     }
     if (LOG.isDebugEnabled()) {
@@ -474,10 +486,20 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
       final Long alarmId = iter.next();
       if (alarmCache.hasKey(alarmId)) {
-        final Alarm alarm = alarmCache.get(alarmId);
+        final Alarm alarm = alarmCache.getCopy(alarmId);
         switch (alarmRequest.getResultType()) {
           case TRANSFER_ALARM_LIST:
-            alarms.add(TransferObjectFactory.createAlarmValue(alarm));
+
+            Long tagId = alarm.getTagId();
+            if (tagLocationService.isInTagCache(tagId)) {
+              Tag tag = tagLocationService.getCopy(tagId);
+              alarms.add(TransferObjectFactory.createAlarmValue(alarm, tag));
+            }
+            else {
+              LOG.warn("handleAlarmRequest() - unrecognized Tag with id " + tagId);
+              alarms.add(TransferObjectFactory.createAlarmValue(alarm));
+            }
+
             break;
           default:
             LOG.error("handleAlarmRequest() - Could not generate response message. Unknown enum ResultType " + alarmRequest.getResultType());
@@ -485,7 +507,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       } else {
         LOG.warn("handleAlarmRequest() - request for unknown alarm with id " + alarmId);
       }
-      
+
     } // end while
     if (LOG.isDebugEnabled()) {
       LOG.debug("Finished processing Alarm request: returning " + alarms.size() + " Alarms");
