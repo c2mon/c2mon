@@ -86,7 +86,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     /**
      * The alive writer to write to the OPC.
      */
-    private AliveWriter writer;
+    protected AliveWriter writer;
 
     /**
      * The equipment configuration for his controller.
@@ -199,7 +199,14 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     public synchronized void startAliveTimer() {
         ISourceDataTag targetTag = equipmentConfiguration.getSourceDataTag(
                 equipmentConfiguration.getAliveTagId());
-        if (targetTag != null) {
+        boolean aliveWriterEnabled = getCurrentOPCAddress().isAliveWriteEnabled();
+        if (!aliveWriterEnabled) {
+          logger.info("Equipment Alive Timer has been disabled in the configuration ==> Alive Timer has not been started.");
+        }
+        else if (targetTag == null) {
+          logger.error("No equipment alive tag is specified. Check the configuration! ==> Alive Timer has not been started.");
+        }
+        else {
             writer = new AliveWriter(
                     endpoint, equipmentConfiguration.getAliveTagInterval() / 2,
                     targetTag, factory.getEquipmentLogger(AliveWriter.class));
@@ -216,6 +223,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         }
     }
 
+    
     /**
      * Makes sure there is a created and initialized endpoint.
      */

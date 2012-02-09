@@ -35,6 +35,7 @@ public class OPCAddressParserTest {
         assertEquals(new URI("dcom://testhost:1234/testpath"), address.getUri());
         assertEquals("dcom://testhost:1234/testpath", address.getUriString());
         assertEquals("user", address.getUser());
+        assertEquals(true, address.isAliveWriteEnabled());
     }
     
     @Test
@@ -42,7 +43,8 @@ public class OPCAddressParserTest {
         String addressString = URI_KEY + "=dcom://testhost:1234/testpath," 
             + "http://testhost2:1234/testpath2;" + USER_KEY + "=user@domain,user2;"
             + PASSWORD_KEY + "=password, password2;"
-            + SERVER_TIMEOUT_KEY + "=314;" + SERVER_RETRY_TIMEOUT_KEY + "=1337";
+            + SERVER_TIMEOUT_KEY + "=314;" + SERVER_RETRY_TIMEOUT_KEY + "=1337;"
+            + ALIVE_WRITER_KEY + "=false";
         List<OPCAddress> addresses =
             parser.parseAddressString(addressString);
         assertEquals(2, addresses.size());
@@ -55,6 +57,7 @@ public class OPCAddressParserTest {
         assertEquals(new URI("dcom://testhost:1234/testpath"), address.getUri());
         assertEquals("dcom://testhost:1234/testpath", address.getUriString());
         assertEquals("user", address.getUser());
+        assertEquals(false, address.isAliveWriteEnabled());
         
         address = addresses.get(1);
         assertEquals("http", address.getProtocol());
@@ -65,6 +68,7 @@ public class OPCAddressParserTest {
         assertEquals(new URI("http://testhost2:1234/testpath2"), address.getUri());
         assertEquals("http://testhost2:1234/testpath2", address.getUriString());
         assertEquals("user2", address.getUser());
+        assertEquals(false, address.isAliveWriteEnabled());
     }
     
     @Test(expected=Exception.class)

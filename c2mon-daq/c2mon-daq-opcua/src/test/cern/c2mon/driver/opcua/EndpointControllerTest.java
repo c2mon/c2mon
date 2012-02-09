@@ -21,6 +21,7 @@ import cern.c2mon.driver.opcua.OPCAddress;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpointFactory;
 import cern.c2mon.driver.opcua.connection.common.IOPCEndpoint.STATE;
+import cern.c2mon.driver.opcua.connection.common.impl.AliveWriter;
 import cern.tim.driver.common.EquipmentLogger;
 import cern.tim.driver.common.EquipmentLoggerFactory;
 import cern.tim.driver.common.IEquipmentMessageSender;
@@ -281,7 +282,7 @@ public class EndpointControllerTest {
     @Test
     public void testStartStopAliveTimer() {
         initializeEndpoint();
-        
+
         expect(conf.getAliveTagId()).andReturn(1L);
         expect(conf.getSourceDataTag(1L)).andReturn(
                 new SourceDataTag(1L, "asd", true));
@@ -289,6 +290,7 @@ public class EndpointControllerTest {
         
         replay(conf);
         controller.startAliveTimer();
+        assertNotNull(controller.writer);
         controller.stopAliveTimer();
         verify(conf);
     }

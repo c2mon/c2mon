@@ -3,6 +3,8 @@ package cern.c2mon.driver.opcua;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import cern.c2mon.driver.opcua.connection.common.impl.AliveWriter;
+
 /**
  * The an OPC server.
  * 
@@ -41,6 +43,16 @@ public final class OPCAddress {
      * Domain to authenticate to.
      */
     private String domain;
+    
+    /**
+     * If, set to false, then the Alive WriterTask is not started.
+     * The OPC has then to update itself the equipment alive tag,
+     * otherwise the C2MON server will invalidate all tags from this
+     * process because of an alive timer expiration.<p>
+     * The default value is <code>true</code>.
+     * @see AliveWriter
+     */
+    private boolean aliveWriter = true;
 
     /**
      * Private constructor. Use the Builder class to create an instance.
@@ -54,6 +66,7 @@ public final class OPCAddress {
         user = builder.user;
         password = builder.password;
         domain = builder.domain;
+        aliveWriter = builder.aliveWriter;
     }
 
     /**
@@ -111,6 +124,20 @@ public final class OPCAddress {
     public int getServerRetryTimeout() {
         return serverRetryTimeout;
     }
+    
+    /**
+     * If this method returns <code>false</code>, then the Alive WriterTask
+     * is not started. The OPC has then to update itself the equipment alive tag,
+     * otherwise the C2MON server will invalidate all tags from this process
+     * because of an alive timer expiration.
+     * 
+     * @return <code>true</code>, if the AliveWriter
+     *         task shall be enabled or not.
+     * @see AliveWriter
+     */
+    public boolean isAliveWriteEnabled() {
+      return aliveWriter;
+    }
 
     /**
      * Builder class.
@@ -149,6 +176,16 @@ public final class OPCAddress {
          * Domain to authenticate to.
          */
         private String domain;
+        
+        /**
+         * If, set to <code>false</code>, then the Alive WriterTask is not started.
+         * The OPC has then to update itself the equipment alive tag,
+         * otherwise the C2MON server will invalidate all tags from this
+         * process because of an alive timer expiration.<p>
+         * The default value is <code>true</code>.
+         * @see AliveWriter
+         */
+        private boolean aliveWriter = true;
 
         /**
          * Creates a new Builder object with the mandatory parameters set.
@@ -231,6 +268,22 @@ public final class OPCAddress {
         public Builder domain(final String domain) {
             this.domain = domain;
             return this;
+        }
+        
+        /**
+         * If this value is set to <code>false</code>, then the Alive WriterTask
+         * is not started. The OPC has then to update itself the equipment alive tag,
+         * otherwise the C2MON server will invalidate all tags from this process
+         * because of an alive timer expiration.<p>
+         * The default value is set to <code>true</code>
+         * @param aliveWriter The startup option of the AliveWriter process.
+         * @return The Builder object itself to chain the calls.
+         * 
+         * @see AliveWriter
+         */
+        public Builder aliveWriter(final boolean aliveWriter) {
+          this.aliveWriter = aliveWriter;
+          return this;
         }
 
         /**

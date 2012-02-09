@@ -36,6 +36,11 @@ public class OPCAddressParser {
      * serverRetryTimeout key in the address string.
      */
     public static final String SERVER_RETRY_TIMEOUT_KEY = "serverRetryTimeout";
+    
+    /**
+     * aliveWriter key in the address string
+     */
+    public static final String ALIVE_WRITER_KEY = "aliveWriter";
 
     /**
      * Creates a properties object which has the properties defined in the
@@ -45,6 +50,7 @@ public class OPCAddressParser {
      * URI=protocol1://host1[:port1]/[path1][,protocol2://host2[:port2]/[path2]];
      * user=user1[@domain1][,user2[@domain2]];password=password1[,password2];
      * serverTimeout=serverTimeout;serverRetryTimeout=serverRetryTimeout
+     * [;aliveWriter=true|false]
      * </pre>
      * 
      * The parts in brackets are optional.
@@ -83,9 +89,11 @@ public class OPCAddressParser {
                 Integer.valueOf(properties.getProperty(SERVER_TIMEOUT_KEY));
             int serverRetryTimeout =
                 Integer.valueOf(properties.getProperty(SERVER_RETRY_TIMEOUT_KEY));
+            // optional value which is set to true, if not specified.
+            boolean aliveWriter = Boolean.valueOf(properties.getProperty(ALIVE_WRITER_KEY, "true"));
             OPCAddress primaryAddress = createOPCAddress(
                     uris[0], usersAtDomains[0], passwords[0], 
-                    serverTimeout, serverRetryTimeout);
+                    serverTimeout, serverRetryTimeout, aliveWriter);
             addresses.add(primaryAddress);
             if (uris.length > 1) {
                 OPCAddress alternativeAddress = createOPCAddress(
@@ -93,7 +101,8 @@ public class OPCAddressParser {
                         ? usersAtDomains[1] : null,
                         passwords.length > 1 ? passwords[1] : null, 
                         serverTimeout,
-                        serverRetryTimeout);
+                        serverRetryTimeout,
+                        aliveWriter);
                 addresses.add(alternativeAddress);
             }
         } catch (Exception ex) {
@@ -119,13 +128,14 @@ public class OPCAddressParser {
      *            The interval in which a reconnection attempt is started.
      * @return The new OPC address.
      */
-    private OPCAddress createOPCAddress(final String uri, final String userAtDomain, final String password, final int serverTimeout, final int serverRetryTimeout) {
+    private OPCAddress createOPCAddress(final String uri, final String userAtDomain, final String password, final int serverTimeout, final int serverRetryTimeout, final boolean aliveWriter) {
         OPCAddress primaryAddress;
         try {
             primaryAddress = new OPCAddress.Builder(
             uri.trim(), serverTimeout, serverRetryTimeout)
                 .userAtDomain(userAtDomain != null ? userAtDomain.trim() : null)
                 .password(password.trim())
+                .aliveWriter(aliveWriter)
                 .build();
         } catch (URISyntaxException e) {
             throw new OPCAddressException("Syntax of OPC URI is incorrect: " + uri, e);
