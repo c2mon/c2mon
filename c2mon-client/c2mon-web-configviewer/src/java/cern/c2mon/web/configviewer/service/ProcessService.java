@@ -1,7 +1,6 @@
 package cern.c2mon.web.configviewer.service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
@@ -12,7 +11,6 @@ import java.util.Iterator;
 import javax.annotation.PostConstruct;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -20,17 +18,10 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.auth.impl.RbacAuthenticationManager;
-import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
-import cern.c2mon.web.configviewer.controller.AlarmController;
-import cern.c2mon.web.configviewer.service.ServiceGateway;
-import cern.c2mon.web.configviewer.service.TagIdException;
-import cern.tim.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
  * Command service providing the XML representation of a given alarm
@@ -45,6 +36,12 @@ public class ProcessService {
   
   /** the path to the xslt document */
   private static final String XSLT_PATH = "/optimised_tag.xsl";
+  
+  /**
+   * Performs xslt transformations. 
+   * */
+  @Autowired
+  private XsltTransformUtility xsltTransformer;
 
   /**
    * Gateway to ConfigLoaderService 
@@ -96,50 +93,21 @@ public class ProcessService {
     return names;
   }    
 
-  /**
-   * Transforms the xml to Html using xslt.
-   * @param xml the xml
-   * @return the html
-   */
-  private String transformToHtml(final String xml) {
-
-    OutputStream ostream = null;
-
-    try {
-
-      InputStream xsltResource = getClass().getResourceAsStream(XSLT_PATH);
-      Source xsltSource = new StreamSource(xsltResource);
-      TransformerFactory transFact;
-      Transformer trans = null;
-
-      transFact = TransformerFactory.newInstance();
-
-      Source xmlSource = new StreamSource(new StringReader(xml));
-
-      trans = transFact.newTransformer(xsltSource);
-
-      ostream = new ByteArrayOutputStream();
-      trans.transform(xmlSource, new StreamResult((ostream)));
-
-    } catch (TransformerException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    
-    String result = ostream.toString();
-    
-    // a little hack to make firefox happy!
-    result = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",""); 
-
-    return result;
-  }
-
   
-  public String generateHtmlResponse(final String processName) {
+  public String generateHtmlResponse(final String processName) throws TagIdException {
 
     String xml = getXml(processName);
+    
+    String html = null;
 
-    return transformToHtml(xml);
+    try {
+      html = xsltTransformer.performXsltTransformation(xml);
+    } catch (TransformerException e) {
+      logger.error("Error while performing xslt transformation.");
+      throw new TagIdException("Error while performing xslt transformation.");
+    }
+
+    return html;
   }
 
 

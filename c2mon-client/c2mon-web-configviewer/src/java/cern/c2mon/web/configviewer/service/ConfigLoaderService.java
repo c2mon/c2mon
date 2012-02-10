@@ -86,7 +86,7 @@ public class ConfigLoaderService {
     String html = null;
 
     try {
-      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
+      html = xsltTransformer.performXsltTransformation(xml);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation.");
       throw new TagIdException("Error while performing xslt transformation.");
