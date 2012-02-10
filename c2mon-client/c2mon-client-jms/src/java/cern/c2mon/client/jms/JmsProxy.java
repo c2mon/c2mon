@@ -126,7 +126,7 @@ public interface JmsProxy {
    * 
    * @param message the message to send
    * @param queueName the name of the queue on which to send this request
-   * @param timeToLive how long the message will live on the broker
+   * @param timeToLive how long the message will live on the broker !!This now overridden with default 10 minutes!!
    * @throws JMSException if not currently connected or 
    *                      if a JMS problem occurs while making the request (reconnection is handled by the JmsProxy)
    * @throws NullPointerException thrown if either argument is null

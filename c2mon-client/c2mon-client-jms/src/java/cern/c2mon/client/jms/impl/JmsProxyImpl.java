@@ -99,6 +99,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private static final long SLEEP_BETWEEN_CONNECTION_ATTEMPTS = 5000;
   
   /**
+   * Timeout used for all messages sent to the server: notice this needs to be quite large
+   * to account for unsynchronized clients.
+   */
+  private static final int JMS_MESSAGE_TIMEOUT = 600000;
+  
+  /**
    * The JMS connection factory.
    */
   private ConnectionFactory jmsConnectionFactory;
@@ -520,7 +526,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   
         final MessageProducer producer = session.createProducer(new ActiveMQTopic(topicName));
         producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        producer.setTimeToLive(timeToLive);
+        producer.setTimeToLive(JMS_MESSAGE_TIMEOUT);
         producer.send(messageObj);
       }
       finally {
@@ -571,7 +577,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           message.setJMSReplyTo(replyQueue);
           MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
           producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-          producer.setTimeToLive(timeout);
+          producer.setTimeToLive(JMS_MESSAGE_TIMEOUT);
           producer.send(message);                         
           Message replyMessage = consumer.receive(timeout);
           if (replyMessage == null) {
