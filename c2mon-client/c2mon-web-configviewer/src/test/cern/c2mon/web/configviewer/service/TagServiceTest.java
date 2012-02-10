@@ -58,13 +58,8 @@ public class TagServiceTest {
   public void testHistory() throws Exception {
 
     String xml = serviceH.getHistoryXml(dataTagWithAlarms, 10);
-    System.out.println(xml);
-    
     Assert.assertTrue(xml.contains("HistoryTag"));
-    
     String html = serviceH.generateHtmlResponse(dataTagWithAlarms, 10);
-    
-    System.out.println(html);
   }  
 
   //  @Test
