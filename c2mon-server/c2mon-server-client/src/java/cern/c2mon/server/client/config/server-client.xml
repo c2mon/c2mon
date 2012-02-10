@@ -45,7 +45,7 @@ Alarm Publications
   <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
   <property name="defaultDestination" ref="alarmDestination"/>
   <property name="explicitQosEnabled" value="true"/>
-  <property name="timeToLive" value="60000"/>
+  <property name="timeToLive" value="5400000"/>
   <property name="deliveryPersistent" value="false" />
   <property name="sessionTransacted" value="false" />
 </bean>
@@ -65,7 +65,7 @@ Publication to Tag updates
 <bean id="clientTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
   <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
   <property name="explicitQosEnabled" value="true"/>
-  <property name="timeToLive" value="60000"/>
+  <property name="timeToLive" value="5400000"/>
   <property name="deliveryPersistent" value="false" /> 
   <property name="sessionTransacted" value="false" />
 </bean>
@@ -90,7 +90,7 @@ Publication of Supervision events
   <property name="connectionFactory" ref="clientSingleConnectionFactory"/>  
   <property name="defaultDestination" ref="supervisionDestination"/>
   <property name="explicitQosEnabled" value="true"/>
-  <property name="timeToLive" value="60000"/>
+  <property name="timeToLive" value="5400000"/>
   <property name="deliveryPersistent" value="false" />
   <property name="sessionTransacted" value="false" />  
 </bean>

@@ -99,7 +99,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   /**
    * Default TTL of replies to client requests
    */
-  private static final long DEFAULT_REPLY_TTL = 120000;
+  private static final long DEFAULT_REPLY_TTL = 5400000;
 
   /**
    * Default Constructor
