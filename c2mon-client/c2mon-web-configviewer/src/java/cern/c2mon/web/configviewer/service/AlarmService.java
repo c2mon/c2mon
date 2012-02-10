@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
@@ -24,6 +25,7 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.web.configviewer.service.ServiceGateway;
 import cern.c2mon.web.configviewer.service.TagIdException;
+import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
  * Alarm service providing the XML representation of a given alarm
@@ -44,6 +46,12 @@ public class AlarmService {
    * */
   @Autowired
   private ServiceGateway gateway;
+  
+  /**
+   * Performs xslt transformations. 
+   * */
+  @Autowired
+  private XsltTransformUtility xsltTransformer;
 
   /**
    * Gets the XML representation of the current value and configuration of an alarm
@@ -67,7 +75,7 @@ public class AlarmService {
   public String generateHtmlResponse(final String alarmId) throws TagIdException {
 
     String xml = null;
-    
+
     try { 
       AlarmValueImpl alarm = (AlarmValueImpl) getAlarmValue(Long.parseLong(alarmId));
       if (alarm != null)
@@ -78,45 +86,16 @@ public class AlarmService {
       throw new TagIdException("Invalid alarm id");
     }
 
-    return transformToHtml(xml);
-  }
-
-  /**
-   * Transforms the xml to Html using xslt.
-   * @param xml the xml
-   * @return the html
-   */
-  private String transformToHtml(final String xml) {
-
-    OutputStream ostream = null;
+    String html = null;
 
     try {
-
-      InputStream xsltResource = getClass().getResourceAsStream(XSLT_PATH);
-      Source xsltSource = new StreamSource(xsltResource);
-      TransformerFactory transFact;
-      Transformer trans = null;
-
-      transFact = TransformerFactory.newInstance();
-
-      Source xmlSource = new StreamSource(new StringReader(xml));
-
-      trans = transFact.newTransformer(xsltSource);
-
-      ostream = new ByteArrayOutputStream();
-      trans.transform(xmlSource, new StreamResult((ostream)));
-
+      html = xsltTransformer.performXsltTransformation(xml);
     } catch (TransformerException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      logger.error("Error while performing xslt transformation.");
+      throw new TagIdException("Error while performing xslt transformation.");
     }
 
-    String result = ostream.toString();
-
-    // a little hack to make firefox happy!
-    result = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",""); 
-
-    return result;
+    return html;
   }
 
   /**

@@ -15,12 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import cern.c2mon.web.configviewer.service.CommandService;
 import cern.c2mon.web.configviewer.service.ConfigLoaderService;
 import cern.c2mon.web.configviewer.service.TagIdException;
-import cern.c2mon.web.configviewer.service.TagService;
 import cern.c2mon.web.configviewer.util.FormUtility;
-import cern.c2mon.web.configviewer.util.LoginForm;
 
 
 /**
@@ -89,9 +86,10 @@ public class ConfigLoaderController {
    * Displays configuration of a process with the given process name
    * @param id config id
    * @param response we write the html result to that HttpServletResponse response
+   * @return nothing
    * */
   @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
-  public String helloWorld(@PathVariable(value = "id") final String id, final HttpServletResponse response)  {
+  public String viewConfig(@PathVariable(value = "id") final String id, final HttpServletResponse response)  {
     logger.info("/configloader/{id} " + id);
     try {
       response.getWriter().println(service.generateHtmlResponse(id));

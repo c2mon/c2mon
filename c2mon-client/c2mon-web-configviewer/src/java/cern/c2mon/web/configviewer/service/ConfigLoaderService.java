@@ -20,6 +20,7 @@ import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.web.configviewer.service.ServiceGateway;
 import cern.c2mon.web.configviewer.service.TagIdException;
+import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
@@ -38,6 +39,12 @@ public class ConfigLoaderService {
    * */
   @Autowired
   private ServiceGateway gateway;
+  
+  /**
+   * Performs xslt transformations. 
+   * */
+  @Autowired
+  private XsltTransformUtility xsltTransformer;
 
   /** the path to the xslt document */
   private static final String XSLT_PATH = "/optimised_tag.xsl";
@@ -65,7 +72,7 @@ public class ConfigLoaderService {
   public String generateHtmlResponse(final String configurationId) throws TagIdException {
 
     String xml = null;
-    
+
     try {
       ConfigurationReport  report = getConfigurationReport(Long.parseLong(configurationId));
       if (report != null)
@@ -76,45 +83,16 @@ public class ConfigLoaderService {
       throw new TagIdException("Invalid configuration Id");
     }
 
-    return transformToHtml(xml);
-  }
-
-  /**
-   * Transforms the xml to Html using xslt.
-   * @param xml the xml
-   * @return the html
-   */
-  private String transformToHtml(final String xml) {
-
-    OutputStream ostream = null;
+    String html = null;
 
     try {
-
-      InputStream xsltResource = getClass().getResourceAsStream(XSLT_PATH);
-      Source xsltSource = new StreamSource(xsltResource);
-      TransformerFactory transFact;
-      Transformer trans = null;
-
-      transFact = TransformerFactory.newInstance();
-
-      Source xmlSource = new StreamSource(new StringReader(xml));
-
-      trans = transFact.newTransformer(xsltSource);
-
-      ostream = new ByteArrayOutputStream();
-      trans.transform(xmlSource, new StreamResult((ostream)));
-
+      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
     } catch (TransformerException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      logger.error("Error while performing xslt transformation.");
+      throw new TagIdException("Error while performing xslt transformation.");
     }
 
-    String result = ostream.toString();
-
-    // a little hack to make firefox happy!
-    result = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",""); 
-
-    return result;
+    return html;
   }
 
   /**

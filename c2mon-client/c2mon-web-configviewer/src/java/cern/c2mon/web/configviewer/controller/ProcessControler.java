@@ -106,6 +106,9 @@ public class ProcessControler {
     } catch (IOException e) {
       e.printStackTrace();
       logger.error(e.getMessage());
+    } catch (TagIdException e) {
+      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 

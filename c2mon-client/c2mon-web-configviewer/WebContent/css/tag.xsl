@@ -70,7 +70,7 @@
 		<xsl:apply-templates select="tagQuality"/>
 	</xsl:template>
 	
-		<xsl:template match="tagQuality">
+	<xsl:template match="tagQuality">
 		<xsl:apply-templates select="invalidQualityStates"/>
 	</xsl:template>
 	
@@ -80,7 +80,6 @@
 	
 		<!-- process the XML element AlarmValue -->
 	<xsl:template match="entry">
-		<div class="column">
 		<table class="inline">
 			<th colspan="4">invalidQualityState</th>
 			
@@ -101,7 +100,6 @@
 			</xsl:for-each>
 			
 		</table>
-	</div>
 	</xsl:template>
 	
 	<xsl:template match="alarms">
