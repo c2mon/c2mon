@@ -121,16 +121,16 @@ public class RecoveryManager implements SmartLifecycle {
   @ManagedOperation(description = "Runs all refresh actions.")
   public void refresh() {
     if (!stopRequested) {
-      refreshSupervisionStatus(); //includes alarm callbacks!
+      refreshSupervisionStatus(); //generates new events with the current status; includes alarm callbacks!
     }
     if (!stopRequested) {
-      refreshStateTags();
+      refreshStateTags(); //updates the tags with the current status
     }
     if (!stopRequested) {
       refreshDataTags(); //gets latest values from DAQ cache
     }
     if (!stopRequested) {      
-      notifyAllTagCacheListeners(); //also refreshes rules and alarms!
+      notifyAllTagCacheListeners(); //also refreshes rules but not alarms (done with supervision)
     }    
   }
   

@@ -14,7 +14,7 @@
   
   <bean id="lifecycleProcessor" class="org.springframework.context.support.DefaultLifecycleProcessor">
     <!-- timeout value in milliseconds -->
-    <property name="timeoutPerShutdownPhase" value="20000"/>    
+    <property name="timeoutPerShutdownPhase" value="60000"/>    
   </bean>
   
   <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
