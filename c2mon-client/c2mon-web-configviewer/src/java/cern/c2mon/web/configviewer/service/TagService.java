@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagConfigImpl;
 import cern.c2mon.web.configviewer.service.ServiceGateway;
+import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 import cern.tim.shared.common.datatag.TagQualityStatus;
 
 /**
@@ -27,6 +30,9 @@ public class TagService {
    * TagService logger
    * */
   private static Logger logger = Logger.getLogger(TagService.class);
+  
+  /** the path to the xslt document */
+  private static final String XSLT_PATH = "/datatag_xslt.xsl";
 
   /**
    * Gateway to C2monService 
@@ -41,7 +47,7 @@ public class TagService {
    * @throws Exception if the datatag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
-  public String getDataTagValueXml(final String dataTagId) throws Exception {
+  public String getDataTagValueXml(final String dataTagId) throws TagIdException {
     try {
       ClientDataTagImpl value = (ClientDataTagImpl) getDataTagValue(Long.parseLong(dataTagId));
       if (value != null)
@@ -61,7 +67,7 @@ public class TagService {
    * thrown by the underlying service gateway.
    * */
 
-  public String getDataTagConfigXml(final String tagId) throws Exception {
+  public String getDataTagConfigXml(final String tagId) throws TagIdException {
     try {
       TagConfigImpl config = (TagConfigImpl) getTagConfig(Long.parseLong(tagId));
       if (config != null)
@@ -71,6 +77,36 @@ public class TagService {
     } catch (NumberFormatException e) {
       throw new TagIdException("Invalid datatag id");
     }
+  }
+  
+  public String generateDataTagConfigHtmlResponse(final String tagId) throws TransformerException, TagIdException {
+
+    String html = null;
+    String tagConfigXml = getDataTagConfigXml(tagId);
+
+    try {
+      html = XsltTransformUtility.performXsltTransformation(tagConfigXml, XSLT_PATH);
+    } catch (TransformerException e) {
+      logger.error("Error while performing xslt transformation.");
+      throw new TransformerException("Error while performing xslt transformation.");
+    }
+
+    return html;
+  }
+  
+  public String generateDataTagValueHtmlResponse(final String tagId) throws TransformerException, TagIdException {
+
+    String html = null;
+    String tagConfigXml = getDataTagValueXml(tagId);
+
+    try {
+      html = XsltTransformUtility.performXsltTransformation(tagConfigXml, XSLT_PATH);
+    } catch (TransformerException e) {
+      logger.error("Error while performing xslt transformation.");
+      throw new TransformerException("Error while performing xslt transformation.");
+    }
+
+    return html;
   }
 
   /**
