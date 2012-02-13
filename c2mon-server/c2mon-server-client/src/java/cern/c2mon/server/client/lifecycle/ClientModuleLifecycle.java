@@ -99,7 +99,7 @@ public class ClientModuleLifecycle implements SmartLifecycle {
 
   @Override
   public int getPhase() {
-    return ServerConstants.PHASE_START_LAST;
+    return ServerConstants.PHASE_START_LAST - 1;
   }
 
 }
