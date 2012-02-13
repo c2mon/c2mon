@@ -5,12 +5,12 @@
   <parent>
     <groupId>cern</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.4</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-pom</artifactId>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>1.0.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>
@@ -183,13 +183,13 @@
       </dependency>
       <dependency>
         <groupId>oracle</groupId>
-        <artifactId>ojdbc14</artifactId>
-        <version>10.2.0.4</version>
+        <artifactId>ojdbc</artifactId>
+        <version>11.2.0.3</version>
       </dependency>
       <dependency>
         <groupId>oracle</groupId>
         <artifactId>orai18n</artifactId>
-        <version>10.2.0.4</version>
+        <version>11.2.0.3</version>
       </dependency>
       <dependency>
         <groupId>javax.jms</groupId>
