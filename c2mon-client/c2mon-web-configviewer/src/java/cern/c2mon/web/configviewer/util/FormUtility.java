@@ -36,6 +36,7 @@ public final class FormUtility {
     +  " <title>Configuration viewer</title>"
     +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"/c2mon-web-configviewer/css/tim.css\"></link>"
     +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"/c2mon-web-configviewer/css/webConfigViewer.css\"></link>"
+    + "<link rel=\"stylesheet\" type=\"text/css\" href=\"/c2mon-web-configviewer/css/buttons.css\"></link>"
     +  " <script type=\"text/javascript\" src=\"/c2mon-web-configviewer/js/jquery-1.7.min.js\"></script>"
     +  " <script type=\"text/javascript\" src=\"/c2mon-web-configviewer/js/bottom_panel.js\"></script>"
     + "</head>"

@@ -40,7 +40,19 @@ public class DataTagController {
    * A URL to the tagviewer with input form
    * */
   public static final String TAG_FORM_URL = "/tagviewer/form";
-
+  
+  /**
+   * URL to tagviewer, which displays tagconfig information
+   * in RAW XML
+   */
+  public static final String TAG_CONFIG_XML_URL = "/tagconfig/xml";
+  
+  /**
+   * URL to tagviewer, which displays tag value information
+   * in RAW XML
+   */
+  public static final String TAG_VALUE_XML_URL = "/tagvalue/xml";
+  
   /**
    * Title for the datatag form page
    * */
@@ -85,6 +97,40 @@ public class DataTagController {
       return ("redirect:" + "/tagviewer/errorform/" + id);
     } 
     return null;
+  }
+  
+  /**
+   * Displays configuration of a process with the given id together with a form
+   * @param id tag config id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = TAG_CONFIG_XML_URL + "/{id}", method = { RequestMethod.GET })
+  public String viewTagValueXml(@PathVariable final String id,  final Model model) {
+    logger.info(TAG_CONFIG_XML_URL + id);
+    try {
+      model.addAttribute("xml", service.getDataTagConfigXml(id));
+    } catch (TagIdException e) {
+      return ("redirect:" + "/tagviewer/errorform/" + id);
+    }
+    return "raw_xml_views/rawXml";
+  }
+  
+  /**
+   * Displays configuration of a process with the given id together with a form
+   * @param id tag value id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = TAG_VALUE_XML_URL + "/{id}", method = { RequestMethod.GET })
+  public String viewTagConfigXml(@PathVariable final String id,  final Model model) {
+    logger.info(TAG_VALUE_XML_URL + id);
+    try {
+      model.addAttribute("xml", service.getDataTagValueXml(id));
+    } catch (TagIdException e) {
+      return ("redirect:" + "/tagviewer/errorform/" + id);
+    }
+    return "raw_xml_views/rawXml";
   }
 
   /**

@@ -7,7 +7,7 @@ DIV.wrapper {
 	float:right;	
 }
 
-xml_button a { color: white; text-decoration:none;}
+xml_button a { color: white; text-decoration:none }
 xml_button a:link    { color: white; text-decoration:none }
 xml_button a:visited { color: white; text-decoration:none }
 xml_button a:hover   { color: white; text-decoration:underline }

@@ -56,7 +56,7 @@ public class ConfigLoaderService {
    * @throws Exception if id not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
-  public String getConfigurationReportXml(final String configurationId) throws Exception {
+  public String getConfigurationReportXml(final String configurationId) throws TagIdException {
 
     try {
       ConfigurationReport  report = getConfigurationReport(Long.parseLong(configurationId));

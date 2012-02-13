@@ -18,6 +18,15 @@
 	<xsl:variable name="process_xml_url">
 		process/xml/
 	</xsl:variable>
+	<xsl:variable name="alarm_xml_url">
+		alarmviewer/xml/
+	</xsl:variable>
+	<xsl:variable name="tag_value_xml_url">
+		tagvalue/xml/
+	</xsl:variable>	
+	<xsl:variable name="tag_config_xml_url">
+		tagconfig/xml/
+	</xsl:variable>		
 
 
 	<!--  leave the paragraphs untouched -->
@@ -31,6 +40,10 @@
 			(
 			<xsl:value-of select="@id" />
 			)
+			
+			<A href="{$base_url}{$tag_value_xml_url}{@id}/" 
+				class="large blue awesome xml_button" target="_blank">View ClientDataTag XML »
+			</A>
 		</p>
 		<table class="inline">
 			<th colspan="4">ClientDataTag</th>
@@ -73,6 +86,12 @@
 
 	<!--  process the XML element TagConfig - take missing information from the element ClientDataTag -->
 	<xsl:template match="TagConfig">
+		
+		<p>
+			<A href="{$base_url}{$tag_config_xml_url}{@id}/" 
+				class="large blue awesome xml_button" target="_blank">View TagConfig XML »
+			</A>	
+		</p>	
 		<table class="inline">
 			<th colspan="4">Tag Configuration</th>
 			<tr>
@@ -147,6 +166,10 @@
 					<xsl:value-of select="faultFamily"/>
 					:<xsl:value-of select="faultMemeber"/>
 					:<xsl:value-of select="faultCode"/>
+					
+			<A href="{$base_url}{$alarm_xml_url}{@id}/" 
+				class="large blue awesome xml_button" target="_blank">View Alarm XML »
+			</A>
 		</p>
 		<table class="inline">
 			<th colspan="4">Alarm Value</th>

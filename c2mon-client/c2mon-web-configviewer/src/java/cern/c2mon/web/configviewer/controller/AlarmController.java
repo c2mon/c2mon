@@ -33,6 +33,12 @@ public class AlarmController {
   public static final String ALARM_URL = "/alarmviewer/";
 
   /**
+   * A REST-style URL to alarmviewer, combined with alarm id displays alarm configuration
+   * in RAW XML
+   */
+  public static final String ALARM_XML_URL = "/alarmviewer/xml";
+
+  /**
    * A URL to the alarmviewer with input form
    * */
   public static final String ALARM_FORM_URL = "/alarmviewer/form";
@@ -73,6 +79,23 @@ public class AlarmController {
     logger.info("/alarmviewer/");
     return ("redirect:" + "/alarmviewer/form");
   }    
+
+  /**
+   * Displays configuration of a process with the given id together with a form
+   * @param id command id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = ALARM_XML_URL + "/{id}", method = { RequestMethod.GET })
+  public String viewXml(@PathVariable final String id,  final Model model) {
+    logger.info(ALARM_XML_URL + id);
+    try {
+      model.addAttribute("xml", service.getAlarmTagXml(id));
+    } catch (TagIdException e) {
+      return ("redirect:" + "/alarmviewer/errorform/" + id);
+    }
+    return "raw_xml_views/rawXml";
+  }
 
   /**
    * Displays configuration of a process with the given process name

@@ -60,7 +60,7 @@ public class AlarmService {
    * @throws Exception if alarm was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
-  public String getAlarmTagXml(final String alarmId) throws Exception {
+  public String getAlarmTagXml(final String alarmId) throws TagIdException {
     try { 
       AlarmValueImpl alarm = (AlarmValueImpl) getAlarmValue(Long.parseLong(alarmId));
       if (alarm != null)

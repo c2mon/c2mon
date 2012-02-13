@@ -18,7 +18,15 @@
 	<xsl:variable name="process_xml_url">
 		process/xml/
 	</xsl:variable>
-
+	<xsl:variable name="alarm_xml_url">
+		alarmviewer/xml/
+	</xsl:variable>
+	<xsl:variable name="command_xml_url">
+		commandviewer/xml/
+	</xsl:variable>
+		<xsl:variable name="report_xml_url">
+		configloader/xml/
+	</xsl:variable>
 
 	<!--  leave the paragraphs untouched -->
 	<xsl:template match="p">
@@ -26,8 +34,8 @@
 	</xsl:template>
 
 	<xsl:template match="ClientDataTag">
-	
-	
+
+
 		<p class="tagName">
 			<xsl:value-of select="tagName" />
 			(
@@ -150,6 +158,7 @@
 				<title>Configuration viewer</title>
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
+				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
 				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
 				<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
 			</head>
@@ -159,6 +168,10 @@
 					<xsl:value-of select="faultFamily"/>
 					:<xsl:value-of select="faultMemeber"/>
 					:<xsl:value-of select="faultCode"/>
+					
+			<A href="{$base_url}{$alarm_xml_url}{@id}/" 
+				class="large blue awesome xml_button" target="_blank">View Alarm XML »
+			</A>		
 		</p>
 		<table class="inline">
 			<th colspan="4">Alarm Value</th>
@@ -220,6 +233,7 @@
 				<title>Configuration viewer</title>
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
+				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
 				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
 				<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
 			</head>
@@ -228,6 +242,10 @@
 		<p class="tagName"> 
 					<xsl:value-of select="name"/>
 					(<xsl:value-of select="@id"/>)
+					
+			<A href="{$base_url}{$command_xml_url}{@id}/" 
+				class="large blue awesome xml_button" target="_blank">View Command XML »
+			</A>		
 		</p>
 	<div class="column">
 		<table class="inline">
@@ -261,12 +279,17 @@
 				<title>Configuration viewer</title>
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
 				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
+				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
 				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
 				<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
 			</head>
 			<body>
 	
-	
+		<p class="tagName"> 
+			<A href="{$base_url}{$report_xml_url}{id}/" 
+				class="large blue awesome xml_button" target="_blank">View Configuration Report XML »
+			</A>		
+		</p>
      <p>
      <h2>Overview</h2>
      <table class="inline" border="1">

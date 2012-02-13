@@ -36,6 +36,12 @@ public class ConfigLoaderController {
    * A URL to the config report viewer with input form
    * */
   public static final String CONFIG_LOADER_FORM_URL = CONFIG_LOADER_URL + "form";
+  
+  /**
+   * A REST-style URL to config report viewer, which displays config reports
+   * in RAW XML
+   */
+  public static final String CONFIG_LOADER_XML_URL = "/configloader/xml";
 
   /**
    * Title for the config form page
@@ -68,6 +74,23 @@ public class ConfigLoaderController {
     logger.info(CONFIG_LOADER_URL);
     return ("redirect:" + "/configloader/form");
   }    
+  
+  /**
+   * Displays configuration of a process with the given id together with a form
+   * @param id command id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = CONFIG_LOADER_XML_URL + "/{id}", method = { RequestMethod.GET })
+  public String viewXml(@PathVariable final String id,  final Model model) {
+    logger.info(CONFIG_LOADER_XML_URL + id);
+    try {
+      model.addAttribute("xml", service.getConfigurationReportXml(id));
+    } catch (TagIdException e) {
+      return ("redirect:" + "/commandviewer/errorform/" + id);
+    }
+    return "raw_xml_views/rawXml";
+  }
 
   /**
    * Displays configuration of a process with the given process name

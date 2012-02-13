@@ -55,7 +55,7 @@ public class CommandService {
    * @throws Exception if command was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
-  public String getCommandTagXml(final String commandId) throws Exception {
+  public String getCommandTagXml(final String commandId) throws TagIdException {
     try {
       ClientCommandTagImpl command = (ClientCommandTagImpl) getCommandTag(Long.parseLong(commandId));
       if (command.isExistingCommand()) 

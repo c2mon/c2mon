@@ -120,7 +120,7 @@ public class ProcessControler {
   public String viewXml(@PathVariable final String id,  final Model model) {
     logger.info("/process/xml/{id} " + id);
     model.addAllAttributes(getProcessModel(id));
-    return "processXml";
+    return "raw_xml_views/processXml";
   }
   
 
@@ -189,7 +189,7 @@ public class ProcessControler {
    * @param processName the process name
    * @return a map of values to include in the model for a jsp page.
    * */
-  private Map<String, Object>  getProcessModel(final String processName) {
+  private Map<String, Object> getProcessModel(final String processName) {
 
     Map<String, Object> model = new HashMap<String, Object>();
 
