@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
@@ -16,7 +15,7 @@
   <url>http://timweb.cern.ch</url>
 
   <dependencies>
-    <!-- C2MON dependencies -->             
+    <!-- C2MON dependencies -->
     <dependency>
       <groupId>cern.tim2.tim2-shared</groupId>
       <artifactId>tim2-shared-client</artifactId>
@@ -41,17 +40,17 @@
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-history</artifactId>
     </dependency>
-    
+
     <!-- 3rd party dependencies -->
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-    </dependency>   
+    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
     </dependency>
-    
+
     <!-- test dependencies -->
     <dependency>
       <groupId>junit</groupId>
@@ -65,20 +64,8 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
     </dependency>
-    
- <dependency>
-			<groupId>cern.accsoft.security</groupId>
-			<artifactId>accsoft-security-rba</artifactId>
-			<version>1.4.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>cern.accsoft.security</groupId>
-			<artifactId>accsoft-security-rba-util</artifactId>
-			<version>1.4.1</version>
-		</dependency>   
   </dependencies>
-
+ 
   <developers />
   <build>
     <plugins>
@@ -86,8 +73,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.8</version>
-         <configuration>
-          <argLine>          
+        <configuration>
+          <argLine>
             <!-- needed for the client JMS module -->
             -Dc2mon.client.jms.url=tcp://jms-tim-test1:61616
             -Dc2mon.client.jms.user=not-used
@@ -97,13 +84,13 @@
             -Dc2mon.client.jms.request.queue=c2mon.JmsProxy.test.request.queue
             -Dc2mon.client.jms.adminmessage.topic=c2mon.JmsProxy.test.adminmessage
           </argLine>
-        </configuration>      
+        </configuration>
       </plugin>
     </plugins>
   </build>
-  
+
   <scm>
-	<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-core</developerConnection>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-core</developerConnection>
   </scm>
 
 </project>
