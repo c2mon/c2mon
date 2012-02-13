@@ -42,6 +42,7 @@ public class TagServiceTest {
   final String dataTagWithAlarms = "142097";
   final String dataTag = "145800";
   final String historyTag = "107202";
+  final String tagConfig = "100023";
 
   final String configurationId_FAIL = "666666";
   final String configurationId_SUCCESS = "10000";
@@ -61,6 +62,22 @@ public class TagServiceTest {
     Assert.assertTrue(xml.contains("HistoryTag"));
     String html = serviceH.generateHtmlResponse(dataTagWithAlarms, 10);
   }  
+  
+  @Test
+  public void testDataTagHtml() throws Exception {
+
+    String xmlConfig = service.getDataTagConfigXml(tagConfig);
+    System.out.println(xmlConfig);
+    Assert.assertTrue(xmlConfig.contains("TagConfig"));
+    String htmlConfig = service.generateDataTagConfigHtmlResponse(tagConfig);
+    System.out.println(htmlConfig);
+    
+    String xmlValue = service.getDataTagValueXml(tagConfig);
+    System.out.println(xmlValue);
+    Assert.assertTrue(xmlValue.contains("ClientDataTag"));
+    String htmlValue = service.generateDataTagValueHtmlResponse(tagConfig);
+    System.out.println(htmlValue);
+  }  
 
   //  @Test
   //  public void testProcessHtml() {
@@ -77,15 +94,15 @@ public class TagServiceTest {
   //  
   //
 
-  @Test
-  public void testTagQualityIsIncludedInXml() throws Exception {
-
-    ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
-    cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_OUT_OF_BOUNDS, "Value is over 9000!");
-    cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE, "It's down!");
-
-    cdt.toString().contains("tagQuality");
-  }  
+//  @Test
+//  public void testTagQualityIsIncludedInXml() throws Exception {
+//
+//    ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
+//    cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_OUT_OF_BOUNDS, "Value is over 9000!");
+//    cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE, "It's down!");
+//
+//    cdt.toString().contains("tagQuality");
+//  }  
 
 //  @Test
 //  public void DataTagValueNotEmpty() {

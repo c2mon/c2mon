@@ -26,6 +26,8 @@
 	</xsl:template>
 
 	<xsl:template match="ClientDataTag">
+	
+	
 		<p class="tagName">
 			<xsl:value-of select="tagName" />
 			(
@@ -114,7 +116,7 @@
 				<td class="highlight bold"> Alarms </td>
 				<td>
 					 <xsl:for-each select="alarmIds">
-							<a href="{$base_url}{$alarm_url}{long}/"><xsl:value-of select="long"/></a>&#160;
+							<a href="{$base_url}{$alarm_url}{long}/"><xsl:value-of select="long"/></a>
 					</xsl:for-each>
 				</td>
 			</tr>

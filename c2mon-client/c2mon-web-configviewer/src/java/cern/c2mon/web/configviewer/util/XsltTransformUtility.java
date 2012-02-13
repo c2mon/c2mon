@@ -34,7 +34,7 @@ public final class XsltTransformUtility {
   private static Logger logger = Logger.getLogger(XsltTransformUtility.class);
 
   /** the path to the xslt document */
-  private static final String XSLT_PATH = "/optimised_tag.xsl";
+  private static final String XSLT_PATH = "/generic_tag.xsl";
 
   /** xslt Source. Used to perform xslt transformations */
   private Source xsltSource;

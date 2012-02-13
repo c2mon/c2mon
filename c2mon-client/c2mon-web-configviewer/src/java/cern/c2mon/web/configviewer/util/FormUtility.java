@@ -27,6 +27,29 @@ public final class FormUtility {
     return model;
   }
 
+  public static String getHeader() {
+    
+    String header = "" +
+    "<!DOCTYPE html>"
+    +  "<html>"
+    + "<head>"
+    +  " <title>Configuration viewer</title>"
+    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"/c2mon-web-configviewer/css/tim.css\"></link>"
+    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"/c2mon-web-configviewer/css/webConfigViewer.css\"></link>"
+    +  " <script type=\"text/javascript\" src=\"/c2mon-web-configviewer/js/jquery-1.7.min.js\"></script>"
+    +  " <script type=\"text/javascript\" src=\"/c2mon-web-configviewer/js/bottom_panel.js\"></script>"
+    + "</head>"
+    + "<body>";
+    
+    return header;
+  }
+  
+  public static String getFooter() {
+    
+    String footer = "" + "</body>" + "</html>";
+    
+    return footer;
+  }
 
 
   /**

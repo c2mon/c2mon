@@ -47,7 +47,7 @@ public class ConfigLoaderService {
   private XsltTransformUtility xsltTransformer;
 
   /** the path to the xslt document */
-  private static final String XSLT_PATH = "/optimised_tag.xsl";
+  private static final String XSLT_PATH = "/generic_tag.xsl";
 
   /**
    * Gets the XML representation of the ConfigurationReport

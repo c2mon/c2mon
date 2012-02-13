@@ -34,7 +34,7 @@ public class CommandService {
   private static Logger logger = Logger.getLogger(CommandService.class);
 
   /** the path to the xslt document */
-  private static final String XSLT_PATH = "/optimised_tag.xsl";
+  private static final String XSLT_PATH = "/generic_tag.xsl";
 
   /**
    * Gateway to C2monService 
