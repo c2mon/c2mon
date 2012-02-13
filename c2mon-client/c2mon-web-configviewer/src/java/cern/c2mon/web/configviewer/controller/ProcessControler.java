@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -75,39 +76,23 @@ public class ProcessControler {
   private ProcessService service;
 
   /**
-   * CommandController logger
+   * ProcessControler logger
    * */
   private static Logger logger = Logger.getLogger(ProcessControler.class);
 
-/* OLD WAY -- NO LONGER USED */
-//  /**
-//   * Displays configuration of a command with the given id
-//   * @param id command id
-//   * @param model Spring MVC Model instance to be filled in before jsp processes it
-//   * @return name of a jsp page which will be displayed
-//   * */
-//  @RequestMapping(value = PROCESS_URL + "{id}", method = { RequestMethod.GET })
-//  public String viewCommand(@PathVariable final String id, final Model model) {
-//    logger.info("/process/{id} " + id);
-//    model.addAllAttributes(getProcessModel(id));
-//    return "tagInfo";
-//  }
-  
   /**
    * Displays configuration of a process with the given process name
    * @param processName the process name
    * @param response we write the html result to that HttpServletResponse response
+   * @throws IOException 
    * */
   @RequestMapping(value = PROCESS_URL + "/{processName}", method = { RequestMethod.GET })
-  public void helloWorld(@PathVariable(value = "processName") final String processName, final HttpServletResponse response)  {
+  public void viewProcess(@PathVariable(value = "processName") final String processName, final HttpServletResponse response) throws IOException  {
     logger.info(PROCESS_URL + processName);
     try {
       response.getWriter().println(service.generateHtmlResponse(processName));
-    } catch (IOException e) {
-      e.printStackTrace();
-      logger.error(e.getMessage());
-    } catch (TagIdException e) {
-      e.printStackTrace();
+    } catch (TransformerException e) {
+      response.getWriter().println(e.getMessage());
       logger.error(e.getMessage());
     }
   }
@@ -119,7 +104,7 @@ public class ProcessControler {
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = PROCESS_FORM_URL + "/{id}", method = { RequestMethod.GET })
-  public String viewCommandWithForm(@PathVariable final String id,  final Model model) {
+  public String viewProcessWithForm(@PathVariable final String id,  final Model model) {
     logger.info("/process/form/{id} " + id);
     model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, id, PROCESS_URL + id));
     return "processFormWithData";
@@ -147,14 +132,12 @@ public class ProcessControler {
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = PROCESS_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
-  public String viewCommandFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
+  public String viewProcessFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
     logger.info("/process/form " + id);
     if (id == null)
       model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, null, null));
-    else {
-      return ("redirect:"+PROCESS_URL+id);
-      //      model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_URL + id, id, PROCESS_URL + id));
-    }
+    else
+      return ("redirect:" + PROCESS_URL + id);
 
     return "processFormWithData";
   }
@@ -167,7 +150,6 @@ public class ProcessControler {
    * @param instruction description of the user action displayed on the jsp page
    * @param formSubmitUrl url to which the form should be submitted
    * @param formTagValue previous value of a tag (datatag, alarm, command) entered in the form, that should be displayed in the form
-   * @param processNames a collection of all available process names
    * @return a map of values ready to be used in the MVC model 
    * */
   public Map<String, Object> getProcessFormModel(final String title, final String instruction

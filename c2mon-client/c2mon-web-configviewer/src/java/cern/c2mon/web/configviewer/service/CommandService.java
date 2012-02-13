@@ -67,7 +67,8 @@ public class CommandService {
     }
   }
 
-  public String generateHtmlResponse(final String commandId) throws TagIdException {
+  public String generateHtmlResponse(final String commandId) 
+    throws TagIdException, TransformerException {
 
     String xml = null;
 
@@ -87,7 +88,7 @@ public class CommandService {
       html = xsltTransformer.performXsltTransformation(xml);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation.");
-      throw new TagIdException("Error while performing xslt transformation.");
+      throw new TransformerException("Error while performing xslt transformation.");
     }
 
     return html;

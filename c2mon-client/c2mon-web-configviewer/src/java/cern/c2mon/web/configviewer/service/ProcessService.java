@@ -94,7 +94,7 @@ public class ProcessService {
   }    
 
   
-  public String generateHtmlResponse(final String processName) throws TagIdException {
+  public String generateHtmlResponse(final String processName) throws TransformerException {
 
     String xml = getXml(processName);
     
@@ -104,7 +104,7 @@ public class ProcessService {
       html = xsltTransformer.performXsltTransformation(xml);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation.");
-      throw new TagIdException("Error while performing xslt transformation.");
+      throw new TransformerException("Error while performing xslt transformation.");
     }
 
     return html;

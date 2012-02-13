@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,20 +63,6 @@ public class AlarmController {
    * */
   private static Logger logger = Logger.getLogger(AlarmController.class);
 
-
-  //    /**
-  //     * Displays configuration of an alarm with the given id
-  //     * @param id alarm id
-  //     * @param model Spring MVC Model instance to be filled in before jsp processes it
-  //     * @return name of a jsp page which will be displayed
-  //     * */
-  //    @RequestMapping(value = ALARM_URL + "{id}", method = { RequestMethod.GET })
-  //    public String viewAlarm(@PathVariable final String id, final Model model) {
-  //        logger.info("/alarmviewer/{id} " + id);
-  //        model.addAllAttributes(getAlarmModel(id));
-  //        return "tagInfo";
-  //    }
-
   /**
    * Displays configuration of an alarm with the given id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
@@ -91,16 +78,17 @@ public class AlarmController {
    * Displays configuration of a process with the given process name
    * @param id alarm id
    * @param response we write the html result to that HttpServletResponse response
+   * @throws IOException 
    * */
   @RequestMapping(value = ALARM_URL + "/{id}", method = { RequestMethod.GET })
-  public String helloWorld(@PathVariable(value = "id") final String id, final HttpServletResponse response)  {
+  public String viewAlarm(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
     logger.info(ALARM_URL + id);
 
     try {
       response.getWriter().println(service.generateHtmlResponse(id));
       return null;
-    } catch (IOException e) {
-      e.printStackTrace();
+    } catch (TransformerException e) {
+      response.getWriter().println(e.getMessage());
       logger.error(e.getMessage());
     } catch (TagIdException e) {
       return ("redirect:" + "/alarmviewer/errorform/" + id);
@@ -152,27 +140,4 @@ public class AlarmController {
 
     return "formWithData";
   }
-
-  /**
-   * A helper method to get the xml and build a map of values for the MVC model.
-   * @param alarmId id of an alarm
-   * @return a map of values to include in the model for a jsp page.
-   * */
-  private Map<String, String> getAlarmModel(final String alarmId) {
-    Map<String, String> model = new HashMap<String, String>();
-    try {
-      String alarmXml = service.getAlarmTagXml(alarmId);
-      model.put("alarmXml", alarmXml);
-      //            model.put("url", HELPALARM_FORM + alarmId);
-      //            model.put("urlText", "Display HelpAlarm information for this alarm");
-    } catch (TagIdException e) {
-      model.put("tagErr", e.getMessage());
-      logger.error(e);
-    } catch (Exception e) {
-      model.put("tagErr", "Unexpected problem occured. Try again or contact C2MON support");
-      logger.error("Unexpected problem occured while getting the XML:", e);
-    }
-    return model;
-  }
-
 }

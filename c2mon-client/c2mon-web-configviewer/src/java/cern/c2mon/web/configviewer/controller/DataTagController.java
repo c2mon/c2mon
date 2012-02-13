@@ -69,7 +69,7 @@ public class DataTagController {
    * @throws IOException 
    * */
   @RequestMapping(value = "/tagviewer/{id}", method = { RequestMethod.GET })
-  public String helloWorld(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
+  public String viewTag(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
     logger.info("/tagviewer/{id} " + id);
     try {
       response.getWriter().println(FormUtility.getHeader());

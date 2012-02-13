@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,27 +59,13 @@ public class CommandController {
      * */
     private static Logger logger = Logger.getLogger(CommandController.class);
     
-    
-//    /**
-//     * Displays configuration of a command with the given id
-//     * @param id command id
-//     * @param model Spring MVC Model instance to be filled in before jsp processes it
-//     * @return name of a jsp page which will be displayed
-//     * */
-//    @RequestMapping(value = "/commandviewer/{id}", method = { RequestMethod.GET })
-//    public String viewCommand(@PathVariable final String id, final Model model) {
-//        logger.info("/commandviewer/{id} " + id);
-//        model.addAllAttributes(getCommandModel(id));
-//        return "tagInfo";
-//    }
-    
     /**
      * Displays configuration of an alarm with the given id
      * @param model Spring MVC Model instance to be filled in before jsp processes it
      * @return name of a jsp page which will be displayed
      * */
     @RequestMapping(value = "/commandviewer/", method = { RequestMethod.GET })
-    public String viewAlarm(final Model model) {
+    public String viewCommand(final Model model) {
       logger.info("/commandviewer/");
       return ("redirect:" + "/commandviewer/form");
     }    
@@ -87,14 +74,15 @@ public class CommandController {
      * Displays configuration of a process with the given process name
      * @param id command id
      * @param response we write the html result to that HttpServletResponse response
+     * @throws IOException 
      * */
     @RequestMapping(value = "/commandviewer/{id}", method = { RequestMethod.GET })
-    public String helloWorld(@PathVariable(value = "id") final String id, final HttpServletResponse response)  {
+    public String viewCommand(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
       logger.info("/commandviewer/{id} " + id);
       try {
         response.getWriter().println(service.generateHtmlResponse(id));
-      } catch (IOException e) {
-        e.printStackTrace();
+      } catch (TransformerException e) {
+        response.getWriter().println(e.getMessage());
         logger.error(e.getMessage());
       } catch (TagIdException e) {
         return ("redirect:" + "/commandviewer/errorform/" + id);
@@ -145,25 +133,4 @@ public class CommandController {
            return ("redirect:" + COMMAND_URL + id);
         return "formWithData";
     }
-    
-    /**
-     * A helper method to get the xml and build a map of values for the MVC model.
-     * @param commandId id of a command
-     * @return a map of values to include in the model for a jsp page.
-     * */
-    private Map<String, String> getCommandModel(final String commandId) {
-        Map<String, String> model = new HashMap<String, String>();
-        try {
-            String commandXml = service.getCommandTagXml(commandId);
-            model.put("commandXml", commandXml);
-        } catch (TagIdException e) {
-            model.put("tagErr", e.getMessage());
-            logger.error(e);
-        } catch (Exception e) {
-            model.put("tagErr", "Unexpected problem occured. Try again or contact C2MON support");
-            logger.error("Unexpected problem occured while getting the XML:", e);
-        }
-        return model;
-    }
-      
 }

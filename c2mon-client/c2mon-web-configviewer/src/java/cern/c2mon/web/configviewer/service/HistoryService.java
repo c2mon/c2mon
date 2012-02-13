@@ -110,7 +110,8 @@ public class HistoryService {
     return historyXml;
   }
 
-  public String generateHtmlResponse(final String dataTagId, final int numberOfRecords) throws TagIdException {
+  public String generateHtmlResponse(final String dataTagId, final int numberOfRecords) 
+    throws TagIdException, TransformerException {
 
     String xml;
     try {
@@ -125,7 +126,7 @@ public class HistoryService {
       html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation.");
-      throw new TagIdException("Error while performing xslt transformation.");
+      throw new TransformerException("Error while performing xslt transformation.");
     }
 
     return html;

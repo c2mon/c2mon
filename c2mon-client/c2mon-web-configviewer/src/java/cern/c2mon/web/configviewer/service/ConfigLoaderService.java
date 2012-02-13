@@ -69,7 +69,8 @@ public class ConfigLoaderService {
     }
   }
 
-  public String generateHtmlResponse(final String configurationId) throws TagIdException {
+  public String generateHtmlResponse(final String configurationId) 
+    throws TagIdException, TransformerException {
 
     String xml = null;
 
@@ -89,7 +90,7 @@ public class ConfigLoaderService {
       html = xsltTransformer.performXsltTransformation(xml);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation.");
-      throw new TagIdException("Error while performing xslt transformation.");
+      throw new TransformerException("Error while performing xslt transformation.");
     }
 
     return html;
