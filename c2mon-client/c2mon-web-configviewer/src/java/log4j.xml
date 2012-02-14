@@ -1,38 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
-<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
-  <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender"> 
-    <param name="Append" value="true"/>
-    <param name="File" value="${user.home}/tim-web.log"/>
-<!--    <param name="File" value="${user.home}/dist/timweb/log/tim-web.log"/>-->
-    <param name="MaxFileSize" value="3MB" />
-    <param name="MaxBackupIndex" value ="3" />
-    <layout class="org.apache.log4j.PatternLayout">
-    	<param name="ConversionPattern" value="%d %p %-80.90C %m%n"/>
-    </layout>       
-  </appender> 
-  
-  <logger name="cern.tim" additivity="false">
-  	<level value="debug" />
-  	<appender-ref ref="fileAppender"/>
-  </logger>
-  
-  <logger name="org.springframework" additivity="false">
-    <level value="info" />
-    <appender-ref ref="fileAppender"/>
-  </logger>
-  
-  <logger name="org.apache.activemq" additivity="false">
-    <level value="info" />
-    <appender-ref ref="fileAppender"/>
-  </logger>
+	<!--
 
-  <root> 
-    <priority value ="info" /> 
-    <appender-ref ref="fileAppender" /> 
-  </root>
-  
-  
-  
+		Set the threshold to "info" in production system. This will filter out
+		all debug messages. If you only want to enable/disable debugging for
+		certain parts of the system, change the "level" attribute of the
+		appropriate logger.
+	-->
+<log4j:configuration debug="false" threshold="debug"
+	xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+
+	<appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
+		<param name="Append" value="true" />
+		<param name="File" value="${tim.web.logs}/c2mon-web.log" />
+		<param name="MaxBackupIndex" value="5" />
+		<param name="MaxFileSize" value="100MB" />
+		<param name="BufferedIO" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="cern.tim" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="fileAppender" />
+	</logger>
+
+	<logger name="org.springframework" additivity="false">
+		<level value="info" />
+		<appender-ref ref="fileAppender" />
+	</logger>
+
+	<logger name="org.apache.activemq" additivity="false">
+		<level value="info" />
+		<appender-ref ref="fileAppender" />
+	</logger>
+
+	<root>
+		<priority value="info" />
+		<appender-ref ref="fileAppender" />
+	</root>
+
 </log4j:configuration>
