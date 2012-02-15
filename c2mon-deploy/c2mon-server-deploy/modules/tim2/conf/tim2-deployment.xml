@@ -67,15 +67,17 @@
 			</deployment>
 		</application>
 
-		<application name="c2mon-tim2-test" extends="default">
+		<application name="c2mon-tim2-test-first" extends="default">
 			<deployment installLocation="/opt/c2mon-test">
 				<directory name="conf">
 					<file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
 						mask="400" />
 					<file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
 						mask="400" />
-					<file name="c2mon.properties" sourceDir="/user/timtest/rep/c2mon/server"
+					<file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.primary"
 						mask="400" />
+          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
+            mask="400" />
 				</directory>
 				<directory name="bin">
 					<file name="setenv.sh" sourceDir="/user/timtest/rep/c2mon/server"
@@ -83,6 +85,25 @@
 				</directory>
 			</deployment>
 		</application>
+    
+    <application name="c2mon-tim2-test-second" extends="default">
+      <deployment installLocation="/opt/c2mon-test">
+        <directory name="conf">
+          <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
+            mask="400" />
+          <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
+            mask="400" />
+          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.secondary"
+            mask="400" />
+          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
+            mask="400" />
+        </directory>
+        <directory name="bin">
+          <file name="setenv.sh" sourceDir="/user/timtest/rep/c2mon/server"
+            mask="700" />
+        </directory>
+      </deployment>
+    </application>
 
 		<application name="c2mon-tim2-dev" extends="default">
 			<deployment installLocation="/opt/c2mon-dev">
@@ -92,7 +113,7 @@
 					<file name="jmxremote.access" sourceDir="/user/timtest/dev/rep/c2mon/server"
 						mask="400" />
 					<file name="c2mon.properties" sourceDir="/user/timtest/dev/rep/c2mon/server"
-						mask="400" />
+						mask="400" />           
 				</directory>
 				<directory name="bin">
 					<file name="setenv.sh" sourceDir="/user/timtest/dev/rep/c2mon/server"
