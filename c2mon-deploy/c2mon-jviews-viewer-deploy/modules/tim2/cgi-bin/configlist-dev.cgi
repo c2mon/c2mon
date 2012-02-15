@@ -6,8 +6,8 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 ##
 # Default variable definition for production
 #
-my $configsubdir = "/test/javaws/tim2-jviews-viewer-stable/conf";
-my $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer-stable/conf";
+my $configsubdir = "/test/javaws/tim2-jviews-viewer/conf";
+my $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer/conf";
 
 ##
 # Reading version number from ../version.txt
@@ -20,14 +20,6 @@ close VFILE;
 
 my $title = "TIM2 Viewer Test (" . $viewerVersion . "): Connecting to the C2MON(TIM2) production server";
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
-
-##
-# In case of a SNAPSHOT we have to change the directory
-#
-if ($viewerVersion =~ /-SNAPSHOT/) {
-  $configsubdir = "/test/javaws/tim2-jviews-viewer/conf";
-  $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer/conf"; 
-}
 
 print header;
 print start_html(-title=>'TIM Viewer', -style=>"/css/tim.css");

@@ -8,7 +8,7 @@ use Config::Properties;
 # Definition of global variables
 #
 my $jardir                    = "../lib";
-my $appdir                    = "tim2-jviews-viewer/";
+my $appdir                    = "tim2-jviews-viewer-stable/";
 my $codebase                  = "http://timweb/test/javaws";
 my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
 my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
@@ -21,6 +21,13 @@ open VFILE, "< ../version.txt"
 my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
+
+##
+# In case of a SNAPSHOT
+#
+if ($viewerVersion =~ /-SNAPSHOT/) {
+  $appdir = "tim2-jviews-viewer/";
+}
 
 ##
 # Reading the C2MON client properties file #

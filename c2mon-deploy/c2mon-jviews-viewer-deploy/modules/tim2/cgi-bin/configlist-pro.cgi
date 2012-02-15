@@ -8,8 +8,6 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 #
 my $configsubdir = "/javaws/tim2-jviews-viewer/conf";
 my $configdir = "/user/timoper/dist/public/html/javaws/tim2-jviews-viewer/conf";
-my $title = "TIM2 Viewer Configurations";
-
 
 ##
 # Reading version number from ../version.txt
@@ -20,15 +18,7 @@ my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
 
-##
-# In case of a SNAPSHOT the codebase will point to test
-#
-if ($viewerVersion =~ /-SNAPSHOT/) {
-  $configsubdir = "/test/javaws/tim2-jviews-viewer/conf";
-  $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer/conf";
-  $title = "TIM2 Viewer Test: Using the latest SNAPSHOT from BAMBOO and connecting to the C2MON(TIM2) production server"; 
-}
-
+my $title = "TIM2 Viewer (" . $viewerVersion . ") Configurations";
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
 
 print header;
