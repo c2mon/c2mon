@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-  <product name="tim2-daq">
+	<product name="tim2-daq">
 
-    <!--
-      this application section is a parent configuration for both
-      c2mon-tim2-prod and c2mon-tim2-test
-    -->
-    <application name="default">
-      <deployment installLocation="~/dist/daqprocess-mvn">
-        <backupPolicy keepBackups="5">
-          <preserve type="dir" name="tmp" />
-          <preserve type="dir" name="conf/local" />
-        </backupPolicy>
-        <notification>
-          <!-- you can give more than one mail for deployment notification -->
-          <mail address="info-tim-admins@cern.ch" />
-        </notification>
-        <!--
-          Not supported by deploy tool! <directory name=""> <link
-          source="log" target="/var/log/$USER/daqprocess-mvn" />
-          </directory>
-        -->
-      </deployment>
-      <startscript>
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
-          <initial-heap-size>256m</initial-heap-size>
-          <max-heap-size>256m</max-heap-size>
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS} -transition</arg>
-          <preExec>
+		<!--
+			this application section is a parent configuration for both
+			c2mon-tim2-prod and c2mon-tim2-test
+		-->
+		<application name="default">
+			<deployment installLocation="~/dist/daqprocess-mvn">
+				<backupPolicy keepBackups="5">
+					<preserve type="dir" name="tmp" />
+					<preserve type="dir" name="conf/local" />
+				</backupPolicy>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="info-tim-admins@cern.ch" />
+				</notification>
+				<!--
+					Not supported by deploy tool! <directory name=""> <link
+					source="log" target="/var/log/$USER/daqprocess-mvn" /> </directory>
+				-->
+			</deployment>
+			<startscript>
+				<main-class name="cern.tim.driver.common.startup.DaqStartup">
+					<initial-heap-size>256m</initial-heap-size>
+					<max-heap-size>256m</max-heap-size>
+					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j
+						${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName
+						${PROCESS_NAME} ${ADDITIONAL_PARAMS} -transition</arg>
+
+					<property name="c2mon.process.name" value="$PROCESS_NAME" />
+					<property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
+					<property name="cmw.mom.config"
+						value="http://slwww/~alaser/console/laser-new/cmw-mom.properties" />
+					<property name="laser.hosts" value="${LASER_HOSTS}" />
+					<property name="JINTEGRA_LOG_ROLLOVER_LINECOUNT" value="100000" />
+					<property name="JINTEGRA_LOG_FILE"
+						value="${DAQ_LOG_HOME}/${PROCESS_NAME}.jintegra.log" />
+					<property name="JINTEGRA_LOG_LEVEL" value="1" />
+					<property name="java.security.egd" value="file://dev/urandom" />
+					<property name="java.library.path" value="$INSTALL_DIR/lib_so" />
+					<output>
+						<file name="log/out.log" />
+					</output>
+				</main-class>
+
+				<preExec>
                     <![CDATA[
                       [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
                       [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
@@ -36,79 +54,71 @@
                       [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
                       [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
                      ]]>
-          </preExec>
-          <property name="c2mon.process.name" value="$PROCESS_NAME" />
-          <property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
-          <property name="cmw.mom.config"
-            value="http://slwww/~alaser/console/laser-new/cmw-mom.properties" />
-          <property name="laser.hosts" value="${LASER_HOSTS}" />
-          <property name="JINTEGRA_LOG_ROLLOVER_LINECOUNT"
-            value="100000" />
-          <property name="JINTEGRA_LOG_FILE"
-            value="${DAQ_LOG_HOME}/${PROCESS_NAME}.jintegra.log" />
-          <property name="JINTEGRA_LOG_LEVEL" value="1" />
-          <property name="java.security.egd" value="file://dev/urandom" />
-          <property name="java.library.path" value="$INSTALL_DIR/lib_so" />
-          <output>
-            <file name="log/out.log" />
-          </output>
-        </main-class>
-      </startscript>
-    </application>
-    
-    <application name="tim2-daq-prod" extends="default">
-      <deployment installLocation="~/dist/daqprocess-mvn">
-        <directory name="conf">
-          <file name=".c2mon.properties" sourceDir="~/rep/c2mon/daq"
-            mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="setenv.sh" sourceDir="~/rep/c2mon/daq" mask="700" />
-        </directory>
-      </deployment>
-      <startscript name="TIM2-DAQ-STARTUP">
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
-          <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml"/>
-        </main-class>
-      </startscript>
-    </application>
-    
-    <application name="tim2-daq-test" extends="default">
-      <deployment installLocation="~/dist/daqprocess-mvn">
-        <directory name="conf">
-          <file name=".c2mon.properties" sourceDir="~/rep/c2mon/daq"
-            mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="setenv.sh" sourceDir="~/rep/c2mon/daq" mask="700" />
-        </directory>
-      </deployment>
-      <startscript name="TIM2-DAQ-STARTUP">
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS} -transition</arg>
-          <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml"/>
-        </main-class>
-      </startscript>
-    </application>
+				</preExec>
 
-    <application name="tim2-daq-dev" extends="default">
-      <deployment installLocation="~/dev/c2mon-daq-dev">
-        <directory name="conf">
-          <file name=".c2mon.properties" sourceDir="~/dev/rep/c2mon/daq"
-            mask="400" />          
-        </directory>
-        <directory name="bin">
-          <file name="setenv.sh" sourceDir="~/dev/rep/c2mon/daq"
-            mask="700" />
-        </directory>
-      </deployment>
-      <startscript name="TIM2-DAQ-STARTUP">
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>          
-        </main-class>
-      </startscript>
-    </application>
+			</startscript>
+		</application>
 
-  </product>
+		<application name="tim2-daq-prod" extends="default">
+			<deployment installLocation="~/dist/daqprocess-mvn">
+				<directory name="conf">
+					<file name=".c2mon.properties" sourceDir="~/rep/c2mon/daq"
+						mask="400" />
+				</directory>
+				<directory name="bin">
+					<file name="setenv.sh" sourceDir="~/rep/c2mon/daq" mask="700" />
+				</directory>
+			</deployment>
+			<startscript name="TIM2-DAQ-STARTUP">
+				<main-class name="cern.tim.driver.common.startup.DaqStartup">
+					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j
+						${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName
+						${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
+					<property name="c2mon.daq.spring.context"
+						value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
+				</main-class>
+			</startscript>
+		</application>
+
+		<application name="tim2-daq-test" extends="default">
+			<deployment installLocation="~/dist/daqprocess-mvn">
+				<directory name="conf">
+					<file name=".c2mon.properties" sourceDir="~/rep/c2mon/daq"
+						mask="400" />
+				</directory>
+				<directory name="bin">
+					<file name="setenv.sh" sourceDir="~/rep/c2mon/daq" mask="700" />
+				</directory>
+			</deployment>
+			<startscript name="TIM2-DAQ-STARTUP">
+				<main-class name="cern.tim.driver.common.startup.DaqStartup">
+					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j
+						${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName
+						${PROCESS_NAME} ${ADDITIONAL_PARAMS} -transition</arg>
+					<property name="c2mon.daq.spring.context"
+						value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
+				</main-class>
+			</startscript>
+		</application>
+
+		<application name="tim2-daq-dev" extends="default">
+			<deployment installLocation="~/dev/c2mon-daq-dev">
+				<directory name="conf">
+					<file name=".c2mon.properties" sourceDir="~/dev/rep/c2mon/daq"
+						mask="400" />
+				</directory>
+				<directory name="bin">
+					<file name="setenv.sh" sourceDir="~/dev/rep/c2mon/daq" mask="700" />
+				</directory>
+			</deployment>
+			<startscript name="TIM2-DAQ-STARTUP">
+				<main-class name="cern.tim.driver.common.startup.DaqStartup">
+					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j
+						${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName
+						${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
+				</main-class>
+			</startscript>
+		</application>
+
+	</product>
 </products>
