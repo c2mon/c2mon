@@ -26,7 +26,7 @@ if ($viewerVersion =~ /-SNAPSHOT/) {
   $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer/conf"; 
 }
 
-my $title = "TIM2 Viewer Test (" . $viewerVersion . "): Connecting to the C2MON(TIM2) production server";
+my $title = "TIM2 Viewer Test (" . $viewerVersion . "): Connecting to the C2MON(TIM2) test server";
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
 
 print header;
