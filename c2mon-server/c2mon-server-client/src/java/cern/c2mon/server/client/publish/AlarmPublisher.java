@@ -90,7 +90,6 @@ public class AlarmPublisher implements TimCacheListener<Alarm>  {
       alarmValue = (TransferObjectFactory.createAlarmValue(alarm));
     }
 
-    alarmValue = TransferObjectFactory.createAlarmValue(alarm);
     String jsonAlarm = GSON.toJson(alarmValue);
     LOGGER.debug("Publishing alarm: " + jsonAlarm);
     jmsSender.send(jsonAlarm);
