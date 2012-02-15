@@ -65,7 +65,7 @@
               <td>
                 <xsl:value-of
                   select="dataTagQuality/invalidQualityStates/entry/tagQualityStatus" />
-                ,
+                -
                 <xsl:value-of select="dataTagQuality/invalidQualityStates/entry/string" />
               </td>
 
