@@ -10,8 +10,8 @@ use Config::Properties;
 my $jardir                    = "../lib";
 my $appdir                    = "tim2-jviews-viewer/";
 my $codebase                  = "http://timweb/test/javaws";
-my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
-my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
+my $c2monClientPropertiesFile = "/user/timtest/rep/c2mon/client/c2mon-client.properties";
+my $c2monClientPropertiesURL  = "http://timweb/test/conf/c2mon-client.properties";
 
 ##
 # Reading version number from ../version.txt
@@ -78,7 +78,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 	codebase=\"$codebase\"
 	>
 	<information>
-		<title>TIM Viewer (Version $viewerVersion)</title>
+		<title>TIM Viewer (TEST C2MON SERVER)</title>
 	        <vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
 	        <homepage href=\"tim-viewer/index.html\"/>
 	        <description>The combined GTPM and synoptic viewer</description>

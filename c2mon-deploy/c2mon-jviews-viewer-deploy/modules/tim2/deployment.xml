@@ -18,10 +18,16 @@
 		</application>
 
 		<application name="tim2-viewer-test" extends="default">
-			<deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-jviews-viewer">
+			<deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-jviews-viewer-stable">
 				<signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
 			</deployment>
 		</application>
+    
+    <application name="tim2-viewer-dev" extends="default">
+      <deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-jviews-viewer">
+        <signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
+      </deployment>
+    </application>
 
 	</product>
 </products>
