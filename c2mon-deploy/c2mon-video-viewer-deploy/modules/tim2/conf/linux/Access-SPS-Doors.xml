@@ -38,7 +38,7 @@
      In case that vlc-player=true, we can also specify the arguments that we want to
      use to initialize the VLC player.
    -->
-   <property name="vlc-args" type="java.lang.String" value="--sout-udp-caching 100 --rtp-caching 100 --audio 0"/>
+   <property name="vlc-args" type="java.lang.String" value="--no-overlay --sout-udp-caching 100 --rtp-caching 100 --audio 0"/>
 
    <!--
      The screen width that the application shall take
