@@ -32,7 +32,7 @@ foreach (@files) {
   my $fn = $_;
   $fn =~ s/.xml//g;
   print "Start the TIM Viewer with configuration ";
-  print a({-href=>"jnlpgenerator-test.cgi?configurl=$configurl/$_"}, $fn);
+  print a({-href=>"jnlpgenerator-dev.cgi?configurl=$configurl/$_"}, $fn);
   print "<br>";
   
   next;
