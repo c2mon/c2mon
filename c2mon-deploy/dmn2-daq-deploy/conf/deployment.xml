@@ -6,20 +6,18 @@
 			this application section is a parent configuration for both
 			c2mon-dmn2-prod and c2mon-dmn2-test
 		-->
-		<application name="default"> 
+		<application name="default">
 			<deployment installLocation="/opt/dmn2-daq">
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
 				</backupPolicy>
-				<notification>
-					<!-- you can give more than one mail for deployment notification -->
-					<mail address="project-diamon-core@cern.ch" />
-				</notification>
 			</deployment>
-		    <startscript name="DMN2-DAQ" >
-			  <main-class name="cern.tim.driver.common.startup.DaqStartup" >
-				  <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
-			      <preExec>
+			<startscript name="DMN2-DAQ">
+				<main-class name="cern.tim.driver.common.startup.DaqStartup">
+					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j
+						${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName
+						${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
+					<preExec>
 			        <![CDATA[
 			          [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
 			          [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
@@ -28,20 +26,21 @@
 			          [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
 			          [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
 			         ]]>
-			      </preExec>
-			      <property name="c2mon.process.name" value="$PROCESS_NAME"/>
-			      <property name="c2mon.log.dir" value="$DAQ_LOG_HOME"/>
-			      <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml"/>
-			      
-                  <output>
-				    <file name="log/out.log" />
-			      </output>						
-			  </main-class>
-		  </startscript>
+					</preExec>
+					<property name="c2mon.process.name" value="$PROCESS_NAME" />
+					<property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
+					<property name="c2mon.daq.spring.context"
+						value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
+
+					<output>
+						<file name="log/out.log" />
+					</output>
+				</main-class>
+			</startscript>
 		</application>
 
 		<application name="dmn2-daq-pro" extends="default">
-		
+
 			<deployment>
 				<directory name="conf">
 					<file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/daq"
@@ -51,14 +50,19 @@
 					<file name="daq.properties" sourceDir="~diamonop/c2mon/daq"
 						mask="400" />
 					<!-- copy over pro. daq log4j configuration -->
-					<file name="log4j.xml" sourceDir="~diamonop/c2mon/daq"
-						mask="444" />						
+					<file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
 				</directory>
+
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="project-diamon-core@cern.ch" />
+				</notification>
+								
 			</deployment>
 		</application>
 
-		<application name="dmn2-daq-dev" extends="default" >
-			
+		<application name="dmn2-daq-dev" extends="default">
+
 			<deployment installLocation="/opt/dmn2-daq-dev">
 				<directory name="conf">
 					<file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/daq"
@@ -68,8 +72,7 @@
 					<file name="daq.properties" sourceDir="~dmndev/c2mon/daq"
 						mask="400" />
 					<!-- copy over dev. daq log4j configuration -->
-					<file name="log4j.xml" sourceDir="~dmndev/c2mon/daq"
-						mask="444" />												
+					<file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
 				</directory>
 			</deployment>
 		</application>
