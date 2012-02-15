@@ -17,16 +17,7 @@
 					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j
 						${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName
 						${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
-					<preExec>
-			        <![CDATA[
-			          [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
-			          [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
-			          [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
-			          [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
-			          [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-			          [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
-			         ]]>
-					</preExec>
+
 					<property name="c2mon.process.name" value="$PROCESS_NAME" />
 					<property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
 					<property name="c2mon.daq.spring.context"
@@ -36,6 +27,16 @@
 						<file name="log/out.log" />
 					</output>
 				</main-class>
+				<preExec>
+			        <![CDATA[
+			          [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
+			          [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
+			          [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
+			          [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
+			          [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+			          [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
+			         ]]>
+				</preExec>
 			</startscript>
 		</application>
 
@@ -57,7 +58,7 @@
 					<!-- you can give more than one mail for deployment notification -->
 					<mail address="project-diamon-core@cern.ch" />
 				</notification>
-								
+
 			</deployment>
 		</application>
 
