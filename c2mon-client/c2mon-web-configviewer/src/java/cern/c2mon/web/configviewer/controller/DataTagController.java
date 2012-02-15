@@ -75,7 +75,7 @@ public class DataTagController {
   private static Logger logger = Logger.getLogger(DataTagController.class);
 
   /**
-   * Displays configuration of a tag with the specified id
+   * Displays (TagConfig + TagValue) information for a tag with the specified id.
    * @param id tag id
    * @param response we write the html result to that HttpServletResponse response
    * @throws IOException 
@@ -100,13 +100,13 @@ public class DataTagController {
   }
   
   /**
-   * Displays configuration of a process with the given id together with a form
-   * @param id tag config id
+   * Displays TagConfig information in RAW XML about a tag with the given id.
+   * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = TAG_CONFIG_XML_URL + "/{id}", method = { RequestMethod.GET })
-  public String viewTagValueXml(@PathVariable final String id,  final Model model) {
+  public String viewTagConfigXml(@PathVariable final String id,  final Model model) {
     logger.info(TAG_CONFIG_XML_URL + id);
     try {
       model.addAttribute("xml", service.getDataTagConfigXml(id));
@@ -117,13 +117,13 @@ public class DataTagController {
   }
   
   /**
-   * Displays configuration of a process with the given id together with a form
-   * @param id tag value id
+   * Displays TagValue information in RAW XML about a tag with the given id.
+   * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = TAG_VALUE_XML_URL + "/{id}", method = { RequestMethod.GET })
-  public String viewTagConfigXml(@PathVariable final String id,  final Model model) {
+  public String viewTagValueXml(@PathVariable final String id,  final Model model) {
     logger.info(TAG_VALUE_XML_URL + id);
     try {
       model.addAttribute("xml", service.getDataTagValueXml(id));
@@ -134,7 +134,8 @@ public class DataTagController {
   }
 
   /**
-   * Displays an input form for an tag id, and if a POST was made with an tag id, also the alarm data.
+   * In case of an error this form is shown.
+   * It displays the error and you can also make a new query.
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
@@ -149,7 +150,7 @@ public class DataTagController {
   }
 
   /**
-   * Displays configuration of an alarm with the given id
+   * Displays a form where a datatag id can be entered.
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -160,7 +161,7 @@ public class DataTagController {
   }    
 
   /**
-   * Displays configuration of a datatag with the given id together with a form
+   * Displays a form where a datatag id can be entered.
    * @param id datatag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
@@ -173,7 +174,7 @@ public class DataTagController {
   }
 
   /**
-   * Displays an input form for a datatag id, and if a POST was made with a datatag id, also the datatag configuration.
+   * Displays an input form for a datatag id, and if a POST was made with a datatag id, also the datatag information.
    * @param id datatag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed

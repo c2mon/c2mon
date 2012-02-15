@@ -23,7 +23,7 @@ import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
- * Alarm service providing the XML representation of a given alarm
+ * HistoryService providing the XML representation for the history of a given tag.
  * */
 @Service
 public class HistoryService {

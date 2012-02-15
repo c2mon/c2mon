@@ -22,44 +22,44 @@ import cern.c2mon.web.configviewer.util.FormUtility;
 
 
 /**
- * A controller for the command viewer 
+ * A controller for the history viewer 
  * */
 @Controller
 public class HistoryController {
 
   /**
-   * A REST-style URL to commandviewer, combined with command id displays command configuration
+   * Base URL for the history viewer
    * */
   public static final String HISTORY_URL = "/historyviewer/";
 
   /**
-   * A URL to the commandviewer with input form
+   * A URL to the history viewer with input form
    * */
   public static final String HISTORY_FORM_URL = "/historyviewer/form";
 
   /**
-   * Title for the command form page
+   * Title for the history form page
    * */
   public static final String HISTORY_FORM_TITLE = "History Viewer";
 
   /**
-   * Description for the command form page
+   * Instruction for the history form page
    * */
-  public static final String HISTORY_FORM_INSTR = "Enter a tag id to view the History.";
+  public static final String HISTORY_FORM_INSTR = "Enter a tag id to view the last 100 records in History.";
 
   /**
-   * A command service
+   * A history service
    * */
   @Autowired
   private HistoryService service;
 
   /**
-   * CommandController logger
+   * HistoryController logger
    * */
   private static Logger logger = Logger.getLogger(HistoryController.class);
 
   /**
-   * Displays configuration of an alarm with the given id
+   * Displays a form where a tag id can be entered.
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -70,8 +70,9 @@ public class HistoryController {
   }    
 
   /**
-   * @param id tag id
-   * @param response we write the html result to that HttpServletResponse response
+   * Displays the history of a given id.
+   * @param id the last 100 records of the given tag id are being shown
+   * @param response the html result is written to that HttpServletResponse response
    * @return nothing
    * @throws IOException 
    * */
@@ -93,8 +94,9 @@ public class HistoryController {
   }
 
   /**
-   * Displays an input form for an alarm id, and if a POST was made with an alarm id, also the alarm data.
-   * @param id alarm id
+   * In case of an error this form is shown.
+   * It displays the error and you can also make a new query.
+   * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -108,8 +110,8 @@ public class HistoryController {
   }
 
   /**
-   * Displays configuration of a command with the given id together with a form
-   * @param id command id
+   * Displays a form where a tag id can be entered.
+   * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -121,8 +123,8 @@ public class HistoryController {
   }
 
   /**
-   * Displays an input form for a command id, and if a POST was made with a command id, also the command data.
-   * @param id command id
+   * Displays an input form for a tag id, and if a POST was made with a tag id, also the history data.
+   * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */

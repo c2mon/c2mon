@@ -22,18 +22,17 @@ import cern.c2mon.web.configviewer.util.FormUtility;
 
 /**
  * A controller for the alarm viewer 
- * */
-
+ **/
 @Controller
 public class AlarmController {
 
   /**
-   * A REST-style URL to alarmviewer, combined with alarm id displays alarm configuration
+   * A REST-style URL to alarmviewer, combined with alarm id displays alarm information
    * */
   public static final String ALARM_URL = "/alarmviewer/";
 
   /**
-   * A REST-style URL to alarmviewer, combined with alarm id displays alarm configuration
+   * A REST-style URL to alarmviewer, combined with alarm id displays alarm information
    * in RAW XML
    */
   public static final String ALARM_XML_URL = "/alarmviewer/xml";
@@ -51,7 +50,7 @@ public class AlarmController {
   /**
    * Description for the alarm form page
    * */
-  public static final String ALARM_FORM_INSTR = "Enter an alarm id to view the alarm's configuration.";
+  public static final String ALARM_FORM_INSTR = "Enter an alarm id.";
 
   /**
    * A link to the helpalarm
@@ -70,7 +69,7 @@ public class AlarmController {
   private static Logger logger = Logger.getLogger(AlarmController.class);
 
   /**
-   * Displays configuration of an alarm with the given id
+   * Displays a form where an alarm id can be entered.
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -81,8 +80,8 @@ public class AlarmController {
   }    
 
   /**
-   * Displays configuration of a process with the given id together with a form
-   * @param id command id
+   * Displays alarm information in RAW XML about a tag with the given id.
+   * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -98,7 +97,7 @@ public class AlarmController {
   }
 
   /**
-   * Displays configuration of a process with the given process name
+   * Displays alarm information for a given alarm id.
    * @param id alarm id
    * @param response we write the html result to that HttpServletResponse response
    * @throws IOException 
@@ -120,7 +119,7 @@ public class AlarmController {
   }
 
   /**
-   * Displays configuration of an alarm with the given id together with a form
+   * Displays a form where an alarm id can be entered.
    * @param id alarm id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
@@ -133,8 +132,9 @@ public class AlarmController {
   }
 
   /**
-   * Displays an input form for an alarm id, and if a POST was made with an alarm id, also the alarm data.
-   * @param id alarm id
+   * In case of an error this form is shown.
+   * It displays the error and you can also make a new query.
+   * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */

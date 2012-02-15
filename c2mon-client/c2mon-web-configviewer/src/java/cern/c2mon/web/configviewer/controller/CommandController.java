@@ -1,8 +1,6 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import cern.c2mon.web.configviewer.service.CommandService;
 import cern.c2mon.web.configviewer.service.TagIdException;
-import cern.c2mon.web.configviewer.service.TagService;
 import cern.c2mon.web.configviewer.util.FormUtility;
 
 
@@ -29,13 +26,12 @@ import cern.c2mon.web.configviewer.util.FormUtility;
 public class CommandController {
 
   /**
-   * A REST-style URL to commandviewer, combined with command id displays command configuration
+   * A REST-style URL to commandviewer, combined with command id displays command information
    * */
   public static final String COMMAND_URL = "/commandviewer/";
   
   /**
-   * A REST-style URL to commandviewer, combined with alarm id displays command configuration
-   * in RAW XML
+   * URL to commandviewer, that displays command information in RAW XML
    */
   public static final String COMMAND_XML_URL = "/commandviewer/xml";
   
@@ -66,7 +62,7 @@ public class CommandController {
   private static Logger logger = Logger.getLogger(CommandController.class);
 
   /**
-   * Displays configuration of an alarm with the given id
+   * Displays a form where an command id can be entered.
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -77,7 +73,7 @@ public class CommandController {
   }    
   
   /**
-   * Displays configuration of a process with the given id together with a form
+   * Displays command information in RAW XML about a tag with the given id.
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
@@ -94,7 +90,7 @@ public class CommandController {
   }
 
   /**
-   * Displays configuration of a process with the given process name
+   * Displays command information for a given command id.
    * @param id command id
    * @param response we write the html result to that HttpServletResponse response
    * @throws IOException 
@@ -114,8 +110,9 @@ public class CommandController {
   }
 
   /**
-   * Displays an input form for an alarm id, and if a POST was made with an alarm id, also the alarm data.
-   * @param id alarm id
+   * In case of an error this form is shown.
+   * It displays the error and you can also make a new query.
+   * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -129,7 +126,7 @@ public class CommandController {
   }
 
   /**
-   * Displays configuration of a command with the given id together with a form
+   * Displays a form where an command id can be entered.
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed

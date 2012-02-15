@@ -24,7 +24,7 @@ import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
- * Command service providing the XML representation of a given alarm
+ * ConfigLoaderService service providing the XML representation for a given config
  * */
 @Service
 public class ConfigLoaderService {

@@ -23,7 +23,7 @@ import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
- * Command service providing the XML representation of a given alarm
+ * Command service providing the XML representation of a given tag
  * */
 @Service
 public class CommandService {

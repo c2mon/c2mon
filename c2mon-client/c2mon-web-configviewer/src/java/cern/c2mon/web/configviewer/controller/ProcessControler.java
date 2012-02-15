@@ -1,10 +1,6 @@
 package cern.c2mon.web.configviewer.controller;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,34 +8,23 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
-import cern.c2mon.web.configviewer.service.CommandService;
-import cern.c2mon.web.configviewer.service.ConfigLoaderService;
 import cern.c2mon.web.configviewer.service.ProcessService;
 import cern.c2mon.web.configviewer.service.TagIdException;
-import cern.c2mon.web.configviewer.service.TagService;
-import cern.c2mon.web.configviewer.util.FormUtility;
 
 
 /**
- * A controller for the command viewer 
+ * A controller for the daq process viewer.
  * */
 @Controller
 public class ProcessControler {

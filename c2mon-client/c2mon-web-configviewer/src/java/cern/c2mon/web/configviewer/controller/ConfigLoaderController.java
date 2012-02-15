@@ -22,7 +22,7 @@ import cern.c2mon.web.configviewer.util.FormUtility;
 
 
 /**
- * A controller for the command viewer 
+ * A controller for the ConfigLoader 
  * */
 @Controller
 public class ConfigLoaderController {
@@ -60,12 +60,12 @@ public class ConfigLoaderController {
   private ConfigLoaderService service;
 
   /**
-   * CommandController logger
+   * ConfigLoaderController logger
    * */
   private static Logger logger = Logger.getLogger(ConfigLoaderController.class);
 
   /**
-   * Displays configuration of an alarm with the given id
+   * Displays configuration for the given id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -76,8 +76,8 @@ public class ConfigLoaderController {
   }    
   
   /**
-   * Displays configuration of a process with the given id together with a form
-   * @param id command id
+   * Displays configuration in RAW XML format.
+   * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -93,7 +93,7 @@ public class ConfigLoaderController {
   }
 
   /**
-   * Displays configuration of a process with the given process name
+   * Displays configuration of for the given id.
    * @param id config id
    * @param response we write the html result to that HttpServletResponse response
    * @return nothing
@@ -114,8 +114,9 @@ public class ConfigLoaderController {
   }
 
   /**
-   * Displays an input form for an alarm id, and if a POST was made with an alarm id, also the alarm data.
-   * @param id alarm id
+   * In case of an error this form is shown.
+   * It displays the error and you can also make a new query.
+   * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -129,8 +130,8 @@ public class ConfigLoaderController {
   }
 
   /**
-   * Displays configuration of a command with the given id together with a form
-   * @param id command id
+   * Displays a form where a config id can be entered.
+   * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
@@ -142,8 +143,8 @@ public class ConfigLoaderController {
   }
 
   /**
-   * Displays an input form for a command id, and if a POST was made with a command id, also the command data.
-   * @param id command id
+   * Displays an input form for a config id, and if a POST was made with a config id, also the config data.
+   * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */

@@ -24,13 +24,13 @@ import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
- * Command service providing the XML representation of a given alarm
+ * ProcessService providing the XML representation for a given process.
  * */
 @Service
 public class ProcessService {
 
   /**
-   * ConfigLoaderService logger
+   * ProcessService logger
    * */
   private static Logger logger = Logger.getLogger(ProcessService.class);
   
