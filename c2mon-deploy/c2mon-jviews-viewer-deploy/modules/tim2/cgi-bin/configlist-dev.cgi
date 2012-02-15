@@ -6,8 +6,8 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 ##
 # Default variable definition for production
 #
-my $configsubdir = "/test/javaws/tim2-jviews-viewer/conf";
-my $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer/conf";
+my $configsubdir = "/test/javaws/tim2-jviews-viewer-stable/conf";
+my $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer-stable/conf";
 
 ##
 # Reading version number from ../version.txt
@@ -17,6 +17,14 @@ open VFILE, "< ../version.txt"
 my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
+
+##
+# In case of a SNAPSHOT we have to change the directory
+#
+if ($viewerVersion =~ /-SNAPSHOT/) {
+  $configsubdir = "/test/javaws/tim2-jviews-viewer/conf";
+  $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer/conf"; 
+}
 
 my $title = "TIM2 Viewer Test (" . $viewerVersion . "): Connecting to the C2MON(TIM2) production server";
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
