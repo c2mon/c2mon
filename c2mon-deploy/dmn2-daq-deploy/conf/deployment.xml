@@ -52,6 +52,9 @@
 						mask="400" />
 					<!-- copy over pro. daq log4j configuration -->
 					<file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
+					<!-- copy over pro. daq list -->
+					<file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq"
+						mask="444" />
 				</directory>
 
 				<notification>
@@ -74,6 +77,9 @@
 						mask="400" />
 					<!-- copy over dev. daq log4j configuration -->
 					<file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
+					<!-- copy over pro. daq list -->
+					<file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq"
+						mask="444" />
 				</directory>
 			</deployment>
 		</application>
