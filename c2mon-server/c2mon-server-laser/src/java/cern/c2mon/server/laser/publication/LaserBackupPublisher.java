@@ -1,5 +1,6 @@
 package cern.c2mon.server.laser.publication;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -148,6 +149,13 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       } else {
         LOGGER.warn("Unable to publish LASER backup as module not running.");
       }
+      //sleep to give laser time to get backup!
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     } finally {
       publisher.getTmpLock().writeLock().unlock();
     }       
@@ -166,7 +174,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       FaultState fs = null;
 
       fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
-      fs.setUserTimestamp(timAlarm.getTimestamp());
+      fs.setUserTimestamp(new Timestamp(System.currentTimeMillis()));
       fs.setDescriptor(timAlarm.getState());
       if (timAlarm.getInfo() != null) {
         Properties prop = null;

@@ -1,5 +1,6 @@
 package cern.c2mon.server.laser.publication;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -132,7 +133,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 
         if (cacheable.isActive()) {
           fs.setDescriptor(cacheable.getState());
-          fs.setUserTimestamp(cacheable.getTimestamp());
+          fs.setUserTimestamp(new Timestamp(System.currentTimeMillis()));
 
           if (cacheable.getInfo() != null) {
             Properties prop = fs.getUserProperties();
@@ -141,7 +142,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
           }
         } else {
           fs.setDescriptor(FaultState.TERMINATE);
-          fs.setUserTimestamp(cacheable.getTimestamp());
+          fs.setUserTimestamp(new Timestamp(System.currentTimeMillis()));
         }
 
         if (log.isDebugEnabled()) {
