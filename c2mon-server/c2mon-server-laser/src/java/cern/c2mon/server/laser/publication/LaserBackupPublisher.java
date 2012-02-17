@@ -111,41 +111,46 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
   @Override
   public void run() {
-    // lock to only allow a single backup at a time
-    if (running){
-      backupLock.writeLock().lock();
-      try {
-        LOGGER.debug("Creating LASER active alarm backup list.");
-        List<Alarm> alarmList = new ArrayList<Alarm>();
-        for (Long alarmId : alarmCache.getKeys()) {
-          if (!shutdownRequested) {
-            try {
-              Alarm alarm = alarmCache.getCopy(alarmId);
-              if (alarm.isActive()) {
-                alarmList.add(alarm);
+    publisher.getTmpLock().writeLock().lock();
+    try {
+   // lock to only allow a single backup at a time
+      if (running){
+        backupLock.writeLock().lock();
+        try {
+          LOGGER.debug("Creating LASER active alarm backup list.");
+          List<Alarm> alarmList = new ArrayList<Alarm>();
+          for (Long alarmId : alarmCache.getKeys()) {
+            if (!shutdownRequested) {            
+              try {
+                Alarm alarm = alarmCache.getCopy(alarmId);
+                if (alarm.isActive()) {
+                  alarmList.add(alarm);
+                }
+              } catch (CacheElementNotFoundException e) {
+                // should only happen if concurrent re-configuration of the server
+                LOGGER.warn("Unable to locate alarm " + alarmId + " in cache during LASER backup: not included in backup.", e);
               }
-            } catch (CacheElementNotFoundException e) {
-              // should only happen if concurrent re-configuration of the server
-              LOGGER.warn("Unable to locate alarm " + alarmId + " in cache during LASER backup: not included in backup.", e);
+            } else {
+              // interrupt alarm sending as shutting down
+              return;
             }
-          } else {
-            // interrupt alarm sending as shutting down
-            return;
           }
+          LOGGER.debug("Sending active alarm backup to LASER.");
+          if (!alarmList.isEmpty()) {
+            publishAlarmBackUp(alarmList);
+          }
+          LOGGER.debug("Finished sending LASER active alarm backup.");
+        } catch (Exception e) {
+          LOGGER.error("Exception caught while publishing active Alarm backup list", e);
+        } finally {
+          backupLock.writeLock().unlock();
         }
-        LOGGER.debug("Sending active alarm backup to LASER.");
-        if (!alarmList.isEmpty()) {
-          publishAlarmBackUp(alarmList);
-        }
-        LOGGER.debug("Finished sending LASER active alarm backup.");
-      } catch (Exception e) {
-        LOGGER.error("Exception caught while publishing active Alarm backup list", e);
-      } finally {
-        backupLock.writeLock().unlock();
+      } else {
+        LOGGER.warn("Unable to publish LASER backup as module not running.");
       }
-    } else {
-      LOGGER.warn("Unable to publish LASER backup as module not running.");
-    }    
+    } finally {
+      publisher.getTmpLock().writeLock().unlock();
+    }       
   }
 
   /**

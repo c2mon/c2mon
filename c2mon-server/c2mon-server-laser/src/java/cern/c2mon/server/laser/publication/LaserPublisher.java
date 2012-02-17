@@ -2,6 +2,7 @@ package cern.c2mon.server.laser.publication;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
@@ -27,6 +28,8 @@ import cern.tim.server.common.config.ServerConstants;
 @ManagedResource(objectName = "cern.c2mon:type=LaserPublisher,name=LaserPublisher")
 public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean {
 
+  private static ReentrantReadWriteLock tmpLock = new ReentrantReadWriteLock();
+  
   /**
    * Time between connection attempts at start-up (in millis)
    */
@@ -119,71 +122,76 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
      */
   @Override
   public void notifyElementUpdated(Alarm cacheable) {
-    if (running) {
-      FaultState fs = null;
-      fs = AlarmSystemInterfaceFactory.createFaultState(cacheable.getFaultFamily(), cacheable.getFaultMember(), cacheable.getFaultCode());
+    tmpLock.writeLock().lock();
+    try {      
+      if (running) {
+        FaultState fs = null;
+        fs = AlarmSystemInterfaceFactory.createFaultState(cacheable.getFaultFamily(), cacheable.getFaultMember(), cacheable.getFaultCode());
 
-      stats.update(cacheable);
+        stats.update(cacheable);
 
-      if (cacheable.isActive()) {
-        fs.setDescriptor(cacheable.getState());
-        fs.setUserTimestamp(cacheable.getTimestamp());
+        if (cacheable.isActive()) {
+          fs.setDescriptor(cacheable.getState());
+          fs.setUserTimestamp(cacheable.getTimestamp());
 
-        if (cacheable.getInfo() != null) {
-          Properties prop = fs.getUserProperties();
-          prop.put(FaultState.ASI_PREFIX_PROPERTY, cacheable.getInfo());
-          fs.setUserProperties(prop);
+          if (cacheable.getInfo() != null) {
+            Properties prop = fs.getUserProperties();
+            prop.put(FaultState.ASI_PREFIX_PROPERTY, cacheable.getInfo());
+            fs.setUserProperties(prop);
+          }
+        } else {
+          fs.setDescriptor(FaultState.TERMINATE);
+          fs.setUserTimestamp(cacheable.getTimestamp());
         }
-      } else {
-        fs.setDescriptor(FaultState.TERMINATE);
-        fs.setUserTimestamp(cacheable.getTimestamp());
-      }
 
-      if (log.isDebugEnabled()) {
-        log.debug("Pushing alarm to LASER :\n" + fs);
-      }        
-      try {
-        asi.push(fs);     
-        log(cacheable);
-        // Keep track of the sent alarm in the Alarm log
-        StringBuilder str = new StringBuilder();
-        str.append(cacheable.getTimestamp());
-        str.append("\t");
-        str.append(cacheable.getFaultFamily());
-        str.append(':');
-        str.append(cacheable.getFaultMember());
-        str.append(':');
-        str.append(cacheable.getFaultCode());
-        str.append('\t');
-        str.append(cacheable.getState());
-        if (cacheable.getInfo() != null) {
+        if (log.isDebugEnabled()) {
+          log.debug("Pushing alarm to LASER :\n" + fs);
+        }        
+        try {
+          asi.push(fs);     
+          log(cacheable);
+          // Keep track of the sent alarm in the Alarm log
+          StringBuilder str = new StringBuilder();
+          str.append(cacheable.getTimestamp());
+          str.append("\t");
+          str.append(cacheable.getFaultFamily());
+          str.append(':');
+          str.append(cacheable.getFaultMember());
+          str.append(':');
+          str.append(cacheable.getFaultCode());
           str.append('\t');
-          str.append(cacheable.getInfo());
-        }
-        log.info(str);      
-      } catch (ASIException e) {
-        // Ooops, didn't work. log the exception.
-        StringBuilder str = new StringBuilder("Alarm System Interface Exception. Unable to send FaultState ");
-        str.append(cacheable.getFaultFamily());
-        str.append(':');
-        str.append(cacheable.getFaultMember());
-        str.append(':');
-        str.append(cacheable.getFaultCode());
-        str.append(" to LASER.");
-        log.error(str, e);
-      } catch (Exception e) {
-        StringBuilder str = new StringBuilder("sendFaultState() : Unexpected Exception. Unable to send FaultState ");
-        str.append(cacheable.getFaultFamily());
-        str.append(':');
-        str.append(cacheable.getFaultMember());
-        str.append(':');
-        str.append(cacheable.getFaultCode());
-        str.append(" to LASER.");
-        log.error(str, e);
-      } 
-    } else {
-      log.warn("Unable to publish alarm as LASER publisher module not running: alarm id " + cacheable.getId());
-    }               
+          str.append(cacheable.getState());
+          if (cacheable.getInfo() != null) {
+            str.append('\t');
+            str.append(cacheable.getInfo());
+          }
+          log.info(str);      
+        } catch (ASIException e) {
+          // Ooops, didn't work. log the exception.
+          StringBuilder str = new StringBuilder("Alarm System Interface Exception. Unable to send FaultState ");
+          str.append(cacheable.getFaultFamily());
+          str.append(':');
+          str.append(cacheable.getFaultMember());
+          str.append(':');
+          str.append(cacheable.getFaultCode());
+          str.append(" to LASER.");
+          log.error(str, e);
+        } catch (Exception e) {
+          StringBuilder str = new StringBuilder("sendFaultState() : Unexpected Exception. Unable to send FaultState ");
+          str.append(cacheable.getFaultFamily());
+          str.append(':');
+          str.append(cacheable.getFaultMember());
+          str.append(':');
+          str.append(cacheable.getFaultCode());
+          str.append(" to LASER.");
+          log.error(str, e);
+        } 
+      } else {
+        log.warn("Unable to publish alarm as LASER publisher module not running: alarm id " + cacheable.getId());
+      }  
+    } finally {
+      tmpLock.writeLock().unlock();
+    }                 
   }
 
   // below server lifecycle methods: complete start/stop (no need to allow for
@@ -311,6 +319,10 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 
   public void confirmStatus(Alarm cacheable) {
     notifyElementUpdated(cacheable);
+  }
+
+  public static ReentrantReadWriteLock getTmpLock() {
+    return tmpLock;
   }
 
 }
