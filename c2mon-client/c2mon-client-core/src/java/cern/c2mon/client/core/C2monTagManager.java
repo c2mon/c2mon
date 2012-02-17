@@ -20,10 +20,13 @@ package cern.c2mon.client.core;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.jms.JMSException;
+
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.manager.TagManager;
+import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
@@ -163,7 +166,7 @@ public interface C2monTagManager {
    * 
    * @return a list of all process names 
    */      
-  public Collection<ProcessNameResponse> getProcessNames();
+  Collection<ProcessNameResponse> getProcessNames();
   
   /**
    * Returns the number of connections in the Cache
@@ -194,4 +197,18 @@ public interface C2monTagManager {
    *         occurs while refreshing to the tags.
    */
   void refreshDataTags(Collection<Long> tagIds) throws CacheSynchronizationException;
+  
+  /**
+   * Unregisters an <code>AlarmListener</code> from the <code>TagManager</code>. 
+   * @param listener The listener to be unregistered
+   * @throws JMSException 
+   */
+  void removeAlarmListener(AlarmListener listener) throws JMSException;
+
+  /**
+   * Registers an <code>AlarmListener</code> to the <code>TagManager</code>. 
+   * @param listener The listener to be registered
+   * @throws JMSException 
+   */
+  void addAlarmListener(AlarmListener listener) throws JMSException;
 }

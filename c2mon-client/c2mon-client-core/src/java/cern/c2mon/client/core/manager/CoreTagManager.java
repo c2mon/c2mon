@@ -44,16 +44,4 @@ interface CoreTagManager extends C2monTagManager, AlarmListener {
    * @throws NullPointerException In case that the parameter is <code>null</code>.
    */
   void removeTagSubscriptionListener(TagSubscriptionListener listener);
-
-  /**
-   * Unregisters an <code>AlarmListener</code> from the <code>TagManager</code>. 
-   * @param listener The listener to be unregistered
-   */
-  void removeAlarmListener(AlarmListener listener);
-
-  /**
-   * Registers an <code>AlarmListener</code> to the <code>TagManager</code>. 
-   * @param listener The listener to be registered
-   */
-  void addAlarmListener(AlarmListener listener);
 }

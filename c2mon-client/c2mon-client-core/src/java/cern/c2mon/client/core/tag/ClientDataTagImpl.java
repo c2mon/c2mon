@@ -136,7 +136,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   @Element(required = false)
   private String unit = null;
   
-  /** The description of the Tag*/
+  /** The description of the Tag */
   @Element(required = false)
   private String description = "";
   

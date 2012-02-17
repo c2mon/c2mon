@@ -40,6 +40,7 @@ import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.AlarmListener;
+import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
@@ -74,6 +75,9 @@ public class TagManager implements CoreTagManager {
   /** Provides methods for requesting tag information from the C2MON server */
   private final RequestHandler clientRequestHandler;
 
+  /** Reference to the <code>JmsProxy</code> singleton instance */
+  private final JmsProxy jmsProxy;
+
   /** Lock for accessing the <code>listeners</code> variable */
   private ReentrantReadWriteLock alarmListenersLock = new ReentrantReadWriteLock();
 
@@ -97,9 +101,10 @@ public class TagManager implements CoreTagManager {
    *          server
    */
   @Autowired
-  protected TagManager(final ClientDataTagCache pCache,
+  protected TagManager(final JmsProxy pJmsProxy, final ClientDataTagCache pCache,
       final RequestHandler pRequestHandler) {
 
+    this.jmsProxy = pJmsProxy;
     this.cache = pCache;
     this.clientRequestHandler = pRequestHandler;
   }
@@ -186,9 +191,16 @@ public class TagManager implements CoreTagManager {
   }
 
   @Override
-  public void addAlarmListener(final AlarmListener listener) {
+  public void addAlarmListener(final AlarmListener listener) throws JMSException {
+
     alarmListenersLock.writeLock().lock();
+
+    if (alarmListeners.size() == 0) {
+      jmsProxy.registerAlarmListener(this);
+    }
+    
     try {
+      LOG.debug(new StringBuffer("addAlarmListener() : adding alarm listener " + listener.getClass()));
       alarmListeners.add(listener);
     } finally {
       alarmListenersLock.writeLock().unlock();
@@ -196,9 +208,15 @@ public class TagManager implements CoreTagManager {
   }
 
   @Override
-  public void removeAlarmListener(final AlarmListener listener) {
+  public void removeAlarmListener(final AlarmListener listener) throws JMSException {
     alarmListenersLock.writeLock().lock();
     try {
+      LOG.debug(new StringBuffer("removeAlarmListener() removing alarm listener"));
+
+      if (alarmListeners.size() == 1) {
+        jmsProxy.unregisterAlarmListener(this);
+      }
+
       alarmListeners.remove(listener);
     } finally {
       alarmListenersLock.writeLock().unlock();
@@ -375,9 +393,16 @@ public class TagManager implements CoreTagManager {
     return cache.getCacheSize();
   }
 
-  private void notifyAlarmListeners (final AlarmValue alarm) {
+  /**
+   * Private method, notifies all listeners for an alarmUpdate.
+   * @param alarm the updated Alarm
+   */
+  private void notifyAlarmListeners(final AlarmValue alarm) {
 
-    for (AlarmListener listener:alarmListeners) {
+    LOG.debug("onAlarmUpdate() -  there is:" + alarmListeners.size() 
+        + " listeners waiting to be notified!");  
+
+    for (AlarmListener listener : alarmListeners) {
 
       listener.onAlarmUpdate(alarm);
     }
@@ -388,6 +413,7 @@ public class TagManager implements CoreTagManager {
 
     alarmListenersLock.readLock().lock();
 
+    LOG.debug("onAlarmUpdate() -  received alarm update for alarmId:" + alarm.getId());  
     try {
       notifyAlarmListeners(alarm);
     }
