@@ -151,7 +151,7 @@ public class RequestHandlerImpl implements RequestHandler {
     ClientRequestImpl<AlarmValue> activeAlarmsRequest = new ClientRequestImpl<AlarmValue>(
         ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST,
           ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
-          10000); // == timeout
+          60000); // == timeout
     
     Collection<AlarmValue> c = jmsProxy.sendRequest(activeAlarmsRequest , requestQueue, 
         activeAlarmsRequest.getTimeout());

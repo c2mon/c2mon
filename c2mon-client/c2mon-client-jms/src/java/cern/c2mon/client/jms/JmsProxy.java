@@ -191,17 +191,17 @@ public interface JmsProxy {
    * from the server.
    * 
    * @param alarmListener the listener to register
-   * @throws NullPointerException if argument is null
+   * @throws JMSException 
    */
-  void registerAlarmListener(final AlarmListener alarmListener);
+  void registerAlarmListener(final AlarmListener alarmListener) throws JMSException;
    
   /**
    * Unregister the listener from receiving alarm updates.
    * 
    * @param alarmListener the listener to remove
-   * @throws NullPointerException if argument is null
+   * @throws JMSException 
    */
-  void unregisterAlarmListener(final AlarmListener alarmListener);
+  void unregisterAlarmListener(final AlarmListener alarmListener) throws JMSException;
   
   /**
    * Register a listener to be notified of AdminMessage events received

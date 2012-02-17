@@ -166,6 +166,16 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private AlarmListenerWrapper alarmListenerWrapper;
   
   /**
+   *  Alarm Session.
+   */
+  private Session alarmSession;                    
+  
+  /**
+   *  Alarm Consumer.
+   */  
+  private MessageConsumer alarmConsumer;
+
+  /**
    * Recording connection status to JMS.
    * Only set in connect and startReconnectThread methods.
    */
@@ -248,6 +258,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     supervisionListenerWrapper = new SupervisionListenerWrapper();
     adminMessageListenerWrapper = new AdminMessageListenerWrapper();
     heartbeatListenerWrapper = new HeartbeatListenerWrapper();
+    alarmListenerWrapper = new AlarmListenerWrapper();
   }
   
   /**
@@ -376,7 +387,6 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       subscribeToSupervisionTopic();
       subscribeToHeartbeatTopic();
       subscribeToAdminMessageTopic();
-      subscribeToAlarmTopic();
     } catch (JMSException e) {
       LOGGER.error("Did not manage to refresh Topic subscriptions.", e);
       throw e;
@@ -389,11 +399,21 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Subscribes to the alarm topic. 
    */
   private void subscribeToAlarmTopic() throws JMSException {
-    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);                           
-    MessageConsumer consumer = session.createConsumer(alarmTopic);                 
-    consumer.setMessageListener(alarmListenerWrapper);
+    alarmSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);                           
+    alarmConsumer = alarmSession.createConsumer(alarmTopic);                 
+    alarmConsumer.setMessageListener(alarmListenerWrapper);
+    LOGGER.debug("Successfully subscribed to alarm topic");
   }
   
+  private void unsubscribeFromAlarmTopic() throws JMSException {
+    
+    alarmSession.close();
+    alarmSession = null;
+    alarmConsumer.close();
+    alarmConsumer = null;
+    LOGGER.debug("Successfully unsubscribed from alarm topic");
+  }
+
   /**
    * Subscribes to the heartbeat topic. Called when refreshing
    * all subscriptions.
@@ -704,18 +724,38 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
   
   @Override
-  public void registerAlarmListener(final AlarmListener alarmListener) {
+  public void registerAlarmListener(final AlarmListener alarmListener) throws JMSException {
     if (alarmListener == null) {
       throw new NullPointerException("Trying to register null alarm listener with JmsProxy.");
+    }
+    if (alarmListenerWrapper.getListenerCount() == 0) { // this is our first listener!
+      // -> it's time to subscribe to the alarm topic
+      try {
+        subscribeToAlarmTopic();
+      }catch (JMSException e) {
+        LOGGER.error("Did not manage to subscribe To Alarm Topic.", e);
+        throw e;
+      } 
     }
     alarmListenerWrapper.addListener(alarmListener);
   }
   
   @Override
-  public void unregisterAlarmListener(final AlarmListener alarmListener) {
+  public void unregisterAlarmListener(final AlarmListener alarmListener) throws JMSException {
     if (alarmListener == null) {
       throw new NullPointerException("Trying to unregister null alarm listener from JmsProxy.");
     }
+    
+    if (alarmListenerWrapper.getListenerCount() == 1) { // this is our last listener!
+      // -> it's time to unsubscribe from the topic
+      try {
+        unsubscribeFromAlarmTopic();
+      }catch (JMSException e) {
+        LOGGER.error("Did not manage to subscribe To Alarm Topic.", e);
+        throw e;
+      } 
+    }
+    
     alarmListenerWrapper.removeListener(alarmListener);
   }
 

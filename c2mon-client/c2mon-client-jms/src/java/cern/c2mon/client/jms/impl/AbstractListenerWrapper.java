@@ -52,6 +52,15 @@ public abstract class AbstractListenerWrapper<T, U> implements MessageListener {
   }
   
   /**
+   * Registers the listener for event notifications.
+   * 
+   * @param listener the listener to notify on update 
+   */
+  public synchronized int getListenerCount() {    
+    return listeners.size();
+  }
+  
+  /**
    * Unsubscribes the listener for update notifications.
    * 
    * @param listener to remove
@@ -85,7 +94,10 @@ public abstract class AbstractListenerWrapper<T, U> implements MessageListener {
   public synchronized void onMessage(final Message message) {
     try {
       if (message instanceof TextMessage) {
-        U event = convertMessage(message);       
+        
+        LOGGER.debug("AbstractListenerWrapper received message for " + this.getClass().getSimpleName());
+        U event = convertMessage(message);     
+        LOGGER.debug("AbstractListenerWrapper: there is " + listeners.size() + " listeners waiting to be notified!");
         for (T listener : listeners) {
           invokeListener(listener, event);
         }
