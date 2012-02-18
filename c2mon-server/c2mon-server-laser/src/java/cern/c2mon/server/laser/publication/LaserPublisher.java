@@ -1,5 +1,7 @@
 package cern.c2mon.server.laser.publication;
 
+import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -53,6 +55,8 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 
   /** Reference to the LASER alarm system interface. */
   private AlarmSystemInterface asi = null;
+  
+  private HashMap<Long, Timestamp> lastLaserTime = new HashMap<Long, Timestamp>();
 
   /**
    * Is the connect thread already running?
@@ -127,12 +131,13 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
       if (running) {
         FaultState fs = null;
         fs = AlarmSystemInterfaceFactory.createFaultState(cacheable.getFaultFamily(), cacheable.getFaultMember(), cacheable.getFaultCode());
-
+        Timestamp laserTime = new Timestamp(System.currentTimeMillis());
+        lastLaserTime.put(cacheable.getId(), laserTime);
         stats.update(cacheable);
 
         if (cacheable.isActive()) {
           fs.setDescriptor(cacheable.getState());
-          fs.setUserTimestamp(cacheable.getTimestamp());
+          fs.setUserTimestamp(laserTime);
 
           if (cacheable.getInfo() != null) {
             Properties prop = fs.getUserProperties();
@@ -141,7 +146,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
           }
         } else {
           fs.setDescriptor(FaultState.TERMINATE);
-          fs.setUserTimestamp(cacheable.getTimestamp());
+          fs.setUserTimestamp(laserTime);
         }
 
         if (log.isDebugEnabled()) {
@@ -220,7 +225,7 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
       new Thread(new Runnable() {
         @Override
         public void run() {
-          try {
+          try {            
             while (!running && !shutdownRequested) {
               try {
                 log.info("Starting " + LaserPublisher.class.getName() + " (in own thread)");
@@ -323,6 +328,10 @@ public class LaserPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
 
   public static ReentrantReadWriteLock getTmpLock() {
     return tmpLock;
+  }
+  
+  public Timestamp getLastLaserTime(Long id) {
+    return lastLaserTime.get(id);
   }
 
 }

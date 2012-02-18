@@ -166,7 +166,11 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       FaultState fs = null;
 
       fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
-      fs.setUserTimestamp(timAlarm.getTimestamp());
+      if (publisher.getLastLaserTime(timAlarm.getId()) != null) {
+        fs.setUserTimestamp(publisher.getLastLaserTime(timAlarm.getId()));
+      } else {
+        fs.setUserTimestamp(timAlarm.getTimestamp());
+      }      
       fs.setDescriptor(timAlarm.getState());
       if (timAlarm.getInfo() != null) {
         Properties prop = null;
