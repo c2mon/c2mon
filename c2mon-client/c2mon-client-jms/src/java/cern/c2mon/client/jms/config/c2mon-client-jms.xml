@@ -26,7 +26,7 @@
   </bean>
   
   <bean id="alarmTopic" class="org.apache.activemq.command.ActiveMQTopic">
-    <constructor-arg value="${c2mon.client.jms.alarm.topic:c2mon.client.alarm}"/>
+    <constructor-arg value="${c2mon.client.jms.alarm.topic}"/>
   </bean>
   
   <bean class="cern.c2mon.client.jms.impl.RequestHandlerImpl" autowire="constructor">
