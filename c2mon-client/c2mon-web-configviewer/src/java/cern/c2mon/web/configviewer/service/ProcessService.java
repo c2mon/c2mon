@@ -49,10 +49,6 @@ public class ProcessService {
   @Autowired
   private ServiceGateway gateway;
 
-  @PostConstruct
-  private void init() {
-
-  }
 
   /**
    * Gets the XML representation of the process

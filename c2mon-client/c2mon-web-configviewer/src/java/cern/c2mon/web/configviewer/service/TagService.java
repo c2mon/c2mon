@@ -44,7 +44,7 @@ public class TagService {
    * Gets the XML representation of the current value of datatag
    * @param dataTagId id of the datatag
    * @return XML datatag value representation 
-   * @throws Exception if the datatag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
+   * @throws TagIdException if the datatag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
   public String getDataTagValueXml(final String dataTagId) throws TagIdException {
@@ -63,7 +63,7 @@ public class TagService {
    * Gets the XML representation of the datatag configuration
    * @param tagId id of the datatag
    * @return XML datatag config representation 
-   * @throws Exception if the datatag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
+   * @throws TagIdException if the datatag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
 

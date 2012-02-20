@@ -57,7 +57,7 @@ public class AlarmService {
    * Gets the XML representation of the current value and configuration of an alarm
    * @param alarmId id of the alarm
    * @return XML representation of alarm value and configuration 
-   * @throws Exception if alarm was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
+   * @throws TagIdException if alarm was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
   public String getAlarmTagXml(final String alarmId) throws TagIdException {

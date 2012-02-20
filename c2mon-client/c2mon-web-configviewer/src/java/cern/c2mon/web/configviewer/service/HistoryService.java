@@ -56,7 +56,7 @@ public class HistoryService {
   }
 
   /**
-   * Initializes the chart's data.
+   * Used to make a request for HistoryData.
    */
   private String requestHistoryData(final String dataTagId, final int numberOfRecords) {
 

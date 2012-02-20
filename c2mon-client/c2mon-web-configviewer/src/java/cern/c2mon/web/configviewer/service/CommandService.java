@@ -52,7 +52,7 @@ public class CommandService {
    * Gets the XML representation of the configuration of a command
    * @param commandId id of the command
    * @return XML representation of command configuration 
-   * @throws Exception if command was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
+   * @throws TagIdException if command was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
   public String getCommandTagXml(final String commandId) throws TagIdException {

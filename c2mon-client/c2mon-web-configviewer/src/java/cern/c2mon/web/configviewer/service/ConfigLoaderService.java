@@ -53,7 +53,7 @@ public class ConfigLoaderService {
    * Gets the XML representation of the ConfigurationReport
    * @param configurationId id
    * @return XML representation of  the ConfigurationReport 
-   * @throws Exception if id not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
+   * @throws TagIdException if id not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
   public String getConfigurationReportXml(final String configurationId) throws TagIdException {
