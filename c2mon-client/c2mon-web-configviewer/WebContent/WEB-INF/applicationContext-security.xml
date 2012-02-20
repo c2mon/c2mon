@@ -1,96 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
+	<!--
   - Sample namespace-based configuration
   -
   -->
 
 <beans:beans xmlns="http://www.springframework.org/schema/security"
-    xmlns:beans="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
                         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd">
 
-    <global-method-security pre-post-annotations="enabled">
-        <!-- AspectJ pointcut expression that locates our "post" method and applies security that way
-        <protect-pointcut expression="execution(* bigbank.*Service.post*(..))" access="ROLE_TELLER"/>
-        -->
-    </global-method-security>
-    
-    
-     <!--
-    <bean id="customAuthListener" 
-    class="cern.c2mon.web.configviewer.security.CustomAuthListener">    
-    </bean>
-    -->
-    
-    <!-- Our custom AccessDecisionManager uses rbac for Authentication -->
-    <beans:bean id="RbacAccessDecisionManager" 
-    	class="cern.c2mon.web.configviewer.security.RbacDecisionManager">
-    	
-    	<!-- Maps urls with RbacAuthorizationDetail Objects -->
-    	<beans:constructor-arg name="authorizationDetails">
+	<global-method-security pre-post-annotations="enabled">
+		<!--
+			AspectJ pointcut expression that locates our "post" method and
+			applies security that way <protect-pointcut expression="execution(*
+			bigbank.*Service.post*(..))" access="ROLE_TELLER"/>
+		-->
+	</global-method-security>
+
+
+	<!--
+		<bean id="customAuthListener"
+		class="cern.c2mon.web.configviewer.security.CustomAuthListener">
+		</bean>
+	-->
+
+	<!-- Our custom AccessDecisionManager uses rbac for Authentication -->
+	<beans:bean id="RbacAccessDecisionManager"
+		class="cern.c2mon.web.configviewer.security.RbacDecisionManager">
+
+		<!-- Maps urls with RbacAuthorizationDetail Objects -->
+		<beans:constructor-arg name="authorizationDetails">
 			<beans:map>
 				<beans:entry key="configloader" value="${c2mon.web.rbac.admin}" />
 				<beans:entry key="process" value="${c2mon.web.rbac.user}" />
 			</beans:map>
 		</beans:constructor-arg>
-    	
-    </beans:bean> 
-		
-	<http auto-config="true" access-decision-manager-ref="RbacAccessDecisionManager">
- 	<!-- no need for interceptor element here because our accessDecisionManager 
- 	 has this hard coded -->
- 	     <intercept-url pattern="/configloader/**" access="hasAnyRole('ROLE_ADMIN')"/>
-        <intercept-url pattern="/process/**" access="hasAnyRole('ROLE_ADMIN')"/>
-	</http>
-    
-    <beans:bean id="customAuthenticationProvider" 
-    	class="cern.c2mon.web.configviewer.security.CustomAuthenticationProvider" >
-    	<!--  # RBAC class/device/property for C2MON  -->
-    	<!--
-    	<beans:constructor-arg name="adminDetails" value="${c2mon.web.rbac.admin}"/>
-    	<beans:constructor-arg name="processViewerDetails" value="${c2mon.web.rbac.user}"/>
-    	 -->
-    </beans:bean> 
-    
-    <beans:bean id="propertyPlaceholderConfigurer" 
-    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-    
-    
-  <!--      
-    <bean id="customAuthenticationProvider" 
-    class="cern.c2mon.web.configviewer.security.CustomAuthenticationProvider">  
-    </bean>
-    -->
- 
- <!--   
-    <property name="requestQueue" value="${c2mon.client.jms.request.queue}"/>
- -->
-    
-    <authentication-manager alias="authenticationManager">
-     <authentication-provider ref="customAuthenticationProvider"/>
- 	</authentication-manager>
 
-    <!--
-    Usernames/Passwords are
-        rod/koala
-        dianne/emu
-        scott/wombat
-        peter/opal
+	</beans:bean>
+
+
+	<http auto-config="true" access-decision-manager-ref="RbacAccessDecisionManager">
+		<!--
+			no need for interceptor element here because our
+			accessDecisionManager has this hard coded
+		-->
+		<intercept-url pattern="/configloader/**" access="hasAnyRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/process/**" access="hasAnyRole('ROLE_ADMIN')" />
+
+		<access-denied-handler error-page="/accessDenied" />
+		<intercept-url pattern="/accessDenied" filters="none" />
+	</http>
+
+	<beans:bean id="customAuthenticationProvider"
+		class="cern.c2mon.web.configviewer.security.CustomAuthenticationProvider">
+		<!--  # RBAC class/device/property for C2MON  -->
+		<!--
+			<beans:constructor-arg name="adminDetails"
+			value="${c2mon.web.rbac.admin}"/> <beans:constructor-arg
+			name="processViewerDetails" value="${c2mon.web.rbac.user}"/>
+		-->
+	</beans:bean>
+
+
+	<beans:bean id="propertyPlaceholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
+	<!--
+		<bean id="customAuthenticationProvider"
+		class="cern.c2mon.web.configviewer.security.CustomAuthenticationProvider">
+		</bean>
 	-->
-	<!-- 
-    <authentication-manager>
-        <authentication-provider>
-            <password-encoder hash="md5"/>
-            <user-service>
-                <user name="mark" password="a564de63c2d0da68cf47586ee05984d7" authorities="ROLE_SUPERVISOR, ROLE_USER, ROLE_TELLER" />
-                <user name="dianne" password="65d15fe9156f9c4bbffd98085992a44e" authorities="ROLE_USER,ROLE_TELLER" />
-                <user name="scott" password="2b58af6dddbd072ed27ffc86725d7d3a" authorities="ROLE_USER" />
-                <user name="peter" password="22b5c9accc6e1ba628cedc63a72d57f8" authorities="ROLE_USER" />
-            </user-service>
-        </authentication-provider>
-    </authentication-manager>
-    -->
-    
+
+	<!--
+		<property name="requestQueue"
+		value="${c2mon.client.jms.request.queue}"/>
+	-->
+
+	<authentication-manager alias="authenticationManager">
+		<authentication-provider ref="customAuthenticationProvider" />
+	</authentication-manager>
+
+	<!--
+		Usernames/Passwords are rod/koala dianne/emu scott/wombat peter/opal
+	-->
+	<!--
+		<authentication-manager> <authentication-provider> <password-encoder
+		hash="md5"/> <user-service> <user name="mark"
+		password="a564de63c2d0da68cf47586ee05984d7"
+		authorities="ROLE_SUPERVISOR, ROLE_USER, ROLE_TELLER" /> <user
+		name="dianne" password="65d15fe9156f9c4bbffd98085992a44e"
+		authorities="ROLE_USER,ROLE_TELLER" /> <user name="scott"
+		password="2b58af6dddbd072ed27ffc86725d7d3a" authorities="ROLE_USER" />
+		<user name="peter" password="22b5c9accc6e1ba628cedc63a72d57f8"
+		authorities="ROLE_USER" /> </user-service> </authentication-provider>
+		</authentication-manager>
+	-->
+
 </beans:beans>

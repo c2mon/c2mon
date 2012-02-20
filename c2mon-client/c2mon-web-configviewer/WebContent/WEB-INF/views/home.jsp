@@ -14,8 +14,8 @@
 </sec:authorize>
 
 <sec:authorize ifNotGranted="ROLE_ANONYMOUS"> Hi 
-	<h1><span style="color: #708090; font-size: 14pt">${username}!</span>  
-	It's nice to see you again!</h1>
+	<span style="color: #708090; font-size: 14pt">${username}!</span>  
+	It's nice to see you again!
 </sec:authorize>
 
 <h4>Please select an option:</h4>

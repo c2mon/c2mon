@@ -19,6 +19,11 @@ import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monSessionManager;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
 
+/**
+ * Decides whether the current user has enough permissions 
+ * to access the page or not.
+ * @author ekoufaki
+ */
 public class RbacDecisionManager implements AccessDecisionManager {
 
   /** So that the SessionManager knows who we are : ) */
@@ -107,10 +112,13 @@ public class RbacDecisionManager implements AccessDecisionManager {
 
     RbacAuthorizationDetails authDetails = null;
 
-    if (splitedDetails.length < 3)
+    if (splitedDetails.length < 3) {
       logger.error(new Error("CustomAuthenticationProvider: error splitting Admin Details!:"
           + stringEncodedAuthDetails + ". Splitted in:" + splitedDetails
       ));
+
+      throw new AccessDeniedException("Not able to fetch RbacAuthorizationDetails. Access has been denied.");
+    }
 
     if (splitedDetails.length == 3) {
       authDetails = new RbacAuthorizationDetails();
