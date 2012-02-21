@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-  <!-- the main Spring XML configuration file for starting up the C2MON client core context -->
+  <!-- the main Spring XML configuration file for starting up the C2MON client core context-->
 
   <context:component-scan base-package="cern.c2mon.client.core"/>
   <context:annotation-config/>
@@ -23,6 +23,11 @@
 	<bean	class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="location" value="${c2mon.client.conf.url}" />
+		<property name="properties">  
+    		<props>  
+      			<prop key="c2mon.client.jms.alarm.topic">not-used</prop>  
+    		</props>  
+ 		 </property>  
 	</bean>
 	
   <!-- import the XML configuration files for the Client API modules -->
