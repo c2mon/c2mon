@@ -152,8 +152,11 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private String topicName = null;
 
   /** In case this data tag is a rule this variable contains its rule expression */
-  @Element(required = false)
   private RuleExpression ruleExpression = null;
+
+  /** Only used for xml serialization. */
+  @Element(required = false)
+  private String ruleExpressionString;
 
   /**
    * Concurrent modifiable collection of DataTagUpdateListeners registered for
@@ -180,6 +183,12 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     id = tagId;
   }  
   
+  @org.simpleframework.xml.core.Persist
+  public void prepare() {
+    
+     if (ruleExpression != null)
+       ruleExpressionString = ruleExpression.getExpression();
+  }
 
   
   /* (non-Javadoc)
