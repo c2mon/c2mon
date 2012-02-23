@@ -1,11 +1,17 @@
 package cern.c2mon.server.laser.publication;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +25,10 @@ import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterfaceFactory;
 import cern.laser.source.alarmsysteminterface.FaultState;
 import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.common.alarm.Alarm;
+import cern.tim.server.common.alarm.AlarmPublication;
 import cern.tim.server.common.config.ServerConstants;
+import ch.cern.tim.shared.alarm.AlarmCondition;
 
 /**
  * Sends regular backups of all active alarms to LASER.
@@ -51,12 +58,6 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * Initial delay before sending first backup (ms).
    */
   private static final int INITIAL_BACKUP_DELAY = 60000;
-
-  /**
-   * Lock used to only allow one backup to run at any time across a server
-   * cluster.
-   */
-  private ReentrantReadWriteLock backupLock = new ReentrantReadWriteLock();
   
   /**
    * Is the connect thread already running?
@@ -82,10 +83,15 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * Ref to alarm cache.
    */
   private AlarmCache alarmCache;
+  
+  /**
+   * For generating the backup.
+   */
+  private ThreadPoolExecutor backupExecutor;
 
   /**
-   * Our reference to the {@link LaserPublisher} as we need it to use the
-   * {@link LaserPublisher#getSourceName()} method.<br>
+   * Our reference to the {@link LaserPublisherImpl} as we need it to use the
+   * {@link LaserPublisherImpl#getSourceName()} method.<br>
    * <br>
    * This is because we want to be aligned (sourcename-wise) with the
    * LaserPublisher instance. Otherwise we may end up sending backups with a
@@ -107,86 +113,48 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
     super();
     this.alarmCache = alarmCache;
     this.publisher = publisher;
+    backupExecutor = new ThreadPoolExecutor(10, 10, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    backupExecutor.allowCoreThreadTimeOut(true);
   }
 
   @Override
-  public void run() {
-    publisher.getTmpLock().writeLock().lock();
-    try {
-   // lock to only allow a single backup at a time
-      if (running){
-        backupLock.writeLock().lock();
-        try {
-          LOGGER.debug("Creating LASER active alarm backup list.");
-          List<Alarm> alarmList = new ArrayList<Alarm>();
-          for (Long alarmId : alarmCache.getKeys()) {
-            if (!shutdownRequested) {            
-              try {
-                Alarm alarm = alarmCache.getCopy(alarmId);
-                if (alarm.isActive()) {
-                  alarmList.add(alarm);
-                }
-              } catch (CacheElementNotFoundException e) {
-                // should only happen if concurrent re-configuration of the server
-                LOGGER.warn("Unable to locate alarm " + alarmId + " in cache during LASER backup: not included in backup.", e);
-              }
-            } else {
-              // interrupt alarm sending as shutting down
-              return;
-            }
-          }
-          LOGGER.debug("Sending active alarm backup to LASER.");
-          if (!alarmList.isEmpty()) {
-            publishAlarmBackUp(alarmList);
-          }
-          LOGGER.debug("Finished sending LASER active alarm backup.");
-        } catch (Exception e) {
-          LOGGER.error("Exception caught while publishing active Alarm backup list", e);
-        } finally {
-          backupLock.writeLock().unlock();
+  public void run() {    
+    // lock to only allow a single backup at a time, and no concurrent publication of alarms
+    if (running){
+      publisher.getBackupLock().writeLock().lock();
+      try {
+        LOGGER.debug("Creating LASER active alarm backup list.");                     
+        LinkedList<BackupTask> tasks = new LinkedList<BackupTask>();
+        for (Long alarmId : alarmCache.getKeys()) {
+          tasks.add(new BackupTask(alarmId));            
         }
-      } else {
-        LOGGER.warn("Unable to publish LASER backup as module not running.");
+        List<Future<FaultState>> taskResults = backupExecutor.invokeAll(tasks, 1, TimeUnit.MINUTES);
+        ArrayList<FaultState> toSend = new ArrayList<FaultState>();
+        for (Future<FaultState> result : taskResults) {
+          try {
+            toSend.add(result.get());          
+          } catch (ExecutionException e) {
+            LOGGER.error("Backup fault state computation threw an exception - unable to include in backup.", e);
+          }
+        }          
+        LOGGER.debug("Sending active alarm backup to LASER with " + toSend.size() + " alarms");
+        if (!toSend.isEmpty()) {
+          try {
+            asi.pushActiveList(toSend);
+            LOGGER.debug("Finished sending LASER active alarm backup.");
+          } catch (ASIException e) {
+            LOGGER.error("Cannot send backup list to LASER", e);
+            e.printStackTrace();
+          }            
+        }          
+      } catch (Exception e) {
+        LOGGER.error("Exception caught while publishing active Alarm backup list", e);
+      } finally {
+        publisher.getBackupLock().writeLock().unlock();
       }
-    } finally {
-      publisher.getTmpLock().writeLock().unlock();
-    }       
-  }
-
-  /**
-   * Publishes the alarm list as backup to LASER
-   * 
-   * @param alarmList list of active alarms
-   */
-  private void publishAlarmBackUp(List<Alarm> alarmList) {
-    ArrayList<FaultState> toSend = new ArrayList<FaultState>();
-
-    // iterate over list and transform them into Laser fault states
-    for (Alarm timAlarm : alarmList) {
-      FaultState fs = null;
-
-      fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
-      if (publisher.getLastLaserTime(timAlarm.getId()) != null) {
-        fs.setUserTimestamp(publisher.getLastLaserTime(timAlarm.getId()));
-      } else {
-        fs.setUserTimestamp(timAlarm.getTimestamp());
-      }      
-      fs.setDescriptor(timAlarm.getState());
-      if (timAlarm.getInfo() != null) {
-        Properties prop = null;
-        prop = fs.getUserProperties();
-        prop.put(FaultState.ASI_PREFIX_PROPERTY, timAlarm.getInfo());
-        fs.setUserProperties(prop);
-      }
-
-      toSend.add(fs);
-    }
-    try {
-      asi.pushActiveList(toSend);
-    } catch (ASIException e) {
-      LOGGER.error("Cannot create backup list : ", e);
-      e.printStackTrace();
-    }
+    } else {
+      LOGGER.warn("Unable to publish LASER backup as module not running.");
+    }         
   }
 
   @Override
@@ -283,6 +251,42 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    */
   public int getBackupInterval() {
     return backupInterval;
+  }
+
+  /**
+   * Generates the FaultState for a single alarm if active.
+   * @author Mark Brightwell
+   *
+   */
+  private class BackupTask implements Callable<FaultState> {
+
+    private Long id;
+    
+    public BackupTask(Long id) {
+      super();
+      this.id = id;
+    }
+
+    @Override
+    public FaultState call() throws Exception {   
+      FaultState fs = null;
+      if (!shutdownRequested) {
+        Alarm timAlarm = alarmCache.getCopy(id);
+        AlarmPublication alarmPublication = timAlarm.getPreviousPublishedState();
+        if (alarmPublication.getState().equals(AlarmCondition.ACTIVE)) {
+          fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
+          fs.setUserTimestamp(alarmPublication.getPublicationTime());              
+          fs.setDescriptor(alarmPublication.getState());
+          if (alarmPublication.getInfo() != null) {
+            Properties prop = null;
+            prop = fs.getUserProperties();
+            prop.put(FaultState.ASI_PREFIX_PROPERTY, alarmPublication.getInfo());
+            fs.setUserProperties(prop);
+          }
+        }
+      }     
+      return fs;
+    }   
   }
 
 }

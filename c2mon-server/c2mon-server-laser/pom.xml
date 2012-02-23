@@ -9,7 +9,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-laser</artifactId>
-  <version>1.0.7-SNAPSHOT</version>
+  <version>1.0.8-SNAPSHOT</version>
   <name>c2mon-server-laser</name>
   <packaging>jar</packaging>
   <description>The C2MON server module responsible for submitting alarms to LASER.</description>
@@ -36,7 +36,11 @@
     <dependency>
       <groupId>cern.tim2.tim2-server</groupId>
       <artifactId>tim2-server-cache</artifactId>
-    </dependency>     
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-cachepersistence</artifactId>
+    </dependency>   
     <dependency>
     	<groupId>cern.laser</groupId>
     	<artifactId>laser-source-ext</artifactId>    	
