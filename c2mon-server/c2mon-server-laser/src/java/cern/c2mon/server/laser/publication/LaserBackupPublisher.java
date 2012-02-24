@@ -132,7 +132,10 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
         ArrayList<FaultState> toSend = new ArrayList<FaultState>();
         for (Future<FaultState> result : taskResults) {
           try {
-            toSend.add(result.get());          
+            FaultState fs = result.get();
+            if (fs != null) {
+              toSend.add(fs);
+            }                      
           } catch (ExecutionException e) {
             LOGGER.error("Backup fault state computation threw an exception - unable to include in backup.", e);
           }
