@@ -88,10 +88,10 @@ public class LaserAlarmPublisherImplTest {
 		mockControl.verify();
 		
 		//check last published value is newly set correctly
-		assertTrue(alarmInCache.getPreviousPublishedState() != null);
-		assertEquals(alarmInCache.getPreviousPublishedState().getInfo(), CacheObjectCreation.createTestAlarm2().getInfo());
-		assertEquals(alarmInCache.getPreviousPublishedState().getState(), CacheObjectCreation.createTestAlarm2().getState());
-		assertTrue(alarmInCache.getPreviousPublishedState().getPublicationTime().after(CacheObjectCreation.createTestAlarm2().getPublicationTime()));
+		assertTrue(alarmInCache.getLastPublication() != null);
+		assertEquals(alarmInCache.getLastPublication().getInfo(), CacheObjectCreation.createTestAlarm2().getInfo());
+		assertEquals(alarmInCache.getLastPublication().getState(), CacheObjectCreation.createTestAlarm2().getState());
+		assertNotNull(alarmInCache.getLastPublication().getPublicationTime());
 	}
 	
 	
@@ -123,10 +123,10 @@ public class LaserAlarmPublisherImplTest {
     mockControl.verify();
     
     //check last published value is newly set correctly
-    assertTrue(alarmInCache.getPreviousPublishedState() != null);
-    assertEquals(alarmInCache.getPreviousPublishedState().getInfo(), CacheObjectCreation.createTestAlarm1().getInfo());
-    assertEquals(alarmInCache.getPreviousPublishedState().getState(), CacheObjectCreation.createTestAlarm1().getState());
-    assertTrue(alarmInCache.getPreviousPublishedState().getPublicationTime().after(CacheObjectCreation.createTestAlarm1().getPublicationTime()));
+    assertTrue(alarmInCache.getLastPublication() != null);
+    assertEquals(alarmInCache.getLastPublication().getInfo(), CacheObjectCreation.createTestAlarm1().getInfo());
+    assertEquals(alarmInCache.getLastPublication().getState(), CacheObjectCreation.createTestAlarm1().getState());
+    assertNotNull(alarmInCache.getLastPublication().getPublicationTime());    
 	}
 	
 	
