@@ -27,6 +27,9 @@
 	</dependencies>
 
 	<developers />
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-jviews-viewer-deploy/modules/tim2</developerConnection>
+	</scm>
 	<build>
 
 		<plugins>
