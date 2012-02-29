@@ -30,6 +30,7 @@
 				<property name="c2mon.home" value="$INSTALL_DIR" />
 				<property name="laser.hosts" value="laser-test" />
 				<property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
+                                <property name="oracle.net.tns_admin" value="/etc" />
 				<preExec>
 					<![CDATA[
 		
