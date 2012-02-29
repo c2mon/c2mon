@@ -113,8 +113,13 @@ if (param('configurl')) {
 
 print "	</resources>
 	<resources os=\"Windows\" > 
-		<property name=\"tim.log.file\" value=\"c:\\temp\\dmn2-viewer.log\"/>
+		<property name=\"tim.log.file\" value=\"c:\\temp\\tim2-viewer.log\"/>
+        <property name=\"oracle.net.tns_admin\" value=\"G:\\Applications\\Oracle\ADMIN\"/>
 	</resources> 
+    <resources os=\"Linux\" >
+        <property name=\"tim.log.file\" value=\"/tmp/tim2-viewer.log\"/>
+        <property name=\"oracle.net.tns_admin\" value=\"/etc\"/>
+    </resources>
 	<application-desc main-class=\"ch.cern.tim.client.jviews.Main\">
 	</application-desc>
 </jnlp>" , "\n";
