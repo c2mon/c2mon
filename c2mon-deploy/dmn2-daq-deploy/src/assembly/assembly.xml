@@ -30,7 +30,7 @@
 				<include>tmp/</include>
 			</includes>
 			<fileMode>0755</fileMode>
-		</fileSet>	
+		</fileSet>
 	</fileSets>
 
 	<files>
@@ -58,7 +58,7 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-		
+
 		<!--  copy sthe starting script -->
 		<file>
 			<source>bin/daqprocess2.sh</source>
@@ -102,15 +102,23 @@
 			<fileMode>0444</fileMode>
 		</file>
 
+		<!--  copy the version file -->
+		<file>
+			<source>${project.build.outputDirectory}/version.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
 		<!--  log4j configuration -->
-<!--	log4j is now deployed by deployment tool-->
-<!--		<file>-->
-<!--			<source>conf/log4j.xml</source>-->
-<!--			<outputDirectory>conf/</outputDirectory>-->
-<!--			<destName>log4j.xml</destName>-->
-<!--			<lineEnding>unix</lineEnding>-->
-<!--			<fileMode>0444</fileMode>-->
-<!--		</file>-->
+		<!--	log4j is now deployed by deployment tool-->
+		<!--		<file>-->
+		<!--			<source>conf/log4j.xml</source>-->
+		<!--			<outputDirectory>conf/</outputDirectory>-->
+		<!--			<destName>log4j.xml</destName>-->
+		<!--			<lineEnding>unix</lineEnding>-->
+		<!--			<fileMode>0444</fileMode>-->
+		<!--		</file>-->
 
 	</files>
 
