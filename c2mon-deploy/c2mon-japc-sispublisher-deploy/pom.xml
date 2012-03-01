@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-client</groupId>
 		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.4</version>
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
@@ -33,6 +33,9 @@
 		<module>modules/tim2</module>
 	</modules>
 
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-japc-sispublisher-deploy</developerConnection>
+	</scm>
 	<build />
 
 
