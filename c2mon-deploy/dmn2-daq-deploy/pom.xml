@@ -51,12 +51,45 @@
 		</dependency>
 		<dependency>
 			<groupId>cern.dmn2.dmn2-daq</groupId>
-			<artifactId>dmn2-daq-cmwadmin</artifactId>			
+			<artifactId>dmn2-daq-cmwadmin</artifactId>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.outputDirectory}
+							</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>version.txt</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>${basedir}</directory>
+									<filtering>false</filtering>
+									<excludes>
+										<exclude>version.txt</exclude>
+									</excludes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
