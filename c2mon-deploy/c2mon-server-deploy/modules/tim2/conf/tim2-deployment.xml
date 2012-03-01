@@ -51,14 +51,14 @@
 			</deployment>
 		</application>
 
-		<application name="c2mon-tim2-prod" extends="default">
+		<application name="c2mon-tim2-prod-1" extends="default">
 			<deployment installLocation="/opt/c2mon">
 				<directory name="conf">
 					<file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
 						mask="400" />
 					<file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
 						mask="400" />
-					<file name="c2mon.properties" sourceDir="/user/timoper/rep/c2mon/server"
+					<file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro1"
 						mask="400" />
 				</directory>
 				<directory name="bin">
@@ -68,6 +68,23 @@
 			</deployment>
 		</application>
 
+    <application name="c2mon-tim2-prod-2" extends="default">
+      <deployment installLocation="/opt/c2mon">
+        <directory name="conf">
+          <file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
+            mask="400" />
+          <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
+            mask="400" />
+          <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro2"
+            mask="400" />
+        </directory>
+        <directory name="bin">
+          <file name="setenv.sh" sourceDir="/user/timoper/rep/c2mon/server"
+            mask="700" />
+        </directory>
+      </deployment>
+    </application>
+    
 		<application name="c2mon-tim2-test-first" extends="default">
 			<deployment installLocation="/opt/c2mon-test">
 				<directory name="conf">
