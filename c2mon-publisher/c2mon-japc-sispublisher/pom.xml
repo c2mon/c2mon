@@ -8,7 +8,7 @@
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-japc-sispublisher</artifactId>
   <name>C2MON client JAPC Pulisher for Saftey Interlock System (SIS)</name>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <description>This project is used to publish on a regular basis (every 30 sec) boolean data from C2MON via JAPC to the Safety Interlock System (SIS).</description>
   <scm>
   	<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-japc-sispublisher</developerConnection>
