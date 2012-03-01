@@ -17,7 +17,8 @@
 	<packaging>pom</packaging>
 
 	<description>
-		TIM2 DAQ assembling all required modules and configuration files for TIM2
+		TIM2 DAQ assembling all required modules and configuration
+		files for TIM2
         </description>
 	<url></url>
 
@@ -75,6 +76,39 @@
 	</scm>
 	<build>
 		<plugins>
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.outputDirectory}
+							</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>version.txt</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>${basedir}</directory>
+									<filtering>false</filtering>
+									<excludes>
+										<exclude>version.txt</exclude>
+									</excludes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 			<!-- Unpack native libraries -->
 			<plugin>
