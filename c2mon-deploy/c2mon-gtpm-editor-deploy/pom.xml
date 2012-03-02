@@ -28,8 +28,6 @@
   </dependencies>
 
   <properties>
-    <c2mon.jarsigner.key>/user/pcrops/production/cmmnbuild/cmmnbuild/build/dist/cmmnbuild/includes/slcerts
-		</c2mon.jarsigner.key>
   </properties>
 
   <developers />

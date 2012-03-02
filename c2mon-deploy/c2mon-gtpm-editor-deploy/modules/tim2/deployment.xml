@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="tim2-gtpm-editor">
+
+		<application name="default">
+			<deployment>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="tim-admin@cern.ch" />
+				</notification>
+			</deployment>
+		</application>
+
+		<application name="tim2-gtpmeditor-pro" extends="default">
+			<deployment installLocation="~timoper/dist/public/html/javaws/tim2-gtpm-editor">
+				<signJars keyStore="~timoper/rep/c2mon/client/jarsign.properties" />
+			</deployment>
+		</application>
+
+		<application name="tim2-gtpmeditor-test" extends="default">
+			<deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-gtpm-editor-stable">
+				<signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
+			</deployment>
+		</application>
+    
+    <application name="tim2-gtpmeditor-dev" extends="default">
+      <deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-gtpm-editor">
+        <signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
+      </deployment>
+    </application>
+
+	</product>
+</products>
