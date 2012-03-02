@@ -7,8 +7,10 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
+import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.ControlTagCache;
 import cern.tim.server.cache.DataTagCache;
+import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.config.ServerConstants;
 import cern.tim.server.common.control.ControlTag;
 import cern.tim.server.common.datatag.DataTag;
@@ -64,6 +66,8 @@ public class RecoveryManager implements SmartLifecycle {
    */
   private DataTagCache dataTagCache;  
   private ControlTagCache controlTagCache;
+  
+  private AlarmCache alarmCache;
    
   
   /**
@@ -77,12 +81,14 @@ public class RecoveryManager implements SmartLifecycle {
   public RecoveryManager(final SupervisionFacade supervisionFacade, 
                           final DataRefreshManager dataRefreshManager, 
                           final DataTagCache dataTagCache, 
-                          final ControlTagCache controlTagCache) {
+                          final ControlTagCache controlTagCache,
+                          final AlarmCache alarmCache) {
     super();
     this.supervisionFacade = supervisionFacade;
     this.dataRefreshManager = dataRefreshManager;
     this.dataTagCache = dataTagCache;
     this.controlTagCache = controlTagCache;
+    this.alarmCache = alarmCache;
   }
 
   @Override
@@ -120,6 +126,9 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description = "Runs all refresh actions.")
   public void refresh() {
+    if (!stopRequested) {      
+      publishUnpublishedAlarms(); //unpublished alarms are sent to LASER
+    }
     if (!stopRequested) {
       refreshSupervisionStatus(); //generates new events with the current status; includes alarm callbacks!
     }
@@ -198,6 +207,32 @@ public class RecoveryManager implements SmartLifecycle {
       }      
     }
     LOGGER.info("Recovery task: finished notifying all tag listeners.");
+  }
+  
+  /**
+   * If the alarm publication thread does not manage to publish all alarms in the queue before
+   * shutdown, the server must check all non-published alarms are published on start-up.
+   * 
+   * <p>If published alarms were not persisted before a crash and then the restart involves a
+   * cache clean (or in single server mode), then these alarms will be re-published to LASER with
+   * a new timestamp.
+   * 
+   * <p>Alarm cache persistence is also notified for these alarms, although this will only result
+   * in saving the current state twice.
+   */
+  @ManagedOperation(description="Republish all non-published alarms (use if alarm publication thread did not shutdown correctly)")
+  public void publishUnpublishedAlarms() {
+    for (Long key : alarmCache.getKeys()) {
+      Alarm alarm = alarmCache.get(key);
+      alarm.getReadLock().lock();
+      try {        
+        alarmCache.notifyListenersOfUpdate(alarm);      
+      } catch (Exception e) {
+        LOGGER.error("Exception caught while checking for unpublished alarms", e);
+      } finally {
+        alarm.getReadLock().unlock();      
+      }
+    }
   }
 
   @Override
