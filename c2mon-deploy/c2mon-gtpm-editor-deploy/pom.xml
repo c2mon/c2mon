@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.tim.tim-client</groupId>
     <artifactId>tim-client-pom</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
@@ -38,6 +38,9 @@
     <module>modules/tim2</module>
   </modules>
 
+  <scm>
+  	<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-gtpm-editor-deploy</developerConnection>
+  </scm>
   <build />
 
 </project>
