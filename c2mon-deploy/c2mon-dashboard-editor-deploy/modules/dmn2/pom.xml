@@ -23,6 +23,9 @@
 	</dependencies>
 
 	<developers />
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-dashboard-editor-deploy/modules/dmn2</developerConnection>
+	</scm>
 	<build>
 
 		<plugins>
@@ -75,30 +78,6 @@
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
 							<stripVersion>true</stripVersion>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>sign-jars</id>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<echo message="Signing libs. in folder: ${project.build.directory}/lib" />
-								<echo message="Using key: ${c2mon.jarsigner.key}" />
-								<signjar alias="cernslcert" keystore="${c2mon.jarsigner.key}"
-									storepass="itutez" keypass="tuwasmamha" lazy="true">
-
-									<fileset dir="${project.build.directory}/lib" includes="**/*.jar" />
-								</signjar>
-							</target>
 						</configuration>
 					</execution>
 				</executions>

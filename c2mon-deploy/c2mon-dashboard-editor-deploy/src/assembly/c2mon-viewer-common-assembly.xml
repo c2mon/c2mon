@@ -1,41 +1,44 @@
-<component
-	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2 http://maven.apache.org/xsd/component-1.1.2.xsd">
+<component xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/component/1.1.2 http://maven.apache.org/xsd/component-1.1.2.xsd">
 
-	<fileSets>
+  <fileSets>
 
-		<fileSet>
-			<outputDirectory>/cgi-bin</outputDirectory>
-			<includes>
-				<include>*.cgi</include>
-			</includes>
-			<fileMode>0755</fileMode>
-			<directoryMode>0755</directoryMode>
-			<directory>${project.basedir}/cgi-bin/</directory>
-		</fileSet>
+    <fileSet>
+      <outputDirectory>/cgi-bin</outputDirectory>
+      <includes>
+        <include>*.cgi</include>
+      </includes>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+      <directory>${project.basedir}/cgi-bin/</directory>
+    </fileSet>
 
-		<fileSet>
-			<outputDirectory>/lib</outputDirectory>
-			<includes>
-				<include>*.jar</include>
-			</includes>
-			<fileMode>0444</fileMode>
-			<directoryMode>0755</directoryMode>
-			<directory>${project.build.directory}/lib/</directory>
-		</fileSet>
+    <fileSet>
+      <outputDirectory>/lib</outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+      <fileMode>0444</fileMode>
+      <directoryMode>0755</directoryMode>
+      <directory>${project.build.directory}/lib/</directory>
+    </fileSet>
 
-	</fileSets>
+  </fileSets>
 
-	<files>
-		<!--  copy the version file -->
-		<file>
-			<source>${project.build.outputDirectory}/version.txt</source>
-			<outputDirectory>/</outputDirectory>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-
-	</files>
+  <files>
+    <!--  copy the version file -->
+    <file>
+      <source>${project.build.outputDirectory}/version.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+    <file>
+      <source>deployment.xml</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+  </files>
 
 </component>

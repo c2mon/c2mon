@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="dmn2-dashboard-editor">
+
+		<application name="default">
+			<deployment>
+			</deployment>
+		</application>
+
+		<application name="dmn2-dashboardeditor-pro" extends="default">
+			<deployment installLocation="~diamonop/public_html/dmn2-dashboard-editor-pro">
+				<signJars keyStore="~diamonop/c2mon/client/jarsign.properties" />
+				<directory name="conf">
+					<file name="client.properties" sourceDir="~diamonop/c2mon/client"
+						mask="444" />
+				</directory>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="project-diamon-core@cern.ch" />
+				</notification>
+			</deployment>
+		</application>
+
+		<application name="dmn2-dashboardeditor-dev" extends="default">
+			<deployment installLocation="~dmndev/public_html/dmn2-dashboard-editor-dev">
+				<signJars keyStore="~dmndev/c2mon/client/jarsign.properties" />
+				<directory name="conf">
+					<file name="client.properties" sourceDir="~dmndev/c2mon/client"
+						mask="444" />
+				</directory>
+			</deployment>
+		</application>
+
+	</product>
+</products>
