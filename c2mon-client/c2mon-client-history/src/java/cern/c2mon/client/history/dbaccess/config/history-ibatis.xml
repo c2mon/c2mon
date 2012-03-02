@@ -31,7 +31,8 @@
   <environments default="development">
     <environment id="development">
       <transactionManager type="JDBC" />
-      <dataSource type="POOLED">
+      <!-- <dataSource type="POOLED"> -->
+      <dataSource type="UNPOOLED">      
         <property name="driver" value="${c2mon.jdbc.driver}" />
         <property name="url" value="${c2mon.jdbc.ro.url}" />
         <property name="username" value="${c2mon.jdbc.ro.user}" />
@@ -39,9 +40,11 @@
         <property name="poolPingEnabled" value="true"/>
         <property name="poolPingQuery" value="SELECT 1 FROM DUAL"/>
         <!-- <property name="poolPingConnectionsNotUsedFor" value=""/>  -->
+                
+        <property name="poolMaximumIdleConnections" value="3"/>        
+        <property name="poolTimeToWait" value="10000"/>
         
-        <property name="poolMaximumIdleConnections" value="3"/>
-        <property name="poolMaximumCheckoutTime" value="60000"/>
+        <property name="poolMaximumCheckoutTime" value="30000"/>
       </dataSource>
     </environment>
   </environments>
