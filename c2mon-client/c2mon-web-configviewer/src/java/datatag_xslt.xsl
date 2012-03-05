@@ -27,6 +27,8 @@
 	<xsl:variable name="tag_config_xml_url">
 		tagconfig/xml/
 	</xsl:variable>		
+	
+	<xsl:variable name="help_alarm_url">http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=</xsl:variable>
 
 
 	<!--  leave the paragraphs untouched -->
@@ -42,7 +44,7 @@
 			)
 			
 			<A href="{$base_url}{$tag_value_xml_url}{@id}/" 
-				class="large blue awesome xml_button" target="_blank">View ClientDataTag XML »
+				class="large blue awesome xml_button" target="_blank">View ClientDataTag XML >>
 			</A>
 		</p>
 		<table class="inline">
@@ -89,7 +91,7 @@
 		
 		<p>
 			<A href="{$base_url}{$tag_config_xml_url}{@id}/" 
-				class="large blue awesome xml_button" target="_blank">View TagConfig XML »
+				class="large blue awesome xml_button" target="_blank">View TagConfig XML >>
 			</A>	
 		</p>	
 		<table class="inline">
@@ -168,8 +170,12 @@
 					:<xsl:value-of select="faultCode"/>
 					
 			<A href="{$base_url}{$alarm_xml_url}{@id}/" 
-				class="large blue awesome xml_button" target="_blank">View Alarm XML »
+				class="large blue awesome xml_button" target="_blank">View Alarm XML >>
 			</A>
+			
+			<A href="{$help_alarm_url}{@id}" 
+				class="large red awesome xml_button" target="_blank">View Help Alarm >>
+			</A>	
 		</p>
 		<table class="inline">
 			<th colspan="4">Alarm Value</th>
@@ -407,7 +413,7 @@
 					<br></br><br></br>
 					<p>Process: <xsl:value-of select="jms-user"/>
 					<A href="{$base_url}{$process_xml_url}{jms-user}/" 
-						class="large blue awesome xml_button" target="_blank">View as XML »
+						class="large blue awesome xml_button" target="_blank">View as XML >>
 						</A>
 					</p>
 		</p>

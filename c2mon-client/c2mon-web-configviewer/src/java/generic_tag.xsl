@@ -170,7 +170,7 @@
 					:<xsl:value-of select="faultCode"/>
 					
 			<A href="{$base_url}{$alarm_xml_url}{@id}/" 
-				class="large blue awesome xml_button" target="_blank">View Alarm XML »
+				class="large blue awesome xml_button" target="_blank">View Alarm XML >>
 			</A>		
 		</p>
 		<table class="inline">
@@ -244,7 +244,7 @@
 					(<xsl:value-of select="@id"/>)
 					
 			<A href="{$base_url}{$command_xml_url}{@id}/" 
-				class="large blue awesome xml_button" target="_blank">View Command XML »
+				class="large blue awesome xml_button" target="_blank">View Command XML >>
 			</A>		
 		</p>
 	<div class="column">
@@ -287,7 +287,7 @@
 	
 		<p class="tagName"> 
 			<A href="{$base_url}{$report_xml_url}{id}/" 
-				class="large blue awesome xml_button" target="_blank">View Configuration Report XML »
+				class="large blue awesome xml_button" target="_blank">View Configuration Report XML >>
 			</A>		
 		</p>
      <p>
@@ -422,7 +422,7 @@
 					<br></br><br></br>
 					<p>Process: <xsl:value-of select="jms-user"/>
 					<A href="{$base_url}{$process_xml_url}{jms-user}/" 
-						class="large blue awesome xml_button" target="_blank">View as XML »
+						class="large blue awesome xml_button" target="_blank">View as XML >>
 						</A>
 					</p>
 		</p>
