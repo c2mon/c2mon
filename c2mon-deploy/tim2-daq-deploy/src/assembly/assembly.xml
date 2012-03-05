@@ -33,6 +33,14 @@
 			<fileMode>0755</fileMode>
 		</fileSet>
 
+		<fileSet>
+			<includes>
+				<include>log/</include>
+			</includes>
+			<fileMode>0755</fileMode>
+			<directoryMode>0755</directoryMode>
+		</fileSet>
+
 		<!--  take the native libraries and copy them to /lib_so -->
 		<fileSet>
 			<outputDirectory>/lib_so</outputDirectory>
