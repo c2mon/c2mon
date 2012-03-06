@@ -66,7 +66,7 @@ public class AbstractQueuedWrapperTest {
 
     @Override
     protected String getDescription(Object event) {
-      return null;
+      return "test description";
     }
     
   }
@@ -89,7 +89,7 @@ public class AbstractQueuedWrapperTest {
   public void testHealthNotification() {
     mocksControl.reset();
     //will get several calls: important is that once is made
-    mockSlowConsumerListener.onSlowConsumer("Slow consumer warning: " + QueuedWrapper.class.getSimpleName() + " unable to keep up with incoming data");    
+    mockSlowConsumerListener.onSlowConsumer("Slow consumer warning: " + QueuedWrapper.class.getSimpleName() + " unable to keep up with incoming data. " + " Info: test description");    
     mocksControl.replay();
     int i = 0;
     while (i < 13) {
