@@ -27,6 +27,9 @@
 		<xsl:variable name="report_xml_url">
 		configloader/xml/
 	</xsl:variable>
+	
+	<xsl:variable name="help_alarm_url">http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=</xsl:variable>
+	
 
 	<!--  leave the paragraphs untouched -->
 	<xsl:template match="p">
@@ -171,6 +174,10 @@
 					
 			<A href="{$base_url}{$alarm_xml_url}{@id}/" 
 				class="large blue awesome xml_button" target="_blank">View Alarm XML >>
+			</A>	
+			
+			<A href="{$help_alarm_url}{@id}" 
+				class="large red awesome xml_button" target="_blank">View Help Alarm >>
 			</A>		
 		</p>
 		<table class="inline">

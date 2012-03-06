@@ -5,6 +5,7 @@ DIV.wrapper {
 .xml_button {
 
 	float:right;	
+	margin:2px;
 }
 
 xml_button a { color: white; text-decoration:none }

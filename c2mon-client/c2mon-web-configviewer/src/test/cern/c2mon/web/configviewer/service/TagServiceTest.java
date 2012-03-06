@@ -38,8 +38,9 @@ public class TagServiceTest {
   @Autowired
   HistoryService serviceH;
 
+  final String complexTag = "90887"; /* only in production */
   final String dataTagWithUnits = "44906";
-  final String dataTagWithAlarms = "142097";
+  final String dataTagWithAlarms = "146047";
   final String dataTag = "145800";
   final String historyTag = "107202";
   final String tagConfig = "100023";
@@ -55,6 +56,7 @@ public class TagServiceTest {
   public void test() {
   }
   
+  /*
   @Test
   public void testHistory() throws Exception {
 
@@ -62,22 +64,42 @@ public class TagServiceTest {
     Assert.assertTrue(xml.contains("HistoryTag"));
     String html = serviceH.generateHtmlResponse(dataTagWithAlarms, 10);
   }  
+  */
   
+  
+  /*
+   * This tests runs only against the production server.
+   * 
   @Test
   public void testDataTagHtml() throws Exception {
 
-    String xmlConfig = service.getDataTagConfigXml(tagConfig);
+    String xmlConfig = service.getDataTagConfigXml(complexTag);
     System.out.println(xmlConfig);
     Assert.assertTrue(xmlConfig.contains("TagConfig"));
-    String htmlConfig = service.generateDataTagConfigHtmlResponse(tagConfig);
+    String htmlConfig = service.generateDataTagConfigHtmlResponse(complexTag);
     System.out.println(htmlConfig);
     
-    String xmlValue = service.getDataTagValueXml(tagConfig);
+    String xmlValue = service.getDataTagValueXml(complexTag);
     System.out.println(xmlValue);
     Assert.assertTrue(xmlValue.contains("ClientDataTag"));
-    String htmlValue = service.generateDataTagValueHtmlResponse(tagConfig);
+    String htmlValue = service.generateDataTagValueHtmlResponse(complexTag);
     System.out.println(htmlValue);
   }  
+  */
+  
+  
+  @Test
+  public void AlarmTagNotEmpty() {
+      String tagXml;
+      try {
+          tagXml = serviceA.getAlarmTagXml(dataTagWithAlarms);
+          System.out.println(tagXml);
+          Assert.assertNotNull(tagXml);
+          Assert.assertTrue(tagXml.contains("<faultCode"));
+      } catch (Exception e) {
+          Assert.assertTrue(false);
+      }
+  }
 
   //  @Test
   //  public void testProcessHtml() {
@@ -214,19 +236,6 @@ public class TagServiceTest {
             System.out.println(tagXml);
             Assert.assertNotNull(tagXml);
             Assert.assertTrue(tagXml.contains("<hardwareAddress"));
-        } catch (Exception e) {
-            Assert.assertTrue(false);
-        }
-    }
-
-    @Test
-    public void AlarmTagNotEmpty() {
-        String tagXml;
-        try {
-            tagXml = serviceA.getAlarmTagXml("137073");
-            System.out.println(tagXml);
-            Assert.assertNotNull(tagXml);
-            Assert.assertTrue(tagXml.contains("<faultCode"));
         } catch (Exception e) {
             Assert.assertTrue(false);
         }
