@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
@@ -41,6 +43,7 @@ import javax.jms.TemporaryQueue;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
 
+import org.apache.activemq.ActiveMQMessageConsumer;
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
@@ -105,6 +108,18 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private static final int JMS_MESSAGE_TIMEOUT = 600000;
   
   /**
+   * Buffer before warnings for slow consumers are sent. Value for
+   * topics with few updates (heartbeat, admin message)
+   */
+  private static final int DEFAULT_LISTENER_QUEUE_SIZE = 100;
+  
+  /**
+   * Buffer before warnings for slow consumers are sent, for
+   * tags, alarms (where larger buffer is desirable).
+   */
+  private static final int HIGH_LISTENER_QUEUE_SIZE = 200000;
+  
+  /**
    * The JMS connection factory.
    */
   private ConnectionFactory jmsConnectionFactory;
@@ -117,6 +132,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   /**
    * Indicates which {@link MessageListenerWrapper} is listening to a given topic
    * (each wrapper listens to a single topic). 
+   * 
+   * <p>Each wrapper has its own internal thread that needs stop/starting when the
+   * wrapper is removed or created.
    */
   private Map<String, MessageListenerWrapper> topicToWrapper;
   
@@ -146,24 +164,33 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private ReentrantReadWriteLock connectionListenersLock;
   
   /**
-   * Subscribes to the Supervision topic and notifies any registered listeners. 
+   * Subscribes to the Supervision topic and notifies any registered listeners.
+   * Thread start once and lives until final stop. 
    */
   private SupervisionListenerWrapper supervisionListenerWrapper;
   
   /**
    * Subscribes to the admin messages topic and notifies any registered listeners. 
+   * Thread start once and lives until final stop. 
    */
   private AdminMessageListenerWrapper adminMessageListenerWrapper;
   
   /**
    *  Subscribes to the Supervision topic and notifies any registered listeners.
+   *  Thread start once and lives until final stop. 
    */
   private HeartbeatListenerWrapper heartbeatListenerWrapper;
   
   /**
    *  Subscribes to the alarm topic and notifies any registered listeners.
+   *  Thread start once and lives until final stop. 
    */
   private AlarmListenerWrapper alarmListenerWrapper;
+  
+  /**
+   * Notified on slow consumer detection.
+   */
+  private SlowConsumerListener slowConsumerListener;
   
   /**
    *  Alarm Session.
@@ -226,6 +253,11 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private Destination alarmTopic;
   
   /**
+   * Threads used for polling topic queues. 
+   */
+  private ExecutorService topicPollingExecutor;
+  
+  /**
    * Constructor.
    * @param connectionFactory the JMS connection factory
    * @param supervisionTopic topic on which supervision events arrive from server
@@ -236,29 +268,36 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   public JmsProxyImpl(final ConnectionFactory connectionFactory, 
       @Qualifier("supervisionTopic") final Destination supervisionTopic,
       @Qualifier("alarmTopic") final Destination alarmTopic,
-      @Qualifier("heartbeatTopic") final Destination heartbeatTopic) {
+      @Qualifier("heartbeatTopic") final Destination heartbeatTopic,
+      final SlowConsumerListener slowConsumerListener) {
     this.jmsConnectionFactory = connectionFactory;
     this.supervisionTopic = supervisionTopic;
     this.heartbeatTopic = heartbeatTopic;
     this.alarmTopic = alarmTopic;
-    this.adminMessageTopic = null;
-    
+    this.adminMessageTopic = null; 
+    this.slowConsumerListener = slowConsumerListener;
     
     connected = false;
     running = false;
     shutdownRequested = false;    
     connectingWriteLock = new ReentrantReadWriteLock().writeLock();
     refreshLock = new ReentrantReadWriteLock();
+    
+    topicPollingExecutor = Executors.newCachedThreadPool();
     sessions = new ConcurrentHashMap<MessageListenerWrapper, Session>();    
     topicToWrapper = new ConcurrentHashMap<String, MessageListenerWrapper>();
     registeredListeners = new ConcurrentHashMap<TagUpdateListener, TopicRegistrationDetails>();
     listenerLocks = new ConcurrentHashMap<TagUpdateListener, ReentrantReadWriteLock.WriteLock>();
     connectionListeners = new ArrayList<ConnectionListener>(); 
     connectionListenersLock = new ReentrantReadWriteLock();
-    supervisionListenerWrapper = new SupervisionListenerWrapper();
-    adminMessageListenerWrapper = new AdminMessageListenerWrapper();
-    heartbeatListenerWrapper = new HeartbeatListenerWrapper();
-    alarmListenerWrapper = new AlarmListenerWrapper();
+    supervisionListenerWrapper = new SupervisionListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
+    supervisionListenerWrapper.start();
+    adminMessageListenerWrapper = new AdminMessageListenerWrapper(DEFAULT_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
+    adminMessageListenerWrapper.start();
+    heartbeatListenerWrapper = new HeartbeatListenerWrapper(DEFAULT_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
+    heartbeatListenerWrapper.start();
+    alarmListenerWrapper = new AlarmListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
+    alarmListenerWrapper.start();
   }
   
   /**
@@ -335,6 +374,10 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    */
   private synchronized void disconnect() {
     connected = false;
+    //these listeners are re-created
+    for (Map.Entry<String, MessageListenerWrapper> entry : topicToWrapper.entrySet()) {
+      entry.getValue().stop();
+    }    
     notifyConnectionListenerOnDisconnection();
     try {
       connection.close(); //closes all consumers and sessions also
@@ -420,7 +463,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    */
   private void subscribeToHeartbeatTopic() throws JMSException {
     Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);                           
-    MessageConsumer consumer = session.createConsumer(heartbeatTopic);                 
+    MessageConsumer consumer = session.createConsumer(heartbeatTopic);
     consumer.setMessageListener(heartbeatListenerWrapper);
   }
 
@@ -481,7 +524,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);              
                 Topic topic = session.createTopic(topicRegistrationDetails.getTopicName());
                 MessageConsumer consumer = session.createConsumer(topic);         
-                MessageListenerWrapper wrapper = new MessageListenerWrapper(topicRegistrationDetails.getId(), serverUpdateListener);
+                MessageListenerWrapper wrapper = new MessageListenerWrapper(topicRegistrationDetails.getId(), serverUpdateListener,
+                                                                  HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
+                wrapper.start();
                 consumer.setMessageListener(wrapper);
                 topicToWrapper.put(topicName, wrapper);
                 sessions.put(wrapper, session);
@@ -640,8 +685,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       try {
         if (isRegisteredListener(serverUpdateListener)) {
           TopicRegistrationDetails subsribedToTag = registeredListeners.get(serverUpdateListener);
-          MessageListenerWrapper wrapper = topicToWrapper.get(subsribedToTag.getTopicName());
+          MessageListenerWrapper wrapper = topicToWrapper.get(subsribedToTag.getTopicName());          
           wrapper.removeListener(subsribedToTag.getId());
+          wrapper.stop();
           if (wrapper.isEmpty()) { //no subscribed listeners, so close session
             try {            
               Session session = sessions.get(wrapper);
@@ -807,13 +853,18 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   @PreDestroy
   public void stop() {
     shutdownRequested = true;
+    disconnect();
+    supervisionListenerWrapper.stop();
+    alarmListenerWrapper.stop();
+    adminMessageListenerWrapper.stop();
+    heartbeatListenerWrapper.stop(); 
+    topicPollingExecutor.shutdown();
     connectionListenersLock.writeLock().lock();
-    try {
+    try {      
       connectionListeners.clear();
     } finally {
       connectionListenersLock.writeLock().unlock();
-    }  
-    disconnect();
+    }      
     running = false;
   }
 

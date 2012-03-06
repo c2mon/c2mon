@@ -2,11 +2,7 @@ package cern.c2mon.client.jms.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.TextMessage;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.log4j.Logger;
 
@@ -19,17 +15,27 @@ import org.apache.log4j.Logger;
  * from message to the event and a listener call method for calling
  * a given listener.
  * 
- * <p>Acces to the hidden collection of listeners is synchronized and
+ * <p>Access to the hidden collection of listeners is synchronized and
  * so all calls to this class are thread safe (implementers should
  * check their implementations of convertMessage and invokeListener
  * are also).
+ * 
+ * <p>Checks for slow consumers and notified the registered SlowConsumerListener
+ * every time this is detected (may get many callbacks). If the client recovers,
+ * messages will not be lost here (but may be discarded on the broker).
+ * 
+ * <p>Details of the queuing functionality are implemented in the parent 
+ * {@link AbstractQueuedWrapper}.
+ * 
+ * <p>The start and stop methods should be called to stop and start the queuing
+ * thread.
  * 
  * @author Mark Brightwell
  *
  * @param <T> the listener interface that needs calling
  * @param <U> the type of event encoded in the message
  */
-public abstract class AbstractListenerWrapper<T, U> implements MessageListener {
+public abstract class AbstractListenerWrapper<T, U> extends AbstractQueuedWrapper<U> {
 
   /**
    * Class logger.
@@ -40,8 +46,24 @@ public abstract class AbstractListenerWrapper<T, U> implements MessageListener {
    * Listeners registered for receiving events.  
    */
   private Collection<T> listeners = new ArrayList<T>();
-    
   
+
+  /**
+   * Calls the listener for the provided event.
+   * @param listener the listener to call
+   * @param event the event that needs notifying
+   */
+  protected abstract void invokeListener(T listener, U event);
+  
+  /**
+   * Constructor.
+   * @param queueCapacity size of queue of events waiting to be processed (exceptions thrown if full)
+   * @param slowConsumerListener listener that will be called when a slow consumer is detected (queue is full)
+   */
+  public AbstractListenerWrapper(final int queueCapacity, final SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
+    super(queueCapacity, slowConsumerListener, executorService);
+  }
+
   /**
    * Registers the listener for event notifications.
    * 
@@ -68,45 +90,15 @@ public abstract class AbstractListenerWrapper<T, U> implements MessageListener {
   public synchronized void removeListener(final T listener) {
     listeners.remove(listener);
   }
-  
+
   /**
-   * Converts the JMS message into an event of the required type. 
-   * @param message the JMS message
-   * @return the event
-   * @throws JMSException if error in using the message
+   * Notifies listeners
+   * @param event event to notify
    */
-  protected abstract U convertMessage(Message message) throws JMSException;
-  
-  /**
-   * Calls the listener for the provided event.
-   * @param listener the listener to call
-   * @param event the event that needs notifying
-   */
-  protected abstract void invokeListener(T listener, U event);
-  
-  /**
-   * Converts message into SupervisionEvent and notifies registered listeners.
-   * 
-   * <p>All exceptions are caught and logged (both exceptions in message conversion
-   * and thrown by the listeners).
-   */
-  @Override
-  public synchronized void onMessage(final Message message) {
-    try {
-      if (message instanceof TextMessage) {
-        
-        LOGGER.debug("AbstractListenerWrapper received message for " + this.getClass().getSimpleName());
-        U event = convertMessage(message);     
-        LOGGER.debug("AbstractListenerWrapper: there is " + listeners.size() + " listeners waiting to be notified!");
-        for (T listener : listeners) {
-          invokeListener(listener, event);
-        }
-      } else {
-        LOGGER.warn("Non-text message received for " + this.getClass().getSimpleName() + " - ignoring event");
-      }
-    } catch (Exception e) {
-      LOGGER.error("Exception caught while processing incoming server event with " + this.getClass().getSimpleName(), e);
+  protected synchronized void notifyListeners(U event) {
+    for (T listener : listeners) {
+      invokeListener(listener, event);
     }
   }
-
+ 
 }

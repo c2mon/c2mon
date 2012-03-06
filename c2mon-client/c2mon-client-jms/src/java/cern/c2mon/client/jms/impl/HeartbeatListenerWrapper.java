@@ -1,5 +1,7 @@
 package cern.c2mon.client.jms.impl;
 
+import java.util.concurrent.ExecutorService;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
@@ -24,6 +26,16 @@ public class HeartbeatListenerWrapper extends AbstractListenerWrapper<HeartbeatL
    */
   private Gson gson = GsonFactory.createGson();
 
+  /**
+   * Constructor.
+   * @param queueCapacity size of event queue
+   * @param slowConsumerListener listener registered for JMS problem callbacks
+   * @param executorService thread pool managing updates
+   */
+  public HeartbeatListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
+    super(queueCapacity, slowConsumerListener, executorService);  
+  }
+  
   @Override
   protected Heartbeat convertMessage(final Message message) throws JMSException {
     return gson.fromJson(((TextMessage) message).getText(), Heartbeat.class);
@@ -34,6 +46,9 @@ public class HeartbeatListenerWrapper extends AbstractListenerWrapper<HeartbeatL
     listener.onHeartbeat(event);
   }
 
-  
- 
+  @Override
+  protected String getDescription(Heartbeat event) {
+    return "Heartbeat message with timestamp " + event.getTimestamp();
+  }
+
 }

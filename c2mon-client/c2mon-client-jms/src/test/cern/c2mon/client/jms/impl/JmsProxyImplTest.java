@@ -66,8 +66,9 @@ public class JmsProxyImplTest {
     Destination supervisionTopic = EasyMock.createNiceMock(Destination.class);
     Destination heartbeatTopic = EasyMock.createNiceMock(Destination.class);
     Destination alarmTopic = EasyMock.createNiceMock(Destination.class);
+    SlowConsumerListener slowConsumerListener = EasyMock.createNiceMock(SlowConsumerListener.class);
     jmsProxy = new JmsProxyImpl(connectionFactory, supervisionTopic,
-        alarmTopic, heartbeatTopic);
+        alarmTopic, heartbeatTopic, slowConsumerListener);
   }
   
   /**

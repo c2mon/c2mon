@@ -17,21 +17,20 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.util.concurrent.ExecutorService;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.apache.log4j.Logger;
 
-import com.google.gson.Gson;
-
-import cern.c2mon.client.common.admin.AdminMessage;
-import cern.c2mon.client.common.admin.AdminMessageImpl;
-import cern.c2mon.client.jms.AdminMessageListener;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.tim.util.json.GsonFactory;
+
+import com.google.gson.Gson;
 
 /**
  * Wrapper JMS listener to register to the alarm messages topic. This
@@ -45,7 +44,17 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, AlarmV
   
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
-
+  
+  /**
+   * Constructor.
+   * @param queueCapacity size of event queue
+   * @param slowConsumerListener listener registered for JMS problem callbacks
+   * @param executorService threads pooling queue
+   */
+  public AlarmListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
+    super(queueCapacity, slowConsumerListener, executorService);     
+  }
+   
   @Override
   protected AlarmValue convertMessage(final Message message) throws JMSException {
     
@@ -58,5 +67,10 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, AlarmV
     LOGGER.debug("AlarmListenerWrapper invokeListener: " + listener.getClass()
         + " for alarm id:" + alarm.getId());
     listener.onAlarmUpdate(alarm);
+  }
+
+  @Override
+  protected String getDescription(AlarmValue event) {
+    return "AlarmValue for alarm " + event.getId();
   }
 }

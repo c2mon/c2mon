@@ -18,6 +18,8 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.util.concurrent.ExecutorService;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
@@ -38,6 +40,16 @@ import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
  */
 class SupervisionListenerWrapper extends AbstractListenerWrapper<SupervisionListener, SupervisionEvent>{
 
+  /**
+   * Constructor.
+   * @param queueCapacity size of event queue
+   * @param slowConsumerListener listener registered for JMS problem callbacks
+   * @param executorService thread pool polling the queue
+   */
+  public SupervisionListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
+    super(queueCapacity, slowConsumerListener, executorService);  
+  }
+
   @Override
   protected SupervisionEvent convertMessage(Message message) throws JMSException {
     return SupervisionEventImpl.fromJson(((TextMessage) message).getText());
@@ -46,6 +58,11 @@ class SupervisionListenerWrapper extends AbstractListenerWrapper<SupervisionList
   @Override
   protected void invokeListener(SupervisionListener listener, SupervisionEvent event) {
     listener.onSupervisionUpdate(event);
+  }
+
+  @Override
+  protected String getDescription(SupervisionEvent event) {
+    return "Supervision message for " + event.getEntity() + " " + event.getEntityId();
   }
 
 }

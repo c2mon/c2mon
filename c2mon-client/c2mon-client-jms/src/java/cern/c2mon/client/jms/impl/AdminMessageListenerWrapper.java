@@ -17,6 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.util.concurrent.ExecutorService;
+
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
@@ -37,6 +39,15 @@ import cern.c2mon.client.jms.AdminMessageListener;
  */
 class AdminMessageListenerWrapper extends AbstractListenerWrapper<AdminMessageListener, AdminMessage> {
 
+  /**
+   * Constructor.
+   * @param queueCapacity size of event queue
+   * @param slowConsumerListener listener registered for JMS problem callbacks
+   */
+  public AdminMessageListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
+    super(queueCapacity, slowConsumerListener, executorService);    
+  }
+
   @Override
   protected AdminMessage convertMessage(Message message) throws JMSException {
     return AdminMessageImpl.fromJson(((TextMessage) message).getText());
@@ -45,6 +56,11 @@ class AdminMessageListenerWrapper extends AbstractListenerWrapper<AdminMessageLi
   @Override
   protected void invokeListener(final AdminMessageListener listener, final AdminMessage event) {
     listener.onAdminMessageUpdate(event);
+  }
+
+  @Override
+  protected String getDescription(AdminMessage event) {
+    return "Admin message: " + event.getMessage();
   }
 
 }

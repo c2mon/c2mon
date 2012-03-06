@@ -20,10 +20,10 @@ package cern.c2mon.client.jms.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
 import org.apache.log4j.Logger;
@@ -48,7 +48,7 @@ import cern.c2mon.shared.client.tag.TransferTagValueImpl;
  * @author Mark Brightwell
  *
  */
-class MessageListenerWrapper implements MessageListener {
+class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
   
   /**
    * Class logger.
@@ -65,8 +65,11 @@ class MessageListenerWrapper implements MessageListener {
    * 
    * @param tagId the ClientDataTag id
    * @param serverUpdateListener the listener that should be registered
+   * @param executorService thread pool polling the queue
    */
-  public MessageListenerWrapper(final Long tagId, final TagUpdateListener serverUpdateListener) { 
+  public MessageListenerWrapper(final Long tagId, final TagUpdateListener serverUpdateListener,
+                                  final int queueCapacity, final SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
+    super(queueCapacity, slowConsumerListener, executorService);
     addListener(serverUpdateListener, tagId);
   }
 
@@ -101,31 +104,21 @@ class MessageListenerWrapper implements MessageListener {
     return listeners.isEmpty();
   }
 
-  /**
-   * Decodes the message into a TransferTagValue. If a listener is registered to
-   * to received updates for this Tag, it will be notified. Otherwise the update
-   * is filtered out.
-   * 
-   * <p>Notice this method is synchronized. This has no performance impact, since
-   * a given message listener is notified on a single thread (since registered on
-   * a given Session).
-   * 
-   * @param message the incoming JMS message
-   */
   @Override
-  public synchronized void onMessage(final Message message) { 
-    try {
-      if (message instanceof TextMessage) {
-        TagValueUpdate tagValueUpdate = TransferTagValueImpl.fromJson(((TextMessage) message).getText());
-        if (listeners.containsKey(tagValueUpdate.getId())) {
-          listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
-        }
-      } else {
-        LOGGER.warn("Non-text message received on ");
-      }
-    } catch (JMSException e) {
-      LOGGER.error("JMSException caught while receiving Tag update message.", e);
-    }    
+  protected TagValueUpdate convertMessage(Message message) throws JMSException {
+    return TransferTagValueImpl.fromJson(((TextMessage) message).getText());
+  }
+
+  @Override
+  protected synchronized void notifyListeners(TagValueUpdate tagValueUpdate) {
+    if (listeners.containsKey(tagValueUpdate.getId())) {
+      listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
+    }
+  }
+
+  @Override
+  protected String getDescription(TagValueUpdate event) {
+    return "Update for tag " + event.getId() + " (value: " + event.getValue() + ")";
   }
   
 }

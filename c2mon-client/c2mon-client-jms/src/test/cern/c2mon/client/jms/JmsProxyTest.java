@@ -36,6 +36,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +107,7 @@ public class JmsProxyTest {
    * @throws InterruptedException 
    */
   @Test(expected = RuntimeException.class)
+  @DirtiesContext
   public void testSendRequestNoReply() throws JMSException {     
     JsonRequest<ClientRequestResult> jsonRequest = EasyMock.createMock(JsonRequest.class);
     EasyMock.expect(jsonRequest.toJson()).andReturn("{}");
@@ -121,7 +123,8 @@ public class JmsProxyTest {
    * @throws JMSException 
    * @throws InterruptedException 
    */
-  @Test
+  @Test  
+  @DirtiesContext
   public void testSendRequest() throws JMSException, InterruptedException {     
     JsonRequest<SupervisionEvent> jsonRequest = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);      
     final String queueName = System.getProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
@@ -157,6 +160,7 @@ public class JmsProxyTest {
    * @throws JMSException 
    */
   @Test
+  @DirtiesContext
   public void testRegisterUpdateListener() throws JMSException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
     TopicRegistrationDetails details = EasyMock.createMock(TopicRegistrationDetails.class);
@@ -179,6 +183,7 @@ public class JmsProxyTest {
    * @throws InterruptedException 
    */
   @Test
+  @DirtiesContext
   public void testUpdateNotification() throws JMSException, InterruptedException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
     TopicRegistrationDetails details = new TopicRegistrationDetails() {
@@ -227,6 +232,7 @@ public class JmsProxyTest {
    * @throws JMSException 
    */
   @Test
+  @DirtiesContext
   public void testUnregisterUpdateListener() throws JMSException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
     TopicRegistrationDetails details = new TopicRegistrationDetails() {
@@ -257,6 +263,7 @@ public class JmsProxyTest {
    * @throws JMSException 
    */
   @Test
+  @DirtiesContext
   public void testReplaceUpdateListener() throws JMSException {
     TagUpdateListener listener = EasyMock.createMock(TagUpdateListener.class);
     TopicRegistrationDetails details = new TopicRegistrationDetails() {
@@ -329,6 +336,7 @@ public class JmsProxyTest {
    * @throws InterruptedException 
    */
   @Test
+  @DirtiesContext
   public void testReconnectAndNotification() throws JMSException, InterruptedException {   
     ConnectionListener connectionListener = EasyMock.createMock(ConnectionListener.class);    
     jmsProxy.registerConnectionListener(connectionListener);
