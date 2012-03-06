@@ -19,6 +19,7 @@ package cern.c2mon.client.core;
 
 import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.jms.ConnectionListener;
+import cern.c2mon.client.jms.JmsHealthListener;
 
 /**
  * This interface describes the methods which are provided by
@@ -64,4 +65,16 @@ public interface C2monSupervisionManager {
    * states.
    */
   boolean isServerConnectionWorking();
+  
+  /**
+   * Register to be notified of detected problems with the processing
+   * of incoming data from JMS subscriptions (slow consumers for example).
+   * 
+   * <p>In general, these notifications indicate a serious problem with
+   * possible data loss, so the client should take some appropriate
+   * action on receiving these callbacks (e.g. notify the user).
+   * 
+   * @param jmsHealthListener the listener to notify
+   */
+  void registerJmsHealthListener(JmsHealthListener jmsHealthListener);
 }

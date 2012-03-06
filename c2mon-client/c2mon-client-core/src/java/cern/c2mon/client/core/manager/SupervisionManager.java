@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.jms.ConnectionListener;
+import cern.c2mon.client.jms.JmsHealthListener;
+import cern.c2mon.client.jms.JmsHealthMonitor;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.client.jms.SupervisionListener;
@@ -90,11 +92,16 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   /** Reference to the <code>HeartbeatManager</code> singleton instance */
   private final HeartbeatListenerManager heartbeatManager;
   
+  /** Monitors health of update processing */
+  private final JmsHealthMonitor jmsHealthMonitor;
+  
   @Autowired
-  protected SupervisionManager(final JmsProxy pJmsProxy, final RequestHandler pRequestHandler, final HeartbeatListenerManager pHeartbeatManager) {
+  protected SupervisionManager(final JmsProxy pJmsProxy, final RequestHandler pRequestHandler, final HeartbeatListenerManager pHeartbeatManager,
+                                final JmsHealthMonitor pJmsHealthMonitor) {
     jmsProxy = pJmsProxy;
     clientRequestHandler = pRequestHandler;
     heartbeatManager = pHeartbeatManager;
+    jmsHealthMonitor = pJmsHealthMonitor;
   }
   
   /**
@@ -327,5 +334,10 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
     if (!c2monConnectionEstablished) {
       refreshSupervisionStatus();
     }
+  }
+
+  @Override
+  public void registerJmsHealthListener(JmsHealthListener jmsHealthListener) {
+    jmsHealthMonitor.registerHealthListener(jmsHealthListener);
   }
 }
