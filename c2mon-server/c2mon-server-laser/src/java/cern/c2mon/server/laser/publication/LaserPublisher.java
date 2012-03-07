@@ -22,4 +22,18 @@ public interface LaserPublisher {
    */
   String getSourceName();
 
+  /**
+   * Are there unpublished alarms in the re-publication list.
+   * @return true if there are
+   */
+  boolean hasUnpublishedAlarms();
+
+  /**
+   * Can be used to set the republish delay. Is only taken
+   * into account when set before (re-)started. 
+   * 
+   * @param republishDelay new delay
+   */
+  void setRepublishDelay(long republishDelay);
+
 }

@@ -1,8 +1,12 @@
 package cern.c2mon.server.laser.publication;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
@@ -44,6 +48,16 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   private static final long SLEEP_BETWEEN_CONNECT = 3000;
 
   /**
+   * Time before republication of failed LASER publications from this bean.
+   */
+  private long republishDelay = 300000;
+
+  /**
+   * Period between republication checks.
+   */
+  private static final long REPUBLISH_PERIOD = 120000;
+
+  /**
    * The alarm source name this publisher is called.
    */
   private String sourceName;
@@ -73,6 +87,11 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   private volatile boolean running = false;
   
   /**
+   * Was the initial connection successful at startup.
+   */
+  private volatile boolean initialConnection = false;
+  
+  /**
    * Module shutdown request (on server shutdown f.eg.)
    */
   private volatile boolean shutdownRequested = false;
@@ -91,9 +110,22 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
    * For persisting changes to alarm publication details in cache object.
    */
   private BatchPersistenceManager alarmPersistenceManager;
-
+  
   /**
-	 */
+   * Timer that re-publishes alarms that failed to publish successfully to LASER.
+   */
+  private Timer republishTimer;
+  
+  /**
+   * Task run on timer.
+   */
+  private TimerTask republishTask;
+  
+  /**
+   * Ids of alarms that need re-publishing as publication failed (map is used as set)
+   */
+  private ConcurrentHashMap<Long, Long> toBePublished = new ConcurrentHashMap<Long, Long>();
+
   private StatisticsModule stats = new StatisticsModule();
 
   /**
@@ -145,7 +177,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
    */
   @Override
   public void notifyElementUpdated(Alarm alarmCopy) {  
-    if (running) {
+    if (running && initialConnection) {
       backupLock.readLock().lock();
       try {
         //get most recent alarm in cache and lock access
@@ -153,8 +185,27 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
         alarm.getWriteLock().lock();
         try {
           if (!alarm.isPublishedToLaser());
-            publishToLaser(alarm);
-            alarmPersistenceManager.addElementToPersist(alarm.getId());
+            try {
+              publishToLaser(alarm);
+              toBePublished.remove(alarm.getId());
+            } catch (Exception e) {              
+              StringBuilder str = new StringBuilder("Exception caught while publishing alarm to LASER: ");
+              str.append(alarm.getTimestamp());
+              str.append("\t");
+              str.append(alarm.getFaultFamily());
+              str.append(':');
+              str.append(alarm.getFaultMember());
+              str.append(':');
+              str.append(alarm.getFaultCode());
+              str.append('\t');
+              str.append(alarm.getState());
+              if (alarm.getInfo() != null) {
+                str.append('\t');
+                str.append(alarm.getInfo());
+              }             
+              log.error(str, e);
+              toBePublished.put(alarm.getId(), alarm.getId());              
+            }                       
         } finally {
           alarm.getWriteLock().unlock();
         }         
@@ -162,16 +213,18 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
         backupLock.readLock().unlock();
       }
     } else {
-      log.warn("Unable to publish alarm as LASER publisher module not running: alarm id " + alarmCopy.getId());
+      log.warn("Unable to publish alarm as LASER publisher module not running/connected - adding to re-publication list (alarm id " + alarmCopy.getId() + ")");
+      toBePublished.put(alarmCopy.getId(), alarmCopy.getId());
     }                       
   }
 
   /**
    * Call within write lock.
    * @param alarm in cache
+   * @throws ASIException 
    */
-  private void publishToLaser(Alarm alarm) {
-    FaultState fs = null;
+  private void publishToLaser(Alarm alarm) throws ASIException {
+    FaultState fs = null;    
     fs = AlarmSystemInterfaceFactory.createFaultState(alarm.getFaultFamily(), alarm.getFaultMember(), alarm.getFaultCode());
     Timestamp laserPublicationTime = new Timestamp(System.currentTimeMillis());        
     stats.update(alarm);
@@ -192,48 +245,11 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
 
     if (log.isDebugEnabled()) {
       log.debug("Pushing alarm to LASER :\n" + fs);
-    }        
-    try {
-      asi.push(fs);     
-      log(alarm);
-      alarm.hasBeenPublished(laserPublicationTime);
-      // Keep track of the sent alarm in the Alarm log
-      StringBuilder str = new StringBuilder();
-      str.append(alarm.getTimestamp());
-      str.append("\t");
-      str.append(alarm.getFaultFamily());
-      str.append(':');
-      str.append(alarm.getFaultMember());
-      str.append(':');
-      str.append(alarm.getFaultCode());
-      str.append('\t');
-      str.append(alarm.getState());
-      if (alarm.getInfo() != null) {
-        str.append('\t');
-        str.append(alarm.getInfo());
-      }
-      log.info(str);      
-    } catch (ASIException e) {
-      // Ooops, didn't work. log the exception.
-      StringBuilder str = new StringBuilder("Alarm System Interface Exception. Unable to send FaultState ");
-      str.append(alarm.getFaultFamily());
-      str.append(':');
-      str.append(alarm.getFaultMember());
-      str.append(':');
-      str.append(alarm.getFaultCode());
-      str.append(" to LASER.");
-      log.error(str, e);
-    } catch (Exception e) {
-      StringBuilder str = new StringBuilder("sendFaultState() : Unexpected Exception. Unable to send FaultState ");
-      str.append(alarm.getFaultFamily());
-      str.append(':');
-      str.append(alarm.getFaultMember());
-      str.append(':');
-      str.append(alarm.getFaultCode());
-      str.append(" to LASER.");
-      log.error(str, e);
-    }
-
+    }          
+    asi.push(fs);    
+    log(alarm);  
+    alarm.hasBeenPublished(laserPublicationTime); 
+    alarmPersistenceManager.addElementToPersist(alarm.getId());
   }
 
   // below server lifecycle methods: complete start/stop (no need to allow for
@@ -257,40 +273,55 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   @Override
   @ManagedOperation(description = "Starts the alarm publisher (will continue in own thread until successful)")
   public void start() {
-    if (!running && !connectThreadRunning) {
-      connectThreadRunning = true;
-      new Thread(new Runnable() {
-        @Override
-        public void run() {
-          try {            
-            while (!running && !shutdownRequested) {
-              try {
-                log.info("Starting " + LaserPublisherImpl.class.getName() + " (in own thread)");
-                asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
-                running = true;
-              } catch (ASIException e) {
-                log.error("Failed to start LASER publisher - will try again in 5 seconds", e);
+    if (!running) {
+      republishTask = new PublicationTask();
+      republishTimer = new Timer("LASER re-publication timer");
+      republishTimer.schedule(republishTask, republishDelay, REPUBLISH_PERIOD);
+      if(!connectThreadRunning) {
+        connectThreadRunning = true;
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            try {            
+              while (!initialConnection && !shutdownRequested) {
                 try {
-                  Thread.sleep(SLEEP_BETWEEN_CONNECT);
-                } catch (InterruptedException e1) {
-                  log.error("Interrupted during sleep", e1);
-                }            
+                  log.info("Starting " + LaserPublisherImpl.class.getName() + " (in own thread)");
+                  asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
+                  initialConnection = true;                
+                } catch (ASIException e) {
+                  log.error("Failed to start LASER publisher - will try again in 5 seconds", e);
+                  try {
+                    Thread.sleep(SLEEP_BETWEEN_CONNECT);
+                  } catch (InterruptedException e1) {
+                    log.error("Interrupted during sleep", e1);
+                  }            
+                }
               }
-            }
-          } finally {
-            connectThreadRunning = false;
-          }                  
-        }
-      }).start();
-    }      
+            } finally {
+              connectThreadRunning = false;
+            }                  
+          }
+        }).start();
+        running = true;
+      }
+    }
+             
   }
 
   @Override
   @ManagedOperation(description = "Stops the alarm publisher.")
   public void stop() {
-    if (running) {
-      log.info("Stopping LASER publisher" + LaserPublisherImpl.class.getName());   
-      shutdownRequested = true;
+    if (running) {      
+      log.info("Stopping LASER publisher" + LaserPublisherImpl.class.getName());
+      while (!toBePublished.isEmpty()) {
+        try {
+          Thread.sleep(REPUBLISH_PERIOD);
+        } catch (InterruptedException e) {
+          log.error("Interrupted while shutting down LASER publisher.", e);
+        }
+      }
+      republishTimer.cancel();
+      shutdownRequested = true;      
       //wait for connect thread to end
       try {
         Thread.sleep(SLEEP_BETWEEN_CONNECT);
@@ -302,6 +333,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
       }
       running = false;
       shutdownRequested = false;
+      initialConnection = false;
     }    
   }
 
@@ -369,6 +401,49 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   @Override
   public ReentrantReadWriteLock getBackupLock() {
     return backupLock;
+  }
+  
+  @ManagedOperation(description = "Does this publisher have failed publications waiting to be published again?")
+  @Override
+  public boolean hasUnpublishedAlarms() {
+    return !toBePublished.isEmpty();
+  }
+  
+  @Override
+  public void setRepublishDelay(long republishDelay) {
+    this.republishDelay = republishDelay;
+  }
+
+  /**
+   * Checks if un-published alarms need publishing. If so, will publish them.
+   * 
+   * @author Mark Brightwell
+   *
+   */
+  private class PublicationTask extends TimerTask {
+        
+    /**
+     * Constructor
+     * @param alarmCopy alarm to republish (only id is used as latest alarm is accessed)
+     */
+    public PublicationTask() {
+      super();      
+    }
+
+    @Override
+    public void run() {
+      try {
+        log.debug("Checking for LASER re-publications");      
+        if (!toBePublished.isEmpty()) {
+          log.info("Detected alarms that failed to be published - will attempt republication of these.");
+          for (Long alarmId : new ArrayList<Long>(toBePublished.keySet())) {  //take copy as these tasks also add to this map if publication fails again        
+            notifyElementUpdated(alarmCache.getCopy(alarmId));
+          }
+        }
+      } catch (Exception e) {
+        log.error("Unexpected exception caught while checking for failed LASER publications", e);
+      }      
+    }    
   }
 
 }
