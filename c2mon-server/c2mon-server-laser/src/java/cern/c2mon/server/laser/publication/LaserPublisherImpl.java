@@ -314,8 +314,10 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
     if (running) {      
       log.info("Stopping LASER publisher" + LaserPublisherImpl.class.getName());
       while (!toBePublished.isEmpty()) {
+        log.warn("Unpublished alarms at shutdown - be sure to restart server in recovery mode to guarantee all alarm publications! (or run 'republish alarms' in Jconsole RecoveryManager)");
+        log.warn("If LASER connection is not re-established, the C2MON server will need killing! (handled by script)");
         try {
-          Thread.sleep(REPUBLISH_PERIOD);
+          Thread.sleep(5000);
         } catch (InterruptedException e) {
           log.error("Interrupted while shutting down LASER publisher.", e);
         }
@@ -339,7 +341,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
 
   @Override
   public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST;
+    return ServerConstants.PHASE_STOP_LAST + 1;
   }
 
   @Override
