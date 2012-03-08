@@ -14,6 +14,7 @@ import oracle.net.aso.p;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,6 +61,12 @@ public class LaserAlarmPublisherImplTest {
     publisher = new LaserPublisherImpl(registrationService, alarmCache, alarmPersistenceManager);
 	}
 	
+	@After
+	public void afterTest() throws InterruptedException {
+	  Thread.sleep(1000);
+	  publisher.stop();
+	}
+	
 	@Test
 	public void testSendActiveAlarmFaultState() throws InterruptedException {
 		
@@ -95,8 +102,8 @@ public class LaserAlarmPublisherImplTest {
 	}
 	
 	
-	@Test
-	public void testSendTerninatedAlarmFaultState() throws InterruptedException {
+	@Test	
+	public void testSendTerminatedAlarmFaultState() throws InterruptedException {
 	  
 	  registrationService.registerToAlarms(publisher);    
     
@@ -127,87 +134,7 @@ public class LaserAlarmPublisherImplTest {
     assertEquals(alarmInCache.getLastPublication().getInfo(), CacheObjectCreation.createTestAlarm1().getInfo());
     assertEquals(alarmInCache.getLastPublication().getState(), CacheObjectCreation.createTestAlarm1().getState());
     assertNotNull(alarmInCache.getLastPublication().getPublicationTime());    
-	}
-	
-	/**
-	 * With no successful connection, alarms should end up in re-publication list.
-	 * @throws Exception
-	 */
-	@Test
-	public void testRepublicationListOnFailedInit() throws Exception {	  	  
-	  //reset properties so publication fails
-	  System.setProperty("laser.hosts", "non-existent");
-    System.setProperty("cmw.mom.brokerlist", "non-existent:2506");
-    
-    Alarm alarmMock = mockControl.createMock(Alarm.class);
-    expect(alarmMock.getId()).andReturn(10L).times(3);
-    
-    mockControl.replay();
-    
-    publisher.init();
-    publisher.start();
-    
-    Thread.sleep(1000);
-    
-    publisher.notifyElementUpdated(alarmMock);
-    
-    assertTrue(publisher.hasUnpublishedAlarms());
-    mockControl.verify();
-	}
-	
-	/**
-	 * Fake an exception thrown by LASER API by using mock persistence manager.
-	 * Republication should then take place and be successful on second attempt
-	 * (needs small hack of resetting alarmcacheobject between publications so that
-	 * the alarm publication fields are set to "not published", since the publication
-	 * was in fact successfull... would of course be better to mock the LASER API and
-	 * inject using Spring...)
-	 * @throws Exception 
-	 */
-	@Test 
-	public void testRepublicationAfterFailure() throws Exception {
-	  
-	  registrationService.registerToAlarms(publisher);    
-    
-    Alarm alarmMock = mockControl.createMock(Alarm.class);
-    Alarm alarmInCache = CacheObjectCreation.createTestAlarm1();
-    assertTrue(alarmInCache.isPublishedToLaser()); //published value set in test object
-    
-    expect(alarmMock.getId()).andReturn(alarmInCache.getId());    
-    expect(alarmCache.get(alarmInCache.getId())).andReturn(alarmInCache).times(2);
-    expect(alarmCache.getCopy(alarmInCache.getId())).andReturn(alarmInCache);
-    alarmPersistenceManager.addElementToPersist(alarmInCache.getId());
-    EasyMock.expectLastCall().andThrow(new RuntimeException("test exception"));
-    alarmPersistenceManager.addElementToPersist(alarmInCache.getId());
-    
-    
-    mockControl.replay();
-        
-    publisher.setSourceName("TEST-SOURCE");  
-    publisher.setRepublishDelay(8000);
-    publisher.init();
-    publisher.start();    
-    
-    //wait as LASER connection done in separate thread
-    Thread.sleep(5000);
-    publisher.notifyElementUpdated(alarmMock);
-    
-    //now has unpublished alarms
-    assertTrue(publisher.hasUnpublishedAlarms());
-    //reset alarmCacheObject as was actually successfull but want to check republication occurred (filtered out otherwise)
-    alarmInCache = CacheObjectCreation.createTestAlarm1();
-    
-    //successful after wait
-    Thread.sleep(5000);
-    assertFalse(publisher.hasUnpublishedAlarms());
-    
-    //check last published value is newly set correctly
-    assertTrue(alarmInCache.getLastPublication() != null);
-    assertEquals(alarmInCache.getLastPublication().getInfo(), CacheObjectCreation.createTestAlarm1().getInfo());
-    assertEquals(alarmInCache.getLastPublication().getState(), CacheObjectCreation.createTestAlarm1().getState());
-    assertNotNull(alarmInCache.getLastPublication().getPublicationTime());  
-    mockControl.verify();
-	}
+	}	
 	
 	@Test
 	public void testStopStart() throws Exception {
