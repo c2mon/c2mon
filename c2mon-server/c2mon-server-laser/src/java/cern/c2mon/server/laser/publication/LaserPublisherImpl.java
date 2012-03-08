@@ -48,14 +48,22 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   private static final long SLEEP_BETWEEN_CONNECT = 3000;
 
   /**
-   * Time before republication of failed LASER publications from this bean.
+   * Time before republication checks of failed LASER publications from this bean.
    */
-  private long republishDelay = 300000;
+  private long republishDelay = 60000;
 
   /**
    * Period between republication checks.
    */
   private static final long REPUBLISH_PERIOD = 120000;
+
+  /**
+   * Nb of seconds given to this module to start-up in it's own thread: this gives
+   * the LASER connection some time to be established, before calls are
+   * made to this module for alarm publications. If no connection is made after this
+   * time, server start-up will continue and failed publications will be stored.
+   */
+  private static final long START_UP_SECONDS= 3;
 
   /**
    * The alarm source name this publisher is called.
@@ -302,6 +310,15 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
             }                  
           }
         }).start();
+        short waited = 0;
+        while (!initialConnection && !shutdownRequested && waited < START_UP_SECONDS) {
+          try {
+            Thread.sleep(1000);
+            waited++;
+          } catch (InterruptedException e) {
+            log.error("Interrupted during start-up check");
+          }
+        }        
         running = true;
       }
     }
@@ -341,7 +358,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
 
   @Override
   public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST + 1;
+    return ServerConstants.PHASE_STOP_LAST - 1;
   }
 
   @Override
