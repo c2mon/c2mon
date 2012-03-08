@@ -63,7 +63,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
    * made to this module for alarm publications. If no connection is made after this
    * time, server start-up will continue and failed publications will be stored.
    */
-  private static final long START_UP_SECONDS= 3;
+  private static final short START_UP_SECONDS= 3;
 
   /**
    * The alarm source name this publisher is called.
@@ -329,7 +329,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   @ManagedOperation(description = "Stops the alarm publisher.")
   public void stop() {
     if (running) {      
-      log.info("Stopping LASER publisher" + LaserPublisherImpl.class.getName());
+      log.info("Stopping LASER publisher " + LaserPublisherImpl.class.getName());
       while (!toBePublished.isEmpty()) {
         log.warn("Unpublished alarms at shutdown - be sure to restart server in recovery mode to guarantee all alarm publications! (or run 'republish alarms' in Jconsole RecoveryManager)");
         log.warn("If LASER connection is not re-established, the C2MON server will need killing! (handled by script)");
@@ -342,11 +342,13 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
       republishTimer.cancel();
       shutdownRequested = true;      
       //wait for connect thread to end
-      try {
-        Thread.sleep(SLEEP_BETWEEN_CONNECT);
-      } catch (InterruptedException e) {
-        log.error("Interrupted during sleep", e);
-      } 
+      if (connectThreadRunning) {
+        try {
+          Thread.sleep(SLEEP_BETWEEN_CONNECT);
+        } catch (InterruptedException e) {
+          log.error("Interrupted during sleep", e);
+        } 
+      }      
       if (asi != null) {
         asi.close();
       }

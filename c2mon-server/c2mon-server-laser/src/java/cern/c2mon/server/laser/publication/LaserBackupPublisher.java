@@ -216,11 +216,13 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       LOGGER.info("Stopping LASER backup mechanism.");
       shutdownRequested = true;
       //wait for connect thread to end
-      try {
-        Thread.sleep(SLEEP_BETWEEN_CONNECT);
-      } catch (InterruptedException e) {
-        LOGGER.error("Interrupted during sleep", e);
-      } 
+      if (connectThreadRunning) {
+        try {
+          Thread.sleep(SLEEP_BETWEEN_CONNECT);
+        } catch (InterruptedException e) {
+          LOGGER.error("Interrupted during sleep", e);
+        }
+      }       
       if (timer != null){
         timer.cancel();
       }    
