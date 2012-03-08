@@ -350,8 +350,14 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
           log.error("Interrupted during sleep", e);
         } 
       }      
-      if (asi != null) {
-        asi.close();
+      if (asi != null) { // in own thread as sometimes freezes
+        Thread laserStopThread = new Thread(new Runnable() {                    
+          public void run() {
+            asi.close();
+          }
+        });
+        laserStopThread.setDaemon(true);
+        laserStopThread.start();
       }
       running = false;
       shutdownRequested = false;
