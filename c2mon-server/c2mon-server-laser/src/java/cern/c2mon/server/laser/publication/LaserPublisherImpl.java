@@ -290,11 +290,12 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
         new Thread(new Runnable() {
           @Override
           public void run() {
+            log.info("Starting " + LaserPublisherImpl.class.getName() + " (in own thread)");
             try {            
               while (!initialConnection && !shutdownRequested) {
                 try {
-                  log.info("Starting " + LaserPublisherImpl.class.getName() + " (in own thread)");
-                  asi = AlarmSystemInterfaceFactory.createSource(getSourceName());
+                  log.info("Attempting LASER connection.");
+                  asi = AlarmSystemInterfaceFactory.createSource(getSourceName());                  
                   initialConnection = true;                
                 } catch (ASIException e) {
                   log.error("Failed to start LASER publisher - will try again in 5 seconds", e);
@@ -330,17 +331,17 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   public void stop() {
     if (running) {      
       log.info("Stopping LASER publisher " + LaserPublisherImpl.class.getName());
+      shutdownRequested = true; 
       while (!toBePublished.isEmpty()) {
         log.warn("Unpublished alarms at shutdown - be sure to restart server in recovery mode to guarantee all alarm publications! (or run 'republish alarms' in Jconsole RecoveryManager)");
-        log.warn("If LASER connection is not re-established, the C2MON server will need killing! (handled by script)");
+        log.warn("If LASER connection is not re-established, the C2MON server will need killing!");
         try {
           Thread.sleep(5000);
         } catch (InterruptedException e) {
           log.error("Interrupted while shutting down LASER publisher.", e);
         }
       }
-      republishTimer.cancel();
-      shutdownRequested = true;      
+      republishTimer.cancel();           
       //wait for connect thread to end
       if (connectThreadRunning) {
         try {
