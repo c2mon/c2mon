@@ -87,10 +87,12 @@ public class ClientModuleLifecycle implements SmartLifecycle {
   @Override
   public synchronized void stop() {    
     running = false;
-    try {     
+    try {   
+      LOGGER.info("Shutting down client module JMS connections");
       clientJmsContainer.stop();
       clientExecutor.shutdown();
       singleConnectionFactory.destroy(); //closes underlying connection
+      LOGGER.debug("Client module JMS connections stopped");
     } catch (Exception e) {
       LOGGER.error("Exception caught while shutting down Client JMS connection/JMS container", e);
     }
