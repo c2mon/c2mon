@@ -109,23 +109,33 @@ public class RecoveryManager implements SmartLifecycle {
 
   @Override
   public void start() {
-    if (!running && !stopRequested && System.getProperty("c2mon.recovery") != null && System.getProperty("c2mon.recovery").equals("true")) {
-      new Thread(new Runnable() {        
-        @Override
-        public void run() {
-          LOGGER.info("Running server recovery tasks.");
-          refresh();          
-        }
-      }).start();      
+    if (!running && !stopRequested) {      
+      if (System.getProperty("c2mon.recovery") != null && System.getProperty("c2mon.recovery").equals("true")) {
+        new Thread(new Runnable() {        
+          @Override
+          public void run() {
+            LOGGER.info("Running server recovery tasks.");
+            recover();          
+          }
+        }).start();             
+      } else {              //run standard recovery tasks
+        new Thread(new Runnable() {        
+          @Override
+          public void run() {
+            LOGGER.info("Running standard start-up tasks (none configured so far)");
+            refreshAfterStandardRestart();          
+          }
+        }).start(); 
+      }
       running = true;
-    }
+    }    
   }
 
   /**
    * Runs all refresh actions.
    */
-  @ManagedOperation(description = "Runs all refresh actions.")
-  public void refresh() {
+  @ManagedOperation(description = "Runs all recovery actions - to be used after a unclean server shutdown (kill)")
+  public void recover() {
     if (!stopRequested) {      
       publishUnpublishedAlarms(); //unpublished alarms are sent to LASER
     }
@@ -141,6 +151,15 @@ public class RecoveryManager implements SmartLifecycle {
     if (!stopRequested) {      
       notifyAllTagCacheListeners(); //also refreshes rules but not alarms (done with supervision)
     }    
+  }
+  
+  /**
+   * Operations that are run after every server restart, fixing
+   * inconsistencies that could be due to the shutdown.
+   */
+  @ManagedOperation(description = "Runs task performed on every server restart (does nothing so far)")
+  public void refreshAfterStandardRestart() {
+    //TODO
   }
   
   /**
