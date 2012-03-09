@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.tim2.tim2-server</groupId>
 		<artifactId>tim2-server-pom</artifactId>
-		<version>1.0.5</version>
+		<version>1.0.6</version>
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
