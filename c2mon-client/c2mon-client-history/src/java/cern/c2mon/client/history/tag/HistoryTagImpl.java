@@ -402,6 +402,11 @@ public class HistoryTagImpl implements HistoryTag {
   public Timestamp getServerTimestamp() {
     return null;
   }
+  
+  @Override
+  public Timestamp getSourceTimestamp() {
+    return null;
+  }
 
   @Override
   public synchronized Timestamp getTimestamp() {
@@ -509,5 +514,4 @@ public class HistoryTagImpl implements HistoryTag {
   public String getExpression() {
     return expression;
   }
-  
 }
