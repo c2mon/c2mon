@@ -21,14 +21,12 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.laser.source.alarmsysteminterface.ASIException;
-import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterfaceFactory;
 import cern.laser.source.alarmsysteminterface.FaultState;
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.AlarmPublication;
 import cern.tim.server.common.config.ServerConstants;
-import ch.cern.tim.shared.alarm.AlarmCondition;
 
 /**
  * Sends regular backups of all active alarms to LASER.
@@ -99,9 +97,6 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    */
   private LaserPublisher publisher = null;
 
-  /** Reference to the LASER alarm system interface. */
-  private AlarmSystemInterface asi = null;
-
   /**
    * Constructor.
    * 
@@ -112,7 +107,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   public LaserBackupPublisher(AlarmCache alarmCache, LaserPublisher publisher) {
     super();
     this.alarmCache = alarmCache;
-    this.publisher = publisher;
+    this.publisher = publisher;    
     backupExecutor = new ThreadPoolExecutor(10, 10, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     backupExecutor.allowCoreThreadTimeOut(true);
   }
@@ -143,7 +138,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
         LOGGER.debug("Sending active alarm backup to LASER with " + toSend.size() + " alarms");
         if (!toSend.isEmpty()) {
           try {
-            asi.pushActiveList(toSend);
+            publisher.getAsi().pushActiveList(toSend);
             LOGGER.debug("Finished sending LASER active alarm backup.");
           } catch (ASIException e) {
             LOGGER.error("Cannot send backup list to LASER", e);
@@ -185,21 +180,19 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
         @Override
         public void run() {
           try {
-            while (!running && !shutdownRequested) {
-              try {
-                LOGGER.info("Starting LASER backup mechanism.");
-                asi = AlarmSystemInterfaceFactory.createSource(publisher.getSourceName());            
+            while (!running && !shutdownRequested) {              
+              LOGGER.info("Starting LASER backup mechanism.");
+              if (publisher.getAsi() != null) {
                 timer = new Timer();
                 timer.scheduleAtFixedRate(LaserBackupPublisher.this, INITIAL_BACKUP_DELAY, backupInterval);
-                running = true;              
-              } catch (ASIException e) {
-                LOGGER.error("Failed to start LASER backup publisher - will try again in 5 seconds", e);
+                running = true;
+              } else {
                 try {
                   Thread.sleep(SLEEP_BETWEEN_CONNECT);
                 } catch (InterruptedException e1) {
                   LOGGER.error("Interrupted during sleep", e1);
-                }            
-              }
+                }
+              }             
             }
           } finally {
             connectThreadRunning = false;
@@ -225,16 +218,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       }       
       if (timer != null){
         timer.cancel();
-      }
-      if (asi != null) { // in own thread as sometimes freezes
-        Thread laserStopThread = new Thread(new Runnable() {                    
-          public void run() {
-            asi.close();
-          }
-        });
-        laserStopThread.setDaemon(true);
-        laserStopThread.start();
-      }     
+      }         
       running = false;
       shutdownRequested = false;
     }    

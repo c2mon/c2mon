@@ -254,7 +254,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
     if (log.isDebugEnabled()) {
       log.debug("Pushing alarm to LASER :\n" + fs);
     }          
-    asi.push(fs);    
+    getAsi().push(fs);    
     log(alarm);  
     alarm.hasBeenPublished(laserPublicationTime); 
     alarmPersistenceManager.addElementToPersist(alarm.getId());
@@ -295,7 +295,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
               while (!initialConnection && !shutdownRequested) {
                 try {
                   log.info("Attempting LASER connection.");
-                  asi = AlarmSystemInterfaceFactory.createSource(getSourceName());                  
+                  setAsi(AlarmSystemInterfaceFactory.createSource(getSourceName()));                  
                   initialConnection = true;                
                 } catch (ASIException e) {
                   log.error("Failed to start LASER publisher - will try again in 5 seconds", e);
@@ -350,15 +350,9 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
           log.error("Interrupted during sleep", e);
         } 
       }      
-      if (asi != null) { // in own thread as sometimes freezes
-        Thread laserStopThread = new Thread(new Runnable() {                    
-          public void run() {
-            asi.close();
-          }
-        });
-        laserStopThread.setDaemon(true);
-        laserStopThread.start();
-      }
+      if (getAsi() != null) { 
+        getAsi().close();
+      }      
       running = false;
       shutdownRequested = false;
       initialConnection = false;
@@ -473,5 +467,22 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
       }      
     }    
   }
+
+  /**
+   * @return the asi
+   */
+  @Override
+  public synchronized AlarmSystemInterface getAsi() {
+    return asi;
+  }
+
+  /**
+   * @param asi the asi to set
+   */
+  private synchronized void setAsi(AlarmSystemInterface asi) {
+    this.asi = asi;
+  }
+  
+  
 
 }

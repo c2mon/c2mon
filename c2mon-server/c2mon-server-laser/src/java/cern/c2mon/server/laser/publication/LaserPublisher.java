@@ -2,6 +2,8 @@ package cern.c2mon.server.laser.publication;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
+
 /**
  * Interface to LaserPublisher. Only used by backup publisher so far.
  * 
@@ -35,5 +37,11 @@ public interface LaserPublisher {
    * @param republishDelay new delay
    */
   void setRepublishDelay(long republishDelay);
+
+  /**
+   * For use by the backup publisher
+   * @return LASER asi object
+   */
+  AlarmSystemInterface getAsi();
 
 }
