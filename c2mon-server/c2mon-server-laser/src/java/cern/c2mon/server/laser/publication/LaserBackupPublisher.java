@@ -157,7 +157,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
   @Override
   public boolean isAutoStartup() {
-    return true;
+    return false;
   }
 
   @Override

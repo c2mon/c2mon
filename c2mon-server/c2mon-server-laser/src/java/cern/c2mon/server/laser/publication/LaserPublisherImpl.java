@@ -264,7 +264,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   // stop/restart, just final shutdown)
   @Override
   public boolean isAutoStartup() {
-    return true;
+    return false;
   }
 
   @Override
