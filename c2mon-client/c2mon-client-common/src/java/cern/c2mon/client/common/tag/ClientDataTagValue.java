@@ -143,6 +143,13 @@ public interface ClientDataTagValue extends RuleInputValue {
    * @see #getTimestamp()
    */
   Timestamp getServerTimestamp();
+  
+  /**
+   * Returns the source timestamp
+   * @return the source timestamp
+   * @see #getTimestamp()
+   */
+  Timestamp getSourceTimestamp();
 
   /**
    * Returns the tag name
