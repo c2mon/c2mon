@@ -40,10 +40,16 @@ import cern.c2mon.client.module.C2monAdminMessageManager;
 public final class C2monServiceGateway {
   
   /** Class logger */
-  private static final Logger LOGGER = Logger.getLogger(C2monServiceGateway.class);
+  private static final Logger LOG = Logger.getLogger(C2monServiceGateway.class);
   
   /** The path to the core Spring XML */
   private static final String APPLICATION_SPRING_XML_PATH = "cern/c2mon/client/core/config/c2mon-client.xml";
+  
+  /**
+   * The maximum amount of time in milliseconds which the C2MON ServiceGateway shall
+   * wait before aborting waiting that the connection to the C2MON server is established. 
+   */
+  private static final Long MAX_INITIALIZATION_TIME = 60000L;
   
   /** Static reference to the <code>C2monSessionManager</code> singleton instance */
   private static C2monSessionManager sessionManager = null;
@@ -123,17 +129,26 @@ public final class C2monServiceGateway {
 
   /**
    * Starts the C2MON core. Must be called at application start-up.
-   * 
-   * <p>This method needs to be called before the C2monServiceGateway 
+   * <p>
+   * This method needs to be called before the C2monServiceGateway 
    * can be used. It should be called synchronously by the main application
-   * thread, and will return once the core is ready for use. Notice
-   * that the method will return even if the core cannot connect to
-   * JMS (reconnection attempts will be made until successful).
+   * thread, and will return once the core is ready for use.
+   * <p>
+   * <b>Notice</b> that the method will return even if the core cannot connect to
+   * JMS (reconnection attempts will be made until successful). You can check
+   * the successful connection status with
+   * {@link C2monSupervisionManager#isServerConnectionWorking()}. The advantage of
+   * this behavior is that you can use the time in between to initialize your
+   * application. However, if you don't want to check yourself that the connection
+   * to the C2MON server is established you should maybe use
+   * {@link #startC2monClientSynchronous(Module...)} instead.
    * 
    * @param modules the modules that should be supported by the service gateway
+   * @see C2monSupervisionManager#isServerConnectionWorking()
+   * @see #startC2monClientSynchronous(Module...)
    */
   public static void startC2monClient(final Module ... modules) {
-    LOGGER.info("Starting C2MON client core.");
+    LOG.info("Starting C2MON client core.");
     
     final Set<String> springXmlFiles = getSpringXmlPathsOfModules(modules);
     springXmlFiles.add(APPLICATION_SPRING_XML_PATH);
@@ -145,6 +160,45 @@ public final class C2monServiceGateway {
     registerModules(xmlContext, modules);
     
     xmlContext.registerShutdownHook();
+  }
+  
+  /**
+   * Starts the C2MON core. Must be called at application start-up.
+   * <p>
+   * This method needs to be called before the C2monServiceGateway 
+   * can be used. It should be called synchronously by the main application
+   * thread, and will return once the core is ready for use. 
+   * <p>
+   * <b>Notice</b> that the method won't return before the core has succesfully 
+   * established the connection to the C2MON server. However, if the C2MON
+   * Client API hasn't managed to connect after 60 seconds this method will
+   * return with a {@link RuntimeException}.
+   * 
+   * @param modules the modules that should be supported by the service gateway
+   * @exception RuntimeException In case the connection to the C2MON server could not
+   *            be established within 60 seconds. However, the C2MON Client API will
+   *            continue trying to establish the connection, but by throwing this
+   *            exception we want to avoid that the application is blocking too long
+   *            on this call.
+   * @see C2monSupervisionManager#isServerConnectionWorking()
+   * @see #startC2monClient(Module...)
+   */
+  public static void startC2monClientSynchronous(final Module ... modules) throws RuntimeException {
+    startC2monClient(modules);
+    
+    LOG.info("Waiting for C2MON server connection (max " + MAX_INITIALIZATION_TIME / 1000  + " sec)...");
+    
+    Long startTime = System.currentTimeMillis();
+    while (!supervisionManager.isServerConnectionWorking()) {
+      try { Thread.sleep(200); } catch (InterruptedException ie) { /* Do nothing */ }
+      if (System.currentTimeMillis() - startTime >= MAX_INITIALIZATION_TIME) {
+        throw new RuntimeException(
+            "Waited " 
+            + MAX_INITIALIZATION_TIME / 1000
+            + " seconds and the connection to C2MON server could still not be established.");
+      }
+    }
+    LOG.info("C2MON server connection established!");
   }
   
   /**
