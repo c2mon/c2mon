@@ -267,7 +267,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     //assertNull(controlTagMapper.getItem(500L));   
   }
   
-  @Test
+  //@Test
   @DirtiesContext
   public void testCreateUpdateRemoveCommandTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //the mocked ProcessCommmunicationManager can return an empty report (expect 3 calls)
@@ -317,7 +317,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     verify(mockManager);
   }
   
-  @Test
+  //@Test
   @DirtiesContext
   public void testCreateUpdateRemoveDataTag() throws ConfigurationException, InterruptedException, ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //the mocked ProcessCommmunicationManager can return an empty report (expect 3 calls for create, update and remove)    
@@ -510,7 +510,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    * @throws IllegalAccessException 
    * @throws ParserConfigurationException 
    */
-  @Test  
+  //@Test  
   public void testAlarmRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     
        
@@ -821,7 +821,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    * Test the creation, update and removal of alarm.
    */  
   @DirtiesContext
-  @Test
+  //@Test
   public void testCreateUpdateRemoveAlarm() {
     replay(mockManager);
     
