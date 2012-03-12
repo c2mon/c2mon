@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -15,14 +16,19 @@ import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.cache.TimCacheListener;
 import cern.tim.server.common.alarm.Alarm;
+import cern.tim.server.common.component.Lifecycle;
+import cern.tim.server.common.config.ServerConstants;
 import cern.tim.server.common.tag.Tag;
 import cern.tim.util.jms.JmsSender;
 import cern.tim.util.json.GsonFactory;
 
 /**
+ * 
+ * @author Manos, Mark Brightwell
+ *
  */
 @Service
-public class AlarmPublisher implements TimCacheListener<Alarm>  {
+public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle  {
   
   /** Class logger */
   private static final Logger LOGGER = Logger.getLogger(AlarmPublisher.class);
@@ -38,6 +44,12 @@ public class AlarmPublisher implements TimCacheListener<Alarm>  {
   
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
+  
+  /** Listener container lifecycle hook */
+  private Lifecycle listenerContainer;
+  
+  /** Lifecycle flag */
+  private volatile boolean running = false;
   
   /**
    * Default Constructor
@@ -61,7 +73,7 @@ public class AlarmPublisher implements TimCacheListener<Alarm>  {
    */
   @PostConstruct
   void init() {
-    cacheRegistrationService.registerToAlarms(this);
+    listenerContainer = cacheRegistrationService.registerToAlarms(this);
   }
 
   @Override
@@ -94,4 +106,40 @@ public class AlarmPublisher implements TimCacheListener<Alarm>  {
     LOGGER.debug("Publishing alarm: " + jsonAlarm);
     jmsSender.send(jsonAlarm);
   }
+  
+  @Override
+  public boolean isAutoStartup() {   
+    return false;
+  }
+
+  @Override
+  public void stop(Runnable runnable) {
+    stop();
+    runnable.run();
+  }
+
+  @Override
+  public boolean isRunning() {
+    return running;
+  }
+
+  @Override
+  public void start() {
+    LOGGER.debug("Starting Alarm publisher");
+    running = true;
+    listenerContainer.start();
+  }
+
+  @Override
+  public void stop() {
+    LOGGER.debug("Stopping Alarm publisher");
+    listenerContainer.stop();
+    running = false;    
+  }
+
+  @Override
+  public int getPhase() {
+    return ServerConstants.PHASE_STOP_LAST - 1;    
+  }
+ 
 }
