@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.tim2.tim2-server</groupId>
     <artifactId>tim2-server-pom</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.6</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <version>1.0.3-SNAPSHOT</version>
@@ -41,7 +41,7 @@
     <!-- 3rd party -->
     <dependency>
       <groupId>oracle</groupId>
-      <artifactId>ojdbc14</artifactId>
+      <artifactId>ojdbc</artifactId>
     </dependency>
     <dependency>
       <groupId>oracle</groupId>
