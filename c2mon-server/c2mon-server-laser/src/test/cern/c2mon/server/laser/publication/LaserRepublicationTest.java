@@ -6,8 +6,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import oracle.net.aso.p;
+
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,6 +18,7 @@ import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.cachepersistence.common.BatchPersistenceManager;
 import cern.tim.server.common.alarm.Alarm;
+import cern.tim.server.common.component.Lifecycle;
 import cern.tim.server.test.CacheObjectCreation;
 
 /**
@@ -30,6 +34,7 @@ public class LaserRepublicationTest {
   AlarmCache alarmCache;
   BatchPersistenceManager alarmPersistenceManager;
   LaserPublisherImpl publisher;
+  Lifecycle listenerContainer;
   
   public LaserRepublicationTest(){
     System.setProperty("log4j.configuration",System.getProperty("log4j.configuration", "cern/c2mon/server/laser/publication/log4j.properties"));
@@ -50,6 +55,7 @@ public class LaserRepublicationTest {
     mockControl.reset();    
     registrationService = mockControl.createMock(CacheRegistrationService.class);
     alarmCache = mockControl.createMock(AlarmCache.class);
+    listenerContainer = mockControl.createMock(Lifecycle.class);
     alarmPersistenceManager = mockControl.createMock(BatchPersistenceManager.class);    
   }
   
@@ -69,6 +75,8 @@ public class LaserRepublicationTest {
     
     Alarm alarmMock = mockControl.createMock(Alarm.class);
     expect(alarmMock.getId()).andReturn(10L).times(3);
+    expect(registrationService.registerToAlarms(publisher)).andReturn(listenerContainer);
+    listenerContainer.start();      
     
     mockControl.replay();
     
@@ -80,7 +88,7 @@ public class LaserRepublicationTest {
     
     publisher.notifyElementUpdated(alarmMock);
     
-    assertTrue(publisher.hasUnpublishedAlarms());
+    assertTrue(publisher.hasUnpublishedAlarms());    
     mockControl.verify();
   }
   
@@ -98,7 +106,9 @@ public class LaserRepublicationTest {
     
     publisher = new LaserPublisherImpl(registrationService, alarmCache, alarmPersistenceManager);
     
-    registrationService.registerToAlarms(publisher);    
+    expect(registrationService.registerToAlarms(publisher)).andReturn(listenerContainer);
+    listenerContainer.start();  
+    listenerContainer.stop();    
     
     Alarm alarmMock = mockControl.createMock(Alarm.class);
     Alarm alarmInCache = CacheObjectCreation.createTestAlarm1();
@@ -136,7 +146,8 @@ public class LaserRepublicationTest {
     assertTrue(alarmInCache.getLastPublication() != null);
     assertEquals(alarmInCache.getLastPublication().getInfo(), CacheObjectCreation.createTestAlarm1().getInfo());
     assertEquals(alarmInCache.getLastPublication().getState(), CacheObjectCreation.createTestAlarm1().getState());
-    assertNotNull(alarmInCache.getLastPublication().getPublicationTime());  
+    assertNotNull(alarmInCache.getLastPublication().getPublicationTime());
+    publisher.stop();
     mockControl.verify();
   }
   

@@ -28,6 +28,7 @@ import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.cache.TimCacheListener;
 import cern.tim.server.cachepersistence.common.BatchPersistenceManager;
 import cern.tim.server.common.alarm.Alarm;
+import cern.tim.server.common.component.Lifecycle;
 import cern.tim.server.common.config.ServerConstants;
 
 /**
@@ -135,6 +136,11 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   private ConcurrentHashMap<Long, Long> toBePublished = new ConcurrentHashMap<Long, Long>();
 
   private StatisticsModule stats = new StatisticsModule();
+  
+  /**
+   * Listener container for stop/starting;
+   */
+  private Lifecycle listenerContainer;
 
   /**
    * Autowired constructor.
@@ -176,7 +182,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
    */
   @PostConstruct
   public void init() throws Exception {
-    cacheRegistrationService.registerToAlarms(this);    
+    listenerContainer = cacheRegistrationService.registerToAlarms(this);    
   }
 
 
@@ -319,8 +325,9 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
           } catch (InterruptedException e) {
             log.error("Interrupted during start-up check");
           }
-        }        
+        }                
         running = true;
+        listenerContainer.start();
       }
     }
              
@@ -328,9 +335,10 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
 
   @Override
   @ManagedOperation(description = "Stops the alarm publisher.")
-  public void stop() {
-    if (running) {      
+  public void stop() {    
+    if (running) {          
       log.info("Stopping LASER publisher " + LaserPublisherImpl.class.getName());
+      listenerContainer.stop();
       shutdownRequested = true; 
       while (!toBePublished.isEmpty()) {
         log.warn("Unpublished alarms at shutdown - be sure to restart server in recovery mode to guarantee all alarm publications! (or run 'republish alarms' in Jconsole RecoveryManager)");

@@ -22,6 +22,7 @@ import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.cachepersistence.common.BatchPersistenceManager;
 import cern.tim.server.common.alarm.Alarm;
+import cern.tim.server.common.component.Lifecycle;
 import cern.tim.server.test.CacheObjectCreation;
 
 /**
@@ -38,6 +39,7 @@ public class LaserAlarmPublisherImplTest {
 	AlarmCache alarmCache;
 	BatchPersistenceManager alarmPersistenceManager;
 	LaserPublisherImpl publisher;
+	Lifecycle listenerContainer;
 	public LaserAlarmPublisherImplTest(){
     System.setProperty("log4j.configuration",System.getProperty("log4j.configuration", "cern/c2mon/server/laser/publication/log4j.properties"));
 		
@@ -55,22 +57,19 @@ public class LaserAlarmPublisherImplTest {
 	  System.setProperty("laser.hosts", "laser-test");
     System.setProperty("cmw.mom.brokerlist", "jms-diamon-test:2506");
 	  mockControl.reset();	  
-    registrationService = mockControl.createMock(CacheRegistrationService.class);
+    registrationService = mockControl.createMock(CacheRegistrationService.class);    
     alarmCache = mockControl.createMock(AlarmCache.class);
     alarmPersistenceManager = mockControl.createMock(BatchPersistenceManager.class);
+    listenerContainer = mockControl.createMock(Lifecycle.class);
     publisher = new LaserPublisherImpl(registrationService, alarmCache, alarmPersistenceManager);
-	}
-	
-	@After
-	public void afterTest() throws InterruptedException {
-	  Thread.sleep(1000);
-	  publisher.stop();
 	}
 	
 	@Test
 	public void testSendActiveAlarmFaultState() throws InterruptedException {
 		
-		registrationService.registerToAlarms(publisher);		
+		expect(registrationService.registerToAlarms(publisher)).andReturn(listenerContainer);
+		listenerContainer.start();	
+		listenerContainer.stop();
 		
 		Alarm alarmMock = mockControl.createMock(Alarm.class);
 		Alarm alarmInCache = CacheObjectCreation.createTestAlarm2();
@@ -92,20 +91,24 @@ public class LaserAlarmPublisherImplTest {
 		//wait as LASER connection done in separate thread
 		Thread.sleep(10000);
 		publisher.notifyElementUpdated(alarmMock);
+		Thread.sleep(1000);
+    publisher.stop();
 		mockControl.verify();
 		
 		//check last published value is newly set correctly
 		assertTrue(alarmInCache.getLastPublication() != null);
 		assertEquals(alarmInCache.getLastPublication().getInfo(), CacheObjectCreation.createTestAlarm2().getInfo());
 		assertEquals(alarmInCache.getLastPublication().getState(), CacheObjectCreation.createTestAlarm2().getState());
-		assertNotNull(alarmInCache.getLastPublication().getPublicationTime());
+		assertNotNull(alarmInCache.getLastPublication().getPublicationTime());		
 	}
 	
 	
 	@Test	
 	public void testSendTerminatedAlarmFaultState() throws InterruptedException {
 	  
-	  registrationService.registerToAlarms(publisher);    
+	  expect(registrationService.registerToAlarms(publisher)).andReturn(listenerContainer);
+    listenerContainer.start();  
+    listenerContainer.stop();	  
     
     Alarm alarmMock = mockControl.createMock(Alarm.class);
     Alarm alarmInCache = CacheObjectCreation.createTestAlarm1();
@@ -127,6 +130,8 @@ public class LaserAlarmPublisherImplTest {
     //wait as LASER connection done in separate thread
     Thread.sleep(5000);
     publisher.notifyElementUpdated(alarmMock);
+    Thread.sleep(1000);
+    publisher.stop();
     mockControl.verify();
     
     //check last published value is newly set correctly
@@ -138,6 +143,13 @@ public class LaserAlarmPublisherImplTest {
 	
 	@Test
 	public void testStopStart() throws Exception {
+	  expect(registrationService.registerToAlarms(publisher)).andReturn(listenerContainer).atLeastOnce();
+    listenerContainer.start();
+    EasyMock.expectLastCall().atLeastOnce();
+    listenerContainer.stop();
+    EasyMock.expectLastCall().atLeastOnce();
+    
+	  mockControl.replay();
 	  publisher.setSourceName("TEST-SOURCE");
 	  publisher.init();
 	  assertFalse(publisher.isRunning());
@@ -147,6 +159,7 @@ public class LaserAlarmPublisherImplTest {
 	  assertFalse(publisher.isRunning());
 	  publisher.start();
 	  publisher.stop();
+	  mockControl.verify();
 	}
 	
 }
