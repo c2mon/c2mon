@@ -369,7 +369,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
 
   @Override
   public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST - 1;
+    return ServerConstants.PHASE_STOP_LAST + 1;
   }
 
   @Override
