@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -29,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.shorttermlog.mapper.SupervisionMapper;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.tim.server.common.component.Lifecycle;
+import cern.tim.server.common.config.ServerConstants;
 import cern.tim.server.supervision.SupervisionListener;
 import cern.tim.server.supervision.SupervisionNotifier;
 
@@ -40,7 +43,7 @@ import cern.tim.server.supervision.SupervisionNotifier;
  *
  */
 @Service
-public class LogSupervisionListener implements SupervisionListener {
+public class LogSupervisionListener implements SupervisionListener, SmartLifecycle {
 
   /**
    * Class logger.
@@ -56,6 +59,16 @@ public class LogSupervisionListener implements SupervisionListener {
    * Supervision Mapper
    */
   private SupervisionMapper supervisionMapper;
+  
+  /**
+   * Listener container lifecycle hook.
+   */
+  private Lifecycle listenerContainer;
+  
+  /**
+   * Lifecycle flag.
+   */
+  private volatile boolean running = false;
   
   /**
    * Autowired constructor.
@@ -77,7 +90,7 @@ public class LogSupervisionListener implements SupervisionListener {
   @PostConstruct
   public void init() {
     LOGGER.debug("Registering short-term-log module for supervision updates");
-    supervisionNotifier.registerAsListener(this);
+    listenerContainer = supervisionNotifier.registerAsListener(this);
   }
 
   @Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.DEFAULT)
@@ -89,6 +102,41 @@ public class LogSupervisionListener implements SupervisionListener {
             + " " + supervisionEvent.getEntityId());
     }
     supervisionMapper.logSupervisionEvent(supervisionEvent);
+  }
+  
+  @Override
+  public boolean isAutoStartup() {   
+    return false;
+  }
+
+  @Override
+  public void stop(Runnable runnable) {
+    stop();
+    runnable.run();
+  }
+
+  @Override
+  public boolean isRunning() {
+    return running;
+  }
+
+  @Override
+  public void start() {
+    LOGGER.debug("Starting supervision event logger.");
+    running = true;
+    listenerContainer.start();
+  }
+
+  @Override
+  public void stop() {
+    LOGGER.debug("Stopping supervision event logger.");
+    listenerContainer.stop();
+    running = false;    
+  }
+
+  @Override
+  public int getPhase() {
+    return ServerConstants.PHASE_STOP_LAST - 1;    
   }
 
 }

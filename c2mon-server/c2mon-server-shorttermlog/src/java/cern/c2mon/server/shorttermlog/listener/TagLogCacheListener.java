@@ -23,12 +23,16 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.shorttermlog.logger.BatchLogger;
 import cern.tim.server.cache.BufferedTimCacheListener;
 import cern.tim.server.cache.CacheRegistrationService;
+import cern.tim.server.common.component.Lifecycle;
+import cern.tim.server.common.config.ServerConstants;
 import cern.tim.server.common.tag.Tag;
 
 /**
@@ -39,8 +43,13 @@ import cern.tim.server.common.tag.Tag;
  *
  */
 @Service
-public class TagLogCacheListener implements BufferedTimCacheListener<Tag> {
+public class TagLogCacheListener implements BufferedTimCacheListener<Tag>, SmartLifecycle {
 
+  /**
+   * Class logger.
+   */
+  private static final Logger LOGGER = Logger.getLogger(TagLogCacheListener.class);
+  
   /**
    * Reference to registration service.
    */
@@ -50,6 +59,16 @@ public class TagLogCacheListener implements BufferedTimCacheListener<Tag> {
    * Bean that logs Tags into the STL.
    */
   private BatchLogger<Tag> tagLogger;
+  
+  /**
+   * Listener container lifecycle hook.
+   */
+  private Lifecycle listenerContainer;
+  
+  /**
+   * Lifecycle flag.
+   */
+  private volatile boolean running = false;
   
   /**
    * Autowired constructor.
@@ -69,7 +88,7 @@ public class TagLogCacheListener implements BufferedTimCacheListener<Tag> {
    */
   @PostConstruct
   public void init() {
-    cacheRegistrationService.registerBufferedListenerToTags(this);
+    listenerContainer = cacheRegistrationService.registerBufferedListenerToTags(this);
   }
 
   @Override
@@ -85,6 +104,41 @@ public class TagLogCacheListener implements BufferedTimCacheListener<Tag> {
         tagsToLog.add(tag);
     }
     tagLogger.log(tagsToLog);
+  }
+
+  @Override
+  public boolean isAutoStartup() {   
+    return false;
+  }
+
+  @Override
+  public void stop(Runnable runnable) {
+    stop();
+    runnable.run();
+  }
+
+  @Override
+  public boolean isRunning() {
+    return running;
+  }
+
+  @Override
+  public void start() {
+    LOGGER.debug("Starting Tag logger (short-term-log)");
+    running = true;
+    listenerContainer.start();
+  }
+
+  @Override
+  public void stop() {
+    LOGGER.debug("Stopping Tag logger (short-term-log)");
+    listenerContainer.stop();
+    running = false;    
+  }
+
+  @Override
+  public int getPhase() {
+    return ServerConstants.PHASE_STOP_LAST - 1;    
   }
  
 
