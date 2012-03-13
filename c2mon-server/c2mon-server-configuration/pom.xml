@@ -8,7 +8,7 @@
     <version>1.0.6</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.3</version>
   <name>c2mon-server-configuration</name>
   <artifactId>c2mon-server-configuration</artifactId>
   <packaging>jar</packaging>
