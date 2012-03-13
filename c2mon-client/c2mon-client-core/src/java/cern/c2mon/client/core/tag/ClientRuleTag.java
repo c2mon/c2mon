@@ -450,11 +450,6 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   public Timestamp getServerTimestamp() {
     return null;
   }
-  
-  @Override
-  public Timestamp getSourceTimestamp() {
-    return null;
-  }
 
   /**
    * If one of the tags used within the rule is marked as simulated,
