@@ -281,7 +281,7 @@ stop() {
 	      echo "Gentle shutdown failed. Killing the C2MON server on $C2MON_HOST"
 	      echo "To ensure all data was processed, one of the following actions should be taken: "
 	      echo "  - either restart a server using the *recover* option"
-	      echo -n "  - or use the JConsole to run the *RecoveryManager -> recover task* (on other running server for instance)"
+	      echo "  - or use the JConsole to run the *RecoveryManager -> recover task* (on other running server for instance)"
 	      kill -9 $pid >/dev/null 2>&1
               sleep 1
 	      runs $pid
