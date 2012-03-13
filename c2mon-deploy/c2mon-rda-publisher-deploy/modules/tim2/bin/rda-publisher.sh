@@ -38,7 +38,7 @@ export PROCESS_NAME=rda-publisher
 PROCESS_COMMAND=$1
 
 # The script which is actually calling the RDA publisher
-STARTUP_SCRIPT=${APP_HOME}/bin/TIM-PUBLISHER-STARTUP.jvm
+STARTUP_SCRIPT=${APP_HOME}/bin/RDA-PUBLISHER-STARTUP.jvm
 
 TIME=`date +"%F %T.%3N"`
 
