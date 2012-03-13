@@ -5,7 +5,7 @@
 # Author: Matthias Braeger (GS-ASE-SSE)
 # Date:   March 2012
 #
-# This script is used to launch the JAPC-publisher on a linux
+# This script is used to launch the RDA Publisher on a linux
 # server. 
 # Please be aware that this script will NOT run from 
 # everywhere but from the APP_HOME directory.  
@@ -34,11 +34,11 @@ APP_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 # PROCESS specific variables #
 ##############################
 
-export PROCESS_NAME=japc-sispublisher
+export PROCESS_NAME=rda-publisher
 PROCESS_COMMAND=$1
 
-# The script which is actually calling the JAPC publisher
-STARTUP_SCRIPT=${APP_HOME}/bin/JAPC-PUBLISHER-STARTUP.jvm
+# The script which is actually calling the RDA publisher
+STARTUP_SCRIPT=${APP_HOME}/bin/TIM-PUBLISHER-STARTUP.jvm
 
 TIME=`date +"%F %T.%3N"`
 
@@ -150,7 +150,7 @@ really_start() {
 
     if [ $? -eq 1 ] ; then
 	echo_failure
-	echo "A $PROCESS_NAME Process could not be started."
+	echo "$PROCESS_NAME process could not be started."
 	echo
 	echo -e "$TIME\t$PROCESS_NAME\t$PROCESS_HOST\tSTART\tFAILED" >> $PROCESS_SCRIPT_LOG
     
