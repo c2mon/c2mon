@@ -152,6 +152,10 @@ public final class RdaPublisher extends DeviceServerBase implements DataTagUpdat
    */
   @Override
   public void onUpdate(final ClientDataTagValue cdt) {
+    // Saves the received value into a separate file
+    Logger logger = Logger.getLogger("ClientDataTagLogger");
+    logger.debug(cdt);
+    
     if (cdt.getDataTagQuality().isExistingTag()) {
       String propertyName = cdt.getName();
       if (!properties.containsKey(cdt.getName())) {

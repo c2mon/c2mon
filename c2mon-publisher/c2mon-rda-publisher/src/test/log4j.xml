@@ -5,6 +5,9 @@
 
 <log4j:configuration debug="false" threshold="debug" xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
+  <renderer  renderedClass="cern.c2mon.client.common.tag.ClientDataTagValue"
+             renderingClass="cern.c2mon.client.common.tag.ClientDataTagValueRenderer" />
+
   <!--
     Create a ConsoleAppender.
     Log messages are written to the console
