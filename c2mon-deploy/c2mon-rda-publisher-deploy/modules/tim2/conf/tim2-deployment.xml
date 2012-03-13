@@ -1,35 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-	<product name="c2mon">
+  <product name="c2mon">
 
-		<!--
+    <!--
 			this application section is a parent configuration for both
 			c2mon-tim2-prod and c2mon-tim2-test
 		-->
-		<application name="default">
-			<deployment installLocation="/opt/tim-rda-publisher/">
-				<backupPolicy keepBackups="2">
-					<preserve type="dir" name="log" />
-					<preserve type="dir" name="tmp" />
-					<preserve type="file" name="conf/publisher.tid" />
-				</backupPolicy>
-				<notification>
-					<!-- you can give more than one mail for deployment notification -->
-					<mail address="tim-admin@cern.ch" />
-				</notification>
-			</deployment>
-		</application>
+    <application name="default">
+      <deployment installLocation="/opt/tim-rda-publisher/">
+        <backupPolicy keepBackups="2">
+          <preserve type="dir" name="log" />
+          <preserve type="dir" name="tmp" />
+          <preserve type="file" name="conf/publisher.tid" />
+        </backupPolicy>
+      </deployment>
+    </application>
 
 
-		<application name="tim-rda-publisher-prod" extends="default">
-			<deployment installLocation="/opt/tim-rda-publisher">
-				<directory name="conf">
-					<!-- Copy over the c2mon-client.properties file into the /conf directory  -->
-					<file name="c2mon-client.properties" sourceDir="/user/timoper/rep/c2mon/client"
-						mask="400" />
-				</directory>
-			</deployment>
-            <startscript name="tim-publisher-startup">
+    <application name="tim-rda-publisher-prod" extends="default">
+      <deployment installLocation="/opt/tim-rda-publisher">
+        <directory name="conf">
+          <!-- Copy over the c2mon-client.properties file into the /conf directory  -->
+          <file name="c2mon-client.properties" sourceDir="/user/timoper/rep/c2mon/client" mask="400" />
+        </directory>
+        <notification>
+          <!-- you can give more than one mail for deployment notification -->
+          <mail address="tim-admin@cern.ch" />
+        </notification>
+      </deployment>
+      <startscript name="tim-publisher-startup">
         <main-class name="cern.c2mon.publisher.rda.PublisherKernel">
           <initial-heap-size>256m</initial-heap-size>
           <max-heap-size>256m</max-heap-size>
@@ -47,17 +46,16 @@
           </output>
         </main-class>
       </startscript>
-		</application>
+    </application>
 
 
-		<application name="tim-rda-publisher-test" extends="default">
-			<deployment installLocation="/opt/tim-rda-publisher-test">
-				<directory name="conf">
+    <application name="tim-rda-publisher-test" extends="default">
+      <deployment installLocation="/opt/tim-rda-publisher-test">
+        <directory name="conf">
           <!-- Copy over the c2mon.properties file into the /conf directory  -->
-          <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client"
-            mask="400" />
+          <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client" mask="400" />
         </directory>
-			</deployment>
+      </deployment>
       <startscript name="tim-publisher-startup">
         <main-class name="cern.c2mon.publisher.rda.PublisherKernel">
           <initial-heap-size>256m</initial-heap-size>
@@ -76,6 +74,6 @@
           </output>
         </main-class>
       </startscript>
-		</application>
-	</product>
+    </application>
+  </product>
 </products>
