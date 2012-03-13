@@ -29,22 +29,24 @@
         </notification>
       </deployment>
       <startscript name="tim-publisher-startup">
+        <preExec>
+          <![CDATA[
+            [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+           ]]>
+        </preExec>
+        <initial-heap-size>256m</initial-heap-size>
+        <max-heap-size>256m</max-heap-size>
+
         <main-class name="cern.c2mon.publisher.rda.PublisherKernel">
-          <initial-heap-size>256m</initial-heap-size>
-          <max-heap-size>256m</max-heap-size>
           <arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -tidfile ${INSTALL_DIR}/conf/publisher.tid -server TIM-RDA-SERVER -device TIM.RDA.DEVICE</arg>
-          <preExec>
-<![CDATA[
-  [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
- ]]>
-          </preExec>
-          <property name="tim.log.path" value="${INSTALL_DIR}/log" />
-          <property name="tim.process.name" value="${PROCESS_NAME}" />
-          <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
-          <output>
-            <logrotate fileSize="50M" files="3" name="${INSTALL_DIR}/log/${PROCESS_NAME}.out.log" />
-          </output>
         </main-class>
+
+        <property name="tim.log.path" value="${INSTALL_DIR}/log" />
+        <property name="tim.process.name" value="${PROCESS_NAME}" />
+        <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+        <output>
+          <logrotate fileSize="50M" files="3" name="${INSTALL_DIR}/log/${PROCESS_NAME}.out.log" />
+        </output>
       </startscript>
     </application>
 
@@ -56,23 +58,24 @@
           <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client" mask="400" />
         </directory>
       </deployment>
+      
       <startscript name="tim-publisher-startup">
+        <preExec>
+          <![CDATA[
+            [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+           ]]>
+        </preExec>
+        <initial-heap-size>256m</initial-heap-size>
+        <max-heap-size>256m</max-heap-size>
         <main-class name="cern.c2mon.publisher.rda.PublisherKernel">
-          <initial-heap-size>256m</initial-heap-size>
-          <max-heap-size>256m</max-heap-size>
           <arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -tidfile ${INSTALL_DIR}/conf/publisher.tid -server TIM-RDA-SERVER-TEST -device TIM.RDA.DEVICE.TEST</arg>
-          <preExec>
-<![CDATA[
-  [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
- ]]>
-          </preExec>
-          <property name="tim.log.path" value="${INSTALL_DIR}/log" />
-          <property name="tim.process.name" value="${PROCESS_NAME}" />
-          <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
-          <output>
-            <logrotate fileSize="50M" files="3" name="${INSTALL_DIR}/log/${PROCESS_NAME}.out.log" />
-          </output>
         </main-class>
+        <property name="tim.log.path" value="${INSTALL_DIR}/log" />
+        <property name="tim.process.name" value="${PROCESS_NAME}" />
+        <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+        <output>
+          <logrotate fileSize="50M" files="3" name="${INSTALL_DIR}/log/${PROCESS_NAME}.out.log" />
+        </output>
       </startscript>
     </application>
   </product>
