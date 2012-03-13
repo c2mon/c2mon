@@ -1019,10 +1019,4 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public String toString() {
       return this.getXml();
   }
-
-  @Override
-  public Timestamp getSourceTimestamp() {
-    
-    return sourceTimestamp;
-  }
 }
