@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
@@ -117,7 +118,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Buffer before warnings for slow consumers are sent, for
    * tags, alarms (where larger buffer is desirable).
    */
-  private static final int HIGH_LISTENER_QUEUE_SIZE = 200000;
+  private static final int HIGH_LISTENER_QUEUE_SIZE = 10000;
   
   /**
    * The JMS connection factory.
@@ -283,7 +284,18 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     connectingWriteLock = new ReentrantReadWriteLock().writeLock();
     refreshLock = new ReentrantReadWriteLock();
     
-    topicPollingExecutor = Executors.newCachedThreadPool();
+    topicPollingExecutor = Executors.newCachedThreadPool(new ThreadFactory() {      
+      
+      ThreadFactory defaultFactory = Executors.defaultThreadFactory();      
+      
+      @Override
+      public Thread newThread(Runnable r) {
+        Thread returnThread = defaultFactory.newThread(r);
+        returnThread.setDaemon(true);        
+        return returnThread;
+      }
+    });
+    
     sessions = new ConcurrentHashMap<MessageListenerWrapper, Session>();    
     topicToWrapper = new ConcurrentHashMap<String, MessageListenerWrapper>();
     registeredListeners = new ConcurrentHashMap<TagUpdateListener, TopicRegistrationDetails>();
@@ -852,6 +864,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   
   @PreDestroy
   public void stop() {
+    LOGGER.debug("Stopping JmsProxy and dependent listeners");
     shutdownRequested = true;
     disconnect();
     supervisionListenerWrapper.stop();

@@ -142,7 +142,7 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
    * Can only be started/stopped once.
    */
   @Override
-  public void start() {    
+  public void start() {     
     running = true;
   }
 
@@ -151,6 +151,7 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
    */
   @Override
   public void stop() {
+    LOGGER.debug("Stopping listener thread");
     shutdownRequest = true;
     running = false;
   }
