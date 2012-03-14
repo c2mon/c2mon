@@ -63,7 +63,7 @@ DAQ_SCRIPT=${DAQ_HOME}/bin/TIM2-DAQ-STARTUP.jvm
 
 export DAQ_LOG_HOME
 export DAQ_CONF_HOME=$DAQ_HOME/conf
-export C2MON_PROPERTIES_FILE=$DAQ_CONF_HOME/.c2mon.properties
+export C2MON_PROPERTIES_FILE=$DAQ_CONF_HOME/c2mon.properties
 DAQ_LOG_FILE=${DAQ_LOG_HOME}/daqprocess.log
 
 # List of all OPC DAQ processes that are started on DAQ_SECONDARY_HOST
