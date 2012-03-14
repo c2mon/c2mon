@@ -13,16 +13,16 @@
           <preserve type="dir" name="tmp" />
           <preserve type="file" name="conf/publisher.tid" />
         </backupPolicy>
+        <directory name="conf">
+          <!-- Copy over the c2mon-client.properties file into the /conf directory  -->
+          <file name="c2mon-client.properties" sourceDir="/user/timoper/rep/c2mon/client" mask="400" />
+        </directory>
       </deployment>
     </application>
 
 
     <application name="tim-rda-publisher-prod" extends="default">
       <deployment installLocation="/opt/tim-rda-publisher">
-        <directory name="conf">
-          <!-- Copy over the c2mon-client.properties file into the /conf directory  -->
-          <file name="c2mon-client.properties" sourceDir="/user/timoper/rep/c2mon/client" mask="400" />
-        </directory>
         <notification>
           <!-- you can give more than one mail for deployment notification -->
           <mail address="tim-admin@cern.ch" />
@@ -54,12 +54,7 @@
 
 
     <application name="tim-rda-publisher-test" extends="default">
-      <deployment installLocation="/opt/tim-rda-publisher-test">
-        <directory name="conf">
-          <!-- Copy over the c2mon.properties file into the /conf directory  -->
-          <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client" mask="400" />
-        </directory>
-      </deployment>
+      <deployment installLocation="/opt/tim-rda-publisher-test" />
 
       <startscript name="rda-publisher-startup">
         <preExec>
