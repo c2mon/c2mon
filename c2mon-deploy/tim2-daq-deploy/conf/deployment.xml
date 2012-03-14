@@ -27,7 +27,7 @@
 					<max-heap-size>256m</max-heap-size>
 					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j
 						${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName
-						${PROCESS_NAME} ${ADDITIONAL_PARAMS} -transition</arg>
+						${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
 
 					<property name="c2mon.process.name" value="$PROCESS_NAME" />
 					<property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
@@ -62,7 +62,7 @@
 		<application name="tim2-daq-prod" extends="default">
 			<deployment installLocation="~/dist/daqprocess-mvn">
 				<directory name="conf">
-					<file name=".c2mon.properties" sourceDir="~/rep/c2mon/daq"
+					<file name="c2mon.properties" sourceDir="~/rep/c2mon/daq"
 						mask="400" />
 				</directory>
 				<directory name="bin">
@@ -83,7 +83,7 @@
 		<application name="tim2-daq-test" extends="default">
 			<deployment installLocation="~/dist/daqprocess-mvn">
 				<directory name="conf">
-					<file name=".c2mon.properties" sourceDir="~/rep/c2mon/daq"
+					<file name="c2mon.properties" sourceDir="~/rep/c2mon/daq"
 						mask="400" />
 				</directory>
 				<directory name="bin">
@@ -94,7 +94,7 @@
 				<main-class name="cern.tim.driver.common.startup.DaqStartup">
 					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j
 						${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName
-						${PROCESS_NAME} ${ADDITIONAL_PARAMS} -transition</arg>
+						${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
 					<property name="c2mon.daq.spring.context"
 						value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
 				</main-class>
@@ -104,7 +104,7 @@
 		<application name="tim2-daq-dev" extends="default">
 			<deployment installLocation="~/dev/c2mon-daq-dev">
 				<directory name="conf">
-					<file name=".c2mon.properties" sourceDir="~/dev/rep/c2mon/daq"
+					<file name="c2mon.properties" sourceDir="~/dev/rep/c2mon/daq"
 						mask="400" />
 				</directory>
 				<directory name="bin">

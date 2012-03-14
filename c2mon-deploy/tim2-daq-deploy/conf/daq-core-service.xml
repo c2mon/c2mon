@@ -12,24 +12,24 @@
 
 <bean id="driverKernel" class="cern.tim.driver.common.DriverKernel">
   <property name="primaryRequestSender" ref="primaryRequestSender"/>
-  <property name="secondaryRequestSender" ref="secondaryRequestSender"/>
+<!--  <property name="secondaryRequestSender" ref="secondaryRequestSender"/> -->
   <property name="processMessageReceivers">
     <list>
-      <ref bean="sonicMessageReceiver"/>
+<!--      <ref bean="sonicMessageReceiver"/> -->
       <ref bean="activeMessageReceiver"/>              
     </list>
   </property>
 </bean>
 
 <!-- initialize the ProcessRequestSender; can switch here between implementations (No dummy implementation needed if local conf used)-->
-<bean id="secondaryRequestSender" class="cern.tim.driver.common.messaging.impl.SonicRequestSender"/>
+<!-- <bean id="secondaryRequestSender" class="cern.tim.driver.common.messaging.impl.SonicRequestSender"/> -->
 <bean id="primaryRequestSender" class="cern.tim.driver.common.messaging.impl.ActiveRequestSender"/>
 
 <!-- 
 Initialize the ProcessMessageReceiver; switch here between implementations (Dummy implementation available) 
 Several can be wired into DriverKernel
 -->
-<bean id="sonicMessageReceiver" class="cern.tim.driver.common.messaging.impl.SonicMessageReceiver"/>
+<!--<bean id="sonicMessageReceiver" class="cern.tim.driver.common.messaging.impl.SonicMessageReceiver"/>-->
 <bean id="activeMessageReceiver" class="cern.tim.driver.common.messaging.impl.ActiveMessageReceiver"/>
 
 <!-- initialize the FilterMessageSender; switch here between implementations (Dummy implementation available) -->
@@ -37,13 +37,13 @@ Several can be wired into DriverKernel
 <!--<bean id="filterMessageSender" class="cern.tim.driver.filter.impl.DummyFilterSender"/>-->
 
 <!-- initialize the JmsSenders; any number of these can be plugged into the ProcessMessageSender below -->
-<bean id="sonicJmsSender" class="cern.tim.driver.common.messaging.impl.SonicJmsSender"/>
+<!--<bean id="sonicJmsSender" class="cern.tim.driver.common.messaging.impl.SonicJmsSender"/>-->
 <bean id="activeJmsSender" class="cern.tim.driver.common.messaging.impl.ActiveJmsSender"/>
 
 <!-- use proxyJmsSender in processMessageSender to shield DAQ from this connection -->
-<bean id="proxyJmsSender" class="cern.tim.driver.common.messaging.impl.ProxyJmsSender">
+<!--<bean id="proxyJmsSender" class="cern.tim.driver.common.messaging.impl.ProxyJmsSender">
   <property name="wrappedSender" ref="sonicJmsSender"/>
-</bean>
+</bean>-->
 
 <!-- set the JMS message senders that will be used; both SonicMQ and ActiveMQ beans are initialized
      automatically and can be wired in here -->
@@ -51,7 +51,7 @@ Several can be wired into DriverKernel
   <property name="jmsSenders">
     <list>
       <ref bean="activeJmsSender"/>
-      <ref bean="proxyJmsSender"/>
+<!--      <ref bean="proxyJmsSender"/> -->
 <!--      <ref bean="sonicJmsSender"/>-->
     </list>
   </property>

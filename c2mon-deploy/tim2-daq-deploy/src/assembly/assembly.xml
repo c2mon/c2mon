@@ -85,8 +85,16 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
+    
+    <!-- copy list of all processes -->
+    <file>
+      <source>conf/daqprocess.lst</source>
+      <outputDirectory>conf/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
 
-		<!--  copy sthe starting script -->
+		<!--  copy the starting script -->
 		<file>
 			<source>bin/daqprocess2.sh</source>
 			<outputDirectory>bin/</outputDirectory>
