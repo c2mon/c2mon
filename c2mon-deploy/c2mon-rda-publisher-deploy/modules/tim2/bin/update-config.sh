@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # The SMILE HTTP link to fetch the JAPC publication list 
-JAPC_PUBLICATIONS_TID_URL="https://oraweb.cern.ch/pls/timw3_oper/smile.queryDisplay?nType=4&Tablename=VSML_360JAPCPUBPTS&vHeader=POINT_ID&vSelect=POINT_ID"
+JAPC_PUBLICATIONS_TID_URL="https://oraweb.cern.ch/pls/timw3/smile.queryDisplay?nType=4&Tablename=VSML_360JAPCPUBPTS&vHeader=POINT_ID&vSelect=POINT_ID"
 
 # resolve links - $0 may be a softlink
 PRG="$0"
@@ -39,15 +39,12 @@ if [ -s $CONF_FILE ]; then
     cp $CONF_FILE $CONF_FILE.`date +%y%m%d_%k%M%S`
     mv $TEMP_FILE $CONF_FILE
     
-    # The JAPC publisher is now restarted
-    echo "Configuration has changed! Restarting JAPC publisher..."
-    $PUBLISHER_HOME/bin/japc-sispublisher.sh restart $FILE_ROOT 
+    echo "Configuration has changed! The Publisher will automatically subscribe to any new tag IDs within the next 60 seconds."
   else
     echo "The configuration has not changed since the last update!"
     rm $TEMP_FILE 	
   fi
 else
   mv $TEMP_FILE $CONF_FILE
-  echo "Configuration has changed! Restarting JAPC publisher..."
-  $PUBLISHER_HOME/bin/japc-sispublisher.sh restart $FILE_ROOT
+  echo "Configuration has changed! The Publisher will automatically subscribe to any new tag IDs within the next 60 seconds."
 fi
