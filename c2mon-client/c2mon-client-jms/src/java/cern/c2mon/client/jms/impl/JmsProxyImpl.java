@@ -20,6 +20,7 @@ package cern.c2mon.client.jms.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -51,6 +52,8 @@ import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.accsoft.commons.util.proc.ProcUtils;
@@ -90,6 +93,7 @@ import cern.tim.shared.client.command.CommandExecuteRequest;
  *
  */
 @Service
+@ManagedResource(objectName="cern.c2mon:type=JMS,name=JmsProxy")
 public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
   /**
@@ -890,6 +894,19 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       connectionListenersLock.writeLock().unlock();
     }          
     running = false;    
+  }
+  
+  @ManagedOperation(description="Get size of current internal listener queues")
+  public Map<String, Integer> getQueueSizes() {
+    Map<String, Integer> returnMap = new HashMap<String, Integer>();
+    for (Map.Entry<String, MessageListenerWrapper> entry : topicToWrapper.entrySet()) {
+      returnMap.put(entry.getKey(), entry.getValue().getQueueSize());
+    }
+    returnMap.put(supervisionTopic.toString(), supervisionListenerWrapper.getQueueSize());
+    returnMap.put(alarmTopic.toString(), alarmListenerWrapper.getQueueSize());
+    returnMap.put(adminMessageTopic.toString(), adminMessageListenerWrapper.getQueueSize());
+    returnMap.put(heartbeatTopic.toString(), heartbeatListenerWrapper.getQueueSize());        
+    return returnMap;      
   }
 
 }

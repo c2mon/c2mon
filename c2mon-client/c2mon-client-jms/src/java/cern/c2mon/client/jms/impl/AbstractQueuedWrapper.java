@@ -158,4 +158,11 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
     running = false;
   }
   
+  /**
+   * @return size of the internal queue of events
+   */
+  public int getQueueSize(){
+    return eventQueue.size();
+  }
+  
 }
