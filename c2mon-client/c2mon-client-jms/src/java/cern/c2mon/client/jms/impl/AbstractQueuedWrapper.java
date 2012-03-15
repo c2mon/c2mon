@@ -116,7 +116,9 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
   public void onMessage(final Message message) {
     try {
       if (message instanceof TextMessage) {        
-        LOGGER.trace("AbstractQueuedWrapper received message for " + this.getClass().getSimpleName());
+        if (LOGGER.isTraceEnabled())
+           LOGGER.trace("AbstractQueuedWrapper received message for " + this.getClass().getSimpleName());
+        
         U event = convertMessage(message);
         if (eventQueue.remainingCapacity() == 0) {
           String warning = "Slow consumer warning: " + this.getClass().getSimpleName() + " unable to keep up with incoming data. " 
