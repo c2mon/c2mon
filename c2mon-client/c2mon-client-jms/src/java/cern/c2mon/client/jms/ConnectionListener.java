@@ -3,7 +3,9 @@ package cern.c2mon.client.jms;
 
 /**
  * Interface that needs implementing by classes wishing to be notified of JMS
- * connection/disconnection events.
+ * connection/disconnection events. 
+ * 
+ * <p>Notice these are not notified on final shutdown of the client application.
  * 
  * @author Mark Brightwell
  * 

@@ -382,20 +382,28 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
 
   /**
-   * Also notifies listeners of disconnection.
+   * Disconnects and notifies listeners of disconnection.
    */
   private synchronized void disconnect() {
+    disconnectQuietly();
+    notifyConnectionListenerOnDisconnection();
+  }
+  
+  /**
+   * Stops all topic listeners and disconnects; connection listeners are not
+   * notified. Used at shutdown.
+   */
+  private synchronized void disconnectQuietly() {
     connected = false;
     //these listeners are re-created
     for (Map.Entry<String, MessageListenerWrapper> entry : topicToWrapper.entrySet()) {
       entry.getValue().stop();
-    }    
-    notifyConnectionListenerOnDisconnection();
+    }        
     try {
       connection.close(); //closes all consumers and sessions also
     } catch (JMSException jmsEx) {
       LOGGER.error("disconnect() - Exception caught while attempting to disconnect from JMS - aborting this attempt.", jmsEx);
-    } 
+    }     
   }
   
   /**
@@ -862,23 +870,26 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     running = true;
   }
   
+  /**
+   * Shuts down the JmsProxy. Connection listeners are not notified.
+   */
   @PreDestroy
   public void stop() {
     LOGGER.debug("Stopping JmsProxy and dependent listeners");
-    shutdownRequested = true;
-    disconnect();
+    shutdownRequested = true;    
     supervisionListenerWrapper.stop();
     alarmListenerWrapper.stop();
     adminMessageListenerWrapper.stop();
     heartbeatListenerWrapper.stop(); 
     topicPollingExecutor.shutdown();
+    disconnectQuietly();
     connectionListenersLock.writeLock().lock();
     try {      
       connectionListeners.clear();
     } finally {
       connectionListenersLock.writeLock().unlock();
-    }      
-    running = false;
+    }          
+    running = false;    
   }
 
 }
