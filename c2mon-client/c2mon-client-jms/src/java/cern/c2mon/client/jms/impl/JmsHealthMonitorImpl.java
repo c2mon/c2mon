@@ -27,7 +27,7 @@ public class JmsHealthMonitorImpl implements JmsHealthMonitor, SlowConsumerListe
   private volatile boolean slowConsumerNotified = false;
   
   @Override
-  public void registerHealthListener(final JmsHealthListener jmsHealthListener) {
+  public void addHealthListener(final JmsHealthListener jmsHealthListener) {
     listenerLock.writeLock().lock();
     try {
       listeners.add(jmsHealthListener);

@@ -16,7 +16,7 @@ public interface JmsHealthMonitor {
    * 
    * @param jmsHealthListener listener that will be called
    */
-  void registerHealthListener(JmsHealthListener jmsHealthListener);
+  void addHealthListener(JmsHealthListener jmsHealthListener);
 
   /**
    * Unregister the listener.

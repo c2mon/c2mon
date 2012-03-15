@@ -76,5 +76,5 @@ public interface C2monSupervisionManager {
    * 
    * @param jmsHealthListener the listener to notify
    */
-  void registerJmsHealthListener(JmsHealthListener jmsHealthListener);
+  void addJmsHealthListener(JmsHealthListener jmsHealthListener);
 }

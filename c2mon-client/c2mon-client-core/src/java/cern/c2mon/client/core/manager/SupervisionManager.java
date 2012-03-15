@@ -337,7 +337,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   }
 
   @Override
-  public void registerJmsHealthListener(JmsHealthListener jmsHealthListener) {
-    jmsHealthMonitor.registerHealthListener(jmsHealthListener);
+  public void addJmsHealthListener(JmsHealthListener jmsHealthListener) {
+    jmsHealthMonitor.addHealthListener(jmsHealthListener);
   }
 }
