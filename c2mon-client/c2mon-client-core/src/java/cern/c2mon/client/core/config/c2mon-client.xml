@@ -29,6 +29,23 @@
     		</props>  
  		 </property>  
 	</bean>
+  
+  <!-- export beans to JMX -->
+  <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
+    <property name="assembler" ref="assembler"/>
+    <property name="autodetectModeName" value="AUTODETECT_ASSEMBLER"/>
+    <property name="namingStrategy" ref="namingStrategy"/>    
+  </bean>
+  
+  <bean id="assembler" class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+    <property name="attributeSource" ref="attributeSource"/>
+  </bean>
+  
+  <bean id="attributeSource" class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+  
+  <bean id="namingStrategy" class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+    <property name="attributeSource" ref="attributeSource"/>
+  </bean>
 	
   <!-- import the XML configuration files for the Client API modules -->
   <import resource="classpath:cern/c2mon/client/jms/config/c2mon-client-jms.xml"/>
