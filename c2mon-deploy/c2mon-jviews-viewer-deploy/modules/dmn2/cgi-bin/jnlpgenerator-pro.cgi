@@ -4,6 +4,17 @@ use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Config::Properties;
+use Cwd;
+
+#find out the name of the home folder of the application
+#home folder is: cgi-bin/../
+
+my $cdir = getcwd;
+my @pathtokens = split(/\//,$cdir);
+
+# we are in cgi-bin folder, so the home folder is one level up
+my $appdir = @pathtokens[scalar(@pathtokens)-2];
+
 
 ##
 # Definition of global variables
