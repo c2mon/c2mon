@@ -26,6 +26,7 @@ import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,6 +123,14 @@ class HeartbeatManager extends TimerTask implements cern.c2mon.client.jms.Heartb
       // Register HeartbeatManager at JMS proxy
       jmsProxy.registerHeartbeatListener(this);
     }
+  }
+  
+  /**
+   * Stops the timer at shutdown.
+   */
+  @PreDestroy
+  public void shutdown() {
+    heartbeatTimer.cancel();
   }
 
   /* (non-Javadoc)
