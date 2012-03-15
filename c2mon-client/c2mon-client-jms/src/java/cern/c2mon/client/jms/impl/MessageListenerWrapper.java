@@ -100,17 +100,16 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
 
     @Override
     protected synchronized void notifyListeners(TagValueUpdate tagValueUpdate) {
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(format("notifying listeners about TagValueUpdate event. tag id: %d  value: %s timestamp: %s",
-                    tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp()));
-        }
 
         if (listeners.containsKey(tagValueUpdate.getId())) {
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(format(
+                        "notifying listener about TagValueUpdate event. tag id: %d  value: %s timestamp: %s",
+                        tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp()));
+            }
+
             listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
-        } else {
-            LOGGER
-                    .warn(format("value update received for tag: , but no listeners registered!", tagValueUpdate
-                            .getId()));
         }
     }
 
