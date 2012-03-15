@@ -8,7 +8,7 @@
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-rda-publisher</artifactId>
   <name>The generic C2MON client RDA Publisher</name>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <description>This project is used to publish data from C2MON to RDA</description>
   <scm>
   	<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-rda-publisher</developerConnection>
