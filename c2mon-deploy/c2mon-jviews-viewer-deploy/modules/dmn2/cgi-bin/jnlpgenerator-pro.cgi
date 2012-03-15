@@ -20,7 +20,6 @@ my $appdir = @pathtokens[scalar(@pathtokens)-2];
 # Definition of global variables
 ##
 my $jardir = "../lib";
-my $appdir = "dmn2-viewer-pro";
 my $codebase = "http://bewww/~diamonop";
 my $c2monClientPropertiesFile = "../conf/client.properties";
 my $c2monClientPropertiesURL = "${codebase}/${appdir}/conf/client.properties";
