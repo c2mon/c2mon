@@ -22,7 +22,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -31,6 +34,7 @@ import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
+import cern.c2mon.shared.client.tag.TagConfig;
 import cern.cmw.InternalException;
 
 
@@ -52,6 +56,9 @@ public class Gateway implements DataTagUpdateListener {
   
   /** The RDA publisher server instance */
   private final RdaPublisher publisher;
+  
+  /** Map containing all configuration information for all subscribed tags */
+  private final Map<Long, TagConfig> tagConfigs = new HashMap<Long, TagConfig>();
 
   /**
    * Default Constructor
@@ -84,7 +91,7 @@ public class Gateway implements DataTagUpdateListener {
    * @param dataTagList a file that contains a list of data tag IDs
    * @return true, if subscription was successful
    */
-  public final boolean subscribeDataTags(final File dataTagList) {
+  public final synchronized boolean subscribeDataTags(final File dataTagList) {
     boolean tagSubscriptionSuccessful = false;
     
     Set<Long> newTagIds = parseDataTags(dataTagList);
@@ -93,6 +100,12 @@ public class Gateway implements DataTagUpdateListener {
       LOG.info("Found " + newTagIds.size() + " new tag IDs in TID file. Trying to subscribe...");
       while (!tagSubscriptionSuccessful) {
         try {
+          // Get first the static tag configurations for the new tags 
+          Collection<TagConfig> newTagConfigs = tagManager.getTagConfigurations(newTagIds);
+          for (TagConfig tagConfig : newTagConfigs) {
+            tagConfigs.put(tagConfig.getId(), tagConfig);
+          }
+          // Subscribe to the tags
           tagSubscriptionSuccessful = tagManager.subscribeDataTags(newTagIds, this);
         }
         catch (Exception ex) {
@@ -102,14 +115,28 @@ public class Gateway implements DataTagUpdateListener {
         }
       }
       
+      // updating all the other tag information so that we are sure having the latest publication addresses
+      updateAllTagConfigurations();
       this.tagIds.addAll(newTagIds);
     }
     else {
+      updateAllTagConfigurations();
       LOG.info("No new tags to subscribe were found in TID file.");
       tagSubscriptionSuccessful = true;
     }
     
     return tagSubscriptionSuccessful;
+  }
+  
+  /**
+   * Private method to synchronize all tag configurations with the server 
+   */
+  private void updateAllTagConfigurations() {
+    LOG.info("Updating configuration information from all subscribed tags.");
+    Collection<TagConfig> newTagConfigs = tagManager.getTagConfigurations(tagIds);
+    for (TagConfig tagConfig : newTagConfigs) {
+      tagConfigs.put(tagConfig.getId(), tagConfig);
+    }
   }
   
   
@@ -187,7 +214,7 @@ public class Gateway implements DataTagUpdateListener {
    */
   @Override
   public synchronized void onUpdate(final ClientDataTagValue tagUpdate) {
-    publisher.onUpdate(tagUpdate);
+    publisher.onUpdate(tagUpdate, tagConfigs.get(tagUpdate.getId()));
   }
 
   /**

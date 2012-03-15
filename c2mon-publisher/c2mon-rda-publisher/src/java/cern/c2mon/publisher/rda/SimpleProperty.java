@@ -50,11 +50,15 @@ final class SimpleProperty implements DataTagUpdateListener {
 
   /** List of registered listeners which are interested in this value */
   private final List<ValueChangeListener> listeners;
+  
+  /** The RDA property name for which this class has been instanciated for */
+  private final String rdaPropertyName;
 
   /**
    * Default Constructor
    */
-  SimpleProperty() {
+  SimpleProperty(final String pRdaPropertyName) {
+    this.rdaPropertyName = pRdaPropertyName;
     listeners = Collections.synchronizedList(new ArrayList<ValueChangeListener>());
   }
 
@@ -124,7 +128,7 @@ final class SimpleProperty implements DataTagUpdateListener {
         data.insert((String) cdt.getValue());
         break;
       default:
-        LOG.warn("The data value of tag " + cdt.getId() + " is uninitialized.");
+        LOG.warn("The data value of tag " + cdt.getId() + " is uninitialized");
         return null;
     }
     
@@ -151,7 +155,7 @@ final class SimpleProperty implements DataTagUpdateListener {
   public synchronized void onUpdate(final ClientDataTagValue cdt) {
     Data newValue = pack(cdt);
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Value update received for RDA property " + cdt.getName() + " : " + newValue);
+      LOG.debug("Value update received for RDA property " + rdaPropertyName + " : " + newValue);
     }
     
     synchronized (listeners) {

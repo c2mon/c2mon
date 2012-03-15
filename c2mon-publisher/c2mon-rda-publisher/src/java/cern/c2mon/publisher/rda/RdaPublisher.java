@@ -22,8 +22,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.shared.client.tag.TagConfig;
 import cern.cmw.BadParameter;
 import cern.cmw.Data;
 import cern.cmw.IOError;
@@ -40,7 +40,7 @@ import cern.cmw.rda.server.ValueChangeListener;
  *
  * @author Matthias Braeger
  */
-public final class RdaPublisher extends DeviceServerBase implements DataTagUpdateListener {
+public final class RdaPublisher extends DeviceServerBase {
 
   /** Log4j logger instance */
   private static final Logger LOG = Logger.getLogger(RdaPublisher.class);
@@ -55,6 +55,7 @@ public final class RdaPublisher extends DeviceServerBase implements DataTagUpdat
    * The RDA device name that shall be used by the clients to access all published properties.
    */
   private final String deviceName;
+  
 
   /**
    * Default constructor
@@ -149,21 +150,52 @@ public final class RdaPublisher extends DeviceServerBase implements DataTagUpdat
    * Updates the corresponding {@link SimpleProperty} instance about the value
    * update. In case of a new (yet) unknown tag a new {@link SimpleProperty} instance
    * is first of all created.
+   * 
+   * @param cdt An new tag update received by the {@link Gateway}
+   * @param cdtConfig The tag configuration which is belonging to this tag update
    */
-  @Override
-  public void onUpdate(final ClientDataTagValue cdt) {
+  public void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig) {
     // Saves the received value into a separate file
     Logger logger = Logger.getLogger("ClientDataTagLogger");
     logger.debug(cdt);
     
-    if (cdt.getDataTagQuality().isExistingTag()) {
-      String propertyName = cdt.getName();
-      if (!properties.containsKey(cdt.getName())) {
-        SimpleProperty property = new SimpleProperty();
-        properties.put(propertyName, property);
+    if (cdt.getDataTagQuality().isExistingTag() && cdtConfig != null) {
+      try {
+        String propertyName = getRdaProperty(cdtConfig.getJapcPublication());
+        if (!properties.containsKey(cdt.getName())) {
+          LOG.info("Adding for tag " + cdt.getId() + " new RDA publication property: " + propertyName);
+          SimpleProperty property = new SimpleProperty(propertyName);
+          properties.put(propertyName, property);
+        }
+        
+        properties.get(propertyName).onUpdate(cdt);
       }
-      
-      properties.get(propertyName).onUpdate(cdt);
+      catch (IllegalArgumentException iae) {
+        LOG.warn("Error while parsing JAPC address for updating tag " 
+            + cdt.getId() + " ==> No RDA property update possible! Reason: " + iae.getMessage());
+      }
     }
+    else {
+      LOG.warn("Got value update for not existing tag "
+          + cdt.getId() + " ==> No RDA property update possible!");
+    }
+  }
+  
+  /**
+   * Internal helper method for parsing the japc publication string and 
+   * @param japcPublication the japc publication address as it is defined by 
+   *         the {@link TagConfig#getJapcPublication()} method
+   * @return The property name without the leading device name
+   * @throws IllegalArgumentException In case of an empty or badly defined publication address.
+   */
+  private static String getRdaProperty(final String japcPublication) throws IllegalArgumentException {
+    if (japcPublication == null 
+        || japcPublication.equalsIgnoreCase("") 
+        || !japcPublication.contains("/")
+        || japcPublication.split("/").length != 2) {      
+      throw new IllegalArgumentException("JAPC publication address has wrong format! Expected <device>/<property>");
+    }
+    
+    return japcPublication.split("/")[1];
   }
 }
