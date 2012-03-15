@@ -20,8 +20,15 @@ package cern.c2mon.client.core;
 
 import static org.junit.Assert.*;
 
+import java.lang.management.ManagementFactory;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -33,7 +40,7 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
  * Integration test of Client API modules.
  * 
  * @author Mark Brightwell
- *
+ * 
  */
 public class C2monServiceGatewayTest {
 
@@ -41,31 +48,34 @@ public class C2monServiceGatewayTest {
    * Log4j instance
    */
   private static final Logger LOG = Logger.getLogger(C2monServiceGatewayTest.class);
-  
+
   @Test
-  public void startClient() throws InterruptedException {
-    C2monServiceGateway.startC2monClient();    
+  public void startClient() throws InterruptedException, MBeanRegistrationException, InstanceNotFoundException, MalformedObjectNameException,
+      NullPointerException {
+    C2monServiceGateway.startC2monClient();
     assertNotNull(C2monServiceGateway.getCommandManager());
     assertNotNull(C2monServiceGateway.getSupervisionManager());
     assertNotNull(C2monServiceGateway.getTagManager());
   }
-  
+
   /**
    * Needs running without JVM properties set in order to test correct loading
    * into Spring context.
+   * 
    * @throws InterruptedException
    */
-  @Test
+  // @Test
   public void startClientWithProperties() throws InterruptedException {
     System.setProperty("c2mon.client.conf.url", "classpath:cern/c2mon/client/core/test-properties.txt");
-    C2monServiceGateway.startC2monClient();    
+    C2monServiceGateway.startC2monClient();
     assertNotNull(C2monServiceGateway.getCommandManager());
     assertNotNull(C2monServiceGateway.getSupervisionManager());
     assertNotNull(C2monServiceGateway.getTagManager());
   }
-  
+
   /**
    * Starts the C2MON client API and registers to some tags
+   * 
    * @param args
    */
   public static void main(String[] args) {
@@ -81,17 +91,16 @@ public class C2monServiceGatewayTest {
     tagIds.add(187227L);
     tagIds.add(165354L);
     tagIds.add(159207L);
-    
+
     try {
       C2monServiceGateway.startC2monClient();
       try {
         // Sleep to give the JmsProxy time to connect (Should be removed soon!)
         Thread.sleep(2000);
-      }
-      catch (InterruptedException e) {
+      } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      
+
       C2monTagManager tagManager = C2monServiceGateway.getTagManager();
       tagManager.subscribeDataTags(tagIds, new DataTagUpdateListener() {
         @Override
@@ -106,8 +115,7 @@ public class C2monServiceGatewayTest {
           System.out.println();
         }
       });
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       LOG.error("Catched runtime exception on main thread.", e);
       System.exit(1);
     }
