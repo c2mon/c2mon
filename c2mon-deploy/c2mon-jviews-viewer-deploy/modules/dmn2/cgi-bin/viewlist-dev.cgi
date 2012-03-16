@@ -5,12 +5,21 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Config::Properties;
 use DBD::Oracle;
 use File::Path;
+use Cwd;
 
 ##
 # Definition of global variables
 ##
 
-my $appdir = "dmn2-viewer-dev";
+#find out the name of the home folder of the application
+#home folder is: cgi-bin/../
+
+my $cdir = getcwd;
+my @pathtokens = split(/\//,$cdir);
+
+# we are in cgi-bin folder, so the home folder is one level up
+my $appdir = @pathtokens[scalar(@pathtokens)-2];
+
 my $basedir = "/user/dmndev/public_html/dmn2-views";
 my $codebase = "http://bewww/~dmndev";
 my $baseurl = "${codebase}/dmn2-views";
@@ -29,7 +38,12 @@ $c2monProperties->load(*PROPS);
 
 my $dbiUser = $c2monProperties->getProperty("c2mon.jdbc.config.user");
 my $dbiPassword = $c2monProperties->getProperty("c2mon.jdbc.config.password");
-my $dbiUrl = $c2monProperties->getProperty("dbi.url");
+
+# get the url (in java jdbc format)
+my $dbiUrl = $c2monProperties->getProperty("c2mon.jdbc.config.url");
+# change it to perl dbi format
+$dbiUrl= =~ s/jdbc:oracle:thin:@/dbi:Oracle:/g
+
 
 my $dbh = DBI->connect( $dbiUrl, $dbiUser, $dbiPassword )
   || die( $DBI::errstr . "\n" );
