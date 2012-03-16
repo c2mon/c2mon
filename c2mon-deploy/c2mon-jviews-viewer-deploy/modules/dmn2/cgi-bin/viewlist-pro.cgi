@@ -42,7 +42,7 @@ my $dbiPassword = $c2monProperties->getProperty("c2mon.jdbc.config.password");
 # get the url (in java jdbc format)
 my $dbiUrl = $c2monProperties->getProperty("c2mon.jdbc.config.url");
 # change it to perl dbi format
-$dbiUrl= =~ s/jdbc:oracle:thin:@/dbi:Oracle:/g
+$dbiUrl =~ s/jdbc:oracle:thin:@/dbi:Oracle:/g
 
 my $dbh = DBI->connect( $dbiUrl, $dbiUser, $dbiPassword )
   || die( $DBI::errstr . "\n" );
