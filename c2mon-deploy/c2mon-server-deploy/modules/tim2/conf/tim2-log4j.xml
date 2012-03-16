@@ -175,15 +175,29 @@
   <appender name="AdministratorEmail" class="org.apache.log4j.net.SMTPAppender">  
   	<param name="SMTPHost" value="cernmx.cern.ch" />
   	<param name="From" value="tim.support@cern.ch" />
-  	<param name="To" value="mark.brightwell@cern.ch" />
+  	<param name="To" value="mark.brightwell@cern.ch,Matthias.Braeger@cern.ch" />
   	<param name="Subject" value="C2MON server warning" />
   	<layout class="org.apache.log4j.PatternLayout">
   	  <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
   	</layout>
   	<filter class="org.apache.log4j.varia.LevelRangeFilter">
-    	<param name="LevelMin" value="warn" />
+    	<param name="LevelMin" value="error" />
     	<param name="LevelMax" value="fatal" />
   	</filter>
+  </appender>
+  
+  <appender name="DevelopperEmail" class="org.apache.log4j.net.SMTPAppender">  
+    <param name="SMTPHost" value="cernmx.cern.ch" />
+    <param name="From" value="tim.support@cern.ch" />
+    <param name="To" value="mark.brightwell@cern.ch" />
+    <param name="Subject" value="C2MON server warning" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
+    </layout>
+    <filter class="org.apache.log4j.varia.LevelRangeFilter">
+      <param name="LevelMin" value="warn" />
+      <param name="LevelMax" value="fatal" />
+    </filter>
   </appender>
   
   <appender name="AdminSmsAppender" class="org.apache.log4j.net.SMTPAppender">
@@ -199,6 +213,14 @@
     	<param name="LevelMin" value="error" />
     	<param name="LevelMax" value="fatal" />
   	</filter>
+  </appender>
+  
+  <appender name="CentralLoggingAppender" class="cern.cmw.log.sources.log4j.CmwLogAppender">    
+    <param name="domain" value="TIM" />
+    <param name="subDomain" value="C2MON-server" />
+    <param name="threshold" value="WARN" />
+    <param name="sourceName" value="${server.process.name}" />
+    <param name="serverName" value="cmw-log-pro:6200" />
   </appender>
   
   <!-- 
@@ -227,6 +249,7 @@
   <logger name="org.apache.activemq"  additivity="false">
     <level value="info"/>
     <appender-ref ref="FileAppender"/>
+    <appender-ref ref="CentralLoggingAppender"/>
   </logger>
   <logger name="org.springframework"  additivity="false">
     <level value="info"/>
@@ -235,41 +258,43 @@
   <logger name="cern.tim"  additivity="false">
     <level value="all"/>
     <appender-ref ref="FileAppender"/>
-    <appender-ref ref="AdministratorEmail"/>
+    <appender-ref ref="DevelopperEmail"/>
+    <appender-ref ref="CentralLoggingAppender"/>
   </logger>
   <logger name="cern.c2mon"  additivity="false">
     <level value="all"/>
     <appender-ref ref="FileAppender"/>
-    <appender-ref ref="AdministratorEmail"/>
+    <appender-ref ref="DevelopperEmail"/>    
+    <appender-ref ref="CentralLoggingAppender"/>
   </logger>
   <logger name="cern.c2mon.server.shorttermlog"  additivity="false">
     <level value="info"/>
     <appender-ref ref="LoggingAppender"/>
-    <appender-ref ref="AdministratorEmail"/>
+    <appender-ref ref="DevelopperEmail"/>    
+    <appender-ref ref="CentralLoggingAppender"/>
   </logger>
   <logger name="cern.c2mon.pmanager"  additivity="false">
-    <level value="info"/>
-    <appender-ref ref="AdministratorEmail"/>
+    <level value="info"/>    
+    <appender-ref ref="DevelopperEmail"/>    
     <appender-ref ref="LoggingAppender"/>
+    <appender-ref ref="CentralLoggingAppender"/>
   </logger>
   <logger name="cern.tim.server.cachepersistence"  additivity="false">
-    <level value="debug"/>
-    <appender-ref ref="AdministratorEmail"/>
+    <level value="debug"/>    
+    <appender-ref ref="DevelopperEmail"/> 
     <appender-ref ref="PersistenceAppender"/>
-  </logger>
-  <logger name="AdminMailLogger"  additivity="false">
-    <level value="error"/>
-    <appender-ref ref="AdministratorEmail"/>
-    <appender-ref ref="FileAppender"/>
-  </logger>  
+    <appender-ref ref="CentralLoggingAppender"/>
+  </logger>   
   <logger name="AdminSmsLogger"  additivity="false">
     <level value="error"/>
     <appender-ref ref="AdminSmsAppender"/>
+    <appender-ref ref="AdministratorEmail"/>
     <appender-ref ref="FileAppender"/>
   </logger>
   <root>
     <level value="info"/>
-    <appender-ref ref="FileAppender" />
-    <appender-ref ref="AdministratorEmail"/>
+    <appender-ref ref="FileAppender" />    
+    <appender-ref ref="DevelopperEmail"/>
+    <appender-ref ref="CentralLoggingAppender"/>
   </root>
 </log4j:configuration>
