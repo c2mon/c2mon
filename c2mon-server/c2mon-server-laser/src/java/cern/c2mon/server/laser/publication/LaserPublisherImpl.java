@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
@@ -75,6 +76,16 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
    * Our Logger
    */
   private Logger log = Logger.getLogger(LaserPublisherImpl.class);
+  
+  /**
+   * For SMS messages on disconnection.
+   */
+  private static final Logger SMS_LOGGER = Logger.getLogger("AdminSmsLogger");
+  
+  /**
+   * Has an SMS warning being sent for current problem.
+   */
+  private AtomicBoolean smsWarningSent = new AtomicBoolean(false);
 
   /**
    * yet another logger, that will be configured to output to a file every alarm
@@ -202,7 +213,13 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
             try {
               publishToLaser(alarm);
               toBePublished.remove(alarm.getId());
-            } catch (Exception e) {              
+              if (smsWarningSent.compareAndSet(true, false)) {
+                SMS_LOGGER.error("Laser connection re-established");
+              }
+            } catch (Exception e) {
+              if (smsWarningSent.compareAndSet(false, true)) {
+                SMS_LOGGER.error("Laser connection lost: alarm not published");                
+              }              
               StringBuilder str = new StringBuilder("Exception caught while publishing alarm to LASER: ");
               str.append(alarm.getTimestamp());
               str.append("\t");
