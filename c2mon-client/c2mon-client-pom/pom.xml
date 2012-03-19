@@ -10,7 +10,7 @@
 
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-pom</artifactId>
-	<version>1.0.8-SNAPSHOT</version>
+	<version>1.0.8</version>
 	<packaging>pom</packaging>
 
 	<description>
