@@ -55,7 +55,8 @@
     <application name="tim2-daq-prod" extends="default">
       <deployment installLocation="~/dist/daqprocess-mvn">
         <directory name="conf">
-          <file name="c2mon.properties" sourceDir="~/rep/c2mon/daq" mask="400" />
+          <file name="c2mon.properties" sourceDir="/user/timoper/rep/c2mon/daq" mask="400" />
+          <file name="daq-core-service.xml" source="/user/timoper/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
         </directory>
         <directory name="bin">
           <file name="setenv.sh" sourceDir="~/rep/c2mon/daq" mask="700" />
@@ -72,10 +73,11 @@
     <application name="tim2-daq-test" extends="default">
       <deployment installLocation="~/dist/daqprocess-mvn">
         <directory name="conf">
-          <file name="c2mon.properties" sourceDir="~/rep/c2mon/daq" mask="400" />
+          <file name="c2mon.properties" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
+          <file name="daq-core-service.xml" source="/user/timtest/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
         </directory>
         <directory name="bin">
-          <file name="setenv.sh" sourceDir="~/rep/c2mon/daq" mask="700" />
+          <file name="setenv.sh" sourceDir="/user/timtest/rep/c2mon/daq" mask="700" />
         </directory>
       </deployment>
       <startscript name="TIM2-DAQ-STARTUP">
