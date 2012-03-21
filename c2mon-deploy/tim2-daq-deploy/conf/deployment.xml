@@ -11,11 +11,7 @@
         <backupPolicy keepBackups="5">
           <preserve type="dir" name="tmp" />
           <preserve type="dir" name="conf/local" />
-        </backupPolicy>
-        <notification>
-          <!-- you can give more than one mail for deployment notification -->
-          <mail address="info-tim-admins@cern.ch" />
-        </notification>
+        </backupPolicy>       
         <!--
 					Not supported by deploy tool! <directory name=""> <link
 					source="log" target="/var/log/$USER/daqprocess-mvn" /> </directory>
@@ -54,6 +50,9 @@
 
     <application name="tim2-daq-prod" extends="default">
       <deployment installLocation="~/dist/daqprocess-mvn">
+         <notification>          
+          <mail address="tim-admin@cern.ch" />
+        </notification>
         <directory name="conf">
           <file name="c2mon.properties" sourceDir="/user/timoper/rep/c2mon/daq" mask="400" />
           <file name="daq-core-service.xml" source="/user/timoper/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
