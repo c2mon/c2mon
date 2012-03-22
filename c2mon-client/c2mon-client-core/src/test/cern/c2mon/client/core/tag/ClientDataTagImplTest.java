@@ -8,6 +8,10 @@ import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -16,6 +20,7 @@ import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
+import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
@@ -222,16 +227,27 @@ public class ClientDataTagImplTest {
     assertFalse(cdt.equals(cdt2));
   }
   
+  
   @Test
   public void testXMLSerialization() throws Exception {
       
       ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
       cdt.onUpdate(createValidTransferTag(1234L));  
-      cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_OUT_OF_BOUNDS,"Value is over 9000!");
-      cdt.getDataTagQuality().addInvalidStatus(TagQualityStatus.INACCESSIBLE,"It's down!");
+      
+      assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
+      TagQualityStatus statusToAdd1 = TagQualityStatus.VALUE_OUT_OF_BOUNDS;
+      TagQualityStatus statusToAdd2 = TagQualityStatus.INACCESSIBLE;
+      cdt.getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
+      cdt.getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
+      assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
+      cdt.getDataTagQuality().removeInvalidStatus(statusToAdd1);
+      cdt.getDataTagQuality().removeInvalidStatus(statusToAdd2);
+      assertTrue(cdt.getXml().contains("<isValid>true</isValid>"));
+      cdt.getDataTagQuality().addInvalidStatus(statusToAdd1, "Value is over 9000!");
+      cdt.getDataTagQuality().addInvalidStatus(statusToAdd2, "It's down!");
+      assertTrue(cdt.getXml().contains("<isValid>false</isValid>"));
       
       ClientDataTagImpl cdt2 = ClientDataTagImpl.fromXml(cdt.toString());
-      
       assertEquals(cdt.getId(), cdt2.getId());
   }  
   
