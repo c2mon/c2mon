@@ -48,8 +48,8 @@
           <tr>
             <th>Server Timestamp</th>
             <th>Value</th>
-            <th>Value Description</th>
             <th>Quality description</th>
+            <th>Value Description</th>
             <th>Source Timestamp</th>
             <th>Mode</th>
           </tr>
