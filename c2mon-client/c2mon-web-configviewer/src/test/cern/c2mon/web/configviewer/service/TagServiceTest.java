@@ -1,11 +1,14 @@
 package cern.c2mon.web.configviewer.service;
 
 
+import static org.junit.Assert.*;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.Collection;
 
 import javax.validation.constraints.AssertTrue;
+import javax.xml.transform.TransformerException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.web.configviewer.service.AlarmService;
 import cern.c2mon.web.configviewer.service.CommandService;
@@ -38,6 +43,7 @@ public class TagServiceTest {
   @Autowired
   HistoryService serviceH;
 
+  final String diamondTag = "1026868"; /* only against diamond */
   final String complexTag = "90887"; /* only in production */
   final String dataTagWithUnits = "44906";
   final String dataTagWithAlarms = "146047";
@@ -56,20 +62,11 @@ public class TagServiceTest {
   public void test() {
   }
   
-  /*
-  @Test
-  public void testHistory() throws Exception {
-
-    String xml = serviceH.getHistoryXml(dataTagWithAlarms, 10);
-    Assert.assertTrue(xml.contains("HistoryTag"));
-    String html = serviceH.generateHtmlResponse(dataTagWithAlarms, 10);
-  }  
-  */
   
-  
-  /*
+  /**
    * This tests runs only against the production server.
    * 
+  */
   @Test
   public void testDataTagHtml() throws Exception {
 
@@ -85,8 +82,25 @@ public class TagServiceTest {
     String htmlValue = service.generateDataTagValueHtmlResponse(complexTag);
     System.out.println(htmlValue);
   }  
-  */
   
+  /**
+   * this test only runs against the diamond server
+   * @throws TagIdException 
+   * @throws TransformerException 
+  @Test
+  public void testDiamond() throws TagIdException, TransformerException {
+    
+    ClientDataTagValue dataTag = service.getDataTagValue(Long.parseLong(diamondTag));
+    System.out.println(dataTag.isValid());
+    assertTrue(dataTag.isValid());
+    
+    String xmlValue = service.getDataTagValueXml(diamondTag);
+    System.out.println(xmlValue);
+    Assert.assertTrue(xmlValue.contains("ClientDataTag"));
+    String htmlValue = service.generateDataTagValueHtmlResponse(diamondTag);
+    System.out.println(htmlValue);
+  }
+  */
   
   @Test
   public void AlarmTagNotEmpty() {
@@ -101,6 +115,14 @@ public class TagServiceTest {
       }
   }
 
+
+//  @Test
+//  public void testHistory() throws Exception {
+//
+//    String xml = serviceH.getHistoryXml(dataTagWithAlarms, 10);
+//    Assert.assertTrue(xml.contains("HistoryTag"));
+//    String html = serviceH.generateHtmlResponse(dataTagWithAlarms, 10);
+//  }  
   //  @Test
   //  public void testProcessHtml() {
   //
