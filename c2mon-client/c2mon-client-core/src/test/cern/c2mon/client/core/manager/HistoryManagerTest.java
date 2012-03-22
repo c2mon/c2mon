@@ -395,7 +395,7 @@ public class HistoryManagerTest {
     EasyMock.expect(cacheMock.isHistoryModeEnabled()).andStubReturn(true);
     
     EasyMock.expect(tagManagerMock.getDataTags(EasyMock.<Collection<Long>>anyObject()))
-      .andDelegateTo(new TagManager(null, null, null) {
+      .andDelegateTo(new TagManager(null, null, null, null) {
         @Override
         public Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds) {
           final List<ClientDataTagValue> result = new ArrayList<ClientDataTagValue>();
