@@ -126,7 +126,7 @@
          <configuration>
           <argLine>          
             <!-- needed for the client JMS module -->
-            -Dc2mon.client.jms.url=tcp://jms-tim-test1:61616
+            -Dc2mon.client.jms.url=tcp://jms-tim-pro1:61616
             -Dc2mon.client.jms.user=not-used
             -Dc2mon.client.jms.password=not-used
             -Dc2mon.client.jms.supervision.topic=tim.client.supervision
@@ -137,6 +137,23 @@
             -Dc2mon.jdbc.ro.url="jdbc:oracle:thin:@( DESCRIPTION= (ADDRESS= (PROTOCOL=TCP) (HOST=dbsrva3202.cern.ch) (PORT=1574) ) (ENABLE=BROKEN) (CONNECT_DATA= (SID=TIMTST)))"
             -Dc2mon.jdbc.ro.user=timop
             -Dc2mon.jdbc.ro.password=optim1954
+            
+            <!-- needed for the DIAMOND people -->
+            <!--
+			-Dc2mon.client.jms.url=tcp://jms-diamon-pro1:61640
+			-Dc2mon.client.jms.user=dmn2procl1ent
+			-Dc2mon.client.jms.password=dmn2pr0cl1ent
+			-Dc2mon.client.jms.supervision.topic=dmn2.client.supervision
+			-Dc2mon.client.jms.heartbeat.topic=dmn2.client.heartbeat
+			-Dc2mon.client.jms.request.queue=dmn2.client.request
+			-Dc2mon.client.jms.adminmessage.topic=dmn2.client.adminmessage
+			-Dc2mon.client.jms.controltag.publication.topic=dmn2.controltag
+			
+			-Dc2mon.jdbc.driver=oracle.jdbc.OracleDriver
+			-Dc2mon.jdbc.ro.url="jdbc:oracle:thin:@laserdb"
+			-Dc2mon.jdbc.ro.user=dmnlog_read
+			-Dc2mon.jdbc.ro.password=R3addmn01
+			-->
           </argLine>
         </configuration>      
       </plugin>
