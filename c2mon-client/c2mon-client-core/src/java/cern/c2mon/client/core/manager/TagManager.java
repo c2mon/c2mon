@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
@@ -71,6 +72,9 @@ public class TagManager implements CoreTagManager {
    * The cache instance which is managing all <code>ClientDataTag</code> objects
    */
   private ClientDataTagCache cache;
+  
+  /** Reference to the supervision manager singleton */
+  private final CoreSupervisionManager supervisionManager;
 
   /** Provides methods for requesting tag information from the C2MON server */
   private final RequestHandler clientRequestHandler;
@@ -101,9 +105,10 @@ public class TagManager implements CoreTagManager {
    *          server
    */
   @Autowired
-  protected TagManager(final JmsProxy pJmsProxy, final ClientDataTagCache pCache,
+  protected TagManager(final CoreSupervisionManager pSupervisionManager, final JmsProxy pJmsProxy, final ClientDataTagCache pCache,
       final RequestHandler pRequestHandler) {
 
+    this.supervisionManager = pSupervisionManager;
     this.jmsProxy = pJmsProxy;
     this.cache = pCache;
     this.clientRequestHandler = pRequestHandler;
@@ -308,9 +313,15 @@ public class TagManager implements CoreTagManager {
         Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(missingTags);
         for (TagUpdate tagUpdate : tagUpdates) {
           try {
-            ClientDataTag cdt = new ClientDataTagImpl(tagUpdate.getId());
+            ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
             cdt.update(tagUpdate);
-            resultList.add(cdt); // No need to clone in this case
+            supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds());
+            try {
+              resultList.add((ClientDataTagValue) cdt.clone());
+            } catch (CloneNotSupportedException e) {
+              LOG.error("getDataTags() - CloneNotSupportedException - " + cdt.getId(), e);
+            }
+            supervisionManager.removeSupervisionListener(cdt);
           } catch (RuleFormatException e) {
             LOG.error("getDataTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
             throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());

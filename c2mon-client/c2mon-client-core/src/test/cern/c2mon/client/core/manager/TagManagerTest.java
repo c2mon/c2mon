@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.jms.JMSException;
@@ -19,6 +21,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.JmsProxy;
@@ -120,6 +123,7 @@ public class TagManagerTest {
     }
     EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(serverUpdateValues);
   }
+  
   
   private TagUpdate createValidTransferTag(final Long tagId) {
     return createValidTransferTag(tagId, Float.valueOf(1.234f));
