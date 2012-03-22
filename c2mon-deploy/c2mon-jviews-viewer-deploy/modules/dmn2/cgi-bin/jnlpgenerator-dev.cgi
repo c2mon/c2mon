@@ -90,13 +90,13 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 	<jnlp spec=\"1.0+\"
 	codebase=\"$codebase\"
 	>
-	<information>
-		<title>DMN2 Viewer [DEV]</title>
-	        <vendor>BE/CO-IN DIAMON2 Team</vendor>
-	        <homepage href=\"tim-viewer/index.html\"/>
-	        <description>The synoptic viewer</description>
-	        <icon kind=\"splash\" href=\"http://timweb.cern.ch/img/tim-animated-320x200.gif\"/>
-	        <offline-allowed />
+	<information>		
+		<title>DMN2 Viewer [DEV] ($viewerVersion)</title>
+	    <vendor>BE/CO-IN DIAMON2 Team</vendor>
+	    <homepage href=\"tim-viewer/index.html\"/>
+	    <description>The synoptic viewer</description>
+	    <icon kind=\"splash\" href=\"http://timweb.cern.ch/img/tim-animated-320x200.gif\"/>
+	    <offline-allowed />
 	</information>
 	<security> 
 		<all-permissions/> 
