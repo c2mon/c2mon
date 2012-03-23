@@ -515,7 +515,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private boolean isValidUpdate(final TagValueUpdate tagValueUpdate) {
     boolean valid = true;
     valid &= tagValueUpdate != null;
-    valid &= tagValueUpdate.getId().equals(id);
+    if (tagValueUpdate != null) 
+      valid &= tagValueUpdate.getId().equals(id);
     if (tagQuality.isAccessible()) { // If inaccessible we always allow a refresh
       valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp);
     }
