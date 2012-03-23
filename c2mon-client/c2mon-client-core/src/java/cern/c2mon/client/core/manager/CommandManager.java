@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.jms.JMSException;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,7 +106,7 @@ public class CommandManager implements C2monCommandManager {
     Set<Long> newCommandTagIds = new HashSet<Long>();
 
     if (LOG.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("getCommandTags() - creating ");
+      StringBuilder str = new StringBuilder("getCommandTags() - creating ");
       str.append(pIds.size());
       str.append(" command tags.");
       LOG.debug(str);
@@ -133,7 +131,7 @@ public class CommandManager implements C2monCommandManager {
 
     if (newCommandTagIds.size() > 0) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug(new StringBuffer("getCommandTags() - ").append(newCommandTagIds.size()).append(" commands to be requested."));
+        LOG.debug(new StringBuilder("getCommandTags() - ").append(newCommandTagIds.size()).append(" commands to be requested."));
       }
       
       Collection<CommandTagHandle> commandTagHandles = clientRequestHandler.requestCommandTagHandles(newCommandTagIds);
