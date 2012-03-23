@@ -77,8 +77,9 @@ public class HistoryService {
       throw new RuntimeException("Cannot retrieve the data from the Short term log because no history provider is accessible.");
     }
 
+    final long id = Long.parseLong(dataTagId);
     Collection<Long> dataTagIds = new ArrayList<Long>();
-    dataTagIds.add(Long.parseLong(dataTagId));
+    dataTagIds.add(id);
     final HistoryLoadingManager loadingManager = C2monServiceGateway.getHistoryManager().createHistoryLoadingManager(historyProvider, dataTagIds);
 
     final HistoryLoadingConfiguration configuration = new HistoryLoadingConfiguration();
@@ -98,8 +99,8 @@ public class HistoryService {
     for (final Long tagId : dataTagIds) {
       historyValues.addAll(loadingManager.getAllHistoryConverted(tagId));
     }
-
-    String historyXml = "<history>";
+    // example: <history id="15685">
+    String historyXml = "<history" + " id=\"" + id + "\" >";
     for (HistoryTagValueUpdate h : historyValues) {
 
       HistoryTagValueUpdateImpl q = (HistoryTagValueUpdateImpl) h;
