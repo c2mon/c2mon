@@ -41,9 +41,11 @@
       </head>
 
       <body>
+        <xsl:for-each select="history/HistoryTag">
         <p class="tagName">
           Data Tag History
-    </p>
+          <xsl:value-of select="/*/@id" />
+        </p>
         <table class="inline">
           <tr>
             <th>Server Timestamp</th>
@@ -54,7 +56,6 @@
             <th>Mode</th>
           </tr>
 
-          <xsl:for-each select="history/HistoryTag">
             <tr>
               <td>
                 <xsl:value-of select="serverTimestamp" />
@@ -80,8 +81,8 @@
               </td>
             </tr>
 
-          </xsl:for-each>
         </table>
+       </xsl:for-each>
       </body>
     </html>
 
