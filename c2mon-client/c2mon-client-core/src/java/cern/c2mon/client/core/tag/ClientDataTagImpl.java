@@ -619,7 +619,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    */
   private void updateProcessStatus() {
     boolean down = false;
-    StringBuffer invalidationMessage = new StringBuffer();
+    StringBuilder invalidationMessage = new StringBuilder();
     for (SupervisionEvent event : processSupervisionStatus.values()) {
       if (event != null) {
         boolean isDown = false;
@@ -649,7 +649,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    */
   private void updateEquipmentStatus() {
     boolean down = false;
-    StringBuffer invalidationMessage = new StringBuffer();
+    StringBuilder invalidationMessage = new StringBuilder();
     for (SupervisionEvent event : equipmentSupervisionStatus.values()) {
       if (event != null) {
         boolean isDown = false;
