@@ -115,14 +115,26 @@ public class TagServiceTest {
       }
   }
 
+  @Test
+  public void testHistory() {
 
-//  @Test
-//  public void testHistory() throws Exception {
-//
-//    String xml = serviceH.getHistoryXml(dataTagWithAlarms, 10);
-//    Assert.assertTrue(xml.contains("HistoryTag"));
-//    String html = serviceH.generateHtmlResponse(dataTagWithAlarms, 10);
-//  }  
+    String xml = null;
+    try {
+      xml = serviceH.getHistoryXml(dataTagWithAlarms, 10);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    Assert.assertTrue(xml.contains("HistoryTag"));
+    System.out.println(xml);
+    try {
+      String html = serviceH.generateHtmlResponse(dataTagWithAlarms, 10);
+    } catch (TagIdException e) {
+      e.printStackTrace();
+    } catch (TransformerException e) {
+      e.printStackTrace();
+    }
+  }  
+  
   //  @Test
   //  public void testProcessHtml() {
   //
