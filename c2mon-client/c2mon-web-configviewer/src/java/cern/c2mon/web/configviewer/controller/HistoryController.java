@@ -90,6 +90,10 @@ public class HistoryController {
       response.getWriter().println(e.getMessage());
       logger.error(e.getMessage());
     }
+    catch (Exception e) {
+      response.getWriter().println(e.getMessage());
+      logger.error(e.getMessage());
+    }
     return null;
   }
 

@@ -47,18 +47,27 @@ public class HistoryService {
    * @param dataTagId id of the datatag
    * @param numberOfRecords number of records to look back in the history
    * @return XML representation of tag's history 
+   * @throws HistoryProviderException in case a HistoryProvider cannot be created
+   * @throws LoadingParameterException in case of an invalid configurations
    * @throws Exception if tag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
-  public String getHistoryXml(final String dataTagId, final int numberOfRecords) throws Exception {
+  public String getHistoryXml(final String dataTagId, final int numberOfRecords) 
+      throws HistoryProviderException, LoadingParameterException  {
 
     return requestHistoryData(dataTagId, numberOfRecords);
   }
 
   /**
    * Used to make a request for HistoryData.
+   * @param dataTagId The tag id whose history we are looking for
+   * @param numberOfRecords number of records to retrieve from history
+   * @throws HistoryProviderException in case a HistoryProvider cannot be created
+   * @throws LoadingParameterException in case of an invalid configurations
+   * @return history in xml format
    */
-  private String requestHistoryData(final String dataTagId, final int numberOfRecords) {
+  private String requestHistoryData(final String dataTagId, final int numberOfRecords) 
+      throws HistoryProviderException, LoadingParameterException {
 
     // other values that can be used //
     Integer numberOfDays;
@@ -74,7 +83,7 @@ public class HistoryService {
     }
     catch (HistoryProviderException e) {
       logger.error("Can't load any history because a HistoryProvider cannot be created.", e);
-      throw new RuntimeException("Cannot retrieve the data from the Short term log because no history provider is accessible.");
+      throw new HistoryProviderException("Cannot retrieve the data from the Short term log because no history provider is accessible.");
     }
 
     final long id = Long.parseLong(dataTagId);
@@ -92,7 +101,7 @@ public class HistoryService {
     }
     catch (LoadingParameterException e) {
       logger.error("The configurations is invalid.", e);
-      throw new RuntimeException("The configuration is invalid", e);
+      throw new LoadingParameterException("The configuration is invalid", e);
     }
 
     final List<HistoryTagValueUpdate> historyValues = new ArrayList<HistoryTagValueUpdate>();
@@ -111,15 +120,20 @@ public class HistoryService {
     return historyXml;
   }
 
+  /**
+   * Used to make a request for HistoryData.
+   * @param dataTagId The tag id whose history we are looking for
+   * @param numberOfRecords number of records to retrieve from history
+   * @return history in html format
+   * @throws HistoryProviderException in case a HistoryProvider cannot be created
+   * @throws LoadingParameterException in case of an invalid configurations
+   */
   public String generateHtmlResponse(final String dataTagId, final int numberOfRecords) 
-    throws TagIdException, TransformerException {
+    throws TagIdException, TransformerException, HistoryProviderException, LoadingParameterException {
 
     String xml;
-    try {
-      xml = getHistoryXml(dataTagId, numberOfRecords);
-    } catch (Exception e) {
-      throw new TagIdException(e.getMessage());
-    }
+    
+    xml = getHistoryXml(dataTagId, numberOfRecords);
 
     String html = null;
 

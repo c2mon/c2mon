@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.client.common.history.exception.HistoryProviderException;
+import cern.c2mon.client.common.history.exception.LoadingParameterException;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
@@ -116,7 +118,8 @@ public class TagServiceTest {
   }
 
   @Test
-  public void testHistory() {
+  public void testHistory() throws TagIdException, TransformerException, 
+    HistoryProviderException, LoadingParameterException {
 
     String xml = null;
     try {
@@ -126,13 +129,8 @@ public class TagServiceTest {
     }
     Assert.assertTrue(xml.contains("HistoryTag"));
     System.out.println(xml);
-    try {
       String html = serviceH.generateHtmlResponse(dataTagWithAlarms, 10);
-    } catch (TagIdException e) {
-      e.printStackTrace();
-    } catch (TransformerException e) {
-      e.printStackTrace();
-    }
+      System.out.println(html);
   }  
   
   //  @Test
