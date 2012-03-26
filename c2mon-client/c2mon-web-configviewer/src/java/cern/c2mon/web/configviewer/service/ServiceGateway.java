@@ -44,17 +44,12 @@ public class ServiceGateway {
     }
     
     /**
-     * Starts the C2monServiceGateway. Sleeps for 1 second to let the gateway start. Sleeping is a workaround, as the C2monServiceGateway.startC2monClient() method does not inform
-     * if the start was completed.
-     * */
+     * Starts the C2monServiceGateway. No need to sleep!
+     * 
+     **/
     private void startC2monServiceGateway() {
         logger.info("Starting C2MON Service Gateway...");
-        C2monServiceGateway.startC2monClient();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            logger.error("Wait for start of C2MON Service Gateway interrupted.", e);
-        }
+        C2monServiceGateway.startC2monClientSynchronous();
     }
     
     /**
