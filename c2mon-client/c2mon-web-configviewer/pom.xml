@@ -9,7 +9,7 @@
 	
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-web-configviewer</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
+	<version>1.0.4</version>
 	<packaging>war</packaging>
 	<name>c2mon-web-configviewer</name>
 	<description>C2MON online configuration viewer (datatag, command, alarm, process viewer)</description>
