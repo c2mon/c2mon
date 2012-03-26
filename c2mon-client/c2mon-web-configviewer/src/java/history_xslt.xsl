@@ -9,6 +9,39 @@
   -->
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  
+  	<!--  link variables  -->
+	<xsl:variable name="base_url">
+		/c2mon-web-configviewer/
+	</xsl:variable>
+	<xsl:variable name="alarm_url">
+		alarmviewer/
+	</xsl:variable>
+	<xsl:variable name="command_url">
+		commandviewer/
+	</xsl:variable>
+	<xsl:variable name="datatag_url">
+		tagviewer/
+	</xsl:variable>
+	<xsl:variable name="history_url">
+		historyviewer/
+	</xsl:variable>		
+	<xsl:variable name="process_xml_url">
+		process/xml/
+	</xsl:variable>
+	<xsl:variable name="alarm_xml_url">
+		alarmviewer/xml/
+	</xsl:variable>
+	<xsl:variable name="tag_value_xml_url">
+		tagvalue/xml/
+	</xsl:variable>	
+	<xsl:variable name="tag_config_xml_url">
+		tagconfig/xml/
+	</xsl:variable>		
+	
+	<xsl:template match="p">
+		<xsl:copy-of select="." />
+	</xsl:template>
 
   <xsl:template match="/">
     <html>
@@ -43,7 +76,7 @@
       <body>
         <p class="tagName">
           Data Tag History
-          <xsl:value-of select="/*/@id" />
+          (<xsl:value-of select="/*/@id" />)
         </p>
         <table class="inline">
           <tr>
