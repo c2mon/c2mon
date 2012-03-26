@@ -15,6 +15,9 @@
 	<xsl:variable name="datatag_url">
 		tagviewer/
 	</xsl:variable>
+	<xsl:variable name="history_url">
+		historyviewer/
+	</xsl:variable>		
 	<xsl:variable name="process_xml_url">
 		process/xml/
 	</xsl:variable>
@@ -29,8 +32,8 @@
 	</xsl:variable>		
 	
 	<xsl:variable name="help_alarm_url">http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=</xsl:variable>
-
-
+	<xsl:variable name="help_point_url">https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=</xsl:variable>
+	
 	<!--  leave the paragraphs untouched -->
 	<xsl:template match="p">
 		<xsl:copy-of select="." />
@@ -46,6 +49,12 @@
 			<A href="{$base_url}{$tag_value_xml_url}{@id}/" 
 				class="large blue awesome xml_button" target="_blank">View ClientDataTag XML >>
 			</A>
+			<A href="{$base_url}{$history_url}{@id}/" 
+				class="large blue awesome xml_button" target="_blank">View History >>
+			</A>	
+			<A href="{$help_point_url}{@id}" 
+				class="large red awesome xml_button" target="_blank">View Help Alarm >>
+			</A>	
 		</p>
 		<table class="inline">
 			<th colspan="4">ClientDataTag</th>
