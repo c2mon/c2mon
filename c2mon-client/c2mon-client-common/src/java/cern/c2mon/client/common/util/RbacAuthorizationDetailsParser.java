@@ -43,7 +43,7 @@ public final class RbacAuthorizationDetailsParser {
 
     if (splitedDetails.length != 3) { // RbacAuthorizationDetails should be provided as 3 comma seperated strings
       logger.error(new Error("parseRbacDetails(): error splitting details!:"
-          + encodedDetails + ". Splitted in:" + splitedDetails
+          + encodedDetails
       ));
       throw new IOException("Not able to fetch RbacAuthorizationDetails.");
     }
