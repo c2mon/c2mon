@@ -12,7 +12,7 @@
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>tim2-daq-deploy</artifactId>
 	<name>TIM2 DAQ deployment module</name>
-	<version>1.0.5-SNAPSHOT</version>
+	<version>1.0.5</version>
 
 	<packaging>pom</packaging>
 
