@@ -18,6 +18,10 @@
     <constructor-arg value="${c2mon.client.jms.adminmessage.topic}"  />
   </bean>
   
+  <bean id="authorizationDetails" class="java.lang.String">
+  	<constructor-arg value="${c2mon.client.rbac.admin}"/>
+  </bean>
+  
   <bean id="adminMessageTimeout" class="java.lang.Long">
     <constructor-arg value="60000"/>
   </bean>

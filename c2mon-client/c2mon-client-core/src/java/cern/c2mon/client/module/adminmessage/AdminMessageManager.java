@@ -17,20 +17,25 @@
  ******************************************************************************/
 package cern.c2mon.client.module.adminmessage;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.admin.AdminMessage;
 import cern.c2mon.client.common.admin.AdminMessageDeliveryException;
 import cern.c2mon.client.common.admin.AdminMessageImpl;
 import cern.c2mon.client.common.util.ConcurrentSet;
+import cern.c2mon.client.common.util.RbacAuthorizationDetailsParser;
 import cern.c2mon.client.core.C2monSessionManager;
 import cern.c2mon.client.jms.AdminMessageListener;
 import cern.c2mon.client.module.C2monAdminMessageManager;
@@ -69,6 +74,14 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
   /** Instance of the session manager */
   private final C2monSessionManager sessionManager;
   
+  /** 
+   * The rbac authorization details that will be used to authorise every person who
+   * tries to send admin messages.
+   */
+  @Autowired 
+  @Qualifier("authorizationDetails")
+  private static String authorizationDetails;
+  
   /**
    * Constructor
    * 
@@ -76,10 +89,18 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
    * @param sessionManager the session manager
    */
   @Autowired
-  protected AdminMessageManager(final AdminMessageHandler adminMessageHandler, final C2monSessionManager sessionManager) {
+  protected AdminMessageManager(final AdminMessageHandler adminMessageHandler
+      , final C2monSessionManager sessionManager) {
+    
     this.adminMessageHandler = adminMessageHandler;
     this.sessionManager = sessionManager;
     this.adminMessageListeners = new ConcurrentSet<AdminMessageListener>();
+  }
+  
+  @Autowired
+  @Qualifier("authorizationDetails")
+  public void setAuthDetails(String authDetails) {
+    authorizationDetails = authDetails;
   }
   
   /**
@@ -118,9 +139,15 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
   
   @Override
   public boolean isUserAllowedToSend(final String userName) {
-    return userName != null
-        && sessionManager.isUserLogged(userName) 
-        && sessionManager.isAuthorized(userName, getAdminAuthorizationDetails());
+    
+    try {
+      return userName != null
+          && sessionManager.isUserLogged(userName) 
+          && sessionManager.isAuthorized(userName, getAdminAuthorizationDetails());
+    } catch (IOException e) {
+      LOG.error("RbacAuthDetails not found! " + e.getMessage());
+      return false;
+    }
   }
 
   @Override
@@ -141,12 +168,10 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
   
   /**
    * @return the authorization details for a admin that can send messages
+   * @throws IOException In case the authDetails could not be found
    */
-  private static AuthorizationDetails getAdminAuthorizationDetails() {
-    final RbacAuthorizationDetails auth = new RbacAuthorizationDetails();
-    auth.setRbacClass(RBAC_ADMIN_MESSAGE_CLASS);
-    auth.setRbacDevice(RBAC_ADMIN_MESSAGE_DEVICE);
-    auth.setRbacProperty(RBAC_ADMIN_MESSAGE_PROPERTY);
-    return auth;
+  private static AuthorizationDetails getAdminAuthorizationDetails() throws IOException {
+    
+    return RbacAuthorizationDetailsParser.parseRbacDetails(authorizationDetails);
   }
 }
