@@ -112,6 +112,10 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-client</groupId>
+			<artifactId>c2mon-client-common</artifactId>
+		</dependency>
 	</dependencies>
 	
 	<scm>

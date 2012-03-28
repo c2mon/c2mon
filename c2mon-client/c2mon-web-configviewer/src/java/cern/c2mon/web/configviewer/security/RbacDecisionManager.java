@@ -1,5 +1,6 @@
 package cern.c2mon.web.configviewer.security;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,13 +16,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
+import cern.c2mon.client.common.util.RbacAuthorizationDetailsParser;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monSessionManager;
 import cern.tim.shared.client.command.RbacAuthorizationDetails;
 
 /**
  * Decides whether the current user has enough permissions 
- * to access the page or not.
+ * to access a page or not.
  * @author ekoufaki
  */
 public class RbacDecisionManager implements AccessDecisionManager {
@@ -33,22 +35,27 @@ public class RbacDecisionManager implements AccessDecisionManager {
   private Map<String, String> authorizationDetails;
 
   /**
-   * 
+   * Decides whether the current user has enough permissions 
+   * to access a page or not.
+   *  
+   * @param authorizationDetails A map of (PageUrls, AuthorizationDetails) required to access each page.
+   * The AuthorizationDetails should be provided as 3 comma seperated strings in the following order: "Class,Device,Property"
+   * Example: "TIM_APPLICATIONS,TIM_WEBCONFIG,RUN" 
    */
   @Autowired
-  public RbacDecisionManager(Map<String, String> authorizationDetails) {
+  public RbacDecisionManager(final Map<String, String> authorizationDetails) {
 
     this.authorizationDetails = authorizationDetails;
   }
 
   /**
    * RbacDecisionManager logger
-   * */
+   */
   private static Logger logger = Logger.getLogger(RbacDecisionManager.class);
 
   @Override
-  public void decide(Authentication authentication, Object secureObject,
-      Collection attributes) throws AccessDeniedException,
+  public void decide(final Authentication authentication, final Object secureObject,
+      final Collection attributes) throws AccessDeniedException,
       InsufficientAuthenticationException {
 
     // The supports method ensures we are dealing with FilterInvocations
@@ -71,13 +78,13 @@ public class RbacDecisionManager implements AccessDecisionManager {
     }
     
     if (!sessionManager.isAuthorized(username, details))  {
-      logger.info(username +
-          " tried to access:" + pageUrl + " but does not have permission to do so!");
+      logger.info(username 
+          + " tried to access:" + pageUrl + " but does not have permission to do so!");
       throw new AccessDeniedException("go away"); // user does not have permission!
     }
     
-    logger.info(username + 
-        " succesfully authorised to access:" + pageUrl);
+    logger.info(username 
+        + " succesfully authorised to access:" + pageUrl);
   }
 
   /**
@@ -107,27 +114,15 @@ public class RbacDecisionManager implements AccessDecisionManager {
    * @return an RbacAuthorizationDetails Object
    */
   private RbacAuthorizationDetails splitDetails(final String stringEncodedAuthDetails) {
-
-    String[] splitedDetails = stringEncodedAuthDetails.replace(" ", "").split( ",\\s*" ); // split on commas
-
-    RbacAuthorizationDetails authDetails = null;
-
-    if (splitedDetails.length < 3) {
-      logger.error(new Error("CustomAuthenticationProvider: error splitting Admin Details!:"
-          + stringEncodedAuthDetails + ". Splitted in:" + splitedDetails
-      ));
-
+    
+    RbacAuthorizationDetails details;
+    try {
+      details = RbacAuthorizationDetailsParser.parseRbacDetails(stringEncodedAuthDetails);
+    } catch (IOException e) {
       throw new AccessDeniedException("Not able to fetch RbacAuthorizationDetails. Access has been denied.");
     }
 
-    if (splitedDetails.length == 3) {
-      authDetails = new RbacAuthorizationDetails();
-      authDetails.setRbacClass(splitedDetails[0]);
-      authDetails.setRbacDevice(splitedDetails[1]);
-      authDetails.setRbacProperty(splitedDetails[2]);
-    }
-
-    return authDetails;
+    return details;
   }
 
   public boolean supports(Class clazz) {
