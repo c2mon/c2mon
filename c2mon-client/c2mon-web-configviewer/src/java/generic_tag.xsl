@@ -484,7 +484,7 @@
 				<td><xsl:value-of select="@name"/></td>
 			</tr>
 
-		<xsl:for-each select="*[not(local-name() = 'DataTags')]">
+		<xsl:for-each select="*[not(local-name() = 'DataTags' or local-name() = 'SubEquipmentUnits')]">
 		<TR>
 			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 			<TD><xsl:value-of select="."/></TD>
@@ -493,8 +493,40 @@
 			
 		</table>
 		</div>
+		<xsl:apply-templates select="SubEquipmentUnits"/>
 		<xsl:apply-templates select="DataTags"/>
 		<xsl:apply-templates select="CommandTags"/>
+</xsl:template>
+
+<xsl:template match="SubEquipmentUnits">
+    <xsl:apply-templates select="SubEquipmentUnit"/>
+</xsl:template>
+
+<xsl:template match="SubEquipmentUnit">
+    <p class="tagName">
+      <a name="{@name}"> <xsl:value-of select="@name"/> </a> : (<xsl:value-of select="@id"/>)
+    </p>
+  <div class="column">
+    <table class="inline">
+      <th colspan="2">SubEquipmentUnit</th>
+      <tr>
+        <td class="bold">  id </td>
+        <td><xsl:value-of select="@id"/></td>
+      </tr>
+      <tr>
+        <td class="bold"> name </td>
+        <td><xsl:value-of select="@name"/></td>
+      </tr>
+
+    <xsl:for-each select="*">
+    <TR>
+      <TD class="bold"><xsl:value-of select="local-name()"/></TD>
+      <TD><xsl:value-of select="."/></TD>
+    </TR>
+        </xsl:for-each>
+      
+    </table>
+    </div>
 </xsl:template>
 
 <xsl:template match="CommandTags">
