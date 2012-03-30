@@ -35,7 +35,8 @@
   <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
     <property name="assembler" ref="assembler"/>
     <property name="autodetectModeName" value="AUTODETECT_ASSEMBLER"/>
-    <property name="namingStrategy" ref="namingStrategy"/>    
+    <property name="namingStrategy" ref="namingStrategy"/>
+    <property name="registrationBehaviorName" value="REGISTRATION_REPLACE_EXISTING"/>    
   </bean>
   
   <bean id="assembler" class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
