@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-client</groupId>
 		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.8</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-test</artifactId>
@@ -106,7 +106,7 @@
 
 	<build>
 
-		<resources>
+<!-- 		<resources>
 			<resource>
 				<directory>src/java/resources</directory>
 			</resource>
@@ -115,7 +115,7 @@
 			<testResource>
 				<directory>src/test/resources</directory>
 			</testResource>
-		</testResources>
+		</testResources> -->
 
 		<plugins>
 			<plugin>

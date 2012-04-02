@@ -98,8 +98,9 @@ public class C2MONClientCommandExecutionTest {
 
             sessionManager = C2monServiceGateway.getSessionManager();
 
-            log.info(format("sessionManager user: %s isLogged: %s", sessionManager.isUserLogged(), sessionManager
-                    .getUserName()));
+            if (!sessionManager.getLoggedUserNames().isEmpty())             
+              log.info(format("sessionManager user: %s isLogged: %s", sessionManager.getLoggedUserNames().iterator().next(), sessionManager
+                    .isUserLogged(sessionManager.getLoggedUserNames().iterator().next())));
 
             commandsManager = C2monServiceGateway.getCommandManager();
 
@@ -136,22 +137,22 @@ public class C2MONClientCommandExecutionTest {
                     String valStr = console.readLine("Enter command value: ");
                     Object val = null;
 
-                    if (ct.getType().equals(Integer.class)) {
+                    if (ct.getValueType().equals(Integer.class)) {
                         val = Integer.parseInt(valStr);
-                    } else if (ct.getType().equals(Long.class)) {
+                    } else if (ct.getValueType().equals(Long.class)) {
                         val = Long.parseLong(valStr);
-                    } else if (ct.getType().equals(Boolean.class)) {
+                    } else if (ct.getValueType().equals(Boolean.class)) {
                         val = Boolean.parseBoolean(valStr);
-                    } else if (ct.getType().equals(Float.class)) {
+                    } else if (ct.getValueType().equals(Float.class)) {
                         val = Float.parseFloat(valStr);
-                    } else if (ct.getType().equals(Double.class)) {
+                    } else if (ct.getValueType().equals(Double.class)) {
                         val = Double.parseDouble(valStr);
                     } else {
                         val = valStr;
                     }
 
                     log.info(format("executing command: %d, value:%s", id, val));
-                    CommandReport rep = commandsManager.executeCommand(ct.getId(), val);
+                    CommandReport rep = commandsManager.executeCommand(sessionManager.getLoggedUserNames().iterator().next(), ct.getId(), val);
                     log.info("done, report received");
                     console.printf("command report status: %d, txt: %s, report-txt: %s", rep.getStatus().getStatus(),
                             rep.getStatusText(), rep.getReportText());
