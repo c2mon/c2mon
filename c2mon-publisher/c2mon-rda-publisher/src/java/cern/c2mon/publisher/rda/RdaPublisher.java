@@ -162,7 +162,7 @@ public final class RdaPublisher extends DeviceServerBase {
     if (cdt.getDataTagQuality().isExistingTag() && cdtConfig != null) {
       try {
         String propertyName = getRdaProperty(cdtConfig.getJapcPublication());
-        if (!properties.containsKey(cdt.getName())) {
+        if (!properties.containsKey(propertyName)) {
           LOG.info("Adding for tag " + cdt.getId() + " new RDA publication property: " + propertyName);
           SimpleProperty property = new SimpleProperty(propertyName);
           properties.put(propertyName, property);
