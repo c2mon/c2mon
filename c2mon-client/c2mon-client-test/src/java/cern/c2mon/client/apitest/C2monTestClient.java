@@ -39,7 +39,7 @@ public class C2monTestClient {
   /**
    * Log4j Logger for logging DataTag values.
    */
-  protected static final Logger TAG_LOG = Logger.getLogger(System.getProperty("c2mon.client.test.log.name"));
+  protected static final Logger TAG_LOG = Logger.getLogger("ClientDataTagValueLogger");
   
   /**
    * @param args

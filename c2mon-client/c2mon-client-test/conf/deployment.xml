@@ -46,9 +46,7 @@
       <startscript name="C2MON-DMN2-CLIENT-COMMANDS-TEST">
         <main-class name="cern.c2mon.client.apitest.C2MONClientCommandExecutionTest">
           <arg>$1</arg>
-        </main-class>
-        <initial-heap-size>64m</initial-heap-size>
-        <max-heap-size>64m</max-heap-size>
+        </main-class>        
         <preExec>
 			        <![CDATA[			          
 			         ]]>
@@ -61,15 +59,18 @@
 
       </startscript>
     </application>
-    <application name="C2MON-TEST-CLIENT">
+    <application name="c2mon-test-client">
        <deployment installLocation="~/dist/c2mon-test-client">         
         <directory name="conf">
           <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client" mask="400" />          
         </directory>        
       </deployment>      
-      <startscript>
+      <startscript name="C2MON-TEST-CLIENT" >
         <main-class name="cern.c2mon.client.apitest.C2monTestClient" />
-      </startscript>
+        <initial-heap-size>64m</initial-heap-size>
+        <max-heap-size>64m</max-heap-size>
+        <property name="c2mon.log.dir" value="log" />
+      </startscript>      
     </application>
 
   </product>
