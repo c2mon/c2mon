@@ -64,7 +64,7 @@
       <source>${basedir}/bin/c2mon-test-client.sh</source>
       <outputDirectory>bin/</outputDirectory>
       <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
+      <fileMode>0755</fileMode>
     </file>
 
 	</files>

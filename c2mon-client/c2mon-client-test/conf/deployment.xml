@@ -70,7 +70,11 @@
         <main-class name="cern.c2mon.client.apitest.C2monTestClient" />
         <initial-heap-size>64m</initial-heap-size>
         <max-heap-size>64m</max-heap-size>
+        <output>
+          <file name="log/out.log" />
+        </output>
         <property name="c2mon.log.dir" value="log" />
+        <property name="log4j.configuration" value="conf/log4j.xml" />
         <property name="c2mon.client.test.tagids.location" value="conf/tagids.txt" />
         <property name="c2mon.client.test.log.name" value="${LOG_NAME}" />
         <property name="c2mon.client.test.subscription.number" value="${TAG_NUMBER}" />        
