@@ -13,14 +13,14 @@ import cern.c2mon.client.apitest.MetricDef;
 import cern.c2mon.client.apitest.service.C2MonClientApiTestService;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:application-context-test.xml" })
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration({ "classpath:resources/application-context-test.xml" })
 public class C2MonClientApiTestServiceImplTest {
 
 	@Autowired
 	C2MonClientApiTestService service;
 
-	@Test
+	//@Test
 	public void getAllDeviceRuleMetricsForProcess() throws Exception {
 
 		List<MetricDef> def = service.getProcessMetrics("P_CLIC_01");
