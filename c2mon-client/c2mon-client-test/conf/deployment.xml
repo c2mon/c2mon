@@ -62,7 +62,8 @@
     <application name="c2mon-test-client">
        <deployment installLocation="~/dist/c2mon-test-client">         
         <directory name="conf">
-          <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client" mask="400" />          
+          <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client" mask="400" />
+          <file name="tagids.txt" sourceDir="/user/timtest/rep/c2mon/client" mask="400" />          
         </directory>        
       </deployment>      
       <startscript name="C2MON-TEST-CLIENT" >
