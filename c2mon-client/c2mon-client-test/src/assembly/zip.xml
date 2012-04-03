@@ -58,6 +58,14 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
+    
+    <!-- test client start-up script -->
+    <file>
+      <source>${basedir}/bin/c2mon-test-client.sh</source>
+      <outputDirectory>bin/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
 
 	</files>
 

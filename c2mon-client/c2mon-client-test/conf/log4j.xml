@@ -49,11 +49,28 @@
 			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
 		</layout>
 	</appender>
-
+  <appender name="ClientDataTagValueAppender" class="org.apache.log4j.RollingFileAppender">
+    <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
+      <root-ref />
+      <appender-ref ref="FallbackConsoleAppender" />
+    </errorHandler>
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/ClientDataTags.log" />
+    <param name="MaxBackupIndex" value="1" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="BufferedIO" value="false" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
+    </layout>
+  </appender>
 
 	<!-- 
     Define the loggers.
     -->
+   <logger name="C2monTestClientLog" additivity="false">
+    <level value="info" />
+    <appender-ref ref="ClientDataTagValueAppender" />
+  </logger>
 	<logger name="ClientDataTagValueLogger" additivity="false">
 		<level value="info" />
 		<appender-ref ref="ClientDataTagValueAppender" />
