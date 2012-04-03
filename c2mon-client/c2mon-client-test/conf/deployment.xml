@@ -71,6 +71,7 @@
         <initial-heap-size>64m</initial-heap-size>
         <max-heap-size>64m</max-heap-size>
         <property name="c2mon.log.dir" value="log" />
+        <property name="c2mon.client.test.tagids.location" value="conf/tagids.txt" />
       </startscript>      
     </application>
 
