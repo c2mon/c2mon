@@ -7,9 +7,9 @@
   Specify the name of the log file in the ${tim.log.filename} system property.
   To do this, start your program the following way:
 
-    java -Dtim.log.path=c:/  ... YourMainClass
+    java -Dc2mon.log.dir=c:/  ... YourMainClass
   or
-    java -Dtim.log.path=c:/  ... -jar YourRunnableJar.jar
+    java -Dc2mon.log.dir=c:/  ... -jar YourRunnableJar.jar
 
   If you don't, the log file will be created in the temp directory. If this
   isn't possible either, log output will be printed on the console.
@@ -36,17 +36,17 @@
                      threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <renderer  renderedClass="ch.cern.tim.shared.datatag.DataTagCacheObject"
-             renderingClass="ch.cern.tim.shared.datatag.DataTagRenderer" />
+  <renderer renderedClass="cern.tim.shared.daq.filter.FilteredDataTagValue"
+          renderingClass="cern.tim.shared.daq.filter.FilteredDataTagValueRenderer" />
 
-  <renderer  renderedClass="ch.cern.tim.shared.datatag.SourceDataTagValue"
-             renderingClass="ch.cern.tim.shared.datatag.SourceDataTagValueRenderer" />
+  <renderer  renderedClass="cern.tim.shared.daq.datatag.SourceDataTagValue"
+             renderingClass="cern.tim.shared.daq.datatag.SourceDataTagValueRenderer" />
 
-  <renderer  renderedClass="ch.cern.tim.shared.commandtag.SourceCommandTagValue"
-             renderingClass="ch.cern.tim.shared.commandtag.SourceCommandTagValueRenderer" />
+  <renderer  renderedClass="cern.tim.shared.daq.command.SourceCommandTagValue"
+             renderingClass="cern.tim.shared.daq.command.SourceCommandTagValueRenderer" />
 
-  <renderer  renderedClass="ch.cern.tim.shared.commandtag.SourceCommandTagReport"
-             renderingClass="ch.cern.tim.shared.commandtag.SourceCommandReportRenderer" />
+  <renderer  renderedClass="cern.tim.shared.daq.command.SourceCommandTagReport"
+             renderingClass="cern.tim.shared.daq.command.SourceCommandReportRenderer" />
 
 
   <!--
@@ -64,9 +64,20 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.path}/${tim.process.name}.log" />
-    <param name="MaxBackupIndex" value="1" />
-    <param name="MaxFileSize" value="5MB" />
+    <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.log" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="MaxFileSize" value="3MB" />
+    <param name="BufferedIO" value="false" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
+    </layout>
+  </appender>
+
+  <appender name="SpringFileAppender" class="org.apache.log4j.RollingFileAppender">
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.spring.log" />
+    <param name="MaxBackupIndex" value="2" />
+    <param name="MaxFileSize" value="3MB" />
     <param name="BufferedIO" value="false" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
@@ -75,8 +86,18 @@
 
   <appender name="SourceDataTagLoggerAppender" class="org.apache.log4j.RollingFileAppender">
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.path}/${tim.process.name}.tag.log" />
-    <param name="MaxFileSize" value="5MB" />
+    <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.tag.log" />
+    <param name="MaxFileSize" value="3MB" />
+    <param name="MaxBackupIndex" value ="1" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
+    </layout>
+  </appender>
+
+  <appender name="FilteredDataTagLoggerAppender" class="org.apache.log4j.RollingFileAppender">
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.filter.tag.log" />
+    <param name="MaxFileSize" value="3MB" />
     <param name="MaxBackupIndex" value ="1" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
@@ -85,13 +106,24 @@
 
   <appender name="SourceCommandTagLoggerAppender" class="org.apache.log4j.RollingFileAppender">
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.path}/${tim.process.name}.cmd.log" />
-    <param name="MaxFileSize" value="5MB" />
+    <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.cmd.log" />
+    <param name="MaxFileSize" value="3MB" />
     <param name="MaxBackupIndex" value ="1" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
     </layout>
   </appender>
+
+  <appender name="ReconfigurationLogAppender" class="org.apache.log4j.RollingFileAppender">
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.reconf.log" />
+    <param name="MaxFileSize" value="3MB" />
+    <param name="MaxBackupIndex" value ="1" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
+    </layout>
+  </appender>
+
 
 
 <!--
@@ -111,15 +143,50 @@
     used for all log output.
   -->
   <logger name="SourceDataTagLogger" additivity="false">
-    <level value="info"/>
+    <level value="debug"/>
     <appender-ref ref="SourceDataTagLoggerAppender" />
   </logger>
 
+  <logger name="FilteredDataTagLogger" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="FilteredDataTagLoggerAppender" />
+  </logger>
+
   <logger name="SourceCommandTagLogger" additivity="false">
-    <level value="info"/>
+    <level value="debug"/>
     <appender-ref ref="SourceCommandTagLoggerAppender" />
   </logger>
 
+  <logger name="org.springframework" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="FileAppender" />
+  </logger>
+
+  <logger name="org.apache.activemq" additivity="false">
+    <level value="info"/>
+    <appender-ref ref="FileAppender" />
+  </logger>
+
+  <logger name="cern.tim.driver.common.messaging.impl" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="FileAppender" />
+  </logger>
+
+
+  <logger name="ReconfigurationLogger" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="ReconfigurationLogAppender" />
+  </logger>
+
+  <logger name="cern.tim" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="FileAppender" />
+  </logger>
+
+  <logger name="ch.cern.tim" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="FileAppender" />
+  </logger>
 
   <root>
     <level value="debug"/>
