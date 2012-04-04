@@ -20,7 +20,6 @@ package cern.c2mon.client.module.adminmessage;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -28,7 +27,6 @@ import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.admin.AdminMessage;
@@ -40,7 +38,6 @@ import cern.c2mon.client.core.C2monSessionManager;
 import cern.c2mon.client.jms.AdminMessageListener;
 import cern.c2mon.client.module.C2monAdminMessageManager;
 import cern.c2mon.client.module.adminmessage.handler.AdminMessageHandler;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
 import cern.tim.shared.common.command.AuthorizationDetails;
 
 /**
@@ -78,9 +75,7 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
    * The rbac authorization details that will be used to authorise every person who
    * tries to send admin messages.
    */
-  @Autowired 
-  @Qualifier("authorizationDetails")
-  private static String authorizationDetails;
+  private String rbacAdminAuthorizationDetails;
   
   /**
    * Constructor
@@ -97,10 +92,14 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
     this.adminMessageListeners = new ConcurrentSet<AdminMessageListener>();
   }
   
+  /**
+   * Sets the RBAC authorization details String 
+   * @param authDetails The RBAC authorization details given as RBAC class/device/property tuple
+   */
   @Autowired
   @Qualifier("authorizationDetails")
-  public void setAuthDetails(String authDetails) {
-    authorizationDetails = authDetails;
+  public void setAuthDetails(final String authDetails) {
+    rbacAdminAuthorizationDetails = authDetails;
   }
   
   /**
@@ -170,8 +169,7 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
    * @return the authorization details for a admin that can send messages
    * @throws IOException In case the authDetails could not be found
    */
-  private static AuthorizationDetails getAdminAuthorizationDetails() throws IOException {
-    
-    return RbacAuthorizationDetailsParser.parseRbacDetails(authorizationDetails);
+  private AuthorizationDetails getAdminAuthorizationDetails() throws IOException {
+    return RbacAuthorizationDetailsParser.parseRbacDetails(rbacAdminAuthorizationDetails);
   }
 }
