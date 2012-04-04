@@ -73,10 +73,11 @@
         <output>
           <file name="log/out.log" />
         </output>
+        <property name="c2mon.client.conf.url" value="file:conf/c2mon-client.properties" />
         <property name="c2mon.log.dir" value="log" />
         <property name="log4j.configuration" value="conf/log4j.xml" />
         <property name="c2mon.client.test.tagids.location" value="conf/tagids.txt" />
-        <property name="c2mon.client.test.log.name" value="${LOG_NAME}" />
+        <property name="c2mon.process.name" value="${PROCESS_NAME}" />
         <property name="c2mon.client.test.subscription.number" value="${TAG_NUMBER}" />        
       </startscript>      
     </application>

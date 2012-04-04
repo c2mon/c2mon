@@ -58,7 +58,7 @@ public class C2monTestClient {
     try {      
       BufferedReader br = null;
       try {
-        URL url = ResourceUtils.getURL(System.getProperty("c2mon.test.client.tagids.location"));      
+        URL url = ResourceUtils.getURL(System.getProperty("c2mon.client.test.tagids.location"));      
         br = new BufferedReader(new InputStreamReader(url.openStream()));      
         String currentLine;
         while ((currentLine = br.readLine()) != null) {
@@ -71,6 +71,7 @@ public class C2monTestClient {
     } catch (Exception e) {
       log.error("Error while reading tag id file", e);
     } 
+   log.info("Found " + tagIds.size() + " tag ids in file.");
    
     //get random subset
     Set<Long> subscriptionIds = getRandomSubset(tagIds, Integer.valueOf(System.getProperty("c2mon.client.test.subscription.number")));

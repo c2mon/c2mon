@@ -66,6 +66,12 @@
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
     </file>
+     <file>
+      <source>${basedir}/bin/c2mon-test-client-stop.sh</source>
+      <outputDirectory>bin/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+    </file>
 
 	</files>
 

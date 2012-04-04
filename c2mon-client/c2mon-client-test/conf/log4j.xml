@@ -20,7 +20,7 @@
 			<appender-ref ref="FallbackConsoleAppender" />
 		</errorHandler>
 		<param name="Append" value="true" />
-		<param name="File" value="${c2mon.log.dir}/dmn2-client-test.log" />
+		<param name="File" value="${c2mon.log.dir}/${c2mon.process.name}-main.log" />
 		<param name="MaxBackupIndex" value="3" />
 		<param name="MaxFileSize" value="5MB" />
 		<param name="BufferedIO" value="false" />
@@ -41,7 +41,7 @@
 			<appender-ref ref="FallbackConsoleAppender" />
 		</errorHandler>
 		<param name="Append" value="true" />
-		<param name="File" value="${c2mon.log.dir}/${c2mon.client.test.log.name}" />
+		<param name="File" value="${c2mon.log.dir}/${c2mon.process.name}-tag.log" />
 		<param name="MaxBackupIndex" value="1" />
 		<param name="MaxFileSize" value="5MB" />
 		<param name="BufferedIO" value="false" />
