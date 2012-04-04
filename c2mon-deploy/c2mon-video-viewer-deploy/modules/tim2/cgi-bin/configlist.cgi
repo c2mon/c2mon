@@ -30,6 +30,15 @@ if ($viewerVersion =~ /-SNAPSHOT/) {
   $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-video-viewer/conf"; 
 }
 
+##
+# Reading version number from ../version.txt
+#
+open VFILE, "< ../version.txt"
+  or die "Unable to open version file ../version.txt";
+my $viewerVersion = <VFILE>;
+chomp $viewerVersion; # removes new line character
+close VFILE;
+
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
 
 # Determine the client operating system
@@ -41,10 +50,10 @@ if($ENV{'HTTP_USER_AGENT'} =~ /Windows/) {
 print header;
 print start_html(-title=>'TIM Video Viewer', -style=>"/css/tim.css");
 if ($os_ eq "linux") {
-  print h1('TIM Video Viewer Configurations (Linux) for VLC version 1.1.4');
+  print h1('TIM Video Viewer (" . $viewerVersion . ") Configurations (Linux) for VLC (version >= 1.1.4)');
 }
 else {
-  print h1('TIM Video Viewer Configurations (Windows)');
+  print h1('TIM Video Viewer (" . $viewerVersion . ") Configurations (Windows)');
 }
 
 # Browsing the configuration files
