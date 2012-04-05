@@ -50,10 +50,10 @@ if($ENV{'HTTP_USER_AGENT'} =~ /Windows/) {
 print header;
 print start_html(-title=>'TIM Video Viewer', -style=>"/css/tim.css");
 if ($os_ eq "linux") {
-  print h1('TIM Video Viewer (" . $viewerVersion . ") Configurations (Linux) for VLC (version >= 1.1.4)');
+  print h1('TIM Video Viewer (' . $viewerVersion . ') Configurations (Linux) for VLC (version >= 1.1.4)');
 }
 else {
-  print h1('TIM Video Viewer (" . $viewerVersion . ") Configurations (Windows)');
+  print h1('TIM Video Viewer (' . $viewerVersion . ') Configurations (Windows)');
 }
 
 # Browsing the configuration files
@@ -62,7 +62,7 @@ my @files = sort grep !/^\.\.?$/, readdir DIR;
 closedir DIR;
 
 if ($os_ eq "linux") {
-  print p("To launch the TIM Video Viewer for Linux, choose one of the configurations below. Please note, that you have to install first VLC v1.1.4 on your client machine and be a trusted client host.",font({-color=>"#FF0000"},"(For security reasons, the TIM Video Viewer only works on the Technical Network)"),":");
+  print p("To launch the TIM Video Viewer for Linux, choose one of the configurations below. Please note, that you have to install first VLC v1.1.4 or higher on your client machine and be a trusted client host.",font({-color=>"#FF0000"},"(For security reasons, the TIM Video Viewer only works on the Technical Network)"),":");
 }
 else {
   print p("To launch the TIM Video Viewer, choose one of the configurations below ",font({-color=>"#FF0000"},"(NOTE: For security reasons, the TIM Video Viewer only works on the Technical Network)"),":");
