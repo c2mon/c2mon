@@ -210,12 +210,6 @@ public class HistoryPlayerSwitchDialog {
     selectedEventLabel.setVisible(false);
     
     Object savedEvent = "Saved events..";
-    if (!C2monServiceGateway.getHistoryManager().getHistoryProviderAvailability().isAvailable(HistoryProviderType.SAVED_HISTORY_EVENTS)) {
-      final JButton savedEventButton = new JButton(savedEvent.toString());
-      savedEventButton.setEnabled(false);
-      savedEventButton.setToolTipText("The history events is not accessible at the time. Check that the properties are set correctly.");
-      savedEvent = savedEventButton;
-    } 
     
     switchPanel.add(historyPlayerConfigPanel, BorderLayout.CENTER);
     switchPanel.add(selectedEventLabel, BorderLayout.SOUTH);
