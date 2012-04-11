@@ -256,7 +256,9 @@ public final class HistoryTagLoadingManager {
               }
               if (configuration.getTotalMilliseconds() != null) {
                 final Timestamp startTime = new Timestamp(System.currentTimeMillis() - configuration.getTotalMilliseconds());
+                final Timestamp endTime = new Timestamp(System.currentTimeMillis());
                 downloaderConfiguration.setStartTime(startTime);
+                downloaderConfiguration.setEndTime(endTime);
               }
               
               downloader.setConfiguration(downloaderConfiguration);
