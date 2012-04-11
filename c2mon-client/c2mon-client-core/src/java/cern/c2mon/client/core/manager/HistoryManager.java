@@ -47,7 +47,6 @@ import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.history.ClientDataTagRequestCallback;
 import cern.c2mon.client.history.HistoryProviderFactoryImpl;
 import cern.c2mon.client.history.data.HistoryLoadingManagerImpl;
-import cern.c2mon.client.history.dbaccess.HistoryProviderAvailabilityImpl;
 import cern.c2mon.client.history.playback.HistoryPlayerCoreAccess;
 import cern.c2mon.client.history.playback.HistoryPlayerImpl;
 import cern.c2mon.client.history.util.KeyForValuesMap;
@@ -317,14 +316,6 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
     return cache.isHistoryModeEnabled();
   }
 
-  @Override
-  public synchronized HistoryProviderAvailability getHistoryProviderAvailability() {
-    if (this.historyProviderAvailability == null) {
-      this.historyProviderAvailability = new HistoryProviderAvailabilityImpl();
-    }
-    return this.historyProviderAvailability;
-  }
-  
   class ConnectionEvents implements ConnectionListener {
     @Override
     public void onConnection() {

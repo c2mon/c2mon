@@ -68,13 +68,6 @@ public interface C2monHistoryManager {
   HistoryProviderFactory getHistoryProviderFactory();
 
   /**
-   * 
-   * @return an interface that provides methods for checking if any of the
-   *         history providers is available
-   */
-  HistoryProviderAvailability getHistoryProviderAvailability();
-  
-  /**
    * Creates a history loading manager which uses the history provider provided
    * to load the data.
    * 
