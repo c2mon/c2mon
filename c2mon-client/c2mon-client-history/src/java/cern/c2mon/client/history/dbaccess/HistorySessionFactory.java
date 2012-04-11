@@ -17,13 +17,9 @@
  *****************************************************************************/
 package cern.c2mon.client.history.dbaccess;
 
-import java.io.IOException;
-import java.io.Reader;
-
-import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.SavedHistoryEvent;
@@ -35,72 +31,25 @@ import cern.c2mon.client.history.dbaccess.exceptions.HistoryException;
 /**
  * Factory to retrieve a {@link SqlSessionFactory}, {@link SqlSession}
  * or a {@link HistoryProvider}.<br/>
- * You can check if the data source is available by calling the
- * <code>isDatasourceAvailable()</code> function
  * 
  * @author vdeila
  */
 public final class HistorySessionFactory {
 
-  /** The default driver used if non is specified */
-  private static final String DEFAULT_JDBC_TIMSTLOG_DRIVER = "oracle.jdbc.OracleDriver";
+  @Autowired
+  private HistoryMapper historyMapper;
   
-  /** The file path to the ibatis configuration file */
-  private static final String CONFIGURATION_FILE = "cern/c2mon/client/history/dbaccess/config/history-ibatis.xml";
+  @Autowired
+  private SavedHistoryMapper savedHistoryMapper;
   
-  /** Singleton instance */
-  private static HistorySessionFactory instance = null;
-
-  /**
-   * @return An instance
-   */
-  public static HistorySessionFactory getInstance() {
-    if (instance == null) {
-      instance = new HistorySessionFactory();
-    }
-    return instance;
-  }
+  @Autowired
+  private SavedHistoryEventsMapper savedHistoryEventsMapper;
+  
 
   /**
    * Is Singleton and therefore private
    */
   private HistorySessionFactory() {
-    if (System.getProperty(HistorySystemProperties.JDBC_DRIVER) == null) {
-      System.setProperty(HistorySystemProperties.JDBC_DRIVER, DEFAULT_JDBC_TIMSTLOG_DRIVER);
-    }
-  }
-
-  /** Session factory is the factory from apache created from the xml files */
-  private SqlSessionFactory sessionFactory = null;
-
-  /**
-   * 
-   * @return An instance of the {@link SqlSessionFactory} which is used to do
-   *         queries against the sql database
-   * @throws HistoryException
-   *           If the configuration file could not be read. Or if the system
-   *           properties for the data source is not set.
-   */
-  public SqlSessionFactory getSqlSessionFactory() throws HistoryException {
-    if (sessionFactory == null) {
-      // Checks if the data source is available
-      if (isDatasourceAvailable()) {
-        // Creates a new SqlSessionFactory with the data source properties
-        Reader reader = null;
-        try {
-          reader = Resources.getResourceAsReader(CONFIGURATION_FILE);
-          sessionFactory = new SqlSessionFactoryBuilder().build(reader, System.getProperties());
-        }
-        catch (IOException e) {
-          throw new HistoryException("Error while reading the iBatis configurations..", e);
-        }
-      }
-      else {
-        // Throws an exception as the data source is not available
-        throw new HistoryException("The system properties for the TIM data source is not available. Please contact TIM support.");
-      }
-    }
-    return sessionFactory;
   }
 
   /**
@@ -117,7 +66,7 @@ public final class HistorySessionFactory {
    *           properties for the data source is not set.
    */
   public HistoryProvider createHistoryProvider(final ClientDataTagRequestCallback clientDataTagRequestCallback) throws HistoryException {
-    return new SqlHistoryProviderDAO(getSqlSessionFactory(), clientDataTagRequestCallback);
+    return new SqlHistoryProviderDAO(historyMapper, clientDataTagRequestCallback);
   }
   
   /**
@@ -137,7 +86,7 @@ public final class HistorySessionFactory {
    *           properties for the data source is not set.
    */
   public HistoryProvider createSavedHistoryProvider(final SavedHistoryEvent event, final ClientDataTagRequestCallback clientDataTagRequestCallback) throws HistoryException {
-    return new SqlHistoryEventsProviderDAO(event, getSqlSessionFactory(), clientDataTagRequestCallback);
+    return new SqlHistoryEventsProviderDAO(event, historyMapper, savedHistoryMapper, clientDataTagRequestCallback);
   }
   
   /**
@@ -151,19 +100,30 @@ public final class HistorySessionFactory {
    */
   public SavedHistoryEventsProvider createSavedHistoryEventsProvider()
       throws HistoryException {
-    return new SqlSavedHistoryEventsProviderDAO(getSqlSessionFactory());
+    return new SqlSavedHistoryEventsProviderDAO(savedHistoryEventsMapper);
   }
-
-  /**
-   * 
-   * @return <code>true</code> if the data source connection string is available
-   */
-  public boolean isDatasourceAvailable() {
-    return 
-      System.getProperty(HistorySystemProperties.JDBC_DRIVER) != null
-      && System.getProperty(HistorySystemProperties.JDBC_RO_URL) != null
-      && System.getProperty(HistorySystemProperties.JDBC_RO_USERNAME) != null
-      && System.getProperty(HistorySystemProperties.JDBC_RO_PASSWORD) != null;
+  
+  public HistoryMapper getHistoryMapper() {
+    return historyMapper;
   }
-
+  
+  public SavedHistoryMapper getSavedHistoryMapper() {
+    return savedHistoryMapper;
+  }
+  
+  public SavedHistoryEventsMapper getSavedHistoryEventsMapper() {
+    return savedHistoryEventsMapper;
+  }
+  
+  public void setHistoryMapper(final HistoryMapper historyMapper) {
+    this.historyMapper = historyMapper;
+  }
+  
+  public void setSavedHistoryMapper(final SavedHistoryMapper savedHistoryMapper) {
+    this.savedHistoryMapper = savedHistoryMapper;
+  }
+  
+  public void setSavedHistoryEventsMapper(final SavedHistoryEventsMapper savedHistoryEventsMapper) {
+    this.savedHistoryEventsMapper = savedHistoryEventsMapper;
+  }
 }

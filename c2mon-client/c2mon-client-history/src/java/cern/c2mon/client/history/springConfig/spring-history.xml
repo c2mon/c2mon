@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<!-- scan the package for Spring annotations -->
+	<context:annotation-config />
+	<context:component-scan base-package="cern.c2mon.client.history" />
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="${c2mon.client.conf.url}" />
+	</bean>
+
+	<!--
+		configure the data source connection pool (from .c2mon.properties in
+		production)
+	-->        
+	<bean id="historyDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	
+		<property name="driverClassName" value="${c2mon.jdbc.driver}" />
+        <property name="url" value="${c2mon.jdbc.ro.url}" />
+        <property name="username" value="${c2mon.jdbc.ro.user}" />
+        <property name="password" value="${c2mon.jdbc.ro.password}" />
+   	<!--
+     	<property name="driverClassName" value="oracle.jdbc.OracleDriver" />
+        <property name="url" value="jdbc:oracle:thin:@( DESCRIPTION= (ADDRESS= (PROTOCOL=TCP) (HOST=dbsrva3202.cern.ch) (PORT=1574) ) (ENABLE=BROKEN) (CONNECT_DATA= (SID=TIMTST)))" />
+        <property name="username" value="timop" />
+        <property name="password" value="optim1954" />  
+	  -->  
+	  <!--
+		<property name="defaultAutoCommit" value="false" />
+		<property name="validationQuery" value="SELECT 0 FROM DUAL" />
+		 -->  
+		<!--    <property name="logWriter" value=""/>-->
+		<property name="initialSize" value="1" />
+		<property name="maxActive" value="2" />
+	</bean>
+
+	<bean id="historySqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation"
+			value="classpath:cern/c2mon/client/history/dbaccess/config/history-ibatis.xml" />
+		<!--	history-ibatis.xml SqlMapHistoryConfig.xml -->
+		<!-- value="classpath:cern/c2mon/client/history/dbaccess/sqlmaps/SqlMapHistoryConfig.xml" /> -->
+		<property name="dataSource" ref="historyDataSource" />
+	</bean>
+
+	<bean id="historyConnectionMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="sqlSessionFactory" ref="historySqlSessionFactory" />
+		<property name="mapperInterface"
+			value="cern.c2mon.client.history.dbaccess.HistoryMapper" />
+	</bean>
+	
+	<bean id="savedHistoryConnectionMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="sqlSessionFactory" ref="historySqlSessionFactory" />
+		<property name="mapperInterface"
+			value="cern.c2mon.client.history.dbaccess.SavedHistoryMapper" />
+	</bean>
+	
+	<bean id="savedHistoryEventsConnectionMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="sqlSessionFactory" ref="historySqlSessionFactory" />
+		<property name="mapperInterface"
+			value="cern.c2mon.client.history.dbaccess.SavedHistoryEventsMapper" />
+	</bean>
+	
+	<bean id="historyFactory" class="cern.c2mon.client.history.dbaccess.HistorySessionFactory">
+	</bean>
+	
+</beans>

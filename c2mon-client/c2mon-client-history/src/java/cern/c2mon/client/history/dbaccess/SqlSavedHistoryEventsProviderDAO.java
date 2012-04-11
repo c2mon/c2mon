@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.client.common.history.SavedHistoryEvent;
 import cern.c2mon.client.common.history.SavedHistoryEventsProvider;
@@ -37,38 +38,32 @@ import cern.c2mon.client.history.dbaccess.beans.SavedHistoryEventBean;
  * 
  */
 public class SqlSavedHistoryEventsProviderDAO implements SavedHistoryEventsProvider {
-
-  /** The factory which creates the sessions */
-  private final SqlSessionFactory sessionFactory;
   
+  /** iBatis mapper for history DB access. */
+  private SavedHistoryEventsMapper savedHistoryEventsMapper;
+
   /**
-   * 
-   * @param sessionFactory
-   *          The sql session factory from which the sessions will be created
+   * @param savedHistoryEventsMapper iBatis mapper for history DB access
    */
-  public SqlSavedHistoryEventsProviderDAO(final SqlSessionFactory sessionFactory) {
-    this.sessionFactory = sessionFactory;
+  public SqlSavedHistoryEventsProviderDAO(final SavedHistoryEventsMapper savedHistoryEventsMapper) {
+  
+    this.savedHistoryEventsMapper = savedHistoryEventsMapper;
   }
   
   /**
-   * @param session
-   *          The session to get the mapper from
    * @return a saved history events mapper
    */
-  private SavedHistoryEventsMapper getSavedHistoryEventsMapper(final SqlSession session) {
-    return session.getMapper(SavedHistoryEventsMapper.class);
+  private SavedHistoryEventsMapper getSavedHistoryEventsMapper() {
+    
+    return savedHistoryEventsMapper;
   }
 
   @Override
   public Collection<SavedHistoryEvent> getSavedHistoryEvents() {
     final ArrayList<SavedHistoryEventBean> events;
-    final SqlSession session = this.sessionFactory.openSession();
-    try {
-      events = new ArrayList<SavedHistoryEventBean>(getSavedHistoryEventsMapper(session).getSavedEvents());
-    }
-    finally {
-      session.close();
-    }
+   
+    events = new ArrayList<SavedHistoryEventBean>(getSavedHistoryEventsMapper().getSavedEvents());
+    
     // Converting dates into local time zone
     for (SavedHistoryEventBean bean : events) {
       bean.convertIntoLocalTimeZone();

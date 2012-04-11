@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.history.HistoryProvider;
@@ -62,7 +60,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
   /** The number of days available from the database */
   private static final int NUMBER_OF_DAYS_AVAILABLE = 30;
-  
+
   /**
    * ORA-01795: maximum number of expressions in a list is 1000
    * 
@@ -72,26 +70,27 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
    */
   private static final Integer MAXIMUM_NUMBER_OF_TAGS_PER_QUERY = 900;
 
-  /** The sql session factory from which the session will be created */
-  private final SqlSessionFactory sessionFactory;
-  
+  /** iBatis mapper for history DB access */
+  private HistoryMapper historyMapper;
+
   /**
    * Callback to get access to attributes in the {@link ClientDataTagValue}.
    * Like for example the {@link ClientDataTagValue#getType()}
    */
-  private final ClientDataTagRequestCallback clientDataTagRequestCallback;
+  private ClientDataTagRequestCallback clientDataTagRequestCallback;
 
   /**
    * 
-   * @param sessionFactory
-   *          The sql session factory from which the session will be created
+   * @param historyMapper iBatis mapper for history DB access
    * @param clientDataTagRequestCallback
    *          Callback to get access to attributes in the
    *          {@link ClientDataTagValue}. Like for example the
    *          {@link ClientDataTagValue#getType()}
    */
-  public SqlHistoryProviderDAO(final SqlSessionFactory sessionFactory, final ClientDataTagRequestCallback clientDataTagRequestCallback) {
-    this.sessionFactory = sessionFactory;
+  public SqlHistoryProviderDAO(final HistoryMapper historyMapper, 
+      final ClientDataTagRequestCallback clientDataTagRequestCallback) {
+
+    this.historyMapper = historyMapper;
     this.clientDataTagRequestCallback = clientDataTagRequestCallback;
   }
 
@@ -102,9 +101,9 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
             DateUtil.addDays(
                 System.currentTimeMillis(), 
                 -NUMBER_OF_DAYS_AVAILABLE)),
-        new Date(System.currentTimeMillis()));
+                new Date(System.currentTimeMillis()));
   }
-  
+
   /**
    * 
    * @param tagIds
@@ -212,7 +211,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     if (isProviderDisabled()) {
       return new ArrayList<HistoryTagValueUpdate>();
     }
-    
+
     // Tells the listeners that the query is starting
     final Object queryId = fireQueryStarting();
 
@@ -260,12 +259,11 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     // The list which will be filled with the values to return
     final List<HistoryRecordBean> records = new ArrayList<HistoryRecordBean>();
 
-    final SqlSession session = this.sessionFactory.openSession();
     try {
-      final HistoryMapper historyMapper = getHistoryMapper(session);
+      final HistoryMapper historyMapper = getHistoryMapper();
 
       // Does the query / queries to the database
-      for (int i = 0; i < queryPlan.size() - 1 && !isProviderDisabled(); i++) {
+      for (int i = 0; i < queryPlan.size() - 1; i++) {
 
         // Gets the list of tags to query
         final Long[] tagIdsToQuery = Arrays.asList(providerRequest.getTagIds()).subList(queryPlan.get(i), queryPlan.get(i + 1)).toArray(new Long[0]);
@@ -283,7 +281,9 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
         // Does the call to the sql mapper
         // and adds the values to the list which will be returned
+
         final Collection<HistoryRecordBean> queryResult = historyMapper.getRecords(request);
+        
         if (queryResult != null) {
           records.addAll(queryResult);
           for (HistoryRecordBean record : queryResult) {
@@ -304,8 +304,6 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       }
     }
     finally {
-      session.close();
-      
       fireQueryProgressChanged(queryId, 1.0);
 
       // Tells the listeners that the query is finished
@@ -331,7 +329,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     if (isProviderDisabled() || tagIds.length == 0) {
       return new ArrayList<HistoryTagValueUpdate>();
     }
-    
+
     // Tells the listener that a query is starting
     final Object queryId = fireQueryStarting();
 
@@ -346,12 +344,10 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       LOG.debug(String.format("Retrieving %d initial data tags", tagIds.length));
     }
     final long startTimeTotal = System.currentTimeMillis();
-    
-    // Opens a session where the data is received from
-    final SqlSession session = this.sessionFactory.openSession();
+
     try {
-      final HistoryMapper historyMapper = getHistoryMapper(session);
-      for (int i = 0; i < tagIds.length && !isProviderDisabled(); i++) {
+      final HistoryMapper historyMapper = getHistoryMapper();
+      for (int i = 0; i < tagIds.length; i++) {
         final Long tagId = tagIds[i];
         final long startTime = System.currentTimeMillis();
         final HistoryRecordBean record = historyMapper.getInitialRecord(new InitialRecordHistoryRequestBean(tagId, before));
@@ -376,13 +372,12 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
       }
     }
     finally {
-      session.close();
-      
+
       fireQueryProgressChanged(queryId, 1.0);
 
       // Tells the listener that the query is finished
       fireQueryFinished(queryId);
-      
+
       if (LOG.isDebugEnabled()) {
         LOG.debug(String.format("Retrieved %d initial data tags. It took %.3f seconds", 
             tagIds.length, 
@@ -392,51 +387,44 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
     return result;
   }
-  
+
   @Override
   public Collection<HistoryTagValueUpdate> getDailySnapshotRecords(final Long[] tagIds, final Timestamp from, final Timestamp to) {
     // List for the result
     final ArrayList<HistoryTagValueUpdate> result = new ArrayList<HistoryTagValueUpdate>();
-    
+
     if (isProviderDisabled()) {
       return result;
     }
-    
+
     // Tells the listener that a query is starting
     final Object queryId = fireQueryStarting();
 
     try {
-    
+
       if (tagIds.length == 0) {
         return result;
       }
-  
+
       final List<Long> requests = new ArrayList<Long>(Arrays.asList(tagIds));
-      
-      // Opens a session where the data is received from
-      final SqlSession session = this.sessionFactory.openSession();
+
       final List<HistoryRecordBean> allRecords = new ArrayList<HistoryRecordBean>();
-      try {
-        while (requests.size() > 0 && !isProviderDisabled()) {
-          final HistoryMapper historyMapper = getHistoryMapper(session);
-          int toIndex = MAXIMUM_NUMBER_OF_TAGS_PER_QUERY;
-          if (toIndex > requests.size()) {
-            toIndex = requests.size();
-          }
-          final List<Long> currentRequest = requests.subList(0, toIndex);
-          final List<HistoryRecordBean> records = historyMapper.getDailySnapshotRecords(new DailySnapshotRequestBean(currentRequest.toArray(new Long[0]), from, to));
-          allRecords.addAll(records);
-          
-          // Removes the requested elements from the list. (Also from the "requests" lists)
-          currentRequest.clear();
-          
-          fireQueryProgressChanged(queryId, 1.0 - (requests.size() / (double) tagIds.length));
+      while (requests.size() > 0 && !isProviderDisabled()) {
+        final HistoryMapper historyMapper = getHistoryMapper();
+        int toIndex = MAXIMUM_NUMBER_OF_TAGS_PER_QUERY;
+        if (toIndex > requests.size()) {
+          toIndex = requests.size();
         }
+        final List<Long> currentRequest = requests.subList(0, toIndex);
+        final List<HistoryRecordBean> records = historyMapper.getDailySnapshotRecords(new DailySnapshotRequestBean(currentRequest.toArray(new Long[0]), from, to));
+        allRecords.addAll(records);
+
+        // Removes the requested elements from the list. (Also from the "requests" lists)
+        currentRequest.clear();
+
+        fireQueryProgressChanged(queryId, 1.0 - (requests.size() / (double) tagIds.length));
       }
-      finally {
-        session.close();
-      }
-      
+
       // Converts the tags into TagValueUpdates
       for (final HistoryRecordBean bean : allRecords) {
         if (isProviderDisabled()) {
@@ -456,7 +444,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     }
     finally {
       fireQueryProgressChanged(queryId, 1.0);
-  
+
       // Tells the listener that the query is finished
       fireQueryFinished(queryId);
     }
@@ -475,10 +463,8 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     // Tells the listeners that a query is starting
     final Object queryId = fireQueryStarting();
 
-    // Opens a session where the data is received from
-    final SqlSession session = this.sessionFactory.openSession();
     try {
-      final HistoryMapper historyMapper = getHistoryMapper(session);
+      final HistoryMapper historyMapper = getHistoryMapper();
 
       int progress = 0;
 
@@ -486,7 +472,7 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
         if (isProviderDisabled()) {
           break;
         }
-        
+
         final Collection<SupervisionRecordBean> records = 
           historyMapper.getInitialSupervisionEvents(
               new SupervisionEventRequestBean(
@@ -513,17 +499,15 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
     }
     finally {
-      session.close();
-      
       fireQueryProgressChanged(queryId, 1.0);
 
       // Tells the listener that the query is finished
       fireQueryFinished(queryId);
     }
-    
+
     return result;
   }
-  
+
   /**
    * 
    * @param from
@@ -547,10 +531,8 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
     // Tells the listeners that a query is starting
     final Object queryId = fireQueryStarting();
 
-    // Opens a session where the data is received from
-    final SqlSession session = this.sessionFactory.openSession();
     try {
-      final HistoryMapper historyMapper = getHistoryMapper(session);
+      final HistoryMapper historyMapper = getHistoryMapper();
 
       int progress = 0;
 
@@ -583,8 +565,6 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
 
     }
     finally {
-      session.close();
-      
       fireQueryProgressChanged(queryId, 1.0);
 
       // Tells the listener that the query is finished
@@ -595,19 +575,11 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
   }
 
   /**
-   * @param session
-   *          The session to get the mapper from
    * @return the mapper
    */
-  private HistoryMapper getHistoryMapper(final SqlSession session) {
-    return session.getMapper(HistoryMapper.class);
-  }
+  private HistoryMapper getHistoryMapper() {
 
-  /**
-   * @return the sessionFactory
-   */
-  protected SqlSessionFactory getSessionFactory() {
-    return sessionFactory;
+    return historyMapper;
   }
 
   /**

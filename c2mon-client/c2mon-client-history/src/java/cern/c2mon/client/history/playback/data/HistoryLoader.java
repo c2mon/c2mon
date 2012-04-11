@@ -897,7 +897,7 @@ public class HistoryLoader {
       this.dailySnapshotFilter.addDailySnapshotValues(values);
       
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Daily snapshot records is loaded");
+        LOG.debug("Daily snapshot records has been successfully loaded");
       }
     }
   }

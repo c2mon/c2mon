@@ -1,5 +1,7 @@
 package cern.c2mon.client.history.dbaccess;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -45,7 +47,7 @@ public class HistorySessionFactoryTest {
   
   @Test
   public void testCreateHistoryProvider() throws HistoryProviderException {
-    new HistoryProviderFactoryImpl().createHistoryProvider();
+    HistoryProvider provider = new HistoryProviderFactoryImpl().createHistoryProvider();
   }
 
   @Test
@@ -53,7 +55,7 @@ public class HistorySessionFactoryTest {
     final HistoryProvider provider = new HistoryProviderFactoryImpl().createHistoryProvider();
 
     final Collection<HistoryTagValueUpdate> values = provider.getHistory(TAG_IDS, MAXIMUM_TOTAL_RECORDS);
-    Assert.assertTrue("More records was returned than requested", values.size() <= MAXIMUM_TOTAL_RECORDS);
+    assertTrue("More records was returned than requested", values.size() <= MAXIMUM_TOTAL_RECORDS);
     
     provider.getInitialValuesForTags(TAG_IDS, TIMESPAN.getStart());
     provider.getInitialSupervisionEvents(TIMESPAN.getStart(), SUPERVISION_REQUESTS);

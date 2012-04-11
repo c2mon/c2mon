@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
   <description>
     	Providing history data and playback for the C2MON client.
-    </description>
+   </description>
   <url>http://timweb.cern.ch</url>
   <dependencies>
 
@@ -35,6 +35,7 @@
     <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis</artifactId>
+      <version>3.0.5</version>
     </dependency>
     <dependency>
       <groupId>oracle</groupId>
@@ -51,6 +52,32 @@
     <dependency>
       <groupId>jep</groupId>
       <artifactId>jep</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>org.springframework</groupId>
+    	<artifactId>spring-test</artifactId>
+    </dependency>
+    <dependency>
+		<groupId>commons-dbcp</groupId>
+		<artifactId>commons-dbcp</artifactId>
+		<version>1.4</version>
+	</dependency>
+    <dependency>
+    	<groupId>org.mybatis</groupId>
+    	<artifactId>mybatis-spring</artifactId>
+    	<!-- 
+    	be carefull with this: 
+    	
+    	mybatis-spring > 1.0.1 requires:
+    	mybatis version > 3.0.5 
+    	
+    	more info here -> http://www.mybatis.org/spring/
+    	-->
+    	<version>1.0.1</version> 
     </dependency>
 
     <!-- test dependencies -->
@@ -78,6 +105,13 @@
             -Dc2mon.jdbc.ro.url="jdbc:oracle:thin:@( DESCRIPTION= (ADDRESS= (PROTOCOL=TCP) (HOST=dbsrva3202.cern.ch) (PORT=1574) ) (ENABLE=BROKEN) (CONNECT_DATA= (SID=TIMTST)))"
             -Dc2mon.jdbc.ro.user=timop
             -Dc2mon.jdbc.ro.password=optim1954
+            
+            <!-- this is the new values (added during the migration to Spring)  -->
+			-Ddatasource.persistence.connections.initial=2
+			-Ddatasource.persistence.connections.max=2
+			<!-- this is the new values (added during the migration to Spring)  -->
+			
+			<!-- for the tests -->	
           </argLine>
         </configuration>
       </plugin>

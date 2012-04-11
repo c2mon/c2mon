@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.history.HistoryProvider;
@@ -37,7 +35,7 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
 
   /** The logger instance */
   private static final Logger LOG = Logger.getLogger(SqlHistoryEventsProviderDAO.class);
-  
+
   /**
    * ORA-01795: maximum number of expressions in a list is 1000
    * 
@@ -46,42 +44,50 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
    * so one tag equals expression)<br/>
    */
   private static final Integer MAXIMUM_NUMBER_OF_TAGS_PER_QUERY = 900;
-  
+
   /** the event id to get the data for */
   private final Long eventId;
-  
+
   /** The event which this provider gets data for */
   private final SavedHistoryEvent event;
-  
+
   /** All records retrieved from the database */
   private final KeyForValuesMap<Long, HistoryTagValueUpdate> allRecords;
-  
+
   /** The list of tag ids which are loaded */
   private final List<Long> loadedTagIds;
-  
+
+  /** iBatis mapper for history DB access. */
+  private final SavedHistoryMapper savedHistoryMapper;
+
   /**
    * @param event
    *          the event to get data for
-   * @param sessionFactory
-   *          The sql session factory from which the session will be created
+   * @param historyMapper iBatis mapper for history DB access
+   * @param savedHistoryMapper iBatis mapper for history DB access
    * @param clientDataTagRequestCallback
    *          Callback to get access to attributes in the
    *          {@link ClientDataTagValue}. Like for example the
    *          {@link ClientDataTagValue#getType()}
    */
-  public SqlHistoryEventsProviderDAO(final SavedHistoryEvent event, final SqlSessionFactory sessionFactory, final ClientDataTagRequestCallback clientDataTagRequestCallback) {
-    super(sessionFactory, clientDataTagRequestCallback);
+  public SqlHistoryEventsProviderDAO(final SavedHistoryEvent event, 
+      final HistoryMapper historyMapper,
+      final SavedHistoryMapper savedHistoryMapper,
+      final ClientDataTagRequestCallback clientDataTagRequestCallback) {
+
+    super(historyMapper, clientDataTagRequestCallback);
     this.event = event;
+    this.savedHistoryMapper = savedHistoryMapper;
     this.eventId = event.getId();
     this.allRecords = new KeyForValuesMap<Long, HistoryTagValueUpdate>();
     this.loadedTagIds = new ArrayList<Long>();
   }
-  
+
   @Override
   public Timespan getDateLimits() {
     return new Timespan(event.getStartDate(), event.getEndDate());
   }
-  
+
   /**
    * Checks which tag ids doesn't exist in {@link #allRecords}
    * 
@@ -101,7 +107,7 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
     }
     return tagIdsNotFound;
   }
-  
+
   /**
    * Gets all the records for the {@link #eventId} and <code>tagIds</code>. All
    * tag ids which isn't already in the {@link #allRecords} will be retrieved
@@ -111,69 +117,63 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
    *          the tag ids to load into {@link #allRecords}
    */
   private synchronized void loadTags(final Long[] tagIds) {
-    
+
     // Returns the list of tag ids which must be requested from the server
     final List<Long> tagIdsToRequest = getMissingTags(tagIds);
-    
+
     final int tagIdsToRequestInitially =  tagIdsToRequest.size();
-    
+
     if (!tagIdsToRequest.isEmpty()) {
       if (LOG.isDebugEnabled()) {
         LOG.debug(
             String.format("Getting data for the event id %d, for %d tag ids; %s", this.eventId, tagIdsToRequest.size(), tagIdsToRequest.toString()));
       }
-      
+
       this.loadedTagIds.addAll(tagIdsToRequest);
-      
+
       final int totalNumberOfTagsToRequest = tagIdsToRequest.size();
       // Tells the listeners that the query is starting
       final Object id = fireQueryStarting();
-      
-      final SqlSession session = getSessionFactory().openSession();
-      try {
-        final SavedHistoryMapper mapper = getSavedHistoryMapper(session);
-        
-        while (!tagIdsToRequest.isEmpty() && !isProviderDisabled()) {
-          final int toIndex;
-          if (MAXIMUM_NUMBER_OF_TAGS_PER_QUERY <= tagIdsToRequest.size()) {
-            toIndex = MAXIMUM_NUMBER_OF_TAGS_PER_QUERY;
-          }
-          else {
-            toIndex = tagIdsToRequest.size();
-          }
-          final List<Long> tagIdsToRequestSubList = tagIdsToRequest.subList(0, toIndex);
-          final SavedHistoryRequestBean request = new SavedHistoryRequestBean(this.eventId, tagIdsToRequestSubList);
-          final List<SavedHistoryEventRecordBean> requestResult = mapper.getRecords(request);
-          
-          if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format(
-                "Retrieved %d records for %d tags from the database",
-                requestResult.size(), tagIdsToRequestSubList.size()));
-          }
-          
-          addRecords(requestResult);
-          tagIdsToRequestSubList.clear();
-          
-          fireQueryProgressChanged(id, tagIdsToRequest.size() / (double) totalNumberOfTagsToRequest);
+
+      final SavedHistoryMapper mapper = getSavedHistoryMapper();
+
+      while (!tagIdsToRequest.isEmpty() && !isProviderDisabled()) {
+        final int toIndex;
+        if (MAXIMUM_NUMBER_OF_TAGS_PER_QUERY <= tagIdsToRequest.size()) {
+          toIndex = MAXIMUM_NUMBER_OF_TAGS_PER_QUERY;
         }
-        
+        else {
+          toIndex = tagIdsToRequest.size();
+        }
+        final List<Long> tagIdsToRequestSubList = tagIdsToRequest.subList(0, toIndex);
+        final SavedHistoryRequestBean request = new SavedHistoryRequestBean(this.eventId, tagIdsToRequestSubList);
+        final List<SavedHistoryEventRecordBean> requestResult = mapper.getRecords(request);
+
         if (LOG.isDebugEnabled()) {
           LOG.debug(String.format(
-              "All data retrieved for %d records",
-              tagIdsToRequestInitially));
+              "Retrieved %d records for %d tags from the database",
+              requestResult.size(), tagIdsToRequestSubList.size()));
         }
+
+        addRecords(requestResult);
+        tagIdsToRequestSubList.clear();
+
+        fireQueryProgressChanged(id, tagIdsToRequest.size() / (double) totalNumberOfTagsToRequest);
       }
-      finally {
-        session.close();
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(String.format(
+            "All data retrieved for %d records",
+            tagIdsToRequestInitially));
       }
-      
+
       fireQueryProgressChanged(id, 1.0);
 
       // Tells the listeners that the query is finished
       fireQueryFinished(id);
     }
   }
-  
+
   /**
    * 
    * @param records the records to add to the {@link #allRecords} map
@@ -210,7 +210,7 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
       }
     };
   }
-  
+
   /**
    * 
    * @param t1
@@ -226,7 +226,7 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
     }
     return 0;
   }
-  
+
   /**
    * 
    * @param tagIds
@@ -318,7 +318,7 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
   protected Collection<HistoryTagValueUpdate> getHistory(final ShortTermLogHistoryRequestBean providerRequest) {
     return getHistory(providerRequest, false);
   }
-  
+
   /**
    * 
    * @param request
@@ -337,11 +337,11 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
     if (request.getTagIds() == null) {
       throw new InvalidParameterException("The 'request.getTagIds()' cannot be null!");
     }
-    
+
     final Object queryId = fireQueryStarting();
-    
+
     loadTags(request.getTagIds());
-    
+
     if (LOG.isDebugEnabled()) {
       String fromTime = "null";
       String toTime = "null";
@@ -354,17 +354,17 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
       LOG.debug(String.format("Filtering data for %d tags. From '%s' to '%s'",
           request.getTagIds().length, fromTime, toTime));
     }
-    
+
     final List<HistoryTagValueUpdate> result = new ArrayList<HistoryTagValueUpdate>();
-    
+
     int progress = 0;
     for (Long tagId : request.getTagIds()) {
       final HistoryTagValueUpdate[] records = allRecords.getValues(tagId).toArray(new HistoryTagValueUpdate[0]);
       Arrays.sort(records, getRecordsSorter());
-      
+
       Integer startIndex = null;
       Integer endIndex = null;
-      
+
       // Finds the start index
       if (request.getFromTime() != null) {
         for (int i = 0; i < records.length; i++) {
@@ -383,7 +383,7 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
       else {
         startIndex = 0;
       }
-      
+
       // Finds the end index
       if (request.getToTime() != null && startIndex != null) {
         for (int i = records.length - 1; i >= startIndex; i--) {
@@ -402,11 +402,11 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
       else {
         endIndex = records.length - 1;
       }
-      
+
       if (startIndex != null && endIndex != null) {
         final List<HistoryTagValueUpdate> tagRecords = 
           new ArrayList<HistoryTagValueUpdate>(Arrays.asList(records));
-        
+
         // Removes the records before "fromTime" and after "toTime"
         if (endIndex != tagRecords.size()) {
           tagRecords.subList(endIndex, tagRecords.size()).clear();
@@ -419,41 +419,41 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
             tagRecords.subList(0, startIndex).clear();
           }
         }
-        
+
         if (maxRecordsIsPerTag
             && request.getMaxRecords() != null 
             && tagRecords.size() > request.getMaxRecords()) {
           // Remove the last part of the list, cutting it down to the "maxRecords"
           tagRecords.subList(request.getMaxRecords(), tagRecords.size()).clear();
         }
-        
+
         result.addAll(tagRecords);
       }
       // else there is nothing to add to the result
-      
+
       progress++;
       fireQueryProgressChanged(queryId, progress / (double) request.getTagIds().length);
     }
-    
+
     Collections.sort(result, getRecordsSorter());
-    
+
     if (!maxRecordsIsPerTag
         && request.getMaxRecords() != null 
         && result.size() > request.getMaxRecords()) {
       // Remove the last part of the list, cutting it down to the "maxRecords"
       result.subList(request.getMaxRecords(), result.size()).clear();
     }
-    
+
     fireQueryProgressChanged(queryId, 1.0);
     fireQueryFinished(queryId);
-    
+
     if (LOG.isDebugEnabled()) {
       LOG.debug(String.format("Filtering finish, returning %d records for %d tags", result.size(), request.getTagIds().length));
     }
-    
+
     return result;
   }
-  
+
   @Override
   public Collection<HistoryTagValueUpdate> getInitialValuesForTags(final Long[] tagIds, final Timestamp before) {
     if (LOG.isDebugEnabled()) {
@@ -467,14 +467,12 @@ class SqlHistoryEventsProviderDAO extends SqlHistoryProviderDAO {
   public Collection<HistoryTagValueUpdate> getDailySnapshotRecords(final Long[] tagIds, final Timestamp from, final Timestamp to) {
     return new ArrayList<HistoryTagValueUpdate>();
   }
-  
+
   /**
-   * @param session
-   *          The session to get the mapper from
    * @return a saved history events mapper
    */
-  private SavedHistoryMapper getSavedHistoryMapper(final SqlSession session) {
-    return session.getMapper(SavedHistoryMapper.class);
+  private SavedHistoryMapper getSavedHistoryMapper() {
+    return savedHistoryMapper;
   }
 
 }

@@ -11,6 +11,10 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
@@ -21,9 +25,14 @@ import cern.c2mon.client.common.history.HistoryTagValueUpdate;
  * @author vdeila
  * 
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({"classpath:cern/c2mon/client/history/springConfig/spring-history.xml" })
 public class SqlHistoryProviderDAOTest {
 
   private HistoryProvider provider;
+  
+  @Autowired
+  private HistoryMapper historyMapper;   
 
   private Timestamp shortFromTime;
   private Timestamp fromTime;
@@ -33,7 +42,8 @@ public class SqlHistoryProviderDAOTest {
 
   @Before
   public void setUp() throws Exception {
-    provider = new SqlHistoryProviderDAO(new FakeSqlSessionFactory(), null);
+    
+    provider = new SqlHistoryProviderDAO(historyMapper, null);
     Calendar calendar = Calendar.getInstance();
     calendar.setTimeInMillis(System.currentTimeMillis());
     toTime = new Timestamp(calendar.getTimeInMillis());

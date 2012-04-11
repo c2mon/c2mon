@@ -17,6 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.client.history;
 
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistoryProviderFactory;
 import cern.c2mon.client.common.history.SavedHistoryEvent;
@@ -42,6 +44,19 @@ public class HistoryProviderFactoryImpl implements HistoryProviderFactory {
   private final ClientDataTagRequestCallback clientDataTagRequestCallback;
   
   /**
+   * Spring's application context 
+   */
+  private static ClassPathXmlApplicationContext appContext;
+  
+  /**
+   * Spring's application context path
+   */
+  private static final String APPLICATION_CONTEXT_PATH = 
+    "classpath:cern/c2mon/client/history/springConfig/spring-history.xml";
+  
+  private HistorySessionFactory historyFactory;
+  
+  /**
    * Constructor
    */
   public HistoryProviderFactoryImpl() {
@@ -57,12 +72,29 @@ public class HistoryProviderFactoryImpl implements HistoryProviderFactory {
    */
   public HistoryProviderFactoryImpl(final ClientDataTagRequestCallback clientDataTagRequestCallback) {
     this.clientDataTagRequestCallback = clientDataTagRequestCallback;
+    
+    // TODO: This can be removed once this class is also maintained by SPRING
+    this.historyFactory = (HistorySessionFactory) getApplicationContext().getBean("historyFactory");
+  }
+  
+  /**
+   * Spring's application context 
+   * @return appContext
+   */
+  public static ClassPathXmlApplicationContext getApplicationContext() {
+
+    appContext = 
+      new ClassPathXmlApplicationContext(new String[] {
+          APPLICATION_CONTEXT_PATH
+      });
+    
+    return appContext;
   }
 
   @Override
   public HistoryProvider createHistoryProvider() throws HistoryProviderException {
     try {
-      return HistorySessionFactory.getInstance().createHistoryProvider(this.clientDataTagRequestCallback);
+      return historyFactory.createHistoryProvider(this.clientDataTagRequestCallback);
     }
     catch (HistoryException e) {
       throw new HistoryProviderException("Could not get a history provider.", e);
@@ -72,7 +104,7 @@ public class HistoryProviderFactoryImpl implements HistoryProviderFactory {
   @Override
   public HistoryProvider createSavedHistoryProvider(final SavedHistoryEvent event) throws HistoryProviderException {
     try {
-      return HistorySessionFactory.getInstance().createSavedHistoryProvider(event, clientDataTagRequestCallback);
+      return historyFactory.createSavedHistoryProvider(event, clientDataTagRequestCallback);
     }
     catch (HistoryException e) {
       throw new HistoryProviderException("Could not get a saved history provider.", e);
@@ -82,12 +114,10 @@ public class HistoryProviderFactoryImpl implements HistoryProviderFactory {
   @Override
   public SavedHistoryEventsProvider createSavedHistoryEventsProvider() throws HistoryProviderException {
     try {
-      return HistorySessionFactory.getInstance().createSavedHistoryEventsProvider();
+      return historyFactory.createSavedHistoryEventsProvider();
     }
     catch (HistoryException e) {
       throw new HistoryProviderException("Could not get a saved history events provider.", e);
     }
   }
-
-  
 }
