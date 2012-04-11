@@ -105,11 +105,12 @@
             -Dc2mon.jdbc.ro.url="jdbc:oracle:thin:@( DESCRIPTION= (ADDRESS= (PROTOCOL=TCP) (HOST=dbsrva3202.cern.ch) (PORT=1574) ) (ENABLE=BROKEN) (CONNECT_DATA= (SID=TIMTST)))"
             -Dc2mon.jdbc.ro.user=timop
             -Dc2mon.jdbc.ro.password=optim1954
+            -Dc2mon.client.conf.url=http://timweb/conf/c2mon-client.properties
             
-            <!-- this is the new values (added during the migration to Spring)  -->
+            <!-- added during the migration to Spring  -->
 			-Ddatasource.persistence.connections.initial=2
 			-Ddatasource.persistence.connections.max=2
-			<!-- this is the new values (added during the migration to Spring)  -->
+			<!-- added during the migration to Spring  -->
 			
 			<!-- for the tests -->	
           </argLine>
