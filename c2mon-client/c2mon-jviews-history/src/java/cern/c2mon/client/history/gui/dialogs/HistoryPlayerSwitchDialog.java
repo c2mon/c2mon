@@ -178,25 +178,16 @@ public class HistoryPlayerSwitchDialog {
   }
   
   /**
-   * 
-   * @return <code>true</code> if the history player was successfully
-   *         configured. The history player can then be activated.
-   *         <code>false</code> if the history player is currently active, or if
-   *         it couldn't configure the player.
+   * Displays the history configuration dialog.
    */
   public void show() {
-    if (C2monServiceGateway.getHistoryManager().isHistoryModeEnabled()) {
-      return;
-    }
-    else 
-    {
+    
       new Thread("History-Configuration-Window-Thread") {
         @Override
         public void run() {
           showConfiguration();
         }
       }.start();
-    }
   }
   
   /**
