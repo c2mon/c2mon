@@ -64,14 +64,19 @@
 				<td>
 					<xsl:value-of select="@id" />
 				</td>
-				<td class="highlight bold">Tag name </td>
-				<td>
-					<xsl:value-of select="tagName" />
-				</td>
+				<td class="highlight bold">Source Timestamp</td>
+				<td><xsl:value-of select="sourceTimestamp"/></td>
 			</tr>
-
+			<tr>
+				<td class="highlight bold">Tag Quality</td>
+				<td><xsl:value-of select="tagQuality/isValid"/></td>
+				<td class="highlight bold">Server Timestamp</td>
+				<td><xsl:value-of select="serverTimestamp"/></td>
+			</tr>		
+			
 			<xsl:for-each
-				select="*[not(local-name() = 'alarms' or local-name() = 'tagName')]">
+				select="*[not(local-name() = 'alarms' or local-name() = 'tagQuality'
+					or local-name() = 'sourceTimestamp' or local-name() = 'serverTimestamp')]">
 
 				<xsl:if test="position() mod 2 = 1">
 					<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
@@ -89,11 +94,50 @@
 		
 		</table>
 		<xsl:apply-templates select="alarms"/>
+		<xsl:apply-templates select="tagQuality"/>
 	</xsl:template>
 	
-	<xsl:template match="alarms">
-		<xsl:apply-templates select="alarmValue"/>
+	<xsl:template match="tagQuality">
+		<xsl:apply-templates select="invalidQualityStates"/>
 	</xsl:template>
+	
+	<xsl:template match="invalidQualityStates">
+		<xsl:apply-templates select="entry"/>
+	</xsl:template>
+	
+		<!--  process the XML element invalidQualityStates - entry  -->
+	<xsl:template match="entry">
+		<p>
+		</p>	
+		<table class="inline">
+		
+			<tr>
+				<td class="highlight bold">Quality Status</td>
+				<td width="25%"><xsl:value-of select="tagQualityStatus"/></td>
+				<td class="highlight bold">Description</td>
+				<td width="25%"><xsl:value-of select="string"/></td>
+			</tr>
+		
+			<xsl:for-each select="*[not(local-name() = 'tagQualityStatus' or local-name() = 'string')]">
+
+				<xsl:if test="position() mod 2 = 1">
+					<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
+					<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>
+				</xsl:if>
+				
+				<xsl:if  test="position() mod 2 = 0">
+					<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
+					<TD width="25%"><xsl:value-of select="."/></TD>		
+					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
+				</xsl:if>
+				
+			</xsl:for-each>
+		</table>
+	
+	</xsl:template>
+	
+	
 
 	<!--  process the XML element TagConfig - take missing information from the element ClientDataTag -->
 	<xsl:template match="TagConfig">
