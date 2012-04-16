@@ -1,13 +1,28 @@
 <config>
-	<view>
-		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/PS_Access/PS_Experimental_Areas/Operation_Access_PS_Zone_Exp.ivl"/>
-		<property name="external" type="java.lang.Boolean" value="false"/>
-	</view>
-  <property name="tree-open" type="java.lang.Boolean" value="false"/>
-	<property name="nominal-values-visible" type="java.lang.Boolean" value="false"/>
-	<property name="links-visible" type="java.lang.Boolean" value="true"/>
-	<property name="fit-to-content" type="java.lang.Boolean" value="true"/>
-	<property name="keep-aspect-ratio" type="java.lang.Boolean" value="true"/>
-	<property name="views-navigation-tree-root-path" type="java.lang.String" value="Production/PS_Access/PS_Experimental_Areas"/>
-	<property name="console-logger-configuration" type="java.lang.String" value="DEBUG_ENABLED=false;TIMESTAMP_ENABLED=false;BUFFER_SIZE=3000;STACK_TRACE_DEPTH=4"/>
+
+  <!-- 
+    This section specifies the views that shall be open at startup
+   -->
+
+  <view>
+    <property name="url" type="java.lang.String" value="http://timweb/Views/Production/PS_Access/PS_Experimental_Areas/AD%20Experimental%20Area.idbd" />
+    <property name="external" type="java.lang.Boolean" value="false" />
+  </view>
+  
+  <view>
+    <property name="url" type="java.lang.String" value="http://timweb/Views/Production/PS_Access/PS_Experimental_Areas/East%20Hall%20Experimental%20Area.idbd" />
+    <property name="external" type="java.lang.Boolean" value="false" />
+  </view>
+  
+  <!-- ******************************************************************************* -->
+
+  <!-- The navigation tree is NOT shown at startup -->
+  <property name="tree-open" type="java.lang.Boolean" value="false" />
+
+  <!--
+    Specification of the root node of the navigation tree.
+    This property shall be specified, if you want to display only a specific directory
+  -->
+  <property name="views-navigation-tree-root-path" type="java.lang.String" value="Production/PS_Access/PS_Experimental_Areas" />
+
 </config>
