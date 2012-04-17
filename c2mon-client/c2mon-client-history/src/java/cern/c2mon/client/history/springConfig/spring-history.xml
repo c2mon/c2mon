@@ -11,6 +11,7 @@
 	<context:component-scan base-package="cern.c2mon.client.history" />
 	
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
 		<property name="location" value="${c2mon.client.conf.url}" />
 	</bean>
 
