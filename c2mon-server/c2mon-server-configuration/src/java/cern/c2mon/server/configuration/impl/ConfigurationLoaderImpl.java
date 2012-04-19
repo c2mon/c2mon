@@ -21,16 +21,17 @@ package cern.c2mon.server.configuration.impl;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
@@ -108,7 +109,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   
   private ProcessFacade processFacade;
   
-  private ProcessCache processCache;
+  private ProcessCache processCache;  
 
   /**
    * Flag recording if configuration events should be sent to the DAQ layer (set in XML).
@@ -119,6 +120,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * The directory name in C2MON home where the configreports will be saved.
    */
   private String reportDirectory; 
+  
+  /**
+   * Flag indicating if a cancel request has been made.
+   */
+  private volatile boolean cancelRequested = false;
     
   @Autowired
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
@@ -147,7 +153,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
 
   @Override
-  public ConfigurationReport applyConfiguration(final int configId) {
+  public ConfigurationReport applyConfiguration(final int configId, final ConfigProgressMonitor configProgressMonitor) {
     
     LOGGER.info("Applying configuration " + configId);
     ConfigurationReport report = null;
@@ -186,16 +192,20 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         throw new RuntimeException(message, e);
       }
       
+      AtomicInteger progressCounter = new AtomicInteger(1);
+      if (configProgressMonitor != null){
+        configProgressMonitor.serverTotalParts(configElements.size());        
+      }
       for (ConfigurationElement element : configElements) {
-        //initialize success report
-        ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
-            element.getEntity(),
-            element.getEntityId());
-        report.addElementReport(elementReport);       
-        List<ProcessChange> processChanges = null; 
-        try {
-          processChanges = applyConfigElement(element, elementReport);          
-          if (processChanges != null) { //is null if exception thrown while applying the element at the server level, so no changes sent to DAQ
+        if (!cancelRequested) {
+          //initialize success report
+          ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
+              element.getEntity(),
+              element.getEntityId());
+          report.addElementReport(elementReport);       
+          List<ProcessChange> processChanges = null; 
+          try {
+            processChanges = applyConfigElement(element, elementReport);  //never returns null                
             element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ, set to OK
             for (ProcessChange processChange : processChanges) {
               
@@ -214,63 +224,77 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
               }
             } 
             daqReportPlaceholder.put(element.getSequenceId(), elementReport);
-            elementPlaceholder.put(element.getSequenceId(), element);
+            elementPlaceholder.put(element.getSequenceId(), element);          
+          } catch (Exception ex) {
+            String errMessage = "Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
+              + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")"; 
+            LOGGER.error(errMessage, ex);
+            elementReport.setFailure("Exception caught while applying the configuration change.", ex);
+            element.setStatus(Status.FAILURE);          
+            report.addStatus(Status.FAILURE);
+            report.setStatusDescription("Failure: see details below.");
           }
-        } catch (Exception ex) {
-          String errMessage = "Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
-            + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")"; 
-          LOGGER.error(errMessage, ex);
-          elementReport.setFailure("Exception caught while applying the configuration change.", ex);
-          element.setStatus(Status.FAILURE);          
-          report.addStatus(Status.FAILURE);
-          report.setStatusDescription("Failure: see details below.");
-        }
-        
-        
+          if (configProgressMonitor != null){
+            configProgressMonitor.onServerProgress(progressCounter.getAndIncrement());
+          }
+        } else {
+          LOGGER.info("Interrupting configuration " + configId + " due to cancel request.");
+        }               
       }
       
       //send events to Process if enabled, convert the responses and introduce them into the existing report; else set all DAQs to restart
       if (daqConfigEnabled) {
+        if (configProgressMonitor != null){
+          configProgressMonitor.daqTotalParts(processLists.size());
+        }
+        AtomicInteger daqProgressCounter = new AtomicInteger(1);
         for (Long processId : processLists.keySet()) {
-          List<Change> processChangeEvents = processLists.get(processId);
-          if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
-            try {
-              ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
-              for (ChangeReport changeReport : processReport.getChangeReports()) {
-                ConfigurationElementReport convertedReport = 
-                  ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
-                daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);   
-                //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
-                if (changeReport.isReboot()) {
-                  report.addProcessToReboot(processCache.get(processId).getName()); 
-                  elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
-                  //TODO set flag & tag to indicate that process restart is needed
-                } else if (changeReport.isFail()) {
-                  report.addStatus(Status.FAILURE);
-                  report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
-                  elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
-                } else { //success, override default failure
-                  if (elementPlaceholder.get(changeReport.getChangeId()).getDaqStatus().equals(Status.RESTART)) {
-                    elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.OK);
-                  }                
+          if (!cancelRequested){
+            List<Change> processChangeEvents = processLists.get(processId);
+            if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
+              try {
+                ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
+                for (ChangeReport changeReport : processReport.getChangeReports()) {
+                  ConfigurationElementReport convertedReport = 
+                    ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
+                  daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);   
+                  //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
+                  if (changeReport.isReboot()) {
+                    report.addProcessToReboot(processCache.get(processId).getName()); 
+                    elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
+                    //TODO set flag & tag to indicate that process restart is needed
+                  } else if (changeReport.isFail()) {
+                    report.addStatus(Status.FAILURE);
+                    report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
+                    elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
+                  } else { //success, override default failure
+                    if (elementPlaceholder.get(changeReport.getChangeId()).getDaqStatus().equals(Status.RESTART)) {
+                      elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.OK);
+                    }                
+                  }
                 }
-              }
-            } catch (Exception e) {
-              String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration to Process (possible timeout)" + processCache.get(processId).getName();
-              LOGGER.error(errorMessage, e);
+              } catch (Exception e) {
+                String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration to Process (possible timeout)" + processCache.get(processId).getName();
+                LOGGER.error(errorMessage, e);
+                processFacade.requiresReboot(processId, true);
+                report.addProcessToReboot(processCache.get(processId).getName());
+                report.addStatus(Status.FAILURE);
+                report.setStatusDescription(errorMessage);
+              }            
+            } else {
               processFacade.requiresReboot(processId, true);
               report.addProcessToReboot(processCache.get(processId).getName());
-              report.addStatus(Status.FAILURE);
-              report.setStatusDescription(errorMessage);
-            }            
+              report.addStatus(Status.RESTART);
+            }
+            if (configProgressMonitor != null) {
+              configProgressMonitor.onDaqProgress(daqProgressCounter.getAndIncrement());
+            }
           } else {
-            processFacade.requiresReboot(processId, true);
-            report.addProcessToReboot(processCache.get(processId).getName());
-            report.addStatus(Status.RESTART);
-          }
+            LOGGER.info("Interrupting configuration " + configId + " due to cancel request.");
+          }          
         }
       } else {
-        LOGGER.debug("DAQ runtime reconfiguration not enable - setting required restart flags");
+        LOGGER.debug("DAQ runtime reconfiguration not enabled - setting required restart flags");
         if (!processLists.isEmpty()){
           report.addStatus(Status.RESTART);
           for (Long processId : processLists.keySet()) {
@@ -325,7 +349,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * 
    * @param element the details of the configuration action
    * @param elementReport report that should be set to failed if there is a problem
-   * @return list of DAQ configuration events; is null if nothing needs doing on the DAQ for this element
+   * @return list of DAQ configuration events; is never null but may be empty
    * @throws IllegalAccessException 
    **/
   private List<ProcessChange> applyConfigElement(final ConfigurationElement element, final ConfigurationElementReport elementReport) throws IllegalAccessException {
@@ -371,15 +395,15 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       case RULETAG : 
         ruleTagConfigHandler.updateRuleTag(element.getEntityId(), element.getElementProperties()); break;
       case COMMANDTAG : 
-        daqConfigEvents = commandTagConfigHandler.updateCommandTag(element.getEntityId(), element.getElementProperties()); break;
+        daqConfigEvents.addAll(commandTagConfigHandler.updateCommandTag(element.getEntityId(), element.getElementProperties())); break;
       case ALARM : 
         alarmConfigHandler.updateAlarm(element.getEntityId(), element.getElementProperties()); break;
       case PROCESS : 
         daqConfigEvents.add(processConfigHandler.updateProcess(element.getEntityId(), element.getElementProperties())); break;
       case EQUIPMENT : 
-        daqConfigEvents = equipmentConfigHandler.updateEquipment(element.getEntityId(), element.getElementProperties()); break;
+        daqConfigEvents.addAll(equipmentConfigHandler.updateEquipment(element.getEntityId(), element.getElementProperties())); break;
       case SUBEQUIPMENT : 
-        daqConfigEvents = subEquipmentConfigHandler.updateSubEquipment(element.getEntityId(), element.getElementProperties()); break;
+        daqConfigEvents.addAll(subEquipmentConfigHandler.updateSubEquipment(element.getEntityId(), element.getElementProperties())); break;
       default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
         LOGGER.warn("Unrecognized reconfiguration entity: " + element.getEntity() 
             + " - see reconfiguration report for details.");
@@ -387,10 +411,10 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       break;
     case REMOVE :
       switch (element.getEntity()) {
-      case DATATAG : daqConfigEvents = dataTagConfigHandler.removeDataTag(element.getEntityId(), elementReport); break;   
+      case DATATAG : daqConfigEvents.addAll(dataTagConfigHandler.removeDataTag(element.getEntityId(), elementReport)); break;   
       case CONTROLTAG : daqConfigEvents.add(controlTagConfigHandler.removeControlTag(element.getEntityId(), elementReport)); break;  
       case RULETAG : ruleTagConfigHandler.removeRuleTag(element.getEntityId(), elementReport); break;  
-      case COMMANDTAG : daqConfigEvents = commandTagConfigHandler.removeCommandTag(element.getEntityId(), elementReport); break;
+      case COMMANDTAG : daqConfigEvents.addAll(commandTagConfigHandler.removeCommandTag(element.getEntityId(), elementReport)); break;
       case ALARM : alarmConfigHandler.removeAlarm(element.getEntityId(), elementReport); break; 
       case PROCESS : daqConfigEvents.add(processConfigHandler.removeProcess(element.getEntityId(), elementReport)); break;
       case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.removeEquipment(element.getEntityId(), elementReport)); break;
@@ -434,7 +458,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     }
   }
   
-
   /**
    * @param daqConfigEnabled the daqConfigEnabled to set
    */
@@ -448,6 +471,16 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    */
   public void setReportDirectory(final String reportDirectory) {
     this.reportDirectory = reportDirectory;
+  }
+
+  @Override
+  public void cancelCurrentConfiguration() {
+    cancelRequested = true;
+  }
+
+  @Override
+  public ConfigurationReport applyConfiguration(int configId) {    
+    return applyConfiguration(configId, null);
   }
 
 }

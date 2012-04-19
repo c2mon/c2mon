@@ -25,19 +25,16 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
+import cern.c2mon.server.configuration.handler.transacted.SubEquipmentConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.AliveTimerCache;
 import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.EquipmentCache;
-import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.SubEquipmentCache;
 import cern.tim.server.cache.SubEquipmentFacade;
-import cern.tim.server.cache.loading.SubEquipmentDAO;
+import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.common.subequipment.SubEquipment;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
@@ -52,78 +49,27 @@ import cern.tim.shared.common.ConfigurationException;
 @Service
 public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<SubEquipment> implements SubEquipmentConfigHandler {
 
-  /**
-   * Class logger.
-   */
   private static final Logger LOGGER = Logger.getLogger(SubEquipmentConfigHandlerImpl.class);
   
-  /**
-   * Facade.
-   */
+  private SubEquipmentConfigTransacted subEquipmentConfigTransacted;
+  
+  private SubEquipmentCache subEquipmentCache;  
+  
   private SubEquipmentFacade subEquipmentFacade;
-  
-  /**
-   * Cache.
-   */
-  private SubEquipmentCache subEquipmentCache;
-  
-  /**
-   * DAO.
-   */
-  private SubEquipmentDAO subEquipmentDAO;
-  
-  private EquipmentCache equipmentCache;
-  
+    
   /**
    * Autowired constructor.
    */
   @Autowired
-  public SubEquipmentConfigHandlerImpl(ControlTagConfigHandler controlTagConfigHandler, SubEquipmentFacade subEquipmentFacade,
-                                   SubEquipmentCache subEquipmentCache, SubEquipmentDAO subEquipmentDAO,
-                                   AliveTimerCache aliveTimerCache , CommFaultTagCache commFaultTagCache,
-                                   ProcessCache processCache, EquipmentCache equipmentCache) {
-    super(controlTagConfigHandler, subEquipmentFacade, subEquipmentCache,
-          subEquipmentDAO, aliveTimerCache, commFaultTagCache);
-    this.subEquipmentFacade = subEquipmentFacade;
+  public SubEquipmentConfigHandlerImpl(SubEquipmentCache subEquipmentCache, SubEquipmentFacade subEquipmentFacade,
+                                        ControlTagConfigHandler controlTagConfigHandler, AliveTimerCache aliveTimerCache,
+                                          CommFaultTagCache commFaultTagCache, SubEquipmentConfigTransacted subEquipmentConfigTransacted) {
+    super(controlTagConfigHandler, subEquipmentConfigTransacted, subEquipmentCache, aliveTimerCache, commFaultTagCache, subEquipmentFacade);   
     this.subEquipmentCache = subEquipmentCache;
-    this.subEquipmentDAO = subEquipmentDAO;
-    this.equipmentCache = equipmentCache;
+    this.subEquipmentFacade = subEquipmentFacade;
+    this.subEquipmentConfigTransacted = subEquipmentConfigTransacted;
   }
 
-  /**
-   * Creates the SubEquipment cache object and puts it into the cache
-   * and DB. The alive and commfault tag caches are updated also.
-   * The Equipment cache object is updated to include the new
-   * SubEquipment.
-   * 
-   * @param element details of configuration
-   * @throws IllegalAccessException should not be thrown here (in common interface for Tags)
-   */
-  @Override
-  @Transactional("cacheTransactionManager")
-  public ProcessChange createSubEquipment(final ConfigurationElement element) throws IllegalAccessException {
-    SubEquipment subEquipment = super.createAbstractEquipment(element);
-    subEquipmentFacade.addSubEquipmentToEquipment(subEquipment.getId(), subEquipment.getParentId());
-    return new ProcessChange(subEquipmentFacade.getEquipmentForSubEquipment(subEquipment.getId()).getProcessId());
-  }
-  
-  public List<ProcessChange> updateSubEquipment(Long subEquipmentId, Properties properties) throws IllegalAccessException {
-    if (properties.containsKey("parent_equip_id")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
-          "Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
-    }
-    SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
-    subEquipment.getWriteLock().lock();
-    try {        
-      return super.updateAbstractEquipment(subEquipment, properties);
-    } catch (UnexpectedRollbackException ex) {    
-      equipmentCache.remove(subEquipment.getParentId());
-      throw ex;
-    } finally {
-      subEquipment.getWriteLock().unlock();
-    }
-  }
-  
   /**
    * First removes the SubEquipment from the DB and cache. If successful,
    * removes the associated control tags. 
@@ -134,35 +80,47 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
    * @param subEquipmentReport to which subreports may be added
    */
   @Override
-  public ProcessChange removeSubEquipment(final Long subEquipmentid, final ConfigurationElementReport equipmentReport) {
-    ProcessChange change = doRemoveSubEquipment(subEquipmentid, equipmentReport);
-    subEquipmentCache.remove(subEquipmentid);    
-    return change;
-  }
- 
-  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
-  private ProcessChange doRemoveSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
+  public ProcessChange removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
     LOGGER.debug("Removing SubEquipment " + subEquipmentId);
-    if (subEquipmentCache.hasKey(subEquipmentId)) {
-      SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);    
-      try {        
-        subEquipment.getWriteLock().lock();      
-        subEquipmentDAO.deleteItem(subEquipmentId);     
+    try {
+      SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
+      subEquipment.getWriteLock().lock();      
+      try {    
+        ProcessChange change = subEquipmentConfigTransacted.doRemoveSubEquipment(subEquipment, subEquipmentReport);        
         removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB
-        //remove alive and commfault before locking (TODO no longer necessary); always *after* control tags are removed, or these could be pull alive back in  
+        //always *after* control tags are removed, or these could be pull alive back in
+        subEquipment.getWriteLock().unlock();        
         subEquipmentFacade.removeAliveTimer(subEquipmentId);
         subEquipmentFacade.removeCommFault(subEquipmentId);
-        return new ProcessChange(equipmentCache.get(subEquipment.getParentId()).getProcessId());
+        subEquipmentCache.remove(subEquipmentId);        
+        return change;
+      } catch (RuntimeException e) {
+        subEquipmentReport.setFailure("Exception caught while removing Sub-equipment " + subEquipmentId);
+        throw new UnexpectedRollbackException("Exception caught while removing Sub-equipment", e);
       } finally {
         if (subEquipment.getWriteLock().isHeldByCurrentThread()) {
           subEquipment.getWriteLock().unlock();
         }        
       } 
-    } else {
-      LOGGER.debug("SubEquipment not found in cache - unable to remove it.");
+    } catch (CacheElementNotFoundException e) {
+      LOGGER.debug("SubEquipment not found in cache - unable to remove it.", e);
       subEquipmentReport.setWarning("SubEquipment not found in cache so cannot be removed.");
       return new ProcessChange(); 
-    }      
+    }  
   }
+
+  @Override
+  public ProcessChange createSubEquipment(ConfigurationElement element) throws IllegalAccessException {
+    return subEquipmentConfigTransacted.doCreateSubEquipment(element);
+  }
+
+  @Override
+  public List<ProcessChange> updateSubEquipment(Long subEquipmentId, Properties elementProperties) throws IllegalAccessException {
+    if (elementProperties.containsKey("parent_equip_id")) {
+      throw new ConfigurationException(ConfigurationException.UNDEFINED,
+          "Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
+    }
+    return commonUpdate(subEquipmentId, elementProperties);
+  } 
 
 }

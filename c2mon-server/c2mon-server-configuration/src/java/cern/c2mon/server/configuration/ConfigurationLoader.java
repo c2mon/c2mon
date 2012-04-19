@@ -56,9 +56,24 @@ public interface ConfigurationLoader {
    * the state tag is set to RECONFIGURED until a new successful reconfiguration is applied.
    * 
    * @param configId the id of the configuration to apply to the server
+   * @param configProgressMonitor will be provided with callbacks on the progress of the call;
+   *        can be set null if no callbacks wished for
    * @return a report with details of the success/failure of the reconfiguration
    * @throws ConfigurationException if the configuration fails (report is attached)
    */
+  ConfigurationReport applyConfiguration(int configId, ConfigProgressMonitor configProgressMonitor);
+  
+  /**
+   * For other method but for use with no progress feedback.
+   * @param configId id of configuration 
+   * @return report
+   */
   ConfigurationReport applyConfiguration(int configId);
+  
+  /**
+   * Will cancel the configuration that is currently running, once the element currently
+   * being applied has terminated.
+   */
+  void cancelCurrentConfiguration();
   
 }

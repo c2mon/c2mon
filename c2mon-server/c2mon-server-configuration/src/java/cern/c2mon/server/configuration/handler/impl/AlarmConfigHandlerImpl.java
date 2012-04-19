@@ -23,18 +23,13 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.UnexpectedRollbackException;
 
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
+import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
 import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.AlarmFacade;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.cache.loading.AlarmLoaderDAO;
-import cern.tim.server.common.alarm.Alarm;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.common.ConfigurationException;
 
 /**
  * See interface documentation.
@@ -48,91 +43,23 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(AlarmConfigHandlerImpl.class);
-
-  /**
-   * Reference to the alarm facade.
-   */
-  private AlarmFacade alarmFacade;
+  private static final Logger LOGGER = Logger.getLogger(AlarmConfigHandlerImpl.class);  
   
   /**
-   * Reference to the alarm DAO.
+   * Transacted bean.
    */
-  private AlarmLoaderDAO alarmDAO;
+  @Autowired
+  private AlarmConfigTransacted alarmConfigTransacted;
   
   /**
-   * Reference to the alarm cache.
+   * Cache.
    */
   private AlarmCache alarmCache;
   
-  /**
-   * Reference to gateway to tag configuration beans.
-   */
   @Autowired
-  private TagConfigGateway tagConfigGateway;
-  
-  /**
-   * Autowired constructor.
-   * @param alarmFacade the alarm facade bean
-   * @param alarmDAO the alarm DAO bean
-   * @param alarmCache the alarm cache bean
-   * @param tagConfigGateway the tag configuration gateway bean
-   */
-  @Autowired
-  public AlarmConfigHandlerImpl(final AlarmFacade alarmFacade, final AlarmLoaderDAO alarmDAO, 
-                            final AlarmCache alarmCache) {
+  public AlarmConfigHandlerImpl(AlarmCache alarmCache) {
     super();
-    this.alarmFacade = alarmFacade;
-    this.alarmDAO = alarmDAO;
     this.alarmCache = alarmCache;
-  }
-
-  /**
-   * Creates an alarm object in the server (puts in DB and loads into cache,
-   * in that order, and updates the associated tag to point to the new
-   * alarm).
-   * 
-   * @param element the details of the new alarm object
-   * @throws IllegalAccessException should not throw the {@link IllegalAccessException} (only Tags can).
-   */
-  @Override
-  public void createAlarm(final ConfigurationElement element) throws IllegalAccessException {
-    Alarm alarm = alarmFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-    alarmDAO.insert(alarm);
-    alarmCache.putQuiet(alarm);
-
-    //add alarm to tag
-    tagConfigGateway.addAlarmToTag(alarm.getTagId(), alarm.getId());
-  }
-
-  /**
-   * Updates the Alarm object in the server from the provided Properties.
-   * In more detail, updates the cache, then the DB.
-   * 
-   * <p>Note that moving the alarm to a different tag is not allowed. In
-   * this case the alarm should be removed and recreated.
-   * @param alarmId the id of the alarm
-   * @param properties the update details
-   */
-  @Override
-  @Transactional("cacheTransactionManager")
-  public void updateAlarm(final Long alarmId, final Properties properties) {
-    //reject if trying to change datatag it is attached to - not currently allowed
-    if (properties.containsKey("dataTagId")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
-          "Attempting to change the tag to which the alarm is attached - this is not currently supported!");
-    }
-    Alarm alarm = alarmCache.get(alarmId);    
-    try {
-      alarm.getWriteLock().lock();
-      alarmFacade.updateConfig(alarm, properties);
-      alarmDAO.updateConfig(alarm);
-    } catch (Exception ex) {      
-      LOGGER.error("Exception caught while updating alarm" + alarmId, ex);
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, ex);
-    } finally {
-      alarm.getWriteLock().unlock();
-    }            
   }
 
   /**
@@ -147,41 +74,25 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
    */
   @Override
   public void removeAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
-    doRemoveAlarm(alarmId, alarmReport);    
+    alarmConfigTransacted.doRemoveAlarm(alarmId, alarmReport);    
     alarmCache.remove(alarmId); //will be skipped if rollback exception thrown in do method    
   }
- 
-  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
-  public void doRemoveAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
-    try {
-      Alarm alarm = alarmCache.get(alarmId);
-      alarm.getWriteLock().lock();
-      try {                
-        alarmDAO.deleteItem(alarmId);
-        alarmCache.remove(alarmId);
-        alarm.getWriteLock().unlock(); //unlock before locking tag
-        removeDataTagReference(alarm);
-      } catch (Exception ex) {      
-        LOGGER.error("Exception caught while removing Alarm " + alarmId, ex);
-        alarmReport.setFailure("Unable to remove Alarm with id " + alarmId);
-        throw new ConfigurationException(ConfigurationException.UNDEFINED, ex);
-      } finally {
-        if (alarm.getWriteLock().isHeldByCurrentThread()) {
-          alarm.getWriteLock().unlock();
-        }        
-      }
-    } catch (CacheElementNotFoundException e) {
-      LOGGER.debug("Attempting to remove a non-existent Alarm - no action taken.");
-      alarmReport.setWarning("Attempting to removed a non-existent Alarm");
-    }    
+
+  @Override
+  public void createAlarm(ConfigurationElement element) throws IllegalAccessException {
+    alarmConfigTransacted.doCreateAlarm(element);
   }
 
-  /**
-   * Removes the reference to the alarm in the associated Tag object.
-   * @param alarm the alarm for which the tag needs updating
-   */
-  private void removeDataTagReference(final Alarm alarm) { 
-    tagConfigGateway.removeAlarmFromTag(alarm.getTagId(), alarm.getId());
+  @Override
+  public void updateAlarm(Long alarmId, Properties properties) {
+    try {
+      alarmConfigTransacted.doUpdateAlarm(alarmId, properties);    
+    } catch (UnexpectedRollbackException e) {
+      LOGGER.error("Rolling back Alarm update in cache");
+      alarmCache.remove(alarmId);
+      alarmCache.get(alarmId);
+      throw e;      
+    }    
   }
 
 }

@@ -19,28 +19,26 @@
 package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
 import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
+import cern.c2mon.server.configuration.handler.transacted.EquipmentConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.AliveTimerCache;
 import cern.tim.server.cache.CommFaultTagCache;
 import cern.tim.server.cache.EquipmentCache;
 import cern.tim.server.cache.EquipmentFacade;
-import cern.tim.server.cache.ProcessCache;
-import cern.tim.server.cache.loading.EquipmentDAO;
+import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.common.equipment.Equipment;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
@@ -56,133 +54,85 @@ import cern.tim.shared.common.ConfigurationException;
  */
 @Service
 public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<Equipment> implements EquipmentConfigHandler {
-
-  private static final Logger LOGGER = Logger.getLogger(EquipmentConfigHandlerImpl.class); 
   
-  private EquipmentFacade equipmentFacade;
+  private static final Logger LOGGER = Logger.getLogger(EquipmentConfigHandlerImpl.class);
   
-  private EquipmentDAO equipmentDAO;
-  
-  private EquipmentCache equipmentCache;
-  
-  private DataTagConfigHandler dataTagConfigHandler; 
-  
-  private CommandTagConfigHandler commandTagConfigHandler;
+  private EquipmentConfigTransacted equipmentConfigTransacted;
   
   private SubEquipmentConfigHandler subEquipmentConfigHandler;
   
-  private ProcessCache processCache;
+  private DataTagConfigHandler dataTagConfigHandler;
   
-  @Autowired
+  private CommandTagConfigHandler commandTagConfigHandler;
+  
+  private EquipmentFacade equipmentFacade;
+  
+  @Autowired  
   private ProcessConfigHandler processConfigHandler;
   
+  private EquipmentCache equipmentCache;
+  
+  /**
+   * Autowired constructor.
+   */
   @Autowired
-  public EquipmentConfigHandlerImpl(ControlTagConfigHandler controlTagConfigHandler, AliveTimerCache aliveTimerCache,
-                                CommFaultTagCache commFaultTagCache, EquipmentCache abstractEquipmentCache, 
-                                EquipmentFacade equipmentFacade, EquipmentDAO equipmentDAO, EquipmentCache equipmentCache,
-                                DataTagConfigHandler dataTagConfigHandler, CommandTagConfigHandler commandTagConfigHandler, 
-                                SubEquipmentConfigHandler subEquipmentConfigHandler, ProcessCache processCache) {
-    super(controlTagConfigHandler, equipmentFacade, abstractEquipmentCache, equipmentDAO,
-        aliveTimerCache, commFaultTagCache);
-    this.equipmentFacade = equipmentFacade;
-    this.equipmentDAO = equipmentDAO;
-    this.equipmentCache = equipmentCache;
-    this.dataTagConfigHandler = dataTagConfigHandler;       
-    this.commandTagConfigHandler = commandTagConfigHandler;
+  public EquipmentConfigHandlerImpl(SubEquipmentConfigHandler subEquipmentConfigHandler, DataTagConfigHandler dataTagConfigHandler,
+      CommandTagConfigHandler commandTagConfigHandler, EquipmentFacade equipmentFacade, EquipmentCache equipmentCache,
+      ControlTagConfigHandler controlTagConfigHandler, EquipmentConfigTransacted equipmentConfigTransacted,
+      AliveTimerCache aliveTimerCache, CommFaultTagCache commFaultTagCache) {
+    super(controlTagConfigHandler, equipmentConfigTransacted, equipmentCache, aliveTimerCache, commFaultTagCache, equipmentFacade);
     this.subEquipmentConfigHandler = subEquipmentConfigHandler;
-    this.processCache = processCache;
+    this.dataTagConfigHandler = dataTagConfigHandler;
+    this.commandTagConfigHandler = commandTagConfigHandler;
+    this.equipmentFacade = equipmentFacade;    
+    this.equipmentCache = equipmentCache;
+    this.equipmentConfigTransacted = equipmentConfigTransacted;
   }
 
-  /**
-   * Inserts the equipment into the cache and updates the DB.
-   * The Process in the cache is updated to refer to the new
-   * Equipment.
-   * 
-   * <p>Also updates the associated cache object in the AliveTimer
-   * and CommFaultTag caches. 
-   * 
-   * @param element the configuration element
-   * @throws IllegalAccessException 
-   */
-  @Override
-  public ProcessChange createEquipment(ConfigurationElement element) throws IllegalAccessException {
-    Equipment equipment = super.createAbstractEquipment(element);
-    equipmentFacade.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
-    return new ProcessChange(equipment.getProcessId());
-  }
-  
-  @Override
-  @Transactional("cacheTransactionManager")
-  public List<ProcessChange> updateEquipment(Long equipmentId, Properties properties) throws IllegalAccessException {
-    if (properties.containsKey("processId")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
-          "Attempting to change the parent process id of an equipment - this is not currently supported!");
-    }
-    Equipment equipment = equipmentCache.get(equipmentId);
-    equipment.getWriteLock().lock();
-    try {        
-      return super.updateAbstractEquipment(equipment, properties);
-    } catch (UnexpectedRollbackException e) {
-      processCache.remove(equipment.getProcessId());
-      throw e;
-    } finally {
-      equipment.getWriteLock().unlock();
-    }
-  }
-  
-  /**
-   * 
-   * @param equipmentid the id of the equipment to be removed
-   * @param equipmentReport the equipment-level configuration report
-   * @return always returns a change object requiring restart (remove not supported on DAQ layer so far)
-   */
   @Override
   public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
-    ProcessChange change = doRemoveEquipment(equipmentid, equipmentReport);
-    equipmentCache.remove(equipmentid);
-    return change;
-  }
-  
-    
-  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
-  private ProcessChange doRemoveEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
     LOGGER.debug("Removing Equipment " + equipmentid);
-    if (equipmentCache.hasKey(equipmentid)) {
-      Equipment equipment = equipmentCache.get(equipmentid);    
+    try {
+      Equipment equipment = equipmentCache.get(equipmentid);
+      equipment.getWriteLock().lock();
       try {
-        //remove alive timers and commfault from cache first, before locking! (lock hierarchy)        
-        equipment.getWriteLock().lock();
         removeEquipmentTags(equipment, equipmentReport);
         removeEquipmentCommands(equipment, equipmentReport);
-        removeSubEquipments(equipment, equipmentReport);
-        equipmentDAO.deleteItem(equipmentid);        
+        removeSubEquipments(equipment.getCopySubEquipmentIds(), equipmentReport);
+        ProcessChange change = equipmentConfigTransacted.doRemoveEquipment(equipment, equipmentReport);        
+        equipment.getWriteLock().unlock();
         removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them; when this returns are removed from cache and DB permanently
-        equipment.getWriteLock().unlock();           
-        //remove alive & commfault after control tags, or could be pulled back in from DB to cache!
+        //remove alive & commfault after control tags, or could be pulled back in from DB to cache!        
         equipmentFacade.removeAliveTimer(equipmentid);
         equipmentFacade.removeCommFault(equipmentid);
         processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());
-        return new ProcessChange(equipment.getProcessId());
-      } catch (UnexpectedRollbackException ex) {
-        equipmentReport.setFailure("Aborting removal of equipment "
-            + equipmentid + " as unable to remove all associated datatags."); 
-        throw new UnexpectedRollbackException("Aborting removal of Equipment as failed to remove all" 
-            + "associated datatags and commandtags.", ex);
+        equipmentCache.remove(equipmentid);
+        return change;
       } finally {
-        if (equipment.getWriteLock().isHeldByCurrentThread()) {
-          equipment.getWriteLock().unlock();
-        }      
-      }
-    } else {
+        if (equipment.getWriteLock().isHeldByCurrentThread())
+        equipment.getWriteLock().unlock();
+      }      
+    } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.debug("Equipment not found in cache - unable to remove it.");
       equipmentReport.setWarning("Equipment not found in cache so cannot be removed.");
       return new ProcessChange();
     }
-             
   }
 
-  
+  @Override
+  public ProcessChange createEquipment(ConfigurationElement element) throws IllegalAccessException {
+    return equipmentConfigTransacted.doCreateEquipment(element);
+  }
 
+  @Override
+  public List<ProcessChange> updateEquipment(Long equipmentId, Properties elementProperties) throws IllegalAccessException {
+    if (elementProperties.containsKey("processId")) {
+      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
+          "Attempting to change the parent process id of an equipment - this is not currently supported!");
+    }    
+    return commonUpdate(equipmentId, elementProperties);
+  }
+  
   /**
    * Removes the subequipments attached to this equipment.
    * Exceptions are caught, added to the report and thrown
@@ -193,8 +143,8 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
    * @param equipment the equipment for which the subequipments should be removed
    * @param equipmentReport the report at the equipment level
    */
-  private void removeSubEquipments(Equipment equipment, ConfigurationElementReport equipmentReport) {
-    for (Long subEquipmentId : new ArrayList<Long>(equipment.getSubEquipmentIds())) {
+  private void removeSubEquipments(Collection<Long> subEquipmentIds, ConfigurationElementReport equipmentReport) {
+    for (Long subEquipmentId : new ArrayList<Long>(subEquipmentIds)) {
       ConfigurationElementReport subEquipmentReport = new ConfigurationElementReport(Action.REMOVE, Entity.SUBEQUIPMENT, subEquipmentId);
       equipmentReport.addSubReport(subEquipmentReport);
       try {
@@ -207,23 +157,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
       
     }
   }
-
-  /**
-   * Removes all command tags associated with this equipment.
-   * @param equipment
-   * @param equipmentReport
-   * @return
-   */
-  private void removeEquipmentCommands(Equipment equipment, ConfigurationElementReport equipmentReport) {
-   
-    for (Long commandTagId : new ArrayList<Long>(equipment.getCommandTagIds())) { //copy as modified when removing command tag
-      ConfigurationElementReport commandReport = new ConfigurationElementReport(Action.REMOVE, Entity.COMMANDTAG, commandTagId);
-      equipmentReport.addSubReport(commandReport);
-      commandTagConfigHandler.removeCommandTag(commandTagId, commandReport);         
-    }
-
-  }
-
+  
   /**
    * Removes the tags for this equipment. The DAQ is not informed as
    * this method is only called when the whole Equipment is removed.
@@ -241,22 +175,17 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   }
   
   /**
-   * Adds a tag to the equipment.
-   * @param equipmentId
-   * @param dataTagId
+   * Removes all command tags associated with this equipment.
+   * @param equipment reference
+   * @param equipmentReport report to add subreports to
    */
-//  public void addDataTagToEquipment(Long equipmentId, Long dataTagId) {
-//    equipmentFacade.addTagToEquipment(equipmentId, dataTagId);        
-//  }
-  
-  /**
-   * Removes the specified tag from the list of tags for this equipment.
-   * @param equipmentId
-   * @param dataTagId
-   */
-//  public void removeDataTagFromEquipment(Long equipmentId, Long dataTagId) {    
-//    equipmentFacade.removeTagFromEquipment(equipmentId, dataTagId);              
-//  }
+  private void removeEquipmentCommands(Equipment equipment, ConfigurationElementReport equipmentReport) {   
+    for (Long commandTagId : new ArrayList<Long>(equipment.getCommandTagIds())) { //copy as modified when removing command tag
+      ConfigurationElementReport commandReport = new ConfigurationElementReport(Action.REMOVE, Entity.COMMANDTAG, commandTagId);
+      equipmentReport.addSubReport(commandReport);
+      commandTagConfigHandler.removeCommandTag(commandTagId, commandReport);         
+    }
+  }
+ 
 
-  
 }

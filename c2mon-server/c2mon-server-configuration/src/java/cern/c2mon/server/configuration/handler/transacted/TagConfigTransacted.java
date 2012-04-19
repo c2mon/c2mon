@@ -1,6 +1,5 @@
-package cern.c2mon.server.configuration.handler.impl;
+package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.common.tag.Tag;
 
 /**
@@ -11,7 +10,7 @@ import cern.tim.server.common.tag.Tag;
  *
  * @param <T> cache object type
  */
-public interface TagConfigHandler<T extends Tag> {
+public interface TagConfigTransacted<T extends Tag> {
 
   /**
    * Adds this Rule to the list of Rules that
@@ -19,7 +18,6 @@ public interface TagConfigHandler<T extends Tag> {
    * 
    * @param tagId the Tag that needs to point to the rule
    * @param ruleId the rule that now needs evaluating
-   * @throws CacheElementNotFoundException if the tag cannot be found in the cache
    */
   void addRuleToTag(Long tagId, Long ruleId);
   
@@ -29,7 +27,6 @@ public interface TagConfigHandler<T extends Tag> {
    * 
    * @param tagId the tag pointing to the rule
    * @param ruleId the rule that no longer needs evaluating
-   * @throws CacheElementNotFoundException if the tag cannot be found in the cache
    */
   void removeRuleFromTag(Long tagId, Long ruleId);
   
@@ -39,7 +36,6 @@ public interface TagConfigHandler<T extends Tag> {
    * 
    * @param tagId the Tag id
    * @param alarmId the id of the alarm to remove
-   * @throws CacheElementNotFoundException if the tag cannot be found in the cache
    */
   void removeAlarmFromTag(Long tagId, Long alarmId);
 
@@ -48,10 +44,7 @@ public interface TagConfigHandler<T extends Tag> {
    * tag (locks tag).
    * @param tagId the id of the tag
    * @param alarmId the id of the alarm
-   * @throws CacheElementNotFoundException if the tag cannot be found in the cache
    */
   void addAlarmToTag(Long tagId, Long alarmId);
-
-  
   
 }

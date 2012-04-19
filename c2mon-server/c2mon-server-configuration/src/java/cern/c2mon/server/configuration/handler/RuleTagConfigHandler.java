@@ -20,6 +20,8 @@ package cern.c2mon.server.configuration.handler;
 
 import java.util.Properties;
 
+import cern.c2mon.server.configuration.handler.impl.TagConfigHandler;
+import cern.tim.server.common.rule.RuleTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 
@@ -29,7 +31,7 @@ import cern.tim.shared.client.configuration.ConfigurationElementReport;
  * @author Mark Brightwell
  *
  */
-public interface RuleTagConfigHandler {
+public interface RuleTagConfigHandler extends TagConfigHandler<RuleTag> {
 
   /**
    * Creates a RuleTag in the C2MON server.

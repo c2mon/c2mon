@@ -66,8 +66,9 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (3,'mode','2
 insert into timconfigval (seqid, elementfield, elementvalue) values (3,'clientTimeout','30000');
 insert into timconfigval (seqid, elementfield, elementvalue) values (3,'execTimeout','6000');
 insert into timconfigval (seqid, elementfield, elementvalue) values (3,'equipmentId','150');
-insert into timconfigval (seqid, elementfield, elementvalue) values (3,'authorizedRoles','ADMIN;TI_OPERATION');
-insert into timconfigval (seqid, elementfield, elementvalue) values (3,'authorizedHosts','*');
+insert into timconfigval (seqid, elementfield, elementvalue) values (3,'rbacClass','RBAC class');
+insert into timconfigval (seqid, elementfield, elementvalue) values (3,'rbacDevice','RBAC device');
+insert into timconfigval (seqid, elementfield, elementvalue) values (3,'rbacProperty','RBAC property');
 insert into timconfigval (seqid, elementfield, elementvalue) values (3,'hardwareAddress','<HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>');
 
 -- insert configuration for updating a datatag
@@ -96,8 +97,8 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (5,5,'UPDATE','CommandTag','10000');
             
 insert into timconfigval (seqid, elementfield, elementvalue) values (5,'name','Test CommandTag Updated');
-insert into timconfigval (seqid, elementfield, elementvalue) values (5,'authorizedRoles','ADMIN');
-insert into timconfigval (seqid, elementfield, elementvalue) values (5,'authorizedHosts','tcp*');
+insert into timconfigval (seqid, elementfield, elementvalue) values (5,'rbacClass','new RBAC class');
+insert into timconfigval (seqid, elementfield, elementvalue) values (5,'rbacDevice','new RBAC device');
 -- updated command pulse length 100->150 in address
 insert into timconfigval (seqid, elementfield, elementvalue) values (5,'hardwareAddress','<HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>');
 
@@ -113,23 +114,23 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (6,'descript
 -- remove datatag
 
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-     values (7,'remove test datatag', 'remove datatag 5000000', 'mbrightw', '?', sysdate);     
+     values (7,'remove test datatag', 'remove datatag 200001', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (7,7,'REMOVE','DataTag','5000000');
+  values (7,7,'REMOVE','DataTag','200001');
   
 -- remove controltag
 
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-     values (8,'remove test control', 'remove control 500', 'mbrightw', '?', sysdate);     
+     values (8,'remove test control', 'remove control 1250', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (8,8,'REMOVE','ControlTag','500');
+  values (8,8,'REMOVE','ControlTag','1250');
   
 -- remove datatag
 
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-     values (9,'remove test command', 'remove command 10000', 'mbrightw', '?', sysdate);     
+     values (9,'remove test command', 'remove command 11000', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (9,9,'REMOVE','CommandTag','10000');
+  values (9,9,'REMOVE','CommandTag','11000');
   
 -- create ruletag
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
@@ -161,9 +162,9 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (11,'ruleTex
 
 --remove rule
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-     values (12,'remove test rule', 'remove rule 50100', 'mbrightw', '?', sysdate);     
+     values (12,'remove test rule', 'remove rule 60007', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (12,12,'REMOVE','RuleTag','50100');
+  values (12,12,'REMOVE','RuleTag','60007');
   
 --create equipment (uses available control tags and TESTHANDLER3 Process for simplicity)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
@@ -206,9 +207,9 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (25,'maxValu
 
 --remove equipment
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-  values (15,'remove equipment', 'remove equipment 110', 'mbrightw', '?', sysdate);     
+  values (15,'remove equipment', 'remove equipment 150', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (15,15,'REMOVE','Equipment','110');
+  values (15,15,'REMOVE','Equipment','150');
   
 --remove another equipment with rules & alarms attached (from permanent test data)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
@@ -274,9 +275,9 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (20,'parent_
 
 --remove subequipment - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-  values (21,'remove subequipment', 'remove subequipment 200', 'mbrightw', '?', sysdate);     
+  values (21,'remove subequipment', 'remove subequipment 250', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (21,21,'REMOVE','SubEquipment','200');
+  values (21,21,'REMOVE','SubEquipment','250');
 
   --create alarm - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
@@ -300,12 +301,12 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (23,'faultFa
 
 --remove alarm - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-  values (24,'remove alarm', 'remove alarm 300000', 'mbrightw', '?', sysdate);     
+  values (24,'remove alarm', 'remove alarm 350000', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (24,24,'REMOVE','Alarm','300000');
+  values (24,24,'REMOVE','Alarm','350000');
   
 --remove tag with attached alarm - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-  values (27,'remove tag with alarm', 'remove tag 1222 with alarm', 'mbrightw', '?', sysdate);     
+  values (27,'remove tag with alarm', 'remove tag 60000 with alarm', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (27,27,'REMOVE','Tag','200003');
+  values (27,27,'REMOVE','RuleTag','60000');

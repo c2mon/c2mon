@@ -19,22 +19,21 @@
 package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
+import cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.ProcessFacade;
-import cern.tim.server.cache.loading.ProcessDAO;
+import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.common.process.Process;
 import cern.tim.server.daqcommunication.in.JmsContainerManager;
 import cern.tim.shared.client.configuration.ConfigurationElement;
@@ -52,181 +51,75 @@ import cern.tim.shared.daq.config.Change;
  */
 public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
-  /**
-   * Class logger.
-   */
   private static final Logger LOGGER = Logger.getLogger(ProcessConfigHandlerImpl.class);
   
   /**
-   * Reference to facade.
+   * Transacted bean.
    */
-  private ProcessFacade processFacade;
+  @Autowired
+  private ProcessConfigTransacted processConfigTransacted;
+  
+  private EquipmentConfigHandler equipmentConfigHandler;
+  
+  private ControlTagConfigHandler controlTagConfigHandler;
   
   /**
-   * Reference to cache.
+   * Cache.
    */
   private ProcessCache processCache;
   
-  /**
-   * Reference to DAO.
-   */
-  private ProcessDAO processDAO;
+  private ProcessFacade processFacade;
   
   /**
-   * Reference to Equipment configuration bean.
+   * Flag indicating if Process removal is allowed when the Process
+   * is running.
    */
-  @Autowired
-  private EquipmentConfigHandler equipmentConfigHandler;
-  
-  /**
-   * Reference to ControlTag configuration bean.
-   */
-  private ControlTagConfigHandler controlTagConfigHandler;
+  private boolean allowRunningProcessRemoval = false;
   
   /**
    * Reference to the bean managing DAQ-in JMS connections.
    */
   private JmsContainerManager jmsContainerManager;
+    
   
-  private boolean allowRunningProcessRemoval = false;
-    
-  /**
-   * Autowired constructor.
-   * @param processFacade the facade bean
-   * @param processCache the cache bean
-   * @param processDAO the DAO bean
-   * @param equipmentConfigHandler the Equipment configuration bean
-   * @param controlTagConfigHandler the ControlTag configuration bean
-   * @param jmsContainerManager JmsContainerManager bean
-   */
   @Autowired
-  public ProcessConfigHandlerImpl(final ProcessFacade processFacade, final ProcessCache processCache, 
-                              final ProcessDAO processDAO, final ControlTagConfigHandler controlTagConfigHandler, 
-                              final JmsContainerManager jmsContainerManager) {
+  public ProcessConfigHandlerImpl(EquipmentConfigHandler equipmentConfigHandler, ControlTagConfigHandler controlTagConfigHandler, ProcessCache processCache,
+      ProcessFacade processFacade, JmsContainerManager jmsContainerManager) {
     super();
-    this.processFacade = processFacade;
-    this.processCache = processCache;
-    this.processDAO = processDAO;    
+    this.equipmentConfigHandler = equipmentConfigHandler;
     this.controlTagConfigHandler = controlTagConfigHandler;
+    this.processCache = processCache;
+    this.processFacade = processFacade;    
     this.jmsContainerManager = jmsContainerManager;
-    
   }
 
-  /**
-   * Creates the process and inserts it into the cache and DB (DB first).
-   * 
-   * <p>Changing a process id is not currently allowed.
-   * 
-   * @param element the configuration element
-   * @throws IllegalAccessException not thrown (inherited from common facade interface) 
-   */
-  @Transactional("cacheTransactionManager")
-  public ProcessChange createProcess(final ConfigurationElement element) throws IllegalAccessException {
-    LOGGER.debug("Creating process with id " + element.getEntityId());
-    if (processCache.hasKey(element.getEntityId())) {
-      throw new ConfigurationException(ConfigurationException.ENTITY_EXISTS, 
-          "Attempting to create a process with an already existing id: " + element.getEntityId());
-    }
-    Process process = (Process) processFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-    try {
-      processDAO.insert(process);
-      processCache.putQuiet(process);
-      //load & status into cache
-      processFacade.loadAndStartAliveTag(process.getId());
-      jmsContainerManager.subscribe(process);
-      return new ProcessChange(process.getId());
-    } catch (RuntimeException ex) {
-      LOGGER.error("Exception caught while creating a new Process - rolling back DB changes and removing from cache.");
-      processCache.remove(process.getId());
-      jmsContainerManager.unsubscribe(process);
-      throw new UnexpectedRollbackException("Unexpected error while creating a new Process.", ex);
-    }
-          
-  }
-  
-  /**
-   * No changes to the Process configuration are currently passed to the DAQ layer,
-   * but the Configuration object is already build into the logic below (always empty
-   * and hence ignored in the {@link ConfigurationLoader}).
-   * @param id
-   * @param properties
-   * @return change requiring DAQ reboot, but not to be sent to the DAQ layer (not supported)
-   * @throws IllegalAccessException
-   */
-  @Transactional("cacheTransactionManager")
-  public ProcessChange updateProcess(final Long id, final Properties properties) throws IllegalAccessException {    
-    if (properties.containsKey("id")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
-          "Attempting to change the process id - this is not currently supported!");
-    }
-    if (properties.containsKey("name")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
-          "Attempting to change the process name - this is not currently supported!");
-    }
-    boolean aliveConfigure = false;
-    if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
-      aliveConfigure = true;
-    }
-    Change processUpdate;
-    Process process = processCache.get(id);    
-    try {
-      process.getWriteLock().lock();
-      if (aliveConfigure){
-        processFacade.removeAliveTimer(process.getId());
-      }
-      processUpdate = processFacade.updateConfig(process, properties); //return always empty
-      processDAO.updateConfig(process);
-      process.getWriteLock().unlock();
-      if (aliveConfigure){
-        processFacade.loadAndStartAliveTag(process.getId());
-      }
-    } catch (RuntimeException e) {
-      LOGGER.error("Exception caught while updating a new Process - rolling back DB changes and removing from cache.");
-      processCache.remove(id);
-      throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);      
-    } finally {
-      if (process.getWriteLock().isHeldByCurrentThread()) {
-        process.getWriteLock().unlock();     
-      }      
-    } 
-    return new ProcessChange(process.getId());    
-  }
-  
   /**
    * Tries to remove the process and all its descendents. The process
    * itself is only completely removed if all the equipments, subequipments
    * and associated tags, commands are all removed successfully.
    * 
    * <p>In the case of a failure, the removal is interrupted and the process
-   * remains with whatever child objects remain at the point of failure (for tags
-   * this is not quite exact: the server will attempt to remove all tags, but will
-   * not remove an equipment or any associated subequipments if one tag fails to
-   * be removed).
+   * remains with whatever child objects remain at the point of failure.
    * @param processId id of process
    * @param processReport the element report for the removal of the process, to which 
    *                          subreports can be attached
    */
   @Override
-  public ProcessChange removeProcess(final Long processId, final ConfigurationElementReport processReport) {   
-    ProcessChange change = doRemoveProcess(processId, processReport);
-    processCache.remove(processId);    
-    return change;
-  }
-      
-  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
-  public ProcessChange doRemoveProcess(final Long processId, final ConfigurationElementReport processReport) {    
+  public ProcessChange removeProcess(final Long processId, final ConfigurationElementReport processReport) {    
     LOGGER.debug("Removing process with id " + processId);
-    if (processCache.hasKey(processId)) {
+    ProcessChange processChange;
+    try {
       Process process = processCache.get(processId);
-      try {        
-        process.getWriteLock().lock();      
+      try {                
+        Collection<Long> equipmentIds = process.getCopyEquipmentIds();
         if (processFacade.isRunning(process) && !allowRunningProcessRemoval) {
           String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
           LOGGER.warn(message); 
           processReport.setFailure(message);
-         } else {
+          processChange = new ProcessChange();
+        } else {
           //remove all associated equipment from system   
-          for (Long equipmentId : new ArrayList<Long>(process.getEquipmentIds())) {
+          for (Long equipmentId : new ArrayList<Long>(equipmentIds)) {
             ConfigurationElementReport childElementReport = new ConfigurationElementReport(Action.REMOVE, Entity.EQUIPMENT, equipmentId);
             try {        
               processReport.addSubReport(childElementReport);
@@ -237,32 +130,120 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
               childElementReport.setFailure("Exception caught while applying the configuration change.", ex);          
               throw new UnexpectedRollbackException("Unexpected exception caught while removing an Equipment.", ex);
             }      
-          }          
-          //remove process from cache and DB
-          processDAO.deleteProcess(processId);             
-          removeProcessControlTags(process, processReport);
+          }
+          process.getWriteLock().lock();
+          processChange = processConfigTransacted.doRemoveProcess(process, processReport);
+          removeProcessControlTags(process, processReport);          
           process.getWriteLock().unlock();
           //remove alive out of lock (in fact no longer necessary); always after removing control tags, or could be pulled back in from DB to cache
           processFacade.removeAliveTimer(processId);
-          jmsContainerManager.unsubscribe(process);            
-         }
-        return new ProcessChange();
+          jmsContainerManager.unsubscribe(process);
+          processCache.remove(processId);              
+         }        
+        return processChange;
       } catch (RuntimeException ex) {                  
-        LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes.", ex);
-        processCache.remove(processId);
+        LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes.", ex);        
         throw new UnexpectedRollbackException("Unexpected exception caught while removing Process.", ex);
       } finally {
         if (process.getWriteLock().isHeldByCurrentThread()) {
           process.getWriteLock().unlock();
         }        
       } 
-    } else {
-      LOGGER.debug("Process not found in cache - unable to remove it.");
+    } catch (CacheElementNotFoundException cacheEx) {
+      LOGGER.warn("Process not found in cache - unable to remove it.", cacheEx);
       processReport.setWarning("Process not found in cache so cannot be removed.");
       return new ProcessChange();
-    }     
+    }    
+  }
+  
+  @Override
+  public ProcessChange createProcess(final ConfigurationElement element) throws IllegalAccessException {
+    LOGGER.debug("Creating process with id " + element.getEntityId());
+    if (processCache.hasKey(element.getEntityId())) {
+      throw new ConfigurationException(ConfigurationException.ENTITY_EXISTS, "Attempting to create a process with an already existing id: "
+          + element.getEntityId());
+    }
+    Process process = null;
+    try {
+      ProcessChange change = processConfigTransacted.doCreateProcess(element);
+      process = processCache.get(element.getEntityId());
+      jmsContainerManager.subscribe(process);
+      processFacade.loadAndStartAliveTag(element.getEntityId());
+      return change;
+    } catch (RuntimeException ex) {
+      LOGGER.error("Exception caught while creating a new Process - rolling back DB changes and removing from cache.");
+      processCache.remove(element.getEntityId());     
+      if (process != null){
+        jmsContainerManager.unsubscribe(process);
+      }      
+      throw new UnexpectedRollbackException("Unexpected error while creating a new Process.", ex);     
+    }
+    
   }
 
+  @Override
+  public void removeEquipmentFromProcess(final Long equipmentId, final Long processId) {
+    processConfigTransacted.removeEquipmentFromProcess(equipmentId, processId);
+  }
+
+  @Override
+  public ProcessChange updateProcess(final Long processId, 
+                                    final Properties elementProperties) throws IllegalAccessException {
+    if (elementProperties.containsKey("id")) {
+      throw new ConfigurationException(ConfigurationException.UNDEFINED, "Attempting to change the process id - this is not currently supported!");
+    }
+    if (elementProperties.containsKey("name")) {
+      throw new ConfigurationException(ConfigurationException.UNDEFINED, "Attempting to change the process name - this is not currently supported!");
+    }
+    boolean aliveConfigure = false;
+    if (elementProperties.containsKey("aliveInterval") || elementProperties.containsKey("aliveTagId")) {
+      aliveConfigure = true;
+    }    
+    try {      
+      Change processUpdate; //not used so far, as no change sent to DAQ
+      Process process = processCache.get(processId);
+      Long oldAliveId = process.getAliveTagId();
+      process.getWriteLock().lock();
+      try {        
+        processUpdate = processFacade.updateConfig(process, elementProperties);
+        processConfigTransacted.doUpdateProcess(processId, elementProperties);
+        //stop old, start new - transaction is committed here   
+        if (aliveConfigure) {
+          processFacade.removeAliveDirectly(oldAliveId);
+          processFacade.loadAndStartAliveTag(process.getId());
+        }
+      } catch (RuntimeException e) {
+        LOGGER.error("Exception caught while updating a new Process - rolling back DB and cache changes for this Process.");
+        //remove newly configured alive directly (process in cache may have been reloaded from DB)
+        if (aliveConfigure) {
+          processFacade.removeAliveDirectly(process.getAliveTagId());        
+        }       
+        //reload old cache object
+        processCache.remove(processId);
+        processCache.get(processId);
+        //reload old alive
+        if (aliveConfigure) {
+          processFacade.loadAndStartAliveTag(processId);
+        }
+        throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);
+      } finally {               
+        process.getWriteLock().unlock();        
+      }
+    } catch (CacheElementNotFoundException e) {
+      LOGGER.warn("Unable to locate Process " + processId + " in cache so unable to update it.");
+      throw e;
+    }    
+    return new ProcessChange(processId);
+  }
+
+  /**
+   * Setter.
+   * @param allowRunningProcessRemoval the allowRunningProcessRemoval to set
+   */
+  public void setAllowRunningProcessRemoval(final boolean allowRunningProcessRemoval) {
+    this.allowRunningProcessRemoval = allowRunningProcessRemoval;
+  }
+  
   /**
    * Removes process alive and state tags (from DB and cache).
    * @param process
@@ -273,33 +254,21 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     Long aliveTagId = process.getAliveTagId();
     if (aliveTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, aliveTagId);
-      controlTagConfigHandler.removeControlTag(aliveTagId, tagReport);
       processReport.addSubReport(tagReport);
+      controlTagConfigHandler.removeControlTag(aliveTagId, tagReport);      
     }          
     Long stateTagId = process.getStateTagId();
     ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, stateTagId);
-    controlTagConfigHandler.removeControlTag(stateTagId, tagReport);
     processReport.addSubReport(tagReport);  
-  }
-
-  @Override
-  public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
-    LOGGER.debug("Removing Process Equipments for process " + processId);
-    Process process = processCache.get(processId);
-    process.getWriteLock().lock();
-    try {
-      process.getEquipmentIds().remove(equipmentId);
-    } catch (RuntimeException e) {
-      throw new UnexpectedRollbackException("Unable to remove equipment reference in process.", e);
-    } finally {
-      process.getWriteLock().unlock();
-    } 
+    controlTagConfigHandler.removeControlTag(stateTagId, tagReport);    
   }
 
   /**
-   * @param allowRunningProcessRemoval the allowRunningProcessRemoval to set
+   * Used for testing.
+   * @param processConfigTransacted the processConfigTransacted to set
    */
-  public void setAllowRunningProcessRemoval(boolean allowRunningProcessRemoval) {
-    this.allowRunningProcessRemoval = allowRunningProcessRemoval;
+  public void setProcessConfigTransacted(ProcessConfigTransacted processConfigTransacted) {
+    this.processConfigTransacted = processConfigTransacted;
   }
+  
 }

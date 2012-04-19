@@ -72,7 +72,9 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getDescription(), object.getDescription());
     assertEquals(expectedObject.getMode(), object.getMode());
     assertEquals(expectedObject.getDataType(), object.getDataType());
-    assertEquals(expectedObject.getAuthorizationDetails(), object.getAuthorizationDetails());    
+    assertEquals(expectedObject.getAuthorizationDetails().getRbacClass(), object.getAuthorizationDetails().getRbacClass());    
+    assertEquals(expectedObject.getAuthorizationDetails().getRbacDevice(), object.getAuthorizationDetails().getRbacDevice());    
+    assertEquals(expectedObject.getAuthorizationDetails().getRbacProperty(), object.getAuthorizationDetails().getRbacProperty());    
     assertEquals(expectedObject.getSourceRetries(), object.getSourceRetries());
     assertEquals(expectedObject.getSourceTimeout(), object.getSourceTimeout());
     assertEquals(expectedObject.getExecTimeout(), object.getExecTimeout());

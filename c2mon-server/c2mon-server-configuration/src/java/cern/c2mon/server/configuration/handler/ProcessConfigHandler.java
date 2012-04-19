@@ -20,8 +20,9 @@ package cern.c2mon.server.configuration.handler;
 
 import java.util.Properties;
 
+import org.springframework.transaction.UnexpectedRollbackException;
+
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.common.equipment.Equipment;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 
@@ -61,6 +62,12 @@ public interface ProcessConfigHandler {
    */
   ProcessChange removeProcess(Long processId, ConfigurationElementReport processReport);
 
+  /**
+   * Removes an equipment reference from the process that contains it.
+   * @param equipmentId the equipment to remove
+   * @param processId the process to remove the equipment reference from
+   * @throws UnexpectedRollbackException if this operation fails
+   */
   void removeEquipmentFromProcess(Long equipmentId, Long processId);
 
 }

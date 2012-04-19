@@ -18,10 +18,11 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler;
 
-import java.util.List;
 import java.util.Properties;
 
+import cern.c2mon.server.configuration.handler.impl.TagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.tim.server.common.control.ControlTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 
@@ -31,7 +32,7 @@ import cern.tim.shared.client.configuration.ConfigurationElementReport;
  * @author Mark Brightwell
  *
  */
-public interface ControlTagConfigHandler {
+public interface ControlTagConfigHandler extends TagConfigHandler<ControlTag> {
 
   /**
    * Creates a Control tag in the C2MON server.
@@ -46,8 +47,9 @@ public interface ControlTagConfigHandler {
    * @param id the id of the Tag to update
    * @param elementProperties details of the fields to modify
    * @return change to send to the DAQ layer
+   * @throws IllegalAccessException 
    */
-  ProcessChange updateControlTag(Long id, Properties elementProperties);
+  ProcessChange updateControlTag(Long id, Properties elementProperties) throws IllegalAccessException;
 
   /**
    * Removes a Control tag from the C2MON server.
