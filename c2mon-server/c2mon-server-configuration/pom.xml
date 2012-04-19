@@ -101,13 +101,13 @@
           <argLine>
             -Dc2mon.properties.location=${c2mon.properties.location}
             -Ddatasource.config.connections.initial=1
-            -Ddatasource.config.connections.max=1
+            -Ddatasource.config.connections.max=2
             -Djms.config.destination=tim.config.test
             -Dc2mon.server.config.daq.enabled=true
             -Dc2mon.server.config.running.process.removal=false
             <!-- cache module properties for integration testing -->
             -Ddatasource.persistence.connections.initial=2
-            -Ddatasource.persistence.connections.max=2
+            -Ddatasource.persistence.connections.max=10
             -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test
             -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test
             -Dcache.loader.batch.size=10000
