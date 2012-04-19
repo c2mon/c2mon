@@ -604,19 +604,19 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
         ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();        
         for (Change change : changeList) {          
           ChangeReport changeReport = new ChangeReport(change);
-          changeReport.setState(CHANGE_STATE.SUCCESS);
+          changeReport.setState(CHANGE_STATE.SUCCESS);         
           report.appendChangeReport(changeReport);
         }
         return report;
       }
-    });
-    
+    }).times(2); //twice: once for create, another for update
+        
     replay(mockManager);
     
     ConfigurationReport report = configurationLoader.applyConfiguration(13);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(Status.RESTART, report.getStatus());
-    assertTrue(report.getProcessesToReboot().contains("P_TESTHANDLER03")); //empty because no process/equipment points to this control tag
+    assertEquals(Status.OK, report.getStatus()); //ok as DAQ handles Equipment creation
+    assertFalse(report.getProcessesToReboot().contains("P_TESTHANDLER03"));
     System.out.println(report.toXML());
     
     EquipmentCacheObject cacheObject = (EquipmentCacheObject) equipmentCache.get(110L);
@@ -679,9 +679,15 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   
   /**
    * Test equipment and control tags are removed correctly.
+   * @throws NoSimpleValueParseException 
+   * @throws NoSuchFieldException 
+   * @throws TransformerException 
+   * @throws InstantiationException 
+   * @throws IllegalAccessException 
+   * @throws ParserConfigurationException 
    */
   @Test
-  public void testRemoveEquipement() {
+  public void testRemoveEquipement() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //check as expected
     Equipment equipment = equipmentCache.get(150L);
     assertNotNull(equipment);
@@ -689,14 +695,29 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertTrue(aliveTimerCache.hasKey(equipment.getAliveTagId()));
     assertTrue(commFaultTagCache.hasKey(equipment.getCommFaultTagId()));
     
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
+
+      @Override
+      public ConfigurationChangeEventReport answer() throws Throwable {
+        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
+        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();        
+        for (Change change : changeList) {          
+          ChangeReport changeReport = new ChangeReport(change);
+          changeReport.setState(CHANGE_STATE.SUCCESS);         
+          report.appendChangeReport(changeReport);
+        }
+        return report;
+      }
+    });
+    
     replay(mockManager);    
     //remove equipment
     //remove completes successfully; both Equipment and ControlTags are removed
     ConfigurationReport report = configurationLoader.applyConfiguration(15);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));    
-    assertEquals(Status.RESTART, report.getStatus());
-    assertTrue(report.getProcessesToReboot().contains("P_TESTHANDLER03"));
+    assertEquals(Status.OK, report.getStatus()); //DAQ deals with Equipment removal
+    assertFalse(report.getProcessesToReboot().contains("P_TESTHANDLER03"));
     assertFalse(equipmentCache.hasKey(150L));
     assertNull(equipmentMapper.getItem(150L));
     //commfault and alive should no longer be in cache 
@@ -800,10 +821,33 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    * Tests the removal of a process succeeds, with dependent rules and alarms.
    * Relies on permanent test data in test account and must be rolled back.
    * No changes should be sent to the DAQ layer.
+   * @throws NoSimpleValueParseException 
+   * @throws NoSuchFieldException 
+   * @throws TransformerException 
+   * @throws InstantiationException 
+   * @throws IllegalAccessException 
+   * @throws ParserConfigurationException 
    */
   @Test
   @DirtiesContext
-  public void testRemoveEquipmentDependentObjects() {
+  public void testRemoveEquipmentDependentObjects() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+    
+    //expect equipment remove message to DAQ
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
+
+      @Override
+      public ConfigurationChangeEventReport answer() throws Throwable {
+        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
+        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();        
+        for (Change change : changeList) {          
+          ChangeReport changeReport = new ChangeReport(change);
+          changeReport.setState(CHANGE_STATE.SUCCESS);         
+          report.appendChangeReport(changeReport);
+        }
+        return report;
+      }
+    });
+    
     replay(mockManager);
     
     ConfigurationReport report = configurationLoader.applyConfiguration(29);
@@ -836,6 +880,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(alarmCache.hasKey(350001L));
     assertNull(alarmMapper.getItem(350001L));
+    
+    verify(mockManager);
   }
   
   /**

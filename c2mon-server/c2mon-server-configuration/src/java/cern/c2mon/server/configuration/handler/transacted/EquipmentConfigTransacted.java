@@ -25,8 +25,7 @@ public interface EquipmentConfigTransacted extends CommonEquipmentConfigTransact
    * Remove equipment in transaction.
    * @param equipment
    * @param equipmentReport
-   * @return
    */
-  ProcessChange doRemoveEquipment(Equipment equipment, ConfigurationElementReport equipmentReport);
+  void doRemoveEquipment(Equipment equipment, ConfigurationElementReport equipmentReport);
 
 }

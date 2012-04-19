@@ -195,7 +195,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       AtomicInteger progressCounter = new AtomicInteger(1);
       if (configProgressMonitor != null){
         configProgressMonitor.serverTotalParts(configElements.size());        
-      }
+      }      
+      int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
       for (ConfigurationElement element : configElements) {
         if (!cancelRequested) {
           //initialize success report
@@ -205,7 +206,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           report.addElementReport(elementReport);       
           List<ProcessChange> processChanges = null; 
           try {
-            processChanges = applyConfigElement(element, elementReport);  //never returns null                
+            processChanges = applyConfigElement(element, elementReport, changeId);  //never returns null                
             element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ, set to OK
             for (ProcessChange processChange : processChanges) {
               
@@ -214,17 +215,17 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                 if (!processLists.containsKey(processId)) {
                   processLists.put(processId, new ArrayList<Change>());
                 }
-                processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface                  
+                processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface
+                daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
+                elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
               } else if (processChange.requiresReboot()) {              
                 elementReport.requiresReboot();
                 report.addStatus(Status.RESTART);
                 report.addProcessToReboot(processCache.get(processId).getName());
                 element.setStatus(Status.RESTART);
                 processFacade.requiresReboot(processId, true);
-              }
-            } 
-            daqReportPlaceholder.put(element.getSequenceId(), elementReport);
-            elementPlaceholder.put(element.getSequenceId(), element);          
+              }              
+            }                      
           } catch (Exception ex) {
             String errMessage = "Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
               + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")"; 
@@ -349,10 +350,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * 
    * @param element the details of the configuration action
    * @param elementReport report that should be set to failed if there is a problem
+   * @param changeId first free id to use in the sequence of changeIds, used for sending to DAQs *is increased by method*
    * @return list of DAQ configuration events; is never null but may be empty
    * @throws IllegalAccessException 
    **/
-  private List<ProcessChange> applyConfigElement(final ConfigurationElement element, final ConfigurationElementReport elementReport) throws IllegalAccessException {
+  private List<ProcessChange> applyConfigElement(final ConfigurationElement element, 
+                                                 final ConfigurationElementReport elementReport,
+                                                 int changeId) throws IllegalAccessException {
               
     if (element.getAction() == null || element.getEntity() == null || element.getEntityId() == null) {
       elementReport.setFailure("Parameter missing in configuration line with sequence id " + element.getSequenceId());
@@ -377,8 +381,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       case ALARM : alarmConfigHandler.createAlarm(element); break;
       case PROCESS : daqConfigEvents.add(processConfigHandler.createProcess(element));
                      element.setDaqStatus(Status.RESTART); break;
-      case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.createEquipment(element));
-                       element.setDaqStatus(Status.RESTART); break;
+      case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.createEquipment(element)); break;
       case SUBEQUIPMENT : daqConfigEvents.add(subEquipmentConfigHandler.createSubEquipment(element));
                           element.setDaqStatus(Status.RESTART); break;
       default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
@@ -428,10 +431,12 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     LOGGER.warn("Unrecognized reconfiguration action: " + element.getAction() 
         + " - see reconfiguration report for details."); 
     }
-    if (!daqConfigEvents.isEmpty()) {
-      for (ProcessChange processChange : daqConfigEvents) {
+    //set *unique* change id (single element may trigger many changes e.g. rule removal)
+    if (!daqConfigEvents.isEmpty()) {            
+      for (ProcessChange processChange : daqConfigEvents) { 
         if (processChange.processActionRequired()) {
-          processChange.getChangeEvent().setChangeId(element.getSequenceId());
+          processChange.getChangeEvent().setChangeId(changeId);       
+          changeId++;
         }        
       }
     }      

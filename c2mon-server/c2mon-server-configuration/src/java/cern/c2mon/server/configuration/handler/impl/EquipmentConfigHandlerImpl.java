@@ -45,6 +45,7 @@ import cern.tim.shared.client.configuration.ConfigurationElementReport;
 import cern.tim.shared.client.configuration.ConfigConstants.Action;
 import cern.tim.shared.client.configuration.ConfigConstants.Entity;
 import cern.tim.shared.common.ConfigurationException;
+import cern.tim.shared.daq.config.EquipmentUnitRemove;
 
 /**
  * See interface documentation.
@@ -99,7 +100,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
         removeEquipmentTags(equipment, equipmentReport);
         removeEquipmentCommands(equipment, equipmentReport);
         removeSubEquipments(equipment.getCopySubEquipmentIds(), equipmentReport);
-        ProcessChange change = equipmentConfigTransacted.doRemoveEquipment(equipment, equipmentReport);        
+        equipmentConfigTransacted.doRemoveEquipment(equipment, equipmentReport);        
         equipment.getWriteLock().unlock();
         removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them; when this returns are removed from cache and DB permanently
         //remove alive & commfault after control tags, or could be pulled back in from DB to cache!        
@@ -107,7 +108,8 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
         equipmentFacade.removeCommFault(equipmentid);
         processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());
         equipmentCache.remove(equipmentid);
-        return change;
+        EquipmentUnitRemove equipmentUnitRemove = new EquipmentUnitRemove(0L, equipmentid); //id is reset
+        return new ProcessChange(equipment.getProcessId(), equipmentUnitRemove);        
       } finally {
         if (equipment.getWriteLock().isHeldByCurrentThread())
         equipment.getWriteLock().unlock();

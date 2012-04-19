@@ -21,11 +21,14 @@ import cern.tim.server.cache.CommFaultTagCache;
 import cern.tim.server.cache.EquipmentCache;
 import cern.tim.server.cache.EquipmentFacade;
 import cern.tim.server.cache.ProcessCache;
+import cern.tim.server.cache.ProcessXMLProvider;
 import cern.tim.server.cache.loading.EquipmentDAO;
 import cern.tim.server.common.equipment.Equipment;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 import cern.tim.shared.common.ConfigurationException;
+import cern.tim.shared.daq.config.EquipmentUnitAdd;
+import cern.tim.shared.daq.config.EquipmentUnitRemove;
 
 /**
  * Equipment configuration transacted methods.
@@ -46,17 +49,20 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
   
   private ProcessCache processCache;
   
+  private ProcessXMLProvider processXMLProvider;
+  
   @Autowired
   public EquipmentConfigTransactedImpl(ControlTagConfigHandler controlTagConfigHandler, AliveTimerCache aliveTimerCache,
                                 CommFaultTagCache commFaultTagCache, EquipmentCache abstractEquipmentCache, 
                                 EquipmentFacade equipmentFacade, EquipmentDAO equipmentDAO, EquipmentCache equipmentCache,
-                                ProcessCache processCache) {
+                                ProcessCache processCache, ProcessXMLProvider processXMLProvider) {
     super(controlTagConfigHandler, equipmentFacade, abstractEquipmentCache, equipmentDAO,
         aliveTimerCache, commFaultTagCache);
     this.equipmentFacade = equipmentFacade;
     this.equipmentDAO = equipmentDAO;
     this.equipmentCache = equipmentCache;
     this.processCache = processCache;
+    this.processXMLProvider = processXMLProvider;
   }
 
   /**
@@ -75,7 +81,8 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
   public ProcessChange doCreateEquipment(ConfigurationElement element) throws IllegalAccessException {
     Equipment equipment = super.createAbstractEquipment(element);
     equipmentFacade.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
-    return new ProcessChange(equipment.getProcessId());
+    EquipmentUnitAdd equipmentUnitAdd = new EquipmentUnitAdd(element.getSequenceId(), equipment.getId(), processXMLProvider.getEquipmentConfigXML(equipment.getId()));
+    return new ProcessChange(equipment.getProcessId(), equipmentUnitAdd);
   }
   
   @Override
@@ -86,11 +93,10 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
    
   @Override
   @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
-  public ProcessChange doRemoveEquipment(final Equipment equipment, final ConfigurationElementReport equipmentReport) {
+  public void doRemoveEquipment(final Equipment equipment, final ConfigurationElementReport equipmentReport) {
     LOGGER.debug("Removing Equipment " + equipment.getId() + " from DB");
     try {
-      equipmentDAO.deleteItem(equipment.getId());                
-      return new ProcessChange(equipment.getProcessId());                        
+      equipmentDAO.deleteItem(equipment.getId());                                     
     } catch (UnexpectedRollbackException ex) {
       equipmentReport.setFailure("Aborting removal of equipment " + equipment.getId() + " as unable to remove it from DB."); 
         throw new UnexpectedRollbackException("Interrupting removal of Equipment as failed to remove it from DB - " 
