@@ -388,7 +388,7 @@ C2MONDAQ_printBasicUsageInfo() {
   if [ $USE_XML_PROTOCOL -eq 0 ] ; then
     echo "*****************************************************************************"
     echo " usage:                                                                      "
-    echo " $0 [-xml] start|stop|status process_name [additional options]               "
+    echo " $0 [-xml] start|stop|restart|status process_name [additional options]       "
     echo
     echo " if -xml parameter is specified, only the XML output will be served          "
     echo
@@ -425,6 +425,11 @@ C2MONDAQ_printBasicUsageInfo() {
      
      'stop')
          C2MONDAQ_executeRemoteCmd stop
+     ;;
+
+     'restart')
+         C2MONDAQ_executeRemoteCmd stop
+         C2MONDAQ_executeRemoteCmd start
      ;;
 
      'status')
