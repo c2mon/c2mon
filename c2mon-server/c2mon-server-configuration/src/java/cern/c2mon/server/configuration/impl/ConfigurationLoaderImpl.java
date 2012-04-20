@@ -254,7 +254,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             List<Change> processChangeEvents = processLists.get(processId);
             if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
               try {
+                LOGGER.trace("Sending " + processChangeEvents.size() + " change events to Process " + processId + "...");
                 ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
+                if (!processReport.getChangeReports().isEmpty()) {
+                  LOGGER.trace("Received " + processReport.getChangeReports().size() + " reports back from Process.");
+                } else {
+                  LOGGER.trace("Received 0 reports back from Process");
+                }                
                 for (ChangeReport changeReport : processReport.getChangeReports()) {
                   ConfigurationElementReport convertedReport = 
                     ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
@@ -357,7 +363,10 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private List<ProcessChange> applyConfigElement(final ConfigurationElement element, 
                                                  final ConfigurationElementReport elementReport,
                                                  int changeId) throws IllegalAccessException {
-              
+    if (LOGGER.isTraceEnabled()){
+      LOGGER.trace("Applying configuration element with sequence id " + element.getSequenceId());
+    }
+    
     if (element.getAction() == null || element.getEntity() == null || element.getEntityId() == null) {
       elementReport.setFailure("Parameter missing in configuration line with sequence id " + element.getSequenceId());
       return null; 

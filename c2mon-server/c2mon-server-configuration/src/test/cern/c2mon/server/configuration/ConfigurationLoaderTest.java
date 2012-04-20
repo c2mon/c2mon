@@ -26,6 +26,7 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -187,6 +188,12 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   
   @Autowired
   private TestDataInserter testDataInserter;
+  
+  @BeforeClass
+  public void beforeClass() throws IOException {
+    testDataInserter.removeTestData();
+    testDataInserter.insertTestData();
+  }
   
   /**
    * Clears DB of failed previous tests and resets the
