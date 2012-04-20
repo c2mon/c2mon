@@ -687,6 +687,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    * @throws ParserConfigurationException 
    */
   @Test
+  @DirtiesContext
   public void testRemoveEquipement() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
     //check as expected
     Equipment equipment = equipmentCache.get(150L);
