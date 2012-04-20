@@ -189,12 +189,6 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Autowired
   private TestDataInserter testDataInserter;
   
-  @BeforeClass
-  public void beforeClass() throws IOException {
-    testDataInserter.removeTestData();
-    testDataInserter.insertTestData();
-  }
-  
   /**
    * Clears DB of failed previous tests and resets the
    * mock before each test.
@@ -609,7 +603,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
       public ConfigurationChangeEventReport answer() throws Throwable {
         List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
         ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();        
-        for (Change change : changeList) {          
+        for (Change change : changeList) {
+          assertTrue(change.getChangeId() != 0);
           ChangeReport changeReport = new ChangeReport(change);
           changeReport.setState(CHANGE_STATE.SUCCESS);         
           report.appendChangeReport(changeReport);
