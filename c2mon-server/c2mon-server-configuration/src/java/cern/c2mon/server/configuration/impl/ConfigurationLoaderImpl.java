@@ -80,7 +80,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    */
   private static final Logger LOGGER = Logger.getLogger(ConfigurationLoaderImpl.class);
   
-
+  int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
+  
   /**
    * Distributed lock used to get exclusive configuration access to the server
    * (applying configurations is forced to be sequential).
@@ -195,8 +196,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       AtomicInteger progressCounter = new AtomicInteger(1);
       if (configProgressMonitor != null){
         configProgressMonitor.serverTotalParts(configElements.size());        
-      }      
-      int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
+      }            
       for (ConfigurationElement element : configElements) {
         if (!cancelRequested) {
           //initialize success report
@@ -206,7 +206,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           report.addElementReport(elementReport);       
           List<ProcessChange> processChanges = null; 
           try {
-            processChanges = applyConfigElement(element, elementReport, changeId);  //never returns null                
+            processChanges = applyConfigElement(element, elementReport);  //never returns null                
             element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ, set to OK
             for (ProcessChange processChange : processChanges) {
               
@@ -257,7 +257,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                 LOGGER.trace("Sending " + processChangeEvents.size() + " change events to Process " + processId + "...");
                 ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
                 if (!processReport.getChangeReports().isEmpty()) {
-                  LOGGER.trace("Received " + processReport.getChangeReports().size() + " reports back from Process.");
+                  LOGGER.trace("Received " + processReport.getChangeReports().size() + " back from Process.");
                 } else {
                   LOGGER.trace("Received 0 reports back from Process");
                 }                
@@ -361,8 +361,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * @throws IllegalAccessException 
    **/
   private List<ProcessChange> applyConfigElement(final ConfigurationElement element, 
-                                                 final ConfigurationElementReport elementReport,
-                                                 int changeId) throws IllegalAccessException {
+                                                 final ConfigurationElementReport elementReport) throws IllegalAccessException {
     if (LOGGER.isTraceEnabled()){
       LOGGER.trace("Applying configuration element with sequence id " + element.getSequenceId());
     }
