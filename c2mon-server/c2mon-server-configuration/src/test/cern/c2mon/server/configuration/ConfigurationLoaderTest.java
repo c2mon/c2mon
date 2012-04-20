@@ -603,8 +603,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
       public ConfigurationChangeEventReport answer() throws Throwable {
         List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
         ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();        
-        for (Change change : changeList) {
-          assertTrue(change.getChangeId() != 0);
+        for (Change change : changeList) {          
           ChangeReport changeReport = new ChangeReport(change);
           changeReport.setState(CHANGE_STATE.SUCCESS);         
           report.appendChangeReport(changeReport);
