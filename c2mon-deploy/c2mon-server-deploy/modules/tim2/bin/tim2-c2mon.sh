@@ -127,7 +127,7 @@ CLASSPATH=`ls $C2MON_HOME/lib/*.jar | tr -s '\n' ':'`
 #property triggering cache clustering
 CACHE_MODE_PROPERTY="-Dcern.c2mon.cache.mode=multi"
 
-COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=$JMX_PORT -Dcom.sun.management.jmxremote.password.file=$C2MON_JMX_REMOTE_PASSWD -Dcom.sun.management.jmxremote.access.file=$C2MON_JMX_REMOTE_ACCESS -Dcom.sun.management.jmxremote.ssl=false -Dlaser.hosts=$LASER_HOSTS -Dcmw.mom.brokerlist=$CMW_BROKER_LIST"
+COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=$JMX_PORT -Dcom.sun.management.jmxremote.password.file=$C2MON_JMX_REMOTE_PASSWD -Dcom.sun.management.jmxremote.access.file=$C2MON_JMX_REMOTE_ACCESS -Dcom.sun.management.jmxremote.ssl=false -Dlaser.hosts=$LASER_HOSTS -Dcmw.mom.brokerlist=$CMW_BROKER_LIST"
 
 CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dtc.config=$TERRACOTTA_CONFIG $CACHE_MODE_PROPERTY"
 
