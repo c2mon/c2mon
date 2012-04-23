@@ -17,5 +17,6 @@
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mybatis.xml"/>
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-tag.xml"/>
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-command.xml"/>
+  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-lifecycle.xml"/>
     
 </beans>

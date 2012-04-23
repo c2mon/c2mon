@@ -124,4 +124,10 @@ cmdreportstatus VARCHAR2(50),
 cmdreportdesc   VARCHAR2(100)
 );
 
-)
+-- table containing server stop/start events
+
+CREATE TABLE SERVER_LIFECYCLE_LOG (
+    SLL_EVENT_TYPE      VARCHAR2(10) NOT NULL,
+    SLL_SERVER_NAME     VARCHAR2(20) NOT NULL,
+    SLL_TIME            TIMESTAMP(6) NOT NULL   
+);

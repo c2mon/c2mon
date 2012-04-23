@@ -106,7 +106,7 @@
 					<argLine>
 						-Dc2mon.properties.location=${c2mon.properties.location}
 						-Ddatasource.stl.connections.initial=1
-						-Ddatasource.stl.connections.max=1
+						-Ddatasource.stl.connections.max=5
 						-Dc2mon.command.log.fallback.file=commandfallback.txt
 						-Dc2mon.tag.log.fallback.file=tagfallback.txt
           </argLine>

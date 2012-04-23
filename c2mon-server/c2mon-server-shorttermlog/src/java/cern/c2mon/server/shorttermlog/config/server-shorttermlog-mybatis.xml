@@ -33,4 +33,9 @@
     <property name="mapperInterface" value="cern.c2mon.server.shorttermlog.mapper.SupervisionMapper"/>
   </bean>
   
+  <bean id="serverLifecycleLogMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="stlSqlSessionFactory"/>
+    <property name="mapperInterface" value="cern.c2mon.shared.client.lifecycle.ServerLifecycleMapper"/>
+  </bean>
+  
 </beans>
