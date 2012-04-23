@@ -15,8 +15,9 @@
 					</output>
 				</main-class>
 				<vm-args>-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC
-					-XX:MaxGCPauseMillis=100</vm-args>
-				<property name="server.process.name" value="C2MON-SERVER-DMN2" />
+					-XX:MaxGCPauseMillis=100</vm-args>									
+				<property name="server.process.name" value="DMN2-SRV" />
+				<property name="c2mon.process.name" value="DMN2-SRV" />
 				<property name="c2mon.home" value="$INSTALL_PATH" />
 				<property name="c2mon.log.dir" value="log" />
 				<property name="c2mon.properties.location" value="conf/c2mon.properties" />
