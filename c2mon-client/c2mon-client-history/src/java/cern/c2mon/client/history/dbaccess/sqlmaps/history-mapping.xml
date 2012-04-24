@@ -68,10 +68,10 @@
         </foreach>
       )
       <if test="fromTime != null">
-        AND LOGDATE <![CDATA[ >= ]]> SYS_EXTRACT_UTC(#{fromTime})
+        AND TAGSERVERTIME <![CDATA[ >= ]]> SYS_EXTRACT_UTC(#{fromTime})
       </if>
       <if test="toTime != null">
-        AND LOGDATE <![CDATA[ < ]]> SYS_EXTRACT_UTC(#{toTime})
+        AND TAGSERVERTIME <![CDATA[ < ]]> SYS_EXTRACT_UTC(#{toTime})
       </if>
       <if test="maxRecords != null">
         ORDER BY TAGSERVERTIME DESC, TAGDAQTIME DESC, TAGTIME DESC
