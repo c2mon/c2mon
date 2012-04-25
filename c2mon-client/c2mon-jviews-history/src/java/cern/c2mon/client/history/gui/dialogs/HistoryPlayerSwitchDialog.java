@@ -60,6 +60,15 @@ public class HistoryPlayerSwitchDialog {
   
   private static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
   
+  /** 
+   * If the user is currently subscribed in more tags than this limit
+   * a warning is shown.
+   * 
+   * Display a warning if starting history mode with a lot of tags 
+   *  @see http://issues/browse/TIMS-180
+   */
+  private final static int THIS_MUCH_TAGS_IS_TOO_MUCH = 600;
+  
   /** The parent component of the dialog */
   private final Component parent;
   
@@ -178,9 +187,38 @@ public class HistoryPlayerSwitchDialog {
   }
   
   /**
+   * Displays a warning message when too many tags are open.
+   * @return false if the user wants to start the History Player anyway, true otherwise.
+   */
+  public boolean showTooManyTagsWarning() {
+    
+    final Object[] options = new Object[] { 
+        "You are right. I will close some views first and try again.",
+        "I don't care, start the History Player NOW." };
+    
+    final int result = JOptionPane.showOptionDialog(
+        parent, 
+        " You have too many views open. This slows the History Player down and may degrade your experience.",
+        "History Player Warning", 
+        JOptionPane.WARNING_MESSAGE, 
+        JOptionPane.WARNING_MESSAGE, 
+        null, 
+        options, 
+        options[0]);
+    
+    return result == 0;
+  }
+  
+  /**
    * Displays the history configuration dialog.
    */
   public void show() {
+    
+      // we don't want this to be too large, otherwise history is slow
+      final int currentlySubscribedTags = C2monServiceGateway.getTagManager().getCacheSize();
+      if (currentlySubscribedTags > THIS_MUCH_TAGS_IS_TOO_MUCH) // if it is too large =>
+        if (showTooManyTagsWarning() == true)  // display a warning (the user can ignore the warning)
+          return; // the user decides to close some views first => return (don't start the history player)
     
       new Thread("History-Configuration-Window-Thread") {
         @Override
