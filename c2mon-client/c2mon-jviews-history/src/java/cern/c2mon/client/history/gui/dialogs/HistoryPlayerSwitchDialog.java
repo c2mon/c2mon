@@ -67,7 +67,7 @@ public class HistoryPlayerSwitchDialog {
    * Display a warning if starting history mode with a lot of tags 
    *  @see http://issues/browse/TIMS-180
    */
-  private final static int THIS_MUCH_TAGS_IS_TOO_MUCH = 600;
+  private final static int THIS_MUCH_TAGS_IS_TOO_MUCH = 1000;
   
   /** The parent component of the dialog */
   private final Component parent;
@@ -198,7 +198,7 @@ public class HistoryPlayerSwitchDialog {
     
     final int result = JOptionPane.showOptionDialog(
         parent, 
-        " You have too many views open. This slows the History Player down and may degrade your experience.",
+        " You have many views open. This slows the History Player down and may degrade your experience.",
         "History Player Warning", 
         JOptionPane.WARNING_MESSAGE, 
         JOptionPane.WARNING_MESSAGE, 
