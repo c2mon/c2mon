@@ -69,6 +69,14 @@ public class HistoryPlayerSwitchDialog {
    */
   private final static int THIS_MUCH_TAGS_IS_TOO_MUCH = 1000;
   
+  /** 
+   * Display a warning if starting history mode with a lot of tags 
+   *  @see http://issues/browse/TIMS-180
+   *  
+   * The warning should not be shown when only a few views are open.
+   */
+  private final static int OPEN_VIEWS_LIMIT = 3;
+  
   /** The parent component of the dialog */
   private final Component parent;
   
@@ -190,14 +198,14 @@ public class HistoryPlayerSwitchDialog {
    * Displays a warning message when too many tags are open.
    * @return false if the user wants to start the History Player anyway, true otherwise.
    */
-  public boolean showTooManyTagsWarning() {
+  public static boolean showTooManyTagsWarning() {
     
     final Object[] options = new Object[] { 
         "You are right. I will close some views first and try again.",
         "I don't care, start the History Player NOW." };
     
     final int result = JOptionPane.showOptionDialog(
-        parent, 
+        null, 
         " You have many views open. This slows the History Player down and may degrade your experience.",
         "History Player Warning", 
         JOptionPane.WARNING_MESSAGE, 
@@ -209,16 +217,19 @@ public class HistoryPlayerSwitchDialog {
     return result == 0;
   }
   
+  public static boolean shouldShowHistoryWarning(int openViewCount, int currentlySubscribedTags) {
+    
+    if (currentlySubscribedTags > THIS_MUCH_TAGS_IS_TOO_MUCH // if it is too large =>
+        && openViewCount > OPEN_VIEWS_LIMIT)  // and too many views are open =>
+      return true;
+    
+    return false;
+  }
+  
   /**
    * Displays the history configuration dialog.
    */
   public void show() {
-    
-      // we don't want this to be too large, otherwise history is slow
-      final int currentlySubscribedTags = C2monServiceGateway.getTagManager().getCacheSize();
-      if (currentlySubscribedTags > THIS_MUCH_TAGS_IS_TOO_MUCH) // if it is too large =>
-        if (showTooManyTagsWarning() == true)  // display a warning (the user can ignore the warning)
-          return; // the user decides to close some views first => return (don't start the history player)
     
       new Thread("History-Configuration-Window-Thread") {
         @Override
