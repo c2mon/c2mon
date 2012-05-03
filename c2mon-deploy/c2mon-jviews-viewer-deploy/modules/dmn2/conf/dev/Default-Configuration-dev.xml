@@ -31,7 +31,7 @@
 		directory: "http://timweb.cern.ch/Views/palettes/"
 	-->
 	<property name="dashboard-palettes-dir" type="java.lang.String"
-		value="http://timweb.cern.ch/Views/palettes/" />
+		value="http://bewww/~dmndev/dmn2-views/palettes/" />
 
 	<!--
 		Defines the URL of the C2MON Tag Viewer. The Viewer will append a Tag
