@@ -173,8 +173,9 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
 
   @Override
   @ManagedOperation(description = "starts the backups publisher.")
-  public void start() {
-    if (!running && !connectThreadRunning){
+  public void start() {    
+    shutdownRequested = false;
+    if (!running && !connectThreadRunning){      
       connectThreadRunning = true;
       new Thread(new Runnable() {
         @Override
@@ -219,8 +220,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       if (timer != null){
         timer.cancel();
       }         
-      running = false;
-      shutdownRequested = false;
+      running = false;      
     }    
   }
 

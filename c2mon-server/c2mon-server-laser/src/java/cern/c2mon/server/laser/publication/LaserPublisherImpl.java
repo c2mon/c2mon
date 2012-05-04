@@ -304,6 +304,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   @Override
   @ManagedOperation(description = "Starts the alarm publisher (will continue in own thread until successful)")
   public void start() {
+    shutdownRequested = false;
     if (!running) {
       republishTask = new PublicationTask();
       republishTimer = new Timer("LASER re-publication timer");
@@ -378,8 +379,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
       if (getAsi() != null) { 
         getAsi().close();
       }      
-      running = false;
-      shutdownRequested = false;
+      running = false;      
       initialConnection = false;
     }    
   }
