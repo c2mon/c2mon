@@ -291,6 +291,10 @@
     <appender-ref ref="AdministratorEmail"/>
     <appender-ref ref="FileAppender"/>
   </logger>
+  <logger name="ShortTermLogFallbackLogger"  additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="LoggingAppender"/>    
+  </logger>
   <root>
     <level value="info"/>
     <appender-ref ref="FileAppender" />    
