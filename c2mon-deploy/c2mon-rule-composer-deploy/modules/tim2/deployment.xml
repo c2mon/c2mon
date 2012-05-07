@@ -2,17 +2,14 @@
 <products>
 	<product name="tim2-rule-composer">
 
-		<application name="default">
-			<deployment>
-				<notification>
-					<!-- you can give more than one mail for deployment notification -->
-					<mail address="tim-admin@cern.ch" />
-				</notification>
-			</deployment>
-		</application>
+		<application name="default" />
 
 		<application name="tim2-rulecomposer-pro" extends="default">
 			<deployment installLocation="~timoper/dist/public/html/javaws/tim2-rule-composer">
+        <notification>
+          <!-- you can give more than one mail for deployment notification -->
+          <mail address="tim-admin@cern.ch" />
+        </notification>
 				<signJars keyStore="~timoper/rep/c2mon/client/jarsign.properties" />
 			</deployment>
 		</application>
