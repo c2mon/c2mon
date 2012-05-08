@@ -75,6 +75,11 @@ SHARED_LIB_HOME=$HOME/dist/libs
 #Terracotta configuration location (either file or host:port)
 TERRACOTTA_CONFIG=$TERRACOTTA_HOST:$TERRACOTTA_PORT
 
+#add Terracotta mirror if set
+if [ ! -z $TERRACOTTA_MIRROR_HOST ] && [ ! -z $TERRACOTTA_MIRROR_PORT ]; then
+    TERRACOTTA_CONFIG=$TERRACOTTA_CONFIG,$TERRACOTTA_MIRROR_HOST:$TERRACOTTA_MIRROR_PORT
+fi
+
 ####################
 # MORE SETTINGS... #
 ####################
