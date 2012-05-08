@@ -14,6 +14,9 @@
 	<packaging>jar</packaging>
 	<description>This is a C2MON JEC DAQ. It allows C2MON to acquire data from Siemens S7 PLCs. The Java Equipment Controller (JEC) was developed by TS-CSE-CO</description>
 	<url />
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-jec</developerConnection>
+  </scm>
 	<dependencies>
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
