@@ -75,7 +75,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
     } catch (UnexpectedRollbackException e) {
       LOGGER.error("Rolling back ControlTag update in cache");
       controlTagCache.remove(id);
-      controlTagCache.get(id);
+      controlTagCache.loadFromDb(id);
       throw e;
     }    
   }

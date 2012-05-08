@@ -136,7 +136,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
         if (oldCommFaultId != null)
           commFaultTagCache.remove(oldCommFaultId);
         if (abstractEquipment.getCommFaultTagId() != null)
-          commFaultTagCache.get(abstractEquipment.getCommFaultTagId());
+          commFaultTagCache.loadFromDb(abstractEquipment.getCommFaultTagId());
       }
       return processChanges;
     } catch (RuntimeException ex) {
@@ -148,7 +148,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
       aliveTimerCache.remove(abstractEquipment.getAliveTagId());
       abstractEquipmentCache.remove(abstractEquipmentId);
       T oldAbstractEquipment = abstractEquipmentCache.get(abstractEquipmentId);
-      commFaultTagCache.get(oldAbstractEquipment.getCommFaultTagId());      
+      commFaultTagCache.loadFromDb(oldAbstractEquipment.getCommFaultTagId());      
       commonEquipmentFacade.loadAndStartAliveTag(abstractEquipmentId); //reloads alive from DB
       throw ex;
     } finally {

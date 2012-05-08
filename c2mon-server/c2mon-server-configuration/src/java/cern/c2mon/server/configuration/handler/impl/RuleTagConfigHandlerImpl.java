@@ -28,6 +28,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.RuleTagConfigTransacted;
 import cern.tim.server.cache.RuleTagCache;
+import cern.tim.server.rule.RuleEvaluator;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 
@@ -53,9 +54,12 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   
   private RuleTagCache ruleTagCache;
   
+  private RuleEvaluator ruleEvaluator;
+  
   @Autowired
-  public RuleTagConfigHandlerImpl(RuleTagCache ruleTagCache) {    
+  public RuleTagConfigHandlerImpl(final RuleTagCache ruleTagCache, final RuleEvaluator ruleEvaluator) {    
     this.ruleTagCache = ruleTagCache;
+    this.ruleEvaluator = ruleEvaluator;
   }
 
   @Override
@@ -67,16 +71,18 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   @Override
   public void createRuleTag(ConfigurationElement element) throws IllegalAccessException {
     ruleTagConfigTransacted.doCreateRuleTag(element);
+    ruleEvaluator.evaluateRule(element.getEntityId());
   }
 
   @Override
   public void updateRuleTag(Long id, Properties elementProperties) throws IllegalAccessException {
     try {
       ruleTagConfigTransacted.doUpdateRuleTag(id, elementProperties);
+      ruleEvaluator.evaluateRule(id);
     } catch (UnexpectedRollbackException e) {
       LOGGER.error("Rolling back Rule update in cache");
       ruleTagCache.remove(id);
-      ruleTagCache.get(id);
+      ruleTagCache.loadFromDb(id);
       throw e;
     }
   }

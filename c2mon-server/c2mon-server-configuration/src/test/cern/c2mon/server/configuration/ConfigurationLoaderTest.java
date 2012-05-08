@@ -615,10 +615,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     replay(mockManager);
     
     ConfigurationReport report = configurationLoader.applyConfiguration(13);
+    System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus()); //ok as DAQ handles Equipment creation
-    assertFalse(report.getProcessesToReboot().contains("P_TESTHANDLER03"));
-    System.out.println(report.toXML());
+    assertFalse(report.getProcessesToReboot().contains("P_TESTHANDLER03"));    
     
     EquipmentCacheObject cacheObject = (EquipmentCacheObject) equipmentCache.get(110L);
     EquipmentCacheObject expectedObject = new EquipmentCacheObject(110L);
@@ -646,13 +646,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     report = configurationLoader.applyConfiguration(25);
     System.out.println(report.toXML());
     //expect 2 top elements (control and equipment, with control first)
-    //  equipment report should have 2 sub-reports, control report none
+    //  equipment report should have 1 sub-reports from DAQ (control tag has no address)
     List<ConfigurationElementReport> topList = report.getElementReports();
     assertEquals(2, topList.size());
     assertEquals(topList.get(0).getEntity(), Entity.CONTROLTAG);
     assertEquals(topList.get(1).getEntity(), Entity.EQUIPMENT);
     assertEquals(0, topList.get(0).getSubreports().size());
-    assertEquals(2, topList.get(1).getSubreports().size());   
+    assertEquals(1, topList.get(1).getSubreports().size());   
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     //should contain both a controltag update and equipment update
     //  (note the DAQ response is generated automatically by the mock)   
@@ -666,14 +666,14 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     cacheObject = (EquipmentCacheObject) equipmentCache.get(110L);
     expectedObject.setDescription("updated description");
     expectedObject.setAddress("serverHostName=VGTCVENTTEST;test");
-    expectedObject.setAliveTagId(501L);
+    expectedObject.setAliveTagId(1251L);
     
     ObjectEqualityComparison.assertEquipmentEquals(expectedObject, cacheObject);
     
     //check alive timer reference is updated in DB
-    assertEquals(new Long(501), equipmentMapper.getItem(110L).getAliveTagId());
+    assertEquals(new Long(1251L), equipmentMapper.getItem(110L).getAliveTagId());
     //also expect alivetimercache to have element 501:
-    assertNotNull(aliveTimerCache.get(501L));
+    assertNotNull(aliveTimerCache.get(1251L));
     
     verify(mockManager);
   }

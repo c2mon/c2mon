@@ -91,7 +91,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
     } catch (UnexpectedRollbackException e) {
       LOGGER.error("Rolling back update in cache");
       dataTagCache.remove(id); //DB transaction is rolled back here: reload the tag
-      dataTagCache.get(id);
+      dataTagCache.loadFromDb(id);
       throw e;
     }
     

@@ -220,7 +220,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
         }       
         //reload old cache object
         processCache.remove(processId);
-        processCache.get(processId);
+        processCache.loadFromDb(processId);
         //reload old alive
         if (aliveConfigure) {
           processFacade.loadAndStartAliveTag(processId);

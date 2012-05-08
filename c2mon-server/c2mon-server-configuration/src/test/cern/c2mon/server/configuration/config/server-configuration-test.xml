@@ -11,7 +11,8 @@
   <!-- requires all DB and cache modules for component testing of the configuration module -->  
   <import resource="classpath:cern/tim/server/cache/config/server-cache-single-server.xml"/>
   <import resource="classpath:cern/tim/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>   
-  <import resource="classpath:cern/tim/server/cache/loading/config/server-cacheloading.xml"/> 
+  <import resource="classpath:cern/tim/server/cache/loading/config/server-cacheloading.xml"/>
+  <import resource="classpath:cern/tim/server/rule/config/server-rule.xml"/> 
 <!--  <import resource="classpath:cern/tim/server/cachepersistence/config/server-cachepersistence.xml"/> -->
   <import resource="classpath:cern/tim/server/common/config/server-common.xml"/> 
   

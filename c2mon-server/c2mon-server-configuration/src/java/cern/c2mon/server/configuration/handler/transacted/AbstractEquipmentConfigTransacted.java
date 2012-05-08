@@ -128,7 +128,8 @@ public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipm
     T abstractEquipment = commonEquipmentFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
     try {
       configurableDAO.insert(abstractEquipment);
-
+      abstractEquipmentCache.putQuiet(abstractEquipment);
+      
       // clear alive and commfault caches and refresh
       // (synch ok as locked equipment so no changes to these ids)
       if (abstractEquipment.getAliveTagId() != null) {
@@ -136,10 +137,9 @@ public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipm
       }
       if (abstractEquipment.getCommFaultTagId() != null) {
         commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
-        commFaultTagCache.get(abstractEquipment.getCommFaultTagId());
+        commFaultTagCache.loadFromDb(abstractEquipment.getCommFaultTagId());
       }
-
-      abstractEquipmentCache.putQuiet(abstractEquipment);
+      
     } catch (Exception e) {
       if (abstractEquipment.getAliveTagId() != null) {
         aliveTimerCache.remove(abstractEquipment.getId());

@@ -78,7 +78,7 @@ public class ConfigurationMapperTest {
     
     assertEquals("serverHostName=VGTCVENTTEST;test", elementLast.getElementProperties().get("address"));
     assertEquals("updated description", elementLast.getElementProperties().get("description"));
-    assertEquals("501", elementLast.getElementProperties().get("aliveTagId"));
+    assertEquals("1251", elementLast.getElementProperties().get("aliveTagId"));
      
   }
   

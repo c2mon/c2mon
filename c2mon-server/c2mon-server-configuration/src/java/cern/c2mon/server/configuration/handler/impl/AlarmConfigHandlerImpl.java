@@ -28,6 +28,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
 import cern.tim.server.cache.AlarmCache;
+import cern.tim.server.cache.AlarmFacade;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 
@@ -56,10 +57,14 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
    */
   private AlarmCache alarmCache;
   
+  private AlarmFacade alarmFacade;
+  
   @Autowired
-  public AlarmConfigHandlerImpl(AlarmCache alarmCache) {
+  public AlarmConfigHandlerImpl(AlarmCache alarmCache, 
+                                AlarmFacade alarmFacade) {
     super();
     this.alarmCache = alarmCache;
+    this.alarmFacade = alarmFacade;
   }
 
   /**
@@ -81,18 +86,22 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
   @Override
   public void createAlarm(ConfigurationElement element) throws IllegalAccessException {
     alarmConfigTransacted.doCreateAlarm(element);
+    alarmFacade.evaluateAlarm(element.getEntityId());
   }
 
   @Override
   public void updateAlarm(Long alarmId, Properties properties) {
     try {
-      alarmConfigTransacted.doUpdateAlarm(alarmId, properties);    
+      alarmConfigTransacted.doUpdateAlarm(alarmId, properties);
+      alarmFacade.evaluateAlarm(alarmId);
     } catch (UnexpectedRollbackException e) {
       LOGGER.error("Rolling back Alarm update in cache");
       alarmCache.remove(alarmId);
-      alarmCache.get(alarmId);
+      alarmCache.loadFromDb(alarmId);
       throw e;      
     }    
   }
+  
+  
 
 }

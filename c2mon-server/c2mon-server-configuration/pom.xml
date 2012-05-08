@@ -87,6 +87,10 @@
     </dependency>
     <dependency>
       <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-rule</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
       <artifactId>tim2-server-daqcommunication-in</artifactId>
     </dependency>
   </dependencies>

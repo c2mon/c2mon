@@ -188,7 +188,7 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (26,'address','serverHostName=VGTCVENTTEST;test');
 insert into timconfigval (seqid, elementfield, elementvalue) values (26,'description','updated description');
-insert into timconfigval (seqid, elementfield, elementvalue) values (26,'aliveTagId','501');
+insert into timconfigval (seqid, elementfield, elementvalue) values (26,'aliveTagId','1251');
 
 -- test control tag that should be loaded to DAQ when equipment is updated (should be performed first 25<26);
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
