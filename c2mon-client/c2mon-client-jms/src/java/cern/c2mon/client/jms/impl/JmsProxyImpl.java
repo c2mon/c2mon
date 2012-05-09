@@ -148,11 +148,10 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private Map<TagUpdateListener, TopicRegistrationDetails> registeredListeners;
 
   /**
-   * Listener locks, to prevent concurrent subscription/unsubscription of a
-   * given listener.
+   * Listener exclusive lock, to prevent concurrent subscription/unsubscription of listeners.
    */
-  private Map<TagUpdateListener, ReentrantReadWriteLock.WriteLock> listenerLocks;
-
+  private ReentrantReadWriteLock.WriteLock listenerLock;
+  
   /**
    * Listeners that need informing about JMS connection and disconnection
    * events.
@@ -295,8 +294,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
     sessions = new ConcurrentHashMap<MessageListenerWrapper, Session>();
     topicToWrapper = new ConcurrentHashMap<String, MessageListenerWrapper>();
-    registeredListeners = new ConcurrentHashMap<TagUpdateListener, TopicRegistrationDetails>();
-    listenerLocks = new ConcurrentHashMap<TagUpdateListener, ReentrantReadWriteLock.WriteLock>();
+    registeredListeners = new ConcurrentHashMap<TagUpdateListener, TopicRegistrationDetails>();    
+    listenerLock = new ReentrantReadWriteLock().writeLock();    
     connectionListeners = new ArrayList<ConnectionListener>();
     connectionListenersLock = new ReentrantReadWriteLock();
     supervisionListenerWrapper = new SupervisionListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
@@ -527,10 +526,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       if (topicRegistrationDetails == null) {
         throw new NullPointerException("Trying to register a TagUpdateListener with null RegistrationDetails!");
       }
-      if (!listenerLocks.containsKey(serverUpdateListener)) {
-        listenerLocks.put(serverUpdateListener, new ReentrantReadWriteLock().writeLock());
-      }
-      listenerLocks.get(serverUpdateListener).lock();
+      listenerLock.lock();
       try {
         if (!isRegisteredListener(serverUpdateListener)) { // throw exception if
                                                            // TagUpdateListener
@@ -564,7 +560,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           LOGGER.debug("Update listener already registered; skipping registration (for Tag " + topicRegistrationDetails.getId() + ")");
         }
       } finally {
-        listenerLocks.get(serverUpdateListener).unlock();
+        listenerLock.unlock();
       }
     } finally {
       refreshLock.readLock().unlock();
@@ -578,15 +574,10 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     }
     refreshLock.readLock().lock();
     try {
-      if (!listenerLocks.containsKey(registeredListener)) {
-        throw new IllegalStateException("Tried to replace a unrecognized update listener.");
-      }
-      ReentrantReadWriteLock.WriteLock listenerLock = listenerLocks.get(registeredListener);
       listenerLock.lock();
       try {
         TopicRegistrationDetails tag = registeredListeners.get(registeredListener);
         topicToWrapper.get(tag.getTopicName()).addListener(replacementListener, tag.getId());
-        listenerLocks.put(replacementListener, listenerLocks.remove(registeredListener));
         registeredListeners.put(replacementListener, registeredListeners.remove(registeredListener));
       } finally {
         listenerLock.unlock();
@@ -696,10 +687,6 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   public void unregisterUpdateListener(final TagUpdateListener serverUpdateListener) {
     refreshLock.readLock().lock();
     try {
-      if (!listenerLocks.containsKey(serverUpdateListener)) {
-        throw new IllegalStateException("Tried to unregister an unrecognized update listener.");
-      }
-      ReentrantReadWriteLock.WriteLock listenerLock = listenerLocks.get(serverUpdateListener);
       listenerLock.lock();
       try {
         if (isRegisteredListener(serverUpdateListener)) {
@@ -721,7 +708,6 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
             }
           }
           registeredListeners.remove(serverUpdateListener);
-          listenerLocks.remove(serverUpdateListener);
         }
       } finally {
         listenerLock.unlock();
