@@ -26,6 +26,13 @@
 		value="DEBUG_ENABLED = false; TIMESTAMP_ENABLED=false; BUFFER_SIZE=3000;STACK_TRACE_DEPTH=4" />
 
 	<!--
+    Defines the root folder's URL of the views
+  -->
+	<property name="view-root-repository-url" type="java.lang.String"
+		value="http://bewww/~diamonop/dmn2-views/" />
+
+
+	<!--
 		This property can be used to load the TIM Viewer with different
 		palettes. If not specified, the TIM Viewer looks into the standard URL
 		directory: "http://timweb.cern.ch/Views/palettes/"
