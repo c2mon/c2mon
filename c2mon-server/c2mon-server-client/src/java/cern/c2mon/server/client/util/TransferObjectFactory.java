@@ -56,6 +56,7 @@ public abstract class TransferObjectFactory {
 
             addAlarmValues(transferTag, tagWithAlarms.getAlarms());
             transferTag.setSimulated(tag.isSimulated());
+            transferTag.setUnit(tag.getUnit());
             transferTag.addEquimpmentIds(tag.getEquipmentIds());
             transferTag.addProcessIds(tag.getProcessIds());
             if (tag instanceof RuleTag) {
@@ -174,7 +175,7 @@ public abstract class TransferObjectFactory {
                 // check if max. value is defined, since it is not mandatory
                 if (dataTag.getMaxValue() != null)
                     tagConfig.setMaxValue(dataTag.getMaxValue().toString());
-
+                
                 if (dataTag.getAddress() != null) {
 
                     tagConfig.setValueDeadbandType(dataTag.getAddress().getValueDeadbandType());
