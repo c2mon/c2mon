@@ -78,7 +78,7 @@ public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle  
 
   @Override
   public void confirmStatus(final Alarm alarm) {
-    // TODO
+    notifyElementUpdated(alarm);
   }
 
   /**
