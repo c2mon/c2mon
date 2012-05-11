@@ -229,6 +229,28 @@ public class RecoveryManager implements SmartLifecycle {
   }
   
   /**
+   * Notifies all Alarm cache listeners using the status confirmation call.
+   * This will re-persist all the cache to the cache DB account (TIMPRO); re-publish
+   * all alarm values to the C2MON clients; publish unpublished alarms to LASER (these
+   * should normally be picked up by the publication-check thread in any case).
+   */
+  @ManagedOperation(description = "Notifies all Alarm cache listeners (status confirmation).")
+  public void notifyAllAlarmCacheListeners() {
+    LOGGER.info("Recovery task: notifying all alarm cache listeners (cache persistence to DB, re-publication to clients, publication to LASER if not already done)");
+    for (Long key : alarmCache.getKeys()) {
+      Alarm alarm = alarmCache.get(key);
+      alarm.getWriteLock().lock();
+      try {
+        long eventTime = System.currentTimeMillis();
+        alarmCache.notifyListenerStatusConfirmation(alarm, eventTime);
+      } finally {
+        alarm.getWriteLock().unlock();
+      }
+    }
+    LOGGER.info("Recovery task: finished notifying all alarm cache listeners.");
+  }
+  
+  /**
    * If the alarm publication thread does not manage to publish all alarms in the queue before
    * shutdown, the server must check all non-published alarms are published on start-up.
    * 
