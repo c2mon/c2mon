@@ -1,0 +1,3 @@
+## To put into the transfer.ref of the corresponding machine
+
+/user/dmndev/public_html/dmn2-viewer-dev/cgi-bin tid-generator-dev.pl  /user/dmndev/public_html/dmn2-viewer-dev/cgi-bin tid-generator-dev.pl dmndev si 0755 server - %exec -a dmnclic /bin/sh -c "while :; do /user/dmndev/public_html/dmn2-viewer-dev/cgi-bin/tid-generator-dev.pl; sleep 181; done"%
