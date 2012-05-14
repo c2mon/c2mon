@@ -9,7 +9,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-client</artifactId>
-  <version>1.0.9</version>
+  <version>1.0.10-SNAPSHOT</version>
   <name>c2mon-server-client</name>
   <packaging>jar</packaging>
   <description>The TIM2 server Client module handles the communication to the client layer API.</description>
