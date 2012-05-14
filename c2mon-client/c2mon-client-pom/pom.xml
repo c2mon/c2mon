@@ -1,282 +1,284 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern</groupId>
-		<artifactId>parent-pom</artifactId>
-		<version>1.0.5-SNAPSHOT</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern</groupId>
+    <artifactId>parent-pom</artifactId>
+    <version>1.0.5-SNAPSHOT</version>
+  </parent>
 
-	<groupId>cern.c2mon.c2mon-client</groupId>
-	<artifactId>c2mon-client-pom</artifactId>
-	<version>1.0.9-SNAPSHOT</version>
-	<packaging>pom</packaging>
+  <groupId>cern.c2mon.c2mon-client</groupId>
+  <artifactId>c2mon-client-pom</artifactId>
+  <version>1.0.9-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-	<description>
+  <description>
       This is a common parent POM for all C2MON client modules
     </description>
-	<url>http://timweb.cern.ch</url>
+  <url>http://timweb.cern.ch</url>
 
-	<!-- Shared version number properties -->
-	<properties>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-	</properties>
+  <!-- Shared version number properties -->
+  <properties>
+    <org.springframework.version>3.0.5.RELEASE</org.springframework.version>
+  </properties>
 
-	<dependencyManagement>
-		<dependencies>
+  <dependencyManagement>
+    <dependencies>
 
-			<!--  spring libraries -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-core</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-beans</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-tx</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-jms</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-test</artifactId>
-				<version>${org.springframework.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context-support</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-jdbc</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
+      <!--  spring libraries -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-beans</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-tx</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jms</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${org.springframework.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context-support</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
 
-			<!--  C2MON shared libraries -->
-			<dependency>
-				<groupId>cern.tim2.tim2-shared</groupId>
-				<artifactId>tim2-shared-util</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-shared</groupId>
-				<artifactId>tim2-shared-common</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-shared</groupId>
-				<artifactId>tim2-shared-client</artifactId>
-				<version>[0.9.9,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.tim2.tim2-shared</groupId>
-				<artifactId>tim2-shared-rule</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
+      <!--  C2MON shared libraries -->
+      <dependency>
+        <groupId>cern.tim2.tim2-shared</groupId>
+        <artifactId>tim2-shared-util</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>cern.tim2.tim2-shared</groupId>
+        <artifactId>tim2-shared-common</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.tim2.tim2-shared</groupId>
+        <artifactId>tim2-shared-client</artifactId>
+        <version>[0.9.9,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.tim2.tim2-shared</groupId>
+        <artifactId>tim2-shared-rule</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
 
-			<!--  C2MON client libraries -->
-			<dependency>
-				<groupId>cern.c2mon.c2mon-client</groupId>
-				<artifactId>c2mon-client-common</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-client</groupId>
-				<artifactId>c2mon-client-core</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-client</groupId>
-				<artifactId>c2mon-client-jms</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-client</groupId>
-				<artifactId>c2mon-client-auth</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-client</groupId>
-				<artifactId>c2mon-client-heartbeat</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-client</groupId>
-				<artifactId>c2mon-client-history</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-client</groupId>
-				<artifactId>c2mon-jviews-history</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
+      <!--  C2MON client libraries -->
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-all</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-common</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-core</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-jms</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-auth</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-heartbeat</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-history</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-jviews-history</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
 
-			<!-- C2MON publisher -->
-			<dependency>
-				<groupId>cern.c2mon.c2mon-publisher</groupId>
-				<artifactId>c2mon-japc-sispublisher</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-publisher</groupId>
-				<artifactId>c2mon-dip-publisher</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
+      <!-- C2MON publisher -->
+      <dependency>
+        <groupId>cern.c2mon.c2mon-publisher</groupId>
+        <artifactId>c2mon-japc-sispublisher</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-publisher</groupId>
+        <artifactId>c2mon-dip-publisher</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
 
-			<!-- RBAC libraries -->
-			<dependency>
-				<groupId>cern.accsoft.security</groupId>
-				<artifactId>accsoft-security-rba</artifactId>
-				<version>1.4.1</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.accsoft.security</groupId>
-				<artifactId>accsoft-security-rba-util</artifactId>
-				<version>1.4.1</version>
-			</dependency>
+      <!-- RBAC libraries -->
+      <dependency>
+        <groupId>cern.accsoft.security</groupId>
+        <artifactId>accsoft-security-rba</artifactId>
+        <version>1.4.1</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.accsoft.security</groupId>
+        <artifactId>accsoft-security-rba-util</artifactId>
+        <version>1.4.1</version>
+      </dependency>
 
-			<!-- other internal libs -->
-			<dependency>
-				<groupId>cern.accsoft.commons</groupId>
-				<artifactId>accsoft-commons-util</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
+      <!-- other internal libs -->
+      <dependency>
+        <groupId>cern.accsoft.commons</groupId>
+        <artifactId>accsoft-commons-util</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
 
-			<!-- 3rd parties -->
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>[1.2.16,2.0.0)</version>
-			</dependency>
-			
-			<!--  slf4j implementation is needed by activemq. note: The API is include directly by activemq-all library -->
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
-				<scope>runtime</scope>
-				<version>1.5.11</version>
-			</dependency>
-			
-			<dependency>
-				<groupId>com.toedter</groupId>
-				<artifactId>jcalendar</artifactId>
-				<version>1.3.2</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis</artifactId>
-				<version>3.0.4</version>
-			</dependency>
-			<dependency>
-				<groupId>oracle</groupId>
-				<artifactId>ojdbc</artifactId>
-				<version>11.2.0.3</version>
-			</dependency>
-			<dependency>
-				<groupId>oracle</groupId>
-				<artifactId>orai18n</artifactId>
-				<version>11.2.0.3</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.jms</groupId>
-				<artifactId>jms</artifactId>
-				<version>1.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.activemq</groupId>
-				<artifactId>activemq-all</artifactId>
-				<version>5.5.1-fuse-02-05</version>
-			</dependency>
-			<dependency>
-				<groupId>org.simpleframework</groupId>
-				<artifactId>simple-xml</artifactId>
-				<version>2.6.1</version>
-			</dependency>
-			<dependency>
-				<groupId>jep</groupId>
-				<artifactId>jep</artifactId>
-				<version>2.24</version>
-			</dependency>
+      <!-- 3rd parties -->
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>[1.2.16,2.0.0)</version>
+      </dependency>
 
-			<!-- test dependencies -->
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>[4.8.1, 5.0.0)</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymock</artifactId>
-				<version>2.5</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymockclassextension</artifactId>
-				<version>2.4</version>
-				<scope>test</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+      <!--  slf4j implementation is needed by activemq. note: The API is include directly by activemq-all library -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <scope>runtime</scope>
+        <version>1.5.11</version>
+      </dependency>
 
-	<build>
+      <dependency>
+        <groupId>com.toedter</groupId>
+        <artifactId>jcalendar</artifactId>
+        <version>1.3.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mybatis</groupId>
+        <artifactId>mybatis</artifactId>
+        <version>3.0.4</version>
+      </dependency>
+      <dependency>
+        <groupId>oracle</groupId>
+        <artifactId>ojdbc</artifactId>
+        <version>11.2.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>oracle</groupId>
+        <artifactId>orai18n</artifactId>
+        <version>11.2.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.jms</groupId>
+        <artifactId>jms</artifactId>
+        <version>1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-all</artifactId>
+        <version>5.5.1-fuse-02-05</version>
+      </dependency>
+      <dependency>
+        <groupId>org.simpleframework</groupId>
+        <artifactId>simple-xml</artifactId>
+        <version>2.6.1</version>
+      </dependency>
+      <dependency>
+        <groupId>jep</groupId>
+        <artifactId>jep</artifactId>
+        <version>2.24</version>
+      </dependency>
 
-		<!--
+      <!-- test dependencies -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>[4.8.1, 5.0.0)</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>2.5</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymockclassextension</artifactId>
+        <version>2.4</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+
+    <!--
 			DEFINE ALL PLUGINS THAT NEED TO BE USED BY CLIENT MODULES HERE
 		-->
-		<pluginManagement>
-			<plugins>
-				<!--
-					NOTE: Unless specified directly we don't need a groupId
-					specification because the group is org.apache.maven.plugins
-					...which is assumed by default.
-				-->
-				<plugin>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.2.1</version>
-				</plugin>
-				<plugin>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.6</version>
-				</plugin>
-				<plugin>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.8.1</version>
-				</plugin>
-			</plugins>
+    <pluginManagement>
+      <plugins>
+        <!--
+          NOTE: Unless specified directly we don't need a groupId specification because the group is org.apache.maven.plugins ...which is assumed by default.
+        -->
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.6</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.8.1</version>
+        </plugin>
+      </plugins>
 
-		</pluginManagement>
+    </pluginManagement>
 
-		<plugins />
+    <plugins />
 
-	</build>
+  </build>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-pom</developerConnection>
-	</scm>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-pom</developerConnection>
+  </scm>
 
 </project>
