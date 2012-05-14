@@ -18,6 +18,18 @@
 		</componentDescriptor>
 	</componentDescriptors>
 	
+	<fileSets>
+	  <fileSet>
+      <outputDirectory>/cgi-bin</outputDirectory>
+      <includes>
+        <include>*.pl</include>
+      </includes>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>      
+      <directory>${project.basedir}/cgi-bin/</directory>
+    </fileSet>
+  </fileSets>
+	
 	<files>
 		<file>
 			<source>deployment.xml</source>
