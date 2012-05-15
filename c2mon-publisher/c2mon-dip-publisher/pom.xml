@@ -3,7 +3,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.9</version>
   </parent>
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-dip-publisher</artifactId>
@@ -17,12 +17,8 @@
   
     <!-- C2MON Client API dependencies -->
   	<dependency>
-  		<groupId>cern.c2mon.c2mon-client</groupId>
-  		<artifactId>c2mon-client-common</artifactId>
-  	</dependency>
-  	<dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
-      <artifactId>c2mon-client-core</artifactId>
+      <artifactId>c2mon-client-all</artifactId>
     </dependency>
   	
   	<!-- CERN 3rd party dependencies -->
