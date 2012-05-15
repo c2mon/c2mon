@@ -1,51 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-client</groupId>
-		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.0.8</version>
-	</parent>
-	<groupId>cern.c2mon.c2mon-client</groupId>
-	<artifactId>c2mon-jviews-history</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
-	<name>c2mon-jviews-history</name>
-	<packaging>jar</packaging>
-	<description>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-pom</artifactId>
+    <version>1.0.9</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-client</groupId>
+  <artifactId>c2mon-jviews-history</artifactId>
+  <version>1.0.4-SNAPSHOT</version>
+  <name>c2mon-jviews-history</name>
+  <packaging>jar</packaging>
+  <description>
         Provides GUI used in history play back for the tim2-jviews-viewer.
     </description>
-	<url>http://timweb.cern.ch</url>
-	
+  <url>http://timweb.cern.ch</url>
+
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-client/c2mon-jviews-history</developerConnection>
   </scm>
-  
-	<dependencies>
-	
-	  <!-- C2MON dependencies -->
-		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-client</groupId>
-			<artifactId>c2mon-client-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-client</groupId>
-			<artifactId>c2mon-client-core</artifactId>
-		</dependency>
-		
-		<!-- 3rd party dependencies -->
+
+  <dependencies>
+
+    <!-- C2MON dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-all</artifactId>
+    </dependency>
+
+    <!-- 3rd party dependencies -->
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
     </dependency>
-		<dependency>
+    <dependency>
       <groupId>com.toedter</groupId>
       <artifactId>jcalendar</artifactId>
     </dependency>
-	</dependencies>
-	<developers />
+  </dependencies>
+  <developers />
 </project>
