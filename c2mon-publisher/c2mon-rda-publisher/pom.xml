@@ -3,7 +3,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.9</version>
   </parent>
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-rda-publisher</artifactId>
@@ -11,31 +11,27 @@
   <version>1.0.4-SNAPSHOT</version>
   <description>This project is used to publish data from C2MON to RDA</description>
   <scm>
-  	<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-rda-publisher</developerConnection>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-rda-publisher</developerConnection>
   </scm>
   <dependencies>
-  
+
     <!-- C2MON Client API dependencies -->
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
-      <artifactId>c2mon-client-core</artifactId>
+      <artifactId>c2mon-client-all</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-client</groupId>
-      <artifactId>c2mon-client-common</artifactId>
-    </dependency>
-  
+
     <!-- CERN 3rd party dependencies -->
     <dependency>
       <groupId>cern.cmw.java</groupId>
       <artifactId>cmw-rda</artifactId>
       <version>[2.9.0,3.0.0)</version>
     </dependency>
-  	
-  	<!-- Test dependencies -->
-  	<dependency>
-  		<groupId>junit</groupId>
-  		<artifactId>junit</artifactId>
-  	</dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
   </dependencies>
 </project>
