@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.9</version>
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-jviews-adminmessage</artifactId>
@@ -19,20 +19,8 @@
     <!-- C2MON dependencies -->
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
-      <artifactId>c2mon-client-core</artifactId>
+      <artifactId>c2mon-client-all</artifactId>
     </dependency>                
-    <dependency>
-      <groupId>cern.tim2.tim2-shared</groupId>
-      <artifactId>tim2-shared-client</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.tim2.tim2-shared</groupId>
-      <artifactId>tim2-shared-util</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-auth</artifactId>
-    </dependency>
     
     <!-- 3rd party dependencies -->
     <dependency>
