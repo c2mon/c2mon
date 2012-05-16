@@ -8,7 +8,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-jec</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <name>c2mon-daq-jec</name>
   <packaging>jar</packaging>
   <description>This is a C2MON JEC DAQ. It allows C2MON to acquire data from Siemens S7 PLCs. The Java Equipment Controller (JEC) was developed by TS-CSE-CO</description>
