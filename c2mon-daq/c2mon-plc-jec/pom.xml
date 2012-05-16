@@ -17,7 +17,7 @@
     </description>
   <url>http://timweb.cern.ch</url>
   <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-plc-jec</developerConnection>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-plc-jec</developerConnection>
   </scm>
   <dependencies>
     <dependency>
