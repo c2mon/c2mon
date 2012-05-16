@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.tim2.tim2-daq</groupId>
+    <artifactId>tim2-daq-pom</artifactId>
+    <version>1.0.7</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-daq</groupId>
+  <artifactId>c2mon-plc-jec</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+  <name>plc-jec</name>
+  <packaging>jar</packaging>
+  <description>
+    This JAR is part of the TIM Data Acquisition layer. It contains specific code to
+    Siemens S7 and Schneider Premium PLCs for establishing their communication protocol.
+    </description>
+  <url>http://timweb.cern.ch</url>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-plc-jec</developerConnection>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>      
+    </dependency>
+  </dependencies>
+  <developers />
+</project>
