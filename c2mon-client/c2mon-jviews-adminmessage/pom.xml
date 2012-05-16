@@ -36,6 +36,9 @@
   </dependencies>
 
   <developers />
+  <scm>
+  	<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-client/c2mon-jviews-adminmessage</developerConnection>
+  </scm>
   <build>
     <plugins>
       <plugin>
