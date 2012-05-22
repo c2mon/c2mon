@@ -49,6 +49,12 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      * The current values.
      */
     private byte[] currentValues;
+    
+    /**
+     * Have the initial values been sent to the server.
+     */
+    private volatile boolean initialValuesSent = false;
+    
     /**
      * The equipment message sender used to send updates to the server.
      */
@@ -118,6 +124,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
     public void initArrays() {
         AbstractJECAddressSpace addressSpace = getJecAddressSpace();
         if (!addressSpace.isEmpty()) {
+            initialValuesSent = false;
             currentValues = new byte[addressSpace.getJavaByteArraySize()];
             lastValues = new byte[addressSpace.getJavaByteArraySize()];
         }
@@ -150,7 +157,12 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
     public void processJECPFrame(final JECPFrames jecpFrames) {
         try {
             copyJECDataToArray(jecpFrames);
-            detectAndSendArrayChanges(jecpFrames.GetDataStartNumber(), jecpFrames.GetJECCurrTimeMilliseconds());
+            if (initialValuesSent) {
+              detectAndSendArrayChanges(jecpFrames.GetDataStartNumber(), jecpFrames.GetJECCurrTimeMilliseconds());
+            } else {
+              sendAll();
+              initialValuesSent = true;
+            }            
             // TODO Do the replacement while checking for updates.
             copyCurrentValueToLastValues();
         } catch (ArrayIndexOutOfBoundsException indexOutOfBoundsException) {
