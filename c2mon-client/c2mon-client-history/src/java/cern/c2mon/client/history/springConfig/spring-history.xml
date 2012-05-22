@@ -31,11 +31,9 @@
         <property name="username" value="timop" />
         <property name="password" value="optim1954" />  
 	  -->  
-	  <!--
+		<!--    <property name="logWriter" value=""/>-->
 		<property name="defaultAutoCommit" value="false" />
 		<property name="validationQuery" value="SELECT 0 FROM DUAL" />
-		 -->  
-		<!--    <property name="logWriter" value=""/>-->
 		<property name="initialSize" value="1" />
 		<property name="maxActive" value="2" />
 	</bean>
