@@ -13,7 +13,7 @@
 					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
 
 					<output>
-					  <logrotate fileSize="10M" files="2" name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log"/>						
+					  <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log"/>						
 					</output>
 
 				</main-class>
@@ -106,37 +106,8 @@
           <file name="DMN2-DAQ-JMX.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
 				</directory>
 			</deployment>
-			
-			<!--  one start script for each DAQ -->
-      <startscript name="DMN2-DAQ">
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
-
-          <output>
-            <logrotate fileSize="10M" files="2" name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log"/>            
-          </output>
-
-        </main-class>
-
-        <property name="c2mon.process.name" value="${PROCESS_NAME}" />
-        <property name="c2mon.log.dir" value="${DAQ_LOG_HOME}" />
-        <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
-
-        <preExec>
-              <![CDATA[
-                [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
-                [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
-                [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
-                [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
-                [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-                [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
-               ]]>
-        </preExec>
-      </startscript>			
 			 
 		</application>
-
-
 
 	</product>
 </products>
