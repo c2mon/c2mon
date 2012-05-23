@@ -415,4 +415,12 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
             }
         }
     }
+
+    /**
+     * For test use only!!
+     * @param initialValuesSent the initialValuesSent to set
+     */
+    public void setInitialValuesSent(boolean initialValuesSent) {
+      this.initialValuesSent = initialValuesSent;
+    }
 }

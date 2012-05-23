@@ -45,6 +45,7 @@ public class AnalogDataProcessorTest {
         sourceDataTag.setDataType("Integer");
         analogDataProcessor.addSourceDataTag(sourceDataTag);
         analogDataProcessor.initArrays();
+        analogDataProcessor.setInitialValuesSent(true);
     }
     
     @Test
