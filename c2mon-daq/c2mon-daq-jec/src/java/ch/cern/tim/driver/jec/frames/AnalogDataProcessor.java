@@ -24,7 +24,6 @@ import cern.tim.shared.common.datatag.DataTagDeadband;
 import cern.tim.shared.common.datatag.address.PLCHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
-import ch.cern.tim.driver.jec.JECMessageHandler;
 import ch.cern.tim.driver.jec.PLCObjectFactory;
 import ch.cern.tim.driver.jec.address.AnalogJECAddressSpace;
 import ch.cern.tim.driver.jec.tools.JECBinaryHelper;
@@ -96,7 +95,7 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
                 // analogs)
                 ISourceDataTag sourceDataTag = getTag(wordId, -1);
                 if (sourceDataTag == null)
-                    getEquipmentLogger().debug("No source data tag for word " + wordId);
+                    getEquipmentLogger().debug("No source datatag found for word " + wordId + " - the change will not be propagated to the server.");
                 else if (filterOn)
                     sendFiltered(actWord, lastWord, sourceDataTag, timestamp);
                 else
@@ -154,15 +153,15 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
             PLCHardwareAddress plcHardwareAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
             if (plcHardwareAddress.getResolutionFactor() == 0) {
                 word = JECBinaryHelper.getAnalogIEEEWord(wordPos, srcArray);
-                getEquipmentLogger().trace("This TAG is a IEEE Float (32bit) - WORD ID:" + wordPos);
+                getEquipmentLogger().trace("Found IEEE Float (32bit) tag for WORD ID:" + wordPos);
             }
             else {
                 word = JECBinaryHelper.getAnalogWord(wordPos, srcArray);
-                getEquipmentLogger().trace("This TAG is a Float (16bit) - WORD ID:" + wordPos);
+                getEquipmentLogger().trace("Found Float (16bit) tag for WORD ID:" + wordPos);
             }
         }
         else {
-            getEquipmentLogger().warn("No type could be determined for word at position " + wordPos);
+            getEquipmentLogger().trace("No tag found for word at position " + wordPos + " - returning 16 bit value.");
             word = JECBinaryHelper.getAnalogWord(wordPos, srcArray);
         }
         return word;
