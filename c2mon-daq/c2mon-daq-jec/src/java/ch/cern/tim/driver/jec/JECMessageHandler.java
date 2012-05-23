@@ -238,15 +238,16 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
      * @throws EqIOException Throws an exception if the disconnection fails through an IO error.
      */
     public void disconnectFromDataSource() throws EqIOException {
+        getEquipmentLogger().info("Disconnecting from data source");
         connectionSamplerThread.shutdown();
         if (connected == StdConstants.SUCCESS) {
             connected = StdConstants.ERROR;
             plcFactory.getPLCDriver().Disconnect(currentConnData);
         }
-        // makes sure that the message processor threads stop and the tags are removed.
-        jecController.setPauseFrameProcessing(true);
-        jecController.clearTagConfiguration();
-        synchronisationTimerThread.setPause(true);        
+        // makes sure that the message processor threads stop
+        jecController.stopFrameProcessing();        
+        synchronisationTimerThread.setPause(true);  
+        getEquipmentLogger().info("... successfully disconnected.");
     }
     
     /**

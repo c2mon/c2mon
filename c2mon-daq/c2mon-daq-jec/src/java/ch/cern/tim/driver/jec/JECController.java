@@ -653,9 +653,10 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
         // Sticks the received Message Identifier into the Data Type area
         sendFrame.SetDataType((byte) (recvMsg.getMsgID()));
         if (getEquipmentLogger().isDebugEnabled()) {
-            getEquipmentLogger().debug("RECEIVED FRAME SEQUENCE NUMBER: " + (" 0x" + Integer.toHexString((int) recvMsg.GetSequenceNumber())));
-            getEquipmentLogger().debug("SENT FRAME SEQUENCE NUMBER: " + (" 0x" + Integer.toHexString((int) sendFrame.GetSequenceNumber())));
-            getEquipmentLogger().debug("NUMBER OF RETRIES: " + (" 0x" + Integer.toHexString((int) recvMsg.GetRetryNumber())));
+            getEquipmentLogger().debug("Acknowledging message from PLC: ");
+            getEquipmentLogger().debug("\tRECEIVED FRAME SEQUENCE NUMBER: " + (" 0x" + Integer.toHexString((int) recvMsg.GetSequenceNumber())));
+            getEquipmentLogger().debug("\tSENT FRAME SEQUENCE NUMBER: " + (" 0x" + Integer.toHexString((int) sendFrame.GetSequenceNumber())));
+            getEquipmentLogger().debug("\tNUMBER OF RETRIES: " + (" 0x" + Integer.toHexString((int) recvMsg.GetRetryNumber())));
         }
 
         if (plcFactory.getPLCDriver().Send(sendFrame) == StdConstants.ERROR)
