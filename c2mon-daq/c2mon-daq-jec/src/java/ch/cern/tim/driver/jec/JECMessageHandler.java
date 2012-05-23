@@ -214,6 +214,9 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
         if (jecRestarter == null) {
             jecRestarter = new TimedJECRestarter(this);
         }
+        //overwrite old sampler on re-connect
+        connectionSamplerThread = new PLCConnectionSampler(jecRestarter, getEquipmentLogger(PLCConnectionSampler.class), 
+                                                                plcConfiguration.getHandlerPeriod() * HANDLER_PERIOD_MULTIPLIER);                  
         jecController = new JECController(plcFactory, connectionSamplerThread, jecCommandRunner, getEquipmentMessageSender(), getEquipmentLoggerFactory());
         JECDataTagChanger dataTagChanger = new JECDataTagChanger(jecController, jecRestarter);
         getEquipmentConfigurationHandler().setDataTagChanger(dataTagChanger);
@@ -235,6 +238,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
      * @throws EqIOException Throws an exception if the disconnection fails through an IO error.
      */
     public void disconnectFromDataSource() throws EqIOException {
+        connectionSamplerThread.shutdown();
         if (connected == StdConstants.SUCCESS) {
             connected = StdConstants.ERROR;
             plcFactory.getPLCDriver().Disconnect(currentConnData);
@@ -242,7 +246,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
         // makes sure that the message processor threads stop and the tags are removed.
         jecController.setPauseFrameProcessing(true);
         jecController.clearTagConfiguration();
-        synchronisationTimerThread.setPause(true);
+        synchronisationTimerThread.setPause(true);        
     }
     
     /**
@@ -396,13 +400,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
      */
     private void startThreads() {
         jecController.startFrameProcessing();
-        if (connectionSamplerThread == null || (!connectionSamplerThread.isAlive())) {
-            connectionSamplerThread = 
-                new PLCConnectionSampler(jecRestarter, getEquipmentLogger(PLCConnectionSampler.class), plcConfiguration.getHandlerPeriod() * HANDLER_PERIOD_MULTIPLIER);
-            connectionSamplerThread.start();
-            jecController.setConnectionSampler(connectionSamplerThread);
-        }
-        
+        connectionSamplerThread.start();        
         if (synchronisationTimerThread == null) {
             synchronisationTimerThread = new SynchronizationTimer(getEquipmentLogger(SynchronizationTimer.class), plcFactory);
         }

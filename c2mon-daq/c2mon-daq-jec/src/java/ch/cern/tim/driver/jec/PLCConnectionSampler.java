@@ -1,5 +1,7 @@
 package ch.cern.tim.driver.jec;
 
+import org.apache.log4j.Logger;
+
 import cern.tim.driver.common.EquipmentLogger;
 
 /**
@@ -11,6 +13,11 @@ import cern.tim.driver.common.EquipmentLogger;
  * restarts a new one, reconfiguring the PLC from the beginning.
  */
 public class PLCConnectionSampler extends Thread {
+    
+    /**
+     * Private logger.
+     */
+    private static Logger LOGGER = Logger.getLogger(PLCConnectionSampler.class);
     /**
      * The message handler to control.
      */
@@ -32,6 +39,11 @@ public class PLCConnectionSampler extends Thread {
      */
     private EquipmentLogger equipmentLogger;
     /**
+     * Flag indicating final shutdown request of this sampler.
+     */
+    private volatile boolean stopRequested = false;
+    
+    /**
      * The PLC connection sampler to use.
      * 
      * @param jecRestarter Object to restart the JEC DAQ.
@@ -40,9 +52,11 @@ public class PLCConnectionSampler extends Thread {
      */
     public PLCConnectionSampler(final IJECRestarter jecRestarter, 
             final EquipmentLogger equipmentLogger, final long samplerPeriod) {
+        super();
         // Defines the Thread priority to 1
         this.jecRestarter = jecRestarter;
         setPriority(Thread.MAX_PRIORITY);
+        setDaemon(true);
         this.samplerPeriod = samplerPeriod;
         this.equipmentLogger = equipmentLogger;
     }
@@ -52,14 +66,14 @@ public class PLCConnectionSampler extends Thread {
      */
     public void run() {
         // Forever cycle (while connection is established)
-        while (true) {
+        while (true && !stopRequested) {
             try {
                 Thread.sleep(samplerPeriod);
             } catch (java.lang.InterruptedException ex) {
-                equipmentLogger.error("Problem detected with the Alive Sampler thread.", ex);
+                equipmentLogger.debug("Interrupted during sampler thread sleep.");
             }
             // No new timestamp - CONNECTION LOST
-            if (previousAliveTagTime == currentAliveTagTime) {
+            if (!stopRequested && previousAliveTagTime == currentAliveTagTime) {
                 equipmentLogger.debug("PLCConnectionSampler : Connection LOST Detected !!, Setting 'connected' to OFF");
                 jecRestarter.forceImmediateRestart();
                 break;
@@ -88,5 +102,13 @@ public class PLCConnectionSampler extends Thread {
      */
     public synchronized long getAliveTimer() {
         return currentAliveTagTime;
+    }
+    
+    /**
+     * Shuts down the sampler. Needs re-instantiating.
+     */
+    public void shutdown() {
+      stopRequested = true;
+      this.interrupt();
     }
 }
