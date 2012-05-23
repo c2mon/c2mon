@@ -154,14 +154,15 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
             PLCHardwareAddress plcHardwareAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
             if (plcHardwareAddress.getResolutionFactor() == 0) {
                 word = JECBinaryHelper.getAnalogIEEEWord(wordPos, srcArray);
-                getEquipmentLogger().debug("This TAG is a IEEE Float (32bit) - WORD ID:" + wordPos);
+                getEquipmentLogger().trace("This TAG is a IEEE Float (32bit) - WORD ID:" + wordPos);
             }
             else {
                 word = JECBinaryHelper.getAnalogWord(wordPos, srcArray);
-                getEquipmentLogger().debug("This TAG is a Float (16bit) - WORD ID:" + wordPos);
+                getEquipmentLogger().trace("This TAG is a Float (16bit) - WORD ID:" + wordPos);
             }
         }
         else {
+            getEquipmentLogger().warn("No type could be determined for word at position " + wordPos);
             word = JECBinaryHelper.getAnalogWord(wordPos, srcArray);
         }
         return word;
