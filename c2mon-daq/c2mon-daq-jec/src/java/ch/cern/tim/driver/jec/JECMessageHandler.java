@@ -430,7 +430,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
                 }
                 // Try to receive data
                 if (plcFactory.getPLCDriver().Receive(recvFrame, StdConstants.TIMEOUT) == StdConstants.ERROR) {
-                    getEquipmentLogger().error("Timeout elapsed for reception...nothing received");
+                    getEquipmentLogger().error("Error during frame reception (possible timeout)");
                 }
                 else {
                     getEquipmentLogger().debug("Received frame: " + recvFrame.getMsgID() + ", Sequence Number: " + recvFrame.GetSequenceNumber());
