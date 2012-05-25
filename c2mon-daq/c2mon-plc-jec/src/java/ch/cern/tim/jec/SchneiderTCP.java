@@ -19,6 +19,7 @@ import java.io.*;
 import java.net.*;
 import org.apache.log4j.Logger;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class is used to connect/disconnect and exchange data between PC and PLC.
@@ -56,7 +57,12 @@ public class SchneiderTCP implements PLCDriver
  * Data input buffer to be assigned to the opened socket (for received data size)
  */
   // Input stream buffer for receive data - size
-  private DataInputStream r_data_size = null;                                   
+  private DataInputStream r_data_size = null;     
+  
+  /**
+   * Locks sending and receiving on streams.
+   */
+  private ReentrantReadWriteLock transportLock = new ReentrantReadWriteLock();
 
 /*//////////////////////////////////////////////////////////////////////////////
 //             METHOD SCHNEIDERTCP - CONSTRUCTOR (no parameters)              //
@@ -225,57 +231,62 @@ public class SchneiderTCP implements PLCDriver
  * -1 - error)
  */
   public int Send(JECPFrames Frame)
-  {     
-    // Status of the send() attempt
-    int status = StdConstants.ERROR;                                            
-    // String to store debug message to be sent to the logger    
-    String debug_msg = new String();                                            
-    // Variable to read system date in Date format
-    Date dt = new Date(System.currentTimeMillis());                             
+  {   
+    transportLock.writeLock().lock();
+    try {
+      // Status of the send() attempt
+      int status = StdConstants.ERROR;                                            
+      // String to store debug message to be sent to the logger    
+      String debug_msg;                                            
+      // Variable to read system date in Date format
+      Date dt = new Date(System.currentTimeMillis());                             
 
-// Checks if there is an opened socket. If yes, send Data through the socket
-    try
-    { 
-      // Repeat as long as socket is opened and connected
-      if(cli_socket != null)                                                    
-        // Send the byte array through the opened socket
-        s_data.write(Frame.frame,0,Frame.frame.length);                                     
-      // INFO message that will appear in the logger                                
-      logger.info("Data Frame sent on : "+dt.toString());                       
-      // Assigns status with SUCCESS (0)                      
-      status = StdConstants.SUCCESS;                                            
-    }
-    // Exception if UNKNOWN HOST
-    catch (IOException e)                                                       
-    {
-      // ERROR message that will appear in the logger
-      logger.error("Error sending Data Frame "+e);                              
-      // Assigns status with ERROR (-1)                      
-      status = StdConstants.ERROR;                                              
-    }
-
-    // Preparing DEBUG message to send to the logger
-    // Reset the debug_msg string
-    debug_msg = "";                   
-    if (status == StdConstants.SUCCESS)
-    {
-      // Generate the debug message to put in the logger
-      for (int j = 0;j < Frame.frame.length ; j++)                                      
-      {
-        // Create the debug frame...
-        debug_msg = debug_msg + (" 0x"+Integer.toHexString((int)Frame.frame[j] & 0xff)); 
+  // Checks if there is an opened socket. If yes, send Data through the socket
+      try
+      { 
+        // Repeat as long as socket is opened and connected
+        if(cli_socket != null)                                                    
+          // Send the byte array through the opened socket
+          s_data.write(Frame.frame,0,Frame.frame.length);                                     
+        // INFO message that will appear in the logger                                
+        logger.info("Data Frame sent on : "+dt.toString());                       
+        // Assigns status with SUCCESS (0)                      
+        status = StdConstants.SUCCESS;                                            
       }
-      // DEBUG message that will appear in the logger
-      logger.debug("Data sent:"+debug_msg);                                       
-    }
-         // DEBUG message that will appear in the logger
-    else logger.debug("No data was sent due to an error");
+      // Exception if UNKNOWN HOST
+      catch (IOException e)                                                       
+      {
+        // ERROR message that will appear in the logger
+        logger.error("Error sending Data Frame "+e);                              
+        // Assigns status with ERROR (-1)                      
+        status = StdConstants.ERROR;                                              
+      }
 
-    // Resets the pointer that tracks the written positions inside the JEC Frame data area
-    Frame.ResetDataBufferOffset();
+      // Preparing DEBUG message to send to the logger
+      // Reset the debug_msg string
+      debug_msg = "";                   
+      if (status == StdConstants.SUCCESS)
+      {
+        // Generate the debug message to put in the logger
+        for (int j = 0;j < Frame.frame.length ; j++)                                      
+        {
+          // Create the debug frame...
+          debug_msg = debug_msg + (" 0x"+Integer.toHexString((int)Frame.frame[j] & 0xff)); 
+        }
+        // DEBUG message that will appear in the logger
+        logger.debug("Data sent:"+debug_msg);                                       
+      }
+           // DEBUG message that will appear in the logger
+      else logger.debug("No data was sent due to an error");
 
-    // Return the actual status
-    return status;                                                              
+      // Resets the pointer that tracks the written positions inside the JEC Frame data area
+      Frame.ResetDataBufferOffset();
+
+      // Return the actual status
+      return status;
+    } finally {
+      transportLock.writeLock().unlock();      
+    }                                                                
   }
 
 /*//////////////////////////////////////////////////////////////////////////////
@@ -290,66 +301,69 @@ public class SchneiderTCP implements PLCDriver
  */   
   public int Receive(JECPFrames buffer, int timeout)
   {
-    // Status of the Receive() attempt
-    int status = StdConstants.ERROR;                                            
-    // String to store debug message to be sent to the logger        
-    String debug_msg = new String();                                            
-    // Array definition to store received data size (2 bytes)
-    byte[] recv_frame_size = new byte[2];                                       
-    // Array definition to store received JEC data (240 bytes)   
-    byte[] recv_frame_data = new byte[StdConstants.max_frame_size];             
-    // variable to store number of bytes received for data
-    int bytes_recv = 0;                                                         
+    transportLock.writeLock().lock();
+    try {
+   // Status of the Receive() attempt
+      int status = StdConstants.ERROR;                                                                                     
+      // Array definition to store received data size (2 bytes)
+      byte[] recv_frame_size = new byte[2];                                       
+      // Array definition to store received JEC data (240 bytes)   
+      byte[] recv_frame_data = new byte[StdConstants.max_frame_size];             
+      // variable to store number of bytes received for data
+      int bytes_recv = 0;                                                         
 
-// Try to receive data from the socket (PLC)
-    try
-    {
-      // INFO message that will appear in the logger                    
-      logger.info("Waiting to receive data...");                                
-      // Writes the received frame into recv_frame_size
-      r_data_size.read(recv_frame_size,0,recv_frame_size.length);               
-      // Writes the received frame into recv_frame_data
-      bytes_recv = r_data_data.read(recv_frame_data,0,recv_frame_data.length);  
-      // Assigns status with SUCCESS (0)                            
-      status = StdConstants.SUCCESS;                                            
-    }
-    // Raised when there's an error on RECEIVE
-    catch (IOException e)                                                       
-    {
-      // ERROR message that will appear in the logger                    
-      logger.error("Error while receive data "+e);                              
-      // Assigns status with ERROR (-1)                            
-      status = StdConstants.ERROR;                                              
-    }
-
-// Tests the status of the Receive() attempt
-    if (status == StdConstants.SUCCESS)
-    {
-    // If there is data received, generates a DEBUG message to send to logger
-      // If something was received (nr of bytes > 0)
-      if(bytes_recv > 0)                                                         
+  // Try to receive data from the socket (PLC)
+      try
       {
-        // Reset the debug_msg string
-        debug_msg = "";                                                           
-        // Generate the debug message to put in the logger
-        for (int j = 0;j < bytes_recv ; j++)                                      
-        {
-          // Create the debug frame...
-          debug_msg = debug_msg + (" 0x"+Integer.toHexString((int)recv_frame_data[j] & 0xff)); 
-        }
-        // DEBUG message that will appear in the logger
-        logger.debug("Data received:"+debug_msg);                                 
+        // INFO message that will appear in the logger                    
+        logger.info("Waiting to receive data...");                                
+        // Writes the received frame into recv_frame_size
+        r_data_size.read(recv_frame_size,0,recv_frame_size.length);               
+        // Writes the received frame into recv_frame_data
+        bytes_recv = r_data_data.read(recv_frame_data,0,recv_frame_data.length);  
+        // Assigns status with SUCCESS (0)                            
+        status = StdConstants.SUCCESS;                                            
+      }
+      // Raised when there's an error on RECEIVE
+      catch (IOException e)                                                       
+      {
+        // ERROR message that will appear in the logger                    
+        logger.error("Error while receive data "+e);                              
+        // Assigns status with ERROR (-1)                            
+        status = StdConstants.ERROR;                                              
       }
 
-      // INFO message that will appear in the logger
-      logger.info("Receive data...complete!");                                  
-      // Returns a 240 byte frame with the received data      
-      buffer.frame = recv_frame_data;
-      return StdConstants.SUCCESS;                                           
-    }
-    else
-      // Function returns ERROR
-      return StdConstants.ERROR;                                          
+  // Tests the status of the Receive() attempt
+      if (status == StdConstants.SUCCESS)
+      {
+      // If there is data received, generates a DEBUG message to send to logger
+        // If something was received (nr of bytes > 0)
+        if(bytes_recv > 0)                                                         
+        {
+          // Reset the debug_msg string
+          StringBuilder debug_msg = new StringBuilder();                                                           
+          // Generate the debug message to put in the logger
+          for (int j = 0;j < bytes_recv ; j++)                                      
+          {
+            // Create the debug frame...
+            debug_msg.append(" 0x" + Integer.toHexString((int)recv_frame_data[j] & 0xff)); 
+          }
+          // DEBUG message that will appear in the logger
+          logger.debug("Data received:" + debug_msg.toString());                                 
+        }
+
+        // INFO message that will appear in the logger
+        logger.info("Receive data...complete!");                                  
+        // Returns a 240 byte frame with the received data      
+        buffer.frame = recv_frame_data;
+        return StdConstants.SUCCESS;                                           
+      }
+      else
+        // Function returns ERROR
+        return StdConstants.ERROR;
+    } finally {
+      transportLock.writeLock().unlock();
+    }                                             
   }
 
 /*//////////////////////////////////////////////////////////////////////////////

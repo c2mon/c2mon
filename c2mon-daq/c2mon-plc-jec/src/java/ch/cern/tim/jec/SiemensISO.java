@@ -19,6 +19,7 @@ import java.io.*;
 import java.net.*;
 import org.apache.log4j.Logger;
 import java.util.Date;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class is used to connect/disconnect and exchange data between PC and PLC.
@@ -104,7 +105,12 @@ public class SiemensISO implements PLCDriver
    // Command Frame squeleton - size defined by RFC1006
    private byte CommandFrame[] = new byte [MAXCFRAME_SIZE];                     
    // Data Frame squeleton - size is defined by the RFC1006   
-   private byte DataFrame[] = new byte [MAXDFRAME_SIZE];                        
+   private byte DataFrame[] = new byte [MAXDFRAME_SIZE];    
+   
+   /**
+    * Lock for sychronising message sending and receiving
+    */
+   private ReentrantReadWriteLock transportLock = new ReentrantReadWriteLock();
 
 /*//////////////////////////////////////////////////////////////////////////////
 //              METHOD SIEMENSISO - CONSTRUCTOR (no parameters)               //
@@ -724,150 +730,155 @@ public class SiemensISO implements PLCDriver
  */
   public int Send(JECPFrames Frame)
   {
-// Variable declaration and initialization  
-    // Status of the send() attempt
-    int status = 0;                                                             
-    // Variable to store the max size of a single data packet
-    int n = 0;                                                                  
-    // Variable to use in loop instructions
-    int i = 0;                                                                  
-    // Variable to store the full frame size to be sent
-    int l = Frame.frame.length;                                                       
-    // Variable to store the max frame size
-    short size = 0;                                                             
-    // Pointer to 'navigate' inside the message
-    byte ptrmsg = 0;                                                            
-    // Fill up the Data Frame to send data using ISO-on-TCP
-    this.FillDataFrame();                                                       
-    // Copy of Data Frame to send data to PLC
-    byte[] MessageData = DataFrame;                                             
-    // Array to store a 'short' type value splitted in 2 bytes
-    byte[] bytes = new byte[2];                                                 
-    // String to store debug message to be sent to the logger
+    transportLock.writeLock().lock();
+    try {
+   // Variable declaration and initialization  
+      // Status of the send() attempt
+      int status = 0;                                                             
+      // Variable to store the max size of a single data packet
+      int n = 0;                                                                  
+      // Variable to use in loop instructions
+      int i = 0;                                                                  
+      // Variable to store the full frame size to be sent
+      int l = Frame.frame.length;                                                       
+      // Variable to store the max frame size
+      short size = 0;                                                             
+      // Pointer to 'navigate' inside the message
+      byte ptrmsg = 0;                                                            
+      // Fill up the Data Frame to send data using ISO-on-TCP
+      this.FillDataFrame();                                                       
+      // Copy of Data Frame to send data to PLC
+      byte[] MessageData = DataFrame;                                             
+      // Array to store a 'short' type value splitted in 2 bytes
+      byte[] bytes = new byte[2];                                                 
+      // String to store debug message to be sent to the logger
 
-    // Checks the size of entire message and, if necessary, splits it    
-    // While the end of msg is not reached...
-    while(l > 0)                                                                
-    {
-      // DEBUG message that will appear in the logger              
-      logger.debug("Checking size of message to be sent...");                    
-      // If message is bigger than the max packet size
-      if(l > MAXTSDU_SIZE)                                                      
+      // Checks the size of entire message and, if necessary, splits it    
+      // While the end of msg is not reached...
+      while(l > 0)                                                                
       {
-        // Assigns the max packet size for 1st packet of data
-        n = MAXTSDU_SIZE;                                                       
-        // Converts and stores the max data frame size (RFC1006)
-        size = (short)MAXDFRAME_SIZE;                                           
-        // Split the 'short' type into 2 bytes 
-        // Ex.: 3550 = 0DDEh -> DT[2]=0x0D DT[3]=0xDE
-        for(i = 0; i < bytes.length; i++)                                       
-        {                                                                       
-          // Offset calculation according the number of bytes used (2)
-          int offset = (bytes.length - i - 1) * 8;                              
-          // Masks size with 0xFF shifted by the offset value
-          bytes[i] = (byte)((size & (0xff << offset)) >>> offset);              
-          // In MessageData[2 and 3] writes the 'short' splitted
-          MessageData[OFFSPACKET_LENGTH + i] = bytes[i];                        
-        }
-        // In MessageData[6] writes 0x00 meaning Intermediate Frame
-        MessageData[OFFSFRAME] = INTERMEDIATE_FRAME;                            
-        // Decrease 'L' in 'N' units (L = L - N)
-        l -= n;                                                                 
-      }
-      // If message is not bigger than the max packet size
-      else                                                                      
-      {
-        // Assigns the size of data as being the max packet size
-        n = l;                                                                  
-        // Size of frame is: 65531 -(65524-4) = 11
-        size = (short)(MAXDFRAME_SIZE - (MAXTSDU_SIZE - n));                    
-        // Split the 'short' type into 2 bytes 
-        // Ex.: 3550 = 0DDEh -> DT[2]=0x0D DT[3]=0xDE
-        for(i = 0; i < bytes.length; i++)                                       
-        {                                                                       
-          // Offset calculation according the number of bytes used (2)
-          int offset = (bytes.length-i-1)*8;                                    
-          // Masks size with 0xFF shifted by the offset value
-          bytes[i] = (byte)((size & (0xff << offset)) >>> offset);              
-          // In MessageData[2 and 3] writes the 'short' splitted
-          MessageData[OFFSPACKET_LENGTH + i] = bytes[i];                        
-        }
-        // In MessageData[6] writes 0x80 meaning Last Frame
-        MessageData[OFFSFRAME] = LAST_FRAME;                                    
-        // Resets 'l' variable and exit cycle
-        l = 0;                                                                  
-      }
-
-      // Fill frame with the data to be sent down to the PLC      
-      // DEBUG message that will appear in the logger    
-      if (logger.isDebugEnabled()) {
-        logger.debug("Creating Data Frame to send...");                           
-      }
-      // Writes the bytes of data in DTframe
-      for(int k = ptrmsg; k < n ; k++)                                          
-      {
-        // Arranges the data, starting at the position DTframe[7]
-        MessageData[OFFSFRAME + 1 + k] = Frame.frame[k];                              
-      }
-      // 'PTRMSG' updated if data's splitted in several packets
-      ptrmsg += n;                                                              
-
-      // Checks if there is an opened socket. If yes, send Data through the socket
-      try
-      {
-        // Get the system time and format it into Date type
-        Date dt = new Date(System.currentTimeMillis());                         
-        // If there is a opened socket
-        if (cli_socket != null)                                                 
+        // DEBUG message that will appear in the logger              
+        logger.debug("Checking size of message to be sent...");                    
+        // If message is bigger than the max packet size
+        if(l > MAXTSDU_SIZE)                                                      
         {
-          // INFO message that will appear in the logger                
-          logger.debug("Sending Data Frame...");                                 
-          // Sends the Data Frame to the PLC
-          s_data.write(MessageData,0,(int)size);                                
-
-          // Preparing DEBUG message to send to the logger
-          if (logger.isDebugEnabled()) {
-            StringBuffer debug_msg = new StringBuffer("DT frame: ");                                                           
-            // DEBUG: Put all DR array values in Hex
-            for (int j = 0 ; j != (int)size ; j++)                                     
-            {  
-              debug_msg.append(" 0x");
-              debug_msg.append(Integer.toHexString((int)MessageData[j] & 0xff));
-            }
-            // DEBUG message that will appear in the logger
-            logger.debug(debug_msg);                                      
+          // Assigns the max packet size for 1st packet of data
+          n = MAXTSDU_SIZE;                                                       
+          // Converts and stores the max data frame size (RFC1006)
+          size = (short)MAXDFRAME_SIZE;                                           
+          // Split the 'short' type into 2 bytes 
+          // Ex.: 3550 = 0DDEh -> DT[2]=0x0D DT[3]=0xDE
+          for(i = 0; i < bytes.length; i++)                                       
+          {                                                                       
+            // Offset calculation according the number of bytes used (2)
+            int offset = (bytes.length - i - 1) * 8;                              
+            // Masks size with 0xFF shifted by the offset value
+            bytes[i] = (byte)((size & (0xff << offset)) >>> offset);              
+            // In MessageData[2 and 3] writes the 'short' splitted
+            MessageData[OFFSPACKET_LENGTH + i] = bytes[i];                        
           }
-
-          // INFO message that will appear in the logger                              
-          logger.debug("Data Frame sent on : "+dt.toString());                     
-          // Assigns status with SUCCESS (0)                              
-          status = StdConstants.SUCCESS;                                          
+          // In MessageData[6] writes 0x00 meaning Intermediate Frame
+          MessageData[OFFSFRAME] = INTERMEDIATE_FRAME;                            
+          // Decrease 'L' in 'N' units (L = L - N)
+          l -= n;                                                                 
         }
-        else
+        // If message is not bigger than the max packet size
+        else                                                                      
         {
-          // INFO message that will appear in the logger                
-          logger.info("No Socket to send data");                          
-          // Assigns status with ERROR (-1)                              
-          status = StdConstants.ERROR;                                            
+          // Assigns the size of data as being the max packet size
+          n = l;                                                                  
+          // Size of frame is: 65531 -(65524-4) = 11
+          size = (short)(MAXDFRAME_SIZE - (MAXTSDU_SIZE - n));                    
+          // Split the 'short' type into 2 bytes 
+          // Ex.: 3550 = 0DDEh -> DT[2]=0x0D DT[3]=0xDE
+          for(i = 0; i < bytes.length; i++)                                       
+          {                                                                       
+            // Offset calculation according the number of bytes used (2)
+            int offset = (bytes.length-i-1)*8;                                    
+            // Masks size with 0xFF shifted by the offset value
+            bytes[i] = (byte)((size & (0xff << offset)) >>> offset);              
+            // In MessageData[2 and 3] writes the 'short' splitted
+            MessageData[OFFSPACKET_LENGTH + i] = bytes[i];                        
+          }
+          // In MessageData[6] writes 0x80 meaning Last Frame
+          MessageData[OFFSFRAME] = LAST_FRAME;                                    
+          // Resets 'l' variable and exit cycle
+          l = 0;                                                                  
         }
-      }//try
-      
-      // Raised when there's an error on SEND
-      catch (IOException e)                                                     
-      {
-        // ERROR message that will appear in the logger                
-        logger.error("Error sending Data Frame ", e);                            
-        // Assigns status with ERROR (-1)                                      
-        status = StdConstants.ERROR;                                            
-      } 
 
-    }//WHILE loop
+        // Fill frame with the data to be sent down to the PLC      
+        // DEBUG message that will appear in the logger    
+        if (logger.isDebugEnabled()) {
+          logger.debug("Creating Data Frame to send...");                           
+        }
+        // Writes the bytes of data in DTframe
+        for(int k = ptrmsg; k < n ; k++)                                          
+        {
+          // Arranges the data, starting at the position DTframe[7]
+          MessageData[OFFSFRAME + 1 + k] = Frame.frame[k];                              
+        }
+        // 'PTRMSG' updated if data's splitted in several packets
+        ptrmsg += n;                                                              
 
-    // Resets the pointer that tracks the written positions inside the JEC Frame data area
-    Frame.ResetDataBufferOffset();
+        // Checks if there is an opened socket. If yes, send Data through the socket
+        try
+        {
+          // Get the system time and format it into Date type
+          Date dt = new Date(System.currentTimeMillis());                         
+          // If there is a opened socket
+          if (cli_socket != null)                                                 
+          {
+            // INFO message that will appear in the logger                
+            logger.debug("Sending Data Frame...");                                 
+            // Sends the Data Frame to the PLC
+            s_data.write(MessageData,0,(int)size);                                
 
-    // Return method execution status    
-    return status;                                                              
+            // Preparing DEBUG message to send to the logger
+            if (logger.isDebugEnabled()) {
+              StringBuffer debug_msg = new StringBuffer("DT frame: ");                                                           
+              // DEBUG: Put all DR array values in Hex
+              for (int j = 0 ; j != (int)size ; j++)                                     
+              {  
+                debug_msg.append(" 0x");
+                debug_msg.append(Integer.toHexString((int)MessageData[j] & 0xff));
+              }
+              // DEBUG message that will appear in the logger
+              logger.debug(debug_msg);                                      
+            }
+
+            // INFO message that will appear in the logger                              
+            logger.debug("Data Frame sent on : "+dt.toString());                     
+            // Assigns status with SUCCESS (0)                              
+            status = StdConstants.SUCCESS;                                          
+          }
+          else
+          {
+            // INFO message that will appear in the logger                
+            logger.info("No Socket to send data");                          
+            // Assigns status with ERROR (-1)                              
+            status = StdConstants.ERROR;                                            
+          }
+        }//try
+        
+        // Raised when there's an error on SEND
+        catch (IOException e)                                                     
+        {
+          // ERROR message that will appear in the logger                
+          logger.error("Error sending Data Frame ", e);                            
+          // Assigns status with ERROR (-1)                                      
+          status = StdConstants.ERROR;                                            
+        } 
+
+      }//WHILE loop
+
+      // Resets the pointer that tracks the written positions inside the JEC Frame data area
+      Frame.ResetDataBufferOffset();
+
+      // Return method execution status    
+      return status; 
+    } finally {
+      transportLock.writeLock().unlock();
+    }                                                            
   }  
 
 /*//////////////////////////////////////////////////////////////////////////////
@@ -881,170 +892,179 @@ public class SiemensISO implements PLCDriver
  */
   public int Receive(JECPFrames buffer, int timeout) 
   {
+    transportLock.writeLock().lock();
+    try {
+   // Variable declaration and initialization    
+      // Status of the send() attempt
+      int status = 0;                                                             
+      // Variable to store the number of data bytes to read
+      int n = 0;                                                                  
+      // Variable to store the size of entire packet
+      short size = 0;                                                             
+      // Fill up the Data Frame to send data using ISO-on-TCP
+      this.FillDataFrame();                                                       
+      // Copy of Data Frame to send data to PLC
+      byte[] MessageData = DataFrame;                                             
+      // Pointer to 'navigate' inside the array of data
+      int dptr = 0;                                                               
+      // Array to store the received data (filtered - no header)
+      byte[] msg = new byte[StdConstants.max_frame_size];                         
+      // Variable to store the position left in the buffer
+      int msgptr = 0;                                                             
+      // Number of received bytes
+      int bytes_rcv = 0;                                                          
+      // Variable to store the size of Data header
+      int rcv_len = 0;                                                            
+      // Length of all data from one or more packets
+      int total_data_len = 0;                                                                                              
+      // Variable to store the number of receive attempts
+      int retry = 0;     
 
-// Variable declaration and initialization    
-    // Status of the send() attempt
-    int status = 0;                                                             
-    // Variable to store the number of data bytes to read
-    int n = 0;                                                                  
-    // Variable to store the size of entire packet
-    short size = 0;                                                             
-    // Fill up the Data Frame to send data using ISO-on-TCP
-    this.FillDataFrame();                                                       
-    // Copy of Data Frame to send data to PLC
-    byte[] MessageData = DataFrame;                                             
-    // Pointer to 'navigate' inside the array of data
-    int dptr = 0;                                                               
-    // Array to store the received data (filtered - no header)
-    byte[] msg = new byte[StdConstants.max_frame_size];                         
-    // Variable to store the position left in the buffer
-    int msgptr = 0;                                                             
-    // Number of received bytes
-    int bytes_rcv = 0;                                                          
-    // Variable to store the size of Data header
-    int rcv_len = 0;                                                            
-    // Length of all data from one or more packets
-    int total_data_len = 0;                                                                                              
-    // Variable to store the number of receive attempts
-    int retry = 0;     
+      StringBuffer debug_msg = new StringBuffer();
 
-    StringBuffer debug_msg = new StringBuffer();
-
-    // Tries to receive all the packages assigned to a message
-    do                                                                          
-    {
-      // Size of the Data header (7)
-      rcv_len = MAXDFRAME_SIZE - MAXTSDU_SIZE;                                  
-      try
+      // Tries to receive all the packages assigned to a message
+      do                                                                          
       {
-        // INFO message that will appear in the logger     
-        logger.debug("Waiting to receive data...");                 
-        // Set the timeout value to read from socket of 2sec
-        // Writes the received frame to DTframe structure
-        bytes_rcv = r_data.read(MessageData);
-        // Assigns status with SUCCESS (0)
-        status = StdConstants.SUCCESS;                                          
-        // Increase the number of retries        
-        retry ++;                                                               
-      } 
-      // Raised when there's an error on RECEIVE
-      catch (IOException e)                                                     
-      { 
-        // ERROR message that will appear in the logger                    
-    //    logger.error("Error while receive data ", e);                            
-        // Assigns status with ERROR (-1)                                      
-        status = StdConstants.ERROR;                                            
-      }
-
-      // If the reception was succeeded
-      if(status == StdConstants.SUCCESS)
-      {
-// If something was received, print the message header in the logger
-        if(bytes_rcv > 0 && logger.isDebugEnabled())                                                         
+        // Size of the Data header (7)
+        rcv_len = MAXDFRAME_SIZE - MAXTSDU_SIZE;                                  
+        try
         {
-          // Reset the debug_msg string
-          debug_msg = new StringBuffer("DT header: ");                                                         
-          // DEBUG: Put all DR array values in Hex
-          for (int j = 0;j != rcv_len ; j++)                                       
+          // INFO message that will appear in the logger     
+          logger.debug("Waiting to receive data...");                 
+          // Set the timeout value to read from socket of 2sec
+          // Writes the received frame to DTframe structure
+          bytes_rcv = r_data.read(MessageData);
+          // Assigns status with SUCCESS (0)
+          status = StdConstants.SUCCESS;                                          
+          // Increase the number of retries        
+          retry ++;                                                               
+        } 
+        // Raised when there's an error on RECEIVE
+        catch (SocketTimeoutException e)                                                     
+        { 
+          logger.error("Timeout while waiting for data on the incoming stream", e);                            
+          // Assigns status with ERROR (-1)                                      
+          status = StdConstants.ERROR;                                            
+        }
+        catch (IOException e)                                                     
+        { 
+          logger.error("Unexpected IOException caught while waiting for data on the incoming stream", e);                            
+          // Assigns status with ERROR (-1)                                      
+          status = StdConstants.ERROR;                                            
+        }
+
+        // If the reception was succeeded
+        if(status == StdConstants.SUCCESS)
+        {
+  // If something was received, print the message header in the logger
+          if(bytes_rcv > 0 && logger.isDebugEnabled())                                                         
           {
-            debug_msg.append(" 0x");
-            debug_msg.append(Integer.toHexString((int)MessageData[j] & 0xff));
-          }
-          // DEBUG message that will appear in the logger
-          logger.debug(debug_msg);                                   
-        }
-        
-        // Analize DT Frame to see if it's not a Disconnection Request from the PLC
-        // Check if its a Disconnection Request Frame
-        if(MessageData[OFFSCREDIT_CODE] == DR_FRAME)                            
-        {
-          // ERROR message that will appear in the logger            
-          logger.error("PLC sent a Disconnection Request instead of data "+debug_msg);  
-          // Assigns status with ERROR (-1)                                        
-          status = StdConstants.ERROR;                                          
-        }
-
-      // Extract the data from DTframe
-        // Gets the position of MessageData[6+1] - Data Start
-        dptr = OFFSFRAME+1;                                                       
-
-        // The next 3 lines pick 2 bytes in the frame and convert them into a 'short' type variable
-        // Mask the first 8 bits DTframe[2] with a 16 bit structure
-        size = (short)(0xFFFF & (short)MessageData[OFFSPACKET_LENGTH]);           
-        // Shift those bits 8 positions left - assign as MSByte
-        size = (short)(size << 8);                                                
-        // Pick the second byte DTframe[3] and assign it as LSByte
-        size = (short)(size | MessageData[OFFSPACKET_LENGTH+1]);                  
-
-        // Size of entire frame (Header and Data)
-        // JAVA 'byte' type: 0x00 -> 0x7f = 00 -> 127
-        //                   0x80 -> 0xff = -128 -> -1
-        size = (short)((size < 0) ? (256 + size) : size);                         
-                                                                                
-        // Size of 'usefull' data (Frame - Header)
-        n = (int)(size) - (int)(MAXDFRAME_SIZE - MAXTSDU_SIZE);                   
-
-  // Retrieve the 'usefull' data from the DTframe
-        // If some data was received
-        if(n > 0 )
-        {
-          if (logger.isDebugEnabled()) {
             // Reset the debug_msg string
-            debug_msg = new StringBuffer("Data received: ");
+            debug_msg = new StringBuffer("DT header: ");                                                         
             // DEBUG: Put all DR array values in Hex
-            for(int k = dptr; k != size ; k++)                                       
+            for (int j = 0;j != rcv_len ; j++)                                       
             {
-              // Stores the data in a 'usefull' data array so that more data can be added (in case of several packets)
               debug_msg.append(" 0x");
-              debug_msg.append(Integer.toHexString((int)MessageData[k] & 0xff));
+              debug_msg.append(Integer.toHexString((int)MessageData[j] & 0xff));
+            }
+            // DEBUG message that will appear in the logger
+            logger.debug(debug_msg);                                   
+          }
+          
+          // Analize DT Frame to see if it's not a Disconnection Request from the PLC
+          // Check if its a Disconnection Request Frame
+          if(MessageData[OFFSCREDIT_CODE] == DR_FRAME)                            
+          {
+            // ERROR message that will appear in the logger            
+            logger.error("PLC sent a Disconnection Request instead of data "+debug_msg);  
+            // Assigns status with ERROR (-1)                                        
+            status = StdConstants.ERROR;                                          
+          }
+
+        // Extract the data from DTframe
+          // Gets the position of MessageData[6+1] - Data Start
+          dptr = OFFSFRAME+1;                                                       
+
+          // The next 3 lines pick 2 bytes in the frame and convert them into a 'short' type variable
+          // Mask the first 8 bits DTframe[2] with a 16 bit structure
+          size = (short)(0xFFFF & (short)MessageData[OFFSPACKET_LENGTH]);           
+          // Shift those bits 8 positions left - assign as MSByte
+          size = (short)(size << 8);                                                
+          // Pick the second byte DTframe[3] and assign it as LSByte
+          size = (short)(size | MessageData[OFFSPACKET_LENGTH+1]);                  
+
+          // Size of entire frame (Header and Data)
+          // JAVA 'byte' type: 0x00 -> 0x7f = 00 -> 127
+          //                   0x80 -> 0xff = -128 -> -1
+          size = (short)((size < 0) ? (256 + size) : size);                         
+                                                                                  
+          // Size of 'usefull' data (Frame - Header)
+          n = (int)(size) - (int)(MAXDFRAME_SIZE - MAXTSDU_SIZE);                   
+
+    // Retrieve the 'usefull' data from the DTframe
+          // If some data was received
+          if(n > 0 )
+          {
+            if (logger.isDebugEnabled()) {
+              // Reset the debug_msg string
+              debug_msg = new StringBuffer("Data received: ");
+              // DEBUG: Put all DR array values in Hex
+              for(int k = dptr; k != size ; k++)                                       
+              {
+                // Stores the data in a 'usefull' data array so that more data can be added (in case of several packets)
+                debug_msg.append(" 0x");
+                debug_msg.append(Integer.toHexString((int)MessageData[k] & 0xff));
+              }
+
+              // DEBUG message that will appear in the logger
+              logger.debug(debug_msg);                               
             }
 
-            // DEBUG message that will appear in the logger
-            logger.debug(debug_msg);                               
-          }
-
-          // Adds data from different packets to msg[] buffer
-          System.arraycopy(MessageData, dptr, msg, msgptr, n);
-
-          /*
-          for(int l = 0; l != n; l++)
-          {
             // Adds data from different packets to msg[] buffer
-            msg[msgptr + l] = MessageData[dptr + l];                              
+            System.arraycopy(MessageData, dptr, msg, msgptr, n);
+
+            /*
+            for(int l = 0; l != n; l++)
+            {
+              // Adds data from different packets to msg[] buffer
+              msg[msgptr + l] = MessageData[dptr + l];                              
+            }
+            */
+            // Saves the current position where to write new data
+            msgptr += n;                                                            
+          }  
+        }
+        // If status is different from SUCCESS
+        else
+        {
+          // DEBUG message that will appear in the logger
+     /*     if (logger.isDebugEnabled()) {
+            logger.debug("Could not receive data");
           }
-          */
-          // Saves the current position where to write new data
-          msgptr += n;                                                            
-        }  
+     */        
+          // Exits from the while loop
+          break;
+        }
+      // While the current packet is not LAST_FRAME and the number of retries is not exceeded
+      }while((MessageData[OFFSFRAME] != LAST_FRAME) && (retry <= StdConstants.recv_retry));
+
+  // Tests the status of the Receive() attempt
+      if (status == StdConstants.SUCCESS)
+      {
+        // INFO message that will appear in the logger
+        logger.debug("Receive data...complete!");                                  
+        // Returns the received data
+        buffer.frame = msg;
+
+        return StdConstants.SUCCESS;                                                               
       }
-      // If status is different from SUCCESS
       else
       {
-        // DEBUG message that will appear in the logger
-   /*     if (logger.isDebugEnabled()) {
-          logger.debug("Could not receive data");
-        }
-   */        
-        // Exits from the while loop
-        break;
+        // Function returns NULL in case of problems during reception
+        return StdConstants.ERROR;                                                
       }
-    // While the current packet is not LAST_FRAME and the number of retries is not exceeded
-    }while((MessageData[OFFSFRAME] != LAST_FRAME) && (retry <= StdConstants.recv_retry));
-
-// Tests the status of the Receive() attempt
-    if (status == StdConstants.SUCCESS)
-    {
-      // INFO message that will appear in the logger
-      logger.debug("Receive data...complete!");                                  
-      // Returns the received data
-      buffer.frame = msg;
-
-      return StdConstants.SUCCESS;                                                               
-    }
-    else
-    {
-      // Function returns NULL in case of problems during reception
-      return StdConstants.ERROR;                                                
+    } finally {
+      transportLock.writeLock().unlock();
     }
   }
 
