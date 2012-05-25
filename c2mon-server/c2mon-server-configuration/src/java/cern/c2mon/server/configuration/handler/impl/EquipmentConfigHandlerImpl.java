@@ -123,7 +123,10 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
 
   @Override
   public ProcessChange createEquipment(ConfigurationElement element) throws IllegalAccessException {
-    return equipmentConfigTransacted.doCreateEquipment(element);
+    ProcessChange change = equipmentConfigTransacted.doCreateEquipment(element);
+    Equipment equipment = equipmentCache.get(element.getEntityId());
+    equipmentCache.lockAndNotifyListeners(equipment);
+    return change;
   }
 
   @Override

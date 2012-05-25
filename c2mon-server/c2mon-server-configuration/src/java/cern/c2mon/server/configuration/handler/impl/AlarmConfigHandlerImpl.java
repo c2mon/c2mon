@@ -29,6 +29,7 @@ import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.AlarmFacade;
+import cern.tim.server.common.alarm.Alarm;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 
@@ -87,6 +88,8 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
   public void createAlarm(ConfigurationElement element) throws IllegalAccessException {
     alarmConfigTransacted.doCreateAlarm(element);
     alarmFacade.evaluateAlarm(element.getEntityId());
+    Alarm alarm = alarmCache.get(element.getEntityId());
+    alarmCache.lockAndNotifyListeners(alarm);
   }
 
   @Override

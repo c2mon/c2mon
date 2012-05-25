@@ -35,6 +35,7 @@ import cern.tim.server.cache.CommFaultTagCache;
 import cern.tim.server.cache.SubEquipmentCache;
 import cern.tim.server.cache.SubEquipmentFacade;
 import cern.tim.server.cache.exception.CacheElementNotFoundException;
+import cern.tim.server.common.equipment.Equipment;
 import cern.tim.server.common.subequipment.SubEquipment;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
@@ -111,7 +112,10 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
 
   @Override
   public ProcessChange createSubEquipment(ConfigurationElement element) throws IllegalAccessException {
-    return subEquipmentConfigTransacted.doCreateSubEquipment(element);
+    ProcessChange change = subEquipmentConfigTransacted.doCreateSubEquipment(element);
+    SubEquipment subEquipment = subEquipmentCache.get(element.getEntityId());
+    subEquipmentCache.lockAndNotifyListeners(subEquipment);
+    return change;
   }
 
   @Override

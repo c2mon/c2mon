@@ -72,6 +72,9 @@ public class CommandTagConfigHandler {
     commandTagDAO.insertCommandTag(commandTag);
     commandTagCache.putQuiet(commandTag);
     equipmentFacade.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
+    
+    commandTagCache.lockAndNotifyListeners(commandTag);
+    
     CommandTagAdd commandTagAdd = new CommandTagAdd(element.getSequenceId(), 
                                                     commandTag.getEquipmentId(), 
                                                     commandTagFacade.generateSourceCommandTag(commandTag));    

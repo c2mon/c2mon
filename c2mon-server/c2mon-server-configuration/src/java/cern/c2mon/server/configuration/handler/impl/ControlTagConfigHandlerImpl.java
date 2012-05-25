@@ -11,6 +11,7 @@ import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.ControlTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.ControlTagCache;
+import cern.tim.server.common.control.ControlTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 
@@ -65,7 +66,10 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
 
   @Override
   public ProcessChange createControlTag(ConfigurationElement element) throws IllegalAccessException {
-    return controlTagConfigTransacted.doCreateControlTag(element);
+    ProcessChange change = controlTagConfigTransacted.doCreateControlTag(element);
+    ControlTag controlTag = controlTagCache.get(element.getEntityId());
+    controlTagCache.lockAndNotifyListeners(controlTag);
+    return change;
   }
 
   @Override

@@ -30,6 +30,7 @@ import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.DataTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.DataTagCache;
+import cern.tim.server.common.datatag.DataTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 
@@ -74,7 +75,10 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
 
   @Override
   public ProcessChange createDataTag(ConfigurationElement element) throws IllegalAccessException {
-    return dataTagConfigTransacted.doCreateDataTag(element);
+    ProcessChange change = dataTagConfigTransacted.doCreateDataTag(element);
+    DataTag dataTag = dataTagCache.get(element.getEntityId());
+    dataTagCache.lockAndNotifyListeners(dataTag);    
+    return change;
   }
 
   @Override

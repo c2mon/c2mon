@@ -28,6 +28,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.RuleTagConfigTransacted;
 import cern.tim.server.cache.RuleTagCache;
+import cern.tim.server.common.rule.RuleTag;
 import cern.tim.server.rule.RuleEvaluator;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
@@ -72,6 +73,8 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   public void createRuleTag(ConfigurationElement element) throws IllegalAccessException {
     ruleTagConfigTransacted.doCreateRuleTag(element);
     ruleEvaluator.evaluateRule(element.getEntityId());
+    RuleTag rule = ruleTagCache.get(element.getEntityId());
+    ruleTagCache.lockAndNotifyListeners(rule);    
   }
 
   @Override
