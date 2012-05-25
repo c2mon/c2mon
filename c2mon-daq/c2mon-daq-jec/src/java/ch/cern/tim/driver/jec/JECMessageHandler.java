@@ -400,6 +400,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
      * Starts all threads needed by the message handler.
      */
     private void startThreads() {
+        getEquipmentLogger().debug("calling startThreads()...");
         jecController.startFrameProcessing();
         connectionSamplerThread.start();        
         if (synchronisationTimerThread == null) {
@@ -418,7 +419,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
      * is lost.
      */
     private void runFrameAquisition() {
-        getEquipmentLogger().info("Acquisition procedure...STARTED");
+        getEquipmentLogger().info("Starting acquisition procedure");
         // Data acquisition loop
         while (connected != StdConstants.ERROR) {
             JECPFrames recvFrame = plcFactory.getRawRecvFrame();

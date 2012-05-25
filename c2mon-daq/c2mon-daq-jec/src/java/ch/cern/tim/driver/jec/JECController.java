@@ -197,6 +197,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
         if (runningState == RUNNING_STATE.STOPPED) {
             throw new IllegalStateException("JECFrameController has bee stopped! Create a new one and start it in order to restart the controller.");
         }
+        getEquipmentLogger().info("Starting JECController threads");
         for (AbstractJECPFrameProcessor frameProcessorThread : frameProcessorThreads) {
             if (!frameProcessorThread.isAlive()) {
                 frameProcessorThread.start();
@@ -211,6 +212,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      */
     @Override
     public synchronized void stopFrameProcessing() {
+        getEquipmentLogger().info("Stopping JECController threads");
         for (AbstractJECPFrameProcessor frameProcessorThread : frameProcessorThreads) {
             frameProcessorThread.stopThread();
         }
