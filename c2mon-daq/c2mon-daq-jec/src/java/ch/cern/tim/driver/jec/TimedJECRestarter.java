@@ -135,6 +135,11 @@ public class TimedJECRestarter implements IJECRestarter {
         restart(0);
     }
     
+    @Override
+    public void shutdown() {
+      timer.cancel();
+    }
+    
     /**
      * Restarts the DAQ after a provided time. If there is already a restart
      * scheduled it is canceled.

@@ -97,7 +97,7 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
                 if (sourceDataTag == null)
                     getEquipmentLogger().debug("No source datatag found for word " + wordId + " - the change will not be propagated to the server.");
                 else if (filterOn)
-                    sendFiltered(actWord, lastWord, sourceDataTag, timestamp);
+                    sendFiltered(actWord, sourceDataTag, timestamp);
                 else
                     convertAndSend(actWord, sourceDataTag, timestamp, false);
             }
@@ -199,37 +199,34 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
      * Sends a value after the filters are applied.
      * 
      * @param value The value to send.
-     * @param lastValue The value before the last update.
      * @param sourceDataTag The source data tag with the configuration.
      * @param timestamp The timestamp to send with the update.
      */
-    public void sendFiltered(final int value, final int lastValue, 
-            final ISourceDataTag sourceDataTag, final long timestamp) {
+    public void sendFiltered(final int value, final ISourceDataTag sourceDataTag, final long timestamp) {
         PLCHardwareAddress hardwareAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
         if (JECConversionHelper.checkSHRTValues(hardwareAddress.getResolutionFactor())) {
             float convertedValue = JECConversionHelper.convertPLCValueToFloat(value, hardwareAddress);
-            float convertedLastValue = JECConversionHelper.convertPLCValueToFloat(lastValue, hardwareAddress);
-            if (getEquipmentLogger().isDebugEnabled()) {
-                getEquipmentLogger().debug("ACT VAL FROM TABLE: " + value);
-                getEquipmentLogger().debug("ACT HRF: " + convertedValue);
-                getEquipmentLogger().debug("LAST VAL FROM TABLE: " + lastValue);
-                getEquipmentLogger().debug("LAST HRF: " + convertedLastValue);
-            }
-            if (!isChangeOutOfRange(value, lastValue, sourceDataTag.getValueDeadbandType(), sourceDataTag.getValueDeadband())) {
+            if (getEquipmentLogger().isTraceEnabled()) {
+              getEquipmentLogger().trace("INCOMING VAL FROM TABLE: " + value);
+              getEquipmentLogger().trace("INCOMING HRF: " + convertedValue);                              
+          }
+            if (isChangeOutOfDeadband(Float.valueOf(convertedValue), sourceDataTag)) {              
                 Object timValue = TIMDriverSimpleTypeConverter.convert(
-                        sourceDataTag, convertedValue);
-                if (timValue != null) {
+                        sourceDataTag, convertedValue);                
+                if (timValue != null) {                    
                     send(timValue, sourceDataTag, timestamp);
                     getEquipmentLogger().debug("ANALOG DATA TAG VALUE SENT: " + sourceDataTag.getName() + " ID:" + sourceDataTag.getId());
                 } else {
                     getEquipmentLogger().debug("\tSending INVALIDATE SourceDataTagValue with quality CONVERSION_ERROR, for Tag name : " + sourceDataTag.getName() + " tag id : " + sourceDataTag.getId());
-                    sendInvalid(sourceDataTag, SourceDataQuality.CONVERSION_ERROR, null, timestamp);
+                    sendInvalid(sourceDataTag, SourceDataQuality.CONVERSION_ERROR, "Error when converting value in JEC DAQ.", timestamp);
                 }
                 
+            } else {
+              getEquipmentLogger().debug("Value Change inside range...ignoring data change");
             }
         }
         else {
-            getEquipmentLogger().debug("Value Change inside range...ignoring data change");
+          getEquipmentLogger().warn("Resolution factor not recognized for tag " + sourceDataTag.getId() + " - unable to process update.");          
         }
     }
 
@@ -237,26 +234,36 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
      * This method is used to check if the analog value is really out of the
      * deadband range. If it is, this function returns true, else returns false.
      * 
+     * <p>If the sourceDataTag value is currently null or invalid, returns true. 
+     * 
      * @param actVal - Actual measurement value (in human readable format)
      * @param lastVal - Last measurement value (in human readable format)
      * @param dbType - Type of deadband filtering used (3:absolute; 4:relative - see 
      * DataTagDeadband constants)
      * @param dbValue - Deadband value received for comparing
      * @return Boolean - TRUE if its out of range; otherwise FALSE
+     * @throws NullPointerException if value argument is null
      */
-    public boolean isChangeOutOfRange(final float actVal, final float lastVal, 
-            final short dbType, final float dbValue) {
+    public <T extends Number> boolean isChangeOutOfDeadband(final T actVal, ISourceDataTag sourceDataTag) {
+        if (actVal == null){
+          throw new NullPointerException("Called with null value parameter.");
+        }
+        int deadbandType = sourceDataTag.getValueDeadbandType();
+        float deadbandValue = sourceDataTag.getValueDeadband();
         float valueDifference = 0;
-        boolean isOutOfRange = false;
-        if (dbType == DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE) {
-            valueDifference = Math.abs(actVal - lastVal);
-            isOutOfRange = (valueDifference > dbValue);
-        }
-        else if (dbType == DataTagDeadband.DEADBAND_EQUIPMENT_RELATIVE) {
-            valueDifference = Math.abs(actVal - lastVal);
-            isOutOfRange = (valueDifference > (lastVal * (dbValue / PERCENTAGE_DIVISOR)));
-        }
-        return isOutOfRange;
+        boolean isOutOfDeadband = true;
+        if (sourceDataTag.getCurrentValue() != null && sourceDataTag.getCurrentValue().isValid() && sourceDataTag.getCurrentValue().getValue() != null ) {
+          Float lastVal = Float.valueOf(sourceDataTag.getCurrentValue().getValue().toString());
+          if (deadbandType == DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE) {
+              valueDifference = Math.abs(actVal.floatValue() - lastVal.floatValue());
+              isOutOfDeadband = (valueDifference > deadbandValue);
+          }
+          else if (deadbandType == DataTagDeadband.DEADBAND_EQUIPMENT_RELATIVE) {
+              valueDifference = Math.abs(actVal.floatValue() - lastVal.floatValue());
+              isOutOfDeadband = (valueDifference > (lastVal.floatValue() * (deadbandValue / PERCENTAGE_DIVISOR)));
+          }
+        }        
+        return isOutOfDeadband;
     }
     
     /**

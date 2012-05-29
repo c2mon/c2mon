@@ -29,6 +29,8 @@
 package ch.cern.tim.driver.jec;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import cern.tim.driver.common.EquipmentMessageHandler;
@@ -189,7 +191,6 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
         }
         
         logConfiguration();
-
         
         String protocol = plcConfiguration.getProtocol();
         try {
@@ -207,17 +208,15 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
             getEquipmentLogger().fatal("Class ch.cern.tim.jec." + protocol + " could not be instantiated");
             throw new EqIOException("Class ch.cern.tim.jec." + protocol + " could not be instantiated");
         }
-        if (jecCommandRunner == null) {
-            jecCommandRunner = new JECCommandRunner(getEquipmentLogger(JECCommandRunner.class), plcFactory, getEquipmentConfiguration());
-            getEquipmentCommandHandler().setCommandRunner(jecCommandRunner);
-        }
-        if (jecRestarter == null) {
-            jecRestarter = new TimedJECRestarter(this);
-        }
-        //overwrite old sampler on re-connect
+       
+        jecCommandRunner = new JECCommandRunner(getEquipmentLogger(JECCommandRunner.class), plcFactory, getEquipmentConfiguration());
+        getEquipmentCommandHandler().setCommandRunner(jecCommandRunner);        
+        
+        jecRestarter = new TimedJECRestarter(this);       
         connectionSamplerThread = new PLCConnectionSampler(jecRestarter, getEquipmentLogger(PLCConnectionSampler.class), 
-                                                                plcConfiguration.getHandlerPeriod() * HANDLER_PERIOD_MULTIPLIER);                  
+                                                                plcConfiguration.getHandlerPeriod() * HANDLER_PERIOD_MULTIPLIER);        
         jecController = new JECController(plcFactory, connectionSamplerThread, jecCommandRunner, getEquipmentMessageSender(), getEquipmentLoggerFactory());
+              
         JECDataTagChanger dataTagChanger = new JECDataTagChanger(jecController, jecRestarter);
         getEquipmentConfigurationHandler().setDataTagChanger(dataTagChanger);
         JECCommandTagChanger commandTagChanger = new JECCommandTagChanger(jecController, jecRestarter);
@@ -240,13 +239,14 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
     public void disconnectFromDataSource() throws EqIOException {
         getEquipmentLogger().info("Disconnecting from data source");
         connectionSamplerThread.shutdown();
+        jecRestarter.shutdown();        
         if (connected == StdConstants.SUCCESS) {
             connected = StdConstants.ERROR;
             plcFactory.getPLCDriver().Disconnect(currentConnData);
         }
         // makes sure that the message processor threads stop
         jecController.stopFrameProcessing();        
-        synchronisationTimerThread.setPause(true);  
+        synchronisationTimerThread.shutdown();          
         getEquipmentLogger().info("... successfully disconnected.");
     }
     
@@ -298,9 +298,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
                 } catch (InterruptedException interruptedEx) {
                     getEquipmentLogger().error("Reconnection waiting interrupted.", interruptedEx);
                 }
-        }
-        getEquipmentLogger().info("Sending EquipmentState OK...");
-        getEquipmentMessageSender().confirmEquipmentStateOK();
+        }        
 
         // Tries to start the method responsible for the JEC INITIALIZATION
         try {
@@ -309,17 +307,34 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
             startThreads();
         }
         catch (IOException ex) {
-            getEquipmentLogger().error("Error during INITIALIZATION procedure - " + ex.getMessage());
-            try {
-                disconnectFromDataSource();
-            } catch (EqIOException e) {
-                getEquipmentLogger().error("Error restarting message handler.", e);
-            }
-            // Restart
-            new Thread(this).start();
+            getEquipmentLogger().error("Error during INITIALIZATION procedure - attempting to restart the handler.", ex);
+            
+            //start timer to restart the JECMessageHandler until successful (tries every 5s)
+            final Timer restartTimer = new Timer(true);
+            restartTimer.schedule(new TimerTask() {
+              
+              @Override
+              public void run() {
+                try {
+                  disconnectFromDataSource();
+                } catch (EqIOException e) {
+                  getEquipmentLogger().error("Error disconnecting from datasource.", e);
+                }
+                try {                  
+                  connectToDataSource();
+                } catch (EqIOException e) {                  
+                  restartTimer.schedule(this, 5000);
+                }
+              }
+            }, 5000);
+            
+            //this thread ends
             return;
         }
-
+        
+        getEquipmentLogger().info("Sending EquipmentState OK...");
+        getEquipmentMessageSender().confirmEquipmentStateOK();
+        
         runFrameAquisition();
         
         getEquipmentMessageSender().confirmEquipmentStateIncorrect("Connection with JEC PLC lost");
@@ -425,7 +440,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
             JECPFrames recvFrame = plcFactory.getRawRecvFrame();
             synchronized (synchronisationTimerThread) {
                 try {
-                    jecSetTime(StdConstants.SET_TIME_DELAY);
+                    jecSetTime(StdConstants.SET_TIME_DELAY, (byte) (sendFrame.GetSequenceNumber() + 0x01));
                 } catch (IOException e) {
                     getEquipmentLogger().error("Error while trying to re-synchronize JEC PLC");
                 }
@@ -751,7 +766,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
             while (analogDBBlocksToSend > 0) {
                 blockID = (short) (analogDBBlocksToSend - 1);
                 try {
-                    jecController.getDeadbandFrame(blockID);
+                    sendFrame = jecController.getDeadbandFrame(blockID);
                 } catch (JECIndexOutOfRangeException ex) {
                     getEquipmentLogger().error("ERROR while writing data to JEC frame - " + ex);
                 }
@@ -837,20 +852,21 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
      * @throws IOException Throws an IOException if the synchronization with the PLC
      * fails through a connection error.
      */
-    private void jecSetTime(final int delay) throws IOException {
+    private void jecSetTime(final int delay, final byte jecSequenceNumber) throws IOException {
         // If the host actual time minus the reference time is bigger than the
         // delay converted into milliseconds (hour * 60 * 60 * 1000 = hours *
         // 3600000), then send the Set Time message
         if ((System.currentTimeMillis() - actTime) >= (delay * MS_TO_HOUR_FACTOR)) {
-            sendFrame.SetMessageIdentifier(StdConstants.SET_TIME_MSG);
+            JECPFrames localSendFrame = plcFactory.getSendFrame(StdConstants.SET_TIME_MSG);
+            localSendFrame.SetMessageIdentifier(StdConstants.SET_TIME_MSG);
             // Set the sequence number: last sequence number + 1
-            sendFrame.SetSequenceNumber((byte) (sendFrame.GetSequenceNumber() + 0x01));
+            localSendFrame.SetSequenceNumber(jecSequenceNumber);
             // Assigns the actual host time to the JEC frame
-            sendFrame.JECSynchronize();
+            localSendFrame.JECSynchronize();
             // Some logging
             getEquipmentLogger().debug("Sending SET TIME MESSAGE...");
             // If there was a problem during send, exits reporting error
-            if (plcFactory.getPLCDriver().Send(sendFrame) == StdConstants.ERROR) {
+            if (plcFactory.getPLCDriver().Send(localSendFrame) == StdConstants.ERROR) {
                 getEquipmentLogger().error("A problem occured while trying to send SET TIME message...");
             }
             actTime = System.currentTimeMillis();
@@ -872,8 +888,9 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
     private void sendStartupMessage(final String msgDescriptor, 
             final long watchDog) throws IOException {
         boolean successfullySent = false;
+        short sendAttempts = 0;
         // Retries sending until it receives the good acknowledge
-        while (!successfullySent) {
+        while (!successfullySent && sendAttempts < 4) {
             // Tests the watchdog value
             if (watchDog != StdConstants.NO_WATCHDOG) {
                 try {
@@ -891,6 +908,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
                 try {
                     // Waits 1 second
                     Thread.sleep(SEND_STARTUP_MESSAGE_FAILURE_WAIT_TIME);
+                    sendAttempts++;
                 } catch (InterruptedException ex) {
                     getEquipmentLogger().error("ERROR - while putting thread RUN asleep...");
                 }
@@ -904,6 +922,8 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
                 }
             }
         }
+        if (!successfullySent)
+          throw new IOException("Failed to send start-up message after " + (sendAttempts - 1) + " attempts - re-initializing connection thread.");
     }
 
     /**

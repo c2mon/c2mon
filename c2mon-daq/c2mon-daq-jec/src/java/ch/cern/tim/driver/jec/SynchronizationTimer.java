@@ -165,5 +165,12 @@ public class SynchronizationTimer extends TimerTask {
     public synchronized boolean isPause() {
         return pause;
     }
+    
+    /**
+     * Final shutdown of this timer.
+     */
+    public void shutdown() {
+      timer.cancel();
+    }
 
 }

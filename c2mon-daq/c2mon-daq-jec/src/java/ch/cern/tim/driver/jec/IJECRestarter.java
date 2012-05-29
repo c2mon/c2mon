@@ -33,5 +33,10 @@ public interface IJECRestarter {
      * Forces a immediate restart of the JEC DAQ.
      */
     void forceImmediateRestart();
+
+    /**
+     * Final shutdown of the restarter.
+     */
+    void shutdown();
     
 }
