@@ -60,7 +60,7 @@ public class AnalogDataProcessorTest {
         analogDataProcessor.addSourceDataTag(sourceDataTag);
         analogDataProcessor.addSourceDataTag(sourceDataTag2);
         analogDataProcessor.initArrays();
-        analogDataProcessor.setInitialValuesSent(true);
+        analogDataProcessor.setInitialValuesSent(0, true);
     }
     
     @Test

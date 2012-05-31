@@ -43,7 +43,7 @@ public class BooleanDataProcessorTest {
         sourceDataTag.update(true);
         booleanDataProcessor.addSourceDataTag(sourceDataTag);
         booleanDataProcessor.initArrays();
-        booleanDataProcessor.setInitialValuesSent(true); //o.w. all values are sent when processing the first frame
+        booleanDataProcessor.setInitialValuesSent(0, true); //o.w. all values are sent when processing the first frame
     }
     
     @Test

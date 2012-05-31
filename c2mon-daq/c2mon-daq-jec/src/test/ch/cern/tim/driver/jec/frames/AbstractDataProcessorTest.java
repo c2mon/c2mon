@@ -72,7 +72,7 @@ public class AbstractDataProcessorTest {
         AbstractJECAddressSpace booleanJECAddressSpace = new BooleanJECAdressSpace();
         booleanJECAddressSpace.setMaxWordId(0);
         expect(abstractDataProcessor.getJecAddressSpace()).andReturn(booleanJECAddressSpace);
-        abstractDataProcessor.sendAll(); //all are sent when processing first frame
+        abstractDataProcessor.sendAllInBlock(0); //all are sent when processing first frame
         abstractDataProcessor.detectAndSendArrayChanges(0, jecpFrames.GetJECCurrTimeMilliseconds());
         abstractDataProcessor.detectAndSendArrayChanges(0, jecpFrames2.GetJECCurrTimeMilliseconds());
         

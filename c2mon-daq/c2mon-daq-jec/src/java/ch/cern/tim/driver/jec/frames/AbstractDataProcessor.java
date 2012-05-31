@@ -53,7 +53,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
     /**
      * Have the initial values been sent to the server.
      */
-    private volatile boolean initialValuesSent = false;
+    private ConcurrentHashMap<Integer, Boolean> initialValuesSent = new ConcurrentHashMap<Integer, Boolean>();
     
     /**
      * The equipment message sender used to send updates to the server.
@@ -108,6 +108,13 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
     public abstract void sendTag(final int wordPos, final int bitPos);
     
     /**
+     * Sends the current values to the server, for all tags that are contained in this block.
+     * 
+     * @param blockNumber the number of the data block
+     */
+    public abstract void sendAllInBlock(final int blockNumber);
+    
+    /**
      * Revalidates the value of the provided word and in case of a boolean value at
      * the provided bit.
      * 
@@ -119,12 +126,12 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
     public abstract void revalidateTag(final int wordPos, final int bitPos);
 
     /**
-     * Initializes the arrays with the correct size matching the former provided tags.
+     * Re-initializes all arrays in the processor. 
      */
     public void initArrays() {
         AbstractJECAddressSpace addressSpace = getJecAddressSpace();
         if (!addressSpace.isEmpty()) {
-            initialValuesSent = false;
+            initialValuesSent = new ConcurrentHashMap<Integer, Boolean>();
             currentValues = new byte[addressSpace.getJavaByteArraySize()];
             lastValues = new byte[addressSpace.getJavaByteArraySize()];
         }
@@ -157,27 +164,18 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
     public void processJECPFrame(final JECPFrames jecpFrames) {
         try {
             copyJECDataToArray(jecpFrames);
-            if (initialValuesSent) {
-              detectAndSendArrayChanges(jecpFrames.GetDataStartNumber(), jecpFrames.GetJECCurrTimeMilliseconds());
+            int blockNumber = jecpFrames.GetDataStartNumber();
+            if (initialValuesSent.get(blockNumber) != null && initialValuesSent.get(blockNumber)) {
+              detectAndSendArrayChanges(blockNumber, jecpFrames.GetJECCurrTimeMilliseconds());
             } else {
-              sendAll();
-              initialValuesSent = true;
+              sendAllInBlock(blockNumber);
+              initialValuesSent.put(blockNumber, true);
             }            
             // TODO Do the replacement while checking for updates.
             copyCurrentValueToLastValues();
         } catch (ArrayIndexOutOfBoundsException indexOutOfBoundsException) {
             getEquipmentLogger().error("Array length: " + currentValues.length + " - There is a serious configuration error with the tags of block type " + getSupervisedMessagesId(),
                     indexOutOfBoundsException);
-        }
-    }
-
-    /**
-     * Sends all the current values to the server.
-     */
-    public void sendAll() {
-        for (ISourceDataTag sourceDataTag : supervisedTags.values()) {
-            PLCHardwareAddress plcHardwareAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
-            sendTag(plcHardwareAddress.getWordId(), plcHardwareAddress.getBitId());
         }
     }
 
@@ -420,7 +418,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      * For test use only!!
      * @param initialValuesSent the initialValuesSent to set
      */
-    public void setInitialValuesSent(boolean initialValuesSent) {
-      this.initialValuesSent = initialValuesSent;
+    public void setInitialValuesSent(int blockNumber, boolean initialValuesSent) {
+      this.initialValuesSent.put(blockNumber, initialValuesSent);
     }
 }

@@ -150,4 +150,16 @@ public class BooleanDataProcessor<T extends BooleanJECAdressSpace> extends Abstr
         return booleanAddressSpace;
     }
 
+    @Override
+    public void sendAllInBlock(int blockNumber) {
+      int startWord = blockNumber * (StdConstants.JEC_DATA_SIZE / 2);
+      int endWord = (blockNumber + 1) * (StdConstants.JEC_DATA_SIZE / 2);
+      for (int word = startWord; word < endWord; word++) {
+        for (int bit = 0; bit < WORD_LENGTH; bit++) {
+          sendTag(word, bit);
+        }
+      }
+      
+    }
+
 }

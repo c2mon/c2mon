@@ -268,15 +268,16 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
     
     /**
      * Sends the tag with the specified word and bit position to the server.
-     * 
+     *      
      * @param wordPosition The position of the word to send.
      * @param bitPosition The position of the bit to send.
      * analog values don't use that so it is ignored when searching for
      * the tag.
+     * @throws NullPointerException if no tag is associated with the word position
      */
     @Override
     public void sendTag(final int wordPosition, final int bitPosition) {
-        int word = getWord(wordPosition);
+        int word = getWord(wordPosition);     
         convertAndSend(word, getTag(wordPosition, -1), System.currentTimeMillis(), false);
     }
     
@@ -285,8 +286,9 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
      * 
      * @param wordPosition The position of the word to send.
      * @param bitPosition The position of the bit to send.
-     * analog values don't use that so it is ignored when searching for
+     * analog values don't use that so it is ignored when searching for     * 
      * the tag.
+     * @throws NullPointerException if no tag is associated with the word position
      */
     @Override
     public void revalidateTag(final int wordPosition, final int bitPosition) {
@@ -314,6 +316,16 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
     @Override
     public String getTagKey(final int wordId, final int bitId) {
         return super.getTagKey(wordId, -1);
+    }
+
+    @Override
+    public void sendAllInBlock(int blockNumber) {
+      int startWord = blockNumber * (StdConstants.JEC_DATA_SIZE / 2);
+      int endWord = (blockNumber + 1) * (StdConstants.JEC_DATA_SIZE / 2);
+      for (int wordId = startWord; wordId < endWord; wordId++) {
+        if (getTag(wordId, -1) != null)
+          sendTag(wordId, 0); //bit not used here
+      }      
     }
 
 }
