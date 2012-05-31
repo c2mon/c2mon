@@ -298,7 +298,10 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
                 } catch (InterruptedException interruptedEx) {
                     getEquipmentLogger().error("Reconnection waiting interrupted.", interruptedEx);
                 }
-        }        
+        }     
+        
+        getEquipmentLogger().info("Sending EquipmentState OK...");
+        getEquipmentMessageSender().confirmEquipmentStateOK();
 
         // Tries to start the method responsible for the JEC INITIALIZATION
         try {
@@ -330,10 +333,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
             
             //this thread ends
             return;
-        }
-        
-        getEquipmentLogger().info("Sending EquipmentState OK...");
-        getEquipmentMessageSender().confirmEquipmentStateOK();
+        }               
         
         runFrameAquisition();
         
