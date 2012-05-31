@@ -11,7 +11,7 @@
         <backupPolicy keepBackups="5">
           <preserve type="dir" name="tmp" />
           <preserve type="dir" name="conf/local" />
-          <preserve type="file" name="conf/*_log4j.xml" />
+<!--          <preserve type="file" name="conf/*_log4j.xml" />-->
         </backupPolicy>       
         <!--
 					Not supported by deploy tool! <directory name=""> <link
