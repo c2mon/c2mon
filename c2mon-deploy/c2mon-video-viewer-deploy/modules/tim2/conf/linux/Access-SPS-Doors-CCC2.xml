@@ -6,7 +6,7 @@
      The name of the video system that must also be defined in the database. Due to this
      information it is possible to determine the relevant data tag IDs.
     -->
-   <property name="video-system-name" type="java.lang.String" value="SPS_ACCESS_NKF"/>
+   <property name="video-system-name" type="java.lang.String" value="SPS_ACCESS_NKF_CCC_2"/>
 
 
    <!-- Put here the web link to the help page for the specific video viewer configuration -->
