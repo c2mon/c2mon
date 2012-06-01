@@ -321,6 +321,22 @@ public class TagManager implements CoreTagManager {
 
         return resultList;
     }
+    
+    @Override
+    public ClientDataTagValue getDataTag(final Long tagId) {
+      if (tagId == null) {
+        throw new NullPointerException("The tagId parameter cannot be null");
+      }
+      
+      Collection<Long> coll = new ArrayList<Long>(1);
+      coll.add(tagId);
+      Collection<ClientDataTagValue> resultColl = getDataTags(coll);
+      for(ClientDataTagValue cdt : resultColl) {
+        return cdt;
+      }
+    
+      return new ClientDataTagImpl(tagId);
+    }
 
     @Override
     public Collection<TagConfig> getTagConfigurations(final Collection<Long> tagIds) {

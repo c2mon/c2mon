@@ -95,17 +95,37 @@ public interface C2monTagManager {
   Set<Long> getAllSubscribedDataTagIds(final DataTagUpdateListener listener);
   
   /**
+   * Returns for the given id a copy of the cached data tag.
+   * If the tag is not in the local cache it will try to fetch it from the server.
+   * In case of an unknown tag id the result will be an empty {@link ClientDataTagValue}
+   * object.
+   * <p>
+   * <b>Please notice</b>, that this method call does not write anything to the local
+   * cache. This means that you might increase the server load when asking constantly
+   * for tags on which no {@link DataTagUpdateListener} is subscribed to. 
+   * 
+   * @param tagId A data tag id
+   * @return A <code>ClientDataTag</code> object
+   * @throws RuntimeException In case a communication problems with JMS or the C2MON server
+   *         occurs while trying to retrieve tag information.
+   * @see #getDataTags(Collection)
+   * @see #subscribeDataTags(Set, DataTagUpdateListener)
+   * @see C2monSupervisionManager#isServerConnectionWorking()
+   */
+  ClientDataTagValue getDataTag(final Long tagId);
+  
+  /**
    * Returns for every valid id of the list a copy of the cached data tag.
-   * If the value is not in the cache it will try to fetch it from the server.
-   * However, in case of a connection error or an unknown tag id the corresponding
-   * tag might be missing.<p>
-   * Please notice, that this method call does not write anything to the local
+   * If the value is not in the local cache it will try to fetch it from the server.
+   * However, in case of an unknown tag id the corresponding tag might be missing.
+   * <p>
+   * <b>Please notice</b>, that this method call does not write anything to the local
    * cache. This means that you might increase the server load when asking constantly
    * for tags on which no {@link DataTagUpdateListener} is subscribed to. 
    * 
    * @param tagIds A collection of data tag id's
    * @return A collection of all <code>ClientDataTag</code> objects
-   * @throws RuntimeException In case a communicatin problems with JMS or the C2MON server
+   * @throws RuntimeException In case a communication problems with JMS or the C2MON server
    *         occurs while trying to retrieve tag information.
    * @see #subscribeDataTags(Set, DataTagUpdateListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
