@@ -93,13 +93,14 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Override
   public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
     LOGGER.debug("Removing Equipment " + equipmentid);
-    try {
+    try {      
       Equipment equipment = equipmentCache.get(equipmentid);
+      //WARNING: outside equipment lock, as all these use methods that access a Process (to create ProcessChange object)!
+      removeEquipmentTags(equipment, equipmentReport);
+      removeEquipmentCommands(equipment, equipmentReport);
+      removeSubEquipments(equipment.getCopySubEquipmentIds(), equipmentReport);      
       equipment.getWriteLock().lock();
       try {
-        removeEquipmentTags(equipment, equipmentReport);
-        removeEquipmentCommands(equipment, equipmentReport);
-        removeSubEquipments(equipment.getCopySubEquipmentIds(), equipmentReport);
         equipmentConfigTransacted.doRemoveEquipment(equipment, equipmentReport);        
         equipment.getWriteLock().unlock();
         removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them; when this returns are removed from cache and DB permanently

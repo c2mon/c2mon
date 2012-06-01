@@ -87,10 +87,9 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
       subEquipment.getWriteLock().lock();      
       try {    
-        ProcessChange change = subEquipmentConfigTransacted.doRemoveSubEquipment(subEquipment, subEquipmentReport);        
-        removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB
-        //always *after* control tags are removed, or these could be pull alive back in
+        ProcessChange change = subEquipmentConfigTransacted.doRemoveSubEquipment(subEquipment, subEquipmentReport);
         subEquipment.getWriteLock().unlock();        
+        removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB        
         subEquipmentFacade.removeAliveTimer(subEquipmentId);
         subEquipmentFacade.removeCommFault(subEquipmentId);
         subEquipmentCache.remove(subEquipmentId);        
