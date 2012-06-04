@@ -30,6 +30,8 @@ import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.DataTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.DataTagCache;
+import cern.tim.server.cache.EquipmentFacade;
+import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.common.datatag.DataTag;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
@@ -62,6 +64,8 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
    * Cache for final removal.
    */
   private DataTagCache dataTagCache;
+  
+  private EquipmentFacade equipmentFacade;
 
   /**
    * Constructor.
@@ -69,8 +73,9 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
    * @param dataTagCache cache
    */
   @Autowired
-  public DataTagConfigHandlerImpl(DataTagCache dataTagCache) {        
+  public DataTagConfigHandlerImpl(DataTagCache dataTagCache, EquipmentFacade equipmentFacade) {        
     this.dataTagCache = dataTagCache;
+    this.equipmentFacade = equipmentFacade;
   }
 
   @Override
@@ -84,7 +89,14 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
   @Override
   public List<ProcessChange> removeDataTag(Long id, ConfigurationElementReport tagReport) {
     List<ProcessChange> changes = dataTagConfigTransacted.doRemoveDataTag(id, tagReport);
-    dataTagCache.remove(id); //only removed from cache is no exception is thrown
+    DataTag dataTag = dataTagCache.get(id);
+    dataTagCache.remove(id); //only removed from cache if no exception is thrown
+    //remove from Equipment list only once definitively removed from DB & cache (o.w. remove/recreate Process/Equipment cannot reach it)
+    try {
+      equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
+    } catch (CacheElementNotFoundException cacheEx) {
+      LOGGER.warn("Unable to locate Equipment with id " + dataTag.getEquipmentId() + "in the cache, when attempting to remove a Tag reference from it.");
+    }
     return changes;
   }
 

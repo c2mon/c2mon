@@ -183,14 +183,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
             alarmConfigHandler.removeAlarm(alarmId, alarmReport);
           }        
         }
-        configurableDAO.deleteItem(dataTag.getId());        
-        dataTag.getWriteLock().unlock();                
-        //outside above lock as locks equipment (lock hierarchy: never lock equipment after tag)
-        try {
-          equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
-        } catch (CacheElementNotFoundException cacheEx) {
-          LOGGER.warn("Unable to locate Equipment with id " + dataTag.getEquipmentId() + "in the cache, when attempting to remove a Tag reference from it.");
-        }      
+        configurableDAO.deleteItem(dataTag.getId());                
       } catch (Exception ex) {
         //commonTagFacade.setStatus(dataTag, Status.RECONFIGURATION_ERROR);
         elementReport.setFailure("Exception caught while removing datatag", ex);
