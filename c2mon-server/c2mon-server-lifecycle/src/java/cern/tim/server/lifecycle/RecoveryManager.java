@@ -138,10 +138,7 @@ public class RecoveryManager implements SmartLifecycle {
   public void recover() {
     if (!stopRequested) {      
       publishUnpublishedAlarms(); //unpublished alarms are sent to LASER
-    }
-    if (!stopRequested) {
-      refreshSupervisionStatus(); //generates new events with the current status; includes alarm callbacks!
-    }
+    }    
     if (!stopRequested) {
       refreshStateTags(); //updates the tags with the current status
     }
@@ -150,7 +147,11 @@ public class RecoveryManager implements SmartLifecycle {
     }
     if (!stopRequested) {      
       notifyAllTagCacheListeners(); //also refreshes rules but not alarms (done with supervision)
-    }    
+    }
+    //IMPORTANT: MUST BE CALLED LAST AS UPDATES TO RULES OR TAGS MAY HAVE OVERWRITTEN CURRENT SUPERVISION STATUS (AND ALARM "?" FOR INSTANCE)
+    if (!stopRequested) {
+      refreshSupervisionStatus(); //generates new events with the current status; includes alarm callbacks!; 
+    }
   }
   
   /**
@@ -187,7 +188,7 @@ public class RecoveryManager implements SmartLifecycle {
    * Asks for tag refresh from DAQ level (DAQ cache refresh).
    * Value already in cache will be filtered out.
    */
-  @ManagedOperation(description = "Refreshes DataTags from DAQ cache.")
+  @ManagedOperation(description = "Refreshes DataTags from DAQ cache. Refresh supervision status after this call!")
   public void refreshDataTags() {
     LOGGER.info("Recovery task: refreshing DataTags from DAQ (using DAQ cache).");
     dataRefreshManager.refreshTagsForAllProcess();  
@@ -202,7 +203,7 @@ public class RecoveryManager implements SmartLifecycle {
    * out here, as all rules are refreshes through DataTag and ControlTag
    * status confirmations).
    */
-  @ManagedOperation(description = "Notifies all Tag cache listeners (status confirmation).")
+  @ManagedOperation(description = "Notifies all Tag cache listeners (status confirmation). Refresh supervision status after this call!")
   public void notifyAllTagCacheListeners() {
     LOGGER.info("Recovery task: notifying all tag listeners.");
     for (Long key : controlTagCache.getKeys()) {
@@ -233,6 +234,10 @@ public class RecoveryManager implements SmartLifecycle {
    * This will re-persist all the cache to the cache DB account (TIMPRO); re-publish
    * all alarm values to the C2MON clients; publish unpublished alarms to LASER (these
    * should normally be picked up by the publication-check thread in any case).
+   * 
+   * <p>Notice that the alarm cache incorporates the current supervision status, unlike
+   * the Tag caches, so it is not necessary to refresh the supervision status after this
+   * call. 
    */
   @ManagedOperation(description = "Notifies all Alarm cache listeners (status confirmation).")
   public void notifyAllAlarmCacheListeners() {
