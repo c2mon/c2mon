@@ -81,7 +81,7 @@ if ( $sth->rows == 0 ) {
 	# print "No equipment types are defined in the current configuration.\n\n";
 }
 
-	my $entity_type = "COMPUTER";
+	my $entity_type = "EQUIPMENT";
 	system("rm -rf ${basedir}/${entity_type}" )  ;    # Drop previous structure
 	mkdir("${basedir}/${entity_type}");
 
