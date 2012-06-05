@@ -5,7 +5,7 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Config::Properties;
 use DBD::Oracle;
 use File::Path;
-use Cwd;
+use Cwd 'abs_path';
 
 ##
 # Definition of global variables
@@ -14,11 +14,12 @@ use Cwd;
 #find out the name of the home folder of the application
 #home folder is: cgi-bin/../
 
-my $cdir = getcwd;
+my $cdir =  abs_path($0);
+
 my @pathtokens = split(/\//,$cdir);
 
 # we are in cgi-bin folder, so the home folder is one level up
-my $appdir = @pathtokens[scalar(@pathtokens)-2];
+my $appdir = @pathtokens[scalar(@pathtokens)-3];
 
 my $basedir = "/user/dmndev/public_html/dmn2-views";
 my $codebase = "http://bewww/~dmndev";
@@ -250,7 +251,7 @@ sub fetchEntities {
 	my $entity_type = $_[0];
 
 	my $fetch_entities_sql = <<END;
-select COMPUTER_RULE_TAG_ID from DMN_COMPUTERS_V where COMPUTER_RULE_FLAG='Y'
+select EQUIPMENT_RULE_TAG_ID from DMNTEST.DMN_EQUIPMENT_V where EQUIPMENT_SINGLETON_FLAG='N'  
 END
 
 	my $sth = $dbh->prepare("${fetch_entities_sql}")
