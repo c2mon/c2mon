@@ -22,6 +22,7 @@ import java.util.Set;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
@@ -29,6 +30,7 @@ import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
+import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
@@ -163,15 +165,36 @@ public interface C2monTagManager {
   Collection<AlarmValue> getAllActiveAlarms();
   
   /**
-   * Applies the confifuration and returns a Configuration Report.
+   * Applies the configuration and returns a Configuration Report.
    * The values are fetched from the server.
    * However, in case of a connection error or an unknown configuration Id the corresponding
    * tag might be missing.
+   * 
+   * @see C2monTagManager#applyConfiguration(Long, ClientRequestReportListener) that also sends
+   * reports for the progress of the operation
    * 
    * @param configurationId The configuration id used to fetch the Configuration Report object
    * @return A Configuration Report object
    */  
   ConfigurationReport applyConfiguration(final Long configurationId);
+  
+  /**
+   * Applies the configuration and returns a Configuration Report.
+   * The values are fetched from the server.
+   * 
+   * Has an extra parameter that allows the caller
+   * to be informed for the progress of the operation.
+   * 
+   * However, in case of a connection error or an unknown configuration Id the corresponding
+   * tag might be missing.
+   * 
+   * @param configurationId The configuration id used to fetch the Configuration Report object
+   * @param reportListener Is informed about the progress of the operation on the server side.
+   * @see ClientRequestProgressReport
+   * @see ClientRequestErrorReport
+   * @return A Configuration Report object
+   */  
+  ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener);
   
   /**
    * Requests the DAQ config XML for a given process.
