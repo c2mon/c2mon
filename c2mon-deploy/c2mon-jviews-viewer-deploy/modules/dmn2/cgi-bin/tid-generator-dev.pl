@@ -146,7 +146,7 @@ sub fetchEquipmentAlives {
 	my $equipment_type = $_[2];
 
 	my $fetch_equipments_sql = <<END;
-select EQUIPMENT_ALIVE_TAG_ID from DMN_EQUIPMENT_V where process_id=
+select EQUIPMENT_ALIVE_TAG_ID from DMN_EQUIPMENT_V where equipment_alive_tag_id is not null and process_id=
 END
 
 	my $sth = $dbh->prepare("${fetch_equipments_sql} ${process_id}")
