@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -43,16 +44,30 @@ import cern.tim.shared.client.configuration.ConfigurationReport;
 public interface RequestHandler {
     
 
-    /**
-     * Queries the server for the latest values and configuration
-     * details for the request tags.
-     * 
-     * <p>If called with an empty collection returns an empty collection.
-     * 
-     * @param configurationId the id of the configuration report
-     * @return a Configuration Report
-     */
+  /**
+   * Applies the configuration and returns a Configuration Report.
+   * The values are fetched from the server.
+   * However, in case of a connection error or an unknown configuration Id the corresponding
+   * tag might be missing.
+   * 
+   * @param configurationId The configuration id used to fetch the Configuration Report object
+   * @return A Configuration Report object
+   */  
     ConfigurationReport applyConfiguration(Long configurationId);    
+    
+    /**
+     * Applies the configuration and returns a Configuration Report.
+     * The values are fetched from the server.
+     * However, in case of a connection error or an unknown configuration Id the corresponding
+     * tag might be missing.
+     * 
+     * @param configurationId The configuration id used to fetch the Configuration Report object
+     * @param reportListener Is informed about the progress of the operation on the server side.
+     * @see ClientRequestProgressReport
+     * @see ClientRequestErrorReport
+     * @return A Configuration Report object
+     */  
+    ConfigurationReport applyConfiguration(Long configurationId, ClientRequestReportListener reportListener);   
     
     /**
      * Queries the server for the latest values and configuration

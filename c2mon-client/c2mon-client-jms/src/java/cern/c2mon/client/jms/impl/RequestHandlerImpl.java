@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -134,7 +135,7 @@ public class RequestHandlerImpl implements RequestHandler {
     if (tagIds == null) {
       throw new NullPointerException("requestTags(..) method called with null parameter.");
     }
-    return executeRequest(tagIds, TagUpdate.class);
+    return executeRequest(tagIds, TagUpdate.class, null);
   }
 
   @Override
@@ -142,7 +143,7 @@ public class RequestHandlerImpl implements RequestHandler {
     if (alarmIds == null) {
       throw new NullPointerException("requestAlarms(..) method called with null parameter.");
     }
-    return executeRequest(alarmIds, AlarmValue.class);
+    return executeRequest(alarmIds, AlarmValue.class, null);
   }
   
   @Override
@@ -164,15 +165,21 @@ public class RequestHandlerImpl implements RequestHandler {
     if (commandIds == null) {
       throw new NullPointerException("requestTags(..) method called with null parameter.");
     }
-    return executeRequest(commandIds, CommandTagHandle.class);
+    return executeRequest(commandIds, CommandTagHandle.class, null);
   }
   
   @Override
   public ConfigurationReport applyConfiguration(final Long configurationId) {
+    
+    return applyConfiguration(configurationId, null);
+  }
+  
+  @Override
+  public ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener) {
     ArrayList<Long> ids = new ArrayList<Long>();
     ids.add(configurationId);
 
-    Collection<ConfigurationReport> report = executeRequest(ids, ConfigurationReport.class);
+    Collection<ConfigurationReport> report = executeRequest(ids, ConfigurationReport.class, reportListener);
 
     if (report.isEmpty()) {
       final String errorMsg = "applyConfiguration returned an empty Collection";
@@ -193,7 +200,7 @@ public class RequestHandlerImpl implements RequestHandler {
     if (tagIds == null) {
       throw new NullPointerException("requestTagConfigurations(..) method called with null parameter.");
     }
-    return executeRequest(tagIds, TagConfig.class);
+    return executeRequest(tagIds, TagConfig.class, null);
   }
 
   @Override
@@ -201,7 +208,7 @@ public class RequestHandlerImpl implements RequestHandler {
     if (tagIds == null) {
       throw new NullPointerException("requestTagValues(..) method called with null parameter.");
     }
-    return executeRequest(tagIds, TagValueUpdate.class);
+    return executeRequest(tagIds, TagValueUpdate.class, null);
   }
 
   /**
@@ -216,7 +223,9 @@ public class RequestHandlerImpl implements RequestHandler {
    *          type of request result
    * @return the result of the request
    */
-  private <T extends ClientRequestResult> Collection<T> executeRequest(final Collection<Long> ids, final Class<T> clazz) {
+  private <T extends ClientRequestResult> Collection<T> executeRequest(
+      final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener) {
+    
     LOGGER.debug("Initiating client request.");
     ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);
     Iterator<Long> it = ids.iterator();
@@ -227,7 +236,7 @@ public class RequestHandlerImpl implements RequestHandler {
         clientRequest.addTagId(it.next());
         counter++;
       }
-      RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest);
+      RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest, reportListener);
       results.add(executor.submit(task));
       clientRequest = new ClientRequestImpl<T>(clazz);
       counter = 0;
@@ -302,15 +311,32 @@ public class RequestHandlerImpl implements RequestHandler {
    */
   private class RequestValuesTask<T extends ClientRequestResult> implements Callable<Collection<T>> {
 
+    /** The request. */
     private ClientRequestImpl<T> clientRequest;
+    
+    /** Receives updates for the progress of the request. */
+    private ClientRequestReportListener reportListener;
 
-    public RequestValuesTask(ClientRequestImpl<T> clientRequest) {
+    /**
+     * @param clientRequest The request.
+     * @param reportListener Receives updates for the progress of the request.
+     */
+    public RequestValuesTask(final ClientRequestImpl<T> clientRequest, final ClientRequestReportListener reportListener) {
       this.clientRequest = clientRequest;
+      this.reportListener = reportListener;
+    }
+    
+    /**
+     * @param clientRequest The request.
+     */
+    public RequestValuesTask(final ClientRequestImpl<T> clientRequest) {
+      this.clientRequest = clientRequest;
+      this.reportListener = null; // can be null in case we don't care about the progress of the request.
     }
 
     @Override
     public Collection<T> call() throws Exception {
-      return jmsProxy.sendRequest(clientRequest, requestQueue, clientRequest.getTimeout());
+      return jmsProxy.sendRequest(clientRequest, requestQueue, clientRequest.getTimeout(), reportListener);
     }
   }
 
