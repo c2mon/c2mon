@@ -47,8 +47,11 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.JsonSyntaxException;
+
 import cern.accsoft.commons.util.proc.ProcUtils;
 import cern.accsoft.commons.util.proc.ProcessInfo;
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.client.jms.AdminMessageListener;
 import cern.c2mon.client.jms.AlarmListener;
@@ -57,6 +60,9 @@ import cern.c2mon.client.jms.HeartbeatListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
+import cern.c2mon.shared.client.request.ClientRequestErrorReport;
+import cern.c2mon.shared.client.request.ClientRequestProgressReport;
+import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 import cern.tim.shared.client.command.CommandExecuteRequest;
@@ -285,7 +291,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       ThreadFactory defaultFactory = Executors.defaultThreadFactory();
 
       @Override
-      public Thread newThread(Runnable r) {
+      public Thread newThread(final Runnable r) {
         Thread returnThread = defaultFactory.newThread(r);
         returnThread.setDaemon(true);
         return returnThread;
@@ -456,6 +462,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
   /**
    * Subscribes to the alarm topic.
+   * @throws JMSException if problem subscribing
    */
   private void subscribeToAlarmTopic() throws JMSException {
     alarmSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -464,6 +471,10 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     LOGGER.debug("Successfully subscribed to alarm topic");
   }
 
+  /**
+   * Unsubscribes from the alarm topic.
+   * @throws JMSException if problem subscribing
+   */
   private void unsubscribeFromAlarmTopic() throws JMSException {
 
     alarmSession.close();
@@ -476,6 +487,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   /**
    * Subscribes to the heartbeat topic. Called when refreshing all
    * subscriptions.
+   * @throws JMSException if problem subscribing
    */
   private void subscribeToHeartbeatTopic() throws JMSException {
     Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -488,7 +500,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * connection goes down.
    * 
    * @throws JMSException
-   *           if unable to subsribe
+   *           if unable to subscribe
    */
   private void subscribeToAdminMessageTopic() throws JMSException {
     if (adminMessageTopic != null) {
@@ -503,7 +515,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * connection goes down.
    * 
    * @throws JMSException
-   *           if unable to subsribe
+   *           if unable to subscribe
    */
   private void subscribeToSupervisionTopic() throws JMSException {
     Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -529,8 +541,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       listenerLock.lock();
       try {
         if (!isRegisteredListener(serverUpdateListener)) { // throw exception if
-                                                           // TagUpdateListener
-                                                           // null
+          // TagUpdateListener
+          // null
           try {
             if (connected) {
               String topicName = topicRegistrationDetails.getTopicName();
@@ -611,15 +623,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       throw new JMSException("Not currently connected: unable to send message at this time.");
     }
   }
-
-  /**
-   * ActiveMQ-specific implementation since need to create topic.
-   * 
-   * @return a Collection of ClientRequestResults
-   */
+  
   @Override
-  public <T extends ClientRequestResult> Collection<T> sendRequest(final JsonRequest<T> jsonRequest, final String queueName, final int timeout)
-      throws JMSException {
+  public <T extends ClientRequestResult> Collection<T> sendRequest(
+      final JsonRequest<T> jsonRequest, final String queueName, final int timeout,
+      final ClientRequestReportListener reportListener) throws JMSException {
+
     if (queueName == null) {
       throw new NullPointerException("sendRequest(..) method called with null queue name argument");
     }
@@ -632,8 +641,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
         Message message = null;
 
-        if (jsonRequest.isObjectRequest()) { // used for
-                                             // EXECUTE_COMMAND_REQUESTS
+        if (jsonRequest.isObjectRequest()) { // used for EXECUTE_COMMAND_REQUESTS
 
           // send only the object
           CommandExecuteRequest o = (CommandExecuteRequest) jsonRequest.getObjectParameter();
@@ -653,22 +661,28 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
           producer.setTimeToLive(JMS_MESSAGE_TIMEOUT);
           producer.send(message);
-          Message replyMessage = consumer.receive(timeout);
-          if (replyMessage == null) {
-            LOGGER.error("No reply received from server on ClientRequest. I was waiting for " + timeout + " milliseconds..");
-            throw new RuntimeException("No reply received from server - possible timeout?");
+
+          while (true) { // until we receive the result 
+            // (it is possible to receive progress and / or error reports during this process)
+
+            Message replyMessage = consumer.receive(timeout);
+            if (replyMessage == null) {
+              LOGGER.error("No reply received from server on ClientRequest. I was waiting for " + timeout + " milliseconds..");
+              throw new RuntimeException("No reply received from server - possible timeout?");
+            }
+
+            if (replyMessage instanceof ObjectMessage) {
+              return (Collection<T>) ((ObjectMessage) replyMessage).getObject();
+            }
+            else {
+              // replyMessage is an instanceof TextMessage (json)
+              TextMessage textMessage = (TextMessage) (replyMessage);
+
+              Collection<T> resultCollection = handleJsonResponse(textMessage, jsonRequest, reportListener);
+              if (resultCollection != null)
+                return resultCollection;
+            }
           }
-
-          if (replyMessage instanceof ObjectMessage) {
-
-            return (Collection<T>) ((ObjectMessage) replyMessage).getObject();
-          }
-
-          else
-            // replyMessage is an instanceof TextMessage
-
-            return jsonRequest.fromJsonResponse(((TextMessage) replyMessage).getText());
-
         } finally {
           if (consumer != null) {
             consumer.close();
@@ -681,6 +695,85 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     } else {
       throw new JMSException("Not currently connected: unable to send request at this time.");
     }
+  }
+
+  /**
+   * ActiveMQ-specific implementation since need to create topic.
+   * @return a Collection of ClientRequestResults
+   */
+  @Override
+  public <T extends ClientRequestResult> Collection<T> sendRequest(
+      final JsonRequest<T> jsonRequest, final String queueName, final int timeout)
+        throws JMSException {
+    
+    ClientRequestReportListener reportListener = null; // we don't care about reports!
+    return sendRequest(jsonRequest, queueName, timeout, reportListener);
+  }
+
+  /**
+   * In case a JsonResponse has been received.
+   * This can either be the final Result or a Report on the progress of the request.
+   * @param jsonMessage the received message.
+   * @param jsonRequest the original request. useful to decode the message
+   * @param reportListener informed in case a Report is received. Can be null 
+   * in case no one cares about the progress of this request.
+   * @param <T> type returned depends on the ClientRequest type.
+   * @return a Collection of ClientRequestResults. 
+   * @throws JMSException if problem subscribing
+   */
+  private <T extends ClientRequestResult> Collection<T> handleJsonResponse(
+      final TextMessage jsonMessage, final JsonRequest<T> jsonRequest, final ClientRequestReportListener reportListener) 
+      throws JsonSyntaxException, JMSException {
+    
+    Collection<T> resultCollection = jsonRequest.fromJsonResponse(jsonMessage.getText());
+    if (resultCollection.isEmpty()) // if the result is empty ->
+      return resultCollection; // we cannot do much with it
+
+    ClientRequestResult result = resultCollection.iterator().next(); // lets take the first element and check if it is a report
+    if (!(result instanceof ClientRequestReport)) // this should never happen -> we don't know how to handle this
+      return null; // lets skip it and assume everything is fine
+
+    ClientRequestReport report = (ClientRequestReport) result;
+    if (isResult(report)) // received the result!
+      return resultCollection; // bye - bye!
+    else { // received a report -> 
+      handleJsonReportResponse(report, reportListener); // let's handle the report! still waiting for the result though
+      return null;
+    }
+  }
+
+  /**
+   * Informs the listener in case a report is received.
+   * @param report the received report.
+   * @param reportListener the listener to be informed. Can be null in case no one cares about this report.
+   */
+  private void handleJsonReportResponse(final ClientRequestReport report, final ClientRequestReportListener reportListener) {
+
+    if (reportListener == null) { // is someone waiting for the report?
+      LOGGER.debug("handleJsonReportResponse(): Received a report, but no reportListener is registered. Ignoring..");
+      return;
+    }
+
+    if (report.isErrorReport()) {
+      LOGGER.debug("handleJsonReportResponse(): Received an error report. Informing listener.");
+      reportListener.onErrorReportReceived((ClientRequestErrorReport) report);
+    }
+    else if (report.isProgressReport()) {
+      LOGGER.debug("handleJsonReportResponse(): Received a progress report. Informing listener.");
+      reportListener.onProgressReportReceived((ClientRequestProgressReport) report);
+    }
+    else
+      LOGGER.warn("handleJsonReportResponse(): Received a report of unknown type. Ignoring..");
+  }
+
+  /**
+   * The server's response can either be a report or the actual result.
+   * @param clientRequestReport the response to be checked
+   * @return True if the final result is received, false in case a report has been received.
+   */
+  private boolean isResult(final ClientRequestReport clientRequestReport) {
+
+    return clientRequestReport.isResult();
   }
 
   @Override
@@ -780,7 +873,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       throw new NullPointerException("Trying to register null alarm listener with JmsProxy.");
     }
     if (alarmListenerWrapper.getListenerCount() == 0) { // this is our first
-                                                        // listener!
+      // listener!
       // -> it's time to subscribe to the alarm topic
       try {
         subscribeToAlarmTopic();
@@ -799,7 +892,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     }
 
     if (alarmListenerWrapper.getListenerCount() == 1) { // this is our last
-                                                        // listener!
+      // listener!
       // -> it's time to unsubscribe from the topic
       try {
         unsubscribeFromAlarmTopic();
@@ -893,5 +986,4 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     returnMap.put(heartbeatTopic.toString(), heartbeatListenerWrapper.getQueueSize());
     return returnMap;
   }
-
 }

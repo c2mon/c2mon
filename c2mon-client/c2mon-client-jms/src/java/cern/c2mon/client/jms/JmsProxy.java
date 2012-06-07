@@ -22,7 +22,9 @@ import java.util.Collection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 
@@ -150,7 +152,28 @@ public interface JmsProxy {
    * @throws RuntimeException if the response from the server is null (probable timeout)
    * @throws NullPointerException thrown if either argument is null
    */
-  <T extends ClientRequestResult> Collection<T> sendRequest(JsonRequest<T> jsonRequest, String queueName,int timeout) throws JMSException;
+  <T extends ClientRequestResult> Collection<T> sendRequest(JsonRequest<T> jsonRequest, String queueName, int timeout) throws JMSException;
+  
+  /**
+   * Send a request to the server and wait "timeout" milliseconds for a response.
+   * 
+   * <p>Never returns null.
+   * 
+   * @param jsonRequest the request object, convertible to Json format
+   * @param queueName the name of the queue on which to send this request
+   * @param timeout the time to wait for a response (in milliseconds); 
+   *                            if no response arrives in this time, a NullPointerException is thrown
+   * @param reportListener Receives updates for <code>ClientRequestProgressReport</code> and <code>ClientRequestErrorReport</code>
+   * @param <T> the type of the response expected (inside the collection)
+   *                            
+   * @return the response to the request (never null)
+   * @throws JMSException if not currently connected or 
+   *                      if a JMS problem occurs while making the request (reconnection is handled by the JmsProxy)
+   * @throws RuntimeException if the response from the server is null (probable timeout)
+   * @throws NullPointerException thrown if either argument is null
+   */
+  <T extends ClientRequestResult> Collection<T> sendRequest(JsonRequest<T> jsonRequest, String queueName, int timeout, 
+      ClientRequestReportListener reportListener) throws JMSException;
 
   /**
    * Register a listener for connection/disconnection events.
