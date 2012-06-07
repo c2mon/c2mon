@@ -32,6 +32,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
@@ -93,7 +94,10 @@ public class RequestHandlerImplTest {
   @Test
   public void getTagValues() throws JMSException, InterruptedException {
     Collection<Object> returnCollection = Arrays.asList(new Object());
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(returnCollection);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), 
+        EasyMock.eq("request queue"), EasyMock.eq(10000),
+          (ClientRequestReportListener) EasyMock.isNull()
+            )).andReturn(returnCollection);
 
     EasyMock.replay(jmsProxy);
 
@@ -124,7 +128,10 @@ public class RequestHandlerImplTest {
   @Test
   public void getTags() throws JMSException, InterruptedException {
     Collection<Object> returnCollection = Arrays.asList(new Object());
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(returnCollection);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class),
+        EasyMock.eq("request queue"), EasyMock.eq(10000),
+          (ClientRequestReportListener) EasyMock.isNull()
+        )).andReturn(returnCollection);
 
     EasyMock.replay(jmsProxy);
 
@@ -140,7 +147,10 @@ public class RequestHandlerImplTest {
   @Test
   public void getManyTags() throws JMSException {
     Collection<Object> returnCollection = Arrays.asList(new Object(), new Object());
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(10000))).andReturn(returnCollection).times(100);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), 
+        EasyMock.eq("request queue"), EasyMock.eq(10000),
+        (ClientRequestReportListener) EasyMock.isNull()
+            )).andReturn(returnCollection).times(100);
 
     EasyMock.replay(jmsProxy);
 
