@@ -105,6 +105,11 @@
       <artifactId>slf4j-api</artifactId>
       <version>1.6.0</version>
     </dependency>
+    <dependency>
+    	<groupId>org.apache.tomcat</groupId>
+    	<artifactId>servlet-api</artifactId>
+    	<version>6.0.35</version>
+    </dependency>
   
     <!-- Test dependencies -->
     <dependency>
