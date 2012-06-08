@@ -1,0 +1,14 @@
+
+<h2>Metric Info</h2>
+<font size="2">
+<table border="0" cellspacing="0" cellpadding="2">
+	<#list children as ctag>
+		<tr><td>Name:</td><td>${ctag.tagName}</td>
+		<td>ID:</td><td><a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${ctag.tagId}">${ctag.tagId}</a></td>
+		<td>Value:</td><td>${ctag.tagValue} ${ctag.tagValueDescription}</td>
+		<td>Tag Description:</td><td>${ctag.tagDescription}</td>
+		<td>Server Time:</td><td>${ctag.tagServerTimestamp}</td>
+		<td>&nbsp;</td><td>&nbsp;</td></tr>
+	</#list>
+</table>
+</font>

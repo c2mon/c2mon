@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+
+	<product>
+
+		<application name="default">
+			<deployment installLocation="/opt/c2mon/notifier">
+				<directory name="conf"/>
+				<directory name="log"/>
+			</deployment>
+			<startscript>
+				<main-class name="cern.c2mon.notifier.Main" />
+				<property name="log4j.configuration" value="conf/log4j.properties" />
+				<property name="server-context" value="conf/context.xml" />
+			</startscript>
+		</application>
+
+		
+		<application name="dmn2-notifier" >
+			<deployment installLocation="/opt/c2mon/c2mon-dmn2-notifier"></deployment>
+			<startscript>
+				<property name="c2mon.client.conf.url" value="http://abwww/~diamonop/c2mon/dev/client/client.properties"/>
+			</startscript>
+		</application>
+		
+		<application name="dmn2-notifier-dev" >
+			<deployment installLocation="/opt/c2mon/c2mon-dmn2-notifier-dev"></deployment>
+			<property name="c2mon.client.conf.url" value="http://abwww/~diamonop/c2mon/dev/client/client.properties"/>
+		</application>
+
+	</product>
+
+</products>

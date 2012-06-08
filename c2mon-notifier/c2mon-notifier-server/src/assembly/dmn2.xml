@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+	<id>install</id>
+
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+
+	<!--  do not include base directory -->
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<componentDescriptors>
+		<!-- 
+		<componentDescriptor>src/assembly/c2mon-srv-common-assembly.xml
+		</componentDescriptor>
+		 -->
+	</componentDescriptors>
+
+	<files>
+		<file>
+			<source>${basedir}/src/java/cern/c2mon/notification/context.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>context.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  copy changelog -->
+		<file>
+			<source>${basedir}/changelog.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>changelog.txt</destName>
+			<fileMode>0444</fileMode>
+			<lineEnding>unix</lineEnding>
+		</file>
+
+		<!--  deployment descriptor -->
+		<file>
+			<source>${basedir}/conf/deployment.xml</source>
+			<outputDirectory>/</outputDirectory>
+			<destName>deployment.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+		<!--  log4j configuration -->
+		<file>
+			<source>${basedir}/deployment/conf/log4j.properties</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>log4j.properties</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+
+	</files>
+
+</assembly>
