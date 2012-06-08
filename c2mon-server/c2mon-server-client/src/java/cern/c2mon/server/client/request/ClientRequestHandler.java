@@ -22,12 +22,14 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
+import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
 import cern.c2mon.shared.client.request.ClientRequest;
+import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.ProcessCache;
@@ -58,7 +60,7 @@ import com.google.gson.Gson;
  * @author Matthias Braeger
  */
 @Service("clientRequestHandler")
-public class ClientRequestHandler implements SessionAwareMessageListener<Message> {
+public class ClientRequestHandler implements SessionAwareMessageListener<Message>{
 
   /** Private class logger */
   private static final Logger LOG = Logger.getLogger(ClientRequestHandler.class);
@@ -152,12 +154,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    */
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
+
     if (LOG.isDebugEnabled()) {
       LOG.debug("onMessage() : Client request received.");
     }
-    ClientRequest clientRequest = ClientRequestMessageConverter.fromMessage(message);
-    try {
-      Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest);   
+    try { 
       Destination replyDestination = null;
       try {
         replyDestination = message.getJMSReplyTo();
@@ -165,6 +166,10 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         LOG.error("onMessage() : Cannot extract ReplyTo from message.", jmse);
         throw jmse;
       }
+
+      ClientRequest clientRequest = ClientRequestMessageConverter.fromMessage(message);
+      Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest, session, replyDestination);  
+
       if (replyDestination != null) {
 
         MessageProducer messageProducer = session.createProducer(replyDestination);    
@@ -200,17 +205,20 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       LOG.error("Exception caught while processing client request - unable to process it; request will time out", e);
     }    
   }
-
+  
   /**
    * Inner method for handling requests. Therefore it has to get for all tag ids
    * mentioned in that request the tag and alarm referenses.
    * 
-   * @param clientRequest
-   *          The request
+   * @param clientRequest The request
+   * @param session Used by the ReportHandler to send reports
+   * @param replyDestination Used by the ReportHandler to send reports
    * @return The response that shall be transfered back to the C2MON client
    *         layer
    */
-  private Collection< ? extends ClientRequestResult> handleClientRequest(@Valid final ClientRequest clientRequest) {
+  private Collection< ? extends ClientRequestResult> handleClientRequest(
+      @Valid final ClientRequest clientRequest, final Session session, final Destination replyDestination) {
+
     switch (clientRequest.getRequestType()) {
 
       case TAG_CONFIGURATION_REQUEST:
@@ -223,7 +231,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         if (LOG.isDebugEnabled()) {
           LOG.debug("handleClientRequest() - Received an APPLY_CONFIGURATION_REQUEST with " + clientRequest.getTagIds().size() + " configurations.");
         }
-        return handleConfigurationReportRequest(clientRequest);
+        return handleConfigurationReportRequest(clientRequest, session, replyDestination);
       case TAG_REQUEST:
         if (LOG.isDebugEnabled()) {
           LOG.debug("handleClientRequest() - Received a TAG_REQUEST for " + clientRequest.getTagIds().size() + " tags.");
@@ -354,7 +362,8 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @return Configuration Report
    */
   @SuppressWarnings("unchecked")
-  private Collection< ? extends ClientRequestResult> handleConfigurationReportRequest(final ClientRequest configurationRequest) {
+  private Collection< ? extends ClientRequestResult> handleConfigurationReportRequest(
+      final ClientRequest configurationRequest, final Session session, final Destination replyDestination) {
 
     // !!! TagId field is also used for Configuration Ids
     final Iterator<Long> iter = configurationRequest.getTagIds().iterator();
@@ -366,7 +375,8 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
       switch (configurationRequest.getResultType()) {
         case TRANSFER_CONFIGURATION_REPORT:
-          reports.add(configurationLoader.applyConfiguration(configId));
+          ClientRequestReportHandler reportHandler = new ClientRequestReportHandler(session, replyDestination, DEFAULT_REPLY_TTL);
+          reports.add(configurationLoader.applyConfiguration(configId, reportHandler));
           if (LOG.isDebugEnabled()) {
             LOG.debug("Finished processing reconfiguration request with id " + configId);
           }
@@ -450,7 +460,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       final Alarm alarm = alarmCache.getCopy(alarmKey);
 
       if (alarm.isActive()) {
-        
+
         Long tagId = alarm.getTagId();
         if (tagLocationService.isInTagCache(tagId)) {
           Tag tag = tagLocationService.getCopy(tagId);
