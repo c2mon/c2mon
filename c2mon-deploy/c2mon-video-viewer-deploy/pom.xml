@@ -27,6 +27,9 @@
 		<module>modules/tim2</module>
 	</modules>
 
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-video-viewer-deploy</developerConnection>
+	</scm>
 	<build/>
 
 </project>
