@@ -15,6 +15,12 @@
     </application>
 
     <application name="tim2-video-viewer-test" extends="default">
+      <deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-video-viewer-stable">
+        <signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
+      </deployment>
+    </application>
+    
+    <application name="tim2-video-viewer-dev" extends="default">
       <deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-video-viewer">
         <signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
       </deployment>
