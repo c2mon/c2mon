@@ -157,7 +157,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Listener exclusive lock, to prevent concurrent subscription/unsubscription of listeners.
    */
   private ReentrantReadWriteLock.WriteLock listenerLock;
-  
+
   /**
    * Listeners that need informing about JMS connection and disconnection
    * events.
@@ -623,7 +623,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       throw new JMSException("Not currently connected: unable to send message at this time.");
     }
   }
-  
+
   @Override
   public <T extends ClientRequestResult> Collection<T> sendRequest(
       final JsonRequest<T> jsonRequest, final String queueName, final int timeout,
@@ -704,8 +704,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   @Override
   public <T extends ClientRequestResult> Collection<T> sendRequest(
       final JsonRequest<T> jsonRequest, final String queueName, final int timeout)
-        throws JMSException {
-    
+      throws JMSException {
+
     ClientRequestReportListener reportListener = null; // we don't care about reports!
     return sendRequest(jsonRequest, queueName, timeout, reportListener);
   }
@@ -724,22 +724,22 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   private <T extends ClientRequestResult> Collection<T> handleJsonResponse(
       final TextMessage jsonMessage, final JsonRequest<T> jsonRequest, final ClientRequestReportListener reportListener) 
       throws JsonSyntaxException, JMSException {
-    
+
     Collection<T> resultCollection = jsonRequest.fromJsonResponse(jsonMessage.getText());
     if (resultCollection.isEmpty()) // if the result is empty ->
       return resultCollection; // we cannot do much with it
 
     ClientRequestResult result = resultCollection.iterator().next(); // lets take the first element and check if it is a report
-    if (!(result instanceof ClientRequestReport)) // this should never happen -> we don't know how to handle this
-      return null; // lets skip it and assume everything is fine
-
-    ClientRequestReport report = (ClientRequestReport) result;
-    if (isResult(report)) // received the result!
-      return resultCollection; // bye - bye!
-    else { // received a report -> 
-      handleJsonReportResponse(report, reportListener); // let's handle the report! still waiting for the result though
-      return null;
+    if ((result instanceof ClientRequestReport)) { // this can either be a Report or the actual Result
+      ClientRequestReport report = (ClientRequestReport) result;
+      if (isResult(report)) // received the result!
+        return resultCollection; // bye - bye!
+      else { // received a report -> 
+        handleJsonReportResponse(report, reportListener); // let's handle the report! still waiting for the result though
+        return null;
+      }
     }
+    return resultCollection;
   }
 
   /**
