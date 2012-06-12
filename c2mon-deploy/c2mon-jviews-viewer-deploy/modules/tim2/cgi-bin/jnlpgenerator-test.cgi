@@ -74,7 +74,6 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
     <homepage href=\"tim-viewer/index.html\"/>
     <description>The combined GTPM and synoptic viewer</description>
     <icon kind=\"splash\" href=\"http://timweb.cern.ch/img/tim-animated-320x200.gif\"/>
-    <offline-allowed />
   </information>
   <security> 
     <all-permissions/> 
