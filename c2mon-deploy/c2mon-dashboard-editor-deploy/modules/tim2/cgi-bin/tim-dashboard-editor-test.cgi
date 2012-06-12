@@ -8,9 +8,9 @@ use Config::Properties;
 # Definition of global variables
 #
 my $jardir                    = "../lib";
-my $appdir                    = "tim2-dashboard-editor/";
+my $appdir                    = "tim2-dashboard-editor-stable/";
 # Default codebase points to operation
-my $codebase                  = "http://timweb.cern.ch/javaws";
+my $codebase                  = "http://timweb.cern.ch/test/javaws";
 my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
 my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
 
@@ -22,6 +22,13 @@ open VFILE, "< ../version.txt"
 my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
+
+##
+# In case of a SNAPSHOT
+#
+if ($viewerVersion =~ /-SNAPSHOT/) {
+  $appdir = "tim2-dashboard-editor/";
+}
 
 ##
 # Reading C2MON Client properties file #
@@ -78,7 +85,7 @@ print "Content-type: application/x-java-jnlp-file" , "\n\n";
 print "<?xml version = '1.0' encoding = 'utf-8'?>
   <jnlp spec=\"1.0+\" codebase=\"$codebase\">
   <information>
-    <title>TIM Dashboard Editor (Version $viewerVersion)</title>
+    <title>TIM Dashboard Editor TEST (Version $viewerVersion)</title>
     <vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
     <homepage href=\"http://timweb.cern.ch\"/>
     <description>This application is based on the IBM ILOG Dashboard Editor and allows users to draw dashboard diagrams for the TIM Viewer.</description>
