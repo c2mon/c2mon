@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="dmn2-snmp-service">
+
+		<!--
+			this application section is a parent configuration for both
+			c2mon-dmn2-prod and c2mon-dmn2-test
+		-->
+		<application name="default">
+
+			<startscript name="DMN2-SNMP-SERVICE">
+				<main-class name="cern.accsoft.diamon.DiamonSnmpService">
+
+					<output>
+						<file name="out.log" />
+					</output>
+
+				</main-class>
+
+				<!--  run job once per minute -->
+				<property name="snmpservice.verification.interval" value="60000" />
+
+				<property name="log4j.configuration" value="file:${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="c2mon.process.name" value="dmn2-snmp-service" />
+				<property name="c2mon.log.dir" value="${INSTALL_DIR}/log" />
+
+			</startscript>
+
+			<deployment installLocation="/opt/dmn2-snmp-service">
+				<backupPolicy keepBackups="2">
+					<preserve type="dir" name="log" />
+				</backupPolicy>
+			</deployment>
+
+		</application>
+
+		<application name="dmn2-snmp-service-pro" extends="default">
+
+			<deployment>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="project-diamon-core@cern.ch" />
+				</notification>
+			</deployment>
+
+		</application>
+
+		<application name="dmn2-snmp-service-test" extends="default">
+			<!--  no notifications on test -->
+		</application>
+
+
+	</product>
+</products>

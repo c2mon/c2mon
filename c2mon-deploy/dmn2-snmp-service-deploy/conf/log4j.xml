@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration debug="false" threshold="debug"
+	xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+	<!--
+		Create a RollingFileAppender. Log messages are written to the file
+		specified in the ${tim.log.file} system property. The file size is
+		limited to 10MB; once this size is reached the file is truncated and
+		backed up and a new file is started. If the specified file cannot be
+		opened or the ${tim.log.file} property has not been specified on the
+		command line, the FallbackFileAppender is used instead.
+	-->
+	<appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
+		<errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
+			<root-ref />
+			<appender-ref ref="FallbackConsoleAppender" />
+		</errorHandler>
+		<param name="Append" value="true" />
+		<param name="File" value="${c2mon.log.dir}/${c2mon.process.name}.log" />
+		<param name="MaxBackupIndex" value="5" />
+		<param name="MaxFileSize" value="30MB" />
+		<param name="BufferedIO" value="false" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n" />
+		</layout>
+	</appender>
+
+	<!--
+		Create a ConsoleAppender. Log messages are written to the console in
+		case neither the FileAppender nor the FallbackFileAppender work.
+	-->
+	<appender name="FallbackConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="cern.accsoft.diamon" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="FileAppender" />
+	</logger>
+
+	<root>
+		<level value="debug" />
+		<appender-ref ref="FileAppender" />
+	</root>
+
+</log4j:configuration>
