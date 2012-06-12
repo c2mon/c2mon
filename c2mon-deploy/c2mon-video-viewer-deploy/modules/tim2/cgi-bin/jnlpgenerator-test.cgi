@@ -8,8 +8,8 @@ use Config::Properties;
 # Definition of global variables
 #
 my $jardir                    = "../lib";
-my $appdir                    = "tim2-video-viewer/";
-my $codebase                  = "http://timweb/javaws";
+my $appdir                    = "tim2-video-viewer-stable/";
+my $codebase                  = "http://timweb/test/javaws";
 my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
 my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
 
@@ -21,6 +21,13 @@ open VFILE, "< ../version.txt"
 my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
+
+##
+# In case of a SNAPSHOT version
+#
+if ($viewerVersion =~ /-SNAPSHOT/) {
+  $appdir = "tim2-video-viewer/";
+}
 
 # Reading property file $c2monClientPropertiesFile #
 open PROPS, "< $c2monClientPropertiesFile"
@@ -72,7 +79,7 @@ print "Content-type: application/x-java-jnlp-file" , "\n\n";
 print "<?xml version = '1.0' encoding = 'utf-8'?>
   <jnlp spec=\"1.0+\" codebase=\"$codebase\">
   <information>
-    <title>TIM Video Viewer (Version $viewerVersion)</title>
+    <title>TIM Video Viewer TEST (Version $viewerVersion)</title>
     <vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
     <homepage href=\"http://timweb.cern.ch\"/>
     <description>Used in CCC to monitor the access to PS and SPS the tunnels</description>
