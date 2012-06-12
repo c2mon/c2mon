@@ -47,10 +47,10 @@ sub jarlist {
 		}
 		else {
  			if (/tim-jviews-viewer.jar$/) {
-    				print "		<jar href=\"", $htmldir, "\" main=\"true\" download=\"eager\"/>\n";
+    				print "    <jar href=\"", $htmldir, "\" main=\"true\" download=\"eager\"/>\n";
 			}
  			elsif (/jar$/) {
-    				print "		<jar href=\"", $htmldir, "\" main=\"false\" download=\"eager\"/>\n";
+    				print "    <jar href=\"", $htmldir, "\" main=\"false\" download=\"eager\"/>\n";
 			}
 		}
     		next
@@ -66,43 +66,39 @@ sub jarlist {
 
 print "Content-type: application/x-java-jnlp-file" , "\n\n";
 print "<?xml version = '1.0' encoding = 'utf-8'?>
-	<jnlp spec=\"1.0+\"
-	codebase=\"$codebase\"
-	>
-	<information>
-		<title>TIM Viewer (TEST C2MON SERVER)</title>
-	        <vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
-	        <homepage href=\"tim-viewer/index.html\"/>
-	        <description>The combined GTPM and synoptic viewer</description>
-	        <icon kind=\"splash\" href=\"http://timweb.cern.ch/img/tim-animated-320x200.gif\"/>
-	        <offline-allowed />
-	</information>
-	<security> 
-		<all-permissions/> 
-	</security> 
-	<resources>
-		<j2se version=\"1.6+\"  initial-heap-size=\"512M\" max-heap-size=\"512M\"/>" , "\n";
+  <jnlp spec=\"1.0+\" codebase=\"$codebase\">
+  <information>
+    <title>TIM Viewer for TEST C2MON SERVER (Version $viewerVersion)</title>
+    <vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
+    <homepage href=\"tim-viewer/index.html\"/>
+    <description>The combined GTPM and synoptic viewer</description>
+    <icon kind=\"splash\" href=\"http://timweb.cern.ch/img/tim-animated-320x200.gif\"/>
+  </information>
+  <security> 
+    <all-permissions/> 
+  </security> 
+  <resources>
+    <j2se version=\"1.6+\"  initial-heap-size=\"512M\" max-heap-size=\"512M\"/>" , "\n";
 
 jarlist ("$jardir");
 
 # Defines the version number that is shown in the TIM Viewer about dialog
-print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
+print "    <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
-print "		<property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
+print "    <property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
 
 if (param('configurl')) {
 	print "		<property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";
 }
 
-print "         </resources>
-        <resources os=\"Windows\" >
-                <property name=\"tim.log.file\" value=\"c:\\temp\\tim2-viewer.log\"/>
-                <property name=\"oracle.net.tns_admin\" value=\"G:\\Applications\\Oracle\\ADMIN\"/>
-        </resources>
-        <resources os=\"Linux\" >
-                <property name=\"tim.log.file\" value=\"/tmp/tim2-viewer.log\"/>
-                <property name=\"oracle.net.tns_admin\" value=\"/etc\"/>
-        </resources>
-        <application-desc main-class=\"ch.cern.tim.client.jviews.Main\">
-        </application-desc>
+print "  </resources>
+  <resources os=\"Windows\" >
+    <property name=\"tim.log.file\" value=\"c:\\temp\\tim2-viewer.log\"/>
+    <property name=\"oracle.net.tns_admin\" value=\"G:\\Applications\\Oracle\\ADMIN\"/>
+  </resources>
+  <resources os=\"Linux\" >
+    <property name=\"tim.log.file\" value=\"/tmp/tim2-viewer.log\"/>
+    <property name=\"oracle.net.tns_admin\" value=\"/etc\"/>
+  </resources>
+  <application-desc main-class=\"ch.cern.tim.client.jviews.Main\"/>
 </jnlp>" , "\n";
