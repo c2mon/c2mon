@@ -50,10 +50,10 @@ if($ENV{'HTTP_USER_AGENT'} =~ /Windows/) {
 print header;
 print start_html(-title=>'TIM Video Viewer', -style=>"/css/tim.css");
 if ($os_ eq "linux") {
-  print h1('TIM Video Viewer (' . $viewerVersion . ') Configurations (Linux) for VLC (version >= 1.1.4)');
+  print h1('TIM Video Viewer TEST (' . $viewerVersion . ') Configurations (Linux) for VLC (version >= 1.1.4)');
 }
 else {
-  print h1('TIM Video Viewer (' . $viewerVersion . ') Configurations (Windows)');
+  print h1('TIM Video Viewer TEST (' . $viewerVersion . ') Configurations (Windows)');
 }
 
 # Browsing the configuration files
