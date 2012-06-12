@@ -11,7 +11,7 @@
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
 	<artifactId>diamon-snmp-service-deploy</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<name>DMN2 SNMP service</name>
 	<packaging>pom</packaging>
 
