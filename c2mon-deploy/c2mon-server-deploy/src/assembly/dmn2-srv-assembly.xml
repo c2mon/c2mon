@@ -87,6 +87,13 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
+    <file>
+      <source>${basedir}/conf/dmn2-datasource.xml</source>
+      <outputDirectory>conf/</outputDirectory>
+      <destName>c2mon-datasource.xml</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
 		<file>
 			<source>${basedir}/conf/dmn2-tc-config.xml</source>
 			<outputDirectory>conf/</outputDirectory>
