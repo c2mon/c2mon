@@ -21,17 +21,11 @@ package cern.tim.server.lifecycle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
 
 /**
  * The class containing the main method for starting a server.
@@ -40,11 +34,18 @@ import org.springframework.context.support.GenericApplicationContext;
  * Distributed configuration details are kept in the DistributedParams
  * Spring bean (in server-common).
  * 
- * The main method can be called with the following arguments:
+ * The following system properties are available:
  * 
- *  -Dlog4j.configuration         - location of the log4j configuration file (compulsory)
- *  -Dc2mon.properties.location     - location of the c2mon.properties file 
- *                                  (optional - default is .c2mon.properties in the user home directory) 
+ *  -Dlog4j.configuration         - location of the log4j configuration file                                REQUIRED
+ *  -Dc2mon.home                  - home directory of the server (used for conf & log location ...)         REQUIRED
+ *  -Dc2mon.properties.location   - location of the c2mon.properties file                                   OPTIONAL
+ *                                  (optional - default is .c2mon.properties in the user home directory)  
+ *  
+ *  The c2mon.home directory must have a "conf" subdirectory containing the following files:
+ *    c2mon-modules.xml           - list of modules the server should run
+ *    c2mon-datasource.xml        - a java.sql.DataSource bean used for the cache persistence
+ *    
+ *  !You will also need to include the correct SQL driver dependency in the your final project! (server deploy module)
  *  
  * @author Mark Brightwell
  *
@@ -63,20 +64,10 @@ public final class ServerStartup {
   }
   
   /**
-   * Terracotta root with distributed configuration data.
-   */
-  //private static HashMap<String,Object> serverConfig;
-  //private static DistributedParams distributedParams;
-  
-  /**
    * Main server start-up method
-   * @param args start-up args
+   * @param args - ignored
    */
   public static void main(final String[] args) {
-    
-    //load the Spring context from the XML file
-    //(must be done after the DistributedParams have been initialized, as some of the Spring
-    // beans will need these at startup - Spring should manage this dependency on the DistributedParams bean)
     
     //initialize log4j
     if (System.getProperty("log4j.configuration") == null) {
@@ -91,36 +82,15 @@ public final class ServerStartup {
       ex.printStackTrace();            
       System.exit(-1);
     }
-     
+    
+    logger.info("C2MON server startup initiated");
+    
     //set default c2mon.properties location if not specified as Dc2mon.properties.location     
     if (System.getProperty("c2mon.properties.location") == null) {
       System.setProperty("c2mon.properties.location", System.getProperty("user.home") + "/.c2mon.properties");
     }
     logger.info("Using c2mon.properties file at: " + System.getProperty("c2mon.properties.location"));
     
-    String confLocation = "file:" + System.getProperty("c2mon.home") + "/conf";
-    
-    String[] coreProperties = new String[]{"file:" + System.getProperty("c2mon.properties.location"),
-                                           confLocation + "/c2mon-jms.properties",
-                                           confLocation + "/c2mon-datasource.properties",
-                                           confLocation + "/c2mon-cache.properties"};
-    
-    GenericBeanDefinition propertiesFactoryBean = new GenericBeanDefinition();
-    propertiesFactoryBean.setBeanClass(PropertiesFactoryBean.class);
-    MutablePropertyValues propertyValues = new MutablePropertyValues();
-    propertyValues.addPropertyValue("locations", coreProperties);
-    propertiesFactoryBean.setPropertyValues(propertyValues);    
-    
-    //start an initial Spring application context and register properties bean
-    GenericApplicationContext ctx = new GenericApplicationContext();    
-    ctx.registerBeanDefinition("serverProperties", propertiesFactoryBean);        
-    ctx.refresh();
-    
-    Properties serverProperties = (Properties) ctx.getBean("serverProperties");
-    for (Map.Entry<Object, Object> entry : serverProperties.entrySet()) {
-      System.setProperty((String) entry.getKey(), (String) entry.getValue());
-    }   
-        
     //by default run in single-server mode
     List<String> cacheModeModules;
     if (System.getProperty("cern.c2mon.cache.mode") != null && System.getProperty("cern.c2mon.cache.mode").equals("multi")) {
@@ -146,7 +116,7 @@ public final class ServerStartup {
     
     coreModules.addAll(cacheModeModules);
     
-    final ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(coreModules.toArray(new String[0]), ctx) {
+    final ClassPathXmlApplicationContext xmlContext = new ClassPathXmlApplicationContext(coreModules.toArray(new String[0])) {
       
       protected DefaultListableBeanFactory createBeanFactory() {
         final DefaultListableBeanFactory vResult = super.createBeanFactory();
@@ -158,37 +128,8 @@ public final class ServerStartup {
        
     logger.info("Starting the beans in application context.");
     //start all components that need manually starting
-    xmlContext.start();
-    
-    //"cern/tim/server/command/config/server-command.xml"
-//                                                                                                  Diamon module
-    //"resources/application-context-with-tim-server.xml"
-    //"cern/tim/server/benchmark/config/server-benchmark.xml",                                                                                          
-    
-    //add shutdown hook to context (all @PreDestroy methods will then be called)
+    xmlContext.start();    
     xmlContext.registerShutdownHook();
-//    Runtime.getRuntime().addShutdownHook(new Thread() {
-//      public void run() {
-//        xmlContext.stop();
-//        xmlContext.close();
-//      }
-//    });
-    
   }
-
   
-  
-  //****************
-  // HELPER METHODS 
-  //****************
-  
-  //not used so far
-  /**
-   * Converts the Java properties object into the configuration
-   * HashMap, mapping Strings to the objects as needed.
-   */
-//  private static HashMap<String,Object> propertiesToMap(Properties properties) {
-//    return null;
-//  }
-
 }

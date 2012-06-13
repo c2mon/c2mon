@@ -11,10 +11,14 @@
   
   <!-- import the optional modules loaded in a separate Spring configuration file (in the server configuration directory) -->
   <import resource="file:${c2mon.home}/conf/c2mon-modules.xml"/>
+  <import resource="file:${c2mon.home}/conf/c2mon-datasource.xml"/>
+  
+  <!-- import server properties -->
+  <import resource="classpath:cern/tim/server/lifecycle/config/server-lifecycle-properties.xml"/>
   
   <bean id="lifecycleProcessor" class="org.springframework.context.support.DefaultLifecycleProcessor">
     <!-- timeout value in milliseconds -->
-    <property name="timeoutPerShutdownPhase" value="60000"/>    
+    <property name="timeoutPerShutdownPhase" value="20000"/>    
   </bean>
   
   <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="ignoreUnresolvablePlaceholders" value="true" />
+  </bean>
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="ignoreResourceNotFound" value="true" />
+    <property name="locations">
+      <list>
+          <value>file:${c2mon.properties.location}</value>
+          <value>file:${c2mon.home}/conf/c2mon-jms.properties</value>
+          <value>file:${c2mon.home}/conf/c2mon-cache.properties</value>          
+          <value>file:${c2mon.home}/conf/c2mon-datasource.properties</value>          
+          <value>file:${c2mon.home}/conf/c2mon-jms.properties</value>          
+      </list>
+    </property>
+    
+    <!-- default values for properties should be placed below -->
+    <property name="properties">  
+        <props>
+        
+            <!-- JMS PROPERTIES -->            
+            <prop key="jms.update.transacted">true</prop>                                                        
+            <prop key="jms.update.consumers.initial">1</prop>
+            <prop key="jms.update.consumers.max">50</prop>
+            <prop key="c2mon.jms.update.task.idle.limit">5</prop>
+            <prop key="c2mon.jms.update.task.max.messages">1</prop>
+            <prop key="c2mon.jms.update.executor.threads">250</prop>
+            <prop key="c2mon.jms.update.task.timeout">1000</prop>
+            <prop key="jms.update.consumers.warmuptime">120</prop>            
+            
+            <prop key="jms.request.transacted">true</prop>
+            <prop key="jms.request.connections.max">1</prop>
+            <prop key="jms.request.consumers.initial">1</prop>
+            <prop key="jms.request.consumers.max">5</prop>
+            
+            <prop key="jms.auth.connections.max">1</prop>
+            <prop key="jms.auth.consumers.initial">1</prop>
+            <prop key="jms.auth.consumers.max">3</prop>
+            <prop key="jms.auth.requestQueue">c2mon.auth</prop>
+            
+            <prop key="jms.config.destination">c2mon.config</prop>
+            
+            <prop key="jms.daq.out.connections">1</prop>
+            <prop key="c2mon.jms.process.listener.trunk">c2mon.process</prop>
+            
+            <prop key="c2mon.jms.heartbeat.topic">c2mon.client.heartbeat</prop>            
+            
+            <prop key="c2mon.jms.client.consumers.min">5</prop>
+            <prop key="c2mon.jms.client.consumers.max">10</prop>
+            <prop key="jms.client.supervision.topic">c2mon.client.supervision</prop>
+            <prop key="jms.client.request.queue">c2mon.client.request</prop>
+            <prop key="jms.client.alarm.topic">c2mon.client.alarm</prop>
+            <prop key="c2mon.jms.controltag.publication.topic">c2mon.client.controltag</prop>
+            <prop key="c2mon.jms.tag.publication.topic">c2mon.client.tag</prop>
+              
+            <prop key="c2mon.client.jms.video.request.queue">c2mon.video.request</prop>
+            
+            <prop key="jms.process.requestQueue">c2mon.process.request</prop>
+            <prop key="jms.process.updateQueueTrunk">c2mon.process.update</prop>
+                       
+            <!-- CACHE PROPERTIES -->   
+            <prop key="cache.loader.batch.size">100</prop>
+            <prop key="cache.loader.equipment.batch.size">5</prop>
+            
+            <prop key="cache.loader.threads.max">2</prop>
+            <prop key="cache.loader.equipment.threads.max">2</prop>
+            
+            <prop key="cache.loader.queue.size">1000</prop>
+            <prop key="cache.loader.equipment.queue.size">100000</prop>
+            
+            <prop key="c2mon.persistence.buffer.min">5000</prop>
+            <prop key="c2mon.persistence.buffer.max">10000</prop>
+            <prop key="c2mon.persistence.buffer.growth">100</prop>
+            <prop key="c2mon.persistence.timeout">30000</prop>
+            
+            <prop key="c2mon.server.config.daq.enabled">false</prop>
+            <prop key="c2mon.server.config.running.process.removal">true</prop>
+
+            <!-- DATASOURCE PROPERTIES -->
+            <prop key="datasource.persistence.connections.initial">5</prop>
+            <prop key="datasource.persistence.connections.max">10</prop>
+            
+            <prop key="datasource.auth.connections.initial">1</prop>
+            <prop key="datasource.auth.connections.max">3</prop>
+            
+            <prop key="datasource.config.connections.initial">1</prop>
+            <prop key="datasource.config.connections.max">2</prop>
+            
+            <prop key="datasource.stl.connections.initial">1</prop>
+            <prop key="datasource.stl.connections.max">2</prop>
+            <prop key="c2mon.tag.log.fallback.file">${c2mon.home}/log/tagfallback.txt</prop>
+            <prop key="c2mon.command.log.fallback.file">${c2mon.home}/log/commandfallback.txt</prop>
+                     
+        </props>  
+     </property>  
+  </bean>
+  
+</beans>
