@@ -8,9 +8,9 @@
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/tim.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/webConfigViewer.css"/>" />
 
-<link type="text/css" href="/c2mon-web-configviewer/css/ui-lightness/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
-<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.2.min.js"></script>
-<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-ui-1.8.19.custom.min.js"></script>
+<link type="text/css" href="/c2mon-web-configviewer/css/ui-lightness/jquery-ui.css" rel="stylesheet" />
+<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery.js"></script>
+<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-ui.js"></script>
 
 
 <script type="text/javascript">
