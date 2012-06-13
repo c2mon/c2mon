@@ -6,6 +6,6 @@
   <!-- Oracle DB connection for this module -->
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-db.xml"/>
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-test.xml"/>
-  
-
+<!--  <import resource="classpath:cern/tim/server/test/cache/config/server-test-datasource-hsqldb.xml"/>-->
+  <import resource="classpath:cern/tim/server/cache/dbaccess/config/server-cachedbaccess-datasource.xml"/>
 </beans>
