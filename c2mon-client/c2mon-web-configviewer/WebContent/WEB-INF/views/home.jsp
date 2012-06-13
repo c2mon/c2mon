@@ -25,6 +25,7 @@
 	<li><a href="alarmviewer/form"> Alarm Viewer </a></li>
 	<li><a href="commandviewer/form"> Command Viewer </a></li>
 	<li><a href="configloader/form"> Config Loader </a></li>
+	<li><a href="configloader/progress"> Config Loader (with progress report!) </a></li>
 	<li><a href="process/form"> DAQ XML Viewer </a></li>
 </ul>
 
