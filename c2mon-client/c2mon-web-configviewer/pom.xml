@@ -15,6 +15,23 @@
 	<description>C2MON online configuration viewer (datatag, command, alarm, process viewer)</description>
 
   <dependencies>
+  
+    <dependency>
+    	<groupId>org.codehaus.jackson</groupId>
+    	<artifactId>jackson-mapper-asl</artifactId>
+    	<version>1.9.4</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.codehaus.jackson</groupId>
+    	<artifactId>jackson-core-asl</artifactId>
+    	<version>1.9.4</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.codehaus.jackson</groupId>
+    	<artifactId>jackson-jaxrs</artifactId>
+    	<version>1.9.4</version>
+    </dependency>
+  
     <!-- C2MON dependency -->
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
@@ -131,7 +148,7 @@
           <argLine>          
             <!-- needed for the client JMS module -->
 -Dtim.conf.url="http://timweb.cern.ch/test/javaws/tim2-jviews-viewer/conf/Debug.xml"
--Dc2mon.client.conf.url=http://timweb/conf/c2mon-client.properties
+-Dc2mon.client.conf.url=http://timweb/test/conf/c2mon-client.properties
 -Dc2mon.jdbc.driver=oracle.jdbc.OracleDriver
 -Dc2mon.jdbc.ro.url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP) (HOST=dbsrva3103-v.cern.ch) (PORT=10121) )(ADDRESS=(PROTOCOL=TCP) (HOST=dbsrva3203-v.cern.ch) (PORT=10121) )(FAILOVER=on)(LOAD_BALANCE=off)(ENABLE=BROKEN)(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=timdb_s.cern.ch)(FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC))))"
 -Dc2mon.jdbc.ro.user=timop
