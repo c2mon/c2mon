@@ -1,25 +1,17 @@
 package cern.c2mon.web.configviewer.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
+import java.util.HashMap;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.core.tag.ClientCommandTagImpl;
-import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.c2mon.web.configviewer.service.ServiceGateway;
-import cern.c2mon.web.configviewer.service.TagIdException;
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.shared.client.request.ClientRequestErrorReport;
+import cern.c2mon.shared.client.request.ClientRequestProgressReport;
+import cern.c2mon.web.configviewer.util.ReportHandler;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
@@ -27,7 +19,7 @@ import cern.tim.shared.client.configuration.ConfigurationReport;
  * ConfigLoaderService service providing the XML representation for a given config
  * */
 @Service
-public class ConfigLoaderService {
+public class ConfigLoaderService  {
 
   /**
    * ConfigLoaderService logger
@@ -45,6 +37,16 @@ public class ConfigLoaderService {
    * */
   @Autowired
   private XsltTransformUtility xsltTransformer;
+  
+  /**
+   * Stores the ProgressReports. 
+   **/
+  private HashMap<String, ReportHandler> progressReports = new HashMap<String, ReportHandler>();
+  
+  /**
+   * Stores the ConfigurationReports. 
+   **/
+  private HashMap<String, ConfigurationReport> finalReports = new HashMap<String, ConfigurationReport>();
 
   /** the path to the xslt document */
   private static final String XSLT_PATH = "/generic_tag.xsl";
@@ -68,14 +70,13 @@ public class ConfigLoaderService {
       throw new TagIdException("Invalid configuration Id");
     }
   }
-
-  public String generateHtmlResponse(final String configurationId) 
+  
+  private String generateHtmlForConfigurationReport(final ConfigurationReport report)
     throws TagIdException, TransformerException {
-
+      
     String xml = null;
 
     try {
-      ConfigurationReport  report = getConfigurationReport(Long.parseLong(configurationId));
       if (report != null)
         xml = report.toXML();
       else
@@ -96,15 +97,86 @@ public class ConfigLoaderService {
     return html;
   }
 
+  public String generateHtmlResponse(final String configurationId) 
+    throws TagIdException, TransformerException {
+
+    ConfigurationReport  report = getConfigurationReport(Long.parseLong(configurationId));
+    return generateHtmlForConfigurationReport(report);
+  }
+
   /**
    * Retrieves a ConfigurationReport object from the service gateway tagManager
-   * @param configurationId id of the alarm
+   * @param configurationId id of the configuration
    * @return Configuration Report
    * */
   private ConfigurationReport getConfigurationReport(final long configurationId) {
     ConfigurationReport report = gateway.getTagManager().applyConfiguration(configurationId); 
 
-    logger.debug("getConfigurationReport fetch for ConfigurationReport " + configurationId + ": " + (report == null ? "NULL" : "SUCCESS"));
+    logger.debug("getConfigurationReport fetch for ConfigurationReport " 
+        + configurationId + ": " + (report == null ? "NULL" : "SUCCESS"));
     return report;
   }
+  
+  /**
+   * Retrieves a ConfigurationReport object from the service gateway tagManager
+   * @param configurationId id of the configuration
+   * of the request
+   * @return Configuration Report
+   * */
+  public ConfigurationReport getConfigurationReportWithReportUpdates(final long configurationId) {
+    
+    ReportHandler reportHandler = new ReportHandler(configurationId);
+    progressReports.put("" + configurationId, reportHandler);
+    
+    ConfigurationReport report = gateway.getTagManager().applyConfiguration(
+        configurationId, reportHandler); 
+    
+    finalReports.put("" + configurationId, report); // store the report for viewing later
+    
+    logger.debug("getConfigurationReportWithReportUpdates fetch for ConfigurationReport " 
+        + configurationId + ": " + (report == null ? "NULL" : "SUCCESS"));
+    return report;
+  }
+  
+  /**
+   * Retrieves a ConfigurationReport stored in the web server.
+   * @param configurationId id of the configuration
+   * of the request
+   * @return Configuration Report
+   * */
+  public ConfigurationReport getStoredConfigurationReport(final String configurationId) {
+    
+    return finalReports.get(configurationId);
+  }
+  
+  /**
+   * Retrieves a ConfigurationReport stored in the web server
+   * and returns the result as an Html Page.
+   * @param configurationId id of the configuration
+   * @return Html page for the Configuration Report
+   * @throws TransformerException 
+   * @throws TagIdException 
+   * */
+  public String getStoredConfigurationReportHtml(final String configurationId) 
+    throws TagIdException, TransformerException {
+    
+    return generateHtmlForConfigurationReport(finalReports.get(configurationId));
+  }
+  
+  /**
+   * @param configurationId id of the configuration request
+   * @return a Report for the specified configuration (must be currently running!)
+   * */
+  public ClientRequestProgressReport getReportForConfiguration(final String configurationId) {
+    
+    ClientRequestProgressReport report = null;
+    ReportHandler reportHandler = progressReports.get(configurationId);
+    
+    if (reportHandler != null)
+      report = reportHandler.getProgressReport();
+    
+    logger.info("ClientRequestProgressReport: fetch for report: " 
+        + configurationId + ": " + (report == null ? "NULL" : "SUCCESS"));
+    return report;
+  }  
 }
