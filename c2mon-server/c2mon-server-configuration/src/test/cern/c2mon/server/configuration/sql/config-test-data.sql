@@ -158,7 +158,7 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (11,11,'UPDATE','RuleTag','50100');
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (11,'japcAddress','newTestConfigJAPCaddress');
-insert into timconfigval (seqid, elementfield, elementvalue) values (11,'ruleText','true[0]');
+insert into timconfigval (seqid, elementfield, elementvalue) values (11,'ruleText','(2 > 1)[1],true[0]');
 
 --remove rule
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)

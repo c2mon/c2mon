@@ -51,13 +51,5 @@
   <bean class="cern.c2mon.server.configuration.handler.transacted.EquipmentConfigTransactedImpl" autowire="constructor"/>
   <bean class="cern.c2mon.server.configuration.handler.transacted.SubEquipmentConfigTransactedImpl" autowire="constructor"/>
   <bean class="cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransactedImpl" autowire="constructor"/>  
-  
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="locations" >
-      <list>
-        <value>file:${c2mon.properties.location}</value>        
-      </list>
-    </property>   
-  </bean>
 
 </beans>

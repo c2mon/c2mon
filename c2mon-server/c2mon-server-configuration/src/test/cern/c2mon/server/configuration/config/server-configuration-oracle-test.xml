@@ -8,4 +8,6 @@
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-test.xml"/>
 <!--  <import resource="classpath:cern/tim/server/test/cache/config/server-test-datasource-hsqldb.xml"/>-->
   <import resource="classpath:cern/tim/server/cache/dbaccess/config/server-cachedbaccess-datasource.xml"/>
+  <import resource="classpath:cern/tim/server/test/core/config/server-test-properties.xml"/>
+  
 </beans>

@@ -3,14 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-      <property name="locations" >
-      <list>
-        <value>file:${c2mon.properties.location}</value>               
-      </list>
-    </property>   
-  </bean>
-  
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-db.xml"/>
+  <import resource="classpath:cern/tim/server/test/core/config/server-test-properties.xml"/>
 
 </beans>

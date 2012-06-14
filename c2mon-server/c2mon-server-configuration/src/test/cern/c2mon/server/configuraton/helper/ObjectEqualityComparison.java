@@ -44,7 +44,7 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getDescription(), object.getDescription());
     assertEquals(expectedObject.getMode(), object.getMode());
     assertEquals(expectedObject.getDataType(), object.getDataType());
-    //assertEquals(expectedObject.getTopic(), object.getTopic());
+    assertEquals(expectedObject.getTopic(), object.getTopic());
     assertEquals(expectedObject.isLogged(), object.isLogged());
     assertEquals(expectedObject.getUnit(), object.getUnit());
     assertEquals(expectedObject.getDipAddress(), object.getDipAddress());
@@ -124,6 +124,7 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getMaxMessageSize(), cacheObject.getMaxMessageSize());
     assertEquals(expectedObject.getStateTagId(), cacheObject.getStateTagId());
     assertEquals(expectedObject.getEquipmentIds(), cacheObject.getEquipmentIds());
+    assertEquals(expectedObject.getJmsListenerTopic(), cacheObject.getJmsListenerTopic());
   }
   
   public static void assertAlarmEquals(AlarmCacheObject expectedObject, AlarmCacheObject cacheObject) {

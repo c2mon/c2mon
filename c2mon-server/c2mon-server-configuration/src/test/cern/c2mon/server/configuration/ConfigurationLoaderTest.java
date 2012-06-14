@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -84,8 +85,10 @@ import cern.tim.shared.common.ConfigurationException;
 import cern.tim.shared.common.NoSimpleValueParseException;
 import cern.tim.shared.common.datatag.DataTagAddress;
 import cern.tim.shared.common.datatag.DataTagConstants;
+import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.common.datatag.DataTagValueDictionary;
+import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.common.datatag.address.HardwareAddressFactory;
 import cern.tim.shared.daq.config.Change;
 import cern.tim.shared.daq.config.ChangeReport;
@@ -108,6 +111,7 @@ import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext
 @ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-oracle-test.xml" })
 //@TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
 public class ConfigurationLoaderTest implements ApplicationContextAware {
@@ -189,6 +193,15 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Autowired
   private TestDataInserter testDataInserter;
   
+  @Value("${c2mon.jms.tag.publication.topic}")
+  private String tagPublicationTrunk = "c2mon.client.tag.default";
+  
+  @Value("${c2mon.jms.controltag.publication.topic}")
+  private String controlTagPublicationTopic;
+  
+  @Value("${c2mon.jms.process.listener.trunk}") 
+  private String processListenerTrunk;
+  
   /**
    * Clears DB of failed previous tests and resets the
    * mock before each test.
@@ -251,7 +264,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setDescription("test");
     expectedObject.setMinValue(new Integer(12));
     expectedObject.setMaxValue(new Integer(22));
-
+    expectedObject.setTopic(controlTagPublicationTopic);
     expectedObject.setLogged(false); //null allowed
 
     expectedObject.setDataTagQuality(new DataTagQualityImpl());
@@ -374,7 +387,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setDescription("test description config datatag");
     expectedObject.setMode(DataTagConstants.MODE_TEST); //non null
     expectedObject.setDataType("Float"); // non null
-    //cacheObject.setTopic("tim.testdatatag.XADDRESS");
+    expectedObject.setTopic(tagPublicationTrunk + "." + 50L);
     expectedObject.setLogged(false); //null allowed
     expectedObject.setUnit("config unit m/sec");
     expectedObject.setDipAddress("testConfigDIPaddress");
@@ -483,6 +496,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setUnit("config unit m/sec");
     expectedObject.setDipAddress("testConfigDIPaddress");
     expectedObject.setJapcAddress("testConfigJAPCaddress");
+    expectedObject.setTopic(tagPublicationTrunk + "." + 50L);
     expectedObject.setRuleText("(#5000000 < 0)|(#5000000 > 200)[1],true[0]");
     Set<Long> eqIds = new HashSet<Long>();
     eqIds.add(150L);
@@ -495,10 +509,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     //update ruletag
     expectedObject.setJapcAddress("newTestConfigJAPCaddress");
-    expectedObject.setRuleText("true[0]");
+    expectedObject.setRuleText("(2 > 1)[1],true[0]");
     expectedObject.setProcessIds(Collections.EMPTY_SET);
     expectedObject.setEquipmentIds(Collections.EMPTY_SET);
+    expectedObject.getDataTagQuality().validate();
+    expectedObject.setTopic(tagPublicationTrunk + "." + 0L);
     report = configurationLoader.applyConfiguration(11);
+    Thread.sleep(1000); //sleep 1s to allow for rule evaluation on separate thread
     System.out.println(report.toXML());
     RuleTagCacheObject updatedCacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
     ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, updatedCacheObject);
@@ -748,6 +765,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setMaxMessageSize(200);
     expectedObject.setMaxMessageDelay(1000);
     expectedObject.setDescription("test description");
+    expectedObject.setJmsListenerTopic(processListenerTrunk + ".NOHOST" + "." + expectedObject.getName() + ".NOTIME");
     
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
     
