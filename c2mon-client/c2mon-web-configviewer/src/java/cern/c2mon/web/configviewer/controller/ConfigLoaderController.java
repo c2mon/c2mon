@@ -206,7 +206,9 @@ public class ConfigLoaderController {
 
     logger.info("CONFIG_LOADER_PROGRESS_REPORT_URL ");
 
-    model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, "", CONFIG_LOADER_URL));
+    model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR,
+        CONFIG_LOADER_FORM_URL, "", CONFIG_LOADER_URL));
+    model.addAttribute("reports", service.getFinalReports());
     return "configurationReportWithProgressReport";
   }  
   

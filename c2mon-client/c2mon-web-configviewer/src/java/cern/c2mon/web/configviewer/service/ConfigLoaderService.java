@@ -164,6 +164,13 @@ public class ConfigLoaderService  {
   }
   
   /**
+   * @return all the previously applied configuration reports
+   */
+  public HashMap<String, ConfigurationReport> getFinalReports() {
+    return finalReports;
+  }
+  
+  /**
    * @param configurationId id of the configuration request
    * @return a Report for the specified configuration (must be currently running!)
    * */

@@ -107,6 +107,20 @@ function getProgress() {
 
 <div id="progressbar"></div>
 
+<div style="margin-top: 50px;">
+<table class="inline" align="center">
+<tr>
+<th>Previously Applied Configurations</th>
+</tr>
+<tr>
+<c:forEach var="report" items="${reports}" >
+	<td align="center"><a href="/c2mon-web-configviewer/configloader/progress/finalReport/${report.key}">
+		${report.key}</a></td>
+</c:forEach>
+</tr>
+</table> 
+</div> 
+
 <br/>
 <br/>
 
