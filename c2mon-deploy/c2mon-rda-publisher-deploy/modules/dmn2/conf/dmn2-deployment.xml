@@ -48,7 +48,7 @@
       <directory name="conf">
           <!-- Copy over the c2mon-client.properties file into the /conf directory  -->
           <file name="client.properties" sourceDir="~diamonop/c2mon/client" mask="400" />
-          <file name="publisher.tid" sourceDir="~dmndev/c2mon/client/rdapublisher" mask="400" />
+          <file name="publisher.tid" sourceDir="~diamonop/c2mon/client/rdapublisher" mask="400" />
       </directory>
       
     </application>
