@@ -75,9 +75,7 @@
 				<max-heap-size>256m</max-heap-size>
 
 				<main-class name="cern.c2mon.publisher.rda.PublisherKernel">
-					<arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -tidfile
-						${INSTALL_DIR}/conf/publisher.tid -server DMN-RDA-SERVER-TEST
-						-device DMN.RDA.DEVICE.TEST</arg>
+					<arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -tidfile ${INSTALL_DIR}/conf/publisher.tid -server DMN-RDA-SERVER-TEST -device DMN.RDA.DEVICE.TEST</arg>
 				</main-class>
 
 				<!-- JVM arguments -->
