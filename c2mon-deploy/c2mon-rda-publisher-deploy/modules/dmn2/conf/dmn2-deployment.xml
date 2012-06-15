@@ -21,11 +21,6 @@
 		<application name="dmn2-rda-publisher-pro" extends="default">
 
 			<startscript name="rda-publisher-startup">
-				<preExec>
-          <![CDATA[
-            [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-           ]]>
-				</preExec>
 				<initial-heap-size>256m</initial-heap-size>
 				<max-heap-size>256m</max-heap-size>
 
@@ -37,9 +32,8 @@
 
 				<!-- JVM arguments -->
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
-				<property name="c2mon.process.name" value="${PROCESS_NAME}" />
-				<property name="c2mon.client.conf.url"
-					value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+				<property name="c2mon.process.name" value="DMN2-RDA-PUBLISHER" />
+				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
 
 			</startscript>
 
@@ -66,11 +60,6 @@
 		<application name="dmn2-rda-publisher-dev" extends="default">
 
 			<startscript name="rda-publisher-startup">
-				<preExec>
-          <![CDATA[
-            [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-           ]]>
-				</preExec>
 				<initial-heap-size>256m</initial-heap-size>
 				<max-heap-size>256m</max-heap-size>
 
@@ -80,9 +69,8 @@
 
 				<!-- JVM arguments -->
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
-				<property name="c2mon.process.name" value="${PROCESS_NAME}" />
-				<property name="c2mon.client.conf.url"
-					value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+				<property name="c2mon.process.name" value="DMN2-RDA-PUBLISHER-DEV" />
+        <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
 
 			</startscript>
 
