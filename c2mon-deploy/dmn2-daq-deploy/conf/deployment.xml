@@ -67,7 +67,9 @@
           <file name="DMN2-DAQ-CLIC_SPS.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-CLIC_MISC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-RDA_BIS.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
+          <file name="DMN2-DAQ-RDA_PLC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />          
           <file name="DMN2-DAQ-JMX.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
+          <file name="DMN2-DAQ-SNMP_WIE" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
         </directory>
 
 				<notification>
@@ -103,7 +105,9 @@
           <file name="DMN2-DAQ-CLIC_SPS.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-CLIC_MISC.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-RDA_BIS.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
+          <file name="DMN2-DAQ-RDA_PLC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-JMX.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
+          <file name="DMN2-DAQ-SNMP_WIE" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
 				</directory>
 			</deployment>
 			 
