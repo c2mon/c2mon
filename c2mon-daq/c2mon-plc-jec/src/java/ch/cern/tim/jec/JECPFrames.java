@@ -922,7 +922,7 @@ public class JECPFrames
  * This method is used to write data (ints) inside a JEC Frame (in the Data area)
  * This method doesn't manages the available free space in the data area.
  * NOTE: This method overwrites the selected word in data area
- * @param int Data - Two bytes of data to write inside the JEC Frame
+ * @param int Data - Two words of data to write inside the JEC Frame
  * @param int pos - Used to give the position inside the array (in word)
  */
   public void AddJECData(int Data, int pos) throws JECIndexOutOfRangeException

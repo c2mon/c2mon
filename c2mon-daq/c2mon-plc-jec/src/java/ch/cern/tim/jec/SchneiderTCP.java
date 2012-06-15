@@ -62,7 +62,9 @@ public class SchneiderTCP implements PLCDriver
   /**
    * Locks sending and receiving on streams.
    */
-  private ReentrantReadWriteLock transportLock = new ReentrantReadWriteLock();
+  private ReentrantReadWriteLock sendLock = new ReentrantReadWriteLock();
+  private ReentrantReadWriteLock receiveLock = new ReentrantReadWriteLock();
+  
 
 /*//////////////////////////////////////////////////////////////////////////////
 //             METHOD SCHNEIDERTCP - CONSTRUCTOR (no parameters)              //
@@ -232,7 +234,7 @@ public class SchneiderTCP implements PLCDriver
  */
   public int Send(JECPFrames Frame)
   {   
-    transportLock.writeLock().lock();
+    sendLock.writeLock().lock();
     try {
       // Status of the send() attempt
       int status = StdConstants.ERROR;                                            
@@ -285,7 +287,7 @@ public class SchneiderTCP implements PLCDriver
       // Return the actual status
       return status;
     } finally {
-      transportLock.writeLock().unlock();      
+      sendLock.writeLock().unlock();      
     }                                                                
   }
 
@@ -301,7 +303,7 @@ public class SchneiderTCP implements PLCDriver
  */   
   public int Receive(JECPFrames buffer, int timeout)
   {
-    transportLock.writeLock().lock();
+    receiveLock.writeLock().lock();
     try {
    // Status of the Receive() attempt
       int status = StdConstants.ERROR;                                                                                     
@@ -362,7 +364,7 @@ public class SchneiderTCP implements PLCDriver
         // Function returns ERROR
         return StdConstants.ERROR;
     } finally {
-      transportLock.writeLock().unlock();
+      receiveLock.writeLock().unlock();
     }                                             
   }
 

@@ -110,7 +110,8 @@ public class SiemensISO implements PLCDriver
    /**
     * Lock for sychronising message sending and receiving
     */
-   private ReentrantReadWriteLock transportLock = new ReentrantReadWriteLock();
+   private ReentrantReadWriteLock sendLock = new ReentrantReadWriteLock();
+   private ReentrantReadWriteLock receiveLock = new ReentrantReadWriteLock();
 
 /*//////////////////////////////////////////////////////////////////////////////
 //              METHOD SIEMENSISO - CONSTRUCTOR (no parameters)               //
@@ -730,7 +731,7 @@ public class SiemensISO implements PLCDriver
  */
   public int Send(JECPFrames Frame)
   {
-    transportLock.writeLock().lock();
+    sendLock.writeLock().lock();
     try {
    // Variable declaration and initialization  
       // Status of the send() attempt
@@ -877,7 +878,7 @@ public class SiemensISO implements PLCDriver
       // Return method execution status    
       return status; 
     } finally {
-      transportLock.writeLock().unlock();
+      sendLock.writeLock().unlock();
     }                                                            
   }  
 
@@ -892,7 +893,7 @@ public class SiemensISO implements PLCDriver
  */
   public int Receive(JECPFrames buffer, int timeout) 
   {
-    transportLock.writeLock().lock();
+    receiveLock.writeLock().lock();
     try {
    // Variable declaration and initialization    
       // Status of the send() attempt
@@ -1064,7 +1065,7 @@ public class SiemensISO implements PLCDriver
         return StdConstants.ERROR;                                                
       }
     } finally {
-      transportLock.writeLock().unlock();
+      receiveLock.writeLock().unlock();
     }
   }
 
