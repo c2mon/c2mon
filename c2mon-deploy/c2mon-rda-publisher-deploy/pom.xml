@@ -27,11 +27,13 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-publisher</groupId>
 			<artifactId>c2mon-rda-publisher</artifactId>
-      <version>[1.0.0,2.0.0)</version>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 	</dependencies>
+
 	<modules>
 		<module>modules/tim2</module>
+		<module>modules/dmn2</module>
 	</modules>
 
 	<scm>

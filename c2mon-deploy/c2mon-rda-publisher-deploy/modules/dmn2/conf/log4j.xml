@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration debug="false"
+                     threshold="debug"
+                     xmlns:log4j='http://jakarta.apache.org/log4j/'>
+                     
+  <renderer  renderedClass="cern.c2mon.client.common.tag.ClientDataTagValue"
+             renderingClass="cern.c2mon.client.common.tag.ClientDataTagValueRenderer" />
+
+  <!--
+    Create a RollingFileAppender.
+    Log messages are written to the file specified in the ${tim.log.file}
+    system property. The file size is limited to 10MB; once this size is reached
+    the file is truncated and backed up and a new file is started.
+    If the specified file cannot be opened or the ${tim.log.file} property
+    has not been specified on the command line, the FallbackFileAppender is used
+    instead.
+  -->
+  <appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
+    <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
+      <root-ref/>
+      <appender-ref ref="FallbackConsoleAppender"/>
+    </errorHandler>
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.path}/${dmn.process.name}.log" />
+    <param name="MaxBackupIndex" value="3" />
+    <param name="MaxFileSize" value="50MB" />
+    <param name="BufferedIO" value="false" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
+    </layout>
+  </appender>
+  
+  <appender name="ClientDataTagLoggerAppender" class="org.apache.log4j.RollingFileAppender">
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.path}/${dmn.process.name}.tag.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value ="2" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
+    </layout>
+  </appender>
+
+<!--
+    Create a ConsoleAppender.
+    Log messages are written to the console in case neither the FileAppender
+    nor the FallbackFileAppender work.
+  -->
+  <appender name="FallbackConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
+    </layout>
+  </appender>
+  
+  <!-- 
+    Special logger used for logging the ClientDataTagValue updates in a separate file & format
+   -->
+  <logger name="ClientDataTagLogger" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="ClientDataTagLoggerAppender" />
+  </logger>
+  
+  <logger name="org.springframework" additivity="false">
+    <level value="warn" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+  
+  <logger name="org.apache" additivity="false">
+    <level value="warn" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+  
+  <logger name="cern.c2mon.client" additivity="false">
+    <level value="warn" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+
+  <root>
+    <level value="info"/>
+    <appender-ref ref="FileAppender" />
+  </root>
+
+</log4j:configuration>

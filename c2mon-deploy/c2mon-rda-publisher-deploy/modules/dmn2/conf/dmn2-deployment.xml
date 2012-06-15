@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <product name="c2mon">
+
+    <!--
+			this application section is a parent configuration for both
+			c2mon-tim2-prod and c2mon-tim2-test
+		-->
+    <application name="default">
+      <deployment installLocation="/opt/dmn2-rda-publisher/">
+        <backupPolicy keepBackups="2">
+          <preserve type="dir" name="log" />
+          <preserve type="dir" name="tmp" />
+          <preserve type="file" name="conf/publisher.tid" />
+        </backupPolicy>
+        
+      </deployment>
+    </application>
+
+
+    <application name="dmn2-rda-publisher-pro" extends="default">
+      <deployment installLocation="/opt/dmn2-rda-publisher">
+        <notification>
+          <!-- you can give more than one mail for deployment notification -->
+          <mail address="project-diamon-core@cern.ch" />
+        </notification>
+      </deployment>
+      <startscript name="rda-publisher-startup">
+        <preExec>
+          <![CDATA[
+            [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+           ]]>
+        </preExec>
+        <initial-heap-size>256m</initial-heap-size>
+        <max-heap-size>256m</max-heap-size>
+
+        <main-class name="cern.c2mon.publisher.rda.PublisherKernel">
+          <arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -tidfile ${INSTALL_DIR}/conf/publisher.tid -server DMN-RDA-SERVER -device DMN.RDA.DEVICE</arg>
+        </main-class>
+
+        <!-- JVM arguments -->
+        <property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
+        <property name="c2mon.process.name" value="${PROCESS_NAME}" />
+        <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+                
+      </startscript>
+      
+      <directory name="conf">
+          <!-- Copy over the c2mon-client.properties file into the /conf directory  -->
+          <file name="client.properties" sourceDir="~diamonop/c2mon/client" mask="400" />
+          <file name="publisher.tid" sourceDir="~dmndev/c2mon/client/rdapublisher" mask="400" />
+      </directory>
+      
+    </application>
+
+
+    <application name="dmn2-rda-publisher-dev" extends="default">
+      <deployment installLocation="/opt/dmn2-rda-publisher-dev" />
+
+      <startscript name="rda-publisher-startup">
+        <preExec>
+          <![CDATA[
+            [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+           ]]>
+        </preExec>
+        <initial-heap-size>256m</initial-heap-size>
+        <max-heap-size>256m</max-heap-size>
+
+        <main-class name="cern.c2mon.publisher.rda.PublisherKernel">
+          <arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -tidfile ${INSTALL_DIR}/conf/publisher.tid -server DMN-RDA-SERVER-TEST -device DMN.RDA.DEVICE.TEST</arg>
+        </main-class>
+        
+        <!-- JVM arguments -->
+        <property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
+        <property name="c2mon.process.name" value="${PROCESS_NAME}" />
+        <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+                               
+      </startscript>
+      
+      <directory name="conf">
+          <!-- Copy over the c2mon-client.properties file into the /conf directory  -->
+          <file name="client.properties" sourceDir="~dmndev/c2mon/client" mask="400" />
+          <file name="publisher.tid" sourceDir="~dmndev/c2mon/client/rdapublisher" mask="400" />
+      </directory>
+      
+    </application>
+  </product>
+</products>
