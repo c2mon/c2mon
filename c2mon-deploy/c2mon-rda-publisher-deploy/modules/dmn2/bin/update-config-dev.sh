@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# The SMILE HTTP link to fetch the JAPC publication list 
-JAPC_PUBLICATIONS_TID_URL="https://oraweb.cern.ch/pls/timw3/smile.queryDisplay?nType=4&Tablename=VSML_360JAPCPUBPTS&vHeader=POINT_ID&vSelect=POINT_ID"
 
 # resolve links - $0 may be a softlink
 PRG="$0"
@@ -21,12 +19,17 @@ PRGDIR=`dirname "$PRG"`
 # Set PUBLISHER_HOME
 PUBLISHER_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 
+#the script to be called to get the rda-published tag id from db 
+JAPC_PUB_TID_GENERATOR=${PUBLISHER_HOME}/bin/tid-generator-dev.pl
+
+
 # The configuration file destination
 CONF_FILE=$PUBLISHER_HOME/conf/publisher.tid
 TEMP_FILE=$PUBLISHER_HOME/conf/publisher.new.xml 
 
 # Get the new configuration
-wget -O - -o /dev/null ${JAPC_PUBLICATIONS_TID_URL} | sort > ${TEMP_FILE}
+./${JAPC_PUB_TID_GENERATOR}
+
 
 # If the new configuration is different from the old one:
 # (1) create a backup of the current configuration

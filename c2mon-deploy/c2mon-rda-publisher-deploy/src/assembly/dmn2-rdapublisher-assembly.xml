@@ -20,14 +20,40 @@
 
 	<files>
 		
-		<!-- copy update script -->
+		<!-- copy PRO update script -->
 		<file>
-      <source>${basedir}/bin/update-config.sh</source>
+      <source>${basedir}/bin/update-config-pro.sh</source>
       <outputDirectory>bin/</outputDirectory>
-      <destName>update-config.sh</destName>
+      <destName>update-config-pro.sh</destName>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
     </file>
+    <!-- copy DEV update script -->
+    <file>
+      <source>${basedir}/bin/update-config-dev.sh</source>
+      <outputDirectory>bin/</outputDirectory>
+      <destName>update-config-dev.sh</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+    </file>
+
+    <!-- copy PRO tid generator script -->
+    <file>
+      <source>${basedir}/bin/tid-generator-pro.pl</source>
+      <outputDirectory>bin/</outputDirectory>
+      <destName>tid-generator-pro.pl</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+    </file>
+    <!-- copy DEV tid generator script -->
+    <file>
+      <source>${basedir}/bin/tid-generator-dev.pl</source>
+      <outputDirectory>bin/</outputDirectory>
+      <destName>tid-generator-dev.pl</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0755</fileMode>
+    </file>
+
 		
 		<!--  deployment descriptor -->
     <file>
