@@ -19,15 +19,6 @@
 	</componentDescriptors>
 
 	<files>
-
-		<!--  copy the starting script -->
-		<file>
-			<source>${basedir}/bin/rda-publisher.sh</source>
-			<outputDirectory>bin/</outputDirectory>
-			<destName>rda-publisher.sh</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0755</fileMode>
-		</file>
 		
 		<!-- copy update script -->
 		<file>

@@ -20,7 +20,7 @@
 
 		<application name="dmn2-rda-publisher-pro" extends="default">
 
-			<startscript name="rda-publisher-startup">
+			<startscript name="dmn2-rda-publisher">
 				<initial-heap-size>256m</initial-heap-size>
 				<max-heap-size>256m</max-heap-size>
 
@@ -59,7 +59,7 @@
 
 		<application name="dmn2-rda-publisher-dev" extends="default">
 
-			<startscript name="rda-publisher-startup">
+			<startscript name="dmn2-rda-publisher">
 				<initial-heap-size>256m</initial-heap-size>
 				<max-heap-size>256m</max-heap-size>
 
