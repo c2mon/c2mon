@@ -23,7 +23,7 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.path}/${dmn.process.name}.log" />
+    <param name="File" value="${c2mon.log.path}/${c2mon.process.name}.log" />
     <param name="MaxBackupIndex" value="3" />
     <param name="MaxFileSize" value="50MB" />
     <param name="BufferedIO" value="false" />
@@ -34,7 +34,7 @@
   
   <appender name="ClientDataTagLoggerAppender" class="org.apache.log4j.RollingFileAppender">
     <param name="Append" value="true" />
-    <param name="File" value="${c2mon.log.path}/${dmn.process.name}.tag.log" />
+    <param name="File" value="${c2mon.log.path}/${c2mon.process.name}.tag.log" />
     <param name="MaxFileSize" value="5MB" />
     <param name="MaxBackupIndex" value ="2" />
     <layout class="org.apache.log4j.PatternLayout">
