@@ -22,13 +22,12 @@ PUBLISHER_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 #the script to be called to get the rda-published tag id from db 
 JAPC_PUB_TID_GENERATOR=${PUBLISHER_HOME}/bin/tid-generator-pro.pl
 
-
 # The configuration file destination
 CONF_FILE=$PUBLISHER_HOME/conf/publisher.tid
-TEMP_FILE=$PUBLISHER_HOME/conf/publisher.new.xml 
+TEMP_FILE=$PUBLISHER_HOME/conf/publisher-new.tid 
 
 # Get the new configuration
-./${JAPC_PUB_TID_GENERATOR}
+`${JAPC_PUB_TID_GENERATOR}`
 
 
 # If the new configuration is different from the old one:
@@ -45,7 +44,7 @@ if [ -s $CONF_FILE ]; then
     echo "Configuration has changed! The Publisher will automatically subscribe to any new tag IDs within the next 60 seconds."
   else
     echo "The configuration has not changed since the last update!"
-    rm $TEMP_FILE 	
+    rm -rf $TEMP_FILE 2>&1 > /dev/null  
   fi
 else
   mv $TEMP_FILE $CONF_FILE
