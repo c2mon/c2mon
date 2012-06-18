@@ -16,7 +16,6 @@
           <value>file:${c2mon.home}/conf/c2mon-jms.properties</value>
           <value>file:${c2mon.home}/conf/c2mon-cache.properties</value>          
           <value>file:${c2mon.home}/conf/c2mon-datasource.properties</value>          
-          <value>file:${c2mon.home}/conf/c2mon-jms.properties</value>          
       </list>
     </property>
     
