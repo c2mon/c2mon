@@ -141,6 +141,11 @@
       <!-- C2MON publisher -->
       <dependency>
         <groupId>cern.c2mon.c2mon-publisher</groupId>
+        <artifactId>c2mon-publisher-core</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-publisher</groupId>
         <artifactId>c2mon-japc-sispublisher</artifactId>
         <version>[1.0.0,2.0.0)</version>
       </dependency>
