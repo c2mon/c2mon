@@ -64,7 +64,7 @@ public class RdaPublisherTest {
     };
     s.start();
     
-    try {Thread.sleep(3000);} catch (InterruptedException e) {}
+    try {Thread.sleep(5000);} catch (InterruptedException e) {}
     
     assertTrue(subscriptionTestOK);
     assertFalse("A RDA subscription error occured", error);
