@@ -49,7 +49,9 @@ my $dbh = DBI->connect( $dbiUrl, $dbiUser, $dbiPassword )
 
 
 my $fetch_equipments_sql = <<END;
-select METRIC_DATA_TAG_ID from DMN_METRICS_V where rda_publish_flag = 'Y'
+select metric_data_tag_id from dmn_metrics_v where japc_metric_pub_flag='Y'
+union
+select metric_rule_tag_id as metric_data_tag_id from dmn_metrics_v where japc_rule_pub_flag='Y'
 END
 
 my $sth = $dbh->prepare("${fetch_equipments_sql}")	
