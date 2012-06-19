@@ -63,7 +63,7 @@
 				<initial-heap-size>256m</initial-heap-size>
 				<max-heap-size>256m</max-heap-size>
 
-				<main-class name="cern.c2mon.publisher.rda.PublisherKernel" />
+				<main-class name="cern.c2mon.publisher.core.PublisherKernel" />
 
 				<!-- JVM arguments -->
         <property name="c2mon.publisher.rda.server.name" value="DMN-RDA-SERVER-TEST" /> <!-- Needed for setting the RDA server name -->
