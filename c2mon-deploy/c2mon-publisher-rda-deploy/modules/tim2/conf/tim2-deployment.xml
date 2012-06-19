@@ -22,7 +22,7 @@
 
 
     <application name="tim-publisher-rda-prod" extends="default">
-      <deployment installLocation="/opt/tim-rda-publisher">
+      <deployment installLocation="/opt/tim-publisher-rda">
         <notification>
           <!-- you can give more than one mail for deployment notification -->
           <mail address="tim-admin@cern.ch" />
@@ -52,7 +52,7 @@
 
 
     <application name="tim-publisher-rda-test" extends="default">
-      <deployment installLocation="/opt/tim-rda-publisher-test" />
+      <deployment installLocation="/opt/tim-publisher-rda-test" />
 
       <startscript name="rda-publisher-startup">
         <preExec>
