@@ -40,7 +40,7 @@
         <main-class name="cern.c2mon.publisher.core.PublisherKernel" />
 
         <!-- JVM arguments -->
-        <property name="app.name" value="TIM-RDA-SERVER" /> <!-- Needed for setting the RDA server name -->
+        <property name="c2mon.publisher.rda.server.name" value="TIM-RDA-SERVER" /> <!-- Needed for setting the RDA server name -->
         <property name="c2mon.publisher.rda.device.name" value="TIM.RDA.DEVICE" />
         <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
         <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
@@ -66,7 +66,7 @@
         <main-class name="cern.c2mon.publisher.core.PublisherKernel" />
         
         <!-- JVM arguments -->
-        <property name="app.name" value="TIM-RDA-SERVER-TEST" /> <!-- Needed for setting the RDA server name -->
+        <property name="c2mon.publisher.rda.server.name" value="TIM-RDA-SERVER-TEST" /> <!-- Needed for setting the RDA server name -->
         <property name="c2mon.publisher.rda.device.name" value="TIM.RDA.DEVICE.TEST" />
         <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
         <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
