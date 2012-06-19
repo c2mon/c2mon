@@ -42,7 +42,7 @@ import cern.c2mon.client.core.C2monServiceGateway;
  * 
  * @author Matthias Braeger
  */
-final class PublisherKernel {
+public final class PublisherKernel {
   /** The Log4j's logger */
   private static Logger logger = null;
 
