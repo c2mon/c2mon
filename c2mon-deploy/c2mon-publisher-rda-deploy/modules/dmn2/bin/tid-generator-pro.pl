@@ -21,7 +21,7 @@ my @pathtokens = split(/\//,$cdir);
 # we are in bin folder, so the home folder is one level up
 my $appdir = @pathtokens[scalar(@pathtokens)-3];
 
-my $basedir = "/opt/dmn2-rda-publisher/conf";
+my $basedir = "/opt/dmn2-publisher-rda/conf";
 
 my $c2monClientPropertiesFile= "/user/diamonop/c2mon/client/client.properties";
 
