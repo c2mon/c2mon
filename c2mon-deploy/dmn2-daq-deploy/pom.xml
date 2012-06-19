@@ -12,7 +12,7 @@
 	<groupId>cern.dmn2.dmn2-daq</groupId>
 	<artifactId>dmn2-daq-deploy</artifactId>
 	<name>DMN2 DAQ deployment module</name>
-	<version>1.0.10</version>
+	<version>1.0.11-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
