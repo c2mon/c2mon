@@ -27,6 +27,7 @@ public class RdaPublisherTest {
     System.setProperty("c2mon.client.conf.url", "http://timweb/conf/c2mon-client.properties");
     System.setProperty("log4j.configuration", "cern/c2mon/publisher/rda/log4j.xml");
     System.setProperty("c2mon.publisher.tid.location", "src/test/cern/c2mon/publisher/rda/test.tid");
+    System.setProperty("c2mon.publisher.rda.server.name", "TIM-RDA-SERVER-TEST");
     System.setProperty("c2mon.publisher.rda.device.name", "TIM.RDA.DEVICE.TEST");
   }
 

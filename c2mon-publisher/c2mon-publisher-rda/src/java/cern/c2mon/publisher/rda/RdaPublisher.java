@@ -72,7 +72,7 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
    * @throws InternalException In case of a problem at creation time of the RDA server
    */
   @Autowired
-  public RdaPublisher(@Value("${app.name}") final String serverName, 
+  public RdaPublisher(@Value("${c2mon.publisher.rda.server.name}") final String serverName, 
                       @Value("${c2mon.publisher.rda.device.name}") final String device) throws InternalException {
     super(serverName);
     this.deviceName = device;
