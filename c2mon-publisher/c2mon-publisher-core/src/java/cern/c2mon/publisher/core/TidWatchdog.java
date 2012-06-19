@@ -37,7 +37,7 @@ class TidWatchdog extends FileWatchdog {
   
   /** Environment variable that defines the location of the tid file as URL */
   private static final String PUBLISHER_TID_FILE = 
-    System.getProperty("publisher.tid.location", "conf/publisher.tid");
+    System.getProperty("c2mon.publisher.tid.location", "conf/publisher.tid");
   
   /** The Log4j's logger */
   private static Logger logger = Logger.getLogger(FileWatchdog.class);

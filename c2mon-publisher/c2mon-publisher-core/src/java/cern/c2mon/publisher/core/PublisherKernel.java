@@ -37,7 +37,7 @@ import cern.c2mon.client.core.C2monServiceGateway;
  * <p>
  * <code>-Dlog4j.configuration</code> - location of the log4j configuration file
  * (REQUIRED)<br>
- * <code>-Dpublisher.tid.location</code> - location of the TID file containing
+ * <code>-Dc2mon.publisher.tid.location</code> - location of the TID file containing
  * the tag ids which shall be published (REQUIRED)
  * 
  * @author Matthias Braeger
@@ -56,7 +56,7 @@ public final class PublisherKernel {
    * This environment variable can be set to point to another Spring context file that should
    * also be scanned and included in to the same context.
    */
-  private static final String CUSTOM_SPRING_CONFIG_ENV = "publisher.spring.configuration.location";
+  private static final String CUSTOM_SPRING_CONFIG_ENV = "c2mon.publisher.spring.configuration.location";
   
   /** The SPRING configuration of the publisher core */
   private static final String SPRING_CONFIG = "cern/c2mon/publisher/core/config/publisher-core.xml";

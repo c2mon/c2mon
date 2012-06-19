@@ -11,11 +11,11 @@ public class PublisherKernelTest {
 
   @Before
   public void beforeTest() {
-    System.setProperty("app.name", "C2MON Publisher core test");
+    System.setProperty("app.name", "C2MON-PUBLISHER-CORE-TEST");
     System.setProperty("app.version", "1.0");
     System.setProperty("c2mon.client.conf.url", "http://timweb/conf/c2mon-client.properties");
     System.setProperty("log4j.configuration", "cern/c2mon/publisher/core/log4j.xml");
-    System.setProperty("publisher.tid.location", "src/test/cern/c2mon/publisher/core/test.tid");
+    System.setProperty("c2mon.publisher.tid.location", "src/test/cern/c2mon/publisher/core/test.tid");
   }
   
   @Test

@@ -28,7 +28,7 @@ import cern.c2mon.shared.client.tag.TagConfig;
  * environment variable an additional path to your your spring context file which
  * will then be included into the startup context:
  * <p>
- * <code>-Dpublisher.spring.configuration.location</code>
+ * <code>-Dc2mon.publisher.spring.configuration.location</code>
  * @author Matthias Braeger
  */
 public interface Publisher {
