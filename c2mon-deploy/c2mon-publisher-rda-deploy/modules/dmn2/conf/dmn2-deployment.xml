@@ -7,7 +7,7 @@
 			c2mon-tim2-prod and c2mon-tim2-test
 		-->
 		<application name="default">
-			<deployment installLocation="/opt/dmn2-rda-publisher/">
+			<deployment installLocation="/opt/dmn2-publisher-rda/">
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
 					<preserve type="dir" name="tmp" />
