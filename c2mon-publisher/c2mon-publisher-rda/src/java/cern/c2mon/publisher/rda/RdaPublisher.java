@@ -73,7 +73,7 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
    */
   @Autowired
   public RdaPublisher(@Value("${app.name}") final String serverName, 
-                      @Value("${rda.device.name}") final String device) throws InternalException {
+                      @Value("${c2mon.publisher.rda.device.name}") final String device) throws InternalException {
     super(serverName);
     this.deviceName = device;
     LOG.info("Registered RDA device " + device + " for server: " + serverName);

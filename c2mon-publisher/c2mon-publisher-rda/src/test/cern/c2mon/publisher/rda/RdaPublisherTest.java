@@ -26,8 +26,8 @@ public class RdaPublisherTest {
     System.setProperty("app.version", "1.0");
     System.setProperty("c2mon.client.conf.url", "http://timweb/conf/c2mon-client.properties");
     System.setProperty("log4j.configuration", "cern/c2mon/publisher/rda/log4j.xml");
-    System.setProperty("publisher.tid.location", "src/test/cern/c2mon/publisher/rda/test.tid");
-    System.setProperty("rda.device.name", "TIM.RDA.DEVICE.TEST");
+    System.setProperty("c2mon.publisher.tid.location", "src/test/cern/c2mon/publisher/rda/test.tid");
+    System.setProperty("c2mon.publisher.rda.device.name", "TIM.RDA.DEVICE.TEST");
   }
 
   /**
@@ -37,7 +37,7 @@ public class RdaPublisherTest {
   public void testSubscription() {
     PublisherKernel.main(new String[] {});
 
-    Subscription s = new Subscription(System.getProperty("rda.device.name"), "EY.L04.EMD801_4R:POSITION", "1000") {
+    Subscription s = new Subscription(System.getProperty("c2mon.publisher.rda.device.name"), "EY.L04.EMD801_4R:POSITION", "1000") {
       @Override
       protected void handleValue(Data value) {
         try {
