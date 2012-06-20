@@ -73,7 +73,7 @@ public class LaserAlarmPublisherImplTest {
 		
 		Alarm alarmMock = mockControl.createMock(Alarm.class);
 		Alarm alarmInCache = CacheObjectCreation.createTestAlarm2();
-		assertTrue(alarmInCache.isPublishedToLaser()); //published value set in test object
+		assertFalse(alarmInCache.isPublishedToLaser()); //not yet published
 		
 		expect(alarmMock.getId()).andReturn(alarmInCache.getId());
 		expect(alarmCache.get(alarmInCache.getId())).andReturn(alarmInCache);
@@ -96,10 +96,13 @@ public class LaserAlarmPublisherImplTest {
 		mockControl.verify();
 		
 		//check last published value is newly set correctly
+		assertTrue(alarmInCache.isPublishedToLaser());
 		assertTrue(alarmInCache.getLastPublication() != null);
 		assertEquals(alarmInCache.getLastPublication().getInfo(), CacheObjectCreation.createTestAlarm2().getInfo());
 		assertEquals(alarmInCache.getLastPublication().getState(), CacheObjectCreation.createTestAlarm2().getState());
 		assertNotNull(alarmInCache.getLastPublication().getPublicationTime());		
+		
+		//TODO update alarm to terminated & check publication
 	}
 	
 	
@@ -112,7 +115,7 @@ public class LaserAlarmPublisherImplTest {
     
     Alarm alarmMock = mockControl.createMock(Alarm.class);
     Alarm alarmInCache = CacheObjectCreation.createTestAlarm1();
-    assertTrue(alarmInCache.isPublishedToLaser()); //published value set in test object
+    assertFalse(alarmInCache.isPublishedToLaser()); //not yet published
     
     expect(alarmMock.getId()).andReturn(alarmInCache.getId());
     expect(alarmCache.get(alarmInCache.getId())).andReturn(alarmInCache);
@@ -135,10 +138,13 @@ public class LaserAlarmPublisherImplTest {
     mockControl.verify();
     
     //check last published value is newly set correctly
+    assertTrue(alarmInCache.isPublishedToLaser());
     assertTrue(alarmInCache.getLastPublication() != null);
     assertEquals(alarmInCache.getLastPublication().getInfo(), CacheObjectCreation.createTestAlarm1().getInfo());
     assertEquals(alarmInCache.getLastPublication().getState(), CacheObjectCreation.createTestAlarm1().getState());
-    assertNotNull(alarmInCache.getLastPublication().getPublicationTime());    
+    assertNotNull(alarmInCache.getLastPublication().getPublicationTime());   
+    
+    //TODO update alarm to activated & check publication
 	}	
 	
 	@Test

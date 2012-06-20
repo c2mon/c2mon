@@ -18,6 +18,7 @@ import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.cachepersistence.common.BatchPersistenceManager;
 import cern.tim.server.common.alarm.Alarm;
+import cern.tim.server.common.alarm.AlarmCacheObject;
 import cern.tim.server.common.component.Lifecycle;
 import cern.tim.server.test.CacheObjectCreation;
 
@@ -108,19 +109,21 @@ public class LaserRepublicationTest {
     
     expect(registrationService.registerToAlarms(publisher)).andReturn(listenerContainer);
     listenerContainer.start();  
-    listenerContainer.stop();    
+    //listenerContainer.stop();    
     
     Alarm alarmMock = mockControl.createMock(Alarm.class);
     Alarm alarmInCache = CacheObjectCreation.createTestAlarm1();
-    assertTrue(alarmInCache.isPublishedToLaser()); //published value set in test object
+    assertFalse(alarmInCache.isPublishedToLaser());  //not published   
+    Alarm freshAlarmInCache = CacheObjectCreation.createTestAlarm1(); //used to fake a non-publication
+    assertFalse(alarmInCache.isPublishedToLaser());  //not published 
     
     expect(alarmMock.getId()).andReturn(alarmInCache.getId());    
-    expect(alarmCache.get(alarmInCache.getId())).andReturn(alarmInCache).times(2);
-    expect(alarmCache.getCopy(alarmInCache.getId())).andReturn(alarmInCache);
+    expect(alarmCache.get(alarmInCache.getId())).andReturn(alarmInCache);
+    expect(alarmCache.get(alarmInCache.getId())).andReturn(freshAlarmInCache);
+    expect(alarmCache.getCopy(alarmInCache.getId())).andReturn(freshAlarmInCache);
     alarmPersistenceManager.addElementToPersist(alarmInCache.getId());
     EasyMock.expectLastCall().andThrow(new RuntimeException("test exception"));
-    alarmPersistenceManager.addElementToPersist(alarmInCache.getId());
-    
+    alarmPersistenceManager.addElementToPersist(freshAlarmInCache.getId());    
     
     mockControl.replay();
         
@@ -134,21 +137,18 @@ public class LaserRepublicationTest {
     publisher.notifyElementUpdated(alarmMock);
     
     //now has unpublished alarms
-    assertTrue(publisher.hasUnpublishedAlarms());
-    //reset alarmCacheObject as was actually successfull but want to check republication occurred (filtered out otherwise)
-    alarmInCache = CacheObjectCreation.createTestAlarm1();
+    assertTrue(publisher.hasUnpublishedAlarms());          
     
     //successful after wait
-    Thread.sleep(8000);
+    Thread.sleep(8000);       
+    mockControl.verify();
     assertFalse(publisher.hasUnpublishedAlarms());
     
     //check last published value is newly set correctly
-    assertTrue(alarmInCache.getLastPublication() != null);
-    assertEquals(alarmInCache.getLastPublication().getInfo(), CacheObjectCreation.createTestAlarm1().getInfo());
-    assertEquals(alarmInCache.getLastPublication().getState(), CacheObjectCreation.createTestAlarm1().getState());
-    assertNotNull(alarmInCache.getLastPublication().getPublicationTime());
-    publisher.stop();
-    mockControl.verify();
+    assertTrue(freshAlarmInCache.getLastPublication() != null);
+    assertEquals(CacheObjectCreation.createTestAlarm1().getInfo(), freshAlarmInCache.getLastPublication().getInfo());
+    assertEquals(CacheObjectCreation.createTestAlarm1().getState(), freshAlarmInCache.getLastPublication().getState());
+    assertNotNull(freshAlarmInCache.getLastPublication().getPublicationTime());    
   }
   
 }

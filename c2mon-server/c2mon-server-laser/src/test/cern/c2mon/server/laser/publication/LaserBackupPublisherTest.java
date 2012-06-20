@@ -1,5 +1,6 @@
 package cern.c2mon.server.laser.publication;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -58,7 +59,9 @@ public class LaserBackupPublisherTest {
   @Test
   public void testBackup() throws InterruptedException, ASIException {  
     Alarm alarm1 = CacheObjectCreation.createTestAlarm1();
+    alarm1.hasBeenPublished(new Timestamp(System.currentTimeMillis()));
     Alarm alarm2 = CacheObjectCreation.createTestAlarm2();    
+    alarm2.hasBeenPublished(new Timestamp(System.currentTimeMillis()));
     EasyMock.expect(laserPublisher.getAsi()).andReturn(asi).times(2);
     asi.pushActiveList(EasyMock.isA(List.class));
     EasyMock.expect(laserPublisher.getBackupLock()).andReturn(backupLock).times(2);
