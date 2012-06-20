@@ -209,7 +209,7 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
         Alarm alarm = alarmCache.get(alarmCopy.getId());
         alarm.getWriteLock().lock();
         try {
-          if (!alarm.isPublishedToLaser());
+          if (!alarm.isPublishedToLaser()) {
             try {
               publishToLaser(alarm);
               toBePublished.remove(alarm.getId());
@@ -236,7 +236,8 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
               }             
               log.error(str, e);
               toBePublished.put(alarm.getId(), alarm.getId());              
-            }                       
+            }
+          }                                   
         } finally {
           alarm.getWriteLock().unlock();
         }         
