@@ -66,7 +66,7 @@ public class DipPublisher implements Publisher {
   private final DipFactory dipFactory;
   
   @Autowired
-  public DipPublisher(@Value("c2mon.publisher.dip.server.name") final String serverName) {
+  public DipPublisher(@Value("${c2mon.publisher.dip.server.name}") final String serverName) {
     dipFactory = Dip.create(serverName);
     LOG.info("Created new DIP publisher: " + serverName);
   }
