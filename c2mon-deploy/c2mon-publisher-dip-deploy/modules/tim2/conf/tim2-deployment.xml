@@ -30,7 +30,7 @@
         <property name="c2mon.publisher.dip.server.name" value="${PROCESS_NAME}" />
         <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/${PROCESS_NAME}.tid" />
         <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
-        <property name="c2mon.publisher.dip.log" value="${INSTALL_DIR}/log/${PROCESS_NAME}.log" />
+        <property name="tim.log.path" value="${INSTALL_DIR}/log" />
         <property name="java.library.path" value="${INSTALL_DIR}/lib_so" />
         <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
       </startscript>
