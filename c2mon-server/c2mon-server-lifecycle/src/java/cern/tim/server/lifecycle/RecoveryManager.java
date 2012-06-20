@@ -268,6 +268,7 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description="Republish all non-published alarms (use if alarm publication thread did not shutdown correctly)")
   public void publishUnpublishedAlarms() {
+    LOGGER.info("Publishing all unpublished alarms to LASER and re-publishing to clients.");
     for (Long key : alarmCache.getKeys()) {
       Alarm alarm = alarmCache.get(key);
       alarm.getReadLock().lock();
