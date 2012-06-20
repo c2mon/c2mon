@@ -266,3 +266,79 @@ END
 	$sth->finish;
 
 }
+
+
+## Fetch RDA published metric data tags
+
+sub fetchPublishedTags {
+
+
+        my $fetch_tags_sql = <<END;
+select metric_data_tag_id from dmn_metrics_v where japc_metric_pub_flag='Y'
+END
+
+        my $sth = $dbh->prepare("${fetch_tags_sql}")
+          || die "Couldn't prepare statement: " . $dbh->errstr;
+        my @data;
+        $sth->execute()
+          || die "Couldn't execute statement: " . $sth->errstr;
+
+        open( MYFILE,
+" > ${basedir}/PUBLISHER/RDA/RDA-metrics.tid"
+        );
+        while ( @data = $sth->fetchrow_array() ) {
+                my $tag_id = $data[0];
+
+                print MYFILE "${tag_id}\n";
+
+        }
+        if ( $sth->rows == 0 ) {
+#               print
+#"No data tags are defined for the selected equipment types in the current configuration.\n\n";
+        }
+        $sth->finish;
+        close(MYFILE);
+
+}
+
+## Fetch RDA published rule tags
+
+sub fetchPublishedLimits {
+
+
+        my $fetch_tags_sql = <<END;
+select metric_rule_tag_id as metric_data_tag_id from dmn_metrics_v where japc_rule_pub_flag='Y'
+END
+
+        my $sth = $dbh->prepare("${fetch_tags_sql}")
+          || die "Couldn't prepare statement: " . $dbh->errstr;
+        my @data;
+        $sth->execute()
+          || die "Couldn't execute statement: " . $sth->errstr;
+
+        open( MYFILE,
+" > ${basedir}/PUBLISHER/RDA/RDA-limits.tid"
+        );
+        while ( @data = $sth->fetchrow_array() ) {
+                my $tag_id = $data[0];
+
+                print MYFILE "${tag_id}\n";
+
+        }
+        if ( $sth->rows == 0 ) {
+#               print
+#"No limits are defined for the selected equipment types in the current configuration.\n\n";
+        }
+        $sth->finish;
+        close(MYFILE);
+}
+
+
+
+### Additional view with published TIDs
+
+mkdir("${basedir}/PUBLISHER");
+mkdir("${basedir}/PUBLISHER/RDA");
+
+fetchPublishedLimits;
+fetchPublishedTags; 
