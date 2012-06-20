@@ -1,32 +1,25 @@
 #!/usr/bin/perl
 use lib '/user/alaser/perllib/Config-Properties-1.71/blib/lib';
 use CGI qw(:standard);
-use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
-use Config::Properties;
-use DBD::Oracle;
-use File::Path;
-use Cwd 'abs_path';
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser); use Config::Properties; use DBD::Oracle; use File::Path; use Cwd 'abs_path';
 
 ##
 # Definition of global variables
 ##
 
-#find out the name of the home folder of the application
-#home folder is: bin/../
+#find out the name of the home folder of the application #home folder is: bin/../
 
 my $cdir =  abs_path($0);
 
 my @pathtokens = split(/\//,$cdir);
 
-# we are in bin folder, so the home folder is one level up
-my $appdir = @pathtokens[scalar(@pathtokens)-3];
+# we are in bin folder, so the home folder is one level up my $appdir = @pathtokens[scalar(@pathtokens)-3];
 
-#my $basedir = "/opt/dmn2-rda-publisher/conf";
+my $tidfile = "/opt/${appdir}/conf/publisher-new.tid";
 
-my $c2monClientPropertiesFile= "/user/dmndev/c2mon/client/client.properties";
+my $c2monClientPropertiesFile= "/opt/${appdir}/conf/client.properties";
 
-# Reading property file client.properties
-open PROPS, "< $c2monClientPropertiesFile"
+# Reading property file client.properties open PROPS, "< $c2monClientPropertiesFile"
   or die "Unable to open configuration file $c2monClientPropertiesFile";
 
 my $c2monProperties = new Config::Properties();
@@ -55,13 +48,12 @@ select metric_rule_tag_id as metric_data_tag_id from dmn_metrics_v where japc_ru
 END
 
 my $sth = $dbh->prepare("${fetch_equipments_sql}")  
-    || die "Couldn't prepare statement: " . $dbh->errstr;
-my @data;
+    || die "Couldn't prepare statement: " . $dbh->errstr; my @data;
 $sth->execute()
     || die "Couldn't execute statement: " . $sth->errstr;
 
 open( MYFILE,
-" > ${appdir}/conf/publisher-new.tid"
+" > ${tidfile}"
 );
 
 while ( @data = $sth->fetchrow_array() ) {
@@ -72,8 +64,7 @@ while ( @data = $sth->fetchrow_array() ) {
 }
 
 if ( $sth->rows == 0 ) {
-  # print "No tags are defined to be published to RDA.\n\n";
-}
+  # print "No tags are defined to be published to RDA.\n\n"; }
   
 $sth->finish;
 close(MYFILE);

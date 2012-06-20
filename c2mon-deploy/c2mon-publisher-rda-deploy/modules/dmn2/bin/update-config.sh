@@ -19,8 +19,7 @@ PRGDIR=`dirname "$PRG"`
 # Set PUBLISHER_HOME
 PUBLISHER_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 
-#the script to be called to get the rda-published tag id from db 
-JAPC_PUB_TID_GENERATOR=${PUBLISHER_HOME}/bin/tid-generator-dev.pl
+#the script to be called to get the rda-published tag id from db JAPC_PUB_TID_GENERATOR=${PUBLISHER_HOME}/bin/tid-generator.pl
 
 
 # The configuration file destination
