@@ -21,7 +21,7 @@ my @pathtokens = split(/\//,$cdir);
 # we are in bin folder, so the home folder is one level up
 my $appdir = @pathtokens[scalar(@pathtokens)-3];
 
-my $basedir = "/opt/dmn2-publisher-rda/conf";
+#my $basedir = "/opt/dmn2-rda-publisher/conf";
 
 my $c2monClientPropertiesFile= "/user/dmndev/c2mon/client/client.properties";
 
@@ -54,18 +54,18 @@ union
 select metric_rule_tag_id as metric_data_tag_id from dmn_metrics_v where japc_rule_pub_flag='Y'
 END
 
-my $sth = $dbh->prepare("${fetch_equipments_sql}")	
-	  || die "Couldn't prepare statement: " . $dbh->errstr;
+my $sth = $dbh->prepare("${fetch_equipments_sql}")  
+    || die "Couldn't prepare statement: " . $dbh->errstr;
 my @data;
 $sth->execute()
     || die "Couldn't execute statement: " . $sth->errstr;
 
 open( MYFILE,
-" > ${basedir}/publisher-new.tid"
+" > ${appdir}/conf/publisher-new.tid"
 );
 
 while ( @data = $sth->fetchrow_array() ) {
-	my $tag_id = $data[0];
+  my $tag_id = $data[0];
 
   print MYFILE "${tag_id}\n";
 
@@ -74,6 +74,6 @@ while ( @data = $sth->fetchrow_array() ) {
 if ( $sth->rows == 0 ) {
   # print "No tags are defined to be published to RDA.\n\n";
 }
-	
+  
 $sth->finish;
 close(MYFILE);
