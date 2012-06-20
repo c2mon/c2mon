@@ -7,19 +7,22 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser); use Config::Properties; use
 # Definition of global variables
 ##
 
-#find out the name of the home folder of the application #home folder is: bin/../
+#find out the name of the home folder of the application 
+#home folder is: bin/../
 
 my $cdir =  abs_path($0);
 
 my @pathtokens = split(/\//,$cdir);
 
-# we are in bin folder, so the home folder is one level up my $appdir = @pathtokens[scalar(@pathtokens)-3];
+# we are in bin folder, so the home folder is one level up 
+my $appdir = @pathtokens[scalar(@pathtokens)-3];
 
 my $tidfile = "/opt/${appdir}/conf/publisher-new.tid";
 
 my $c2monClientPropertiesFile= "/opt/${appdir}/conf/client.properties";
 
-# Reading property file client.properties open PROPS, "< $c2monClientPropertiesFile"
+# Reading property file client.properties 
+open PROPS, "< $c2monClientPropertiesFile"
   or die "Unable to open configuration file $c2monClientPropertiesFile";
 
 my $c2monProperties = new Config::Properties();
@@ -64,7 +67,8 @@ while ( @data = $sth->fetchrow_array() ) {
 }
 
 if ( $sth->rows == 0 ) {
-  # print "No tags are defined to be published to RDA.\n\n"; }
+  # print "No tags are defined to be published to RDA.\n\n"; 
+}
   
 $sth->finish;
 close(MYFILE);
