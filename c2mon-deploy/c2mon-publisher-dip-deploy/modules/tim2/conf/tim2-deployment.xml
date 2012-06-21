@@ -36,11 +36,15 @@
       </startscript>
     </application>
 
+
     <application name="tim-publisher-dip-prod" extends="default">
-      <!-- Setting DIP environment variables  -->
-      <env name="DIPNS" value="dipns1,dipns2" />
-      <env name="DIM_DNS_NODE" value="dipns1,dipns2" />
-      <env name="DIM_DNS_PORT" value="2506" />
+
+      <startscript name="dip-publisher-startup">
+        <!-- Setting DIP environment variables  -->
+        <env name="DIPNS" value="dipns1,dipns2" />
+        <env name="DIM_DNS_NODE" value="dipns1,dipns2" />
+        <env name="DIM_DNS_PORT" value="2506" />
+      </startscript>
       
       <deployment installLocation="/opt/tim-publisher-dip">
         <notification>
@@ -54,11 +58,15 @@
       </deployment>
     </application>
 
+
     <application name="tim-publisher-dip-test" extends="default">
-      <!-- Setting DIP environment variables to test DIM DNS -->
-      <env name="DIPNS" value="tim2" />
-      <env name="DIM_DNS_NODE" value="tim2" />
-      <env name="DIM_DNS_PORT" value="2506" />
+    
+      <startscript name="dip-publisher-startup">
+        <!-- Setting DIP environment variables to test DIM DNS -->
+        <env name="DIPNS" value="tim2" />
+        <env name="DIM_DNS_NODE" value="tim2" />
+        <env name="DIM_DNS_PORT" value="2506" />
+      </startscript>
       
       <deployment installLocation="/opt/tim-publisher-dip-test">
         <directory name="conf">
