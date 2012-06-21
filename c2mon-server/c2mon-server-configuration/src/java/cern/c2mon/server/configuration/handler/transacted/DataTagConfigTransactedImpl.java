@@ -155,9 +155,8 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   }
   
   @Override
-  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW,isolation = Isolation.READ_COMMITTED)
-  public List<ProcessChange> doRemoveDataTag(final Long id, final ConfigurationElementReport elementReport) {
-    LOGGER.trace("Removing DataTag " + id);
+  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+  public List<ProcessChange> doRemoveDataTag(final Long id, final ConfigurationElementReport elementReport) {    
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
     try {
       DataTag dataTag = tagCache.get(id);
@@ -201,7 +200,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), removeEvent));
     } catch (CacheElementNotFoundException e) {
       LOGGER.warn("Attempting to remove a non-existent DataTag - no action taken.");
-      elementReport.setWarning("Attempting to remove a non-existent DataTag");
+      throw new CacheElementNotFoundException("Attempting to remove a non-existent DataTag - no action taken", e);      
     }    
     return processChanges;
   }

@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -88,16 +89,18 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
 
   @Override
   public List<ProcessChange> removeDataTag(Long id, ConfigurationElementReport tagReport) {
-    List<ProcessChange> changes = dataTagConfigTransacted.doRemoveDataTag(id, tagReport);
-    DataTag dataTag = dataTagCache.get(id);
-    dataTagCache.remove(id); //only removed from cache if no exception is thrown
-    //remove from Equipment list only once definitively removed from DB & cache (o.w. remove/recreate Process/Equipment cannot reach it)
+    LOGGER.trace("Removing DataTag " + id);
     try {
+      List<ProcessChange> changes = dataTagConfigTransacted.doRemoveDataTag(id, tagReport);
+      DataTag dataTag = dataTagCache.get(id);
+      dataTagCache.remove(id); //only removed from cache if no exception is thrown
+      //remove from Equipment list only once definitively removed from DB & cache (o.w. remove/recreate Process/Equipment cannot reach it)
       equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
-    } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("Unable to locate Equipment with id " + dataTag.getEquipmentId() + "in the cache, when attempting to remove a Tag reference from it.");
-    }
-    return changes;
+      return changes;
+    } catch (CacheElementNotFoundException e) {     
+      tagReport.setWarning(e.getMessage());
+      return new ArrayList<ProcessChange>(); //no changes for DAQ layer
+    }    
   }
 
   @Override
