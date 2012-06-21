@@ -117,10 +117,11 @@ public class BooleanDataProcessor<T extends BooleanJECAdressSpace> extends Abstr
         int word = JECBinaryHelper.getBooleanWord(wordPos, getCurrentValues());
         boolean value = ((word >> bitPos) & 1) == 1;
         ISourceDataTag sourceDataTag = getTag(wordPos, bitPos);
-        if (sourceDataTag != null)
-            send(value, sourceDataTag, System.currentTimeMillis());
-        else
-            getEquipmentLogger().debug("Source data tag for boolean word " + wordPos + " bit " + bitPos);
+        if (sourceDataTag != null) {
+          getEquipmentLogger().trace("Sending boolean datatag with word " + wordPos + " bit " + bitPos);
+          send(value, sourceDataTag, System.currentTimeMillis());
+        } else
+          getEquipmentLogger().trace("No source data tag for boolean word " + wordPos + " bit " + bitPos);
     }
     
     /**

@@ -168,6 +168,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
             if (initialValuesSent.get(blockNumber) != null && initialValuesSent.get(blockNumber)) {
               detectAndSendArrayChanges(blockNumber, jecpFrames.GetJECCurrTimeMilliseconds());
             } else {
+              getEquipmentLogger().debug("Sending initial values for block " + blockNumber);
               sendAllInBlock(blockNumber);
               initialValuesSent.put(blockNumber, true);
             }            
