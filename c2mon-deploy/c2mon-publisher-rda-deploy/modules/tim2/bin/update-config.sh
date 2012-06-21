@@ -26,7 +26,7 @@ CONF_FILE=$PUBLISHER_HOME/conf/publisher.tid
 TEMP_FILE=$PUBLISHER_HOME/conf/publisher.new.xml 
 
 # Get the new configuration
-wget -O - -o /dev/null ${JAPC_PUBLICATIONS_TID_URL} | sort > ${TEMP_FILE}
+wget -O - -o /dev/null ${JAPC_PUBLICATIONS_TID_URL} | sort | uniq > ${TEMP_FILE}
 
 # If the new configuration is different from the old one:
 # (1) create a backup of the current configuration
@@ -36,7 +36,7 @@ if [ -s $CONF_FILE ]; then
   diff $CONF_FILE $TEMP_FILE >/dev/null
   if [ $? -eq 1 ] ; then
     echo "copying file..."
-    cp $CONF_FILE $CONF_FILE.`date +%y%m%d_%k%M%S`
+    cp -fp $CONF_FILE $CONF_FILE.`date +%y%m%d_%k%M%S`
     mv $TEMP_FILE $CONF_FILE
     
     echo "Configuration has changed! The Publisher will automatically subscribe to any new tag IDs within the next 60 seconds."
