@@ -148,7 +148,8 @@ public class RecoveryManager implements SmartLifecycle {
     if (!stopRequested) {      
       notifyAllTagCacheListeners(); //also refreshes rules but not alarms (done with supervision)
     }
-    //IMPORTANT: MUST BE CALLED LAST AS UPDATES TO RULES OR TAGS MAY HAVE OVERWRITTEN CURRENT SUPERVISION STATUS (AND ALARM "?" FOR INSTANCE)
+    //IMPORTANT: MUST BE CALLED LAST AS UPDATES TO RULES OR TAGS MAY HAVE OVERWRITTEN CURRENT SUPERVISION STATUS IF CACHE LISTENER
+    //TAKES ACTION ON STATUS CONFIRMATION (ALTHOUGH THIS IS NOT RECOMMENDED - SEE TimCacheListener INTERFACE FOR DETAILS)
     if (!stopRequested) {
       refreshSupervisionStatus(); //generates new events with the current status; includes alarm callbacks!; 
     }
