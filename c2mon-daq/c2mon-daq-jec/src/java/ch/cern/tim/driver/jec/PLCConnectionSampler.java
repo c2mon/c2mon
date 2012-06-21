@@ -52,7 +52,7 @@ public class PLCConnectionSampler extends Thread {
      */
     public PLCConnectionSampler(final IJECRestarter jecRestarter, 
             final EquipmentLogger equipmentLogger, final long samplerPeriod) {
-        super();
+        super("plc-connection-sampler");
         // Defines the Thread priority to 1
         this.jecRestarter = jecRestarter;
         setPriority(Thread.MAX_PRIORITY);

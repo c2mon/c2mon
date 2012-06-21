@@ -680,27 +680,24 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
         short filteringType = analogDataTag.getValueDeadbandType();
         if (JECConversionHelper.checkSHRTValues(resolutionFactor)) {
             if (resolutionFactor == 0) {
-                getEquipmentLogger().debug("Float value received to be converted in IEEE bits: " + deadbandValue);
+                getEquipmentLogger().debug("Value deadband found for tag " + analogDataTag.getId() + ", to be converted in IEEE bits: " + deadbandValue);
                 if (filteringType == DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE) {
-                    int intBits = JECBinaryHelper.maskIEEEAbsoluteFilteringType(Float.floatToIntBits(deadbandValue));
-                    getEquipmentLogger().debug("DEADBAND IEEE VALUE: 0x" + Integer.toHexString((int) (intBits & BINARY_DEADBAND_PRINT_MASK)));
+                    int intBits = JECBinaryHelper.maskIEEEAbsoluteFilteringType(Float.floatToIntBits(deadbandValue));                    
                     JECBinaryHelper.putIEEEAnalogValueIntoArray(anaRawDeadbandValues, intBits, wordID);
                 } else if (filteringType == DataTagDeadband.DEADBAND_EQUIPMENT_RELATIVE) {
-                    int intBits = JECBinaryHelper.maskIEEERelativeFilteringType(Float.floatToIntBits(deadbandValue));
-                    getEquipmentLogger().debug("DEADBAND IEEE VALUE: 0x" + Integer.toHexString((int) (intBits & BINARY_DEADBAND_PRINT_MASK)));
+                    int intBits = JECBinaryHelper.maskIEEERelativeFilteringType(Float.floatToIntBits(deadbandValue));                    
                     JECBinaryHelper.putIEEEAnalogValueIntoArray(anaRawDeadbandValues, intBits, wordID);
                 } else
                     // TODO Is this the desired behavior? Process deadband?
                     getEquipmentLogger().error("Data Tag Discarded: Invalid Filtering Type - TAG ID: " + analogDataTag.getId());
             } else {
+                getEquipmentLogger().debug("Value deadband found for tag " + analogDataTag.getId() + ": " + deadbandValue);
                 if (filteringType == DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE) {
                     short rawDeadbandValue = JECConversionHelper.convertDeadbandValueToRawDeadband(physicalMaxValue, physicalMinValue, deadbandValue, resolutionFactor);
-                    rawDeadbandValue = JECBinaryHelper.maskAbsoluteFilteringType(rawDeadbandValue);
-                    getEquipmentLogger().debug("ABSOLUTE DEADBAND VALUE: 0x" + Integer.toHexString((int) (rawDeadbandValue & BINARY_DEADBAND_PRINT_MASK)));
+                    rawDeadbandValue = JECBinaryHelper.maskAbsoluteFilteringType(rawDeadbandValue);                    
                     JECBinaryHelper.putAnalogValueIntoArray(anaRawDeadbandValues, rawDeadbandValue, wordID);
                 } else if (filteringType == DataTagDeadband.DEADBAND_EQUIPMENT_RELATIVE) {
-                    short hrfDeadBandValue = JECBinaryHelper.maskRelativeFilteringType((short) (deadbandValue * StdConstants.MANTISSA));
-                    getEquipmentLogger().debug("RELATIVE DEADBAND VALUE: 0x" + Integer.toHexString((int) (hrfDeadBandValue & BINARY_DEADBAND_PRINT_MASK)));
+                    short hrfDeadBandValue = JECBinaryHelper.maskRelativeFilteringType((short) (deadbandValue * StdConstants.MANTISSA));                    
                     JECBinaryHelper.putAnalogValueIntoArray(anaRawDeadbandValues, hrfDeadBandValue, wordID);
                 } else
                     // TODO Is this the desired behavior? Process deadband?
@@ -721,7 +718,11 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
     public JECPFrames getDeadbandFrame(final short blockID) throws JECIndexOutOfRangeException {
         anaRawDeadbandValues = new byte[analogDataProcessor.getJecAddressSpace().getJavaByteArraySize()];
         for (ISourceDataTag analogDataTag : analogDataTags) {
+          try {
             configureDeadband(analogDataTag);
+          } catch (IllegalArgumentException e) {
+            getEquipmentLogger().error("Exception caught while configuring deadband for PLC for tag " + analogDataTag.getId() + " - will not be correctly configured on PLC side.", e);
+          }            
         }
         JECPFrames sendFrame = plcFactory.getRawSendFrame();
         sendFrame.UpdateMsgID(StdConstants.SET_CFG_MSG);
