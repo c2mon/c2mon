@@ -10,13 +10,6 @@
 # Email address for notifications sent out by the silentcheck function
 NOTIFY=tim.support@cern.ch,ti.operation@cern.ch
 
-#####################
-# DIP configuration #
-#####################
-export DIPNS=dipns1,dipns2
-export DIM_DNS_NODE=dipns1,dipns2
-export DIM_DNS_PORT=2506
-
 ########
 # JAVA #
 ########
@@ -153,7 +146,12 @@ DIPPublisher_silentcheck() {
 
 
 if [ "$2" == "" -o "$2" != "DIPPub01" -a "$2" != "DIPPub02" ] ; then
-
+  echo "**************************************************************"
+  echo " usage:"
+  echo "   $0 start|stop|restart|status publisher_name"
+  echo " e.g: $0 start DIPPub01"
+  echo "**************************************************************"
+else
   case "$1" in
 
    'start')
@@ -177,13 +175,7 @@ if [ "$2" == "" -o "$2" != "DIPPub01" -a "$2" != "DIPPub02" ] ; then
     echo "   $0 start|stop|restart|status publisher_name"
     echo " e.g: $0 start DIPPub01"
     echo "**************************************************************"
-   esac
-  else
-    echo "**************************************************************"
-    echo " usage:"
-    echo "   $0 start|stop|restart|status publisher_name"
-    echo " e.g: $0 start DIPPub01"
-    echo "**************************************************************"
-  fi
+  esac
+fi
 
 exit $?

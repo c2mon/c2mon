@@ -37,6 +37,11 @@
     </application>
 
     <application name="tim-publisher-dip-prod" extends="default">
+      <!-- Setting DIP environment variables  -->
+      <env name="DIPNS" value="dipns1,dipns2" />
+      <env name="DIM_DNS_NODE" value="dipns1,dipns2" />
+      <env name="DIM_DNS_PORT" value="2506" />
+      
       <deployment installLocation="/opt/tim-publisher-dip">
         <notification>
           <!-- you can give more than one mail for deployment notification -->
@@ -50,10 +55,15 @@
     </application>
 
     <application name="tim-publisher-dip-test" extends="default">
+      <!-- Setting DIP environment variables to test DIM DNS -->
+      <env name="DIPNS" value="tim2" />
+      <env name="DIM_DNS_NODE" value="tim2" />
+      <env name="DIM_DNS_PORT" value="2506" />
+      
       <deployment installLocation="/opt/tim-publisher-dip-test">
         <directory name="conf">
           <!-- Copy over the c2mon.properties file into the /conf directory  -->
-          <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client" mask="400" />
+          <file name="c2mon-client.properties" sourceDir="/user/timoper/rep/c2mon/client" mask="400" />
         </directory>
       </deployment>
     </application>
