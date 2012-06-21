@@ -7,6 +7,11 @@ import static org.junit.Assert.*;
 import ch.cern.tim.driver.jec.tools.JECBinaryHelper;
 import ch.cern.tim.jec.StdConstants;
 
+/**
+ * 
+ * @author Andreas Lang, Mark Brightwell
+ *
+ */
 public class JECBinaryHelperTest {
     
     private byte[] testByteArray = new byte[StdConstants.JEC_DATA_SIZE];
@@ -59,5 +64,39 @@ public class JECBinaryHelperTest {
         JECBinaryHelper.putAnalogValueIntoArray(testByteArray, (short) -50, 0);
         int value = JECBinaryHelper.getAnalogWord(0, testByteArray);
         assertEquals(-50, value);
+    }
+    
+    @Test
+    public void testMaskIEEEAbsoluteFilteringType() {
+      int testDeadband = Float.floatToIntBits(4.5f); //assume positive 
+      int maskedValue = JECBinaryHelper.maskIEEEAbsoluteFilteringType(testDeadband);      
+      assertEquals("01" + Integer.toBinaryString(testDeadband).substring(0, 30), "0" + Integer.toBinaryString(maskedValue)); 
+    }
+    
+    @Test
+    public void testMaskIEEERelativeFilteringType() {
+      int testDeadband = Float.floatToIntBits(40.5f); //assume positive 
+      int maskedValue = JECBinaryHelper.maskIEEERelativeFilteringType(testDeadband);      
+      assertEquals("11" + Integer.toBinaryString(testDeadband).substring(0, 30), Integer.toBinaryString(maskedValue)); 
+    }
+    
+    @Test
+    public void testMaskAbsoluteFilteringType() {
+      short testDeadband = 4000;
+      short maskedValue = JECBinaryHelper.maskAbsoluteFilteringType(testDeadband);      
+      assertEquals(Integer.toBinaryString(testDeadband), Integer.toBinaryString(maskedValue)); 
+    }
+    
+    @Test
+    public void testMaskRelativeFilteringType() {
+      short testDeadband = 23; 
+      short maskedValue = JECBinaryHelper.maskRelativeFilteringType(testDeadband);      
+      assertEquals(Integer.toBinaryString(testDeadband), Integer.toBinaryString(maskedValue & 0x7FFF)); //remove leading 1 
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void testMaskAbsoluteFilteringTypeException() {
+      short deadband = 16400; //bigger than 2^14 (2 most significant bits are 0)
+      short maskedValue = JECBinaryHelper.maskAbsoluteFilteringType(deadband);
     }
 }

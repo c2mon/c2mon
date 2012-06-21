@@ -173,6 +173,8 @@ public final class JECBinaryHelper {
      * @return short - Value with the right masking value
      */
     public static short maskAbsoluteFilteringType(final short value) {
+        if ((value & 0xC000) != 0x0000) 
+          throw new IllegalArgumentException("Value deadband is either too large or negative and cannot be masked correctly.");
         short result = (short) (value & 0x3FFF);
         return result;
     }
@@ -185,6 +187,8 @@ public final class JECBinaryHelper {
      * @return short - Value with the right masking value
      */
     public static short maskRelativeFilteringType(final short value) {
+        if ((value & 0xC000) != 0x0000) 
+          throw new IllegalArgumentException("Value deadband is either too large or negative and cannot be masked correctly.");
         short result = (short) (value | 0x8000);
         result = (short) (result & 0xBFFF);
         return result;
