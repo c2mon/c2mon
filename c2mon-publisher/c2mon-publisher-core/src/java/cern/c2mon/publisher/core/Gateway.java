@@ -213,7 +213,13 @@ public class Gateway implements DataTagUpdateListener {
    */
   @Override
   public synchronized void onUpdate(final ClientDataTagValue tagUpdate) {
-    publisher.onUpdate(tagUpdate, tagConfigs.get(tagUpdate.getId()));
+    if (tagUpdate.getDataTagQuality().isExistingTag()) {
+      publisher.onUpdate(tagUpdate, tagConfigs.get(tagUpdate.getId()));
+    }
+    else {
+      LOG.warn("onUpdate() - Got value update for unknown tag "
+               + tagUpdate.getId() + " ==> No publication possible!");
+    }
   }
 
   /**
