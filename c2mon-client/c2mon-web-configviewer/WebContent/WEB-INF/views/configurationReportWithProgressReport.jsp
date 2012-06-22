@@ -34,6 +34,9 @@ function startProcess() {
 
 	startConfigurationRequest(); // starts the apply configuration request
 	getProgress(); // polls the server and updates the progress bar
+
+	document.theOnlyFormInThisPage.id.readOnly = true;
+	document.getElementsByName("submitButton")[0].disabled = true;
 }
 
 /**
@@ -103,7 +106,7 @@ function getProgress() {
 	<input type="text" name="id" value="${formTagValue}" size="10" /> 
 </form:form>
 
-<input type="button" value="Submit" onclick="startProcess()">
+<input name="submitButton" type="button" value="Submit" onclick="startProcess()">
 
 <div id="progressbar"></div>
 
