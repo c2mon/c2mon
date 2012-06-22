@@ -213,6 +213,26 @@ public class ConfigLoaderController {
   }  
   
   /**
+   * Directly makes an ApplyConfiguration request for the specified id.
+   * A listener is registered that listens for ProgressReport updates.
+   * The progress update is shown in a progress bar.
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @param id The configuration id for which the request is made.
+   * @return name of a jsp page which will be displayed
+   */
+  @RequestMapping(value = CONFIG_LOADER_PROGRESS_REPORT_URL + "/{id}", method = RequestMethod.GET)
+  public String startConfigurationProcessWithProgressReportWithoutForm(
+      @PathVariable(value = "id") final String id, final Model model) {
+
+    logger.info("CONFIG_LOADER_PROGRESS_REPORT_URL/id:" + id);
+
+    model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR,
+        CONFIG_LOADER_FORM_URL, "", CONFIG_LOADER_URL));
+    model.addAttribute("configurationId", id);
+    return "configurationReportWithProgressReportWithoutForm";
+  }  
+  
+  /**
    * Starts an applyConfiguration request to the server.
    * Listens for Progress Report updates.
    * @param configurationId the id of the configuration
