@@ -237,7 +237,9 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
               log.error(str, e);
               toBePublished.put(alarm.getId(), alarm.getId());              
             }
-          }                                   
+          } else {
+            toBePublished.remove(alarm.getId()); //remove in case re-publicaton thread attempts a publication but other server has already published it
+          }
         } finally {
           alarm.getWriteLock().unlock();
         }         
