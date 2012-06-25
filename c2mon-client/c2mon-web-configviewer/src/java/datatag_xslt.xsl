@@ -69,7 +69,16 @@
 			</tr>
 			<tr>
 				<td class="highlight bold">Tag Quality</td>
-				<td><xsl:value-of select="tagQuality/isValid"/></td>
+				<td>
+					<xsl:choose>
+						<xsl:when test="tagQuality/isValid = 'true'">
+        			Valid
+        		</xsl:when>
+        		<xsl:otherwise>
+        			Not Valid
+    				</xsl:otherwise>
+        	</xsl:choose>
+				</td>
 				<td class="highlight bold">Server Timestamp</td>
 				<td><xsl:value-of select="serverTimestamp"/></td>
 			</tr>		
