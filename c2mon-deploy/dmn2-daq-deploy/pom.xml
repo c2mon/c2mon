@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.tim2.tim2-daq</groupId>
 		<artifactId>tim2-daq-pom</artifactId>
-		<version>1.0.7</version>
+		<version>1.0.8</version>
 	</parent>
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
