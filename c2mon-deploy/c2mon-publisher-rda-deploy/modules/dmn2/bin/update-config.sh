@@ -26,6 +26,8 @@ PUBLISHER_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 CONF_FILE=$PUBLISHER_HOME/conf/publisher.tid
 TEMP_FILE=$PUBLISHER_HOME/conf/publisher-new.tid 
 
+JAPC_PUB_TID_GENERATOR=${PUBLISHER_HOME}/bin/tid-generator.pl
+
 # Get the new configuration
 `${JAPC_PUB_TID_GENERATOR}`
 
