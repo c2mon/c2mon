@@ -251,7 +251,7 @@ sub fetchEntities {
 	my $entity_type = $_[0];
 
 	my $fetch_entities_sql = <<END;
-select EQUIPMENT_RULE_TAG_ID from DMNTEST.DMN_EQUIPMENT_V where EQUIPMENT_SINGLETON_FLAG='N'  
+select EQUIPMENT_RULE_TAG_ID from DMN_EQUIPMENT_V where EQUIPMENT_SINGLETON_FLAG='N'  
 END
 
 	my $sth = $dbh->prepare("${fetch_entities_sql}")
