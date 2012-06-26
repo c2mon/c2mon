@@ -22,12 +22,12 @@
     </dependency>
   	
   	<!-- CERN 3rd party dependencies -->
-  	<dependency>
-      <groupId>cern.en.ice</groupId>
+    <dependency>
+      <groupId>cern.dip</groupId>
       <artifactId>dip</artifactId>
-      <version>5.4.2</version>
+      <version>5.4.3</version>
     </dependency>
-  	
+    
   	<!-- 3rd party dependencies -->
   	<dependency>
   		<groupId>log4j</groupId>
@@ -37,5 +37,6 @@
   		<groupId>org.springframework</groupId>
   		<artifactId>spring-context</artifactId>
   	</dependency>
+  	
   </dependencies>
 </project>
