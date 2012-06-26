@@ -1,5 +1,5 @@
 #!/usr/bin/perl -wT
-use lib '/user/alaser/perllib/Config-Properties-1.71/blib/lib';
+#use lib '/user/alaser/perllib/Config-Properties-1.71/blib/lib';
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
@@ -32,23 +32,6 @@ open VFILE, "< ../version.txt"
 my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
-
-##
-# Reading the C2MON client properties file #
-#
-open PROPS, "< $c2monClientPropertiesFile"
-  or die "Unable to open configuration file $c2monClientPropertiesFile";
-
-
-my $c2monProperties = new Config::Properties();
-$c2monProperties->load(*PROPS);
-
-my $jdbcDriver           = $c2monProperties->getProperty("c2mon.jdbc.driver");
-
-my $jdbcRoUrl            = $c2monProperties->getProperty("c2mon.jdbc.ro.url");
-my $jdbcRoUser           = $c2monProperties->getProperty("c2mon.jdbc.ro.user");
-my $jdbcRoPassword       = $c2monProperties->getProperty("c2mon.jdbc.ro.password");
-close PROPS;
 
 ##
 # Procedure to generate for each library defined in the ../lib directory
@@ -110,12 +93,6 @@ jarlist ("$jardir");
 print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
 print "		<property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
-
-# C2MON read-only credentials to STL database, needed for the history player and charts
-print "		<property name=\"c2mon.jdbc.driver\" value=\"$jdbcDriver\"/>\n";
-print "		<property name=\"c2mon.jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
-print "		<property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
-print "		<property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
 
 if (param('configurl')) {
 	print "		<property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";
