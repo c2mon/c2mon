@@ -5,7 +5,7 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Config::Properties;
 use DBD::Oracle;
 use File::Path;
-use Cwd;
+use Cwd 'abs_path';
 
 ##
 # Definition of global variables
@@ -14,11 +14,12 @@ use Cwd;
 #find out the name of the home folder of the application
 #home folder is: cgi-bin/../
 
-my $cdir = getcwd;
+my $cdir =  abs_path($0);
+
 my @pathtokens = split(/\//,$cdir);
 
 # we are in cgi-bin folder, so the home folder is one level up
-my $appdir = @pathtokens[scalar(@pathtokens)-2];
+my $appdir = @pathtokens[scalar(@pathtokens)-3];
 
 my $basedir = "/user/diamonop/public_html/dmn2-views";
 my $codebase = "http://bewww/~diamonop";
@@ -44,13 +45,18 @@ my $dbiUrl = $c2monProperties->getProperty("c2mon.jdbc.config.url");
 # change it to perl dbi format
 $dbiUrl =~ s/jdbc:oracle:thin:@/dbi:Oracle:/g;
 
+
 my $dbh = DBI->connect( $dbiUrl, $dbiUser, $dbiPassword )
   || die( $DBI::errstr . "\n" );
 
+### Start of configuration file generation
+#
+#  Creating the following structure: Equipment_type/Process/Process-*.tid
+#
 
 ## Fetch current equipment types
 
-rename( "${basedir}/DAQ", "/dev/null/1" );    # Drop previous structure
+system("rm -rf ${basedir}/DAQ" );    # Drop previous structure
 mkdir("${basedir}/DAQ");
 
 my $fetch_types_sql = <<END;
@@ -75,15 +81,17 @@ if ( $sth->rows == 0 ) {
 	# print "No equipment types are defined in the current configuration.\n\n";
 }
 
-	my $entity_type = "COMPUTER";
-	rename( "${basedir}/${entity_type}", "/dev/null/1" )
-	  ;    # Drop previous structure
+	my $entity_type = "EQUIPMENT";
+	system("rm -rf ${basedir}/${entity_type}" )  ;    # Drop previous structure
 	mkdir("${basedir}/${entity_type}");
 
 	fetchEntities($entity_type);
 
 
 ### End of configuration file generation
+
+
+### Additional subs used for tid file generation by Peter Jurcso
 
 ### Fetch current processes
 
@@ -138,7 +146,7 @@ sub fetchEquipmentAlives {
 	my $equipment_type = $_[2];
 
 	my $fetch_equipments_sql = <<END;
-select EQUIPMENT_ALIVE_TAG_ID from DMN_EQUIPMENT_V where process_id=
+select EQUIPMENT_ALIVE_TAG_ID from DMN_EQUIPMENT_V where equipment_alive_tag_id is not null and process_id=
 END
 
 	my $sth = $dbh->prepare("${fetch_equipments_sql} ${process_id}")
@@ -243,7 +251,7 @@ sub fetchEntities {
 	my $entity_type = $_[0];
 
 	my $fetch_entities_sql = <<END;
-select COMPUTER_RULE_TAG_ID from DMN_COMPUTERS_V where COMPUTER_RULE_FLAG='Y'
+select EQUIPMENT_RULE_TAG_ID from DMNTEST.DMN_EQUIPMENT_V where EQUIPMENT_SINGLETON_FLAG='N'  
 END
 
 	my $sth = $dbh->prepare("${fetch_entities_sql}")
@@ -266,7 +274,6 @@ END
 	$sth->finish;
 
 }
-
 
 ## Fetch RDA published metric data tags
 
