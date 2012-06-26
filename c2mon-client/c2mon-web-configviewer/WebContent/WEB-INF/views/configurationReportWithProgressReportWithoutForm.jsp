@@ -29,6 +29,9 @@
 
 	startConfigurationRequest(); // starts the apply configuration request
 	getProgress(); // polls the server and updates the progress bar
+	getProgressDescription(); // polls the server and updates the description info
+
+	$("p").text("Started...");
 
 	// disable the submit button
 	document.theOnlyFormInThisPage.id.readOnly = true;
@@ -90,6 +93,25 @@ function getProgress() {
 	}, dataType: "json", complete: getProgress, timeout: 50 });
 }
 
+/**
+ * Runs every "timeout" milliseconds and polls the server 
+ * for a description of the current progress of the Request.
+ */
+function getProgressDescription() {
+	
+    $.ajax({ 
+		type: "POST",
+    url: "/c2mon-web-configviewer/configloader/progress/getProgressDescription",
+    data: { configurationId : document.theOnlyFormInThisPage.id.value },
+			async: true,
+    success: function(data){
+
+		var description = data;
+		$("p").text(description);
+	    
+	}, dataType: "json", complete: getProgressDescription, timeout: 50 });
+}
+
 </script>
 </head>
 
@@ -104,6 +126,12 @@ function getProgress() {
 
 <input name="submitButton" type="button" value="Submit" onclick="startProcess()">
 
+<div class="ui-widget">
+	<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
+				<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+				<strong>No configuration is running at the moment.</strong></p>
+	</div>
+</div>
 <div id="progressbar"></div>
 
 <br/>
