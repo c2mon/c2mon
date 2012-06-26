@@ -34,6 +34,9 @@ function startProcess() {
 
 	startConfigurationRequest(); // starts the apply configuration request
 	getProgress(); // polls the server and updates the progress bar
+	getProgressDescription(); // polls the server and updates the description info
+
+	$("p").text("Started...");
 
 	document.theOnlyFormInThisPage.id.readOnly = true;
 	document.getElementsByName("submitButton")[0].disabled = true;
@@ -43,10 +46,10 @@ function startProcess() {
  * Redirects the user to the final "ConfigurationReport"
  * once the Request has finished executing in the server. 
  */
-function progressFinished() {
+ function progressFinished() {
 
-	window.location = "/c2mon-web-configviewer/configloader/progress/finalReport/" 
-		+ document.theOnlyFormInThisPage.id.value;
+		window.location = "/c2mon-web-configviewer/configloader/progress/finalReport/" 
+			+ document.theOnlyFormInThisPage.id.value;
 }
 
 /**
@@ -90,9 +93,30 @@ function getProgress() {
     $("#progressbar").progressbar({
     	value: data
 			});
-
+	    
 	}, dataType: "json", complete: getProgress, timeout: 50 });
 }
+
+
+/**
+ * Runs every "timeout" milliseconds and polls the server 
+ * for a description of the current progress of the Request.
+ */
+function getProgressDescription() {
+	
+    $.ajax({ 
+		type: "POST",
+    url: "/c2mon-web-configviewer/configloader/progress/getProgressDescription",
+    data: { configurationId : document.theOnlyFormInThisPage.id.value },
+			async: true,
+    success: function(data){
+
+		var description = data;
+		$("p").text(description);
+	    
+	}, dataType: "json", complete: getProgressDescription, timeout: 50 });
+}
+
 
 </script>
 </head>
@@ -108,6 +132,12 @@ function getProgress() {
 
 <input name="submitButton" type="button" value="Submit" onclick="startProcess()">
 
+<div class="ui-widget">
+	<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
+				<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+				<strong>No configuration is running at the moment.</strong></p>
+	</div>
+</div>
 <div id="progressbar"></div>
 
 <div style="margin-top: 50px;">
