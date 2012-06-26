@@ -1,10 +1,8 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
-import java.util.Random;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.SwingUtilities;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
@@ -17,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import cern.c2mon.shared.client.request.ClientRequestErrorReport;
-import cern.c2mon.shared.client.request.ClientRequestErrorReportImpl;
+import com.google.gson.Gson;
+
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.web.configviewer.service.ConfigLoaderService;
 import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.FormUtility;
+import cern.tim.shared.client.configuration.ConfigurationReport;
+import cern.tim.util.json.GsonFactory;
 
 
 /**
@@ -30,6 +30,8 @@ import cern.c2mon.web.configviewer.util.FormUtility;
  * */
 @Controller
 public class ConfigLoaderController {
+  
+  private static transient Gson gson = null;
 
   /**
    * A REST-style URL 
@@ -266,5 +268,36 @@ public class ConfigLoaderController {
     // @ResponseBody will automatically convert the returned value into JSON format
     // You must have Jackson in your classpath
     return currentProgress;
+  }
+  
+  /**
+   * @param configurationId the id of the configuration
+   * @return Returns a description of what is happening in the server currently
+   * @throws InterruptedException in case of error
+   */
+  @RequestMapping(value = CONFIG_LOADER_PROGRESS_REPORT_URL + "/getProgressDescription", method = RequestMethod.POST)
+  @ResponseBody
+  public String getProgressDescription(@RequestParam("configurationId") final String configurationId) throws InterruptedException {
+
+    logger.info("(AJAX) Received Progress Description Request for configurationId:" + configurationId);
+
+    ClientRequestProgressReport report = service.getReportForConfiguration(configurationId);
+    if (report == null) {
+      return null;
+    }
+    // @ResponseBody will automatically convert the returned value into JSON format
+    // You must have Jackson in your classpath
+    return getGson().toJson(report.getDescriptionMessage());
+  }
+  
+  /**
+   * @return The Gson parser singleton instance
+   */
+  protected static synchronized Gson getGson() {
+    if (gson == null) {
+      gson = GsonFactory.createGson();
+    }
+
+    return gson;
   }
 }
