@@ -1,9 +1,8 @@
 #!/usr/bin/perl -wT
-#use lib '/user/alaser/perllib/Config-Properties-1.71/blib/lib';
+
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
-use Config::Properties;
 use Cwd;
 
 #find out the name of the home folder of the application
@@ -32,6 +31,7 @@ open VFILE, "< ../version.txt"
 my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
+
 
 ##
 # Procedure to generate for each library defined in the ../lib directory

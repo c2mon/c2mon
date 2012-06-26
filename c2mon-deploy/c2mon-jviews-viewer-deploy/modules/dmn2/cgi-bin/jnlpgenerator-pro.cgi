@@ -1,9 +1,8 @@
 #!/usr/bin/perl -wT
-#use lib '/user/alaser/perllib/Config-Properties-1.71/blib/lib';
+
 use strict;
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
-use Config::Properties;
 use Cwd;
 
 #find out the name of the home folder of the application
@@ -33,22 +32,6 @@ my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
 
-##
-# Reading the C2MON client properties file #
-#
-#open PROPS, "< $c2monClientPropertiesFile"
-#  or die "Unable to open configuration file $c2monClientPropertiesFile";
-
-
-#my $c2monProperties = new Config::Properties();
-#$c2monProperties->load(*PROPS);
-
-#my $jdbcDriver           = $c2monProperties->getProperty("c2mon.jdbc.driver");
-
-#my $jdbcRoUrl            = $c2monProperties->getProperty("c2mon.jdbc.ro.url");
-#my $jdbcRoUser           = $c2monProperties->getProperty("c2mon.jdbc.ro.user");
-#my $jdbcRoPassword       = $c2monProperties->getProperty("c2mon.jdbc.ro.password");
-#close PROPS;
 
 ##
 # Procedure to generate for each library defined in the ../lib directory
