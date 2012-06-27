@@ -20,6 +20,7 @@ package cern.c2mon.server.configuration.mybatis;
 
 import java.util.List;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +63,16 @@ public class ConfigurationDAOImpl implements ConfigurationDAO {
 
   @Override
   public List<ConfigurationElement> getConfigElements(int configId) {
-    return configurationMapper.getConfigElements(configId);
+    try {
+      return configurationMapper.getConfigElements(configId);
+    } catch (PersistenceException e) {
+      if (e.getCause() instanceof NullPointerException) {
+        throw new PersistenceException("Nullpointer exception caught while loading configuration elements: "
+            + "please check none of the element key-value pairs you are trying to load are null!", e);
+      } else {
+        throw e;
+      }        
+    }    
   }
 
   @Override
