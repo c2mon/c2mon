@@ -46,6 +46,7 @@
             <prop key="jms.config.destination">c2mon.config</prop>
             
             <prop key="jms.daq.out.connections">1</prop>
+            <prop key="c2mon.jms.daq.configuration.timeout">180000</prop>
             <prop key="c2mon.jms.process.listener.trunk">c2mon.process</prop>
             
             <prop key="c2mon.jms.heartbeat.topic">c2mon.client.heartbeat</prop>            
