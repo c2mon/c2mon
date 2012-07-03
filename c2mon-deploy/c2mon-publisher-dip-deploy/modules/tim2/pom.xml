@@ -45,10 +45,10 @@
           <artifactItems>
             <artifactItem>
 
-              <groupId>cern.en.ice</groupId>
-              <artifactId>dip</artifactId>
-              <classifier>i386-SLC5-gpp-shared</classifier>
-              <version>5.4.2</version>
+              <groupId>cern.dip</groupId>
+              <artifactId>dip-shared</artifactId>
+              <classifier>i386-Linux-gpp-shared</classifier>
+              <version>5.4.3</version>
               <type>nar</type>
 
               <overWrite>true</overWrite>
