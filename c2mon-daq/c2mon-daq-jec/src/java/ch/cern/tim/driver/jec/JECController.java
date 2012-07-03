@@ -603,7 +603,12 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      */
     @Override
     public int getNumberOfAnalogDataJECFrames() {
-        return (analogDataProcessor.getJecAddressSpace().getMaxWordIdPLC() * 2 / StdConstants.JEC_DATA_SIZE) + 1;
+        int maxWordId = analogDataProcessor.getJecAddressSpace().getMaxWordIdPLC(); 
+        if (maxWordId < 0) { //not set
+          return 0;
+        } else {
+          return (maxWordId * 2 / StdConstants.JEC_DATA_SIZE) + 1;
+        }        
     }
 
     /**
@@ -613,7 +618,12 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      */
     @Override
     public int getNumberOfBooleanDataJECFrames() {
-        return (booleanDataProcessor.getJecAddressSpace().getMaxWordId() * 2 / StdConstants.JEC_DATA_SIZE) + 1;
+        int maxWordId = booleanDataProcessor.getJecAddressSpace().getMaxWordId();        
+        if (maxWordId < 0) { //not set
+          return 0;
+        } else {
+          return (maxWordId * 2 / StdConstants.JEC_DATA_SIZE) + 1;
+        }
     }
 
     /**

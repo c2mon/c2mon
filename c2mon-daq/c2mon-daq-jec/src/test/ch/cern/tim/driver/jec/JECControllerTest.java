@@ -15,9 +15,12 @@ import cern.tim.driver.common.conf.core.EquipmentConfiguration;
 import cern.tim.driver.common.conf.core.ProcessConfiguration;
 import cern.tim.driver.common.conf.core.RunOptions;
 import cern.tim.shared.common.ConfigurationException;
+import cern.tim.shared.common.datatag.DataTagAddress;
 import cern.tim.shared.common.datatag.address.PLCHardwareAddress;
 import cern.tim.shared.daq.command.ISourceCommandTag;
 import cern.tim.shared.daq.command.SourceCommandTag;
+import cern.tim.shared.daq.datatag.SourceDataTag;
+import ch.cern.tim.driver.jec.address.TestPLCHardwareAddress;
 import ch.cern.tim.driver.jec.config.PLCConfiguration;
 import ch.cern.tim.driver.jec.frames.JECCommandRunner;
 import ch.cern.tim.jec.JECPFrames;
@@ -115,5 +118,33 @@ public class JECControllerTest {
     @Test
     public void testClearTagConfiguration() {
         jecController.clearTagConfiguration();
+    }
+       
+    @Test
+    public void testGetNumberAnalogFrames() {
+      assertEquals(0, jecController.getNumberOfAnalogDataJECFrames());
+      //need a single frame
+      jecController.configureDataTag(new SourceDataTag(10L, "test tag", false, (short)0, "Float", new DataTagAddress(new TestPLCHardwareAddress("PWA", 1, 0, 0, PLCHardwareAddress.STRUCT_ANALOG))));
+      assertEquals(1, jecController.getNumberOfAnalogDataJECFrames());
+      //still 1 frame only
+      jecController.configureDataTag(new SourceDataTag(11L, "test tag", false, (short)0, "Float", new DataTagAddress(new TestPLCHardwareAddress("PWA", 1, 110, 13, PLCHardwareAddress.STRUCT_ANALOG))));
+      assertEquals(1, jecController.getNumberOfAnalogDataJECFrames());
+      //need 2 frames
+      jecController.configureDataTag(new SourceDataTag(12L, "test tag", false, (short)0, "Float", new DataTagAddress(new TestPLCHardwareAddress("PWA", 1, 222, 0, PLCHardwareAddress.STRUCT_ANALOG))));
+      assertEquals(2, jecController.getNumberOfAnalogDataJECFrames());
+    }
+    
+    @Test
+    public void testGetNumberBooleanFrames() {
+      assertEquals(0, jecController.getNumberOfBooleanDataJECFrames());
+      //need a single frame
+      jecController.configureDataTag(new SourceDataTag(10L, "test tag", false, (short)0, "Boolean", new DataTagAddress(new TestPLCHardwareAddress("PWA", 1, 0, 0, PLCHardwareAddress.STRUCT_BOOLEAN))));
+      assertEquals(1, jecController.getNumberOfBooleanDataJECFrames());
+      //still 1 frame only
+      jecController.configureDataTag(new SourceDataTag(11L, "test tag", false, (short)0, "Boolean", new DataTagAddress(new TestPLCHardwareAddress("PWA", 1, 111, 12, PLCHardwareAddress.STRUCT_BOOLEAN))));
+      assertEquals(1, jecController.getNumberOfBooleanDataJECFrames());
+      //need 2 frames
+      jecController.configureDataTag(new SourceDataTag(12L, "test tag", false, (short)0, "Boolean", new DataTagAddress(new TestPLCHardwareAddress("PWA", 1, 112, 0, PLCHardwareAddress.STRUCT_BOOLEAN))));
+      assertEquals(2, jecController.getNumberOfBooleanDataJECFrames());
     }
 }
