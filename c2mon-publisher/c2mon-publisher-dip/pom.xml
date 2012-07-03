@@ -25,8 +25,7 @@
     <dependency>
       <groupId>cern.dip</groupId>
       <artifactId>dip-jni</artifactId>
-      <version>5.4.3</version>
-      <type>nar</type>
+      <version>5.4.3a</version>
     </dependency>
     
   	<!-- 3rd party dependencies -->
