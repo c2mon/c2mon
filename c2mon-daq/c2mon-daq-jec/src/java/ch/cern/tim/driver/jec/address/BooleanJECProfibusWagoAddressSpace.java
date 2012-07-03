@@ -76,15 +76,15 @@ public class BooleanJECProfibusWagoAddressSpace extends BooleanJECAdressSpace {
      */
     public int getNumberOfMMDModules() {
         int numberOfModules = 0;
-        if (maxMMDWordId != -1) {
-            numberOfModules = ((maxMMDWordId * MMD_MODULES_PER_WORD) + 1) + (maxMMDBitId / MMD_MODULES_PER_WORD);
+        if (maxMMDWordId != -1) {            
+            numberOfModules = maxMMDWordId * MMD_MODULES_PER_WORD + maxMMDBitId * MMD_MODULES_PER_WORD / 16 + 1;
         }
         return numberOfModules;
     }
 
     /**
      * This will set the max word id. But only! if the provided word id is bigger
-     * or equals.
+     * or equals. If the max word id is set by this method, the max bit id is reset.
      * 
      * @param wordId the maxMMDWordId to set
      * @return True if the word was greater or equals else false.
@@ -93,10 +93,11 @@ public class BooleanJECProfibusWagoAddressSpace extends BooleanJECAdressSpace {
         boolean greaterOrEquals = false;
         if (wordId > maxMMDWordId) {
             maxMMDWordId = wordId;
+            maxMMDBitId = -1; //reset as new largest word id 
             greaterOrEquals = true;
         }
         else if (wordId == maxMMDWordId) {
-            greaterOrEquals = true;
+            greaterOrEquals = true; //need to check bit ID also
         }
         return greaterOrEquals;
     }
@@ -112,7 +113,8 @@ public class BooleanJECProfibusWagoAddressSpace extends BooleanJECAdressSpace {
      * @param maxMMDBitId the maxMMDBitId to set
      */
     public void setMaxMMDBitId(final int maxMMDBitId) {
-        this.maxMMDBitId = maxMMDBitId;
+        if (maxMMDBitId > this.maxMMDBitId)
+          this.maxMMDBitId = maxMMDBitId;
     }
 
     /**
