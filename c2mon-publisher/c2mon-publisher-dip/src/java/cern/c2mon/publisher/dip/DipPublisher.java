@@ -35,6 +35,7 @@ import cern.dip.DipException;
 import cern.dip.DipFactory;
 import cern.dip.DipPublication;
 import cern.dip.DipPublicationErrorHandler;
+import cern.dip.DipQuality;
 import cern.dip.DipTimestamp;
 import cern.tim.shared.common.datatag.DataTagQuality;
 
@@ -161,100 +162,88 @@ public class DipPublisher implements Publisher {
     ts.setMillis(System.currentTimeMillis());
     DipData data = dipFactory.createDipData();
 
-    if (cdt.isValid()) {
-      try {        
-        switch (cdt.getTypeNumeric()) {
-          case TYPE_BOOLEAN:        
-            data.insert(VALUE_FIELD_NAME, ((Boolean) cdt.getValue()).booleanValue());
-            break;
-          case TYPE_BYTE:
-            data.insert(VALUE_FIELD_NAME, ((Byte) cdt.getValue()).byteValue());
-            break;
-          case TYPE_DOUBLE:
-            data.insert(VALUE_FIELD_NAME, ((Double) cdt.getValue()).doubleValue());
-            break;
-          case TYPE_FLOAT:
-            data.insert(VALUE_FIELD_NAME, ((Float) cdt.getValue()).floatValue());
-            break;
-          case TYPE_INTEGER:
-            data.insert(VALUE_FIELD_NAME, ((Integer) cdt.getValue()).intValue());
-            break;
-          case TYPE_LONG:
-            data.insert(VALUE_FIELD_NAME, ((Long) cdt.getValue()).longValue());
-            break;
-          case TYPE_SHORT:
-            data.insert(VALUE_FIELD_NAME, ((Short) cdt.getValue()).shortValue());
-            break;
-          case TYPE_STRING:
-            data.insert(VALUE_FIELD_NAME, ((String) cdt.getValue()));
-            break;
-          default:
-            LOG.error("\ttag's type is UNKNOWN! for tag " + cdt.getId());
-            LOG.info("\tthe tag update for tag " + cdt.getId() + " will not be forwarded to DIP"); 
-        }
-        
-        if (cdt.getTypeNumeric() != TypeNumeric.TYPE_UNKNOWN) {
-          LOG.debug("\ttag's type: " + cdt.getType().getName());
-        
-          data.insert("id", cdt.getId().longValue());
-          data.insert("valueDescription", cdt.getValueDescription());
-          data.insert("timestamp", cdt.getServerTimestamp().getTime());
-          data.insert("sourceTimestamp", cdt.getTimestamp().getTime());
-          data.insert("unit", cdt.getUnit());
-          data.insert("name", cdt.getName());
-          data.insert("description", cdt.getDescription());
-          data.insert("mode", cdt.getMode().toString());
-          data.insert("simulated", cdt.isSimulated());
-  
+    try {
+      switch (cdt.getTypeNumeric()) {
+        case TYPE_BOOLEAN:
+          data.insert(VALUE_FIELD_NAME, ((Boolean) cdt.getValue()).booleanValue());
+          break;
+        case TYPE_BYTE:
+          data.insert(VALUE_FIELD_NAME, ((Byte) cdt.getValue()).byteValue());
+          break;
+        case TYPE_DOUBLE:
+          data.insert(VALUE_FIELD_NAME, ((Double) cdt.getValue()).doubleValue());
+          break;
+        case TYPE_FLOAT:
+          data.insert(VALUE_FIELD_NAME, ((Float) cdt.getValue()).floatValue());
+          break;
+        case TYPE_INTEGER:
+          data.insert(VALUE_FIELD_NAME, ((Integer) cdt.getValue()).intValue());
+          break;
+        case TYPE_LONG:
+          data.insert(VALUE_FIELD_NAME, ((Long) cdt.getValue()).longValue());
+          break;
+        case TYPE_SHORT:
+          data.insert(VALUE_FIELD_NAME, ((Short) cdt.getValue()).shortValue());
+          break;
+        case TYPE_STRING:
+          data.insert(VALUE_FIELD_NAME, ((String) cdt.getValue()));
+          break;
+        default:
+          LOG.error("\ttag's type is UNKNOWN! for tag " + cdt.getId());
+          LOG.info("\tthe tag update for tag " + cdt.getId() + " will not be forwarded to DIP");
+      }
+
+      if (cdt.getDataTagQuality().isExistingTag()) {
+        LOG.debug("\ttag's type: " + cdt.getType().getName());
+
+        data.insert("id", cdt.getId().longValue());
+        data.insert("valueDescription", cdt.getValueDescription());
+        data.insert("timestamp", cdt.getServerTimestamp().getTime());
+        data.insert("sourceTimestamp", cdt.getTimestamp().getTime());
+        data.insert("unit", cdt.getUnit());
+        data.insert("name", cdt.getName());
+        data.insert("description", cdt.getDescription());
+        data.insert("mode", cdt.getMode().toString());
+        data.insert("simulated", cdt.isSimulated());
+      
+      
+        if (cdt.isValid()) {
           LOG.debug("\tsending the value via DIP");
           pub.send(data, ts);
         }
+        else { // the quality != OK
+          DataTagQuality tagQuality = cdt.getDataTagQuality();
+          if (!tagQuality.isAccessible()) {
+            LOG.debug("setting DIP tag " + cdt.getId() + "to inaccessible. Description : " + cdt.getDataTagQuality().getDescription());
+            pub.send(data, ts, DipQuality.DIP_QUALITY_UNCERTAIN, tagQuality.getDescription());
+          }
+          else if (!tagQuality.isInitialised()) {
+            LOG.debug("setting publication QUALITY to BAD for tag " + cdt.getId() + ". Reason: not initialized");
+            pub.send(data, ts, DipQuality.DIP_QUALITY_UNINITIALIZED, "Value has not correctly been initialized by the source.");
+          }
+          else if (cdt.getDataTagQuality().getDescription() != null) {
+            LOG.debug("setting publication QUALITY to BAD for tag " + cdt.getId() + ". Descr: " + cdt.getDataTagQuality().getDescription());
+            pub.send(data, ts, DipQuality.DIP_QUALITY_BAD, cdt.getDataTagQuality().getDescription());
+          }
+          else {
+            LOG.debug("setting publication QUALITY to BAD for tag " + cdt.getId());
+            pub.send(data, ts, DipQuality.DIP_QUALITY_BAD, "Unknown reason");
+          }
+        }
       }
-      catch (cern.dip.TypeMismatch ex) {
-        LOG.error("TypeMismatch exception was caught", ex);
-      }
-      catch (DipException ex) {
-        LOG.error("Failed do send data on DIP", ex);
-      } 
-      catch (Exception ex) {
-        LOG.error("An exception was caught!", ex);
+      else {
+        LOG.warn("setting publication QUALITY to BAD for tag " + cdt.getId() + " - Reason: UNKNOWN");
+        pub.setQualityBad("The requested TIM tag " + cdt.getId()
+            + " is not known by the system or the DIP publisher for TIM has a communication problem with the server.");
       }
     }
-    else { //the quality != OK
-      try {
-        DataTagQuality tagQuality = cdt.getDataTagQuality();        
-        if (!tagQuality.isExistingTag()) {
-          LOG.debug("setting publication QUALITY to BAD for tag " + cdt.getId());
-          pub.setQualityBad("The requested TIM tag " + cdt.getId() 
-              + " is not known by the system or the DIP publisher for TIM has a communication problem with the server.");
-        }
-        else if (!tagQuality.isAccessible()) {
-          LOG.debug("setting DIP tag " + cdt.getId() 
-              + "to inaccessible. Description : " 
-              + cdt.getDataTagQuality().getDescription());   
-          pub.setQualityUncertain(tagQuality.getDescription());
-        }
-        else if (!tagQuality.isInitialised()) {
-          LOG.debug("setting publication QUALITY to BAD for tag " + cdt.getId() + ". Reason: not initialized");
-          pub.setQualityBad("Value has not correctly been initialized by the source.");
-        }
-        else if (cdt.getDataTagQuality().getDescription() != null) {
-          LOG.debug("setting publication QUALITY to BAD for tag " + cdt.getId()
-          + ". Descr: " + cdt.getDataTagQuality().getDescription());        
-          pub.setQualityBad(cdt.getDataTagQuality().getDescription());
-        }
-        else {
-          LOG.debug("setting publication QUALITY to BAD for tag " + cdt.getId());
-          pub.setQualityBad("Unknown reason");
-        }
-      }
-      catch (DipException ex) {
-        LOG.error("DipException was caught", ex);
-      }
-      catch (Exception ex) {
-        LOG.error("An exception was caught", ex);
-      }
+    catch (DipException ex) {
+      LOG.error("DipException was caught", ex);
     }
+    catch (Exception ex) {
+      LOG.error("An exception was caught", ex);
+    }
+    
   }
   
   /**

@@ -24,8 +24,9 @@
   	<!-- CERN 3rd party dependencies -->
     <dependency>
       <groupId>cern.dip</groupId>
-      <artifactId>dip</artifactId>
+      <artifactId>dip-jni</artifactId>
       <version>5.4.3</version>
+      <type>nar</type>
     </dependency>
     
   	<!-- 3rd party dependencies -->
