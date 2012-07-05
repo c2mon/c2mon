@@ -30,15 +30,16 @@
   -->
 	<property name="view-root-repository-url" type="java.lang.String"
 		value="http://bewww/~diamonop/dmn2-views/" />
+		
+		
+  <!--
+    This property can be used to load the TIM Viewer with different
+    palettes. If not specified, the TIM Viewer looks into the standard URL
+    directory: "http://timweb.cern.ch/Views/palettes/"
+  -->
+  <property name="dashboard-palettes-dir" type="java.lang.String"
+    value="http://bewww/~diamonop/dmn2-views/palettes/" />		
 
-
-	<!--
-		This property can be used to load the TIM Viewer with different
-		palettes. If not specified, the TIM Viewer looks into the standard URL
-		directory: "http://timweb.cern.ch/Views/palettes/"
-	-->
-	<property name="dashboard-palettes-dir" type="java.lang.String"
-		value="http://timweb.cern.ch/Views/palettes/" />
 
 	<!--
 		Defines the URL of the C2MON Tag Viewer. The Viewer will append a Tag
