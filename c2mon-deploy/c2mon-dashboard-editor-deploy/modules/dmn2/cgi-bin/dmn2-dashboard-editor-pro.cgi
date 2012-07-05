@@ -2,30 +2,40 @@
 use lib '/user/alaser/perllib/Config-Properties-1.71/blib/lib';
 use strict;
 use CGI qw(:standard);
-use CGI::Carp qw(warningsToBrowser fatalsToBrowser); use Config::Properties; use Cwd;
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser); 
+use Config::Properties; 
+use Cwd;
 
 
 #find out the name of the home folder of the application #home folder is: cgi-bin/../
 my $cdir = getcwd;
 my @pathtokens = split(/\//,$cdir);
 
-# we are in cgi-bin folder, so the home folder is one level up my $appdir = @pathtokens[scalar(@pathtokens)-2];
+# we are in cgi-bin folder, so the home folder is one level up 
+my $appdir = @pathtokens[scalar(@pathtokens)-2];
 
 ##
 # Definition of global variables
 ##
 my $jardir = "../lib";
 my $codebase = "http://bewww/~diamonop";
-my $c2monClientPropertiesFile = "../conf/client.properties"; my $c2monClientPropertiesURL = "${codebase}/${appdir}/conf/client.properties";
+my $c2monClientPropertiesFile = "../conf/client.properties"; 
+my $c2monClientPropertiesURL = "${codebase}/${appdir}/conf/client.properties";
 
 #Reading version number from ../version.txt open VFILE, "< ../version.txt"
-  or die "Unable to open version file ../version.txt"; my $viewerVersion = <VFILE>; chomp $viewerVersion; # removes new line character close VFILE;
+  or die "Unable to open version file ../version.txt"; 
+  
+my $viewerVersion = <VFILE>; 
+chomp $viewerVersion; # removes new line character close VFILE;
 
 ##
-# Reading the C2MON client properties file # # open PROPS, "< $c2monClientPropertiesFile"
+# Reading the C2MON client properties file #
+# 
+open PROPS, "< $c2monClientPropertiesFile"
   or die "Unable to open configuration file $c2monClientPropertiesFile";
 
-my $c2monProperties = new Config::Properties(); $c2monProperties->load(*PROPS);
+my $c2monProperties = new Config::Properties(); 
+$c2monProperties->load(*PROPS);
 
 my $jdbcDriver           = $c2monProperties->getProperty("c2mon.jdbc.driver");
 my $jdbcRoUrl            = $c2monProperties->getProperty("c2mon.jdbc.ro.url");
@@ -68,7 +78,8 @@ sub jarlist {
 #         Generating JNLP file           #
 ##########################################
 
-print "Content-type: application/x-java-jnlp-file" , "\n\n"; print "<?xml version = '1.0' encoding = 'utf-8'?>
+print "Content-type: application/x-java-jnlp-file" , "\n\n"; 
+print "<?xml version = '1.0' encoding = 'utf-8'?>
   <jnlp spec=\"1.0+\" codebase=\"$codebase\">
   <information>
           <title>DMN2 Dashboard Editor [PRO] ($viewerVersion)</title>
