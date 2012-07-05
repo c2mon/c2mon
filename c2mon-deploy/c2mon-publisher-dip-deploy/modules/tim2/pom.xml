@@ -46,7 +46,7 @@
             <artifactItem>
 
               <groupId>cern.dip</groupId>
-              <artifactId>dip-shared</artifactId>
+              <artifactId>dip-jni</artifactId>
               <classifier>i386-Linux-gpp-jni</classifier>
               <version>5.4.3a</version>
               <type>nar</type>
