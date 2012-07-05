@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.dip.Dip;
@@ -51,6 +50,12 @@ public class DipPublisher implements Publisher {
 
   /** Log4j logger instance */
   private static final Logger LOG = Logger.getLogger(DipPublisher.class);
+  
+  /** The DIP Wiki URL */
+  private static final String DIP_WIKI_URL = "http://cern.ch/c2monwiki/DIP+Publisher";
+  
+  /** The HelpAlarm URL for TIM */
+  private static final String HELPALARM_URL = "http://cern.ch/tim-helpalarm?p_pointid1=";
   
   /** The value field name which is used within a DIP publication */
   public static final String VALUE_FIELD_NAME = "value";
@@ -205,6 +210,8 @@ public class DipPublisher implements Publisher {
         data.insert("description", cdt.getDescription());
         data.insert("mode", cdt.getMode().toString());
         data.insert("simulated", cdt.isSimulated());
+        data.insert("wiki", DIP_WIKI_URL);
+        data.insert("pointDetails", HELPALARM_URL + cdt.getId().toString());
       
       
         if (cdt.isValid()) {
