@@ -52,8 +52,10 @@ public class LaserBackupPublisherTest {
     alarmCache = controller.createMock(AlarmCache.class);
     laserPublisher = controller.createMock(LaserPublisher.class);
     asi = controller.createMock(AlarmSystemInterface.class);
-    laserBackupPublisher = new LaserBackupPublisher(alarmCache, laserPublisher);
+    laserBackupPublisher = new LaserBackupPublisher(alarmCache, laserPublisher);    
+    laserBackupPublisher.setNbBackupThreads(2);
     laserBackupPublisher.setBackupInterval(60000);
+    laserBackupPublisher.init();
   }
   
   @Test

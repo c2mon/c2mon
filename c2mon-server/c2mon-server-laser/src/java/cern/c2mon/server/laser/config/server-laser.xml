@@ -18,6 +18,7 @@
   
   <bean class="cern.c2mon.server.laser.publication.LaserBackupPublisher">
   	<property name="backupInterval" value="600000"/>
+    <property name="nbBackupThreads" value="${c2mon.server.laser.backup.threads}"/>
   </bean>
   
   </beans>

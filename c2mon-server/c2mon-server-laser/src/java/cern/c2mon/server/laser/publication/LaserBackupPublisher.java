@@ -13,6 +13,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
@@ -86,6 +88,11 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * For generating the backup.
    */
   private ThreadPoolExecutor backupExecutor;
+  
+  /**
+   * Number of threads used when creating the backup.
+   */  
+  private int nbBackupThreads;
 
   /**
    * Our reference to the {@link LaserPublisherImpl} as we need it to use the
@@ -107,8 +114,12 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   public LaserBackupPublisher(AlarmCache alarmCache, LaserPublisher publisher) {
     super();
     this.alarmCache = alarmCache;
-    this.publisher = publisher;    
-    backupExecutor = new ThreadPoolExecutor(10, 10, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    this.publisher = publisher;        
+  }
+  
+  @PostConstruct
+  public void init() {
+    backupExecutor = new ThreadPoolExecutor(nbBackupThreads, nbBackupThreads, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     backupExecutor.allowCoreThreadTimeOut(true);
   }
 
@@ -247,7 +258,26 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   public int getBackupInterval() {
     return backupInterval;
   }
+  
+  /**
+   * Getter method.
+   * 
+   * @return the nbBackupThreads
+   */
+  public int getNbBackupThreads() {
+    return nbBackupThreads;
+  }
 
+  /**
+   * Setter method.
+   * 
+   * @param nbBackupThreads the nbBackupThreads to set
+   */
+  @Required
+  public void setNbBackupThreads(int nbBackupThreads) {
+    this.nbBackupThreads = nbBackupThreads;
+  }
+  
   /**
    * Generates the FaultState for a single alarm if active.
    * @author Mark Brightwell
@@ -283,5 +313,5 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       return fs;
     }   
   }
-
+  
 }
