@@ -96,6 +96,10 @@
             <prop key="datasource.stl.connections.max">2</prop>
             <prop key="c2mon.tag.log.fallback.file">${c2mon.home}/log/tagfallback.txt</prop>
             <prop key="c2mon.command.log.fallback.file">${c2mon.home}/log/commandfallback.txt</prop>
+            
+            <!-- LASER module -->
+            <!-- number of threads used when creating a LASER backup -->
+            <prop key="c2mon.server.laser.backup.threads">10</prop>                     
                      
         </props>  
      </property>  
