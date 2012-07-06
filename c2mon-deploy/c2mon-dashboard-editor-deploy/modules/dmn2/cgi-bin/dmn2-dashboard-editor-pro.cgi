@@ -22,7 +22,8 @@ my $codebase = "http://bewww/~diamonop";
 my $c2monClientPropertiesFile = "../conf/client.properties"; 
 my $c2monClientPropertiesURL = "${codebase}/${appdir}/conf/client.properties";
 
-#Reading version number from ../version.txt open VFILE, "< ../version.txt"
+#Reading version number from ../version.txt 
+open VFILE, "< ../version.txt"
   or die "Unable to open version file ../version.txt"; 
   
 my $viewerVersion = <VFILE>; 
