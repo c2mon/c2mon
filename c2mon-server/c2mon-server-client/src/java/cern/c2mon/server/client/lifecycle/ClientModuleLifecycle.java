@@ -47,18 +47,34 @@ public class ClientModuleLifecycle implements SmartLifecycle {
   private SingleConnectionFactory singleConnectionFactory;
   
   /**
+   * Container for admin requests from client.
+   */
+  private DefaultMessageListenerContainer adminJmsContainer;
+
+  /**
+   * Connections for admin messages.
+   */
+  private SingleConnectionFactory adminConnectionFactory;
+  
+  /**
    * Constructor.
    * @param clientJmsContainer JMS container used in client module
    * @param clientExecutor thread pool used by container
+   * @param singleConnectionFactory client request connection factory
+   * 
    */
   @Autowired
   public ClientModuleLifecycle(@Qualifier("clientRequestJmsContainer") final DefaultMessageListenerContainer clientJmsContainer, 
                                     @Qualifier("clientExecutor") final ThreadPoolExecutor clientExecutor,
-                                    @Qualifier("clientSingleConnectionFactory") final SingleConnectionFactory singleConnectionFactory) {
+                                    @Qualifier("clientSingleConnectionFactory") final SingleConnectionFactory singleConnectionFactory,
+                                    @Qualifier("adminRequestJmsContainer") final DefaultMessageListenerContainer adminJmsContainer,
+                                    @Qualifier("adminSingleConnectionFactory") final SingleConnectionFactory adminSingleConnectionFactory) {
     super();
     this.clientJmsContainer = clientJmsContainer;
     this.clientExecutor = clientExecutor;
     this.singleConnectionFactory = singleConnectionFactory;
+    this.adminConnectionFactory = adminSingleConnectionFactory;
+    this.adminJmsContainer = adminJmsContainer;
   }
 
   @Override
@@ -81,7 +97,7 @@ public class ClientModuleLifecycle implements SmartLifecycle {
   public synchronized void start() {
     running = true;
     clientJmsContainer.start();
-    
+    adminJmsContainer.start();
   }
 
   @Override
@@ -90,8 +106,10 @@ public class ClientModuleLifecycle implements SmartLifecycle {
     try {   
       LOGGER.info("Shutting down client module JMS connections");
       clientJmsContainer.stop();
+      adminJmsContainer.stop();
       clientExecutor.shutdown();
       singleConnectionFactory.destroy(); //closes underlying connection
+      adminConnectionFactory.destroy();
       LOGGER.debug("Client module JMS connections stopped");
     } catch (Exception e) {
       LOGGER.error("Exception caught while shutting down Client JMS connection/JMS container", e);

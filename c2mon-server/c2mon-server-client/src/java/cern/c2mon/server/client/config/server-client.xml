@@ -30,6 +30,31 @@ Connection settings for client module
    <property name="targetConnectionFactory" ref="clientActiveMQConnectionFactory" />    
 </bean>
 
+<!--
+
+Connection settings for admin requests to the client module (prefetch is 0)
+
+-->
+
+<bean id="adminActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+  <property name="brokerURL" value="${jms.broker.url}"/>
+  <property name="userName" value="${jms.client.user}"/>
+  <property name="password" value="${jms.client.password}"/>
+  <property name="clientIDPrefix" value="C2MON-SERVER-CLIENT"/> 
+  <property name="watchTopicAdvisories" value="false"/>
+  <property name="prefetchPolicy" ref="prefetchPolicy"/>
+</bean>
+
+<!-- disable the prefetch buffer for admin client requests -->
+<bean id="prefetchPolicy" class="org.apache.activemq.ActiveMQPrefetchPolicy">
+  <property name="queuePrefetch" value="0"/>
+</bean>
+
+<!-- connection factory used for all connections to the server -->
+<bean id="adminSingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">   
+   <property name="targetConnectionFactory" ref="adminActiveMQConnectionFactory" />    
+</bean>
+
 <!-- 
 
 Alarm Publications
@@ -110,6 +135,10 @@ Request from clients
    <constructor-arg index="0" value="${jms.client.request.queue}"/>
 </bean>
 
+<bean id="adminRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+   <constructor-arg index="0" value="${c2mon.jms.client.admin.queue}"/>
+</bean>
+
 <!-- thread pool for request containers -->
 <bean id="clientExecutor" class="java.util.concurrent.ThreadPoolExecutor">
   <constructor-arg value="1"/>      <!-- min threads -->
@@ -133,6 +162,26 @@ Request from clients
       <property name="messageListener" ref="clientRequestHandler" />
       <property name="concurrentConsumers" value="${c2mon.jms.client.consumers.min}"/>
       <property name="maxConcurrentConsumers" value="${c2mon.jms.client.consumers.max}"/> 
+      <property name="maxMessagesPerTask" value="1"/>
+      <property name="receiveTimeout" value="1000"/>
+      <property name="idleTaskExecutionLimit" value="600"/>   
+      <property name="sessionTransacted" value="false"/>      
+      <property name="taskExecutor" ref="clientExecutor"/>
+      <property name="errorHandler" ref="tagRequestErrorHandler"/>   
+      <property name="autoStartup" value="false"/>
+      <property name="phase">
+        <util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_INTERMEDIATE"/>
+      </property>  
+</bean>
+
+<!-- set phase to intermediate, as shutdown is managed in ClientModuleLifecycle, so do to wish this bean to shutdown before then -->
+<bean id="adminRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+      <!-- include exception listener here? -->    
+      <property name="connectionFactory" ref="adminSingleConnectionFactory"/>
+      <property name="destination" ref="adminRequestDestination"/>
+      <property name="messageListener" ref="clientRequestHandler" />
+      <property name="concurrentConsumers" value="1"/>
+      <property name="maxConcurrentConsumers" value="2"/> 
       <property name="maxMessagesPerTask" value="1"/>
       <property name="receiveTimeout" value="1000"/>
       <property name="idleTaskExecutionLimit" value="600"/>   

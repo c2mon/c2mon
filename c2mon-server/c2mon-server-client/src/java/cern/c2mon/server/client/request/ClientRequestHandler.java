@@ -57,6 +57,8 @@ import com.google.gson.Gson;
  * The request is processed and a list of <code>TranferTag</code> objects is
  * returned as serialized JSON string
  * 
+ * <p>Handles requests on both client request and admin queues.
+ * 
  * @author Matthias Braeger
  */
 @Service("clientRequestHandler")
