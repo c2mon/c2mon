@@ -42,8 +42,13 @@ import cern.tim.shared.common.datatag.DataTagQuality;
 /**
  * This classes manages the publication of the subscribed data tags
  * via the DIP protocol.
+ * <p>
+ * Use the following Java environment variable, if you want to specify
+ * a URL that provides more details about the published data tags:<br>
+ * <code>c2mon.publisher.dip.pointdetails.url</code>
  *
  * @author Matthias Braeger
+ * @see #pointDetailsURL
  */
 @Service
 public class DipPublisher implements Publisher {
@@ -54,8 +59,16 @@ public class DipPublisher implements Publisher {
   /** The DIP Wiki URL */
   private static final String DIP_WIKI_URL = "http://cern.ch/c2monwiki/DIP+Publisher";
   
-  /** The HelpAlarm URL for TIM */
-  private static final String HELPALARM_URL = "http://cern.ch/tim-helpalarm?p_pointid1=";
+  /** 
+   * A URL that provides for information about a given point. The URL must be specified
+   * in such a way, that it is enough to append the point ID to the end, e.g: <br>
+   * <code>http://cern.ch/tim-helpalarm?p_pointid1=</code>
+   * <p>
+   * The URL can be set through the following Java environment variable:<br>
+   * <code>c2mon.publisher.dip.pointdetails.url</code>
+   */
+  @Value("${c2mon.publisher.dip.pointdetails.url:\"\"}")
+  private String pointDetailsURL = "";
   
   /** The value field name which is used within a DIP publication */
   public static final String VALUE_FIELD_NAME = "value";
@@ -211,7 +224,10 @@ public class DipPublisher implements Publisher {
         data.insert("mode", cdt.getMode().toString());
         data.insert("simulated", cdt.isSimulated());
         data.insert("wiki", DIP_WIKI_URL);
-        data.insert("pointDetails", HELPALARM_URL + cdt.getId().toString());
+        // We only add point details URL, if it was specified 
+        if (!pointDetailsURL.equalsIgnoreCase("")) {
+          data.insert("pointDetails", pointDetailsURL + cdt.getId().toString());
+        }
       
       
         if (cdt.isValid()) {
