@@ -212,8 +212,6 @@ public class DipPublisher implements Publisher {
       }
 
       if (cdt.getDataTagQuality().isExistingTag()) {
-        LOG.debug("\ttag's type: " + cdt.getType().getName());
-
         data.insert("id", cdt.getId().longValue());
         data.insert("valueDescription", cdt.getValueDescription());
         data.insert("timestamp", cdt.getServerTimestamp().getTime());
@@ -231,7 +229,10 @@ public class DipPublisher implements Publisher {
       
       
         if (cdt.isValid()) {
-          LOG.debug("\tsending the value via DIP");
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("\ttag's type: " + cdt.getType().getName());
+            LOG.debug("\tsending the value via DIP");
+          }
           pub.send(data, ts);
         }
         else { // the quality != OK
