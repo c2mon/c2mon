@@ -28,6 +28,8 @@
         
         <!-- JVM environment variables -->
         <property name="c2mon.publisher.dip.server.name" value="${PROCESS_NAME}" />
+        <!-- Adds an additional field to each DIP publication for pointing to the HelpAlarm page -->
+        <property name="c2mon.publisher.dip.pointdetails.url" value="http://cern.ch/tim-helpalarm?p_pointid1="/>
         <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/${PROCESS_NAME}.tid" />
         <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
         <property name="tim.log.path" value="${INSTALL_DIR}/log" />
