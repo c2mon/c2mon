@@ -55,6 +55,7 @@
             <prop key="c2mon.jms.client.consumers.max">10</prop>
             <prop key="jms.client.supervision.topic">c2mon.client.supervision</prop>
             <prop key="jms.client.request.queue">c2mon.client.request</prop>
+            <prop key="c2mon.jms.client.admin.queue">c2mon.client.admin</prop>            
             <prop key="jms.client.alarm.topic">c2mon.client.alarm</prop>
             <prop key="c2mon.jms.controltag.publication.topic">c2mon.client.controltag</prop>
             <prop key="c2mon.jms.tag.publication.topic">c2mon.client.tag</prop>
