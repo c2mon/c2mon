@@ -67,7 +67,7 @@ public class DipPublisher implements Publisher {
    * The URL can be set through the following Java environment variable:<br>
    * <code>c2mon.publisher.dip.pointdetails.url</code>
    */
-  @Value("${c2mon.publisher.dip.pointdetails.url}")
+  @Value("${c2mon.publisher.dip.pointdetails.url:}")
   private String pointDetailsURL = "";
   
   /** The value field name which is used within a DIP publication */
@@ -91,7 +91,7 @@ public class DipPublisher implements Publisher {
   }
   
   @Override
-  public void onUpdate(ClientDataTagValue cdt, TagConfig cdtConfig) {
+  public void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig) {
     // Saves the received value into a separate file
     Logger logger = Logger.getLogger("ClientDataTagLogger");
     logger.debug(cdt);
