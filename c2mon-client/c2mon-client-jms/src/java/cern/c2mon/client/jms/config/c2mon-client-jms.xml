@@ -29,11 +29,4 @@
     <constructor-arg value="${c2mon.client.jms.alarm.topic}"/>
   </bean>
   
-  <bean class="cern.c2mon.client.jms.impl.RequestHandlerImpl" autowire="constructor">
-    <property name="requestQueue" value="${c2mon.client.jms.request.queue}"/>
-    <!-- no longer used! every request now has its own timeout.
-    <property name="requestTimeout" value="120000"/>
-    -->
-  </bean>
-  
 </beans>

@@ -18,7 +18,6 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,12 +33,13 @@ import javax.jms.JMSException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
@@ -61,6 +61,7 @@ import cern.tim.shared.client.configuration.ConfigurationReport;
  * @author Mark Brightwell
  * 
  */
+@Service
 public class RequestHandlerImpl implements RequestHandler {
 
   /**
@@ -100,9 +101,13 @@ public class RequestHandlerImpl implements RequestHandler {
   private JmsProxy jmsProxy;
 
   /**
-   * Name of request queue.
+   * Name of main client request queue.
    */
-  private String requestQueue;
+  @Value("${c2mon.client.jms.request.queue}")
+  private String defaultRequestQueue;
+  
+  @Value("${c2mon.client.jms.admin.queue}")
+  private String adminRequestQueue;
   
   /**
    * Executor for submitting requests to the server.
@@ -127,7 +132,7 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException {
     ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);
-    return jmsProxy.sendRequest(clientRequest, requestQueue, clientRequest.getTimeout());
+    return jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
   }
 
   @Override
@@ -135,7 +140,7 @@ public class RequestHandlerImpl implements RequestHandler {
     if (tagIds == null) {
       throw new NullPointerException("requestTags(..) method called with null parameter.");
     }
-    return executeRequest(tagIds, TagUpdate.class, null);
+    return executeRequest(tagIds, TagUpdate.class, null, defaultRequestQueue);
   }
 
   @Override
@@ -143,7 +148,7 @@ public class RequestHandlerImpl implements RequestHandler {
     if (alarmIds == null) {
       throw new NullPointerException("requestAlarms(..) method called with null parameter.");
     }
-    return executeRequest(alarmIds, AlarmValue.class, null);
+    return executeRequest(alarmIds, AlarmValue.class, null, defaultRequestQueue);
   }
   
   @Override
@@ -154,7 +159,7 @@ public class RequestHandlerImpl implements RequestHandler {
           ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
           60000); // == timeout
     
-    Collection<AlarmValue> c = jmsProxy.sendRequest(activeAlarmsRequest , requestQueue, 
+    Collection<AlarmValue> c = jmsProxy.sendRequest(activeAlarmsRequest, defaultRequestQueue, 
         activeAlarmsRequest.getTimeout());
     
     return c;
@@ -165,7 +170,7 @@ public class RequestHandlerImpl implements RequestHandler {
     if (commandIds == null) {
       throw new NullPointerException("requestTags(..) method called with null parameter.");
     }
-    return executeRequest(commandIds, CommandTagHandle.class, null);
+    return executeRequest(commandIds, CommandTagHandle.class, null, defaultRequestQueue);
   }
   
   @Override
@@ -179,7 +184,7 @@ public class RequestHandlerImpl implements RequestHandler {
     ArrayList<Long> ids = new ArrayList<Long>();
     ids.add(configurationId);
 
-    Collection<ConfigurationReport> report = executeRequest(ids, ConfigurationReport.class, reportListener);
+    Collection<ConfigurationReport> report = executeRequest(ids, ConfigurationReport.class, reportListener, adminRequestQueue);
 
     if (report.isEmpty()) {
       final String errorMsg = "applyConfiguration returned an empty Collection";
@@ -200,7 +205,7 @@ public class RequestHandlerImpl implements RequestHandler {
     if (tagIds == null) {
       throw new NullPointerException("requestTagConfigurations(..) method called with null parameter.");
     }
-    return executeRequest(tagIds, TagConfig.class, null);
+    return executeRequest(tagIds, TagConfig.class, null, defaultRequestQueue);
   }
 
   @Override
@@ -208,7 +213,7 @@ public class RequestHandlerImpl implements RequestHandler {
     if (tagIds == null) {
       throw new NullPointerException("requestTagValues(..) method called with null parameter.");
     }
-    return executeRequest(tagIds, TagValueUpdate.class, null);
+    return executeRequest(tagIds, TagValueUpdate.class, null, defaultRequestQueue);
   }
 
   /**
@@ -224,7 +229,7 @@ public class RequestHandlerImpl implements RequestHandler {
    * @return the result of the request
    */
   private <T extends ClientRequestResult> Collection<T> executeRequest(
-      final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener) {
+      final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
     
     LOGGER.debug("Initiating client request.");
     ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);
@@ -236,7 +241,7 @@ public class RequestHandlerImpl implements RequestHandler {
         clientRequest.addTagId(it.next());
         counter++;
       }
-      RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest, reportListener);
+      RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest, reportListener, requestQueue);
       results.add(executor.submit(task));
       clientRequest = new ClientRequestImpl<T>(clazz);
       counter = 0;
@@ -262,10 +267,9 @@ public class RequestHandlerImpl implements RequestHandler {
    * 
    * @param requestQueue
    *          the requestQueue to set
-   */
-  @Required
+   */ 
   public void setRequestQueue(final String requestQueue) {
-    this.requestQueue = requestQueue;
+    this.defaultRequestQueue = requestQueue;
   }
 
   @Override
@@ -273,7 +277,7 @@ public class RequestHandlerImpl implements RequestHandler {
     ClientRequestImpl<ProcessXmlResponse> xmlRequest = new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
     xmlRequest.setRequestParameter(processName);
     // response should have a unique element in
-    ProcessXmlResponse response = jmsProxy.sendRequest(xmlRequest, requestQueue, xmlRequest.getTimeout()).iterator().next();
+    ProcessXmlResponse response = jmsProxy.sendRequest(xmlRequest, defaultRequestQueue, xmlRequest.getTimeout()).iterator().next();
     if (response.getProcessXML() != null) {
       return response.getProcessXML();
     } else {
@@ -286,7 +290,7 @@ public class RequestHandlerImpl implements RequestHandler {
     
     ClientRequestImpl<ProcessNameResponse> namesRequest = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
 
-    return jmsProxy.sendRequest(namesRequest, requestQueue, namesRequest.getTimeout());
+    return jmsProxy.sendRequest(namesRequest, defaultRequestQueue, namesRequest.getTimeout());
   }
   
   @SuppressWarnings("unchecked")
@@ -296,7 +300,7 @@ public class RequestHandlerImpl implements RequestHandler {
     ClientRequestImpl clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
     clientRequest.setObjectParameter(commandExecuteRequest);
     
-    Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, requestQueue, commandExecuteRequest.getTimeout());
+    Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, commandExecuteRequest.getTimeout());
     CommandReport report = c.iterator().next();
     
     return report;
@@ -316,14 +320,20 @@ public class RequestHandlerImpl implements RequestHandler {
     
     /** Receives updates for the progress of the request. */
     private ClientRequestReportListener reportListener;
+    
+    /** The queue to send the request to */
+    private String requestQueue;
 
     /**
      * @param clientRequest The request.
      * @param reportListener Receives updates for the progress of the request.
      */
-    public RequestValuesTask(final ClientRequestImpl<T> clientRequest, final ClientRequestReportListener reportListener) {
+    public RequestValuesTask(final ClientRequestImpl<T> clientRequest, 
+                             final ClientRequestReportListener reportListener, 
+                             final String requestQueue) {
       this.clientRequest = clientRequest;
       this.reportListener = reportListener;
+      this.requestQueue = requestQueue;
     }
     
     /**
