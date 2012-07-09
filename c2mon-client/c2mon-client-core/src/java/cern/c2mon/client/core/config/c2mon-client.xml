@@ -26,7 +26,9 @@
 		<property name="properties">  
     		<props>  
       			<prop key="c2mon.client.jms.alarm.topic">c2mon.client.alarm</prop>  
-      			<prop key="c2mon.client.rbac.admin">c2mon.rbac.admin</prop>  
+      			<prop key="c2mon.client.rbac.admin">c2mon.rbac.admin</prop> 
+            <prop key="c2mon.client.jms.admin.queue">c2mon.client.admin</prop>
+            <prop key="c2mon.client.jms.request.queue">c2mon.client.request</prop>  
     		</props>  
  		 </property>  
 	</bean>
