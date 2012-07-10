@@ -19,7 +19,7 @@ public class HealthCheckerTest {
    */
   @Test
   public void runHealthCheck() throws Exception {
-    System.setProperty("c2mon.healthchecker.config.location","classpath:/cern/c2mon/toolkit/health-checker.properties");
+    System.setProperty("c2mon.healthchecker.config.location","classpath:/cern/c2mon/toolkit/health-checker-test.properties");
     String report = HealthChecker.checkHealth();
     assertNotNull(report);
   }
