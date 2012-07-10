@@ -14,20 +14,20 @@ import cern.c2mon.notification.shared.UserNotFoundException;
  */
 public interface NotificationService {
 
-	/** Subscribes to WARNING level of the tag Id.
-	 * 
-	 * @param subscription the new subscription  
-	 * @throws UserNotFoundException in case the user can't be found.
-	 * @throws ServiceException in case of a problem while using the service.
-	 */
-	public void subscribe(Subscription subscription) throws UserNotFoundException, ServiceException;
-	
 	/**
 	 * 
-	 * @param sub
+	 * @param sub the {@link Subscriber} to set.
      * @throws ServiceException in case of a problem while using the service.
 	 */
-	public void setSubscriber(Subscriber sub) throws ServiceException;
+	public Subscriber setSubscriber(Subscriber sub) throws ServiceException;
+	
+	/**
+	 * Adds a new notification user to the system.
+	 * 
+	 * @param sub the {@link Subscriber} object representing the information on this user.
+	 * @throws ServiceException in case of a problem with the notification service.
+	 */
+	public void addSubscriber(Subscriber sub) throws ServiceException;
 	
 	/** Subscribes to the tagId for notification.<br><br>
 	 * 
@@ -39,7 +39,7 @@ public interface NotificationService {
 	 * @throws UserNotFoundException in case the user with userId was not found.
      * @throws ServiceException in case of a problem while using the service.
 	 */
-	public void subscribe(String userId, Long tagId) throws UserNotFoundException, ServiceException;
+	public Subscriber subscribe(String userId, Long tagId) throws UserNotFoundException, ServiceException;
 	
 	/**
 	 * @param userName the unique identifier of the user. 
@@ -51,27 +51,20 @@ public interface NotificationService {
 	
 	/**
 	 * 
-	 * @param user a valid, in the system existing {@link Subscriber} object.
+	 * @param user the unique identifier of the user. 
 	 * @param tagId the data tag id [long]
 	 * @return true, in case the user is subscribed to this data tag.
 	 * @throws UserNotFoundException in case the user can't be found.
      * @throws ServiceException in case of a problem while using the service.
 	 */
-	public boolean isSubscribed(Subscriber user, Long tagId) throws UserNotFoundException, ServiceException;
+	public boolean isSubscribed(String user, Long tagId) throws UserNotFoundException, ServiceException;
 
 	/**
-	 * @param subscription a valid, in the system existing {@link Subscription} object.
+	 * @param user the unique identifier of the user. 
+     * @param tagId the data tag id [long]
 	 * @throws UserNotFoundException in case the associated user cannot be found
      * @throws ServiceException in case of a problem while using the service.
 	 */
-	public void removeSubscription(Subscription subscription) throws UserNotFoundException, ServiceException;
-	
-	/**
-	 * @param user a valid, in the system existing {@link Subscriber} object.
-	 * @param tagId the data tag id [long]
-	 * @throws UserNotFoundException in case the associated user cannot be found
-     * @throws ServiceException in case of a problem while using the service.
-	 */
-	public void removeSubscription(Subscriber user, Long tagId) throws UserNotFoundException, ServiceException;
+	public void removeSubscription(String user, Long tagId) throws UserNotFoundException, ServiceException;
 	
 }

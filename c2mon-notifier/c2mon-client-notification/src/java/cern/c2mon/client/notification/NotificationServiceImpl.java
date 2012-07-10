@@ -36,6 +36,7 @@ import cern.c2mon.notification.shared.RemoteServerException;
 import cern.c2mon.notification.shared.ServiceException;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
+import cern.c2mon.notification.shared.TagNotFoundException;
 import cern.c2mon.notification.shared.UserNotFoundException;
 
 import com.google.gson.Gson;
@@ -175,11 +176,17 @@ public class NotificationServiceImpl implements NotificationService {
                 logger.info(request.getId() + " Waiting " + requestTimeout + "msec for answer from remote server...");
             }
             TextMessage fromServer = (TextMessage)myConsumer.receive(requestTimeout);
+            
+            logger.trace("Got message from server : " + fromServer.getText());
+            
             if (fromServer == null) {
                 throw new ServiceException(request.getId() + " Timeout while trying to get answer from remote notification service!");
             }
             
             response = gson.fromJson(fromServer.getText(), ClientResponse.class);
+            
+            logger.trace("Transformed message from server to :\n" + response);
+            
         }catch(Exception ex) {
             // an error on OUR side. Need of course to publish this.
             throw new ServiceException(ex);
@@ -202,12 +209,14 @@ public class NotificationServiceImpl implements NotificationService {
         }
         
         // handle remote server exceptions:
-        if (response.getType().equals(ClientResponse.Type.ErrorReponse)) {
+        if (response.getType().equals(ClientResponse.Type.ErrorResponse)) {
+            logger.error("Got error from server : "  + (String) response.getBody());
             throw new RemoteServerException((String)response.getBody());
         } else if (response.getType().equals(ClientResponse.Type.UserNotFoundError)) {
             throw new UserNotFoundException((String)response.getBody());
+        }else if (response.getType().equals(ClientResponse.Type.TagNotFoundError)) {
+            throw new TagNotFoundException((String)response.getBody());
         }
-        
         // ClientResponse for the API calls
         return response;
         
@@ -232,12 +241,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public boolean isSubscribed(Subscriber user, Long tagId) throws UserNotFoundException, ServiceException {
+    public boolean isSubscribed(String user, Long tagId) throws UserNotFoundException, ServiceException {
         throw new ServiceException("Not yet implemented.");
     }
 
-    @Override
-    public void removeSubscription(Subscription subscription) throws UserNotFoundException, ServiceException {
+    private void removeSubscription(Subscription subscription) throws UserNotFoundException, ServiceException {
         if (logger.isDebugEnabled()) {
             logger.debug("entering removeSubscription() for User=" + subscription.getSubscriberId() + " and TagID=" + subscription.getTagId());
         }
@@ -246,17 +254,12 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void removeSubscription(Subscriber user, Long tagId) throws UserNotFoundException, ServiceException {
-        Subscription sub = user.getSubscriptions().get(tagId);
-        if (sub == null) {
-            throw new IllegalArgumentException("Passed user " + user.getUserName() + " does not have a subscription for " + tagId);
-        } 
-        removeSubscription(sub);
-        user.removeSubscription(sub.getTagId());
+    public void removeSubscription(String user, Long tagId) throws UserNotFoundException, ServiceException {
+        removeSubscription(new Subscription(user,tagId));
     }
 
     @Override
-    public void setSubscriber(Subscriber sub) throws ServiceException {
+    public Subscriber setSubscriber(Subscriber sub) throws ServiceException {
         if (logger.isDebugEnabled()) {
             logger.debug("entering setSubscriber() for User=" + sub.getUserName());
             
@@ -266,24 +269,40 @@ public class NotificationServiceImpl implements NotificationService {
         }
         
         ClientRequest request = new ClientRequest(Type.UpdateSubscriber, sub);
-        getResponse(request);
-        // check error already done in getResponse. No need for further checks.
+        ClientResponse reponse = getResponse(request);
+        return getSubscriberFromClientResponse(reponse);
     }
 
-    @Override
-    public void subscribe(Subscription subscription) throws UserNotFoundException, ServiceException {
+    private Subscriber subscribe(Subscription subscription) throws UserNotFoundException, ServiceException {
         if (logger.isDebugEnabled()) {
             logger.debug("entering subscribe() for User=" + subscription.getSubscriberId() + " and TagID=" + subscription.getTagId());
         }
         ClientRequest request = new ClientRequest(Type.AddSubscription, subscription);
-        getResponse(request);
+        ClientResponse reponse = getResponse(request);
+        return getSubscriberFromClientResponse(reponse);
     }
 
     @Override
-    public void subscribe(String userId, Long tagId) throws UserNotFoundException, ServiceException {
+    public Subscriber subscribe(String userId, Long tagId) throws UserNotFoundException, ServiceException {
         Subscription sub = new Subscription(userId, tagId);
-        subscribe(sub);
+        return subscribe(sub);
     }
 
+    @Override
+    public void addSubscriber(Subscriber sub) throws ServiceException {
+        setSubscriber(sub);
+    }
+
+    
+    private Subscriber getSubscriberFromClientResponse(ClientResponse response) {
+        Subscriber subscriber = null;
+        Gson gson = new Gson();
+        try {
+            subscriber = gson.fromJson((String)response.getBody(), Subscriber.class);
+        }catch(Exception ex) {
+            throw new ServiceException("Can't read message body from server " + response.getType() + " response: " + ex.getMessage());
+        }
+        return subscriber;
+    }
     
 }
