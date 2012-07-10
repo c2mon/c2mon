@@ -10,6 +10,16 @@ package cern.c2mon.notification.shared;
 /**
  * An object representing a status in Diamon-2
  * 
+ * 
+ * The following states are available :
+ * <ul>
+ * <li>UNKNOWN (-1)</li>
+ * <li>OK (0)</li>
+ * <li>WARNING (1)</li>
+ * <li>ERROR (2)</li>
+ * </ul>
+ * 
+ * 
  * @author felixehm
  */
 public enum Status {
