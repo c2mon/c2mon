@@ -31,6 +31,7 @@ import cern.tim.shared.common.ConfigurationException;
 import cern.tim.shared.daq.config.Change;
 import cern.tim.shared.daq.config.DataTagAdd;
 import cern.tim.shared.daq.config.DataTagRemove;
+import cern.tim.shared.daq.config.DataTagUpdate;
 
 /**
  * Implementation of transacted methods.
@@ -144,8 +145,12 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
     try {
       dataTag.getWriteLock().lock();
       dataTagUpdate = commonTagFacade.updateConfig(dataTag, properties);
-      configurableDAO.updateConfig(dataTag);            
-      return new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagUpdate);      
+      configurableDAO.updateConfig(dataTag);
+      if (((DataTagUpdate) dataTagUpdate).isEmpty()) {
+        return new ProcessChange();
+      } else {
+        return new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagUpdate);      
+      }      
     } catch (Exception ex) {
       LOGGER.error("Exception caught while updating a datatag. Rolling back transaction and removing from cache.", ex);           
       throw new UnexpectedRollbackException("Unexpected exception caught while updating a DataTag configuration.", ex);
