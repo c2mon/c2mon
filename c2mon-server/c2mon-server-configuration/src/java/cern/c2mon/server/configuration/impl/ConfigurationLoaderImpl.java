@@ -207,7 +207,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
           List<ProcessChange> processChanges = null; 
           try {
             processChanges = applyConfigElement(element, elementReport);  //never returns null                
-            element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ, set to OK
+            
             for (ProcessChange processChange : processChanges) {
               
               Long processId = processChange.getProcessId();
@@ -218,7 +218,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                 processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface
                 daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
                 elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
-              } else if (processChange.requiresReboot()) {              
+                element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
+              } else if (processChange.requiresReboot()) { 
+                element.setDaqStatus(Status.RESTART);
                 elementReport.requiresReboot();
                 report.addStatus(Status.RESTART);
                 report.addProcessToReboot(processCache.get(processId).getName());
