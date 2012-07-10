@@ -17,8 +17,9 @@ public class ClientResponse extends RemoteObject {
 		RemoveSubscriptionReponse,
 		UpdateSubscriberReponse,
 		EmptyResponse,
-		ErrorReponse,
-		UserNotFoundError;
+		ErrorResponse,
+		UserNotFoundError,
+		TagNotFoundError;
 	}
 	
 	private final Object body;
@@ -36,5 +37,9 @@ public class ClientResponse extends RemoteObject {
 	
 	public Object getBody() {
 		return body;
+	}
+	
+	public String toString() {
+	    return "ClientResponse from " + super.getOriginHostName() + " with Type=" + type.toString();
 	}
 }
