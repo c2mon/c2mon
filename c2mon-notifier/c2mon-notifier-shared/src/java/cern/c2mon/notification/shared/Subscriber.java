@@ -24,7 +24,7 @@ public class Subscriber {
 	 * 
 	 */
 	private int reportInterval = 0;
-
+	
 	private HashMap<Long, Subscription> subscriptions = new HashMap<Long, Subscription>();
 
 	/**
@@ -89,19 +89,24 @@ public class Subscriber {
 		return subscriptions;
 	}
 
-	public void addSubscription(Subscription subscription) {
+	public synchronized void addSubscription(Subscription subscription) {
 		subscriptions.put(subscription.getTagId(), subscription);
 	}
 
-	public void removeSubscription(Subscription subscription) {
+	public synchronized void removeSubscription(Subscription subscription) {
 		removeSubscription(subscription.getTagId());
 	}
+	
+	public Subscription getSubscription(Subscription reference) {
+	    return subscriptions.get(reference.getTagId());
+	}
+	
 
 	/**
 	 * Removes a Subscription from {@link Subscriber#subscriptions}. 
 	 * @param tagId the id to remove
 	 */
-	public void removeSubscription(Long tagId) {
+	public synchronized void removeSubscription(Long tagId) {
 		subscriptions.remove(tagId);
 	}
 
@@ -167,7 +172,9 @@ public class Subscriber {
 	}
 
 	/**
-	 * @return an exact copy of this subscriber object.
+	 * @return an exact copy of this subscriber object. 
+	 * No references (also not to the {@link Subscription} objects are left. <br>
+	 * You can mess up as you want...
 	 */
     public Subscriber getCopy() {
         Subscriber result = new Subscriber(this.getUserName(), this.getEmail(), this.getSms());
