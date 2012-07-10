@@ -50,8 +50,13 @@ public class Subscription implements Comparable<Subscription> {
     /**
      * a list which contains information on the last notified tags
      */
-    private HashMap<Long, Status> lastNotifiedTags = new HashMap<Long, Status>();
+    protected HashMap<Long, Status> lastNotifiedTags = new HashMap<Long, Status>();
 
+    /**
+     * flag to indicate that this subscription should be used when metric changes happen. 
+     */
+    private boolean notifyOnMetricChange = false;
+    
     /**
      * Holds the client-side rule expression (if desired by the user)
      */
@@ -100,7 +105,8 @@ public class Subscription implements Comparable<Subscription> {
     }
 
     /**
-     * Creates a subscription object with desired notification level.
+     * Creates a subscription object with desired notification level.<br><br>
+     * <b>Note:</b> this constructor also adds itself to the passed Subscriber object {@link Subscriber#addSubscription(Subscription)}. No need to do this in a second call.
      * 
      * @param user the {@link Subscriber} which this Subscription belongs to.
      * @param tagId tagId the tag id [long] this subscription belongs to
@@ -108,6 +114,7 @@ public class Subscription implements Comparable<Subscription> {
      */
     public Subscription(Subscriber user, Long tagId, int level) {
         this(user.getUserName(), tagId, level);
+        user.addSubscription(this);
     }
 
     /**
@@ -126,6 +133,19 @@ public class Subscription implements Comparable<Subscription> {
         return level;
     }
 
+    /**
+     * Sets the notification level to the desired level
+     * @see Status
+     * @param level 
+     */
+    public void setNotificationLevel(int level) {
+        Status s = Status.fromInt(level);
+        if (s.equals(Status.UNKNOWN) || s.equals(Status.OK)) {
+            throw new IllegalArgumentException("The level argument is not allowed to be UNKNOWN or OK.");
+        }
+        this.level = level;
+    }
+    
     /**
      * @return true in case this subscription is enabled, false otherwise.
      */
@@ -174,6 +194,20 @@ public class Subscription implements Comparable<Subscription> {
     }
 
     /**
+     * @return Returns the notifyOnMetricChange.
+     */
+    public boolean isNotifyOnMetricChange() {
+        return notifyOnMetricChange;
+    }
+
+    /**
+     * @param notifyOnMetricChange Triggers a notification whenever a metric change appear. <b>Note:</b> This can be very often!
+     */
+    public void setNotifyOnMetricChange(boolean notifyOnMetricChange) {
+        this.notifyOnMetricChange = notifyOnMetricChange;
+    }
+
+    /**
      * @return the owner of this subscription.
      */
     public final String getSubscriberId() {
@@ -193,6 +227,11 @@ public class Subscription implements Comparable<Subscription> {
         return (s.getTagId() == this.getTagId() && s.getNotificationLevel() == this.getNotificationLevel() && s
                 .getSubscriberId().equals(this.getSubscriberId()));
     }
+    
+    @Override
+    public int hashCode() {
+        return this.getSubscriberId().hashCode() ^ this.getTagId().hashCode();
+    }
 
     public String toString() {
         StringBuilder ret = new StringBuilder();
@@ -210,7 +249,13 @@ public class Subscription implements Comparable<Subscription> {
      * @return an exact copy of this object.
      */
     public Subscription getCopy() {
-        return new Subscription(this.getSubscriberId(), this.getTagId(), this.getNotificationLevel());
+        Subscription sub = new Subscription(this.getSubscriberId(), this.getTagId(), this.getNotificationLevel());
+        sub.setEnabled(this.isEnabled());
+        sub.setLastNotification(getLastNotification());
+        sub.setLastNotifiedStatus(getLastNotifiedStatus());
+        sub.setMailNotification(isMailNotification());
+        sub.setSmsNotification(isSmsNotification());
+        return sub;
     }
 
     /**
@@ -252,5 +297,27 @@ public class Subscription implements Comparable<Subscription> {
     public Set<Long> getResolvedSubTagIds() {
         return lastNotifiedTags.keySet();
     }
-
+    
+    
+    public void addResolvedSubTag(Long l) {
+        lastNotifiedTags.put(l, Status.UNKNOWN);
+    }
+    
+    
+    public Status getLastStatusForResolvedSubTag(Long tagId) {
+        Status s = lastNotifiedTags.get(tagId);
+        if (s != null) {
+            return s;
+        } else {
+            throw new IllegalArgumentException("Rule # " + getTagId() +  ": Tag #" + tagId + " in not in my resolved list.");
+        }
+    }
+    
+    
+    public void setLastStatusForResolvedTSubTag(Long tagId, Status status) {
+        if (!lastNotifiedTags.containsKey(tagId)) {
+            throw new IllegalArgumentException("Tag # " + getTagId() + ": I do not have a resolved child with ID=" + tagId);
+        }
+        lastNotifiedTags.put(tagId, status);
+    }
 }
