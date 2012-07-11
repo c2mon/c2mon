@@ -27,8 +27,14 @@
     		<props>  
       			<prop key="c2mon.client.jms.alarm.topic">c2mon.client.alarm</prop>  
       			<prop key="c2mon.client.rbac.admin">c2mon.rbac.admin</prop> 
+            <!-- name of the JMS queue for client to server admin requests -->
             <prop key="c2mon.client.jms.admin.queue">c2mon.client.admin</prop>
-            <prop key="c2mon.client.jms.request.queue">c2mon.client.request</prop>  
+            <!-- name of the JMS queue for client to server standard requests -->
+            <prop key="c2mon.client.jms.request.queue">c2mon.client.request</prop>
+            <!-- number of tags requested per JMS message -->  
+            <prop key="c2mon.client.request.size">100</prop>
+            <!-- max number of threads used to request tags from server -->  
+            <prop key="c2mon.client.request.threads.max">20</prop>  
     		</props>  
  		 </property>  
 	</bean>
