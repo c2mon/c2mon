@@ -72,10 +72,10 @@
 				<td>
 					<xsl:choose>
 						<xsl:when test="tagQuality/isValid = 'true'">
-        			Valid
+        			OK
         		</xsl:when>
         		<xsl:otherwise>
-        			Not Valid
+        			INVALID
     				</xsl:otherwise>
         	</xsl:choose>
 				</td>
