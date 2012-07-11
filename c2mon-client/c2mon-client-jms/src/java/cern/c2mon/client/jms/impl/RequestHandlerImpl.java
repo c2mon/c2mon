@@ -21,10 +21,10 @@ package cern.c2mon.client.jms.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -32,7 +32,6 @@ import javax.jms.JMSException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -73,28 +72,20 @@ public class RequestHandlerImpl implements RequestHandler {
    * The maximum number of tags in a single request. Each request runs in its
    * own thread on the server and is sent in a single JMS message.
    */
+  @Value("${c2mon.client.request.size}")
   private static final int MAX_REQUEST_SIZE = 100;
 
   /**
-   * Core number of threads in executor.
+   * Core/max number of threads in executor.
    */
-  private static final int CORE_POOL_SIZE = 40;
-
-  /**
-   * Max number of exector threads.
-   */
-  private static final int MAX_POOL_SIZE = 100;
+  @Value("${c2mon.client.request.threads.max}")
+  private static final int CORE_POOL_SIZE = 20;
 
   /**
    * Thread idle timeout in executor (in seconds), including core threads.
    */
   private static final long KEEP_ALIVE_TIME = 60;
-
-  /**
-   * Thread pool queue size.
-   */
-  private static final int QUEUE_SIZE = 10;
-
+  
   /**
    * Ref to JmsProxy bean.
    */
@@ -112,8 +103,8 @@ public class RequestHandlerImpl implements RequestHandler {
   /**
    * Executor for submitting requests to the server.
    */
-  private ThreadPoolExecutor executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-      new ArrayBlockingQueue<Runnable>(QUEUE_SIZE), new ThreadPoolExecutor.CallerRunsPolicy());
+  private ThreadPoolExecutor executor = new ThreadPoolExecutor(CORE_POOL_SIZE, CORE_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+      new LinkedBlockingDeque<Runnable>(), new ThreadPoolExecutor.CallerRunsPolicy());
 
   /**
    * Constructor.
