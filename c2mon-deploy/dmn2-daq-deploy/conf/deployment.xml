@@ -65,6 +65,8 @@
           <file name="DMN2-DAQ-CLIC_INJ.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-CLIC_LHC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-CLIC_SPS.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
+          <file name="DMN2-DAQ-CLIC_MISC_FEC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
+          <file name="DMN2-DAQ-CLIC_MISC_WS.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-CLIC_MISC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-RDA_BIS.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-RDA_PLC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />          
@@ -103,6 +105,8 @@
           <file name="DMN2-DAQ-CLIC_INJ.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-CLIC_LHC.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-CLIC_SPS.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
+          <file name="DMN2-DAQ-CLIC_MISC_FEC.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
+          <file name="DMN2-DAQ-CLIC_MISC_WS.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />          
           <file name="DMN2-DAQ-CLIC_MISC.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-RDA_BIS.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
           <file name="DMN2-DAQ-RDA_PLC.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
