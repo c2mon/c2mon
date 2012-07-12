@@ -110,23 +110,23 @@
 		<xsl:apply-templates select="invalidQualityStates"/>
 	</xsl:template>
 	
-	<xsl:template match="invalidQualityStates">
-		<xsl:apply-templates select="entry"/>
-	</xsl:template>
-	
 		<!--  process the XML element invalidQualityStates - entry  -->
-	<xsl:template match="entry">
+	<xsl:template match="invalidQualityStates">
 		<p>
 		</p>	
 		<table class="inline">
 		
+			<th colspan="4">Reason for tag invalidation</th>
+			
+			<xsl:for-each
+				select="entry">
 			<tr>
 				<td class="highlight bold">Quality Status</td>
 				<td width="25%"><xsl:value-of select="tagQualityStatus"/></td>
 				<td class="highlight bold">Description</td>
 				<td width="25%"><xsl:value-of select="string"/></td>
 			</tr>
-		
+			
 			<xsl:for-each select="*[not(local-name() = 'tagQualityStatus' or local-name() = 'string')]">
 
 				<xsl:if test="position() mod 2 = 1">
@@ -141,6 +141,7 @@
 					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
 				</xsl:if>
 				
+			</xsl:for-each>
 			</xsl:for-each>
 		</table>
 	
