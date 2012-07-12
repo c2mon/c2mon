@@ -10,11 +10,7 @@
       <deployment installLocation="/opt/statistics-generator-not-used/">
         <backupPolicy keepBackups="2">
           <preserve type="dir" name="log" />
-        </backupPolicy>
-        <notification>
-          <!-- you can give more than one mail for deployment notification -->
-          <mail address="timdiamon-developers@cern.ch" />
-        </notification>
+        </backupPolicy>        
       </deployment>
       <startscript name="C2MON-STATISTICS-GENERATOR">
         <main-class name="cern.c2mon.statistics.generator.GraphDeployer">
@@ -40,6 +36,9 @@
           <file name="webconfig.xml" sourceDir="/user/timoper/rep/c2mon/statistics" mask="400" />
           <file name="c2mon-generator.properties" sourceDir="/user/timoper/rep/c2mon/statistics" mask="400" />
         </directory>
+        <notification>          
+          <mail address="tim-admin@cern.ch" />
+        </notification>
       </deployment>
     </application>
 
