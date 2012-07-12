@@ -2,13 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>cern.c2mon.notification</groupId>
   <artifactId>c2mon-notification-shared</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   
   <parent>
-		<groupId>cern.dmn2.client</groupId>
-		<artifactId>dmn2-client-pom</artifactId>
-		<version>1.0.1</version>
-	</parent>
+    <artifactId>c2mon-client-pom</artifactId>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <version>1.0.10</version>
+  </parent>
   
   <packaging>jar</packaging>
   <dependencies>
