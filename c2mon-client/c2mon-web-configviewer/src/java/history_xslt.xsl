@@ -96,12 +96,18 @@
               <td>
                 <xsl:value-of select="value" />
               </td>
+              
               <td>
-                <xsl:value-of
-                  select="dataTagQuality/invalidQualityStates/entry/tagQualityStatus" />
-                -
-                <xsl:value-of select="dataTagQuality/invalidQualityStates/entry/string" />
+        				<xsl:for-each select="dataTagQuality/invalidQualityStates/entry">
+        					<p>
+                	<xsl:value-of
+                  	select="tagQualityStatus" />
+               			 -
+               		 <xsl:value-of select="string" />
+               		 </p>
+								</xsl:for-each>
               </td>
+              
               <td>
                 <xsl:value-of select="description" />
               </td>
@@ -112,23 +118,6 @@
                 <xsl:value-of select="mode" />
               </td>
             </tr>
-        	<xsl:for-each select="dataTagQuality/invalidQualityStates/entry">
-        	<xsl:if test="position()!=1">
-        	<tr>
-              <td></td>
-              <td></td>
-              <td>
-                <xsl:value-of
-                  select="tagQualityStatus" />
-                -
-                <xsl:value-of select="string" />
-              </td>
-              <td></td>
-              <td></td>
-              <td></td>
-             </tr> 
-       		</xsl:if>
-			</xsl:for-each>
        </xsl:for-each>
         </table>
       </body>
