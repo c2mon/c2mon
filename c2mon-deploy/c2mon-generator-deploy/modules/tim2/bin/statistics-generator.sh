@@ -41,7 +41,7 @@ STATISTICS_GENERATOR_LOG_HOME=$STATISTICS_GENERATOR_HOME/log
 STATISTICS_GENERATOR_CONF_HOME=$STATISTICS_GENERATOR_HOME/conf
 
 #name of web home directory on server root
-WEB_HOME=tim-web-statistics
+WEB_HOME=c2mon-statistics-web
 
 
 
