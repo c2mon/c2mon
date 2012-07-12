@@ -7,12 +7,24 @@
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/form.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/tim.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/webConfigViewer.css"/>" />
+
+<link type="text/css" href="/c2mon-web-configviewer/css/ui-lightness/jquery-ui.css" rel="stylesheet" />
+<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery.js"></script>
+<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-ui.js"></script>
 </head>
 
 <body>
 <h1>${title}</h1>
 
-<p class="instruction">${instruction}</p>
+<div class="ui-widget">
+	<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
+				<p style="font-size : 1.1em;"><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+				${instruction}</p>
+	</div>
+</div>
+
+<br/>
+
 <p>
 
 <c:url var="submitUrl" value="${formSubmitUrl}"/>
