@@ -22,10 +22,9 @@ public class NotificationGateway {
     /** The path to the core Spring XML */
     private static final String APPLICATION_SPRING_XML_PATH = "cern/c2mon/client/notification/config/client.xml";
     
-    /** A JVM property to override the default spring context */ 
-    private static String APPLICATION_SYS_PROP = "notification.props";
-    
     private static NotificationService INSTANCE = null;
+    
+    private static ClassPathXmlApplicationContext xmlContext = null;
     
     
     /**
@@ -45,17 +44,24 @@ public class NotificationGateway {
      */
     public static NotificationService getService() {
         if (INSTANCE == null) {
-            ClassPathXmlApplicationContext xmlContext = null;
-            
-            if (System.getProperty(APPLICATION_SYS_PROP) != null) {
-                xmlContext = new ClassPathXmlApplicationContext(System.getProperty(APPLICATION_SYS_PROP));
-            } else {
                 xmlContext = new ClassPathXmlApplicationContext(APPLICATION_SPRING_XML_PATH);
-            }
-            
             INSTANCE = xmlContext.getBean(NotificationServiceImpl.class);
         }
         return INSTANCE;
     }
+    
+    /**
+     * Closes all resources.
+     */
+    public static void close() {
+        if (xmlContext != null) {
+            try {
+                xmlContext.close();
+            }catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    
     
 }

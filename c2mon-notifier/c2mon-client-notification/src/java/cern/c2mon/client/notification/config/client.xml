@@ -1,42 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
-	
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="properties">
-			<props>
-				<prop key="c2mon.notification.jms.url">failover:(tcp://jms-diamon-pro:61640?wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=false&amp;soTimeout=3000&amp;connectionTimeout=8000)?startupMaxReconnectAttempts=4</prop>
-				<prop key="c2mon.notification.requestQueue">c2mon.notification.request</prop>
-			</props>
-		</property>
-		<property name="locations">
-			<value>${config.properties}</value>
-		</property>
-		
-		<property name="ignoreResourceNotFound">
-			<value>true</value>
-		</property>
-	</bean>
-       
-    
-    
-    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="ignoreUnresolvablePlaceholders" value="true" />
+   </bean>
 
-	<!--  the main JMS connection factory  -->	
-	<bean id="logConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
-        <property name="targetConnectionFactory">
-          <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-			<constructor-arg index="0" value="${c2mon.notification.jms.url}" />
-			<property name="dispatchAsync" value="true" />
-		  </bean>
-        </property>
-    </bean>
-    
-    <bean id="notificationService" class="cern.c2mon.client.notification.NotificationServiceImpl">
-    	<constructor-arg index="0" ref="logConnectionFactory"/>
-    	<property name="requestQueue" value="${c2mon.notification.requestQueue}"/>
-    </bean>
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="properties">
+         <props>
+            <prop key="c2mon.notification.jms.url">failover:(tcp://jms-diamon-pro:61640?wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=false&amp;soTimeout=3000&amp;connectionTimeout=8000)?startupMaxReconnectAttempts=4
+            </prop>
+            <prop key="c2mon.notification.requestQueue">c2mon.notification.request</prop>
+         </props>
+      </property>
+      <property name="ignoreResourceNotFound" value="true" />
+	  <property name="location" value="${c2mon.client.conf.url}" />
+   </bean>
+
+
+
+   <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
+
+   <!--  the main JMS connection factory  -->
+   <bean id="logConnectionFactory"
+      class="org.springframework.jms.connection.SingleConnectionFactory">
+      <property name="targetConnectionFactory">
+         <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+            <constructor-arg index="0"
+               value="${c2mon.notification.jms.url}" />
+            <property name="dispatchAsync" value="true" />
+         </bean>
+      </property>
+   </bean>
+
+   <bean id="notificationService"
+      class="cern.c2mon.client.notification.NotificationServiceImpl">
+      <constructor-arg index="0" ref="logConnectionFactory" />
+      <property name="requestQueue" value="${c2mon.notification.requestQueue}" />
+   </bean>
 
 </beans>
