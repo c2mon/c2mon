@@ -84,7 +84,7 @@ public class NotificationServiceImplTest {
         System.out.println("Server Response : " + resp.getType());
         
         
-        if (resp.getType().equals(ClientResponse.Type.ErrorReponse)) {
+        if (resp.getType().equals(ClientResponse.Type.ErrorResponse)) {
             fail((String) resp.getBody());
         }
     }
@@ -103,7 +103,7 @@ public class NotificationServiceImplTest {
         request = new ClientRequest(ClientRequest.Type.GetSubscriber, getValidSubscriber().getUserName());
         resp = service.prepareResponse(request);
         System.out.println("Server Response : " + resp.getType());
-        if (resp.getType().equals(ClientResponse.Type.ErrorReponse)) {
+        if (resp.getType().equals(ClientResponse.Type.ErrorResponse)) {
             fail((String) resp.getBody());
         }
         
@@ -129,7 +129,7 @@ public class NotificationServiceImplTest {
         request = new ClientRequest(ClientRequest.Type.GetSubscriber, getValidSubscriber().getUserName());
         resp = service.prepareResponse(request);
         System.out.println("Server Response : " + resp.getType());
-        if (resp.getType().equals(ClientResponse.Type.ErrorReponse)) {
+        if (resp.getType().equals(ClientResponse.Type.ErrorResponse)) {
             fail((String) resp.getBody());
         }
         
@@ -165,7 +165,7 @@ public class NotificationServiceImplTest {
         request = new ClientRequest(ClientRequest.Type.GetSubscriber, getValidSubscriber().getUserName());
         resp = service.prepareResponse(request);
         System.out.println("Server Response : " + resp.getType());
-        if (resp.getType().equals(ClientResponse.Type.ErrorReponse)) {
+        if (resp.getType().equals(ClientResponse.Type.ErrorResponse)) {
             fail((String) resp.getBody());
         }
         Subscriber fromReg = gson.fromJson((String) resp.getBody(), Subscriber.class);
@@ -189,7 +189,7 @@ public class NotificationServiceImplTest {
         request = new ClientRequest(ClientRequest.Type.AddSubscription, gson.toJson(sub));
         resp = service.prepareResponse(request);
         
-        if (resp.getType().equals(ClientResponse.Type.ErrorReponse)) {
+        if (resp.getType().equals(ClientResponse.Type.ErrorResponse)) {
             fail((String) resp.getBody());
         }
         
@@ -236,22 +236,20 @@ public class NotificationServiceImplTest {
             // create the client and connect it to the same internal broker.
             cern.c2mon.client.notification.NotificationServiceImpl clientService = new cern.c2mon.client.notification.NotificationServiceImpl(fac);
             clientService.setRequestQueue(requestQueue);
-            clientService.setRequestTimeout(60000);
+            clientService.setRequestTimeout(60000L);
             
             Subscriber s = getValidSubscriber();
             try {
                 clientService.setSubscriber(s);
             } catch (ServiceException sx) {
+                System.err.println(sx.getMessage());
                 fail(sx.getMessage());
             }
             Subscriber fromServer = clientService.getSubscriber(s.getUserName());
-            System.out.println("Got subscriber form Server : "  + fromServer);
+            System.out.println("Got subscriber from Server : "  + fromServer);
         } finally {
             broker.stop();
         }
-        
-        
-        
     }
     
 }

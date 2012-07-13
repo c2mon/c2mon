@@ -1,6 +1,6 @@
 package cern.c2mon.notification.test;
 
-import java.lang.reflect.Type;
+import java.util.HashMap;
 
 import org.junit.Test;
 
@@ -9,10 +9,6 @@ import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
 
 public class GsonTest {
 
@@ -40,30 +36,75 @@ public class GsonTest {
 	@Test
 	public void testSerializeSubscriptionsForUser() {
 		Subscriber s = getNewSubscriber(); 
-		ClientRequest req = new ClientRequest(ClientRequest.Type.GetSubscriptionsForUser, s);
 		s.addSubscription(new Subscription(s, 1L));
 		s.addSubscription(new Subscription(s, 2L));
 		s.addSubscription(new Subscription(s, 3L));
 
 		Gson gson = new Gson();
-		
-		
-		
+		String text = gson.toJson(s);
 
-		String body = gson.toJson(req);
+		System.out.println("Generated String from object : \n" + text);
 		
-		System.out.println("Generated String from object : \n" + body);
-		
-		System.out.println("Back to object \n:");
-		ClientRequest back = gson.fromJson(body, ClientRequest.class);
+		System.out.println("Back to object :\n ");
+		Subscriber back = gson.fromJson(text, Subscriber.class);
 		
 		System.out.println(back);
 		
-		Subscriber sback = gson.fromJson((String) back.getBody(), Subscriber.class);
-		System.out.println(sback);
+//		Subscriber sback = gson.fromJson((String) back.getBody(), Subscriber.class);
+//		System.out.println(sback);
 	}
 	
 	
+	@Test
+	public void testRubbish() {
+	    Gson gson = new Gson();
+	    Rubbish rubbish = new Rubbish();
 
+        String body = gson.toJson(rubbish);
+        
+        System.out.println(body);
+        
+        Rubbish back = gson.fromJson(body, Rubbish.class);
+        System.out.println(back);
+        
+        if (back.getType() == 1) {
+            RubbishOne c = (RubbishOne) back.getObject();
+        } else if (back.getType() == 2) {
+            RubbishTwo c = (RubbishTwo) back.getObject();
+        }
+	}
 	
+	
+	private class Rubbish {
+	    
+	    private Object child;
+	    public final int type;
+	    
+	    public Rubbish() {
+	        child = new RubbishOne();
+	        type = 1;
+	    }
+	    public int getType() {
+	        return type;
+	    }
+	    public Object getObject() {
+	        return child;
+	    }
+	}
+	
+	
+	private class RubbishOne {
+	    private String name;
+	    
+	    public RubbishOne() {
+	        this.name = "Rubbish1";
+	    }
+	}
+	private class RubbishTwo {
+        private String name;
+        
+        public RubbishTwo() {
+            this.name = "Rubbish2";
+        }
+    }
 }

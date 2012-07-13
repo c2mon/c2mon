@@ -79,7 +79,7 @@ public class TextCreatorTest {
     public void testSimpleTagUpdate() throws IOException, TemplateException, RuleFormatException {
         TextCreator creator = new TextCreator();
         
-        String text = creator.getTextForUpdate(getClientDataTagMock());
+        String text = creator.getTextForRuleUpdate(getClientDataTagMock());
         System.out.println(text);
         
     }

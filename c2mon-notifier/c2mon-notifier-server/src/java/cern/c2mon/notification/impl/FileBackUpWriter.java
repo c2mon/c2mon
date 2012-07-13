@@ -16,6 +16,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
@@ -82,8 +83,8 @@ public class FileBackUpWriter implements BackupWriter {
      * @param fileName the name of the file to load the registry from .
      * @return a HashMap with the {@link Subscriber#getUserName()} as key and the {@link Subscriber} as value.
      */
-    public HashMap<String, Subscriber> load() {
-        HashMap<String, Subscriber> newUsers = new HashMap<String, Subscriber>();
+    public ConcurrentHashMap<String, Subscriber> load() {
+        ConcurrentHashMap<String, Subscriber> newUsers = new ConcurrentHashMap<String, Subscriber>();
         // load newUsers from DB, File, etc....
         
         FileReader fr = null;
@@ -105,10 +106,10 @@ public class FileBackUpWriter implements BackupWriter {
         } catch (Exception ex) {
             logger.error(ex.getMessage());
         } finally {
-            try { input.close(); } catch (IOException e) {
+            try { if (input != null) input.close(); } catch (IOException e) {
                 e.printStackTrace();
             }
-            try { fr.close(); } catch (IOException e) {
+            try { if (fr != null) fr.close(); } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -128,7 +129,7 @@ public class FileBackUpWriter implements BackupWriter {
      * 
      * @param toStore the data to store.
      */
-    public void store(HashMap<String, Subscriber> toStore) {
+    public void store(final ConcurrentHashMap<String, Subscriber> toStore) {
         FileWriter fr = null;
         BufferedWriter output = null;
         long t1 = System.currentTimeMillis();

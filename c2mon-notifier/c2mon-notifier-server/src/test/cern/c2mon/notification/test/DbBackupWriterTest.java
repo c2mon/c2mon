@@ -14,8 +14,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -136,7 +136,7 @@ public class DbBackupWriterTest {
          * test writing a large set to db and see how long it takes.
          */
 
-        HashMap<String, Subscriber> toStore = new HashMap<String, Subscriber>(total);
+        ConcurrentHashMap<String, Subscriber> toStore = new ConcurrentHashMap<String, Subscriber>(total);
         long totalSubs = 0;
         for (int i = 1; i <= total; i++) {
             Subscriber s = new Subscriber("test-" + i, "test" + i + "@cern.ch", "");
@@ -149,7 +149,7 @@ public class DbBackupWriterTest {
         
         System.out.println("Created " + total + " subscribers with " + totalSubs + " subscriptions");
         writer.store(toStore);
-        HashMap<String, Subscriber> loaded = writer.load();
+        ConcurrentHashMap<String, Subscriber> loaded = writer.load();
     }
     
         

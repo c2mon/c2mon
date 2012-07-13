@@ -15,6 +15,7 @@ import org.junit.Test;
 import cern.c2mon.notification.impl.SubscriptionRegistryImpl;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
+import cern.c2mon.notification.shared.TagNotFoundException;
 import cern.c2mon.notification.shared.UserNotFoundException;
 
 /**
@@ -25,6 +26,9 @@ public class SubscriptionRegistryTest {
 
 	SubscriptionRegistryImpl reg = null;
 	
+	/**
+	 * 
+	 */
 	@BeforeClass
     public static void initLog4J() {
         System.setProperty("log4j.configuration", SubscriptionRegistryTest.class.getResource("log4j.properties").toExternalForm());
@@ -39,13 +43,21 @@ public class SubscriptionRegistryTest {
 		return new Subscription(getSubscriber(), 1L);
 	}
 	
+	/**
+	 * 
+	 */
 	@Before
 	public void initRegistry() {
 		reg = new SubscriptionRegistryImpl();
 	}
 	
+	/**
+	 * 
+	 * @throws UserNotFoundException in case the user cannot be found
+	 * @throws TagNotFoundException in case the tag cannot be found
+	 */
 	@Test
-	public void testAddSubscriber() throws UserNotFoundException {
+	public void testAddSubscriber() throws UserNotFoundException, TagNotFoundException {
 		
 	    // test API calls
 		Subscriber toAdd = getSubscriber();
@@ -65,8 +77,13 @@ public class SubscriptionRegistryTest {
 		assertEquals(1, reg.getRegisteredUsers().size());
 	}
 	
+	/**
+	 * 
+     * @throws UserNotFoundException in case the user cannot be found
+     * @throws TagNotFoundException in case the tag cannot be found
+	 */
 	@Test
-	public void testAddSubscriberWithEmptySubscriptions() throws UserNotFoundException {
+	public void testAddSubscriberWithEmptySubscriptions() throws UserNotFoundException, TagNotFoundException {
 		Subscriber toAdd = getSubscriber();
 		reg.addSubscriber(toAdd);
 		assertEquals(1, reg.getRegisteredUsers().size());
@@ -78,8 +95,13 @@ public class SubscriptionRegistryTest {
 		assertEquals(1, reg.getRegisteredUsers().size());
 	}
 	
+	/**
+	 * 
+	 * @throws UserNotFoundException in case the user cannot be found
+	 * @throws TagNotFoundException in case the tag cannot be found 
+	 */
 	@Test
-	public void testAddSubscriberWithOneDefaultSubscription() throws UserNotFoundException {
+	public void testAddSubscriberWithOneDefaultSubscription() throws UserNotFoundException, TagNotFoundException {
 		Subscriber toAdd = getSubscriber();
 		toAdd.addSubscription(new Subscription(toAdd, 1L));
 		reg.addSubscriber(toAdd);
@@ -102,8 +124,13 @@ public class SubscriptionRegistryTest {
 		assertEquals(1, reg.getAllRegisteredTagIds().size());
 	}
 	
+	/**
+	 * 
+	 * @throws UserNotFoundException in case the user cannot be found
+	 * @throws TagNotFoundException in case the tag cannot be found  
+	 */
 	@Test
-	public void testAddSubscriberWithOneErrorSubscription() throws UserNotFoundException {
+	public void testAddSubscriberWithOneErrorSubscription() throws UserNotFoundException, TagNotFoundException {
 		Subscriber toAdd = getSubscriber();
 		toAdd.addSubscription(new Subscription(toAdd, 1L, 2));
 		reg.addSubscriber(toAdd);
@@ -120,9 +147,13 @@ public class SubscriptionRegistryTest {
 		assertEquals(1, reg.getAllRegisteredTagIds().size());
 	}
 	
-	
+	/**
+     * 
+     * @throws UserNotFoundException in case the user cannot be found
+     * @throws TagNotFoundException in case the tag cannot be found  
+     */
 	@Test
-	public void testSetSubscriber() throws UserNotFoundException {
+	public void testSetSubscriber() throws UserNotFoundException, TagNotFoundException {
 		Subscriber toAdd = getSubscriber();
 		Subscription sub = new Subscription(toAdd, 1L, 2);
 		toAdd.addSubscription(sub);
@@ -145,9 +176,13 @@ public class SubscriptionRegistryTest {
 		reg.addSubscription(sub);
 	}
 	
-	
+	/**
+     * 
+     * @throws UserNotFoundException in case the user cannot be found
+     * @throws TagNotFoundException in case the tag cannot be found  
+     */
 	@Test
-	public void testRemoveSubscription() throws UserNotFoundException {
+	public void testRemoveSubscription() throws UserNotFoundException, TagNotFoundException {
 		Subscriber toAdd = getSubscriber();
 		Subscription sub = new Subscription(toAdd, 1L, 2);
 		
@@ -166,8 +201,13 @@ public class SubscriptionRegistryTest {
 		
 	}
 	
+	/**
+     * 
+     * @throws UserNotFoundException in case the user cannot be found
+     * @throws TagNotFoundException in case the tag cannot be found  
+     */
 	@Test
-	public void testRemoveSubscriptionForTwo() throws UserNotFoundException {
+	public void testRemoveSubscriptionForTwo() throws UserNotFoundException, TagNotFoundException {
 	    Subscriber first = new Subscriber("test1", "test1@cern.ch", "");
         Subscriber second = new Subscriber("test2", "test2@cern.ch", "");
         
@@ -188,8 +228,13 @@ public class SubscriptionRegistryTest {
         assertEquals(1, reg.getAllRegisteredTagIds().size());
 	}
 	
+	/**
+     * 
+     * @throws UserNotFoundException in case the user cannot be found
+     * @throws TagNotFoundException in case the tag cannot be found  
+     */
 	@Test
-	public void testUpdateReportInterval() throws UserNotFoundException {
+	public void testUpdateReportInterval() throws UserNotFoundException, TagNotFoundException {
 		Subscriber toAdd = getSubscriber();
 		reg.addSubscriber(toAdd);
 		
@@ -200,9 +245,12 @@ public class SubscriptionRegistryTest {
 		System.out.println(reg.getSubscriber(userId));
 	}
 	
-	
+	/**
+     * 
+     * @throws TagNotFoundException in case the tag cannot be found  
+     */
 	@Test
-	public void testWriteAndReadBack() {
+	public void testWriteAndReadBack() throws TagNotFoundException {
 		
 		Subscriber toAdd = getSubscriber();
 		toAdd.addSubscription(new Subscription(toAdd, 1L, 2));

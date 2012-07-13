@@ -9,7 +9,7 @@
  */
 package cern.c2mon.notification.impl;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
@@ -27,14 +27,14 @@ public interface BackupWriter {
      * @return a HashMap containing all {@link Subscriber}s and their 
      *          {@link Subscription}s with the {@link Subscriber#getUserName()} as key
      */
-    public HashMap<String, Subscriber> load();
+    public ConcurrentHashMap<String, Subscriber> load();
     
     /**
      * 
      * @param toStore a HashMap containing all {@link Subscriber}s and their 
      *          {@link Subscription}s with the {@link Subscriber#getUserName()} as key
      */
-    public void store(HashMap<String, Subscriber> toStore);
+    public void store(ConcurrentHashMap<String, Subscriber> toStore);
     
     /**
      * @return <code>TRUE</code> in case the BackupWriter is ok or <code>FALSE</code> in case not.

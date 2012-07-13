@@ -9,18 +9,19 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-
-import javax.annotation.PostConstruct;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 
-import cern.accsoft.commons.util.Trace;
 import cern.c2mon.notification.SubscriptionRegistry;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
+import cern.c2mon.notification.shared.TagNotFoundException;
 import cern.c2mon.notification.shared.UserNotFoundException;
+import cern.dmn2.db.DiamonDbGateway;
+import cern.dmn2.db.PersonData;
 
 /**
  * @author felixehm
@@ -36,7 +37,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	/**
 	 * our list of subscriptions organized by users. 
 	 */
-	protected HashMap<String, Subscriber> users = new HashMap<String, Subscriber>();
+	private ConcurrentHashMap<String, Subscriber> users = new ConcurrentHashMap<String, Subscriber>();
 	
 	/**
 	 * a object to sync the backup writers and add/remove operations. 
@@ -49,12 +50,17 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 * 
 	 * Maybe obsoleted in case speed is enough.
 	 */
-	protected HashSet<Long> tagIds = new HashSet<Long>();
+	private HashSet<Long> tagIds = new HashSet<Long>();
 	
 	/**
 	 * flag to indicated whether we auto-save every time a change to the registry happens.
 	 */
 	private long autoSaveLocal = 0;   // 30 seconds autosafe
+	
+	/**
+	 * 
+	 */
+	private static long AUTO_SAVE_INTERVAL = 20000;
 	
 	/**
 	 * our db writer.
@@ -83,7 +89,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
      * our reference to the notifier who is responsible for the c2mon subscriptions.
      */
     @Autowired
-    private NotifierImpl notifier;
+    private TagCache tagCache;
+    
     
 	/**
 	 * Empty constructor.
@@ -97,7 +104,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 * read the latest snapshot on the local disk.
 	 * 
 	 */
-	@PostConstruct
+	//@PostConstruct
     public void reloadConfig() {
 	    
 	    /*
@@ -114,8 +121,10 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
             logger.info("Attempting to load config from DB ...");
             try {
                 dbWriter.isFine();  // may throw Exception 
-                users = dbWriter.load();
-                updateTagIdList();
+                synchronized (users) {
+                    users = dbWriter.load();
+                    updateTagIdList();
+                }
                 localBackupWriter.store(users);
                 logger.info("Loading data from DB was successful.");
             } catch (Exception ex) {
@@ -136,13 +145,15 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	         *  no db writer. We need a auto-saver
 	         */
 	        if (getAutoSaveInterval() == 0) {
-	            setAutoSaveInterval(20000); // 20 sec auto-saving
+	            setAutoSaveInterval(AUTO_SAVE_INTERVAL); // 20 sec auto-saving
 	        }
         }
-        logger.info("Loaded " + users.size() + " subscribers from DB");
+        logger.info("Registry load finished.");
 	}	
 	
-	
+	/**
+	 * 
+	 */
 	public void start() {
 	    /*
          *  check if autosaver is demanded and start it in case it is. 
@@ -170,6 +181,9 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	    autoSaveLocal = time;
 	}
 	
+	/**
+	 * Stops all backup writers.
+	 */
 	private void stopWriters() {
 	    // Should stop the backup writers
 	    // TODO
@@ -184,7 +198,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	/**
 	 * @param writer an implementation of the {@link BackupWriter}.
 	 */
-	public void setDatabaseWriter(DbBackupWriter writer) {
+	public void setDatabaseWriter(final DbBackupWriter writer) {
 	    logger.info("Setting database writer.");
 	    dbWriter = writer; 
 	}
@@ -195,58 +209,82 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 * with old subscriptions in order to cancel or add tag subscriptions on the c2mon server.  
 	 * 
 	 * @param subscriber the {@link Subscriber} to set. 
+	 * @throws TagNotFoundException in case one of the associated tags cannot be found.
 	 */
-    @SuppressWarnings("unchecked")
-    public void setSubscriber(Subscriber subscriber) {
+    public void setSubscriber(Subscriber subscriber) throws TagNotFoundException {
 	    checkNull(subscriber);
-	    
+
 	    // a bit of a hack : we need to find the differences to cancel the c2mon subscriptions
-	    HashSet<Long> before = null;
 	    if (logger.isTraceEnabled()) {
 	        logger.trace("Entering setSubscriber() for user " + subscriber);
 	    }
+	    /*
+	     * lets get the subscriber we have in the registry
+	     */
+	    Subscriber inReg = null;
+	    try {
+	        inReg = getSubscriber(subscriber.getUserName());
+	    } catch (UserNotFoundException ignore) {
+	        addSubscriber(subscriber);
+	        return;
+	    }
+	    inReg.setReportInterval(subscriber.getReportInterval());
 	    
-		synchronized (accessLock) {
-		    /*
-		     * get the internal tag list and make a copy.
-		     */
-		    before = (HashSet<Long>) getAllRegisteredTagIds().clone();
-		    
-		    /*
-		     * make the changes to the reg and ...
-		     */
-			users.put(subscriber.getUserName(), subscriber);
-			/*
-			 *  ... update the internal tag list 
-			 */
-			updateTagIdList();
-		}	
+	    HashSet<Subscription> toStart = new HashSet<Subscription>();
+	    /*
+	     * iterate over the subscriptions from the NEW subscriber and ..
+	     */
+	    for (Subscription newSub : subscriber.getSubscriptions().values()) {
+	        if (inReg.getSubscription(newSub) == null) {
+	            // .. add new subscriptions to the user
+	            inReg.addSubscription(newSub);
+	            toStart.add(newSub);
+	        } 
+	    }
+	    if (tagCache != null) {
+	        tagCache.startSubscription(toStart);
+	    }
+	    
+	    /**
+	     * iterate over subscriptions from the OLD subscriber and 
+	     * remove (unsubscribe) them if they cannot be found in the NEW one
+	     */
+	    for (Subscription oldSub : inReg.getSubscriptions().values()) {
+	        if (subscriber.getSubscription(oldSub) == null) {
+	            // remove Subscription
+	            if (tagCache != null) {
+	                tagCache.cancelSubscription(oldSub);
+	            }
+                inReg.removeSubscription(oldSub);
+	        } 
+	    }
+	    updateTagIdList();
+	    
+	    /**
+	     * update all subscription objects with attributes from incoming subscriber
+	     */
+	    for (Subscription sameButPossiblyModified : subscriber.getSubscriptions().values()) {
+	        Subscription existing = inReg.getSubscription(sameButPossiblyModified); 
+	        existing.setEnabled(sameButPossiblyModified.isEnabled());
+	        existing.setSmsNotification(sameButPossiblyModified.isSmsNotification());
+	        existing.setMailNotification(sameButPossiblyModified.isMailNotification());
+	        existing.setNotificationLevel(sameButPossiblyModified.getNotificationLevel());
+	        existing.setNotifyOnMetricChange(sameButPossiblyModified.isNotifyOnMetricChange());
+	    }
 		
-		/*
-		 * find the differences between new and old list 
-		 * and tell the notifier to cancel the tags which have been been found. 
-		 */
-		Iterator<Long> i = before.iterator();
-		
-		HashSet<Long> toRemove = new HashSet<Long>();
-		HashSet<Long> now = getAllRegisteredTagIds();
-		while (i.hasNext()) {
-		    Long tagId = i.next();
-		    if (!now.contains(tagId)) {
-		        toRemove.add(tagId);
-		    }
-		}
-		if (notifier != null && toRemove.size() > 0) {
-		    logger.debug("Cancelling the following tagid subscriptions : " + toRemove.toString());
-		    notifier.cancelSubscription(toRemove);
-		}
 		setLastModificationTime(System.currentTimeMillis());
+
+		/*
+		 * we modify the passed object to and set it to the current object in our registry.
+		 */
+		subscriber = inReg;
 		
 		logger.trace("leaving setSubscriber()");
 	}
 	
 	/**
-	 * updates the internal tag list which. 
+	 * Iterates over ALL subscriptions and add the ids into an internal list. This operation is thread-safe.
+	 * 
 	 * @see SubscriptionRegistry#getAllRegisteredTagIds()  
 	 */
 	public void updateTagIdList() {
@@ -264,8 +302,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	/**
 	 * @return an exact copy of the registry. All changes to the result will not affect the original registry.
 	 */
-	public HashMap<String, Subscriber> getCopy() {
-	    HashMap<String, Subscriber> result = new HashMap<String, Subscriber>();
+	public ConcurrentHashMap<String, Subscriber> getCopy() {
+	    ConcurrentHashMap<String, Subscriber> result = new ConcurrentHashMap<String, Subscriber>();
 	    synchronized (accessLock) {
 	        for (Entry<String, Subscriber> e : users.entrySet()) {
 	            result.put(e.getKey(), e.getValue().getCopy());
@@ -273,19 +311,27 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	    }
 	    return result;
 	}
-		
-	public void addSubscriber(Subscriber user) {
+
+	/**
+	 * Adds a subscriber to the system. 
+	 * @param user the {@link Subscriber} to add
+	 * @throws TagNotFoundException in case one of the tags the user wants to subscribe does not exist.
+	 */
+	public void addSubscriber(Subscriber user) throws TagNotFoundException {
 	    checkNull(user);
 	    
 	    logger.trace("Entering addSubscriber()" + user);
 	    
-	    if (notifier != null) {
-	        notifier.startSubscription(new HashSet<Long>(user.getSubscribedTagIds()));
-	    }
 	    
-	    synchronized (accessLock) {
-            users.put(user.getUserName(), user);
-            updateTagIdList();
+        users.put(user.getUserName(), user);
+        updateTagIdList();
+        
+
+	    /*
+	     * start the subscription
+	     */
+	    if (tagCache != null) {
+	        tagCache.startSubscription(new HashSet<Subscription>(user.getSubscriptions().values()));
         }
 	    
 	    setLastModificationTime(System.currentTimeMillis());
@@ -300,22 +346,54 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	    String userId = subscription.getSubscriberId();
 	    getSubscriber(userId);
 
-	    HashSet<Long> toCheck = new HashSet<Long>();
-	    toCheck.add(subscription.getTagId());
-	    
-	    if (notifier != null) {
-	        notifier.startSubscription(toCheck);
+	    if (logger.isTraceEnabled()) {
+	        logger.trace("Adding subscription for tag " + subscription.getTagId() + " to user " + subscription.getSubscriberId());
 	    }
 	    
-		synchronized (users) {
-		    users.get(userId).addSubscription(subscription);
-        }
+	    // thread-safe in Subscriber object
+	    Subscriber owner = users.get(userId);
+	    if (owner.getSubscriptions().containsKey(subscription.getTagId())) {
+	        throw new IllegalStateException("User is already subscribed to " + subscription.getTagId());
+	    }
+	    owner.addSubscription(subscription);
+	    
+        /*
+         * we could also call updateTagList() but as we only add one, it is much faster.
+         */
 		if (!tagIds.contains(subscription.getTagId())) {
-    		synchronized (tagIds) {
-    		    tagIds.add(subscription.getTagId());
-            }
+		    tagIds.add(subscription.getTagId());
 		}
-		setLastModificationTime(System.currentTimeMillis());
+		
+		
+		/*
+		 * start the subscription
+		 */
+	    
+	    if (tagCache != null) {
+	        HashSet<Subscription> toStart = new HashSet<Subscription>();
+	        toStart.add(subscription);
+	        try {
+	            tagCache.startSubscription(toStart);
+	        } catch (TagNotFoundException ex) {
+	            tagIds.remove(subscription.getTagId());
+	            owner.removeSubscription(subscription);
+	            throw ex;
+	        }
+        }
+	    setLastModificationTime(System.currentTimeMillis());
+	}
+	
+	/**
+	 * Removes a Subscription and cancels all releated sub-tags using the C2Mon API. 
+	 * @param subscriber the {@link Subscriber} to cancel. 
+	 */
+	public void removeSubscriber(Subscriber subscriber) {
+	    for (Subscription s : subscriber.getSubscriptions().values()) {
+	        removeSubscription(s);
+	    }
+	    
+	    users.remove(subscriber.getUserName());
+	    updateTagIdList();
 	}
 	
 	@Override
@@ -331,15 +409,24 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	@Override
 	public Subscriber getSubscriber(String userName) throws UserNotFoundException {
 	    checkNull(userName);
+	    
 		if (users.containsKey(userName)) {
 			return users.get(userName);
 		} else {
-			throw new UserNotFoundException("User " + userName + " is not registered for notification");
+		    
+		    PersonData p = DiamonDbGateway.getDbService().getPersonData(userName.toUpperCase());
+		    if (p == null) {
+		        throw new UserNotFoundException("User " + userName + " is not registered.");
+		    } else {
+		        Subscriber s = new Subscriber(p.getUserName(), p.getMail(), p.getMobile());
+		        users.put(s.getUserName(), s);
+		        return s;
+		    }
 		}
 	}
 
 	
-	/**
+	/** Removes a subscription from the registry and calls the {@link NotifierImpl#cancelSubscription(Subscription)}.
 	 * 
 	 * @param subscription the subscription to remove.
 	 * @throws UserNotFoundException in case the owner of this subscription does not even exist.
@@ -350,27 +437,25 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	        logger.trace("entering removeSubscription() : USER=" + subscription.getSubscriberId() + " TagId=" + subscription.getTagId());
 	    }
 	    
-		getSubscriber(subscription.getSubscriberId()).removeSubscription(subscription);
+	    Subscriber subscriber = getSubscriber(subscription.getSubscriberId());
+	    subscription = subscriber.getSubscription(subscription);
+	    
+		subscriber.removeSubscription(subscription);
 		updateTagIdList();
 		
 		/*
 		 * we need to tell the notifier to remove the subscription
 		 */
-		if (notifier != null) {
-		    if (!getAllRegisteredTagIds().contains(subscription.getTagId())) {
-		        logger.info("Removing subscription for ID=" + subscription.getTagId());
-		        // only remove c2mon subscription if there is no one left who is interested. 
-		        HashSet<Long> toRemove = new HashSet<Long>();
-		        toRemove.add(subscription.getTagId());
-		        notifier.cancelSubscription(toRemove);
-		    }
+		if (tagCache != null) {
+		    tagCache.cancelSubscription(subscription);
 		}
 		
 		setLastModificationTime(System.currentTimeMillis());
 	}
 	
 	/**
-	 * 
+	 * @return HashMap<Subscriber, Subscription> A list of Subscribers and their subscriptions.
+	 * @param tagId the id of the tag
 	 */
 	public HashMap<Subscriber, Subscription> getSubscriptionsForTagId(Long tagId) {
 		HashMap<Subscriber, Subscription> result = new HashMap<Subscriber, Subscription>();
@@ -388,6 +473,16 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 */
 	public List<Subscriber> getRegisteredUsers() {
 		return new ArrayList<Subscriber>(users.values());
+	}
+	
+	public HashSet<Subscription> getRegisteredSubscriptions() {
+	    HashSet<Subscription> result = new HashSet<Subscription>();
+	    for (Subscriber s : users.values()) {
+	        for (Subscription sup : s.getSubscriptions().values()) {
+	            result.add(sup);
+	        }
+	    }
+	    return result;
 	}
 	
 	/**
@@ -429,6 +524,10 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
         this.localBackupFileName = localBackupFileName;
     }
     
+    /**
+     * 
+     * @param arg the object to check for.
+     */
     private void checkNull(Object arg) {
         if (arg == null) {
             throw new IllegalArgumentException("Passed argument is null! : ");
@@ -442,6 +541,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
     private void startDatabaseBackupWriter(final BackupWriter writer) {
         new Thread(new Runnable() {
             public void run() {
+                logger.trace("Starting DB BackupWriter.");
+                
                 while (getAutoSaveInterval() > 0) {
                     try {
                         Thread.sleep(getAutoSaveInterval());
@@ -450,11 +551,13 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
                         break;
                     }
                     try {
+                        logger.trace("Checking if we need to write registry to DB ...");
                         if (getLastModificationTime() > writer.getLastFullWrite()) {
                             logger.debug("Storing Registry into DB");
                             writer.store(getCopy());
+                            logger.trace("Entries stored in DB.");
                         } else {
-                            logger.debug("No storage as no modification took place.");
+                            logger.trace("No storage as no modification took place.");
                         }
                     } catch (Exception ex) {
                         logger.error(ex.getMessage(), ex);
@@ -476,6 +579,20 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
      */
     public long getLastModificationTime() {
         return lastModificationTime;
+    }
+
+    /**
+     * @return Returns the notifier.
+     */
+    public TagCache getTagCache() {
+        return tagCache;
+    }
+
+    /**
+     * @param tagCache The {@link TagCache} to set.
+     */
+    public void setTagCache(TagCache tagCache) {
+        this.tagCache = tagCache;
     }
     
 }

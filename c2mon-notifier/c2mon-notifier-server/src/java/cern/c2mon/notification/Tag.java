@@ -14,12 +14,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.notification.shared.Status;
+import cern.c2mon.notification.shared.Subscription;
 
 /**
  * 
@@ -36,6 +37,7 @@ public class Tag {
     private final Long id;
     
     private ClientDataTagValue latest = null;
+    private ClientDataTagValue previous = null;
     
 //    private int latestStatus = Status.OK.toInteger();
 //    private int previousStatus = Status.OK.toInteger();
@@ -43,11 +45,24 @@ public class Tag {
     /**
      * only if we are a rule this field is used.
      */
-    private List<Tag> children = new ArrayList<Tag>();
+    private HashSet<Tag> children = new HashSet<Tag>();
+    /**
+     * this can be used to a rule or metric
+     */
     private HashMap<Long, Tag> parents = new HashMap<Long, Tag>();
     
     private Status [] history;
     private int currentHistoryPtr = 0;
+    
+    private HashSet<Subscription> subscribers = new HashSet<Subscription>();
+    
+    /**
+     * 
+     */
+    private boolean isSourceDown = false;
+    private boolean wasSourceDown = false;
+    
+    //private int subscribers = 0;
     
     
     public Tag(Long id, boolean isRule) {
@@ -61,6 +76,25 @@ public class Tag {
        currentHistoryPtr = 0;
     }
 
+    public synchronized void removeSubscription(Subscription s) {
+        for (Tag t : children) {
+            t.removeSubscription(s);
+        }
+        subscribers.remove(s);
+    }
+    public synchronized void addSubscription(Subscription s) {
+        for (Tag t : children) {
+            t.addSubscription(s);
+        }
+        subscribers.add(s);
+    }
+    public synchronized HashSet<Subscription> getSubscribers() {
+        return subscribers;
+    }
+    public synchronized void removeAllSubscriptions() {
+        subscribers.clear();
+    }
+    
     public boolean isRule() {
         return isRule;
     }
@@ -68,15 +102,6 @@ public class Tag {
     public Long getId() {
         return id;
     }
-    
-//    public void setStatus(int status) {
-//        if (latest == null) {
-//            previousStatus = latestStatus;
-//            latestStatus = status;
-//        } else {
-//            throw new IllegalStateException("Attempt to set status of Tag " + getId() + " to " + status + "  but I have a ClientDataTagValue assigned. Not allowed.");
-//        }
-//    }
     
     public int getLatestStatusInt() {
         return getLatestStatus().toInteger();
@@ -97,9 +122,9 @@ public class Tag {
      */
     public Status getPreviousStatus() {
         if (currentHistoryPtr == 0) {
-            return history[MAX_STATE_HISTORY_ENTRIES-1];
+            return history[MAX_STATE_HISTORY_ENTRIES - 1];
         }
-        return history[currentHistoryPtr];
+        return history[currentHistoryPtr - 1];
     }
 
     public Status [] getHistory() {
@@ -121,15 +146,32 @@ public class Tag {
     public boolean hasStatusChanged() {
         if (this.isRule()) {
             // for rule only true if the status has changed 
-            return (getPreviousStatus().equals(getLatestStatus()));
+            return (!getPreviousStatus().equals(getLatestStatus()));
         } else {
           // for metric always true.
           return true;  
         }
     }
     
-    public List<Tag> getChildTags() {
+    public boolean hasValueChanged() {
+        if (previous != null) {
+            return Tag.hasValueChanged(previous, latest);
+        } else {
+            return true;
+        }
+    }
+    
+    public HashSet<Tag> getChildTags() {
         return children;
+    }
+    
+    public HashSet<Tag> getAllChildTagsRecursive() {
+        HashSet<Tag> list = new HashSet<Tag>();
+        for (Tag child : children) {
+            list.addAll(child.getAllChildTagsRecursive());
+            list.add(child);
+        }
+        return list;
     }
 
     public void addChildTag(Tag tag) {
@@ -165,21 +207,34 @@ public class Tag {
     public void update(ClientDataTagValue update) {
         int newStatus = Status.UNKNOWN.toInteger();
         
-        if (update.isRuleResult()) {
-            if (update.getValue() != null) {
-                newStatus = ((Double) update.getValue()).intValue();
-            }
-        }
-        
-        //previousStatus = latestStatus;
-        //latestStatus = newStatus;
+        previous = latest;
         latest = update;
         
+        if (latest.isRuleResult()) {
+            /*
+             * Rule
+             */
+            if (latest.getValue() != null) {
+                newStatus = ((Double) latest.getValue()).intValue();
+            }
+            currentHistoryPtr++;
+            if (currentHistoryPtr == MAX_STATE_HISTORY_ENTRIES)
+                currentHistoryPtr = 0;
+            history[currentHistoryPtr] = Status.fromInt(newStatus);
+            
+        } 
         
-        currentHistoryPtr++;
-        if (currentHistoryPtr == MAX_STATE_HISTORY_ENTRIES)
-            currentHistoryPtr = 0;
-        history[currentHistoryPtr] = Status.fromInt(newStatus);
+        if (update != null && !update.getDataTagQuality().isAccessible()) {
+            this.isSourceDown = true; 
+        } else {
+            this.isSourceDown  = false;
+        }
+        /*
+            else {
+            
+            // nothing, just update.
+            } 
+         */ 
     }
     
     @SuppressWarnings("unchecked")
@@ -191,6 +246,25 @@ public class Tag {
         return latest;
     }
     
+    /**
+     * @return Returns the isSourceDown.
+     */
+    public boolean isSourceDown() {
+        return isSourceDown;
+    }
+
+    /**
+     * @param isSourceDown The isSourceDown to set.
+     */
+    public void setSourceDown(boolean isSourceDown) {
+        this.wasSourceDown = this.isSourceDown;
+        this.isSourceDown = isSourceDown;
+    }
+    
+    public boolean wasSourceDown() {
+        return this.wasSourceDown;
+    }
+
     public String toString() {
        StringBuilder sb = new StringBuilder();
 
@@ -225,116 +299,28 @@ public class Tag {
            }
            
        }
-       
-       
-//       for (Tag child : getChildTags()) {
-//           if (child.isRule()) {
-//               sb.append("Rule{ID=").append(child.getId());
-//               if (child.getLatestUpdate() != null) {
-//                   sb
-//                   .append(",isValid=" + child.getLatestUpdate().isValid())
-//                   .append(",Description=" + child.getLatestUpdate().getDescription())
-//                   .append(",VDescription=" + child.getLatestUpdate().getValueDescription())
-//                   .append(",Name=" + child.getLatestUpdate().getName())
-//                   .append(",Value=" + child.getLatestUpdate().getValue()).append(",");
-//               }
-//               for (Tag t : child.getChildTags()) {
-//                   sb.append("\n").append(t.toString()).append(",\n");
-//               }
-//               sb.append("}");
-//           } else {
-//               sb.append("Metric{ID=").append(child.getId()); 
-//               if (child.getLatestUpdate() != null) {
-//                   sb.append(",DTQDescription=" + child.getLatestUpdate().getDataTagQuality().getDescription())
-//                   .append(",Description=" + child.getLatestUpdate().getDescription())
-//                   .append(",VDescription=" + child.getLatestUpdate().getValueDescription())
-//                   .append(",isValid=" + child.getLatestUpdate().getDataTagQuality().isValid())
-//                   .append(",Value=" + child.getLatestUpdate().getValue());
-//               }
-//               sb.append("}");
-//           }
-//       }
        return sb.toString();
     }
     
-    /**
-     * 
-     * @return list of all rules with status != OK.<br> 
-     *          This happens recursively so that all tags returned will have exactly 
-     *          one metric assigned 
-     *          (if a rule has > 1 metric it will appear in the list the number of times it has metrics).
-     *        
-     */
-//    public List<Tag> getInterestingMetrics() {
-//        ArrayList<Tag> result = new ArrayList<Tag>();
-//        
-//        /*
-//         * we need to add ourself as we may have children
-//         */
-//        if (this.isRule()) {
-//            for (Tag c : getChildTags()) {
-//                List<Tag> problemChilds = c.getInterestingMetrics();
-//                result.addAll(problemChilds);
-//            }
-//        } else {
-//            if (logger.isDebugEnabled()) {
-//                if (getParent() != null) {
-//                    logger.trace("Checking child tag " + getId() + " with parent tagID " + getParent().getId() + " and its status " + getParent().getLatestStatus());
-//                } else {
-//                    logger.trace("Checking child tag " + getId());
-//                }
-//            }
-//            if (
-//                    getParent() != null 
-//                    && getParent().getLatestUpdate().getRuleExpression().getInputTagIds().contains((getId()))) {
-//                logger.debug("Adding metric tag " + getId() + " for parent TagID=" + getParent().getId());
-//                result.add(this);
-//            }
-//        } 
-//        return result;
-//    }
     
-//    /**
-//     * 
-//     * @param rule the Tag
-//     * @return a list of all metrics (not rules) for the given Tag
-//     */
-//    public HashSet<Tag> getAllMetrics() {
-//        //ArrayList<Tag> result = new ArrayList<Tag>();
-//        HashSet<Tag> toReturn = new HashSet<Tag>();
-//        
-//        for (Tag c : getChildTags()) {
-//            if (c.isRule()) {
-//                toReturn.addAll(getAllMetrics());
-//                //result.addAll(c.getAllMetrics());
-//            } else {
-//                toReturn.add(c);
-//            }
-//        }
-//        return toReturn;
-//    }
     
-    //
-    // -- CONSTRUCTORS -----------------------------------------------
-    //
-
-    //
-    // -- PUBLIC METHODS -----------------------------------------------
-    //
-
-    //
-    // -- implements XXXX -----------------------------------------------
-    //
-
-    //
-    // -- PROTECTED METHODS -----------------------------------------------
-    //
-
-    //
-    // -- PRIVATE METHODS -----------------------------------------------
-    //
-
-    // 
-    // -- INNER CLASSES -----------------------------------------------
-    //
+    public static boolean hasValueChanged(ClientDataTagValue before, ClientDataTagValue after) {
+        boolean result = false;
+        if (before.getTypeNumeric().equals(TypeNumeric.TYPE_DOUBLE)) {
+            result = (Double) before.getValue() != (Double) after.getValue();
+        } else if (before.getTypeNumeric().equals(TypeNumeric.TYPE_INTEGER)) {
+            result = ((Integer) before.getValue()) != (Integer) after.getValue();
+        } else if (before.getTypeNumeric().equals(TypeNumeric.TYPE_STRING)) {
+            result = ((String) before.getValue()) != (String) after.getValue();
+        } else if (before.getTypeNumeric().equals(TypeNumeric.TYPE_FLOAT)) {
+            result = ((Float) before.getValue()) != (Float) after.getValue();
+        } else if (before.getTypeNumeric().equals(TypeNumeric.TYPE_LONG)) {
+            result = ((Long) before.getValue()) != (Long) after.getValue();
+        } else {
+            result = false;
+        }
+        return result;
+    }
+    
+    
 }

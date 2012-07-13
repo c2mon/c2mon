@@ -3,14 +3,12 @@
  */
 package cern.c2mon.notification.test;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -34,7 +32,6 @@ import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.rule.RuleEvaluationException;
 import cern.tim.shared.rule.RuleExpression;
-import cern.tim.shared.rule.RuleFormatException;
 
 /**
  * @author felixehm
@@ -47,13 +44,19 @@ public class NotifierImplTest {
 	NotifierImpl notifier = null;
 	MyCache m = new MyCache();
 	
-	
+	/**
+	 * 
+	 */
 	@BeforeClass
 	public static void initLog4J() {
 	    System.setProperty("log4j.configuration", NotifierImplTest.class.getResource("log4j.properties").toExternalForm());
 	    System.out.println(System.getProperty("log4j.configuration"));
 	}
 	
+	/**
+	 * 
+	 * @throws IOException
+	 */
 	@Before
 	public void reset() throws IOException {
 	    reg = new SubscriptionRegistryImpl();
@@ -61,7 +64,7 @@ public class NotifierImplTest {
 	    notifier.setSubscriptionRegistry(reg);
         HashSet<Long> list = new HashSet<Long>();
         list.add(1L);
-        m.initAndResolve(list);
+        m.resolveSubTags(list);
         notifier.setTagCache(m);
 	}
 	
@@ -75,7 +78,7 @@ public class NotifierImplTest {
 	 */
 	private class MyCache extends TagCache {
 	    @Override
-	    public Tag metricTagResolver(Tag tagID, HashMap<Long, Tag> overallList) {
+	    public Tag metricTagResolver2(Long tagID, ConcurrentHashMap<Long, Tag> overallList) {
 
 	        /*
 	         * complex rule with sub rule and child.
@@ -187,10 +190,14 @@ public class NotifierImplTest {
 	        
 	        
 	        
-	        return overallList.get(tagID.getId());
+	        return overallList.get(tagID);
 	    }
 	}
 	
+	/**
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void test() throws IOException {
 		NotifierImpl notifier = new NotifierImpl();
@@ -199,7 +206,8 @@ public class NotifierImplTest {
 	
 	/**
 	 * helper to create a RuleExpression quickly.
-	 * @param inRule
+	 * @param inRule the tags belonging to the rule.\
+	 * @return a RuleExpression object
 	 */
 	private RuleExpression getRuleExpression(final Long [] inRule) {
 	    /*
@@ -209,7 +217,7 @@ public class NotifierImplTest {
 	    for (Long l : inRule) {
 	        b.append("#" + l + " & ");
 	    }
-	    b.append("true");
+	    b.append("true[0]");
 	    
         RuleExpression rExpression = new RuleExpression(b.toString()) {
             @Override
@@ -229,6 +237,10 @@ public class NotifierImplTest {
         return rExpression;
 	}
 	
+	/**
+	 * 
+	 * @throws Exception in case of an error
+	 */
 	@Test
 	public void testRuleRuleMetric() throws Exception {
 
@@ -242,7 +254,7 @@ public class NotifierImplTest {
 		s.addSubscription(new Subscription(s.getUserName(), toBeNotifiedFor.getId()));
 		reg.setSubscriber(s);
 		
-		printToSubmitNicely(toBeNotifiedFor);
+		printToSubmitNicely(toBeNotifiedFor.getId());
 		
 		/*
          * we expect to have a mail notification send for our test at the end of the last update() call.
@@ -271,7 +283,10 @@ public class NotifierImplTest {
         
 	}
 
-	
+	/**
+	 * 
+     * @throws Exception in case of an error
+	 */
 	@Test
 	public void testSimpleRuleOnOneMatric() throws Exception {
 
@@ -285,7 +300,7 @@ public class NotifierImplTest {
         s.addSubscription(new Subscription(s.getUserName(), toBeNotifiedFor.getId()));
         reg.setSubscriber(s);
         
-        printToSubmitNicely(toBeNotifiedFor);  
+        printToSubmitNicely(toBeNotifiedFor.getId());  
         
         /*
          * we expect to have a mail notification send for our test here.
@@ -309,7 +324,10 @@ public class NotifierImplTest {
 	}
 	
 	
-	
+	/**
+	 * 
+	 * @throws Exception
+	 */
 	@Test
 	public void testTwoSubscriptionsOneRuleOneMetric() throws Exception {
 	    startTest("testTwoSubscriptionsOneRuleOneMetric");
@@ -333,7 +351,7 @@ public class NotifierImplTest {
         s.addSubscription(sub);
         reg.setSubscriber(s);
         
-        printToSubmitNicely(toBeNotifiedFor);  
+        printToSubmitNicely(toBeNotifiedFor.getId());  
         
         /*
          * here, we send off 
@@ -356,7 +374,7 @@ public class NotifierImplTest {
         s.addSubscription(sub);
         reg.setSubscriber(s);
         
-        printToSubmitNicely(toBeNotifiedFor);  
+        printToSubmitNicely(toBeNotifiedFor.getId());  
         
         /*
          * here, we send off 
@@ -387,7 +405,7 @@ public class NotifierImplTest {
         
         reg.setSubscriber(s);
         
-        printToSubmitNicely(toBeNotifiedFor);
+        printToSubmitNicely(toBeNotifiedFor.getId());
         
         /*
          * let's have some metric's submitted
@@ -426,53 +444,53 @@ public class NotifierImplTest {
 	
 	
 	
-	@Test
-	public void testMethodhasValueChanged() throws RuleFormatException {
-	    ClientDataTagImpl before = new ClientDataTagImpl(1L);
-        DataTagQualityImpl q = new DataTagQualityImpl();
-        q.removeInvalidStatus(TagQualityStatus.UNINITIALISED);
-        TransferTagImpl t = new TransferTagImpl(1L, 1.1d , "description", q, TagMode.OPERATIONAL, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), "metric tag description", "MetricTag-"+1, null);
-        before.update(t);
-        
-        ClientDataTagImpl after = new ClientDataTagImpl(1L);
-        t = new TransferTagImpl(1L, 2.1d , "description", q, TagMode.OPERATIONAL, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), "metric tag description", "MetricTag-"+1, null);
-        after.update(t);
-        
-	    assertTrue(notifier.hasValueChanged(before, after));
-	}
 	
-	
-	
-	
-	// ------------------ HELPER METHODS -------------------------
-	
-	private void sendUpdateRuleTag(long id, Long [] ruleInputTag, double status) throws RuleFormatException {
+	/**
+     * sends a rule update
+     * @param id the id of the metric
+     * @param ruleInputTag the input tags of the pseudo rule
+     * @param status the new status value
+     * @throws Exception in case the passed id is not a metric
+     */
+	private void sendUpdateRuleTag(long id, Long [] ruleInputTag, int status) throws Exception {
 	    ClientDataTagImpl ruleUpdate2 = new ClientDataTagImpl(id);
 	    DataTagQualityImpl q = new DataTagQualityImpl();
         q.removeInvalidStatus(TagQualityStatus.UNINITIALISED);
         TransferTagImpl t = new TransferTagImpl(id, status , "description", q, TagMode.OPERATIONAL, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), "rule tag description", "RuleTag-"+id, null);
         if (m.get(id) == null || !m.get(id).isRule()) {
-            throw new RuleFormatException("Tag " + id + " is not a rule!");
+            throw new Exception("Tag " + id + " is not a rule!");
         }
         assert (ruleInputTag != null);
         t.setRuleExpression(getRuleExpression(ruleInputTag));
         ruleUpdate2.update(t);
         
-        notifier.onUpdate(ruleUpdate2);
+        Tag myTag = new Tag(id, true);
+        myTag.update(ruleUpdate2);
+        
+        notifier.onUpdate(myTag);
 	}
 	
-	
-	private void sendUpdateMetricTag(long id, double value) throws RuleFormatException {
+	/**
+	 * sends a metric update
+	 * @param id the id of the metric
+	 * @param value the value of the metric
+	 * @throws Exception in case the passed id is not a metric
+	 */
+	private void sendUpdateMetricTag(long id, double value) throws Exception {
 	    ClientDataTagImpl ruleUpdate2 = new ClientDataTagImpl(id);
         DataTagQualityImpl q = new DataTagQualityImpl();
         q.removeInvalidStatus(TagQualityStatus.UNINITIALISED);
         TransferTagImpl t = new TransferTagImpl(id, value , "description", q, TagMode.OPERATIONAL, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), "metric tag description", "MetricTag-"+id, null);
         ruleUpdate2.update(t);  
         if (m.get(id) == null || m.get(id).isRule()) {
-            throw new RuleFormatException("Tag " + id + " is not a metric!");
+            throw new Exception("Tag " + id + " is not a metric!");
         }
         
-        notifier.onUpdate(ruleUpdate2);
+        
+        Tag myTag = new Tag(id, true);
+        myTag.update(ruleUpdate2);
+        
+        notifier.onUpdate(myTag);
 	}
 	
 	/**
@@ -481,21 +499,24 @@ public class NotifierImplTest {
 	 * @param toBeNotified
 	 * @throws Exception 
 	 */
-	public void printToSubmitNicely(Tag toBeNotified) throws Exception {
+	public void printToSubmitNicely(Long toBeNotified) throws Exception {
 	    /*
          * for friendly output
          */
-        toBeNotified = m.metricTagResolver(toBeNotified, null);
-        if (toBeNotified == null) { 
-            throw new Exception("Tag " + toBeNotified + " was not resolved correctly. Please check the MyCache in the Test");
+        Tag t = m.metricTagResolver2(toBeNotified, null);
+        if (t == null) { 
+            throw new Exception("Tag " + t + " was not resolved correctly. Please check the MyCache in the Test");
         }
-        System.out.println("I trying to submit a notification for  : " + toBeNotified);
+        System.out.println("I trying to submit a notification for  : " + t);
         
         
         
 	}
 	
-	
+	/**
+	 * 
+	 * @param name the test name
+	 */
 	private void startTest(String name) {
 	    System.out.println("------------------------------------------------------");
 	    System.out.println("|             " + name);

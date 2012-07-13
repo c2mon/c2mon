@@ -10,8 +10,8 @@
 package cern.c2mon.notification.test;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -26,7 +26,7 @@ public class TagCacheTest {
 
     public class MyCache extends TagCache {
         @Override
-        public Tag metricTagResolver(Tag tagID, HashMap<Long, Tag> overallList) {
+        public Tag metricTagResolver2(Long tagID, ConcurrentHashMap<Long, Tag> overallList) {
 
             // one child with a metric
             Tag rule1 = new Tag(1L, true);
@@ -42,11 +42,13 @@ public class TagCacheTest {
             overallList.put(metric.getId(), metric);
             overallList.put(metric2.getId(), metric2);
             
-            return overallList.get(tagID.getId());
+            return overallList.get(tagID);
         }
     }
     
-    
+    /**
+     * 
+     */
     @Test 
     public void testUpdateCache() {
         IMocksControl mockControl = EasyMock.createControl();
@@ -69,20 +71,12 @@ public class TagCacheTest {
         MyCache cache = new MyCache();
         HashSet<Long> list = new HashSet<Long>();
         list.add(1L);
-        cache.initAndResolve(list);
+        cache.resolveSubTags(list);
         
         System.out.println(cache);
         
         cache.get(3L).update(metricUpdate3);
         
         System.out.println(cache);
-        
-        
-        
-        
-        
     }
-
-    
-    
 }

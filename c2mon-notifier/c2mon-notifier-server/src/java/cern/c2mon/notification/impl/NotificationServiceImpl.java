@@ -27,6 +27,7 @@ import cern.c2mon.notification.jms.ClientResponse;
 import cern.c2mon.notification.jms.ClientRequest.Type;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
+import cern.c2mon.notification.shared.TagNotFoundException;
 import cern.c2mon.notification.shared.UserNotFoundException;
 
 import com.google.gson.Gson;
@@ -116,33 +117,38 @@ public class NotificationServiceImpl implements MessageListener {
 	        logger.trace(request.getId() + " Content of request " + request.getBody());
 	    }
 	    
-            try {
-                String body = request.getBody().toString();
-                switch (request.getType()) {
-                case UpdateSubscriber:
-                    Subscriber subscriber = gson.fromJson(body, Subscriber.class);
-                    registry.setSubscriber(subscriber);
-                    break;
-                case GetSubscriber:
-                    String userName = gson.fromJson(body, String.class);
-                    Subscriber toSend = registry.getSubscriber(userName);
-                    response = new ClientResponse(
-                            ClientResponse.Type.GetSubscriberReponse, gson.toJson(toSend)
-                            );
-                    break;
-                case AddSubscription:
-                    Subscription subscription = gson.fromJson(body, Subscription.class);
-                    registry.getSubscriber(subscription.getSubscriberId()).addSubscription(subscription);
-                    break;
-                case RemoveSubscription:
-                    registry.removeSubscription(gson.fromJson(body, Subscription.class));
-                    break;
-                default:
-                    response = new ClientResponse(ClientResponse.Type.ErrorReponse, "I do not understand this request type : " + request.getType());
-                }
-            } catch (UserNotFoundException notFound) {
-                response = new ClientResponse(ClientResponse.Type.UserNotFoundError, notFound.getMessage());
+        try {
+            String body = (String) request.getBody();
+            switch (request.getType()) {
+            case UpdateSubscriber:
+                Subscriber subscriber = gson.fromJson(body, Subscriber.class);
+                registry.setSubscriber(subscriber);
+                response = new ClientResponse(
+                        ClientResponse.Type.GetSubscriberReponse, gson.toJson(
+                                registry.getSubscriber(subscriber.getUserName())));
+                break;
+            case GetSubscriber:
+                String userName = gson.fromJson(body, String.class);
+                Subscriber toSend = registry.getSubscriber(userName);
+                response = new ClientResponse(
+                        ClientResponse.Type.GetSubscriberReponse, gson.toJson(toSend)
+                        );
+                break;
+            case AddSubscription:
+                Subscription subscription = gson.fromJson(body, Subscription.class);
+                registry.addSubscription(subscription);
+                break;
+            case RemoveSubscription:
+                registry.removeSubscription(gson.fromJson(body, Subscription.class));
+                break;
+            default:
+                response = new ClientResponse(ClientResponse.Type.ErrorResponse, "I do not understand this request type : " + request.getType());
             }
+        } catch (UserNotFoundException notFound) {
+            response = new ClientResponse(ClientResponse.Type.UserNotFoundError, notFound.getMessage());
+        } catch (TagNotFoundException notFound) {
+            response = new ClientResponse(ClientResponse.Type.TagNotFoundError, notFound.getMessage());
+        }
         response.setOriginHostName(hostName);
         response.setId(request.getId());
 	    return response;
@@ -150,7 +156,7 @@ public class NotificationServiceImpl implements MessageListener {
 	
 	
 	/**
-	 * Method called for any client request. It unserializes the message using {@link #gson} 
+	 * Method called for any client request. It deserializes the message using {@link #gson} 
 	 * and prepares the answer with {@link #prepareResponse(ClientRequest)}.   
 	 * 
 	 * All Exceptions will be wrapped and passed to the client.
@@ -185,7 +191,9 @@ public class NotificationServiceImpl implements MessageListener {
 			    Writer result = new StringWriter();
 			    PrintWriter printWriter = new PrintWriter(result);
 			    ex.printStackTrace(printWriter);
-				response = new ClientResponse(ClientResponse.Type.ErrorReponse, result.toString());
+				response = new ClientResponse(ClientResponse.Type.ErrorResponse, result.toString());
+				logger.warn(ex);
+				ex.printStackTrace();
 			}
 
 			try {
@@ -194,7 +202,7 @@ public class NotificationServiceImpl implements MessageListener {
 			} catch (JMSException e) {
 				// we can't do anything here
 				e.printStackTrace();
-				logger.error(e.getMessage());
+				logger.error(e);
 			} catch (Exception e) {
 				// we try to send the cause to the client.
 				if (replyDestination != null) {

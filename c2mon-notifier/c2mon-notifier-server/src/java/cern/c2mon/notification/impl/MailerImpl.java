@@ -5,15 +5,20 @@ import java.util.Properties;
 
 import javax.mail.Authenticator;
 import javax.mail.MessagingException;
+import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.Message.RecipientType;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.apache.log4j.Logger;
+
+import com.sun.mail.smtp.SMTPSSLTransport;
 
 import cern.c2mon.notification.Mailer;
 
@@ -48,18 +53,27 @@ public class MailerImpl implements Mailer {
 	 */
 	public MailerImpl(String from, final String name, final String password, String server, int port) throws AddressException {
 	    Properties props = System.getProperties();
-        props.put("mail.smtp.auth", "true");
+	    
         props.put("mail.smtp.host", server);
         props.put("mail.smtp.port", port);
+        props.put("mail.smtp.from", from);
+        //props.put("mail.smtp.auth", "true");
+        
+        props.put("mail.transport.protocol", "smtp");
+        
+        //props.put("mail.smtp.starttls.enable", "true");
+        
+        //props.put("mail.debug", "true");
+        
+        me = new InternetAddress(from);
 	    
 	    // get the session / connection to the mailserver
-		session = Session.getDefaultInstance(props, new Authenticator() {
+		session = Session.getInstance(props, new Authenticator() {
 		    public PasswordAuthentication getPasswordAuthentication() {
 	            return new PasswordAuthentication(name, password);
 	          }
         });
 		
-		me = new InternetAddress(from);
 		
 		logger.info("Started Mailer. FROM=" + from + ", SERVER=" + server + ":" + port);
 	}
@@ -72,10 +86,9 @@ public class MailerImpl implements Mailer {
      * @param server the mailserver hostname
 	 * @throws AddressException in case this {@link MailerImpl} instance cannot create an {@link InetAddress} object (required). 
 	 */
-	public MailerImpl(String from, final String name, final String password, String server) throws AddressException {
+	public MailerImpl(final String from, final String name, final String password, final String server) throws AddressException {
         this(from, name, password, server, 25);
     }
-	
 	
 	/**
 	 * Threadsafe call to send a mail.
@@ -100,12 +113,18 @@ public class MailerImpl implements Mailer {
 		}
 
 		MimeMessage simpleMessage = new MimeMessage(session);
-
+		
+		//MimeMultipart content = new MimeMultipart();
+		//MimeBodyPart html = new MimeBodyPart();
+		//html.setContent(mailText, "text/html");
+		//content.addBodyPart(html);
+		
+		simpleMessage.setContent(mailText, "text/html");
+//
 		simpleMessage.setFrom(me);
 		simpleMessage.setRecipient(RecipientType.TO, new InternetAddress(to));
 		simpleMessage.setSubject(subject);
-		simpleMessage.setText(mailText);
-			
+		//simpleMessage.setText(mailText);
 			
 		Transport.send(simpleMessage);			
 	}

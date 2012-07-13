@@ -1,14 +1,14 @@
-/**
- * 
- */
 package cern.c2mon.notification;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import cern.c2mon.notification.impl.NotifierImpl;
+import cern.c2mon.notification.impl.TagCache;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
+import cern.c2mon.notification.shared.TagNotFoundException;
 import cern.c2mon.notification.shared.UserNotFoundException;
 
 /**
@@ -27,8 +27,9 @@ public interface SubscriptionRegistry {
 	/**
 	 * 
 	 * @param subscriber the {@link Subscriber} object to update/add
+	 * @throws TagNotFoundException in case one of the associated tags is not defined.
 	 */
-	public void setSubscriber(Subscriber subscriber);
+	public void setSubscriber(Subscriber subscriber) throws TagNotFoundException;
 	
 	/**
 	 * @return a list of all tagids for which a subscription exists.
@@ -39,22 +40,7 @@ public interface SubscriptionRegistry {
 	 * @param subscription the subscription to remove.
 	 */
 	public void removeSubscription(Subscription subscription);
-//	
-//	/**
-//	 * 
-//	 * @param user the user identifier
-//	 * @param tagId the tag id
-//	 * @param level the subscription level
-//	 */
-//	public void addSubscription(Subscriber user, Long tagId, int level);
-//	
-//	/**
-//	 * 
-//	 * @param user the user identifier
-//	 * @param tagId the tag id
-//	 */
-//	public void addSubscription(Subscriber user, Long tagId);
-//	
+
 	/**
 	 * 
 	 * @param subscription the subscription to add
@@ -82,6 +68,18 @@ public interface SubscriptionRegistry {
 	 */
 	public List<Subscriber> getRegisteredUsers();
 	
+	/**
+	 * 
+	 * @return a list of all registered Subscriptions
+	 */ 
+	public HashSet<Subscription> getRegisteredSubscriptions();
+	
 	public void reloadConfig();
+	
+	public void start();
+
+    public void setTagCache(TagCache tagCache);
+    
+    public TagCache getTagCache();
 	
 }

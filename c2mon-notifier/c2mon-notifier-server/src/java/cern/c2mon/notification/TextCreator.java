@@ -15,7 +15,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -24,8 +23,9 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.notification.shared.Status;
+import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.tim.shared.rule.RuleExpression;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
@@ -108,45 +108,81 @@ public class TextCreator {
     
     /**
      * 
+     * @param metricUpdate
+     */
+    public String getTextForMetricUpdate(Tag metricUpdate) {
+        if (metricUpdate.isRule()) {
+            throw new IllegalArgumentException("Got rule tag, athough I expect a metric : " + metricUpdate.getId());
+        }
+        
+        HashMap<String, Object> root = new HashMap<String, Object>();
+        
+        ClientDataTagValue cdtv = metricUpdate.getLatestUpdate();
+        
+        root.put("tagId", metricUpdate.getId());
+        root.put("tagValue", cdtv.getValue());
+        root.put("tagName", cdtv.getName());
+        root.put("tagUnit", cdtv.getUnit());
+        root.put("tagValueDescription", cdtv.getValueDescription());
+        
+        
+        StringWriter out = new StringWriter();
+        try {
+          Template temp = c.getTemplate("metricUpdate.html");
+          temp.process(root, out);
+          out.flush();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        return out.toString();
+    }
+    
+    
+    public static String statusToTransitionText(ClientDataTagValue update) {
+        int status = ((Double) update.getValue()).intValue();
+        if (status == 1 || status == 2) {
+            return "PROBLEM";
+        } else if (status == 0) {
+            return "RECOVERY";
+        } else {
+            return "UNKNOWN " + status;
+        }
+    }
+    
+    /**
+     * 
      * @param update the {@link ClientDataTagValue} from which the information should be retrieved.
      * @return a proper string with information on the update  
      * @throws IOException 
      * @throws TemplateException 
      */
-    public String getTextForUpdate(ClientDataTagValue update) throws IOException, TemplateException {
+    public String getTextForRuleUpdate(ClientDataTagValue update) throws IOException, TemplateException {
         logger.debug("Entering getTextForUpdate()");
         
         if (update == null) {
-            throw new IllegalArgumentException("Pased argument for ClientDataTagValue update was null! ");
+            throw new IllegalArgumentException("Passed argument for ClientDataTagValue update was null! ");
         }
         
         // Create the root hash
         HashMap<String, Object> root = new HashMap<String, Object>();
         
-        
-        int status = ((Integer) update.getValue()).intValue();
-        if (status == 1 || status == 2) {
-            root.put("notificationType", "PROBLEM");
-        } else if (status == 0) {
-            root.put("notificationType", "RECOVERY");
-        } else {
-            root.put("notificationType", "UNKNOWN");
-        }
-        
+        root.put("notificationType", statusToTransitionText(update));
+
         ArrayList<String> ruleInputTags = new ArrayList<String>();
         for (Long l : update.getRuleExpression().getInputTagIds()) {
             ruleInputTags.add(Long.toString(l));
         }
         
+        int status = ((Double) update.getValue()).intValue();
         root.put("tagId", Long.toString(update.getId()));
-        root.put("tagValue", Status.fromInt(status).toString());
+        root.put("tagStatus", Status.fromInt(status));
         root.put("tagName", update.getName());
         root.put("tagDescription", update.getDescription());
         root.put("tagRuleExpression", update.getRuleExpression());
         root.put("tagServerTimestamp", update.getServerTimestamp());
         root.put("tagUnit", update.getUnit());
         root.put("tagValueDescription", update.getValueDescription());
-        root.put("ruleExpression", update.getRuleExpression().getExpression());
+        root.put("ruleExpression", RuleExpressionColorer.colorRegexp(update.getRuleExpression()));
         root.put("ruleExpressionInput", ruleInputTags);
 
         StringWriter out = new StringWriter();
@@ -202,6 +238,32 @@ public class TextCreator {
     }
    
 
+    public String getTextForSourceDown(Tag update) throws IOException, TemplateException {
+        logger.debug("Entering getTextForSourceDown()");
+        HashMap<String, Object> root = new HashMap<String, Object>();
+        
+        DataTagQuality quality = update.getLatestUpdate().getDataTagQuality();
+        ClientDataTagValue cdtv = update.getLatestUpdate();
+        if (cdtv != null) {
+            root.put("notificationType", quality.getDescription());
+            root.put("tagId", Long.toString(update.getId()));
+            root.put("tagName", cdtv.getName());
+            root.put("tagDescription", cdtv.getDescription());
+            root.put("tagServerTimestamp", cdtv.getServerTimestamp());
+        }
+        
+        Template temp = c.getTemplate("sourceDown.html"); 
+        StringWriter out = new StringWriter();
+        temp.process(root, out);
+        out.flush();
+        
+        
+        return out.toString();
+    }
+    
+    
+    
+    
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

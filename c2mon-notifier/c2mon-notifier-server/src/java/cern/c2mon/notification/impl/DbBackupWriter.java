@@ -16,6 +16,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
@@ -240,7 +241,7 @@ public class DbBackupWriter implements BackupWriter {
      * @see DbBackupWriter#setSubscriber(Subscriber)
      * @param toStore the HashMap of subscribers to store in the DB.
      */
-    public void store(final HashMap<String, Subscriber> toStore) {
+    public void store(final ConcurrentHashMap<String, Subscriber> toStore) {
         logger.trace("entering store()");
                 
         TransactionTemplate tt = new TransactionTemplate(new DataSourceTransactionManager(jdbcTemplate.getDataSource()));
@@ -275,7 +276,7 @@ public class DbBackupWriter implements BackupWriter {
                     List<Object[]> toAdd = new ArrayList<Object[]>();
                     List<Object[]> subs = new ArrayList<Object[]>();
                     for (Subscriber s : toStore.values()) {
-                        toAdd.add(new Object [] {s.getUserName(), s.getEmail(), s.getReportInterval(), s.getSms()});
+                        toAdd.add(new Object [] {s.getUserName(), s.getEmail(), s.getSms(), s.getReportInterval()});
                         for (Subscription sub : s.getSubscriptions().values()) {
                             subs.add(new Object [] {sub.getSubscriberId(), sub.isEnabled(), sub.getNotificationLevel(), sub.getTagId(), sub.getLastNotifiedStatus(), sub.getLastNotification()});
                         }
@@ -292,7 +293,6 @@ public class DbBackupWriter implements BackupWriter {
                             "INSERT INTO DMN_NOTIFY_SUBSCRIPTIONS (userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts) VALUES (?,?,?,?,?,?)", 
                             subs, 
                             new int [] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP});
-                    
                     
                     lastStoreTime = (System.currentTimeMillis() - t1);
                     logger.info("Stored " + addedSubscribers.length + " Subscribers and " + addedSubscriptions.length + " Subscriptions in " + getLastStoreTime() + " millis");
@@ -314,7 +314,7 @@ public class DbBackupWriter implements BackupWriter {
      * 
      * @return the registry will all users and their subscriptions.
      */
-    public HashMap<String, Subscriber> load() {
+    public ConcurrentHashMap<String, Subscriber> load() {
         
         long t1 = System.currentTimeMillis(); 
         
@@ -337,7 +337,7 @@ public class DbBackupWriter implements BackupWriter {
                     }
                 });
         
-        HashMap<String, Subscriber> result = new HashMap<String, Subscriber>(subscribers.size());
+        ConcurrentHashMap<String, Subscriber> result = new ConcurrentHashMap<String, Subscriber>(subscribers.size());
         
         // add all subscribers to the resultlist ...
         for (Subscriber s : subscribers) {

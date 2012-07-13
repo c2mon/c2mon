@@ -33,9 +33,10 @@
     <!--  
     	our registry instance holding subscriber information. 
     -->
-	<bean id="registry" class="cern.c2mon.notification.impl.SubscriptionRegistryImpl" depends-on="dbWriter">
-		<property name="autoSaveInterval" value="${registry.localautoSaveInterval}" />
+	<bean id="registry" class="cern.c2mon.notification.impl.SubscriptionRegistryImpl" depends-on="dbWriter,tagCache">
+		<property name="autoSaveInterval" value="${registry.localAutoSaveInterval}" />
 		<property name="databaseWriter" ref="dbWriter" />
+		<property name="tagCache" ref="tagCache" />
 	</bean>
 	<!-- for the db access. We only need one connection.-->
     <bean id="dataSource" class="org.springframework.jdbc.datasource.SingleConnectionDataSource">
@@ -56,14 +57,19 @@
 	
 	
 	
-	<!-- 
-		Receives updates from the c2mon server and sends the notifications.
-	 -->
-	<bean id="notifier" class="cern.c2mon.notification.impl.NotifierImpl" >
+	 
+		<!-- Receives updates from the c2mon server and sends the notifications.  -->
+	 
+	<bean id="notifier" class="cern.c2mon.notification.impl.NotifierImpl" depends-on="mailer,tagCache,registry">
 		<property name="subscriptionRegistry" ref="registry"/>
 		<property name="mailer" ref="mailer"/>
 		<property name="tagCache" ref="tagCache"/>
 	</bean>
+	<!-- 
+	<jms:listener-container connection-factory="logConnectionFactory" concurrency="1" destination-type="queue">
+		<jms:listener destination="c2mon.notification.updates" ref="notifier" method="onUpdate" />
+	</jms:listener-container>
+	 -->
 	<!-- utility class to send mails. -->
 	<bean id="mailer" class="cern.c2mon.notification.impl.MailerImpl">
 		<constructor-arg index="0" value="${mail.from}"/>
@@ -71,9 +77,7 @@
 		<constructor-arg index="2" value="${mail.password}" />
 		<constructor-arg index="3" value="${mail.server}" />
 	</bean>
-	<jms:listener-container connection-factory="logConnectionFactory" concurrency="1" destination-type="queue">
-		<jms:listener destination="c2mon.notification.updates" ref="notifier" method="onUpdate" />
-	</jms:listener-container>
+	
 
 
 
