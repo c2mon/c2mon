@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE faces-config PUBLIC
+    "-//Sun Microsystems, Inc.//DTD JavaServer Faces Config 1.1//EN"
+    "http://java.sun.com/dtd/web-facesconfig_1_1.dtd">
+
+<faces-config>
+  <application>
+	  <variable-resolver>
+	    org.springframework.web.jsf.DelegatingVariableResolver
+	  </variable-resolver>
+  </application>
+  <!-- moved all these beans to Spring context -->
+<!--	<managed-bean>-->
+<!--		<managed-bean-name>userRequests</managed-bean-name>-->
+<!--		<managed-bean-class>ch.cern.tim.statistics.web.UserRequests</managed-bean-class>-->
+<!--		<managed-bean-scope>request</managed-bean-scope>-->
+<!--	</managed-bean>-->
+<!--	<managed-bean>-->
+<!--		<managed-bean-name>daqQualityTable</managed-bean-name>-->
+<!--		<managed-bean-class>ch.cern.tim.statistics.web.tables.DaqQualityTable</managed-bean-class>-->
+<!--		<managed-bean-scope>application</managed-bean-scope>-->
+<!--	</managed-bean>-->
+<!--	<managed-bean>-->
+<!--		<managed-bean-name>asQualityTable</managed-bean-name>-->
+<!--		<managed-bean-class>ch.cern.tim.statistics.web.tables.AsQualityTable</managed-bean-class>-->
+<!--		<managed-bean-scope>application</managed-bean-scope>-->
+<!--	</managed-bean>-->
+	<navigation-rule>
+		<display-name>stats-home</display-name>
+		<from-view-id>/stats-home.jsp</from-view-id>
+		<navigation-case>
+			<from-outcome>allStatistics</from-outcome>
+			<to-view-id>/all-stats.jsp</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<display-name>/all-stats</display-name>
+		<from-view-id>/all-stats.jsp</from-view-id>
+		<navigation-case>
+			<from-outcome>displayCharts</from-outcome>
+			<to-view-id>/chart-display.jsp</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<display-name>/stats-home</display-name>
+		<from-view-id>/stats-home.jsp</from-view-id>
+		<navigation-case>
+			<from-outcome>displayCharts</from-outcome>
+			<to-view-id>/chart-display.jsp</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<display-name>/stats-home</display-name>
+		<from-view-id>/stats-home.jsp</from-view-id>
+		<navigation-case>
+			<from-outcome>displayQualityCodes</from-outcome>
+			<to-view-id>/quality-codes.jsp</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+</faces-config>
