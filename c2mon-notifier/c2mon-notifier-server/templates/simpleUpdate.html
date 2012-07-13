@@ -1,16 +1,48 @@
+<HTML>
+<HEAD>
+<style type="text/css">
+body {
+  font: 12px  Verdana, "Lucida Grande", Lucida, Helvetica, Arial, sans-serif;
+  color: #000000;
+  margin: 1.5em;
+  line-height: 150%;
+  background: #f8f8f8
+}
 
-<h2>${notificationType} Notification for ${tagName} (${tagId})</h2>
+table {
+	
+  font-size: 12px;
+  padding:0;
+  margin:0;
+  margin-bottom:20px;
+  width:100%
+}
 
-<h4>New status : <font <#if tagValue == "OK">color="green"><#else>color="red"</#if>>${tagValue}</font></h4>
+ p {padding:0; margin: 0 0 1.0em 0;font-size: 12px;}
+</style>
+</HEAD>
+
+</HTML>
+<BODY>
+
+
+<h4>'${tagDescription}' has changed to status 
+<font 
+	<#if tagStatus == "OK">
+		color="green"
+	<#elseif tagStatus == "WARNING">
+		color="orange"
+	<#elseif tagStatus == "ERROR">
+		color="red"
+	<#else>
+		color="blue"
+	</#if>
+>${tagStatus}</font></h4>
 
 <table border="0" cellpadding="0" cellspacing="2">
-	<tr><td>Name:</td><td>${tagName}</td></tr>
-	<tr><td>ID:</td><td></td><a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${tagId}">${tagId}</a></td></tr>
-	<tr><td>&nbsp;</td><td>${tagValueDescription}</td></tr>
-	<tr><td>Tag Description:</td><td>${tagDescription}</td></tr>
+	<tr><td>Web Link:</td><td></td><a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${tagId}">${tagName}</a></td></tr>
 	<tr><td>Server Time:</td><td>${tagServerTimestamp}</td></tr>
 </table>
 
-<h2>Rule Expression:</h2>
-${ruleExpression}
-
+<h4>Rule Expression:</h4>
+<font  size="2">${ruleExpression}</font>
