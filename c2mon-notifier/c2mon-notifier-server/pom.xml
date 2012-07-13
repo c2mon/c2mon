@@ -2,11 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
+   <parent>
     <artifactId>c2mon-client-pom</artifactId>
     <groupId>cern.c2mon.c2mon-client</groupId>
-    <version>1.0.2</version>
-    </parent>
+    <version>1.0.10</version>
+   </parent>
 
 
 	<groupId>cern.c2mon.notifcation</groupId>
@@ -23,7 +23,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-client</groupId>
-			<artifactId>c2mon-client-core</artifactId>
+			<artifactId>c2mon-client-all</artifactId>
+			<version>1.0.2</version>
 			<type>jar</type>
 			<scope>compile</scope>
 			<exclusions>
@@ -68,7 +69,7 @@
 		<dependency>
 			<groupId>cern.c2mon.notification</groupId>
 			<artifactId>c2mon-client-notification</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>[1.0.3, 2.0.0]</version>
 			<type>jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -87,17 +88,18 @@
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.7.2</version>
 			<type>jar</type>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.notification</groupId>
 			<artifactId>c2mon-notification-shared</artifactId>
-			<version>1.0.0</version>
+			<version>[1.0.1, 2.0.0]</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>cern.dmn2.shared</groupId>
 			<artifactId>dmn2-db-service</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
+			<version>1.0.3-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
