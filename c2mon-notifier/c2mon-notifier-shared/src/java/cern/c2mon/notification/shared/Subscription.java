@@ -15,7 +15,7 @@ public class Subscription implements Comparable<Subscription> {
     /**
      * 
      */
-    private int lastNotifiedStatus = Status.UNKNOWN.toInteger();
+    private Status lastNotifiedStatus = Status.UNKNOWN;
 
     /**
      * 
@@ -235,8 +235,12 @@ public class Subscription implements Comparable<Subscription> {
 
     public String toString() {
         StringBuilder ret = new StringBuilder();
-        ret.append("TagId=").append(ruleTagId).append(", User={").append(user).append("}, Level=").append(level)
-                .append(", Enabled=").append(isEnabled);
+        ret.append("TagId=").append(ruleTagId)
+                .append(", User={").append(user)
+                .append("}, Level=").append(level)
+                .append(", Enabled=").append(isEnabled)
+                .append(", LastNotifiedState=").append(lastNotifiedStatus)
+                .append(", LastNotifiedTime").append(lastNotification);
         return ret.toString();
     }
 
@@ -263,7 +267,7 @@ public class Subscription implements Comparable<Subscription> {
      * 
      * @param newStatus the status as integer representation
      */
-    public void setLastNotifiedStatus(int newStatus) {
+    public void setLastNotifiedStatus(Status newStatus) {
         this.lastNotifiedStatus = newStatus;
         setLastNotification(new Timestamp(System.currentTimeMillis()));
     }
@@ -272,7 +276,7 @@ public class Subscription implements Comparable<Subscription> {
      * @see Subscription#getLastNotification()
      * @return the last notified status as integer.
      */
-    public int getLastNotifiedStatus() {
+    public Status getLastNotifiedStatus() {
         return this.lastNotifiedStatus;
     }
 
