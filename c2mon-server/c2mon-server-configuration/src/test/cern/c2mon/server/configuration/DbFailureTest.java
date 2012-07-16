@@ -57,7 +57,7 @@ import cern.tim.shared.client.configuration.ConfigurationReport;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-oracle-test.xml" })
+@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-loader-test.xml" })
 public class DbFailureTest implements ApplicationContextAware {
 
   private IMocksControl mockControl = EasyMock.createNiceControl();

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- test beans for the Configuration Loader -->
+  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-test.xml" />
+
+  <!-- some Mybatis beans -->
+  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-mybatis.xml" />
+
+  <!-- choose the configuration below to run against the Oracle or HSQLDB configuration schema -->
+  <!-- for Oracle, uncomment the data creation/removal lines in the ConfigurationLoaderTest class -->
+  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-oracle.xml" />
+  <!--  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-hsqldb.xml"/>  -->
+
+  <!-- choose the configuration below to run against the Oracle or HSQLDB cache schema -->
+  <!--  <import resource="classpath:cern/tim/server/test/cache/config/server-test-datasource-hsqldb.xml"/>-->
+  <import resource="classpath:cern/tim/server/cache/dbaccess/config/server-cachedbaccess-datasource.xml" />
+
+  <!-- import properties -->
+  <import resource="classpath:cern/tim/server/test/server-test-properties.xml" />
+
+</beans>

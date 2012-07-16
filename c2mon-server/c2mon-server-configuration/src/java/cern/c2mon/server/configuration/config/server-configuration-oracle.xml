@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <!-- This DataSource bean needs including at server deployment into the c2mon-datasource.xml file in the conf directory -->
+  <!-- Used here for reference & testing -->
+
+  <!-- data source for Oracle configuration module connection -->
+  <bean id="configurationDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+    <property name="url" value="${jdbc.config.url}" />
+    <property name="username" value="${jdbc.config.user}" />
+    <property name="password" value="${jdbc.config.password}" />
+    <!--    <property name="defaultAutoCommit" value="false"/>-->
+    <!--    <property name="logWriter" value=""/>-->
+    <property name="testWhileIdle" value="true" />
+    <property name="timeBetweenEvictionRunsMillis" value="600000" />
+    <property name="numTestsPerEvictionRun" value="${datasource.config.connections.initial}" />
+    <property name="validationQuery" value="SELECT 0 FROM DUAL" />
+    <property name="initialSize" value="${datasource.config.connections.initial}" />
+    <property name="maxActive" value="${datasource.config.connections.max}" />
+  </bean>
+
+</beans>

@@ -112,7 +112,7 @@ import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-oracle-test.xml" })
+@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-loader-test.xml" })
 //@TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
 public class ConfigurationLoaderTest implements ApplicationContextAware {
 
@@ -210,16 +210,6 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Before  
   public void beforeTest() throws IOException {
     ((AbstractApplicationContext) context).start();
-    //clean DB
-    dataTagMapper.deleteDataTag(5000000L);
-    controlTagMapper.deleteControlTag(500L);
-    commandTagMapper.deleteCommandTag(10000L);
-    ruleTagMapper.deleteRuleTag(50100L);
-    equipmentMapper.deleteEquipment(110L);
-    controlTagMapper.deleteControlTag(501L);
-    processMapper.deleteProcess(2L);
-    subEquipmentMapper.deleteSubEquipment(200L);
-    alarmMapper.deleteAlarm(300000L);
     
     //make sure Process is "running" (o.w. nothing is sent to DAQ)
     processFacade.start(processCache.get(50L), "hostname", new Timestamp(System.currentTimeMillis()));
@@ -230,15 +220,6 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   
   @After
   public void afterTest() throws IOException {    
-    dataTagMapper.deleteDataTag(5000000L);
-    controlTagMapper.deleteControlTag(500L);
-    commandTagMapper.deleteCommandTag(10000L);
-    ruleTagMapper.deleteRuleTag(50100L);
-    equipmentMapper.deleteEquipment(110L);
-    controlTagMapper.deleteControlTag(501L);
-    processMapper.deleteProcess(2L);
-    subEquipmentMapper.deleteSubEquipment(200L);
-    alarmMapper.deleteAlarm(300000L);
     testDataInserter.removeTestData();
     testDataInserter.insertTestData();
   }

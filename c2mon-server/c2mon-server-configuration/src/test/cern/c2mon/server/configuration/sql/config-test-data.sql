@@ -11,7 +11,7 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (1,1,'CREATE','DataTag','5000000');
   
 
-  -- insert datatag config info
+-- insert datatag config info
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (1,'name','Config_test_datatag');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1,'description','test description config datatag');
@@ -217,7 +217,7 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (29,29,'REMOVE','Equipment','150');
   
- --create process (uses P_TESTHANDLER03 control tag)
+--create process (uses P_TESTHANDLER03 control tag)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (16,'create process', 'create process 2', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
@@ -279,13 +279,13 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (21,21,'REMOVE','SubEquipment','250');
 
-  --create alarm - should succeed
+--create alarm - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (22,'create alarm', 'create alarm 300000', 'mbrightw', '?', sysdate);     
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (22,22,'CREATE','Alarm','300000');
-  
-insert into timconfigval (seqid, elementfield, elementvalue) values (22,'dataTagId','200003'); --attached to data tag
+  values (22,22,'CREATE','Alarm','300000');  
+--attached to data tag
+insert into timconfigval (seqid, elementfield, elementvalue) values (22,'dataTagId','200003');
 insert into timconfigval (seqid, elementfield, elementvalue) values (22,'faultFamily','fault family');
 insert into timconfigval (seqid, elementfield, elementvalue) values (22,'faultMember','fault member');
 insert into timconfigval (seqid, elementfield, elementvalue) values (22,'faultCode','223');

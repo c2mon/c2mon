@@ -1,4 +1,4 @@
--- schema needed for the configuration module; 
+-- Oracle-specific schema needed for the configuration module; 
 -- it is self-contained and can be used to create schema for testing
 
 CREATE TABLE timconfig (
@@ -13,7 +13,7 @@ CREATE TABLE timconfig (
 );
 
 ALTER TABLE timconfig
-ADD CONSTRAINT TIMCONFIG_PK PRIMARY KEY (configid) USING INDEX;
+ADD CONSTRAINT TIMCONFIG_PK PRIMARY KEY (configid);
 
 CREATE TABLE timconfigelt (
 seqid  NUMBER  NOT NULL
@@ -26,7 +26,7 @@ seqid  NUMBER  NOT NULL
 );
 
 ALTER TABLE timconfigelt
-ADD CONSTRAINT TIMCONFIGELT_PK PRIMARY KEY (seqid) USING INDEX;
+ADD CONSTRAINT TIMCONFIGELT_PK PRIMARY KEY (seqid);
 
 ALTER TABLE timconfigelt
 ADD CONSTRAINT TIMCONFIGELT_FK FOREIGN KEY (configid) REFERENCES timconfig (configid);
@@ -35,13 +35,13 @@ CREATE INDEX TCE_CONID_ELPKEY_IDX ON TIMCONFIGELT (CONFIGID,ELEMENTPKEY);
 
 CREATE TABLE timconfigval (
 seqid  NUMBER
-,elementfield VARCHAR2(240)
-,elementvalue VARCHAR2(4000)
+,elementfield VARCHAR2(240) NOT NULL
+,elementvalue VARCHAR2(4000) NOT NULL
 ,configid NUMBER
 );
 
 ALTER TABLE timconfigval
-ADD CONSTRAINT TIMCONFIGVAL_PK PRIMARY KEY (seqid, elementfield) USING INDEX;
+ADD CONSTRAINT TIMCONFIGVAL_PK PRIMARY KEY (seqid, elementfield);
 
 ALTER TABLE timconfigval
 ADD CONSTRAINT TIMCONFIGVAL_FK FOREIGN KEY (seqid) REFERENCES timconfigelt (seqid);
