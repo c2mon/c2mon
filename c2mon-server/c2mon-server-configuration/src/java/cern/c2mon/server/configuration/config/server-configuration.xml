@@ -10,9 +10,8 @@
   <context:annotation-config/>
   <context:component-scan base-package="cern.c2mon.server.configuration"/>
   
-  <!-- DB details for this module -->
+  <!-- datasource itself is included in the c2mon-datasource.xml file in the deployment configuration directory -->
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-mybatis.xml"/>
-  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-oracle.xml"/>
   
   <bean id="configurationLoader" class="cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl" autowire="constructor">
     <property name="daqConfigEnabled" value="${c2mon.server.config.daq.enabled}"/>
