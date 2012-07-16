@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <!-- This datasource is included in the c2mon-datasource.xml file at deployment, in the conf directory -->
+  <!-- Is kept here for reference and test purposes only -->
+
+  <!-- Oracle datasource for logging functionalities -->
+  <bean id="stlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+    <property name="url" value="${jdbc.stl.url}"/>
+    <property name="username" value="${jdbc.stl.user}"/>
+    <property name="password" value="${jdbc.stl.password}"/>
+    <property name="defaultAutoCommit" value="false"/>
+    <property name="validationQuery" value="SELECT 0 FROM DUAL"/>
+<!--    <property name="logWriter" value=""/>-->
+    <property name="initialSize" value="${datasource.stl.connections.initial}"/>
+    <property name="maxActive" value="${datasource.stl.connections.max}"/>
+  </bean>
+  
+</beans>

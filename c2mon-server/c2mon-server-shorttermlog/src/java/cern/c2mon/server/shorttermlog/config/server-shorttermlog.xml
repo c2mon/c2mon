@@ -14,6 +14,7 @@
   
   <tx:annotation-driven transaction-manager="stlTransactionManager"/>
   
+  <!-- data source itself is included in c2mon-datasource.xml in deployment conf directory -->
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mybatis.xml"/>
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-tag.xml"/>
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-command.xml"/>

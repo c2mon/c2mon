@@ -7,15 +7,12 @@
 	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 	                    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
     
-  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-      <property name="locations" >
-      <list>
-        <value>file:${c2mon.properties.location}</value>
-      </list>
-    </property>   
-  </bean>
-  
+  <!-- DB datasource and beans -->  
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-mybatis.xml"/>  
+  <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-oracle.xml"/>  
+  
+  <!-- import properties -->
+  <import resource="classpath:cern/tim/server/test/server-test-properties.xml" />
   
   <bean id="dataTagLogMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
     <property name="sqlSessionFactory" ref="stlSqlSessionFactory"/>

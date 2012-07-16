@@ -4,20 +4,6 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-
-  <!-- configure the data source connection pool (from .c2mon.properties in production) -->
-  <!-- on shutdown ... -->
-  <bean id="stlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
-    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
-    <property name="url" value="${jdbc.stl.url}"/>
-    <property name="username" value="${jdbc.stl.user}"/>
-    <property name="password" value="${jdbc.stl.password}"/>
-    <property name="defaultAutoCommit" value="false"/>
-    <property name="validationQuery" value="SELECT 0 FROM DUAL"/>
-<!--    <property name="logWriter" value=""/>-->
-    <property name="initialSize" value="${datasource.stl.connections.initial}"/>
-    <property name="maxActive" value="${datasource.stl.connections.max}"/>
-  </bean>
   
   <bean id="stlTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="stlDataSource"/>
