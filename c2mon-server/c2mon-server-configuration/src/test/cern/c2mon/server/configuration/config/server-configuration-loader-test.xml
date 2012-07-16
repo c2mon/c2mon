@@ -10,8 +10,8 @@
 
   <!-- choose the configuration below to run against the Oracle or HSQLDB configuration schema -->
   <!-- for Oracle, uncomment the data creation/removal lines in the ConfigurationLoaderTest class -->
-  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-oracle.xml" />
-  <!--  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-hsqldb.xml"/>  -->
+  <!--  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-oracle.xml" />-->
+  <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-hsqldb.xml"/>  
 
   <!-- choose the configuration below to run against the Oracle or HSQLDB cache schema -->
   <!--  <import resource="classpath:cern/tim/server/test/cache/config/server-test-datasource-hsqldb.xml"/>-->

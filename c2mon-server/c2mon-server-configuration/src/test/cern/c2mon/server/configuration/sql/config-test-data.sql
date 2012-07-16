@@ -80,6 +80,7 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (4,4,'UPDATE','DataTag','5000000');
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (4,'japcAddress','testConfigJAPCaddress2');
+insert into timconfigval (seqid, elementfield, elementvalue) values (4,'dipAddress','null');
 
 insert into timconfigval (seqid, elementfield, elementvalue) values (4,'maxValue','26');
 insert into timconfigval (seqid, elementfield, elementvalue) values (4,'address',
@@ -110,6 +111,8 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (6,6,'UPDATE','ControlTag','500');
         
 insert into timconfigval (seqid, elementfield, elementvalue) values (6,'description','modified description');
+insert into timconfigval (seqid, elementfield, elementvalue) values (6,'minValue','null');
+insert into timconfigval (seqid, elementfield, elementvalue) values (6,'maxValue','null');
 
 -- remove datatag
 

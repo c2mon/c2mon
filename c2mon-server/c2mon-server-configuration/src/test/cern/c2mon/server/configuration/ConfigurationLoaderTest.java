@@ -260,6 +260,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertTrue(report.getProcessesToReboot().isEmpty());
     //ControlTagCacheObject updatedCacheObject = (ControlTagCacheObject) controlTagCache.get(500L);
     expectedObject.setDescription("modified description");
+    expectedObject.setMinValue(null); //check can reset min & max to null using update
+    expectedObject.setMaxValue(null);
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
     
   }
@@ -403,7 +405,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertTrue(report.getProcessesToReboot().isEmpty());
     DataTagCacheObject updatedCacheObject = (DataTagCacheObject) dataTagCache.get(5000000L);
        
-    expectedObject.setJapcAddress("testConfigJAPCaddress2");    
+    expectedObject.setJapcAddress("testConfigJAPCaddress2");
+    expectedObject.setDipAddress(null); //checks can be set to null also
     expectedObject.setMaxValue(new Float(26));   
     expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND4")));
     
