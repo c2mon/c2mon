@@ -20,6 +20,9 @@ DAQ_LOG_FILE=${DAQ_LOG_HOME}/daqprocess.log
 
 export C2MON_PROPERTIES_FILE=${DAQ_CONF_HOME}/daq.properties
 
+#default VM options
+export DAQ_VM_ARGS="-Xms512m -Xmx512m"
+
 # the name of the parameter determining that the DAQ start-up script
 # should output only XML feedback messages
 
