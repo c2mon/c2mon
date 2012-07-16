@@ -14,8 +14,7 @@
 						<file name="log/out.log" />
 					</output>
 				</main-class>
-				<vm-args>-Xms2048m -Xmx2048m -XX:+PrintGCDetails
-					-XX:+UseParallelGC -XX:MaxGCPauseMillis=100</vm-args>
+				<java-vm-args>-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 				<property name="server.process.name" value="C2MON-SERVER-TIM2" />
 				<property name="c2mon.home" value="$C2MON_HOME" />
 				<property name="c2mon.log.dir" value="log" />
