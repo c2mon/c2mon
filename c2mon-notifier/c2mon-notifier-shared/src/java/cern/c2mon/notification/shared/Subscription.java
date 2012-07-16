@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Set;
 
+import cern.dmn2.core.Status;
+
 /**
  * @author felixehm
  */
@@ -91,7 +93,7 @@ public class Subscription implements Comparable<Subscription> {
      * @param tagId tagId the tag id [long] this subscription belongs to
      */
     public Subscription(Subscriber user, Long tagId) {
-        this(user.getUserName(), tagId, Status.WARNING.toInteger());
+        this(user.getUserName(), tagId, Status.WARNING.ordinal());
     }
 
     /**
@@ -101,7 +103,7 @@ public class Subscription implements Comparable<Subscription> {
      * @param tagId tagId the tag id [long] this subscription belongs to
      */
     public Subscription(String user, Long tagId) {
-        this(user, tagId, Status.WARNING.toInteger());
+        this(user, tagId, Status.WARNING.ordinal());
     }
 
     /**
@@ -304,9 +306,10 @@ public class Subscription implements Comparable<Subscription> {
     
     
     public void addResolvedSubTag(Long l) {
-        lastNotifiedTags.put(l, Status.UNKNOWN);
+        if (!lastNotifiedTags.containsKey(l)) {
+            lastNotifiedTags.put(l, Status.UNKNOWN);
+        }
     }
-    
     
     public Status getLastStatusForResolvedSubTag(Long tagId) {
         Status s = lastNotifiedTags.get(tagId);
