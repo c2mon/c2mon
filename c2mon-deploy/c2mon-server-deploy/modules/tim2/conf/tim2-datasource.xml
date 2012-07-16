@@ -10,6 +10,7 @@
                        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
   <!-- must contain a bean with id cacheDataSource of type java.sql.DataSource -->
+  <!-- must contain a bean with id configurationDataSource of type java.sql.DataSource -->
   
   <bean id="cacheDataSource" class="org.apache.commons.dbcp.BasicDataSource">
     <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
@@ -21,6 +22,22 @@
 <!--    <property name="logWriter" value=""/>-->
     <property name="initialSize" value="${datasource.persistence.connections.initial}"/>
     <property name="maxActive" value="${datasource.persistence.connections.max}"/>
+  </bean>
+  
+  <!-- data source for loading configurations -->
+  <bean id="configurationDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+    <property name="url" value="${jdbc.config.url}"/>
+    <property name="username" value="${jdbc.config.user}"/>
+    <property name="password" value="${jdbc.config.password}"/>
+<!--    <property name="defaultAutoCommit" value="false"/>-->
+<!--    <property name="logWriter" value=""/>-->
+    <property name="testWhileIdle" value="true"/>
+    <property name="timeBetweenEvictionRunsMillis" value="600000"/>
+    <property name="numTestsPerEvictionRun" value="${datasource.config.connections.initial}"/>
+    <property name="validationQuery" value="SELECT 0 FROM DUAL"/>
+    <property name="initialSize" value="${datasource.config.connections.initial}"/>
+    <property name="maxActive" value="${datasource.config.connections.max}"/>
   </bean>
   
 </beans>
