@@ -17,9 +17,9 @@
 					</output>
                 
 				</main-class>
-                
-                <vm-args>${DAQ_VM_ARGS}</vm-args>
-                
+				
+                <java-vm-args>${DAQ_VM_ARGS}</java-vm-args>
+                                
 				<property name="c2mon.process.name" value="${PROCESS_NAME}" />
 				<property name="c2mon.log.dir" value="${DAQ_LOG_HOME}" />
 				<property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
