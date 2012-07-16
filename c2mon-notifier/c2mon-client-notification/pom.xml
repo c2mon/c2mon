@@ -1,13 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  
   <parent>
     <artifactId>c2mon-client-pom</artifactId>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <version>1.0.10</version>
   </parent>
+  
+  
   <groupId>cern.c2mon.notification</groupId>
   <artifactId>c2mon-client-notification</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.4</version>
   <dependencies>
   	<dependency>
   		<groupId>org.apache.activemq</groupId>
@@ -16,7 +19,7 @@
   	<dependency>
   		<groupId>cern.c2mon.notification</groupId>
   		<artifactId>c2mon-notification-shared</artifactId>
-  		<version>[1.0.2,2.0.0]</version>
+  		<version>[1.0.0,2.0.0)</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
