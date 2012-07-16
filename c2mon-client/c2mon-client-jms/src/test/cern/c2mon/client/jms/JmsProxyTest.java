@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -32,9 +33,10 @@ import javax.jms.TextMessage;
 
 import junit.framework.Assert;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -84,20 +86,31 @@ public class JmsProxyTest {
   
   private JmsTemplate serverTemplate;
  
+  private static ConnectionFactory connectionFactory;
+  
+  
+  @BeforeClass
+  public static void startBroker() throws Exception {
+    TestBrokerService.createAndStartBroker();
+    connectionFactory = TestBrokerService.getConnectionFactory();
+  }
+  
   /**
    * Starts context.
-   * @throws InterruptedException 
+   * @throws Exception 
    */
   @Before
-  public void setUp() throws InterruptedException {
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(System.getProperty("c2mon.client.jms.user"), 
-                                                                                System.getProperty("c2mon.client.jms.password"),
-                                                                                System.getProperty("c2mon.client.jms.url")); 
+  public void setUp() throws Exception {    
     jmsSender = new ActiveJmsSender();
     jmsSender.setJmsTemplate(new JmsTemplate(connectionFactory));
     serverTemplate = new JmsTemplate(connectionFactory);    
     //JMS connection is started in separate thread, so leave time to connect
     Thread.sleep(2000);
+  }
+  
+  @AfterClass
+  public static void stopBroker() throws Exception {
+    TestBrokerService.stopBroker();
   }
   
   /**
