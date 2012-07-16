@@ -11,6 +11,7 @@
 
   <!-- must contain a bean with id cacheDataSource of type java.sql.DataSource -->
   <!-- must contain a bean with id configurationDataSource of type java.sql.DataSource -->
+  <!-- must contain a bean with id stlDataSource of type java.sql.DataSource -->
   
   <!-- datasource for the cache persistence -->
   <bean id="cacheDataSource" class="org.apache.commons.dbcp.BasicDataSource">
@@ -39,6 +40,19 @@
     <property name="validationQuery" value="SELECT 0 FROM DUAL"/>
     <property name="initialSize" value="${datasource.config.connections.initial}"/>
     <property name="maxActive" value="${datasource.config.connections.max}"/>
+  </bean>
+  
+  <!-- datasource for logging functionalities -->
+  <bean id="stlDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+    <property name="url" value="${jdbc.stl.url}"/>
+    <property name="username" value="${jdbc.stl.user}"/>
+    <property name="password" value="${jdbc.stl.password}"/>
+    <property name="defaultAutoCommit" value="false"/>
+    <property name="validationQuery" value="SELECT 0 FROM DUAL"/>
+<!--    <property name="logWriter" value=""/>-->
+    <property name="initialSize" value="${datasource.stl.connections.initial}"/>
+    <property name="maxActive" value="${datasource.stl.connections.max}"/>
   </bean>
   
 </beans>
