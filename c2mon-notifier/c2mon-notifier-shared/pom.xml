@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>cern.c2mon.notification</groupId>
   <artifactId>c2mon-notification-shared</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.4</version>
   
   <parent>
     <artifactId>c2mon-client-pom</artifactId>
