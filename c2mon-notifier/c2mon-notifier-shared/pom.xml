@@ -28,5 +28,9 @@
   	</dependency>
   </dependencies>
   
+  <scm>
+   <developerConnection>svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-notifier/c2mon-notifier-shared</developerConnection>
+  </scm>
+  
   
 </project>
