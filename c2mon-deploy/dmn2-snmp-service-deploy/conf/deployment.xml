@@ -16,6 +16,8 @@
 					</output>
 
 				</main-class>
+				
+				<java-vm-args>-Xms128m -Xmx128m</java-vm-args>
 
 				<!--  run job once per minute -->
 				<property name="snmpservice.verification.interval" value="60000" />
