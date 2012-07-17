@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+	<id>demo</id>
+
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+
+	<!--  do not include base directory -->
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<componentDescriptors>
+		<componentDescriptor>src/assembly/c2mon-srv-common-assembly.xml
+		</componentDescriptor>
+	</componentDescriptors>
+
+	<files>
+
+		<!--  copy sthe starting script -->
+		<file>
+			<source>${basedir}/bin/c2mon-demo.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<destName>c2mon-demo.sh</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
+
+		<!--  deployment descriptor -->		
+
+		<!--  log4j configuration -->
+		<file>
+			<source>${basedir}/conf/demo-log4j.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>log4j.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0700</fileMode>
+		</file>		
+		<file>
+			<source>${basedir}/conf/demo-modules.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>c2mon-modules.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+    <file>
+      <source>${basedir}/conf/demo-datasource.xml</source>
+      <outputDirectory>conf/</outputDirectory>
+      <destName>c2mon-datasource.xml</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>	
+    <file>
+      <source>${basedir}/conf/demo-c2mon.properties</source>
+      <outputDirectory>conf/</outputDirectory>
+      <destName>c2mon.properties</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+		
+		<!--  copy the version file -->
+		<file>
+			<source>${project.build.outputDirectory}/version.txt</source>
+			<outputDirectory>/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+				
+	</files>
+
+</assembly>
