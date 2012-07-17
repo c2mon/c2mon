@@ -18,7 +18,6 @@
  *****************************************************************************/
 package cern.c2mon.server.shorttermlog.dao;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -26,8 +25,6 @@ import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.Logger;
-import org.springframework.dao.DataAccessException;
-import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.IFallback;
@@ -175,23 +172,24 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
     return "C2MON Short-Term-Log account on DB with URL: " + dbUrl;
   }
 
-  @Override
-  @Transactional("stlTransactionManager")
-  public void storeData(IFallback object) throws SQLException {
-    SqlSession session = sqlSessionFactory.openSession();
+  @Override  
+  public void storeData(IFallback object) throws IDBPersistenceException {
+    SqlSession session = null;
     try {
+      session = sqlSessionFactory.openSession();     
       LoggerMapper<T> loggerMapper = session.getMapper(mapperInterface);
       loggerMapper.insertLog((T) object);
-      session.commit();
-    } catch (DataAccessException e) {
-      String message = "Exception caught while writing to short-term-log";
-      LOGGER.error(message, e);
-      session.rollback();
-      throw new SQLException(message, e);
+      session.commit();            
+    } catch (PersistenceException ex1) {
+      String message = "Exception caught while persisting an object to the short-term-log";
+      LOGGER.error(message, ex1);
+      if (session != null)
+        session.rollback();
+      throw new IDBPersistenceException(message, ex1);
     } finally {
-      session.close();
+      if (session != null)
+        session.close();
     }
-
   }
 
 }
