@@ -39,9 +39,9 @@ public interface IDBPersistenceHandler {
     
     /** Stores an IFallback object into a DB table 
      *  @param object IFallback object containing the data to be committed to the DB
-     *  @throws SQLException An exception is thrown in case the object cannot be committed to the DB
+     *  @throws IDBPersistenceException An exception is thrown in case the object cannot be committed to the DB
      */    
-     void storeData(IFallback object) throws SQLException;
+     void storeData(IFallback object) throws IDBPersistenceException;
 
      /** Stores a list of incoming objects into a db table
      *  @param data List of IFallback objects containing the data to be committed to the DB

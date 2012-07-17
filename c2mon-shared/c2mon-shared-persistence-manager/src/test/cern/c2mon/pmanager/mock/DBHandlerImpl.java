@@ -47,12 +47,12 @@ public class DBHandlerImpl implements IDBPersistenceHandler {
      *  @throws SQLException An exception is thrown in case the object cannot be committed to the DB
      */
     
-     public final void storeData(final IFallback object) throws SQLException {
+     public final void storeData(final IFallback object) throws IDBPersistenceException {
          if (object instanceof FallbackImpl) {
              if (!((FallbackImpl) object).toString().equals(FallbackImpl.ERROR)) {
                  storage.add(object);
              } else {
-                 throw new SQLException("Connection to the DB has been lost");
+                 throw new IDBPersistenceException("Connection to the DB has been lost");
              }
          }
      }

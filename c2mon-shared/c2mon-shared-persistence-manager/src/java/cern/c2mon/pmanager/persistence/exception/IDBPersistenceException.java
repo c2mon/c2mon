@@ -53,6 +53,14 @@ public class IDBPersistenceException extends Exception {
        super(); 
     }
     
+    public IDBPersistenceException(String message, Throwable cause) {
+      super(message, cause);      
+    }
+
+    public IDBPersistenceException(Throwable cause) {
+      super(cause);      
+    }
+
     /** Creates an exception with a detailed message 
      * @param msg The detailed message that the parent class will store
      * */

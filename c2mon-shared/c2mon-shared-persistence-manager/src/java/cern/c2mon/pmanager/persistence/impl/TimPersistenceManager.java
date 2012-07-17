@@ -281,7 +281,7 @@ public class TimPersistenceManager implements IPersistenceManager, FallbackAlarm
         try {
             dbHandler.storeData(object);
             alarmSender.dbUnavailable(DOWN, null, dbHandler.getDBInfo());
-        } catch (SQLException e) {
+        } catch (IDBPersistenceException e) {
             dbConnectionUp = false;            
             synchronized (fallbackManager.getFallbackFileController()) {
                 ArrayList temp = new ArrayList();
