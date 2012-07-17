@@ -39,8 +39,9 @@ import cern.c2mon.server.shorttermlog.mapper.LoggerMapper;
  * the fallback mechanism.
  * 
  * @author Mark Brightwell
- *
- * @param <T> the object that is being logged in the STL table
+ * 
+ * @param <T>
+ *          the object that is being logged in the STL table
  */
 public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
 
@@ -48,52 +49,55 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
    * Private class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(LoggerDAO.class);
-  
-  /** 
-   * Maximum number of statements that will be executed in each SQL batch 
+
+  /**
+   * Maximum number of statements that will be executed in each SQL batch
    **/
   private static final int RECORDS_PER_BATCH = 500;
-  
+
   /**
    * The iBatis factory used to acquire database sessions.
    */
   private SqlSessionFactory sqlSessionFactory;
-    
+
   /**
    * Auto-commit mapper for single queries.
    */
-//  private LoggerMapper<T> loggerMapper;
-  
+  // private LoggerMapper<T> loggerMapper;
+
   /**
-   * The mapper class name used for creating the batch logger mapper from the session.
+   * The mapper class name used for creating the batch logger mapper from the
+   * session.
    */
-  private Class< ? extends LoggerMapper<T>> mapperInterface;
-  
+  private Class<? extends LoggerMapper<T>> mapperInterface;
+
   /**
    * Information in order to identify the DB.
    */
   private String dbUrl;
-    
+
   /**
    * 
    * @param sqlSessionFactory
-   * @param loggerMapper the auto-commit mapper for single queries/inserts
-   * @param dbUrl only used for logging error messages
-   * @throws ClassNotFoundException 
+   * @param loggerMapper
+   *          the auto-commit mapper for single queries/inserts
+   * @param dbUrl
+   *          only used for logging error messages
+   * @throws ClassNotFoundException
    */
   public LoggerDAO(SqlSessionFactory sqlSessionFactory, String mapperInterface, String dbUrl) throws ClassNotFoundException {
     super();
-    this.sqlSessionFactory = sqlSessionFactory;   
-    Class< ? > tmpInterface = Class.forName(mapperInterface);
+    this.sqlSessionFactory = sqlSessionFactory;
+    Class<?> tmpInterface = Class.forName(mapperInterface);
     if (LoggerMapper.class.isAssignableFrom(tmpInterface)) {
       this.mapperInterface = (Class<? extends LoggerMapper<T>>) tmpInterface;
     } else {
       throw new IllegalArgumentException("Unexpected class name passed to LoggerDAO constructor - unable to instantiate.");
     }
     this.dbUrl = dbUrl;
-//    if (tmpInterface instanceof LoggerMapper) {
-//      Class<? extends LoggerMapper> mappper = tmpInterface;
-//    }
+    // if (tmpInterface instanceof LoggerMapper) {
+    // Class<? extends LoggerMapper> mappper = tmpInterface;
+    // }
   }
 
   /**
@@ -101,79 +105,74 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
    * several IFallback objects
    * 
    * @param data
-   *            List of IFallback object whose data has to be inserted in the
-   *            DB
+   *          List of IFallback object whose data has to be inserted in the DB
    * @throws IDBPersistenceException
-   *             An exception is thrown in case an error occurs during the
-   *             data insertion. The exception provides also the number of
-   *             already committed objects
-   */  
-  @SuppressWarnings("unchecked") //add generics to persistence manager
+   *           An exception is thrown in case an error occurs during the data
+   *           insertion. The exception provides also the number of already
+   *           committed objects
+   */
+  @SuppressWarnings("unchecked")
+  // add generics to persistence manager
   public final void storeData(final List data) throws IDBPersistenceException {
-      SqlSession session = null;
-      int size = data.size();
-      int commited = 0;
-      T dtShortTermLog;
+    SqlSession session = null;
+    int size = data.size();
+    int commited = 0;
+    T dtShortTermLog;
 
-      try {
-          // We use batch set of statements to improve performance
-          session = sqlSessionFactory.openSession(ExecutorType.BATCH, false);
-          if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Obtained batch transacted SQL session (session: " + session.toString() + ")");
-          }        
-          LoggerMapper<T> persistenceMapper = session.getMapper(mapperInterface);
-          
-          // Iterate through the list of DataTagCacheObjects to insert
-          // them one by one
-          for (int i = 0; i != size; i++) {
-              if ((0 == i % RECORDS_PER_BATCH) && i > 0) {
-                  if (LOGGER.isDebugEnabled()) {
-                      LOGGER.debug("storeData([Collection]) : Commiting rows for i=" + i);
-                  }
-                  session.commit();                  
-                  commited = i;                  
-              }
-                  
-              if (data.get(i) != null) {
-                  dtShortTermLog = (T) data.get(i);
-                  if (LOGGER.isDebugEnabled()) {
-                      LOGGER.debug("Logging object with ID: " + dtShortTermLog.getId());
-                  }
-                  persistenceMapper.insertLog(dtShortTermLog);                  
-              }
-          }
-          // Commit the transaction
-          session.commit();
-          commited = size;          
-      } catch (PersistenceException e) {
-          LOGGER.error(
-                  "storeData([Collection]) : Error executing/closing prepared statement for "
-                  + data.size() + " dataTags", e);
-          try {
-              if (session != null) {
-                session.rollback();
-              }              
-          } catch (Exception sql) {
-              LOGGER
-              .error(
-                      "storeData([Collection]) : Error rolling back transaction.",
-                      sql);
-          }
-          throw new IDBPersistenceException(e.getMessage(), commited);            
-      } finally {
-          try { 
-              if (session != null) {
-                session.close();
-              }              
-          } catch (Exception e) {
-              LOGGER.error("storeData([Collection]) : Error closing session.", e);
-          }
+    try {
+      // We use batch set of statements to improve performance
+      session = sqlSessionFactory.openSession(ExecutorType.BATCH, false);
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Obtained batch transacted SQL session (session: " + session.toString() + ")");
       }
+      LoggerMapper<T> persistenceMapper = session.getMapper(mapperInterface);
+
+      // Iterate through the list of DataTagCacheObjects to insert
+      // them one by one
+      for (int i = 0; i != size; i++) {
+        if ((0 == i % RECORDS_PER_BATCH) && i > 0) {
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("storeData([Collection]) : Commiting rows for i=" + i);
+          }
+          session.commit();
+          commited = i;
+        }
+
+        if (data.get(i) != null) {
+          dtShortTermLog = (T) data.get(i);
+          if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Logging object with ID: " + dtShortTermLog.getId());
+          }
+          persistenceMapper.insertLog(dtShortTermLog);
+        }
+      }
+      // Commit the transaction
+      session.commit();
+      commited = size;
+    } catch (PersistenceException e) {
+      LOGGER.error("storeData([Collection]) : Error executing/closing prepared statement for " + data.size() + " dataTags", e);
+      try {
+        if (session != null) {
+          session.rollback();
+        }
+      } catch (Exception sql) {
+        LOGGER.error("storeData([Collection]) : Error rolling back transaction.", sql);
+      }
+      throw new IDBPersistenceException(e.getMessage(), commited);
+    } finally {
+      try {
+        if (session != null) {
+          session.close();
+        }
+      } catch (Exception e) {
+        LOGGER.error("storeData([Collection]) : Error closing session.", e);
+      }
+    }
   }
 
   @Override
   public String getDBInfo() {
-    return "C2MON Short-Term-Log account on DB with URL: " + dbUrl;    
+    return "C2MON Short-Term-Log account on DB with URL: " + dbUrl;
   }
 
   @Override
@@ -192,10 +191,7 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler {
     } finally {
       session.close();
     }
-   
+
   }
-  
+
 }
-
-
-  
