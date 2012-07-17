@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import cern.c2mon.pmanager.IAlarmListener;
 
 /**
- * Fallback alarm listener that send emails via log4j.
+ * Fallback alarm listener that send emails/SMS via log4j.
  * 
  * @author Mark Brightwell
  *
