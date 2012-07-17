@@ -39,7 +39,7 @@ import cern.c2mon.server.client.request.ClientRequestReportHandler;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.tim.server.command.CommandExecutionManager;
-import cern.tim.server.test.TestBrokerService;
+import cern.tim.server.test.broker.TestBrokerService;
 import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
