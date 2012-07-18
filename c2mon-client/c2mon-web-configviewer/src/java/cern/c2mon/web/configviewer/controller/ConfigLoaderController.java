@@ -287,7 +287,8 @@ public class ConfigLoaderController {
     }
     // @ResponseBody will automatically convert the returned value into JSON format
     // You must have Jackson in your classpath
-    return getGson().toJson(report.getDescriptionMessage());
+    // Jackson does not work as expected.. so Gson is used for this case
+    return getGson().toJson(report.getProgressDescription());
   }
   
   /**
