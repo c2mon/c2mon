@@ -17,7 +17,7 @@
   <!-- <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml"/>-->
   <import resource="classpath:cern/c2mon/server/client/config/server-client.xml"/> 
   <!-- <import resource="classpath:cern/c2mon/server/video/config/server-video.xml"/> -->
-  <import resource="classpath:cern/tim/server/test/demo/server-test-broker.xml"/>
+  <import resource="classpath:cern/tim/server/test/broker/server-test-broker.xml"/>
   
   
 
