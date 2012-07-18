@@ -18,6 +18,9 @@
  *****************************************************************************/
 package cern.c2mon.client.jms;
 
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +38,6 @@ import junit.framework.Assert;
 
 import org.apache.activemq.command.ActiveMQQueue;
 import org.easymock.EasyMock;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -48,14 +50,18 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.TagUpdateListener;
+import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
+import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
+import cern.tim.shared.client.configuration.ConfigurationReport;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
@@ -370,6 +376,141 @@ public class JmsProxyTest {
     //check connection is back by rerunning supervison and update tests
     testSupervisionNotification();
     testUpdateNotification();
+  }
+  
+  /**
+   * Tests client requests with intermediate progress reports are processed and notify listener
+   * correctly. Fakes server response with some progress reports followed by the result.
+   * @throws JMSException 
+   */
+  @Test
+  public void testProgressReportProcessing() throws JMSException {
+    ClientRequestReportListener reportListener = EasyMock.createMock(ClientRequestReportListener.class);
+    reportListener.onProgressReportReceived(EasyMock.isA(ClientRequestProgressReport.class));
+    EasyMock.expectLastCall().times(3);
+    
+    EasyMock.replay(reportListener);
+    
+    ClientRequestImpl<ConfigurationReport> jsonRequest = new ClientRequestImpl<ConfigurationReport>(ConfigurationReport.class);      
+    final String queueName = System.getProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
+    new Thread(new Runnable() {      
+      @Override
+      public void run() {       
+        serverTemplate.execute(new SessionCallback<Object>() {
+
+          @Override
+          public Object doInJms(Session session) throws JMSException {            
+            MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(queueName));
+            Message message = consumer.receive(10000);            
+            Assert.assertNotNull(message);
+            Assert.assertTrue(message instanceof TextMessage);
+                        
+            //send progress reports
+            MessageProducer producer = session.createProducer(message.getJMSReplyTo());
+            Collection<ConfigurationReport> configReport = new ArrayList<ConfigurationReport>();
+            configReport.add(new ConfigurationReport(10, 5, 20, 2, "fake progress"));
+            Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));            
+            producer.send(replyMessage);
+            
+            configReport.clear();
+            configReport.add(new ConfigurationReport(1, 1, 2, 1, "fake progress"));
+            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));            
+            producer.send(replyMessage);
+            
+            configReport.clear();
+            configReport.add(new ConfigurationReport(10, 6, 22, 10, "fake progress"));
+            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));            
+            producer.send(replyMessage);
+            
+            //send result
+            configReport.clear();
+            configReport.add(new ConfigurationReport(10L, "name", "user"));
+            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));            
+            producer.send(replyMessage);
+            return null;
+          }
+         
+        }, true);
+      }
+    }).start();     
+    Collection<ConfigurationReport> response = jmsProxy.sendRequest(jsonRequest, queueName, 10000, reportListener); //wait 10s for an answer
+    Assert.assertNotNull(response);
+    Assert.assertTrue(response.iterator().next().isResult());
+    
+    EasyMock.verify(reportListener);
+    
+  }
+  
+  /**
+   * Tests error reports are correctly processed. Fakes a sequence of progress reports back from the 
+   * server followed by an error report.
+   * 
+   * @throws JMSException
+   */
+  @Test
+  public void testErrorReportProcessing() throws JMSException {
+    ClientRequestReportListener reportListener = EasyMock.createMock(ClientRequestReportListener.class);
+    reportListener.onProgressReportReceived(EasyMock.isA(ClientRequestProgressReport.class));
+    EasyMock.expectLastCall().times(3);
+    reportListener.onErrorReportReceived(EasyMock.isA(ClientRequestErrorReport.class));
+    
+    EasyMock.replay(reportListener);
+    
+    ClientRequestImpl<ConfigurationReport> jsonRequest = new ClientRequestImpl<ConfigurationReport>(ConfigurationReport.class);      
+    final String queueName = System.getProperty("c2mon.client.jms.request.queue") + "-" + System.currentTimeMillis();
+    new Thread(new Runnable() {      
+      @Override
+      public void run() {       
+        serverTemplate.execute(new SessionCallback<Object>() {
+
+          @Override
+          public Object doInJms(Session session) throws JMSException {            
+            MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(queueName));
+            Message message = consumer.receive(10000);            
+            Assert.assertNotNull(message);
+            Assert.assertTrue(message instanceof TextMessage);
+                        
+            //send progress reports
+            MessageProducer producer = session.createProducer(message.getJMSReplyTo());
+            Collection<ConfigurationReport> configReport = new ArrayList<ConfigurationReport>();
+            configReport.add(new ConfigurationReport(10, 5, 20, 2, "fake progress"));
+            Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));            
+            producer.send(replyMessage);
+            
+            configReport.clear();
+            configReport.add(new ConfigurationReport(1, 1, 2, 1, "fake progress"));
+            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));            
+            producer.send(replyMessage);
+            
+            configReport.clear();
+            configReport.add(new ConfigurationReport(10, 6, 22, 10, "fake progress"));
+            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));            
+            producer.send(replyMessage);
+            
+            //send result
+            configReport.clear();
+            configReport.add(new ConfigurationReport(false, "error occurred"));
+            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));            
+            producer.send(replyMessage);
+            return null;
+          }
+         
+        }, true);
+      }
+    }).start();
+    boolean exceptionCaught = false;
+    Collection<ConfigurationReport> response = null;
+    try {
+      response = jmsProxy.sendRequest(jsonRequest, queueName, 10000, reportListener); //wait 10s for an answer
+    } catch (RuntimeException e) {
+      exceptionCaught = true;
+      assertTrue(e.getMessage().endsWith("error occurred"));
+    }
+    assertTrue(exceptionCaught);    
+    assertNull(response);
+    
+    EasyMock.verify(reportListener);
+    
   }
   
 }

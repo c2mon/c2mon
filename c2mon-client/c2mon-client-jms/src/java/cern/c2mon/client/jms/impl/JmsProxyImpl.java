@@ -662,7 +662,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           producer.setTimeToLive(JMS_MESSAGE_TIMEOUT);
           producer.send(message);
 
-          while (true) { // until we receive the result 
+          while (connected && !shutdownRequested) { // until we receive the result 
             // (it is possible to receive progress and / or error reports during this process)
 
             Message replyMessage = consumer.receive(timeout);
@@ -683,6 +683,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
                 return resultCollection;
             }
           }
+          throw new RuntimeException("Disconnected from JMS, so unable to process request.");
         } finally {
           if (consumer != null) {
             consumer.close();
@@ -757,6 +758,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     if (report.isErrorReport()) {
       LOGGER.debug("handleJsonReportResponse(): Received an error report. Informing listener.");
       reportListener.onErrorReportReceived((ClientRequestErrorReport) report);
+      throw new RuntimeException("Error report received from server on client request: " + report.getErrorMessage());
     }
     else if (report.isProgressReport()) {
       LOGGER.debug("handleJsonReportResponse(): Received a progress report. Informing listener.");
