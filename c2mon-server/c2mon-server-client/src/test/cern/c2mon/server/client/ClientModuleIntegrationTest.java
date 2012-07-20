@@ -65,14 +65,16 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
  
   private ApplicationContext applicationContext;
   
+  private static TestBrokerService testBrokerService = new TestBrokerService();
+  
   @BeforeClass
   public static void startJmsBroker() throws Exception {
-    TestBrokerService.createAndStartBroker();
+    testBrokerService.createAndStartBroker();
   }
   
   @AfterClass
   public static void stopBroker() throws Exception {
-    TestBrokerService.stopBroker();
+    testBrokerService.stopBroker();
   }
   
   @Before
@@ -97,7 +99,7 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
     
     control.replay();
     //send client request to admin queue
-    JmsTemplate clientTemplate = new JmsTemplate(TestBrokerService.getConnectionFactory());
+    JmsTemplate clientTemplate = new JmsTemplate(testBrokerService.getConnectionFactory());
     clientTemplate.execute(new SessionCallback<Object>() {
 
       @Override
