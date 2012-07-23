@@ -158,12 +158,12 @@
   </logger>
 
   <logger name="org.springframework" additivity="false">
-    <level value="debug"/>
+    <level value="warn"/>
     <appender-ref ref="FileAppender" />
   </logger>
 
   <logger name="org.apache.activemq" additivity="false">
-    <level value="info"/>
+    <level value="warn"/>
     <appender-ref ref="FileAppender" />
   </logger>
 
