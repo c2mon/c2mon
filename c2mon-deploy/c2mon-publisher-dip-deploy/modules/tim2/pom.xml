@@ -44,13 +44,20 @@
         <configuration>
           <artifactItems>
             <artifactItem>
-
               <groupId>cern.dip</groupId>
               <artifactId>dip-jni</artifactId>
               <classifier>i386-Linux-gpp-jni</classifier>
               <version>5.4.4</version>
               <type>nar</type>
-
+              <overWrite>true</overWrite>
+              <outputDirectory>${project.build.directory}/lib_so</outputDirectory>
+            </artifactItem>
+            <artifactItem>
+              <groupId>com.googlecode.narlibs</groupId>
+              <artifactId>log4cxx-nar</artifactId>
+              <classifier>i386-Linux-gpp-shared</classifier>
+              <version>10.0.0.1</version>
+              <type>nar</type>
               <overWrite>true</overWrite>
               <outputDirectory>${project.build.directory}/lib_so</outputDirectory>
             </artifactItem>
