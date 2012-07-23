@@ -100,7 +100,7 @@ public class DipPublisher implements Publisher {
       StringBuffer str = new StringBuffer("received tag update [\n");
       str.append(" id          : " + cdt.getId() + "\n");
       str.append(" name        : " + cdt.getName() + "\n");
-      str.append(" type        : " + cdt.getType() + "\n");
+      str.append(" type        : " + cdt.getTypeNumeric().toString() + "\n");
       str.append(" value       : " + cdt.getValue() + "\n");
       str.append(" valueDescr  : " + cdt.getValueDescription() + "\n");
       str.append(" description : " + cdt.getDescription() + "\n");
@@ -213,12 +213,12 @@ public class DipPublisher implements Publisher {
 
       if (cdt.getDataTagQuality().isExistingTag()) {
         data.insert("id", cdt.getId().longValue());
-        data.insert("valueDescription", cdt.getValueDescription());
+        data.insert("valueDescription", cdt.getValueDescription() != null ? cdt.getValueDescription() : "");
         data.insert("timestamp", cdt.getServerTimestamp().getTime());
         data.insert("sourceTimestamp", cdt.getTimestamp().getTime());
         data.insert("unit", cdt.getUnit());
         data.insert("name", cdt.getName());
-        data.insert("description", cdt.getDescription());
+        data.insert("description", cdt.getDescription() != null ?  cdt.getDescription() : "");
         data.insert("mode", cdt.getMode().toString());
         data.insert("simulated", cdt.isSimulated());
         data.insert("wiki", DIP_WIKI_URL);
