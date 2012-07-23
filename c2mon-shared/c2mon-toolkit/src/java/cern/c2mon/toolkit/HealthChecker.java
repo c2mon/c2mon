@@ -162,7 +162,10 @@ public class HealthChecker {
         healthReport.append("Number of threads currently processing DAQ updates: " + updateThreads + " - " + (updateThreads < 10 ? Status.OK : Status.WARN) + "\n");
         objectName = new ObjectName("cern.c2mon:name=processJmsContainerManager");
         Integer jmsThreads = Integer.valueOf(mBeanConnection.invoke(objectName, "getNumActiveThreads", null, null).toString());
-        healthReport.append("Number of JMS container threads: " + jmsThreads + " - " + (jmsThreads < 200 ? Status.OK : Status.WARN) + "\n");        
+        healthReport.append("Number of JMS container threads: " + jmsThreads + " - " + (jmsThreads < 200 ? Status.OK : Status.WARN) + "\n");
+        objectName = new ObjectName("cern.c2mon:type=LaserPublisher,name=LaserPublisher");
+        Boolean hasUnpublishedAlarms = Boolean.valueOf(mBeanConnection.invoke(objectName, "hasUnpublishedAlarms", null, null).toString());
+        healthReport.append("Problems publishing alarms to LASER: " + hasUnpublishedAlarms + "\n");
       } catch (IOException e) {
         healthReport.append("Unable to connect to C2MON server at " + url + "\n");
       }
