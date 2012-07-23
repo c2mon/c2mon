@@ -27,7 +27,7 @@ public class Subscription implements Comparable<Subscription> {
     /**
      * level to notify for
      */
-    private int level = 1;
+    private Status level = Status.WARNING;
 
     /**
      * the user this subscription belongs to.
@@ -71,7 +71,7 @@ public class Subscription implements Comparable<Subscription> {
      * @param tagId the tag id [long] this subscription belongs to
      * @param level the notifcation level [int]
      */
-    public Subscription(String userId, Long tagId, int level) {
+    public Subscription(String userId, Long tagId, Status level) {
         this.level = level;
         if (userId == null) {
             throw new IllegalArgumentException("Passed argument 'user' was null");
@@ -93,7 +93,7 @@ public class Subscription implements Comparable<Subscription> {
      * @param tagId tagId the tag id [long] this subscription belongs to
      */
     public Subscription(Subscriber user, Long tagId) {
-        this(user.getUserName(), tagId, Status.WARNING.ordinal());
+        this(user.getUserName(), tagId, Status.WARNING);
     }
 
     /**
@@ -103,7 +103,7 @@ public class Subscription implements Comparable<Subscription> {
      * @param tagId tagId the tag id [long] this subscription belongs to
      */
     public Subscription(String user, Long tagId) {
-        this(user, tagId, Status.WARNING.ordinal());
+        this(user, tagId, Status.WARNING);
     }
 
     /**
@@ -115,7 +115,7 @@ public class Subscription implements Comparable<Subscription> {
      * @param level the notification level for this subscription.
      */
     public Subscription(Subscriber user, Long tagId, int level) {
-        this(user.getUserName(), tagId, level);
+        this(user.getUserName(), tagId, Status.fromInt(level));
         user.addSubscription(this);
     }
 
@@ -131,7 +131,7 @@ public class Subscription implements Comparable<Subscription> {
     /**
      * @return the notification level.
      */
-    public int getNotificationLevel() {
+    public Status getNotificationLevel() {
         return level;
     }
 
@@ -140,9 +140,8 @@ public class Subscription implements Comparable<Subscription> {
      * @see Status
      * @param level 
      */
-    public void setNotificationLevel(int level) {
-        Status s = Status.fromInt(level);
-        if (s.equals(Status.UNKNOWN) || s.equals(Status.OK)) {
+    public void setNotificationLevel(Status level) {
+        if (level.equals(Status.UNKNOWN) || level.equals(Status.OK)) {
             throw new IllegalArgumentException("The level argument is not allowed to be UNKNOWN or OK.");
         }
         this.level = level;
@@ -159,8 +158,8 @@ public class Subscription implements Comparable<Subscription> {
      * @param toCheck the level to check.
      * @return true if this subscription triggers a notification based on the passed level.
      */
-    public boolean isInterestedInLevel(int toCheck) {
-        return (toCheck >= level || toCheck == 0) ? true : false;
+    public boolean isInterestedInLevel(Status toCheck) {
+        return (toCheck.worserThan(level) || toCheck.equals(level) || toCheck.equals(Status.OK)) ? true : false;
     }
 
     /**
@@ -241,8 +240,11 @@ public class Subscription implements Comparable<Subscription> {
                 .append(", User={").append(user)
                 .append("}, Level=").append(level)
                 .append(", Enabled=").append(isEnabled)
+                .append(", OnMetricValueChange=").append(this.notifyOnMetricChange)
+                .append(", SmsEnabled=").append(this.notifyOnMetricChange)
+                .append(", ResolvedTags={").append(this.lastNotifiedTags).append("}")
                 .append(", LastNotifiedState=").append(lastNotifiedStatus)
-                .append(", LastNotifiedTime").append(lastNotification);
+                .append(", LastNotifiedTime=").append(lastNotification);
         return ret.toString();
     }
 

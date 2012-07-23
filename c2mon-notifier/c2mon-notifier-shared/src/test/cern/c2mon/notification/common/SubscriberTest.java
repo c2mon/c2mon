@@ -53,7 +53,7 @@ public class SubscriberTest {
 		Subscriber s = getSubscriber();
 		Subscription sub = new Subscription(s, 1L);
 		s.addSubscription(sub);
-		s.removeSubscription(sub);
+		s.removeSubscription(sub.getTagId());
 		assertEquals(0, s.getSubscriptions().size());
 	}
 	

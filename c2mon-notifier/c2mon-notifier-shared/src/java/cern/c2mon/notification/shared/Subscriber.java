@@ -93,22 +93,14 @@ public class Subscriber {
 		subscriptions.put(subscription.getTagId(), subscription);
 	}
 
-	public synchronized void removeSubscription(Subscription subscription) {
-		removeSubscription(subscription.getTagId());
-	}
-	
-	public Subscription getSubscription(Subscription reference) {
-	    return subscriptions.get(reference.getTagId());
-	}
-	
-
-	/**
-	 * Removes a Subscription from {@link Subscriber#subscriptions}. 
-	 * @param tagId the id to remove
-	 */
 	public synchronized void removeSubscription(Long tagId) {
-		subscriptions.remove(tagId);
+	    subscriptions.remove(tagId);
 	}
+	
+	public Subscription getSubscription(Long tagId) {
+	    return subscriptions.get(tagId);   
+	}
+	
 
 	public List<Long> getSubscribedTagIds() {
 		return new ArrayList<Long>(subscriptions.keySet());
@@ -178,6 +170,7 @@ public class Subscriber {
 	 */
     public Subscriber getCopy() {
         Subscriber result = new Subscriber(this.getUserName(), this.getEmail(), this.getSms());
+        result.setReportInterval(this.getReportInterval());
         for (Subscription s : subscriptions.values()) {
             result.addSubscription(s.getCopy());
         }
