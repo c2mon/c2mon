@@ -168,6 +168,9 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private ReentrantReadWriteLock updateTagLock = new ReentrantReadWriteLock();
 
 
+  /**
+   * Protected default constructor that initializes the tag id with -1L
+   */
   protected ClientDataTagImpl() {      
     this.id = -1L;
   }
@@ -702,7 +705,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public String getTopicName() {
     updateTagLock.readLock().lock();
     try {
-      return this.topicName;
+      if (topicName != null) {
+        return this.topicName;
+      }
+      return "";
     }
     finally {
       updateTagLock.readLock().unlock();
@@ -796,7 +802,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public String getDescription() {
     updateTagLock.readLock().lock();
     try {
-      return this.description;
+      if (this.description != null) {
+        return this.description;
+      }
+      return "";
     }
     finally { updateTagLock.readLock().unlock(); }
   }
@@ -805,7 +814,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public String getValueDescription() {
     updateTagLock.readLock().lock();
     try {
-      return valueDescription;
+      if (valueDescription != null) {
+        return valueDescription;
+      }
+      return "";
     } 
     finally { updateTagLock.readLock().unlock(); }
   }
