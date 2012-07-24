@@ -10,7 +10,9 @@ public class DipPublisherTest {
   public void testIsASCII() {
     assertTrue(DipPublisher.isASCII(""));
     assertFalse(DipPublisher.isASCII(null));
-    assertFalse(DipPublisher.isASCII("Réal"));
-    assertFalse(DipPublisher.isASCII("°C"));
+    // french Real
+    assertFalse(DipPublisher.isASCII("R\u00E9al"));
+    // degree sign
+    assertFalse(DipPublisher.isASCII("\u00B0C"));
   }
 }
