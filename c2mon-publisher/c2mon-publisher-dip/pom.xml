@@ -37,6 +37,11 @@
   		<groupId>org.springframework</groupId>
   		<artifactId>spring-context</artifactId>
   	</dependency>
-  	
+    
+    <!-- Test dependencies -->
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  	</dependency>
   </dependencies>
 </project>
