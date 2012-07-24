@@ -73,13 +73,13 @@ public class RequestHandlerImpl implements RequestHandler {
    * own thread on the server and is sent in a single JMS message.
    */
   @Value("${c2mon.client.request.size}")
-  private static final int MAX_REQUEST_SIZE = 100;
+  private int maxRequestSize = 100;
 
   /**
    * Core/max number of threads in executor.
    */
   @Value("${c2mon.client.request.threads.max}")
-  private static final int CORE_POOL_SIZE = 20;
+  private int corePoolSize = 20;
 
   /**
    * Thread idle timeout in executor (in seconds), including core threads.
@@ -103,7 +103,7 @@ public class RequestHandlerImpl implements RequestHandler {
   /**
    * Executor for submitting requests to the server.
    */
-  private ThreadPoolExecutor executor = new ThreadPoolExecutor(CORE_POOL_SIZE, CORE_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
+  private ThreadPoolExecutor executor = new ThreadPoolExecutor(corePoolSize, corePoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
       new LinkedBlockingDeque<Runnable>(), new ThreadPoolExecutor.CallerRunsPolicy());
 
   /**
@@ -228,7 +228,7 @@ public class RequestHandlerImpl implements RequestHandler {
     Collection<Future<Collection<T>>> results = new ArrayList<Future<Collection<T>>>();
     int counter = 0;
     while (it.hasNext()) {
-      while (it.hasNext() && counter < MAX_REQUEST_SIZE) {
+      while (it.hasNext() && counter < maxRequestSize) {
         clientRequest.addTagId(it.next());
         counter++;
       }
