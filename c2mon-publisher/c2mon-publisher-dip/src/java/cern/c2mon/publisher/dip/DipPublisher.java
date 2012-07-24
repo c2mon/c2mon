@@ -207,7 +207,7 @@ public class DipPublisher implements Publisher {
           data.insert(VALUE_FIELD_NAME, ((String) cdt.getValue()));
           break;
         default:
-          LOG.error("\ttag's type is UNKNOWN! for tag " + cdt.getId());
+          LOG.error("\ttag's type is UNKNOWN for tag " + cdt.getId());
           LOG.info("\tthe tag update for tag " + cdt.getId() + " will not be forwarded to DIP");
       }
 
@@ -262,10 +262,10 @@ public class DipPublisher implements Publisher {
       }
     }
     catch (DipException ex) {
-      LOG.error("DipException was caught", ex);
+      LOG.error("DipException was caught whilst updating tag " + cdt.getId(), ex);
     }
     catch (Exception ex) {
-      LOG.error("An exception was caught", ex);
+      LOG.error("An exception was caught whilst updating tag " + cdt.getId(), ex);
     }
     
   }
