@@ -220,7 +220,7 @@ public class DipPublisher implements Publisher {
           data.insert("valueDescription", cdt.getValueDescription());
         }
         else {
-          LOG.warn("valueDescription of tag " + cdt.getId() + " is not compatible to UTF-8: " 
+          LOG.warn("valueDescription of tag " + cdt.getId() + " is not compatible to US-ASCII: " 
               + cdt.getValueDescription() + " ==> valueDescription field won't be send!");
         }
         
@@ -231,7 +231,7 @@ public class DipPublisher implements Publisher {
           data.insert("unit", cdt.getUnit());
         }
         else {
-          LOG.warn("Unit of tag " + cdt.getId() + " is not compatible to UTF-8: " 
+          LOG.warn("Unit of tag " + cdt.getId() + " is not compatible to US-ASCII: " 
               + cdt.getUnit() + " ==> Unit field won't be send!");
         }
         
@@ -241,7 +241,7 @@ public class DipPublisher implements Publisher {
           data.insert("description", cdt.getDescription());
         }
         else {
-          LOG.warn("Description of tag " + cdt.getId() + " is not compatible to UTF-8: " 
+          LOG.warn("Description of tag " + cdt.getId() + " is not compatible to US-ASCII: " 
               + cdt.getDescription() + " ==> Decription field won't be send!");
         }
         
@@ -297,9 +297,9 @@ public class DipPublisher implements Publisher {
   }
   
   /**
-   * Checks whether the given text is <b>UTF-8</b> compatible or not.
+   * Checks whether the given text is <b>US-ASCII</b> compatible or not.
    * @param text the text that shall be checked
-   * @return <code>true</code>, if the text is compatible with UTF-8
+   * @return <code>true</code>, if the text is compatible with US-ASCII
    */
   protected static boolean isASCII(final String text) {
     try {
