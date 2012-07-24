@@ -17,7 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.publisher.dip;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -300,10 +301,10 @@ public class DipPublisher implements Publisher {
    * @param text the text that shall be checked
    * @return <code>true</code>, if the text is compatible with UTF-8
    */
-  private boolean isASCII(final String text) {
+  protected static boolean isASCII(final String text) {
     try {
-      text.getBytes("ASCII");
-      return true;
+      final CharsetEncoder asciiEncoder = Charset.forName("US-ASCII").newEncoder(); 
+      return asciiEncoder.canEncode(text);
     }
     catch (Exception e) {
       return false;
