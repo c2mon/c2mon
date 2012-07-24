@@ -17,6 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.publisher.dip;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -213,12 +214,36 @@ public class DipPublisher implements Publisher {
 
       if (cdt.getDataTagQuality().isExistingTag()) {
         data.insert("id", cdt.getId().longValue());
-        data.insert("valueDescription", cdt.getValueDescription() != null ? cdt.getValueDescription() : "");
+        
+        if (isUTF8(cdt.getValueDescription())) {
+          data.insert("valueDescription", cdt.getValueDescription() != null ? cdt.getValueDescription() : "");
+        }
+        else {
+          LOG.warn("valueDescription of tag " + cdt.getId() + " is not compatible to UTF-8: " 
+              + cdt.getValueDescription() + " ==> valueDescription field won't be send!");
+        }
+        
         data.insert("timestamp", cdt.getServerTimestamp().getTime());
         data.insert("sourceTimestamp", cdt.getTimestamp().getTime());
-        data.insert("unit", cdt.getUnit());
+        
+        if (isUTF8(cdt.getUnit())) {
+          data.insert("unit", cdt.getUnit());
+        }
+        else {
+          LOG.warn("Unit of tag " + cdt.getId() + " is not compatible to UTF-8: " 
+              + cdt.getUnit() + " ==> Unit field won't be send!");
+        }
+        
         data.insert("name", cdt.getName());
-        data.insert("description", cdt.getDescription() != null ?  cdt.getDescription() : "");
+        
+        if (isUTF8(cdt.getDescription())) {
+          data.insert("description", cdt.getDescription() != null ? cdt.getDescription() : "");
+        }
+        else {
+          LOG.warn("Description of tag " + cdt.getId() + " is not compatible to UTF-8: " 
+              + cdt.getDescription() + " ==> Decription field won't be send!");
+        }
+        
         data.insert("mode", cdt.getMode().toString());
         data.insert("simulated", cdt.isSimulated());
         data.insert("wiki", DIP_WIKI_URL);
@@ -271,6 +296,23 @@ public class DipPublisher implements Publisher {
   }
   
   /**
+   * Checks whether the given text is <b>UTF-8</b> compatible or not.
+   * @param text the text that shall be checked
+   * @return <code>true</code>, if the text is compatible with UTF-8
+   */
+  private boolean isUTF8(final String text) {
+    try {
+      text.getBytes("UTF-8");
+      return true;
+    }
+    catch (Exception e) {
+      return false;
+    }
+  }
+  
+  
+  
+  /**
    * This class implements DIP error handler
    */
   private static class DIPErrHandler implements DipPublicationErrorHandler {
@@ -281,5 +323,4 @@ public class DipPublisher implements Publisher {
       LOG.error("Publication source " + dp.getTopicName() + " has error: " + de.getMessage());
     }
   } 
-
 }
