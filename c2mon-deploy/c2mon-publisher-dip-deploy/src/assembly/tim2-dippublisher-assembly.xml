@@ -69,6 +69,15 @@
       <lineEnding>unix</lineEnding>
       <fileMode>0444</fileMode>
     </file>
+    
+    <!-- log4cxx configuration -->
+    <file>
+      <source>${basedir}/conf/log4cxx.properties</source>
+      <outputDirectory>conf/</outputDirectory>
+      <destName>log4cxx.properties</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
   </files>
 
 </assembly>

@@ -21,9 +21,13 @@
 [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
            ]]>
         </preExec>
+        <!-- Bash environment variables needed for DIP -->
+        <env name="LOG4CXX_CONFIGURATION" value="${INSTALL_DIR}/conf/log4cxx.properties" />
+        <env name="LD_LIBRARY_PATH" value="${INSTALL_DIR}/lib_so" />
+        
+        <!-- VM arguments -->
         <initial-heap-size>256m</initial-heap-size>
         <max-heap-size>256m</max-heap-size>
-        
         <main-class name="cern.c2mon.publisher.core.PublisherKernel" />
         
         <!-- JVM environment variables -->
