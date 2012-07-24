@@ -84,6 +84,8 @@
             -Dc2mon.client.jms.alarm.topic=c2mon.JmsProxy.test.alarm.topic
             -Dc2mon.client.jms.request.queue=c2mon.JmsProxy.test.request.queue
             -Dc2mon.client.jms.adminmessage.topic=c2mon.JmsProxy.test.adminmessage
+            -Dc2mon.client.request.size=100
+            -Dc2mon.client.request.threads.max=3            
           </argLine>
         </configuration>
       </plugin>
