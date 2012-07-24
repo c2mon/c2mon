@@ -215,8 +215,8 @@ public class DipPublisher implements Publisher {
       if (cdt.getDataTagQuality().isExistingTag()) {
         data.insert("id", cdt.getId().longValue());
         
-        if (isUTF8(cdt.getValueDescription())) {
-          data.insert("valueDescription", cdt.getValueDescription() != null ? cdt.getValueDescription() : "");
+        if (isASCII(cdt.getValueDescription())) {
+          data.insert("valueDescription", cdt.getValueDescription());
         }
         else {
           LOG.warn("valueDescription of tag " + cdt.getId() + " is not compatible to UTF-8: " 
@@ -226,7 +226,7 @@ public class DipPublisher implements Publisher {
         data.insert("timestamp", cdt.getServerTimestamp().getTime());
         data.insert("sourceTimestamp", cdt.getTimestamp().getTime());
         
-        if (isUTF8(cdt.getUnit())) {
+        if (isASCII(cdt.getUnit())) {
           data.insert("unit", cdt.getUnit());
         }
         else {
@@ -236,8 +236,8 @@ public class DipPublisher implements Publisher {
         
         data.insert("name", cdt.getName());
         
-        if (isUTF8(cdt.getDescription())) {
-          data.insert("description", cdt.getDescription() != null ? cdt.getDescription() : "");
+        if (isASCII(cdt.getDescription())) {
+          data.insert("description", cdt.getDescription());
         }
         else {
           LOG.warn("Description of tag " + cdt.getId() + " is not compatible to UTF-8: " 
@@ -300,9 +300,9 @@ public class DipPublisher implements Publisher {
    * @param text the text that shall be checked
    * @return <code>true</code>, if the text is compatible with UTF-8
    */
-  private boolean isUTF8(final String text) {
+  private boolean isASCII(final String text) {
     try {
-      text.getBytes("UTF-8");
+      text.getBytes("ASCII");
       return true;
     }
     catch (Exception e) {
