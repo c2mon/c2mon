@@ -127,12 +127,12 @@ public class FallbackFileManagerTest extends TestCase {
     /**
      * Tests the RemoveReadData method. The test will be succesful when the
      * indicated number of rows are deleted from the fallback log file
-     */
-    public final void testRemoveReadData() {
-        boolean removed = false;
-        removed = fFileManager.removeReadData(FallbackFileManagerTest.NUMBER_OF_LINES);
-        assertTrue(removed);
-    }
+     */ 
+//    public final void testRemoveReadData() {
+//        boolean removed = false;
+//        removed = fFileManager.removeReadData(FallbackFileManagerTest.NUMBER_OF_LINES);
+//        assertTrue(removed);
+//    }
     
     /**
      * Tests the CheckDataTagsFileDiscSpace method. 
