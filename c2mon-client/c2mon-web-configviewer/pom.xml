@@ -1,43 +1,42 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-client</groupId>
-		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.0.10</version>
-	</parent>
-	
-	<groupId>cern.c2mon.c2mon-client</groupId>
-	<artifactId>c2mon-web-configviewer</artifactId>
-	<version>1.0.6-SNAPSHOT</version>
-	<packaging>war</packaging>
-	<name>c2mon-web-configviewer</name>
-	<description>C2MON online configuration viewer (datatag, command, alarm, process viewer)</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-pom</artifactId>
+    <version>1.0.10</version>
+  </parent>
+
+  <groupId>cern.c2mon.c2mon-client</groupId>
+  <artifactId>c2mon-web-configviewer</artifactId>
+  <version>1.0.6-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <name>c2mon-web-configviewer</name>
+  <description>C2MON online configuration viewer (datatag, command, alarm, process viewer)</description>
 
   <dependencies>
-  
+
     <dependency>
-    	<groupId>org.codehaus.jackson</groupId>
-    	<artifactId>jackson-mapper-asl</artifactId>
-    	<version>1.9.4</version>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.4</version>
     </dependency>
     <dependency>
-    	<groupId>org.codehaus.jackson</groupId>
-    	<artifactId>jackson-core-asl</artifactId>
-    	<version>1.9.4</version>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <version>1.9.4</version>
     </dependency>
     <dependency>
-    	<groupId>org.codehaus.jackson</groupId>
-    	<artifactId>jackson-jaxrs</artifactId>
-    	<version>1.9.4</version>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-jaxrs</artifactId>
+      <version>1.9.4</version>
     </dependency>
-  
+
     <!-- C2MON dependency -->
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-all</artifactId>
     </dependency>
-    
+
     <!-- SPRING library dependencies -->
     <dependency>
       <groupId>org.springframework</groupId>
@@ -95,7 +94,7 @@
       <version>${org.springframework.version}</version>
       <scope>runtime</scope>
     </dependency>
-    
+
     <!-- 3rd party library dependencies -->
     <dependency>
       <groupId>log4j</groupId>
@@ -109,7 +108,6 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <scope>compile</scope>
       <version>4.1.0.Final</version>
     </dependency>
     <dependency>
@@ -123,72 +121,51 @@
       <version>1.6.0</version>
     </dependency>
     <dependency>
-    	<groupId>org.apache.tomcat</groupId>
-    	<artifactId>servlet-api</artifactId>
-    	<version>6.0.35</version>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>6.0.35</version>
     </dependency>
-  
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
-	
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-client/c2mon-web-configviewer</developerConnection>
-	</scm>
-	<build>
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-client/c2mon-web-configviewer</developerConnection>
+  </scm>
+  <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.8</version>
-         <configuration>
-          <argLine>          
-            <!-- needed for the client JMS module -->
--Dtim.conf.url="http://timweb.cern.ch/test/javaws/tim2-jviews-viewer/conf/Debug.xml"
--Dc2mon.client.conf.url=http://timweb/test/conf/c2mon-client.properties
--Dc2mon.jdbc.driver=oracle.jdbc.OracleDriver
--Dc2mon.jdbc.ro.url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP) (HOST=dbsrva3103-v.cern.ch) (PORT=10121) )(ADDRESS=(PROTOCOL=TCP) (HOST=dbsrva3203-v.cern.ch) (PORT=10121) )(FAILOVER=on)(LOAD_BALANCE=off)(ENABLE=BROKEN)(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=timdb_s.cern.ch)(FAILOVER_MODE=(TYPE=SELECT)(METHOD=BASIC))))"
--Dc2mon.jdbc.ro.user=timop
--Dc2mon.jdbc.ro.password=tim0pPub
-            <!-- needed for the DIAMOND people -->
-            <!--
-			-Dc2mon.client.jms.url=tcp://jms-diamon-pro1:61640
-			-Dc2mon.client.jms.user=dmn2procl1ent
-			-Dc2mon.client.jms.password=dmn2pr0cl1ent
-			-Dc2mon.client.jms.supervision.topic=dmn2.client.supervision
-			-Dc2mon.client.jms.heartbeat.topic=dmn2.client.heartbeat
-			-Dc2mon.client.jms.request.queue=dmn2.client.request
-			-Dc2mon.client.jms.adminmessage.topic=dmn2.client.adminmessage
-			-Dc2mon.client.jms.controltag.publication.topic=dmn2.controltag
-			
-			-Dc2mon.jdbc.driver=oracle.jdbc.OracleDriver
-			-Dc2mon.jdbc.ro.url="jdbc:oracle:thin:@laserdb"
-			-Dc2mon.jdbc.ro.user=dmnlog_read
-			-Dc2mon.jdbc.ro.password=R3addmn01
-			-->
+        <configuration>
+          <argLine>
+            <!-- needed for the C2MON Client API -->
+            -Dc2mon.client.conf.url=http://timweb/test/conf/c2mon-client.properties
           </argLine>
-        </configuration>      
+        </configuration>
       </plugin>
-      
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-war-plugin</artifactId>
-      <configuration>
-        <webResources>
-          <resource>
-            <directory>${basedir}/WebContent</directory>
-          </resource>
-        </webResources>
-        <warSourceDirectory>WebContent</warSourceDirectory>
-        <warSourceExcludes>WebContent/WEB-INF/lib/*.jar</warSourceExcludes>
-        <webXml>WebContent\WEB-INF\web.xml</webXml>
-      </configuration>
-    </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>${basedir}/WebContent</directory>
+            </resource>
+          </webResources>
+          <warSourceDirectory>WebContent</warSourceDirectory>
+          <warSourceExcludes>WebContent/WEB-INF/lib/*.jar</warSourceExcludes>
+          <webXml>WebContent\WEB-INF\web.xml</webXml>
+        </configuration>
+      </plugin>
 
     </plugins>
   </build>
-	
+
 </project>
