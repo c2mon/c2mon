@@ -26,6 +26,9 @@
 	<xsl:variable name="history_url">
 		historyviewer/
 	</xsl:variable>		
+	<xsl:variable name="history_xml_url">
+		historyviewer/xml/
+	</xsl:variable>		
 	<xsl:variable name="process_xml_url">
 		process/xml/
 	</xsl:variable>
@@ -65,18 +68,20 @@
           background : #66FFFF;
           }
     </style>
-
-        <link rel="stylesheet" type="text/css"
-          href="/c2mon-web-configviewer/css/tim.css" />
-        <link rel="stylesheet" type="text/css"
-          href="/c2mon-web-configviewer/css/webConfigViewer.css" />
-
+				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
+				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
+				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
+				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
       </head>
 
       <body>
         <p class="tagName">
           Data Tag History
           (<xsl:value-of select="/*/@id" />)
+          
+       	<A href="{$base_url}{$history_xml_url}{/*/@id}/" 
+					class="large blue awesome xml_button" target="_blank">View History XML >>
+				</A>	
         </p>
         <table class="inline">
           <tr>

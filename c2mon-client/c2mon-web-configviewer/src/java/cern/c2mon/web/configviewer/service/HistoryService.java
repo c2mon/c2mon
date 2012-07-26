@@ -49,7 +49,8 @@ public class HistoryService {
    * @return XML representation of tag's history 
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
-   * @throws Exception if tag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
+   * @throws Exception if tag was not found or a non-numeric id was requested
+   *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
   public String getHistoryXml(final String dataTagId, final int numberOfRecords) 
@@ -79,7 +80,7 @@ public class HistoryService {
 
     HistoryProvider historyProvider;
     try {
-      historyProvider = C2monServiceGateway.getHistoryManager().getHistoryProviderFactory().createHistoryProvider();
+      historyProvider = gateway.getHistoryManager().getHistoryProviderFactory().createHistoryProvider();
     }
     catch (HistoryProviderException e) {
       logger.error("Can't load any history because a HistoryProvider cannot be created.", e);
@@ -89,7 +90,7 @@ public class HistoryService {
     final long id = Long.parseLong(dataTagId);
     Collection<Long> dataTagIds = new ArrayList<Long>();
     dataTagIds.add(id);
-    final HistoryLoadingManager loadingManager = C2monServiceGateway.getHistoryManager().createHistoryLoadingManager(historyProvider, dataTagIds);
+    final HistoryLoadingManager loadingManager = gateway.getHistoryManager().createHistoryLoadingManager(historyProvider, dataTagIds);
 
     final HistoryLoadingConfiguration configuration = new HistoryLoadingConfiguration();
     configuration.setLoadInitialValues(true);
@@ -129,7 +130,8 @@ public class HistoryService {
    * @throws LoadingParameterException in case of an invalid configurations
    */
   public String generateHtmlResponse(final String dataTagId, final int numberOfRecords) 
-    throws TagIdException, TransformerException, HistoryProviderException, LoadingParameterException {
+    throws TagIdException, TransformerException, 
+      HistoryProviderException, LoadingParameterException {
 
     String xml;
     

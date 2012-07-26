@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import cern.c2mon.client.common.history.exception.HistoryProviderException;
+import cern.c2mon.client.common.history.exception.LoadingParameterException;
 import cern.c2mon.web.configviewer.service.HistoryService;
 import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.FormUtility;
@@ -36,6 +38,11 @@ public class HistoryController {
    * A URL to the history viewer with input form
    * */
   public static final String HISTORY_FORM_URL = "/historyviewer/form";
+  
+  /**
+   * The URL to view the history of a tag in RAW XML format
+   */
+  public static final String HISTORY_XML_URL = HISTORY_URL + "xml";
 
   /**
    * Title for the history form page
@@ -47,6 +54,9 @@ public class HistoryController {
    * */
   public static final String HISTORY_FORM_INSTR = "Enter a tag id to view the last 100 records in History.";
 
+  /** How many records in history to ask for. 100 looks ok! */
+  private static final int HISTORY_RECORDS_TO_ASK_FOR = 100;
+  
   /**
    * A history service
    * */
@@ -80,10 +90,8 @@ public class HistoryController {
   public String viewHistory(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
     logger.info("/historyviewer/{id} " + id);
 
-    int numberOfHistoryRecords = 100; // we ask for that many history records
-
     try {
-      response.getWriter().println(service.generateHtmlResponse(id, numberOfHistoryRecords));
+      response.getWriter().println(service.generateHtmlResponse(id, HISTORY_RECORDS_TO_ASK_FOR));
     } catch (TagIdException e) {
       return ("redirect:" + "/historyviewer/errorform/" + id);
     } catch (TransformerException e) {
@@ -95,6 +103,27 @@ public class HistoryController {
       logger.error(e.getMessage());
     }
     return null;
+  }
+  
+  /**
+   * Displays the History in RAW XML for a tag with the given id.
+   * @param id tag id
+   * @param model Spring MVC Model instance to be filled in before jsp processes it
+   * @return name of a jsp page which will be displayed
+   * */
+  @RequestMapping(value = HISTORY_XML_URL + "/{id}", method = { RequestMethod.GET })
+  public String viewXml(@PathVariable final String id,  final Model model) {
+    logger.info(HISTORY_XML_URL + id);
+    try {
+      model.addAttribute("xml", service.getHistoryXml(id, HISTORY_RECORDS_TO_ASK_FOR));
+    } catch (HistoryProviderException e) {
+      logger.error(e.getMessage());
+      return ("redirect:" + "/historyviewer/errorform/" + id);
+    } catch (LoadingParameterException e) {
+      logger.error(e.getMessage());
+      return ("redirect:" + "/historyviewer/errorform/" + id);
+    }
+    return "raw_xml_views/rawXml";
   }
 
   /**
