@@ -42,7 +42,7 @@
 	<xsl:template match="p">
 		<xsl:copy-of select="." />
 	</xsl:template>
-
+	
   <xsl:template match="/">
     <html>
       <head>
@@ -89,7 +89,17 @@
           </tr>
           
         <xsl:for-each select="history/HistoryTag">
-            <tr>
+        
+        	<!-- Used to display a light-blue line in case of a datatag with invalid quality -->
+					<xsl:variable name="quality_status">
+						<xsl:choose>
+     					<xsl:when test="dataTagQuality/invalidQualityStates/entry">invalid</xsl:when>
+        			<xsl:otherwise>ok</xsl:otherwise>
+   					 </xsl:choose>
+  				</xsl:variable>
+        	
+        
+        	<tr class="{$quality_status}">
               <td>
                 <xsl:value-of select="serverTimestamp" />
               </td>
