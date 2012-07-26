@@ -98,14 +98,23 @@
               </td>
               
               <td>
-        				<xsl:for-each select="dataTagQuality/invalidQualityStates/entry">
+              <xsl:choose>
+              	<xsl:when test="dataTagQuality/invalidQualityStates/entry">
+        					<xsl:for-each select="dataTagQuality/invalidQualityStates/entry">
         					<p>
                 	<xsl:value-of
                   	select="tagQualityStatus" />
                			 -
                		 <xsl:value-of select="string" />
                		 </p>
-								</xsl:for-each>
+									</xsl:for-each>
+              	</xsl:when>
+              	<xsl:otherwise>
+              		 <p>
+              		  OK
+               		 </p>
+								</xsl:otherwise>
+							</xsl:choose>
               </td>
               
               <td>
