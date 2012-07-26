@@ -9,6 +9,8 @@
  */
 package cern.c2mon.notification.test;
 
+import java.io.IOException;
+
 import javax.mail.MessagingException;
 
 import org.junit.Test;
@@ -18,10 +20,10 @@ import cern.c2mon.notification.impl.MailerImpl;
 public class MailterTest {
 
    @Test
-   public void test() throws IllegalArgumentException, MessagingException {
-       MailerImpl mailer = new MailerImpl("diamon-support@cern.ch", "diamonop", "D1agm0nitor", "cernmx.cern.ch");
-       
-       mailer.sendEmail("felix.ehm@cern.ch", "test", "test-body");
+   public void test() throws IllegalArgumentException, MessagingException, IOException {
+
+       //MailerImpl mailer = MailerImpl.fromPropertiesFile("mailer.properties");
+       //mailer.sendEmail("felix.ehm@cern.ch", "test", "test-body");
    }
    
 }
