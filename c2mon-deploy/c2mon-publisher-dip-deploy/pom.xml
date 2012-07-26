@@ -11,7 +11,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>c2mon-publisher-dip-deploy</artifactId>
   <name>Deploys the DIP publisher for the C2MON </name>
-  <version>1.1.0</version>
+  <version>1.1.1-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
