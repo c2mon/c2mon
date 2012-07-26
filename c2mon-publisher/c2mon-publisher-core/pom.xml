@@ -8,7 +8,7 @@
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-publisher-core</artifactId>
   <name>The C2MON publisher core package</name>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <description>Provides the core functionalities which are needed to implement a publisher service for C2MON.</description>
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-publisher-core</developerConnection>
