@@ -122,7 +122,7 @@ public class CommandController {
 
     model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR, COMMAND_FORM_URL, id, COMMAND_URL + id));
     model.addAttribute("err", id);
-    return "errorFormWithData";
+    return "notFoundErrorFormWithData";
   }
 
   /**

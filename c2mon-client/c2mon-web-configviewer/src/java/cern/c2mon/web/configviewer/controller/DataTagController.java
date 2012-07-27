@@ -146,7 +146,7 @@ public class DataTagController {
 
     model.addAllAttributes(FormUtility.getFormModel(TAG_FORM_TITLE, TAG_FORM_INSTR, TAG_FORM_URL, null, null));
     model.addAttribute("err", id);
-    return "errorFormWithData";
+    return "notFoundErrorFormWithData";
   }
 
   /**

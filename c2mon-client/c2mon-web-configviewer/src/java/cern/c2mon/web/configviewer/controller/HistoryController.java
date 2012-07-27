@@ -139,7 +139,7 @@ public class HistoryController {
 
     model.addAllAttributes(FormUtility.getFormModel(HISTORY_FORM_TITLE, HISTORY_FORM_INSTR, HISTORY_FORM_URL, id, HISTORY_URL + id));
     model.addAttribute("err", id);
-    return "errorFormWithData";
+    return "notFoundErrorFormWithData";
   }
 
   /**

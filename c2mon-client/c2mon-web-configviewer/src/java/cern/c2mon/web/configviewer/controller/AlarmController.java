@@ -144,7 +144,7 @@ public class AlarmController {
 
     model.addAllAttributes(FormUtility.getFormModel(ALARM_FORM_TITLE, ALARM_FORM_INSTR, ALARM_FORM_URL, null, null));
     model.addAttribute("err", id);
-    return "errorFormWithData";
+    return "notFoundErrorFormWithData";
   }
 
   /**

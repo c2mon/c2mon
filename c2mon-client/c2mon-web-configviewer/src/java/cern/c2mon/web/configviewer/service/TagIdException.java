@@ -17,6 +17,4 @@ public class TagIdException extends Exception {
     public TagIdException(final String message) {
         super(message);
     }
-    
-
 }
