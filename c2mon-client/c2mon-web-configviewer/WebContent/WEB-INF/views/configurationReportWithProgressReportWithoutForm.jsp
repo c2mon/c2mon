@@ -62,14 +62,11 @@ function startConfigurationRequest() {
         url: "/c2mon-web-configviewer/configloader/progress/start",
         data: { configurationId : ${configurationId} },
 				async: true,
-        success: function(data){
-
-        //Update progressbar
-        $("#progressbar").progressbar({
-						value: data
-				});
-    }, complete: progressFinished
-});
+				complete: progressFinished,
+				error : function(xhr, status, error) {
+		  	  		alert(error + ". Please check the logs for more details about the problem.");
+		  			}
+	});
 }
 
 /**
