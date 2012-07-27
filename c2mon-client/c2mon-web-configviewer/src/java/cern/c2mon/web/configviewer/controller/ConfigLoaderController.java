@@ -2,6 +2,7 @@ package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
 
+import javax.naming.CannotProceedException;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
 
@@ -31,6 +32,7 @@ import cern.tim.util.json.GsonFactory;
 @Controller
 public class ConfigLoaderController {
   
+  /** Used to convert the returned value into JSON format for the AJAX calls */
   private static transient Gson gson = null;
 
   /**
@@ -44,7 +46,7 @@ public class ConfigLoaderController {
   public static final String CONFIG_LOADER_FORM_URL = CONFIG_LOADER_URL + "form";
 
   /**
-   * A REST-style URL to config report viewer, which displays config reports
+   * A URL to config report viewer, which displays config reports
    * in RAW XML
    */
   public static final String CONFIG_LOADER_XML_URL = CONFIG_LOADER_URL + "xml";
@@ -55,7 +57,7 @@ public class ConfigLoaderController {
   public static final String CONFIG_LOADER_PROGRESS_REPORT_URL = CONFIG_LOADER_URL + "progress";
 
   /**
-   * URL for ajax progress report requests.
+   * URL that retrieves a Stored Configuration Report and displays it.
    */
   public static final String CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL = 
     CONFIG_LOADER_PROGRESS_REPORT_URL + "/finalReport/";
@@ -68,7 +70,7 @@ public class ConfigLoaderController {
   /**
    * Description for the config form page
    * */
-  public static final String CONFIG_LOADER_FORM_INSTR = "Enter configuration id.";
+  public static final String CONFIG_LOADER_FORM_INSTR = "Please enter the Configuration the Id you want to apply.";
 
   /**
    * A config loader service
@@ -93,7 +95,7 @@ public class ConfigLoaderController {
   }    
 
   /**
-   * Displays configuration in RAW XML format.
+   * Displays configuration report in RAW XML format.
    * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
@@ -110,8 +112,10 @@ public class ConfigLoaderController {
   }
 
   /**
-   * Displays configuration for the given id.
-   * @param id config id
+   * Applies the configuration for the given Configuration Id
+   * and also displays the generated configuration report.
+   * 
+   * @param id the configuration it to be applied
    * @param response we write the html result to that HttpServletResponse response
    * @return nothing
    * @throws IOException 
@@ -122,17 +126,23 @@ public class ConfigLoaderController {
     try {
       response.getWriter().println(service.generateHtmlResponse(id));
     } catch (TransformerException e) {
+      response.setStatus(400);
       response.getWriter().println(e.getMessage());
       logger.error(e.getMessage());
     } catch (TagIdException e) {
       return ("redirect:" + "/configloader/errorform/" + id);
+    } catch (CannotProceedException e) {
+      response.setStatus(400);
+      response.getWriter().println(e.getMessage());
+      logger.error(e.getMessage());
     }
     return null;
   }
 
   /**
-   * Displays configuration for the given id.
-   * @param id config id
+   * Retrieves a stored Configuration Report and displays it.
+   * 
+   * @param id the Configuration Report id
    * @param response we write the html result to that HttpServletResponse response
    * @return nothing
    * @throws IOException
@@ -143,10 +153,15 @@ public class ConfigLoaderController {
     try {
       response.getWriter().println(service.getStoredConfigurationReportHtml(id));
     } catch (TransformerException e) {
+      response.setStatus(400);
       response.getWriter().println(e.getMessage());
       logger.error(e.getMessage());
     } catch (TagIdException e) {
       return ("redirect:" + "/configloader/errorform/" + id);
+    } catch (CannotProceedException e) {
+      response.setStatus(400);
+      response.getWriter().println(e.getMessage());
+      logger.error(e.getMessage());
     }
     return null;
   }  
@@ -164,7 +179,7 @@ public class ConfigLoaderController {
 
     model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
     model.addAttribute("err", id);
-    return "errorFormWithData";
+    return "notFoundErrorFormWithData";
   }
 
   /**
@@ -238,12 +253,15 @@ public class ConfigLoaderController {
    * Starts an applyConfiguration request to the server.
    * Listens for Progress Report updates.
    * @param configurationId the id of the configuration
-   * @throws InterruptedException in case of error
+   * @throws Exception 
    */
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_REPORT_URL + "/start", method = RequestMethod.POST)
-  public void startConfigurationProcess(@RequestParam("configurationId") final String configurationId) throws InterruptedException {
+  public void startConfigurationProcess(@RequestParam("configurationId") final String configurationId) 
+      throws Exception {
+    
     logger.info("(AJAX) Starting Configuration Request: " + configurationId);
-    service.getConfigurationReportWithReportUpdates(Integer.parseInt(configurationId));
+    throw new Exception("Need food!!");
+//    service.getConfigurationReportWithReportUpdates(Integer.parseInt(configurationId));
   }
 
   /**
@@ -257,7 +275,7 @@ public class ConfigLoaderController {
 
     logger.info("(AJAX) Received Progress Report Request for configurationId:" + configurationId);
 
-    ClientRequestProgressReport report = service.getReportForConfiguration(configurationId);
+    ClientRequestProgressReport report = service.getProgressReportForConfiguration(configurationId);
     if (report == null) {
       return 0;
     }
@@ -281,14 +299,16 @@ public class ConfigLoaderController {
 
     logger.info("(AJAX) Received Progress Description Request for configurationId:" + configurationId);
 
-    ClientRequestProgressReport report = service.getReportForConfiguration(configurationId);
-    if (report == null) {
-      return null;
+    ClientRequestProgressReport report = service.getProgressReportForConfiguration(configurationId);
+    String progressDescription = "";
+    
+    if (report != null) {
+      progressDescription =  report.getProgressDescription();
     }
     // @ResponseBody will automatically convert the returned value into JSON format
     // You must have Jackson in your classpath
     // Jackson does not work as expected.. so Gson is used for this case
-    return getGson().toJson(report.getProgressDescription());
+    return getGson().toJson(progressDescription);
   }
   
   /**
