@@ -260,8 +260,7 @@ public class ConfigLoaderController {
       throws Exception {
     
     logger.info("(AJAX) Starting Configuration Request: " + configurationId);
-    throw new Exception("Need food!!");
-//    service.getConfigurationReportWithReportUpdates(Integer.parseInt(configurationId));
+    service.getConfigurationReportWithReportUpdates(Integer.parseInt(configurationId));
   }
 
   /**
