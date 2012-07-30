@@ -43,26 +43,6 @@ Alarm Publications
 
 <!-- 
 
-Publication to Tag updates
-
- -->
-
-<!-- plugged into ActiveJmsSender -->
-<bean id="clientTopicPublisherJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-  <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
-  <property name="explicitQosEnabled" value="true"/>
-  <property name="timeToLive" value="5400000"/>
-  <property name="deliveryPersistent" value="false" /> 
-  <property name="sessionTransacted" value="false" />
-</bean>
-
-<!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
-<bean name="clientTopicPublisher" class="cern.tim.util.jms.ActiveJmsSender">
-  <property name="jmsTemplate" ref="clientTopicPublisherJmsTemplate"></property>
-</bean>
-
-<!-- 
-
 Publication of Supervision events
 
  -->
