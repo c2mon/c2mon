@@ -209,8 +209,10 @@ public class DipPublisher implements Publisher {
           data.insert(VALUE_FIELD_NAME, ((String) cdt.getValue()));
           break;
         default:
-          LOG.error("\ttag's type is UNKNOWN for tag " + cdt.getId());
-          LOG.info("\tthe tag update for tag " + cdt.getId() + " will not be forwarded to DIP");
+          LOG.warn("\tvalue type is UNKNOWN for tag " + cdt.getId());
+          LOG.info("\tthe quality of tag " + cdt.getId() + " will be set to bad. Reason: Uninitialized");
+          pub.setQualityBad("Value is currently uninitialized in the system. Please verify it with the TIM Viewer.");
+          return;
       }
 
       if (cdt.getDataTagQuality().isExistingTag()) {
@@ -222,6 +224,7 @@ public class DipPublisher implements Publisher {
         else {
           LOG.warn("valueDescription of tag " + cdt.getId() + " is not compatible to US-ASCII: " 
               + cdt.getValueDescription() + " ==> valueDescription field won't be send!");
+          data.insert("valueDescription", "");
         }
         
         data.insert("timestamp", cdt.getServerTimestamp().getTime());
@@ -233,6 +236,7 @@ public class DipPublisher implements Publisher {
         else {
           LOG.warn("Unit of tag " + cdt.getId() + " is not compatible to US-ASCII: " 
               + cdt.getUnit() + " ==> Unit field won't be send!");
+          data.insert("unit", "");
         }
         
         data.insert("name", cdt.getName());
@@ -243,6 +247,7 @@ public class DipPublisher implements Publisher {
         else {
           LOG.warn("Description of tag " + cdt.getId() + " is not compatible to US-ASCII: " 
               + cdt.getDescription() + " ==> Decription field won't be send!");
+          data.insert("description", "");
         }
         
         data.insert("mode", cdt.getMode().toString());
@@ -284,7 +289,7 @@ public class DipPublisher implements Publisher {
       else {
         LOG.warn("setting publication QUALITY to BAD for tag " + cdt.getId() + " - Reason: UNKNOWN");
         pub.setQualityBad("The requested TIM tag " + cdt.getId()
-            + " is not known by the system or the DIP publisher for TIM has a communication problem with the server.");
+            + " is not known by the system or the DIP publisher has a communication problem with the server.");
       }
     }
     catch (DipException ex) {
