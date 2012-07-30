@@ -18,8 +18,6 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.server.alarm.AlarmAggregator;
 import cern.tim.server.alarm.AlarmAggregatorListener;
-import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.common.alarm.TagWithAlarmsImpl;
@@ -52,12 +50,6 @@ public class TagValuePublisher implements AlarmAggregatorListener, Publisher<Tag
   /** Listens for Tag updates, evaluates all associated alarms and passes the result */
   private final AlarmAggregator alarmAggregator;
   
-  /** For re-publication */
-  private TagLocationService tagLocationService;
-  
-  /** For re-publication */
-  private AlarmCache alarmCache;
-  
   /** Contains re-publication logic */
   private Republisher<TagWithAlarms> republisher;
   
@@ -71,14 +63,10 @@ public class TagValuePublisher implements AlarmAggregatorListener, Publisher<Tag
    */
   @Autowired
   public TagValuePublisher(@Qualifier("clientTopicPublisher") final JmsSender jmsSender, 
-                           final AlarmAggregator alarmAggregator,
-                           final TagLocationService tagLocationService,
-                           final AlarmCache alarmCache) {
+                           final AlarmAggregator alarmAggregator) {
     this.jmsSender = jmsSender;
-    this.alarmAggregator = alarmAggregator;
-    this.tagLocationService = tagLocationService;
-    this.republisher = RepublisherFactory.createRepublisher(this, "Tag");   
-    this.alarmCache = alarmCache;
+    this.alarmAggregator = alarmAggregator;   
+    this.republisher = RepublisherFactory.createRepublisher(this, "Tag");       
   }
   
   /**
