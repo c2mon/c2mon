@@ -29,8 +29,6 @@ import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.server.alarm.AlarmAggregator;
-import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.TagLocationService;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.datatag.DataTag;
 import cern.tim.server.common.tag.Tag;
@@ -62,9 +60,7 @@ public class TagValuePublisherTest {
    * Mocks of other modules.
    */
   private AlarmAggregator alarmAggregator;  
-  private TagLocationService tagLocationService;
-  private AlarmCache alarmCache;
-  
+
   /**
    * Instantiated in XML.
    */
@@ -84,17 +80,15 @@ public class TagValuePublisherTest {
   
   @Before
   public void setUp() {    
-    alarmAggregator = control.createMock(AlarmAggregator.class);
-    tagLocationService = control.createMock(TagLocationService.class);
-    alarmCache = control.createMock(AlarmCache.class);
+    alarmAggregator = control.createMock(AlarmAggregator.class);   
     //alarmAggregator.registerForTagUpdates(tagValuePublisher);
-    tagValuePublisher = new TagValuePublisher(jmsSender, alarmAggregator, tagLocationService, alarmCache);
+    tagValuePublisher = new TagValuePublisher(jmsSender, alarmAggregator);
     tagValuePublisher.setRepublicationDelay(1000);
     tagValuePublisher.init();
   }
   
   @After
-  public void afterTest(){
+  public void afterTest() {
     tagValuePublisher.shutdown();
   }
   
