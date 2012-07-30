@@ -10,8 +10,9 @@
     <property name="ignoreResourceNotFound" value="true" />
     <property name="locations">
       <list>
-        <value>file:${c2mon.statistics.web.properties.location}</value>
+        <!-- default properties first - will be overridden by successive successful loads -->
         <value>classpath:cern/c2mon/statistics/web/site.properties</value>
+        <value>file:${c2mon.statistics.web.properties.location}</value>        
       </list>
     </property>
   </bean>
