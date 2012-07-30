@@ -89,7 +89,7 @@ public class TagValuePublisherTest {
     alarmCache = control.createMock(AlarmCache.class);
     //alarmAggregator.registerForTagUpdates(tagValuePublisher);
     tagValuePublisher = new TagValuePublisher(jmsSender, alarmAggregator, tagLocationService, alarmCache);
-    tagValuePublisher.setRepublicationDelay(100);
+    tagValuePublisher.setRepublicationDelay(1000);
     tagValuePublisher.init();
   }
   
@@ -142,6 +142,9 @@ public class TagValuePublisherTest {
     }
   }  
   
+  /**
+   * Listens for 1s for updates on the tag topic.
+   */
   private Thread startListenerThread(final Tag tag) {
     // start listener in separate thread (to catch update to topic)
     Thread listenerThread = new Thread(new Runnable() {
@@ -150,12 +153,12 @@ public class TagValuePublisherTest {
       public void run() {
         try {
           JmsTemplate template = new JmsTemplate(testBrokerService.getConnectionFactory());
-          template.setReceiveTimeout(500);
+          template.setReceiveTimeout(1000);
           Message message = template.receive(new ActiveMQTopic(tag.getTopic()));                   
           synchronized (updateLock) {
             update = TransferTagValueImpl.fromJson(((TextMessage) message).getText());
           }                                  
-        } catch (Exception e) {
+        } catch (Exception e) {          
           update = null;          
         }       
       }
@@ -188,12 +191,13 @@ public class TagValuePublisherTest {
     
     control.replay();
     tagValuePublisher.notifyOnUpdate(tag, alarms);
-    listenerThread.join(1000);
+    listenerThread.join(1000); //will fail after 100ms (failover timeout)
     assertTrue(update == null); //update failed as broker stopped
    
-    Thread.sleep(1000); //allow a number of republications to fail
-    listenerThread = startListenerThread(tag); //new thread
-    testBrokerService.createAndStartBroker(); //only start broker once listener thread is running, or will miss the re-publication!      
+    Thread.sleep(1000); //allow another republication to fail (after 1s=republication delay)
+                        //then start broker & listener before next republication attempt!
+    testBrokerService.createAndStartBroker();  //connection to listener thread must have time to establish itself before republication
+    listenerThread = startListenerThread(tag); //new thread     
     
     listenerThread.join(1000);
     
