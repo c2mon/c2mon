@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.JmsException;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
@@ -39,6 +41,7 @@ import cern.tim.util.jms.JmsSender;
  * @see TagValueUpdate
  */
 @Service
+@ManagedResource(description = "Bean publishing tag updates to the clients")
 public class TagValuePublisher implements AlarmAggregatorListener, Publisher<TagWithAlarms> {
 
   private static final Logger LOGGER = Logger.getLogger(TagValuePublisher.class); 
@@ -134,8 +137,24 @@ public class TagValuePublisher implements AlarmAggregatorListener, Publisher<Tag
   /**
    * @param republicationDelay the republicationDelay to set
    */
-  public void setRepublicationDelay(int republicationDelay) {
+  public void setRepublicationDelay(final int republicationDelay) {
     this.republicationDelay = republicationDelay;
+  }
+  
+  /**
+   * @return the total number of failed publications since the publisher start
+   */
+  @ManagedOperation(description = "Returns the total number of failed publication attempts since the application started")  
+  public long getNumberFailedPublications() {
+    return republisher.getNumberFailedPublications();
+  }
+
+  /**
+   * @return the number of current tag updates awaiting publication to the clients
+   */
+  @ManagedOperation(description = "Returns the current number of events awaiting re-publication (should be 0 in normal operation)")  
+  public int getSizeUnpublishedList() {    
+    return republisher.getSizeUnpublishedList();
   }
   
   
