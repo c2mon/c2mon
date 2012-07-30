@@ -172,7 +172,8 @@
     </layout>
   </appender>  
   
-  <appender name="AdministratorEmail" class="org.apache.log4j.net.SMTPAppender">  
+  <appender name="AdministratorEmail" class="org.apache.log4j.net.SMTPAppender">
+    <param name="BufferSize" value="1" /> 
   	<param name="SMTPHost" value="cernmx.cern.ch" />
   	<param name="From" value="tim.support@cern.ch" />
   	<param name="To" value="mark.brightwell@cern.ch,Matthias.Braeger@cern.ch" />
@@ -186,7 +187,8 @@
   	</filter>
   </appender>
   
-  <appender name="DevelopperEmail" class="org.apache.log4j.net.SMTPAppender">  
+  <appender name="DevelopperEmail" class="org.apache.log4j.net.SMTPAppender">
+    <param name="BufferSize" value="1" />   
     <param name="SMTPHost" value="cernmx.cern.ch" />
     <param name="From" value="tim.support@cern.ch" />
     <param name="To" value="mark.brightwell@cern.ch" />
