@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # The SMILE HTTP link to fetch the JAPC publication list 
-JAPC_PUBLICATIONS_TID_URL="https://oraweb.cern.ch/pls/timw3/smile.queryDisplay?nType=4&Tablename=VSML_360JAPCPUBPTS&vHeader=POINT_ID&vSelect=POINT_ID"
+JAPC_PUBLICATIONS_TID_URL="https://oraweb.cern.ch/pls/timw3/smile.queryDisplay?nType=4&Tablename=VCONF_TIMPUB_PTS&vHeader=POINT_ID&vSelect=POINT_ID&vClause=PUB_TYPE='RDA'"
 
 # resolve links - $0 may be a softlink
 PRG="$0"
