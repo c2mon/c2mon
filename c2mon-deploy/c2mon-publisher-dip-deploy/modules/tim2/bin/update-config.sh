@@ -18,7 +18,7 @@ if [ "$1" == "" -o "$1" != "DIPPub01" -a "$1" != "DIPPub02" ] ; then
 fi
 
 # The SMILE HTTP link to fetch the DIP publication list 
-DIP_PUBLICATIONS_TID_URL="https://oraweb.cern.ch/pls/timw3/smile.queryDisplay?nType=4&Tablename=VSML_280DIPPUBPTS&vHeader=POINT_ID&vSelect=POINT_ID&vClause=DIP_PUBLISHER='${PROCESS_NAME}'"
+DIP_PUBLICATIONS_TID_URL="https://oraweb.cern.ch/pls/timw3/smile.queryDisplay?nType=4&Tablename=VCONF_TIMPUB_PTS&vHeader=POINT_ID&vSelect=POINT_ID&vClause=PUBLISHER='${PROCESS_NAME}'"
 
 while [ -h "$PRG" ] ; do
   ls=`ls -ld "$PRG"`
