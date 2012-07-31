@@ -16,9 +16,7 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagConfigImpl;
-import cern.c2mon.web.configviewer.service.ServiceGateway;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
-import cern.tim.shared.common.datatag.TagQualityStatus;
 
 /**
  * Datatag service providing the XML representation of a given datatag
@@ -132,7 +130,7 @@ public class TagService {
    * @param dataTagId id of the datatag
    * @return tag value 
    * */
-  private ClientDataTagValue getDataTagValue(final long dataTagId) {
+  public ClientDataTagValue getDataTagValue(final long dataTagId) {
     ClientDataTagValue dt = null;
     List<Long> tagIds = new ArrayList<Long>();
     tagIds.add(dataTagId);

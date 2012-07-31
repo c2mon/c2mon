@@ -1,16 +1,6 @@
 package cern.c2mon.web.configviewer.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +8,6 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
-import cern.c2mon.web.configviewer.service.ServiceGateway;
-import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**

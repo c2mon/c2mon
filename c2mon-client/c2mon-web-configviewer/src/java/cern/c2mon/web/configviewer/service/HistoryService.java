@@ -18,7 +18,6 @@ import cern.c2mon.client.common.history.HistoryProvider;
 import cern.c2mon.client.common.history.HistoryTagValueUpdate;
 import cern.c2mon.client.common.history.exception.HistoryProviderException;
 import cern.c2mon.client.common.history.exception.LoadingParameterException;
-import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
