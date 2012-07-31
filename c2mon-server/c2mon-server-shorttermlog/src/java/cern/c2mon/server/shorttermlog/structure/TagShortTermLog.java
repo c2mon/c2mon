@@ -40,6 +40,9 @@ public class TagShortTermLog implements IFallback, Loggable {
     
     /** Data tag value */
     private String tagValue;
+    
+    /** Tag value description */
+    private String tagValueDesc;
 
     /** Data tag type */
     private String tagDataType;
@@ -274,7 +277,9 @@ public class TagShortTermLog implements IFallback, Loggable {
                  
             } else {
                 dtShortTermLog.setTagValue(tagValue);    
-            }            
+            } 
+            currentValue = value[j++];
+            dtShortTermLog.setTagValueDesc(currentValue.equals("null") ? null : currentValue);            
             dtShortTermLog.setTagDataType(value[j++]);
             currentValue = value[j++];
             dtShortTermLog.setSourceTimestamp(currentValue.equals("null") ? null : Timestamp.valueOf(currentValue));
@@ -323,6 +328,8 @@ public class TagShortTermLog implements IFallback, Loggable {
             str.append("null");
         }
         str.append('\t');
+        str.append(getTagValueDesc());
+        str.append('\t');
         str.append(getTagDataType());
         str.append('\t');
         str.append(getSourceTimestamp());
@@ -353,47 +360,7 @@ public class TagShortTermLog implements IFallback, Loggable {
      */
     public final String getId() {
         return String.valueOf(this.getTagId());
-    }
-
-    /**
-     * Compares two objects of the same class. The objects will be equal when
-     * its properties have the same values
-     * 
-     * @param obj
-     *            DataTagShortTermLog object to which we want to compare the
-     *            current one
-     * @return A boolean value indicating whether the two objects are considered
-     *         equals (true) or not (false)
-     */
-    public final boolean equals(final Object obj) {
-        boolean equal = false;
-
-        TagShortTermLog dt = (TagShortTermLog) obj;
-        if ((dt.getTagId() == this.getTagId()) && dt.getTagName().equals(this.getTagName())
-                && (dt.getTagDir().equals(this.getTagDir()))
-                && dt.getTagMode() == this.getTagMode()
-                && dt.getTagQualityCode() == this.getTagQualityCode()
-                && dt.getTagQualityDesc().equals(this.getTagQualityDesc())
-                && dt.getTagValue().equals(this.getTagValue())
-                && dt.getTagDataType().equals(this.getTagDataType())
-                && this.getSourceTimestamp().equals(this.getSourceTimestamp()) 
-                && this.getDaqTimestamp().equals(this.getDaqTimestamp()) 
-                && this.getServerTimestamp().equals(this.getServerTimestamp()) 
-                && dt.getTagDir().equals(this.getTagDir())) {
-            equal = true;
-        }
-        return equal;
-    }
-
-    /**
-     * Overrides the hashCode method as required when overriding the "equals"
-     * method.
-     * 
-     * @return Int value representing the hashcode of the object
-     */
-    public final int hashCode() {
-        return this.getId().hashCode();
-    }
+    }    
 
     /**
      * Implementation for generic logging functionality (see {@link Loggable}).
@@ -429,6 +396,114 @@ public class TagShortTermLog implements IFallback, Loggable {
      */
     public void setServerTimestamp(Timestamp serverTimestamp) {
       this.serverTimestamp = serverTimestamp;
+    }
+
+    /**
+     * @param tagValueDesc the value description to set
+     */
+    public void setTagValueDesc(String tagValueDesc) {
+      this.tagValueDesc = tagValueDesc;
+    }
+
+    /**
+     * @return Tag value description
+     */
+    public String getTagValueDesc() {
+      return tagValueDesc;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((daqTimestamp == null) ? 0 : daqTimestamp.hashCode());
+      result = prime * result + ((logDate == null) ? 0 : logDate.hashCode());
+      result = prime * result + ((serverTimestamp == null) ? 0 : serverTimestamp.hashCode());
+      result = prime * result + ((sourceTimestamp == null) ? 0 : sourceTimestamp.hashCode());
+      result = prime * result + ((tagDataType == null) ? 0 : tagDataType.hashCode());
+      result = prime * result + ((tagDir == null) ? 0 : tagDir.hashCode());
+      result = prime * result + (int) (tagId ^ (tagId >>> 32));
+      result = prime * result + tagMode;
+      result = prime * result + ((tagName == null) ? 0 : tagName.hashCode());
+      result = prime * result + tagQualityCode;
+      result = prime * result + ((tagQualityDesc == null) ? 0 : tagQualityDesc.hashCode());
+      result = prime * result + ((tagValue == null) ? 0 : tagValue.hashCode());
+      result = prime * result + ((tagValueDesc == null) ? 0 : tagValueDesc.hashCode());
+      return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      TagShortTermLog other = (TagShortTermLog) obj;
+      if (daqTimestamp == null) {
+        if (other.daqTimestamp != null)
+          return false;
+      } else if (!daqTimestamp.equals(other.daqTimestamp))
+        return false;
+      if (logDate == null) {
+        if (other.logDate != null)
+          return false;
+      } else if (!logDate.equals(other.logDate))
+        return false;
+      if (serverTimestamp == null) {
+        if (other.serverTimestamp != null)
+          return false;
+      } else if (!serverTimestamp.equals(other.serverTimestamp))
+        return false;
+      if (sourceTimestamp == null) {
+        if (other.sourceTimestamp != null)
+          return false;
+      } else if (!sourceTimestamp.equals(other.sourceTimestamp))
+        return false;
+      if (tagDataType == null) {
+        if (other.tagDataType != null)
+          return false;
+      } else if (!tagDataType.equals(other.tagDataType))
+        return false;
+      if (tagDir == null) {
+        if (other.tagDir != null)
+          return false;
+      } else if (!tagDir.equals(other.tagDir))
+        return false;
+      if (tagId != other.tagId)
+        return false;
+      if (tagMode != other.tagMode)
+        return false;
+      if (tagName == null) {
+        if (other.tagName != null)
+          return false;
+      } else if (!tagName.equals(other.tagName))
+        return false;
+      if (tagQualityCode != other.tagQualityCode)
+        return false;
+      if (tagQualityDesc == null) {
+        if (other.tagQualityDesc != null)
+          return false;
+      } else if (!tagQualityDesc.equals(other.tagQualityDesc))
+        return false;
+      if (tagValue == null) {
+        if (other.tagValue != null)
+          return false;
+      } else if (!tagValue.equals(other.tagValue))
+        return false;
+      if (tagValueDesc == null) {
+        if (other.tagValueDesc != null)
+          return false;
+      } else if (!tagValueDesc.equals(other.tagValueDesc))
+        return false;
+      return true;
     }
 
 }

@@ -46,6 +46,7 @@ public class DataTagLogMapperTest {
   private static final Long ID = 10L;
   private static final String DATATYPE = "Integer";
   private static final String TAGVALUE = "25";
+  private static final String TAGVALUEDESC = "Tag value description";
   private static final java.sql.Timestamp TAGTIME = new java.sql.Timestamp(System.currentTimeMillis()); 
   private static final java.sql.Timestamp LOGTIME = new java.sql.Timestamp(System.currentTimeMillis()+1000); 
     
@@ -91,6 +92,7 @@ public class DataTagLogMapperTest {
     dataTagShortTermLog.setDaqTimestamp(TAGTIME);
     dataTagShortTermLog.setServerTimestamp(TAGTIME);    
     dataTagShortTermLog.setTagValue(TAGVALUE);
+    dataTagShortTermLog.setTagValueDesc(TAGVALUEDESC);
     dataTagLogMapper.insertLog(dataTagShortTermLog);
   }
   
@@ -109,6 +111,7 @@ public class DataTagLogMapperTest {
     dataTagShortTermLog.setDaqTimestamp(TAGTIME); 
     dataTagShortTermLog.setServerTimestamp(TAGTIME); 
     dataTagShortTermLog.setTagValue(TAGVALUE);
+    dataTagShortTermLog.setTagValue(TAGVALUEDESC);
     dataTagShortTermLog.setTimezone(TimeZone.getDefault().getID());
     dataTagLogMapper.insertLog(dataTagShortTermLog);
   }

@@ -15,7 +15,7 @@
     stored in the DataTagShortTermLog object
   -->
   <insert id="insertLog" parameterType="DataTagSTLog">
-    INSERT INTO shorttermlog (LOGDATE, TAGID, TAGNAME, TAGVALUE,
+    INSERT INTO shorttermlog (LOGDATE, TAGID, TAGNAME, TAGVALUE, TAGVALUEDESC,
     TAGDATATYPE,
     TAGSTATUS, TAGSTATUSDESC, TAGMODE, TAGDIR, TAGTIME, TAGDAQTIME, TAGSERVERTIME)
     VALUES (
@@ -23,7 +23,7 @@
     <if test="logDate != null">SYS_EXTRACT_UTC(from_tz(#{logDate,jdbcType=TIMESTAMP},'${timezone}'))</if>
     <!-- The logDate is null, what means that comes from a DAQ -->
     <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>
-    ,#{tagId,jdbcType=NUMERIC},#{tagName,jdbcType=VARCHAR},#{tagValue,jdbcType=VARCHAR}
+    ,#{tagId,jdbcType=NUMERIC},#{tagName,jdbcType=VARCHAR},#{tagValue,jdbcType=VARCHAR},#{tagValueDesc,jdbcType=VARCHAR}
     ,#{tagDataType,jdbcType=VARCHAR},#{tagQualityCode,jdbcType=NUMERIC}
     ,#{tagQualityDesc,jdbcType=VARCHAR},#{tagMode,jdbcType=NUMERIC}
     ,'I',#{sourceTimestamp,jdbcType=TIMESTAMP},

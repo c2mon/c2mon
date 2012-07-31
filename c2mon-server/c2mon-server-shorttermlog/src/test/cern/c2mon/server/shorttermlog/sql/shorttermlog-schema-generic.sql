@@ -3,6 +3,7 @@ logdate           DATE          NOT NULL,
 tagid             INTEGER     NOT NULL,
 tagname           VARCHAR(60),
 tagvalue          VARCHAR(4000),
+TAGVALUEDESC      VARCHAR(500),
 tagdatatype       VARCHAR(10),
 tagtime           TIMESTAMP(6),
 tagservertime     TIMESTAMP(6) NOT NULL,
@@ -32,7 +33,7 @@ logdate       DATE
 ,tagservertime TIMESTAMP(6)
 ,tagdaqtime    TIMESTAMP(6)
 ,tagstatus     INTEGER
-,tagstatusdesc VARCHAR(500)
+,tagstatusdesc VARCHAR(1000)
 ,tagmode       INTEGER
 ) tablespace LOGDATA;
 

@@ -10,6 +10,7 @@ logdate           DATE          NOT NULL,
 tagid             NUMBER(9)     NOT NULL,
 tagname           VARCHAR2(60),
 tagvalue          VARCHAR2(4000),
+TAGVALUEDESC      VARCHAR2(500),
 tagdatatype       VARCHAR2(10),
 tagtime           TIMESTAMP(6),
 tagservertime     TIMESTAMP(6) NOT NULL,
@@ -98,7 +99,7 @@ logdate       DATE
 ,tagservertime TIMESTAMP(6)
 ,tagdaqtime    TIMESTAMP(6)
 ,tagstatus     number(3)
-,tagstatusdesc VARCHAR2(500)
+,tagstatusdesc VARCHAR2(1000)
 ,tagmode       NUMBER(1)
 ) tablespace LOGDATA;
 

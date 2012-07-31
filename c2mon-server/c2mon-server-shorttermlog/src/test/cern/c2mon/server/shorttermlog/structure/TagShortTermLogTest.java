@@ -24,7 +24,8 @@ public class TagShortTermLogTest {
     Timestamp ts3 = new Timestamp(System.currentTimeMillis()-5);    
     dtSTLog.setTagId(10L);
     dtSTLog.setTagName("name");    
-    dtSTLog.setTagValue("1223");    
+    dtSTLog.setTagValue("1223"); 
+    dtSTLog.setTagValueDesc("value desc");
     dtSTLog.setTagDataType("Integer");   
     dtSTLog.setSourceTimestamp(ts);
     dtSTLog.setDaqTimestamp(ts2);    
@@ -78,12 +79,24 @@ public class TagShortTermLogTest {
     //log date is set when logging to file
     assertNotNull(retrievedLog.getLogDate());
   }
+  
+  @Test
+  public void testEncodingWithNullValueDesc() throws DataFallbackException {
+    TagShortTermLog log = getTag();
+    log.setTagValueDesc(null);
+    String encoded = log.toString();
+    TagShortTermLog retrievedLog = (TagShortTermLog) log.getObject(encoded);
+    assertSameLog(log, retrievedLog);
+    //log date is set when logging to file
+    assertNotNull(retrievedLog.getLogDate());
+  }
 
   private void assertSameLog(TagShortTermLog log, TagShortTermLog retrievedLog) {
     assertEquals(log.getTagId(), retrievedLog.getTagId());
     assertEquals(log.getTagName(), retrievedLog.getTagName());
     assertEquals(log.getTagDataType(), retrievedLog.getTagDataType());
     assertEquals(log.getTagValue(), retrievedLog.getValue());
+    assertEquals(log.getTagValueDesc(), retrievedLog.getTagValueDesc());
     assertEquals(log.getSourceTimestamp(), retrievedLog.getSourceTimestamp());
     assertEquals(log.getDaqTimestamp(), retrievedLog.getDaqTimestamp());
     assertEquals(log.getServerTimestamp(), retrievedLog.getServerTimestamp());
