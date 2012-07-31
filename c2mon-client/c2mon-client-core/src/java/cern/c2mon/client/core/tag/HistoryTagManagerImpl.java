@@ -51,6 +51,11 @@ public class HistoryTagManagerImpl implements HistoryTagManager {
   }
 
   @Override
+  public HistoryTag createHistoryTag(String expression, boolean allowNullValues) {
+    return new HistoryTagImpl(expression, allowNullValues);
+  }
+
+  @Override
   public HistoryTag createHistoryTag(final HistoryTagConfiguration configuration) {
     return new HistoryTagImpl(configuration);
   }
