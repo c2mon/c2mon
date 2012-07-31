@@ -36,6 +36,24 @@ public interface HistoryTagManager {
    *         configuration.
    */
   HistoryTag createHistoryTag(String expression);
+  
+  /**
+   * Creates a history tag based on the <code>expression</code>. Note that
+   * {@link #subscribeToConfiguration(HistoryTagConfiguration, HistoryTagManagerListener)}
+   * should be called after creating it. (Else it won't do much)
+   * 
+   * @param expression
+   *          an expression created with the
+   *          {@link HistoryTagConfiguration#createExpression()}
+   *          
+   * @param allowNullValues 
+   *  Whether null values are allowed or not. In case this is false,
+   *  null values will be removed.
+   * 
+   * @return a history tag with the given <code>expression</code> as the
+   *         configuration.
+   */
+  HistoryTag createHistoryTag(String expression, boolean allowNullValues);
 
   /**
    * Creates a history tag based on the <code>configuration</code>. Note that
