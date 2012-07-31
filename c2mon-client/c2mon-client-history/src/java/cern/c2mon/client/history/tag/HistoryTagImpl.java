@@ -111,15 +111,31 @@ public class HistoryTagImpl implements HistoryTag {
    *          {@link HistoryTagConfiguration#createExpression()}
    */
   public HistoryTagImpl(final String expression) {
-    this(createHistoryTagConfiguration(expression), expression);
+    this(createHistoryTagConfiguration(expression), expression, true);
   }
-
+  
+  /**
+   * The history tag must be subscribed for data tag updates, and for history
+   * data.
+   * 
+   * @see HistoryTagManager#subscribe(HistoryTagImpl)
+   * @see C2monTagManager#subscribeDataTags(java.util.Set,
+   *      DataTagUpdateListener)
+   * @param expression
+   *          an expression created with the
+   *          {@link HistoryTagConfiguration#createExpression()}
+   * @param allowNullValues Whether Null values are allowed as a result, or should be removed.
+   */
+  public HistoryTagImpl(final String expression, final boolean allowNullValues) {
+    this(createHistoryTagConfiguration(expression), expression, allowNullValues);
+  }
+  
   /**
    * @param historyTagConfiguration
    *          the configuration to use for the history tag
    */
   public HistoryTagImpl(final HistoryTagConfiguration historyTagConfiguration) {
-    this(historyTagConfiguration, null);
+    this(historyTagConfiguration, null, true);
   }
 
   /**
@@ -128,15 +144,18 @@ public class HistoryTagImpl implements HistoryTag {
    * @param expression
    *          the expression used to create the configuration, can be
    *          <code>null</code>
+   * @param allowNullValues Whether Null values are allowed as a result, or should be removed.
    */
-  public HistoryTagImpl(final HistoryTagConfiguration historyTagConfiguration, final String expression) {
+  public HistoryTagImpl(final HistoryTagConfiguration historyTagConfiguration, final String expression
+       , final boolean allowNullValues) {
+    
     this.dataTagUpdateListeners = new ArrayList<DataTagUpdateListener>();
     this.data = null;
     this.value = null;
     this.timestamp = new Timestamp(System.currentTimeMillis());
     this.dataTagQuality = new DataTagQualityImpl();
     this.dataTagQuality.validate();
-    this.dataConverter = new HistoryTagRecordConverter(this);
+    this.dataConverter = new HistoryTagRecordConverter(this, allowNullValues);
     
     if (expression == null && historyTagConfiguration != null) {
       String generatedExpression;
@@ -167,6 +186,7 @@ public class HistoryTagImpl implements HistoryTag {
       this.dataTagQuality.addInvalidStatus(QUALITY_STATUS_EXPRESSION_ERROR, "The expression is invalid");
     }
   }
+  
   
   /**
    * @param expression
@@ -481,8 +501,15 @@ public class HistoryTagImpl implements HistoryTag {
   /**
    * @return a copy of the list of listeners
    */
-  private synchronized Collection<DataTagUpdateListener> getDataTagUpdateListeners() {
+  public synchronized Collection<DataTagUpdateListener> getDataTagUpdateListeners() {
    return new ArrayList<DataTagUpdateListener>(this.dataTagUpdateListeners);
+  }
+  
+  /**
+   * Removes all listeners.
+   */
+  public synchronized void removeDataTagUpdateListeners() {
+    this.dataTagUpdateListeners.clear();
   }
   
   /**

@@ -56,11 +56,16 @@ final class HistoryTagRecordConverter {
   /** the data to convert */
   private Collection<HistoryTagRecord> data = null;
   
+  /** Whether Null values are allowed as a result, or should be removed */
+  private boolean allowNullValues;
+  
   /**
    * @param historyTag the history tag to convert the data of
+   * @param allowNullValues Whether Null values are allowed as a result, or should be removed.
    */
-  public HistoryTagRecordConverter(final HistoryTag historyTag) {
+  public HistoryTagRecordConverter(final HistoryTag historyTag, final boolean allowNullValues) {
     this.historyTag = historyTag;
+    this.allowNullValues = allowNullValues;
   }
 
   /**
@@ -105,22 +110,22 @@ final class HistoryTagRecordConverter {
       }
       break;
     case Labels:
-      result = getXValues(data).toArray();
+      result = getXValues(data, allowNullValues).toArray();
       break;
     case Values:
-      result = getYValues(data).toArray();
+      result = getYValues(data, allowNullValues).toArray();
       break;
     case XMax: 
-      result = findValue(getXValues(data), true, resultType.getResultClass());
+      result = findValue(getXValues(data, allowNullValues), true, resultType.getResultClass());
       break;
     case XMin:
-      result = findValue(getXValues(data), false, resultType.getResultClass());
+      result = findValue(getXValues(data, allowNullValues), false, resultType.getResultClass());
       break;
     case YMax:
-      result = findValue(getYValues(data), true, resultType.getResultClass());
+      result = findValue(getYValues(data, allowNullValues), true, resultType.getResultClass());
       break;
     case YMin:
-      result = findValue(getYValues(data), false, resultType.getResultClass());
+      result = findValue(getYValues(data, allowNullValues), false, resultType.getResultClass());
       break;
     default:
       LOG.error(String.format("The %s '%s' is not supported", HistoryTagResultType.class.getSimpleName(), resultType.toString()));
@@ -325,13 +330,16 @@ final class HistoryTagRecordConverter {
   /**
    * @param records
    *          the records to get the x data from.
+   * @param allowNullValues Whether Null values are allowed as a result, or should be removed.         
    * @return all the x values of the records. That is all the
    *         {@link HistoryTagRecord#getTimestamp()}s.
    */
-  private static Collection<Timestamp> getXValues(final Collection<HistoryTagRecord> records) {
+  private Collection<Timestamp> getXValues(final Collection<HistoryTagRecord> records, final boolean allowNullValues) {
     final List<Timestamp> result = new ArrayList<Timestamp>();
     if (records != null) {
       for (final HistoryTagRecord record : records) {
+        if (!allowNullValues && record.getValue() == null)
+          continue;
         result.add(record.getTimestamp());
       }
     }
@@ -341,13 +349,16 @@ final class HistoryTagRecordConverter {
   /**
    * @param records
    *          the records to get the y data from.
+   * @param allowNullValues Whether Null values are allowed as a result, or should be removed.   
    * @return all the y values of the records. That is all the
    *         {@link HistoryTagRecord#getValue()}s.
    */
-  private static Collection<Object> getYValues(final Collection<HistoryTagRecord> records) {
+  private Collection<Object> getYValues(final Collection<HistoryTagRecord> records, final boolean allowNullValues) {
     final List<Object> result = new ArrayList<Object>();
     if (records != null) {
       for (final HistoryTagRecord record : records) {
+        if (!allowNullValues && record.getValue() == null)
+          continue;
         result.add(record.getValue());
       }
     }
