@@ -8,7 +8,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-core</artifactId>
-  <version>1.1.2-SNAPSHOT</version>
+  <version>1.1.2</version>
   <name>c2mon-client-core</name>
   <packaging>jar</packaging>
   <description>The C2MON Client API which handles the communication to the C2MON server.</description>
