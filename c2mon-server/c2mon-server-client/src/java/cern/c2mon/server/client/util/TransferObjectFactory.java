@@ -16,6 +16,7 @@ import cern.tim.server.common.control.ControlTag;
 import cern.tim.server.common.datatag.DataTag;
 import cern.tim.server.common.rule.RuleTag;
 import cern.tim.server.common.tag.Tag;
+import cern.tim.shared.common.datatag.DataTagQualityImpl;
 
 /**
  * Factory class for creating transfer objects for sending to the C2MON client layer  
@@ -46,7 +47,7 @@ public abstract class TransferObjectFactory {
                         tag.getId(),
                         tag.getValue(),
                         tag.getValueDescription(),
-                        tag.getDataTagQuality(),
+                        (DataTagQualityImpl) tag.getDataTagQuality(),
                         getTagMode(tag),
                         tag.getTimestamp(),
                         tag.getCacheTimestamp(),
@@ -81,7 +82,7 @@ public abstract class TransferObjectFactory {
                         tag.getId(), 
                         tag.getValue(),
                         tag.getValueDescription(),
-                        tag.getDataTagQuality(),
+                        (DataTagQualityImpl) tag.getDataTagQuality(),
                         getTagMode(tag),
                         tag.getTimestamp(), 
                         tag.getCacheTimestamp(), 

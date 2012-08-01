@@ -310,14 +310,15 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   private Collection< ? extends ClientRequestResult> handleDaqXmlRequest(final ClientRequest daqXmlRequest) {
 
     Collection<ProcessXmlResponse> singleXML = new ArrayList<ProcessXmlResponse>(1);
-    ProcessXmlResponseImpl processXmlResponse = new ProcessXmlResponseImpl();
+    ProcessXmlResponseImpl processXmlResponse;
     try {
       String xmlString = processXMLProvider.getProcessConfigXML((String) daqXmlRequest.getRequestParameter());
+      processXmlResponse = new ProcessXmlResponseImpl();
       processXmlResponse.setProcessXML(xmlString);
     } catch (CacheElementNotFoundException cacheEx) {
       String errorMessage = "Requested process not found.";
       LOG.warn(errorMessage, cacheEx);
-      processXmlResponse.setErrorMessage(errorMessage);
+      processXmlResponse = new ProcessXmlResponseImpl(false, errorMessage);     
     }
     singleXML.add(processXmlResponse);
     return singleXML;
