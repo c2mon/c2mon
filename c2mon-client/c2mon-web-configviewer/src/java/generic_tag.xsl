@@ -484,7 +484,8 @@
 				<td><xsl:value-of select="@name"/></td>
 			</tr>
 
-		<xsl:for-each select="*[not(local-name() = 'DataTags' or local-name() = 'SubEquipmentUnits')]">
+		<xsl:for-each select="*[not(local-name() = 'DataTags' or local-name() = 'SubEquipmentUnits' 
+			or local-name() = 'CommandTags')]">
 		<TR>
 			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 			<TD><xsl:value-of select="."/></TD>
@@ -560,7 +561,7 @@
 			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 			<TD><xsl:value-of select="."/></TD>
 		</TR>
-        </xsl:for-each>
+    </xsl:for-each>
 		
 		</table>
 		<xsl:apply-templates select="HardwareAddress"/>
