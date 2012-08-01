@@ -46,7 +46,7 @@ public class ClientDataTagImplTest {
           tagId,
           value,
           "test value desc",
-          tagQuality,
+          (DataTagQualityImpl) tagQuality,
           TagMode.TEST,
           new Timestamp(System.currentTimeMillis() - 10000L),
           new Timestamp(System.currentTimeMillis()),

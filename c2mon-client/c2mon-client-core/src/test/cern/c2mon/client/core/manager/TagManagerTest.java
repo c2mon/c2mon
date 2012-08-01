@@ -32,6 +32,7 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
+import cern.tim.shared.common.datatag.TagQualityStatus;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:cern/c2mon/client/core/manager/c2mon-tagmanager-test.xml" })
@@ -131,13 +132,14 @@ public class TagManagerTest {
   
   private TagUpdate createValidTransferTag(final Long tagId, Object value) {
     DataTagQuality tagQuality = new DataTagQualityImpl();
-    tagQuality.validate();
+    tagQuality.addInvalidStatus(TagQualityStatus.UNDEFINED_TAG);
+    //tagQuality.validate();
     TagUpdate tagUpdate = 
       new TransferTagImpl(
           tagId,
-          value,
+          null,
           "test value desc",
-          tagQuality,
+          (DataTagQualityImpl) tagQuality,
           TagMode.TEST,
           new Timestamp(System.currentTimeMillis() - 10000L),
           new Timestamp(System.currentTimeMillis()),
