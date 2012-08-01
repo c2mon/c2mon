@@ -145,14 +145,19 @@ public class ClientDataTagImplTest {
     cdt.clean();
     cdt.onUpdate(createValidTransferTag(1234L, "Test string"));
     assertEquals(TypeNumeric.TYPE_STRING, cdt.getTypeNumeric());
-    
-    cdt.clean();
-    cdt.onUpdate(createValidTransferTag(1234L, new Object()));
-    assertEquals(TypeNumeric.TYPE_UNKNOWN, cdt.getTypeNumeric());
-    
+       
     cdt.clean();
     cdt.onUpdate(createValidTransferTag(1234L, null));
     assertEquals(TypeNumeric.TYPE_UNKNOWN, cdt.getTypeNumeric());
+  }
+  
+  /**
+   * Arbitrary types are no longer supported.
+   */
+  @Test(expected = IllegalArgumentException.class)
+  public void testArbitraryTypeNotSupported() {
+    final ClientDataTag cdt = new ClientDataTagImpl(1234L);    
+    cdt.onUpdate(createValidTransferTag(1234L, new Object()));    
   }
   
   @Test

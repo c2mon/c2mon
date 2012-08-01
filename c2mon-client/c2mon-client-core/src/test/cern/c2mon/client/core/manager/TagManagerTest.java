@@ -131,9 +131,8 @@ public class TagManagerTest {
   }
   
   private TagUpdate createValidTransferTag(final Long tagId, Object value) {
-    DataTagQuality tagQuality = new DataTagQualityImpl();
-    tagQuality.addInvalidStatus(TagQualityStatus.UNDEFINED_TAG);
-    //tagQuality.validate();
+    DataTagQuality tagQuality = new DataTagQualityImpl();    
+    tagQuality.validate();
     TagUpdate tagUpdate = 
       new TransferTagImpl(
           tagId,
