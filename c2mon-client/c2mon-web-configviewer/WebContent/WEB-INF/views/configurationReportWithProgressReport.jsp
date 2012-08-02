@@ -139,17 +139,22 @@ function getProgressDescription() {
 <div id="progressbar"></div>
 
 <div style="margin-top: 50px;">
-<table class="inline" align="center">
-<tr>
-<th>Previously Applied Configurations</th>
-</tr>
-<tr>
-<c:forEach var="report" items="${reports}" >
-	<td align="center"><a href="/c2mon-web-configviewer/configloader/progress/finalReport/${report.key}">
-		${report.key}</a></td>
-</c:forEach>
-</tr>
-</table> 
+
+<c:if test="${not empty reports}">
+	<table class="inline" align="center">
+		<tr>
+			<th>Previously Applied Configurations</th>
+		</tr>
+	<c:forEach var="report" items="${reports}" >
+		<tr>
+			<td align="center"><a href="/c2mon-web-configviewer/configloader/progress/finalReport/${report.key}">
+			${report.key}</a>
+			</td>
+		</tr>
+	</c:forEach>
+	</table> 
+</c:if>
+
 </div> 
 
 <br/>
