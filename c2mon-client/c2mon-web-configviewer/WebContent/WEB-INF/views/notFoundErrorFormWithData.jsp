@@ -1,46 +1,82 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+
 
 <html>
 <head>
 <title>Configuration viewer</title>
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/form.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/tim.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/webConfigViewer.css"/>" />
 
-<link type="text/css" href="/c2mon-web-configviewer/css/ui-lightness/jquery-ui.css" rel="stylesheet" />
-<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery.js"></script>
-<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap-responsive.css" />
+
+    <style type="text/css">
+      body {
+        padding-top: 90px;
+        padding-bottom: 40px;
+				padding-left: 50px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+    
 </head>
 
 <body>
-<h1>${title}</h1>
 
-<div class="ui-widget">
-	<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
-				<p style="font-size : 1.1em;"><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-				${instruction}</p>
-	</div>
+	    <div class="container-fluid">
+      <div class="row-fluid">
+      
+
+    <ul class="breadcrumb">
+    <li>
+    <a href="/c2mon-web-configviewer">Home</a> <span class="divider">/</span>
+    </li>
+    <li>${title}</li>
+    </ul>
+	
+    <div class="hero-unit">
+	<h1>${title}</h1>
+    </div>
+      
+<div class="alert alert-info">
+	<strong>${instruction}</strong>
 </div>
 
-<br/>
-
-<div class="ui-widget">
-			<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
-				<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
-				<strong>id: ${err} NOT FOUND </strong> Sorry :( </p>
-			</div>
+<div class="alert alert-error">
+ 	<strong>id: ${err} NOT FOUND </strong> Sorry :( 
 </div>
-<p>
 
 <c:url var="submitUrl" value="${formSubmitUrl}"/>
 
-<br/>
-<form:form action="${submitUrl}" method="post">
+<form class="well" action="${submitUrl}" method="post">
 	<input type="text" name="id" value="${formTagValue}" size="10" /> 
-	<input type="submit" />
-</form:form>
-</p>
+	<input class="btn btn-large btn-primary" type="submit" value="Submit">
+</form>
+
+</div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <p>&copy; CERN 2012</p>
+      </footer>
+    </div><!--/.fluid-container-->
+    
+        <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/c2mon-web-configviewer/js/jquery.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-transition.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-alert.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-modal.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-dropdown.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-scrollspy.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-tab.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-tooltip.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-popover.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-button.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-collapse.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-carousel.js"></script>
+    <script src="/c2mon-web-configviewer/js/bootstrap-typeahead.js"></script>
 
 </body>
 </html>
