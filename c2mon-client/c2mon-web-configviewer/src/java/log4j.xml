@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
 	<!--
-
 		Set the threshold to "info" in production system. This will filter out
 		all debug messages. If you only want to enable/disable debugging for
 		certain parts of the system, change the "level" attribute of the
@@ -27,19 +26,24 @@
 		<level value="debug" />
 		<appender-ref ref="fileAppender" />
 	</logger>
+	
+	<logger name="cern.c2mon" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="fileAppender" />
+	</logger>
 
 	<logger name="org.springframework" additivity="false">
-		<level value="info" />
+		<level value="warn" />
 		<appender-ref ref="fileAppender" />
 	</logger>
 
 	<logger name="org.apache.activemq" additivity="false">
-		<level value="info" />
+		<level value="warn" />
 		<appender-ref ref="fileAppender" />
 	</logger>
 
 	<root>
-		<priority value="info" />
+		<level value="debug" />
 		<appender-ref ref="fileAppender" />
 	</root>
 
