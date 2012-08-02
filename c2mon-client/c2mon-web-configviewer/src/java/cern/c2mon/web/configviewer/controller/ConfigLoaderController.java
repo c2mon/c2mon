@@ -90,7 +90,7 @@ public class ConfigLoaderController {
    * */
   @RequestMapping(value = CONFIG_LOADER_URL, method = { RequestMethod.GET })
   public String viewConfig(final Model model) {
-    logger.info(CONFIG_LOADER_URL);
+    logger.debug(CONFIG_LOADER_URL);
     return ("redirect:" + "/configloader/form");
   }    
 
@@ -102,7 +102,7 @@ public class ConfigLoaderController {
    * */
   @RequestMapping(value = CONFIG_LOADER_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewXml(@PathVariable final String id,  final Model model) {
-    logger.info(CONFIG_LOADER_XML_URL + id);
+    logger.debug(CONFIG_LOADER_XML_URL + id);
     try {
       model.addAttribute("xml", service.getConfigurationReportXml(id));
     } catch (TagIdException e) {
@@ -122,7 +122,7 @@ public class ConfigLoaderController {
    * */
   @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
   public String viewConfig(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
-    logger.info("/configloader/{id} " + id);
+    logger.debug("/configloader/{id} " + id);
     try {
       response.getWriter().println(service.generateHtmlResponse(id));
     } catch (TransformerException e) {
@@ -149,7 +149,7 @@ public class ConfigLoaderController {
    * */
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL + "{id}", method = { RequestMethod.GET })
   public String viewFinalReport(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
-    logger.info("/CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL/{id} " + id);
+    logger.debug("/CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL/{id} " + id);
     try {
       response.getWriter().println(service.getStoredConfigurationReportHtml(id));
     } catch (TransformerException e) {
@@ -175,7 +175,7 @@ public class ConfigLoaderController {
    * */
   @RequestMapping(value = "/configloader/errorform/{id}")
   public String viewConfigLoaderErrorForm(@PathVariable(value = "id") final String id, final Model model) {
-    logger.info("/configloader/errorform " + id);
+    logger.debug("/configloader/errorform " + id);
 
     model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
     model.addAttribute("err", id);
@@ -190,7 +190,7 @@ public class ConfigLoaderController {
    * */
   @RequestMapping(value = CONFIG_LOADER_FORM_URL + "/{id}", method = { RequestMethod.GET })
   public String viewConfigLoaderWithForm(@PathVariable final String id, final Model model) {
-    logger.info("/configloader/form/{id} " + id);
+    logger.debug("/configloader/form/{id} " + id);
     model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
     return "formWithData";
   }
@@ -203,7 +203,7 @@ public class ConfigLoaderController {
    * */
   @RequestMapping(value = CONFIG_LOADER_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
   public String viewConfigLoaderFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
-    logger.info("/configloader/form " + id);
+    logger.debug("/configloader/form " + id);
     if (id == null)
       model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, null, null));
     else
@@ -221,7 +221,7 @@ public class ConfigLoaderController {
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_REPORT_URL, method = RequestMethod.GET)
   public String startConfigurationProcessWithProgressReportForm(final Model model) {
 
-    logger.info("CONFIG_LOADER_PROGRESS_REPORT_URL ");
+    logger.debug(CONFIG_LOADER_PROGRESS_REPORT_URL);
 
     model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR,
         CONFIG_LOADER_FORM_URL, "", CONFIG_LOADER_URL));
@@ -241,7 +241,7 @@ public class ConfigLoaderController {
   public String startConfigurationProcessWithProgressReportWithoutForm(
       @PathVariable(value = "id") final String id, final Model model) {
 
-    logger.info("CONFIG_LOADER_PROGRESS_REPORT_URL/id:" + id);
+    logger.debug(CONFIG_LOADER_PROGRESS_REPORT_URL + "/id:" + id);
 
     model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR,
         CONFIG_LOADER_FORM_URL, "", CONFIG_LOADER_URL));
@@ -259,7 +259,7 @@ public class ConfigLoaderController {
   public void startConfigurationProcess(@RequestParam("configurationId") final String configurationId) 
       throws Exception {
     
-    logger.info("(AJAX) Starting Configuration Request: " + configurationId);
+    logger.debug("(AJAX) Starting Configuration Request: " + configurationId);
     service.getConfigurationReportWithReportUpdates(Integer.parseInt(configurationId));
   }
 
@@ -272,7 +272,7 @@ public class ConfigLoaderController {
   @ResponseBody
   public Integer getProgressReport(@RequestParam("configurationId") final String configurationId) throws InterruptedException {
 
-    logger.info("(AJAX) Received Progress Report Request for configurationId:" + configurationId);
+    logger.debug("(AJAX) Received Progress Report Request for configurationId:" + configurationId);
 
     ClientRequestProgressReport report = service.getProgressReportForConfiguration(configurationId);
     if (report == null) {
@@ -280,7 +280,7 @@ public class ConfigLoaderController {
     }
 
     int currentProgress = ((100 * report.getCurrentProgressPart()) / report.getTotalProgressParts());
-    logger.info("returning:" + report.getCurrentProgressPart() + " out of " + report.getTotalProgressParts());
+    logger.debug("returning:" + report.getCurrentProgressPart() + " out of " + report.getTotalProgressParts());
 
     // @ResponseBody will automatically convert the returned value into JSON format
     // You must have Jackson in your classpath
@@ -296,10 +296,10 @@ public class ConfigLoaderController {
   @ResponseBody
   public String getProgressDescription(@RequestParam("configurationId") final String configurationId) throws InterruptedException {
 
-    logger.info("(AJAX) Received Progress Description Request for configurationId:" + configurationId);
+    logger.debug("(AJAX) Received Progress Description Request for configurationId:" + configurationId);
 
     ClientRequestProgressReport report = service.getProgressReportForConfiguration(configurationId);
-    String progressDescription = "";
+    String progressDescription = null;
     
     if (report != null) {
       progressDescription =  report.getProgressDescription();
