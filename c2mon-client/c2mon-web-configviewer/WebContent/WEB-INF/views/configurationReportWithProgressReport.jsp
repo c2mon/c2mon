@@ -15,6 +15,7 @@
 
 <script type="text/javascript">
 
+
 /**
  * Sets the default value of the progress bar to 0
  */
@@ -36,7 +37,7 @@ function startProcess() {
 	getProgress(); // polls the server and updates the progress bar
 	getProgressDescription(); // polls the server and updates the description info
 
-	$("p").text("Started...");
+	$("p").text("Starting...");
 
 	document.theOnlyFormInThisPage.id.readOnly = true;
 	document.getElementsByName("submitButton")[0].disabled = true;
@@ -66,10 +67,7 @@ function startConfigurationRequest() {
         url: "/c2mon-web-configviewer/configloader/progress/start",
         data: { configurationId : document.theOnlyFormInThisPage.id.value },
 				async: true,
-				complete: progressFinished,
-				error : function(xhr, status, error) {
-  	  		alert(error + ". Please check the logs for more details about the problem.");
-  			}
+				complete: progressFinished
 	});
 }
 
@@ -109,6 +107,9 @@ function getProgressDescription() {
     success: function(data){
 
 		var description = data;
+		if (description == null) {
+			description = "No response has been received yet from the server. Please wait..";
+		}
 		$("p").text(description);
 	    
 	}, dataType: "json", complete: getProgressDescription, timeout: 50 });

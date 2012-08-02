@@ -31,7 +31,7 @@
 	getProgress(); // polls the server and updates the progress bar
 	getProgressDescription(); // polls the server and updates the description info
 
-	$("p").text("Started...");
+	$("p").text("Starting...");
 
 	// disable the submit button
 	document.theOnlyFormInThisPage.id.readOnly = true;
@@ -62,10 +62,7 @@ function startConfigurationRequest() {
         url: "/c2mon-web-configviewer/configloader/progress/start",
         data: { configurationId : ${configurationId} },
 				async: true,
-				complete: progressFinished,
-				error : function(xhr, status, error) {
-		  	  		alert(error + ". Please check the logs for more details about the problem.");
-		  			}
+				complete: progressFinished
 	});
 }
 
@@ -104,6 +101,9 @@ function getProgressDescription() {
     success: function(data){
 
 		var description = data;
+	  if (description == null) {
+		  description = "No response has been received yet from the server. Please wait..";
+	  }
 		$("p").text(description);
 	    
 	}, dataType: "json", complete: getProgressDescription, timeout: 50 });
