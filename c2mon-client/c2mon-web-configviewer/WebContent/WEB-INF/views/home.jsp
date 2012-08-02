@@ -2,44 +2,92 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 
 <!DOCTYPE html>
-<html>
-<head>
-<link rel="stylesheet" type="text/css" href="<c:url value="css/buttons.css"/>" />
-<title>Online Viewer</title>
-</head>
-<body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Online Viewer Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-<sec:authorize ifAnyGranted="ROLE_ANONYMOUS"> 
-	<h1>You are not logged in.</h1> 
-</sec:authorize>
+    <!-- Le styles -->
+    <link rel="stylesheet" type="text/css" href="<c:url value="css/bootstrap.css"/>" />
+		<link rel="stylesheet" type="text/css" href="<c:url value="css/buttons.css"/>" />
+    <link rel="stylesheet" type="text/css" href=" <c:url value="css/bootstrap-responsive.css"/>" />
+		
+    <style type="text/css">
+      body {
+        padding-top: 90px;
+        padding-bottom: 40px;
+				padding-left: 50px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+    </style>
+  </head>
 
-<sec:authorize ifNotGranted="ROLE_ANONYMOUS"> Hi 
-	<span style="color: #708090; font-size: 14pt">${username}!</span>  
-	It's nice to see you again!
-</sec:authorize>
+  <body>
 
-<h4>Please select an option:</h4>
-<ul>
-	<li><a href="tagviewer/form">Tag Viewer</a></li>
-	<li><a href="historyviewer/form"> Tag History Viewer </a></li>
-	<li><a href="alarmviewer/form"> Alarm Viewer </a></li>
-	<li><a href="commandviewer/form"> Command Viewer </a></li>
-	<li><a href="configloader/form"> Config Loader </a></li>
-	<li><a href="configloader/progress"> Config Loader (with progress report!) </a></li>
-	<li><a href="process/form"> DAQ XML Viewer </a></li>
-</ul>
+    <div class="container-fluid">
+      <div class="row-fluid">
+	  
+        <div class="span9">
+		
+			<div class="alert alert-info">Welcome to the Online Viewer Home Page!</div>
+			
+				<sec:authorize ifNotGranted="ROLE_ANONYMOUS">
+					<div class="alert alert-info">
+					 Hi 
+					<span style="color: #708090; font-size: 14pt">${username}!</span>  
+					It's nice to see you again!
+					</div>
+				</sec:authorize>
+			
+          <div class="row-fluid">
+            <div class="span4">
+              <h2>Tag Viewer</h2>
+              <p><a class="btn" href="tagviewer/form">Go! &raquo;</a></p>
+            </div><!--/span-->
+            <div class="span4">
+              <h2>Tag History Viewer</h2>
+              <p><a class="btn" href="historyviewer/form">Go! &raquo;</a></p>
+            </div><!--/span-->
+            <div class="span4">
+              <h2>Alarm Viewer</h2>
+              <p><a class="btn" href="alarmviewer/form">Go! &raquo;</a></p>
+            </div><!--/span-->
+          </div><!--/row-->
+          <div class="row-fluid">
+            <div class="span4">
+              <h2>Command Viewer</h2>
+              <p><a class="btn" href="commandviewer/form">Go! &raquo;</a></p>
+            </div><!--/span-->
+            <div class="span4">
+              <h2>Config Loader</h2>
+              <p><a class="btn" href="configloader/progress">Go! &raquo;</a></p>
+            </div><!--/span-->
+            <div class="span4">
+              <h2>DAQ XML Viewer</h2>
+              <p><a class="btn" href="process/form">Go! &raquo;</a></p>
+            </div><!--/span-->
+          </div><!--/row-->
+        </div><!--/span-->
+      </div><!--/row-->
+	  
+			<sec:authorize ifNotGranted="ROLE_ANONYMOUS">
+				<div class="alert alert-success">
+					<p>You are currently logged in. 
+						<a href="/c2mon-web-configviewer/j_spring_security_logout">Logout</a>
+    		</div>
+   		</sec:authorize>
 
-<sec:authorize ifNotGranted="ROLE_ANONYMOUS">
-<p>You are currently logged in. <a href="/c2mon-web-configviewer/j_spring_security_logout">Logout</a>
-</sec:authorize>
+      <hr>
 
-<p><sec:authorize url='/configloader/form'>You are currently authorised to access the 
-<a href="configloader/form"> Config Loader </a>.
-</sec:authorize></p>
-
-<p><sec:authorize url='/process/form'>
-You are currently authorised to access the <a href="process/form"> DAQ XML Viewer </a>.
-</sec:authorize></p>
+      <footer>
+        <p>&copy; CERN 2012</p>
+      </footer>
+    </div><!--/.fluid-container-->
 
 </body>
 </html>
