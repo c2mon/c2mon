@@ -162,6 +162,9 @@ public class ConfigLoaderService  {
     ConfigurationReport report = gateway.getTagManager().applyConfiguration(
         configurationId, reportHandler); 
     
+    logger.debug("getConfigurationReport: Received configuration report? -> " 
+        + configurationId + ": " + (report == null ? "NULL" : "SUCCESS"));
+    
     if (report == null) {
       logger.error("Received NULL Configuration report for configuration id:" + configurationId);
       throw new CannotProceedException("Did not receive Configuration Report.");
@@ -225,7 +228,7 @@ public class ConfigLoaderService  {
     if (reportHandler != null)
       report = reportHandler.getProgressReport();
     
-    logger.info("ClientRequestProgressReport: fetch for report: " 
+    logger.debug("ClientRequestProgressReport: fetch for report: " 
         + configurationId + ": " + (report == null ? "NULL" : "SUCCESS"));
     return report;
   }  
