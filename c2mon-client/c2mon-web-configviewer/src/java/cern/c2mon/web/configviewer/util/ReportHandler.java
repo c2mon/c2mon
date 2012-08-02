@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
-import cern.c2mon.web.configviewer.service.ConfigLoaderService;
 
 /**
  * In case of long running requests,
@@ -28,7 +27,7 @@ public class ReportHandler implements ClientRequestReportListener {
   /**
    * ReportHandler logger
    * */
-  private static Logger logger = Logger.getLogger(ConfigLoaderService.class);
+  private static Logger logger = Logger.getLogger(ReportHandler.class);
   
   public ReportHandler(final Long id) {
     
