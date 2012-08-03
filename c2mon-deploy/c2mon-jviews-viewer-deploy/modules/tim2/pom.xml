@@ -24,6 +24,12 @@
 			<groupId>cern.tim.tim-client</groupId>
 			<artifactId>tim-jviews-viewer</artifactId>
 		</dependency>
+    <dependency>
+      <groupId>cern.cmw.java.log.sources</groupId>
+      <artifactId>cmw-log-log4j</artifactId>
+      <version>[1.0.0,2.0.0)</version>
+      <scope>runtime</scope>
+    </dependency>
 	</dependencies>
 
 	<developers />
