@@ -2,14 +2,14 @@
 
 <html>
 <head>
-<title>Configuration viewer</title>
+<title>${title}</title>
 
 <link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap.css" />
 <link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap-responsive.css" />
 
     <style type="text/css">
       body {
-        padding-top: 90px;
+        padding-top: 50px;
         padding-bottom: 40px;
 				padding-left: 50px;
       }

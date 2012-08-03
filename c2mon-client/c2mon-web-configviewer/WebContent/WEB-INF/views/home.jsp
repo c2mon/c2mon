@@ -17,7 +17,7 @@
 		
     <style type="text/css">
       body {
-        padding-top: 90px;
+        padding-top: 50px;
         padding-bottom: 40px;
 				padding-left: 50px;
       }
