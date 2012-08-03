@@ -56,7 +56,7 @@ public class DataTagController {
   /**
    * Title for the datatag form page
    * */
-  public static final String TAG_FORM_TITLE = "DataTag Configuration Viewer";
+  public static final String TAG_FORM_TITLE = "Tag  Viewer";
 
   /**
    * Description for the datatag form page

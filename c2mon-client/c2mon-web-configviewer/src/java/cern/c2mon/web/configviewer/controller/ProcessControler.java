@@ -47,7 +47,7 @@ public class ProcessControler {
   /**
    * Title for the process form page
    * */
-  public static final String PROCESS_FORM_TITLE = "Process";
+  public static final String PROCESS_FORM_TITLE = "DAQ XML Viewer";
 
   /**
    * Description for the process form page
