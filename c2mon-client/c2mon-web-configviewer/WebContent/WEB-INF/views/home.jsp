@@ -28,13 +28,23 @@
   </head>
 
   <body>
+  
 
     <div class="container-fluid">
       <div class="row-fluid">
+			
 	  
         <div class="span9">
 		
-			<div class="alert alert-info">Welcome to the Online Viewer Home Page!</div>
+	<ul class="breadcrumb">
+    <li> Home</li>
+    </ul>
+		
+	<div class="hero-unit">
+		<h1>Online Viewer Home</h1>
+    </div>
+		
+			<div class="alert alert-info">Welcome! Please select an option:</div>
 			
 				<sec:authorize ifNotGranted="ROLE_ANONYMOUS">
 					<div class="alert alert-info">
