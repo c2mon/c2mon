@@ -31,12 +31,7 @@
       <artifactId>c2mon-client-jms</artifactId>
     </dependency>
 
-    <!-- 3rd party dependencies -->
-    <dependency>
-      <groupId>org.mybatis</groupId>
-      <artifactId>mybatis</artifactId>
-      <version>3.0.5</version>
-    </dependency>
+    <!-- 3rd party dependencies -->    
     <dependency>
       <groupId>oracle</groupId>
       <artifactId>ojdbc</artifactId>
