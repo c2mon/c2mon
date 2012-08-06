@@ -197,7 +197,7 @@
       <dependency>
         <groupId>org.mybatis</groupId>
         <artifactId>mybatis</artifactId>
-        <version>3.0.4</version>
+        <version>3.0.5</version>
       </dependency>
       <dependency>
         <groupId>oracle</groupId>
