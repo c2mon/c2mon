@@ -31,9 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.listener.HeartbeatListener;
+import cern.c2mon.client.jms.ClientHealthListener;
 import cern.c2mon.client.jms.ConnectionListener;
-import cern.c2mon.client.jms.JmsHealthListener;
-import cern.c2mon.client.jms.JmsHealthMonitor;
+import cern.c2mon.client.jms.ClientHealthMonitor;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.client.jms.SupervisionListener;
@@ -93,11 +93,11 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   private final HeartbeatListenerManager heartbeatManager;
   
   /** Monitors health of update processing */
-  private final JmsHealthMonitor jmsHealthMonitor;
+  private final ClientHealthMonitor jmsHealthMonitor;
   
   @Autowired
   protected SupervisionManager(final JmsProxy pJmsProxy, final RequestHandler pRequestHandler, final HeartbeatListenerManager pHeartbeatManager,
-                                final JmsHealthMonitor pJmsHealthMonitor) {
+                                final ClientHealthMonitor pJmsHealthMonitor) {
     jmsProxy = pJmsProxy;
     clientRequestHandler = pRequestHandler;
     heartbeatManager = pHeartbeatManager;
@@ -337,7 +337,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
   }
 
   @Override
-  public void addJmsHealthListener(JmsHealthListener jmsHealthListener) {
-    jmsHealthMonitor.addHealthListener(jmsHealthListener);
+  public void addClientHealthListener(ClientHealthListener clientHealthListener) {
+    jmsHealthMonitor.addHealthListener(clientHealthListener);
   }
 }
