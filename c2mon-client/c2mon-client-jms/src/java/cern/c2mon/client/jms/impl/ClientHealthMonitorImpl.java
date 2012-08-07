@@ -3,18 +3,21 @@ package cern.c2mon.client.jms.impl;
 import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.jms.JmsHealthListener;
-import cern.c2mon.client.jms.JmsHealthMonitor;
+import cern.c2mon.client.jms.ClientHealthListener;
+import cern.c2mon.client.jms.ClientHealthMonitor;
 
 @Service
-public class JmsHealthMonitorImpl implements JmsHealthMonitor, SlowConsumerListener {
+public class ClientHealthMonitorImpl implements ClientHealthMonitor, SlowConsumerListener {
 
+  private static final Logger LOGGER = Logger.getLogger("CentralLogger");
+  
   /**
    * Listeners.
    */
-  private HashSet<JmsHealthListener> listeners  = new HashSet<JmsHealthListener>();
+  private HashSet<ClientHealthListener> listeners  = new HashSet<ClientHealthListener>();
   
   /**
    * Lock to access listener set.
@@ -27,32 +30,33 @@ public class JmsHealthMonitorImpl implements JmsHealthMonitor, SlowConsumerListe
   private volatile boolean slowConsumerNotified = false;
   
   @Override
-  public void addHealthListener(final JmsHealthListener jmsHealthListener) {
+  public void addHealthListener(final ClientHealthListener clientHealthListener) {
     listenerLock.writeLock().lock();
     try {
-      listeners.add(jmsHealthListener);
+      listeners.add(clientHealthListener);
     } finally {
       listenerLock.writeLock().unlock();     
     }    
   }
   
   @Override
-  public void removeHealthListener(final JmsHealthListener jmsHealthListener) {
+  public void removeHealthListener(final ClientHealthListener clientHealthListener) {
     listenerLock.writeLock().lock();
     try {
-      listeners.remove(jmsHealthListener);
+      listeners.remove(clientHealthListener);
     } finally {
       listenerLock.writeLock().unlock();     
     }    
   }
 
   @Override
-  public void onSlowConsumer(String details) {    
+  public void onSlowConsumer(String details) {
+    LOGGER.warn("Slow update consumer detected: " + details);
     if (!slowConsumerNotified) { 
       listenerLock.writeLock().lock();
       try {
-        for (JmsHealthListener listener : listeners) {
-          listener.slowConsumerDetected(details);
+        for (ClientHealthListener listener : listeners) {
+          listener.onSlowUpdateListener(details);
         }
         slowConsumerNotified = true;
       } finally {

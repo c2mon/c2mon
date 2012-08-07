@@ -1,5 +1,7 @@
 package cern.c2mon.client.jms;
 
+import cern.c2mon.client.common.listener.TagUpdateListener;
+
 /**
  * Implement this interface to be notified about problems with the
  * processing of incoming updates on the JMS topics.
@@ -8,18 +10,18 @@ package cern.c2mon.client.jms;
  * possible data loss, so the client should take some appropriate
  * action on receiving these callbacks (e.g. notify the user).
  * 
- * <p>Register with the SubscriptionHeathMonitor.
+ * <p>Register with the {@link ClientHealthMonitor}.
  * 
  * @author Mark Brightwell
  *
  */
-public interface JmsHealthListener {
+public interface ClientHealthListener {
 
   /**
-   * Called when one of the topic subscribers is slow.
+   * Called when one of the registered {@link TagUpdateListener}'s is slow.
    * 
    * @param diagnosticMessage a human-readable message for displaying
    */
-  void slowConsumerDetected(String diagnosticMessage);
+  void onSlowUpdateListener(String diagnosticMessage);
   
 }

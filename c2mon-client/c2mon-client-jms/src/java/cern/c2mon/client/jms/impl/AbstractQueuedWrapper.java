@@ -4,6 +4,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -47,6 +49,12 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
    * Poll timeout.
    */
   private static final int POLL_TIMEOUT = 2;
+
+  /**
+   * Time given for the notification to subscribed listeners before
+   * notifying of a slow consumer!
+   */
+  private AtomicLong notificationTimeBeforeWarning = new AtomicLong(30000);
   
   /**
    * Shutdown request made.
@@ -57,6 +65,12 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
    * Lifecycle flag.
    */
   private volatile boolean running = false;
+  
+  /**
+   * Time the last notification started. Will notify as slow if
+   * takes over 30s to return (only checked on new message arrival).
+   */
+  private AtomicLong notificationTime = new AtomicLong(0);
   
   /**
    * Converts the JMS message into an event of the required type. 
@@ -93,7 +107,9 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
         try {
           event = eventQueue.poll(POLL_TIMEOUT, TimeUnit.SECONDS);
           if (event != null) {
+            notificationTime.set(System.currentTimeMillis());
             notifyListeners(event);
+            notificationTime.set(0);
           }            
         } catch (Exception e) {
           LOGGER.error("Exception caught while polling queue: " + e);
@@ -120,9 +136,10 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
            LOGGER.trace("AbstractQueuedWrapper received message for " + this.getClass().getSimpleName());
         
         U event = convertMessage(message);
-        if (eventQueue.remainingCapacity() == 0) {
-          String warning = "Slow consumer warning: " + this.getClass().getSimpleName() + " unable to keep up with incoming data. " 
-                      + " Info: " + getDescription(event);
+        if (notificationTime.get() != 0 && (System.currentTimeMillis() - notificationTime.get()) > notificationTimeBeforeWarning.get()) {
+          String warning = "Slow consumer warning: " + this.getClass().getSimpleName()
+                              + " client application is not consuming updates correctly and should be restarted! " 
+                              + " Info: " + getDescription(event);
           LOGGER.warn(warning);
           slowConsumerListener.onSlowConsumer(warning);
         }
@@ -163,6 +180,23 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
    */
   public int getQueueSize(){
     return eventQueue.size();
+  }
+
+  /**
+   * Default is 30s.
+   * @return the time given to all listeners to return on an update
+   * notification, in milliseconds; after this time the client is warned of a slow consumer
+   */
+  public long getNotificationTimeBeforeWarning() {
+    return notificationTimeBeforeWarning.get();
+  }
+
+  /**
+   * @param notificationTimeBeforeWarning the time given to all listeners to return on an update
+   * notification, in milliseconds
+   */
+  public void setNotificationTimeBeforeWarning(long notificationTimeBeforeWarning) {
+    this.notificationTimeBeforeWarning.set(notificationTimeBeforeWarning);
   }
   
 }

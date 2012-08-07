@@ -247,7 +247,7 @@ public class JmsProxyTest {
    
   
   /**
-   * Tests registration to a topic works.
+   * Tests unregistration to a topic works.
    * @throws JMSException 
    */
   @Test
