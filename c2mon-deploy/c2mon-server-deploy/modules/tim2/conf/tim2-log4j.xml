@@ -33,7 +33,7 @@
 
 -->
 <log4j:configuration debug="false" 
-                     threshold="all"
+                     threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
   <renderer  renderedClass="cern.tim.shared.daq.datatag.SourceDataTagValue"
