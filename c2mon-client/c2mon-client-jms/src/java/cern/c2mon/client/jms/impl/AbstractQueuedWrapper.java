@@ -98,7 +98,8 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
                                     final ExecutorService executorService) {    
     super();
     this.slowConsumerListener = slowConsumerListener;
-    eventQueue = new ArrayBlockingQueue<U>(queueCapacity);    
+    eventQueue = new ArrayBlockingQueue<U>(queueCapacity); 
+    //notice the slow consumer notification only works for a single listener thread here: if change would need a map U->notificationTime as field 
     executorService.submit(new Callable<Boolean>() {
 
       @Override

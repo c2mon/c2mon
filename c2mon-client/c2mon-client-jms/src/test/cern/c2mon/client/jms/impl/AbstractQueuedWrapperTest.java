@@ -1,18 +1,16 @@
 package cern.c2mon.client.jms.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Enumeration;
 import java.util.concurrent.Executors;
 
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.easymock.MockControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,14 +37,15 @@ public class AbstractQueuedWrapperTest {
   private IMocksControl mocksControl;
 
   /**
-   * Extendsion for testing AbstractQueuedWrapper.
+   * Extension for testing AbstractQueuedWrapper.
    * @author Mark Brightwell
    *
    */
   private class QueuedWrapper extends AbstractQueuedWrapper<Object> {
 
     public QueuedWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener) {
-      super(queueCapacity, slowConsumerListener, Executors.newFixedThreadPool(2));      
+      super(queueCapacity, slowConsumerListener, Executors.newFixedThreadPool(2));
+      this.setNotificationTimeBeforeWarning(100); //reset delay before warning to 300ms
     }
 
     @Override
@@ -58,7 +57,7 @@ public class AbstractQueuedWrapperTest {
     protected void notifyListeners(Object event) {
       listenerNotified++;
       try {
-        Thread.sleep(1000); //queue will overflow as this consumer is slow
+        Thread.sleep(500); //queue will overflow as this consumer is slow
       } catch (InterruptedException e) {
         e.printStackTrace();
       } 
@@ -85,31 +84,44 @@ public class AbstractQueuedWrapperTest {
     wrapper.stop();
   }
   
+  /**
+   * Notification happens because: the listener calls on the internal threads take 1s 
+   *                                & the second notification is made after 200ms, at
+   *                                which point the delay of 100ms is passed 
+   * @throws InterruptedException
+   */
   @Test
-  public void testHealthNotification() {
+  public void testHealthNotification() throws InterruptedException {
     mocksControl.reset();
     //will get several calls: important is that once is made
-    mockSlowConsumerListener.onSlowConsumer("Slow consumer warning: " + QueuedWrapper.class.getSimpleName() + " unable to keep up with incoming data. " + " Info: test description");    
+    mockSlowConsumerListener.onSlowConsumer(EasyMock.isA(String.class));    
     mocksControl.replay();
     int i = 0;
-    while (i < 13) {
+    while (i < 2) {
       wrapper.onMessage(mockMessage);
       i++;
+      Thread.sleep(300); //must sleep because notification happens on incoming message
     }
     mocksControl.verify();
     assertTrue(listenerNotified > 0);
   }
   
+  /**
+   * No notification here as the notification is fast enough
+   * @throws InterruptedException
+   */
   @Test
   public void testNoHealthNotification() throws InterruptedException {
+    wrapper.setNotificationTimeBeforeWarning(1000); //allow up to 1s
     mocksControl.reset();
     mocksControl.replay();
     int i = 0;
     while (i < 2) {
       wrapper.onMessage(mockMessage);
-      Thread.sleep(2000);
+      Thread.sleep(300);
       i++;
     }
+    Thread.sleep(500); //wait for both notifications to happen
     mocksControl.verify();
     assertEquals(2, listenerNotified);    
   }
