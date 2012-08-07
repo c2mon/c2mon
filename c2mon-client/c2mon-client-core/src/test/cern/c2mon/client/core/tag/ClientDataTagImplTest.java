@@ -154,11 +154,11 @@ public class ClientDataTagImplTest {
   /**
    * Arbitrary types are no longer supported.
    */
-//  @Test(expected = IllegalArgumentException.class)
-//  public void testArbitraryTypeNotSupported() {
-//    final ClientDataTag cdt = new ClientDataTagImpl(1234L);    
-//    cdt.onUpdate(createValidTransferTag(1234L, new Object()));    
-//  }
+  @Test(expected = IllegalArgumentException.class)
+  public void testArbitraryTypeNotSupported() {
+    final ClientDataTag cdt = new ClientDataTagImpl(1234L);    
+    cdt.onUpdate(createValidTransferTag(1234L, new Object()));    
+  }
   
   @Test
   public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException {
