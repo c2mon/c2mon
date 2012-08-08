@@ -6,9 +6,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.jms.JmsException;
 import org.springframework.stereotype.Service;
-
-import com.google.gson.Gson;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -18,17 +17,28 @@ import cern.tim.server.cache.TimCacheListener;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.component.Lifecycle;
 import cern.tim.server.common.config.ServerConstants;
+import cern.tim.server.common.republisher.Publisher;
+import cern.tim.server.common.republisher.Republisher;
+import cern.tim.server.common.republisher.RepublisherFactory;
 import cern.tim.server.common.tag.Tag;
 import cern.tim.util.jms.JmsSender;
 import cern.tim.util.json.GsonFactory;
 
+import com.google.gson.Gson;
+
 /**
+ * Publishes active alarms to the C2MON client applications on the
+ * alarm publication topic, specified using the property
+ * jms.client.alarm.topic
+ * 
+ * <p>Will attempt re-publication of alarms if JMS connection fails.
+ * 
  * 
  * @author Manos, Mark Brightwell
  *
  */
 @Service
-public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle  {
+public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle, Publisher<AlarmValue>  {
   
   /** Class logger */
   private static final Logger LOGGER = Logger.getLogger(AlarmPublisher.class);
@@ -48,6 +58,9 @@ public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle  
   /** Listener container lifecycle hook */
   private Lifecycle listenerContainer;
   
+  /** Contains re-publication logic */
+  private Republisher<AlarmValue> republisher;
+  
   /** Lifecycle flag */
   private volatile boolean running = false;
   
@@ -66,6 +79,7 @@ public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle  
     jmsSender = pJmsSender;
     cacheRegistrationService = pCacheRegistrationService;
     tagLocationService = pTagLocationService;
+    republisher = RepublisherFactory.createRepublisher(this, "Alarm");
   }
   
   /**
@@ -101,10 +115,12 @@ public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle  
       LOGGER.warn("notifyElementUpdated() - unrecognized Tag with id " + tagId);
       alarmValue = (TransferObjectFactory.createAlarmValue(alarm));
     }
-
-    String jsonAlarm = GSON.toJson(alarmValue);
-    LOGGER.debug("Publishing alarm: " + jsonAlarm);
-    jmsSender.send(jsonAlarm);
+    try {
+      publish(alarmValue);
+    } catch (JmsException e) {
+      LOGGER.error("Error publishing alarm to clients - submitting for republication. Alarm id is " + alarmValue.getId(), e); 
+      republisher.publicationFailed(alarmValue);      
+    }    
   }
   
   @Override
@@ -127,6 +143,7 @@ public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle  
   public void start() {
     LOGGER.debug("Starting Alarm publisher");
     running = true;
+    republisher.start();
     listenerContainer.start();
   }
 
@@ -134,12 +151,20 @@ public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle  
   public void stop() {
     LOGGER.debug("Stopping Alarm publisher");
     listenerContainer.stop();
+    republisher.stop();    
     running = false;    
   }
 
   @Override
   public int getPhase() {
     return ServerConstants.PHASE_STOP_LAST - 1;    
+  }
+
+  @Override
+  public void publish(final AlarmValue alarmValue) {    
+    String jsonAlarm = GSON.toJson(alarmValue);
+    LOGGER.debug("Publishing alarm: " + jsonAlarm);
+    jmsSender.send(jsonAlarm);
   }
  
 }
