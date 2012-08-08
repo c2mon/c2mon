@@ -11,6 +11,7 @@ my $jardir                    = "../lib";
 my $appdir                    = "tim2-jviews-viewer-stable/";
 my $codebase                  = "http://timweb/test/javaws";
 my $c2monClientPropertiesURL  = "http://timweb/test/conf/c2mon-client.properties";
+my $log4jURL                  = "http://timweb/test/conf/log4j.xml";
 
 ##
 # Reading version number from ../version.txt
@@ -86,6 +87,8 @@ jarlist ("$jardir");
 print "    <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
 print "    <property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
+#log4j configuration URL
+print "    <property name=\"log4j.configuration\" value=\"$log4jURL\"/>\n";
 
 if (param('configurl')) {
 	print "		<property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";
