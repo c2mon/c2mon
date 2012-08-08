@@ -14,6 +14,7 @@ import static java.lang.String.format;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 import javax.jms.JMSException;
@@ -48,6 +49,11 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
      * Wrapped listener. Methods accessing this field are synchronized.
      */
     private Map<Long, TagUpdateListener> listeners = new HashMap<Long, TagUpdateListener>();
+    
+    /**
+     * Timestamps of tag updates used to filter out older events.
+     */
+    private ConcurrentHashMap<Long, Long> eventTimes = new ConcurrentHashMap<Long, Long>();
 
     /**
      * Constructor. Adds the listener to receive updates for the specified Tag id.
@@ -81,6 +87,7 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
      */
     public synchronized void removeListener(final Long tagId) {
         listeners.remove(tagId);
+        eventTimes.remove(tagId);
     }
 
     /**
@@ -102,14 +109,14 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
     protected synchronized void notifyListeners(TagValueUpdate tagValueUpdate) {
 
         if (listeners.containsKey(tagValueUpdate.getId())) {
-
-            if (LOGGER.isTraceEnabled()) {
+            if (!filterout(tagValueUpdate)) { 
+              if (LOGGER.isTraceEnabled()) {
                 LOGGER.trace(format(
                         "notifying listener about TagValueUpdate event. tag id: %d  value: %s timestamp: %s",
                         tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp()));
-            }
-
-            listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
+              }
+              listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);                           
+            }                       
         } else {
           if (LOGGER.isTraceEnabled()) {
               LOGGER.trace(format(
@@ -118,6 +125,18 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
           }
         }
           
+    }
+
+    private boolean filterout(TagValueUpdate tagValueUpdate) {      
+      Long oldTime = eventTimes.get(tagValueUpdate.getId());
+      Long newTime = tagValueUpdate.getServerTimestamp().getTime();
+      if (oldTime == null || oldTime <= newTime) {
+        eventTimes.put(tagValueUpdate.getId(), newTime);
+        return false;
+      } else {
+        LOGGER.info("Filtering out Tag update as newer update already received.");
+        return true;
+      }
     }
 
     @Override
