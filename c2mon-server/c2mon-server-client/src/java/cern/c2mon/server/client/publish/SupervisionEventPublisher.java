@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jms.JmsException;
 import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -32,6 +33,7 @@ import com.google.gson.Gson;
  *
  */
 @Service
+@ManagedResource(description = "Bean publishing supervision updates to the clients")
 public class SupervisionEventPublisher implements SupervisionListener, SmartLifecycle, Publisher<SupervisionEvent> {
 
   /** Class logger */

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jms.JmsException;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
@@ -38,6 +40,7 @@ import com.google.gson.Gson;
  *
  */
 @Service
+@ManagedResource(description = "Bean publishing Alarm updates to the clients")
 public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle, Publisher<AlarmValue>  {
   
   /** Class logger */
@@ -165,6 +168,22 @@ public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle, 
     String jsonAlarm = GSON.toJson(alarmValue);
     LOGGER.debug("Publishing alarm: " + jsonAlarm);
     jmsSender.send(jsonAlarm);
+  }
+  
+  /**
+   * @return the total number of failed publications since the publisher start
+   */
+  @ManagedOperation(description = "Returns the total number of failed alarm publication attempts since the application started")  
+  public long getNumberFailedPublications() {
+    return republisher.getNumberFailedPublications();
+  }
+
+  /**
+   * @return the number of current tag updates awaiting publication to the clients
+   */
+  @ManagedOperation(description = "Returns the current number of alarms awaiting re-publication (should be 0 in normal operation)")  
+  public int getSizeUnpublishedList() {    
+    return republisher.getSizeUnpublishedList();
   }
  
 }
