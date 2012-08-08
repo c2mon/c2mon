@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 import javax.jms.JMSException;
@@ -41,6 +42,11 @@ import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 class SupervisionListenerWrapper extends AbstractListenerWrapper<SupervisionListener, SupervisionEvent>{
 
   /**
+   * Timestamps of supervision events to filter out older events.
+   */
+  private ConcurrentHashMap<String, Long> eventTimes = new ConcurrentHashMap<String, Long>();
+  
+  /**
    * Constructor.
    * @param queueCapacity size of event queue
    * @param slowConsumerListener listener registered for JMS problem callbacks
@@ -56,13 +62,26 @@ class SupervisionListenerWrapper extends AbstractListenerWrapper<SupervisionList
   }
 
   @Override
-  protected void invokeListener(SupervisionListener listener, SupervisionEvent event) {
+  protected void invokeListener(SupervisionListener listener, SupervisionEvent event) {    
     listener.onSupervisionUpdate(event);
   }
 
   @Override
   protected String getDescription(SupervisionEvent event) {
     return "Supervision message for " + event.getEntity() + " " + event.getEntityId();
+  }
+
+  @Override
+  protected boolean filterout(SupervisionEvent event) {
+    String eventKey = event.getEntity().toString() + event.getEntityId().toString();
+    Long oldTime = eventTimes.get(eventKey);
+    Long newTime = event.getEventTime().getTime();
+    if (oldTime == null || oldTime <= newTime) {
+      eventTimes.put(eventKey, newTime);
+      return false;
+    } else {
+      return true;
+    }   
   }
 
 }

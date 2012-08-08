@@ -51,4 +51,9 @@ public class HeartbeatListenerWrapper extends AbstractListenerWrapper<HeartbeatL
     return "Heartbeat message with timestamp " + event.getTimestamp();
   }
 
+  @Override
+  protected boolean filterout(Heartbeat event) {    
+    return false;
+  }
+
 }

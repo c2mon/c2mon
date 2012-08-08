@@ -17,6 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 import javax.jms.JMSException;
@@ -46,6 +47,11 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, AlarmV
   private static final Gson GSON = GsonFactory.createGson();
   
   /**
+   * Timestamps of events to filter out older events.
+   */
+  private ConcurrentHashMap<Long, Long> eventTimes = new ConcurrentHashMap<Long, Long>();
+  
+  /**
    * Constructor.
    * @param queueCapacity size of event queue
    * @param slowConsumerListener listener registered for JMS problem callbacks
@@ -72,5 +78,17 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, AlarmV
   @Override
   protected String getDescription(AlarmValue event) {
     return "AlarmValue for alarm " + event.getId();
+  }
+
+  @Override
+  protected boolean filterout(AlarmValue event) {        
+    Long oldTime = eventTimes.get(event.getId());
+    Long newTime = event.getTimestamp().getTime();
+    if (oldTime == null || oldTime <= newTime) {
+      eventTimes.put(event.getId(), newTime);
+      return false;
+    } else {
+      return true;
+    }
   }
 }

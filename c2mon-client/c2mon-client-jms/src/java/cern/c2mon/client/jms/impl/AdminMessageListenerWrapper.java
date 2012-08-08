@@ -63,4 +63,9 @@ class AdminMessageListenerWrapper extends AbstractListenerWrapper<AdminMessageLi
     return "Admin message: " + event.getMessage();
   }
 
+  @Override
+  protected boolean filterout(AdminMessage event) {    
+    return false;
+  }
+
 }

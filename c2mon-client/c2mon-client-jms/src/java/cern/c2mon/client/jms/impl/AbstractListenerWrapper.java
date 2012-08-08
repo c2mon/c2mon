@@ -56,9 +56,19 @@ public abstract class AbstractListenerWrapper<T, U> extends AbstractQueuedWrappe
   protected abstract void invokeListener(T listener, U event);
   
   /**
+   * Return true if this event should be filtered out, in which
+   * case no listeners will be notified. Called once per incoming event.
+   * 
+   * <p>Allows the listener to filter out on timestamp for instance.
+   * 
+   * @param event the incoming event
+   */
+  protected abstract boolean filterout(U event);
+  
+  /**
    * Constructor.
    * @param queueCapacity size of queue of events waiting to be processed (exceptions thrown if full)
-   * @param slowConsumerListener listener that will be called when a slow consumer is detected (queue is full)
+   * @param slowConsumerListener listener that will be called when a slow consumer is detected (slow event consumption)
    */
   public AbstractListenerWrapper(final int queueCapacity, final SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
     super(queueCapacity, slowConsumerListener, executorService);
@@ -96,8 +106,10 @@ public abstract class AbstractListenerWrapper<T, U> extends AbstractQueuedWrappe
    * @param event event to notify
    */
   protected synchronized void notifyListeners(U event) {
-    for (T listener : listeners) {
-      invokeListener(listener, event);
+    if (!filterout(event)) {
+      for (T listener : listeners) {
+        invokeListener(listener, event);
+      }  
     }
   }
  
