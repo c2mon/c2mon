@@ -110,7 +110,14 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
             }
 
             listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
+        } else {
+          if (LOGGER.isTraceEnabled()) {
+              LOGGER.trace(format(
+                      "no subscribed listener for TagValueUpdate event. tag id: %d  value: %s timestamp: %s - filtering out",
+                      tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp()));
+          }
         }
+          
     }
 
     @Override
