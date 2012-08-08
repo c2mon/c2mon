@@ -134,7 +134,7 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
     try {
       if (message instanceof TextMessage) {        
         if (LOGGER.isTraceEnabled())
-           LOGGER.trace("AbstractQueuedWrapper received message for " + this.getClass().getSimpleName());
+           LOGGER.trace("AbstractQueuedWrapper received message for " + this.getClass().getSimpleName() + ": " + ((TextMessage)message).getText());
         
         U event = convertMessage(message);
         if (notificationTime.get() != 0 && (System.currentTimeMillis() - notificationTime.get()) > notificationTimeBeforeWarning.get()) {
