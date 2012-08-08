@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-client</groupId>
 		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.0.8</version>
+		<version>1.0.11</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-test</artifactId>
@@ -84,7 +84,7 @@
 
 		<dependency>
 			<groupId>cern.c2mon.c2mon-client</groupId>
-			<artifactId>c2mon-client-core</artifactId>
+			<artifactId>c2mon-client-all</artifactId>
 		</dependency>
 
 
