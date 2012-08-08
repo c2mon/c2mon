@@ -100,19 +100,19 @@ public class TagValuePublisher implements AlarmAggregatorListener, Publisher<Tag
    */
   @Override
   public void notifyOnUpdate(final Tag tag, final List<Alarm> alarms) {
-    TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
-    publish(tagWithAlarms);    
+    TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);    
+    try {
+      publish(tagWithAlarms);
+    } catch (JmsException e) {
+      LOGGER.error("Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e); 
+      republisher.publicationFailed(tagWithAlarms);      
+    }
   }
 
   @Override
   public void publish(final TagWithAlarms tagWithAlarms) {
     TransferTagValueImpl tagValue = TransferObjectFactory.createTransferTagValue(tagWithAlarms);
-    try {
-      jmsSender.sendToTopic(tagValue.toJson(), tagWithAlarms.getTag().getTopic());
-    } catch (JmsException e) {
-      LOGGER.error("Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId(), e); 
-      republisher.publicationFailed(tagWithAlarms);      
-    }
+    jmsSender.sendToTopic(tagValue.toJson(), tagWithAlarms.getTag().getTopic());
   }
 
   /**
