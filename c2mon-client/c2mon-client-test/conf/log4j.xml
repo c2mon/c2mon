@@ -1,84 +1,96 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
-	<!--
+  <!--
 
-		Set the threshold to "info" in production system. This will filter out
-		all debug messages. If you only want to enable/disable debugging for
-		certain parts of the system, change the "level" attribute of the
-		appropriate logger.
-	-->
-<log4j:configuration debug="true" threshold="debug"
-	xmlns:log4j='http://jakarta.apache.org/log4j/'>
+    Set the threshold to "info" in production system. This will filter out all debug messages. If you only want to enable/disable debugging for certain parts of the system, change
+    the "level" attribute of the appropriate logger.
+  -->
+<log4j:configuration debug="true" threshold="debug" xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-	<renderer renderedClass="cern.c2mon.client.common.tag.ClientDataTagValue"
-		renderingClass="cern.c2mon.client.common.tag.ClientDataTagValueRenderer" />
+  <renderer renderedClass="cern.c2mon.client.common.tag.ClientDataTagValue" renderingClass="cern.c2mon.client.common.tag.ClientDataTagValueRenderer" />
 
-	<appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
-		<errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
-			<root-ref />
-			<appender-ref ref="FallbackConsoleAppender" />
-		</errorHandler>
-		<param name="Append" value="true" />
-		<param name="File" value="${c2mon.log.dir}/${c2mon.process.name}-main.log" />
-		<param name="MaxBackupIndex" value="1" />
-		<param name="MaxFileSize" value="5MB" />
-		<param name="BufferedIO" value="false" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n" />
-		</layout>
-	</appender>
+  <appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
+    <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
+      <root-ref />
+      <appender-ref ref="FallbackConsoleAppender" />
+    </errorHandler>
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}-main.log" />
+    <param name="MaxBackupIndex" value="1" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="BufferedIO" value="false" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n" />
+    </layout>
+  </appender>
 
-	<appender name="FallbackConsoleAppender" class="org.apache.log4j.ConsoleAppender">
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n" />
-		</layout>
-	</appender>
+  <appender name="FallbackConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n" />
+    </layout>
+  </appender>
 
-	<appender name="ClientDataTagValueAppender" class="org.apache.log4j.RollingFileAppender">
-		<errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
-			<root-ref />
-			<appender-ref ref="FallbackConsoleAppender" />
-		</errorHandler>
-		<param name="Append" value="true" />
-		<param name="File" value="${c2mon.log.dir}/${c2mon.process.name}-tag.log" />
-		<param name="MaxBackupIndex" value="1" />
-		<param name="MaxFileSize" value="5MB" />
-		<param name="BufferedIO" value="false" />
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
-		</layout>
-	</appender>
+  <appender name="ClientDataTagValueAppender" class="org.apache.log4j.RollingFileAppender">
+    <errorHandler class="org.apache.log4j.varia.FallbackErrorHandler">
+      <root-ref />
+      <appender-ref ref="FallbackConsoleAppender" />
+    </errorHandler>
+    <param name="Append" value="true" />
+    <param name="File" value="${c2mon.log.dir}/${c2mon.process.name}-tag.log" />
+    <param name="MaxBackupIndex" value="1" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="BufferedIO" value="false" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
+    </layout>
+  </appender>
 
-	<!-- 
+  <appender name="CentralLoggingAppender" class="cern.cmw.log.sources.log4j.CmwLogAppender">
+    <param name="domain" value="TIM" />
+    <param name="subDomain" value="TIM-Viewer" />
+    <param name="threshold" value="INFO" />
+    <param name="sourceName" value="${user.name}-VERSION:${tim.version}-JAVA:${java.version}" />
+    <param name="serverName" value="cmw-log-pro:6200" />
+  </appender>
+
+  <!-- 
     Define the loggers.
     -->
-	<logger name="ClientDataTagValueLogger" additivity="false">
-		<level value="info" />
-		<appender-ref ref="ClientDataTagValueAppender" />
-	</logger>
-<!--	<logger name="RuleTagLogger" additivity="false">-->
-<!--		<level value="info" />-->
-<!--		<appender-ref ref="RuleTagAppender" />-->
-<!--	</logger>-->
-	<logger name="org.apache.activemq" additivity="false">
-		<level value="info" />
-		<appender-ref ref="FileAppender" />
-	</logger>
-	<logger name="org.springframework" additivity="false">
-		<level value="info" />
-		<appender-ref ref="FileAppender" />
-	</logger>
-	<logger name="cern.tim" additivity="false">
-		<level value="debug" />
-		<appender-ref ref="FileAppender" />
-	</logger>
-    <logger name="cern.c2mon" additivity="false">
-		<level value="debug" />
-		<appender-ref ref="FileAppender" />
-	</logger>	
-	<root>
-		<level value="info" />
-		<appender-ref ref="FileAppender" />
-	</root>
+  <logger name="CentralLogger" additivity="false">
+    <level value="info" />
+    <appender-ref ref="CentralLoggingAppender" />
+  </logger>
+  <logger name="ClientDataTagValueLogger" additivity="false">
+    <level value="info" />
+    <appender-ref ref="ClientDataTagValueAppender" />
+  </logger>
+  <!--	<logger name="RuleTagLogger" additivity="false">-->
+  <!--		<level value="info" />-->
+  <!--		<appender-ref ref="RuleTagAppender" />-->
+  <!--	</logger>-->
+  <logger name="org.apache.activemq" additivity="false">
+    <level value="info" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+  <logger name="org.springframework" additivity="false">
+    <level value="info" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+  <logger name="ch.cern.tim" additivity="false">
+    <level value="all" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+  <logger name="cern.tim" additivity="false">
+    <level value="all" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+  <logger name="cern.c2mon" additivity="false">
+    <level value="all" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+  <root>
+    <level value="info" />
+    <appender-ref ref="FileAppender" />
+  </root>
 </log4j:configuration>
