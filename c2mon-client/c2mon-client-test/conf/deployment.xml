@@ -65,12 +65,12 @@
         </directory>
       </deployment>
       <startscript name="C2MON-TEST-CLIENT">
-        <main-class name="cern.c2mon.client.apitest.C2monTestClient">
-          <output>
-            <file name="log/out.log" />
-          </output>
-        </main-class>
-        <vm-args>-Xms64m -Xmx64m</vm-args>
+        <initial-heap-size>32m</initial-heap-size>
+        <max-heap-size>32m</max-heap-size>
+        <main-class name="cern.c2mon.client.apitest.C2monTestClient"/>
+        <output>
+          <file name="log/out.log" />
+        </output>                         
         <property name="c2mon.client.conf.url" value="file:conf/c2mon-client.properties" />
         <property name="c2mon.log.dir" value="log" />
         <property name="log4j.configuration" value="conf/log4j.xml" />
