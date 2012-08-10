@@ -78,7 +78,7 @@ public class C2monTestClient {
     
     //subscribe to random subset of these tags
     C2monTagManager tagManager = C2monServiceGateway.getTagManager();
-    log.info(format("trying to subscribe to %s metrics", tagIds.size()));
+    log.info(format("trying to subscribe to %s metrics", subscriptionIds.size()));
     tagManager.subscribeDataTags(subscriptionIds, new DataTagUpdateListener() {
       @Override
       public void onUpdate(ClientDataTagValue tagUpdate) {
