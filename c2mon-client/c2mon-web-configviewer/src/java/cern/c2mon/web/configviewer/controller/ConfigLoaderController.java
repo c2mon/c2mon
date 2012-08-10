@@ -174,11 +174,17 @@ public class ConfigLoaderController {
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/configloader/errorform/{id}")
-  public String viewConfigLoaderErrorForm(@PathVariable(value = "id") final String id, final Model model) {
+  public String viewConfigLoaderErrorForm(@PathVariable(value = "id") final String errorId,
+      @RequestParam(value = "id", required = false) final String id, final Model model) {
+    
     logger.debug("/configloader/errorform " + id);
 
-    model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
-    model.addAttribute("err", id);
+   if (id == null)
+      model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, null, null));
+    else
+      return ("redirect:" + CONFIG_LOADER_URL + id);
+
+    model.addAttribute("err", errorId);
     return "notFoundErrorFormWithData";
   }
 

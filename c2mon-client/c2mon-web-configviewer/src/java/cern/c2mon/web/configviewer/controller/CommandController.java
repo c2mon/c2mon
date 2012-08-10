@@ -117,11 +117,17 @@ public class CommandController {
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/commandviewer/errorform/{id}")
-  public String viewCommandErrorForm(@PathVariable(value = "id") final String id, final Model model) {
+  public String viewCommandErrorForm(@PathVariable(value = "id") final String errorId,
+      @RequestParam(value = "id", required = false) final String id, final Model model) {
+    
     logger.info("/commandviewer/errorform " + id);
 
-    model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR, COMMAND_FORM_URL, id, COMMAND_URL + id));
-    model.addAttribute("err", id);
+    if (id == null)
+      model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR, COMMAND_FORM_URL, id, COMMAND_URL + id));
+    else
+      return ("redirect:" + COMMAND_URL + id);
+
+    model.addAttribute("err", errorId);
     return "notFoundErrorFormWithData";
   }
 

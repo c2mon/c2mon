@@ -1,8 +1,6 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
@@ -140,12 +138,18 @@ public class DataTagController {
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
-  @RequestMapping(value = "/tagviewer/errorform/{id}")
-  public String viewTagErrorForm(@PathVariable(value = "id") final String id, final Model model) {
+  @RequestMapping(value = "/tagviewer/errorform/{id}", method = { RequestMethod.GET, RequestMethod.POST })
+  public String viewTagErrorForm(@PathVariable(value = "id") final String errorId,
+      @RequestParam(value = "id", required = false) final String id, final Model model) {
+    
     logger.info("/tagviewer/errorform " + id);
+    
+    if (id == null)
+      model.addAllAttributes(FormUtility.getFormModel(TAG_FORM_TITLE, TAG_FORM_INSTR, TAG_FORM_URL, null, null));
+    else
+      return ("redirect:" + TAG_URL + id);
 
-    model.addAllAttributes(FormUtility.getFormModel(TAG_FORM_TITLE, TAG_FORM_INSTR, TAG_FORM_URL, null, null));
-    model.addAttribute("err", id);
+    model.addAttribute("err", errorId);
     return "notFoundErrorFormWithData";
   }
 

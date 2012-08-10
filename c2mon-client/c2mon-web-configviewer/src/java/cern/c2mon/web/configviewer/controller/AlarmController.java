@@ -139,11 +139,17 @@ public class AlarmController {
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/alarmviewer/errorform/{id}")
-  public String viewAlarmErrorForm(@PathVariable(value = "id") final String id, final Model model) {
+  public String viewAlarmErrorForm(@PathVariable(value = "id") final String errorId,
+      @RequestParam(value = "id", required = false) final String id, final Model model) {
+    
     logger.info("/alarmviewer/errorform " + id);
 
-    model.addAllAttributes(FormUtility.getFormModel(ALARM_FORM_TITLE, ALARM_FORM_INSTR, ALARM_FORM_URL, null, null));
-    model.addAttribute("err", id);
+    if (id == null)
+      model.addAllAttributes(FormUtility.getFormModel(ALARM_FORM_TITLE, ALARM_FORM_INSTR, ALARM_FORM_URL, null, null));
+    else
+      return ("redirect:" + ALARM_URL + id);
+
+    model.addAttribute("err", errorId);
     return "notFoundErrorFormWithData";
   }
 
