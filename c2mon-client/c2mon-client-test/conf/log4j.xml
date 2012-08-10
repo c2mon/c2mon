@@ -6,7 +6,7 @@
     Set the threshold to "info" in production system. This will filter out all debug messages. If you only want to enable/disable debugging for certain parts of the system, change
     the "level" attribute of the appropriate logger.
   -->
-<log4j:configuration debug="true" threshold="debug" xmlns:log4j='http://jakarta.apache.org/log4j/'>
+<log4j:configuration debug="false" threshold="all" xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
   <renderer renderedClass="cern.c2mon.client.common.tag.ClientDataTagValue" renderingClass="cern.c2mon.client.common.tag.ClientDataTagValueRenderer" />
 
