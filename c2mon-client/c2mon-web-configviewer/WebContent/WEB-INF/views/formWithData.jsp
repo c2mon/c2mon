@@ -41,9 +41,8 @@
 	<strong>${instruction}</strong>
 </div>
 
-<c:url var="submitUrl" value="${formSubmitUrl}"/>
 
-<form class="well" action="${submitUrl}" method="post">
+<form class="well" action="" method="post">
 	<input type="text" name="id" value="${formTagValue}" size="10" /> 
 	<input class="btn btn-large btn-primary" type="submit" value="Submit">
 </form>
