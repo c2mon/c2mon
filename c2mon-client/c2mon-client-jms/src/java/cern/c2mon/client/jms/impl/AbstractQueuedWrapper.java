@@ -138,12 +138,13 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
            LOGGER.trace("AbstractQueuedWrapper received message for " + this.getClass().getSimpleName() + ": " + ((TextMessage)message).getText());
         
         U event = convertMessage(message);
-        if (notificationTime.get() != 0 && (System.currentTimeMillis() - notificationTime.get()) > notificationTimeBeforeWarning.get()) {
+        long lastNotificationTime = notificationTime.get();
+        if (lastNotificationTime != 0 && (System.currentTimeMillis() - lastNotificationTime) > notificationTimeBeforeWarning.get()) {
           String warning = "Slow consumer warning: " + this.getClass().getSimpleName() + ". "
                               + "C2MON client is not consuming updates correctly and should be restarted! " 
                               + " Event type: " + getDescription(event);
           LOGGER.warn(warning);
-          LOGGER.warn("No returning call from listener since " + new Timestamp(notificationTime.get()));
+          LOGGER.warn("No returning call from listener since " + new Timestamp(lastNotificationTime));
           slowConsumerListener.onSlowConsumer(warning);
         }
         eventQueue.put(event);
