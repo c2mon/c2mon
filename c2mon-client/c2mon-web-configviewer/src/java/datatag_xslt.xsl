@@ -112,6 +112,7 @@
 	
 		<!--  process the XML element invalidQualityStates - entry  -->
 	<xsl:template match="invalidQualityStates">
+		<xsl:if test="entry!=''">
 		<p>
 		</p>	
 		<table class="inline">
@@ -144,6 +145,7 @@
 			</xsl:for-each>
 			</xsl:for-each>
 		</table>
+		</xsl:if>
 	
 	</xsl:template>
 	
