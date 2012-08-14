@@ -141,25 +141,25 @@ public class RequestHandlerImplTest {
   }
 
   /**
-   * Tests that a request is split into bunches of 250 and results are gathered in the correct way.
+   * Tests that a request is split into bunches of 500 and results are gathered in the correct way.
    * @throws JMSException 
    */
   @Test
   public void getManyTags() throws JMSException {
     Collection<Object> returnCollection = Arrays.asList(new Object(), new Object());
     EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), 
-        EasyMock.eq("request queue"), EasyMock.eq(10000),
+        EasyMock.eq("request queue"), EasyMock.eq(10000), //10000 is timeout
         (ClientRequestReportListener) EasyMock.isNull()
-            )).andReturn(returnCollection).times(100);
+            )).andReturn(returnCollection).times(20);
 
     EasyMock.replay(jmsProxy);
 
     LongRange range = new LongRange(1, 10000);
 
     long[] arrayRange = range.toArray();
-    Collection<Long> ids = Arrays.asList(ArrayUtils.toObject(arrayRange)); 
+    Collection<Long> ids = Arrays.asList(ArrayUtils.toObject(arrayRange));    
     Collection result = requestHandlerImpl.requestTags(ids);
-    Assert.assertEquals(200,result.size());
+    Assert.assertEquals(40,result.size()); //each request for 500 tags returns 2 objects (faked list back)
 
     EasyMock.verify(jmsProxy);
   }
