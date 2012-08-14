@@ -8,7 +8,9 @@
      <property name="l1.cachemanager.criticalThreshold" value="95" />
      <property name="l1.cachemanager.threshold" value="90" />
      <property name="l2.objectmanager.dgc.young.enabled" value="true" />
-     <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="360000" />     
+     <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="360000" />
+     <!-- allow a client to attempt reconnection to a TC server (for 2 seconds, which is default) -->          
+     <property name="l2.l1reconnect.enabled" value="true" />
   </tc-properties>  
   <servers>
     <server host="cs-ccr-tim11" name="server1">
@@ -199,7 +201,10 @@
           <class-expression>cern.tim.server.cache.process.ProcessFacadeImpl</class-expression>
         </include>
         <include>
-          <class-expression>cern.tim.server.cache.process.ProcessXMLProvider</class-expression>
+          <class-expression>cern.tim.server.cache.process.ProcessCacheImpl</class-expression>
+        </include>
+        <include>
+          <class-expression>cern.tim.server.cache.process.ProcessXMLProviderImpl</class-expression>
         </include>
         <include>
           <class-expression>cern.tim.server.configuration.handler.impl.ProcessConfigHandlerImpl</class-expression>
@@ -385,7 +390,11 @@
         <root>       
           <field-name>cern.c2mon.server.laser.publication.LaserPublisherImpl.backupLock</field-name>
           <root-name>laserModuleBackupLock</root-name>
-        </root>         
+        </root>
+        <root>       
+          <field-name>cern.tim.server.cache.process.ProcessCacheImpl.processNameLookup</field-name>
+          <root-name>processNameLookup</root-name>
+        </root>       
        </roots>
 <!--      <web-applications>-->
 <!--        <web-application>viewTags</web-application>-->
