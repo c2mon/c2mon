@@ -4,23 +4,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.StringWriter;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import cern.c2mon.web.configviewer.service.AlarmService;
 
 /**
  * Utility class to perform xslt transformations
@@ -35,9 +31,15 @@ public final class XsltTransformUtility {
 
   /** the path to the xslt document */
   private static final String XSLT_PATH = "/generic_tag.xsl";
+  
+  /** the path to the xslt document */
+  private static final String REMOVE_NAMESPACES_XSLT_PATH = "/removeXmlNamespaces.xsl";
 
-  /** xslt Source. Used to perform xslt transformations */
-  private Source xsltSource;
+  /** Default xslt Source. Used to perform xslt transformations */
+  private Source defaultXsltSource;
+  
+  /** Used to remove XML Namespaces */
+  private Source removeXmlNamespacesXsltSource;
 
   /** Transformer performs xslt transformations */
   private Transformer trans;
@@ -46,27 +48,70 @@ public final class XsltTransformUtility {
    * XsltTransformUtility.
    **/
   public XsltTransformUtility() { 
-
-    InputStream xsltResource = new Object() { }.getClass().getResourceAsStream(XSLT_PATH);
     
-    if (xsltResource != null) {
-      logger.info("XsltTransformUtility(): Sucessfully initialised xsltResource -" + XSLT_PATH);
-    }
-    
-    xsltSource = new StreamSource(xsltResource);    
-    
-    if (xsltSource == null) {
-      logger.error("XsltTransformUtility() xsltSource is null!");
-    }
+    initializeXsltResources();
 
     TransformerFactory transFact = TransformerFactory.newInstance();
     try {
-      trans = transFact.newTransformer(xsltSource);
+      trans = transFact.newTransformer(defaultXsltSource);
     } catch (TransformerConfigurationException e) {
       logger.error("XsltTransformUtility() Error while initialising xslt TransformerFactory:"
           + e.getMessage());
     }
   };
+  
+  /**
+   * Reads the xslt files used in the xslt transformations.
+   */
+  private void initializeXsltResources() {
+    
+    // xslt used to remove Xml Namespaces
+    InputStream removeNamespaceXsltResource = new Object() { }.getClass().getResourceAsStream(REMOVE_NAMESPACES_XSLT_PATH);
+    if (removeNamespaceXsltResource != null) {
+      logger.info("XsltTransformUtility(): Sucessfully initialised xsltResource -" + REMOVE_NAMESPACES_XSLT_PATH);
+    }
+    removeXmlNamespacesXsltSource = new StreamSource(removeNamespaceXsltResource);    
+    if (removeXmlNamespacesXsltSource == null) {
+      logger.error("XsltTransformUtility() removeXmlNamespacesXsltSource is null!");
+    }
+    
+    // default xslt used in transformations
+    InputStream defaultxsltResource = new Object() { }.getClass().getResourceAsStream(XSLT_PATH);
+    if (defaultxsltResource != null) {
+      logger.info("XsltTransformUtility(): Sucessfully initialised xsltResource -" + XSLT_PATH);
+    }    
+    defaultXsltSource = new StreamSource(defaultxsltResource);    
+    if (defaultXsltSource == null) {
+      logger.error("XsltTransformUtility() defaultxsltResource is null!");
+    }
+  }
+  
+  /**
+   * Removes Namespaces from the specified XML file.
+   * 
+   * @param xml the XML file
+   * @return the XML file without Namespaces
+   * @throws TransformerException
+   */
+  private String removeXmlNameSpaces(final String xml) throws TransformerException {
+    
+    Source xmlSource = new StreamSource(new StringReader(xml)); // the input file
+    
+    Transformer transf = null;
+    try {
+      transf = TransformerFactory.newInstance().newTransformer(removeXmlNamespacesXsltSource);
+    } catch (TransformerConfigurationException e) {
+      logger.error("XsltTransformUtility() Error while initialising xslt TransformerFactory:"
+          + e.getMessage());
+    } catch (TransformerFactoryConfigurationError e) {
+      logger.error("XsltTransformUtility() Error while initialising xslt TransformerFactory:"
+          + e.getMessage());
+    }
+    
+    StringWriter writer = new StringWriter();
+    transf.transform(xmlSource, new StreamResult(writer));
+    return writer.toString();
+  }
 
   /**
    * Transforms the xml to Html using xslt.
@@ -76,9 +121,27 @@ public final class XsltTransformUtility {
    */
   public String performXsltTransformation(final String xml) throws TransformerException {
 
-    OutputStream ostream = null;
+    return performXsltTransformation(xml, false);
+  }
+  
+  /**
+   * Transforms the xml to Html using xslt.
+   * @param xml The xml to be transformed
+   * @param ignoreXmlNameSpaces if true Namespaces in the Xml file will be removed
+   * before the transformation takes place.
+   * 
+   * @return The html produced by transforming the xml using xslt.
+   * @throws TransformerException if something goes wrong during the transformation
+   */
+  public String performXsltTransformation(final String xml, final boolean ignoreXmlNameSpaces) throws TransformerException {
 
-    Source xmlSource = new StreamSource(new StringReader(xml));
+    OutputStream ostream = null;
+    String xmlToBeTransformed = xml;
+    
+    if (ignoreXmlNameSpaces)
+      xmlToBeTransformed = removeXmlNameSpaces(xml);
+    
+    Source xmlSource = new StreamSource(new StringReader(xmlToBeTransformed));
 
     ostream = new ByteArrayOutputStream();
     trans.transform(xmlSource, new StreamResult((ostream)));
