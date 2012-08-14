@@ -134,7 +134,7 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
         eventTimes.put(tagValueUpdate.getId(), newTime);
         return false;
       } else {
-        LOGGER.info("Filtering out Tag update as newer update already received.");
+        LOGGER.warn(format("Filtering out Tag update as newer update already received (tag id: %d, value: %s)", tagValueUpdate.getId(), tagValueUpdate.getValue()));
         return true;
       }
     }
