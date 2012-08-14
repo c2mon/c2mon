@@ -32,9 +32,9 @@
             <!-- name of the JMS queue for client to server standard requests -->
             <prop key="c2mon.client.jms.request.queue">c2mon.client.request</prop>
             <!-- number of tags requested per JMS message -->  
-            <prop key="c2mon.client.request.size">100</prop>
+            <prop key="c2mon.client.request.size">500</prop>
             <!-- max number of threads used to request tags from server -->  
-            <prop key="c2mon.client.request.threads.max">20</prop>  
+            <prop key="c2mon.client.request.threads.max">5</prop>  
     		</props>  
  		 </property>  
 	</bean>

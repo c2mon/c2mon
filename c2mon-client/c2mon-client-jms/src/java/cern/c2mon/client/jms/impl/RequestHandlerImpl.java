@@ -73,13 +73,13 @@ public class RequestHandlerImpl implements RequestHandler {
    * own thread on the server and is sent in a single JMS message.
    */
   @Value("${c2mon.client.request.size}")
-  private int maxRequestSize = 100;
+  private int maxRequestSize = 500;
 
   /**
    * Core/max number of threads in executor.
    */
   @Value("${c2mon.client.request.threads.max}")
-  private int corePoolSize = 20;
+  private int corePoolSize = 5;
 
   /**
    * Thread idle timeout in executor (in seconds), including core threads.
