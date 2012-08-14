@@ -87,7 +87,7 @@ public class ProcessService {
     String html = null;
 
     try {
-      html = xsltTransformer.performXsltTransformation(xml);
+      html = xsltTransformer.performXsltTransformation(xml, true);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation.");
       throw new TransformerException("Error while performing xslt transformation.");
