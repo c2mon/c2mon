@@ -241,7 +241,7 @@
         </include>
         <include>
           <class-expression>cern.tim.server.cache.alive.AliveTimerFacadeImpl</class-expression>
-        </include>
+        </include>        
         <!-- CommFault cache -->
         <include>
           <class-expression>cern.tim.server.common.commfault.CommFaultTagCacheObject</class-expression>
@@ -394,7 +394,15 @@
         <root>       
           <field-name>cern.tim.server.cache.process.ProcessCacheImpl.processNameLookup</field-name>
           <root-name>processNameLookup</root-name>
-        </root>       
+        </root>   
+        <root>       
+          <field-name>cern.tim.server.supervision.alive.AliveTimerChecker.lastCheck</field-name>
+          <root-name>lastAliveCheck</root-name>
+        </root>   
+        <root>       
+          <field-name>cern.tim.server.supervision.alive.AliveTimerChecker.exclusiveAliveLock</field-name>
+          <root-name>aliveCheckerLock</root-name>
+        </root>        
        </roots>
 <!--      <web-applications>-->
 <!--        <web-application>viewTags</web-application>-->
