@@ -142,7 +142,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      * 
      * @return The current value array.
      */
-    public byte[] getCurrentValues() {
+    protected byte[] getCurrentValues() {
         return currentValues;
     }
 
@@ -151,7 +151,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      * 
      * @return The last values.
      */
-    public byte[] getLastValues() {
+    protected byte[] getLastValues() {
         return lastValues;
     }
 
@@ -161,7 +161,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      * @param jecpFrames The frame to process.
      */
     @Override
-    public void processJECPFrame(final JECPFrames jecpFrames) {
+    protected void processJECPFrame(final JECPFrames jecpFrames) {
         try {
             copyJECDataToArray(jecpFrames);
             int blockNumber = jecpFrames.GetDataStartNumber();
@@ -212,7 +212,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
             final int length) {
         String tempArray = "";
         for (int k = startpos; k < length; k++) {
-            tempArray = tempArray + (" 0x" + Integer.toHexString(array[k]));
+            tempArray = tempArray + (" 0x" + Integer.toHexString(array[k] & 0xFF));
         }
         return tempArray;
     }
@@ -234,7 +234,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
                 && !sourceDataTag.getCurrentValue().isValid()
                 && sourceDataTag.getCurrentValue().getQuality().getDescription() != null
                 && sourceDataTag.getCurrentValue().getQuality().getDescription().equals(JECMessageHandler.HIERARCHICAL_INVALIDATION_MESSAGE)) {
-            getEquipmentLogger().debug("TAG: " + sourceDataTag.getId() + " comes from the DEAD UNIT: " + plcHardwareAddress.getNativeAddress());
+            getEquipmentLogger().debug("TAG: " + sourceDataTag.getId() + " comes from the DEAD UNIT: " + plcHardwareAddress.getNativeAddress() + " - not sending to server");
         } else {
             getEquipmentLogger().debug("Sending tag value through filter: ID '" + sourceDataTag.getId() + "' value=" + value.toString());
             equipmentMessageSender.sendTagFiltered(sourceDataTag, value, timestamp);

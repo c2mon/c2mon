@@ -147,7 +147,7 @@ public class PLCConfiguration {
                 else if (propertyKey.equalsIgnoreCase("Dp_slave_address")) {
                     // If there are no more tokens, means no slaves
                     if (!configurationPropertyTokens.hasMoreTokens()) {
-                        LOGGER.error("ERROR: Invalid declaration for Dp_slave_address in configuration!");
+                        LOGGER.info("No DP slave address found in configuration");
                     }
                     // If there are more tokens, but ',' doesn't appear, there's
                     // only one slave

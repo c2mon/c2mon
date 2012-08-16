@@ -89,7 +89,7 @@ public abstract class AbstractJECPFrameProcessor extends Thread {
      * Processes a JECFrame. This method has to be implemented from subclasses.
      * @param jecpFrames The frame to be processed.
      */
-    public abstract void processJECPFrame(JECPFrames jecpFrames);
+    protected abstract void processJECPFrame(JECPFrames jecpFrames);
     
     /**
      * Run method of the thread. Processes a JECPFrame and waits for more of
@@ -171,6 +171,8 @@ public abstract class AbstractJECPFrameProcessor extends Thread {
                 getEquipmentLogger().debug("Processing JECFrame... (Msg Id: '" + getSupervisedMessagesId() + "')");
             processJECPFrame(jecpFrames);
             valueProcessed = true;
+            if (getEquipmentLogger().isDebugEnabled())
+              getEquipmentLogger().debug("Finished processing JECFrame... (Msg Id: '" + getSupervisedMessagesId() + "')");
         }
         return valueProcessed;
     }
