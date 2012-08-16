@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicLong;
 
 import cern.tim.driver.common.EquipmentMessageHandler;
 import cern.tim.driver.tools.equipmentexceptions.EqIOException;
@@ -46,7 +47,6 @@ import ch.cern.tim.jec.ConnectionData;
 import ch.cern.tim.jec.JECIndexOutOfRangeException;
 import ch.cern.tim.jec.JECPFrames;
 import ch.cern.tim.jec.StdConstants;
-
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The
@@ -86,6 +86,12 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
      * startup is stopped and retried.
      */
     private static final int MAX_FAILED_RECEIVES = 5;
+    
+    /**
+     * Only reject alives on seq. number basis if one has been sent
+     * in the last MAX_REJECT_ALIVE_TIME to server.
+     */
+    private static final int MAX_REJECT_ALIVE_TIME = 30000;
 
     /**
      * The PLC configuration object to access all values of the PLC.
@@ -146,6 +152,13 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
      * number
      */
     private byte superSeqNumber = 0x00;
+    
+    /**
+     * Time of last supervision alive. Use this in conjunction to superSeqNumber
+     * to filter out repeated messages from PLC (is necessary while PLC uses
+     * single sequence and JEC DAQ seq per type - see TIMS-751).
+     */
+    private AtomicLong lastSupervisionAlive = new AtomicLong(0);
 
     /**
      * Field to store the currently connected PLC.
@@ -468,15 +481,17 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
      * @param supervisionFrame The supervision frame received from the PLC.
      */
     private void processSupervisionFrame(final JECPFrames supervisionFrame) {
-        if (supervisionFrame.GetSequenceNumber() != superSeqNumber) {
+        if (supervisionFrame.GetSequenceNumber() != superSeqNumber 
+            || System.currentTimeMillis() - lastSupervisionAlive.get() > MAX_REJECT_ALIVE_TIME) {
             // Acknowledge the received message
             try {
                 jecController.acknowledgeReceivedMessage(sendFrame, supervisionFrame);
                 getEquipmentLogger().debug("SUPERVISION ALIVE MESSAGE: Acknowledgement succeeded!");
                 // Store the last sequence number of this kind of
                 // message to avoid repetitions
-                superSeqNumber = supervisionFrame.GetSequenceNumber();
+                superSeqNumber = supervisionFrame.GetSequenceNumber();               
                 getEquipmentMessageSender().sendSupervisionAlive(System.currentTimeMillis());
+                lastSupervisionAlive.set(System.currentTimeMillis());
                 connectionSamplerThread.updateAliveTimer();
             } catch (IOException e) {
                 getEquipmentLogger().error("SUPERVISION ALIVE MESSAGE: Error while acknowledging received message to JEC");
