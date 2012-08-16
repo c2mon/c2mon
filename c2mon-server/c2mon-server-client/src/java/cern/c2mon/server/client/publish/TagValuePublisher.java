@@ -110,8 +110,11 @@ public class TagValuePublisher implements AlarmAggregatorListener, Publisher<Tag
   }
 
   @Override
-  public void publish(final TagWithAlarms tagWithAlarms) {
+  public void publish(final TagWithAlarms tagWithAlarms) {    
     TransferTagValueImpl tagValue = TransferObjectFactory.createTransferTagValue(tagWithAlarms);
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace("Publishing tag update to client: " + tagValue.toJson());
+    }
     jmsSender.sendToTopic(tagValue.toJson(), tagWithAlarms.getTag().getTopic());
   }
 
