@@ -9,8 +9,12 @@
      <property name="l1.cachemanager.threshold" value="90" />
      <property name="l2.objectmanager.dgc.young.enabled" value="true" />
      <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="360000" />
-     <!-- allow a client to attempt reconnection to a TC server (for 2 seconds, which is default) -->          
+     <!-- allow a client to attempt reconnection to a TC server (for 5 seconds, 2 is default) -->          
      <property name="l2.l1reconnect.enabled" value="true" />
+     <property name="l2.l1reconnect.timeout.millis" value="5000" />  
+     <!-- allow TC mirror to attempt to reconnect for longer due to network disruption -->
+     <property name="l2.nha.tcgroupcomm.reconnect.enabled" value="true" />       
+     <property name="l2.nha.tcgroupcomm.reconnect.timeout" value="5000" />  
   </tc-properties>  
   <servers>
     <server host="cs-ccr-tim11" name="server1">

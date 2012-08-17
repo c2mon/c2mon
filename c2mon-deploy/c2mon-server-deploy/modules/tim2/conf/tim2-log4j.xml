@@ -281,7 +281,7 @@
     <appender-ref ref="LoggingAppender"/>
     <appender-ref ref="CentralLoggingAppender"/>
   </logger>
-  <logger name="cern.tim.server.cachepersistence"  additivity="false">
+  <logger name="cern.tim.server.cachepersistence"  additivity="true">
     <level value="debug"/>    
     <appender-ref ref="DevelopperEmail"/> 
     <appender-ref ref="PersistenceAppender"/>
