@@ -58,6 +58,12 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    * Initial delay before sending first backup (ms).
    */
   private static final int INITIAL_BACKUP_DELAY = 60000;
+
+  /**
+   * Max number of minutes allowed for backup to complete. If takes
+   * longer, will fail and be re-attempted in backupInterval ms.
+   */
+  private static final long MAX_BACKUP_TIME = 3;
   
   /**
    * Is the connect thread already running?
@@ -134,7 +140,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
         for (Long alarmId : alarmCache.getKeys()) {
           tasks.add(new BackupTask(alarmId));            
         }
-        List<Future<FaultState>> taskResults = backupExecutor.invokeAll(tasks, 1, TimeUnit.MINUTES);
+        List<Future<FaultState>> taskResults = backupExecutor.invokeAll(tasks, MAX_BACKUP_TIME, TimeUnit.MINUTES);
         ArrayList<FaultState> toSend = new ArrayList<FaultState>();
         for (Future<FaultState> result : taskResults) {
           try {
