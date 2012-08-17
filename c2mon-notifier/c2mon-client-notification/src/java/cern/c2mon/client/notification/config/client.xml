@@ -31,6 +31,7 @@
             <constructor-arg index="0"
                value="${c2mon.notification.jms.url}" />
             <property name="dispatchAsync" value="true" />
+            <property name="watchTopicAdvisories" value="false"/>
          </bean>
       </property>
    </bean>
