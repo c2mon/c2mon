@@ -24,11 +24,6 @@
 				<property name="c2mon.log.dir" value="${DAQ_LOG_HOME}" />
 				<property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
 				
-				<!--  JAPC-EXT-YAMI tuning -->
-				<property name="japc.ext.yami.subscriptionMonitor.poolSize" value="20" />
-				<property name="japc.ext.yami.confirmationTimeoutMs" value="500" />				
-				<property name="japc.ext.yami.checkPeriodMs" value="10000" />
-
 				<preExec>
 			        <![CDATA[
 			          [[ -z $DAQ_VM_ARGS ]] && echo "DAQ_VM_ARGS not set!" && exit 1
