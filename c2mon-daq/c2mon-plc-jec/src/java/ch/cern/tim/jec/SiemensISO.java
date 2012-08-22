@@ -105,7 +105,8 @@ public class SiemensISO implements PLCDriver
    // Command Frame squeleton - size defined by RFC1006
    private byte CommandFrame[] = new byte [MAXCFRAME_SIZE];                     
    // Data Frame squeleton - size is defined by the RFC1006   
-   private byte DataFrame[] = new byte [MAXDFRAME_SIZE];    
+   private byte sendDataFrame[] = new byte [MAXDFRAME_SIZE];
+   private byte receiveDataFrame[] = new byte [MAXDFRAME_SIZE];
    
    /**
     * Lock for sychronising message sending and receiving
@@ -214,24 +215,24 @@ public class SiemensISO implements PLCDriver
  * This method is used to fill the Data Frame with the standard protocol 
  * defined values.
  */
-  private void FillDataFrame()
+  private void FillDataFrame(byte[] frame)
   {
     // vrsn: always 3 for this RFC version
-    DataFrame[0] = 0x03;                                                        
+    frame[0] = 0x03;                                                        
     // Reserved: always 0
-    DataFrame[1] = 0x00;                                                        
+    frame[1] = 0x00;                                                        
     // To fill up with the length of the entire packet (2 bytes)
-    DataFrame[2] = 0x00;                                                        
-    DataFrame[3] = 0x00;    
+    frame[2] = 0x00;                                                        
+    frame[3] = 0x00;    
 
     // Length of entire packet excluding header
-    DataFrame[4] = 0x02;                                                        
+    frame[4] = 0x02;                                                        
     // Code: (4 highest bits) : DT
     // Credit: (4 lowest bits) : 0
-    DataFrame[5] = DT_FRAME;                                                    
+    frame[5] = DT_FRAME;                                                    
     // 0x80 when its the Last Frame
     // 0x00 when its an Intermediate Frame
-    DataFrame[6] = 0x00;                                                        
+    frame[6] = 0x00;                                                        
 
     // User Data (size = MAXTSDU_SIZE)    
     // xx xx xx xx .. */                                                        
@@ -747,9 +748,9 @@ public class SiemensISO implements PLCDriver
       // Pointer to 'navigate' inside the message
       byte ptrmsg = 0;                                                            
       // Fill up the Data Frame to send data using ISO-on-TCP
-      this.FillDataFrame();                                                       
+      this.FillDataFrame(sendDataFrame);                                                       
       // Copy of Data Frame to send data to PLC
-      byte[] MessageData = DataFrame;                                             
+      byte[] MessageData = sendDataFrame;                                             
       // Array to store a 'short' type value splitted in 2 bytes
       byte[] bytes = new byte[2];                                                 
       // String to store debug message to be sent to the logger
@@ -903,9 +904,9 @@ public class SiemensISO implements PLCDriver
       // Variable to store the size of entire packet
       short size = 0;                                                             
       // Fill up the Data Frame to send data using ISO-on-TCP
-      this.FillDataFrame();                                                       
+      this.FillDataFrame(receiveDataFrame);                                                       
       // Copy of Data Frame to send data to PLC
-      byte[] MessageData = DataFrame;                                             
+      byte[] MessageData = receiveDataFrame;                                             
       // Pointer to 'navigate' inside the array of data
       int dptr = 0;                                                               
       // Array to store the received data (filtered - no header)
