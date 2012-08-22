@@ -1,5 +1,7 @@
 package cern.c2mon.client.core.manager;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -210,7 +212,16 @@ public class CommandManager implements C2monCommandManager {
           + ". It cannot be compared to a value of type " + value.getClass().getName() + ". Contact the configuration responsible for correcting this problem");
     }
     
-    return new CommandExecuteRequestImpl<T>(commandTag.getId(), value, commandTag.getClientTimeout());
+    String hostname;
+    try {
+      hostname = InetAddress.getLocalHost().getHostName();
+    } catch (UnknownHostException e) {
+      LOG.warn("UnknownHostException caught while creating command request - set to unknown", e);
+      hostname = "unknown-host";
+    }
+    
+    return new CommandExecuteRequestImpl<T>(commandTag.getId(), value, 
+                                  commandTag.getClientTimeout(), System.getProperty("user.home"), hostname);
   }
 
   @Override
