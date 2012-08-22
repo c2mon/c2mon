@@ -19,13 +19,6 @@
 	<description>The DMN2 jviews-viewer deployment module</description>
 	<url></url>
 
-	<dependencies>
-		<dependency>
-			<groupId>cern.tim.tim-client</groupId>
-			<artifactId>tim-jviews-viewer</artifactId>
-		</dependency>
-	</dependencies>
-
 	<developers />
 	<scm>
 		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-jviews-viewer-deploy/modules/dmn2</developerConnection>
@@ -82,7 +75,6 @@
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
-							<stripVersion>true</stripVersion>
 						</configuration>
 					</execution>
 				</executions>

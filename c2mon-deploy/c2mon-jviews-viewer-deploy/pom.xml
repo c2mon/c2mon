@@ -1,39 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>cern.tim.tim-client</groupId>
-		<artifactId>tim-client-pom</artifactId>
-		<version>1.0.3</version>
-	</parent>
+  <parent>
+    <groupId>cern.tim.tim-client</groupId>
+    <artifactId>tim-client-pom</artifactId>
+    <version>1.0.3</version>
+  </parent>
 
-	<groupId>cern.c2mon.c2mon-deploy</groupId>
-	<artifactId>c2mon-jviews-viewer-deploy</artifactId>
-	<name>C2MON jviews viewer deployment module</name>
-	<version>1.1.9-SNAPSHOT</version>
+  <groupId>cern.c2mon.c2mon-deploy</groupId>
+  <artifactId>c2mon-jviews-viewer-deploy</artifactId>
+  <name>C2MON jviews viewer deployment module</name>
+  <version>1.1.9-SNAPSHOT</version>
 
-	<packaging>pom</packaging>
+  <packaging>pom</packaging>
 
-	<description>
+  <description>
 		C2MON module assembling all required modules and
 		configuration files for c2mon-jviews-viewer
         </description>
-	<url></url>
+  <url></url>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-jviews-viewer-deploy</developerConnection>
-	</scm>
+  <dependencies>
+    <dependency>
+      <groupId>cern.tim.tim-client</groupId>
+      <artifactId>tim-jviews-viewer</artifactId>
+    </dependency>
+  </dependencies>
 
-	<developers />
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-jviews-viewer-deploy</developerConnection>
+  </scm>
 
-	<modules>
-		<module>modules/tim2</module>
-		<module>modules/dmn2</module>
-	</modules>
-	
-	<build>
-	</build>
+  <developers />
+
+  <modules>
+    <module>modules/tim2</module>
+    <module>modules/dmn2</module>
+  </modules>
+
+  <build>
+  </build>
 
 </project>
