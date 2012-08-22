@@ -45,6 +45,10 @@
       <artifactId>tim-api</artifactId>
     </dependency>  
 
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-cache</artifactId>      
+    </dependency>
 		<dependency>
 			<groupId>cern.tim2.tim2-server</groupId>
 			<artifactId>tim2-server-supervision</artifactId>
@@ -58,12 +62,7 @@
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-configuration</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-    <dependency>
-      <groupId>cern.tim2.tim2-server</groupId>
-      <artifactId>tim2-server-cache</artifactId>
-      <scope>runtime</scope>
-    </dependency>
+		</dependency>    
     <dependency>
       <groupId>cern.tim2.tim2-server</groupId>
       <artifactId>tim2-server-rule</artifactId>
