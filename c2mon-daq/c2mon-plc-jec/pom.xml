@@ -9,7 +9,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-plc-jec</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.3</version>
   <name>c2mon-plc-jec</name>
   <packaging>jar</packaging>
   <description>
