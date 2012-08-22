@@ -7,6 +7,8 @@
 
   <import resource="classpath:cern/tim/server/lifecycle/config/server-lifecycle-common.xml"/>
   
+  <bean id="nodeShutdownListener" class="cern.tim.server.lifecycle.NodeShutdownListener"/>
+  
   <!-- import JMX configuration -->
 <!--  <import resource="classpath:cern/tim/server/lifecycle/config/server-lifecycle-jmx-multi.xml"/>-->
   
