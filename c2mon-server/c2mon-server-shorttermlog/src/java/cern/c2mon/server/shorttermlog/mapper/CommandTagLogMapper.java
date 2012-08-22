@@ -15,7 +15,8 @@ public interface CommandTagLogMapper extends LoggerMapper<CommandTagLog> {
 
   /**
    * Returns all command logs for this command.
-   * Used for test only.
+   * Used for test only, as does *not* return
+   * correct timestamp (not adjusted for UTC).
    * 
    * @param id of the command
    * @return a list of log events
