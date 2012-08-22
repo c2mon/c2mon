@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cern.tim2.tim2-server</groupId>
 		<artifactId>tim2-server-pom</artifactId>
-		<version>1.0.5</version>
+		<version>1.0.10</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-server</groupId>
 	<artifactId>c2mon-server-lifecycle</artifactId>
@@ -35,7 +35,15 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 		</dependency>
-
+    
+    <dependency>
+      <groupId>org.terracotta.toolkit</groupId>
+      <artifactId>terracotta-toolkit-1.3</artifactId>      
+    </dependency>  
+    <dependency>
+      <groupId>org.terracotta.api</groupId>
+      <artifactId>tim-api</artifactId>
+    </dependency>  
 
 		<dependency>
 			<groupId>cern.tim2.tim2-server</groupId>
@@ -51,8 +59,52 @@
 			<artifactId>c2mon-server-configuration</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-cache</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-rule</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-alarm</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-test</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-client</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-command</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-server</groupId>
+      <artifactId>tim2-server-cachepersistence</artifactId>
+      <scope>runtime</scope>
+    </dependency>    
 	</dependencies>
 
 	<developers />
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.terracotta.maven.plugins</groupId>
+        <artifactId>tc-maven-plugin</artifactId>
+        <version>1.6.1</version>        
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
