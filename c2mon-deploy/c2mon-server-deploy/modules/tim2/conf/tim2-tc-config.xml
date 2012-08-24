@@ -5,8 +5,8 @@
   <tc-properties>
      <property name="l2.berkeleydb.je.cleaner.bytesInterval" value="20000000" />
      <property name="l1.objectmanager.remote.maxDNALRUSize" value="200000" />
-     <property name="l1.cachemanager.criticalThreshold" value="95" />
-     <property name="l1.cachemanager.threshold" value="90" />
+     <property name="l1.cachemanager.criticalThreshold" value="90" />
+     <property name="l1.cachemanager.threshold" value="70" />
      <property name="l2.objectmanager.dgc.young.enabled" value="true" />
      <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="360000" />
      <!-- allow a client to attempt reconnection to a TC server (for 5 seconds, 2 is default) -->          
@@ -18,9 +18,9 @@
   </tc-properties>  
   <servers>
     <server host="cs-ccr-tim11" name="server1">
-      <data>%(user.home)/dist/terracotta/log/server-data</data>      
-      <logs>%(user.home)/dist/terracotta/log/server-logs</logs>
-      <statistics>%(user.home)/dist/terracotta/log/cluster-statistics</statistics>
+      <data>/opt/terracotta/log/server1-data</data>      
+      <logs>/opt/terracotta/log/server1-logs</logs>
+      <statistics>/opt/terracotta/log/cluster-statistics</statistics>
       <dso-port>9510</dso-port>
       <jmx-port>9520</jmx-port>
       <l2-group-port>9530</l2-group-port>
@@ -36,9 +36,9 @@
       </dso>
     </server>
       <server host="cs-ccr-tim12" name="server2">
-      <data>%(user.home)/dist/terracotta/log/server2-data</data>
-      <logs>%(user.home)/dist/terracotta/log/server2-logs</logs>
-      <statistics>%(user.home)/dist/terracotta/log/cluster2-statistics</statistics>
+      <data>/opt/terracotta/log/server2-data</data>
+      <logs>/opt/terracotta/log/server2-logs</logs>
+      <statistics>/opt/terracotta/log/cluster-statistics</statistics>
       <dso-port>9511</dso-port>
       <jmx-port>9521</jmx-port>
       <l2-group-port>9531</l2-group-port>
