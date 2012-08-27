@@ -43,6 +43,9 @@ public final class XsltTransformUtility {
 
   /** Transformer performs xslt transformations */
   private Transformer trans;
+  
+  /** Transformer used to remove Xml Namespaces */
+  private Transformer removeXmlNameSpacesTransformer;
 
   /**
    * XsltTransformUtility.
@@ -52,8 +55,10 @@ public final class XsltTransformUtility {
     initializeXsltResources();
 
     TransformerFactory transFact = TransformerFactory.newInstance();
+    
     try {
       trans = transFact.newTransformer(defaultXsltSource);
+      removeXmlNameSpacesTransformer = transFact.newTransformer(removeXmlNamespacesXsltSource);
     } catch (TransformerConfigurationException e) {
       logger.error("XsltTransformUtility() Error while initialising xslt TransformerFactory:"
           + e.getMessage());
@@ -97,19 +102,8 @@ public final class XsltTransformUtility {
     
     Source xmlSource = new StreamSource(new StringReader(xml)); // the input file
     
-    Transformer transf = null;
-    try {
-      transf = TransformerFactory.newInstance().newTransformer(removeXmlNamespacesXsltSource);
-    } catch (TransformerConfigurationException e) {
-      logger.error("XsltTransformUtility() Error while initialising xslt TransformerFactory:"
-          + e.getMessage());
-    } catch (TransformerFactoryConfigurationError e) {
-      logger.error("XsltTransformUtility() Error while initialising xslt TransformerFactory:"
-          + e.getMessage());
-    }
-    
     StringWriter writer = new StringWriter();
-    transf.transform(xmlSource, new StreamResult(writer));
+    removeXmlNameSpacesTransformer.transform(xmlSource, new StreamResult(writer));
     return writer.toString();
   }
 
