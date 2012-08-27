@@ -251,13 +251,14 @@ public class RequestHandlerImplTest {
 
     ClientRequestImpl<CommandReport> executeCommandRequest =
       new ClientRequestImpl<CommandReport>(CommandReport.class);
-    CommandExecuteRequest<Boolean> executeRequest = new CommandExecuteRequestImpl<Boolean>(id, Boolean.TRUE, 1000);
+    CommandExecuteRequest<Boolean> executeRequest = new CommandExecuteRequestImpl<Boolean>(id, Boolean.TRUE, 1000, "FRED", "CIA");
     executeCommandRequest.setObjectParameter(executeRequest);
     
     Collection<CommandReport> response = new ArrayList<CommandReport>();
     response.add(createCommandReport(executeCommandRequest));
     
-    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(1000))).andReturn(response);
+    EasyMock.expect(jmsProxy.sendRequest(EasyMock.isA(JsonRequest.class), EasyMock.eq("request queue"), EasyMock.eq(1000))
+        ).andReturn(response);
 
     EasyMock.replay(jmsProxy);
 
