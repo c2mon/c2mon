@@ -43,6 +43,11 @@ $(function(){
  */
 function startProcess() {
 
+	var submittedNumber = parseInt (document.theOnlyFormInThisPage.id.value);
+	if (isNaN(submittedNumber) ) {
+		return;
+	}
+
 	startConfigurationRequest(); // starts the apply configuration request
 	getProgress(); // polls the server and updates the progress bar
 	getProgressDescription(); // polls the server and updates the description info
@@ -78,7 +83,7 @@ function startConfigurationRequest() {
     $.ajax({ 
     		type: "POST",
         url: "/c2mon-web-configviewer/configloader/progress/start",
-        data: { configurationId : document.theOnlyFormInThisPage.id.value },
+        data: { configurationId : parseInt (document.theOnlyFormInThisPage.id.value) },
 				async: true,
 				complete: progressFinished
 	});
