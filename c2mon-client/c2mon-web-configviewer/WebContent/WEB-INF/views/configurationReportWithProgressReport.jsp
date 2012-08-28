@@ -161,7 +161,7 @@ function getProgressDescription() {
 				<a href="/c2mon-web-configviewer/configloader/progress/finalReport/${report.key}">
 					${report.key}</a>
 				
-				(<a href="/c2mon-web-configviewer/configloader/progress/finalReport/xml/${report.key}">XML</a>)
+				(<a href="/c2mon-web-configviewer/configloader/progress/finalReport/xml/${report.key}" target="_blank">XML</a>)
 				
 			</td>
 		</tr>
