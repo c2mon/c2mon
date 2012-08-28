@@ -44,14 +44,15 @@
 		<h1>Online Viewer Home</h1>
     </div>
 		
-			<div class="alert alert-info">Welcome! Please select an option:</div>
-			
 				<sec:authorize ifNotGranted="ROLE_ANONYMOUS">
 					<div class="alert alert-info">
 					 Hi 
 					<span style="color: #708090; font-size: 14pt">${username}!</span>  
-					It's nice to see you again!
+					It's nice to see you again! Please select an option:
 					</div>
+				</sec:authorize>
+				<sec:authorize ifAllGranted="ROLE_ANONYMOUS">
+					<div class="alert alert-info">Welcome! Please select an option:</div>
 				</sec:authorize>
 			
           <div class="row-fluid">
