@@ -21,9 +21,18 @@
  */
 $(function(){
 
-	// Progressbar
+	// Reset the Progressbar
 	$("#progressbar").progressbar({
 		value: 0
+	});
+
+	// Pressing enter should start the process.
+	$('#config_id_input').bind('keypress', function(e) {
+
+        if(e.keyCode==13){
+            // Enter pressed...
+            startProcess();
+        }
 	});
 });
 
@@ -125,7 +134,7 @@ function getProgressDescription() {
 <c:url var="submitUrl" value="${formSubmitUrl}"/>
 
 <form:form action="${submitUrl}" method="post" name="theOnlyFormInThisPage">
-	<input type="text" name="id" value="${formTagValue}" size="10" /> 
+	<input id="config_id_input" type="text" name="id" value="${formTagValue}" size="10" /> 
 </form:form>
 
 <input name="submitButton" type="button" value="Submit" onclick="startProcess()">
