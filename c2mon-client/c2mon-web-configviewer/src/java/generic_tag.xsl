@@ -25,7 +25,7 @@
 		commandviewer/xml/
 	</xsl:variable>
 		<xsl:variable name="report_xml_url">
-		configloader/xml/
+		configloader/progress/finalReport/xml/
 	</xsl:variable>
 	
 	<xsl:variable name="help_alarm_url">http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=</xsl:variable>

@@ -8,6 +8,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,12 +47,6 @@ public class ConfigLoaderController {
   public static final String CONFIG_LOADER_FORM_URL = CONFIG_LOADER_URL + "form";
 
   /**
-   * A URL to config report viewer, which displays config reports
-   * in RAW XML
-   */
-  public static final String CONFIG_LOADER_XML_URL = CONFIG_LOADER_URL + "xml";
-
-  /**
    * URL for ajax progress report requests.
    */
   public static final String CONFIG_LOADER_PROGRESS_REPORT_URL = CONFIG_LOADER_URL + "progress";
@@ -61,6 +56,12 @@ public class ConfigLoaderController {
    */
   public static final String CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL = 
     CONFIG_LOADER_PROGRESS_REPORT_URL + "/finalReport/";
+  
+  /**
+   * URL that retrieves a Stored Configuration Report and displays it in RAW XML.
+   */
+  public static final String CONFIG_LOADER_PROGRESS_FINAL_REPORT_XML_URL = 
+    CONFIG_LOADER_PROGRESS_REPORT_URL + "/finalReport/" + "xml" ;
 
   /**
    * Title for the config form page
@@ -95,18 +96,18 @@ public class ConfigLoaderController {
   }    
 
   /**
-   * Displays configuration report in RAW XML format.
+   * Displays an --ALREADY APPLIED-- configuration report in RAW XML format.
    * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
-  @RequestMapping(value = CONFIG_LOADER_XML_URL + "/{id}", method = { RequestMethod.GET })
+  @RequestMapping(value = CONFIG_LOADER_PROGRESS_FINAL_REPORT_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewXml(@PathVariable final String id,  final Model model) {
-    logger.debug(CONFIG_LOADER_XML_URL + id);
+    logger.debug(CONFIG_LOADER_PROGRESS_FINAL_REPORT_XML_URL + id);
     try {
-      model.addAttribute("xml", service.getConfigurationReportXml(id));
-    } catch (TagIdException e) {
-      return ("redirect:" + "/commandviewer/errorform/" + id);
+      model.addAttribute("xml", service.getStoredConfigurationReport(id).toXML());
+    } catch (NotFoundException e) {
+      return ("redirect:" + "/configloader/errorform/" + id);
     }
     return "raw_xml_views/rawXml";
   }

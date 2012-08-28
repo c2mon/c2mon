@@ -147,8 +147,13 @@ function getProgressDescription() {
 		</tr>
 	<c:forEach var="report" items="${reports}" >
 		<tr>
-			<td align="center"><a href="/c2mon-web-configviewer/configloader/progress/finalReport/${report.key}">
-			${report.key}</a>
+			<td align="center">
+			
+				<a href="/c2mon-web-configviewer/configloader/progress/finalReport/${report.key}">
+					${report.key}</a>
+				
+				(<a href="/c2mon-web-configviewer/configloader/progress/finalReport/xml/${report.key}">XML</a>)
+				
 			</td>
 		</tr>
 	</c:forEach>
