@@ -10,6 +10,7 @@
 
 <link type="text/css" href="/c2mon-web-configviewer/css/ui-lightness/jquery-ui.css" rel="stylesheet" />
 <script type="text/javascript" src="/c2mon-web-configviewer/js/jquery.js"></script>
+<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-spinner.js"></script>
 <script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-ui.js"></script>
 
 
@@ -32,6 +33,8 @@
 	getProgressDescription(); // polls the server and updates the description info
 
 	$("p").text("Starting...");
+	var $this = $("#progressbar");
+	$this.spinner();
 
 	// disable the submit button
 	document.theOnlyFormInThisPage.id.readOnly = true;

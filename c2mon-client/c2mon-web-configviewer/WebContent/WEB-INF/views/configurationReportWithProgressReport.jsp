@@ -10,6 +10,7 @@
 
 <link type="text/css" href="/c2mon-web-configviewer/css/ui-lightness/jquery-ui.css" rel="stylesheet" />
 <script type="text/javascript" src="/c2mon-web-configviewer/js/jquery.js"></script>
+<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-spinner.js"></script>
 <script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-ui.js"></script>
 
 
@@ -50,6 +51,9 @@ function startProcess() {
 
 	document.theOnlyFormInThisPage.id.readOnly = true;
 	document.getElementsByName("submitButton")[0].disabled = true;
+	
+	var $this = $("#progressbar");
+	$this.spinner();
 }
 
 /**
@@ -138,6 +142,7 @@ function getProgressDescription() {
 </form:form>
 
 <input name="submitButton" type="button" value="Submit" onclick="startProcess()">
+
 
 <div class="ui-widget">
 	<div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
