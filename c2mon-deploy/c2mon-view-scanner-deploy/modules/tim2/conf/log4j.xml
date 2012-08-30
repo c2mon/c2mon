@@ -74,14 +74,6 @@
     </layout>
   </appender>
   
-  <!-- 
-    Special logger used for logging the ClientDataTagValue updates in a separate file & format
-   -->
-  <logger name="ClientDataTagLogger" additivity="false">
-    <level value="debug"/>
-    <appender-ref ref="ClientDataTagLoggerAppender" />
-  </logger>
-  
   <logger name="org.springframework" additivity="false">
     <level value="warn" />
     <appender-ref ref="FileAppender" />
