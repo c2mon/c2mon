@@ -54,22 +54,12 @@
       <appender-ref ref="FallbackConsoleAppender"/>
     </errorHandler>
     <param name="Append" value="true" />
-    <param name="File" value="${tim.log.path}/${c2mon.publisher.dip.server.name}.log" />
+    <param name="File" value="${tim.log.path}/tim-view-scanner.log" />
     <param name="MaxBackupIndex" value="3" />
     <param name="MaxFileSize" value="50MB" />
     <param name="BufferedIO" value="false" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
-    </layout>
-  </appender>
-  
-  <appender name="ClientDataTagLoggerAppender" class="org.apache.log4j.RollingFileAppender">
-    <param name="Append" value="true" />
-    <param name="File" value="${tim.log.path}/${c2mon.publisher.dip.server.name}.tag.log" />
-    <param name="MaxFileSize" value="5MB" />
-    <param name="MaxBackupIndex" value ="2" />
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
     </layout>
   </appender>
 
