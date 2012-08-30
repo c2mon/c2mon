@@ -51,7 +51,7 @@ sub jarlist {
 			&jarlist($_);
 		}
 		else {
- 			if (/tim-jviews-viewer.jar$/) {
+ 			if (/tim-jviews-viewer/) {
     				print "		<jar href=\"", $htmldir, "\" main=\"true\" download=\"eager\"/>\n";
 			}
  			elsif (/jar$/) {
