@@ -14,12 +14,12 @@
           <file name="c2mon-client.properties" sourceDir="/user/timoper/rep/c2mon/client" mask="400" />
         </directory>
       </deployment>
+    </application>
+
+    <application name="tim-view-scanner-pro" extends="default">
+
       <startscript name="tim-view-scanner">
-        <preExec>
-          <![CDATA[
-[[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-           ]]>
-        </preExec>
+
         <!-- VM arguments -->
         <initial-heap-size>256m</initial-heap-size>
         <max-heap-size>256m</max-heap-size>
@@ -36,12 +36,6 @@
           the name into the database 
         -->
         <property name="tim.scanner.views.home.url" value="http://timweb/Views/Production" />
-      </startscript>
-    </application>
-
-    <application name="tim-view-scanner-pro" extends="default">
-
-      <startscript name="tim-view-scanner">
         <property name="tim.scanner.servlet.home.url" value="https://oraweb.cern.ch/pls/timw3_oper/TIMVIEWS_TRACK." />
       </startscript>
 
@@ -56,6 +50,23 @@
     <application name="tim-view-scanner-test" extends="default">
 
       <startscript name="tim-view-scanner-test">
+
+        <!-- VM arguments -->
+        <initial-heap-size>256m</initial-heap-size>
+        <max-heap-size>256m</max-heap-size>
+        <main-class name="cern.tim.client.scanner.Main" />
+
+        <!-- JVM environment variables -->
+        <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
+        <property name="tim.log.path" value="${INSTALL_DIR}/log" />
+        <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+        <!-- Defines which local directory should be scanned for views -->
+        <property name="tim.scanner.views.root.dir" value="/user/timoper/dist/Views/Production" />
+        <!-- 
+          Defines the URL root which should replace the local root directory path for storing 
+          the name into the database 
+        -->
+        <property name="tim.scanner.views.home.url" value="http://timweb/Views/Production" />
         <property name="tim.scanner.servlet.home.url" value="https://oraweb.cern.ch/pls/timw3_test/TIMVIEWS_TRACK." />
       </startscript>
 
