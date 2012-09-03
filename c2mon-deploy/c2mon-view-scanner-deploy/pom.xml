@@ -3,15 +3,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cern.c2mon.c2mon-client</groupId>
-    <artifactId>c2mon-client-pom</artifactId>
-    <version>1.0.11</version>
+    <groupId>cern.tim.tim-client</groupId>
+    <artifactId>tim-client-pom</artifactId>
+    <version>1.0.4</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>c2mon-view-scanner-deploy</artifactId>
   <name>Deploys View Scanner for scanning TIM ILOG views </name>
-  <version>1.0.1</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
