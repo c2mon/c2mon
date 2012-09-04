@@ -16,8 +16,8 @@
       </deployment>
       <startscript>
         <!-- VM arguments -->
-        <initial-heap-size>256m</initial-heap-size>
-        <max-heap-size>256m</max-heap-size>
+        <initial-heap-size>512m</initial-heap-size>
+        <max-heap-size>512m</max-heap-size>
         <main-class name="cern.tim.client.scanner.Main" />
 
         <!-- JVM environment variables -->
