@@ -39,7 +39,7 @@
     <application name="tim-view-scanner-pro" extends="default">
 
       <startscript name="tim-view-scanner">
-        <property name="tim.scanner.servlet.home.url" value="https://oraweb.cern.ch/pls/timw3_oper/TIMVIEWS_TRACK." />
+        <property name="tim.scanner.servlet.home.url" value="https://oraweb.cern.ch/pls/timw3/TIMVIEWS_TRACK." />
       </startscript>
 
       <deployment installLocation="/opt/tim-view-scanner">
