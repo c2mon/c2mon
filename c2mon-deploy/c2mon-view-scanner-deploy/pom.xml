@@ -11,7 +11,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>c2mon-view-scanner-deploy</artifactId>
   <name>Deploys View Scanner for scanning TIM ILOG views </name>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>1.0.4</version>
 
   <packaging>pom</packaging>
 
