@@ -95,7 +95,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
     <all-permissions/> 
   </security> 
   <resources>
-    <java version=\"1.6+\" initial-heap-size=\"256M\"  max-heap-size=\"512M\"/>" , "\n";
+    <java version=\"1.6+\" initial-heap-size=\"128M\"  max-heap-size=\"128M\"/>" , "\n";
 
 jarlist ("$jardir");
 
