@@ -1,11 +1,11 @@
 <config>
   <view>
-    <property name="url" type="java.lang.String" value="http://timweb/Views/Production/Bat_513/Vue_Generale_Bat_513.cmb" />
+    <property name="url" type="java.lang.String" value="http://timweb/Views/Production/Bat_513/513_Temp_Power.cmb" />
     <property name="external" type="java.lang.Boolean" value="false" />
   </view>
 
   <view>
-    <property name="url" type="java.lang.String" value="http://timweb/Views/Production/Bat_513/B613_R-001.idbd" />
+    <property name="url" type="java.lang.String" value="http://timweb/Views/Production/Bat_513/513_Temp_Water.cmb" />
     <property name="external" type="java.lang.Boolean" value="false" />
   </view>
 
