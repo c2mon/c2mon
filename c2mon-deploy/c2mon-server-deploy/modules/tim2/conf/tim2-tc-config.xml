@@ -316,7 +316,11 @@
         </include>  
         <include>
           <class-expression>cern.c2mon.server.laser.publication.LaserPublisherImpl</class-expression>
-        </include> 
+        </include>
+        <!-- Cluster event listener, for lifecycle actions -->
+        <include>
+          <class-expression>cern.tim.server.lifecycle.NodeShutdownListener</class-expression>
+        </include>
       </instrumented-classes>
 <!--      <locks>      -->
 <!--        <autolock auto-synchronized="false">-->
