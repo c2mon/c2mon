@@ -106,12 +106,16 @@ jarlist ("$jardir");
 print "   <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
 print "   <property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
+print "   <property name=\"db.properties\" value=\"$c2monClientPropertiesURL\"/>\n";
 
 # C2MON read-only credentials to STL database, needed for the history player and charts
 print "   <property name=\"c2mon.jdbc.driver\" value=\"$jdbcDriver\"/>\n";
 print "   <property name=\"c2mon.jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
 print "   <property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
 print "   <property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
+
+print "   <property name=\"c2mon.dashboard.editor.datatagchooser.class\" value=\"ch.cern.tim.client.jviews.tagchooser.DMN2MetricsTagChooserImpl\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.commandtagchooser.class\" value=\"ch.cern.tim.client.jviews.tagchooser.DMN2CommandsTagChooserImpl\"/>\n";
 
 print "         </resources>
         <resources os=\"Windows\" >
