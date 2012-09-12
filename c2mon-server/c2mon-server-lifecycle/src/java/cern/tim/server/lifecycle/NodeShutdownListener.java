@@ -55,7 +55,7 @@ public class NodeShutdownListener implements DsoClusterListener, ApplicationCont
   @Override
   public void nodeLeft(final DsoClusterEvent clusterEvent) {
     LOGGER.info("Detected Terracotta node left event for node " + clusterEvent.getNode().getId());
-    if (clusterEvent.getNode().getId().equals(thisNode.getId())); {
+    if (clusterEvent.getNode().getId().equals(thisNode.getId())) {
       LOGGER.info("Initiating server shutdown since this node has left the Terracotta cluster.");
       Thread shutdownThread = new Thread(new Runnable() {               
         public void run() {
