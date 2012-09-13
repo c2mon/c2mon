@@ -84,7 +84,7 @@ public class ClientModuleLifecycle implements SmartLifecycle {
 
   @Override
   public void stop(Runnable callback) {
-    start();
+    stop();
     callback.run();
   }
 
