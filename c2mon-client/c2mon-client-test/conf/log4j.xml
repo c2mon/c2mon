@@ -51,7 +51,7 @@
     <param name="subDomain" value="TIM-Viewer" />
     <param name="threshold" value="INFO" />
     <param name="sourceName" value="${user.name}-VERSION:${tim.version}-JAVA:${java.version}" />
-    <param name="serverName" value="cmw-log-pro:6200" />
+    <param name="serverName" value="feedback-log-test:6200" />
   </appender>
 
   <!-- 
