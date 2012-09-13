@@ -18,6 +18,8 @@
  *****************************************************************************/
 package cern.tim.server.lifecycle;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultLifecycleProcessor;
@@ -38,7 +40,7 @@ import org.springframework.stereotype.Service;
  * outstanding batch jobs.
  * 
  * Once the prepareForShutdown() method returns, a
- * response it send to the shutdown process (started
+ * response is send to the shutdown process (started
  * by the script) and the server process will be killed
  * (first gently, then forced).
  * 
@@ -59,6 +61,8 @@ public class LifeCycleController {
    */
   private DefaultLifecycleProcessor defaultLifecycleProcessor;
   
+  private AtomicBoolean running = new AtomicBoolean(true);
+  
   /**
    * Autowired constructor.
    * @param defaultLifecycleProcessor the lifecycle manager
@@ -69,20 +73,23 @@ public class LifeCycleController {
     this.defaultLifecycleProcessor = defaultLifecycleProcessor;
   }
 
-
-
   /**
    * Starts the process of shutting down this node. It is assumed
    * that this method should return within 30 seconds, at which
    * point the server should be ready to disconnect from the
    * distributed cache (in the case of a distributed setup).
    * 
+   * <p>Only the first call to this method will have an effect. 
+   * Subsequent calls are ignored.
+   * 
    * Uses Spring's lifecycle management.
    */
   @ManagedOperation(description="Prepare server for shutdown")
   public void prepareForShutdown() {
-    LOGGER.info("Preparing server for shutdown");
-    defaultLifecycleProcessor.stop();
+    if (running.compareAndSet(true, false)) {
+      LOGGER.info("Preparing server for shutdown");
+      defaultLifecycleProcessor.stop();      
+    }    
   }
   
 }
