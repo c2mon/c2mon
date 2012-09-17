@@ -520,10 +520,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     valid &= tagValueUpdate != null;
     if (tagValueUpdate != null) 
       valid &= tagValueUpdate.getId().equals(id);
-    if (tagQuality.isAccessible()) { // If inaccessible we always allow a refresh
-      valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp);
-    }
-    
+    	valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp);    
     return valid;
   }
   
