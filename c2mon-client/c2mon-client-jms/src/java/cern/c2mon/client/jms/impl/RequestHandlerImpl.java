@@ -187,8 +187,12 @@ public class RequestHandlerImpl implements RequestHandler {
       LOGGER.error(errorMsg);
       throw new RuntimeException(errorMsg);
     }
+    final ConfigurationReport receivedReport = report.iterator().next();
+    if (receivedReport != null)
+      LOGGER.trace("applyConfiguration(): Received Configuration report Report=" 
+          + receivedReport.toXML());
 
-    return report.iterator().next();
+    return receivedReport;
   }
 
   @Override
