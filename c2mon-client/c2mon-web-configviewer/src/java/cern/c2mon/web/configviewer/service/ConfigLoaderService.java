@@ -169,6 +169,8 @@ public class ConfigLoaderService  {
       logger.error("Received NULL Configuration report for configuration id:" + configurationId);
       throw new CannotProceedException("Did not receive Configuration Report.");
     }
+    logger.debug("getConfigurationReport: Report=" + report.toXML());
+    
     finalReports.put("" + configurationId, report); // store the report for viewing later
   }
 
