@@ -187,6 +187,11 @@
     <level value="debug"/>
     <appender-ref ref="FileAppender" />
   </logger>
+  
+  <logger name="cern.tim.driver.common.messaging.impl.ProxyJmsSender" additivity="false">
+    <level value="fatal"/>
+    <appender-ref ref="FileAppender" />
+  </logger>  
 
   <root>
     <level value="debug"/>
