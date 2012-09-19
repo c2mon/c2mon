@@ -49,7 +49,7 @@
         <garbage-collection>
          <enabled>true</enabled>
          <verbose>true</verbose>
-         <interval>1200</interval>
+         <interval>7200</interval>
         </garbage-collection>
       </dso>
     </server>
