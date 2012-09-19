@@ -7,7 +7,7 @@
 		certain parts of the system, change the "level" attribute of the
 		appropriate logger.
 	-->
-<log4j:configuration debug="false" threshold="debug"
+<log4j:configuration debug="false" threshold="all"
 	xmlns:log4j="http://jakarta.apache.org/log4j/">
 
 
@@ -23,12 +23,12 @@
 	</appender>
 
 	<logger name="cern.tim" additivity="false">
-		<level value="debug" />
+		<level value="all" />
 		<appender-ref ref="fileAppender" />
 	</logger>
 	
 	<logger name="cern.c2mon" additivity="false">
-		<level value="debug" />
+		<level value="all" />
 		<appender-ref ref="fileAppender" />
 	</logger>
 
@@ -43,7 +43,7 @@
 	</logger>
 
 	<root>
-		<level value="debug" />
+		<level value="all" />
 		<appender-ref ref="fileAppender" />
 	</root>
 
