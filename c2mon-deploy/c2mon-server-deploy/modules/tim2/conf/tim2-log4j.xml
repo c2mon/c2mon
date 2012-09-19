@@ -212,7 +212,7 @@
   	  <param name="ConversionPattern" value="%m" />
   	</layout>
   	<filter class="org.apache.log4j.varia.LevelRangeFilter">
-    	<param name="LevelMin" value="error" />
+    	<param name="LevelMin" value="info" />
     	<param name="LevelMax" value="fatal" />
   	</filter>
   </appender>
@@ -288,7 +288,7 @@
     <appender-ref ref="CentralLoggingAppender"/>
   </logger>   
   <logger name="AdminSmsLogger"  additivity="false">
-    <level value="error"/>
+    <level value="info"/>
     <appender-ref ref="AdminSmsAppender"/>
     <appender-ref ref="AdministratorEmail"/>
     <appender-ref ref="FileAppender"/>
