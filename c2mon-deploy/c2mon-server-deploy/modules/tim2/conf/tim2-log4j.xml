@@ -206,7 +206,7 @@
   	<param name="BufferSize" value="1" />  	 
   	<param name="SMTPHost" value="cernmx.cern.ch" />
   	<param name="From" value="tim.support@cern.ch" />
-  	<param name="To" value="0041764878739@mail2sms.cern.ch" />
+  	<param name="To" value="0041764878739@mail2sms.cern.ch,0041764875788@mail2sms.cern.ch" />
   	<param name="Subject" value="C2MON server warning" />
   	<layout class="org.apache.log4j.PatternLayout">
   	  <param name="ConversionPattern" value="%m" />
