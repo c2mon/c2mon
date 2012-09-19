@@ -1,5 +1,7 @@
 package cern.tim.server.lifecycle;
 
+import java.net.InetAddress;
+
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
@@ -31,6 +33,8 @@ public class NodeShutdownListener implements DsoClusterListener, ApplicationCont
   
   private static final Logger LOGGER = Logger.getLogger(NodeShutdownListener.class);
   
+  private final static Logger SMS_LOGGER = Logger.getLogger("AdminSmsLogger");
+  
   @InjectedDsoInstance
   private DsoCluster dsoCluster;
  
@@ -57,6 +61,14 @@ public class NodeShutdownListener implements DsoClusterListener, ApplicationCont
     LOGGER.info("Detected Terracotta node left event for node " + clusterEvent.getNode().getId());
     if (clusterEvent.getNode().getId().equals(thisNode.getId())) {
       LOGGER.info("Initiating server shutdown since this node has left the Terracotta cluster.");
+      String hostname;
+      try {
+        hostname = InetAddress.getLocalHost().getHostName();
+      } catch (Exception e) {
+        LOGGER.error("Unable to get local hostname", e);
+        hostname = "#unknown host#";
+      }
+      SMS_LOGGER.info("Initiating C2MON server shutdown of " + System.getProperty("c2mon.process.name") + " on " + hostname);
       Thread shutdownThread = new Thread(new Runnable() {               
         public void run() {
           lifeCycleController.prepareForShutdown();
