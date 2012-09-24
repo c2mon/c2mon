@@ -35,9 +35,27 @@
         </garbage-collection>
       </dso>
     </server>
-      <server host="cs-ccr-tim12" name="server2">
+    <server host="cs-ccr-tim12" name="server2">
       <data>/opt/terracotta/log/server2-data</data>
       <logs>/opt/terracotta/log/server2-logs</logs>
+      <statistics>/opt/terracotta/log/cluster-statistics</statistics>
+      <dso-port>9511</dso-port>
+      <jmx-port>9521</jmx-port>
+      <l2-group-port>9531</l2-group-port>
+      <dso>
+        <persistence>
+          <mode>permanent-store</mode>
+        </persistence>
+        <garbage-collection>
+         <enabled>true</enabled>
+         <verbose>true</verbose>
+         <interval>7200</interval>
+        </garbage-collection>
+      </dso>
+    </server>
+    <server host="tim-cache-pro2b" name="timcache2">
+      <data>/opt/terracotta/log/server-data</data>
+      <logs>/opt/terracotta/log/server-logs</logs>
       <statistics>/opt/terracotta/log/cluster-statistics</statistics>
       <dso-port>9511</dso-port>
       <jmx-port>9521</jmx-port>
