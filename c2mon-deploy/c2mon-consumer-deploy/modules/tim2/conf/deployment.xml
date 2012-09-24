@@ -46,8 +46,7 @@
 				<directory name="conf">
 					<file name="c2mon-consumer.properties" sourceDir="/user/timtest/rep/c2mon/statistics"
 						mask="400" />
-				</directory>
-        <startscript name="C2MON-STATISTICS-CONSUMER"/>
+				</directory>      
 			</deployment>
 		</application>
 
