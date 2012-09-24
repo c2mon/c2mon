@@ -11,19 +11,15 @@
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
 					<preserve type="dir" name="tmp" />
-				</backupPolicy>
-				<notification>
-					<!-- you can give more than one mail for deployment notification -->
-					<mail address="timdiamon-developers@cern.ch" />
-				</notification>
+				</backupPolicy>				
 
 				<startscript name="C2MON-STATISTICS-CONSUMER">
 					<main-class name="cern.c2mon.statistics.consumer.ConsumerStartup">
-						<arg>-l ${LOG4J_CONF_FILE}</arg>
-						<output>
-							<file name="log/out.log" />
-						</output>
+						<arg>-l ${LOG4J_CONF_FILE}</arg>						
 					</main-class>
+          <output>
+            <file name="log/out.log" />
+          </output>
 					<property name="tim.log.path" value="${CONSUMER_LOG_HOME}" />
 					<property name="tim.process.name" value="statistics-consumer" />
 					<property name="consumer.home" value="${CONSUMER_HOME}" />
@@ -38,6 +34,10 @@
 					<file name="c2mon-consumer.properties" sourceDir="/user/timoper/rep/c2mon/statistics"
 						mask="400" />
 				</directory>
+        <notification>
+          <!-- you can give more than one mail for deployment notification -->
+          <mail address="tim-admin@cern.ch" />
+        </notification>
 			</deployment>
 		</application>
 
