@@ -6,7 +6,7 @@
 			this application section is a parent configuration for both
 			c2mon-tim2-prod and c2mon-tim2-test
 		-->
-		<application name="default">
+		<application>
 			<deployment installLocation="/opt/statistics-consumer-not-used/">
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
@@ -28,7 +28,7 @@
 			</deployment>
 		</application>
 
-		<application name="consumer-tim2-prod" extends="default">
+		<application name="consumer-tim2-prod">
 			<deployment installLocation="/opt/statistics-consumer">
 				<directory name="conf">
 					<file name="c2mon-consumer.properties" sourceDir="/user/timoper/rep/c2mon/statistics"
@@ -41,7 +41,7 @@
 			</deployment>
 		</application>
 
-		<application name="consumer-tim2-test" extends="default">
+		<application name="consumer-tim2-test">
 			<deployment installLocation="/opt/statistics-consumer-test">
 				<directory name="conf">
 					<file name="c2mon-consumer.properties" sourceDir="/user/timtest/rep/c2mon/statistics"
@@ -50,7 +50,7 @@
 			</deployment>
 		</application>
 
-		<application name="consumer-tim2-dev" extends="default">
+		<application name="consumer-tim2-dev">
 			<deployment installLocation="/user/timtest/dev/statistics-consumer-dev">
 				<directory name="conf">
 					<file name="c2mon-consumer.properties" sourceDir="/user/timtest/dev/rep/c2mon/statistics"
