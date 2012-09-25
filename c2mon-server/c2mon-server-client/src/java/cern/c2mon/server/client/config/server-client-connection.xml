@@ -14,7 +14,7 @@ Connection settings for client module
 -->
 
 <bean id="clientActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-  <property name="brokerURL" value="${jms.broker.url}"/>
+  <property name="brokerURL" value="${jms.broker.client.url}"/>
   <property name="userName" value="${jms.client.user}"/>
   <property name="password" value="${jms.client.password}"/>
   <property name="clientIDPrefix" value="C2MON-SERVER-CLIENT"/> 
