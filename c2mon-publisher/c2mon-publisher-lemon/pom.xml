@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>c2mon-client-pom</artifactId>
+		<groupId>cern.c2mon.c2mon-client</groupId>
+		<version>1.0.11</version>
+	</parent>
+	<groupId>cern.c2mon.c2mon-publisher</groupId>
+	<artifactId>c2mon-publisher-lemon</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>The LEMON Publisher based on the C2MON Publisher core</name>
+	<description>The LEMON Publisher based on the C2MON Publisher core</description>
+	<dependencies>
+
+		<!-- C2MON Client API dependencies -->
+		<dependency>
+			<groupId>cern.c2mon.c2mon-publisher</groupId>
+			<artifactId>c2mon-publisher-core</artifactId>
+		</dependency>
+		<!-- 3rd party dependencies -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymockclassextension</artifactId>
+		</dependency>
+	</dependencies>
+</project>
