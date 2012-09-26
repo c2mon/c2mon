@@ -90,6 +90,9 @@ public class Subscriber {
 	}
 
 	public synchronized void addSubscription(Subscription subscription) {
+	    if (!subscription.getSubscriberId().equals(getUserName())) {
+	        throw new IllegalArgumentException("You tried to set a subscription which does not belong to me : " + subscription);
+	    }
 		subscriptions.put(subscription.getTagId(), subscription);
 	}
 
