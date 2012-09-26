@@ -6,6 +6,7 @@ package cern.c2mon.notification.shared;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import cern.dmn2.core.Status;
 
@@ -22,7 +23,7 @@ public class Subscription implements Comparable<Subscription> {
     /**
      * 
      */
-    private Timestamp lastNotification = null;
+    private Timestamp lastNotification = new Timestamp(0);
 
     /**
      * level to notify for
@@ -259,10 +260,14 @@ public class Subscription implements Comparable<Subscription> {
     public Subscription getCopy() {
         Subscription sub = new Subscription(this.getSubscriberId(), this.getTagId(), this.getNotificationLevel());
         sub.setEnabled(this.isEnabled());
-        sub.setLastNotification(getLastNotification());
-        sub.setLastNotifiedStatus(getLastNotifiedStatus());
+        sub.setLastNotification(new Timestamp(getLastNotification().getTime()));
+        sub.setLastNotifiedStatus(Status.fromInt(getLastNotifiedStatus().toInt()));
         sub.setMailNotification(isMailNotification());
         sub.setSmsNotification(isSmsNotification());
+        sub.setNotifyOnMetricChange(isNotifyOnMetricChange());
+        for (Entry<Long, Status> l : this.lastNotifiedTags.entrySet()) {
+            sub.lastNotifiedTags.put(l.getKey(), Status.fromInt(l.getValue().toInt()));
+        }
         return sub;
     }
 
@@ -314,6 +319,9 @@ public class Subscription implements Comparable<Subscription> {
     }
     
     public Status getLastStatusForResolvedSubTag(Long tagId) {
+        if (tagId.equals(this.getTagId())) {
+            return this.getLastNotifiedStatus();
+        }
         Status s = lastNotifiedTags.get(tagId);
         if (s != null) {
             return s;
@@ -327,6 +335,6 @@ public class Subscription implements Comparable<Subscription> {
         if (!lastNotifiedTags.containsKey(tagId)) {
             throw new IllegalArgumentException("Tag # " + getTagId() + ": I do not have a resolved child with ID=" + tagId);
         }
-        lastNotifiedTags.put(tagId, status);
+        lastNotifiedTags.put(tagId, Status.fromInt(status.toInt()));
     }
 }
