@@ -142,7 +142,8 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      *             Thrown if there is a connection error.
      */
     private void setUpConnection(final URI uri) throws IOException {
-        AuthInfo.setThreadDefault(authInfo);
+        logger.debug("Establishing NTdomain: " + authInfo.getCallerDomain() + ", NTuser: " + authInfo.getCallerUser() + ", NTpassword: ********");
+        AuthInfo.setDefault(authInfo);
         String host = uri.getHost();
         String opcServer = uri.getPath().replaceFirst("/", "");
         server = new OPCServer(host);
