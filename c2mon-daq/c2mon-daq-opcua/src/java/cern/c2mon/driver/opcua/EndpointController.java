@@ -142,7 +142,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         } catch (OPCCommunicationException e) {
             logger.error(
                     "Endpoint creation failed. Controller will try again. ", e);
-            triggerEndpointRestart();
+            triggerEndpointRestart(e.getMessage());
         }
     }
 
@@ -178,7 +178,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
             public void onOPCCommunicationException(
                     final IOPCEndpoint endpoint, final OPCCommunicationException e) {
                 logger.error("OPCCommunication exception try to restart.", e);
-                triggerEndpointRestart();
+                triggerEndpointRestart(e.getMessage());
             }
         }, serverTimeout, serverTimeout);
     }
@@ -364,13 +364,14 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     @Override
     public void onSubscriptionException(final Throwable cause) {
         logger.error("Subscription failed. Restarting endpoint.", cause);
-        triggerEndpointRestart();
+        triggerEndpointRestart(cause.getMessage());
     }
 
     /**
      * Triggers the restart of this endpoint.
+     * @param reason The reason of the restart, if any applicable.
      */
-    private synchronized void triggerEndpointRestart() {      
+    private synchronized void triggerEndpointRestart(final String reason) {      
         if (reconnectThread == null || !reconnectThread.isAlive()) {
             reconnectThread = new Thread() {
                 @Override
@@ -383,7 +384,12 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                           logger.warn("Error stopping endpoint subscription", ex);
                         }
                         finally {
-                          sender.confirmEquipmentStateIncorrect();
+                          if (reason == null || reason.equalsIgnoreCase("")) {
+                            sender.confirmEquipmentStateIncorrect();
+                          }
+                          else {
+                            sender.confirmEquipmentStateIncorrect(reason);
+                          }
                         }
                         
                         try {

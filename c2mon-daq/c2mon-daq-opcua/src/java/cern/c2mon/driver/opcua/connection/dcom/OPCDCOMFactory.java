@@ -21,7 +21,7 @@ import com.linar.jintegra.AutomationException;
  * @author Andreas Lang
  *
  */
-public final class OPCDCOMFactory implements IDCOMErrorConstants {
+public final class OPCDCOMFactory {
     
     /**
      * logger of this class.
@@ -201,72 +201,25 @@ public final class OPCDCOMFactory implements IDCOMErrorConstants {
      */
     public static RuntimeException createWrappedAutomationException(
             final AutomationException cause, final String itemAddress) {
-        RuntimeException exception;
         long code = cause.getCode();
-        if (code == OPC_E_INVALIDHANDLE) {
-            exception = new OPCCriticalException("The value of the handle is invalid.", cause);
-        } else if (code == OPC_E_BADTYPE) {
-            exception = new OPCCriticalException("The OPC server cannot convert the data between the" + "requested data type and the canonical data type.", cause);
-        } else if (code == OPC_E_PUBLIC) {
-            exception = new OPCCriticalException("The requested operation cannot be done on a public group.", cause);
-        } else if (code == OPC_E_BADRIGHTS) {
-            exception = new OPCCriticalException("The Items AccessRights do not allow the operation.", cause);
-        } else if (code == OPC_E_UNKNOWNITEMID) {
-            if (itemAddress != null) {
-              exception = new OPCCriticalException("The item " + itemAddress + " is no longer available in the OPC server address space", cause);
-            }
-            else {
-              exception = new OPCCriticalException("The item is no longer available in the OPC server address space", cause);
-            }
-        } else if (code == OPC_E_INVALIDITEMID) {
-            if (itemAddress != null) {
-              exception = new OPCCriticalException("The item definition " + itemAddress + " doesn't conform to the OPC server's syntax.", cause);
-            }
-            else {
-              exception = new OPCCriticalException("The item definition doesn't conform to the OPC server's syntax.", cause);
-            }
-        } else if (code == OPC_E_INVALIDFILTER) {
-            exception = new OPCCriticalException("The filter string was not valid.", cause);
-        } else if (code == OPC_E_UNKNOWNPATH) {
-            exception = new OPCCriticalException("The item's access path is not known to the OPC server.", cause);
-        } else if (code == OPC_E_RANGE) {
-            exception = new OPCCriticalException("The value was out of range.", cause);
-        } else if (code == OPC_E_DUPLICATENAME) {
-            if (itemAddress != null) {
-              exception = new OPCCriticalException("Duplicate name not allowed. Item address is: " + itemAddress, cause);
-            }
-            else {
-              exception = new OPCCriticalException("Duplicate name not allowed. ", cause);
-            }
-        } else if (code == OPC_S_UNSUPPORTEDRATE) {
-            exception = new OPCCriticalException("The OPC server does not support the requested data rate" + "but will use the closest available rate.", cause);
-        } else if (code == OPC_S_CLAMP) {
-            exception = new OPCCommunicationException("A value passed to WRITE was accepted but the output was clamped. ", cause);
-        } else if (code == OPC_S_INUSE) {
-            exception = new OPCCommunicationException("The operation cannot be completed because the" + "object still has references that exist.", cause);
-        } else if (code == OPC_E_INVALIDCONFIGFILE) {
-            exception = new OPCCommunicationException("The OPC server's configuration file is an invalid format.", cause);
-        } else if (code == OPC_E_NOTFOUND) {
-            exception = new OPCCriticalException("The OPC server could not locate the requested object.", cause);
-        } else if (code == OPC_E_INVALID_PID) {
-            exception = new OPCCriticalException("The OPC server does not recognise the passed property ID.", cause);
-        } else if (code == OPC_E_DEADBANDNOTSET) {
-            exception = new OPCCriticalException("The item deadband has not been set for this item.", cause);
-        } else if (code == OPC_E_DEADBANDNOTSUPPORTED) {
-            exception = new OPCCriticalException("The item does not support deadband.", cause);
-        } else if (code == OPC_E_NOBUFFERING) {
-            exception = new OPCCriticalException("The OPC server does not support buffering of data items that are" + "collected at a faster rate than the group update rate.", cause);
-        } else if (code == OPC_E_INVALIDCONTINUATIONPOINT) {
-            exception = new OPCCriticalException("The continuation point is not valid.", cause);
-        } else if (code == OPC_S_DATAQUEUEOVERFLOW) {
-            exception = new OPCCommunicationException("Data Queue Overflow - Some value transitions were lost.", cause);
-        } else if (code == OPC_E_RATENOTSET) {
-            exception = new OPCCriticalException("Server does not support requested rate.", cause);
-        } else if (code == OPC_E_NOTSUPPORTED) {
-            exception = new OPCCriticalException("The OPC server does not support writing of quality and/or timestamp.", cause);
-        } else {
-            exception = new OPCCommunicationException("Unknown automation error.", cause);
+        
+        // checks whether the error is a critical OPC error
+        for (DCOMErrorConstant error : DCOMErrorConstant.values()) {
+          if (code == error.getCode().longValue()) {
+            return new OPCCriticalException(error.toString(), cause);
+          }
         }
-        return exception;
+        
+        // checks whether the automation exception code is known
+        // and creates a communication exception.
+        for (COMErrorConstant error : COMErrorConstant.values()) {
+          if (code == error.getCode().longValue()) {
+            return new OPCCommunicationException(error.toString(), cause);
+          }
+        }
+        
+        // If unknown, we use directly the description of the automation exception
+        // to create the communication exception
+        return new OPCCommunicationException(cause.getDescription(), cause);
     }
 }
