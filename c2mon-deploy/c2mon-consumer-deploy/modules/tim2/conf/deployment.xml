@@ -12,20 +12,18 @@
 					<preserve type="dir" name="log" />
 					<preserve type="dir" name="tmp" />
 				</backupPolicy>				
-
-				<startscript name="C2MON-STATISTICS-CONSUMER">
-					<main-class name="cern.c2mon.statistics.consumer.ConsumerStartup">
-						<arg>-l ${LOG4J_CONF_FILE}</arg>						
-					</main-class>
-          <output>
-            <file name="log/out.log" />
-          </output>
-					<property name="tim.log.path" value="${CONSUMER_LOG_HOME}" />
-					<property name="tim.process.name" value="statistics-consumer" />
-					<property name="consumer.home" value="${CONSUMER_HOME}" />
-				</startscript>
-
 			</deployment>
+      <startscript name="C2MON-STATISTICS-CONSUMER">
+        <main-class name="cern.c2mon.statistics.consumer.ConsumerStartup">
+          <arg>-l ${LOG4J_CONF_FILE}</arg>            
+        </main-class>
+        <output>
+          <file name="log/out.log" />
+        </output>
+        <property name="tim.log.path" value="${CONSUMER_LOG_HOME}" />
+        <property name="tim.process.name" value="statistics-consumer" />
+        <property name="consumer.home" value="${CONSUMER_HOME}" />
+      </startscript>
 		</application>
 
 		<application name="consumer-tim2-prod">
