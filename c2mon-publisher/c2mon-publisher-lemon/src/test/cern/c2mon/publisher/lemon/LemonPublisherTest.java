@@ -13,9 +13,7 @@ import static org.easymock.EasyMock.verify;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.classextension.EasyMock.replay;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 
 import org.easymock.classextension.EasyMock;
 import org.junit.After;
@@ -48,14 +46,15 @@ public class LemonPublisherTest {
 		cdt1 = EasyMock.createMock(ClientDataTagValue.class);
 		cdt2 = EasyMock.createMock(ClientDataTagValue.class);
 		cdt3 = EasyMock.createMock(ClientDataTagValue.class);
-		cdt4 = EasyMock.createMock(ClientDataTagValue.class); // This will be invalid update
-
+		cdt4 = EasyMock.createMock(ClientDataTagValue.class); // This will be
+																// invalid
+																// update
 
 		cdtConfig = EasyMock.createMock(TagConfig.class);
 		quality = EasyMock.createMock(DataTagQuality.class);
 		cdtConfig1 = EasyMock.createMock(TagConfig.class);
 		quality1 = EasyMock.createMock(DataTagQuality.class);
-		
+
 	}
 
 	@After
@@ -69,9 +68,9 @@ public class LemonPublisherTest {
 
 			publisher.loadLemonTemplate(LemonPublisherTest.class
 					.getResource("lemonids.template"));
-			assertEquals(2, publisher.lemonId2Metrics.keySet().size());
-			assertEquals(3, publisher.diamonMetrics2LemonId.keySet().size());
-			// fail("Not yet implemented");
+			assertEquals(3, publisher.lemonId2Metric.keySet().size());
+			assertEquals(5, publisher.diamonMetric2LemonId.keySet().size());
+
 		} catch (Exception ex) {
 			fail("Execption not expected");
 		}
@@ -80,7 +79,7 @@ public class LemonPublisherTest {
 
 			publisher.loadLemonTemplate(new URL("http://lemonids.template"));
 			fail("It should fail");
-			// fail("Not yet implemented");
+
 		} catch (Exception ex) {
 			;
 		}
@@ -92,25 +91,35 @@ public class LemonPublisherTest {
 
 		try {
 			publisher.UPDATE_RECEIVING_PERIOD_SEC = 2;
-			expect(cdt.getDataTagQuality()).andReturn(quality).anyTimes();;
+			expect(cdt.getDataTagQuality()).andReturn(quality).anyTimes();
+			;
 			expect(quality.isValid()).andReturn(true).anyTimes();
-			
-			expect(cdt4.getDataTagQuality()).andReturn(quality1).anyTimes();;
+
+			expect(cdt4.getDataTagQuality()).andReturn(quality1).anyTimes();
+			;
 			expect(quality1.isValid()).andReturn(false).anyTimes();
 
-			expect(cdt.getName()).andReturn("CLIC:CS-CCR-TEST:SYS.KERN.UPTIME").anyTimes();;
+			expect(cdt.getName()).andReturn("CLIC:CS-CCR-TEST:SYS.KERN.UPTIME")
+					.anyTimes();
+			;
 
-			expect(cdt1.getDataTagQuality()).andReturn(quality).anyTimes();;
+			expect(cdt1.getDataTagQuality()).andReturn(quality).anyTimes();
+			;
 			expect(cdt1.getName())
-					.andReturn("CLIC:CS-CCR-PROB:SYS.KERN.UPTIME").anyTimes();;
+					.andReturn("CLIC:CS-CCR-PROB:SYS.KERN.UPTIME").anyTimes();
+			;
 
-			expect(cdt2.getDataTagQuality()).andReturn(quality).anyTimes();;
+			expect(cdt2.getDataTagQuality()).andReturn(quality).anyTimes();
+			;
 			expect(cdt2.getName()).andReturn(
-					"CLIC:CS-CCR-PROB:SYS.KERN.DOWNTIME").anyTimes();;
+					"CLIC:CS-CCR-PROB:SYS.KERN.DOWNTIME").anyTimes();
+			;
 
-			expect(cdt3.getDataTagQuality()).andReturn(quality).anyTimes();;
+			expect(cdt3.getDataTagQuality()).andReturn(quality).anyTimes();
+			;
 			expect(cdt3.getName()).andReturn(
-					"CLIC:CS-CCR-TEST:SYS.KERN.DOWNUPTIME").anyTimes();;
+					"CLIC:CS-CCR-TEST:SYS.KERN.DOWNUPTIME").anyTimes();
+			;
 
 			replay(cdt, cdt1, cdt2, cdt3, cdt4, quality, quality1);
 			publisher.onUpdate(cdt, null);
@@ -129,7 +138,7 @@ public class LemonPublisherTest {
 			publisher.onUpdate(cdt4, null);
 
 			publisher.onUpdate(cdt2, null);
-			
+
 			publisher.onUpdate(cdt1, null);
 
 			publisher.onUpdate(cdt2, null);
@@ -137,8 +146,7 @@ public class LemonPublisherTest {
 			publisher.onUpdate(cdt3, null);
 
 			Thread.sleep(5000);
-			
-			
+
 			verify(cdt, quality);
 
 		} catch (Exception ex) {

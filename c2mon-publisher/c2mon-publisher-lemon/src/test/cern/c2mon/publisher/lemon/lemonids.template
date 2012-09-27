@@ -1,2 +1,3 @@
 9025, sys.kern.activeproc
-9208, net.in.kbytes,net.out.kbytes
+9208, sys.kern.uptime, sys.kern.downtime
+9288, sys.net.io, sys.net.out
