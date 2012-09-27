@@ -114,8 +114,8 @@ print "   <property name=\"c2mon.jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
 print "   <property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
 print "   <property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
 
-print "   <property name=\"c2mon.dashboard.editor.datatagchooser.class\" value=\"ch.cern.tim.client.jviews.tagchooser.DMN2MetricsTagChooserImpl\"/>\n";
-print "   <property name=\"c2mon.dashboard.editor.commandtagchooser.class\" value=\"ch.cern.tim.client.jviews.tagchooser.DMN2CommandsTagChooserImpl\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.datatagchooser.class\" value=\"ch.cern.dmn2.client.jviews.tagchooser.DMN2MetricsTagChooserImpl\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.commandtagchooser.class\" value=\"ch.cern.dmn2.client.jviews.tagchooser.DMN2CommandsTagChooserImpl\"/>\n";
 
 print "         </resources>
         <resources os=\"Windows\" >
