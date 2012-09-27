@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.tim2.tim2-daq</groupId>
     <artifactId>tim2-daq-pom</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
   </parent>
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-opcua</artifactId>
