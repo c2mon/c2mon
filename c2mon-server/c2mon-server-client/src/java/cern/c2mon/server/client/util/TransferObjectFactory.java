@@ -2,7 +2,6 @@ package cern.c2mon.server.client.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
@@ -209,7 +208,7 @@ public abstract class TransferObjectFactory {
             } else {
                 tagConfig.setLogged(Boolean.FALSE);
             }
-            HashSet<String> processNames = new HashSet<String>();
+            ArrayList<String> processNames = new ArrayList<String>();
             for (Process process : tagProcesses) {
               processNames.add(process.getName());
             }
