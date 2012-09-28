@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.tag.TagConfig;
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.ProcessXMLProvider;
@@ -415,22 +417,25 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @param tagConfigurationRequest
    *          The configuration request sent from the client
    * @return A tag configuration list
-   */
-  @SuppressWarnings("unchecked")
+   */  
   private Collection< ? extends ClientRequestResult> handleTagConfigurationRequest(final ClientRequest tagConfigurationRequest) {
 
     // !!! TagId field is also used for Configuration Ids
     final Iterator<Long> iter = tagConfigurationRequest.getTagIds().iterator();
-    final Collection transferTags = new ArrayList(tagConfigurationRequest.getTagIds().size());
+    final Collection<TagConfig> transferTags = new ArrayList<TagConfig>(tagConfigurationRequest.getTagIds().size());
 
     while (iter.hasNext()) {
 
       final Long tagId = iter.next();
       if (tagLocationService.isInTagCache(tagId)) {
         final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
+        HashSet<Process> tagProcesses = new HashSet<Process>();
+        for (Long procId : tagWithAlarms.getTag().getProcessIds()) {
+          tagProcesses.add(processCache.get(procId));
+        }
         switch (tagConfigurationRequest.getResultType()) {
           case TRANSFER_TAG_CONFIGURATION_LIST:
-            transferTags.add(TransferObjectFactory.createTagConfiguration(tagWithAlarms));
+            transferTags.add(TransferObjectFactory.createTagConfiguration(tagWithAlarms, tagProcesses));
             break;
           default:
             LOG.error("handleConfigurationRequest() - Could not generate response message. Unknown enum ResultType " + tagConfigurationRequest.getResultType());

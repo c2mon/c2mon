@@ -2,6 +2,7 @@ package cern.c2mon.server.client.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
@@ -14,6 +15,7 @@ import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.TagWithAlarms;
 import cern.tim.server.common.control.ControlTag;
 import cern.tim.server.common.datatag.DataTag;
+import cern.tim.server.common.process.Process;
 import cern.tim.server.common.rule.RuleTag;
 import cern.tim.server.common.tag.Tag;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
@@ -148,9 +150,10 @@ public abstract class TransferObjectFactory {
     /**
      * Creates a <code>TagConfigImpl</code> object for the given parameters
      * @param tagWithAlarms A tag from the cache
+     * @param tagProcesses all processes that this tag is attached to (single one for DataTag, multiple for Rules)
      * @return The resulting <code>TransferTagValueImpl</code>
      */
-    public static TagConfigImpl createTagConfiguration(final TagWithAlarms tagWithAlarms) {
+    public static TagConfigImpl createTagConfiguration(final TagWithAlarms tagWithAlarms, final Collection<Process> tagProcesses) {
 
         Tag tag = tagWithAlarms.getTag();
         TagConfigImpl tagConfig = null;
@@ -201,6 +204,16 @@ public abstract class TransferObjectFactory {
             if (tag.getJapcAddress() != null) {
                 tagConfig.addPublication(Publisher.JAPC, tag.getJapcAddress());
             }
+            if (tag.isLogged()) {
+                tagConfig.setLogged(Boolean.TRUE);                
+            } else {
+                tagConfig.setLogged(Boolean.FALSE);
+            }
+            HashSet<String> processNames = new HashSet<String>();
+            for (Process process : tagProcesses) {
+              processNames.add(process.getName());
+            }
+            tagConfig.setProcessNames(processNames);
         }
         return tagConfig;
     }
