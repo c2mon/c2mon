@@ -55,7 +55,7 @@ sub jarlist {
       &jarlist($_);
     }
     else {
-      if (/tim-dashboard-editor.jar$/) {
+      if (/tim-dashboard-editor/) {
             print "    <jar href=\"", $htmldir, "\" main=\"true\" download=\"eager\"/>\n";
       }
       elsif (/jar$/) {
