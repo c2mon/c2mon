@@ -17,9 +17,9 @@
      <property name="l2.nha.tcgroupcomm.reconnect.timeout" value="5000" />  
   </tc-properties>  
   <servers>
-    <server host="cs-ccr-tim11" name="server1">
-      <data>/opt/terracotta/log/server1-data</data>      
-      <logs>/opt/terracotta/log/server1-logs</logs>
+    <server host="tim-cache-pro1" name="timcache1">
+      <data>/opt/terracotta/log/server-data</data>      
+      <logs>/opt/terracotta/log/server-logs</logs>
       <statistics>/opt/terracotta/log/cluster-statistics</statistics>
       <dso-port>9510</dso-port>
       <jmx-port>9520</jmx-port>
@@ -35,9 +35,9 @@
         </garbage-collection>
       </dso>
     </server>
-    <server host="cs-ccr-tim12" name="server2">
-      <data>/opt/terracotta/log/server2-data</data>
-      <logs>/opt/terracotta/log/server2-logs</logs>
+    <server host="tim-cache-pro2" name="server2">
+      <data>/opt/terracotta/log/server-data</data>
+      <logs>/opt/terracotta/log/server-logs</logs>
       <statistics>/opt/terracotta/log/cluster-statistics</statistics>
       <dso-port>9511</dso-port>
       <jmx-port>9521</jmx-port>
