@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cern.c2mon.c2mon-client</groupId>
+		<artifactId>c2mon-client-pom</artifactId>
+		<version>1.0.10</version>
+	</parent>
+
+	<groupId>cern.c2mon.c2mon-deploy</groupId>
+	<artifactId>c2mon-publisher-lemon-deploy</artifactId>
+	<name>Deploys the LEMON publisher for C2MON</name>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<description>
+		C2MON LEMON publisher assembling all required modules and configuration files
+    </description>
+	<url></url>
+
+	<developers />
+
+	<dependencies>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-publisher</groupId>
+			<artifactId>c2mon-publisher-lemon</artifactId>
+			<version>[0.0.0,2.0.0)</version>
+		</dependency>
+	</dependencies>
+
+	<modules>
+		<module>modules/tim2</module>
+		<module>modules/dmn2</module>
+	</modules>
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-publisher-lemon-deploy</developerConnection>
+	</scm>
+	<build />
+
+
+
+</project>
