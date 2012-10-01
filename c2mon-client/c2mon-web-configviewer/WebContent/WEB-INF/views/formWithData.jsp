@@ -42,9 +42,9 @@
 </div>
 
 
-<form class="well" action="" method="post">
-	<input type="text" name="id" value="${formTagValue}" size="10" /> 
-	<input class="btn btn-large btn-primary" type="submit" value="Submit">
+<form class="well form-inline" action="" method="post">
+		<input class="span2" style="display:inline"  type="text" name="id" value="${formTagValue}" /> 
+		<input class="btn btn-large btn-primary" type="submit" value="Submit">
 </form>
 
 </div><!--/row-->
