@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-deploy</groupId>
 		<artifactId>c2mon-publisher-lemon-deploy</artifactId>
-		<version>1.0.8-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
@@ -59,7 +59,7 @@
 						</goals>
 						<configuration>
 							<outputDirectory>${project.build.outputDirectory}
-              </outputDirectory>
+							</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}</directory>
