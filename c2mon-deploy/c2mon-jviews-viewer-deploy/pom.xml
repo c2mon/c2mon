@@ -11,7 +11,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>c2mon-jviews-viewer-deploy</artifactId>
   <name>C2MON jviews viewer deployment module</name>
-  <version>1.1.14</version>
+  <version>1.1.15-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
