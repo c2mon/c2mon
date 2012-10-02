@@ -1,0 +1,7 @@
+version history log
+=========================
+
+02/10/2012  - wbuczak: release of version 1.1.9
+--------------------------------------------------
+  * Mitko Mitev (DMN-1201, DMN-1202) 
+      + new dmn2-tagchooser integrated with the new dmn2-db-service component
