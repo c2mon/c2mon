@@ -33,7 +33,7 @@ Connection settings for admin requests to the client module (prefetch is 0)
 -->
 
 <bean id="adminActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-  <property name="brokerURL" value="${jms.broker.url}"/>
+  <property name="brokerURL" value="${jms.broker.client.url}"/>
   <property name="userName" value="${jms.client.user}"/>
   <property name="password" value="${jms.client.password}"/>
   <property name="clientIDPrefix" value="C2MON-SERVER-CLIENT"/> 
