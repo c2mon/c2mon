@@ -135,7 +135,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
             endpoint.registerEndpointListener(this);
             endpoint.addDataTags(equipmentConfiguration.getSourceDataTags().values());
             endpoint.addCommandTags(equipmentConfiguration.getSourceCommandTags().values());
-            sender.confirmEquipmentStateOK();
+            sender.confirmEquipmentStateOK("Connected to " + currentAddress.getUri().getHost());
             startAliveTimer();
             setUpStatusChecker();
             endpoint.setStateOperational();
