@@ -1,108 +1,112 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>c2mon-dashboard-editor-deploy</artifactId>
-		<groupId>cern.c2mon.c2mon-deploy</groupId>
-		<version>1.1.9-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
-	</parent>
+  <parent>
+    <artifactId>c2mon-dashboard-editor-deploy</artifactId>
+    <groupId>cern.c2mon.c2mon-deploy</groupId>
+    <version>1.1.9-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
 
-	<groupId>cern.c2mon.c2mon-deploy</groupId>
-	<artifactId>c2mon-dashboard-editor-tim2</artifactId>
-	<name>TIM2 Dashboard Editor deployment module</name>
-	<version>1.1.9-SNAPSHOT</version>
-	<packaging>pom</packaging>
+  <groupId>cern.c2mon.c2mon-deploy</groupId>
+  <artifactId>c2mon-dashboard-editor-tim2</artifactId>
+  <name>TIM2 Dashboard Editor deployment module</name>
+  <version>1.1.9-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-	<description>The TIM2 Dashboard Editor deployment module</description>
-	<url></url>
+  <description>The TIM2 Dashboard Editor deployment module</description>
+  <url></url>
 
-	<dependencies>
-	</dependencies>
+  <dependencies>
+    <!-- This dependency is only needed for TIM. Can be replaced by any other project -->
+    <dependency>
+      <groupId>cern.tim.tim-client</groupId>
+      <artifactId>tim-jviews-tagchooser</artifactId>
+    </dependency>
+  </dependencies>
 
-	<developers />
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-dashboard-editor-deploy/modules/tim2</developerConnection>
-	</scm>
-	<build>
+  <developers />
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-dashboard-editor-deploy/modules/tim2</developerConnection>
+  </scm>
+  <build>
 
-		<plugins>
+    <plugins>
 
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.outputDirectory}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>true</filtering>
-									<includes>
-										<include>version.txt</include>
-									</includes>
-								</resource>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>false</filtering>
-									<excludes>
-										<exclude>version.txt</exclude>
-									</excludes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${basedir}</directory>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>version.txt</include>
+                  </includes>
+                </resource>
+                <resource>
+                  <directory>${basedir}</directory>
+                  <filtering>false</filtering>
+                  <excludes>
+                    <exclude>version.txt</exclude>
+                  </excludes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>				
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>test-compile</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>false</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
 
-					<descriptors>
-						<descriptor>src/assembly/tim2-dashboard-editor-assembly.xml</descriptor>
-					</descriptors>
+          <descriptors>
+            <descriptor>src/assembly/tim2-dashboard-editor-assembly.xml</descriptor>
+          </descriptors>
 
-				</configuration>
-				<executions>
-					<execution>
-						<id>create-assembly-file</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-assembly-file</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
-		</plugins>
-	</build>
+    </plugins>
+  </build>
 
 </project>
