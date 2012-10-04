@@ -88,6 +88,12 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
    * the <code>ClientRuleTag</code> itself is marked as simulated.
    */
   private boolean simulated = false;
+
+  /** The rule tag description */
+  private String description = "";
+
+  /** The value description */
+  private String valueDescription = "";
   
   /** Empty collection */
   private static final Collection<Long> EMPTY_LONG_LIST = new ArrayList<Long>();
@@ -290,14 +296,37 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
     return this.name;
   }
   
+  /**
+   * Sets the client rule tag description
+   * @param pDescription The description of the client rule
+   */
+  public void setDescription(final String pDescription) {
+    this.description = pDescription;
+  }
+  
   @Override
   public String getDescription() {
-    return "Client rule: " + rule.getExpression();
+    if (this.description == null || this.description.equalsIgnoreCase("")) {
+      return "Client rule tag"; 
+    }
+    
+    return "Client rule tag: " + this.description;
+  }
+  
+  /**
+   * Sets the value Description
+   * @param pValueDescription the value description
+   */
+  public void setValueDescription(final String pValueDescription) {
+    this.valueDescription = pValueDescription;
   }
   
   @Override
   public String getValueDescription() {
-    return "Client rule result";
+    if (this.valueDescription == null || this.valueDescription.equalsIgnoreCase("")) {
+      return "Client rule tag result";
+    }
+    return this.valueDescription;
   }
 
   @Override
