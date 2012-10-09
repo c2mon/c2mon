@@ -1,0 +1,10 @@
+japc-ext-remote version history log
+===================================
+
+27/09/2012 - release of version 1.1.16
+----------------------------------
+* TIM-688, wbuczak
+
+the tid-generator scripts need to be updated in order to take into account "enabled" flag.
+This issue only concerns dmn2 module
+
