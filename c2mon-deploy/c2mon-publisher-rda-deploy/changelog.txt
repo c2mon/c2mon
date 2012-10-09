@@ -1,0 +1,8 @@
+c2mon-publisher-rda-deploy version history log
+===================================
+
+09/10/2012 - release of version 1.0.8
+----------------------------------
+* TIMS-783: the tid generation script must take "enabled" flag into account 
+   This fix only applies to dmn2 module
+
