@@ -146,7 +146,7 @@ sub fetchEquipmentAlives {
 	my $equipment_type = $_[2];
 
 	my $fetch_equipments_sql = <<END;
-select EQUIPMENT_ALIVE_TAG_ID from DMN_EQUIPMENT_V where equipment_alive_tag_id is not null and process_id=
+select EQUIPMENT_ALIVE_TAG_ID from DMN_EQUIPMENT_V where enabled_flag='Y' and equipment_alive_tag_id is not null and process_id=
 END
 
 	my $sth = $dbh->prepare("${fetch_equipments_sql} ${process_id}")
@@ -167,7 +167,7 @@ END
 	}
 	if ( $sth->rows == 0 ) {
 #		print
-# "No equipments are defined for the selected equipment types in the current configuration.\n\n";
+# "No equipment is defined for the selected equipment types in the current configuration.\n\n";
 	}
 	$sth->finish;
 	close(MYFILE);
@@ -183,7 +183,7 @@ sub fetchTags {
 	my $equipment_type = $_[2];
 
 	my $fetch_tags_sql = <<END;
-select metric_data_tag_id from DMN_METRICS_V m, DMN_EQUIPMENT_V e where e.equipment_id=m.equipment_id and m.metric_data_tag_id is not null and m.metric_control_flag='N' and e.process_id=
+select metric_data_tag_id from DMN_METRICS_V m, DMN_EQUIPMENT_V e where e.enabled_flag='Y' and m.enabled_flag='Y' and e.equipment_id=m.equipment_id and m.metric_data_tag_id is not null and m.metric_control_flag='N' and e.process_id=
 END
 
 	my $sth = $dbh->prepare("${fetch_tags_sql} ${process_id}")
@@ -219,7 +219,7 @@ sub fetchLimits {
 	my $equipment_type = $_[2];
 
 	my $fetch_tags_sql = <<END;
-select metric_rule_tag_id from DMN_METRICS_V m, DMN_EQUIPMENT_V e where e.equipment_id=m.equipment_id and m.metric_rule_tag_id is not null and limit_flag='Y' and e.process_id=
+select metric_rule_tag_id from DMN_METRICS_V m, DMN_EQUIPMENT_V e where e.enabled_flag='Y' and m.enabled_flag='Y' and e.equipment_id=m.equipment_id and m.metric_rule_tag_id is not null and limit_flag='Y' and e.process_id=
 END
 
 	my $sth = $dbh->prepare("${fetch_tags_sql} ${process_id}")
@@ -251,7 +251,7 @@ sub fetchEntities {
 	my $entity_type = $_[0];
 
 	my $fetch_entities_sql = <<END;
-select EQUIPMENT_RULE_TAG_ID from DMN_EQUIPMENT_V where EQUIPMENT_SINGLETON_FLAG='N'  
+select EQUIPMENT_RULE_TAG_ID from DMN_EQUIPMENT_V where enabled_flag='Y' and EQUIPMENT_SINGLETON_FLAG='N'  
 END
 
 	my $sth = $dbh->prepare("${fetch_entities_sql}")
@@ -281,7 +281,7 @@ sub fetchPublishedTags {
 
 
         my $fetch_tags_sql = <<END;
-select metric_data_tag_id from dmn_metrics_v where japc_metric_pub_flag='Y'
+select metric_data_tag_id from dmn_metrics_v where enabled_flag='Y' and japc_metric_pub_flag='Y'
 END
 
         my $sth = $dbh->prepare("${fetch_tags_sql}")
@@ -314,7 +314,7 @@ sub fetchPublishedLimits {
 
 
         my $fetch_tags_sql = <<END;
-select metric_rule_tag_id as metric_data_tag_id from dmn_metrics_v where japc_limit_pub_flag='Y'
+select metric_rule_tag_id as metric_data_tag_id from dmn_metrics_v where enabled_flag='Y' and japc_limit_pub_flag='Y'
 END
 
         my $sth = $dbh->prepare("${fetch_tags_sql}")
@@ -348,4 +348,4 @@ mkdir("${basedir}/PUBLISHER");
 mkdir("${basedir}/PUBLISHER/RDA");
 
 fetchPublishedLimits;
-fetchPublishedTags; 
+fetchPublishedTags;
