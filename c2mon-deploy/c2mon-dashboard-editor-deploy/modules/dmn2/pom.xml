@@ -22,9 +22,9 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>cern.dmn2.client</groupId>	
+			<groupId>cern.dmn2.client</groupId>
 			<artifactId>dmn2-jviews-tagchooser</artifactId>
-			<version>[0.9.9,2.0.0)</version>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 
 	</dependencies>
