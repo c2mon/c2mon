@@ -116,6 +116,7 @@ print "   <property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\
 
 print "   <property name=\"c2mon.dashboard.editor.datatagchooser.class\" value=\"ch.cern.dmn2.client.jviews.tagchooser.DMN2DataTagChooserImpl\"/>\n";
 print "   <property name=\"c2mon.dashboard.editor.commandtagchooser.class\" value=\"ch.cern.dmn2.client.jviews.tagchooser.DMN2CommandsTagChooserImpl\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.daofactory.class\" value=\"ch.cern.dmn2.client.jviews.dao.DMN2DaoFactory\"/>\n";
 
 print "         </resources>
         <resources os=\"Windows\" >

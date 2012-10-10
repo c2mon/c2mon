@@ -1,6 +1,11 @@
 version history log
 =========================
 
+10/10/2012  - mmitev, wbuxzak: release of version 1.1.10
+--------------------------------------------------
+  * Mitko Mitev (TIM-687) 
+      + splitting dependencies between TIM2 and DMN2
+
 02/10/2012  - wbuczak: release of version 1.1.9
 --------------------------------------------------
   * Mitko Mitev (DMN-1201, DMN-1202) 
