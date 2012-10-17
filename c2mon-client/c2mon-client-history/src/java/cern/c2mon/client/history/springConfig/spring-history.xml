@@ -34,6 +34,8 @@
 		<!--    <property name="logWriter" value=""/>-->
 		<property name="defaultAutoCommit" value="false" />
 		<property name="validationQuery" value="SELECT 0 FROM DUAL" />
+    <property name="testWhileIdle" value="true" />
+    <property name="timeBetweenEvictionRunsMillis" value="600000" />        
 		<property name="initialSize" value="1" />
 		<property name="maxActive" value="2" />
 	</bean>
