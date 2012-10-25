@@ -22,7 +22,7 @@
   	<dependency>
   		<groupId>cern.dmn2.shared</groupId>
   		<artifactId>dmn2-commons</artifactId>
-  		<version>1.0.3</version>
+  		<version>[1.0.7,)</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
