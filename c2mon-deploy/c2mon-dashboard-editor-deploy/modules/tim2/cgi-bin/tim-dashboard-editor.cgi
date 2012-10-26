@@ -34,6 +34,8 @@ my $jdbcDriver          = $c2monProperties->getProperty("c2mon.jdbc.driver");
 my $jdbcRoUrl           = $c2monProperties->getProperty("c2mon.jdbc.ro.url");
 my $jdbcRoUser          = $c2monProperties->getProperty("c2mon.jdbc.ro.user");
 my $jdbcRoPassword      = $c2monProperties->getProperty("c2mon.jdbc.ro.password");
+# retrieve Dashboard specific setting
+my $gmaoChooserClass    = $c2monProperties->getProperty("c2mon.dashboard.editor.gmaochooser.class");
 close PROPS;
 
 
@@ -101,6 +103,9 @@ print "    <property name=\"c2mon.jdbc.driver\" value=\"$jdbcDriver\"/>\n";
 print "    <property name=\"c2mon.jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
 print "    <property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
 print "    <property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
+# This property is used to specify the class which implements the GmaoChooser interface
+# that allows mapping multiple tags to one symbol by specifying the GMAO code.
+print "    <property name=\"c2mon.dashboard.editor.gmaochooser.class\" value=\"$gmaoChooserClass\"/>\n";
 print "  </resources>
   <resources os=\"Windows\" >
     <property name=\"tim.log.file\" value=\"c:\\temp\\tim-dashboard-editor.log\"/>
