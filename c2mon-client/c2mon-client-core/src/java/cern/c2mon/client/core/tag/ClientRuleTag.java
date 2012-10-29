@@ -49,12 +49,15 @@ import cern.tim.shared.rule.RuleExpression;
  *
  * @author Matthias Braeger
  */
-public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue {
+public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagValue {
   /** Log4j Logger for this class */
   private static final Logger LOG = Logger.getLogger(ClientRuleTag.class);
   
   /** The rule expression of the client rule */
   private final RuleExpression rule;
+  
+  /** The result type of the rule */
+  private final Class<T> resultType;
   
   /** Indicates when the client rule was evaluated for the last time */
   private Timestamp timestamp = null;
@@ -63,7 +66,7 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   private DataTagQuality ruleQuality = new DataTagQualityImpl(); 
 
   /** The rule result */
-  private Object ruleResult = null;
+  private T ruleResult = null;
   
   /** List of unique update listeners */
   private final List<DataTagUpdateListener> listeners = new ArrayList<DataTagUpdateListener>();;
@@ -110,10 +113,15 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
    * Do not forget to unsubscribe from the input tags once you not need anymore
    * this <code>ClientRuleTag</code> instance.
    * @param pRule The client rule expression 
+   * @param pResultType The result type of the rule expression
    * @see ClientRuleTag#unsubscribe()
    */
-  public ClientRuleTag(final RuleExpression pRule) { 
+  public ClientRuleTag(final RuleExpression pRule, Class<T> pResultType) { 
+    if (pRule == null || pResultType == null) {
+      throw new NullPointerException("The arguments cannot be null");
+    }
     this.rule = pRule;
+    this.resultType = pResultType;
   }
   
   /**
@@ -180,7 +188,7 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
    * @return the tag value
    */
   @Override
-  public Object getValue() {
+  public T getValue() {
     return ruleResult;
   }
   
@@ -189,13 +197,9 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
    * @see #getValue
    * @return the class of the tag value
    */
-  public final Class< ? > getType() {
-    Class< ? > type = null;
-    if (this.ruleResult != null) {
-      type = ruleResult.getClass();
-    }
-    
-    return type;
+  @Override
+  public final Class< T > getType() {
+    return resultType;
   } 
   
   @Override
@@ -261,7 +265,7 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
           this.ruleMode = newRuleMode;
 
           try {
-            this.ruleResult = rule.evaluate(new Hashtable<Long, Object>(ruleInputValues));
+            this.ruleResult = rule.evaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           catch (RuleEvaluationException e) {
             this.ruleQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_VALUE, "Rule expression could not be evaluated. See log messages.");
@@ -372,8 +376,9 @@ public class ClientRuleTag implements DataTagUpdateListener, ClientDataTagValue 
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof ClientRuleTag) {
-      ClientRuleTag crt = (ClientRuleTag) obj;
-      if (this.getRuleExpression().getExpression().equalsIgnoreCase(crt.getRuleExpression().getExpression())) {
+      ClientRuleTag<?> crt = (ClientRuleTag<?>) obj;
+      if (this.getRuleExpression().getExpression().equalsIgnoreCase(crt.getRuleExpression().getExpression())
+          && this.getType().equals(crt.getType())) {
         return true;
       }
     }
