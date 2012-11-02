@@ -233,7 +233,8 @@ public class JmsProxyTest {
                                                    "value description",
                                                    new DataTagQualityImpl(),
                                                    TagMode.TEST,
-                                                   new Timestamp(System.currentTimeMillis()), 
+                                                   new Timestamp(System.currentTimeMillis()),
+                                                   new Timestamp(System.currentTimeMillis()),
                                                    new Timestamp(System.currentTimeMillis()), 
                                                    "description").toJson(), 
                             details.getTopicName());

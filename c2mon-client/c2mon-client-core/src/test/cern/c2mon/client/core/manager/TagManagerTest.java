@@ -4,8 +4,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.jms.JMSException;
@@ -21,7 +19,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.jms.JmsProxy;
@@ -32,7 +29,6 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.datatag.TagQualityStatus;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:cern/c2mon/client/core/manager/c2mon-tagmanager-test.xml" })
@@ -141,6 +137,7 @@ public class TagManagerTest {
           (DataTagQualityImpl) tagQuality,
           TagMode.TEST,
           new Timestamp(System.currentTimeMillis() - 10000L),
+          new Timestamp(System.currentTimeMillis() - 5000L),
           new Timestamp(System.currentTimeMillis()),
           "Test description",
           "My.data.tag.name",

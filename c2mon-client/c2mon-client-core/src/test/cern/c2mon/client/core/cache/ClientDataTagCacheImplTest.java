@@ -227,6 +227,7 @@ public class ClientDataTagCacheImplTest {
           (DataTagQualityImpl) tagQuality,
           TagMode.TEST,
           new Timestamp(System.currentTimeMillis() - 10000L),
+          new Timestamp(System.currentTimeMillis() - 5000L),
           new Timestamp(System.currentTimeMillis()),
           "Test description",
           "My.data.tag.name",

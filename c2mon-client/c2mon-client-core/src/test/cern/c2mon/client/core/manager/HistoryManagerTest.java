@@ -203,6 +203,7 @@ public class HistoryManagerTest {
       final ClientDataTagImpl cdt = new ClientDataTagImpl(100000L + i);
       
       final Timestamp sourceTimestamp;
+      final Timestamp daqTimestamp;
       final Timestamp serverTimestamp;
       
       final boolean willBeFiltered = i < NUMBER_FILTERED_TAGS;
@@ -210,10 +211,12 @@ public class HistoryManagerTest {
       
       if (willBeFiltered) {
         sourceTimestamp = new Timestamp(timespan.getStart().getTime() - 3 * 60 * 60 * 1000);
+        daqTimestamp    = new Timestamp(timespan.getStart().getTime() - 3 * 60 * 60 * 1000);
         serverTimestamp = new Timestamp(timespan.getStart().getTime() - 3 * 60 * 60 * 1000);
       }
       else {
         sourceTimestamp = new Timestamp(timespan.getStart().getTime() + 2 * 60 * 60 * 1000);
+        daqTimestamp    = new Timestamp(timespan.getStart().getTime() + 2 * 60 * 60 * 1000);
         serverTimestamp = new Timestamp(timespan.getStart().getTime() + 2 * 60 * 60 * 1000);
       }
       
@@ -226,6 +229,7 @@ public class HistoryManagerTest {
             new DataTagQualityImpl(), 
             TagMode.OPERATIONAL, 
             sourceTimestamp, 
+            daqTimestamp,
             serverTimestamp, 
             "Test tag");
       value.getDataTagQuality().validate();

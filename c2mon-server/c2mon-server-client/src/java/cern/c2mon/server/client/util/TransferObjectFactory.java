@@ -51,6 +51,7 @@ public abstract class TransferObjectFactory {
                         (DataTagQualityImpl) tag.getDataTagQuality(),
                         getTagMode(tag),
                         tag.getTimestamp(),
+                        tag.getDaqTimestamp(),
                         tag.getCacheTimestamp(),
                         tag.getDescription(),
                         tag.getName(),
@@ -86,6 +87,7 @@ public abstract class TransferObjectFactory {
                         (DataTagQualityImpl) tag.getDataTagQuality(),
                         getTagMode(tag),
                         tag.getTimestamp(), 
+                        tag.getDaqTimestamp(),
                         tag.getCacheTimestamp(), 
                         tag.getDescription());
 

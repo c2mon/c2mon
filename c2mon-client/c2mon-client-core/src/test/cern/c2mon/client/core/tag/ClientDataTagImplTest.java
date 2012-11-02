@@ -8,10 +8,6 @@ import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -20,7 +16,6 @@ import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
-import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
@@ -49,6 +44,7 @@ public class ClientDataTagImplTest {
           (DataTagQualityImpl) tagQuality,
           TagMode.TEST,
           new Timestamp(System.currentTimeMillis() - 10000L),
+          new Timestamp(System.currentTimeMillis() - 5000L),
           new Timestamp(System.currentTimeMillis()),
           "Test description",
           "My.data.tag.name",
