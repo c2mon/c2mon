@@ -24,7 +24,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -58,26 +57,19 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
    * exactly one entry registered in this map.
    */
   private final Map<String, SimpleProperty> properties = new HashMap<String, SimpleProperty>();
-  
-  /**
-   * The RDA device name that shall be used by the clients to access all published properties.
-   */
-  private final String deviceName;
-  
+
 
   /**
    * Default constructor
    * @param serverName The device name that is used for creating the RDA server
-   * @param device The device name that shall be used for by the clients to access the properties
    * @throws InternalException In case of a problem at creation time of the RDA server
    */
   @Autowired
-  public RdaPublisher(@Value("${c2mon.publisher.rda.server.name}") final String serverName, 
-                      @Value("${c2mon.publisher.rda.device.name}") final String device) throws InternalException {
+  public RdaPublisher(@Value("${c2mon.publisher.rda.server.name}") final String serverName) throws InternalException {
     super(serverName);
-    this.deviceName = device;
-    LOG.info("Registered RDA device " + device + " for server: " + serverName);
+    LOG.info("Starting RDA server " + serverName);
   }
+  
   
   /**
    * This method has to be called in order to start the RDA publisher
@@ -115,10 +107,6 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
 
   @Override
   public Data get(final IOPoint iop, final Data context) throws BadParameter, IOError {
-    if (!iop.getDeviceName().equalsIgnoreCase(deviceName)) {
-      LOG.warn("GET - Rejected request for unknown device " + iop.getDeviceName());
-      throw new BadParameter("Device name " + iop.getDeviceName() + " unknown by server " + getServerName());
-    }
     if (LOG.isDebugEnabled()) {
       LOG.debug("GET - " + iop.getDeviceName() + "/" + iop.getPropertyName());
     }
@@ -128,10 +116,6 @@ public final class RdaPublisher extends DeviceServerBase implements Publisher {
 
   @Override
   public void set(final IOPoint iop, final Data value, final Data context) throws BadParameter, IOError {
-    if (!iop.getDeviceName().equalsIgnoreCase(deviceName)) {
-      LOG.warn("SET - Rejected request for unknown device " + iop.getDeviceName());
-      throw new BadParameter("Device name " + iop.getDeviceName() + " unknown by server " + getServerName());
-    }
     if (LOG.isDebugEnabled()) {
       LOG.debug("SET - " + iop.getDeviceName() + "/" + iop.getPropertyName());
     }

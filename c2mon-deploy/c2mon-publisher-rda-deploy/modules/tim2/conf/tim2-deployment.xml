@@ -41,7 +41,6 @@
 
         <!-- JVM arguments -->
         <property name="c2mon.publisher.rda.server.name" value="TIM-RDA-SERVER" /> <!-- Needed for setting the RDA server name -->
-        <property name="c2mon.publisher.rda.device.name" value="TIM.RDA.DEVICE" />
         <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
         <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
         <property name="tim.log.path" value="${INSTALL_DIR}/log" />
