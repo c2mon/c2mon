@@ -422,6 +422,11 @@ public class HistoryTagImpl implements HistoryTag {
   public Timestamp getServerTimestamp() {
     return null;
   }
+  
+  @Override
+  public Timestamp getDaqTimestamp() {
+    return null;
+  }
 
   @Override
   public synchronized Timestamp getTimestamp() {
