@@ -475,9 +475,18 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public Collection<Long> getProcessIds() {
     return EMPTY_LONG_LIST;
   }
+  
+  /**
+   * @return By definition the <code>ClientRuleTag</code> will always return
+   *         <code>null</code> as DAQ timestamp. 
+   */
+  @Override
+  public Timestamp getDaqTimestamp() {
+    return null;
+  }
 
   /**
-   * @return By definiton the <code>ClientRuleTag</code> will always return
+   * @return By definition the <code>ClientRuleTag</code> will always return
    *         <code>null</code> as server timestamp. 
    */
   @Override

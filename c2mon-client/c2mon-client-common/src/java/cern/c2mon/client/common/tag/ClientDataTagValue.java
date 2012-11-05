@@ -128,9 +128,22 @@ public interface ClientDataTagValue extends RuleInputValue {
   /**
    * Returns the tag source timestamp. In case the tag is uninitialized
    * it return the default time stamp which is from 1970.
-   * @return the tag source timestamp.
+   * @return the tag source timestamp. This value is never <code>null</code>.
    */
   Timestamp getTimestamp();
+  
+  /**
+   * Returns the time when the data tag update
+   * has passed the DAQ module. This value might be
+   * interesting for reordering the incoming events
+   * in case of race conditions. 
+   * @return the DAQ timestamp, or <code>null</code> in case that
+   *         this tag update has not yet been initialized or has
+   *         not passed the DAQ (e.g. in case of communication errors
+   *         between server and DAQ layer).
+   * @see #getTimestamp()
+   */
+  Timestamp getDaqTimestamp();
   
   /**
    * Returns the time when the data tag update

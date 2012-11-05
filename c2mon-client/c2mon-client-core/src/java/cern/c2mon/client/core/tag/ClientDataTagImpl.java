@@ -128,6 +128,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   @Element(required = false)
   private Timestamp sourceTimestamp = null;
   
+  /** The DAQ timestamp that indicates when the change message passed the DAQ module */
+  @Element(required = false)
+  private Timestamp daqTimestamp = null;
+  
   /** The server timestamp that indicates when the change message passed the server */
   @Element
   private Timestamp serverTimestamp = new Timestamp(0L);
@@ -266,6 +270,17 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       else {
         return sourceTimestamp;
       }
+    }
+    finally {
+      updateTagLock.readLock().unlock();
+    }
+  }
+  
+  @Override
+  public Timestamp getDaqTimestamp() {
+    updateTagLock.readLock().lock();
+    try {
+      return daqTimestamp;
     }
     finally {
       updateTagLock.readLock().unlock();
@@ -520,7 +535,16 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     valid &= tagValueUpdate != null;
     if (tagValueUpdate != null) 
       valid &= tagValueUpdate.getId().equals(id);
-    	valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp);    
+      if (tagValueUpdate.getDaqTimestamp() != null && daqTimestamp != null) {
+       // The second case with equal server timestamps can occur, if the two
+       // tag updates were sent within the same DAQ XML message. (see TIMS-784)
+       valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp)
+                 || (tagValueUpdate.getDaqTimestamp().after(daqTimestamp) 
+                     && tagValueUpdate.getServerTimestamp().equals(serverTimestamp));    
+      }
+      else {
+        valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp);    
+      }
     return valid;
   }
   
@@ -689,6 +713,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     description = tagValueUpdate.getDescription();
     valueDescription = tagValueUpdate.getValueDescription();
     serverTimestamp = tagValueUpdate.getServerTimestamp();
+    daqTimestamp = tagValueUpdate.getDaqTimestamp();
     sourceTimestamp = tagValueUpdate.getSourceTimestamp();
     tagValue = tagValueUpdate.getValue();
     mode = tagValueUpdate.getMode();
@@ -869,6 +894,9 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       if (sourceTimestamp != null) {
         clone.sourceTimestamp = (Timestamp) sourceTimestamp.clone();
       }
+      if (daqTimestamp != null) {
+        clone.daqTimestamp = (Timestamp) daqTimestamp.clone();
+      }
       if (serverTimestamp != null) {
         clone.serverTimestamp = (Timestamp) serverTimestamp.clone();
       }
@@ -907,6 +935,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       this.description = DEFAULT_DESCRIPTION;
       this.tagQuality.setInvalidStatus(TagQualityStatus.UNINITIALISED, DEFAULT_DESCRIPTION);
       this.serverTimestamp = new Timestamp(0L);
+      this.daqTimestamp = null;
       this.sourceTimestamp = null;
       this.tagValue = null;
       for (Long id : processSupervisionStatus.keySet()) {
