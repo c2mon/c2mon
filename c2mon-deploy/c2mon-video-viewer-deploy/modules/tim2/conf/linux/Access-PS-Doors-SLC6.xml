@@ -1,35 +1,25 @@
 <config>
    <!-- The display title of the TIM Video Viewer -->
-   <property name="video-viewer-title" type="java.lang.String" value="Access SPS Doors"/>
+   <property name="video-viewer-title" type="java.lang.String" value="Access PS Doors"/>
    
    <!-- 
      The name of the video system that must also be defined in the database. Due to this
      information it is possible to determine the relevant data tag IDs.
     -->
-   <property name="video-system-name" type="java.lang.String" value="SPS_ACCESS_NKF_CCC_2"/>
-   
-   <!-- Set this variable to true, in case you want a display for the taken keys on the access doors -->
-   <property name="keys-taken-counter" type="java.lang.Boolean" value="false"/>
-
-   <!-- 
-     Set this variable to true, if you want to ensure that the TIM Video Viewer
-     is only listening to requests of a specific host. The user will in this case 
-     be prompted at startup to enter a host name for the requester.
-   -->
-   <property name="single-host-controller" type="java.lang.Boolean" value="true"/>
+   <property name="video-system-name" type="java.lang.String" value="PS_ACCESS_NKF"/>
    
    <!--
      This variable must be set to true, if you want to start the TIM video viewer with VLC.
      By default it is set to false.
    -->
    <property name="vlc-player" type="java.lang.Boolean" value="true"/>
-
+   
    <!--
      In case that vlc-player=true, we can also specify the arguments that we want to
      use to initialize the VLC player.
    -->
    <property name="vlc-args" type="java.lang.String" value="--no-overlay --sout-udp-caching 100 --rtp-caching 100 --audio 0"/>
-   
+
    <!-- 
      This variable is only relevant, if the VLC player is used. 
      If the video streams have to be requested through the CERN On-Demand server,

@@ -7,38 +7,19 @@
      information it is possible to determine the relevant data tag IDs.
     -->
    <property name="video-system-name" type="java.lang.String" value="PS_TEST_NKF"/>
-
-
-   <!-- Put here the web link to the help page for the specific video viewer configuration -->
-   <property name="viewerhelpdir" type="java.lang.String" value="http://wikis/display/TIM/TIM+Video+Viewer"/>
-   
-   <!-- 
-     The amount of video viewer that shall be displayed on the right side of the TIM Video viewer. 
-     The number shall be between 2 and 6. The default is 4, in case this variable is not specified 
-    -->
-   <property name="video-queue-size" type="java.lang.Integer" value="4"/>
-   
-   <!-- Set this variable to true, in case you want a display for the taken keys on the access doors -->
-   <property name="keys-taken-counter" type="java.lang.Boolean" value="true"/>
-
-   <!-- 
-     Set this variable to true, if you want to ensure that the TIM Video Viewer
-     is only listening to requests of a specific host. The user will in this case 
-     be prompted at startup to enter a host name for the requester.
-   -->
-   <property name="single-host-controller" type="java.lang.Boolean" value="false"/>
    
    <!--
      This variable must be set to true, if you want to start the TIM video viewer with VLC.
      By default it is set to false.
    -->
    <property name="vlc-player" type="java.lang.Boolean" value="true"/>
-
-   <!--
-     In case that vlc-player=true, we can also specify the arguments that we want to
-     use to initialize the VLC player.
+   
+   <!-- 
+     This variable is only relevant, if the VLC player is used. 
+     If the video streams have to be requested through the CERN On-Demand server,
+     then you have to set the variable to true.
    -->
-   <property name="vlc-args" type="java.lang.String" value="--sout-udp-caching 100 --rtp-caching 100 --audio 0 --quiet"/>
+   <property name="enable-od-client" type="java.lang.Boolean" value="false" />
 
    <!--
      The screen width that the application shall take

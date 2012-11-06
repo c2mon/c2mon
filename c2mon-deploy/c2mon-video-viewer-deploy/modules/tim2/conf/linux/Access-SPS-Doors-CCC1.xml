@@ -7,16 +7,6 @@
      information it is possible to determine the relevant data tag IDs.
     -->
    <property name="video-system-name" type="java.lang.String" value="SPS_ACCESS_NKF_CCC_1"/>
-
-
-   <!-- Put here the web link to the help page for the specific video viewer configuration -->
-   <property name="viewerhelpdir" type="java.lang.String" value="http://wikis/display/TIM/TIM+Video+Viewer"/>
-   
-   <!-- 
-     The amount of video viewer that shall be displayed on the right side of the TIM Video viewer. 
-     The number shall be between 2 and 6. The default is 4, in case this variable is not specified 
-    -->
-   <property name="video-queue-size" type="java.lang.Integer" value="4"/>
    
    <!-- Set this variable to true, in case you want a display for the taken keys on the access doors -->
    <property name="keys-taken-counter" type="java.lang.Boolean" value="false"/>
@@ -40,13 +30,10 @@
    -->
    <property name="vlc-args" type="java.lang.String" value="--no-overlay --sout-udp-caching 100 --rtp-caching 100 --audio 0"/>
 
-   <!--
-     The screen width that the application shall take
-   -->
-   <property name="screen-width" type="java.lang.Integer" value="1280"/>
-
-   <!--
-     The screen height that the application shall take
-   -->
-   <property name="screen-height" type="java.lang.Integer" value="1024"/>
+    <!-- 
+      This variable is only relevant, if the VLC player is used. 
+      If the video streams have to be requested through the CERN On-Demand server,
+      then you have to set the variable to true.
+    -->
+    <property name="enable-od-client" type="java.lang.Boolean" value="true" />
 </config>
