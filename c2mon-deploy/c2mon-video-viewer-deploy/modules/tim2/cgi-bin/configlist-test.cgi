@@ -26,8 +26,8 @@ close VFILE;
 # In case of a SNAPSHOT the codebase changes
 #
 if ($viewerVersion =~ /-SNAPSHOT/) {
-  my $configsubdir = "/test/javaws/tim2-video-viewer/conf";
-  my $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-video-viewer/conf"; 
+  $configsubdir = "/test/javaws/tim2-video-viewer/conf";
+  $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-video-viewer/conf"; 
 }
 
 ##
