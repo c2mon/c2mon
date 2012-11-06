@@ -533,18 +533,24 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private boolean isValidUpdate(final TagValueUpdate tagValueUpdate) {
     boolean valid = true;
     valid &= tagValueUpdate != null;
-    if (tagValueUpdate != null) 
+    if (tagValueUpdate != null) {
       valid &= tagValueUpdate.getId().equals(id);
+      
+      // Check server cache timestamp
+      final long newSeverTime = tagValueUpdate.getServerTimestamp().getTime();
+      final long oldServerTime = serverTimestamp.getTime();
+      
+      valid &= newSeverTime >= oldServerTime;
+
+      // Check DAQ timestamp, if configured.
+      // This is not the case for server rule tags
       if (tagValueUpdate.getDaqTimestamp() != null && daqTimestamp != null) {
-       // The second case with equal server timestamps can occur, if the two
-       // tag updates were sent within the same DAQ XML message. (see TIMS-784)
-       valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp)
-                 || (tagValueUpdate.getDaqTimestamp().after(daqTimestamp) 
-                     && tagValueUpdate.getServerTimestamp().equals(serverTimestamp));    
+        final long newDaqTime = tagValueUpdate.getDaqTimestamp().getTime();
+        final long oldDaqTime = daqTimestamp.getTime();
+        valid &= newDaqTime >= oldDaqTime;
       }
-      else {
-        valid &= tagValueUpdate.getServerTimestamp().after(serverTimestamp);    
-      }
+    }
+      
     return valid;
   }
   
