@@ -1,50 +1,46 @@
 <config>
 
-	<!--
-		This variable determines the global title that is given to the
-		application and which is displayed e.g. in the task bar
-	-->
+	<!-- This variable determines the global title that is given to the application 
+		and which is displayed e.g. in the task bar -->
 	<property name="viewer-title" type="java.lang.String" value="DMN2 Viewer [DEV]" />
 
-	<!--
-		Application name which is used to register the TIM Viewer in RBAC
-	-->
+	<!-- Application name which is used to register the TIM Viewer in RBAC -->
 	<property name="rbac-app-name" type="java.lang.String" value="diamon-console" />
 
-	<!--
-		Defines URL to the XML file that shall be used to create the
-		navigation tree. This URL can also point to a Perl script.
-	-->
+	<!-- Defines URL to the XML file that shall be used to create the navigation 
+		tree. This URL can also point to a Perl script. -->
 	<property name="views-navigation-tree-creator" type="java.lang.String"
 		value="http://bewww/~dmndev/dmn2-viewer-dev/cgi-bin/viewlist-dev.cgi" />
 
-	<!--
-		Defines the initialization parameter for the
-		cern.accsoft.gui.frame.Console
-	-->
+	<!-- Defines the initialization parameter for the cern.accsoft.gui.frame.Console -->
 	<property name="console-logger-configuration" type="java.lang.String"
 		value="DEBUG_ENABLED = false; TIMESTAMP_ENABLED=false; BUFFER_SIZE=3000;STACK_TRACE_DEPTH=4" />
 
-  <!--
-    Defines the root folder's URL of the views
-  -->
+	<!-- Defines the root folder's URL of the views -->
 	<property name="view-root-repository-url" type="java.lang.String"
 		value="http://bewww/~dmndev/dmn2-views/" />
 
 
-	<!--
-		This property can be used to load the TIM Viewer with different
-		palettes. If not specified, the TIM Viewer looks into the standard URL
-		directory: "http://timweb.cern.ch/Views/palettes/"
-	-->
+	<!-- This property can be used to load the TIM Viewer with different palettes. 
+		If not specified, the TIM Viewer looks into the standard URL directory: "http://timweb.cern.ch/Views/palettes/" -->
 	<property name="dashboard-palettes-dir" type="java.lang.String"
 		value="http://bewww/~dmndev/dmn2-views/palettes/" />
 
-	<!--
-		Defines the URL of the C2MON Tag Viewer. The Viewer will append a Tag
-		ID at the end of the URL to retrieve more information.
-	-->
+	<!-- Defines the URL of the C2MON Tag Viewer. The Viewer will append a Tag 
+		ID at the end of the URL to retrieve more information. -->
 	<property name="tag-viewer-url" type="java.lang.String"
 		value="http://cs-ccr-lasertest:8080/c2mon-web-configviewer/tagviewer/" />
+
+	<!-- A list of Email Addresses to be added in the Mail Dialog whenever it 
+		shows up. -->
+	<property name="mail-dialog-default-repicients" type="java.lang.String"
+		value="
+               diamon-support, diamon-support@cern.ch;
+               diamon-developers, diamon-developers@cern.ch;
+               Peter Jurcso, Peter.Jurcso@cern.ch;
+               Mark Buttner, Mark.Buttner@cern.ch;
+               Wojtek Buczak, Wojtek.Buczak@cern.ch;
+               Joel Lauener, Joel.Lauener@cern.ch;
+               Felix Ehm, Felix.Ehm@cern.ch;" />
 
 </config>
