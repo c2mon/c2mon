@@ -27,6 +27,7 @@ import javax.annotation.PostConstruct;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.admin.AdminMessage;
@@ -97,8 +98,7 @@ public class AdminMessageManager implements C2monAdminMessageManager, AdminMessa
    * @param authDetails The RBAC authorization details given as RBAC class/device/property tuple
    */
   @Autowired
-  @Qualifier("authorizationDetails")
-  public void setAuthDetails(final String authDetails) {
+  public void setAuthDetails(@Value("${c2mon.client.rbac.admin}") final String authDetails) {
     rbacAdminAuthorizationDetails = authDetails;
   }
   
