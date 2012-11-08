@@ -36,4 +36,10 @@
       then you have to set the variable to true.
     -->
     <property name="enable-od-client" type="java.lang.Boolean" value="false" />
+    
+    <!-- 
+      The amount of video viewer that shall be displayed on the right side of the TIM Video viewer. 
+      The number shall be between 2 and 6. The default is 4, in case this variable is not specified 
+    -->
+    <property name="video-queue-size" type="java.lang.Integer" value="3" />
 </config>
