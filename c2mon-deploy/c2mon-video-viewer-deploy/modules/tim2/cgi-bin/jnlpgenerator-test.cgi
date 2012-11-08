@@ -12,7 +12,7 @@ my $appdir                    = "tim2-video-viewer-stable/";
 my $codebase                  = "http://timweb/test/javaws";
 my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
 my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
-my $log4jURL                  = "http://timweb/test/conf/log4j.xml";
+my $log4jURL                  = "http://timweb/test/conf/tim-video-log4j.xml";
 
 ##
 # Reading version number from ../version.txt
