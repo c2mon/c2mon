@@ -12,6 +12,7 @@ my $appdir                    = "tim2-video-viewer/";
 my $codebase                  = "http://timweb/javaws";
 my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
 my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
+my $log4jURL                  = "http://timweb/conf/log4j.xml";
 
 ##
 # Reading version number from ../version.txt
@@ -87,7 +88,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 jarlist ("$jardir");
 
 # Defines the application name for RBAC
-print "    <property name=\"app.name\" value=\"tim-video-viewer\"/>\n";
+print "    <property name=\"app.name\" value=\"tim-video-viewer-pro\"/>\n";
 # Defines the version number for RBAC
 print "    <property name=\"app.version\" value=\"$viewerVersion\"/>\n";
 # Defines the version number that is shown in the TIM Viewer about dialog
@@ -96,6 +97,8 @@ print "    <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 print "    <property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
 # JMS configuration parameters needed by TIM Video
 print "    <property name=\"c2mon.client.jms.video.request.queue\" value=\"$jmsVideoRequestQueue\"/>\n";
+# log4j configuration URL
+print "    <property name=\"log4j.configuration\" value=\"$log4jURL\"/>\n";
 
 if (param('configurl')) {
 	print "    <property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";

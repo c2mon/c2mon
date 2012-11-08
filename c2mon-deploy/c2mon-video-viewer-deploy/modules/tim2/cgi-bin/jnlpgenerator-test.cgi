@@ -12,6 +12,7 @@ my $appdir                    = "tim2-video-viewer-stable/";
 my $codebase                  = "http://timweb/test/javaws";
 my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
 my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
+my $log4jURL                  = "http://timweb/test/conf/log4j.xml";
 
 ##
 # Reading version number from ../version.txt
@@ -103,6 +104,8 @@ print "    <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 print "    <property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
 # JMS configuration parameters needed by TIM Video
 print "    <property name=\"c2mon.client.jms.video.request.queue\" value=\"$jmsVideoRequestQueue\"/>\n";
+# log4j configuration URL
+print "    <property name=\"log4j.configuration\" value=\"$log4jURL\"/>\n";
 
 if (param('configurl')) {
 	print "    <property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";
