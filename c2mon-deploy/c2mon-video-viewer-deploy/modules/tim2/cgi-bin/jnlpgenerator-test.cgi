@@ -93,7 +93,11 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 
 jarlist ("$jardir");
 
-# Defines the version number that is shown in the TIM Viewer about dialog
+# Defines the application name for RBAC
+print "    <property name=\"app.name\" value=\"tim-video-viewer-test\"/>\n";
+# Defines the version number for RBAC
+print "    <property name=\"app.version\" value=\"$viewerVersion\"/>\n";
+# Defines the version number that is shown in the TIM Video Viewer about dialog
 print "    <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
 print "    <property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
