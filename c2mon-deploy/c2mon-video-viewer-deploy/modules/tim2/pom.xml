@@ -81,7 +81,7 @@
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
-							<stripVersion>true</stripVersion>
+							<stripVersion>false</stripVersion>
 						</configuration>
 					</execution>
 				</executions>

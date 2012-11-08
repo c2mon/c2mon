@@ -49,7 +49,7 @@ sub jarlist {
       &jarlist($_);
     }
     else {
-      if (/tim-video-viewer.jar$/) {
+      if (/tim-video-viewer/) {
             print "    <jar href=\"", $htmldir, "\" main=\"true\" download=\"eager\"/>\n";
       }
       elsif (/jar$/) {
@@ -82,7 +82,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
     <all-permissions/> 
   </security> 
   <resources>
-    <java version=\"1.6+\" initial-heap-size=\"256M\"  max-heap-size=\"256M\"/>" , "\n";
+    <java version=\"1.6+\" initial-heap-size=\"64M\"  max-heap-size=\"64M\"/>" , "\n";
 
 jarlist ("$jardir");
 
