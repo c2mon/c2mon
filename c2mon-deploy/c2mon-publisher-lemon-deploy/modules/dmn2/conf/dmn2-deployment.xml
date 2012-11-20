@@ -28,7 +28,7 @@
 				<property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
 				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
-				<property name="c2mon.process.name" value="DMN2-RDA-PUBLISHER" />
+				<property name="c2mon.process.name" value="DMN2-LEMON-PUBLISHER" />
 				<property name="c2mon.client.conf.url"
 					value="file://${INSTALL_DIR}/conf/client.properties" />
 				<property name="cern.c2mon.publisher.lemon.template"

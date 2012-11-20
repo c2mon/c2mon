@@ -94,7 +94,7 @@ while ( @data = $sth->fetchrow_array() )
                 my @host = gethostbyname("$hostName.cern.ch");
     if (scalar(@host) == 0) {
         $addr = "0.0.0.0";
-        print "$hostName is not in DNS!\n";
+        # print "$hostName is not in DNS!\n";
     } else {
         $addr = inet_ntoa($host[4]);
         $ep=time;
