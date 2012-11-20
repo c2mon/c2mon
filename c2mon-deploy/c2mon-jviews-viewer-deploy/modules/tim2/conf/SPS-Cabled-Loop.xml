@@ -1,6 +1,6 @@
 <config>
 	<view>
-		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/BoucleCablee_SPS/BC_SPS.ivl"/>
+		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/BoucleCablee_SPS/boucle_cablee_SPS_16.9.idbd"/>
 
 		<property name="external" type="java.lang.Boolean" value="false"/>
 	</view>
