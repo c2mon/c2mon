@@ -2,10 +2,8 @@
 <products>
 	<product name="c2mon">
 
-		<!--
-			this application section is a parent configuration for both
-			c2mon-tim2-prod and c2mon-tim2-test
-		-->
+		<!-- this application section is a parent configuration for both c2mon-tim2-prod 
+			and c2mon-tim2-test -->
 		<application name="default">
 			<deployment installLocation="/opt/dmn2-publisher-rda/">
 				<backupPolicy keepBackups="2">
@@ -27,12 +25,13 @@
 				<main-class name="cern.c2mon.publisher.core.PublisherKernel" />
 
 				<!-- JVM arguments -->
-        <property name="c2mon.publisher.rda.server.name" value="DMN-RDA-SERVER" /> <!-- Needed for setting the RDA server name -->
-        <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
-        <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="c2mon.publisher.rda.server.name" value="DMN-RDA-SERVER" /> <!-- Needed for setting the RDA server name -->
+				<property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
+				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-RDA-PUBLISHER" />
-				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
+				<property name="c2mon.client.conf.url"
+					value="file://${INSTALL_DIR}/conf/client.properties" />
 
 			</startscript>
 
@@ -43,10 +42,7 @@
 				</notification>
 
 				<directory name="conf">
-					<!--
-						Copy over the c2mon-client.properties file into the /conf
-						directory
-					-->
+					<!-- Copy over the c2mon-client.properties file into the /conf directory -->
 					<file name="client.properties" sourceDir="~diamonop/c2mon/client"
 						mask="400" />
 					<file name="publisher.tid" sourceDir="~diamonop/c2mon/client/rdapublisher"
@@ -65,22 +61,20 @@
 				<main-class name="cern.c2mon.publisher.core.PublisherKernel" />
 
 				<!-- JVM arguments -->
-        <property name="c2mon.publisher.rda.server.name" value="DMN-RDA-SERVER-TEST" /> <!-- Needed for setting the RDA server name -->
-        <property name="c2mon.publisher.rda.device.name" value="DMN.RDA.DEVICE.TEST" />
-        <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
-        <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="c2mon.publisher.rda.server.name" value="DMN-RDA-SERVER-TEST" /> <!-- Needed for setting the RDA server name -->
+				<property name="c2mon.publisher.rda.device.name" value="DMN.RDA.DEVICE.TEST" />
+				<property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
+				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-RDA-PUBLISHER-DEV" />
-        <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
+				<property name="c2mon.client.conf.url"
+					value="file://${INSTALL_DIR}/conf/client.properties" />
 
 			</startscript>
 
 			<deployment installLocation="/opt/dmn2-publisher-rda-dev">
 				<directory name="conf">
-					<!--
-						Copy over the c2mon-client.properties file into the /conf
-						directory
-					-->
+					<!-- Copy over the c2mon-client.properties file into the /conf directory -->
 					<file name="client.properties" sourceDir="~dmndev/c2mon/client"
 						mask="400" />
 					<file name="publisher.tid" sourceDir="~dmndev/c2mon/client/rdapublisher"
