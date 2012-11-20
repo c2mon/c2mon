@@ -98,7 +98,7 @@ public class LemonPublisher implements Publisher {
 
             }
 
-            log.info(computerName + " Preparing packet");
+            log.debug(computerName + " Preparing packet");
 
             for (ConcurrentHashMap.Entry<Long, List<String>> lemonEntry : lemonId2Metric.entrySet()) {
 
@@ -147,7 +147,7 @@ public class LemonPublisher implements Publisher {
                                     + ") used to build LemonId: " + blockId);
                         } else {
                             missingMetrics++;
-                            log.info(computerName + " Missing metrics:" + requiredMetric + " to build LemonId:"
+                            log.debug(computerName + " Missing metrics:" + requiredMetric + " to build LemonId:"
                                     + blockId);
                         }
                     }
@@ -165,11 +165,11 @@ public class LemonPublisher implements Publisher {
                     totalBlocks++;
                 } else {
                     if (missingMetrics > 0) {
-                        log.info(computerName + " Block ignored: " + blockId + " Reason: " + missingMetrics
+                        log.debug(computerName + " Block ignored: " + blockId + " Reason: " + missingMetrics
                                 + " metric(s) missing to construct");
                     }
                     if ((blockMetrics <= oldMetrics)) {
-                        log.info(computerName + " Block ignored: " + blockId + " No new data since last update");
+                        log.debug(computerName + " Block ignored: " + blockId + " No new data since last update");
                     }
 
                 } // end of missing metrics verification
@@ -185,7 +185,7 @@ public class LemonPublisher implements Publisher {
 
                 // To avoid sending upd packets during tests
                 if (LEMON_SERVER_NONET == 0) {
-                    log.info(computerName + " SEND UDP " + LEMON_SERVER_NAME + ":" + LEMON_SERVER_PORT + " ->  "
+                    log.debug(computerName + " SEND UDP " + LEMON_SERVER_NAME + ":" + LEMON_SERVER_PORT + " ->  "
                             + finalLemonMessage);
 
                     DatagramSocket clientSocket;
@@ -210,13 +210,13 @@ public class LemonPublisher implements Publisher {
 
                     }
                 } else {
-                    log.info(computerName + " NO-NET-MODE: Prepared but not sent to " + LEMON_SERVER_NAME + ":"
+                    log.debug(computerName + " NO-NET-MODE: Prepared but not sent to " + LEMON_SERVER_NAME + ":"
                             + LEMON_SERVER_PORT + " ->  " + finalLemonMessage);
 
                 } // if nonet
 
             } else {
-                log.info(computerName + " No update to be sent");
+                log.debug(computerName + " No update to be sent");
             }// if (totalBlocks>0
 
             // To ensure that during the update nobody touches the hash
@@ -562,7 +562,7 @@ public class LemonPublisher implements Publisher {
             log.debug("Update for " + cdt.getName() + " has been processed.");
 
         } else {
-            log.info("Invalid update received, ignored");
+            log.debug("Invalid update received, ignored");
         }
     } // onUpdate
 
