@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>cern.c2mon.c2mon-publisher</groupId>
 	<artifactId>c2mon-publisher-lemon</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<name>The LEMON Publisher based on the C2MON Publisher core</name>
 	<description>The LEMON Publisher based on the C2MON Publisher core</description>
 
