@@ -11,6 +11,11 @@
 	<version>1.0.0</version>
 	<name>The LEMON Publisher based on the C2MON Publisher core</name>
 	<description>The LEMON Publisher based on the C2MON Publisher core</description>
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-publisher-lemon</developerConnection>
+	</scm>
+
 	<dependencies>
 
 		<!-- C2MON Client API dependencies -->
