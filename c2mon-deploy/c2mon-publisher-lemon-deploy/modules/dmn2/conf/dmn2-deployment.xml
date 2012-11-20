@@ -19,8 +19,8 @@
 		<application name="dmn2-publisher-lemon-pro" extends="default">
 
 			<startscript name="dmn2-publisher-lemon">
-				<initial-heap-size>256m</initial-heap-size>
-				<max-heap-size>256m</max-heap-size>
+				<initial-heap-size>512m</initial-heap-size>
+				<max-heap-size>512m</max-heap-size>
 
 				<main-class name="cern.c2mon.publisher.core.PublisherKernel" />
 
@@ -58,13 +58,11 @@
 		<application name="dmn2-publisher-lemon-dev" extends="default">
 
 			<startscript name="dmn2-publisher-lemon">
-				<initial-heap-size>256m</initial-heap-size>
-				<max-heap-size>256m</max-heap-size>
+				<initial-heap-size>512m</initial-heap-size>
+				<max-heap-size>512m</max-heap-size>
 
 				<!-- enable eclipse remote debugging on port 8000 -->
-				<java-vm-args>-Xdebug
-					-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n
-				</java-vm-args>
+				<java-vm-args>-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n	</java-vm-args>
 
 				<main-class name="cern.c2mon.publisher.core.PublisherKernel" />
 
