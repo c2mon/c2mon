@@ -46,16 +46,7 @@
       <lineEnding>unix</lineEnding>
       <fileMode>0444</fileMode>
     </file>
-
-		<!--  log4j configuration -->
-		<file>
-			<source>${basedir}/conf/log4j.xml</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>log4j.xml</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-		
+				
     <!--  copy the version file -->
     <file>
       <source>${project.build.outputDirectory}/version.txt</source>
