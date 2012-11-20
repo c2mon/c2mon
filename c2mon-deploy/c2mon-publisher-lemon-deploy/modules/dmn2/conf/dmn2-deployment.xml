@@ -2,10 +2,8 @@
 <products>
 	<product name="c2mon">
 
-		<!--
-			this application section is a parent configuration for both
-			c2mon-publisher-lemon-pro and c2mon-publisher-lemon-test
-		-->
+		<!-- this application section is a parent configuration for both c2mon-publisher-lemon-pro 
+			and c2mon-publisher-lemon-test -->
 		<application name="default">
 			<deployment installLocation="/opt/dmn2-publisher-lemon/">
 				<backupPolicy keepBackups="2">
@@ -27,12 +25,14 @@
 				<main-class name="cern.c2mon.publisher.core.PublisherKernel" />
 
 				<!-- JVM arguments -->
-                <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
-                <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
+				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-RDA-PUBLISHER" />
-				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
-				<property name="cern.c2mon.publisher.lemon.template" value="file://${INSTALL_DIR}/conf/lemonids.template" />
+				<property name="c2mon.client.conf.url"
+					value="file://${INSTALL_DIR}/conf/client.properties" />
+				<property name="cern.c2mon.publisher.lemon.template"
+					value="file://${INSTALL_DIR}/conf/lemonids.template" />
 
 			</startscript>
 
@@ -43,16 +43,13 @@
 				</notification>
 
 				<directory name="conf">
-					<!--
-						Copy over the c2mon-client.properties file into the /conf
-						directory
-					-->
+					<!-- Copy over the c2mon-client.properties file into the /conf directory -->
 					<file name="client.properties" sourceDir="~diamonop/c2mon/client"
-						mask="400" />
-					<file name="publisher.tid" sourceDir="~diamonop/c2mon/client/lemonpublisher"
-						mask="400" />
+						mask="444" />
+					<file name="log4j.xml" sourceDir="~diamonop/c2mon/client/lemonpublisher"
+						mask="444" />
 					<file name="lemonids.template" sourceDir="~dmndev/c2mon/client/lemonpublisher"
-						mask="400" />							
+						mask="444" />
 				</directory>
 			</deployment>
 		</application>
@@ -63,33 +60,35 @@
 			<startscript name="dmn2-publisher-lemon">
 				<initial-heap-size>256m</initial-heap-size>
 				<max-heap-size>256m</max-heap-size>
-				<!--  enable eclipse remote debugging on port 8000 -->
-				<java-vm-args>-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n</java-vm-args>
+
+				<!-- enable eclipse remote debugging on port 8000 -->
+				<java-vm-args>-Xdebug
+					-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n
+				</java-vm-args>
 
 				<main-class name="cern.c2mon.publisher.core.PublisherKernel" />
 
 				<!-- JVM arguments -->
-			    <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
-			    <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
+				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-LEMON-PUBLISHER-DEV" />
-			    <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
-			    <property name="cern.c2mon.publisher.lemon.template" value="file://${INSTALL_DIR}/conf/lemonids.template" />
+				<property name="c2mon.client.conf.url"
+					value="file://${INSTALL_DIR}/conf/client.properties" />
+				<property name="cern.c2mon.publisher.lemon.template"
+					value="file://${INSTALL_DIR}/conf/lemonids.template" />
 
 			</startscript>
 
 			<deployment installLocation="/opt/dmn2-publisher-lemon-dev">
 				<directory name="conf">
-					<!--
-						Copy over the c2mon-client.properties file into the /conf
-						directory
-					-->
+					<!-- Copy over the c2mon-client.properties file into the /conf directory -->
 					<file name="client.properties" sourceDir="~dmndev/c2mon/client"
-						mask="400" />
-					<file name="publisher.tid" sourceDir="~dmndev/c2mon/client/lemonpublisher"
-						mask="400" />
+						mask="444" />
+					<file name="log4j.xml" sourceDir="~dmndev/c2mon/client/lemonpublisher"
+						mask="444" />
 					<file name="lemonids.template" sourceDir="~dmndev/c2mon/client/lemonpublisher"
-						mask="400" />	
+						mask="444" />
 				</directory>
 			</deployment>
 		</application>
