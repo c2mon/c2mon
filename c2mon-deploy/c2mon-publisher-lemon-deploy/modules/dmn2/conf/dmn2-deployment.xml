@@ -29,10 +29,8 @@
 				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-LEMON-PUBLISHER" />
-				<property name="c2mon.client.conf.url"
-					value="file://${INSTALL_DIR}/conf/client.properties" />
-				<property name="cern.c2mon.publisher.lemon.template"
-					value="file://${INSTALL_DIR}/conf/lemonids.template" />
+				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
+				<property name="cern.c2mon.publisher.lemon.template" value="file://${INSTALL_DIR}/conf/lemonids.template" />
 
 			</startscript>
 
@@ -62,7 +60,7 @@
 				<max-heap-size>512m</max-heap-size>
 
 				<!-- enable eclipse remote debugging on port 8000 -->
-				<java-vm-args>-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n	</java-vm-args>
+				<java-vm-args>-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n</java-vm-args>
 
 				<main-class name="cern.c2mon.publisher.core.PublisherKernel" />
 
@@ -71,10 +69,8 @@
 				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-LEMON-PUBLISHER-DEV" />
-				<property name="c2mon.client.conf.url"
-					value="file://${INSTALL_DIR}/conf/client.properties" />
-				<property name="cern.c2mon.publisher.lemon.template"
-					value="file://${INSTALL_DIR}/conf/lemonids.template" />
+				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
+				<property name="cern.c2mon.publisher.lemon.template" value="file://${INSTALL_DIR}/conf/lemonids.template" />
 
 			</startscript>
 
