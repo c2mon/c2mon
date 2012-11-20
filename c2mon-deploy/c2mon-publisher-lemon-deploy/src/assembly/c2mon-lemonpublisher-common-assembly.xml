@@ -6,7 +6,8 @@
 	<dependencySets>
 
 		<dependencySet>
-			<outputDirectory>/lib</outputDirectory>			
+			<outputDirectory>/lib</outputDirectory>		
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>	
 			<fileMode>0644</fileMode>
 		</dependencySet>
 
