@@ -56,7 +56,7 @@ my $dbh = DBI->connect( $dbiUrl, $dbiUser, $dbiPassword )
 
 
 my $fetch_configuration_sql = <<END;
-SELECT compname,compdescrip,operating_system,
+SELECT compname,substr(nvl(replace(compdescrip,'#',''),'NA'),1,33) compdescrip,operating_system,
 LISTAGG(metric_data_tag_id, ',')  WITHIN GROUP (ORDER BY metric_data_tag_id) AS metrics,
 count(metric_data_tag_id)
 FROM   DMN_METRICS_V,DMN_COMPUTERS    where enabled_flag='Y'     and compname=lower(equipment_short_name)
