@@ -100,6 +100,13 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   
   /** Empty collection */
   private static final Collection<Long> EMPTY_LONG_LIST = new ArrayList<Long>();
+  
+  /** 
+   * In case the rule expression could not be evaluated, an error message describing the problem.
+   * Null otherwise. 
+   */
+  private String ruleError;
+  
   /** 
    * Empty alarm collection instance that is returned, if another class
    * wants to know whether there are alarms registered for this
@@ -269,6 +276,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
           }
           catch (RuleEvaluationException e) {
             this.ruleQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_VALUE, "Rule expression could not be evaluated. See log messages.");
+            ruleError = e.getMessage();
             LOG.debug("computeRule() - \"" + rule.getExpression() + "\" could not be evaluated.", e);
           }
           // Update the time stamp of the ClientRuleTag
@@ -279,6 +287,14 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
         ruleMapLock.readLock().unlock();
       }
     }
+  }
+  
+  /**
+   * @return In case the rule expression could not be evaluated, the error message.
+   * Returns null if the rule was evaluated without problems.
+   */
+  public String getRuleError() {
+    return ruleError;
   }
   
   /**
