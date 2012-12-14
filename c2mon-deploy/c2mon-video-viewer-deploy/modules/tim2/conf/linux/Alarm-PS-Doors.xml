@@ -19,5 +19,5 @@
       If the video streams have to be requested through the CERN On-Demand server,
       then you have to set the variable to true.
     -->
-    <property name="enable-od-client" type="java.lang.Boolean" value="false" />
+    <property name="enable-od-client" type="java.lang.Boolean" value="true" />
 </config>
