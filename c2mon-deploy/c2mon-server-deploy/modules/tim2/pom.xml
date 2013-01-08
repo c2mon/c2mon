@@ -21,6 +21,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-rule</artifactId>
+      <version>[1.0.1]</version>
+    </dependency>
+    <dependency>
       <groupId>cern.tim2.tim2-server</groupId>
       <artifactId>tim2-server-common</artifactId>
     </dependency>
