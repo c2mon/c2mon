@@ -20,9 +20,6 @@
         </main-class>
         <initial-heap-size>256m</initial-heap-size>
         <max-heap-size>256m</max-heap-size>
-        <output>
-          <file name="log/out.log" />
-        </output>
         <property name="c2mon.process.name" value="$PROCESS_NAME" />
         <property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
         <property name="cmw.mom.config" value="http://slwww/~alaser/console/laser-new/cmw-mom.properties" />
@@ -52,7 +49,6 @@
           <file name="daq-core-service.xml" source="/user/timoper/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
         </directory>
         <directory name="bin">
-          <file name="setenv.sh" sourceDir="/user/timoper/rep/c2mon/daq" mask="700" />
           <file name="daqprocess.sh" sourceDir="/user/timoper/rep/c2mon/daq" mask="700" />
         </directory>
       </deployment>
@@ -72,7 +68,6 @@
           <file name="daq-core-service.xml" source="/user/timtest/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
         </directory>
         <directory name="bin">
-          <file name="setenv.sh" sourceDir="/user/timtest/rep/c2mon/daq" mask="700" />
           <file name="daqprocess.sh" sourceDir="/user/timtest/rep/c2mon/daq" mask="700" />
         </directory>
       </deployment>
