@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+  <id>install</id>
+
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+
+  <!-- do not include base directory -->
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+  
+    <!-- create default bin and tmp folders in the assembly -->
+    <fileSet>
+      <includes>
+        <include>/bin</include>
+        <include>/tmp</include>
+        <include>/conf/local</include>
+      </includes>
+      <fileMode>0755</fileMode>
+    </fileSet>
+
+    <!-- Copy all jars which are needed for running the DAQ modules -->
+    <fileSet>
+      <outputDirectory>/lib</outputDirectory>
+      <includes>
+        <include>*.jar</include>
+      </includes>
+      <fileMode>0444</fileMode>
+      <directoryMode>0755</directoryMode>
+      <directory>${project.build.directory}/lib/</directory>
+    </fileSet>
+    
+    <!-- take the native libraries and copy them to /lib_so -->
+    <fileSet>
+      <outputDirectory>/lib_so</outputDirectory>
+      <includes>
+        <include>*.so</include>
+      </includes>
+      <directory>${project.build.directory}/lib_so/lib/i386-SLC5-gpp/shared</directory>
+      <fileMode>0444</fileMode>
+    </fileSet>
+  </fileSets>
+
+  <files>
+    <file>
+      <source>conf/log4j-debug.xml</source>
+      <outputDirectory>conf/</outputDirectory>
+      <destName>P_YourProcessName_log4j.xml</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
+    <!-- deployment descriptor -->
+    <file>
+      <source>conf/deployment.xml</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
+    <!-- log4j configuration -->
+    <file>
+      <source>conf/log4j.xml</source>
+      <outputDirectory>conf/</outputDirectory>
+      <destName>log4j.xml</destName>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
+    <!-- copy the version file -->
+    <file>
+      <source>${project.build.outputDirectory}/version.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <lineEnding>unix</lineEnding>
+      <fileMode>0444</fileMode>
+    </file>
+
+  </files>
+
+</assembly>
