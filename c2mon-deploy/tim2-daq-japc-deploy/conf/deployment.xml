@@ -10,6 +10,7 @@
       <deployment installLocation="/opt/tim2-daq-japc">
         <backupPolicy keepBackups="5">
           <preserve type="dir" name="tmp" />
+          <preserve type="dir" name="log" />
           <preserve type="dir" name="conf/local" />
         </backupPolicy>       
       </deployment>
@@ -41,7 +42,7 @@
     </application>
 
     <application name="tim2-daq-japc-prod" extends="default">
-      <deployment installLocation="/opt/tim2-daq-japc-test">
+      <deployment installLocation="/opt/tim2-daq-japc">
          <notification>          
           <mail address="tim-admin@cern.ch" />
         </notification>
@@ -51,8 +52,8 @@
           <file name="daq-core-service.xml" source="/user/timoper/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
         </directory>
         <directory name="bin">
-          <file name="setenv.sh" sourceDir="~/rep/c2mon/daq" mask="700" />
-          <file name="daqprocess.sh" sourceDir="~/rep/c2mon/daq" mask="700" />
+          <file name="setenv.sh" sourceDir="/user/timoper/rep/c2mon/daq" mask="700" />
+          <file name="daqprocess.sh" sourceDir="/user/timoper/rep/c2mon/daq" mask="700" />
         </directory>
       </deployment>
       <startscript name="TIM2-DAQ-STARTUP">
@@ -64,7 +65,7 @@
     </application>
 
     <application name="tim2-daq-japc-test" extends="default">
-      <deployment installLocation="/opt/tim2-daq-japc-dev">
+      <deployment installLocation="/opt/tim2-daq-japc-test">
         <directory name="conf">
           <file name="c2mon.properties" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
           <file name="daq.conf" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
