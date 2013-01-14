@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.tim2.tim2-daq</groupId>
 		<artifactId>tim2-daq-pom</artifactId>
-		<version>1.0.10</version>
+		<version>1.0.12</version>
 	</parent>
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
@@ -17,7 +17,7 @@
 	<packaging>pom</packaging>
 
 	<description>
-		DMN2 DAQ assembling all required modules and configuration files for DMN2
+            DMN2 DAQ assembling all required modules and configuration files for DMN2
         </description>
 	<url></url>
 
@@ -44,6 +44,10 @@
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
 			<artifactId>tim2-daq-testhandler</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-daq</groupId>
+			<artifactId>tim2-daq-jms</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>

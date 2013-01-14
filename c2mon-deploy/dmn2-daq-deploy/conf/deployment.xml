@@ -1,128 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-	<product name="dmn2-daq">
+   <product name="dmn2-daq">
 
-		<!--
-			this application section is a parent configuration for both
-			c2mon-dmn2-prod and c2mon-dmn2-test
-		-->
-		<application name="default">
+      <!--
+         this application section is a parent configuration for both
+         c2mon-dmn2-prod and c2mon-dmn2-test
+      -->
+      <application name="default">
 
-			<startscript name="DMN2-DAQ">
-				<main-class name="cern.tim.driver.common.startup.DaqStartup">
-					<arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
+         <startscript name="DMN2-DAQ">
+            <main-class name="cern.tim.driver.common.startup.DaqStartup">
+               <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
 
-					<output>
-					  <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log"/>						
-					</output>
-                
-				</main-class>
-				
-                <java-vm-args>${DAQ_VM_ARGS}</java-vm-args>
-                                
-				<property name="c2mon.process.name" value="${PROCESS_NAME}" />
-				<property name="c2mon.log.dir" value="${DAQ_LOG_HOME}" />
-				<property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
-				
-				<preExec>
-			        <![CDATA[
-			          [[ -z $DAQ_VM_ARGS ]] && echo "DAQ_VM_ARGS not set!" && exit 1
-			          [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
-			          [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
-			          [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
-			          [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
-			          [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-			          [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
-			         ]]>
-				</preExec>
-			</startscript>
+               <output>
+                  <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
+               </output>
 
-			<deployment installLocation="/opt/dmn2-daq">
-				<backupPolicy keepBackups="2">
-					<preserve type="dir" name="log" />
-				</backupPolicy>
-			</deployment>
+            </main-class>
 
-		</application>
+            <java-vm-args>${DAQ_VM_ARGS}</java-vm-args>
 
-		<application name="dmn2-daq-pro" extends="default">
+            <property name="c2mon.process.name" value="${PROCESS_NAME}" />
+            <property name="c2mon.log.dir" value="${DAQ_LOG_HOME}" />
+            <property name="c2mon.daq.spring.context"
+               value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
 
-			<deployment>
-				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/daq"
-						mask="400" />
-					<file name=".jmxremote.access" sourceDir="~diamonop/c2mon/daq"
-						mask="400" />
-					<file name="daq.properties" sourceDir="~diamonop/c2mon/daq"
-						mask="400" />
-					<!-- copy over pro. daq log4j configuration -->
-					<file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
-					<!-- copy over pro. daq list -->
-					<file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq"
-						mask="444" />
-				</directory>
+            <preExec>
+                          <![CDATA[
+                            [[ -z $DAQ_VM_ARGS ]] && echo "DAQ_VM_ARGS not set!" && exit 1
+                            [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
+                            [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
+                            [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
+                            [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
+                            [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+                            [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
+                           ]]>
+            </preExec>
+         </startscript>
 
-        <!--  NOTE: this shall be improved - the deployment tool should support patterns, e.g: *.jvm -->
-        <directory name="bin">
-          <file name="DMN2-DAQ-PING_01.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />         
-          <file name="DMN2-DAQ-CLIC_INJ.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_LHC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_SPS.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_MISC_FEC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_MISC_WS.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_MISC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_VMW.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_VML.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />                    
-          <file name="DMN2-DAQ-RDA_BIS.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-RDA_PLC.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />          
-          <file name="DMN2-DAQ-JMX.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-SNMP_WIE.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-        </directory>
+         <deployment installLocation="/opt/dmn2-daq">
+            <backupPolicy keepBackups="2">
+               <preserve type="dir" name="log" />
+            </backupPolicy>
+         </deployment>
 
-				<notification>
-					<!-- you can give more than one mail for deployment notification -->
-					<mail address="project-diamon-core@cern.ch" />
-				</notification>
+      </application>
 
-			</deployment>
-		</application>
+      <application name="dmn2-daq-pro" extends="default">
 
-		<application name="dmn2-daq-dev" extends="default">
+         <deployment>
+            <directory name="conf">
+               <file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/daq" mask="400" />
+               <file name=".jmxremote.access" sourceDir="~diamonop/c2mon/daq" mask="400" />
+               <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
+               <!-- copy over pro. daq log4j configuration -->
+               <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
+               <!-- copy over pro. daq list -->
+               <file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq" mask="444" />
+            </directory>
 
-			<deployment installLocation="/opt/dmn2-daq-dev">
-				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/daq"
-						mask="400" />
-					<file name=".jmxremote.access" sourceDir="~dmndev/c2mon/daq"
-						mask="400" />
-					<file name="daq.properties" sourceDir="~dmndev/c2mon/daq"
-						mask="400" />
-					<!-- copy over dev. daq log4j configuration -->
-					<file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
-					<!-- copy over pro. daq list -->
-					<file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq"
-						mask="444" />
-				</directory>				
-				
-				<!--  NOTE: this shall be improved - the deployment tool should support patterns, e.g: *.jvm -->
-				<directory name="bin">
-          <file name="DMN2-DAQ-PING_01.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />				  
-          <file name="DMN2-DAQ-CLIC_INJ.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_LHC.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_SPS.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_MISC_FEC.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_MISC_WS.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />          
-          <file name="DMN2-DAQ-CLIC_MISC.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_VMW.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-CLIC_VML.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />          
-          <file name="DMN2-DAQ-RDA_BIS.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-RDA_PLC.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-JMX.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-          <file name="DMN2-DAQ-SNMP_WIE.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-				</directory>
-			</deployment>
-			 
-		</application>
+            <!--
+               NOTE: this shall be improved - the deployment tool should
+               support patterns, e.g: *.jvm
+            -->
+            <directory name="bin">
+               <file name="DMN2-DAQ-PING_01.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-CLIC_INJ.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-CLIC_LHC.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-CLIC_SPS.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-CLIC_MISC_FEC.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-CLIC_MISC_WS.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-CLIC_MISC.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-CLIC_VMW.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-CLIC_VML.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-RDA_BIS.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-RDA_PLC.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-JMX.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+               <file name="DMN2-DAQ-SNMP_WIE.jvm" sourceDir="~diamonop/c2mon/daq/bin"
+                  mask="744" />
+            </directory>
 
-	</product>
+            <notification>
+               <!-- you can give more than one mail for deployment notification -->
+               <mail address="project-diamon-core@cern.ch" />
+            </notification>
+
+         </deployment>
+      </application>
+
+      <application name="dmn2-daq-dev" extends="default">
+
+         <deployment installLocation="/opt/dmn2-daq-dev">
+            <directory name="conf">
+               <file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/daq" mask="400" />
+               <file name=".jmxremote.access" sourceDir="~dmndev/c2mon/daq" mask="400" />
+               <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
+               <!-- copy over dev. daq log4j configuration -->
+               <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
+               <!-- copy over pro. daq list -->
+               <file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq" mask="444" />
+            </directory>
+
+            <!--
+               NOTE: this shall be improved - the deployment tool should
+               support patterns, e.g: *.jvm
+            -->
+            <directory name="bin">
+               <file name="DMN2-DAQ-*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
+            </directory>
+         </deployment>
+
+      </application>
+
+   </product>
 </products>
