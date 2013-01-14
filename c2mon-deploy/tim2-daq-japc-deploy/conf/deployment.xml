@@ -22,8 +22,6 @@
         <max-heap-size>256m</max-heap-size>
         <property name="c2mon.process.name" value="$PROCESS_NAME" />
         <property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
-        <property name="cmw.mom.config" value="http://slwww/~alaser/console/laser-new/cmw-mom.properties" />
-        <property name="laser.hosts" value="${LASER_HOSTS}" />
         <property name="java.security.egd" value="file://dev/urandom" />
         <preExec>
                     <![CDATA[
