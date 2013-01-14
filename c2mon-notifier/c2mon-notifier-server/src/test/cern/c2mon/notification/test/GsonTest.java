@@ -55,56 +55,5 @@ public class GsonTest {
 	}
 	
 	
-	@Test
-	public void testRubbish() {
-	    Gson gson = new Gson();
-	    Rubbish rubbish = new Rubbish();
-
-        String body = gson.toJson(rubbish);
-        
-        System.out.println(body);
-        
-        Rubbish back = gson.fromJson(body, Rubbish.class);
-        System.out.println(back);
-        
-        if (back.getType() == 1) {
-            RubbishOne c = (RubbishOne) back.getObject();
-        } else if (back.getType() == 2) {
-            RubbishTwo c = (RubbishTwo) back.getObject();
-        }
-	}
 	
-	
-	private class Rubbish {
-	    
-	    private Object child;
-	    public final int type;
-	    
-	    public Rubbish() {
-	        child = new RubbishOne();
-	        type = 1;
-	    }
-	    public int getType() {
-	        return type;
-	    }
-	    public Object getObject() {
-	        return child;
-	    }
-	}
-	
-	
-	private class RubbishOne {
-	    private String name;
-	    
-	    public RubbishOne() {
-	        this.name = "Rubbish1";
-	    }
-	}
-	private class RubbishTwo {
-        private String name;
-        
-        public RubbishTwo() {
-            this.name = "Rubbish2";
-        }
-    }
 }

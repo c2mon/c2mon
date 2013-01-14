@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -13,8 +11,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.notification.Tag;
 import cern.c2mon.notification.TextCreator;
-import cern.tim.shared.rule.RuleEvaluationException;
+import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.rule.RuleExpression;
 import cern.tim.shared.rule.RuleFormatException;
 import freemarker.template.TemplateException;
@@ -49,6 +49,7 @@ public class TextCreatorTest {
         EasyMock.expect(value.getRuleExpression()).andReturn(rule).anyTimes();
         EasyMock.expect(value.getServerTimestamp()).andReturn(new Timestamp(0)).atLeastOnce();
         EasyMock.expect(value.isRuleResult()).andReturn(false).atLeastOnce();
+        EasyMock.expect(value.getDataTagQuality()).andReturn(new DataTagQualityImpl()).atLeastOnce();
         
         EasyMock.expect(value.getType()).andReturn((Class) Integer.class).atLeastOnce();
         EasyMock.expect(value.getValueDescription()).andReturn("test-value-description").atLeastOnce();
@@ -78,9 +79,37 @@ public class TextCreatorTest {
     @Test
     public void testSimpleTagUpdate() throws IOException, TemplateException, RuleFormatException {
         TextCreator creator = new TextCreator();
+        ClientDataTagValue cdtv = getClientDataTagMock();
         
-        String text = creator.getTextForRuleUpdate(getClientDataTagMock());
+        Tag t = new Tag (cdtv.getId(), true);
+        t.update(cdtv);
+        
+        String text = creator.getTextForRuleUpdate(t);
         System.out.println(text);
+        
+    }
+    
+    
+    
+    
+    
+    
+    @Test
+    public void testMetricChangeUpdate() throws RuleFormatException, IOException {
+//        Tag t1 = new Tag(1L, true);
+//        ClientDataTagValue value = mockControl.createMock(ClientDataTagValue.class);
+//        EasyMock.expect(value.getName()).andReturn("TheParent").once();
+//        EasyMock.expect(value.getValue()).andReturn(new Double(1L)).once();
+//        EasyMock.expect(value.getDataTagQuality()).andReturn(new DataTagQualityImpl()).once();
+//        EasyMock.expect(value.isRuleResult()).andReturn(true).once();
+//        
+//        t1.update(value);
+//        
+//        Tag t2 = new Tag(2L, false);
+//        t2.update(getClientDataTagMock());
+//        
+//        TextCreator creator = new TextCreator();
+//        System.out.println(creator.getTextForMetricUpdate(t2, t1));
         
     }
     

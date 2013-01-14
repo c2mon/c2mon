@@ -10,11 +10,12 @@
 package cern.c2mon.notification.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.util.HashMap;
+import java.sql.Timestamp;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.After;
@@ -28,6 +29,7 @@ import cern.c2mon.notification.impl.DbBackupWriter;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.notification.shared.UserNotFoundException;
+import cern.dmn2.core.Status;
 
 public class DbBackupWriterTest {
 
@@ -50,6 +52,7 @@ public class DbBackupWriterTest {
     public void setUp() {
         File f = new File (fileName);
         if (f.exists()) {
+            System.out.println("Deleting " + fileName + " for test...");
             f.delete();
         }
         
@@ -78,7 +81,7 @@ public class DbBackupWriterTest {
             writer.addSubscriber(s);
             fail("I was able to add the user twice.");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // IGNORE
         }
     }
     
@@ -98,13 +101,15 @@ public class DbBackupWriterTest {
         assertEquals(toAdd.getSubscribedTagIds().size(), fromDb.getSubscribedTagIds().size());
     }
     
-    @Test(expected=UserNotFoundException.class)
+    @Test(expected = UserNotFoundException.class)
     public void testUserNotFoundException() throws UserNotFoundException {
-        Subscriber toCheck = SubscriptionRegistryTest.getSubscriber();
-        writer.getSubscriber(toCheck.getUserName());
+        Subscriber toAdd = SubscriptionRegistryTest.getSubscriber();
+        //writer.setSubscriber(toAdd);
+        //Subscriber toCheck = SubscriptionRegistryTest.getSubscriber();
+        writer.getSubscriber(toAdd.getUserName());
     }
     
-    @Test(expected=UserNotFoundException.class)
+    @Test(expected = UserNotFoundException.class)
     public void testSchema() throws UserNotFoundException {
 
         /*
@@ -151,6 +156,42 @@ public class DbBackupWriterTest {
         writer.store(toStore);
         ConcurrentHashMap<String, Subscriber> loaded = writer.load();
     }
+ 
     
+    @Test
+    public void testSafeSubscriptionObject() {
+        Subscriber toAdd = SubscriptionRegistryTest.getSubscriber();
         
+        Subscription valueChangeEnabled = new Subscription(toAdd, 2L, Status.WARNING.toInt());
+        valueChangeEnabled.setNotifyOnMetricChange(true);
+        valueChangeEnabled.setEnabled(false);
+        Timestamp lastNotification = new Timestamp(System.currentTimeMillis());
+        valueChangeEnabled.setLastNotifiedStatus(Status.WARNING);
+        valueChangeEnabled.setLastNotification(lastNotification);
+        valueChangeEnabled.setSmsNotification(true);
+        
+        toAdd.addSubscription(valueChangeEnabled);
+        
+        writer.setSubscriber(toAdd);
+        Subscription fromStore = writer.getSubscriber(toAdd.getUserName()).getSubscriptions().get(valueChangeEnabled.getTagId());
+        
+        assertTrue(fromStore.getLastNotification().equals(lastNotification));
+        assertTrue(fromStore.getLastNotifiedStatus().equals(Status.WARNING));
+        assertTrue("Notification Level not expected : " + fromStore.getNotificationLevel(), fromStore.getNotificationLevel() == Status.WARNING);
+        assertFalse(fromStore.isEnabled());
+        assertTrue(fromStore.isNotifyOnMetricChange());
+        assertTrue(fromStore.isSmsNotification());
+        
+        
+    }
+        
+    
+    
+    public void testConcurrentTest() {
+        Subscriber toAdd = SubscriptionRegistryTest.getSubscriber();
+        Subscription valueChangeEnabled = new Subscription(toAdd, 2L, Status.WARNING.toInt());
+        toAdd.addSubscription(valueChangeEnabled);
+        
+        writer.setSubscriber(toAdd);
+    }
 }

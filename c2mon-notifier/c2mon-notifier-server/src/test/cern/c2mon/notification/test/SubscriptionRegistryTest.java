@@ -17,6 +17,7 @@ import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.notification.shared.TagNotFoundException;
 import cern.c2mon.notification.shared.UserNotFoundException;
+import cern.dmn2.core.Status;
 
 /**
  * @author felixehm
@@ -43,12 +44,46 @@ public class SubscriptionRegistryTest {
 		return new Subscription(getSubscriber(), 1L);
 	}
 	
+	public static Subscriber getNonExistingSubscriber() {
+	    return new Subscriber("non-existent", "no", "no");
+	}
+	
+	/**
+     * our private little RegistryImpl which does not use the DB for the unit tests
+     * 
+     */
+    public static class RegWithoutDb extends SubscriptionRegistryImpl {
+        /**
+         * 
+         */
+        public RegWithoutDb() {
+            super.setAutoSaveInterval(0);
+            super.setBackUpWriter(null);
+            users.clear();
+        }
+        @Override
+        public Subscriber getSubscriber(String userName) {
+            
+            if (userName.toUpperCase().equals(getNonExistingSubscriber().getUserName().toUpperCase())) {
+                throw new UserNotFoundException("User " + userName + " not found.");
+            }
+            
+            if (super.users.containsKey(userName)) {
+                return super.users.get(userName);
+            } else {
+                Subscriber s = new Subscriber(userName, userName + "@cern.ch", null);
+                super.users.put(userName, s);
+                return s;
+            }
+        }
+    }
+	
 	/**
 	 * 
 	 */
 	@Before
 	public void initRegistry() {
-		reg = new SubscriptionRegistryImpl();
+		reg = new RegWithoutDb();
 	}
 	
 	/**
@@ -143,7 +178,7 @@ public class SubscriptionRegistryTest {
 		assertEquals(1, list.size());
 		
 		Subscription fromReg = list.entrySet().iterator().next().getValue();
-		assertEquals(fromReg.getNotificationLevel(), 2);
+		assertEquals(fromReg.getNotificationLevel(), Status.WARNING);
 		assertEquals(1, reg.getAllRegisteredTagIds().size());
 	}
 	
@@ -157,9 +192,13 @@ public class SubscriptionRegistryTest {
 		Subscriber toAdd = getSubscriber();
 		Subscription sub = new Subscription(toAdd, 1L, 2);
 		toAdd.addSubscription(sub);
-		reg.addSubscriber(toAdd);
+		reg.setSubscriber(toAdd);
 		
 		Subscriber inReg = reg.getSubscriber(toAdd.getUserName());
+		
+		assertEquals(1, inReg.getSubscribedTagIds().size());
+		assertEquals(sub, inReg.getSubscription(sub.getTagId()));
+		
 		inReg.removeSubscription(sub.getTagId());
 		
 		reg.setSubscriber(inReg);
@@ -170,10 +209,10 @@ public class SubscriptionRegistryTest {
 	}
 	
 	
-	@Test(expected=UserNotFoundException.class)
+	@Test(expected = UserNotFoundException.class)
 	public void testUserNotFoundException() throws UserNotFoundException {
-		Subscription sub = getValidSubscription();
-		reg.addSubscription(sub);
+	    Subscription forInvalidUser = new Subscription(getNonExistingSubscriber().getUserName(),1L); 
+		reg.addSubscription(forInvalidUser);
 	}
 	
 	/**
@@ -196,6 +235,8 @@ public class SubscriptionRegistryTest {
 		
 		// the subscription should have disappeared
 		assertEquals(0, reg.getSubscriptionsForUser(toAdd).size());
+		assertEquals(0, toAdd.getSubscriptions().size());
+		assertEquals(0, reg.getSubscriber(toAdd.getUserName()).getSubscriptions().size());
 		
 		System.out.println(reg);
 		
@@ -211,8 +252,11 @@ public class SubscriptionRegistryTest {
 	    Subscriber first = new Subscriber("test1", "test1@cern.ch", "");
         Subscriber second = new Subscriber("test2", "test2@cern.ch", "");
         
-        reg.addSubscriber(first);
-        reg.addSubscriber(second);
+        /*
+         * we need a copy as we assume this call has been made over the network.
+         */
+        reg.addSubscriber(first.getCopy());
+        reg.addSubscriber(second.getCopy());
         
         reg.addSubscription(new Subscription(first, 1L, 1));
         reg.addSubscription(new Subscription(second, 1L, 1));
@@ -258,9 +302,9 @@ public class SubscriptionRegistryTest {
 		toAdd.addSubscription(new Subscription(toAdd, 3L, 2));
 		
 		Subscriber another = new Subscriber("Test2", "test2@gmail.com", null);
-		another.addSubscription(new Subscription(toAdd, 1L, 2));
-		another.addSubscription(new Subscription(toAdd, 2L, 2));
-		another.addSubscription(new Subscription(toAdd, 3L, 2));
+		another.addSubscription(new Subscription(another, 1L, 2));
+		another.addSubscription(new Subscription(another, 2L, 2));
+		another.addSubscription(new Subscription(another, 3L, 2));
 		
 		reg.setSubscriber(toAdd);
 		reg.setSubscriber(another);
@@ -268,6 +312,19 @@ public class SubscriptionRegistryTest {
 		//reg.loadFromFile("test");
 	}
 	
+	
+	@Test
+	public void testDeleteallSubscriptionsBySetCall() {
+	    Subscriber toAdd = getSubscriber();
+        toAdd.addSubscription(new Subscription(toAdd, 1L, 2));
+        toAdd.addSubscription(new Subscription(toAdd, 2L, 2));
+        toAdd.addSubscription(new Subscription(toAdd, 3L, 2));
+        
+        reg.setSubscriber(toAdd.getCopy());
+        
+        toAdd.getSubscriptions().clear();
+        reg.setSubscriber(toAdd.getCopy());
+	}
 	
 	
 }

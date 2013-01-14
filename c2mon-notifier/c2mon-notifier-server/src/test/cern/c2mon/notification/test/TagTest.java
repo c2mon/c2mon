@@ -34,11 +34,11 @@ public class TagTest {
         ClientDataTagImpl before = new ClientDataTagImpl(1L);
         DataTagQualityImpl q = new DataTagQualityImpl();
         q.removeInvalidStatus(TagQualityStatus.UNINITIALISED);
-        TransferTagImpl t = new TransferTagImpl(1L, 1.1d , "description", q, TagMode.OPERATIONAL, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), "metric tag description", "MetricTag-"+1, null);
+        TransferTagImpl t = new TransferTagImpl(new Long(1L), 1.1d , "description", q, TagMode.OPERATIONAL, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), "metric tag description", "MetricTag-" + 1, null);
         before.update(t);
         
         ClientDataTagImpl after = new ClientDataTagImpl(1L);
-        t = new TransferTagImpl(1L, 2.1d , "description", q, TagMode.OPERATIONAL, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), "metric tag description", "MetricTag-"+1, null);
+        t = new TransferTagImpl(1L, 2.1d , "description", q, TagMode.OPERATIONAL, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), "metric tag description", "MetricTag-" + 1, null);
         after.update(t);
         
         assertTrue(Tag.hasValueChanged(before, after));

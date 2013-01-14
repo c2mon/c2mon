@@ -67,7 +67,7 @@ public class NotificationServiceImplTest {
     
     @Before
     public void initServiceAndReg() {
-        service = new NotificationServiceImpl(new SubscriptionRegistryImpl());
+        service = new NotificationServiceImpl(new SubscriptionRegistryTest.RegWithoutDb());
     }
     
     //
@@ -122,7 +122,7 @@ public class NotificationServiceImplTest {
         s.addSubscription(new Subscription(s, 2L));
         s.addSubscription(new Subscription(s, 3L));
         
-        request = new ClientRequest(ClientRequest.Type.UpdateSubscriber, gson.toJson(s));
+        request = new ClientRequest(ClientRequest.Type.UpdateSubscriber, gson.toJson(s.getCopy()));
         System.out.println("Subscriber object to register : " + s);
         resp = service.prepareResponse(request);
         
@@ -218,9 +218,8 @@ public class NotificationServiceImplTest {
             String requestQueue = "requests";
             
             ConnectionFactory fac = new ActiveMQConnectionFactory("vm://localhost");
-            
-            
-            NotificationServiceImpl service = new NotificationServiceImpl(new SubscriptionRegistryImpl());
+
+            NotificationServiceImpl service = new NotificationServiceImpl(new SubscriptionRegistryTest.RegWithoutDb());
             JmsTemplate responderForRequests = new JmsTemplate(fac);
             responderForRequests.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
             responderForRequests.setPriority(0);
@@ -236,7 +235,7 @@ public class NotificationServiceImplTest {
             // create the client and connect it to the same internal broker.
             cern.c2mon.client.notification.NotificationServiceImpl clientService = new cern.c2mon.client.notification.NotificationServiceImpl(fac);
             clientService.setRequestQueue(requestQueue);
-            clientService.setRequestTimeout(60000L);
+            clientService.setRequestTimeout(1000L);
             
             Subscriber s = getValidSubscriber();
             try {
@@ -246,6 +245,8 @@ public class NotificationServiceImplTest {
                 fail(sx.getMessage());
             }
             Subscriber fromServer = clientService.getSubscriber(s.getUserName());
+            assertTrue(s.equals(fromServer));
+            
             System.out.println("Got subscriber from Server : "  + fromServer);
         } finally {
             broker.stop();

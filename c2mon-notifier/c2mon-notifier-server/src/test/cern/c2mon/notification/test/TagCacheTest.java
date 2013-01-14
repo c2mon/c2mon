@@ -61,9 +61,12 @@ public class TagCacheTest {
         EasyMock.expect(metricUpdate3.getValueDescription()).andReturn("value-description").anyTimes();
         EasyMock.expect(metricUpdate3.getServerTimestamp()).andReturn(new Timestamp(System.currentTimeMillis())).anyTimes();
         EasyMock.expect(metricUpdate3.getUnit()).andReturn("double").anyTimes();
+                
+        
         DataTagQuality dtq3 = mockControl.createMock(DataTagQuality.class);
         EasyMock.expect(dtq3.isExistingTag()).andReturn(true).anyTimes();
         EasyMock.expect(dtq3.isValid()).andReturn(true).anyTimes();
+        EasyMock.expect(dtq3.isAccessible()).andReturn(true).anyTimes();
         EasyMock.expect(dtq3.getDescription()).andReturn("Cool").anyTimes();
         EasyMock.expect(metricUpdate3.getDataTagQuality()).andReturn(dtq3).anyTimes();
         EasyMock.replay(metricUpdate3);
