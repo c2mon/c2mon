@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import cern.dmn2.core.Status;
 
@@ -336,5 +337,10 @@ public class Subscription implements Comparable<Subscription> {
             throw new IllegalArgumentException("Tag # " + getTagId() + ": I do not have a resolved child with ID=" + tagId);
         }
         lastNotifiedTags.put(tagId, Status.fromInt(status.toInt()));
+    }
+    
+    
+    public void clearResolvedSubTagIds() {
+        lastNotifiedTags = new HashMap<Long, Status>();
     }
 }
