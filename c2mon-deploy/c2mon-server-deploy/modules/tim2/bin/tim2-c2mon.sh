@@ -256,14 +256,14 @@ status() {
                 pid=`cat $C2MON_PIDFILE`
                 runs $pid
                 if [ $? -eq 0 ] ; then
-                   echo "A C2MON server is running on $C2MON_HOST (pid=$pid)."
+                   echo "This C2MON server is running (pid=$pid)."
 		   RETVAL=0
                 else
-                   echo "A pid file exists ($C2MON_PIDFILE) but the C2MON process is not running on $C2MON_HOST."
+                   echo "A pid file exists ($C2MON_PIDFILE) but the C2MON process is not running."
 		   RETVAL=1
                 fi
         else
-          echo "A C2MON server does not seem to be running on $C2MON_HOST."
+          echo "This C2MON server does not seem to be running."
 	  RETVAL=2
         fi
         return $RETVAL
