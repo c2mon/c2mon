@@ -91,11 +91,11 @@
             mask="400" />
           <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
             mask="400" />
-          <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro2"
+          <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro1"
             mask="400" />
         </directory>
         <directory name="bin">
-          <file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro1.sh"
+          <file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro3.sh"
             mask="700" />
         </directory>
       </deployment>
@@ -125,7 +125,7 @@
 						mask="400" />
 					<file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
 						mask="400" />
-					<file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.primary"
+					<file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test1"
 						mask="400" />
           <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
@@ -144,7 +144,7 @@
             mask="400" />
           <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
-          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.secondary"
+          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test2"
             mask="400" />
           <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
@@ -163,7 +163,7 @@
             mask="400" />
           <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
-          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.secondary"
+          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test1"
             mask="400" />
           <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
@@ -182,7 +182,7 @@
             mask="400" />
           <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
-          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.secondary"
+          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test2"
             mask="400" />
           <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
             mask="400" />
