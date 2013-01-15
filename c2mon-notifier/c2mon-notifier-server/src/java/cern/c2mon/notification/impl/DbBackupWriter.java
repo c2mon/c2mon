@@ -14,8 +14,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
@@ -34,6 +35,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.notification.shared.UserNotFoundException;
+import cern.dmn2.core.Status;
 
 /**
  * An implementation of the {@link BackupWriter} interface which writes data 
@@ -101,11 +103,14 @@ public class DbBackupWriter implements BackupWriter {
                 + " userid VARCHAR(16) NOT NULL,"
                 + " tagid INTEGER NOT NULL, "
                 + " enabled INTEGER DEFAULT 1, " 
-                + " notifylevel INTEGER DEFAULT 1, "
+                + " notifylevel VARCHAR(12) NOT NULL, "
                 + " lastnotifiedstate INTEGER NOT NULL, "
                 + " lastnotifiedts TIMESTAMP , "
-                + " lastTagsNotified VARCHAR(1024) , "
+                + " resolvedtags VARCHAR(2048) , "
+                + " onvaluechange INTEGER DEFAULT 0 , "
+                + " sms_enabled INTEGER DEFAULT 0 , "
                 + "CONSTRAINT DMN_NOTIFY_SUBSCRIPTIONS PRIMARY KEY (userid, tagid), "
+                + "CONSTRAINT DMN_NOTIFY_LEVEL_CHECK CHECK (notifylevel in ('ok','warning','error')),"
                 + "FOREIGN KEY (userid) REFERENCES DMN_NOTIFY_SUBSCRIBERS(userid) ON DELETE CASCADE" 
                 + ")");
     }
@@ -120,14 +125,31 @@ public class DbBackupWriter implements BackupWriter {
         
         List<Object[]> toAdd = new ArrayList<Object[]>();
         for (Subscription sup : s.getSubscriptions().values()) {
-            toAdd.add(new Object [] {sup.getSubscriberId(), sup.isEnabled(), sup.getNotificationLevel(), sup.getTagId(), sup.getLastNotifiedStatus(), sup.getLastNotification()});
+            toAdd.add(new Object [] {sup.getSubscriberId(), sup.isEnabled(), sup.getNotificationLevel().toString(), sup.getTagId(), sup.getLastNotifiedStatus().toInt(), sup.getLastNotification(), getResolvedTagsAsString(sup), sup.isNotifyOnMetricChange(), sup.isSmsNotification()});
         }
         
         jdbcTemplate.batchUpdate(
-                "INSERT INTO DMN_NOTIFY_SUBSCRIPTIONS (userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts) VALUES (?,?,?,?,?,?)", 
+                "INSERT INTO DMN_NOTIFY_SUBSCRIPTIONS (userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts, resolvedtags, onvaluechange, sms_enabled) VALUES (?,?,?,?,?,?,?,?,?)", 
                 toAdd,
-                new int [] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP});
+                new int [] {Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER});
     }
+    
+    
+    public String getResolvedTagsAsString(Subscription sup) {
+        StringBuilder resolvedTagsAndTheirStatus = new StringBuilder();
+        Iterator<Long> tagsToJoin = sup.getResolvedSubTagIds().iterator();
+        
+        while (tagsToJoin.hasNext()) {
+            Long l = tagsToJoin.next();
+            Status subStatus = sup.getLastStatusForResolvedSubTag(l);
+            resolvedTagsAndTheirStatus.append(l).append("=").append(subStatus.toString());
+            if (tagsToJoin.hasNext()) {
+                resolvedTagsAndTheirStatus.append(",");
+            }
+        }
+        return resolvedTagsAndTheirStatus.toString();
+    }
+    
     
     public void updateSubscriber(Subscriber s) {
         logger.trace("entering updateSubscriber()");
@@ -144,9 +166,9 @@ public class DbBackupWriter implements BackupWriter {
             logger.trace("entering addSubscription() for User=" + sup.getSubscriberId() + ", tagId= " + sup.getTagId());
         }
         jdbcTemplate.update(
-                "INSERT INTO DMN_NOTIFY_SUBSCRIPTIONS (userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts) VALUES (?,?,?,?,?,?)", 
-                new Object [] {sup.getSubscriberId(), sup.isEnabled(), sup.getNotificationLevel(), sup.getTagId(), sup.getLastNotifiedStatus(), sup.getLastNotification()}, 
-                new int [] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP});
+                "INSERT INTO DMN_NOTIFY_SUBSCRIPTIONS (userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts, resolvedtags, onvaluechange) VALUES (?,?,?,?,?,?,?,?,?)", 
+                new Object [] {sup.getSubscriberId(), sup.isEnabled(), sup.getNotificationLevel().toString(), sup.getTagId(), sup.getLastNotifiedStatus().toInt(), sup.getLastNotification(), getResolvedTagsAsString(sup), sup.isNotifyOnMetricChange(), sup.isSmsNotification()}, 
+                new int [] {Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER}, Types.INTEGER);
     }
     
     public Subscriber getSubscriber(String id) throws UserNotFoundException {
@@ -176,7 +198,7 @@ public class DbBackupWriter implements BackupWriter {
         }
 
         List<Subscription> subscriptions = jdbcTemplate.query(
-                "SELECT userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts  FROM DMN_NOTIFY_SUBSCRIPTIONS where userid = ?", 
+                "SELECT userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts, resolvedtags, onvaluechange, sms_enabled  FROM DMN_NOTIFY_SUBSCRIPTIONS where userid = ?", 
                 new Object [] {id} ,
                 new RowMapper<Subscription>() {
                     @Override
@@ -248,9 +270,17 @@ public class DbBackupWriter implements BackupWriter {
         tt.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus arg0) {
+                
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Storing subscriptions");
+                    for (Subscriber s : toStore.values()) {
+                        logger.trace("Storing :" + s.getUserName() + " " + s.getSubscriptions());
+                    }
+                }
+                
                 try {
                     long t1 = System.currentTimeMillis();
-                    logger.debug("Deleting subscribers...");
+                    logger.debug("Delete subscribers, then re-insert.");
                     jdbcTemplate.execute("DELETE FROM DMN_NOTIFY_SUBSCRIBERS");
                     
                     
@@ -278,11 +308,11 @@ public class DbBackupWriter implements BackupWriter {
                     for (Subscriber s : toStore.values()) {
                         toAdd.add(new Object [] {s.getUserName(), s.getEmail(), s.getSms(), s.getReportInterval()});
                         for (Subscription sub : s.getSubscriptions().values()) {
-                            subs.add(new Object [] {sub.getSubscriberId(), sub.isEnabled(), sub.getNotificationLevel(), sub.getTagId(), sub.getLastNotifiedStatus(), sub.getLastNotification()});
+                            subs.add(new Object [] {sub.getSubscriberId(), sub.isEnabled(), sub.getNotificationLevel().toString(), sub.getTagId(), sub.getLastNotifiedStatus().toInt(), sub.getLastNotification(), getResolvedTagsAsString(sub), sub.isNotifyOnMetricChange(), sub.isSmsNotification()});
                         }
                     }
                     
-                    // add all subscribers
+                      // add all subscribers
                     int [] addedSubscribers = jdbcTemplate.batchUpdate(
                             "INSERT INTO DMN_NOTIFY_SUBSCRIBERS (userid, email, sms, reportinterval) VALUES (?,?,?,?)", 
                             toAdd, 
@@ -290,15 +320,15 @@ public class DbBackupWriter implements BackupWriter {
                     
                     // add all subscriptions
                     int [] addedSubscriptions = jdbcTemplate.batchUpdate(
-                            "INSERT INTO DMN_NOTIFY_SUBSCRIPTIONS (userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts) VALUES (?,?,?,?,?,?)", 
+                            "INSERT INTO DMN_NOTIFY_SUBSCRIPTIONS (userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts, resolvedtags, onvaluechange, sms_enabled) VALUES (?,?,?,?,?,?,?,?,?)", 
                             subs, 
-                            new int [] {Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP});
+                            new int [] {Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER});
                     
                     lastStoreTime = (System.currentTimeMillis() - t1);
-                    logger.info("Stored " + addedSubscribers.length + " Subscribers and " + addedSubscriptions.length + " Subscriptions in " + getLastStoreTime() + " millis");
+                    //logger.info("Stored " + addedSubscribers.length + " Subscribers and " + addedSubscriptions.length + " Subscriptions in " + getLastStoreTime() + " millis");
                     
                     lastFullStorageTime = System.currentTimeMillis();
-
+                    
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     logger.error(ex.getMessage());
@@ -329,7 +359,7 @@ public class DbBackupWriter implements BackupWriter {
                 });
         // get all subscriptions
         List<Subscription> subscriptions = jdbcTemplate.query(
-                "SELECT userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts FROM DMN_NOTIFY_SUBSCRIPTIONS", 
+                "SELECT userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts, resolvedtags, onvaluechange, sms_enabled FROM DMN_NOTIFY_SUBSCRIPTIONS", 
                 new RowMapper<Subscription>() {
                     @Override
                     public Subscription mapRow(ResultSet arg0, int rowNumber) throws SQLException {
@@ -359,6 +389,12 @@ public class DbBackupWriter implements BackupWriter {
         lastLoadTime = (System.currentTimeMillis() - t1);
         logger.info("Loaded " + subscribers.size() + " Subscribers and " + subscriptions.size() + " Subscriptions in " + getLastLoadTime() + " millis");
         
+        if (logger.isTraceEnabled()) {
+            for (Entry<String, Subscriber> e : result.entrySet()) {
+                logger.trace("Loaded :" + e.getValue().getUserName() + " " + e.getValue().getSubscriptions());
+            }
+        }
+        
         return result;
     }
     
@@ -384,14 +420,30 @@ public class DbBackupWriter implements BackupWriter {
         Long tagId = rs.getLong("tagid");
         String userId = rs.getString("userid");
         int enabled = rs.getInt("enabled");
-        int level = rs.getInt("notifylevel");
+        int onvalueChange = rs.getInt("onvaluechange");
+        int isSmsEnabled = rs.getInt("sms_enabled");
+        String level = rs.getString("notifylevel");
         int lastStatus = rs.getInt("lastnotifiedstate");
         Timestamp ts = rs.getTimestamp("lastnotifiedts");
+        String tmp = rs.getString("resolvedtags");
         
-        s = new Subscription(userId, tagId, level);
+        s = new Subscription(userId, tagId, Status.fromString(level));
         s.setEnabled(enabled > 0 ? true : false);
+        s.setLastNotifiedStatus(Status.fromInt(lastStatus));
         s.setLastNotification(ts);
-        s.setLastNotifiedStatus(lastStatus);
+        s.setNotifyOnMetricChange(onvalueChange > 0 ? true : false);
+        s.setSmsNotification(isSmsEnabled > 0 ? true : false);
+        
+        if (tmp != null && tmp.length() > 10) {
+            for (String t2 : tmp.split(",")) {
+                String childTag = t2.split("=")[0];
+                String savedStatus = t2.split("=")[1];
+                Long id = Long.parseLong(childTag);
+                s.addResolvedSubTag(id);
+                s.setLastStatusForResolvedTSubTag(id, Status.fromString(savedStatus));
+            }
+        }
+        
         return s;
     }
 
@@ -400,8 +452,7 @@ public class DbBackupWriter implements BackupWriter {
     public boolean isFine() {
         try {
             // test get and close a connection.
-            jdbcTemplate.getDataSource().getConnection().close();
-            return true;
+            return !jdbcTemplate.getDataSource().getConnection().isClosed();
         } catch (Exception ex) {
             return false;
         }

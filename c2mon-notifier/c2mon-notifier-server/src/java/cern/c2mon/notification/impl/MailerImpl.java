@@ -1,24 +1,23 @@
 package cern.c2mon.notification.impl;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
 import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.Message.RecipientType;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import org.apache.log4j.Logger;
-
-import com.sun.mail.smtp.SMTPSSLTransport;
 
 import cern.c2mon.notification.Mailer;
 
@@ -40,6 +39,22 @@ public class MailerImpl implements Mailer {
 	private InternetAddress me = new InternetAddress();
 
 	private Session session = null;
+	
+	public static MailerImpl fromPropertiesFile(String fileName) throws AddressException, NumberFormatException, IOException {
+	    Properties properties = new Properties();
+	    BufferedInputStream stream = new BufferedInputStream(new FileInputStream(fileName));
+	    properties.load(stream);
+	    stream.close();
+	    
+	    return new MailerImpl(
+	            properties.getProperty("mailer.from"), 
+	            properties.getProperty("mailer.name"), 
+	            properties.getProperty("mailer.password"), 
+	            properties.getProperty("mailer.server"), Integer.parseInt(properties.getProperty("mailer.port")));
+	    
+	    
+	}
+	
 	
 	/**
 	 * 
