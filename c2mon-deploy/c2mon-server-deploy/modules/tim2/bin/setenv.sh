@@ -1,8 +1,9 @@
 #Script setting required environment variables
 # for the C2MON startup script
 
-C2MON_PRIMARY_HOST=
-C2MON_SECOND_HOST=
+#name of the process
+PROCESS_NAME=
+
 TC_HOST=
 
 #Server JMX port
