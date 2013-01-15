@@ -9,6 +9,8 @@
  */
 package cern.c2mon.notification;
 
+import cern.c2mon.notification.shared.Subscription;
+
 /** Interface which describes a listener for the TagCache 
  * 
  * @author ${user} 

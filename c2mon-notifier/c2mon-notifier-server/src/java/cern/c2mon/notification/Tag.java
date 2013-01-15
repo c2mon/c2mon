@@ -9,18 +9,18 @@
  */
 package cern.c2mon.notification;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
-import cern.c2mon.notification.shared.Status;
 import cern.c2mon.notification.shared.Subscription;
+import cern.dmn2.core.Status;
 
 /**
  * 
@@ -39,9 +39,6 @@ public class Tag {
     private ClientDataTagValue latest = null;
     private ClientDataTagValue previous = null;
     
-//    private int latestStatus = Status.OK.toInteger();
-//    private int previousStatus = Status.OK.toInteger();
-    
     /**
      * only if we are a rule this field is used.
      */
@@ -56,6 +53,7 @@ public class Tag {
     
     private HashSet<Subscription> subscribers = new HashSet<Subscription>();
     
+    private AtomicBoolean toBeNotified = new AtomicBoolean(false);
     /**
      * 
      */
@@ -104,7 +102,7 @@ public class Tag {
     }
     
     public int getLatestStatusInt() {
-        return getLatestStatus().toInteger();
+        return getLatestStatus().toInt();
     }
     
     public Status getLatestStatus() {
@@ -115,7 +113,7 @@ public class Tag {
      * @return Returns the previousStatus.
      */
     public int getPreviousStatusInt() {
-        return getPreviousStatus().toInteger();
+        return getPreviousStatus().toInt();
     }
     /**
      * @return Returns the previousStatus.
@@ -161,6 +159,20 @@ public class Tag {
         }
     }
     
+    /**
+     * @return Returns the toBeNotified.
+     */
+    public AtomicBoolean getToBeNotified() {
+        return toBeNotified;
+    }
+
+    /**
+     * @param toBeNotified The toBeNotified to set.
+     */
+    public void setToBeNotified(boolean flag) {
+        this.toBeNotified.set(flag);
+    }
+
     public HashSet<Tag> getChildTags() {
         return children;
     }
@@ -170,6 +182,26 @@ public class Tag {
         for (Tag child : children) {
             list.addAll(child.getAllChildTagsRecursive());
             list.add(child);
+        }
+        return list;
+    }
+    
+    public HashSet<Tag> getAllChildRules() {
+        HashSet<Tag> list = new HashSet<Tag>();
+        for (Tag c : children) {
+            if (c.isRule()) {
+                list.add(c);
+            }
+        }
+        return list;
+    }
+    
+    public HashSet<Tag> getAllChildMetrics() {
+        HashSet<Tag> list = new HashSet<Tag>();
+        for (Tag c : children) {
+            if (!c.isRule()) {
+                list.add(c);
+            }
         }
         return list;
     }
@@ -203,38 +235,53 @@ public class Tag {
         this.parents.remove(tag.getId());
     }
 
-    
+    /**
+     * Updates this Tag object with the incoming {@link ClientDataTagValue}. 
+     * If ClientDataTagValue.getDataTagQuality().isAccessible() is true the {@link #isSourceDown()} will also return true; 
+     *  
+     * @param update the {@link ClientDataTagValue}
+     */
     public void update(ClientDataTagValue update) {
-        int newStatus = Status.UNKNOWN.toInteger();
+        int newStatus = Status.UNKNOWN.toInt();
         
-        previous = latest;
-        latest = update;
-        
-        if (latest.isRuleResult()) {
+        if (update.isRuleResult()) {
             /*
              * Rule
              */
-            if (latest.getValue() != null) {
-                newStatus = ((Double) latest.getValue()).intValue();
+            if (update.getValue() != null) {
+                
+                if (update.getValue() instanceof Integer) {
+                    newStatus = (Integer) update.getValue();
+                } else if (update.getValue() instanceof Double) {
+                    newStatus = ((Double) update.getValue()).intValue();
+                } else {
+                    throw new IllegalArgumentException("TagID=" + update.getId() + ": I cannot interprete the passed ClientDataTagValue as a status :" + update.getValue());
+                }
             }
+            
             currentHistoryPtr++;
-            if (currentHistoryPtr == MAX_STATE_HISTORY_ENTRIES)
+            if (currentHistoryPtr == MAX_STATE_HISTORY_ENTRIES) {
                 currentHistoryPtr = 0;
+            }
             history[currentHistoryPtr] = Status.fromInt(newStatus);
             
-        } 
+            if (logger.isTraceEnabled()) {
+                logger.trace("updated RuleTag=" + update.getId() + " to status " + getLatestStatus() + ", value=" + update.getValue() + ", interpreted=" + newStatus );
+            }
+        } else {
+            if (logger.isTraceEnabled()) {
+                logger.trace("updated MetricTag=" + update.getId() + " to value=" + update.getValue());
+            }
+        }
+        
+        previous = latest;
+        latest = update;
         
         if (update != null && !update.getDataTagQuality().isAccessible()) {
             this.isSourceDown = true; 
         } else {
             this.isSourceDown  = false;
         }
-        /*
-            else {
-            
-            // nothing, just update.
-            } 
-         */ 
     }
     
     @SuppressWarnings("unchecked")
@@ -271,7 +318,9 @@ public class Tag {
        if (this.isRule()) {
            sb.append("Rule ID=").append(getId())
              .append(",Prev.State=").append(getPreviousStatus().toString())
-             .append(",Status=").append(this.getLatestStatus().toString());
+             .append(",Status=").append(this.getLatestStatus().toString())
+             .append(",NotifyRequired=").append(this.getToBeNotified().get());
+           
            if (getLatestUpdate() != null) {
                sb
                .append(",isValid=" + getLatestUpdate().isValid())
@@ -285,7 +334,8 @@ public class Tag {
            }
            sb.append("}");
        } else {
-           sb.append("Metric ID=").append(getId());
+           sb.append("Metric ID=").append(getId())
+           .append(",NotifyRequired=").append(this.getToBeNotified().get());
            sb.append(",Value=");
            if (getLatestUpdate() != null) {
                sb
@@ -321,6 +371,15 @@ public class Tag {
         }
         return result;
     }
+    @Override
+    public boolean equals(Object o) {
+        Tag s = (Tag) o;
+        return (s.getId().equals(this.getId()));
+    }
     
+    @Override
+    public int hashCode() {
+        return this.getId().hashCode();
+    }
     
 }

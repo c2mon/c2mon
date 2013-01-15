@@ -81,5 +81,6 @@ public interface SubscriptionRegistry {
     public void setTagCache(TagCache tagCache);
     
     public TagCache getTagCache();
-	
+    
+    public void updateLastModificationTime();
 }

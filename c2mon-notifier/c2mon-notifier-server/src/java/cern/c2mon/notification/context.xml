@@ -2,118 +2,147 @@
 
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
-	xmlns:jms="http://www.springframework.org/schema/jms"
-	xsi:schemaLocation="
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+   xmlns:jms="http://www.springframework.org/schema/jms"
+   xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd">
-       
-       
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="properties">
-			<props>
-				<prop key="c2mon.notification.jms.url">failover:(tcp://jms-diamon-pro:61640?wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=false&amp;soTimeout=3000&amp;connectionTimeout=8000)?startupMaxReconnectAttempts=4</prop>
-			</props>
-		</property>
-		<property name="locations">
-			<value>${config.properties}</value>
-		</property>
-		
-		<property name="ignoreResourceNotFound">
-		<!--  we require the properties file for the mail server and database authentication (if enabled) -->
-			<value>false</value>
-		</property>
-	</bean>
-       
-    
-    
-    <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
-    
-    
-    <!--  
-    	our registry instance holding subscriber information. 
-    -->
-	<bean id="registry" class="cern.c2mon.notification.impl.SubscriptionRegistryImpl" depends-on="dbWriter,tagCache">
-		<property name="autoSaveInterval" value="${registry.localAutoSaveInterval}" />
-		<property name="databaseWriter" ref="dbWriter" />
-		<property name="tagCache" ref="tagCache" />
-	</bean>
-	<!-- for the db access. We only need one connection.-->
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.SingleConnectionDataSource">
-		<property name="driverClassName" value="${jdbc.config.driverClassName}" />
-		<property name="url" value="${jdbc.config.url}" />
-		<property name="username" value="${jdbc.config.user}" />
-		<property name="password" value="${jdbc.config.password}" />
-    </bean>
-    <!--  optional : we can use transacted datasource -->
-    <bean id="transactedDataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy" depends-on="dataSource">
-    	<constructor-arg ref="dataSource"/>
-    </bean>
-    <bean id="dbWriter" class="cern.c2mon.notification.impl.DbBackupWriter" depends-on="transactedDataSource">
-    	<constructor-arg index="0" ref="transactedDataSource"/>
-    </bean>
-	
-	<bean id="tagCache" class="cern.c2mon.notification.impl.TagCache" />
-	
-	
-	
-	 
-		<!-- Receives updates from the c2mon server and sends the notifications.  -->
-	 
-	<bean id="notifier" class="cern.c2mon.notification.impl.NotifierImpl" depends-on="mailer,tagCache,registry">
-		<property name="subscriptionRegistry" ref="registry"/>
-		<property name="mailer" ref="mailer"/>
-		<property name="tagCache" ref="tagCache"/>
-	</bean>
-	<!-- 
-	<jms:listener-container connection-factory="logConnectionFactory" concurrency="1" destination-type="queue">
-		<jms:listener destination="c2mon.notification.updates" ref="notifier" method="onUpdate" />
-	</jms:listener-container>
-	 -->
-	<!-- utility class to send mails. -->
-	<bean id="mailer" class="cern.c2mon.notification.impl.MailerImpl">
-		<constructor-arg index="0" value="${mail.from}"/>
-		<constructor-arg index="1" value="${mail.userName}"/>
-		<constructor-arg index="2" value="${mail.password}" />
-		<constructor-arg index="3" value="${mail.server}" />
-	</bean>
-	
+
+
+   <bean
+      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="properties">
+         <props>
+            <prop key="c2mon.notification.jms.url">failover:(tcp://jms-diamon-pro:61640?wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=false&amp;soTimeout=3000&amp;connectionTimeout=8000)?startupMaxReconnectAttempts=4</prop>
+            <prop key="registry.backupFile">registry.backup</prop>
+            <prop key="cache.localCacheFile">tag.cache</prop>
+         </props>
+      </property>
+      <property name="locations">
+         <value>${c2mon.notification.properties}</value>
+      </property>
+
+      <property name="ignoreResourceNotFound">
+         <!--
+            we require the properties file for the mail server and
+            database authentication (if enabled)
+         -->
+         <value>false</value>
+      </property>
+   </bean>
+
+
+
+   <bean
+      class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
+
+
+   <!--
+      our registry instance holding subscriber information.
+   -->
+   <bean id="registry" class="cern.c2mon.notification.impl.SubscriptionRegistryImpl"
+      depends-on="dbWriter,tagCache">
+      <property name="autoSaveInterval" value="${registry.localAutoSaveInterval}" />
+      <property name="localBackupFileName" value="${registry.backupFile}" />
+      <property name="databaseWriter" ref="dbWriter" />
+      <property name="tagCache" ref="tagCache" />
+   </bean>
+   <!-- for the db access. We only need one connection.-->
+   <bean id="dataSource"
+      class="org.apache.commons.dbcp.BasicDataSource">
+      <property name="driverClassName" value="${jdbc.config.driverClassName}" />
+      <property name="url" value="${jdbc.config.url}" />
+      <property name="username" value="${jdbc.config.user}" />
+      <property name="password" value="${jdbc.config.password}" />
+      <property name="maxActive" value="1" />
+   </bean>
+   <!--  optional : we can use transacted datasource -->
+   <bean id="transactedDataSource"
+      class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy"
+      depends-on="dataSource">
+      <constructor-arg ref="dataSource" />
+   </bean>
+   <bean id="dbWriter" class="cern.c2mon.notification.impl.DbBackupWriter"
+      depends-on="transactedDataSource">
+      <constructor-arg index="0" ref="transactedDataSource" />
+   </bean>
+
+   <bean id="tagCache" class="cern.c2mon.notification.impl.TagCache" >
+      <property name="localCacheFileName" value="${cache.localCacheFile}" />
+   </bean>
 
 
 
 
-	<!--  
+   <!--
+      Receives updates from the c2mon server and sends the
+      notifications.
+   -->
+
+   <bean id="notifier" class="cern.c2mon.notification.impl.NotifierImpl"
+      depends-on="mailer,tagCache,registry">
+      <property name="subscriptionRegistry" ref="registry" />
+      <property name="mailer" ref="mailer" />
+      <property name="tagCache" ref="tagCache" />
+   </bean>
+   <!--
+      <jms:listener-container connection-factory="logConnectionFactory"
+      concurrency="1" destination-type="queue"> <jms:listener
+      destination="c2mon.notification.updates" ref="notifier"
+      method="onUpdate" /> </jms:listener-container>
+   -->
+   <!-- utility class to send mails. -->
+   <bean id="mailer" class="cern.c2mon.notification.impl.MailerImpl">
+      <constructor-arg index="0" value="${mail.from}" />
+      <constructor-arg index="1" value="${mail.userName}" />
+      <constructor-arg index="2" value="${mail.password}" />
+      <constructor-arg index="3" value="${mail.server}" />
+   </bean>
+
+
+
+
+
+   <!--  
 		the request handler for client requests. 
 	-->
-	<bean id="clientService" class="cern.c2mon.notification.impl.NotificationServiceImpl" depends-on="requestHandlerJmsTemplate">
-		<constructor-arg index="0" ref="registry"/>
-		<property name="clientResponseJmsTemplate" ref="requestHandlerJmsTemplate"/>
-	</bean>
-	<!--  the jms listener containing so we can listen to client requests.  -->
-	<jms:listener-container connection-factory="logConnectionFactory" concurrency="1" destination-type="queue">
-		<jms:listener destination="c2mon.notification.request" ref="clientService" method="onMessage" />
-	</jms:listener-container>
-	<!--  the JmsTemplate to answer client requests -->
-	<bean id="requestHandlerJmsTemplate" class="org.springframework.jms.core.JmsTemplate" depends-on="logConnectionFactory">
-    	<property name="connectionFactory">
-    		<ref local="logConnectionFactory"/>
-   		</property>
-	</bean>
-	
-	
-	
-	
-	
-	<!--  the main JMS connection factory  -->	
-	<bean id="logConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
-        <property name="targetConnectionFactory">
-          <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-			<constructor-arg index="0" value="${c2mon.notification.jms.url}" />
-			<property name="dispatchAsync" value="true" />
-			<property name="clientIDPrefix" value="C2MON-NOTIFIER-REQUEST-HANLDER" />
-		  </bean>
-        </property>
-    </bean>
-	
-       
+   <bean id="clientService" class="cern.c2mon.notification.impl.NotificationServiceImpl"
+      depends-on="requestHandlerJmsTemplate">
+      <constructor-arg index="0" ref="registry" />
+      <property name="clientResponseJmsTemplate" ref="requestHandlerJmsTemplate" />
+   </bean>
+   <!--
+      the jms listener containing so we can listen to client requests.
+   -->
+   <jms:listener-container connection-factory="logConnectionFactory"
+      concurrency="1" destination-type="queue">
+      <jms:listener destination="c2mon.notification.request"
+         ref="clientService" method="onMessage" />
+   </jms:listener-container>
+   <!--  the JmsTemplate to answer client requests -->
+   <bean id="requestHandlerJmsTemplate" class="org.springframework.jms.core.JmsTemplate"
+      depends-on="logConnectionFactory">
+      <property name="connectionFactory">
+         <ref local="logConnectionFactory" />
+      </property>
+   </bean>
+
+
+
+
+
+   <!--  the main JMS connection factory  -->
+   <bean id="logConnectionFactory"
+      class="org.springframework.jms.connection.SingleConnectionFactory">
+      <property name="targetConnectionFactory">
+         <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+            <constructor-arg index="0"
+               value="${c2mon.notification.jms.url}" />
+            <property name="dispatchAsync" value="true" />
+            <property name="watchTopicAdvisories" value="false"/>
+         </bean>
+      </property>
+   </bean>
+
+
 </beans>

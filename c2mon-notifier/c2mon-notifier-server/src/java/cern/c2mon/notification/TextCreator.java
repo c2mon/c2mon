@@ -12,8 +12,8 @@ package cern.c2mon.notification;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,9 +23,7 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.notification.shared.Status;
 import cern.tim.shared.common.datatag.DataTagQuality;
-import cern.tim.shared.rule.RuleExpression;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
@@ -41,6 +39,8 @@ public class TextCreator {
      * our Logger.
      */
     private Logger logger = Logger.getLogger(TextCreator.class);
+
+    private int SUBJECT_TEXT_MAXLEN = 20;
     
     /**
      * our FreeMarker Configuration.
@@ -54,6 +54,9 @@ public class TextCreator {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
+    /**
+     * @throws IOException in case it cannot initialize
+     */
     public TextCreator() throws IOException {
         reLoadTemplates();
         
@@ -107,23 +110,90 @@ public class TextCreator {
     }
     
     /**
+     * Simple wrapper for a notification.
+     * 
+     */
+    public interface Notification {
+        public String getSubject();
+        public String getBody();
+    }
+    
+    class NotificationImpl implements Notification {
+
+        private String body;
+        private String subject;
+        @Override
+        public String getBody() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public String getSubject() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+    }
+    
+    
+    
+    public Notification getStateChangeNotficationFor(Tag update, List<Tag> interestingChildren) throws IOException, TemplateException {
+        NotificationImpl result = new NotificationImpl();
+        StringBuilder bodyBuffer = new StringBuilder();
+        bodyBuffer.append(getTextForRuleUpdate(update));
+        bodyBuffer.append(getFreeTextMapForChildren(interestingChildren));
+        result.body = bodyBuffer.toString();
+        result.subject = "< NOT-SET";
+        return result;
+    }
+    
+    
+    public String getMailSubjectForStateChange(Tag update, List<Tag> interestingTags) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("Entering getMailSubjectForStateChange() for " + update.getId());
+        }
+        
+        StringBuilder subject = new StringBuilder();
+        if (interestingTags.size() == 0) {
+            subject.append(update.getLatestStatus()).append(" ").append(update.getLatestUpdate().getDescription());
+        } else if ((interestingTags.size() == 1 && !interestingTags.get(0).isRule()) || interestingTags.get(0).getLatestUpdate().getDescription().length() > SUBJECT_TEXT_MAXLEN) {
+            subject.append("DMNNTFY [").append(update.getLatestStatus().toString().toUpperCase()).append("] : ").append(interestingTags.get(0).getLatestUpdate().getDescription());
+        } else {
+            Tag single = interestingTags.get(0);
+            subject.append("DMNNTFY [").append(single.getLatestStatus().toString().toUpperCase()).append("] : ").append(single.getLatestUpdate().getDescription());
+        }
+        logger.trace("Leaving getMailSubjectForStateChange()");
+        
+        return subject.toString();
+    }
+    
+    /**
      * 
      * @param metricUpdate
      */
-    public String getTextForMetricUpdate(Tag metricUpdate) {
+    public String getTextForMetricUpdate(Tag metricUpdate, Tag parent) {
         if (metricUpdate.isRule()) {
             throw new IllegalArgumentException("Got rule tag, athough I expect a metric : " + metricUpdate.getId());
         }
+        
+        SimpleDateFormat df = new SimpleDateFormat("MM.dd.yyyy HH:mm:ss,SSS");
+        
         
         HashMap<String, Object> root = new HashMap<String, Object>();
         
         ClientDataTagValue cdtv = metricUpdate.getLatestUpdate();
         
+        root.put("parentStatus", parent.getLatestStatus());
+        root.put("parentTagId", parent.getId());
+        root.put("parentName", parent.getLatestUpdate().getName());
+        
         root.put("tagId", metricUpdate.getId());
         root.put("tagValue", cdtv.getValue());
         root.put("tagName", cdtv.getName());
+        root.put("time", df.format(cdtv.getServerTimestamp()));
         root.put("tagUnit", cdtv.getUnit());
-        root.put("tagValueDescription", cdtv.getValueDescription());
+        root.put("tagValueDescription", cdtv.getValueDescription().length() > 0 ? cdtv.getValueDescription() : "N/A");
+        root.put("tagDescription", cdtv.getDescription().length() > 0 ? cdtv.getDescription() : "N/A");
         
         
         StringWriter out = new StringWriter();
@@ -156,33 +226,35 @@ public class TextCreator {
      * @throws IOException 
      * @throws TemplateException 
      */
-    public String getTextForRuleUpdate(ClientDataTagValue update) throws IOException, TemplateException {
+    public String getTextForRuleUpdate(Tag update) throws IOException, TemplateException {
         logger.debug("Entering getTextForUpdate()");
         
         if (update == null) {
-            throw new IllegalArgumentException("Passed argument for ClientDataTagValue update was null! ");
+            throw new IllegalArgumentException("Passed argument for Tag was null! ");
         }
+        
+        ClientDataTagValue cdtv = update.getLatestUpdate(); 
         
         // Create the root hash
         HashMap<String, Object> root = new HashMap<String, Object>();
         
-        root.put("notificationType", statusToTransitionText(update));
+        root.put("notificationType", update.getLatestStatus().toString());
 
         ArrayList<String> ruleInputTags = new ArrayList<String>();
-        for (Long l : update.getRuleExpression().getInputTagIds()) {
+        for (Long l : cdtv.getRuleExpression().getInputTagIds()) {
             ruleInputTags.add(Long.toString(l));
         }
         
-        int status = ((Double) update.getValue()).intValue();
+        
         root.put("tagId", Long.toString(update.getId()));
-        root.put("tagStatus", Status.fromInt(status));
-        root.put("tagName", update.getName());
-        root.put("tagDescription", update.getDescription());
-        root.put("tagRuleExpression", update.getRuleExpression());
-        root.put("tagServerTimestamp", update.getServerTimestamp());
-        root.put("tagUnit", update.getUnit());
-        root.put("tagValueDescription", update.getValueDescription());
-        root.put("ruleExpression", RuleExpressionColorer.colorRegexp(update.getRuleExpression()));
+        root.put("tagStatus", update.getLatestStatus().toString());
+        root.put("tagName", cdtv.getName());
+        root.put("tagDescription", cdtv.getDescription());
+        root.put("tagRuleExpression", cdtv.getRuleExpression());
+        root.put("tagServerTimestamp", cdtv.getServerTimestamp());
+        root.put("tagUnit", cdtv.getUnit());
+        root.put("tagValueDescription", cdtv.getValueDescription());
+        root.put("ruleExpression", RuleExpressionColorer.colorRegexp(cdtv.getRuleExpression()));
         root.put("ruleExpressionInput", ruleInputTags);
 
         StringWriter out = new StringWriter();
@@ -198,24 +270,35 @@ public class TextCreator {
     
     /**
      * 
-     * @param list a list of {@link ClientDataTagValue} RULE objects.  
+     * @param list a list of {@link Tag} RULE objects.  
      * @return a string representation of the problematic metrics.
      * @throws IOException if there is a problem loading the template
      * @throws TemplateException in case there is a problem while setting the variables in the template.
      */
-    public String getFreeTextMapForChildren(Collection<ClientDataTagValue> list) throws IOException, TemplateException {
+    public String getFreeTextMapForChildren(List<Tag> list) throws IOException, TemplateException {
         
-//        HashSet<Long> tagIds = new HashSet<Long>();
-//        for (ClientDataTagValue c : list) {
-//            tagIds.addAll(c.getRuleExpression().getInputTagIds());
-//        }
-//        Collection<ClientDataTagValue> metrics = C2monServiceGateway.getTagManager().getDataTags(tagIds);
-        
-        
-        logger.debug("Entering getFreeTextMapForChildren()");
+        logger.trace("Entering getFreeTextMapForChildren()");
         List<HashMap<String, Object>> children = new ArrayList<HashMap<String, Object>>();
     
-        for (ClientDataTagValue c : list) {
+        /*
+         * Log DEBUG/TRACE
+         */
+        if (logger.isDebugEnabled()) {
+            logger.debug("Rendering text for " + list.size() + " elements.");
+            if (logger.isTraceEnabled()) {
+                StringBuilder b = new StringBuilder();
+                for (Tag t : list) {
+                    b.append(t.toString()).append("\n");
+                }
+                logger.trace("Content of passed list :" + b.toString());
+            }
+        }
+        
+        /*
+         * put the relevant information into the list. 
+         */
+        for (Tag tag : list) {
+            ClientDataTagValue c = tag.getLatestUpdate(); 
             HashMap<String, Object> child = new HashMap<String, Object>();
             child.put("tagId", Long.toString(c.getId()));
             child.put("tagValue", c.getValue() == null ? "UNKNOWN" : c.getValue());
@@ -224,9 +307,13 @@ public class TextCreator {
             child.put("tagServerTimestamp", c.getServerTimestamp() == null ? "UNKNOWN" : c.getServerTimestamp());
             child.put("tagUnit", c.getUnit() == null ? "UNKNOWN" : c.getUnit());
             child.put("tagValueDescription", c.getValueDescription() == null ? "UNKNOWN" : c.getValueDescription());
+            child.put("tagQuality", c.getDataTagQuality().getDescription() == null ? null : c.getDataTagQuality().getDescription());
             children.add(child);
         }
         
+        /*
+         * and render it here :
+         */
         HashMap<String, Object> root = new HashMap<String, Object>();
         root.put("children", children);
         
@@ -234,6 +321,9 @@ public class TextCreator {
         StringWriter out = new StringWriter();
         temp.process(root, out);
         out.flush();
+        
+        logger.trace("Leaving getFreeTextMapForChildren()");
+        
         return out.toString();
     }
    
