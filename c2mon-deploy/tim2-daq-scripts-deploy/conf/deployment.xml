@@ -8,8 +8,9 @@
 		-->
     <application name="default">
       <deployment installLocation="/opt/tim2-daq-scripts">
-        <backupPolicy keepBackups="5">
+        <backupPolicy keepBackups="3">
           <preserve type="dir" name="log" />
+          <preserve type="dir" name="conf" />
         </backupPolicy>
         
         <directory name="bin">
