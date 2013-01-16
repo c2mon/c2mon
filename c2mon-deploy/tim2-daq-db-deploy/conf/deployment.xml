@@ -10,7 +10,6 @@
       <deployment installLocation="/opt/tim2-daq-db">
         <backupPolicy keepBackups="5">
           <preserve type="dir" name="tmp" />
-          <preserve type="dir" name="log" />
           <preserve type="dir" name="conf/local" />
         </backupPolicy>       
       </deployment>
