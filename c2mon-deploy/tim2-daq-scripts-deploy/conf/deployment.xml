@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <product name="tim2-daq-scripts">
+
+    <!--
+			this application section is a parent configuration for both
+			tim2-daq-scripts-prod and tim2-daq-scripts-test
+		-->
+    <application name="default">
+      <deployment installLocation="/opt/tim2-daq-scripts">
+        <backupPolicy keepBackups="5">
+          <preserve type="dir" name="log" />
+        </backupPolicy>
+        
+        <directory name="bin">
+          <file name="setenv.sh" sourceDir="~/rep/c2mon/daq" mask="400" />
+        </directory>
+      </deployment>
+    </application>
+
+    <application name="tim2-daq-scripts-prod" extends="default">
+      <deployment installLocation="~/dist/daqprocess">
+         <notification>          
+          <mail address="tim-admin@cern.ch" />
+        </notification>
+      </deployment>
+    </application>
+
+    <application name="tim2-daq-scripts-test" extends="default">
+      <deployment installLocation="~/dist/daqprocess-test">
+      
+        <replaceString>
+          <file name="bin/daqprocess-remote.sh" var="/opt/tim2-daq-${DAQ_MODULE_NAME}/bin/daqprocess.sh" value="/opt/tim2-daq-${DAQ_MODULE_NAME}-test/bin/daqprocess.sh" />
+        </replaceString>
+      </deployment>
+    </application>
+  </product>
+</products>
