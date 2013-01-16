@@ -3,6 +3,7 @@ package cern.c2mon.notification.common;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.junit.Test;
@@ -75,6 +76,22 @@ public class SubscriberTest {
 		List<Long> subsTagIds = s.getSubscribedTagIds();
 		assertEquals(1, subsTagIds.size());
 		assertTrue(1L == subsTagIds.get(0));
+	}
+	
+	@Test
+	public void testGetCopy() {
+	    Subscriber s = getSubscriber();
+	    s.setLastReportTs(new Timestamp(System.currentTimeMillis()));
+	    s.setReportInterval(4);
+	    s.addSubscription(new Subscription(s, 1L));
+	    s.addSubscription(new Subscription(s, 2L));
+	    
+	    Subscriber copy = s.getCopy();
+	    
+	    assertTrue(copy.getReportInterval() == s.getReportInterval());
+	    assertTrue(copy.getLastReportTs().equals(s.getLastReportTs()));
+	    assertTrue(copy.getEmail().equals(s.getEmail()));
+	    assertTrue(copy.getSms().equals(s.getSms()));
 	}
 	
 	
