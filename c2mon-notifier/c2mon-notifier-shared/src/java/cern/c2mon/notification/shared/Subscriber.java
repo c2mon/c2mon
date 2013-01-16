@@ -1,5 +1,6 @@
 package cern.c2mon.notification.shared;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,10 +21,14 @@ public class Subscriber {
 	 */
 	private final String sms;
 	/**
-	 * States how often a report should be sent [sec].
-	 * 
+	 * States how often a report should be sent [hours].
 	 */
 	private int reportInterval = 0;
+	
+	/**
+	 * the time when the report has been send the last time 
+	 */
+	private Timestamp lastReportTs = null; 
 	
 	private HashMap<Long, Subscription> subscriptions = new HashMap<Long, Subscription>();
 
@@ -140,13 +145,27 @@ public class Subscriber {
 
 	/**
 	 * @param interval
-	 *            The new report interval [sec]
+	 *            The new report interval [hours]
 	 */
 	public void setReportInterval(final int interval) {
 		reportInterval = interval;
 	}
 
 	/**
+     * @return Returns the lastReportTs.
+     */
+    public Timestamp getLastReportTs() {
+        return lastReportTs;
+    }
+
+    /**
+     * @param lastReportTs The lastReportTs to set.
+     */
+    public void setLastReportTs(Timestamp lastReportTs) {
+        this.lastReportTs = lastReportTs;
+    }
+
+    /**
 	 * @see java.lang.Object#toString()
 	 * @return a string representation of this object.
 	 */
@@ -174,6 +193,7 @@ public class Subscriber {
     public Subscriber getCopy() {
         Subscriber result = new Subscriber(this.getUserName(), this.getEmail(), this.getSms());
         result.setReportInterval(this.getReportInterval());
+        result.setLastReportTs(getLastReportTs());
         for (Subscription s : subscriptions.values()) {
             result.addSubscription(s.getCopy());
         }
