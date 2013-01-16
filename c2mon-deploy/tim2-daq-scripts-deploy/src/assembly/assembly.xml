@@ -12,17 +12,6 @@
   <includeBaseDirectory>false</includeBaseDirectory>
 
   <fileSets>
-  
-    <!-- create default bin and tmp folders in the assembly -->
-    <fileSet>
-      <includes>
-        <include>/bin</include>
-        <include>/tmp</include>
-        <include>/conf/local</include>
-      </includes>
-      <fileMode>0755</fileMode>
-    </fileSet>
-
     <!-- Copy all config files which are needed for running the DAQ modules -->
     <fileSet>
       <outputDirectory>/conf</outputDirectory>
