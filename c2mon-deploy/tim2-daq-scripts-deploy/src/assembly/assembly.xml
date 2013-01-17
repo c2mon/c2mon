@@ -21,7 +21,7 @@
       <fileMode>0644</fileMode>
       <lineEnding>unix</lineEnding>
       <directoryMode>0755</directoryMode>
-      <directory>/conf</directory>
+      <directory>conf/</directory>
     </fileSet>
     
     <!-- Copy all scripts -->
@@ -33,7 +33,7 @@
       <fileMode>0744</fileMode>
       <lineEnding>unix</lineEnding>
       <directoryMode>0755</directoryMode>
-      <directory>/bin</directory>
+      <directory>bin/</directory>
     </fileSet>
   </fileSets>
 
