@@ -29,7 +29,15 @@
       <outputDirectory>/bin</outputDirectory>
       <includes>
         <include>*.sh</include>
+        
       </includes>
+      <excludes>
+        <!-- 
+          This file is just there for backup purposes and does not need to be deployed.
+          It normally sits in ~/rep/c2mon/daq/
+         -->
+        <exclude>daqprocess.sh</exclude>
+      </excludes>
       <fileMode>0744</fileMode>
       <lineEnding>unix</lineEnding>
       <directoryMode>0755</directoryMode>
