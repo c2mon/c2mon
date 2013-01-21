@@ -7,7 +7,6 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 import cern.dmn2.core.Status;
 
@@ -69,7 +68,7 @@ public class Subscription implements Comparable<Subscription> {
     /**
      * a timestamp which contains the alst time a reminder has been sent. 
      */
-    private long lastReminderTime = 0l;
+    private Timestamp lastReminderTime = null;
     
     /**
      * Constructs a new subscription for a notification.
@@ -352,14 +351,14 @@ public class Subscription implements Comparable<Subscription> {
     /**
      * @return Returns the lastReminderTime.
      */
-    public long getLastReminderTime() {
+    public Timestamp getLastReminderTime() {
         return lastReminderTime;
     }
 
     /**
      * @param lastReminderTime The lastReminderTime to set.
      */
-    public void setLastReminderTime(long lastReminderTime) {
+    public void setLastReminderTime(Timestamp lastReminderTime) {
         this.lastReminderTime = lastReminderTime;
     }
 }
