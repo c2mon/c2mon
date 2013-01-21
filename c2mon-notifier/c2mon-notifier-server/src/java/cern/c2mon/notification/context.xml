@@ -13,7 +13,8 @@
       class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
       <property name="properties">
          <props>
-            <prop key="c2mon.notification.jms.url">failover:(tcp://jms-diamon-pro:61640?wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=false&amp;soTimeout=3000&amp;connectionTimeout=8000)?startupMaxReconnectAttempts=4</prop>
+            <prop key="c2mon.notification.jms.url">failover:(tcp://jms-diamon-pro:61640?wireFormat.tcpNoDelayEnabled=true&amp;wireFormat.tightEncodingEnabled=false&amp;soTimeout=3000&amp;connectionTimeout=8000)?startupMaxReconnectAttempts=4
+            </prop>
             <prop key="registry.backupFile">registry.backup</prop>
             <prop key="cache.localCacheFile">tag.cache</prop>
          </props>
@@ -48,8 +49,7 @@
       <property name="tagCache" ref="tagCache" />
    </bean>
    <!-- for the db access. We only need one connection.-->
-   <bean id="dataSource"
-      class="org.apache.commons.dbcp.BasicDataSource">
+   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
       <property name="driverClassName" value="${jdbc.config.driverClassName}" />
       <property name="url" value="${jdbc.config.url}" />
       <property name="username" value="${jdbc.config.user}" />
@@ -67,11 +67,15 @@
       <constructor-arg index="0" ref="transactedDataSource" />
    </bean>
 
-   <bean id="tagCache" class="cern.c2mon.notification.impl.TagCache" >
+   <bean id="tagCache" class="cern.c2mon.notification.impl.TagCache">
       <property name="localCacheFileName" value="${cache.localCacheFile}" />
    </bean>
 
-
+   <bean id="reminder" class="cern.c2mon.notification.impl.ReminderImpl" init-method="start" depends-on="notifier,registry">
+      <property name="reminderTime" value="${reminder.reminderTime}" />
+      <property name="notifier" ref="notifier"/>
+      <property name="registry" ref="registry"/>
+   </bean>
 
 
    <!--
@@ -139,7 +143,7 @@
             <constructor-arg index="0"
                value="${c2mon.notification.jms.url}" />
             <property name="dispatchAsync" value="true" />
-            <property name="watchTopicAdvisories" value="false"/>
+            <property name="watchTopicAdvisories" value="false" />
          </bean>
       </property>
    </bean>
