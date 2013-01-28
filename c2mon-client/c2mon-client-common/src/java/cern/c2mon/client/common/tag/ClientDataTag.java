@@ -18,7 +18,6 @@
 package cern.c2mon.client.common.tag;
 
 import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.rule.RuleFormatException;
@@ -61,16 +60,14 @@ public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, Cl
    * <code>ClientDataTag</code> object.
    * <p>
    * Please note that the <code>ClientDataTag</code> gets only updated, if the tag id's
-   * matches and if the server time stamp of the update is older thatn the current time
+   * matches and if the server time stamp of the update is older than the current time
    * stamp set.
    * 
    * @param transferTag The object that contains the updates.
    * @return <code>true</code>, if the update was successful, otherwise
    *         <code>false</code>
-   * @throws RuleFormatException In case that the <code>TransferTag</code>
-   *         parameter contains a invalid rule expression.
    */
-  boolean update(final TagValueUpdate tagValueUpdate) throws RuleFormatException;
+  boolean update(final TagValueUpdate tagValueUpdate);
 
   
 //  /**
