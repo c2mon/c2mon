@@ -7,6 +7,12 @@ package cern.c2mon.notification;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 
+
+/**
+ * Describes the notification service and methods it has to provide.
+ * 
+ * @author felixehm
+ */
 public interface Notifier {
 
     /**
