@@ -33,8 +33,6 @@ public class ReminderImpl implements Reminder {
      */
     private Timestamp lastReminderRound = null;
 
-    private TagCache cache = null;
-
     private Notifier notifier = null;
 
     private SubscriptionRegistry registry = null;
@@ -159,13 +157,11 @@ public class ReminderImpl implements Reminder {
                     logger.debug("Subscription Tag=" + sup.getTagId() + ", User=" + sup.getSubscriberId()
                             + " Setting lastReminderTime to " + ts);
                 }
-                sup.setLastReminderTime(ts);
             } else {
                 logger.debug("Subscription Tag=" + sup.getTagId() + ", User=" + sup.getSubscriberId()
                         + " No reminder required");
             }
         }
-        registry.updateLastModificationTime();
         logger.trace("Leaving checkForReminder()");
     }
 
