@@ -44,6 +44,10 @@
                   <include>cern.tim2.tim2-shared:*</include>
                   <include>cern.c2mon.c2mon-shared:*</include>
                 </includes>
+                <excludes>
+                  <!-- Excludes all C2MON client API extensions, for example: c2mon-client-ext-simulator -->
+                  <exclude>cern.c2mon.c2mon-client:*-ext-*</exclude>
+                </excludes>
               </artifactSet>
             </configuration>
           </execution>
