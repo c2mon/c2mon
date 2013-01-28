@@ -7,6 +7,9 @@
 		<tr><td colspan="2" bgcolor="#A2D6DE">&nbsp;</td></tr>
 		<tr><td>Description:</td><td>${ctag.tagDescription}</td></tr>
 		<tr><td>Value:</td><td>${ctag.tagValue} ${ctag.tagValueDescription}</td></tr>
+		<#if ctag.tagQuality?has_content>
+			<tr><td>Quality:</td><td>${ctag.tagQuality}</td></tr>
+		</#if>
 		<tr><td>Server Time:</td><td>${ctag.tagServerTimestamp}</td></tr>
 		<tr><td>Web Link</td><td><a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${ctag.tagId}">${ctag.tagName}</a></td></tr>
 	</#list>

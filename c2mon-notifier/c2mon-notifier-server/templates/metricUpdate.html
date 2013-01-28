@@ -1,0 +1,53 @@
+<HTML>
+<HEAD>
+<style type="text/css">
+body {
+  font: 12px  Verdana, "Lucida Grande", Lucida, Helvetica, Arial, sans-serif;
+  color: #000000;
+  margin: 1.5em;
+  line-height: 150%;
+  background: #f8f8f8
+}
+
+table {
+  font-size: 12px;
+  padding:0;
+  margin:0;
+  margin-bottom:20px;
+  width:100%
+}
+
+ p {padding:0; margin: 0 0 1.0em 0;font-size: 12px;}
+ 
+ 
+</style>
+</HEAD>
+
+<BODY>
+<h4>Metric update for ${tagName}</h4>
+
+<p>
+The value has changed to <b>${tagValue} ${tagUnit}</b> at ${time}<br/><br/>
+<u>(New) Value Description:</u><br>
+${tagValueDescription}
+</p>
+
+
+
+
+<p>
+This update belongs to rule <a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${parentTagId}">${parentName}</a> which is <font 
+	<#if parentStatus == "ok">
+		color="green"
+	<#elseif parentStatus == "warning">
+		color="orange"
+	<#elseif parentStatus == "error">
+		color="red"
+	<#else>
+		color="blue"
+	</#if>
+>${parentStatus}</font>
+</p>
+
+
+</BODY>

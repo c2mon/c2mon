@@ -1,7 +1,30 @@
+<style type="text/css">
+body {
+  font: 12px  Verdana, "Lucida Grande", Lucida, Helvetica, Arial, sans-serif;
+  color: #000000;
+  margin: 1.5em;
+  line-height: 150%;
+  background: #f8f8f8
+}
 
+table {
+	
+  font-size: 12px;
+  padding:0;
+  margin:0;
+  margin-bottom:20px;
+  width:100%
+}
+
+ p {padding:0; margin: 0 0 1.0em 0;font-size: 12px;}
+</style>
+</HEAD>
+
+</HTML>
+<BODY>
 <h2>${notificationType}</h2>
 
-The source ${tagName} is ${notificationType}
+${tagName} is ${notificationType}
 
 <table border="0" cellpadding="0" cellspacing="2">
 	<tr><td>Name:</td><td>${tagName}</td></tr>
@@ -10,3 +33,4 @@ The source ${tagName} is ${notificationType}
 	<tr><td>Server Time:</td><td>${tagServerTimestamp}</td></tr>
 </table>
 
+</BODY>

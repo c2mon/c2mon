@@ -5,20 +5,21 @@ body {
   font: 12px  Verdana, "Lucida Grande", Lucida, Helvetica, Arial, sans-serif;
   color: #000000;
   margin: 1.5em;
-  line-height: 150%;
+  line-height: 110%;
   background: #f8f8f8
 }
 
 table {
-	
   font-size: 12px;
   padding:0;
   margin:0;
-  margin-bottom:20px;
+  margin-bottom:10px;
   width:100%
 }
 
  p {padding:0; margin: 0 0 1.0em 0;font-size: 12px;}
+ 
+ 
 </style>
 </HEAD>
 
@@ -28,11 +29,11 @@ table {
 
 <h4>'${tagDescription}' has changed to status 
 <font 
-	<#if tagStatus == "OK">
+	<#if tagStatus == "ok">
 		color="green"
-	<#elseif tagStatus == "WARNING">
+	<#elseif tagStatus == "warning">
 		color="orange"
-	<#elseif tagStatus == "ERROR">
+	<#elseif tagStatus == "error">
 		color="red"
 	<#else>
 		color="blue"
@@ -44,5 +45,3 @@ table {
 	<tr><td>Server Time:</td><td>${tagServerTimestamp}</td></tr>
 </table>
 
-<h4>Rule Expression:</h4>
-<font  size="2">${ruleExpression}</font>
