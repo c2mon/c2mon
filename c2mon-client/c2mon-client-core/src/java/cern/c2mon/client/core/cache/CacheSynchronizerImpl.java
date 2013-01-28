@@ -342,13 +342,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
       for (TagValueUpdate tagValueUpdate : requestedTagValues) {
         newTag = newTags.get(tagValueUpdate.getId());
         if (newTag.getServerTimestamp() == null || newTag.getServerTimestamp().before(tagValueUpdate.getServerTimestamp())) {
-          try {
-            newTag.update(tagValueUpdate);
-          }
-          catch (RuleFormatException e) {
-            LOG.fatal("synchronizeCacheValues() - Received an incorrect rule tag from the server. Please check tag with id " + tagValueUpdate.getId(), e);
-            throw new RuntimeException(e);
-          }
+          newTag.update(tagValueUpdate);
         }
       } // end for loop
     }

@@ -37,13 +37,16 @@ import cern.c2mon.client.module.C2monAdminMessageManager;
  *
  * @author Matthias Braeger
  */
-public final class C2monServiceGateway {
+public class C2monServiceGateway {
   
   /** Class logger */
   private static final Logger LOG = Logger.getLogger(C2monServiceGateway.class);
   
   /** The path to the core Spring XML */
   private static final String APPLICATION_SPRING_XML_PATH = "cern/c2mon/client/core/config/c2mon-client.xml";
+  
+  /** The SPRING application context, which can be used as parent context */
+  private static ClassPathXmlApplicationContext xmlContext = null;
   
   /**
    * The maximum amount of time in milliseconds which the C2MON ServiceGateway shall
@@ -70,10 +73,19 @@ public final class C2monServiceGateway {
   private static C2monAdminMessageManager adminMessageManager = null;
   
   /**
-   * Hidden constructor
+   * Protected default constructor
    */
-  private C2monServiceGateway() {
+  protected C2monServiceGateway() {
     // Do nothing
+  }
+
+  /**
+   * This method returns the SPRING application context of the {@linkplain C2monServiceGateway}
+   * @return the application context of the {@linkplain C2monServiceGateway} which can be used
+   *         as parent context for an API extension.
+   */
+  public static final ClassPathXmlApplicationContext getApplicationContext() {
+    return xmlContext;
   }
 
   /**
@@ -147,19 +159,23 @@ public final class C2monServiceGateway {
    * @see C2monSupervisionManager#isServerConnectionWorking()
    * @see #startC2monClientSynchronous(Module...)
    */
-  public static void startC2monClient(final Module ... modules) {
-    LOG.info("Starting C2MON client core.");
-    
-    final Set<String> springXmlFiles = getSpringXmlPathsOfModules(modules);
-    springXmlFiles.add(APPLICATION_SPRING_XML_PATH);
-    
-    final ClassPathXmlApplicationContext xmlContext = 
-                    new ClassPathXmlApplicationContext(springXmlFiles.toArray(new String[0]));
-    
-    initiateGatewayFields(xmlContext);
-    registerModules(xmlContext, modules);
-    
-    xmlContext.registerShutdownHook();
+  public static synchronized void startC2monClient(final Module ... modules) {
+    if (xmlContext == null) {
+      LOG.info("Starting C2MON client core.");
+      
+      final Set<String> springXmlFiles = getSpringXmlPathsOfModules(modules);
+      springXmlFiles.add(APPLICATION_SPRING_XML_PATH);
+      
+      xmlContext = new ClassPathXmlApplicationContext(springXmlFiles.toArray(new String[0]));
+      
+      initiateGatewayFields(xmlContext);
+      registerModules(xmlContext, modules);
+      
+      xmlContext.registerShutdownHook();
+    }
+    else {
+      LOG.warn("startC2monClient() - C2MON client core already started.");
+    }
   }
   
   /**
@@ -183,7 +199,7 @@ public final class C2monServiceGateway {
    * @see C2monSupervisionManager#isServerConnectionWorking()
    * @see #startC2monClient(Module...)
    */
-  public static void startC2monClientSynchronous(final Module ... modules) throws RuntimeException {
+  public static synchronized void startC2monClientSynchronous(final Module ... modules) throws RuntimeException {
     startC2monClient(modules);
     
     LOG.info("Waiting for C2MON server connection (max " + MAX_INITIALIZATION_TIME / 1000  + " sec)...");
