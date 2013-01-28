@@ -3,15 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 
    <parent>
-    <artifactId>c2mon-client-pom</artifactId>
-    <groupId>cern.c2mon.c2mon-client</groupId>
-    <version>1.0.10</version>
+    <artifactId>dmn2-client-pom</artifactId>
+    <groupId>cern.dmn2.client</groupId>
+    <version>1.0.2</version>
    </parent>
 
 
-	<groupId>cern.c2mon.notifcation</groupId>
+	<groupId>cern.c2mon.notification</groupId>
 	<artifactId>c2mon-server-notification</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>notifier</name>
 	<packaging>jar</packaging>
 
@@ -24,7 +24,6 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-client</groupId>
 			<artifactId>c2mon-client-all</artifactId>
-			<version>1.0.2</version>
 			<type>jar</type>
 			<scope>compile</scope>
 			<exclusions>
@@ -79,11 +78,6 @@
 			<version>2.3.18</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-			<version>3.1.0.RELEASE</version>
-		</dependency>
-		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.7.2</version>
@@ -93,15 +87,8 @@
 		<dependency>
 			<groupId>cern.c2mon.notification</groupId>
 			<artifactId>c2mon-notification-shared</artifactId>
-			<version>[1.0.1, 2.0.0]</version>
+			<version>[1.0.0,2.0.0)</version>
 			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>cern.dmn2.shared</groupId>
-			<artifactId>dmn2-db-service</artifactId>
-			<version>1.0.3-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -109,6 +96,38 @@
 			<version>4.10</version>
 			<type>jar</type>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>cern.dmn2.shared</groupId>
+			<artifactId>dmn2-db-service</artifactId>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>3.1.2.RELEASE</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>jms</groupId>
+			<artifactId>jms</artifactId>
+			<version>1.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>cern.dmn2.shared</groupId>
+			<artifactId>dmn2-db-service</artifactId>
+			<type>jar</type>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	
@@ -119,7 +138,7 @@
 				<configuration>
 
 					<descriptors>
-						<descriptor>src/assembly/dmn2.xml</descriptor>
+						<descriptor>src/assembly/assembly.xml</descriptor>
 					</descriptors>
 
 				</configuration>
@@ -136,5 +155,9 @@
 		</plugins>
 	</build>
 	
+  <scm>
+   <developerConnection>svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-notifier/c2mon-notifier-server</developerConnection>
+  </scm>
+   
 	
 </project>
