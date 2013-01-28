@@ -58,8 +58,8 @@ public class ReminderTest {
         /* verify */
         verify(registry);
         verify(notifier);
+     
         
-        assertTrue(sub.getLastReminderTime() != null);
         
     }
     
@@ -73,8 +73,6 @@ public class ReminderTest {
     private SubscriptionRegistry getRegistryMock(HashSet<Subscription> list) {
         SubscriptionRegistry registry = createMock(SubscriptionRegistry.class);
         expect(registry.getRegisteredSubscriptions()).andReturn(list).once();
-        registry.updateLastModificationTime();
-        expectLastCall().once();
         return registry;
     }
     
