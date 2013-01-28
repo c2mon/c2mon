@@ -38,7 +38,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	/**
 	 * our list of subscriptions organized by users. 
 	 */
-	protected ConcurrentHashMap<String, Subscriber> users = new ConcurrentHashMap<String, Subscriber>();
+	ConcurrentHashMap<String, Subscriber> users = new ConcurrentHashMap<String, Subscriber>();
 	
 	/**
 	 * a object to sync the backup writers and add/remove operations. 
@@ -471,12 +471,15 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	}
 	
 	/**
-	 * 
+	 * @return a list of all current registered subscribers.
 	 */
 	public List<Subscriber> getRegisteredUsers() {
 		return new ArrayList<Subscriber>(users.values());
 	}
 	
+	/**
+	 * @return a list of current registered subscriptions
+	 */
 	public HashSet<Subscription> getRegisteredSubscriptions() {
 	    HashSet<Subscription> result = new HashSet<Subscription>();
 	    for (Subscriber s : users.values()) {
@@ -550,6 +553,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
                         Thread.sleep(getAutoSaveInterval());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                        logger.error("Stopping DB BackupWriter as it was interruped: " + e.getMessage());
                         break;
                     }
                     try {
@@ -576,6 +580,9 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
         this.lastModificationTime = lastModificationTime;
     }
 
+    /**
+     * calls {@link #setLastModificationTime(long)} with the current Time.
+     */
     public void updateLastModificationTime() {
         setLastModificationTime(System.currentTimeMillis());
     }
