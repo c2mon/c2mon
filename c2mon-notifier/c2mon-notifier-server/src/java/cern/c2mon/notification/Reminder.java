@@ -7,7 +7,6 @@ package cern.c2mon.notification;
 import java.sql.Timestamp;
 import java.util.concurrent.TimeUnit;
 
-import cern.c2mon.notification.impl.TagCache;
 import cern.c2mon.notification.shared.Subscriber;
 
 /**
