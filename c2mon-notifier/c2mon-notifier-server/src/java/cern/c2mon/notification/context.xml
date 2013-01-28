@@ -71,6 +71,9 @@
       <property name="localCacheFileName" value="${cache.localCacheFile}" />
    </bean>
 
+   <!-- 
+      The Reminder Service  
+   -->
    <bean id="reminder" class="cern.c2mon.notification.impl.ReminderImpl" init-method="start" depends-on="notifier,registry">
       <property name="reminderTime" value="${reminder.reminderTime}" />
       <property name="notifier" ref="notifier"/>
