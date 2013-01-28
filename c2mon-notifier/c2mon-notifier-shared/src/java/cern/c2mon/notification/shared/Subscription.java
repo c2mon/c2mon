@@ -66,11 +66,6 @@ public class Subscription implements Comparable<Subscription> {
     private String ruleExpression = null;
 
     /**
-     * a timestamp which contains the alst time a reminder has been sent. 
-     */
-    private Timestamp lastReminderTime = null;
-    
-    /**
      * Constructs a new subscription for a notification.
      * 
      * @param userId the user id of which this Subscription belongs to.
@@ -348,17 +343,4 @@ public class Subscription implements Comparable<Subscription> {
         lastNotifiedTags = new HashMap<Long, Status>();
     }
 
-    /**
-     * @return Returns the lastReminderTime.
-     */
-    public Timestamp getLastReminderTime() {
-        return lastReminderTime;
-    }
-
-    /**
-     * @param lastReminderTime The lastReminderTime to set.
-     */
-    public void setLastReminderTime(Timestamp lastReminderTime) {
-        this.lastReminderTime = lastReminderTime;
-    }
 }
