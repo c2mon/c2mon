@@ -241,7 +241,7 @@ public class TextCreator {
         root.put("tagServerTimestamp", cdtv.getServerTimestamp());
         root.put("tagUnit", cdtv.getUnit());
         root.put("tagValueDescription", cdtv.getValueDescription());
-        root.put("ruleExpression", RuleExpressionColorer.colorRegexp(cdtv.getRuleExpression()));
+        root.put("ruleExpression", cdtv.getRuleExpression());
         root.put("ruleExpressionInput", ruleInputTags);
 
         StringWriter out = new StringWriter();
