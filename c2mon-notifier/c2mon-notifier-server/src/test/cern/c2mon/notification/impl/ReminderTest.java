@@ -1,31 +1,29 @@
 /*
- * $Id $
- *
- * $Date$
- * $Revision$
- * $Author$
  *
  * Copyright CERN ${year}, All Rights Reserved.
  */
 package cern.c2mon.notification.impl;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.classextension.EasyMock.verify;
+import static org.junit.Assert.assertTrue;
+
+import java.sql.Timestamp;
 import java.util.HashSet;
 
-import org.easymock.classextension.EasyMock;
 import org.junit.Test;
 
-import cern.c2mon.notification.Reminder;
+import cern.c2mon.notification.Notifier;
 import cern.c2mon.notification.SubscriptionRegistry;
-import cern.c2mon.notification.impl.ReminderImpl;
-import cern.c2mon.notification.impl.TagCache;
-import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.dmn2.core.Status;
 
 /**
  * 
- * @author ${user} 
- * @version $Revision$, $Date$, $Author$
+ * @author felixehm 
  */
 public class ReminderTest {
 
@@ -33,30 +31,84 @@ public class ReminderTest {
     public void testReminder() {
         ReminderImpl service = new ReminderImpl();
         
-        TagCache c = EasyMock.createMock(TagCache.class);
-        c.get(1L);
-        EasyMock.expectLastCall().once();
+        /* prepare registry list */
+        Subscription sub = new Subscription("test", 1L);
+        sub.setLastNotifiedStatus(Status.WARNING);
+        // last normal notification older than the reminder interval.  
+        sub.setLastNotification(new Timestamp(System.currentTimeMillis() - service.getReminderTime() - 100));
         
-        Subscriber s = new Subscriber("test", "test@mail.com", null);
-        Subscription sub = new Subscription("test",1L);
+        HashSet<Subscription> list = new HashSet<Subscription>();
+        list.add(sub);
+        
+        /* Registry */
+        SubscriptionRegistry registry = getRegistryMock(list);
+
+        /* Notifier */
+        Notifier notifier = getNotifierMock(sub);
+
+        /* replay */
+        replay(registry);
+        replay(notifier);
+        
+        /* do action */
+        service.setRegistry(registry);
+        service.setNotifier(notifier);
+        service.checkForReminder();
+        
+        /* verify */
+        verify(registry);
+        verify(notifier);
+        
+        assertTrue(sub.getLastReminderTime() != null);
+        
+    }
+    
+    private Notifier getNotifierMock(Subscription sub) {
+        Notifier notifier = createMock(Notifier.class);
+        notifier.sendReminder(sub);
+        expectLastCall().once();
+        return notifier;
+    }
+    
+    private SubscriptionRegistry getRegistryMock(HashSet<Subscription> list) {
+        SubscriptionRegistry registry = createMock(SubscriptionRegistry.class);
+        expect(registry.getRegisteredSubscriptions()).andReturn(list).once();
+        registry.updateLastModificationTime();
+        expectLastCall().once();
+        return registry;
+    }
+    
+    @Test
+    public void testDisabledReminderByNormalNotificationTs() {
+        
+        ReminderImpl service = new ReminderImpl();
+        
+        /* prepare registry calls */
+        Subscription sub = new Subscription("test", 1L);
         sub.setLastNotifiedStatus(Status.WARNING);
         
         HashSet<Subscription> list = new HashSet<Subscription>();
         list.add(sub);
         
+        SubscriptionRegistry registry = getRegistryMock(list);
         
-        SubscriptionRegistry registry = EasyMock.createMock(SubscriptionRegistry.class);
-        registry.getRegisteredSubscriptions();
-        EasyMock.expectLastCall().once().andReturn(list);
+        /* Notifier */
+        Notifier notifier = createMock(Notifier.class);
         
-        registry.getSubscriber(s.getUserName());
-        EasyMock.expectLastCall().once().andReturn(s);
+        /* replay */
+        replay(registry);
+        replay(notifier);
         
         
-        
-        service.setTagCache(c);
+        /* do action */
         service.setRegistry(registry);
-        service.
+        service.setNotifier(notifier);
+        service.checkForReminder();
+        
+        /* verify */
+        verify(registry);
+        verify(notifier);
         
     }
 }
+
