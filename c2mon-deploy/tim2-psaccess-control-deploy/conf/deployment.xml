@@ -1,80 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-  <product name="tim2-daq-db">
+  <product name="tim2-psaccess-control">
 
-    <!--
-			this application section is a parent configuration for both
-			tim2-daq-db-prod and tim2-daq-db-test
-		-->
-    <application name="default">
-      <deployment installLocation="/opt/tim2-daq-db">
-        <backupPolicy keepBackups="5">
-          <preserve type="dir" name="tmp" />
-          <preserve type="dir" name="log" />
-          <preserve type="dir" name="conf/local" />
-        </backupPolicy>       
-      </deployment>
-      <startscript>
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
-        </main-class>
-        <initial-heap-size>256m</initial-heap-size>
-        <max-heap-size>256m</max-heap-size>
-        <property name="c2mon.process.name" value="$PROCESS_NAME" />
-        <property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
-        <property name="java.security.egd" value="file://dev/urandom" />
-        <preExec>
-                    <![CDATA[
-                      [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
-                      [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
-                      [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
-                      [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
-                      [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-                      [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
-                     ]]>
-        </preExec>
-      </startscript>
-    </application>
+    <application name="default" />
 
-    <application name="tim2-daq-db-prod" extends="default">
-      <deployment installLocation="/opt/tim2-daq-db">
-         <notification>          
+    <application name="tim2-psaccess-control-pro" extends="default">
+      <deployment installLocation="~timoper/dist/public/html/javaws/tim2-psaccess-control">
+        <notification>
+          <!-- you can give more than one mail for deployment notification -->
           <mail address="tim-admin@cern.ch" />
         </notification>
-        <directory name="conf">
-          <file name="c2mon.properties" sourceDir="/user/timoper/rep/c2mon/daq" mask="400" />
-          <file name="daq.conf" sourceDir="/user/timoper/rep/c2mon/daq" mask="400" />
-          <file name="daq-core-service.xml" source="/user/timoper/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="daqprocess.sh" sourceDir="/user/timoper/rep/c2mon/daq" mask="700" />
-        </directory>
+        <signJars keyStore="~timoper/rep/c2mon/client/jarsign.properties" />
       </deployment>
-      <startscript name="TIM2-DAQ-STARTUP">
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
-        </main-class>
-        <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
-      </startscript>
     </application>
 
-    <application name="tim2-daq-db-test" extends="default">
-      <deployment installLocation="/opt/tim2-daq-db-test">
-        <directory name="conf">
-          <file name="c2mon.properties" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
-          <file name="daq.conf" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
-          <file name="daq-core-service.xml" source="/user/timtest/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="daqprocess.sh" sourceDir="/user/timtest/rep/c2mon/daq" mask="700" />
-        </directory>
+    <application name="tim2-psaccess-control-test" extends="default">
+      <deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-psaccess-control-stable">
+        <signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
       </deployment>
-      <startscript name="TIM2-DAQ-STARTUP">
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
-        </main-class>
-        <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
-      </startscript>
     </application>
+
+    <application name="tim2-psaccess-control-dev" extends="default">
+      <deployment installLocation="~timtest/dist/public/test/html/javaws/tim2-psaccess-control">
+        <signJars keyStore="~timtest/rep/c2mon/client/jarsign.properties" />
+      </deployment>
+    </application>
+
   </product>
 </products>
