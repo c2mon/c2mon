@@ -71,7 +71,7 @@ print "Content-type: application/x-java-jnlp-file" , "\n\n";
 print "<?xml version = '1.0' encoding = 'utf-8'?>
   <jnlp spec=\"1.0+\" codebase=\"$codebase\">
   <information>
-    <title>TIM PS Access Control TEST (Version $viewerVersion)</title>
+    <title>TIM PS Access Control TEST (v$viewerVersion)</title>
     <vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
     <homepage href=\"http://timweb.cern.ch/test\"/>
     <description>This application allows controlling the access keys in the different zones of the PS access complex</description>
@@ -93,5 +93,5 @@ print "  </resources>
   <resources os=\"Windows\" >
     <property name=\"tim.log.file\" value=\"c:\\temp\\tim-psaccess-control-test.log\"/>
   </resources>
-  <application-desc main-class=\"ch.cern.tim.client.psaccess.Main\"/>
+  <application-desc main-class=\"cern.tim.client.psaccess.Main\"/>
 </jnlp>" , "\n";
