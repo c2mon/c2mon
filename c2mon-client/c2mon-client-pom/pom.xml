@@ -137,6 +137,11 @@
         <artifactId>c2mon-jviews-history</artifactId>
         <version>[1.0.0,2.0.0)</version>
       </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-client</groupId>
+        <artifactId>c2mon-client-ext-simulator</artifactId>
+        <version>[1.0.0,2.0.0)</version>
+      </dependency>
 
       <!-- C2MON publisher -->
       <dependency>
