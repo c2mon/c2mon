@@ -11,7 +11,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -132,6 +131,8 @@ public final class XsltTransformUtility {
     OutputStream ostream = null;
     String xmlToBeTransformed = xml;
     
+    //DebugUtil.writeToFile(xmlToBeTransformed, "xmlToBeTransformed" + ".xml");
+    
     if (ignoreXmlNameSpaces)
       xmlToBeTransformed = removeXmlNameSpaces(xml);
     
@@ -140,13 +141,32 @@ public final class XsltTransformUtility {
     ostream = new ByteArrayOutputStream();
     trans.transform(xmlSource, new StreamResult((ostream)));
 
-    String result = ostream.toString();
-
-    // a little hack to make firefox happy!
-    result = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""); 
-    
+    final String result = ostream.toString();
     logger.info("XsltTransformUtility(): Sucessfully performed xslt transformation.");
 
+    return result;
+  }
+  
+  /**
+   * Removes the xml header
+   * <?xml version="1.0" encoding="UTF-8" ?>
+   * 
+   * from the given xml string.
+   * 
+   * @param xml The xml whose header will be removed
+   * @return The given xml with the header removed
+   */
+  public static String removeXmlHeader(final String xml) {
+    
+    String result = new String(xml);
+    
+    // this little hack makes firefox happy!
+    // 
+    // @see http://issues/browse/TIMS-782
+    result = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""); 
+    result = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>", ""); 
+    result = result.replace("<?xml", "");
+    
     return result;
   }
 
@@ -176,10 +196,8 @@ public final class XsltTransformUtility {
     trans.transform(xmlSource, new StreamResult((ostream)));
 
     String result = ostream.toString();
+    result = removeXmlHeader(result);
 
-    // a little hack to make firefox happy!
-    result = result.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", ""); 
-    
     logger.info("XsltTransformUtility(): Sucessfully performed xslt transformation.");
 
     return result;
