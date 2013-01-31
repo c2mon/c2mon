@@ -105,8 +105,14 @@ public class ProcessService {
   private String getXml(final String processName) {
 
     String xml = gateway.getTagManager().getProcessXml(processName);
+    
+    if (xml != null) 
+      // @see http://issues/browse/TIMS-782
+      xml = XsltTransformUtility.removeXmlHeader(xml);
 
-    logger.debug("getXml fetch for process " + processName + ": " + (xml == null ? "NULL" : "SUCCESS"));
+    logger.debug("getXml fetch for process " + processName + ": " 
+        + (xml == null ? "NULL" : "SUCCESS"));
+    
     return xml;
   }
 }
