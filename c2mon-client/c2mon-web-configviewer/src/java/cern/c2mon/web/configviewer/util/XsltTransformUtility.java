@@ -141,9 +141,12 @@ public final class XsltTransformUtility {
     ostream = new ByteArrayOutputStream();
     trans.transform(xmlSource, new StreamResult((ostream)));
 
-    final String result = ostream.toString();
+    String result = ostream.toString();
     logger.info("XsltTransformUtility(): Sucessfully performed xslt transformation.");
-
+    
+    if (result != null)
+      result = removeXmlHeader(result);
+    
     return result;
   }
   
