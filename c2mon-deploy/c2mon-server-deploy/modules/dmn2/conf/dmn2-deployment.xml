@@ -15,6 +15,10 @@
 					</output>
 				</main-class>
 				<java-vm-args>-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+				
+				<!--  the following property defines if C2MON server caches shall be preloaded from database at start-up -->
+				<property name="c2mon.server.cache.skippreloading" value="false" />
+				
 				<property name="server.process.name" value="DMN2-SRV" />
 				<property name="c2mon.process.name" value="DMN2-SRV" />
 				<property name="c2mon.home" value="$INSTALL_PATH" />
@@ -22,10 +26,8 @@
 				<property name="c2mon.properties.location" value="conf/c2mon.properties" />
 				<property name="log4j.configuration" value="conf/log4j.xml" />
 				<property name="com.sun.management.jmxremote.port" value="9523" />
-				<property name="com.sun.management.jmxremote.password.file"
-					value="conf/.jmxremote.passwd" />
-				<property name="com.sun.management.jmxremote.access.file"
-					value="conf/.jmxremote.access" />
+				<property name="com.sun.management.jmxremote.password.file" value="conf/.jmxremote.passwd" />
+				<property name="com.sun.management.jmxremote.access.file" 	value="conf/.jmxremote.access" />
 				<property name="com.sun.management.jmxremote.ssl" value="false" />
 				<property name="c2mon.home" value="$INSTALL_DIR" />
 				<property name="laser.hosts" value="laser-test" />
