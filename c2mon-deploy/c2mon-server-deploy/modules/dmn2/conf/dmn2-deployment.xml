@@ -35,7 +35,12 @@
                 <property name="oracle.net.tns_admin" value="/etc" />
 				<preExec>
 					<![CDATA[
-		
+					      # ***************************************************************************
+					      #           NOTE:					         
+					      #           If the c2mon.server.cache.skippreloading flag is set to "true" the server 
+					      #           will not preload its caches from  the database, isitead it will refer to local 
+					      #           cache files, stored in: log/ehcache-diskstore  
+					      # ***************************************************************************
                     ]]>
 				</preExec>
 			</startscript>
