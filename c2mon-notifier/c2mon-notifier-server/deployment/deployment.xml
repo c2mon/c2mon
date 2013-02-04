@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
 
-	<product>
+   <product>
+      <!-- not installable -->
+      <application>
+         <deployment installLocation="/opt/c2mon/notifier">
+            <directory name="conf" />
+            <directory name="log" />
+            <backupPolicy>
+               <preserve type="dir" name="conf" />
+               <preserve type="dir" name="conf" />
+            </backupPolicy>
+         </deployment>
+         <startscript>
+            <main-class name="cern.c2mon.notification.Main" />
+            <property name="log4j.configuration" value="conf/log4j.properties" />
+            <property name="oracle.net.tns_admin" value="/etc/" />
+            <initial-heap-size>256m</initial-heap-size>
+            <max-heap-size>256m</max-heap-size>
+         </startscript>
+      </application>
 
-		<application name="default">
-			<deployment installLocation="/opt/c2mon/notifier">
-				<directory name="conf"/>
-				<directory name="log"/>
-			</deployment>
-			<startscript>
-				<main-class name="cern.c2mon.notifier.Main" />
-				<property name="log4j.configuration" value="conf/log4j.properties" />
-				<property name="server-context" value="conf/context.xml" />
-			</startscript>
-		</application>
 
-		
-		<application name="dmn2-notifier" >
-			<deployment installLocation="/opt/c2mon/c2mon-dmn2-notifier"></deployment>
-			<startscript>
-				<property name="c2mon.client.conf.url" value="http://abwww/~diamonop/c2mon/dev/client/client.properties"/>
-			</startscript>
-		</application>
-		
-		<application name="dmn2-notifier-dev" >
-			<deployment installLocation="/opt/c2mon/c2mon-dmn2-notifier-dev"></deployment>
-			<property name="c2mon.client.conf.url" value="http://abwww/~diamonop/c2mon/dev/client/client.properties"/>
-		</application>
+      <application name="dmn2-notifier">
+         <deployment installLocation="/opt/c2mon/c2mon-dmn2-notifier"></deployment>
+         <startscript>
+            <property name="c2mon.client.conf.url" value="http://abwww/~diamonop/c2mon/client/client.properties" />
+            <property name="db.properties" value="file:conf/config.properties" /> <!-- for the dmn2-db-service package -->
+            <property name="c2mon.notification.properties" value="file:conf/config.properties"/>
+         </startscript>
+      </application>
 
-	</product>
+      <application name="dmn2-notifier-dev">
+         <deployment installLocation="/opt/c2mon/c2mon-dmn2-notifier-dev"></deployment>
+         <startscript>
+            <property name="c2mon.client.conf.url" value="http://abwww/~dmndev/c2mon/client/client.properties" />
+            <property name="db.properties" value="file:conf/config.properties" /> <!-- for the dmn2-db-service package -->
+            <property name="c2mon.notification.properties" value="file:conf/config.properties"/>
+         </startscript>
+      </application>
 
+   </product>
 </products>
