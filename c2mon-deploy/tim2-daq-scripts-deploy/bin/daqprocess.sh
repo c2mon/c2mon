@@ -1,4 +1,4 @@
-##!/bin/sh
+#!/bin/sh
 
 # TIM. CERN. All rights reserved.
 #
@@ -19,9 +19,9 @@ export LASER_HOSTS=laser2,laser1
 export CMW_MOM_CONFIG=http://slwww/~alaser/console/laser-new/cmw-mom.properties
 
 #set home directory of script
-SCRIPT=` readlink -f $(which $0)`
+SCRIPT=`readlink -f $(which $0)`
 SCRIPTPATH=`dirname $SCRIPT`
-DAQ_HOME=$SCRIPTPATH/..
+DAQ_HOME=`dirname $SCRIPTPATH`
 
 DAQ_HOST=`hostname -s`
 

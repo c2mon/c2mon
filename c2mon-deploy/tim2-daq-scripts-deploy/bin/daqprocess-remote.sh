@@ -1,4 +1,4 @@
-##!/bin/sh
+#!/bin/sh
 
 # TIM. CERN. All rights reserved.
 #
@@ -11,9 +11,9 @@
 # Start/stop/restart TIM2 DAQ process
 
 #set home directory of script
-SCRIPT=` readlink -f $(which $0)`
+SCRIPT=`readlink -f $(which $0)`
 SCRIPTPATH=`dirname $SCRIPT`
-DAQ_HOME=$SCRIPTPATH/..
+DAQ_HOME=`dirname $SCRIPTPATH`
 SET_ENV_SCRIPT=$DAQ_HOME/bin/setenv.sh
 
 #set the DAQ host machines if script is available
