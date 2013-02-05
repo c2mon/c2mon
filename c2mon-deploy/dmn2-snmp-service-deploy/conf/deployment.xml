@@ -6,7 +6,7 @@
 			this application section is a parent configuration for both
 			c2mon-dmn2-prod and c2mon-dmn2-test
 		-->
-		<application name="default">
+		<application>
 
 			<startscript>
 				<main-class name="cern.accsoft.diamon.DiamonSnmpService">
@@ -34,7 +34,7 @@
 		</application>
 
 
-		<application name="dmn2-snmp-service" extends="default">
+		<application name="dmn2-snmp-service" >
 			<deployment>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
@@ -44,7 +44,7 @@
 		</application>
 
 
-		<application name="dmn2-snmp-service-dev" extends="default">
+		<application name="dmn2-snmp-service-dev" >
 			<!--  no notifications on test -->
 		</application>
 
