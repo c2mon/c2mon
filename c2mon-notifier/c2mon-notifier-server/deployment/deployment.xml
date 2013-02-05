@@ -23,7 +23,7 @@
 
 
       <application name="dmn2-notifier">
-         <deployment installLocation="/opt/dmn2/c2mon-dmn2-notifier"></deployment>
+         <deployment installLocation="/opt/dmn2/dmn2-notifier"></deployment>
          <startscript>
             <property name="c2mon.client.conf.url" value="http://abwww/~diamonop/c2mon/client/client.properties" />
             <property name="db.properties" value="file:conf/config.properties" /> <!-- for the dmn2-db-service package -->
@@ -32,7 +32,7 @@
       </application>
 
       <application name="dmn2-notifier-dev">
-         <deployment installLocation="/opt/dmn2/c2mon-dmn2-notifier-dev"></deployment>
+         <deployment installLocation="/opt/dmn2/dmn2-notifier-dev"></deployment>
          <startscript>
             <property name="c2mon.client.conf.url" value="http://abwww/~dmndev/c2mon/client/client.properties" />
             <property name="db.properties" value="file:conf/config.properties" /> <!-- for the dmn2-db-service package -->
