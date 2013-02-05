@@ -38,7 +38,7 @@
             </preExec>
          </startscript>
 
-         <deployment installLocation="/opt/dmn2-daq">
+         <deployment installLocation="/opt/dmn2/dmn2-daq">
             <backupPolicy keepBackups="2">
                <preserve type="dir" name="log" />
             </backupPolicy>
@@ -102,7 +102,7 @@
 
       <application name="dmn2-daq-dev" extends="default">
 
-         <deployment installLocation="/opt/dmn2-daq-dev">
+         <deployment installLocation="/opt/dmn2/dmn2-daq-dev">
             <directory name="conf">
                <file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <file name=".jmxremote.access" sourceDir="~dmndev/c2mon/daq" mask="400" />
