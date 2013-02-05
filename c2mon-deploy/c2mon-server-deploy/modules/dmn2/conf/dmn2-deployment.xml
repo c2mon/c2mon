@@ -46,7 +46,7 @@
 			</startscript>
 
 
-			<deployment installLocation="/opt/dmn2/dmn2-srv-pro">
+			<deployment>
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
 					<preserve type="dir" name="reports" />
@@ -55,7 +55,7 @@
 		</application>
 
 		<application name="dmn2-srv-pro" extends="default">
-			<deployment>
+			<deployment installLocation="/opt/dmn2/dmn2-srv-pro">
 				<directory name="conf">
 					<file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/server"
 						mask="400" />
