@@ -7,7 +7,6 @@
 			c2mon-dmn2-prod and c2mon-dmn2-test
 		-->
 		<application>
-
 			<startscript>
 				<main-class name="cern.accsoft.diamon.DiamonSnmpService">
 					<output>
@@ -42,12 +41,6 @@
 				</notification>
 			</deployment>
 		</application>
-
-
-		<application name="dmn2-snmp-service-dev" >
-			<!--  no notifications on test -->
-		</application>
-
-
+		
 	</product>
 </products>
