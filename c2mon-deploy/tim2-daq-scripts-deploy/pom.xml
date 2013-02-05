@@ -11,7 +11,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>tim2-daq-scripts-deploy</artifactId>
   <name>TIM2 DAQ scripts deployment module</name>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
