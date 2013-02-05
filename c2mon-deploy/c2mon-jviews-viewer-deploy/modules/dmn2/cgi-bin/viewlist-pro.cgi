@@ -84,6 +84,12 @@ sub smash {
 	  readdir DIR;
 	closedir DIR;
 	foreach (@contents) {
+
+                # skip folders with name starting with 'template'
+                if ( filename($_) =~ m/template/ ) {
+                        next;
+                }
+
 		if ( !-l && -d ) {
 
 			print "<Folder name=\"", filename($_), "\" display=\"",
