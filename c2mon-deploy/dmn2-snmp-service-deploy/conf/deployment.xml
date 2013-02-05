@@ -19,7 +19,6 @@
 
 				<!--  run job once per minute -->
 				<property name="snmpservice.verification.interval" value="60000" />
-
 				<property name="log4j.configuration" value="file:${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.process.name" value="dmn2-snmp-service" />
 				<property name="c2mon.log.dir" value="${INSTALL_DIR}/log" />
@@ -35,6 +34,7 @@
 
 
 		<application name="dmn2-snmp-service" >
+            <startscript name="DMN2-SNMP-SERVICE"/>
 			<deployment>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
