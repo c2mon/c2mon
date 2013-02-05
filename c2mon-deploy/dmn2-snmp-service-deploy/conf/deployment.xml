@@ -8,13 +8,11 @@
 		-->
 		<application name="default">
 
-			<startscript name="DMN2-SNMP-SERVICE">
+			<startscript>
 				<main-class name="cern.accsoft.diamon.DiamonSnmpService">
-
 					<output>
 						<file name="out.log" />
 					</output>
-
 				</main-class>
 				
 				<java-vm-args>-Xms128m -Xmx128m</java-vm-args>
@@ -25,10 +23,9 @@
 				<property name="log4j.configuration" value="file:${INSTALL_DIR}/conf/log4j.xml" />
 				<property name="c2mon.process.name" value="dmn2-snmp-service" />
 				<property name="c2mon.log.dir" value="${INSTALL_DIR}/log" />
-
 			</startscript>
 
-			<deployment installLocation="/opt/dmn2-snmp-service">
+			<deployment installLocation="/opt/dmn2/dmn2-snmp-service">
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
 				</backupPolicy>
@@ -36,18 +33,18 @@
 
 		</application>
 
-		<application name="dmn2-snmp-service-pro" extends="default">
 
+		<application name="dmn2-snmp-service" extends="default">
 			<deployment>
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
 					<mail address="project-diamon-core@cern.ch" />
 				</notification>
 			</deployment>
-
 		</application>
 
-		<application name="dmn2-snmp-service-test" extends="default">
+
+		<application name="dmn2-snmp-service-dev" extends="default">
 			<!--  no notifications on test -->
 		</application>
 
