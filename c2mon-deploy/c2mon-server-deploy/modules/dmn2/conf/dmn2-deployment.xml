@@ -46,7 +46,7 @@
 			</startscript>
 
 
-			<deployment installLocation="/opt/c2mon-dmn2">
+			<deployment installLocation="/opt/dmn2/c2mon-dmn2">
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
 					<preserve type="dir" name="reports" />
@@ -77,7 +77,7 @@
 		</application>
 
 		<application name="c2mon-dmn2-dev" extends="default">
-			<deployment installLocation="/opt/c2mon-dmn2-dev">
+			<deployment installLocation="/opt/dmn2/c2mon-dmn2-dev">
 				<directory name="conf">
 					<file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/server"
 						mask="400" />
