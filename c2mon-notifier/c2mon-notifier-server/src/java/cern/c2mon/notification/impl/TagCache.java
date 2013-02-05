@@ -418,7 +418,10 @@ public class TagCache implements DataTagUpdateListener {
             throw new IllegalStateException("TagID=" + tagUpdate.getId() + ": Is not known by the C2Mon server!");
         }
         
-        if (tagUpdate.getDataTagQuality().getInvalidQualityStates().containsKey(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)) {
+        if (tagUpdate.getDataTagQuality().getInvalidQualityStates().containsKey(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)
+                || tagUpdate.getDataTagQuality().getInvalidQualityStates().containsKey(TagQualityStatus.PROCESS_DOWN)
+                || tagUpdate.getDataTagQuality().getInvalidQualityStates().containsKey(TagQualityStatus.JMS_CONNECTION_DOWN)
+        ) {
             logger.warn("TagID=" + tagUpdate.getId() + ": Server Heartbeat lost. Waiting for revival...");
         } else if (!tagUpdate.getDataTagQuality().isAccessible()) {
             logger.warn("TagID=" + tagUpdate.getId() + " is reported as not accessible.");
@@ -493,7 +496,10 @@ public class TagCache implements DataTagUpdateListener {
 //            } else {
 //                notifier.sendReportOnValueChange(tag);
 //            }
-             
+            
+            /*
+             * triggers the notifier to notify for this tag
+             */
             for (TagCacheUpdateListener l : listeners) {
                 l.onUpdate(tag);
             }
