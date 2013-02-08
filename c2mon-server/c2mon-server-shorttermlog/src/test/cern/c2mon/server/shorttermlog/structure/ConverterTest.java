@@ -36,4 +36,15 @@ public class ConverterTest {
     assertEquals(11, logTag.getTagQualityCode());
   }
   
+  /**
+   * Tests conversion for some other fields.
+   */
+  @Test
+  public void testConversion() {
+    DataTagCacheObject tag = new DataTagCacheObject(10L);
+    tag.setValueDescription("value desc");
+    TagShortTermLog logTag = (TagShortTermLog) converter.convertToLogged(tag);
+    assertEquals("value desc",logTag.getTagValueDesc());    
+  }
+  
 }
