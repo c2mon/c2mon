@@ -89,8 +89,8 @@ public final class BeanConverterUtil {
       }
       
       if (cdt != null) {
-        if (cdt.getDescription() != null) {
-          description = cdt.getDescription();
+        if (cdt.getValueDescription() != null) {
+          description = cdt.getValueDescription();
         }
       }
       else {

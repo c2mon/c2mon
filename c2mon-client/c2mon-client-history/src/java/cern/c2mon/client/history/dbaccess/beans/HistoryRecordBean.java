@@ -42,6 +42,11 @@ public class HistoryRecordBean {
   /** The tag value */
   private String tagValue;
   
+  /**
+   *  the tag value description;
+   */
+  private String tagValueDesc;
+  
   /** The tag type */
   private String tagDataType;
   
@@ -180,7 +185,15 @@ public class HistoryRecordBean {
   public String getTagValue() {
     return tagValue;
   }
+  
+  /**
+   * @return the tagValue
+   */
+  public String getTagValueDesc() {
+    return tagValueDesc;
+  }
 
+  
   /**
    * @param tagValue the tagValue to set
    */
@@ -188,6 +201,13 @@ public class HistoryRecordBean {
     this.tagValue = tagValue;
   }
 
+  /**
+   * @param tagValue the tagValue to set
+   */
+  public void setTagValueDesc(final String tagValueDesc) {
+    this.tagValueDesc = tagValueDesc;
+  }  
+  
   /**
    * @return the tagDataType
    */

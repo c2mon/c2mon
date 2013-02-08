@@ -33,6 +33,7 @@ public class HistoryRecordBeanTest {
   private static final Long SERVER_TIME = 654654654L;
   private static final boolean FROM_INITIAL_SNAPSHOT = false;
   private static final String TAG_VALUE = "The tag value";
+  private static final String TAG_VALUE_DESCRIPTION = "The tag value description";  
   private static final String TAG_DATA_TYPE = "String";
   private static final short TAG_MODE = 1;
   private static final String TAG_NAME = "A name-2345-dsfh";
@@ -48,6 +49,7 @@ public class HistoryRecordBeanTest {
     bean.setLogDate(new Timestamp(LOG_TIME));
     bean.setServerTime(new Timestamp(SERVER_TIME));
     bean.setTagValue(TAG_VALUE);
+    bean.setTagValueDesc(TAG_VALUE_DESCRIPTION);
     bean.setTagDataType(TAG_DATA_TYPE);
     bean.setTagMode(TAG_MODE);
     bean.setTagName(TAG_NAME);
@@ -62,7 +64,8 @@ public class HistoryRecordBeanTest {
     assertEquals(DAQ_TIME, Long.valueOf(bean.getDaqTime().getTime()));
     assertEquals(LOG_TIME, Long.valueOf(bean.getLogDate().getTime()));
     assertEquals(SERVER_TIME, Long.valueOf(bean.getServerTime().getTime()));
-    assertEquals(TAG_VALUE, bean.getTagValue());
+    assertEquals(TAG_VALUE, bean.getTagValue());    
+    assertEquals(TAG_VALUE_DESCRIPTION, bean.getTagValueDesc());    
     assertEquals(TAG_DATA_TYPE, bean.getTagDataType());
     assertEquals(TAG_MODE, bean.getTagMode());
     assertEquals(TAG_NAME, bean.getTagName());
