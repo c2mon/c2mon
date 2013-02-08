@@ -168,7 +168,8 @@ public final class DataTagShortTermLogConverter implements LoggerConverter<Tag> 
           dtSTLog.setTagValue(tag.getValue().toString());
       } else {
           dtSTLog.setTagValue(null);
-      }        
+      } 
+      dtSTLog.setTagValueDesc(tag.getValueDescription());
       dtSTLog.setTagDataType(tag.getDataType());
       if (tag instanceof DataTag || tag instanceof ControlTag) {
         dtSTLog.setSourceTimestamp(((DataTag) tag).getSourceTimestamp());
