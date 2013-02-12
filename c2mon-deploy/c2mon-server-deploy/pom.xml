@@ -11,7 +11,7 @@
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-server-deploy</artifactId>
-	<version>1.1.10</version>
+	<version>1.1.11-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
