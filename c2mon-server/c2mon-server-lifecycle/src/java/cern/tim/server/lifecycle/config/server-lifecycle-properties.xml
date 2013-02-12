@@ -65,7 +65,9 @@
             <prop key="jms.process.requestQueue">c2mon.process.request</prop>
             <prop key="jms.process.updateQueueTrunk">c2mon.process.update</prop>
                        
-            <!-- CACHE PROPERTIES -->   
+            <!-- CACHE PROPERTIES --> 
+            <!-- the cache mode indicates if the cache is running in distributed(="multi") or single mode -->
+            <prop key="cern.c2mon.cache.mode">single</prop>
             <prop key="cache.loader.batch.size">100</prop>
             <prop key="cache.loader.equipment.batch.size">5</prop>
             
