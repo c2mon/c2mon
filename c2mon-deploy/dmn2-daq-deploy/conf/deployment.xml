@@ -64,32 +64,7 @@
                support patterns, e.g: *.jvm
             -->
             <directory name="bin">
-               <file name="DMN2-DAQ-PING_01.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-CLIC_INJ.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-CLIC_LHC.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-CLIC_SPS.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-CLIC_MISC_FEC.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-CLIC_MISC_WS.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-CLIC_MISC.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-CLIC_VMW.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-CLIC_VML.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-RDA_BIS.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-RDA_PLC.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-JMX.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
-               <file name="DMN2-DAQ-SNMP_WIE.jvm" sourceDir="~diamonop/c2mon/daq/bin"
-                  mask="744" />
+               <file name="DMN2-DAQ-*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
             </directory>
 
             <notification>
