@@ -64,6 +64,7 @@
     <dependency>
       <groupId>cern.tim2.tim2-server</groupId>
       <artifactId>tim2-server-rule</artifactId>
+      <version>[1.0.8]</version>
     </dependency>
     <dependency>
       <groupId>cern.tim2.tim2-server</groupId>
