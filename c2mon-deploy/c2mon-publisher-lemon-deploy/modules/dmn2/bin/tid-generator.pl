@@ -18,9 +18,9 @@ my @pathtokens = split(/\//,$cdir);
 # we are in bin folder, so the home folder is one level up 
 my $appdir = @pathtokens[scalar(@pathtokens)-3];
 
-my $tidfile = "/opt/${appdir}/conf/publisher-new.tid";
+my $tidfile = "/opt/dmn2/${appdir}/conf/publisher-new.tid";
 
-my $c2monClientPropertiesFile= "/opt/${appdir}/conf/client.properties";
+my $c2monClientPropertiesFile= "/opt/dmn2/${appdir}/conf/client.properties";
 
 # Reading property file client.properties 
 open PROPS, "< $c2monClientPropertiesFile"
