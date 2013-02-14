@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.tim2.tim2-daq</groupId>
 		<artifactId>tim2-daq-pom</artifactId>
-		<version>1.0.13</version>
+		<version>1.0.14</version>
 	</parent>
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
@@ -54,8 +54,8 @@
 			<artifactId>tim2-daq-ssh</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.dmn2.dmn2-daq</groupId>
-			<artifactId>dmn2-daq-cmwadmin</artifactId>
+			<groupId>cern.tim2.tim2-daq</groupId>
+			<artifactId>tim2-daq-cmwadmin</artifactId>
 		</dependency>
 	</dependencies>
 

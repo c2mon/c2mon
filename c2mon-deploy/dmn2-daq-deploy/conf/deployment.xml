@@ -38,7 +38,7 @@
             </preExec>
          </startscript>
 
-         <deployment installLocation="/opt/dmn2/dmn2-daq">
+         <deployment installLocation="/opt/dmn2/dmn2-daq-pro">
             <backupPolicy keepBackups="2">
                <preserve type="dir" name="log" />
             </backupPolicy>
