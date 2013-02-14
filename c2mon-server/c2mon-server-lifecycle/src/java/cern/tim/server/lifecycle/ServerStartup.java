@@ -93,7 +93,7 @@ public final class ServerStartup {
     
     //by default run in single-server mode
     List<String> cacheModeModules;
-    if (System.getProperty("cern.c2mon.cache.mode").equals("multi")) {
+    if (System.getProperty("cern.c2mon.cache.mode") != null && System.getProperty("cern.c2mon.cache.mode").equals("multi")) {
       logger.info("C2MON server running in distributed cache mode");
       cacheModeModules = new ArrayList<String>(Arrays.asList("cern/tim/server/lifecycle/config/server-lifecycle-multi.xml",         
                                          "cern/tim/server/cache/config/server-cache-multi-server.xml")); 
