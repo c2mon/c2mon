@@ -275,9 +275,18 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
             this.ruleResult = rule.evaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           catch (RuleEvaluationException e) {
-            this.ruleQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_VALUE, "Rule expression could not be evaluated. See log messages.");
+            this.ruleQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_VALUE,
+                "Rule expression could not be evaluated. See log messages.");
             ruleError = e.getMessage();
-            LOG.debug("computeRule() - \"" + rule.getExpression() + "\" could not be evaluated.", e);
+            LOG.debug("computeRule() - \"" + rule.getExpression() 
+                + "\" could not be evaluated.", e);
+          }
+          catch (Exception e) {
+            this.ruleQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_VALUE
+                , "Rule expression could not be evaluated. See log messages.");
+            ruleError = e.getMessage();
+            LOG.debug("computeRule() - \"" + rule.getExpression() 
+                + "\" could not be evaluated.", e);
           }
           // Update the time stamp of the ClientRuleTag
           this.timestamp = new Timestamp(System.currentTimeMillis());
