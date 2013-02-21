@@ -82,6 +82,8 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
     try {
       ruleTagConfigTransacted.doUpdateRuleTag(id, elementProperties);
       ruleEvaluator.evaluateRule(id);
+      RuleTag rule = ruleTagCache.get(id);
+      ruleTagCache.lockAndNotifyListeners(rule);
     } catch (UnexpectedRollbackException e) {
       LOGGER.error("Rolling back Rule update in cache");
       ruleTagCache.remove(id);
