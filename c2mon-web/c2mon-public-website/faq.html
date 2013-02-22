@@ -166,10 +166,10 @@
 			<!-- F.A.Q HEADER
 			================================================== -->	
           <div class="hero-unit">
-				<h1>C2MON F.A.Q</h1>
+				<h1>C2MON F.A.Q.</h1>
 					<br />
-					<h2>Today:</h2>
-					<p class="lead">Your most common questions, answered by our C2MON experts</p>
+					<!--  <h2>Today:</h2> -->
+					<p class="lead">All your favourite questions, with our answers.</p>
 				</div>
 				
 				
@@ -177,95 +177,94 @@
 			ANY h2 element will appear as HEAD TITLE on the sidebar on the left!
 			h3,h4 elements appear as sub-elements on the same sidebar!
 			================================================== -->	
-
-              <h2>Who has more legs: 1 elephant and 9 monkeys,<br>
-				or 6 chicken, 2 tigers and 20 dolphins?</h2>
+                 
+        <h2>Who is behind this?</h2>
               <br />
-              <p class="well">???
+              <p class="well">The software is developed and used by several projects at CERN in Geneva, Switzerland.
+              It is used for monitoring a wide variety of technical infrastructure across the CERN sites.
               </p>
-              <br />
+              <br />      
 			  
-			  <h2>Who is stronger?</h2>
+			  <h2>What makes your product different from others?</h3>
+              </p>
               <br />
               <p class="well">
-				<!-- Place the C2MON EXPERT's answer here:
-				================================================== -->	
-			  ???
+              It's free. It's multi-platform. It can run as a high-availability cluster.  It's scalable to manage large amounts of data.
+              It's easy to write a custom data acquisition module to suit your needs. It's easy to build your own GUI application on top of our API.
+              </p>
+              <br />
+              
+			  <h2>Where is the download link?</h2>
+              <br />
+              <p class="well">The software is not yet freely distributed. If you are interested in using C2MON for a monitoring project, 
+                or just trying it out, please contact us for a demo package.
               </p>
               <br />
 			  
-			  <!-- This is an example of a sub-element!
-				================================================== -->	
-			  <h3>3 elephants or 4 crocodiles?</h3>
-              </p>
+			  <h2>How much does it cost?</h2>
               <br />
-              <p class="well">???
-              </p>
-              <br />
-			  
-			  <!-- This is another example of a sub-element!
-				================================================== -->	
-			  <h3>4 dolphins or 5 tigers?</h3>
-              </p>
-              <br />
-              <p class="well">???
+              <p class="well">
+							C2MON is free and based on open source products. Some of these products offer support contracts and enterprise features for a licence cost,
+							if you require these (for cache, database or middleware).
               </p>
               <br />
 			  
-			  <h3>60 chicken or Rafa and Breo?</h3>
+					 
+			  <h2>What licence are you using?</h2>
               </p>
               <br />
-              <p class="well">???
-              </p>
-              <br />
-			  
-			  
-			 <h2>I heard PVSS is better than C2MON,<br>
-				is this true?</h2>
-              <br />
-              <p class="well">???
+              <p class="well">
+              The plan is to make the project open source in the near future, so please be patient...
               </p>
               <br />
 			  
-			  <h2>I am looking for cheap flights to Singapore,<br>
-				is this the right place?</h2>
+			  <h2>What's inside?</h2>
               <br />
-              <p class="well">???
+              <p class="well">Short answer is Java. For more details on the internals, see below... 
               </p>
               <br />
-			  
-			  <h2>Nigerian Scams</h2>
-              <br />
-              <p class="well">...
+              
+        <h3>Overall architecture</h3>
               </p>
               <br />
-			  
-			  <h3>I am Mr. paul agabi, a Lawyer by profession.</h3>
+              <p class="well">C2MON is a 3-tier monitoring platform, made up of a data acquisition (DAQ) API, a server layer and a client API.
+                The inter-layer communication is done exclusively through JMS (ActiveMQ). The acquired data is logged in the configured database and kept 
+                in-memory in a cache (Ehcache). C2MON comes equipped with a number of available DAQ and client implementations (see below)
               </p>
               <br />
-              <p class="well">....
+        
+        <h3>Server cluster configuration</h3>
               </p>
               <br />
-			  
-			 <h3>I am Mohammed Abacha,the son of the late Nigerian Head of State</h3>
+              <p class="well">The C2MON server can run in a clustered setup, by making use of the Ehcache Terracotta distributed cache technology.
+                This allows to build high-availability services on top of C2MON. The cache can also make use of Terracotta BigMemory&reg;, for
+                high-performance monitoring requirements of large data sets.
+              </p>
+              <br /> 
+        
+        <h3>Supported databases</h3>
               </p>
               <br />
-              <p class="well">...
+              <p class="well">At CERN we run with Oracle, but the platform can run equally well with other standard databases (the demo package even
+                uses the in-memory HSQLDB).
               </p>
-              <br />
-			  
-			  <h3>I am Peter Lawson,a merchant in Dubai, in the U.A.E.I</h3>
-              </p>
-              <br />
-              <p class="well">...
-              </p>
-              <br />
-			   
-			  <h2>Can you send me some chocolate?</h2>
-              <br />
-              <p class="well">???
-              </p>
-              <br />
+              <br />   
+              
+        <h3>Available client applications</h3>
+             </p>
+             <br />
+             <p class="well">A number of client applications are already available on top of C2MON (see screenshots). Some of them make use of the
+              IBM ILOG&reg; framework, and hence require are licence, but a free GUI is also available.
+             </p>
+             <br />   
+                             
+			   <h3>Available data acquisition modules</h3>
+             </p>
+             <br />
+             <p class="well">Data acquisition modules already exist for acquiring data from a variety of sources, in particular OPC UA and 
+              Siemens/Schneider PLCs. What's more, it is easy to implement new modules to acquire data from your own hardware and protocols.
+             </p>
+             <br />
 			  
         </div><!--/span-->
       </div><!--/row-->
