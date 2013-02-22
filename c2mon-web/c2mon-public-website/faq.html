@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>C2MON FAQ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <!-- Le javascript
+    ================================================== -->
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/jquery-ui-1-9-1-custom-min.js"></script>
+	
+	<!-- tocify! == THE PLUGIN THAT GENERATES THE SIDEBAR ON THE LEFT!
+	================================================== -->	
+    <script src="assets/js/tocify.js"></script>
+    <script src="assets/js/prettify.js"></script>
+    <script>
+        $(function() {
+
+            $("#toc").tocify({ selectors: "h2, h3, h4, h5" }).data("tocify");
+
+            prettyPrint();
+            // $(".optionName").popover({ trigger: "hover" });
+            $("a[href='#']").click(function(event) {
+ 
+                event.preventDefault();
+
+            });
+
+        });
+    </script>
+	
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/black-tie/jquery-ui.css" rel="stylesheet">
+	
+	<!-- tocify css! == THE CSS THAT STYLES THE SIDEBAR ON THE LEFT!
+	================================================== -->	
+    <link href="assets/css/tocify.css" rel="stylesheet">
+	
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <style>
+    body {
+      padding-top: 20px;
+    }
+    p {
+      font-size: 16px;
+    }
+    .headerDoc {
+      color: #005580;
+    }
+
+	@media (max-width: 767px) {
+		#toc {
+			position: relative;
+			width: 100%;
+			margin: 0px 0px 20px 0px;
+		}
+	}
+    </style>
+	<style type="text/css">
+	
+      body {
+		padding-top: 20px;
+		padding-bottom: 60px;
+	  }
+
+      /* Main marketing message and sign up button */
+      .jumbotron {
+        margin: 80px 0;
+        text-align: center;
+      }
+      .jumbotron h1 {
+        font-size: 100px;
+        line-height: 1;
+      }
+      .jumbotron .lead {
+        font-size: 24px;
+        line-height: 1.25;
+      }
+      .jumbotron .btn {
+        font-size: 21px;
+        padding: 14px 24px;
+      }
+
+      /* Supporting marketing content */
+      .marketing {
+        margin: 60px 0;
+      }
+      .marketing p + h4 {
+        margin-top: 28px;
+      }
+
+      /* Customize the navbar links to be fill the entire space of the .navbar */
+      .navbar .navbar-inner {
+        padding: 0;
+      }
+      .navbar .nav {
+        margin: 0;
+        display: table;
+        width: 100%;
+      }
+      .navbar .nav li {
+        display: table-cell;
+        width: 1%;
+        float: none;
+      }
+      .navbar .nav li a {
+        font-weight: bold;
+        text-align: center;
+        border-left: 1px solid rgba(255,255,255,.75);
+        border-right: 1px solid rgba(0,0,0,.1);
+      }
+      .navbar .nav li:first-child a {
+        border-left: 0;
+        border-radius: 3px 0 0 3px;
+      }
+      .navbar .nav li:last-child a {
+        border-right: 0;
+        border-radius: 0 3px 3px 0;
+      }
+    </style>
+  </head>
+
+  <body>
+  
+    <div class="container">
+  
+		 <!-- Navbar
+	 ================================================== -->
+	  <div class="masthead">
+        <h3 class="muted">C<sup>2</sup>MON</h3>
+        <div class="navbar">
+          <div class="navbar-inner">
+            <div class="container">
+              <ul class="nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="c2mon.html">C<sup>2</sup>MON</a></li>
+                <li class="active"><a href="faq.html">FAQ</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+	 <!-- MAIN CONTENT: below the navigation bar
+	================================================== -->	
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div id="toc">
+          </div><!--/.well -->
+        </div><!--/span-->
+        <div class="span9">
+		
+			<!-- F.A.Q HEADER
+			================================================== -->	
+          <div class="hero-unit">
+				<h1>C2MON F.A.Q</h1>
+					<br />
+					<h2>Today:</h2>
+					<p class="lead">Your most common questions, answered by our C2MON experts</p>
+				</div>
+				
+				
+			<!-- F.A.Q CONTENT:
+			ANY h2 element will appear as HEAD TITLE on the sidebar on the left!
+			h3,h4 elements appear as sub-elements on the same sidebar!
+			================================================== -->	
+
+              <h2>Who has more legs: 1 elephant and 9 monkeys,<br>
+				or 6 chicken, 2 tigers and 20 dolphins?</h2>
+              <br />
+              <p class="well">???
+              </p>
+              <br />
+			  
+			  <h2>Who is stronger?</h2>
+              <br />
+              <p class="well">
+				<!-- Place the C2MON EXPERT's answer here:
+				================================================== -->	
+			  ???
+              </p>
+              <br />
+			  
+			  <!-- This is an example of a sub-element!
+				================================================== -->	
+			  <h3>3 elephants or 4 crocodiles?</h3>
+              </p>
+              <br />
+              <p class="well">???
+              </p>
+              <br />
+			  
+			  <!-- This is another example of a sub-element!
+				================================================== -->	
+			  <h3>4 dolphins or 5 tigers?</h3>
+              </p>
+              <br />
+              <p class="well">???
+              </p>
+              <br />
+			  
+			  <h3>60 chicken or Rafa and Breo?</h3>
+              </p>
+              <br />
+              <p class="well">???
+              </p>
+              <br />
+			  
+			  
+			 <h2>I heard PVSS is better than C2MON,<br>
+				is this true?</h2>
+              <br />
+              <p class="well">???
+              </p>
+              <br />
+			  
+			  <h2>I am looking for cheap flights to Singapore,<br>
+				is this the right place?</h2>
+              <br />
+              <p class="well">???
+              </p>
+              <br />
+			  
+			  <h2>Nigerian Scams</h2>
+              <br />
+              <p class="well">...
+              </p>
+              <br />
+			  
+			  <h3>I am Mr. paul agabi, a Lawyer by profession.</h3>
+              </p>
+              <br />
+              <p class="well">....
+              </p>
+              <br />
+			  
+			 <h3>I am Mohammed Abacha,the son of the late Nigerian Head of State</h3>
+              </p>
+              <br />
+              <p class="well">...
+              </p>
+              <br />
+			  
+			  <h3>I am Peter Lawson,a merchant in Dubai, in the U.A.E.I</h3>
+              </p>
+              <br />
+              <p class="well">...
+              </p>
+              <br />
+			   
+			  <h2>Can you send me some chocolate?</h2>
+              <br />
+              <p class="well">???
+              </p>
+              <br />
+			  
+        </div><!--/span-->
+      </div><!--/row-->
+    </div><!--/.fluid-container-->
+    </div> <!-- /container -->
+
+  </body>
+</html>
