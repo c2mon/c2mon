@@ -1,297 +1,329 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>C2MON FAQ</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+	<head>
+		<meta charset="utf-8">
+		<title>C2MON FAQ</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="">
+		<meta name="author" content="">
 
-    <link href="assets/css/bootstrap.css" rel="stylesheet">
-    <!-- Le javascript
-    ================================================== -->
-    <script src="assets/js/jquery.js"></script>
-    <script src="assets/js/jquery-ui-1-9-1-custom-min.js"></script>
-	
-	<!-- tocify! == THE PLUGIN THAT GENERATES THE SIDEBAR ON THE LEFT!
-	================================================== -->	
-    <script src="assets/js/tocify.js"></script>
-    <script src="assets/js/prettify.js"></script>
-    <script>
-        $(function() {
+		<link href="assets/css/bootstrap.css" rel="stylesheet">
+		<!-- Le javascript
+		================================================== -->
+		<script src="assets/js/jquery.js"></script>
+		<script src="assets/js/jquery-ui-1-9-1-custom-min.js"></script>
 
-            $("#toc").tocify({ selectors: "h2, h3, h4, h5" }).data("tocify");
+		<!-- tocify! == THE PLUGIN THAT GENERATES THE SIDEBAR ON THE LEFT!
+		================================================== -->
+		<script src="assets/js/tocify.js"></script>
+		<script src="assets/js/prettify.js"></script>
+		<script>
+			$(function() {
 
-            prettyPrint();
-            // $(".optionName").popover({ trigger: "hover" });
-            $("a[href='#']").click(function(event) {
- 
-                event.preventDefault();
+				$("#toc").tocify({
+					selectors : "h2, h3, h4, h5"
+				}).data("tocify");
 
-            });
+				prettyPrint();
+				// $(".optionName").popover({ trigger: "hover" });
+				$("a[href='#']").click(function(event) {
 
-        });
-    </script>
-	
-    <!-- Le styles -->
-    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/black-tie/jquery-ui.css" rel="stylesheet">
-	
-	<!-- tocify css! == THE CSS THAT STYLES THE SIDEBAR ON THE LEFT!
-	================================================== -->	
-    <link href="assets/css/tocify.css" rel="stylesheet">
-	
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+					event.preventDefault();
 
-    <style>
-    body {
-      padding-top: 20px;
-    }
-    p {
-      font-size: 16px;
-    }
-    .headerDoc {
-      color: #005580;
-    }
+				});
 
-	@media (max-width: 767px) {
-		#toc {
-			position: relative;
-			width: 100%;
-			margin: 0px 0px 20px 0px;
-		}
-	}
-    </style>
-	<style type="text/css">
-	
-      body {
-		padding-top: 20px;
-		padding-bottom: 60px;
-	  }
+			});
+		</script>
 
-      /* Main marketing message and sign up button */
-      .jumbotron {
-        margin: 80px 0;
-        text-align: center;
-      }
-      .jumbotron h1 {
-        font-size: 100px;
-        line-height: 1;
-      }
-      .jumbotron .lead {
-        font-size: 24px;
-        line-height: 1.25;
-      }
-      .jumbotron .btn {
-        font-size: 21px;
-        padding: 14px 24px;
-      }
+		<!-- Le styles -->
+		<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+		<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/black-tie/jquery-ui.css" rel="stylesheet">
 
-      /* Supporting marketing content */
-      .marketing {
-        margin: 60px 0;
-      }
-      .marketing p + h4 {
-        margin-top: 28px;
-      }
+		<!-- tocify css! == THE CSS THAT STYLES THE SIDEBAR ON THE LEFT!
+		================================================== -->
+		<link href="assets/css/tocify.css" rel="stylesheet">
 
-      /* Customize the navbar links to be fill the entire space of the .navbar */
-      .navbar .navbar-inner {
-        padding: 0;
-      }
-      .navbar .nav {
-        margin: 0;
-        display: table;
-        width: 100%;
-      }
-      .navbar .nav li {
-        display: table-cell;
-        width: 1%;
-        float: none;
-      }
-      .navbar .nav li a {
-        font-weight: bold;
-        text-align: center;
-        border-left: 1px solid rgba(255,255,255,.75);
-        border-right: 1px solid rgba(0,0,0,.1);
-      }
-      .navbar .nav li:first-child a {
-        border-left: 0;
-        border-radius: 3px 0 0 3px;
-      }
-      .navbar .nav li:last-child a {
-        border-right: 0;
-        border-radius: 0 3px 3px 0;
-      }
-    </style>
-  </head>
+		<!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
 
-  <body>
-  
-    <div class="container">
-  
-		 <!-- Navbar
-	 ================================================== -->
-	  <div class="masthead">
-        <h3 class="muted">C<sup>2</sup>MON</h3>
-        <div class="navbar">
-          <div class="navbar-inner">
-            <div class="container">
-              <ul class="nav">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="c2mon.html">C<sup>2</sup>MON</a></li>
-                <li class="active"><a href="faq.html">FAQ</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
+		<style>
+			body {
+				padding-top: 20px;
+			}
+			p {
+				font-size: 16px;
+			}
+			.headerDoc {
+				color: #005580;
+			}
 
-	 <!-- MAIN CONTENT: below the navigation bar
-	================================================== -->	
-    <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="span3">
-          <div id="toc">
-          </div><!--/.well -->
-        </div><!--/span-->
-        <div class="span9">
-		
-			<!-- F.A.Q HEADER
-			================================================== -->	
-          <div class="hero-unit">
-				<h1>C2MON F.A.Q.</h1>
-					<br />
-					<!--  <h2>Today:</h2> -->
-					<p class="lead">All your favourite questions, with our answers.</p>
-				</div>
-				
-				
-			<!-- F.A.Q CONTENT:
-			ANY h2 element will appear as HEAD TITLE on the sidebar on the left!
-			h3,h4 elements appear as sub-elements on the same sidebar!
-			================================================== -->	
-                 
-        <h2>Who is behind this?</h2>
-              <br />
-              <p class="well">The software is developed and used by several projects at CERN in Geneva, Switzerland.
-              It is used for monitoring a wide variety of technical infrastructure across the CERN sites.
-              </p>
-              <br />      
-			  
-			  <h2>What makes your product different from others?</h3>
-              </p>
-              <br />
-              <p class="well">
-              It's free. It's multi-platform. It can run as a high-availability cluster.  It's scalable to manage large amounts of data.
-              It's easy to write a custom data acquisition module to suit your needs. It's easy to build your own GUI application on top of our API.
-              </p>
-              <br />
-              
-			  <h2>Where is the download link?</h2>
-              <br />
-              <p class="well">The software is not yet freely distributed. If you are interested in using C2MON for a monitoring project, 
-                or just trying it out, please contact us for a demo package.
-              </p>
-              <br />
-			  
-			  <h2>How much does it cost?</h2>
-              <br />
-              <p class="well">
+			/**
+			 * For a bit smaller screens:
+			 * 
+			 * decrease the size of the sidebar a little bit
+			 * so that everything fits in the screen
+			 */
+			@media (max-width: 983px) {
+				#toc {
+					width: 180px;
+				}
+			}
+			
+			/**
+			 * For very small screens:
+			 * 
+			 * there is no place to fill both the Sidebar AND the FAQ horizontally.
+			 * 
+			 * Lets make the sidebar take up the whole row width
+			 * and put the FAQ below it.
+			 */
+			@media (max-width: 767px) {
+				#toc {
+					position: relative;
+					width: 100%;
+					margin: 0px 0px 20px 0px;
+				}
+			}
+		</style>
+		<style type="text/css">
+			body {
+				padding-top: 20px;
+				padding-bottom: 60px;
+			}
+
+			/* Main marketing message and sign up button */
+			.jumbotron {
+				margin: 80px 0;
+				text-align: center;
+			}
+			.jumbotron h1 {
+				font-size: 100px;
+				line-height: 1;
+			}
+			.jumbotron .lead {
+				font-size: 24px;
+				line-height: 1.25;
+			}
+			.jumbotron .btn {
+				font-size: 21px;
+				padding: 14px 24px;
+			}
+
+			/* Supporting marketing content */
+			.marketing {
+				margin: 60px 0;
+			}
+			.marketing p + h4 {
+				margin-top: 28px;
+			}
+
+			/* Customize the navbar links to be fill the entire space of the .navbar */
+			.navbar .navbar-inner {
+				padding: 0;
+			}
+			.navbar .nav {
+				margin: 0;
+				display: table;
+				width: 100%;
+			}
+			.navbar .nav li {
+				display: table-cell;
+				width: 1%;
+				float: none;
+			}
+			.navbar .nav li a {
+				font-weight: bold;
+				text-align: center;
+				border-left: 1px solid rgba(255,255,255,.75);
+				border-right: 1px solid rgba(0,0,0,.1);
+			}
+			.navbar .nav li:first-child a {
+				border-left: 0;
+				border-radius: 3px 0 0 3px;
+			}
+			.navbar .nav li:last-child a {
+				border-right: 0;
+				border-radius: 0 3px 3px 0;
+			}
+		</style>
+	</head>
+
+	<body>
+
+		<div class="container">
+
+			<!-- Navbar
+			================================================== -->
+			<div class="masthead">
+				<h3 class="muted">C<sup>2</sup>MON</h3>
+				<div class="navbar">
+					<div class="navbar-inner">
+						<div class="container">
+							<ul class="nav">
+								<li>
+									<a href="index.html">Home</a>
+								</li>
+								<li>
+									<a href="c2mon.html">C<sup>2</sup>MON</a>
+								</li>
+								<li>
+									<a href="at_cern.html">@CERN</a>
+								</li>
+								<li class="active">
+									<a href="faq.html">FAQ</a>
+								</li>
+								<li>
+									<a href="#">About</a>
+								</li>
+								<li>
+									<a href="#">Contact</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div><!-- /.navbar -->
+			</div>
+
+			<!-- MAIN CONTENT: below the navigation bar
+			================================================== -->
+			<div class="container-fluid">
+				<div class="row-fluid">
+					<div class="span3">
+						<div id="toc"></div><!--/.well -->
+					</div><!--/span-->
+					<div class="span9">
+
+						<!-- F.A.Q HEADER
+						================================================== -->
+						<div class="hero-unit">
+							<h1>C2MON F.A.Q.</h1>
+							<br />
+							<!--  <h2>Today:</h2> -->
+							<p class="lead">
+								All your favourite questions, with our answers.
+							</p>
+						</div>
+
+						<!-- F.A.Q CONTENT:
+						ANY h2 element will appear as HEAD TITLE on the sidebar on the left!
+						h3,h4 elements appear as sub-elements on the same sidebar!
+						================================================== -->
+
+						<h2>Who is behind this?</h2>
+						<br />
+						<p class="well">
+							The software is developed and used by several projects at CERN in Geneva, Switzerland.
+							It is used for monitoring a wide variety of technical infrastructure across the CERN sites.
+						</p>
+						<br />
+
+						<h2>What makes your product different from others?</h2>
+						<br />
+						<p class="well">
+							It's free. It's multi-platform. It can run as a high-availability cluster.  It's scalable to manage large amounts of data.
+							It's easy to write a custom data acquisition module to suit your needs. It's easy to build your own GUI application on top of our API.
+						</p>
+						<br />
+
+						<h2>Where is the download link?</h2>
+						<br />
+						<p class="well">
+							The software is not yet freely distributed. If you are interested in using C2MON for a monitoring project,
+							or just trying it out, please contact us for a demo package.
+						</p>
+						<br />
+
+						<h2>How much does it cost?</h2>
+						<br />
+						<p class="well">
 							C2MON is free and based on open source products. Some of these products offer support contracts and enterprise features for a licence cost,
 							if you require these (for cache, database or middleware).
-              </p>
-              <br />
-			  
-					 
-			  <h2>What licence are you using?</h2>
-              </p>
-              <br />
-              <p class="well">
-              The plan is to make the project open source in the near future, so please be patient...
-              </p>
-              <br />
-			  
-			  <h2>What's inside?</h2>
-              <br />
-              <p class="well">Short answer is Java. For more details on the internals, see below... 
-              </p>
-              <br />
-              
-        <h3>Overall architecture</h3>
-              </p>
-              <br />
-              <p class="well">C2MON is a 3-tier monitoring platform, made up of a data acquisition (DAQ) API, a server layer and a client API.
-                The inter-layer communication is done exclusively through JMS (ActiveMQ). The acquired data is logged in the configured database and kept 
-                in-memory in a cache (Ehcache). C2MON comes equipped with a number of available DAQ and client implementations (see below)
-              </p>
-              <br />
-        
-        <h3>Server cluster configuration</h3>
-              </p>
-              <br />
-              <p class="well">The C2MON server can run in a clustered setup, by making use of the Ehcache Terracotta distributed cache technology.
-                This allows to build high-availability services on top of C2MON. The cache can also make use of Terracotta BigMemory&reg;, for
-                high-performance monitoring requirements of large data sets.
-              </p>
-              <br /> 
-        
-        <h3>Supported databases</h3>
-              </p>
-              <br />
-              <p class="well">At CERN we run with Oracle, but the platform can run equally well with other standard databases (the demo package even
-                uses the in-memory HSQLDB).
-              </p>
-              <br />   
-              
-        <h3>Available client applications</h3>
-             </p>
-             <br />
-             <p class="well">A number of client applications are already available on top of C2MON (see screenshots). Some of them make use of the
-              IBM ILOG&reg; framework, and hence require are licence, but a free GUI is also available.
-             </p>
-             <br />   
-                             
-			   <h3>Available data acquisition modules</h3>
-             </p>
-             <br />
-             <p class="well">Data acquisition modules already exist for acquiring data from a variety of sources, in particular OPC UA and 
-              Siemens/Schneider PLCs. What's more, it is easy to implement new modules to acquire data from your own hardware and protocols.
-             </p>
-             <br />
-			  
-        </div><!--/span-->
-      </div><!--/row-->
-    </div><!--/.fluid-container-->
-    </div> <!-- /container -->
+						</p>
+						<br />
 
-	  <!-- Piwik Tracking
-  ================================================== -->
-	<script type="text/javascript"> 
-		var pkBaseURL = (("https:" == document.location.protocol) 
-				? "https://piwik.web.cern.ch/" : "http://piwik.web.cern.ch/"); 
-			document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E")); 
-	</script>
-	<script type="text/javascript"> 
-	
-		try { 
-				var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 96); 
-				piwikTracker.trackPageView(); 
-				piwikTracker.enableLinkTracking(); 
-		} 
-		catch( err ) {} 
-	</script>
-	<noscript>
-		<p>
-			<img src="http://piwik.web.cern.ch/piwik.php?idsite=96" style="border:0" alt="" />
-		</p>
-	</noscript> 
-	<!-- End Piwik Tracking Code -->
-  </body>
+						<h2>What licence are you using?</h2>
+						<br />
+						<p class="well">
+							The plan is to make the project open source in the near future, so please be patient...
+						</p>
+						<br />
+
+						<h2>What's inside?</h2>
+						<br />
+						<p class="well">
+							Short answer is Java. For more details on the internals, see below...
+						</p>
+						<br />
+
+						<h3>Overall architecture</h3>
+						<br />
+						<p class="well">
+							C2MON is a 3-tier monitoring platform, made up of a data acquisition (DAQ) API, a server layer and a client API.
+							The inter-layer communication is done exclusively through JMS (ActiveMQ). The acquired data is logged in the configured database and kept
+							in-memory in a cache (Ehcache). C2MON comes equipped with a number of available DAQ and client implementations (see below)
+						</p>
+						<br />
+
+						<h3>Server cluster configuration</h3>
+						<br />
+						<p class="well">
+							The C2MON server can run in a clustered setup, by making use of the Ehcache Terracotta distributed cache technology.
+							This allows to build high-availability services on top of C2MON. The cache can also make use of Terracotta BigMemory&reg;, for
+							high-performance monitoring requirements of large data sets.
+						</p>
+						<br />
+
+						<h3>Supported databases</h3>
+						<br />
+						<p class="well">
+							At CERN we run with Oracle, but the platform can run equally well with other standard databases (the demo package even
+							uses the in-memory HSQLDB).
+						</p>
+						<br />
+
+						<h3>Available client applications</h3>
+						<br />
+						<p class="well">
+							A number of client applications are already available on top of C2MON (see screenshots). Some of them make use of the
+							IBM ILOG&reg; framework, and hence require are licence, but a free GUI is also available.
+						</p>
+						<br />
+
+						<h3>Available data acquisition modules</h3>
+						<br />
+						<p class="well">
+							Data acquisition modules already exist for acquiring data from a variety of sources, in particular OPC UA and
+							Siemens/Schneider PLCs. What's more, it is easy to implement new modules to acquire data from your own hardware and protocols.
+						</p>
+						<br />
+
+					</div><!--/span-->
+				</div><!--/row-->
+			</div><!--/.fluid-container-->
+		</div>
+		<!-- /container -->
+
+		<!-- Piwik Tracking
+		================================================== -->
+		<script type="text/javascript">
+			var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.web.cern.ch/" : "http://piwik.web.cern.ch/");
+			document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			try {
+				var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 96);
+				piwikTracker.trackPageView();
+				piwikTracker.enableLinkTracking();
+			} catch( err ) {
+			}
+		</script>
+		<noscript>
+			<p>
+				<img src="http://piwik.web.cern.ch/piwik.php?idsite=96" style="border:0" alt="" />
+			</p>
+		</noscript>
+		<!-- End Piwik Tracking Code -->
+	</body>
 </html>
