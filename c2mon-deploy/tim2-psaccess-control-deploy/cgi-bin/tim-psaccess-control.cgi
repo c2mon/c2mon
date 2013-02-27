@@ -9,9 +9,7 @@ use Config::Properties;
 #
 my $jardir                    = "../lib";
 my $appdir                    = "tim2-psaccess-control/";
-# Default codebase points to operation
 my $codebase                  = "http://timweb.cern.ch/javaws";
-my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
 my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
 
 ##

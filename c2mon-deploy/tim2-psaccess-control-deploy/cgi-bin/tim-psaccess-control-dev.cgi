@@ -10,7 +10,7 @@ use Config::Properties;
 my $jardir                    = "../lib";
 my $appdir                    = "tim2-psaccess-control-stable/";
 my $codebase                  = "http://timweb.cern.ch/test/javaws";
-my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
+my $c2monClientPropertiesURL  = "http://timweb/conf/test/c2mon-client.properties";
 
 ##
 # Reading version number from ../version.txt
