@@ -3,6 +3,25 @@
 	<product name="dmn2-dashboard-editor">
 
 		<application name="default">
+			<startscript name="dmn2-views-gen">
+				<main-class name="ch.cern.dmn2.client.common.TemplateGenerator">
+					<arg>$1 $2</arg>
+				</main-class>
+
+				<!-- JVM arguments -->
+				<property name="log4j.configuration" value="file://${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
+				<property name="c2mon.process.name" value="dmn2-views-gen" />
+				<property name="db.properties" value="file://${INSTALL_DIR}/conf/client.properties" />	
+				<property name="oracle.net.tns_admin" value="/etc"/>
+				
+				<preExec>
+                          <![CDATA[
+                      		echo "View instances will be generated in: $1"
+                           ]]>
+            	</preExec>
+						
+			</startscript>		
 			<deployment>
 			</deployment>
 		</application>
@@ -27,6 +46,8 @@
 				<directory name="conf">
 					<file name="client.properties" sourceDir="~dmndev/c2mon/client"
 						mask="444" />
+                    <file name="log4j.xml" sourceDir="~dmndev/c2mon/client/"
+						mask="644" />						
 				</directory>
 			</deployment>
 		</application>
