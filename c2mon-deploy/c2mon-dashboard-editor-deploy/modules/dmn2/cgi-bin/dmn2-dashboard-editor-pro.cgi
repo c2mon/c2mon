@@ -118,6 +118,18 @@ print "   <property name=\"c2mon.dashboard.editor.datatagchooser.class\" value=\
 print "   <property name=\"c2mon.dashboard.editor.commandtagchooser.class\" value=\"ch.cern.dmn2.client.jviews.tagchooser.DMN2CommandsTagChooserImpl\"/>\n";
 print "   <property name=\"c2mon.dashboard.editor.daofactory.class\" value=\"ch.cern.dmn2.client.jviews.dao.DMN2DaoFactory\"/>\n";
 
+######################################
+# Properties used in templating mode #
+######################################
+print "   <property name=\"c2mon.dashboard.editor.templatingenabled\" value=\"true\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.templateid.class\" value=\"ch.cern.dmn2.client.jviews.templatetagchooser.DMN2TemplateIDImpl\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.parameterset.class\" value=\"ch.cern.dmn2.client.jviews.templatetagchooser.DMN2ParameterSetImpl\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.templatedatatagchooser.class\" value=\"ch.cern.dmn2.client.jviews.templatetagchooser.DMN2TemplateDataTagChooserImpl\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.templatecommandtagchooser.class\" value=\"ch.cern.dmn2.client.jviews.templatetagchooser.DMN2TemplateCommandsTagChooserImpl\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.templatecombinationchooser.class\" value=\"ch.cern.dmn2.client.jviews.templatetagchooser.DMN2CombinationChooserImpl\"/>\n";
+print "   <property name=\"c2mon.dashboard.editor.templateconfigurationchooser.class\" value=\"ch.cern.dmn2.client.jviews.templatetagchooser.DMN2TemplateConfigurationChooserImpl\"/>\n";
+
+
 print "         </resources>
         <resources os=\"Windows\" >
                 <property name=\"tim.log.file\" value=\"c:\\temp\\dmn2-dashboard-editor.log\"/>
