@@ -27,14 +27,15 @@
 		<module>modules/dmn2</module>
 	</modules>
 
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-consumer-deploy</developerConnection>
+	</scm>
+
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!--
-					NOTE: Unless specified directly we don't need a groupId
-					specification because the group is org.apache.maven.plugins
-					...which is assumed by default.
-				-->
+				<!-- NOTE: Unless specified directly we don't need a groupId specification 
+					because the group is org.apache.maven.plugins ...which is assumed by default. -->
 				<plugin>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>2.2.1</version>
