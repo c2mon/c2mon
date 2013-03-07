@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="c2mon-statistics-consumer">
+		<!-- this application section is a parent configuration for both dmn2-consumer-prod 
+			and dmn2-consumer-dev -->
+		<application name="default">
+			<deployment>
+				<backupPolicy keepBackups="2">
+					<preserve type="dir" name="log" />
+					<preserve type="dir" name="tmp" />
+				</backupPolicy>
+			</deployment>
+			<startscript name="C2MON-STATISTICS-CONSUMER">
+				<main-class name="cern.c2mon.statistics.consumer.ConsumerStartup">
+					<arg>-l ${INSTALL_DIR}/conf/log4j.xml</arg>
+				</main-class>
+				<output>
+					<file name="${INSTALL_DIR}/log/out.log" />
+				</output>
+				
+				<property name="dmn2.log.path" value="${INSTALL_DIR}/log" />
+				<property name="dmn2.process.name" value="statistics-consumer" />
+				<property name="consumer.home" value="${INSTALL_DIR}" />
+				<property name="oracle.net.tns_admin" value="/etc" />
+			</startscript>
+		</application>
+
+		<application name="dmn2-consumer-prod">
+			<deployment installLocation="/opt/dmn2/dmn2-consumer-prod">
+				<directory name="conf">
+					<file name="c2mon-consumer.properties" sourceDir="/user/diamonop/c2mon/statistics"
+						mask="400" />
+				</directory>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="diamon-admin@cern.ch" />
+				</notification>
+			</deployment>
+		</application>
+
+		<application name="dmn2-consumer-dev">
+			<deployment installLocation="/opt/dmn2/dmn2-consumer-dev">
+				<directory name="conf">
+					<file name="c2mon-consumer.properties" sourceDir="/user/dmndev/c2mon/statistics"
+						mask="400" />
+				</directory>
+			</deployment>
+		</application>
+
+	</product>
+</products>
