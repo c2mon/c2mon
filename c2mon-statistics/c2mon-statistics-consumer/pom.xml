@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>cern.c2mon.c2mon-statistics</groupId>
 	<artifactId>c2mon-statistics-consumer</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<name>c2mon-statistics-consumer</name>
 	<packaging>jar</packaging>
 	<description>Consumer application for reading filtered data from the DAQ and writing it to the database.</description>
