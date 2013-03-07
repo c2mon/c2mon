@@ -92,18 +92,24 @@ public class ReminderImpl implements Reminder {
     @Override
     public void start() {
 
-        logger.info("Starting Reminder Service with reminderTime=" + getReminderTime() + " msec");
-
-        myChecker = service.scheduleWithFixedDelay(getWorker(), getReminderTime(), getReminderTime(),
-                TimeUnit.MILLISECONDS);
+        
+        if (getReminderTime() > 0) {
+            logger.info("Starting Reminder Service with reminderTime=" + getReminderTime() + " msec");
+            myChecker = service.scheduleWithFixedDelay(getWorker(), getReminderTime(), getReminderTime(),
+                    TimeUnit.MILLISECONDS);
+        } else {
+            logger.info("Reminder not started as reminder time =" + getReminderTime());
+        }
 
         logger.trace("Leaving start();");
     }
 
     @Override
     public void stop() {
-        logger.info("Stopping Reminder Service...");
-        myChecker.cancel(true);
+        if (myChecker != null) {
+            logger.info("Stopping Reminder Service...");
+            myChecker.cancel(true);
+        }
 
         logger.trace("Leaving stop();");
     }
