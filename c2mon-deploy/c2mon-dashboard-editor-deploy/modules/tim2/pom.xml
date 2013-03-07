@@ -28,7 +28,7 @@
 
   <developers />
   <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-dashboard-editor-deploy/</developerConnection>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-dashboard-editor-deploy/modules/tim2</developerConnection>
   </scm>
   <build>
 
