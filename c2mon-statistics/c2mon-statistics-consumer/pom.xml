@@ -18,31 +18,31 @@
 		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
 	</properties>
 	<profiles>
-    <profile>
-      <id>win</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-        <os>
-          <family>Windows</family>
-        </os>
-      </activation>
-      <properties>
-        <c2mon.properties.location>T:\.c2mon.test.properties</c2mon.properties.location>
-      </properties>
-    </profile>
-    <profile>
-      <id>lin</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-        <os>
-          <family>unix</family>
-        </os>
-      </activation>
-      <properties>
-        <c2mon.properties.location>/user/timtest/.c2mon.test.properties</c2mon.properties.location>
-      </properties>
-    </profile>
-  </profiles>
+		<profile>
+			<id>win</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>
+			<properties>
+				<c2mon.properties.location>T:\.c2mon.test.properties</c2mon.properties.location>
+			</properties>
+		</profile>
+		<profile>
+			<id>lin</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<os>
+					<family>unix</family>
+				</os>
+			</activation>
+			<properties>
+				<c2mon.properties.location>/user/timtest/.c2mon.test.properties</c2mon.properties.location>
+			</properties>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
@@ -112,40 +112,45 @@
 		<dependency>
 			<groupId>oracle</groupId>
 			<artifactId>ojdbc14</artifactId>
-			<version>10.2.0.4</version>			
+			<version>10.2.0.4</version>
 		</dependency>
 	</dependencies>
 
 	<developers />
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-statistics/c2mon-statistics-consumer</developerConnection>
+	</scm>
+	
 	<build>
-	<plugins>
-	    <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2.1</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>          
-        <version>2.8.1</version>    
-        <configuration>
-          <argLine>
-            -Dc2mon.properties=${c2mon.properties.location}
-            -Dc2mon.filter.queue=tim.filter.test
-            -Dc2mon.consumer.consumers.min=1
-            -Dc2mon.consumer.consumers.max=1
-            -Dbuffer.max.window=500
-            -Dbuffer.min.window=100
-            -Dbuffer.window.growth=100
-            -Dbuffer.capacity=50000
-            -Dfallback.file=fallback.txt            
-          </argLine>
-        </configuration>
-      </plugin>
-    </plugins>		
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.8.1</version>
+				<configuration>
+					<argLine>
+						-Dc2mon.properties=${c2mon.properties.location}
+						-Dc2mon.filter.queue=tim.filter.test
+						-Dc2mon.consumer.consumers.min=1
+						-Dc2mon.consumer.consumers.max=1
+						-Dbuffer.max.window=500
+						-Dbuffer.min.window=100
+						-Dbuffer.window.growth=100
+						-Dbuffer.capacity=50000
+						-Dfallback.file=fallback.txt
+					</argLine>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>
