@@ -30,8 +30,9 @@
 
 <!-- initialize the FilterMessageSender; switch here between implementations (Dummy implementation available) -->
 <!--<bean id="filterMessageSender" class="cern.tim.driver.filter.impl.SonicFilterSender"/>-->
-<bean id="filterMessageSender" class="cern.tim.driver.filter.impl.DummyFilterSender"/>
-<!-- <bean id="filterMessageSender" class="cern.tim.driver.filter.impl.ActiveFilterSender"/> -->
+<!-- <bean id="filterMessageSender" class="cern.tim.driver.filter.impl.DummyFilterSender"/> -->
+
+<bean id="filterMessageSender" class="cern.tim.driver.filter.impl.ActiveFilterSender"/>
 
 <!-- initialize the JmsSenders; any number of these can be plugged into the ProcessMessageSender below -->
 <!--<bean id="sonicJmsSender" class="cern.tim.driver.common.messaging.impl.SonicJmsSender"/>-->
