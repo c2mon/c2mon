@@ -2,14 +2,17 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Cern Monitoring - C2MON</title>
+		<title>C2MON: Used at CERN</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="">
+		<meta name="description" content="Two major systems @CERN are already based on C2MON and contributing features to the platform. Thanks to the flexibility of the design, others are looking into using it for covering new monitoring requirements.">
 		<meta name="author" content="">
 
 		<!-- Le styles -->
+
+		<link href="assets/css/style.css" rel="stylesheet" >
 		<link href="assets/css/bootstrap.css" rel="stylesheet">
 		<link href="assets/css/bootstrap-lightbox.css" rel="stylesheet">
+		<link href="assets/css/bootstrap-image-gallery.min.css" rel="stylesheet" >
 
 		<style>
 			/* GLOBAL STYLES
@@ -277,11 +280,9 @@
 								<li>
 									<a href="faq.html">FAQ</a>
 								</li>
+
 								<li>
-									<a href="#">About</a>
-								</li>
-								<li>
-									<a href="#">Contact</a>
+									<a href="contact.html">Contact</a>
 								</li>
 							</ul>
 						</div>
@@ -295,12 +296,12 @@
 				================================================== -->
 				<section id="what-next">
 					<!-- <div class="page-header">
-						<h1>C2MON is used by a number of projects at CERN</h1>
+					<h1>C2MON is used by a number of projects at CERN</h1>
 					</div> -->
 					<h1>One platform for multiple monitoring scenarios</h1>
 					<p class="lead">
-						  Two major systems @CERN are already based on C2MON and contributing features to the platform.
-						  Thanks to the flexibility of the design, others are looking into using it for covering new monitoring requirements.  
+						Two major systems @CERN are already based on C2MON and contributing features to the platform.
+						Thanks to the flexibility of the design, others are looking into using it for covering new monitoring requirements.
 					</p>
 				</section>
 
@@ -313,90 +314,77 @@
 						<h2>TIM</h2>
 						<p>
 							The Technical Infrastructure Monitoring system is used at CERN to supervise and control a variety of insfrastructure spread across the CERN sites.
-							
+
 							<br>
 							<br>
 
 							<!-- Screenshots here
 							================================================== -->
-							<ul class="thumbnails">
-								<li class="span3">
-									<a data-toggle="lightbox" href="#demoLightbox" class="thumbnail"> <img src="tim_viewer_1.png" alt=""> </a>
-								</li>
-								<li class="span3">
-									<a data-toggle="lightbox" href="#demoLightbox" class="thumbnail"> <img src="tim_viewer_1.png" alt=""> </a>
-								</li>
-							</ul>
-							<div id="demoLightbox" class="lightbox hide fade"  tabindex="-1" role="dialog" aria-hidden="true">
-								<div class='lightbox-header'>
-									<button type="button" class="close" data-dismiss="lightbox" aria-hidden="true">
-										&times;
-									</button>
+							<div id="gallery" data-toggle="modal-gallery" data-target="#modal-gallery">
+								<ul class="thumbnails">
+									<li class="span3">
+										<a href="tim_viewer_1.png" title="Tim Viewer: a client application build on top of C2MON" data-gallery="gallery"> <img class="thumbnail" src="tim_viewer_1.png" alt=""> </a>
+									</li>
+									<li class="span3">
+										<a href="tim_viewer_2.png" title="Water monitoring station screen as shown on the Tim Viewer" data-gallery="gallery"> <img class="thumbnail" src="tim_viewer_2.png" alt=""> </a>
+									</li>
+									<a href="C2MON_System Architecture.png" title="C2MON Architecture" data-gallery="gallery"> </a>
+									<a href="TVV_in_CCC.JPG" title="C2MON in action in the CERN Control Center" data-gallery="gallery"> </a>
+								</ul>
+							</div>
+
+							<!-- modal-gallery is the modal dialog used for the image gallery -->
+							<div id="modal-gallery" class="modal modal-gallery hide fade" tabindex="-1">
+								<div class="modal-header">
+									<a class="close" data-dismiss="modal">&times;</a>
+									<h3 class="modal-title"></h3>
 								</div>
-								<div class='lightbox-content'>
-									<img src="tim_viewer_1.png">
-									<div class="lightbox-caption">
-										<p>
-											Amazing Screenshot description here!
-										</p>
-									</div>
+								<div class="modal-body">
+									<div class="modal-image"></div>
+								</div>
+								<div class="modal-footer">
+									<a class="btn btn-info modal-prev"> <i class="icon-arrow-left icon-white"></i> <span>Previous</span> </a>
+									<a class="btn btn-primary modal-next"> <span>Next</span> <i class="icon-arrow-right icon-white"></i> </a>
 								</div>
 							</div>
 							<!--================================================== -->
 
 							<blockquote class="pull-left lead">
-							  Views showing the access status to the LHC tunnel and ...
+								Views showing the access status to the <a href="http://en.wikipedia.org/wiki/Large_Hadron_Collider" >LHC tunnel</a>
+								and a CERN water Monitoring station
+								(<a href="http://public.web.cern.ch/public/en/research/SPS-en.html" >SPS Accelerator</a>).
 							</blockquote>
 							<br>
 							<br>
-							Using a variety of client applications, operators are for instance reacting to alarms, supervising maintenance operations, or monitoring access 
-              to the accelerator complex.							
+							Using a variety of client applications, operators are for instance reacting to alarms, supervising maintenance operations, or monitoring access
+							to the accelerator complex.
 						</p>
 					</div><!-- /.span4 -->
 					<div class="span6">
 						<h2>DIAMON</h2>
 						<p>
-							Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.
+							The purpose of the DIagnostic And MONitoring (DIAMON) project is to propose to the CERN operators and equipment groups tools to monitor the BE Controls infrastructure with easy to use, first line diagnostics and tools to solve problems, or help to decide about responsibilities for first line of intervention.
 							<br>
 							<br>
-
-							<!-- Screenshots here
-							================================================== -->
-							<ul class="thumbnails">
-								<li class="span3">
-									<a data-toggle="lightbox" href="#demoLightbox" class="thumbnail"> <img src="tim_viewer_1.png" alt=""> </a>
-								</li>
-								<li class="span3">
-									<a data-toggle="lightbox" href="#demoLightbox" class="thumbnail"> <img src="tim_viewer_1.png" alt=""> </a>
-								</li>
-							</ul>
-							<div id="demoLightbox" class="lightbox hide fade"  tabindex="-1" role="dialog" aria-hidden="true">
-								<div class='lightbox-header'>
-									<button type="button" class="close" data-dismiss="lightbox" aria-hidden="true">
-										&times;
-									</button>
-								</div>
-								<div class='lightbox-content'>
-									<img src="tim_viewer_1.png">
-									<div class="lightbox-caption">
-										<p>
-											Amazing Screenshot description here!
-										</p>
-									</div>
-								</div>
-							</div>
-							<!--================================================== -->
 
 							<blockquote class="pull-left lead">
-								DIAMON Viewer  knows Victoria's Secret
-								<small>Victoria</small>
+								The AB Controls Infrastructure spans over huge distances around CERN and covers a multitude of different equipment
+								(more than 3'000 items  are eligible to be monitored)!
 							</blockquote>
 							<br>
 							<br>
 							<br>
 							<br>
 							<br>
-							Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.
+							<h4>Main Objectives</h4>
+							<ul>
+								<li>
+									Provide the <a href="http://public.web.cern.ch/public/en/spotlight/SpotlightCCC-en.html">CERN Control Centre (CCC)</a> operators with precise and easy to use tools to monitor the behaviour of the <a href="https://espace.cern.ch/be-dep/CO/default.aspx">BE Controls</a> Infrastructure.
+								</li>
+								<li>
+									Allow for an easy access to diagnostic tools providing more details and help to solve an eventual problem.
+								</li>
+							</ul>
 						</p>
 					</div><!-- /.span4 -->
 				</div><!-- /.row -->
@@ -433,8 +421,10 @@
 			<script src=" assets/js/bootstrap-collapse.js"></script>
 			<script src=" assets/js/bootstrap-carousel.js"></script>
 			<script src=" assets/js/bootstrap-typeahead.js"></script>
-			<script src="assets/js/scale-fix.js"></script>
-			<script src="assets/js/bootstrap-lightbox.js"></script>
+
+			<!-- Image Carousel -->
+			<script src="http://blueimp.github.com/JavaScript-Load-Image/load-image.min.js"></script>
+			<script src="assets/js/bootstrap-image-gallery.min.js"></script>
 
 			<!-- Piwik Tracking
 			================================================== -->
