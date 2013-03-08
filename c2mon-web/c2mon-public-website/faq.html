@@ -2,9 +2,9 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>C2MON FAQ</title>
+		<title>C2MON - FAQ</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="">
+		<meta name="description" content="All your favourite questions, with our answers.">
 		<meta name="author" content="">
 
 		<link href="assets/css/bootstrap.css" rel="stylesheet">
@@ -61,7 +61,7 @@
 
 			/**
 			 * For a bit smaller screens:
-			 * 
+			 *
 			 * decrease the size of the sidebar a little bit
 			 * so that everything fits in the screen
 			 */
@@ -70,12 +70,12 @@
 					width: 180px;
 				}
 			}
-			
+
 			/**
 			 * For very small screens:
-			 * 
+			 *
 			 * there is no place to fill both the Sidebar AND the FAQ horizontally.
-			 * 
+			 *
 			 * Lets make the sidebar take up the whole row width
 			 * and put the FAQ below it.
 			 */
@@ -174,11 +174,9 @@
 								<li class="active">
 									<a href="faq.html">FAQ</a>
 								</li>
+
 								<li>
-									<a href="#">About</a>
-								</li>
-								<li>
-									<a href="#">Contact</a>
+									<a href="contact.html">Contact</a>
 								</li>
 							</ul>
 						</div>
@@ -214,7 +212,7 @@
 						<h2>Who is behind this?</h2>
 						<br />
 						<p class="well">
-							The software is developed and used by several projects at CERN in Geneva, Switzerland.
+							The software is developed and used by several projects at <a href="http://home.web.cern.ch">CERN</a> in Geneva, Switzerland.
 							It is used for monitoring a wide variety of technical infrastructure across the CERN sites.
 						</p>
 						<br />
@@ -253,7 +251,9 @@
 						<h2>What's inside?</h2>
 						<br />
 						<p class="well">
-							Short answer is Java. For more details on the internals, see below...
+							Short answer is 
+							<a href="http://en.wikipedia.org/wiki/Java_%28programming_language%29">Java</a>. 
+							For more details on the internals, see below...
 						</p>
 						<br />
 
@@ -261,25 +261,36 @@
 						<br />
 						<p class="well">
 							C2MON is a 3-tier monitoring platform, made up of a data acquisition (DAQ) API, a server layer and a client API.
-							The inter-layer communication is done exclusively through JMS (ActiveMQ). The acquired data is logged in the configured database and kept
-							in-memory in a cache (Ehcache). C2MON comes equipped with a number of available DAQ and client implementations (see below)
+							The inter-layer communication is done exclusively through 
+							<a href="http://en.wikipedia.org/wiki/Java_Message_Service">JMS</a>
+							(<a href="http://activemq.apache.org">ActiveMQ</a>). 
+							The acquired data is logged in the configured database and kept
+							in-memory in a cache (<a href="http://ehcache.org">Ehcache</a>).
+							 C2MON comes equipped with a number of available DAQ and client implementations (see below)
 						</p>
 						<br />
 
 						<h3>Server cluster configuration</h3>
 						<br />
 						<p class="well">
-							The C2MON server can run in a clustered setup, by making use of the Ehcache Terracotta distributed cache technology.
-							This allows to build high-availability services on top of C2MON. The cache can also make use of Terracotta BigMemory&reg;, for
-							high-performance monitoring requirements of large data sets.
+							The C2MON server can run in a clustered setup, by making use of the 
+							<a href="http://ehcache.org">Ehcache</a>
+							 Terracotta distributed cache technology.
+							This allows to build high-availability services on top of C2MON. The cache can also make use of 
+							<a href="http://terracotta.org/products/bigmemory">Terracotta BigMemory</a> &reg;,
+							for high-performance monitoring requirements of large data sets.
 						</p>
 						<br />
 
 						<h3>Supported databases</h3>
 						<br />
 						<p class="well">
-							At CERN we run with Oracle, but the platform can run equally well with other standard databases (the demo package even
-							uses the in-memory HSQLDB).
+							At CERN we run with 
+							<a href="http://www.oracle.com/us/products/database/overview/index.html">Oracle</a>,
+							but the platform can run equally well with other standard databases (the demo package even
+							uses the in-memory 
+							<a href="http://en.wikipedia.org/wiki/HSQLDB">HSQLDB</a>
+							).
 						</p>
 						<br />
 
@@ -287,15 +298,32 @@
 						<br />
 						<p class="well">
 							A number of client applications are already available on top of C2MON (see screenshots). Some of them make use of the
-							IBM ILOG&reg; framework, and hence require are licence, but a free GUI is also available.
+							<a href="http://www-01.ibm.com/software/integration/visualization/java">IBM ILOG</a> &reg;,
+							 framework, and hence require are licence, but a free GUI is also available.
 						</p>
 						<br />
 
 						<h3>Available data acquisition modules</h3>
 						<br />
 						<p class="well">
-							Data acquisition modules already exist for acquiring data from a variety of sources, in particular OPC UA and
-							Siemens/Schneider PLCs. What's more, it is easy to implement new modules to acquire data from your own hardware and protocols.
+							Data acquisition modules already exist for acquiring data from a variety of sources, in particular 
+							<a href="http://en.wikipedia.org/wiki/OPC_Unified_Architecture">OPC UA</a>,
+							and Siemens/Schneider
+							<a href="http://en.wikipedia.org/wiki/Programmable_logic_controller">PLCs</a>.
+							What's more, it is easy to implement new modules to acquire data from your own hardware and protocols.
+						</p>
+						<br />
+
+						<h2>I would like to learn more about C2MON</h2>
+						<br />
+						<p class="well">
+
+							C2MON is actively maintained and well documented. You can dive into the internals of the project by downloading the C2MON Manual.
+
+							<br>
+							<br>
+
+							<a class="btn btn-large btn-primary" target="_blank" href="downloads/C2MON-manual.pdf">C2MON Manual (PDF) &raquo;</a>
 						</p>
 						<br />
 
