@@ -1,429 +1,418 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Cern Monitoring - C2MON</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+	<head>
+		<meta charset="utf-8">
+		<title>C2MON - Overview</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="">
+		<meta name="author" content="">
 
-    <!-- Le styles -->
-    <link href="assets/css/bootstrap.css" rel="stylesheet">
+		<!-- Le styles -->
+		<link href="assets/css/bootstrap.css" rel="stylesheet">
 
-    <style>
+		<style>
+			/* GLOBAL STYLES
+			 -------------------------------------------------- */
+			/* Padding below the footer and lighter body text */
 
-    /* GLOBAL STYLES
-    -------------------------------------------------- */
-    /* Padding below the footer and lighter body text */
+			body {
+				padding-top: 20px;
+				padding-bottom: 60px;
+				color: #5a5a5a;
+			}
 
-    body {
-      padding-top: 20px;
-      padding-bottom: 60px;
-      color: #5a5a5a;
-    }
+			/* CUSTOMIZE THE NAVBAR
+			 -------------------------------------------------- */
 
-    /* CUSTOMIZE THE NAVBAR
-    -------------------------------------------------- */
-	
-      .navbar .navbar-inner {
-        padding: 0;
-      }
-      .navbar .nav {
-        margin: 0;
-        display: table;
-        width: 100%;
-      }
-      .navbar .nav li {
-        display: table-cell;
-        width: 1%;
-        float: none;
-      }
-      .navbar .nav li a {
-        font-weight: bold;
-        text-align: center;
-        border-left: 1px solid rgba(255,255,255,.75);
-        border-right: 1px solid rgba(0,0,0,.1);
-      }
-      .navbar .nav li:first-child a {
-        border-left: 0;
-        border-radius: 3px 0 0 3px;
-      }
-      .navbar .nav li:last-child a {
-        border-right: 0;
-        border-radius: 0 3px 3px 0;
-      }
+			.navbar .navbar-inner {
+				padding: 0;
+			}
+			.navbar .nav {
+				margin: 0;
+				display: table;
+				width: 100%;
+			}
+			.navbar .nav li {
+				display: table-cell;
+				width: 1%;
+				float: none;
+			}
+			.navbar .nav li a {
+				font-weight: bold;
+				text-align: center;
+				border-left: 1px solid rgba(255,255,255,.75);
+				border-right: 1px solid rgba(0,0,0,.1);
+			}
+			.navbar .nav li:first-child a {
+				border-left: 0;
+				border-radius: 3px 0 0 3px;
+			}
+			.navbar .nav li:last-child a {
+				border-right: 0;
+				border-radius: 0 3px 3px 0;
+			}
 
+			/* MARKETING CONTENT
+			 -------------------------------------------------- */
 
-    /* CUSTOMIZE THE CAROUSEL
-    -------------------------------------------------- */
+			/* Center align the text within the three columns below the carousel */
+			.marketing .span4 {
+				text-align: center;
+			}
+			.marketing h2 {
+				font-weight: normal;
+			}
+			.marketing .span4 p {
+				margin-left: 10px;
+				margin-right: 10px;
+			}
 
-    /* Carousel base class */
-    .carousel {
-      margin-bottom: 60px;
-    }
+			/* Featurettes
+			 ------------------------- */
 
-    .carousel .container {
-      position: relative;
-      z-index: 9;
-    }
+			.featurette-divider {
+				margin: 40px 0; /* Space out the Bootstrap <hr> more */
+			}
+			.featurette {
+				padding-top: 20px; /* Vertically center images part 1: add padding above and below text. */
+				overflow: hidden; /* Vertically center images part 2: clear their floats. */
+			}
+			.featurette-image {
+				margin-top: -20px; /* Vertically center images part 3: negative margin up the image the same amount of the padding to center it. */
+			}
 
-    .carousel-control {
-      height: 80px;
-      margin-top: 0;
-      font-size: 120px;
-      text-shadow: 0 1px 1px rgba(0,0,0,.4);
-      background-color: transparent;
-      border: 0;
-      z-index: 10;
-    }
+			/* Give some space on the sides of the floated elements so text doesn't run right into it. */
+			.featurette-image.pull-left {
+				margin-right: 40px;
+			}
+			.featurette-image.pull-right {
+				margin-left: 40px;
+			}
 
-    .carousel .item {
-      height: 500px;
-    }
-    .carousel img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      min-width: 100%;
-      height: 500px;
-    }
+			/* Thin out the marketing headings */
+			.featurette-heading {
+				font-size: 40px;
+				font-weight: 300;
+				line-height: 1;
+				letter-spacing: -1px;
+			}
 
-    .carousel-caption {
-      background-color: transparent;
-      position: static;
-      max-width: 550px;
-      padding: 0 20px;
-      margin-top: 200px;
-    }
-    .carousel-caption h1,
-    .carousel-caption .lead {
-      margin: 0;
-      line-height: 1.25;
-      color: #fff;
-      text-shadow: 0 1px 1px rgba(0,0,0,.4);
-    }
-    .carousel-caption .btn {
-      margin-top: 10px;
-    }
+			/* RESPONSIVE CSS
+			 -------------------------------------------------- */
 
+			@media (max-width: 979px) {
 
+				.container.navbar-wrapper {
+					margin-bottom: 0;
+					width: auto;
+				}
+				.navbar-inner {
+					border-radius: 0;
+					margin: -20px 0;
+				}
 
-    /* MARKETING CONTENT
-    -------------------------------------------------- */
+				.carousel .item {
+					height: 500px;
+				}
+				.carousel img {
+					width: auto;
+					height: 500px;
+				}
 
-    /* Center align the text within the three columns below the carousel */
-    .marketing .span4 {
-      text-align: center;
-    }
-    .marketing h2 {
-      font-weight: normal;
-    }
-    .marketing .span4 p {
-      margin-left: 10px;
-      margin-right: 10px;
-    }
+				.featurette {
+					height: auto;
+					padding: 0;
+				}
+				.featurette-image.pull-left, .featurette-image.pull-right {
+					display: block;
+					float: none;
+					max-width: 40%;
+					margin: 0 auto 20px;
+				}
+			}
 
+			@media (max-width: 767px) {
 
-    /* Featurettes
-    ------------------------- */
+				.navbar-inner {
+					margin: -20px;
+				}
 
-    .featurette-divider {
-      margin: 80px 0; /* Space out the Bootstrap <hr> more */
-    }
-    .featurette {
-      padding-top: 120px; /* Vertically center images part 1: add padding above and below text. */
-      overflow: hidden; /* Vertically center images part 2: clear their floats. */
-    }
-    .featurette-image {
-      margin-top: -120px; /* Vertically center images part 3: negative margin up the image the same amount of the padding to center it. */
-    }
+				.carousel {
+					margin-left: -20px;
+					margin-right: -20px;
+				}
+				.carousel .container {
 
-    /* Give some space on the sides of the floated elements so text doesn't run right into it. */
-    .featurette-image.pull-left {
-      margin-right: 40px;
-    }
-    .featurette-image.pull-right {
-      margin-left: 40px;
-    }
+				}
+				.carousel .item {
+					height: 300px;
+				}
+				.carousel img {
+					height: 300px;
+				}
+				.carousel-caption {
+					width: 65%;
+					padding: 0 70px;
+					margin-top: 100px;
+				}
+				.carousel-caption h1 {
+					font-size: 30px;
+				}
+				.carousel-caption .lead, .carousel-caption .btn {
+					font-size: 18px;
+				}
 
-    /* Thin out the marketing headings */
-    .featurette-heading {
-      font-size: 50px;
-      font-weight: 300;
-      line-height: 1;
-      letter-spacing: -1px;
-    }
+				.marketing .span4 + .span4 {
+					margin-top: 40px;
+				}
 
+				.featurette-heading {
+					font-size: 30px;
+				}
+				.featurette .lead {
+					font-size: 18px;
+					line-height: 1.5;
+				}
 
+			}
+		</style>
+		<link href=" assets/css/bootstrap-responsive.css" rel="stylesheet">
 
-    /* RESPONSIVE CSS
-    -------------------------------------------------- */
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+		<script src=" assets/js/html5shiv.js"></script>
+		<![endif]-->
 
-    @media (max-width: 979px) {
+		<!-- Fav and touch icons -->
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href=" assets/ico/apple-touch-icon-144-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="114x114" href=" assets/ico/apple-touch-icon-114-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="72x72" href=" assets/ico/apple-touch-icon-72-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" href=" assets/ico/apple-touch-icon-57-precomposed.png">
+		<link rel="shortcut icon" href="favicon.ico">
 
-      .container.navbar-wrapper {
-        margin-bottom: 0;
-        width: auto;
-      }
-      .navbar-inner {
-        border-radius: 0;
-        margin: -20px 0;
-      }
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<!-- Let's switch on the tooltips -->
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$(".c2mon_tooltip").tooltip()
+			});
+		</script>
 
-      .carousel .item {
-        height: 500px;
-      }
-      .carousel img {
-        width: auto;
-        height: 500px;
-      }
+	</head>
 
-      .featurette {
-        height: auto;
-        padding: 0;
-      }
-      .featurette-image.pull-left,
-      .featurette-image.pull-right {
-        display: block;
-        float: none;
-        max-width: 40%;
-        margin: 0 auto 20px;
-      }
-    }
+	<body>
 
+		<div class="container">
 
-    @media (max-width: 767px) {
+			<!-- NAVIGATION BAR
+			================================================== -->
+			<div class="masthead">
+				<h3 class="muted">C<sup>2</sup>MON</h3>
+				<div class="navbar">
+					<div class="navbar-inner">
+						<div class="container">
+							<ul class="nav">
+								<li>
+									<a href="index.html">Home</a>
+								</li>
+								<li class="active">
+									<a href="c2mon.html">C<sup>2</sup>MON</a>
+								</li>
+								<li>
+									<a href="at_cern.html">@CERN</a>
+								</li>
+								<li>
+									<a href="faq.html">FAQ</a>
+								</li>
 
-      .navbar-inner {
-        margin: -20px;
-      }
+								<li>
+									<a href="contact.html">Contact</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div><!-- /.navbar -->
+			</div>
 
-      .carousel {
-        margin-left: -20px;
-        margin-right: -20px;
-      }
-      .carousel .container {
+			<!-- Marketing messaging and featurettes
+			================================================== -->
+			<!-- Wrap the rest of the page in another container to center all the content. -->
 
-      }
-      .carousel .item {
-        height: 300px;
-      }
-      .carousel img {
-        height: 300px;
-      }
-      .carousel-caption {
-        width: 65%;
-        padding: 0 70px;
-        margin-top: 100px;
-      }
-      .carousel-caption h1 {
-        font-size: 30px;
-      }
-      .carousel-caption .lead,
-      .carousel-caption .btn {
-        font-size: 18px;
-      }
+			<div class="container marketing">
 
-      .marketing .span4 + .span4 {
-        margin-top: 40px;
-      }
+				<!-- Some info about C2MON -->
+				<div class="row hidden-phone">
+					<div class="span12">
+						<div class="alert alert-success">
+							<p>
+								Built for <a class="lead" href="#cern">complex operational environments</a>,
+								where monitoring and control systems are asked to satisfy  stringent
+								<a class="lead" href="#reliability">reliability</a>
+								requirements,
+								C2MON
+								is a monitoring system that can <a class="lead" href="#flexibility">adapt</a> to changes in its environment
+								and meet requests for new functionalities. C2MON manages to combine maintainability and high-availability within
+								<a class="lead" href="#scalability">a portable architecture.</a>
+							</p>
+						</div>
+					</div>
+				</div><!-- /.row -->
 
-      .featurette-heading {
-        font-size: 30px;
-      }
-      .featurette .lead {
-        font-size: 18px;
-        line-height: 1.5;
-      }
+				<!-- START LISTING THE AMAZING FEATURES -->
 
-    }
-    </style>
-    <link href=" assets/css/bootstrap-responsive.css" rel="stylesheet">
+				<div id="cern" class="featurette">
+					<!-- http://design-guidelines.web.cern.ch/sites/design-guidelines.web.cern.ch/files/u6/CERN-logo_outline.jpg -->
+					<a href="http://www.cern.ch"><img class="featurette-image pull-right" src="cern_logo_small.jpg"></a>
+					<h2 class="featurette-heading">C2MON is used at CERN. <span class="muted">The world's largest particle physics laboratory.</span></h2>
+					<p class="lead">
+						The technical infrastructure operators (BE-OP-TI) have chosen C2MON to monitor CERN's technical services 24 hours a day, 365 days a year.
+					</p>
+					<a class="btn btn-large btn-primary" href="at_cern.html">More</a>
+				</div>
 
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src=" assets/js/html5shiv.js"></script>
-    <![endif]-->
+				<hr class="featurette-divider">
 
-    <!-- Fav and touch icons -->
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href=" assets/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href=" assets/ico/apple-touch-icon-114-precomposed.png">
-      <link rel="apple-touch-icon-precomposed" sizes="72x72" href=" assets/ico/apple-touch-icon-72-precomposed.png">
-                    <link rel="apple-touch-icon-precomposed" href=" assets/ico/apple-touch-icon-57-precomposed.png">
-                                   <link rel="shortcut icon" href="favicon.ico">
-								   
-	 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	 <!-- Let's switch on the tooltips -->
-	<script type="text/javascript">
-		$(document).ready(function(){
-			$(".c2mon_tooltip").tooltip()
-		});
-	</script>							   
-	
-  </head>
+				<div id="reliability" class="featurette">
+					<img class="featurette-image pull-left" src="check_small.png">
+					<h2 class="featurette-heading">C2MON is <a href="#reliability" class="c2mon_tooltip" data-toggle="tooltip" data-placement="top"
+					title="">RELIABLE*</a><span class="muted"></span></h2>
 
-  <body>
+					<br>
+					<p class="lead">
+						When you’re trying to understand the building blocks of matter, the origin of
+						the universe and everything in between, <strong> system downtime is not an option</strong>.
+						<br>
+						<br>
+						- C2MON is designed to provide 24/7 availability
+						<br>
+						- JMS transactions ensure that no message is lost and all the updates are written to the cache
+						<br>
+						- <a href="#reliability" class="c2mon_tooltip" data-toggle="tooltip" data-placement="bottom"
+						title="Several servers can run in parallel ">Multi server configuration</a>
+						allows for rolling updates and provides a failover mechanism
+						<br>
+					</p>
+				</div>
 
-    <div class="container">
-	
-    <!-- NAVIGATION BAR
-    ================================================== -->
-	
-	  <div class="masthead">
-        <h3 class="muted">C<sup>2</sup>MON</h3>
-        <div class="navbar">
-          <div class="navbar-inner">
-            <div class="container">
-              <ul class="nav">
-                <li><a href="index.html">Home</a></li>
-                <li class="active"><a href="c2mon.html">C<sup>2</sup>MON</a></li>
-                <li><a href="faq.html">FAQ</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-        </div><!-- /.navbar -->
-      </div>
-	  
-	<!-- Marketing messaging and featurettes
-    ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
+				<hr class="featurette-divider">
 
-    <div class="container marketing">
+				<div id="scalability" class="featurette">
+					<img class="featurette-image pull-right" src="scalable.png">
+					<h2 class="featurette-heading">C2MON is SCALABLE, <span class="muted">at all levels.</span></h2>
+					<p class="lead">
+						<br>
+						- Scalable
+						<a href="#scalability" class="c2mon_tooltip" data-toggle="tooltip" data-placement="top"
+						title="Brokers can run in clusters">JMS Middleware</a>
+						<br>
 
-      <!-- Three columns of text -->
-      <div class="row">
-        <div class="span12">
-		<div class="alert alert-success">
-			<p> Built for
-			<a class="lead" href="#cern">complex operational environments</a>,
-			where monitoring and control systems are asked to satisfy  stringent 
-			<a class="lead" href="#reliability">reliability</a>
-			requirements, 
-			C2MON
-			is a monitoring system that can <a class="lead" href="#flexibility">adapt</a> to changes in its environment
-			and meet requests for new functionalities. C2MON manages to combine maintainability and high-availability within 
-			<a class="lead" href="#scalability">a portable architecture.</a></p>
-		</div>
-        </div>
-      </div><!-- /.row -->
-	  
-	 
-      <!-- START LISTING THE AMAZING FEATURES -->
-	  
-      <div id="cern" class="featurette">
-        <a href="http://www.cern.ch"><img class="featurette-image pull-right" src="cern_logo.jpg"></a>
-        <h2 class="featurette-heading">C2MON is used at CERN. <span class="muted">The world's largest particle physics laboratory.</span></h2>
-        <p class="lead">The technical infrastructure operators (BE-OP-TI) have chosen C2MON to monitor CERN's technical services 24 hours a day, 365 days a year.</p>
-      </div>
+						- Unlimited Data Acquisition processes
+						<br>
 
-      <hr class="featurette-divider">
-	  
-      <div id="reliability" class="featurette">
-        <img class="featurette-image pull-left" src="check.png">
-        <h2 class="featurette-heading">C2MON is <a href="#reliability" class="c2mon_tooltip" data-toggle="tooltip" data-placement="top" 
-				title="99.99984% of uptime since January 2012">RELIABLE*</a><span class="muted"></span></h2>
-		
-		 <br>
-        <p class="lead">
-			- Designed to provide 24/7 availability  <br>
-			- JMS transactions ensure that no message is lost and all the updates are written to the cache <br>
-			- <a href="#reliability" class="c2mon_tooltip" data-toggle="tooltip" data-placement="bottom" 
-				title="Several servers can run in parallel ">Multi server configuration</a>
-				allows for rolling updates and provides a failover mechanism <br>
-		</p>
-      </div>
+						- <a href="#scalability" class="c2mon_tooltip" data-toggle="tooltip" data-placement="bottom"
+						title="Several servers can run in parallel ">Multi server configuration</a>
+						means if the limit of the current system is reached servers can be scaled horizontally
+						<br>
+					</p>
+				</div>
 
-      <hr class="featurette-divider">
+				<hr class="featurette-divider">
 
-      <div id="scalability" class="featurette">
-        <img class="featurette-image pull-right" src="scalable.png">
-        <h2 class="featurette-heading">C2MON is SCALABLE, <span class="muted">at all levels.</span></h2>
-        <p class="lead">
-			<br>
-			- Scalable
-			<a href="#scalability" class="c2mon_tooltip" data-toggle="tooltip" data-placement="top" 
-				title="Brokers can run in clusters">JMS Middleware</a> <br>
-				
-			- Unlimited Data Acquisition processes<br>
-			
-			- <a href="#scalability" class="c2mon_tooltip" data-toggle="tooltip" data-placement="bottom" 
-				title="Several servers can run in parallel ">Multi server configuration</a>
-				means if the limit of the current system is reached servers can be scaled horizontally<br>
-		</p>
-      </div>
+				<div id="flexibility" class="featurette">
+					<img class="featurette-image pull-left" src="flexible_small.png">
+					<h2 class="featurette-heading">C2MON is FLEXIBLE, <span class="muted"> and designed from the start to fit multiple monitoring scenarios.</span></h2>
+					<p class="lead">
+						- Customizable Server
+						<br>
+						- Data Acquisition using a variety of protocols
+						<br>
+						- Operational Database Independence
+						<br>
+						- Easily reused Client API (actual GUI implementation also available)
+					</p>
+				</div>
 
-      <hr class="featurette-divider">
-	  
-	  
-	  <div id="flexibility" class="featurette">
-        <img class="featurette-image pull-left" src="flexible.png">
-        <h2 class="featurette-heading">C2MON is FLEXIBLE, <span class="muted"> and designed from the start to fit multiple monitoring scenarios.</span></h2>
-        <p class="lead">
-		<br>
-		- Customizable Server  <br>
-		- Data Acquisition using a variety of protocols  <br>
-		- Operational Database Independence  <br>
-		- Easily reused Client API (actual GUI implementation also available)  <br>
-		</p>
-      </div>
+				<hr class="featurette-divider">
 
-      <!-- /END OF THE LIST OF THE AMAZING FEATURES -->
+				<div id="documented" class="featurette">
+					<img class="featurette-image pull-right" src="documented_small.png">
+					<h2 class="featurette-heading">C2MON is actively maintained and well documented. <span class="muted"> Dive into the internals of the project by downloading the C2MON Manual.</span></h2>
+					<p class="lead">
+						<br>
+						<a class="btn btn-large btn-primary" target="_blank" href="downloads/C2MON-manual.pdf">C2MON Manual (PDF) &raquo;</a>
+						<br>
+					</p>
+				</div>
 
-      <hr>
+				<!-- /END OF THE LIST OF THE AMAZING FEATURES -->
 
-      <!-- FOOTER -->
-      <div class="footer">
-        <p class="pull-right"><a href="#">Back to top</a></p>
-		
-		<p class="pull-left">
-			(&copy; Cern 2013)
-			<a href="index.html">HOME</a>
-		</p>
-      </div>
+				<hr>
 
-    </div><!-- /.container -->
+				<!-- What's Next ?
+				================================================== -->
+				<section id="what-next" class="visible-phone">
+					<div class="page-header">
+						<h1>I would like to know more...!</h1>
+					</div>
+					<p class="lead">
+						Head to the F.A.Q for more information, or check the list of projects already using C2MON at CERN.
+					</p>
+					<a class="btn btn-large btn-primary" href="faq.html">To the F.A.Q please!</a>
+					<a class="btn btn-large" href="#" style="margin-left: 5px;">C2MON @ CERN</a>
+					<hr>
 
+				</section>
 
-    <!-- Le javascript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src=" assets/js/jquery.js"></script>
-    <script src=" assets/js/bootstrap-transition.js"></script>
-    <script src=" assets/js/bootstrap-alert.js"></script>
-    <script src=" assets/js/bootstrap-modal.js"></script>
-    <script src=" assets/js/bootstrap-dropdown.js"></script>
-    <script src=" assets/js/bootstrap-scrollspy.js"></script>
-    <script src=" assets/js/bootstrap-tab.js"></script>
-    <script src=" assets/js/bootstrap-tooltip.js"></script>
-    <script src=" assets/js/bootstrap-popover.js"></script>
-    <script src=" assets/js/bootstrap-button.js"></script>
-    <script src=" assets/js/bootstrap-collapse.js"></script>
-    <script src=" assets/js/bootstrap-carousel.js"></script>
-    <script src=" assets/js/bootstrap-typeahead.js"></script>
-    
-  <!-- Piwik Tracking
-  ================================================== -->
-	<script type="text/javascript"> 
-		var pkBaseURL = (("https:" == document.location.protocol) 
-				? "https://piwik.web.cern.ch/" : "http://piwik.web.cern.ch/"); 
-			document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E")); 
-	</script>
-	<script type="text/javascript"> 
-	
-		try { 
-				var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 96); 
-				piwikTracker.trackPageView(); 
-				piwikTracker.enableLinkTracking(); 
-		} 
-		catch( err ) {} 
-	</script>
-	<noscript>
-		<p>
-			<img src="http://piwik.web.cern.ch/piwik.php?idsite=96" style="border:0" alt="" />
-		</p>
-	</noscript> 
-	<!-- End Piwik Tracking Code -->
-  </body>
+				<!-- FOOTER -->
+				<div class="footer">
+					<p class="pull-right">
+						<a href="#">Back to top</a>
+					</p>
+
+					<p class="pull-left">
+						(&copy; Cern 2013)
+						<a href="index.html">HOME</a>
+					</p>
+				</div>
+
+			</div><!-- /.container -->
+
+			<!-- Le javascript
+			================================================== -->
+			<!-- Placed at the end of the document so the pages load faster -->
+			<script src=" assets/js/jquery.js"></script>
+			<script src=" assets/js/bootstrap-transition.js"></script>
+			<script src=" assets/js/bootstrap-alert.js"></script>
+			<script src=" assets/js/bootstrap-modal.js"></script>
+			<script src=" assets/js/bootstrap-dropdown.js"></script>
+			<script src=" assets/js/bootstrap-scrollspy.js"></script>
+			<script src=" assets/js/bootstrap-tab.js"></script>
+			<script src=" assets/js/bootstrap-tooltip.js"></script>
+			<script src=" assets/js/bootstrap-popover.js"></script>
+			<script src=" assets/js/bootstrap-button.js"></script>
+			<script src=" assets/js/bootstrap-collapse.js"></script>
+			<script src=" assets/js/bootstrap-carousel.js"></script>
+			<script src=" assets/js/bootstrap-typeahead.js"></script>
+
+			<!-- Piwik Tracking
+			================================================== -->
+			<script type="text/javascript">
+				var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.web.cern.ch/" : "http://piwik.web.cern.ch/");
+				document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+			</script>
+			<script type="text/javascript">
+				try {
+					var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 96);
+					piwikTracker.trackPageView();
+					piwikTracker.enableLinkTracking();
+				} catch( err ) {
+				}
+			</script>
+			<noscript>
+				<p>
+					<img src="http://piwik.web.cern.ch/piwik.php?idsite=96" style="border:0" alt="" />
+				</p>
+			</noscript>
+			<!-- End Piwik Tracking Code -->
+	</body>
 </html>
