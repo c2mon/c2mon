@@ -29,7 +29,7 @@
 	<!-- Defines the URL of the C2MON Tag Viewer. The Viewer will append a Tag 
 		ID at the end of the URL to retrieve more information. -->
 	<property name="tag-viewer-url" type="java.lang.String"
-		value="http://cs-ccr-lasertest:8080/c2mon-web-configviewer/tagviewer/" />
+		value="http://diamon-test:8080/c2mon-web-configviewer/tagviewer/" />
 
 	<!-- A list of Email Addresses to be added in the Mail Dialog whenever it 
 		shows up. -->
