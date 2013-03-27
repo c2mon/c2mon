@@ -10,7 +10,7 @@
 					<preserve type="dir" name="tmp" />
 				</backupPolicy>
 			</deployment>
-			<startscript name="C2MON-STATISTICS-CONSUMER">
+			<startscript name="DMN2-STATS-CONSUMER">
 				<main-class name="cern.c2mon.statistics.consumer.ConsumerStartup">
 					<arg>-l ${INSTALL_DIR}/conf/log4j.xml</arg>
 				</main-class>
