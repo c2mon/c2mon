@@ -148,12 +148,14 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
     private long actTime = 0;
 
     /**
+     * TODO TIM-807 : no longer need this, move to JECController and use single seq number
      * This variable is used to save the supervision alive message sequence
      * number
      */
     private byte superSeqNumber = 0x00;
     
     /**
+     * TODO move to JECController
      * Time of last supervision alive. Use this in conjunction to superSeqNumber
      * to filter out repeated messages from PLC (is necessary while PLC uses
      * single sequence and JEC DAQ seq per type - see TIMS-751).
@@ -463,8 +465,10 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
                 else {
                     getEquipmentLogger().debug("Received frame: " + recvFrame.getMsgID() + ", Sequence Number: " + recvFrame.GetSequenceNumber());
                     // Checks which type of message was received
+                    //always acknowledge supervision messages
+                    //TODO TIM-808 remove this processing to the pushFrame in the JECController with other frame processing
                     if (recvFrame.getMsgID() == StdConstants.SUPERV_ALIVE_MSG) {
-                        processSupervisionFrame(recvFrame);
+                        processSupervisionFrame(recvFrame); //also acknowledges
                     }
                     else {
                         jecController.pushFrame(recvFrame);
@@ -477,7 +481,7 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * Checks the received supervision frame and sends a supervision alive message.
-     * 
+     * TODO TIM-808 move to JECController & extract acknowledgment to pushFrame method
      * @param supervisionFrame The supervision frame received from the PLC.
      */
     private void processSupervisionFrame(final JECPFrames supervisionFrame) {

@@ -85,6 +85,13 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
     private RUNNING_STATE runningState = RUNNING_STATE.NOT_STARTED;
 
     /**
+     * TODO TIM-807 use this unique sequence number for all messages! remove the sequence numbers in the JECMessageHandler (supervision)
+     * and all the DataProcessor classes!
+     * Holds the sequence number of the last message received from the JEC PLC.
+     */
+    //private byte lastSequenceNumber;
+    
+    /**
      * The command runner which sends the command to the PLC and processes the answer frames.
      */
     private JECCommandRunner jecCommandRunner;
@@ -250,11 +257,15 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
         boolean success;
         AbstractJECPFrameProcessor currentProcessor = null;
         switch (frame.getMsgID()) {
+        //TODO TIM-808 add supervision message case here, move processing method from JECMessageHandler and call it
+        // (like handler_alive_message below, no need to use currentProcessor)
+        //standard Boolean update from monitored process
         case StdConstants.BOOL_DATA_MSG:
             currentProcessor = booleanDataProcessor;
             getEquipmentLogger().debug("BOOLEAN DATA MESSAGE RECEIVED");
             updateAliveTimer();
             break;
+        //standard Boolean update from internal JEC memory area
         case StdConstants.BOOL_DATA_CTRL_MSG:
             if (!booleanDataControlProcessor.getJecAddressSpace().isEmpty()) {
                 currentProcessor = booleanDataControlProcessor;
@@ -276,32 +287,19 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
                 }
             }
             break;
+        //command acknowledgment from the PLC: we do nothing with this on our side
         case StdConstants.BOOL_CMD_CTRL_MSG:
-            if (!booleanDataControlProcessor.getJecAddressSpace().isEmpty()) {
-//                currentProcessor = booleanDataControlProcessor;
-                getEquipmentLogger().info("BOOLEAN COMMAND CONTROL MESSAGE RECEIVED");
-                updateAliveTimer();
-            }
-            /*
-             * This is a small hack. The PLC will return a frame for this values
-             * at startup even if there are no tags configured. In this case the 
-             * frame should only be acknowledged and not processed. The processing
-             * would fail because an empty processor has no array to store the
-             * values.
-             */
-            else {
-                try {
-                    booleanDataControlProcessor.acknowledgeReceivedMessage(frame);
-                } catch (IOException e) {
-                    getEquipmentLogger().error("Error while acknowleding frame.");
-                }
-            }
+            getEquipmentLogger().info("BOOLEAN COMMAND CONTROL ACKNOWLEDGMENT RECEIVED: nothing to do");                
             break;
+        //standard analog updates from monitored process
+        //always acknowledge
         case StdConstants.ANALOG_DATA_MSG:
             currentProcessor = analogDataProcessor;
             getEquipmentLogger().debug("ANALOG DATA MESSAGE RECEIVED");
             updateAliveTimer();
             break;
+        //standard analog updates from internal JEC memory area
+        //always acknowledge
         case StdConstants.ANA_DATA_CTRL_MSG:
             if (!analogDataControlProcessor.getJecAddressSpace().isEmpty()) {
                 currentProcessor = analogDataControlProcessor;
@@ -323,9 +321,11 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
                 }
             }
             break;
+        //no ack expected by JEC
         case StdConstants.HANDLER_ALIVE_MSG:
             updateAliveTimer();
             break;
+        //always acknowledge
         case StdConstants.INFO_MSG:
             currentProcessor = infoMessageProcessor;
             try {
@@ -336,8 +336,10 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
             getEquipmentLogger().debug("INFO MESSAGE SET IN THE QUEUE");
             updateAliveTimer();
             break;
+        //acknowledging that a command executed successfully on the PLC
+        // no acknowledgment expected from JEC!
         case StdConstants.CONFIRM_BOOL_CMD_MSG:
-        case StdConstants.CONFIRM_BOOL_CMD_CTRL_MSG:
+        case StdConstants.CONFIRM_BOOL_CMD_CTRL_MSG: //not used so far in TIM
         case StdConstants.CONFIRM_ANA_CMD_MSG:
             currentProcessor = jecCommandRunner;
             updateAliveTimer();
@@ -651,6 +653,10 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
     /**
      * This method is used to acknowledge every message sent by the PLC. This
      * method was created to guarantee that all messages arrive to the driver.
+     * 
+     * TODO TIM-808 add a new method here that calls this one, but without sendFrame parameter: create the sendFrame yourself,
+     * as is done in the AbstractJECPFrameProcessor. This new method can then be called from the pushFrame method
+     * to ackn. all required frames (see comments on the ones that need acks).
      * 
      * @param recvMsg JEC received message
      * @param sendFrame JECFrame to use to send to the PLC.
