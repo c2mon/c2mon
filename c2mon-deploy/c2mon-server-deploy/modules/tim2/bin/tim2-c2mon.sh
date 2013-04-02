@@ -301,11 +301,11 @@ status() {
 	
      *)
 	echo
-	echo $"Usage: $0 {start|stop|recover|status} [second|single]"
-	echo $"start [second|single] - Starts C2MON [second] server on the appropriate machine, if it is not running. If single is used, a single (non-clustered) server is started."
-	echo $"recover [second|single] - Same as start command, but with extra functionality for recovering after a server crash."
-	echo $"status [second] - Checks the status (running/stopped) of the C2MON [second] server."
-	echo $"stop [second] - Stops the C2MON [second] server on the appropriate host, if it is running. If a gentle shutdown fails, the process is killed after 30 seconds."
+	echo $"Usage: $0 {start|stop|recover|status}"
+	echo $"start - Starts C2MON server on this machine, if it is not running."
+	echo $"recover - Same as start command, but with extra functionality for recovering after a server crash."
+	echo $"status - Checks the status (running/stopped) of the C2MON server."
+	echo $"stop - Stops the C2MON server on this host, if it is running. If a gentle shutdown fails, the process is killed after 30 seconds."
 	exit 1
     esac
 
