@@ -21,11 +21,8 @@ if [ -f $C2MON_HOME/bin/setenv.sh ] ; then
   . $C2MON_HOME/bin/setenv.sh
 fi
 
-# make sure JAVA_HOME is set correctly
-if [ -z $JAVA_HOME ]; then 	
-   # use default if not
-   export JAVA_HOME=/usr/java/jdk
-fi
+# make sure JAVA_HOME is set correctly to Java 1.6
+export JAVA_HOME=/usr/java/jdk1.6
 
 #.c2mon.properties location
 C2MON_PROPERTIES=$C2MON_HOME/conf/c2mon.properties
