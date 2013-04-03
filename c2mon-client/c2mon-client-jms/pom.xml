@@ -54,6 +54,12 @@
 		<dependency>
 			<groupId>cern.accsoft.commons</groupId>
 			<artifactId>accsoft-commons-util</artifactId>
+			<exclusions>
+			  <exclusion>
+			    <artifactId>spring</artifactId>
+			    <groupId>org.springframework</groupId>
+			  </exclusion>
+			</exclusions>
 		</dependency>
 
 
