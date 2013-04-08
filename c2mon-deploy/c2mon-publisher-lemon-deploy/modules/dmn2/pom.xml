@@ -6,14 +6,14 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-deploy</groupId>
 		<artifactId>c2mon-publisher-lemon-deploy</artifactId>
-		<version>1.0.2</version>
+		<version>1.0.3-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-publisher-lemon-dmn2</artifactId>
 	<name>The DMN2 LEMON Publisher</name>
-	<version>1.0.2</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<description>C2MON LEMON publisher assembling all required modules and configuration files for DMN2</description>
