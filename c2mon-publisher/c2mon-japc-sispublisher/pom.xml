@@ -25,21 +25,21 @@
   	<dependency>
   		<groupId>cern.japc</groupId>
   		<artifactId>japc</artifactId>
-  		<version>2.15.6</version>
+  		<version>3.2.1</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>cern.japc</groupId>
   		<artifactId>japc-ext-cmwrda</artifactId>
-  		<version>2.11.3</version>
+  		<version>2.14.1</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>cern.japc</groupId>
   		<artifactId>japc-ext-remote</artifactId>
-  		<version>3.5.3</version>
+  		<version>3.8.5</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>
