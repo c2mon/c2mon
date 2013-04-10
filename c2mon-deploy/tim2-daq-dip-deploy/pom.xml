@@ -20,6 +20,15 @@
 
   <developers />
 
+  <!-- This is needed to retrieve the DIP dependencies -->
+  <repositories>
+    <repository>
+      <id>cern-nexus</id>
+      <name>CERN Central Nexus</name>
+      <url>https://j2eeps.cern.ch/nexus/content/groups/public</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>cern.tim2.tim2-daq</groupId>
@@ -30,6 +39,13 @@
   <scm>
     <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/tim2-daq-dip-deploy</developerConnection>
   </scm>
+  
+  <properties>
+    <dip.version>5.5.0</dip.version>
+    <dip.native.libs.dir.rel>dip-${dip.version}/lib64</dip.native.libs.dir.rel>
+    <dip.native.libs.dir.abs>${project.build.directory}/lib_so/${dip.native.libs.dir.rel}</dip.native.libs.dir.abs>
+  </properties>
+  
   <build>
     <plugins>
 
@@ -96,10 +112,12 @@
               <artifactItems>
                 <artifactItem>
 
-                  <groupId>cern.en.ice</groupId>
+                  <groupId>cern.dip</groupId>
                   <artifactId>dip</artifactId>
-                  <classifier>i386-SLC5-gpp-shared</classifier>
-                  <type>nar</type>
+                  <version>${dip.version}</version>
+                  <classifier>distribution</classifier>
+                  <type>zip</type>
+                  <includes>${dip.native.libs.dir.rel}/*</includes>
 
                   <overWrite>true</overWrite>
                   <outputDirectory>${project.build.directory}/lib_so</outputDirectory>
@@ -131,5 +149,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

@@ -38,9 +38,9 @@
     <fileSet>
       <outputDirectory>/lib_so</outputDirectory>
       <includes>
-        <include>*.so</include>
+        <include>*.so*</include>
       </includes>
-      <directory>${project.build.directory}/lib_so/lib/i386-SLC5-gpp/shared</directory>
+      <directory>${dip.native.libs.dir.abs}</directory>
       <fileMode>0444</fileMode>
     </fileSet>
   </fileSets>
