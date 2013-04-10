@@ -1,0 +1,7 @@
+dmn2-daq-snmp version history log
+==============================
+
+ -----------------------------------------
+10/04/2013, mmitev, release version 1.0.0
+* DMN-1414 - improvement: Create new deployment module for the DIAMON SNMP DAQ
+
