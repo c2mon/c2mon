@@ -1,0 +1,81 @@
+<EquipmentUnit id="5250" name="E_CLIC_CLIC01">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address></address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+	</DataTags>
+
+	<CommandTags>
+
+		<CommandTag id="100847" name="TEST:TESTCMD1">
+			<source-timeout>4000</source-timeout>
+			<source-retries>2</source-retries>
+			<HardwareAddress 	class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+				<device-name>DMN.CLIC.TEST</device-name>
+				<property-name>Command</property-name>
+				<data-field-name>field1</data-field-name>
+				<command-type>SET</command-type>
+			</HardwareAddress>
+		</CommandTag>
+
+		<CommandTag id="100848" name="TEST:TESTCMD2">
+			<source-timeout>4000</source-timeout>
+			<source-retries>1</source-retries>
+			<HardwareAddress 	class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+				<device-name>DMN.CLIC.TEST</device-name>
+				<property-name>Command</property-name>
+				<command-type>SET</command-type>
+			</HardwareAddress>
+		</CommandTag>
+
+		<CommandTag id="100849" name="TEST:TESTCMD3">
+			<source-timeout>4000</source-timeout>
+			<source-retries>1</source-retries>
+			<HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+				<device-name>DMN.CLIC.TEST</device-name>
+				<property-name>Command</property-name>
+				<column-index>-1</column-index>
+				<row-index>-1</row-index>
+				<command-type>SET</command-type>
+			</HardwareAddress>
+		</CommandTag>
+
+		<CommandTag id="100850" name="TEST:TESTCMD4">
+			<source-timeout>6000</source-timeout>
+			<source-retries>1</source-retries>
+			<HardwareAddress 	class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+				<device-name>DMN.CLIC.TEST</device-name>
+				<property-name>RestartProcess</property-name>
+				<command-type>GET</command-type>
+				<context-field>process</context-field>
+			</HardwareAddress>
+		</CommandTag>
+
+		<CommandTag id="100851" name="TEST:TESTCMD5">
+			<source-timeout>4000</source-timeout>
+			<source-retries>1</source-retries>
+			<HardwareAddress 	class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+				<device-name>DMN.CLIC.TEST</device-name>
+				<property-name>Command</property-name>
+				<command-type>GET</command-type>
+			</HardwareAddress>
+		</CommandTag>
+
+		<CommandTag id="100852" name="TEST:TESTCMD6">
+			<source-timeout>4000</source-timeout>
+			<source-retries>1</source-retries>
+			<HardwareAddress 	class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+				<device-name>DMN.CLIC.TEST</device-name>
+				<property-name>Command</property-name>
+				<command-type>GET</command-type>
+				<context-field>command;args</context-field>
+			</HardwareAddress>
+		</CommandTag>
+
+	</CommandTags>
+</EquipmentUnit>

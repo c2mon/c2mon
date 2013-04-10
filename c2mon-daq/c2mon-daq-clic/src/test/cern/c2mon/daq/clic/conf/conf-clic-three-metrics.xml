@@ -1,0 +1,72 @@
+<EquipmentUnit id="5250" name="E_CLIC_CLIC01">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address></address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+
+		<DataTag id="100909" name="TEST1" control="false">
+			<data-type>Integer</data-type>			
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>mockito</protocol>
+					<service>mockito</service>
+					<device-name>DMN.CLIC.TEST</device-name>
+					<property-name>Acquisition</property-name>					
+					<data-field-name>test.property1</data-field-name>					
+				</HardwareAddress>
+				
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+		
+	<DataTag id="100910" name="TEST2" control="false">
+			<data-type>Integer</data-type>			
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>mockito</protocol>
+					<service>mockito</service>
+					<device-name>DMN.CLIC.TEST</device-name>
+					<property-name>Acquisition</property-name>					
+					<data-field-name>test.property2</data-field-name>					
+				</HardwareAddress>
+								
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+		
+	<DataTag id="100911" name="TEST3" control="false">
+			<data-type>Integer</data-type>			
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>mockito</protocol>
+					<service>mockito</service>
+					<device-name>DMN.CLIC.TEST</device-name>
+					<property-name>Acquisition</property-name>					
+					<data-field-name>test.property3</data-field-name>					
+				</HardwareAddress>
+				
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>				
+
+	</DataTags>
+	<CommandTags>
+	</CommandTags>
+</EquipmentUnit>  
