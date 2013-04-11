@@ -38,7 +38,7 @@
             </preExec>
          </startscript>
 
-         <deployment installLocation="/opt/dmn2/dmn2-daq-rda">
+         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-rda">
             <backupPolicy keepBackups="2">
                <preserve type="dir" name="log" />
             </backupPolicy>
@@ -53,8 +53,6 @@
                <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <!-- copy over pro. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
-               <!-- copy over pro. daq list -->
-               <file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq" mask="444" />
             </directory>
             <directory name="bin">
                <file name="DMN2-DAQ-RDA*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
@@ -62,7 +60,7 @@
 
             <notification>
                <!-- you can give more than one mail for deployment notification -->
-               <mail address="project-diamon-core@cern.ch" />
+               <mail address="diamon-developers@cern.ch" />
             </notification>
 
          </deployment>
@@ -75,8 +73,6 @@
                <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <!-- copy over dev. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
-               <!-- copy over pro. daq list -->
-               <file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq" mask="444" />
             </directory>
             <directory name="bin">
                <file name="DMN2-DAQ-RDA*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
