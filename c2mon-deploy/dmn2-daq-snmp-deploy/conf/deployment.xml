@@ -38,7 +38,7 @@
             </preExec>
          </startscript>
 
-         <deployment installLocation="/opt/dmn2/dmn2-daq-snmp">
+         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-snmp">
             <backupPolicy keepBackups="2">
                <preserve type="dir" name="log" />
             </backupPolicy>
@@ -62,7 +62,7 @@
 
             <notification>
                <!-- you can give more than one mail for deployment notification -->
-               <mail address="project-diamon-core@cern.ch" />
+               <mail address="diamon-developers@cern.ch" />
             </notification>
          </deployment>
       </application>
