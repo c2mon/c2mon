@@ -467,8 +467,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
                     }
                 }
 
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception e) {                
                 logger.error(e);
                 throw new EqCommandTagException("command execution failed. Problem: " + e.getMessage());
             }
