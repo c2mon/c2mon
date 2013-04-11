@@ -67,7 +67,7 @@
 
       <application name="dmn2-daq-cmwadm-dev" extends="default">
 
-         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-dev">
+         <deployment>
             <directory name="conf">
                <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <!-- copy over dev. daq log4j configuration -->
