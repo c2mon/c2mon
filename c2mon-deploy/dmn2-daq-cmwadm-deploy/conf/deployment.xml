@@ -22,8 +22,7 @@
 
             <property name="c2mon.process.name" value="${PROCESS_NAME}" />
             <property name="c2mon.log.dir" value="${DAQ_LOG_HOME}" />
-            <property name="c2mon.daq.spring.context"
-               value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
+            <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
 
             <preExec>
                           <![CDATA[
@@ -38,7 +37,7 @@
             </preExec>
          </startscript>
 
-         <deployment installLocation="/opt/dmn2/dmn2-daq-cmwadm">
+         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-cmwadm">
             <backupPolicy keepBackups="2">
                <preserve type="dir" name="log" />
             </backupPolicy>
@@ -53,8 +52,6 @@
                <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <!-- copy over pro. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
-               <!-- copy over pro. daq list -->
-               <file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq" mask="444" />
             </directory>
             <directory name="bin">
                <file name="DMN2-DAQ-CMWADM*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
@@ -62,7 +59,7 @@
 
             <notification>
                <!-- you can give more than one mail for deployment notification -->
-               <mail address="project-diamon-core@cern.ch" />
+               <mail address="diamon-developers@cern.ch" />
             </notification>
 
          </deployment>
@@ -70,13 +67,11 @@
 
       <application name="dmn2-daq-cmwadm-dev" extends="default">
 
-         <deployment installLocation="/opt/dmn2/dmn2-daq-dev">
+         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-dev">
             <directory name="conf">
                <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <!-- copy over dev. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
-               <!-- copy over pro. daq list -->
-               <file name="daqprocess.lst" sourceDir="~diamonop/c2mon/daq" mask="444" />
             </directory>
             <directory name="bin">
                <file name="DMN2-DAQ-CMWADM*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
