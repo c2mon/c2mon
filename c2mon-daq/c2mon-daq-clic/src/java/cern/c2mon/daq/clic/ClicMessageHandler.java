@@ -43,6 +43,8 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
     public static final String DEFAULT_TIMESTAMP_FIELD = "ts";
     public static final String DEFAULT_DETAILS_FIELD = "details";
 
+    public static final String ACQUISITION_PROPERTY = "Acquisition";
+
     protected static int RECONNECTION_TIME = 30000; // in ms
 
     // reference to the static agent client instance, shared across all instances of the ClicMessageHandler
@@ -56,7 +58,13 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
     /**
      * a map keeping for each tag, its AgentListeners
      */
-    private Map<Long, ClicAgentListener> pvlistenersMap = new ConcurrentHashMap<Long, ClicAgentListener>();
+    private Map<Long, ClicAgentListener> clientAgentListenersMap = new ConcurrentHashMap<Long, ClicAgentListener>();
+
+    /**
+     * a map keeping list of references to registered Acquisition property AgentListeners , for each of the registered
+     * devices
+     */
+    private Map<String, List<ClicAgentListener>> agentAcquisittionLstenersMap = new ConcurrentHashMap<String, List<ClicAgentListener>>();
 
     // logger is initialized in the connectToDataSource() method
     private EquipmentLogger logger;
@@ -215,6 +223,9 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
                 getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.DATA_UNAVAILABLE, ex.getMessage());
             }
         }
+
+        // get initial update
+        getInitialAcquisitionUpdate();
     }// run
 
     /**
@@ -227,7 +238,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
             logger.trace(format("entering registerTag(%d)", tag.getId()));
 
         // check if there's any listener registered already for that tag
-        AgentListener regListener = this.pvlistenersMap.get(tag.getId());
+        AgentListener regListener = this.clientAgentListenersMap.get(tag.getId());
 
         // none of the above should be present
         if (regListener != null) {
@@ -253,7 +264,18 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
                 logger.debug(format("successfully subscribed to tag: %d (device/property: %s/%s)", tag.getId(), device,
                         property));
 
-            this.pvlistenersMap.put(tag.getId(), listener);
+            this.clientAgentListenersMap.put(tag.getId(), listener);
+
+            if (property.equals(ACQUISITION_PROPERTY)) {
+                if (!this.agentAcquisittionLstenersMap.containsKey(device)) {
+                    this.agentAcquisittionLstenersMap.put(device, new ArrayList<ClicAgentListener>());
+                }
+
+                List<ClicAgentListener> clist = this.agentAcquisittionLstenersMap.get(device);
+                synchronized (clist) {
+                    clist.add(listener);
+                }
+            }
 
         } catch (Exception ex) {
 
@@ -267,6 +289,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
             if (logger.isTraceEnabled())
                 logger.trace(format("leaving registerTag(%d)", tag.getId()));
         }
+
     }
 
     /**
@@ -278,7 +301,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
             getEquipmentLogger().trace(format("entering unregisterTag(%d)", tag.getId()));
 
         // check if there's handle registered for that tag
-        ClicAgentListener listener = this.pvlistenersMap.get(tag.getId());
+        ClicAgentListener listener = this.clientAgentListenersMap.get(tag.getId());
 
         try {
             if (listener != null) {
@@ -286,7 +309,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
             } else {
                 logger.warn(format("tag %d is not registerd", tag.getId()));
             }
-            this.pvlistenersMap.remove(tag.getId());
+            this.clientAgentListenersMap.remove(tag.getId());
 
         } catch (Exception ex) {
             String err = format("Unable to unregister listener tag: %d. Problem description: %s", tag.getId(),
@@ -314,7 +337,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
             }
         }// for
 
-        this.pvlistenersMap.clear();
+        this.clientAgentListenersMap.clear();
 
         client.unregisterCommunicationListener(communicationListener);
 
@@ -435,7 +458,13 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
                 }
 
                 if (feedback != null) {
-                    result = feedback.getBody().get(MessageBody.COMMAND_RESPONSE_KEY).toString();
+                    // check if the response is correctly set
+                    if (feedback.getBody().containsKey(MessageBody.COMMAND_RESPONSE_KEY)) {
+                        result = feedback.getBody().get(MessageBody.COMMAND_RESPONSE_KEY).toString();
+                    } else {
+                        throw new EqCommandTagException("Command reply received from CLIC agent is missing field: "
+                                + MessageBody.COMMAND_RESPONSE_KEY.toString());
+                    }
                 }
 
             } catch (Exception e) {
@@ -461,17 +490,17 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
         return sendCommand(sourceCommandTagValue);
     }
 
-    public final String runCommand(Long commandId) throws EqCommandTagException {
-        ISourceCommandTag command = getEquipmentConfiguration().getSourceCommandTag(commandId);
-        if (command == null) {
-            return format("command %d is unknown", command);
-        }
-
-        SourceCommandTagValue ctv = new SourceCommandTagValue(commandId, command.getName(), this
-                .getEquipmentConfiguration().getId(), (short) 0, "dummy", "java.lang.String");
-
-        return sendCommand(ctv);
-    }
+    // public final String runCommand(Long commandId) throws EqCommandTagException {
+    // ISourceCommandTag command = getEquipmentConfiguration().getSourceCommandTag(commandId);
+    // if (command == null) {
+    // return format("command %d is unknown", command);
+    // }
+    //
+    // SourceCommandTagValue ctv = new SourceCommandTagValue(commandId, command.getName(), this
+    // .getEquipmentConfiguration().getId(), (short) 0, "dummy", "java.lang.String");
+    //
+    // return sendCommand(ctv);
+    // }
 
     /**
      * this method is called when a new DataTag is "injected"
@@ -588,6 +617,31 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
             getEquipmentLogger().debug(
                     format("leaving onUpdateCommandTag(%d,%d)", sourceCommandTag.getId(), oldSourceCommandTag.getId()));
 
+    }
+
+    private void getInitialAcquisitionUpdate() {
+        if (logger.isTraceEnabled()) {
+            logger.trace("entering getInitialAcquisitionUpdate()..");
+        }
+
+        for (Map.Entry<String, List<ClicAgentListener>> entry : this.agentAcquisittionLstenersMap.entrySet()) {
+            String device = entry.getKey();
+
+            try {
+                AgentMessage initValue = client.sendCommand(device, ACQUISITION_PROPERTY, CommandType.GET);
+                List<ClicAgentListener> listeners = entry.getValue();
+                for (ClicAgentListener listener : listeners) {
+                    listener.onMessage(initValue);
+                }
+            } catch (AgentCommunicationException e) {
+                logger.error("could not get initial value for device/parameter: %" + device + "/"
+                        + ACQUISITION_PROPERTY);
+            }
+        }// for
+
+        if (logger.isTraceEnabled()) {
+            logger.trace("leaving getInitialAcquisitionUpdate()");
+        }
     }
 
     @Override
