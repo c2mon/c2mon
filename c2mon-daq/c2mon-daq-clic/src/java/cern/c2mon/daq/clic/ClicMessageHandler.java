@@ -72,8 +72,8 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
     private CommunicationListener communicationListener = new ClicCommunicationValueListener();
 
     /**
-     * This class implements a JAPC listener. JAPC listener is called when a value of a parameter changes, or a problem
-     * (such as disconnection) is detected
+     * This class implements a AgentLib communication listener. This listener is called when a value of a parameter
+     * changes, or a problem (such as disconnection) is detected
      */
     class ClicCommunicationValueListener implements CommunicationListener {
 
@@ -346,7 +346,8 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
 
     protected final void convertAndSend(final ISourceDataTag tag, final Object sValue, final String valueDescription,
             final long sourceTimestamp) {
-        getEquipmentLogger().debug("enetring sendJAPCSValueFromScalar()..");
+
+        logger.trace("enetring convertAndSend()..");
 
         Object value4send = null;
 
@@ -366,7 +367,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
             getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.CONVERSION_ERROR, null);
         }
 
-        getEquipmentLogger().debug("leaving sendJAPCSValueFromScalar()");
+        logger.trace("leaving convertAndSend()");
     }
 
     protected final String sendCommand(SourceCommandTagValue p0) throws EqCommandTagException {
@@ -467,7 +468,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
                     }
                 }
 
-            } catch (Exception e) {                
+            } catch (Exception e) {
                 logger.error(e);
                 throw new EqCommandTagException("command execution failed. Problem: " + e.getMessage());
             }
