@@ -36,7 +36,8 @@
 
 <!-- initialize the JmsSenders; any number of these can be plugged into the ProcessMessageSender below -->
 <!--<bean id="sonicJmsSender" class="cern.tim.driver.common.messaging.impl.SonicJmsSender"/>-->
-<bean id="activeJmsSender" class="cern.tim.driver.common.messaging.impl.ActiveJmsSender"/>
+<!-- <bean id="activeJmsSender" class="cern.tim.driver.common.messaging.impl.ActiveJmsSender"/> -->
+<bean id="filterMessageSender" class="cern.tim.driver.filter.impl.DummyFilterSender"/>
 
 <!-- use proxyJmsSender in processMessageSender to shield DAQ from this connection -->
 <bean id="proxyJmsSender" class="cern.tim.driver.common.messaging.impl.ProxyJmsSender">
