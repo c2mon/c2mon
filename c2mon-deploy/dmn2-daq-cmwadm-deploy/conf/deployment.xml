@@ -54,7 +54,7 @@
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
             </directory>
             <directory name="bin">
-               <file name="DMN2-DAQ-CMWADM*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
+               <file name="DMN2-DAQ-CMWADM*.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
             </directory>
 
             <notification>
