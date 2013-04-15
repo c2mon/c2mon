@@ -12,7 +12,7 @@
 	<groupId>cern.dmn2.dmn2-daq</groupId>
 	<artifactId>dmn2-daq-clic-deploy</artifactId>
 	<name>DMN2 CLIC DAQ deployment module</name>
-	<version>1.0.4</version>
+	<version>1.0.5-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
