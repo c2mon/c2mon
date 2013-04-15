@@ -41,6 +41,9 @@ my $jdbcDriver          = $c2monProperties->getProperty("c2mon.jdbc.driver");
 my $jdbcRoUrl           = $c2monProperties->getProperty("c2mon.jdbc.ro.url");
 my $jdbcRoUser          = $c2monProperties->getProperty("c2mon.jdbc.ro.user");
 my $jdbcRoPassword      = $c2monProperties->getProperty("c2mon.jdbc.ro.password");
+my $jdbcRwUrl           = $c2monProperties->getProperty("c2mon.jdbc.rw.url");
+my $jdbcRwUser          = $c2monProperties->getProperty("c2mon.jdbc.rw.user");
+my $jdbcRwPassword      = $c2monProperties->getProperty("c2mon.jdbc.rw.password");
 close PROPS;
 
 
@@ -108,6 +111,10 @@ print "    <property name=\"c2mon.jdbc.driver\" value=\"$jdbcDriver\"/>\n";
 print "    <property name=\"c2mon.jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
 print "    <property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
 print "    <property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
+# C2MON read-write credentials, needed making rule manipulations
+print "   <property name=\"c2mon.jdbc.rw.url\" value=\"$jdbcRwUrl\"/>\n";
+print "   <property name=\"c2mon.jdbc.rw.user\" value=\"$jdbcRwUser\"/>\n";
+print "   <property name=\"c2mon.jdbc.rw.password\" value=\"$jdbcRwPassword\"/>\n";
 
 print " </resources>
         <resources os=\"Windows\" >
