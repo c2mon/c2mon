@@ -10,8 +10,9 @@ use Config::Properties;
 my $jardir = "../lib";
 my $appdir = "tim2-rule-composer/";
 # Default codebase points to operation
-my $codebase = "http://timweb.cern.ch/javaws";
+my $codebase                  = "http://timweb.cern.ch/javaws";
 my $c2monClientPropertiesFile = "/user/timoper/rep/c2mon/client/c2mon-client.properties";
+my $c2monClientPropertiesURL  = "http://timweb/conf/c2mon-client.properties";
 
 ##
 # Reading version number from ../version.txt
@@ -40,15 +41,6 @@ my $jdbcDriver          = $c2monProperties->getProperty("c2mon.jdbc.driver");
 my $jdbcRoUrl           = $c2monProperties->getProperty("c2mon.jdbc.ro.url");
 my $jdbcRoUser          = $c2monProperties->getProperty("c2mon.jdbc.ro.user");
 my $jdbcRoPassword      = $c2monProperties->getProperty("c2mon.jdbc.ro.password");
-my $jdbcRwUrl           = $c2monProperties->getProperty("c2mon.jdbc.rw.url");
-my $jdbcRwUser          = $c2monProperties->getProperty("c2mon.jdbc.rw.user");
-my $jdbcRwPassword      = $c2monProperties->getProperty("c2mon.jdbc.rw.password");
-my $jmsUrl              = $c2monProperties->getProperty("c2mon.client.jms.url");
-my $jmsUser             = $c2monProperties->getProperty("c2mon.client.jms.user");
-my $jmsPassword         = $c2monProperties->getProperty("c2mon.client.jms.password");
-my $jmsSupervisionTopic = $c2monProperties->getProperty("c2mon.client.jms.supervision.topic");
-my $jmsHeartbeatTopic   = $c2monProperties->getProperty("c2mon.client.jms.heartbeat.topic");
-my $jmsRequestQueue     = $c2monProperties->getProperty("c2mon.client.jms.request.queue");
 close PROPS;
 
 
@@ -70,7 +62,7 @@ sub jarlist {
       &jarlist($_);
     }
     else {
-      if (/tim-rule-composer.jar$/) {
+      if (/tim-rule-composer/) {
             print "   <jar href=\"", $htmldir, "\" main=\"true\" download=\"eager\"/>\n";
       }
       elsif (/jar$/) {
@@ -93,43 +85,29 @@ print "Content-type: application/x-java-jnlp-file" , "\n\n";
 print "<?xml version = '1.0' encoding = 'utf-8'?>
 	<jnlp spec=\"1.0+\" codebase=\"$codebase\">
 	<information>
-      		<title>TIM Rule Composer</title>
-      		<vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
-      		<homepage href=\"http://timweb.cern.ch\"/>
-      		<description>This application allows creating server rules for the TIM2 system.</description>
-			<icon href=\"http://timweb.cern.ch/img/tim-animated-320x200.gif\" kind=\"splash\"/>
-      		<offline-allowed/>
-		<shortcut online=\"false\">
-		  <desktop/>
-		  <menu submenu=\"TIM Rule Composer\"/>
-		</shortcut>
+        <title>TIM Rule Composer (Version $viewerVersion)</title>
+      	<vendor>Technical Infrastructure Monitoring (TIM) Team</vendor>
+      	<homepage href=\"http://timweb.cern.ch\"/>
+      	<description>This application allows creating server rules for the TIM2 system.</description>
+		<icon href=\"http://timweb.cern.ch/img/tim-animated-320x200.gif\" kind=\"splash\"/>
 	</information>
 	<security> 
 		<all-permissions/> 
 	</security> 
 	<resources>
-		<java version=\"1.6+\" initial-heap-size=\"256M\"  max-heap-size=\"512M\"/>" , "\n";
+		<java version=\"1.6+\" initial-heap-size=\"64M\"  max-heap-size=\"64M\"/>" , "\n";
 
 jarlist ("$jardir");
 
 # Defines the version number that is shown in the TIM Viewer about dialog
 print "   <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
-# JMS configuration parameters needed by C2MON client API
-print "   <property name=\"c2mon.client.jms.url\" value=\"$jmsUrl\"/>\n";
-print "   <property name=\"c2mon.client.jms.user\" value=\"$jmsUser\"/>\n";
-print "   <property name=\"c2mon.client.jms.password\" value=\"$jmsPassword\"/>\n";
-print "   <property name=\"c2mon.client.jms.supervision.topic\" value=\"$jmsSupervisionTopic\"/>\n";
-print "   <property name=\"c2mon.client.jms.heartbeat.topic\" value=\"$jmsHeartbeatTopic\"/>\n";
-print "   <property name=\"c2mon.client.jms.request.queue\" value=\"$jmsRequestQueue\"/>\n";
+# Configuration parameters needed by C2MON client API
+print "    <property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
 # C2MON read-only credentials to STL database, needed for the history player and charts
-print "   <property name=\"c2mon.jdbc.driver\" value=\"$jdbcDriver\"/>\n";
-print "   <property name=\"c2mon.jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
-print "   <property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
-print "   <property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
-# C2MON read-write credentials, needed making rule manipulations
-print "   <property name=\"c2mon.jdbc.rw.url\" value=\"$jdbcRwUrl\"/>\n";
-print "   <property name=\"c2mon.jdbc.rw.user\" value=\"$jdbcRwUser\"/>\n";
-print "   <property name=\"c2mon.jdbc.rw.password\" value=\"$jdbcRwPassword\"/>\n";
+print "    <property name=\"c2mon.jdbc.driver\" value=\"$jdbcDriver\"/>\n";
+print "    <property name=\"c2mon.jdbc.ro.url\" value=\"$jdbcRoUrl\"/>\n";
+print "    <property name=\"c2mon.jdbc.ro.user\" value=\"$jdbcRoUser\"/>\n";
+print "    <property name=\"c2mon.jdbc.ro.password\" value=\"$jdbcRoPassword\"/>\n";
 
 print " </resources>
         <resources os=\"Windows\" >
