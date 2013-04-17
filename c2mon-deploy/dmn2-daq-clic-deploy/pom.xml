@@ -26,12 +26,7 @@
 	
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
-			<artifactId>tim2-daq-core</artifactId>
-			<!--  
-			     NOTE: temporarily restrict the version of the core to t
-			     in order not to take in the changes for PIK ( issue: TIMD-36)
-			 -->
-			<version>1.1.9</version>
+			<artifactId>tim2-daq-core</artifactId>			
 		</dependency>
 	
 		<dependency>
