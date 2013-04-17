@@ -10,7 +10,7 @@
 
          <startscript name="DMN2-DAQ">
             <main-class name="cern.tim.driver.common.startup.DaqStartup">
-               <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
+               <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noPIK -noDeadband ${ADDITIONAL_PARAMS}</arg>
 
                <output>
                   <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
