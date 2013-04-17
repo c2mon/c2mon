@@ -7,6 +7,7 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
+<import resource="classpath:resources/daq-no-deadband.xml"/>
 <import resource="classpath:resources/daq-core-common.xml"/>
 <import resource="classpath:resources/daq-activemq.xml"/>
 
@@ -36,7 +37,10 @@
 
 <!-- initialize the JmsSenders; any number of these can be plugged into the ProcessMessageSender below -->
 <!--<bean id="sonicJmsSender" class="cern.tim.driver.common.messaging.impl.SonicJmsSender"/>-->
-<bean id="activeJmsSender" class="cern.tim.driver.common.messaging.impl.ActiveJmsSender"/>
+<bean id="activeJmsSender" class="cern.tim.driver.common.messaging.impl.ActiveJmsSender">
+   <property name="name" value="productionSender"/>
+</bean>
+
 
 <!-- use proxyJmsSender in processMessageSender to shield DAQ from this connection -->
 <bean id="proxyJmsSender" class="cern.tim.driver.common.messaging.impl.ProxyJmsSender">
