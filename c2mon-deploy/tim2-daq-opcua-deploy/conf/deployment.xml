@@ -47,7 +47,7 @@
         <directory name="conf">
           <file name="c2mon.properties" sourceDir="/user/timoper/rep/c2mon/daq" mask="400" />
           <file name="daq.conf" sourceDir="/user/timoper/rep/c2mon/daq" mask="400" />
-          <file name="daq-core-service.xml" source="/user/timoper/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
+          <file name="daq-core-service-double.xml" source="/user/timoper/rep/c2mon/daq" mask="400" />
         </directory>
         <directory name="bin">
           <file name="daqprocess.sh" sourceDir="/user/timoper/rep/c2mon/daq" mask="700" />
@@ -57,7 +57,7 @@
         <main-class name="cern.tim.driver.common.startup.DaqStartup">
           <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
         </main-class>
-        <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
+        <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service-double.xml" />
       </startscript>
     </application>
 
@@ -66,7 +66,7 @@
         <directory name="conf">
           <file name="c2mon.properties" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
           <file name="daq.conf" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
-          <file name="daq-core-service.xml" source="/user/timtest/rep/c2mon/daq/daq-core-service-double.xml" mask="400" />
+          <file name="daq-core-service-double.xml" source="/user/timtest/rep/c2mon/daq" mask="400" />
         </directory>
         <directory name="bin">
           <file name="daqprocess.sh" sourceDir="/user/timtest/rep/c2mon/daq" mask="700" />
@@ -76,7 +76,7 @@
         <main-class name="cern.tim.driver.common.startup.DaqStartup">
           <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
         </main-class>
-        <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
+        <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service-double.xml" />
       </startscript>
     </application>
   </product>
