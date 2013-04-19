@@ -23,10 +23,6 @@
 	</scm>
 
 	<dependencies>
-		<dependency>
-			<groupId>cern.tim2.tim2-daq</groupId>
-			<artifactId>tim2-daq-core</artifactId>			
-		</dependency>
 		
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
