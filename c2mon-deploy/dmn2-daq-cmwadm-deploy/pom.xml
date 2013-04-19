@@ -22,15 +22,7 @@
 		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/dmn2-daq-cmwadm-deploy</developerConnection>
 	</scm>
 
-	<developers />
-
-
 	<dependencies>
-	
-		<dependency>
-			<groupId>cern.tim2.tim2-daq</groupId>
-			<artifactId>tim2-daq-core</artifactId>			
-		</dependency>
 		
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
