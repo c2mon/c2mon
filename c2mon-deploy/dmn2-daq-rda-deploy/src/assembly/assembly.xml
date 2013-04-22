@@ -49,14 +49,6 @@
 			<fileMode>0444</fileMode>
 		</file>
 
-		<!--  include the spring core services descriptor -->
-		<file>
-			<source>conf/daq-core-service.xml</source>
-			<outputDirectory>conf/</outputDirectory>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
-
 		<!--  copy the starting script -->
 		<file>
 			<source>bin/daqprocess2.sh</source>

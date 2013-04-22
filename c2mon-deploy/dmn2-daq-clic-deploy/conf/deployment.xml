@@ -53,6 +53,7 @@
                <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <!-- copy over pro. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
+               <file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
             </directory>
             <directory name="bin">
                <file name="DMN2-DAQ-CLIC*.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
@@ -73,6 +74,7 @@
                <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <!-- copy over dev. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
+               <file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
             </directory>
             <directory name="bin">
                <file name="DMN2-DAQ-CLIC*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
