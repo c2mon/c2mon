@@ -29,6 +29,7 @@ import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.cache.TimCacheListener;
 import cern.tim.server.cachepersistence.common.BatchPersistenceManager;
 import cern.tim.server.common.alarm.Alarm;
+import cern.tim.server.common.alarm.AlarmCacheObject.AlarmChangeState;
 import cern.tim.server.common.component.Lifecycle;
 import cern.tim.server.common.config.ServerConstants;
 
@@ -263,18 +264,18 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
     Timestamp laserPublicationTime = new Timestamp(System.currentTimeMillis());        
     stats.update(alarm);
 
-    if (alarm.isActive()) {
+    if (alarm.getAlarmChangeState() == AlarmChangeState.CHANGE_STATE) {
       fs.setDescriptor(alarm.getState());
-      fs.setUserTimestamp(laserPublicationTime);
-
-      if (alarm.getInfo() != null) {
-        Properties prop = fs.getUserProperties();
-        prop.put(FaultState.ASI_PREFIX_PROPERTY, alarm.getInfo());
-        fs.setUserProperties(prop);
-      }
-    } else {
-      fs.setDescriptor(FaultState.TERMINATE);
-      fs.setUserTimestamp(laserPublicationTime);
+    }
+    else {
+      fs.setDescriptor(FaultState.CHANGE);
+    }
+    fs.setUserTimestamp(laserPublicationTime);
+    
+    if (alarm.getInfo() != null) {
+      Properties prop = fs.getUserProperties();
+      prop.put(FaultState.ASI_PREFIX_PROPERTY, alarm.getInfo());
+      fs.setUserProperties(prop);
     }
 
     if (log.isDebugEnabled()) {
