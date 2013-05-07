@@ -131,12 +131,15 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
    * @param mode
    *          the current mode of the tag.
    */
-  public HistoryTagValueUpdateImpl(final Long tagId, final DataTagQuality dataTagQuality, final Object value, final Timestamp sourceTimestamp,
-      final Timestamp serverTimestamp, final Timestamp logTimestamp, final String description, final AlarmValue[] alarms, final TagMode mode) {
+  public HistoryTagValueUpdateImpl(final Long tagId, final DataTagQuality dataTagQuality, final Object value, 
+      final Timestamp sourceTimestamp, final Timestamp daqTimestamp,
+      final Timestamp serverTimestamp, final Timestamp logTimestamp,
+      final String description, final AlarmValue[] alarms, final TagMode mode) {
     this.id = new TagValueUpdateId(tagId);
     this.dataTagQuality = dataTagQuality;
     this.value = value;
     this.sourceTimestamp = sourceTimestamp;
+    this.daqTimestamp = daqTimestamp;
     this.serverTimestamp = serverTimestamp;
     this.logTimestamp = logTimestamp;
     this.description = description;
@@ -172,9 +175,10 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
    * @param mode
    *          the current mode of the tag.
    */
-  public HistoryTagValueUpdateImpl(final Long tagId, final DataTagQuality dataTagQuality, final Object value, final Timestamp sourceTimestamp,
+  public HistoryTagValueUpdateImpl(final Long tagId, final DataTagQuality dataTagQuality, final Object value,
+      final Timestamp sourceTimestamp, final Timestamp daqTimestamp,
       final Timestamp serverTimestamp, final Timestamp logTimestamp, final String description, final TagMode mode) {
-    this(tagId, dataTagQuality, value, sourceTimestamp, serverTimestamp, logTimestamp, description, null, mode);
+    this(tagId, dataTagQuality, value, sourceTimestamp, daqTimestamp, serverTimestamp, logTimestamp, description, null, mode);
   }
   
   /**
@@ -187,6 +191,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
         tagValueUpdate.getDataTagQuality(), 
         tagValueUpdate.getValue(), 
         tagValueUpdate.getSourceTimestamp(), 
+        tagValueUpdate.getDaqTimestamp(), 
         tagValueUpdate.getServerTimestamp(), 
         null,
         tagValueUpdate.getDescription(), 
@@ -310,6 +315,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((alarms == null) ? 0 : alarms.hashCode());
+    result = prime * result + ((daqTimestamp == null) ? 0 : daqTimestamp.hashCode());
     result = prime * result + ((dataTagQuality == null) ? 0 : dataTagQuality.hashCode());
     result = prime * result + ((dataType == null) ? 0 : dataType.hashCode());
     result = prime * result + ((description == null) ? 0 : description.hashCode());
@@ -323,7 +329,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
   }
 
   @Override
-  public boolean equals(final Object obj) {
+  public boolean equals(Object obj) {
     if (this == obj)
       return true;
     if (obj == null)
@@ -334,57 +340,59 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
     if (alarms == null) {
       if (other.alarms != null)
         return false;
-    }
+    } 
     else if (!alarms.equals(other.alarms))
+      return false;
+    if (daqTimestamp == null) {
+      if (other.daqTimestamp != null)
+        return false;
+    } 
+    else if (!daqTimestamp.equals(other.daqTimestamp))
       return false;
     if (dataTagQuality == null) {
       if (other.dataTagQuality != null)
         return false;
-    }
+    } 
     else if (!dataTagQuality.equals(other.dataTagQuality))
       return false;
     if (dataType == null) {
       if (other.dataType != null)
         return false;
-    }
+    } 
     else if (!dataType.equals(other.dataType))
       return false;
     if (description == null) {
       if (other.description != null)
         return false;
-    }
+    } 
     else if (!description.equals(other.description))
       return false;
     if (id == null) {
       if (other.id != null)
         return false;
-    }
+    } 
     else if (!id.equals(other.id))
       return false;
     if (isSimulated != other.isSimulated)
       return false;
-    if (mode == null) {
-      if (other.mode != null)
-        return false;
-    }
-    else if (!mode.equals(other.mode))
+    if (mode != other.mode)
       return false;
     if (serverTimestamp == null) {
       if (other.serverTimestamp != null)
         return false;
-    }
+    } 
     else if (!serverTimestamp.equals(other.serverTimestamp))
       return false;
     if (sourceTimestamp == null) {
       if (other.sourceTimestamp != null)
         return false;
-    }
+    } 
     else if (!sourceTimestamp.equals(other.sourceTimestamp))
       return false;
     if (value == null) {
       if (other.value != null)
         return false;
-    }
+    } 
     else if (!value.equals(other.value))
       return false;
     return true;
