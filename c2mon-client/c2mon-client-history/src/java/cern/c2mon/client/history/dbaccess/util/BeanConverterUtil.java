@@ -67,7 +67,7 @@ public final class BeanConverterUtil {
 
         final HistoryTagValueUpdateImpl value = new HistoryTagValueUpdateImpl(bean.getTagId(),
                 bean.getDataTagQuality(), TypeConverter.cast(bean.getTagValue(), bean.getTagDataType()),
-                bean.getTagTime(), bean.getServerTime(), new Timestamp(bean.getLogDate().getTime()),
+                bean.getTagTime(), bean.getDaqTime(), bean.getServerTime(), new Timestamp(bean.getLogDate().getTime()),
                 bean.getTagValueDesc() == null ? "" : bean.getTagValueDesc(), mode);
         value.setDataType(bean.getTagDataType());
         value.setDaqTimestamp(bean.getDaqTime());
