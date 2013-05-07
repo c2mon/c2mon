@@ -278,7 +278,7 @@ public class HistoryManager implements C2monHistoryManager, TagSubscriptionListe
             this.historyPlayer.unregisterSupervisionListener(SupervisionEntity.PROCESS, listener);
             this.historyPlayer.unregisterSupervisionListener(SupervisionEntity.EQUIPMENT, listener);
             this.historyPlayer.unregisterSupervisionListener(SupervisionEntity.SUBEQUIPMENT, listener);
-            tagToSupervisionListener.remove(listener);
+            tagToSupervisionListener.removeValue(listener);
           }
         }
       }
