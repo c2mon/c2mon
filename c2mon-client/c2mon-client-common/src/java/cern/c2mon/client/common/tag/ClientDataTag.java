@@ -35,6 +35,14 @@ import cern.tim.shared.rule.RuleFormatException;
 public interface ClientDataTag extends ClientDataTagValue, TagUpdateListener, Cloneable {
   
   /**
+   * Checks whether the received update is valid or not. 
+   * 
+   * @param tagValueUpdate The received update
+   * @return <code>true</code>, if the update passed all checks
+   */
+  boolean isValidUpdate(final TagValueUpdate tagValueUpdate);
+  
+  /**
    * This thread safe method updates the given <code>ClientDataTag</code> object.
    * It copies every single field of the <code>TransferTag</code> object and notifies
    * then the registered listener about the update by providing a copy of the
