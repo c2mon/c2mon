@@ -21,12 +21,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
@@ -422,6 +423,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   private void notifyListeners() {
     try {
       final ClientDataTag clone = this.clone();
+
       for (DataTagUpdateListener updateListener : listeners) { 
         try { 
           updateListener.onUpdate(clone);
@@ -526,78 +528,77 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
   
   /**
-   * Checks whether the update is valid or not. An update is considered as valid,
-   * if the following checks are valid:
+   * Checks whether the received update is valid or not. 
+   * 
+   * The following properties are checked (in order)
+   * to decide whether an update is valid or not
+   * 
    * <li> the tag id is the same
    * <li> The tag update is not <code>null</code>
-   * <li> The server timestamp or at least the DAQ timestamp is never
+   * <li> The server timestamp is never older or at least equals.
+   * <li> The DAQ timestamp.
+   * <li> The source timestamp.
+   * 
+   * Checkout issue:
+   * http://issues.cern.ch/browse/TIMS-826
+   * for more details.
    * 
    * @param tagValueUpdate The received update
    * @return <code>true</code>, if the update passed all checks
    */
-  private boolean isValidUpdate(final TagValueUpdate tagValueUpdate) {
-    boolean valid = true;
-    valid &= tagValueUpdate != null;
-    if (tagValueUpdate != null) {
-      valid &= tagValueUpdate.getId().equals(id);
+  @Override
+  public boolean isValidUpdate(final TagValueUpdate tagValueUpdate) {
+    
+    if (tagValueUpdate != null && tagValueUpdate.getId().equals(id)) {
+      
+      if (tagValueUpdate.getServerTimestamp() == null) {
+        return false;
+      }
       
       // Check server cache timestamp
-      final long newSeverTime = tagValueUpdate.getServerTimestamp().getTime();
+      final long newServerTime = tagValueUpdate.getServerTimestamp().getTime();
       final long oldServerTime = serverTimestamp.getTime();
+      
+      if (newServerTime > oldServerTime) {
+        return true;
+      }
       
       // Check DAQ timestamp, if configured.
       // This is not the case for server rule tags
-      if (tagValueUpdate.getDaqTimestamp() != null && daqTimestamp != null) {
+      if (newServerTime == oldServerTime && tagValueUpdate.getDaqTimestamp() != null) {
         final long newDaqTime = tagValueUpdate.getDaqTimestamp().getTime();
-        final long oldDaqTime = daqTimestamp.getTime();
-        valid &= newSeverTime >= oldServerTime;
-        valid &= newDaqTime > oldDaqTime;
-      }
-      else {
-        valid &= newSeverTime > oldServerTime;
-      }
-    }
-      
-    return valid;
-  }
-  
-  
-  /**
-   * Checks whether the update is valid or not. An update is considered as valid,
-   * if the following checks are valid:
-   * <li> the tag id is the same
-   * <li> The tag update is not <code>null</code>
-   * <li> The server timestamp and the DAQ timestamp are never or at least equal.
-   * <p><br>
-   * <b>Please note</b>, that this method allows value refresh with the same object.
-   * 
-   * @param tagValueUpdate The received update
-   * @return <code>true</code>, if the update passed all checks
-   */
-  private boolean isValidUpdate(final TagUpdate tagUpdate) {
-    boolean valid = true;
-    valid &= tagUpdate != null;
-    if (tagUpdate != null) {
-      valid &= tagUpdate.getId().equals(id);
-      
-      // Check server cache timestamp
-      final long newSeverTime = tagUpdate.getServerTimestamp().getTime();
-      final long oldServerTime = serverTimestamp.getTime();
-      
-      valid &= newSeverTime >= oldServerTime;
+        
+        if (daqTimestamp == null) { // old DAQ timestamp is not set
+          return true;
+        }
 
-      // Check DAQ timestamp, if configured.
-      // This is not the case for server rule tags
-      if (tagUpdate.getDaqTimestamp() != null && daqTimestamp != null) {
-        final long newDaqTime = tagUpdate.getDaqTimestamp().getTime();
         final long oldDaqTime = daqTimestamp.getTime();
-        valid &= newDaqTime >= oldDaqTime;
+        if (newDaqTime > oldDaqTime) {
+          return true;
+        }        
+        else if (newDaqTime == oldDaqTime && tagValueUpdate.getSourceTimestamp() != null) {
+          final long newSourceTime = tagValueUpdate.getSourceTimestamp().getTime();
+          
+          if (sourceTimestamp == null) { // old source timestamp is not set
+            return true;
+          }
+          
+          final long oldSourceTime = sourceTimestamp.getTime();
+          if (tagValueUpdate instanceof TagUpdate || newSourceTime != oldSourceTime) {
+            // We basically allow non-continuous source timestamps
+            return true;
+          }
+        } 
+        else if (tagValueUpdate instanceof TagUpdate && newDaqTime == oldDaqTime && sourceTimestamp == null) {
+          // This means we accept a TagUpdate also when server & DAQ time are equals
+          // but both source timestamps are not set 
+          return true;
+        }
       }
     }
       
-    return valid;
+    return false;
   }
-  
   
   /**
    * Inner method to update the tag quality without changing the inaccessible states
@@ -629,7 +630,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     updateTagLock.writeLock().lock();
     try {
       boolean valid = isValidUpdate(tagValueUpdate);
-
+      
       if (valid) {
         doUpdateValues(tagValueUpdate);
         // Notify all listeners of the update
