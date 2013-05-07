@@ -52,7 +52,8 @@ public class DailySnapshotSmartFilterTest {
       final Object value, 
       final Timestamp logTimestamp,
       final Timestamp serverTimestamp) {
-    return new HistoryTagValueUpdateImpl(TAG_ID, null, value, serverTimestamp, serverTimestamp, logTimestamp, "Test tag", TagMode.OPERATIONAL);
+    return new HistoryTagValueUpdateImpl(TAG_ID, null, value, serverTimestamp, serverTimestamp,
+        serverTimestamp, logTimestamp, "Test tag", TagMode.OPERATIONAL);
   }
   
   private Timestamp time(int day, int hour, int minute) {

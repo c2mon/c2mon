@@ -348,6 +348,7 @@ public class HistoryPlayerImpl
               currentRealtimeValue.getDataTagQuality(), 
               currentRealtimeValue.getValue(), 
               currentRealtimeValue.getTimestamp(), 
+              currentRealtimeValue.getDaqTimestamp(), 
               currentRealtimeValue.getServerTimestamp(), 
               null,
               currentRealtimeValue.getDescription(), 

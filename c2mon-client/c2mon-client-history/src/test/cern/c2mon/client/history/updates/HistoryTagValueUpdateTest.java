@@ -69,7 +69,7 @@ public class HistoryTagValueUpdateTest {
 
     HistoryTagValueUpdateImpl h = new HistoryTagValueUpdateImpl(100L, 
         q, value, 
-        now, now, 
+        now, now, now,
         now, "it looks ok", 
         null, TagMode.MAINTENANCE);
     

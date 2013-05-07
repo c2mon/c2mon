@@ -133,6 +133,7 @@ public class HistoryPlayerImplTest {
             Integer.valueOf(i+40000), 
             new Timestamp(TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000), 
             new Timestamp(TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000), 
+            new Timestamp(TIMESPAN.getStart().getTime() - 1 * 60 * 60 * 1000), 
             null,
             "Test tag", 
             TagMode.OPERATIONAL);
@@ -158,6 +159,7 @@ public class HistoryPlayerImplTest {
               tagId, 
               new DataTagQualityImpl(), 
               Integer.valueOf((int) (currentTime % 100000)), // Random value
+              new Timestamp(currentTime), 
               new Timestamp(currentTime), 
               new Timestamp(currentTime),
               null,

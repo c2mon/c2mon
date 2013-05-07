@@ -97,6 +97,7 @@ public class HistoryPublisher {
           new DataTagQualityImpl(TagQualityStatus.UNINITIALISED, message), 
           null, 
           null, 
+          null, 
           new Timestamp(1), // The data tag is only updated of a value greater than 0
           null,
           "",  
