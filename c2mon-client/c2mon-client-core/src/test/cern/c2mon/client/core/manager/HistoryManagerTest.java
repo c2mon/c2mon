@@ -262,6 +262,7 @@ public class HistoryManagerTest {
             Integer.valueOf(i+40000), 
             new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
             new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
+            new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
             null,
             "Test tag", 
             TagMode.OPERATIONAL);
@@ -287,6 +288,7 @@ public class HistoryManagerTest {
               cdt.getId(), 
               new DataTagQualityImpl(), 
               Integer.valueOf((int)(currentTime % 100000)), 
+              new Timestamp(currentTime - 2 * 60 * 60 * 1000), 
               new Timestamp(currentTime - 2 * 60 * 60 * 1000), 
               new Timestamp(currentTime), 
               null,
