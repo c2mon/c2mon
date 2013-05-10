@@ -546,8 +546,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @param tagValueUpdate The received update
    * @return <code>true</code>, if the update passed all checks
    */
-  @Override
-  public boolean isValidUpdate(final TagValueUpdate tagValueUpdate) {
+  protected boolean isValidUpdate(final TagValueUpdate tagValueUpdate) {
     
     if (tagValueUpdate != null && tagValueUpdate.getId().equals(id)) {
       
@@ -964,8 +963,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   }
 
   @Override
-  public void onUpdate(final TagValueUpdate tagValueUpdate) {
-    update(tagValueUpdate);
+  public boolean onUpdate(final TagValueUpdate tagValueUpdate) {
+    return update(tagValueUpdate);
   }
 
   @Override
