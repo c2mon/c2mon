@@ -224,13 +224,13 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
     for (int index = 0; index < historyUpdates.length; index++) {
       final HistoryUpdate historyUpdate = historyUpdates[index];
       if (historyUpdate instanceof HistoryTagValueUpdate) {
-        final HistoryTagValueUpdate historyTagValueUpdate = (HistoryTagValueUpdate) historyUpdate;
         
-        final boolean isValid = clientDataTag.isValidUpdate(historyTagValueUpdate);
-        if (!isValid) // only Valid updates should be added in the history
+        final HistoryTagValueUpdate historyTagValueUpdate = (HistoryTagValueUpdate) historyUpdate;
+        final boolean wasUpdatedSuccesfully = clientDataTag.onUpdate(historyTagValueUpdate);
+        
+        if (!wasUpdatedSuccesfully) // only Valid updates should be added in the history
           continue; // => the rest are ignored
         
-        clientDataTag.onUpdate(historyTagValueUpdate);
         try {
           final HistoryTagValueUpdateImpl update = new HistoryTagValueUpdateImpl(
               clientDataTag.getId(), 

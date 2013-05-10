@@ -200,10 +200,12 @@ public class HistoryPlayerImplTest2 {
     // Stub for the tagUpdateListener
     final TagUpdateListener tagUpdateListenerDelegate = new TagUpdateListener() {
       @Override
-      public void onUpdate(final TagValueUpdate tagValueUpdate) {
+      public boolean onUpdate(final TagValueUpdate tagValueUpdate) {
         if (tagValueUpdate.getDataTagQuality().isInitialised()) {
           Assert.fail(String.format("Unexpected method call onUpdate(%s)", tagValueUpdate.toString()));
         }
+
+        return true;
       }
     };
     tagUpdateListener.onUpdate(EasyMock.<TagValueUpdate>anyObject());

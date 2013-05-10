@@ -291,10 +291,11 @@ public class HistoryPlayerImplTest {
     
     final TagUpdateListener tagUpdateListenerDelegate = new TagUpdateListener() {
       @Override
-      public void onUpdate(final TagValueUpdate tagValueUpdate) {
+      public boolean onUpdate(final TagValueUpdate tagValueUpdate) {
         if (tagValueUpdate.getDataTagQuality().isInitialised()) {
           Assert.fail(String.format("Unexpected method call onUpdate(%s)", tagValueUpdate.toString()));
         }
+        return true;
       }
     };
     
@@ -354,11 +355,13 @@ public class HistoryPlayerImplTest {
     
     final TagUpdateListener tagUpdateListener = new TagUpdateListener() {
       @Override
-      public void onUpdate(final TagValueUpdate update) {
+      public boolean onUpdate(final TagValueUpdate update) {
         try {
           Thread.sleep(millisecondsToDelay, nanosecondsToDelay);
         }
         catch (InterruptedException e) { }
+
+        return true;
       }
     };
     
