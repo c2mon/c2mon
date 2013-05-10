@@ -41,7 +41,8 @@ public interface TagUpdateListener {
    * @param tagValueUpdate contains the value information
    *          used to update the <code>ClientDataTag</code> 
    *          in the client
+   * @return 
    */
-  void onUpdate(TagValueUpdate tagValueUpdate);
+  boolean onUpdate(TagValueUpdate tagValueUpdate);
   
 }
