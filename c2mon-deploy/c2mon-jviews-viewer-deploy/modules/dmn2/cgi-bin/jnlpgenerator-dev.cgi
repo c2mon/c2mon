@@ -85,7 +85,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 		<all-permissions/> 
 	</security> 
 	<resources>
-		<j2se version=\"1.6+\"  initial-heap-size=\"512M\" max-heap-size=\"512M\"/>" , "\n";
+		<j2se version=\"1.7+\"  initial-heap-size=\"512M\" max-heap-size=\"512M\"/>" , "\n";
 
 jarlist ("$jardir");
 

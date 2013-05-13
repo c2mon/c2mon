@@ -80,7 +80,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
     <all-permissions/> 
   </security> 
   <resources>
-    <j2se version=\"1.6+\"  initial-heap-size=\"512M\" max-heap-size=\"512M\"/>" , "\n";
+    <j2se version=\"1.7+\"  initial-heap-size=\"512M\" max-heap-size=\"512M\"/>" , "\n";
 
 jarlist ("$jardir");
 
@@ -92,8 +92,10 @@ print "    <property name=\"app.version\" value=\"$viewerVersion\"/>\n";
 print "    <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
 print "    <property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
-#log4j configuration URL
+# log4j configuration URL
 print "    <property name=\"log4j.configuration\" value=\"$log4jURL\"/>\n";
+# Defines the timezone, which is not always correctly picked up from Linux
+print "    <property name=\"user.timezone\" value=\"Europe/Zurich\"/>\n";
 
 if (param('configurl')) {
 	print "		<property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";
