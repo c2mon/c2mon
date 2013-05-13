@@ -41,6 +41,11 @@
 					      #           will not preload its caches from  the database, isitead it will refer to local 
 					      #           cache files, stored in: log/ehcache-diskstore  
 					      # ***************************************************************************
+					      
+					      # uncomment the 2 lines below  if you need remote debugging 
+					      #REMOTE_DEBUGGER_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+					      #JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUGER_OPTS}"
+					      
                     ]]>
 				</preExec>
 			</startscript>
