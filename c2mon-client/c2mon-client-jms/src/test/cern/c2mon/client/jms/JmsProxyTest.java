@@ -219,8 +219,7 @@ public class JmsProxyTest {
     };
     
     //expect
-    listener.onUpdate(EasyMock.isA(TransferTagValueImpl.class));
-    
+    EasyMock.expect(listener.onUpdate(EasyMock.isA(TransferTagValueImpl.class))).andReturn(true);
     
     //run test
     EasyMock.replay(listener);
