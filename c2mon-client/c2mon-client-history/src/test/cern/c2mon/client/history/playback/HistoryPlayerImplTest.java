@@ -48,6 +48,7 @@ import cern.c2mon.client.history.testUtil.UncaughtExceptionSetup;
 import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 
 /**
@@ -275,7 +276,9 @@ public class HistoryPlayerImplTest {
     mockCtrl.checkOrder(false);
     
     for (final TagValueUpdate update : initialRecords) {
-      tagUpdateListenersMock.get(update.getId()).onUpdate(EasyMock.eq(update));
+
+      EasyMock.expect(tagUpdateListenersMock.get(update.getId())
+          .onUpdate(EasyMock.eq(update))).andReturn(true);
       EasyMock.expectLastCall().atLeastOnce();
     }
     
@@ -283,7 +286,9 @@ public class HistoryPlayerImplTest {
     mockCtrl.checkOrder(true);
     
     for (final TagValueUpdate update : orderedRecords) {
-      tagUpdateListenersMock.get(update.getId()).onUpdate(update);
+      
+      EasyMock.expect(tagUpdateListenersMock.get(update.getId())
+          .onUpdate(EasyMock.eq(update))).andReturn(true);
       EasyMock.expectLastCall().once();
     }
     
@@ -300,7 +305,7 @@ public class HistoryPlayerImplTest {
     };
     
     for (final TagUpdateListener listener : tagUpdateListenersMock.values()) {
-      listener.onUpdate(EasyMock.<TagValueUpdate>anyObject());
+            listener.onUpdate(EasyMock.<TagValueUpdate>anyObject());
       EasyMock.expectLastCall().andStubDelegateTo(tagUpdateListenerDelegate);
     }
     

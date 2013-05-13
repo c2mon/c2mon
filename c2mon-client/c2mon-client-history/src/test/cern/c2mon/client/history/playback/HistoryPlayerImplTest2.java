@@ -184,13 +184,14 @@ public class HistoryPlayerImplTest2 {
     
     supervisionListener.onSupervisionUpdate(EasyMock.eq(initialSupervisionEvent));
     EasyMock.expectLastCall().atLeastOnce();
-    tagUpdateListener.onUpdate(EasyMock.eq(initialHistoryRecord));
+    EasyMock.expect(tagUpdateListener.onUpdate(EasyMock.eq(initialHistoryRecord))).andReturn(true);
     EasyMock.expectLastCall().atLeastOnce();
     
     
     mockCtrl.checkOrder(true);
     
-    tagUpdateListener.onUpdate(EasyMock.eq(historyRecord));
+    EasyMock.expect(tagUpdateListener.onUpdate(EasyMock.eq(historyRecord))).andReturn(true);
+    
     supervisionListener.onSupervisionUpdate(EasyMock.eq(supervisionEvent));
     
     //
