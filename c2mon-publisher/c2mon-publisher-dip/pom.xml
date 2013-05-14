@@ -3,7 +3,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.13</version>
   </parent>
   <groupId>cern.c2mon.c2mon-publisher</groupId>
   <artifactId>c2mon-publisher-dip</artifactId>
@@ -13,6 +13,22 @@
   <scm>
   	<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-publisher/c2mon-publisher-dip</developerConnection>
   </scm>
+  
+  <!-- This is needed to retrieve the DIP dependencies -->
+  <repositories>
+    <repository>
+      <id>cern-nexus</id>
+      <name>CERN Central Nexus</name>
+      <url>https://j2eeps.cern.ch/nexus/content/groups/public</url>
+    </repository>
+  </repositories>
+
+  <properties>
+    <dip.version>5.5.0</dip.version>
+    <dip.native.libs.dir.rel>dip-${dip.version}/lib</dip.native.libs.dir.rel>
+    <dip.native.libs.dir.abs>${project.build.directory}/lib_so/${dip.native.libs.dir.rel}</dip.native.libs.dir.abs>
+  </properties>
+  
   <dependencies>
   
     <!-- C2MON Client API dependencies -->
@@ -25,7 +41,7 @@
     <dependency>
       <groupId>cern.dip</groupId>
       <artifactId>dip</artifactId>
-      <version>5.4.4</version>
+      <version>${dip.version}</version>
     </dependency>
     
   	<!-- 3rd party dependencies -->
