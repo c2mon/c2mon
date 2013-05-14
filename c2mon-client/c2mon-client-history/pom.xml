@@ -8,7 +8,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-history</artifactId>
-  <version>1.1.7</version>
+  <version>1.1.8-SNAPSHOT</version>
   <name>c2mon-client-history</name>
   <packaging>jar</packaging>
   <description>
