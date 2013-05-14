@@ -101,6 +101,12 @@
         <groupId>cern.c2mon.c2mon-client</groupId>
         <artifactId>c2mon-client-all</artifactId>
         <version>[1.0.0,2.0.0)</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-client</groupId>
@@ -165,11 +171,23 @@
         <groupId>cern.accsoft.security</groupId>
         <artifactId>accsoft-security-rba</artifactId>
         <version>1.4.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>cern.accsoft.security</groupId>
         <artifactId>accsoft-security-rba-util</artifactId>
         <version>1.4.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- other internal libs -->
@@ -177,6 +195,12 @@
         <groupId>cern.accsoft.commons</groupId>
         <artifactId>accsoft-commons-util</artifactId>
         <version>[1.0.0,2.0.0)</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- 3rd parties -->
