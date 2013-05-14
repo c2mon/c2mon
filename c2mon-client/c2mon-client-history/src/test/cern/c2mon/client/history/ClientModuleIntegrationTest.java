@@ -23,8 +23,6 @@ public class ClientModuleIntegrationTest {
   @Test
   public void moduleStartUp() {
     //do nothing
-    //TODO remove this fake failure
-    Assert.assertTrue(false);
   }
   
 }
