@@ -28,14 +28,13 @@
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!--  take the native libraries and copy them to /lib_so -->
+    <!-- take the native libraries and copy them to /lib_so -->
     <fileSet>
       <outputDirectory>/lib_so</outputDirectory>
       <includes>
-        <include>*.so</include>
+        <include>*.so*</include>
       </includes>
-      <directory>${project.build.directory}/lib_so/lib/i386-Linux-gpp/jni
-			</directory>
+      <directory>${dip.native.libs.dir.abs}</directory>
       <fileMode>0444</fileMode>
     </fileSet>
     <fileSet>

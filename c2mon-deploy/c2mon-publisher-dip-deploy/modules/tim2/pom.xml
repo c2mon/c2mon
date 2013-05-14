@@ -31,38 +31,45 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.2</version>
+        <version>2.6</version>
         <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>false</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+            </configuration>
+          </execution>
           <execution>
             <id>unpack</id>
             <phase>compile</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+
+                  <groupId>cern.dip</groupId>
+                  <artifactId>dip</artifactId>
+                  <version>${dip.version}</version>
+                  <classifier>distribution</classifier>
+                  <type>zip</type>
+                  <includes>${dip.native.libs.dir.rel}/*</includes>
+
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/lib_so</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <artifactItems>
-            <artifactItem>
-              <groupId>cern.dip</groupId>
-              <artifactId>dip-jni</artifactId>
-              <classifier>i386-Linux-gpp-jni</classifier>
-              <version>5.4.4</version>
-              <type>nar</type>
-              <overWrite>true</overWrite>
-              <outputDirectory>${project.build.directory}/lib_so</outputDirectory>
-            </artifactItem>
-            <artifactItem>
-              <groupId>com.googlecode.narlibs</groupId>
-              <artifactId>log4cxx-nar</artifactId>
-              <classifier>i386-Linux-gpp-shared</classifier>
-              <version>10.0.0.1</version>
-              <type>nar</type>
-              <overWrite>true</overWrite>
-              <outputDirectory>${project.build.directory}/lib_so</outputDirectory>
-            </artifactItem>
-          </artifactItems>
-        </configuration>
       </plugin>
 
       <plugin>
