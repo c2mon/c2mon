@@ -12,7 +12,7 @@
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-publisher-rda-deploy</artifactId>
 	<name>Deploys the RDA publisher for C2MON</name>
-	<version>1.0.12</version>
+	<version>1.0.13-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
