@@ -5,14 +5,14 @@
   <parent>
     <groupId>cern.c2mon.c2mon-deploy</groupId>
     <artifactId>c2mon-publisher-dip-deploy</artifactId>
-    <version>1.2.0</version>
+    <version>1.2.1-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>c2mon-publisher-dip-tim2</artifactId>
   <name>The TIM2 DIP Publisher module</name>
-  <version>1.2.0</version>
+  <version>1.2.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>C2MON DIP publisher assembling all required modules and configuration files for TIM2</description>
