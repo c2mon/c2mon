@@ -14,7 +14,7 @@
 	<name>DMN2 CLIC DAQ deployment module</name>
 	<version>1.0.9-SNAPSHOT</version>
 
-	<packaging>pom</packaging>
+	<!-- <packaging>jar</packaging> -->
 
 	<description>DMN2 CLIC DAQ assembling required modules and configuration files</description>
 
@@ -23,50 +23,16 @@
 	</scm>
 
 	<dependencies>
-	
+
 		<dependency>
 			<groupId>cern.c2mon.c2mon-daq</groupId>
 			<artifactId>c2mon-daq-clic</artifactId>
 		</dependency>
-	
+
 	</dependencies>
 
 	<build>
 		<plugins>
-
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.outputDirectory}
-							</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>true</filtering>
-									<includes>
-										<include>version.txt</include>
-									</includes>
-								</resource>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>false</filtering>
-									<excludes>
-										<exclude>version.txt</exclude>
-									</excludes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>

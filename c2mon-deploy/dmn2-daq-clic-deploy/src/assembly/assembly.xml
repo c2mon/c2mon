@@ -10,7 +10,7 @@
 		<format>tar.gz</format>
 	</formats>
 
-	<!--  do not include base directory -->
+	<!-- do not include base directory -->
 	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<dependencySets>
@@ -41,7 +41,7 @@
 
 	<files>
 
-		<!--  copy the configuration file -->
+		<!-- copy the configuration file -->
 		<file>
 			<source>conf/daq.conf</source>
 			<outputDirectory>conf/</outputDirectory>
@@ -49,7 +49,7 @@
 			<fileMode>0444</fileMode>
 		</file>
 
-		<!--  copy the starting script -->
+		<!-- copy the starting script -->
 		<file>
 			<source>bin/daqprocess2.sh</source>
 			<outputDirectory>bin/</outputDirectory>
@@ -62,15 +62,15 @@
 			<outputDirectory>bin/</outputDirectory>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0755</fileMode>
-		</file>		
-    	<file>
-	      <source>bin/dmn2-daq-wreboot-common.sh</source>
-	      <outputDirectory>bin/</outputDirectory>
-	      <lineEnding>unix</lineEnding>
-	      <fileMode>0755</fileMode>
-	    </file>		
+		</file>
+		<file>
+			<source>bin/dmn2-daq-wreboot-common.sh</source>
+			<outputDirectory>bin/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0755</fileMode>
+		</file>
 
-		<!--  copy changelog -->
+		<!-- copy changelog -->
 		<file>
 			<source>changelog/changelog.txt</source>
 			<outputDirectory>/</outputDirectory>
@@ -78,7 +78,7 @@
 			<fileMode>0444</fileMode>
 		</file>
 
-		<!--  deployment descriptor -->
+		<!-- deployment descriptor -->
 		<file>
 			<source>conf/deployment.xml</source>
 			<outputDirectory>/</outputDirectory>
@@ -86,7 +86,7 @@
 			<fileMode>0444</fileMode>
 		</file>
 
-		<!--  copy the version file -->
+		<!-- copy the version file -->
 		<file>
 			<source>${project.build.outputDirectory}/version.txt</source>
 			<outputDirectory>/</outputDirectory>
