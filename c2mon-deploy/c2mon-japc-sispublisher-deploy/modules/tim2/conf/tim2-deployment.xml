@@ -31,9 +31,6 @@
           <property name="tim.log.path" value="${INSTALL_DIR}/log" />
           <property name="tim.process.name" value="${PROCESS_NAME}" />
           <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
-          <output>
-            <logrotate fileSize="100M" files="3" name="${INSTALL_DIR}/log/${PROCESS_NAME}.out.log" />
-          </output>
         </main-class>
       </startscript>
 		</application>
