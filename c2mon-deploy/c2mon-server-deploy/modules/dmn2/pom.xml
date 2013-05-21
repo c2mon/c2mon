@@ -14,7 +14,6 @@
 	<artifactId>c2mon-srv-dmn2</artifactId>
 	<name>The DMN2 SRV module</name>
 	<version>1.1.18-SNAPSHOT</version>
-	<packaging>pom</packaging>
 
 	<description>C2MON server assembling all required modules and configuration files for DMN2</description>
 	<url></url>
@@ -40,10 +39,10 @@
 			<groupId>cern.tim2.tim2-server</groupId>
 			<artifactId>tim2-server-cachepersistence</artifactId>
 		</dependency>
-		<!--		<dependency>-->
-		<!--			<groupId>cern.tim2.tim2-server</groupId>-->
-		<!--			<artifactId>tim2-server-benchmark</artifactId>-->
-		<!--		</dependency>-->
+		<!-- <dependency> -->
+		<!-- <groupId>cern.tim2.tim2-server</groupId> -->
+		<!-- <artifactId>tim2-server-benchmark</artifactId> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>cern.tim2.tim2-server</groupId>
 			<artifactId>tim2-server-command</artifactId>
@@ -108,40 +107,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.outputDirectory}
-							</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>true</filtering>
-									<includes>
-										<include>version.txt</include>
-									</includes>
-								</resource>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>false</filtering>
-									<excludes>
-										<exclude>version.txt</exclude>
-									</excludes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
 
