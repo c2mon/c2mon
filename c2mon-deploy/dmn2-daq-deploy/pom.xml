@@ -14,8 +14,6 @@
 	<name>DMN2 DAQ deployment module</name>
 	<version>1.0.36-SNAPSHOT</version>
 
-	<packaging>pom</packaging>
-
 	<description>
             DMN2 DAQ assembling all required modules and configuration files for DMN2
         </description>
@@ -29,12 +27,12 @@
 
 
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
-			<artifactId>tim2-daq-core</artifactId>			
+			<artifactId>tim2-daq-core</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
 			<artifactId>tim2-daq-jmx</artifactId>
@@ -63,39 +61,6 @@
 
 	<build>
 		<plugins>
-
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.outputDirectory}
-							</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>true</filtering>
-									<includes>
-										<include>version.txt</include>
-									</includes>
-								</resource>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>false</filtering>
-									<excludes>
-										<exclude>version.txt</exclude>
-									</excludes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
