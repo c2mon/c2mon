@@ -1,58 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-	<product name="c2mon">
+  <product name="c2mon">
 
-		<!--
-			this application section is a parent configuration for both
-			c2mon-tim2-prod and c2mon-tim2-test
-		-->
-		<application name="default">
-			<deployment installLocation="/opt/tim-japc-sispublisher/">
-				<backupPolicy keepBackups="2">
-					<preserve type="dir" name="log" />
-					<preserve type="dir" name="tmp" />
-					<preserve type="file" name="conf/publisher.tid" />
-				</backupPolicy>
-				<notification>
-					<!-- you can give more than one mail for deployment notification -->
-					<mail address="tim-admin@cern.ch" />
-				</notification>
-			</deployment>
-			<startscript name="japc-publisher-startup">
+    <!-- this application section is a parent configuration for both c2mon-tim2-prod and c2mon-tim2-test -->
+    <application name="default">
+      <deployment installLocation="/opt/tim-japc-sispublisher/">
+        <backupPolicy keepBackups="2">
+          <preserve type="dir" name="log" />
+          <preserve type="dir" name="tmp" />
+          <preserve type="file" name="conf/publisher.tid" />
+        </backupPolicy>
+        <notification>
+          <!-- you can give more than one mail for deployment notification -->
+          <mail address="tim-admin@cern.ch" />
+        </notification>
+      </deployment>
+      <startscript name="japc-publisher-startup">
         <main-class name="cern.c2mon.japc.publisher.JAPCPublisherKernel">
-          <initial-heap-size>256m</initial-heap-size>
-          <max-heap-size>256m</max-heap-size>
           <arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -dataTags ${INSTALL_DIR}/conf/publisher.tid</arg>
-          <preExec>
+        </main-class>
+
+        <initial-heap-size>256m</initial-heap-size>
+        <max-heap-size>256m</max-heap-size>
+
+        <!-- JVM arguments -->
+        <property name="tim.log.path" value="${INSTALL_DIR}/log" />
+        <property name="tim.process.name" value="${PROCESS_NAME}" />
+        <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
+
+        <preExec>
 <![CDATA[
   [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
- ]]>
-          </preExec>
-          <property name="tim.log.path" value="${INSTALL_DIR}/log" />
-          <property name="tim.process.name" value="${PROCESS_NAME}" />
-          <property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/c2mon-client.properties" />
-        </main-class>
+]]>
+        </preExec>
       </startscript>
-		</application>
+    </application>
 
-		<application name="tim-japc-sispublisher-prod" extends="default">
-			<deployment installLocation="/opt/tim-japc-sispublisher">
-				<directory name="conf">
-					<!-- Copy over the c2mon.properties file into the /conf directory  -->
-					<file name="c2mon-client.properties" sourceDir="/user/timoper/rep/c2mon/client"
-						mask="400" />
-				</directory>
-			</deployment>
-		</application>
-
-		<application name="tim-japc-sispublisher-test" extends="default">
-			<deployment installLocation="/opt/tim-japc-sispublisher-test">
-				<directory name="conf">
-          <!-- Copy over the c2mon.properties file into the /conf directory  -->
-          <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client"
-            mask="400" />
+    <application name="tim-japc-sispublisher-prod" extends="default">
+      <deployment installLocation="/opt/tim-japc-sispublisher">
+        <directory name="conf">
+          <!-- Copy over the c2mon.properties file into the /conf directory -->
+          <file name="c2mon-client.properties" sourceDir="/user/timoper/rep/c2mon/client" mask="400" />
         </directory>
-			</deployment>
-		</application>
-	</product>
+      </deployment>
+    </application>
+
+    <application name="tim-japc-sispublisher-test" extends="default">
+      <deployment installLocation="/opt/tim-japc-sispublisher-test">
+        <directory name="conf">
+          <!-- Copy over the c2mon.properties file into the /conf directory -->
+          <file name="c2mon-client.properties" sourceDir="/user/timtest/rep/c2mon/client" mask="400" />
+        </directory>
+      </deployment>
+    </application>
+  </product>
 </products>
