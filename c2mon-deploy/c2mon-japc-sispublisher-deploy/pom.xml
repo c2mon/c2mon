@@ -12,7 +12,7 @@
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-japc-sispublisher-deploy</artifactId>
 	<name>Deploys the JAPC SIS publisher</name>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3</version>
 
 	<packaging>pom</packaging>
 
