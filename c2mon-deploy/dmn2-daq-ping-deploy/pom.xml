@@ -14,8 +14,6 @@
 	<name>DMN2 PING DAQ deployment module</name>
 	<version>1.0.3-SNAPSHOT</version>
 
-	<packaging>pom</packaging>
-
 	<description>DMN2 PING DAQ assembling required modules and configuration files</description>
 
 	<scm>
@@ -23,7 +21,7 @@
 	</scm>
 
 	<dependencies>
-		
+
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
 			<artifactId>tim2-daq-japc</artifactId>
@@ -50,39 +48,6 @@
 
 	<build>
 		<plugins>
-
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.outputDirectory}
-							</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>true</filtering>
-									<includes>
-										<include>version.txt</include>
-									</includes>
-								</resource>
-								<resource>
-									<directory>${basedir}</directory>
-									<filtering>false</filtering>
-									<excludes>
-										<exclude>version.txt</exclude>
-									</excludes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
