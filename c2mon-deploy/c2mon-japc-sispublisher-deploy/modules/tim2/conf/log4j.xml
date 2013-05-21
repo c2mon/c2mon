@@ -35,6 +35,9 @@
 <log4j:configuration debug="false"
                      threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
+                     
+  <renderer  renderedClass="cern.c2mon.client.common.tag.ClientDataTagValue"
+             renderingClass="cern.c2mon.client.common.tag.ClientDataTagValueRenderer" />
 
   <!--
     Create a RollingFileAppender.
@@ -52,11 +55,21 @@
     </errorHandler>
     <param name="Append" value="true" />
     <param name="File" value="${tim.log.path}/${tim.process.name}.log" />
-    <param name="MaxBackupIndex" value="1" />
-    <param name="MaxFileSize" value="10MB" />
+    <param name="MaxBackupIndex" value="3" />
+    <param name="MaxFileSize" value="20MB" />
     <param name="BufferedIO" value="false" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
+    </layout>
+  </appender>
+  
+  <appender name="ClientDataTagLoggerAppender" class="org.apache.log4j.RollingFileAppender">
+    <param name="Append" value="true" />
+    <param name="File" value="${tim.log.path}/${tim.process.name}.tag.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value ="2" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n"/>
     </layout>
   </appender>
 
@@ -70,6 +83,29 @@
       <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
     </layout>
   </appender>
+  
+  <!-- 
+    Special logger used for logging the ClientDataTagValue updates in a separate file & format
+   -->
+  <logger name="ClientDataTagLogger" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="ClientDataTagLoggerAppender" />
+  </logger>
+  
+  <logger name="org.springframework" additivity="false">
+    <level value="warn" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+  
+  <logger name="org.apache" additivity="false">
+    <level value="warn" />
+    <appender-ref ref="FileAppender" />
+  </logger>
+  
+  <logger name="cern.c2mon.client" additivity="false">
+    <level value="warn" />
+    <appender-ref ref="FileAppender" />
+  </logger>
 
   <root>
     <level value="debug"/>
