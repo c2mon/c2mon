@@ -110,7 +110,7 @@ public final class JAPCPublisherKernel {
      }
      
      // Initialize C2MON Gateway
-     C2monServiceGateway.startC2monClient();
+     C2monServiceGateway.startC2monClientSynchronous();
      
      logger.info("Starting JAPCGateway...");
      final JAPCGateway gateway = new JAPCGateway();
