@@ -384,11 +384,6 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
 
         JAPCHardwareAddress addr = (JAPCHardwareAddress) sct.getHardwareAddress();
 
-        String dataField = addr.getDataFieldName();
-        if (dataField != null && dataField.length() == 0) {
-            dataField = null;
-        }
-
         String device = addr.getDeviceName();
         String property = addr.getPropertyName();
 
@@ -489,18 +484,6 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
     public final String runCommand(SourceCommandTagValue sourceCommandTagValue) throws EqCommandTagException {
         return sendCommand(sourceCommandTagValue);
     }
-
-    // public final String runCommand(Long commandId) throws EqCommandTagException {
-    // ISourceCommandTag command = getEquipmentConfiguration().getSourceCommandTag(commandId);
-    // if (command == null) {
-    // return format("command %d is unknown", command);
-    // }
-    //
-    // SourceCommandTagValue ctv = new SourceCommandTagValue(commandId, command.getName(), this
-    // .getEquipmentConfiguration().getId(), (short) 0, "dummy", "java.lang.String");
-    //
-    // return sendCommand(ctv);
-    // }
 
     /**
      * this method is called when a new DataTag is "injected"
