@@ -155,7 +155,7 @@ public class PingMessageHandlerTest extends GenericMessageHandlerTst {
      * 
      * @throws Exception
      */
-    @Test
+    //@Test
     @UseConf("integration-test-ten-metrics.xml")
     public void testPing4() throws Exception {
 
