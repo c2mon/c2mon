@@ -1,0 +1,55 @@
+<EquipmentUnit id="5250" name="E_PING_PING01">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address></address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+		<DataTag id="54676" name="BE.TEST:TEST1" control="false">
+			<data-type>Integer</data-type>
+			<min-value data-type="Integer">0</min-value>
+			<max-value data-type="Integer">64000</max-value>
+			<DataTagAddress>
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+					<address>localhost</address>
+				</HardwareAddress>
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+		<DataTag id="54677" name="BE.TEST:TEST2" control="false">
+			<data-type>Integer</data-type>
+			<min-value data-type="Integer">0</min-value>
+			<max-value data-type="Integer">64000</max-value>
+			<DataTagAddress>
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+					<address>localhost</address>
+				</HardwareAddress>
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+		<DataTag id="54678" name="BE.TEST:TEST3" control="false">
+			<data-type>Integer</data-type>
+			<min-value data-type="Integer">0</min-value>
+			<max-value data-type="Integer">64000</max-value>
+			<DataTagAddress>
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+					<address>localhost</address>
+				</HardwareAddress>
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+	</DataTags>
+	<CommandTags />
+</EquipmentUnit>
