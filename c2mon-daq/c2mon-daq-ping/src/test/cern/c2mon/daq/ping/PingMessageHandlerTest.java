@@ -165,7 +165,7 @@ public class PingMessageHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(5, 9);
+        expectLastCall().times(9);
 
         replay(messageSender);
 
