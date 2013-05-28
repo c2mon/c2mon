@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.tim2.tim2-daq</groupId>
 		<artifactId>tim2-daq-pom</artifactId>
-		<version>1.0.16</version>
+		<version>1.0.19</version>
 	</parent>
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
@@ -21,28 +21,9 @@
 	</scm>
 
 	<dependencies>
-
 		<dependency>
-			<groupId>cern.tim2.tim2-daq</groupId>
-			<artifactId>tim2-daq-japc</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>cern.japc</groupId>
-					<artifactId>japc-ext-remote</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>cern.japc</groupId>
-					<artifactId>japc-ext-cmwrda</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>cern.japc</groupId>
-					<artifactId>japc-ext-snmp</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>cern.japc</groupId>
-					<artifactId>japc-ext-valcompl</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>cern.c2mon.c2mon-daq</groupId>
+			<artifactId>c2mon-daq-ping</artifactId>
 		</dependency>
 	</dependencies>
 
