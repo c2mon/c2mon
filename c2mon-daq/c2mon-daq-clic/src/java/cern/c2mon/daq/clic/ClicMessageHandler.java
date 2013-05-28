@@ -617,8 +617,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
                     listener.onMessage(initValue);
                 }
             } catch (AgentCommunicationException e) {
-                logger.error("could not get initial value for device/parameter: %" + device + "/"
-                        + ACQUISITION_PROPERTY);
+                logger.error("could not get initial value for device/parameter: " + device + "/" + ACQUISITION_PROPERTY);
             }
         }// for
 
