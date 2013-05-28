@@ -12,7 +12,7 @@
 	<groupId>cern.dmn2.dmn2-daq</groupId>
 	<artifactId>dmn2-daq-ping-deploy</artifactId>
 	<name>DMN2 PING DAQ deployment module</name>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3</version>
 
 	<description>DMN2 PING DAQ assembling required modules and configuration files</description>
 
