@@ -118,9 +118,6 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
         // set equipment configuration changer
         getEquipmentConfigurationHandler().setEquipmentConfigurationChanger(this);
 
-        // start the connection thread
-        // new Thread(new OpenMBeanConnectionTask(this)).start();
-
         // create initialization thread
         initThread = new Thread(this);
 
