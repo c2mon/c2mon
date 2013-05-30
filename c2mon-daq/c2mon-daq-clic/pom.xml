@@ -10,7 +10,7 @@
 
 	<groupId>cern.c2mon.c2mon-daq</groupId>
 	<artifactId>c2mon-daq-clic</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6-SNAPSHOT</version>
 	<name>dmn2-daq-clic</name>
 	<packaging>jar</packaging>
 	<description>C2MON data acquisition component for communication with the JMS-STOMP CLIC agents</description>
