@@ -4,6 +4,9 @@
 
 package cern.c2mon.daq.clic;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -16,7 +19,6 @@ import javax.jms.TextMessage;
 import javax.jms.Topic;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.network.jms.JmsMesageConvertor;
 import org.apache.log4j.Logger;
 
 import cern.dmn2.agentlib.AgentMessage;
@@ -26,31 +28,36 @@ import cern.dmn2.agentlib.MessageHeader;
 import cern.dmn2.agentlib.impl.AgentMessageImpl;
 
 /**
+ * This class implements a dummy CLIC agent. It is used for test purposes only.
+ * 
  * @author wbuczak
  */
 public class DummyClicAgent {
 
-    
     private static final Logger log = Logger.getLogger(DummyClicAgent.class);
 
     private final String brokerUrl;
-    
+
     private final String agentDevice;
     private final long heartbeatLoopTime;
     private final long acqusitionLoopTime;
+
+    // array of dummy agent's metrics
+    private List<String> metrics = new CopyOnWriteArrayList<String>();
 
     public DummyClicAgent(String brokerUrl) {
         this.brokerUrl = brokerUrl;
         this.agentDevice = "DMN.CLIC.TEST";
         this.heartbeatLoopTime = 1000;
         this.acqusitionLoopTime = 1500;
+
+        initClicConfiguration();
     }
 
-    public DummyClicAgent(String brokerUrl, String agentDeviceName, long heartbeatLoopTime, long acquisitionLoopTime) {
-        this.brokerUrl = brokerUrl;
-        this.agentDevice = agentDeviceName;
-        this.heartbeatLoopTime = heartbeatLoopTime;
-        this.acqusitionLoopTime = acquisitionLoopTime;
+    public void initClicConfiguration() {
+        this.metrics.add("test.property.1");
+        this.metrics.add("test.property.2");
+        this.metrics.add("test.property.3");
     }
 
     ActiveMQConnectionFactory factory;
@@ -180,9 +187,12 @@ public class DummyClicAgent {
 
         // set msg. body
         StringBuilder strbld = new StringBuilder();
-        strbld.append(FieldDataType.TYPE_LONG.getValueString() + "/1/test.property1=1\n");
-        strbld.append(FieldDataType.TYPE_LONG.getValueString() + "/1/test.property2=2\n");
-        strbld.append(FieldDataType.TYPE_LONG.getValueString() + "/1/test.property3=3\n");
+
+        for (String m : metrics) {
+            String metricNum = m.split("\\.")[2];
+            strbld.append(FieldDataType.TYPE_LONG.getValueString() + "/" + metricNum.length() + "/" + m + "="
+                    + metricNum + "\n");
+        }
 
         message.setText(strbld.toString());
 
@@ -225,9 +235,10 @@ public class DummyClicAgent {
         }
 
         // set msg. body
-        
+
         StringBuilder responseBld = new StringBuilder();
-        responseBld.append(FieldDataType.TYPE_STRING.getValueString() + "/"+resultString.length()+"/response=").append(resultString).append("\n\n");
+        responseBld.append(FieldDataType.TYPE_STRING.getValueString() + "/" + resultString.length() + "/response=")
+                .append(resultString).append("\n\n");
         message.setText(responseBld.toString());
 
         log.debug("Sending command reply");
@@ -236,7 +247,7 @@ public class DummyClicAgent {
         producer.close();
 
     }
-    
+
     private void handleCommandRequest(Message requestMessage) throws JMSException {
 
         Destination replyToDest = requestMessage.getJMSReplyTo();
@@ -249,19 +260,17 @@ public class DummyClicAgent {
             return;
         }
 
-        
-
         String commandName = null;
         String args = null;
-        
+
         if (am.getBody().containsKey("command")) {
-            commandName = (String) am.getBody().get("command");            
+            commandName = (String) am.getBody().get("command");
         }
 
         if (am.getBody().containsKey("args")) {
-            args = (String) am.getBody().get("args");            
+            args = (String) am.getBody().get("args");
         }
-                
+
         MessageProducer producer = session.createProducer(replyToDest);
         TextMessage message = session.createTextMessage();
 
@@ -274,13 +283,14 @@ public class DummyClicAgent {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
         }
-                
-        String resultString = String.format("received command: %s with arguments: %s",commandName,args);
-        log.debug("result="+resultString);
+
+        String resultString = String.format("received command: %s with arguments: %s", commandName, args);
+        log.debug("result=" + resultString);
         // set msg. body
-        
+
         StringBuilder responseBld = new StringBuilder();
-        responseBld.append(FieldDataType.TYPE_STRING.getValueString() + "/"+resultString.length()+"/response=").append(resultString).append("\n\n");
+        responseBld.append(FieldDataType.TYPE_STRING.getValueString() + "/" + resultString.length() + "/response=")
+                .append(resultString).append("\n\n");
         message.setText(responseBld.toString());
 
         log.debug("Sending command reply");
@@ -290,9 +300,20 @@ public class DummyClicAgent {
 
     }
 
-    
-    
-    
+    private void handleClicReconfiguration(AgentMessage message) {
+        log.info("received reconfiguration message with following content : " + message.getBody().toString());
+
+        String payload = (String) message.getBody().get("entries");
+
+        String[] entries = payload.split(",");
+
+        for (String e : entries) {
+            if (!metrics.contains(e)) {
+                metrics.add(e);
+            }
+        }
+    }
+
     public synchronized void start() throws Exception {
 
         factory = new ActiveMQConnectionFactory("", "", this.brokerUrl);
@@ -319,15 +340,19 @@ public class DummyClicAgent {
 
                         try {
                             AgentMessage am = new AgentMessageImpl(textMessage);
+                            String agentProperty = am.getHeader().getAgentProperty();
 
                             switch (am.getHeader().getCommandType()) {
                             case SET:
                                 log.debug("set comand received");
+
+                                if (agentProperty.equals("Setting")) {
+                                    handleClicReconfiguration(am);
+                                }
+
                                 break;
                             case GET:
                                 log.debug("get comand received");
-
-                                String agentProperty = am.getHeader().getAgentProperty();
 
                                 if (agentProperty.equals("Acquisition")) {
                                     // reply with acquisition, as requested
@@ -338,7 +363,7 @@ public class DummyClicAgent {
                                 } else if (agentProperty.equals("RestartProcess")) {
                                     handleRestartProcessRequest(message);
                                 } else if (agentProperty.equals("Command")) {
-                                    handleCommandRequest(message);                                
+                                    handleCommandRequest(message);
                                 } else {
                                     log.warn("unknown comand received");
                                 }
@@ -348,7 +373,7 @@ public class DummyClicAgent {
                         }
                     }
                 } catch (JMSException e) {
-                    System.out.println("Caught:" + e);
+                    log.error("Caught JMSException", e);
                     e.printStackTrace();
                 }
             }
@@ -367,6 +392,12 @@ public class DummyClicAgent {
         }
         if (conn != null)
             conn.close();
+    }
+
+    public void removeMetric(final String metricName) {
+        if (metrics.contains(metricName)) {
+            metrics.remove(metricName);
+        }
     }
 
 }

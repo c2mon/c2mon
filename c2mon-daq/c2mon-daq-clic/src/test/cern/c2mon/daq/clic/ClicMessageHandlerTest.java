@@ -98,7 +98,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
 
         clicMsgHandler.connectToDataSource();
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
 
         verify(messageSender);
 
@@ -122,7 +122,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
 
         clicMsgHandler.connectToDataSource();
 
-        Thread.sleep(3000);
+        Thread.sleep(2000);
 
         verify(messageSender);
 
@@ -137,6 +137,92 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(100911).getQuality().getQualityCode());
         assertEquals(3, sdtv.getFirstValue(100911).getValue());
         assertEquals("", sdtv.getFirstValue(100911).getValueDescription());
+    }
+
+    @Test
+    @UseConf("conf-clic-two-metrics.xml")
+    public void subscriptionWithClicReconfigurationTest1() throws Exception {
+        messageSender.sendCommfaultTag(107211, true);
+        expectLastCall().once();
+
+        SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
+
+        messageSender.addValue(EasyMock.capture(sdtv));
+        expectLastCall().times(3);
+
+        replay(messageSender);
+
+        clicMsgHandler.connectToDataSource();
+
+        Thread.sleep(2500);
+
+        verify(messageSender);
+
+        assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(100909).getQuality().getQualityCode());
+        assertEquals(1, sdtv.getFirstValue(100909).getValue());
+        assertEquals("", sdtv.getFirstValue(100909).getValueDescription());
+
+        // first time the expected metric is not configured on the CLIC agent's side
+        assertEquals(SourceDataQuality.INCORRECT_NATIVE_ADDRESS, sdtv.getFirstValue(100912).getQuality()
+                .getQualityCode());
+        assertEquals("Field: test.property.10 missing in the map. Please check your configuration.", sdtv
+                .getFirstValue(100912).getQuality().getDescription());
+
+        // after CLIC is reconfigured, with the next acquisition the expected metric should now be available
+        assertEquals(SourceDataQuality.OK, sdtv.getValueAt(1, 100912).getQuality().getQualityCode());
+        assertEquals(10, sdtv.getValueAt(1, 100912).getValue());
+        assertEquals("", sdtv.getValueAt(1, 100912).getValueDescription());
+    }
+
+    @Test
+    @UseConf("conf-clic-two-metrics.xml")
+    public void subscriptionWithClicReconfigurationTest2() throws Exception {
+        messageSender.sendCommfaultTag(107211, true);
+        expectLastCall().once();
+
+        SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
+
+        messageSender.addValue(EasyMock.capture(sdtv));
+        expectLastCall().times(5);
+
+        replay(messageSender);
+
+        clicMsgHandler.connectToDataSource();
+
+        Thread.sleep(2500);
+
+        // force the CLIC to unregister one of its metrics
+        agent1.removeMetric("test.property.1");
+
+        Thread.sleep(2500);
+
+        verify(messageSender);
+
+        assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(100909).getQuality().getQualityCode());
+        assertEquals(1, sdtv.getFirstValue(100909).getValue());
+        assertEquals("", sdtv.getFirstValue(100909).getValueDescription());
+
+        // first time the expected metric is not configured on the CLIC agent's side
+        assertEquals(SourceDataQuality.INCORRECT_NATIVE_ADDRESS, sdtv.getFirstValue(100912).getQuality()
+                .getQualityCode());
+        assertEquals("Field: test.property.10 missing in the map. Please check your configuration.", sdtv
+                .getFirstValue(100912).getQuality().getDescription());
+
+        // after CLIC is reconfigured, with the next acquisition the expected metric should now be available
+        assertEquals(SourceDataQuality.OK, sdtv.getValueAt(1, 100912).getQuality().getQualityCode());
+        assertEquals(10, sdtv.getValueAt(1, 100912).getValue());
+        assertEquals("", sdtv.getValueAt(1, 100912).getValueDescription());
+
+        assertEquals(SourceDataQuality.INCORRECT_NATIVE_ADDRESS, sdtv.getValueAt(1, 100909).getQuality()
+                .getQualityCode());
+        assertEquals("Field: test.property.1 missing in the map. Please check your configuration.",
+                sdtv.getValueAt(1, 100909).getQuality().getDescription());
+
+        // with next iteration the CLIC should be back reconfigured, hence the tag 100909 is again correctly received
+        assertEquals(SourceDataQuality.OK, sdtv.getLastValue(100909).getQuality().getQualityCode());
+        assertEquals(1, sdtv.getLastValue(100909).getValue());
+        assertEquals("", sdtv.getLastValue(100909).getValueDescription());
+
     }
 
     @Test
@@ -210,7 +296,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
         str.append("    <HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl\">");
         str.append("       <device-name>DMN.CLIC.TEST</device-name>\n");
         str.append("       <property-name>Acquisition</property-name>\n");
-        str.append("       <data-field-name>test.property2</data-field-name>\n");
+        str.append("       <data-field-name>test.property.2</data-field-name>\n");
         str.append("    </HardwareAddress>");
         str.append("    <time-to-live>3600000</time-to-live>");
         str.append("    <priority>2</priority>");
@@ -268,13 +354,13 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(1,2);
+        expectLastCall().times(1, 2);
 
         replay(messageSender);
 
         clicMsgHandler.connectToDataSource();
 
-        assertEquals(1,clicMsgHandler.getEquipmentConfiguration().getSourceDataTags().size());
+        assertEquals(1, clicMsgHandler.getEquipmentConfiguration().getSourceDataTags().size());
 
         Thread.sleep(2000);
 
@@ -305,8 +391,8 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
 
         // the first request should be successful
         assertEquals(CHANGE_STATE.SUCCESS, report.getState());
-        
-        assertEquals(0,clicMsgHandler.getEquipmentConfiguration().getSourceDataTags().size());
+
+        assertEquals(0, clicMsgHandler.getEquipmentConfiguration().getSourceDataTags().size());
 
         // the other one should give some warning, but the status should still be SUCCESS
         assertEquals(CHANGE_STATE.SUCCESS, report2.getState());

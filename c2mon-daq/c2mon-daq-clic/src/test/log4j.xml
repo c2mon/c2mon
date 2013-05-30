@@ -31,7 +31,7 @@
 	</logger>
 
 	<root>
-		<level value="debug" />
+		<level value="info" />
 		<appender-ref ref="ConsoleAppender" />
 	</root>
 

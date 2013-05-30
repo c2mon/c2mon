@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import cern.dmn2.agentlib.AgentClient;
 import cern.dmn2.agentlib.AgentCommunicationException;
@@ -47,6 +51,10 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
 
     protected static int RECONNECTION_TIME = 30000; // in ms
 
+    // size of the reconfiguration thread pool
+    protected static int CLIC_RECONFIGURATION_THREADS_POOL_SIZE = Integer.parseInt(System.getProperty(
+            "dmn2.daq.clic.configuration_threads", "4"));
+
     // reference to the static agent client instance, shared across all instances of the ClicMessageHandler
     private static AgentClient client;
 
@@ -54,6 +62,17 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
      * reference to the initialization thread
      */
     private Thread initThread;
+
+    /**
+     * a thread pool used for CLIC reconfigurations
+     */
+    private static ExecutorService clicReconfigurationExecutor = Executors
+            .newFixedThreadPool(CLIC_RECONFIGURATION_THREADS_POOL_SIZE);
+
+    /**
+     * an array of handlers to the CLIC configuration threads
+     */
+    private static List<Future<?>> clicReconfigurationFutures = new CopyOnWriteArrayList<Future<?>>();
 
     /**
      * a map keeping for each tag, its AgentListeners
@@ -70,6 +89,16 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
     private EquipmentLogger logger;
 
     private CommunicationListener communicationListener = new ClicCommunicationValueListener();
+
+    public ClicMessageHandler() {
+
+        // start a predefined number of CLIC configuration threads
+        // NOTE: CLIC configuration threads are shared across all CLIC handlers
+        while (clicReconfigurationFutures.size() < CLIC_RECONFIGURATION_THREADS_POOL_SIZE) {
+            clicReconfigurationFutures.add(clicReconfigurationExecutor.submit(new ClicConfigurationTask()));
+        }// while
+
+    }
 
     /**
      * This class implements a AgentLib communication listener. This listener is called when a value of a parameter
@@ -144,6 +173,16 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
                     logger.info(format("received an empty map for parameter: %s (missing initial update?)",
                             header.getAgentDeviceName() + "/" + header.getAgentProperty()));
                 }
+            } catch (IndexOutOfBoundsException ex) {
+                getEquipmentLogger().warn(
+                        "\tInvalidating SourceDataTagValue with quality INCORRECT_NATIVE_ADDRESS, for Tag name : "
+                                + tag.getName() + " id : " + tag.getId() + " Problem: " + ex.getMessage());
+                getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
+                        ex.getMessage());
+
+                // register this CLIC for reconfiguration
+                ClicConfigurationTask.registerForReconfiguration(ClicMessageHandler.this);
+
             } catch (Exception e) {
                 getEquipmentLogger().warn(
                         "\tInvalidating SourceDataTagValue with quality INCORRECT_NATIVE_ADDRESS, for Tag name : "
