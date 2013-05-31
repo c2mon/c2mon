@@ -281,7 +281,7 @@ sub fetchPublishedTags {
 
 
         my $fetch_tags_sql = <<END;
-select metric_data_tag_id from dmn_metrics_v where and japc_metric_pub_flag='Y'
+select metric_data_tag_id from dmn_metrics_v where japc_metric_pub_flag='Y'
 END
 
         my $sth = $dbh->prepare("${fetch_tags_sql}")
