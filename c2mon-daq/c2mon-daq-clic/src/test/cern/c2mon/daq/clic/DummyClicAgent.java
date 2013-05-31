@@ -42,23 +42,13 @@ public class DummyClicAgent {
     private final long heartbeatLoopTime;
     private final long acqusitionLoopTime;
 
+    private volatile int reconfigurationCounter = 0;
+
+    private volatile boolean runHeartbeatThread = true;
+    private volatile boolean runAcquisitionThread = true;
+
     // array of dummy agent's metrics
     private List<String> metrics = new CopyOnWriteArrayList<String>();
-
-    public DummyClicAgent(String brokerUrl) {
-        this.brokerUrl = brokerUrl;
-        this.agentDevice = "DMN.CLIC.TEST";
-        this.heartbeatLoopTime = 1000;
-        this.acqusitionLoopTime = 1500;
-
-        initClicConfiguration();
-    }
-
-    public void initClicConfiguration() {
-        this.metrics.add("test.property.1");
-        this.metrics.add("test.property.2");
-        this.metrics.add("test.property.3");
-    }
 
     ActiveMQConnectionFactory factory;
     Connection conn;
@@ -71,9 +61,6 @@ public class DummyClicAgent {
 
     Thread hbSenderThread;
     Thread aqSenderThread;
-
-    private volatile boolean runHeartbeatThread = true;
-    private volatile boolean runAcquisitionThread = true;
 
     Session hbSession;
 
@@ -132,6 +119,25 @@ public class DummyClicAgent {
             }
         }
 
+    }
+
+    public DummyClicAgent(String brokerUrl) {
+        this.brokerUrl = brokerUrl;
+        this.agentDevice = "DMN.CLIC.TEST";
+        this.heartbeatLoopTime = 1000;
+        this.acqusitionLoopTime = 1500;
+
+        initClicConfiguration();
+    }
+
+    public void initClicConfiguration() {
+        this.metrics.add("test.property.1");
+        this.metrics.add("test.property.2");
+        this.metrics.add("test.property.3");
+    }
+
+    public int getReconfigurationCounter() {
+        return this.reconfigurationCounter;
     }
 
     public synchronized void startHeartbeat() {
@@ -347,6 +353,8 @@ public class DummyClicAgent {
                                 log.debug("set comand received");
 
                                 if (agentProperty.equals("Setting")) {
+                                    // increment reconfiguration request counter
+                                    reconfigurationCounter++;
                                     handleClicReconfiguration(am);
                                 }
 

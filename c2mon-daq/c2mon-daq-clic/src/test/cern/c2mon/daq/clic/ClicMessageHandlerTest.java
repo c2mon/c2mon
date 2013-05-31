@@ -43,7 +43,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
     ClicMessageHandler clicMsgHandler;
 
     BrokerService broker;
-    DummyClicAgent agent1;
+    DummyClicAgent clicAgent;
 
     public static final String ACTIVEMQ_URL = "tcp://localhost:9999";
     public static final String ACTIVEMQ_FAILOVER_URL = "failover:(" + ACTIVEMQ_URL
@@ -63,10 +63,10 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
         log.info("entering beforeTest()..");
         clicMsgHandler = (ClicMessageHandler) msgHandler;
 
-        agent1 = new DummyClicAgent(ACTIVEMQ_FAILOVER_URL);
-        agent1.start();
-        agent1.startHeartbeat();
-        agent1.startAcquisition();
+        clicAgent = new DummyClicAgent(ACTIVEMQ_FAILOVER_URL);
+        clicAgent.start();
+        clicAgent.startHeartbeat();
+        clicAgent.startAcquisition();
 
         log.info("leaving beforeTest()");
     }
@@ -76,9 +76,9 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
 
         clicMsgHandler.disconnectFromDataSource();
 
-        agent1.stopHeartbeat();
-        agent1.stopAcquisition();
-        agent1.stop();
+        clicAgent.stopHeartbeat();
+        clicAgent.stopAcquisition();
+        clicAgent.stop();
 
         broker.stop();
     }
@@ -172,6 +172,9 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals(SourceDataQuality.OK, sdtv.getValueAt(1, 100912).getQuality().getQualityCode());
         assertEquals(10, sdtv.getValueAt(1, 100912).getValue());
         assertEquals("", sdtv.getValueAt(1, 100912).getValueDescription());
+        
+        // the CLIC agent is supposed to receive reconfiguration request once only
+        assertEquals(1,clicAgent.getReconfigurationCounter());
     }
 
     @Test
@@ -192,7 +195,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
         Thread.sleep(2500);
 
         // force the CLIC to unregister one of its metrics
-        agent1.removeMetric("test.property.1");
+        clicAgent.removeMetric("test.property.1");
 
         Thread.sleep(2500);
 
@@ -222,7 +225,9 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals(SourceDataQuality.OK, sdtv.getLastValue(100909).getQuality().getQualityCode());
         assertEquals(1, sdtv.getLastValue(100909).getValue());
         assertEquals("", sdtv.getLastValue(100909).getValueDescription());
-
+        
+        // the CLIC agent is supposed to receive reconfiguration request twice!
+        assertEquals(2,clicAgent.getReconfigurationCounter());        
     }
 
     @Test
