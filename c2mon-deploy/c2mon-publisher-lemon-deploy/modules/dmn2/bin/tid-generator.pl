@@ -56,19 +56,26 @@ my $dbh = DBI->connect( $dbiUrl, $dbiUser, $dbiPassword )
 
 
 my $fetch_configuration_sql = <<END;
-SELECT compname,substr(nvl(replace(compdescrip,'#',''),'NA'),1,33) compdescrip,operating_system,
-LISTAGG(metric_data_tag_id, ',')  WITHIN GROUP (ORDER BY metric_data_tag_id) AS metrics,
-count(metric_data_tag_id)
-FROM   DMN_METRICS_V,DMN_COMPUTERS    where enabled_flag='Y'     and compname=lower(equipment_short_name)
-and comptype='DSC'
-and diamon_flag='Y'
-and rule_flag='Y'
-and  operating_system is not null
-and metric_short_name in ('PROC.ACTIVESTATE.ABSOLUTE','PROC.ACTIVESTATE.DELTA','PROC.ACTIVEUSERS',
+SELECT 
+  c.compname, 
+  substr(nvl(replace(c.compdescrip,'#',''),'NA'),1,33) compdescrip, 
+  c_os.operating_system, 
+  LISTAGG(m.metric_data_tag_id, ',')  WITHIN GROUP (ORDER BY m.metric_data_tag_id) AS metrics,
+  COUNT(m.metric_data_tag_id)
+FROM DMN_METRICS_V m INNER JOIN DMN_COMPUTERS_OS c_os
+        ON m.computer_id = c_os.computer_id 
+     INNER JOIN DMN_COMPUTERS c
+        ON c_os.computer_id = c.computer_id 
+WHERE 
+  c.comptype='DSC' and 
+  c.rule_flag='Y' and  
+  c_os.operating_system is not null and 
+  m.metric_short_name in ('PROC.ACTIVESTATE.ABSOLUTE','PROC.ACTIVESTATE.DELTA','PROC.ACTIVEUSERS',
 'SYS.KERN.IDLE','SYS.KERN.IRQ','SYS.KERN.NICE','SYS.KERN.SIRQ','SYS.KERN.SYSTEM','SYS.KERN.UPTIME',
 'SYS.KERN.USER','SYS.LOADAVG','SYS.MEM.BUFFERED','SYS.MEM.CACHED','SYS.MEM.FREE','SYS.MEM.INACTPCT',
 'SYS.MEM.SWAPPCT','SYS.MEM.USED','SYS.NET.IN','SYS.NET.OUT')
-GROUP BY compname,compdescrip,operating_system     order by compname
+GROUP BY c.compname, c.compdescrip, c_os.operating_system     
+ORDER BY c.compname
 END
 
 my $sth = $dbh->prepare($fetch_configuration_sql)
