@@ -1,60 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-                <product name="dmn2-dashboard-editor">
+	<product name="dmn2-dashboard-editor">
 
-                                <application name="default">
-                                                <startscript name="dmn2-views-gen">
-                                                                <main-class name="ch.cern.dashboardeditor.common.templates.TemplateGenerator">
-                                                                <!-- 
-                                                                     $1 - the directory where the instances are going to be generated 
-                                                                     $2 - url to the template 
-                                                                -->
-                                                                                <arg>$1 $2</arg>
-                                                                </main-class>
+		<application name="default">
+			<startscript name="dmn2-views-gen">
+				<main-class
+					name="ch.cern.dashboardeditor.common.templates.TemplateGenerator">
+					<!-- $1 - the directory where the instances are going to be generated 
+						$2 - url to the template 
+						$3 - url to the template configuration 
+					-->
+					<arg>$1 $2 $3</arg>
+				</main-class>
 
-                                                                <!-- JVM arguments -->
-                                                                <property name="log4j.configuration" value="file://${INSTALL_DIR}/conf/log4j.xml" />
-                                                                <property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
-                                                                <property name="c2mon.process.name" value="dmn2-views-gen" />
-                                                                <property name="db.properties" value="file://${INSTALL_DIR}/conf/client.properties" />                
-                                                                <property name="oracle.net.tns_admin" value="/etc"/>
-                                                                
-                                                                <preExec>
+				<!-- JVM arguments -->
+				<property name="log4j.configuration" value="file://${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
+				<property name="c2mon.process.name" value="dmn2-views-gen" />
+				<property name="db.properties"
+					value="file://${INSTALL_DIR}/conf/client.properties" />
+				<property name="oracle.net.tns_admin" value="/etc" />
+
+				<preExec>
                           <![CDATA[
                                                 echo "View instances will be generated in: $1"
                            ]]>
-                </preExec>
-                                                                                                
-                                                </startscript>                    
-                                                <deployment>
-                                                </deployment>
-                                </application>
+				</preExec>
 
-                                <application name="dmn2-dashboardeditor-pro" extends="default">
-                                                <deployment installLocation="~diamonop/public_html/dmn2-dashboard-editor-pro">
-                                                                <signJars keyStore="~diamonop/c2mon/client/jarsign.properties" />
-                                                                <directory name="conf">
-                                                                                <file name="client.properties" sourceDir="~diamonop/c2mon/client"
-                                                                                                mask="444" />
-                                                                </directory>
-                                                                <notification>
-                                                                                <!-- you can give more than one mail for deployment notification -->
-                                                                                <mail address="project-diamon-core@cern.ch" />
-                                                                </notification>
-                                                </deployment>
-                                </application>
+			</startscript>
+			<deployment>
+			</deployment>
+		</application>
 
-                                <application name="dmn2-dashboardeditor-dev" extends="default">
-                                                <deployment installLocation="~dmndev/public_html/dmn2-dashboard-editor-dev">
-                                                                <signJars keyStore="~dmndev/c2mon/client/jarsign.properties" />
-                                                                <directory name="conf">
-                                                                                <file name="client.properties" sourceDir="~dmndev/c2mon/client"
-                                                                                                mask="444" />
-                    <file name="log4j.xml" sourceDir="~dmndev/c2mon/client/"
-                                                                                                mask="644" />                                                                                  
-                                                                </directory>
-                                                </deployment>
-                                </application>
+		<application name="dmn2-dashboardeditor-pro" extends="default">
+			<deployment installLocation="~diamonop/public_html/dmn2-dashboard-editor-pro">
+				<signJars keyStore="~diamonop/c2mon/client/jarsign.properties" />
+				<directory name="conf">
+					<file name="client.properties" sourceDir="~diamonop/c2mon/client"
+						mask="444" />
+				</directory>
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="project-diamon-core@cern.ch" />
+				</notification>
+			</deployment>
+		</application>
 
-                </product>
+		<application name="dmn2-dashboardeditor-dev" extends="default">
+			<deployment installLocation="~dmndev/public_html/dmn2-dashboard-editor-dev">
+				<signJars keyStore="~dmndev/c2mon/client/jarsign.properties" />
+				<directory name="conf">
+					<file name="client.properties" sourceDir="~dmndev/c2mon/client"
+						mask="444" />
+					<file name="log4j.xml" sourceDir="~dmndev/c2mon/client/" mask="644" />
+				</directory>
+			</deployment>
+		</application>
+
+	</product>
 </products>
