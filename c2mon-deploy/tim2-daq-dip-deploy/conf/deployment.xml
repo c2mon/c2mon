@@ -48,7 +48,7 @@
         <directory name="conf">
           <file name="c2mon.properties" sourceDir="/user/timoper/rep/c2mon/daq" mask="400" />
           <file name="daq.conf" sourceDir="/user/timoper/rep/c2mon/daq" mask="400" />
-          <file name="daq-core-service-double.xml" source="/user/timoper/rep/c2mon/daq" mask="400" />
+          <file name="daq-core-service-double.xml" sourceDir="/user/timoper/rep/c2mon/daq" mask="400" />
         </directory>
         <directory name="bin">
           <file name="daqprocess.sh" sourceDir="/user/timoper/rep/c2mon/daq" mask="700" />
@@ -67,7 +67,7 @@
         <directory name="conf">
           <file name="c2mon.properties" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
           <file name="daq.conf" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
-          <file name="daq-core-service-double.xml" source="/user/timtest/rep/c2mon/daq" mask="400" />
+          <file name="daq-core-service-double.xml" sourceDir="/user/timtest/rep/c2mon/daq" mask="400" />
         </directory>
         <directory name="bin">
           <file name="daqprocess.sh" sourceDir="/user/timtest/rep/c2mon/daq" mask="700" />
