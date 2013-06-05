@@ -314,7 +314,7 @@ sub fetchPublishedLimits {
 
 
         my $fetch_tags_sql = <<END;
-select metric_rule_tag_id as metric_data_tag_id from dmn_metrics_v where and japc_limit_pub_flag='Y'
+select metric_rule_tag_id as metric_data_tag_id from dmn_metrics_v where japc_limit_pub_flag='Y'
 END
 
         my $sth = $dbh->prepare("${fetch_tags_sql}")
