@@ -11,7 +11,7 @@ package cern.c2mon.notification.impl;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -19,14 +19,13 @@ import org.junit.Test;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.notification.Tag;
-import cern.c2mon.notification.impl.TagCache;
 import cern.tim.shared.common.datatag.DataTagQuality;
 
 public class TagCacheTest {
 
     public class MyCache extends TagCache {
         @Override
-        public Tag metricTagResolver2(Long tagID, ConcurrentHashMap<Long, Tag> overallList) {
+        public Tag metricTagResolver2(Long tagID, Map<Long, Tag> overallList) {
 
             // one child with a metric
             Tag rule1 = new Tag(1L, true);
