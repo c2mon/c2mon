@@ -201,7 +201,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
 
         logger.info("Step 6 of 6 : Starting the cache checker...");
         // start the cache checker
-        service.scheduleWithFixedDelay(new Runnable() {
+        service.scheduleAtFixedRate(new Runnable() {
 
             @Override
             public void run() {
