@@ -68,8 +68,7 @@ public class ReminderImpl implements Reminder {
      * @param millis the reminder time in milliseconds.
      */
     public void setReminderTime(long millis) {
-        reminderTime = millis;
-        logger.info("Setting new reminder time to " + millis + " msec");
+        setReminderTime(millis, TimeUnit.MINUTES);
     }
 
     /**
