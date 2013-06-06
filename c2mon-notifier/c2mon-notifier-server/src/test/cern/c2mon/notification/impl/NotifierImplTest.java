@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -20,6 +19,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.notification.Mailer;
@@ -49,7 +49,7 @@ public class NotifierImplTest {
     /**
      * a factor to create values for example metrics.
      */
-    private static Double DEFAULT_METRIC_VALUE_FACTOR = 1.0d;
+    static Double DEFAULT_METRIC_VALUE_FACTOR = 1.0d;
     
 	SubscriptionRegistry reg = null;
 	IMocksControl mockControl = EasyMock.createControl();
@@ -120,14 +120,12 @@ public class NotifierImplTest {
                     try {
                         t.update(getClientDataTagFakeUpdateFor(t, new Double(Status.OK.toInt())));
                     } catch (RuleFormatException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 } else {
                     try {
                         t.update(getClientDataTagFakeUpdateFor(t, DEFAULT_METRIC_VALUE_FACTOR * t.getId()));
                     } catch (RuleFormatException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
@@ -153,9 +151,15 @@ public class NotifierImplTest {
 	    protected void startSubscriptionFor(HashSet<Long> l) {
 	        // IGNORE
 	    }
-	    
-	    protected void startSubscriptionWithoutNotification(HashSet<Long> list) {
+	    @Override
+	    protected DataTagUpdateListener startSubscriptionWithoutNotification(HashSet<Long> list) {
+	        return null;
         }
+	    
+	    @Override
+	    void unsubscribeFirstUpdateListener(DataTagUpdateListener initialReportTagListener) {
+	        
+	    }
 	    
 	    @Override
         public void cancelSubscription(@SuppressWarnings("unused") Subscription subscription) {
@@ -789,7 +793,7 @@ public class NotifierImplTest {
 	}
 	
 	
-	private ClientDataTagValue getClientDataTagFakeUpdateFor(Tag tag, Double value) throws RuleFormatException {
+	ClientDataTagValue getClientDataTagFakeUpdateFor(Tag tag, Double value) throws RuleFormatException {
 	    ClientDataTagImpl result = null;
 	    Long id = tag.getId();
 	    if (tag.isRule()) {
