@@ -31,7 +31,7 @@
             <include>log4j.properties</include>
             <include>config.properties</include>
          </includes>
-         <fileMode>0500</fileMode>
+         <fileMode>0700</fileMode>
          <outputDirectory>conf</outputDirectory>
       </fileSet>
       
