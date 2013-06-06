@@ -38,6 +38,7 @@ import cern.tim.shared.common.datatag.TagQualityStatus;
 import cern.tim.shared.rule.RuleEvaluationException;
 import cern.tim.shared.rule.RuleExpression;
 import cern.tim.shared.rule.RuleFormatException;
+import cern.tim.shared.rule.RuleValidationReport;
 
 /**
  * @author felixehm
@@ -167,7 +168,7 @@ public class NotifierImplTest {
         }
 	    
 	    @Override
-	    protected Tag metricTagResolver2(Long tagID, ConcurrentHashMap<Long, Tag> overallList) {
+	    protected Tag metricTagResolver2(Long tagID, Map<Long, Tag> overallList) {
 
 	        /*
 	         * complex rule with two sub rule and their children.
@@ -325,6 +326,11 @@ public class NotifierImplTest {
             
             @Override
             public Object evaluate(Map<Long, Object> arg0) throws RuleEvaluationException {
+                return null;
+            }
+
+            @Override
+            public RuleValidationReport validate(Map<Long, Object> pInputParams) {
                 return null;
             }
         };
