@@ -5,13 +5,13 @@
    <parent>
     <artifactId>dmn2-client-pom</artifactId>
     <groupId>cern.dmn2.client</groupId>
-    <version>1.0.2</version>
+    <version>1.0.5</version>
    </parent>
 
 
 	<groupId>cern.c2mon.notification</groupId>
 	<artifactId>c2mon-server-notification</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>notifier</name>
 	<packaging>jar</packaging>
 
@@ -43,8 +43,7 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
@@ -93,7 +92,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>4.10</version><!--$NO-MVN-MAN-VER$-->
 			<type>jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -106,9 +105,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
-			<version>3.1.2.RELEASE</version>
-			<type>jar</type>
-			<scope>compile</scope>
+			<version>3.1.2.RELEASE</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
@@ -128,6 +125,11 @@
 			<artifactId>dmn2-db-service</artifactId>
 			<type>jar</type>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+		   <groupId>org.apache.activemq</groupId>
+		   <artifactId>activemq-all</artifactId>
+		   <version>5.6.0</version>
 		</dependency>
 	</dependencies>
 	
@@ -153,6 +155,38 @@
 				</executions>
 			</plugin>
 		</plugins>
+
+		<pluginManagement>
+		   <plugins>
+		      <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+		      <plugin>
+		         <groupId>org.eclipse.m2e</groupId>
+		         <artifactId>lifecycle-mapping</artifactId>
+		         <version>1.0.0</version>
+		         <configuration>
+		            <lifecycleMappingMetadata>
+		               <pluginExecutions>
+		                  <pluginExecution>
+		                     <pluginExecutionFilter>
+		                        <groupId>org.codehaus.mojo</groupId>
+		                        <artifactId>
+		                           build-helper-maven-plugin
+		                        </artifactId>
+		                        <versionRange>[1.1,)</versionRange>
+		                        <goals>
+		                           <goal>add-source</goal>
+		                        </goals>
+		                     </pluginExecutionFilter>
+		                     <action>
+		                        <ignore></ignore>
+		                     </action>
+		                  </pluginExecution>
+		               </pluginExecutions>
+		            </lifecycleMappingMetadata>
+		         </configuration>
+		      </plugin>
+		   </plugins>
+		</pluginManagement>
 	</build>
 	
   <scm>
