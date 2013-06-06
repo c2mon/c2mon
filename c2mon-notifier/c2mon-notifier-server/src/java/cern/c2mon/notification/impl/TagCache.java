@@ -628,14 +628,9 @@ public class TagCache implements DataTagUpdateListener {
                 t.addSubscription(s);
                 toSubscribeTo.add(t.getId());
             }
-            /* trigger the c2mon client API to load the Tags from the server into its local cache, 
-             * then, we check for intial report sending
-             */
-            FirstUpdateListener fu = new FirstUpdateListener(toSubscribeTo);
-            C2monServiceGateway.getTagManager().subscribeDataTags(toSubscribeTo, fu);
-            fu.waitUntilDone();
             
-            //startSubscriptionWithoutNotification(toSubscribeTo);
+            
+            DataTagUpdateListener toCancelLater = startSubscriptionWithoutNotification(toSubscribeTo);
             
             for (Subscription s : list) {
                 notifier.sendReportOnRuleChange(get(s.getTagId()));
@@ -650,7 +645,7 @@ public class TagCache implements DataTagUpdateListener {
             }
             startSubscriptionFor(toSubscribeTo);
             
-            C2monServiceGateway.getTagManager().unsubscribeAllDataTags(fu);
+            unsubscribeFirstUpdateListener(toCancelLater);
             
             logger.trace("Leaving startSubscription()");
         } catch (TagNotFoundException ex) {
@@ -665,13 +660,24 @@ public class TagCache implements DataTagUpdateListener {
      * @param toSubscribeTo the tags to subscribe to 
      * @throws InterruptedException in case we are interrupted while waiting for all updates.
      */
-    void startSubscriptionWithoutNotification(HashSet<Long> toSubscribeTo) throws InterruptedException {
+    DataTagUpdateListener startSubscriptionWithoutNotification(HashSet<Long> toSubscribeTo) throws InterruptedException {
         FirstUpdateListener fu = new FirstUpdateListener(toSubscribeTo);
         C2monServiceGateway.getTagManager().subscribeDataTags(toSubscribeTo, fu);
         fu.waitUntilDone();
         if (fu.getLeft() > 0) {
             logger.error("Not all updates arrived while waiting for initial subscription. Lef =" + fu.getLeft());
         }
+        return fu;
+    }
+    
+    /**
+     * Required to cancel. Together with {@link #startSubscriptionWithoutNotification(HashSet)} 
+     * this is a workaround used by {@link #startSubscription(HashSet)} to overcome the defect of the C2MON client 
+     * API to provide a first collection when calling subscribe.  
+     * @param initialReportTagListener
+     */
+    void unsubscribeFirstUpdateListener(DataTagUpdateListener initialReportTagListener) {
+        C2monServiceGateway.getTagManager().unsubscribeAllDataTags(initialReportTagListener);
     }
     
     /**
