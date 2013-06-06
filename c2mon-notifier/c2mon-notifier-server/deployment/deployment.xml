@@ -5,7 +5,9 @@
       <!-- not installable -->
       <application>
          <deployment installLocation="/opt/c2mon/notifier">
-            <directory name="conf" />
+            <directory name="conf" >
+               <file name="config.properties" sourceDir="~/c2mon/notifier/" />
+            </directory>
             <directory name="log" />
             <backupPolicy>
                <preserve type="dir" name="conf" />
