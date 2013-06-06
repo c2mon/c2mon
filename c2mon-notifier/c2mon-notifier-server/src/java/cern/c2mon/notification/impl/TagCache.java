@@ -8,7 +8,6 @@
 package cern.c2mon.notification.impl;
 
 import java.io.BufferedWriter;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,8 +15,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -41,8 +41,8 @@ import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.notification.shared.TagNotFoundException;
 import cern.dmn2.core.Status;
 import cern.dmn2.db.DiamonDbGateway;
-import cern.dmn2.db.MetricData;
 import cern.dmn2.db.EntityData.Type;
+import cern.dmn2.db.MetricData;
 import cern.tim.shared.common.datatag.TagQualityStatus;
 
 import com.google.gson.Gson;
@@ -102,10 +102,14 @@ public class TagCache implements DataTagUpdateListener {
         
         if (root == null) {
             logger.debug("Resolving sub-tags for " + id);
-            root = metricTagResolver2(id, cache);
+            HashMap<Long, Tag> list = new HashMap<Long, Tag>();
+            root = metricTagResolver2(id, list);
             if (root == null) {
                 logger.fatal("Tag " + id + " cannot be resolved!");
             } else {
+                for (Entry<Long, Tag> e : list.entrySet()) {
+                    cache.put(e.getKey(), e.getValue());
+                }
                 cache.put(root.getId(), root);
             }
         }
@@ -211,7 +215,7 @@ public class TagCache implements DataTagUpdateListener {
      * @return a {@link Tag} with all its children attached
      * @throws TagNotFoundException in case the passed id does not exist on the server.
      */
-    Tag metricTagResolver2(final Long tagId, ConcurrentHashMap<Long, Tag> overallList) throws TagNotFoundException {
+    Tag metricTagResolver2(final Long tagId, Map<Long, Tag> overallList) throws TagNotFoundException {
         
         if (get(tagId) != null) {
             logger.debug("Tag #" + tagId + "+ already in cache. returning current (local) object.");
@@ -457,6 +461,9 @@ public class TagCache implements DataTagUpdateListener {
         public void onUpdate(ClientDataTagValue tagUpdate) {
             c.countDown();
             Tag tag = cache.get(tagUpdate.getId());
+            if (tag == null) {
+                throw new IllegalStateException("Cannot find Tag " + tagUpdate.getId() + " in my cache but got it from the server as an update.");
+            }
             tag.update(tagUpdate);
         }
         public void waitUntilDone() throws InterruptedException {
@@ -606,7 +613,6 @@ public class TagCache implements DataTagUpdateListener {
                     // unknown to the cache so far. need to resolve and 
                     // get latest values for initial notification
                     t = resolveSubTags(s.getTagId());
-                    cache.put(t.getId(), t);
                 }
                 for (Tag c : t.getAllChildTagsRecursive()) {
                     if (c.isRule()) {
@@ -622,8 +628,14 @@ public class TagCache implements DataTagUpdateListener {
                 t.addSubscription(s);
                 toSubscribeTo.add(t.getId());
             }
+            /* trigger the c2mon client API to load the Tags from the server into its local cache, 
+             * then, we check for intial report sending
+             */
+            FirstUpdateListener fu = new FirstUpdateListener(toSubscribeTo);
+            C2monServiceGateway.getTagManager().subscribeDataTags(toSubscribeTo, fu);
+            fu.waitUntilDone();
             
-            startSubscriptionWithoutNotification(toSubscribeTo);
+            //startSubscriptionWithoutNotification(toSubscribeTo);
             
             for (Subscription s : list) {
                 notifier.sendReportOnRuleChange(get(s.getTagId()));
@@ -637,6 +649,8 @@ public class TagCache implements DataTagUpdateListener {
                 logger.debug("Starting C2MON subscription to " + toSubscribeTo.size() + " tags.");
             }
             startSubscriptionFor(toSubscribeTo);
+            
+            C2monServiceGateway.getTagManager().unsubscribeAllDataTags(fu);
             
             logger.trace("Leaving startSubscription()");
         } catch (TagNotFoundException ex) {
@@ -655,6 +669,9 @@ public class TagCache implements DataTagUpdateListener {
         FirstUpdateListener fu = new FirstUpdateListener(toSubscribeTo);
         C2monServiceGateway.getTagManager().subscribeDataTags(toSubscribeTo, fu);
         fu.waitUntilDone();
+        if (fu.getLeft() > 0) {
+            logger.error("Not all updates arrived while waiting for initial subscription. Lef =" + fu.getLeft());
+        }
     }
     
     /**
