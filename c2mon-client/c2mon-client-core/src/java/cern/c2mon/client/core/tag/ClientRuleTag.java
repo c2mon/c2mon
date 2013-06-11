@@ -86,6 +86,9 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   /** The computed rule mode */
   private TagMode ruleMode = TagMode.OPERATIONAL;
   
+  /** Default error message in case the Rule expression cannot be evaluated. */
+  private final static String RULE_ERROR_MESSAGE = "Errors occurred while evaluating the Rule Expression.";
+  
   /** 
    * If on of the tags that is used to compute the rule is simulated, then
    * the <code>ClientRuleTag</code> itself is marked as simulated.
@@ -275,18 +278,20 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
             this.ruleResult = rule.evaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           catch (RuleEvaluationException e) {
-            this.ruleQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_VALUE,
-                "Rule expression could not be evaluated. See log messages.");
+            this.ruleQuality.setInvalidStatus(TagQualityStatus.UNKNOWN_REASON, RULE_ERROR_MESSAGE);
             ruleError = e.getMessage();
             LOG.debug("computeRule() - \"" + rule.getExpression() 
                 + "\" could not be evaluated.", e);
+            
+            this.ruleResult = rule.forceEvaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           catch (Exception e) {
-            this.ruleQuality.setInvalidStatus(TagQualityStatus.UNDEFINED_VALUE
-                , "Rule expression could not be evaluated. See log messages.");
+            this.ruleQuality.setInvalidStatus(TagQualityStatus.UNKNOWN_REASON, RULE_ERROR_MESSAGE);
             ruleError = e.getMessage();
             LOG.debug("computeRule() - \"" + rule.getExpression() 
                 + "\" could not be evaluated.", e);
+            
+            this.ruleResult = rule.forceEvaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           // Update the time stamp of the ClientRuleTag
           this.timestamp = new Timestamp(System.currentTimeMillis());
@@ -297,6 +302,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
       }
     }
   }
+  
   
   /**
    * @return In case the rule expression could not be evaluated, the error message.
