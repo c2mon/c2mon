@@ -19,8 +19,8 @@ import cern.tim.driver.test.UseHandler;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
 
 /**
- * This class implements a set of JUnit tests for <code>JMXMessageHandler</code>. All tests that require
- * JMXMessageHandler's pre-configuration with XML based configuration shall be annotated with <code>UseConf</code>
+ * This class implements a set of JUnit tests for <code>PingMessageHandler</code>. All tests that require
+ * PingMessageHandler's pre-configuration with XML based configuration shall be annotated with <code>UseConf</code>
  * annotation, specifying the XML file to be used.
  * 
  * @see
