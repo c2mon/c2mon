@@ -51,7 +51,7 @@ public class PingTask implements Runnable {
                 target.refreshAddress();
             } catch (UnknownHostException ex) {
                 target.failure(ex);
-                log.error("Could not get IP address due to " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+                log.warn("Could not get IP address due to " + ex.getClass().getName() + ": " + ex.getMessage());
 
                 try {
                     handler.getEquipmentMessageSender().sendTagFiltered(tag, target.getCurrentStatus().getCode(),
