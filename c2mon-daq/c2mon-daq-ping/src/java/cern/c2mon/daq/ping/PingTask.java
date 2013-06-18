@@ -76,6 +76,11 @@ public class PingTask implements Runnable {
                     log.debug("Querying DNS for latest address ..." + target.getHostname());
                 }
                 target.refreshAddress();
+
+                if (log.isDebugEnabled()) {
+                    log.debug(format("received IP address: %s  for host: %s from DNS", target.getAddress()
+                            .getHostAddress(), target.getHostname()));
+                }
             }
 
             if (target.getAddress() != null) {
