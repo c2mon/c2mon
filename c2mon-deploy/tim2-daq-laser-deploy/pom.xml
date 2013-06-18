@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.tim2.tim2-daq</groupId>
     <artifactId>tim2-daq-pom</artifactId>
-    <version>1.0.11</version>
+    <version>1.0.20</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
@@ -24,6 +24,7 @@
     <dependency>
       <groupId>cern.tim2.tim2-daq</groupId>
       <artifactId>tim2-daq-laser</artifactId>
+      <version>[1.0.0,2.0.0)</version>
     </dependency>
   </dependencies>
 
