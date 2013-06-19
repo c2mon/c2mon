@@ -9,7 +9,7 @@
 
 	<groupId>cern.c2mon.c2mon-shared</groupId>
 	<artifactId>c2mon-shared-pom</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
+	<version>1.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<description>
@@ -23,7 +23,7 @@
 	
 	<!-- Shared version number properties -->
 	<properties>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
+		<org.springframework.version>3.0.7.RELEASE</org.springframework.version>
 	</properties>
 
 	<dependencyManagement>
@@ -87,7 +87,7 @@
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
-				<version>2.2.2</version>
+				<version>1.7.1</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -135,7 +135,7 @@
 			<dependency>
 				<groupId>org.apache.activemq</groupId>
 				<artifactId>activemq-all</artifactId>
-				<version>5.5.1-fuse-02-05</version>				
+				<version>5.5.1-fuse-02-02</version>				
 			</dependency>
 			<dependency>
 				<groupId>org.mybatis</groupId>
