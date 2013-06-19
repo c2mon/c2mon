@@ -232,19 +232,9 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
             logger.debug(format("leaving onUpdateDataTag(%d,%d)", sourceDataTag.getId(), oldSourceDataTag.getId()));
     }
 
-    boolean isTagAlreadyRegistered(final long tagId) {
-        boolean result = true;
-
-        if (scheduledFutures.get(tagId) == null) {
-            result = false;
-        }
-
-        return result;
-    }
-
     boolean isTagPollerRegistered(final long tagId) {
         boolean result = true;
-        if (scheduledFutures.get(tagId) == null) {
+        if (!scheduledFutures.containsKey(tagId)) {
             result = false;
         }
 
@@ -258,7 +248,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
         // check if this tag is not already registered
 
         // this tag should not be present neither in the notification-tags map nor a scheduler should be present
-        if (isTagAlreadyRegistered(tag.getId())) {
+        if (isTagPollerRegistered(tag.getId())) {
             throw new TagOperationException(format("tag: %d is already registered. You must unregister it first!",
                     tag.getId()));
         }
@@ -285,7 +275,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
         if (logger.isTraceEnabled())
             logger.trace(format("entering unregisterTag(%d)", tag.getId()));
 
-        if (!isTagAlreadyRegistered(tag.getId())) {
+        if (!isTagPollerRegistered(tag.getId())) {
             throw new TagOperationException(format("tag: %d is not registered. You must register it first!",
                     tag.getId()));
         }
