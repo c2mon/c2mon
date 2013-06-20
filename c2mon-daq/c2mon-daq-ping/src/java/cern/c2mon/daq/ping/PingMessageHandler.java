@@ -87,23 +87,16 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
         if (logger.isTraceEnabled())
             logger.trace(format("entering stopPingTask(%d)..", tagId));
 
-        ScheduledFuture<?> sf = scheduledFutures.get(tagId);
-        if (null != sf) {
-            sf.cancel(true);
+        if (scheduledFutures.containsKey(tagId)) {
+            ScheduledFuture<?> sf = scheduledFutures.get(tagId);
+            if (sf != null) {
+                sf.cancel(true);
+            }
+
             scheduledFutures.remove(tagId);
-        }
+        }// if
 
         logger.trace("leaving stopPingTask()");
-    }
-
-    void stopAllPingTasks() {
-        logger.trace("entering stopAllPingTasks()..");
-
-        for (Long tagId : scheduledFutures.keySet()) {
-            this.stopPingTask(tagId);
-        }
-
-        logger.trace("leaving stopAllPingTasks()");
     }
 
     @Override
@@ -143,12 +136,13 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     }
 
     @Override
-    @SuppressWarnings("unused")
-    public void disconnectFromDataSource() throws EqIOException {
+    public synchronized void disconnectFromDataSource() throws EqIOException {
         logger.debug("entering diconnectFromDataSource()..");
 
-        // stop all ping tasks
-        this.stopAllPingTasks();
+        // stop all ping tasks for that handler
+        for (ISourceDataTag sdt : getEquipmentConfiguration().getSourceDataTags().values()) {
+            this.stopPingTask(sdt.getId());
+        }
 
         logger.debug("leaving diconnectFromDataSource()");
     }
@@ -241,7 +235,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
         return result;
     }
 
-    void registerTag(ISourceDataTag tag) throws TagOperationException {
+    synchronized void registerTag(ISourceDataTag tag) throws TagOperationException {
         if (logger.isTraceEnabled())
             logger.trace(format("entering registerTag(%d)", tag.getId()));
 
@@ -271,7 +265,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
 
     }
 
-    private void unregisterTag(ISourceDataTag tag) throws TagOperationException {
+    synchronized void unregisterTag(ISourceDataTag tag) throws TagOperationException {
         if (logger.isTraceEnabled())
             logger.trace(format("entering unregisterTag(%d)", tag.getId()));
 
@@ -282,14 +276,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
 
         try {
 
-            if (isTagPollerRegistered(tag.getId())) {
-                // stop the poller for that tag (if exists)
-                this.stopPingTask(tag.getId());
-            } else {
-                throw new TagOperationException(format(
-                        "could not unregister tag: %d. Ping poller task was not registered. You must restart the DAQ!",
-                        tag.getId()));
-            }
+            this.stopPingTask(tag.getId());
 
         } catch (Exception ex) {
             String err = format("Unable to unregister tag: %d. Problem description: %s", tag.getId(), ex.getMessage());

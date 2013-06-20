@@ -12,7 +12,7 @@ public class Configuration {
     /**
      * defines the number of threads that run the ping tasks
      */
-    public static final int POLLING_THREADS = Integer.parseInt(System.getProperty("dmn2.daq.ping.threads", "80"));
+    public static final int POLLING_THREADS = Integer.parseInt(System.getProperty("dmn2.daq.ping.threads", "60"));
 
     /**
      * defines the polling interval

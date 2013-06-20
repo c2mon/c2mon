@@ -98,7 +98,8 @@ public class PingTask implements Runnable {
             }
         } catch (Exception ex) {
             target.failure(ex);
-            // this is not really an error - machine may be switched off etc.. Therefore we log it only in debug mode
+            // this is not really an error - machine may be switched off etc.. Therefore we log it only in debug
+            // mode
             if (log.isDebugEnabled()) {
                 log.debug("Ping failed due to " + ex.getClass().getName() + ": " + ex.getMessage());
             }
