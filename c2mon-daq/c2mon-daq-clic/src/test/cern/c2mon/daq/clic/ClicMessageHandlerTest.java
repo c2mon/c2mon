@@ -74,7 +74,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
     @Override
     protected void afterTest() throws Exception {
 
-        clicMsgHandler.disconnectFromDataSource();
+        // DONT' call disconnectFromDataSource() because it is called by the superclass
 
         clicAgent.stopHeartbeat();
         clicAgent.stopAcquisition();
@@ -172,9 +172,9 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals(SourceDataQuality.OK, sdtv.getValueAt(1, 100912).getQuality().getQualityCode());
         assertEquals(10, sdtv.getValueAt(1, 100912).getValue());
         assertEquals("", sdtv.getValueAt(1, 100912).getValueDescription());
-        
+
         // the CLIC agent is supposed to receive reconfiguration request once only
-        assertEquals(1,clicAgent.getReconfigurationCounter());
+        assertEquals(1, clicAgent.getReconfigurationCounter());
     }
 
     @Test
@@ -225,9 +225,9 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals(SourceDataQuality.OK, sdtv.getLastValue(100909).getQuality().getQualityCode());
         assertEquals(1, sdtv.getLastValue(100909).getValue());
         assertEquals("", sdtv.getLastValue(100909).getValueDescription());
-        
+
         // the CLIC agent is supposed to receive reconfiguration request twice!
-        assertEquals(2,clicAgent.getReconfigurationCounter());        
+        assertEquals(2, clicAgent.getReconfigurationCounter());
     }
 
     @Test

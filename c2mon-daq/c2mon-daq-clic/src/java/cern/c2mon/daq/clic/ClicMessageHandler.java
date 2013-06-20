@@ -272,7 +272,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
      * 
      * @param tag
      */
-    protected void registerTag(ISourceDataTag tag) throws TagOperationException {
+    protected synchronized void registerTag(ISourceDataTag tag) throws TagOperationException {
         if (logger.isTraceEnabled())
             logger.trace(format("entering registerTag(%d)", tag.getId()));
 
@@ -335,7 +335,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
      * @param tag
      * @throws TagOperationException
      */
-    protected void unregisterTag(ISourceDataTag tag) throws TagOperationException {
+    protected synchronized void unregisterTag(ISourceDataTag tag) throws TagOperationException {
         if (getEquipmentLogger().isTraceEnabled())
             getEquipmentLogger().trace(format("entering unregisterTag(%d)", tag.getId()));
 
@@ -365,7 +365,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
 
     @Override
     @SuppressWarnings("unused")
-    public void disconnectFromDataSource() throws EqIOException {
+    public synchronized void disconnectFromDataSource() throws EqIOException {
         getEquipmentLogger().debug("entering diconnectFromDataSource()..");
 
         for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
