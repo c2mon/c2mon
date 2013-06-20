@@ -243,8 +243,8 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
 
         // this tag should not be present neither in the notification-tags map nor a scheduler should be present
         if (isTagPollerRegistered(tag.getId())) {
-            throw new TagOperationException(format("tag: %d is already registered. You must unregister it first!",
-                    tag.getId()));
+            logger.warn(format("tag: %d is already registered. You must unregister it first!", tag.getId()));
+            return;
         }
 
         try {
