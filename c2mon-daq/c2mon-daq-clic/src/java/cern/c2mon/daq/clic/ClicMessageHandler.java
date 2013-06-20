@@ -281,8 +281,8 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
 
         // none of the above should be present
         if (regListener != null) {
-            throw new TagOperationException(format("tag: %d is already registered. You must unregister it first!",
-                    tag.getId()));
+            logger.warn(format("tag: %d is already registered. You must unregister it first!", tag.getId()));
+            return;
         }
 
         try {
