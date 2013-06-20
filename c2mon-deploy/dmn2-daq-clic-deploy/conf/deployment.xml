@@ -27,13 +27,18 @@
 
             <preExec>
                           <![CDATA[
-                            [[ -z $DAQ_VM_ARGS ]] && echo "DAQ_VM_ARGS not set!" && exit 1
-                            [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
-                            [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
-                            [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
-                            [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
-                            [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-                            [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
+    [[ -z $DAQ_VM_ARGS ]] && echo "DAQ_VM_ARGS not set!" && exit 1
+    [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
+    [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
+    [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
+    [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
+    [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+    [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
+    
+    #  uncomment the following 2 lines if you need to enable remote debugging
+    #  REMOTE_DEBUG="-Xrunjdwp:transport=dt_socket,address=8012,server=y,suspend=n"
+    #  JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUG}"    
+       
                            ]]>
             </preExec>
          </startscript>
