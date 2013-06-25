@@ -22,10 +22,15 @@
 
   <dependencies>
 
-    <!-- C2MON dependencies -->
+    <!-- C2MON dependencies -->		
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-all</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>cern.c2mon.c2mon-client</groupId>
+    	<artifactId>c2mon-client-ext-history</artifactId>
+    	<version>1.0.1-SNAPSHOT</version>
     </dependency>
 
     <!-- 3rd party dependencies -->
