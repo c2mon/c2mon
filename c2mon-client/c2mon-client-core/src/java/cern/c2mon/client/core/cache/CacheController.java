@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import cern.c2mon.client.core.manager.HistoryManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 
 /**

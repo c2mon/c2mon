@@ -43,7 +43,8 @@ public class C2monServiceGateway {
   private static final Logger LOG = Logger.getLogger(C2monServiceGateway.class);
   
   /** The path to the core Spring XML */
-  private static final String APPLICATION_SPRING_XML_PATH = "cern/c2mon/client/core/config/c2mon-client.xml";
+  private static final String APPLICATION_SPRING_XML_PATH = 
+      "cern/c2mon/client/core/config/c2mon-client.xml";
   
   /** The SPRING application context, which can be used as parent context */
   private static ClassPathXmlApplicationContext xmlContext = null;
@@ -59,9 +60,6 @@ public class C2monServiceGateway {
   
   /** Static reference to the <code>C2monCommandManager</code> singleton instance */
   private static C2monCommandManager commandManager = null;
-  
-  /** Static reference to the <code>C2monHistoryManager</code> singleton instance */
-  private static C2monHistoryManager historyManager = null;
   
   /** Static reference to the <code>C2monTagManager</code> singleton instance */
   private static C2monTagManager tagManager = null;
@@ -112,15 +110,7 @@ public class C2monServiceGateway {
   public static C2monTagManager getTagManager() {
     return tagManager;
   }
-  
-  
-  /**
-   * @return The C2MON history manager which allows 
-   *         switching data into history mode.
-   */
-  public static C2monHistoryManager getHistoryManager() {
-    return historyManager;
-  }
+
   
   /**
    * @return the supervision manager
@@ -226,7 +216,6 @@ public class C2monServiceGateway {
     sessionManager = xmlContext.getBean(C2monSessionManager.class);
     tagManager = xmlContext.getBean(C2monTagManager.class);
     supervisionManager = xmlContext.getBean(C2monSupervisionManager.class);
-    historyManager = xmlContext.getBean(C2monHistoryManager.class);
     commandManager = xmlContext.getBean(C2monCommandManager.class);
   }
   

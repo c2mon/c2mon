@@ -35,10 +35,12 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-client</groupId>
       <artifactId>c2mon-client-jms</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.c2mon-client</groupId>
-      <artifactId>c2mon-client-history</artifactId>
+      <exclusions>
+      	<exclusion>
+      		<artifactId>spring</artifactId>
+      		<groupId>org.springframework</groupId>
+      	</exclusion>
+      </exclusions>
     </dependency>
 
     <!-- 3rd party dependencies -->

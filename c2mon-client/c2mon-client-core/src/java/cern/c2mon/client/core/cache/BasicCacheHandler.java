@@ -6,7 +6,6 @@ import java.util.Set;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
-import cern.c2mon.client.core.manager.HistoryManager;
 
 /**
  * This interface provides basic access methods to the client cache and

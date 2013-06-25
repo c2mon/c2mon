@@ -29,7 +29,7 @@ import cern.c2mon.client.jms.AlarmListener;
  *
  * @author Matthias Braeger
  */
-interface CoreTagManager extends C2monTagManager, AlarmListener {
+public interface CoreTagManager extends C2monTagManager, AlarmListener {
   
   /**
    * Registers a <code>TagSubscriptionListener</code> to the <code>TagManager</code>. 
