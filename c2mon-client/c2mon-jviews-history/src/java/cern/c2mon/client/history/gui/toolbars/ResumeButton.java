@@ -25,9 +25,9 @@ import javax.swing.ImageIcon;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.history.event.PlaybackControlListener;
-import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
-import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.ext.history.C2monHistoryGateway;
+import cern.c2mon.client.ext.history.common.event.PlaybackControlListener;
+import cern.c2mon.client.ext.history.common.exception.HistoryPlayerNotActiveException;
 
 /**
  * The play/pause button for resuming and pausing the history playback.
@@ -85,7 +85,7 @@ public class ResumeButton extends StandardButton implements PlaybackControlListe
   private void pause() {
     if (this.playButtonIsPlaying) {
       try {
-        C2monServiceGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().pause();
+        C2monHistoryGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().pause();
       }
       catch (HistoryPlayerNotActiveException e) {
         LOG.debug("Cannot pause", e);
@@ -99,7 +99,7 @@ public class ResumeButton extends StandardButton implements PlaybackControlListe
   private void play() {
     if (!this.playButtonIsPlaying) {
       try {
-        C2monServiceGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().resume();
+        C2monHistoryGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().resume();
       }
       catch (HistoryPlayerNotActiveException e) {
         LOG.debug("Cannot resume", e);

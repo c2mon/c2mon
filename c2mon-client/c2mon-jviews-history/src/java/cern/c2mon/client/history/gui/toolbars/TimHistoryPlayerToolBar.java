@@ -35,13 +35,14 @@ import javax.swing.event.ChangeEvent;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.history.HistoryPlayer;
-import cern.c2mon.client.common.history.event.HistoryPlayerAdapter;
-import cern.c2mon.client.common.history.event.PlaybackControlAdapter;
-import cern.c2mon.client.common.history.event.PlaybackControlListener;
-import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
-import cern.c2mon.client.core.C2monHistoryManager;
 import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.ext.history.C2monHistoryGateway;
+import cern.c2mon.client.ext.history.C2monHistoryManager;
+import cern.c2mon.client.ext.history.common.HistoryPlayer;
+import cern.c2mon.client.ext.history.common.event.HistoryPlayerAdapter;
+import cern.c2mon.client.ext.history.common.event.PlaybackControlAdapter;
+import cern.c2mon.client.ext.history.common.event.PlaybackControlListener;
+import cern.c2mon.client.ext.history.common.exception.HistoryPlayerNotActiveException;
 import cern.c2mon.client.history.gui.components.TimeSlider;
 import cern.c2mon.client.history.gui.components.event.BufferedChangeListener;
 
@@ -153,7 +154,7 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
 
     this.setFloatable(false);
     
-    historyManager = C2monServiceGateway.getHistoryManager();
+    historyManager = C2monHistoryGateway.getHistoryManager();
     
     // Install listener
     historyManager.getHistoryPlayerEvents().addHistoryPlayerListener(new HistoryPlayerEvents());
@@ -194,7 +195,7 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
 //            // If the clock is running it is paused
 //            //pause();
 //          }
-          C2monServiceGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().setClockTime(computeTimeFromTimeSlider());
+          C2monHistoryGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().setClockTime(computeTimeFromTimeSlider());
         }
         catch (final HistoryPlayerNotActiveException e1) {
           if (LOG.isDebugEnabled()) {
@@ -214,7 +215,7 @@ public final class TimHistoryPlayerToolBar extends JToolBar {
     @Override
     public void onActivatedHistoryPlayer() {
       try {
-        final HistoryPlayer historyPlayer = C2monServiceGateway.getHistoryManager().getHistoryPlayer();
+        final HistoryPlayer historyPlayer = C2monHistoryGateway.getHistoryManager().getHistoryPlayer();
         if (playbackControlEvents == null) {
           playbackControlEvents = new PlaybackControlEvents();
         }

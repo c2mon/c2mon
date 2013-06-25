@@ -27,9 +27,10 @@ import javax.swing.JPopupMenu;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.history.event.PlaybackControlListener;
-import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
 import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.ext.history.C2monHistoryGateway;
+import cern.c2mon.client.ext.history.common.event.PlaybackControlListener;
+import cern.c2mon.client.ext.history.common.exception.HistoryPlayerNotActiveException;
 
 /**
  * The speed button for changing the speed of the history playback
@@ -108,7 +109,7 @@ public class SpeedButton extends StandardButton implements PlaybackControlListen
    */
   private void setClockSpeed(final double newSpeed) {
     try {
-      C2monServiceGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().setPlaybackSpeed(newSpeed);
+      C2monHistoryGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().setPlaybackSpeed(newSpeed);
     }
     catch (HistoryPlayerNotActiveException e) {
       LOG.debug("Cannot change the clock speed", e);
@@ -121,7 +122,7 @@ public class SpeedButton extends StandardButton implements PlaybackControlListen
    */
   private String getClockSpeedString() {
     try {
-      return getSpeedString(C2monServiceGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().getPlaybackSpeed());
+      return getSpeedString(C2monHistoryGateway.getHistoryManager().getHistoryPlayer().getPlaybackControl().getPlaybackSpeed());
     }
     catch (HistoryPlayerNotActiveException e) {
       return "Unknown";

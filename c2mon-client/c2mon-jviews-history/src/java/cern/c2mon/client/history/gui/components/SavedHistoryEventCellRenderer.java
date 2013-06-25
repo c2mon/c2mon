@@ -26,7 +26,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
-import cern.c2mon.client.common.history.SavedHistoryEvent;
+import cern.c2mon.client.ext.history.common.SavedHistoryEvent;
 
 /**
  * Panel which represents a {@link SavedHistoryEvent}. Uses the

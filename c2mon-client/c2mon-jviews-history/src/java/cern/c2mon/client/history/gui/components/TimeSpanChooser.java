@@ -29,7 +29,7 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import cern.c2mon.client.common.history.Timespan;
+import cern.c2mon.client.ext.history.common.Timespan;
 import cern.c2mon.client.history.gui.components.event.TimeSpanChooserListener;
 
 import com.toedter.calendar.JDateChooser;

@@ -28,20 +28,18 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.history.HistoryProvider;
-import cern.c2mon.client.common.history.HistoryProviderFactory;
-import cern.c2mon.client.common.history.HistoryProviderType;
-import cern.c2mon.client.common.history.SavedHistoryEvent;
-import cern.c2mon.client.common.history.Timespan;
-import cern.c2mon.client.common.history.exception.HistoryProviderException;
-import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.ext.history.C2monHistoryGateway;
+import cern.c2mon.client.ext.history.common.HistoryProvider;
+import cern.c2mon.client.ext.history.common.HistoryProviderFactory;
+import cern.c2mon.client.ext.history.common.SavedHistoryEvent;
+import cern.c2mon.client.ext.history.common.Timespan;
+import cern.c2mon.client.ext.history.common.exception.HistoryProviderException;
 import cern.c2mon.client.history.gui.components.HistoryPlayerConfigPanel;
 import cern.c2mon.client.history.gui.dialogs.generic.ProgressDialog;
 
@@ -108,7 +106,7 @@ public class HistoryPlayerSwitchDialog {
         progress.setProgress(null);
         progress.show();
         
-        final Collection<SavedHistoryEvent> savedEvents = C2monServiceGateway.getHistoryManager().getHistoryProviderFactory().createSavedHistoryEventsProvider().getSavedHistoryEvents();
+        final Collection<SavedHistoryEvent> savedEvents = C2monHistoryGateway.getHistoryManager().getHistoryProviderFactory().createSavedHistoryEventsProvider().getSavedHistoryEvents();
   
         final List<Object> events = new ArrayList<Object>();
         events.add("None");
@@ -332,7 +330,8 @@ public class HistoryPlayerSwitchDialog {
       }
     }
     
-    final HistoryProviderFactory historyProviderFactory = C2monServiceGateway.getHistoryManager().getHistoryProviderFactory();
+    final HistoryProviderFactory historyProviderFactory = C2monHistoryGateway
+        .getHistoryManager().getHistoryProviderFactory();
     final HistoryProvider historyProvider;
     
     try {
@@ -405,12 +404,13 @@ public class HistoryPlayerSwitchDialog {
       @Override
       public void run() {
         try {
-          C2monServiceGateway.getHistoryManager().startHistoryPlayerMode(historyProvider, historyTimespan);
+          C2monHistoryGateway.getHistoryManager()
+            .startHistoryPlayerMode(historyProvider, historyTimespan);
         }
         catch (Exception e) {
           LOG.error("Something went wrong when starting the history player", e);
-          if (C2monServiceGateway.getHistoryManager().isHistoryModeEnabled()) {
-            C2monServiceGateway.getHistoryManager().stopHistoryPlayerMode();
+          if (C2monHistoryGateway.getHistoryManager().isHistoryModeEnabled()) {
+            C2monHistoryGateway.getHistoryManager().stopHistoryPlayerMode();
           }
           JOptionPane.showMessageDialog(parent, "Cannot start the history player. Please see the log for more information.", "Can't start history player", JOptionPane.ERROR_MESSAGE);
         }

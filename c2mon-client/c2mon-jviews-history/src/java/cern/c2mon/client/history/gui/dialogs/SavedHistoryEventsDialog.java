@@ -33,8 +33,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import cern.c2mon.client.common.history.SavedHistoryEvent;
-import cern.c2mon.client.history.dbaccess.beans.SavedHistoryEventBean;
+import cern.c2mon.client.ext.history.common.SavedHistoryEvent;
+import cern.c2mon.client.ext.history.dbaccess.beans.SavedHistoryEventBean;
 import cern.c2mon.client.history.gui.components.SavedHistoryEventCellRenderer;
 import cern.c2mon.client.history.gui.components.model.SearchListModel;
 

@@ -20,7 +20,7 @@ package cern.c2mon.client.history.gui.dialogs;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import cern.c2mon.client.common.history.SavedHistoryEvent;
+import cern.c2mon.client.ext.history.common.SavedHistoryEvent;
 import cern.c2mon.client.history.gui.components.model.Matcher;
 
 /**

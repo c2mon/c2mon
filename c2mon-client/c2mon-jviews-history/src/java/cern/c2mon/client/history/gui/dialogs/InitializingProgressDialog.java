@@ -21,11 +21,11 @@ import java.awt.Component;
 
 import javax.swing.JOptionPane;
 
-import cern.c2mon.client.common.history.event.HistoryPlayerAdapter;
-import cern.c2mon.client.common.history.event.HistoryPlayerListener;
-import cern.c2mon.client.common.history.event.HistoryProviderAdapter;
-import cern.c2mon.client.common.history.event.HistoryProviderListener;
-import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.ext.history.C2monHistoryGateway;
+import cern.c2mon.client.ext.history.common.event.HistoryPlayerAdapter;
+import cern.c2mon.client.ext.history.common.event.HistoryPlayerListener;
+import cern.c2mon.client.ext.history.common.event.HistoryProviderAdapter;
+import cern.c2mon.client.ext.history.common.event.HistoryProviderListener;
 import cern.c2mon.client.history.gui.dialogs.generic.ProgressDialog;
 import cern.c2mon.client.history.gui.dialogs.generic.ProgressDialogActionListener;
 
@@ -90,7 +90,7 @@ public class InitializingProgressDialog {
         public void onCancel(final ProgressDialog progressDialog) {
           progressDialog.setMessage("Stopping history playback, please wait..");
           progressDialog.setStatus("");
-          C2monServiceGateway.getHistoryManager().stopHistoryPlayerMode();
+          C2monHistoryGateway.getHistoryManager().stopHistoryPlayerMode();
         }
       });
     }

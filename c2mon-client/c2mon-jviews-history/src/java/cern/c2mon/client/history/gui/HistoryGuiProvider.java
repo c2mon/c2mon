@@ -23,12 +23,12 @@ import javax.swing.JToolBar;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.history.HistoryPlayer;
-import cern.c2mon.client.common.history.HistoryProvider;
-import cern.c2mon.client.common.history.event.HistoryPlayerAdapter;
-import cern.c2mon.client.common.history.event.HistoryPlayerListener;
-import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
-import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.ext.history.C2monHistoryGateway;
+import cern.c2mon.client.ext.history.common.HistoryPlayer;
+import cern.c2mon.client.ext.history.common.HistoryProvider;
+import cern.c2mon.client.ext.history.common.event.HistoryPlayerAdapter;
+import cern.c2mon.client.ext.history.common.event.HistoryPlayerListener;
+import cern.c2mon.client.ext.history.common.exception.HistoryPlayerNotActiveException;
 import cern.c2mon.client.history.gui.dialogs.HistoryPlayerSwitchDialog;
 import cern.c2mon.client.history.gui.dialogs.InitializingProgressDialog;
 import cern.c2mon.client.history.gui.toolbars.TimHistoryPlayerToolBar;
@@ -87,7 +87,7 @@ public final class HistoryGuiProvider {
         // Gets the history player
         HistoryPlayer historyPlayer;
         try {
-          historyPlayer = C2monServiceGateway.getHistoryManager().getHistoryPlayer();
+          historyPlayer = C2monHistoryGateway.getHistoryManager().getHistoryPlayer();
         }
         catch (HistoryPlayerNotActiveException e1) {
           LOG.error("Not history player is available, no initialization dialog will be shown.", e1);
@@ -98,7 +98,7 @@ public final class HistoryGuiProvider {
         initializingProgressDialog = new InitializingProgressDialog(parent);
 
         // Make it listen to history player events
-        C2monServiceGateway.getHistoryManager().getHistoryPlayerEvents().addHistoryPlayerListener(initializingProgressDialog.getHistoryPlayerEvents());
+        C2monHistoryGateway.getHistoryManager().getHistoryPlayerEvents().addHistoryPlayerListener(initializingProgressDialog.getHistoryPlayerEvents());
 
         // Make it listen to history provider events
         final HistoryProvider historyProvider = historyPlayer.getHistoryProvider();
@@ -116,12 +116,12 @@ public final class HistoryGuiProvider {
       }
     };
 
-    if (C2monServiceGateway.getHistoryManager().isHistoryModeEnabled()) {
+    if (C2monHistoryGateway.getHistoryManager().isHistoryModeEnabled()) {
       listener.onActivatedHistoryPlayer();
     }
 
     // Makes it listen to history player events
-    C2monServiceGateway.getHistoryManager().getHistoryPlayerEvents().addHistoryPlayerListener(listener);
+    C2monHistoryGateway.getHistoryManager().getHistoryPlayerEvents().addHistoryPlayerListener(listener);
   }
 
   /** hidden constructor */

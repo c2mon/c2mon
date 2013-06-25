@@ -30,7 +30,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import cern.c2mon.client.common.history.SavedHistoryEvent;
+import cern.c2mon.client.ext.history.common.SavedHistoryEvent;
 
 /**
  * GUI which represents a {@link SavedHistoryEvent} 

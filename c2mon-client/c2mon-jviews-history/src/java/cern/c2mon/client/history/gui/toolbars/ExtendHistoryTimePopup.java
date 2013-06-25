@@ -38,13 +38,13 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.history.HistoryPlayer;
-import cern.c2mon.client.common.history.HistoryProvider;
-import cern.c2mon.client.common.history.Timespan;
-import cern.c2mon.client.common.history.exception.HistoryPlayerNotActiveException;
-import cern.c2mon.client.common.history.exception.IllegalTimespanException;
-import cern.c2mon.client.core.C2monHistoryManager;
-import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.ext.history.C2monHistoryGateway;
+import cern.c2mon.client.ext.history.C2monHistoryManager;
+import cern.c2mon.client.ext.history.common.HistoryPlayer;
+import cern.c2mon.client.ext.history.common.HistoryProvider;
+import cern.c2mon.client.ext.history.common.Timespan;
+import cern.c2mon.client.ext.history.common.exception.HistoryPlayerNotActiveException;
+import cern.c2mon.client.ext.history.common.exception.IllegalTimespanException;
 import cern.c2mon.client.history.gui.components.TimeSpanChooser;
 import cern.c2mon.client.history.gui.components.event.TimeSpanChooserListener;
 import cern.c2mon.client.history.gui.dialogs.generic.ProgressDialog;
@@ -90,7 +90,7 @@ public class ExtendHistoryTimePopup {
    *          the owner component
    */
   public ExtendHistoryTimePopup() {
-     this.historyManager = C2monServiceGateway.getHistoryManager();
+     this.historyManager = C2monHistoryGateway.getHistoryManager();
 
     this.clockLabel = new JLabel();
     this.timeSpanChooser = new TimeSpanChooser();
