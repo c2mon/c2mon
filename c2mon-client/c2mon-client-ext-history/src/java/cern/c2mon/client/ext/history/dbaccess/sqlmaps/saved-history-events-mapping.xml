@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!--
+    This mapper first defines which interface ("namespace") that should be instantiated
+    by iBatis.
+    The functions within defines the functions in the mapper's interface. And the function's
+    parameter.
+  -->
+<mapper namespace="cern.c2mon.client.ext.history.dbaccess.SavedHistoryEventsMapper">
+
+  <!--
+      Defines what object every single row will be converted into,
+      and how this object is mapped from the sql table
+  -->
+  <resultMap id="savedHistoryEventResultMap" type="SavedHistoryEventBean">
+    <constructor>
+      <idArg column="REE_ID" javaType="Long"/>
+    </constructor>
+    
+    <result property="name" column="REE_EVENT_NAME" jdbcType="VARCHAR" />
+    <result property="description" column="REE_EVENT_DESCRIPTION" jdbcType="VARCHAR" />
+    <result property="startDate" column="REE_EVENT_START_DATE" jdbcType="TIMESTAMP" />
+    <result property="endDate" column="REE_EVENT_END_DATE" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <!--
+    Requests the saved event list from the database
+    
+    The dates stored in the REPLAY_EVENTS is without timezone,
+    but is saved with UTC+1 (without day light savings)
+  -->
+  <select   id="getSavedEvents" 
+            resultMap="savedHistoryEventResultMap">
+    SELECT 
+        REE_ID, REE_EVENT_NAME, REE_EVENT_DESCRIPTION, 
+        REE_EVENT_START_DATE,
+        REE_EVENT_END_DATE
+    FROM REPLAY_EVENTS 
+    ORDER BY REE_EVENT_START_DATE DESC
+  </select>
+  
+</mapper>
+

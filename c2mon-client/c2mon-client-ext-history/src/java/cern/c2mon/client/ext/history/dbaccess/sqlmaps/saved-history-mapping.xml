@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!--
+    This mapper first defines which interface ("namespace") that should be instantiated
+    by iBatis.
+    The functions within defines the functions in the mapper's interface. And the function's
+    parameter.
+  -->
+<mapper namespace="cern.c2mon.client.ext.history.dbaccess.SavedHistoryMapper">
+
+  <!--
+      Defines what object every single row will be converted into,
+      and how this object is mapped from the sql table
+  -->
+  <resultMap id="historyRecordResultMap" type="SavedHistoryEventRecord">
+    <constructor>
+      <idArg column="RED_ID" javaType="Long"/>
+      <idArg column="RED_TAGID" javaType="Long"/>
+    </constructor>
+    <result property="logDate" column="RED_LOGDATE" jdbcType="TIMESTAMP" />
+    <result property="tagName" column="RED_TAGNAME" jdbcType="VARCHAR"/>
+    <result property="tagValue" column="RED_TAGVALUE" jdbcType="VARCHAR"/>
+    <result property="tagDataType" column="RED_TAGDATATYPE" jdbcType="VARCHAR"/>
+    
+    <result property="tagTime" column="RED_TAGTIME" jdbcType="TIMESTAMP"/>
+    <result property="daqTime" column="RED_TAGDAQTIME" jdbcType="TIMESTAMP"/>
+    <result property="serverTime" column="RED_TAGSERVERTIME" jdbcType="TIMESTAMP"/>
+    
+    <result property="dataTagQuality" column="RED_TAGSTATUSDESC" jdbcType="VARCHAR" javaType="DataTagQuality"/>
+    <result property="tagMode" column="RED_TAGMODE"/>
+  </resultMap>
+  
+
+  <!--
+    Requests the history records of a list of tags from the saved history events data
+  -->
+  <select   id="getRecords" 
+            parameterType="SavedHistoryRequestBean"
+            resultMap="historyRecordResultMap">
+    SELECT 
+        RED_ID, RED_LOGDATE, RED_TAGID, RED_TAGNAME, RED_TAGVALUE, RED_TAGDATATYPE, 
+        RED_TAGTIME AS RED_TAGTIME, 
+        RED_TAGSERVERTIME, 
+        RED_TAGDAQTIME, 
+        RED_TAGSTATUSDESC, 
+        RED_TAGMODE
+    FROM REPLAY_DATA
+    WHERE
+      RED_ID = #{eventId}
+      AND (RED_TAGID IN 
+        <foreach item="tag" index="index" collection="tagIds"
+          open="(" separator="," close=")">
+          #{tag}
+        </foreach>
+      )
+    ORDER BY RED_TAGSERVERTIME DESC, RED_TAGDAQTIME DESC, RED_TAGTIME DESC, RED_LOGDATE DESC
+  </select>
+  
+</mapper>
+
