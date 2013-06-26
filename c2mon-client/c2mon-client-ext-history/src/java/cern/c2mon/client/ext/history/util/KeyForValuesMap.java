@@ -43,7 +43,7 @@ import cern.c2mon.client.ext.history.playback.publish.TagListenersManager;
  * @param <V>
  *          The type of value
  */
-public class KeyForValuesMap<K, V> {
+public class KeyForValuesMap<K extends Number, V> {
 
   /** The keys with the values */
   private final Map<K, Set<V>> keysWithValues;
