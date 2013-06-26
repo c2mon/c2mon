@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.14</version>
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-jviews-history</artifactId>
@@ -30,7 +30,6 @@
     <dependency>
     	<groupId>cern.c2mon.c2mon-client</groupId>
     	<artifactId>c2mon-client-ext-history</artifactId>
-    	<version>1.0.1-SNAPSHOT</version>
     </dependency>
 
     <!-- 3rd party dependencies -->
