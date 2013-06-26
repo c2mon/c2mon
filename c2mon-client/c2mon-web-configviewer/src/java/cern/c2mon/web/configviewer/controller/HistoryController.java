@@ -1,8 +1,6 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
@@ -16,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import cern.c2mon.client.common.history.exception.HistoryProviderException;
-import cern.c2mon.client.common.history.exception.LoadingParameterException;
+import cern.c2mon.client.ext.history.common.exception.HistoryProviderException;
+import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
 import cern.c2mon.web.configviewer.service.HistoryService;
 import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.FormUtility;

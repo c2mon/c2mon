@@ -9,16 +9,16 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.common.history.HistoryLoadingConfiguration;
-import cern.c2mon.client.common.history.HistoryLoadingManager;
-import cern.c2mon.client.common.history.HistoryProvider;
-import cern.c2mon.client.common.history.HistoryTagValueUpdate;
-import cern.c2mon.client.common.history.exception.HistoryProviderException;
-import cern.c2mon.client.common.history.exception.LoadingParameterException;
-import cern.c2mon.client.history.updates.HistoryTagValueUpdateImpl;
+import cern.c2mon.client.ext.history.C2monHistoryGateway;
+import cern.c2mon.client.ext.history.common.HistoryLoadingConfiguration;
+import cern.c2mon.client.ext.history.common.HistoryLoadingManager;
+import cern.c2mon.client.ext.history.common.HistoryProvider;
+import cern.c2mon.client.ext.history.common.HistoryTagValueUpdate;
+import cern.c2mon.client.ext.history.common.exception.HistoryProviderException;
+import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
+import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
@@ -34,12 +34,6 @@ public class HistoryService {
 
   /** the path to the xslt document */
   private static final String XSLT_PATH = "/history_xslt.xsl";
-
-  /**
-   * Gateway to C2monService 
-   * */
-  @Autowired
-  private ServiceGateway gateway;
 
   /**
    * Gets the XML representation of the configuration of a command
@@ -79,7 +73,7 @@ public class HistoryService {
 
     HistoryProvider historyProvider;
     try {
-      historyProvider = gateway.getHistoryManager().getHistoryProviderFactory().createHistoryProvider();
+      historyProvider = C2monHistoryGateway.getHistoryManager().getHistoryProviderFactory().createHistoryProvider();
     }
     catch (HistoryProviderException e) {
       logger.error("Can't load any history because a HistoryProvider cannot be created.", e);
@@ -89,7 +83,7 @@ public class HistoryService {
     final long id = Long.parseLong(dataTagId);
     Collection<Long> dataTagIds = new ArrayList<Long>();
     dataTagIds.add(id);
-    final HistoryLoadingManager loadingManager = gateway.getHistoryManager().createHistoryLoadingManager(historyProvider, dataTagIds);
+    final HistoryLoadingManager loadingManager = C2monHistoryGateway.getHistoryManager().createHistoryLoadingManager(historyProvider, dataTagIds);
 
     final HistoryLoadingConfiguration configuration = new HistoryLoadingConfiguration();
     configuration.setLoadInitialValues(true);

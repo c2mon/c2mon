@@ -6,10 +6,10 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.C2monCommandManager;
-import cern.c2mon.client.core.C2monHistoryManager;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monTagManager;
-import cern.c2mon.web.configviewer.service.TagService;
+import cern.c2mon.client.ext.history.C2monHistoryGateway;
+import cern.c2mon.client.ext.history.C2monHistoryManager;
 
 /**
  * Service gateway wrapper for C2monServiceGateway
@@ -47,7 +47,7 @@ public class ServiceGateway {
     logger.info("TagManager instance started: " + (tagManager == null ? "NULL" : "OK"));
     commandManager = C2monServiceGateway.getCommandManager();
     logger.info("CommandManager instance started: " + (commandManager == null ? "NULL" : "OK"));
-    historyManager = C2monServiceGateway.getHistoryManager();
+    historyManager = C2monHistoryGateway.getHistoryManager();
     logger.info("HistoryManager instance started: " + (historyManager == null ? "NULL" : "OK")); 
   }
 
