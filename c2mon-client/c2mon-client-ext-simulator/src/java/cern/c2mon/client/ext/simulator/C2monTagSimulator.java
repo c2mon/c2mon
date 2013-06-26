@@ -20,7 +20,6 @@ package cern.c2mon.client.ext.simulator;
 import java.util.Map;
 import java.util.Set;
 
-import cern.c2mon.client.core.C2monHistoryManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.tim.shared.common.datatag.TagQualityStatus;
 
