@@ -42,7 +42,7 @@ public class DummyClicAgent {
     private final long heartbeatLoopTime;
     private final long acqusitionLoopTime;
 
-    private volatile int reconfigurationCounter = 0;
+    private int reconfigurationCounter = 0;
 
     private volatile boolean runHeartbeatThread = true;
     private volatile boolean runAcquisitionThread = true;
@@ -136,25 +136,30 @@ public class DummyClicAgent {
         this.metrics.add("test.property.3");
     }
 
-    public int getReconfigurationCounter() {
+    public synchronized int getReconfigurationCounter() {        
         return this.reconfigurationCounter;
     }
+    
+    public synchronized void incrementReconfigurationCouinter() {
+        this.reconfigurationCounter++;
+    }
+   
 
-    public synchronized void startHeartbeat() {
+    public void startHeartbeat() {
         hbSenderThread = new Thread(new HeartbeatSender());
         hbSenderThread.start();
     }
 
-    public synchronized void stopHeartbeat() {
+    public void stopHeartbeat() {
         runHeartbeatThread = false;
     }
 
-    public synchronized void startAcquisition() {
+    public void startAcquisition() {
         aqSenderThread = new Thread(new AcquisitionSender());
         aqSenderThread.start();
     }
 
-    public synchronized void stopAcquisition() {
+    public void stopAcquisition() {
         runAcquisitionThread = false;
     }
 
@@ -354,7 +359,7 @@ public class DummyClicAgent {
 
                                 if (agentProperty.equals("Setting")) {
                                     // increment reconfiguration request counter
-                                    reconfigurationCounter++;
+                                    incrementReconfigurationCouinter();
                                     handleClicReconfiguration(am);
                                 }
 
