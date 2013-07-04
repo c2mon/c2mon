@@ -113,14 +113,12 @@ public class PingTask implements Runnable {
         }
         runCountMap.put(hostname, runcount);
 
-        if (target.hasChanged()) {
-            try {
-                handler.getEquipmentMessageSender().sendTagFiltered(tag, target.getCurrentStatus().getCode(),
-                        System.currentTimeMillis(),
-                        format(target.getCurrentStatus().getDescription(), target.getHostname()));
-            } catch (Exception ex) {
-                log.error("exception caught when trying to send tag update", ex);
-            }
+        try {
+            handler.getEquipmentMessageSender().sendTagFiltered(tag, target.getCurrentStatus().getCode(),
+                    System.currentTimeMillis(),
+                    format(target.getCurrentStatus().getDescription(), target.getHostname()));
+        } catch (Exception ex) {
+            log.error("exception caught when trying to send tag update", ex);
         }
 
     }// run
