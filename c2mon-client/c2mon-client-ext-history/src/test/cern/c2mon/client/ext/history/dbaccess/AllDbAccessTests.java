@@ -12,7 +12,6 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
   HistoryRecordBeanTest.class,
-  SqlHistoryProviderDAOTest.class,
   HistorySessionFactoryTest.class
 })
 public class AllDbAccessTests {
