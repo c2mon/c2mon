@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- the main Spring XML configuration file for starting up the C2MON client core context -->
+
+  <bean id="supervisionManager" class="org.easymock.EasyMock" factory-method="createNiceMock">
+    <constructor-arg value="cern.c2mon.client.core.manager.CoreSupervisionManager"/>
+  </bean>
+
+  <bean id="cache" class="org.easymock.EasyMock" factory-method="createMock">
+    <constructor-arg value="cern.c2mon.client.core.cache.BasicCacheHandler"/>
+  </bean>
+  
+  <bean id="historyProvider" class="org.easymock.EasyMock" factory-method="createMock">
+    <constructor-arg value="cern.c2mon.client.ext.history.common.HistoryProvider"/>
+  </bean>
+  
+  <bean id="tagManager" class="org.easymock.EasyMock" factory-method="createNiceMock" >
+    <constructor-arg value="cern.c2mon.client.core.manager.CoreTagManager"/>
+  </bean>
+  
+  <bean id="historyTagManager" class="org.easymock.EasyMock" factory-method="createNiceMock" >
+    <constructor-arg value="cern.c2mon.client.ext.history.common.tag.HistoryTagManager"/>
+  </bean>
+  
+  <bean id="historyManager" class="cern.c2mon.client.ext.history.HistoryManager">
+    <constructor-arg value="tagManager"/>
+    <constructor-arg value="cache"/>
+    <constructor-arg value="supervisionManager"/>
+    <constructor-arg value="historyTagManager"/>
+  </bean>
+
+</beans>
