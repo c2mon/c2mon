@@ -43,7 +43,7 @@ import cern.c2mon.client.ext.history.playback.publish.TagListenersManager;
  * @param <V>
  *          The type of value
  */
-public class KeyForValuesMap<K extends Number, V> {
+public class KeyForValuesMap<K, V> {
 
   /** The keys with the values */
   private final Map<K, Set<V>> keysWithValues;
@@ -84,7 +84,7 @@ public class KeyForValuesMap<K extends Number, V> {
    * @return a list of keys which doesn't have any values after the removal of
    *         this key
    */
-  public synchronized Collection<K> remove(final V value) {
+  public synchronized Collection<K> removeValue(final V value) {
     // Goes through all the lists and removes the key, if it exists.
     final Set<K> removedKeys = new HashSet<K>();
     final Set<K> keys = this.keysWithValues.keySet();
@@ -106,7 +106,7 @@ public class KeyForValuesMap<K extends Number, V> {
    * 
    * @param key the key to remove. 
    */
-  public synchronized void remove(final K key) {
+  public synchronized void removeKey(final K key) {
     this.keysWithValues.remove(key);
   }
 

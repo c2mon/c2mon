@@ -71,9 +71,8 @@ public class TagListenersManager extends KeyForValuesMap<Long, TagUpdateListener
    * @return a list of tags which doesn't have any listeners after the removal
    *         of this listener
    */
-  @Override
   public Collection<Long> remove(final TagUpdateListener listener) {
-    return super.remove(listener);
+    return super.removeValue(listener);
   }
 
   /**
@@ -82,9 +81,7 @@ public class TagListenersManager extends KeyForValuesMap<Long, TagUpdateListener
    * @param tagId
    *          the tag to remove.
    */
-  @Override
   public void remove(final Long tagId) {
-    super.remove(tagId);
+    super.removeKey(tagId);
   }
-
 }

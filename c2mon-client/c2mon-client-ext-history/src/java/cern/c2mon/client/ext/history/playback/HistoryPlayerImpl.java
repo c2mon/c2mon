@@ -348,6 +348,7 @@ public class HistoryPlayerImpl
               currentRealtimeValue.getDataTagQuality(), 
               currentRealtimeValue.getValue(), 
               currentRealtimeValue.getTimestamp(), 
+              currentRealtimeValue.getDaqTimestamp(), 
               currentRealtimeValue.getServerTimestamp(), 
               null,
               currentRealtimeValue.getDescription(), 
@@ -477,7 +478,7 @@ public class HistoryPlayerImpl
    */
   @Override
   public void unregisterSupervisionListener(final SupervisionEntity entity, final SupervisionListener listener) {
-    final Collection<Long> removedIds = this.publisher.getSupervisionManager(entity).remove(listener);
+    final Collection<Long> removedIds = this.publisher.getSupervisionManager(entity).removeValue(listener);
     final List<HistoryUpdateId> removedDataIds = new ArrayList<HistoryUpdateId>(removedIds.size());
     
     this.supervisionEventsToRegisterLock.lock();
