@@ -17,7 +17,13 @@ import cern.c2mon.client.ext.history.dbaccess.HistorySessionFactory;
  * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/client/ext/history/dbaccess/spring/config/spring-history-test.xml" })
+@ContextConfiguration(
+    locations = 
+  {
+        "classpath:cern/c2mon/client/ext/history/c2mon-historymanager-test.xml"
+        ,
+        "classpath:cern/c2mon/client/ext/history/dbaccess/spring/config/spring-history-test.xml" 
+  })
 public class HistorySessionFactoryTest {
   
   @Autowired

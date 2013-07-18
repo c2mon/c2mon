@@ -23,7 +23,6 @@ import cern.c2mon.client.ext.history.common.HistoryTagValueUpdate;
 import cern.c2mon.client.ext.history.common.Timespan;
 import cern.c2mon.client.ext.history.common.event.HistoryPlayerAdapter;
 import cern.c2mon.client.ext.history.dbaccess.HistoryProviderSimpleImpl;
-import cern.c2mon.client.ext.history.playback.HistoryPlayerImpl;
 import cern.c2mon.client.ext.history.testUtil.UncaughtExceptionSetup;
 import cern.c2mon.client.ext.history.updates.HistorySupervisionEventImpl;
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
@@ -105,6 +104,7 @@ public class HistoryPlayerImplTest2 {
           Integer.valueOf(40000), 
           new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000), 
           new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000), 
+          new Timestamp(TIMESPAN.getStart().getTime() - 2 * 60 * 60 * 1000), 
           null,
           "Test tag", 
           TagMode.OPERATIONAL);
@@ -119,6 +119,7 @@ public class HistoryPlayerImplTest2 {
           10000L, 
           new DataTagQualityImpl(), 
           Integer.valueOf(100000), // Random value
+          new Timestamp(historyRecordTime), 
           new Timestamp(historyRecordTime), 
           new Timestamp(historyRecordTime), 
           null,
@@ -183,13 +184,14 @@ public class HistoryPlayerImplTest2 {
     
     supervisionListener.onSupervisionUpdate(EasyMock.eq(initialSupervisionEvent));
     EasyMock.expectLastCall().atLeastOnce();
-    tagUpdateListener.onUpdate(EasyMock.eq(initialHistoryRecord));
+    EasyMock.expect(tagUpdateListener.onUpdate(EasyMock.eq(initialHistoryRecord))).andReturn(true);
     EasyMock.expectLastCall().atLeastOnce();
     
     
     mockCtrl.checkOrder(true);
     
-    tagUpdateListener.onUpdate(EasyMock.eq(historyRecord));
+    EasyMock.expect(tagUpdateListener.onUpdate(EasyMock.eq(historyRecord))).andReturn(true);
+    
     supervisionListener.onSupervisionUpdate(EasyMock.eq(supervisionEvent));
     
     //
@@ -203,6 +205,7 @@ public class HistoryPlayerImplTest2 {
         if (tagValueUpdate.getDataTagQuality().isInitialised()) {
           Assert.fail(String.format("Unexpected method call onUpdate(%s)", tagValueUpdate.toString()));
         }
+
         return true;
       }
     };

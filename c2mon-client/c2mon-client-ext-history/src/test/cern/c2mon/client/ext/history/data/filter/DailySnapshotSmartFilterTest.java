@@ -31,7 +31,6 @@ import org.junit.Test;
 
 import cern.c2mon.client.ext.history.common.HistoryTagValueUpdate;
 import cern.c2mon.client.ext.history.common.Timespan;
-import cern.c2mon.client.ext.history.data.filter.DailySnapshotSmartFilter;
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 
@@ -53,7 +52,8 @@ public class DailySnapshotSmartFilterTest {
       final Object value, 
       final Timestamp logTimestamp,
       final Timestamp serverTimestamp) {
-    return new HistoryTagValueUpdateImpl(TAG_ID, null, value, serverTimestamp, serverTimestamp, logTimestamp, "Test tag", TagMode.OPERATIONAL);
+    return new HistoryTagValueUpdateImpl(TAG_ID, null, value, serverTimestamp, serverTimestamp,
+        serverTimestamp, logTimestamp, "Test tag", TagMode.OPERATIONAL);
   }
   
   private Timestamp time(int day, int hour, int minute) {

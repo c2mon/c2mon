@@ -52,7 +52,6 @@ import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.manager.CoreTagManager;
 import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
-import cern.c2mon.client.ext.history.HistoryManager;
 import cern.c2mon.client.ext.history.common.HistoryPlayer;
 import cern.c2mon.client.ext.history.common.HistoryProvider;
 import cern.c2mon.client.ext.history.common.HistoryTagValueUpdate;
@@ -79,7 +78,13 @@ import cern.tim.shared.common.datatag.DataTagQualityImpl;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:cern/c2mon/client/core/manager/c2mon-historymanager-test.xml" })
+@ContextConfiguration(
+    locations = 
+  {
+        "classpath:cern/c2mon/client/ext/history/c2mon-historymanager-test.xml"
+        ,
+        "classpath:cern/c2mon/client/ext/history/dbaccess/spring/config/spring-history-test.xml" 
+  })
 public class HistoryManagerTest {
 
   /*
@@ -260,16 +265,17 @@ public class HistoryManagerTest {
       
       // Creates a TagValueUpdate record 
       final HistoryTagValueUpdateImpl initialHistoryRecord = 
-        new HistoryTagValueUpdateImpl(
-            cdt.getId(), 
-            new DataTagQualityImpl(), 
-            Integer.valueOf(i+40000), 
-            new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
-            new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
-            null,
-            "Test tag", 
-            TagMode.OPERATIONAL);
-      initialHistoryRecord.setDataType("Integer");
+          new HistoryTagValueUpdateImpl(
+              cdt.getId(), 
+              new DataTagQualityImpl(), 
+              Integer.valueOf(i+40000), 
+              new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
+              new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
+              new Timestamp(timespan.getStart().getTime() - 1 * 60 * 60 * 1000), 
+              null,
+              "Test tag", 
+              TagMode.OPERATIONAL);
+        initialHistoryRecord.setDataType("Integer");
       
       // Adds the initial record to the list of initialization records
       initialRecords.add(initialHistoryRecord);
@@ -287,16 +293,17 @@ public class HistoryManagerTest {
         
         // Creates a TagValueUpdate record 
         final HistoryTagValueUpdateImpl historyRecord = 
-          new HistoryTagValueUpdateImpl(
-              cdt.getId(), 
-              new DataTagQualityImpl(), 
-              Integer.valueOf((int)(currentTime % 100000)), 
-              new Timestamp(currentTime - 2 * 60 * 60 * 1000), 
-              new Timestamp(currentTime), 
-              null,
-              "Test tag", 
-              TagMode.OPERATIONAL);
-        historyRecord.setDataType("Integer");
+            new HistoryTagValueUpdateImpl(
+                cdt.getId(), 
+                new DataTagQualityImpl(), 
+                Integer.valueOf((int)(currentTime % 100000)), 
+                new Timestamp(currentTime - 2 * 60 * 60 * 1000), 
+                new Timestamp(currentTime - 2 * 60 * 60 * 1000), 
+                new Timestamp(currentTime), 
+                null,
+                "Test tag", 
+                TagMode.OPERATIONAL);
+          historyRecord.setDataType("Integer");
         
         // Adds it to the list of records
         historyRecords.add(historyRecord);
@@ -401,7 +408,7 @@ public class HistoryManagerTest {
     
     EasyMock.expect(cacheMock.getHistoryModeSyncLock()).andStubReturn(historyModeSyncLock);
     EasyMock.expect(cacheMock.isHistoryModeEnabled()).andStubReturn(true);
-    
+
     EasyMock.expect(tagManagerMock.getDataTags(EasyMock.<Collection<Long>>anyObject()))
       .andDelegateTo(new TagManager(null, null, null, null) {
         @Override

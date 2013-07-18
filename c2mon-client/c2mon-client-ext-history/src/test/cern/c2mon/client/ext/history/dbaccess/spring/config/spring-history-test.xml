@@ -13,7 +13,7 @@
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="location" value="${c2mon.client.conf.url}" />
 	</bean>
-
+	
 		<!--
 		configure the data source connection pool (from .c2mon.properties in
 		production)

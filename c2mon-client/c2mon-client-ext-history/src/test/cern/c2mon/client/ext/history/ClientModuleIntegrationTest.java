@@ -12,7 +12,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/client/ext/history/springConfig/spring-history.xml" })
+@ContextConfiguration(
+    locations = 
+  {
+        "classpath:cern/c2mon/client/ext/history/c2mon-historymanager-test.xml"
+        ,
+        "classpath:cern/c2mon/client/ext/history/springConfig/spring-history.xml" 
+  })
 public class ClientModuleIntegrationTest {
 
   /**

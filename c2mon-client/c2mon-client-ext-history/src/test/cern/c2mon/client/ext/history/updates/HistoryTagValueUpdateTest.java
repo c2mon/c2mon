@@ -18,36 +18,12 @@
 package cern.c2mon.client.ext.history.updates;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import junit.framework.Assert;
 
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.client.common.listener.TagUpdateListener;
-import cern.c2mon.client.ext.history.common.HistoryProvider;
-import cern.c2mon.client.ext.history.common.HistorySupervisionEvent;
-import cern.c2mon.client.ext.history.common.HistoryTagValueUpdate;
-import cern.c2mon.client.ext.history.common.Timespan;
-import cern.c2mon.client.ext.history.common.event.HistoryPlayerAdapter;
-import cern.c2mon.client.ext.history.dbaccess.HistoryProviderSimpleImpl;
-import cern.c2mon.client.ext.history.playback.schedule.HistoryScheduler;
-import cern.c2mon.client.ext.history.testUtil.UncaughtExceptionSetup;
-import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.tim.shared.common.datatag.DataTagQualityImpl;
 import cern.tim.shared.common.datatag.TagQualityStatus;
 
@@ -69,7 +45,7 @@ public class HistoryTagValueUpdateTest {
 
     HistoryTagValueUpdateImpl h = new HistoryTagValueUpdateImpl(100L, 
         q, value, 
-        now, now, 
+        now, now, now,
         now, "it looks ok", 
         null, TagMode.MAINTENANCE);
     
