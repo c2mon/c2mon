@@ -97,6 +97,8 @@ public class Target {
         if (e instanceof UnknownHostException) {
             previous = current;
             current = PingStatus.UnkownHost;
+            // reset the address
+            address = null;
         } else {
             failure();
         }

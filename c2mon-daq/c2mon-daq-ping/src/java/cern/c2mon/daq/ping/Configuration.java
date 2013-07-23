@@ -28,5 +28,5 @@ public class Configuration {
      * defines after how many iterations the DAQ should re-ask the DNS for the IP address resolution
      */
     public static final int REFRESH_DNS_ADDRESS = Integer.parseInt(System.getProperty(
-            "dmn2.daq.ping.dns_refresh_address", "10"));
+            "dmn2.daq.ping.dns_refresh_address", "5"));
 }
