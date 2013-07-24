@@ -33,6 +33,12 @@ if [ -z $DAQ_SECONDARY_HOST ]; then
  exit 1
 fi
 
+#stop if variable not set
+if [ -z $DAQ_HOST_32 ]; then
+ echo "DAQ_HOST_32 is not set"
+ exit 1
+fi
+
 DAQ_HOST=`hostname -s`
 
 
@@ -67,6 +73,8 @@ TIMDAQ_setExecutionEnvironment() {
       # Setting the execution host. All OPC DAQs are started on the primary host
       if [ $DAQ_MODULE_NAME = "opcua" ] ; then
         DAQ_HOST=$DAQ_PRIMARY_HOST
+      elif [ $DAQ_MODULE_NAME = "ens" ] ; then
+        DAQ_HOST=$DAQ_HOST_32
       else
         DAQ_HOST=$DAQ_SECONDARY_HOST
       fi
