@@ -177,11 +177,10 @@ public class NotificationServiceImpl implements NotificationService {
             }
             TextMessage fromServer = (TextMessage)myConsumer.receive(requestTimeout);
             
-            logger.trace("Got message from server : " + fromServer.getText());
-            
             if (fromServer == null) {
                 throw new ServiceException(request.getId() + " Timeout while trying to get answer from remote notification service!");
             }
+            logger.trace("Got message from server : " + fromServer.getText());
             
             response = gson.fromJson(fromServer.getText(), ClientResponse.class);
             
