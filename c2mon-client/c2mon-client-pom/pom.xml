@@ -170,37 +170,26 @@
       <dependency>
         <groupId>cern.accsoft.security</groupId>
         <artifactId>accsoft-security-rba</artifactId>
-        <version>1.4.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>1.5.1</version>
       </dependency>
       <dependency>
         <groupId>cern.accsoft.security</groupId>
         <artifactId>accsoft-security-rba-util</artifactId>
-        <version>1.4.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>1.5.1</version>
       </dependency>
+      <!--
+      <dependency>
+        <groupId>cern.accsoft.security</groupId>
+        <artifactId>accsoft-security-rba-util-gui</artifactId>
+        <version>1.5.0</version>
+      </dependency>
+      -->
 
       <!-- other internal libs -->
       <dependency>
         <groupId>cern.accsoft.commons</groupId>
         <artifactId>accsoft-commons-util</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>1.17.0</version>
       </dependency>
 
       <!-- 3rd parties -->
