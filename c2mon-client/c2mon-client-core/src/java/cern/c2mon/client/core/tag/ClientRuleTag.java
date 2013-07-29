@@ -259,14 +259,6 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
               // Do nothing
             }
 
-            // Check, if value tag is valid or not
-            if (!inputValue.isValid()) {
-              // Add Invalidations flags to the the rule
-              Map<TagQualityStatus, String> qualityStatusMap = inputValue.getDataTagQuality().getInvalidQualityStates();
-              for (Entry<TagQualityStatus, String> entry : qualityStatusMap.entrySet()) {
-                newRuleQuality.addInvalidStatus(entry.getKey(), entry.getValue());
-              }
-            }
           } // end of for loop
 
           // Set the rule quality
@@ -278,11 +270,11 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
             this.ruleResult = rule.evaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           catch (RuleEvaluationException e) {
-            this.ruleQuality.setInvalidStatus(TagQualityStatus.UNKNOWN_REASON, RULE_ERROR_MESSAGE);
-            ruleError = e.getMessage();
             LOG.debug("computeRule() - \"" + rule.getExpression() 
-                + "\" could not be evaluated.", e);
-            
+                + "\" is Invalid.", e);
+
+            ruleError = null;
+            this.ruleQuality = getInvalidTagQuality();
             this.ruleResult = rule.forceEvaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           catch (Exception e) {
@@ -301,6 +293,38 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
         ruleMapLock.readLock().unlock();
       }
     }
+  }
+  
+  /**
+   * In case a ClientRule tag is Invalid, the invalidity can be a result of multiple
+   * invalid Datatags that belong to the Client rule.
+   * 
+   * @return an overall Datatag quality from all the Tags belonging to this rule
+   * 
+   * IMPORTANT! ->
+   * This should only be called if we know that the Rule is Invalid.
+   * 
+   * This is because a rule can be VALID, even though it contains INVALID tags. In such a case
+   * calling this method will give the wrong result..
+   * 
+   * @see https://issues.cern.ch/browse/TIMS-833
+   */
+  private DataTagQuality getInvalidTagQuality() {
+
+    DataTagQuality invalidRuleQuality = new DataTagQualityImpl();
+    invalidRuleQuality.validate();
+    
+    for (ClientDataTagValue inputValue : ruleInputValues.values()) {
+      // Check, if value tag is valid or not
+      if (!inputValue.isValid()) {
+        // Add Invalidations flags to the the rule
+        Map<TagQualityStatus, String> qualityStatusMap = inputValue.getDataTagQuality().getInvalidQualityStates();
+        for (Entry<TagQualityStatus, String> entry : qualityStatusMap.entrySet()) {
+          invalidRuleQuality.addInvalidStatus(entry.getKey(), entry.getValue());
+        }
+      }
+    }
+    return invalidRuleQuality;
   }
   
   
