@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-common</artifactId>
-	<version>1.1.6-SNAPSHOT</version>
+	<version>1.2.0</version>
 	<name>c2mon-client-common</name>
 	<packaging>jar</packaging>
 	<description>
