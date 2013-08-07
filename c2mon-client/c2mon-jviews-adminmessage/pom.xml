@@ -9,7 +9,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-jviews-adminmessage</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4-SNAPSHOT</version>
   <name>c2mon-jviews-adminmessage</name>
   <packaging>jar</packaging>
   <description>Contains the graphical toolbars to show the C2MON Client administrator buttons and messages.</description>
