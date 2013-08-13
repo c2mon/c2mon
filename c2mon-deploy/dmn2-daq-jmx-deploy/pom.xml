@@ -12,7 +12,7 @@
 	<groupId>cern.dmn2.dmn2-daq</groupId>
 	<artifactId>dmn2-daq-jmx-deploy</artifactId>
 	<name>DMN2 JMX DAQ deployment module</name>
-	<version>1.0.7</version>
+	<version>1.0.8-SNAPSHOT</version>
 
 	<description>DMN2 JMX DAQ assembling required modules and configuration files</description>
 
