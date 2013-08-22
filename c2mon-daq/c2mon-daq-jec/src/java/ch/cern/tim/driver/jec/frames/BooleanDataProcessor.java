@@ -138,7 +138,7 @@ public class BooleanDataProcessor<T extends BooleanJECAdressSpace> extends Abstr
         if (sourceDataTag != null)
             revalidate(value, sourceDataTag, System.currentTimeMillis());
         else
-            getEquipmentLogger().debug("Source data tag for boolean word " + wordPos + " bit " + bitPos);
+            getEquipmentLogger().warn("revalidateTag() - Cannot send revalidation Source data tag for boolean word " + wordPos + " bit " + bitPos + ". Reason: tag unknown!");
     }
 
     /**

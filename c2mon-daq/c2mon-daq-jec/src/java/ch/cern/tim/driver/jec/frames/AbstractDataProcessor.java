@@ -27,6 +27,7 @@ import cern.tim.driver.common.IEquipmentMessageSender;
 import cern.tim.shared.common.datatag.address.PLCHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.tim.shared.daq.datatag.SourceDataTagValue;
 import ch.cern.tim.driver.jec.JECMessageHandler;
 import ch.cern.tim.driver.jec.PLCObjectFactory;
 import ch.cern.tim.driver.jec.address.AbstractJECAddressSpace;
@@ -41,6 +42,7 @@ import ch.cern.tim.jec.StdConstants;
  * 
  */
 public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
+
     /**
      * The values before the last update.
      */
@@ -131,6 +133,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
     public void initArrays() {
         AbstractJECAddressSpace addressSpace = getJecAddressSpace();
         if (!addressSpace.isEmpty()) {
+            getEquipmentLogger().debug("initArrays() - Initializing local cache arrays to store initial-, current- and last values sent");
             initialValuesSent = new ConcurrentHashMap<Integer, Boolean>();
             currentValues = new byte[addressSpace.getJavaByteArraySize()];
             lastValues = new byte[addressSpace.getJavaByteArraySize()];
@@ -252,6 +255,7 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      *            The timestamp to use.
      */
     public void revalidate(final Object value, final ISourceDataTag sourceDataTag, final long timestamp) {
+        getEquipmentLogger().debug("revalidate() - Sending revalidation update message for tag " + sourceDataTag.getId() + " with value " + value);
         equipmentMessageSender.sendTagFiltered(sourceDataTag, value, timestamp);
     }
     
@@ -406,10 +410,9 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
             PLCHardwareAddress plcTagAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
             String natAddr = plcTagAddress.getNativeAddress();
             if (natAddr != null && natAddr.startsWith(slaveAddress)) {
-                if (sourceDataTag.getCurrentValue() != null) {
-                    if (!sourceDataTag.getCurrentValue().isValid()) {
-                        revalidateTag(plcTagAddress.getWordId(), plcTagAddress.getBitId());
-                    }
+                final SourceDataTagValue currentValue = sourceDataTag.getCurrentValue();
+                if (currentValue != null && !currentValue.isValid()) {
+                    revalidateTag(plcTagAddress.getWordId(), plcTagAddress.getBitId());
                 }
             }
         }
