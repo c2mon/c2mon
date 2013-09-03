@@ -26,8 +26,6 @@ import cern.c2mon.notification.Mailer;
 import cern.c2mon.notification.SubscriptionRegistry;
 import cern.c2mon.notification.Tag;
 import cern.c2mon.notification.TagCacheUpdateListener;
-import cern.c2mon.notification.impl.NotifierImpl;
-import cern.c2mon.notification.impl.TagCache;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -162,7 +160,7 @@ public class NotifierImplTest {
 	    }
 	    
 	    @Override
-        public void cancelSubscription(@SuppressWarnings("unused") Subscription subscription) {
+        public void cancelSubscription(Subscription subscription) {
             if (cache.containsKey(subscription.getTagId())) {
                 cache.get(subscription.getTagId()).getSubscribers().remove(subscription);
             }
@@ -318,7 +316,9 @@ public class NotifierImplTest {
 	    }
 	    b.append("true[0]");
 	    
-        RuleExpression rExpression = new RuleExpression(b.toString()) {
+      RuleExpression rExpression = new RuleExpression(b.toString()) {
+            private static final long serialVersionUID = 7424951105237067129L;
+
             @Override
             public Set<Long> getInputTagIds() {
                 HashSet<Long> result = new HashSet<Long>();
@@ -336,6 +336,12 @@ public class NotifierImplTest {
             @Override
             public RuleValidationReport validate(Map<Long, Object> pInputParams) {
                 return null;
+            }
+
+            @Override
+            public Object forceEvaluate(Map<Long, Object> pInputParams) {
+              // TODO Auto-generated method stub
+              return null;
             }
         };
         return rExpression;
