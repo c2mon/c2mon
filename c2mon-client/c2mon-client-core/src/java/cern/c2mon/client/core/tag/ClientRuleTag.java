@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
+import org.simpleframework.xml.Attribute;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -67,6 +68,9 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
 
   /** The rule result */
   private T ruleResult = null;
+
+  /** Identifier for a ClientRuleTag */
+  private Long id;
   
   /** List of unique update listeners */
   private final List<DataTagUpdateListener> listeners = new ArrayList<DataTagUpdateListener>();;
@@ -132,6 +136,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
     }
     this.rule = pRule;
     this.resultType = pResultType;
+    this.id = new Long(-1);
   }
   
   /**
@@ -144,11 +149,32 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   }
   
   /**
-   * @return -1 as default Id
+   * @return Rule id: used to be -1 as a convention for all the ClientRuleTags.
+   * Default is still -1, but can now be any minus (-) value, 
+   * to differentiate between RuleTags.
    */
   @Override
   public Long getId() {
-    return Long.valueOf(-1L);
+    return id;
+  }
+
+  /**
+   * Use this method to set Id for the ClientRuleTag.
+   * 
+   * Rule id used to be -1 as a convention for all the ClientRuleTags.
+   * 
+   * Default is still -1, but can now be any minus (-) value, 
+   * to differentiate between RuleTags.
+   * 
+   * Client Rule Tag id's can only be a minus value.
+   * Positive values are ignored.
+   */
+  public void setId(final Long id)  {
+    
+    if (id >= 0) {
+      return;
+    }
+    this.id = id;
   }
   
   /**
