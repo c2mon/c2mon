@@ -22,8 +22,9 @@
 
             <property name="c2mon.process.name" value="${PROCESS_NAME}" />
             <property name="c2mon.log.dir" value="${DAQ_LOG_HOME}" />
-            <property name="c2mon.daq.spring.context"
-               value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
+            <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
+            <property name="jmx.daq.passwd.file" value="${DAQ_CONF_HOME}/jmx-daq-credentials.txt" />
+                              
 
             <preExec>
                           <![CDATA[
@@ -52,6 +53,7 @@
             <directory name="conf">
                <file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <file name=".jmxremote.access" sourceDir="~diamonop/c2mon/daq" mask="400" />
+               <file name="jmx-daq-credentials.txt" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <!-- copy over pro. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
@@ -75,6 +77,7 @@
             <directory name="conf">
                <file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <file name=".jmxremote.access" sourceDir="~dmndev/c2mon/daq" mask="400" />
+               <file name="jmx-daq-credentials.txt" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <!-- copy over dev. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
