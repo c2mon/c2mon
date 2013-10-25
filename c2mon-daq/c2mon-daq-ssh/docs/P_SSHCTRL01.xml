@@ -1,0 +1,114 @@
+<ProcessConfiguration process-id="4020" type="initialise">
+  <jms-user>P_SSHCTRL01</jms-user>
+  <jms-password>SSHCTRL01_P</jms-password>
+  <jms-qcf-jndi-name>jms/process/factories/QCF</jms-qcf-jndi-name>
+  <jms-queue-jndi-name>jms/process/destinations/queues/processmessage/P_SSHCTRL01</jms-queue-jndi-name>
+  <jms-listener-topic>tim.process.tcrpl9.cern.ch.P_SSHCTRL01</jms-listener-topic>
+  <alive-tag-id>100410</alive-tag-id>
+  <alive-interval>60000</alive-interval>
+  <max-message-size>100</max-message-size>
+  <max-message-delay>1000</max-message-delay>
+  <EquipmentUnits>
+    <EquipmentUnit id="1" name="E_SSH_SSHCTRL01">
+      <handler-class-name>cern.c2mon.driver.ssh.SSHMessageHandler</handler-class-name>
+      <commfault-tag-id>32047</commfault-tag-id>
+      <commfault-tag-value>false</commfault-tag-value>
+      <alive-tag-id>42841</alive-tag-id>
+      <alive-interval>120000</alive-interval>
+      <address>default_ssh_key = $HOME/.ssh/id_dsa</address>
+     <DataTags>
+       <DataTag id="1" name="TIMDAQ1:FREE_MEMORY_BLOCK" control="false">
+          <data-type>Long</data-type>
+          <DataTagAddress>
+          <time-to-live>9999999</time-to-live>
+          <priority>7</priority>
+          <guaranteed-delivery>false</guaranteed-delivery>
+          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+             <system-call>cat /proc/meminfo | grep MemFree | awk '{ print $2}'</system-call>
+	     <ssh-key>$HOME/.ssh/id_dsa</ssh-key>
+	     <protocol>simple-io</protocol>
+             <call-interval>10</call-interval>
+	     <call-delay>10</call-delay>
+	   </HardwareAddress>
+        </DataTagAddress>
+       </DataTag>
+      <!--
+       <DataTag id="2" name="TIMDAQ1:NUMBER_OF_PROCESSES_IN_THE_RUN_QUEUE" control="false">
+          <data-type>Integer</data-type>
+          <DataTagAddress>
+          <time-to-live>9999999</time-to-live>
+          <priority>7</priority>
+          <guaranteed-delivery>false</guaranteed-delivery>
+          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+             <system-call>vmstat 1 2 | tail -1 | awk '{print $1}'</system-call>
+	     <protocol>simple-io</protocol>
+             <call-interval>60</call-interval>
+	     <call-delay>5</call-delay>
+	  </HardwareAddress>
+        </DataTagAddress>
+       </DataTag>
+       <DataTag id="3" name="TIMDAQ1:CPU_USER_TIME" control="false">
+          <data-type>Integer</data-type>
+          <DataTagAddress>
+          <time-to-live>9999999</time-to-live>
+          <priority>7</priority>
+          <guaranteed-delivery>false</guaranteed-delivery>
+          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+             <system-call>vmstat 1 2 | tail -1 | awk '{print $13}' </system-call>
+	     <protocol>simple-io</protocol>
+             <call-interval>60</call-interval>
+	     <call-delay>60</call-delay>
+	  </HardwareAddress>
+        </DataTagAddress>
+       </DataTag>
+       <DataTag id="4" name="TIMDAQ1:CPU_SYSTEM_TIME" control="false">
+          <data-type>Integer</data-type>
+          <DataTagAddress>
+          <time-to-live>9999999</time-to-live>
+          <priority>7</priority>
+          <guaranteed-delivery>false</guaranteed-delivery>
+          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+             <system-call>vmstat 1 2 | tail -1 | awk '{print $14}' </system-call>
+	     <protocol>simple-io</protocol>
+             <call-interval>60</call-interval>
+	     <call-delay>60</call-delay>
+	  </HardwareAddress>
+        </DataTagAddress>
+       </DataTag>
+       <DataTag id="5" name="TIMDAQ1:CPU_IDLE_TIME" control="false">
+          <data-type>Integer</data-type>
+          <DataTagAddress>
+          <time-to-live>9999999</time-to-live>
+          <priority>7</priority>
+          <guaranteed-delivery>false</guaranteed-delivery>
+          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+             <system-call>vmstat 1 2 | tail -1 | awk '{print $15}' </system-call>
+	     <protocol>simple-io</protocol>
+             <call-interval>60</call-interval>
+	     <call-delay>60</call-delay>
+	  </HardwareAddress>
+        </DataTagAddress>
+       </DataTag>
+       -->
+     </DataTags>
+     <CommandTags>
+       <CommandTag id="1" name="P_DIP01.start">
+         <source-timeout>4000</source-timeout>
+         <source-retries>0</source-retries>
+         <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+            <system-call>daqprocess -xml P_DIP01 start</system-call>
+	    <protocol>xml</protocol>
+         </HardwareAddress>
+       </CommandTag>
+       <CommandTag id="2" name="P_DIP01.stop">
+         <source-timeout>4000</source-timeout>
+         <source-retries>0</source-retries>
+         <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+            <system-call>daqprocess_remote.sh -xml P_DIP01 stop</system-call>
+	    <protocol>xml</protocol>
+         </HardwareAddress>
+       </CommandTag>
+     </CommandTags>
+    </EquipmentUnit>
+  </EquipmentUnits>
+</ProcessConfiguration>

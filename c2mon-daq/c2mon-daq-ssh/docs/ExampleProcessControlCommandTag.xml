@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<CommandTag id="42839" name="command_name.name">
+  <source-timeout>4000</source-timeout>
+  <source-retries>1</source-retries>
+  <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+      <server-alias>tcrpl4</server-alias>
+      <user-name>timoper</user-name>
+      <!-- not obligatory - the connection may be authenticated externally -->
+      <user-password>some_passwd</user-password>
+      <!-- example call:
+		ssh timoper@tcrpl4 /user/timoper/dist/daqprocess/bin/daqprocess.sh start DIP-001
+      -->
+      <system-call>/user/timoper/dist/daqprocess/bin/daqprocess.sh start P_DIP01</system-call>
+
+      <!-- not obligatory, may appear for DataTags, for periodic system calls (in ms.) -->
+      <call-interval>5000</call-interval>
+      </HardwareAddress>
+</CommandTag>
+
+
+
+
+
+
+
