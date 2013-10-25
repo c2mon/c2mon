@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jms="http://www.springframework.org/schema/jms"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:amq="http://activemq.apache.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+
+	<!-- keep this file synchronized with the test properties file in the server 
+		test module (all properties should appear in both) -->
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>file:${c2mon.properties.location}</value>
+			</list>
+		</property>
+		
+		<!-- default values for properties should be placed below -->
+    <property name="properties">  
+        <props>
+        
+             <!-- TEST PROPERTIES -->    
+	        <prop key="jms.daq.user">user-default</prop>
+	        <prop key="jms.daq.password">password-default</prop>
+	        <prop key="jms.daq.consumers">1</prop>
+	        <prop key="tim.process.name">C2MON-DAQ-TEST_PROCESS</prop>
+	        <prop key="jms.process.requestQueue">c2mon.process.request</prop>
+	        <prop key="jms.process.updateQueueTrunk">c2mon.process.update</prop>
+	        
+	        <prop key="c2mon.jms.statistics.url">nacho</prop>
+            <prop key="c2mon.jms.statistics.user">nacho</prop>
+            <prop key="c2mon.jms.statistics.pwd">nacho</prop>
+            <prop key="c2mon.jms.filter.queue">nacho</prop>
+            
+            <!-- Broker Propertie -->
+            <prop key="jms.broker.url">vm://localhost</prop>
+                            
+        </props>  
+     </property>  
+		
+	</bean>
+
+</beans>

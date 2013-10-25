@@ -1,0 +1,788 @@
+<?xml version="1.0" encoding="UTF-8" ?><ProcessConfiguration xmlns="http://timweb.cern.ch/schemas/tim-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://timweb.cern.ch/schemas/tim-daq/Configuration http://timweb/schemas/tim-daq/ProcessConfiguration.xsd"  process-id="4000" type="initialise">
+  <jms-user>P_JECTEST01</jms-user>
+  <jms-password>JECTEST01_P</jms-password>
+  <jms-qcf-jndi-name>jms/process/factories/QCF</jms-qcf-jndi-name>
+  <jms-queue-jndi-name>jms/process/destinations/queues/processmessage/P_JECTEST01</jms-queue-jndi-name>
+  <jms-listener-topic>tim.process.command.NOHOST.P_JECTEST01.NOPIK</jms-listener-topic>
+  <alive-tag-id>100123</alive-tag-id>
+  <alive-interval>6000</alive-interval>
+  <max-message-size>100</max-message-size>
+  <max-message-delay>300</max-message-delay>
+  <EquipmentUnits>
+<EquipmentUnit id="5000" name="T_MMD01">
+  <handler-class-name>cern.c2mon.driver.testhandler.TestMessageHandler</handler-class-name>
+  <commfault-tag-id>100128</commfault-tag-id>
+  <commfault-tag-value>false</commfault-tag-value>
+  <alive-tag-id>100129</alive-tag-id>
+  <alive-interval>60000</alive-interval>
+  <address>interval=200;eventProb=0.05;inRangeProb=1;outDeadBandProb=1;switchProb=1;startIn=0.3;aliveInterval=30000</address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>
+  <DataTags>
+    <DataTag id="100144" name="CP.MEY.TEST15:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>2</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-04c-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100154" name="CP.MEY.TEST01:TEST_VALUE" control="false">
+      <data-type>Integer</data-type>
+        <min-value data-type="Integer">0</min-value>
+        <max-value data-type="Integer">100</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>2</block-type>
+          <word-id>0</word-id>
+          <bit-id>-1</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>100.0</physical-max-val>
+          <resolution-factor>0</resolution-factor>
+          <native-address>PWA005-01a-AI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <value-deadband-type>3</value-deadband-type>
+        <value-deadband>0.5</value-deadband>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100155" name="CP.MEY.TEST02:TEST_VALUE" control="false">
+      <data-type>Integer</data-type>
+        <min-value data-type="Integer">0</min-value>
+        <max-value data-type="Integer">100</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>2</block-type>
+          <word-id>160</word-id>
+          <bit-id>-1</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>100.0</physical-max-val>
+          <resolution-factor>0</resolution-factor>
+          <native-address>PWA005-01b-AI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <value-deadband-type>3</value-deadband-type>
+        <value-deadband>0.5</value-deadband>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100130" name="CP.MEY.TEST01:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>0</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-01a-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100131" name="CP.MEY.TEST02:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>1</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-01b-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100146" name="CP.MEY.TEST17:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>4</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-02a-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100846" name="CP.MEY.MMD00:PONG" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>5</block-type>
+          <word-id>1</word-id>
+          <bit-id>0</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100147" name="CP.MEY.TEST18:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>5</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-02b-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100148" name="CP.MEY.TEST19:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>6</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-02c-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100149" name="CP.MEY.TEST20:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>7</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-02d-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100152" name="CP.MEY.TEST23:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>10</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-03c-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100153" name="CP.MEY.TEST24:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>11</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-03d-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100145" name="CP.MEY.TEST16:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>3</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-04d-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100150" name="CP.MEY.TEST21:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>8</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-03a-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100151" name="CP.MEY.TEST22:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>9</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-03b-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100132" name="CP.MEY.TEST03:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>2</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-01c-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100133" name="CP.MEY.TEST04:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>3</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-01d-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100134" name="CP.MEY.TEST05:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>4</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-02a-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100135" name="CP.MEY.TEST06:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>5</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-02b-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100136" name="CP.MEY.TEST07:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>6</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-02c-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100137" name="CP.MEY.TEST08:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>7</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-02d-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100138" name="CP.MEY.TEST09:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>8</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-03a-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100139" name="CP.MEY.TEST10:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>9</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-03b-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100140" name="CP.MEY.TEST11:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>10</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-03c-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100141" name="CP.MEY.TEST12:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>0</word-id>
+          <bit-id>11</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-03d-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100142" name="CP.MEY.TEST13:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>0</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-04a-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100143" name="CP.MEY.TEST14:TEST_STATE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>1</block-type>
+          <word-id>260</word-id>
+          <bit-id>1</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-04b-DI</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <time-to-live>60000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100848" name="CP.MEY.MMD00:DEFAUT_COMM_SLAVE2" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>5</block-type>
+          <word-id>2</word-id>
+          <bit-id>4</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100849" name="CP.MEY.MMD00:DEFAUT_GENERAL" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>5</block-type>
+          <word-id>0</word-id>
+          <bit-id>0</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100850" name="CP.MEY.MMD00:DEFAUT_PROFIBUS" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>5</block-type>
+          <word-id>0</word-id>
+          <bit-id>2</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100851" name="CP.MEY.MMD00:DEFAUT_PILE" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>5</block-type>
+          <word-id>0</word-id>
+          <bit-id>1</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="100852" name="CP.MEY.MMD00:DEFAUT_COMM_SLAVE1" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>5</block-type>
+          <word-id>2</word-id>
+          <bit-id>3</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>0</command-pulse-length>
+        </HardwareAddress>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+  </DataTags>
+  <CommandTags>
+    <CommandTag id="100847" name="CP.MEY.MMD00:PING">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>7</block-type>
+          <word-id>1</word-id>
+          <bit-id>0</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>1.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100157" name="CP.MEY.TEST02:CMD_TEST_B">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>3</block-type>
+          <word-id>29</word-id>
+          <bit-id>7</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-01b-DO</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100156" name="CP.MEY.TEST01:CMD_TEST_B">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>3</block-type>
+          <word-id>0</word-id>
+          <bit-id>0</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-01a-DO</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100158" name="CP.MEY.TEST03:CMD_TEST_B">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>3</block-type>
+          <word-id>49</word-id>
+          <bit-id>8</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-01c-DO</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100159" name="CP.MEY.TEST04:CMD_TEST_B">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>3</block-type>
+          <word-id>55</word-id>
+          <bit-id>4</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA004-01d-DO</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100160" name="CP.MEY.TEST05:CMD_TEST_B">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>3</block-type>
+          <word-id>55</word-id>
+          <bit-id>11</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-01a-DO</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100161" name="CP.MEY.TEST06:CMD_TEST_B">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>3</block-type>
+          <word-id>62</word-id>
+          <bit-id>8</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-01b-DO</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100163" name="CP.MEY.TEST08:CMD_TEST_B">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>3</block-type>
+          <word-id>111</word-id>
+          <bit-id>15</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-01d-DO</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100162" name="CP.MEY.TEST07:CMD_TEST_B">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>3</block-type>
+          <word-id>82</word-id>
+          <bit-id>7</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>0.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>PWA005-01c-DO</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100164" name="CP.MEY.TEST01:CMD_TEST_A">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>4</block-type>
+          <word-id>0</word-id>
+          <bit-id>-1</bit-id>
+          <physical-min-val>-50.0</physical-min-val>
+          <physical-max-val>50.0</physical-max-val>
+          <resolution-factor>0</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100165" name="CP.MEY.TEST02:CMD_TEST_A">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>4</block-type>
+          <word-id>111</word-id>
+          <bit-id>-1</bit-id>
+          <physical-min-val>-20.0</physical-min-val>
+          <physical-max-val>80.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100166" name="CP.MEY.TEST03:CMD_TEST_A">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>4</block-type>
+          <word-id>112</word-id>
+          <bit-id>-1</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>100.0</physical-max-val>
+          <resolution-factor>0</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="100167" name="CP.MEY.TEST04:CMD_TEST_A">
+      <source-timeout>4000</source-timeout>
+      <source-retries>0</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+          <block-type>4</block-type>
+          <word-id>223</word-id>
+          <bit-id>-1</bit-id>
+          <physical-min-val>0.0</physical-min-val>
+          <physical-max-val>50.0</physical-max-val>
+          <resolution-factor>1</resolution-factor>
+          <native-address>INT999</native-address>
+          <command-pulse-length>100</command-pulse-length>
+        </HardwareAddress>
+    </CommandTag>
+  </CommandTags>
+</EquipmentUnit>  </EquipmentUnits>
+</ProcessConfiguration>
+
+

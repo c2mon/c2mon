@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.c2mon.c2mon-daq</groupId>
+		<artifactId>c2mon-daq-pom</artifactId>
+		<version>1.0.24</version>
+	</parent>
+	<artifactId>c2mon-daq-core</artifactId>
+	<version>1.2.5-SNAPSHOT</version>
+	<name>c2mon-daq-core</name>
+	<packaging>jar</packaging>
+	<description>
+     This product is a new implementation of c2mon-daq-core, which it will eventually replace. During
+     the transition period to TIM2, both products will run in parallel. This new implementation can 
+     easily be configured to send updates to multiple JMS providers at once.
+    </description>
+	<url>http://timweb.cern.ch</url>
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-core</developerConnection>
+	</scm>
+	<dependencies>
+		<!-- C2MON dependencies -->
+		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-daq</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-util</artifactId>
+		</dependency>
+
+		<!-- 3rd party dependencies -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jencks</groupId>
+			<artifactId>jencks-amqpool</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>activemq-core</artifactId>
+					<groupId>org.apache.activemq</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>commons-pool</groupId>
+			<artifactId>commons-pool</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.espertech</groupId>
+			<artifactId>esper</artifactId>
+		</dependency>
+
+
+		<!-- Test dependency -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymockclassextension</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+	</dependencies>
+	<developers />
+	<groupId>cern.c2mon.c2mon-daq</groupId>
+</project>

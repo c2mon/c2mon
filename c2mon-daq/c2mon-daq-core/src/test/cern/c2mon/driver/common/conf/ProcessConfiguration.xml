@@ -1,0 +1,131 @@
+<ProcessConfiguration process-id="4092" type="initialise">
+  <jms-user>P_AIRH4STP887</jms-user>
+  <jms-password>AIRH4STP887_P</jms-password>
+  <jms-qcf-jndi-name>jms/process/factories/QCF</jms-qcf-jndi-name>
+  <jms-queue-jndi-name>jms/process/destinations/queues/processmessage/P_AIRH4STP887</jms-queue-jndi-name>
+  <jms-listener-topic>tim.process.command.NOHOST.P_AIRH4STP887.NOPIK</jms-listener-topic>
+  <alive-tag-id>100730</alive-tag-id>
+  <alive-interval>60000</alive-interval>
+  <max-message-size>100</max-message-size>
+  <max-message-delay>1000</max-message-delay>
+  <EquipmentUnits>
+	<EquipmentUnit id="1" name="E_JEC_AIRH4STP887">
+	  <handler-class-name>ch.cern.tim.driver.testhandler.TestMessageHandler</handler-class-name>
+	  <commfault-tag-id>47014</commfault-tag-id>
+	  <commfault-tag-value>false</commfault-tag-value>
+	  <alive-tag-id>47321</alive-tag-id>
+	  <alive-interval>120000</alive-interval>
+	  <address>interval=100;eventProb=0.8;inRangeProb=1.0;outDeadBandProb=0.0;outDeadBandProb=0.0;switchProb=0.5;startIn=0.01;aliveInterval=30000</address>
+	  <SubEquipmentUnits>
+	  	<SubEquipmentUnit>
+		  	<commfault-tag-id>1</commfault-tag-id>
+		  	<commfault-tag-value>true</commfault-tag-value>
+	  	</SubEquipmentUnit>
+	  	<SubEquipmentUnit>
+		  	<commfault-tag-id>2</commfault-tag-id>
+		  	<commfault-tag-value>false</commfault-tag-value>
+	  	</SubEquipmentUnit>
+	  </SubEquipmentUnits>
+	  <DataTags>
+	    <DataTag id="1" name="CP.PRE.AIRH4STP887:DEFAUT_PROCESSEUR" control="false">
+	      <data-type>Boolean</data-type>
+	      <DataTagAddress>
+	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	          <block-type>5</block-type>
+	          <word-id>0</word-id>
+	          <bit-id>1</bit-id>
+	          <physical-min-val>0.0</physical-min-val>
+	          <physical-max-val>0.0</physical-max-val>
+	          <resolution-factor>1</resolution-factor>
+	          <native-address>INT999</native-address>
+	          <command-pulse-length>0</command-pulse-length>
+	        </HardwareAddress>
+	        <time-to-live>9999999</time-to-live>
+	        <priority>7</priority>
+	        <guaranteed-delivery>true</guaranteed-delivery>
+	      </DataTagAddress>
+	    </DataTag>
+	    <DataTag id="2" name="CP.PRE.AIRH4STP887:DEFAUT_GENERAL_PLC" control="false">
+	      <data-type>Boolean</data-type>
+	      <DataTagAddress>
+	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	          <block-type>5</block-type>
+	          <word-id>0</word-id>
+	          <bit-id>0</bit-id>
+	          <physical-min-val>0.0</physical-min-val>
+	          <physical-max-val>0.0</physical-max-val>
+	          <resolution-factor>1</resolution-factor>
+	          <native-address>INT999</native-address>
+	          <command-pulse-length>0</command-pulse-length>
+	        </HardwareAddress>
+	        <time-to-live>9999999</time-to-live>
+	        <priority>7</priority>
+	        <guaranteed-delivery>true</guaranteed-delivery>
+	      </DataTagAddress>
+	    </DataTag>
+	  </DataTags>
+	  <CommandTags>
+	    <CommandTag id="1" name="CP.PRE.AIRH4STP01:TEST_PRESENCE_CONTROL">
+	      <source-timeout>4000</source-timeout>
+	      <source-retries>2</source-retries>
+	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	          <block-type>7</block-type>
+	          <word-id>1</word-id>
+	          <bit-id>0</bit-id>
+	          <physical-min-val>0.0</physical-min-val>
+	          <physical-max-val>0.0</physical-max-val>
+	          <resolution-factor>1</resolution-factor>
+	          <native-address>INT999</native-address>
+	          <command-pulse-length>100</command-pulse-length>
+	        </HardwareAddress>
+	    </CommandTag>
+	  </CommandTags>
+	</EquipmentUnit>
+	<EquipmentUnit id="2" name="E_JEC_AIRH4STP887">
+	  <handler-class-name>ch.cern.tim.driver.testhandler.TestMessageHandler</handler-class-name>
+	  <commfault-tag-id>47014</commfault-tag-id>
+	  <commfault-tag-value>false</commfault-tag-value>
+	  <alive-tag-id>47321</alive-tag-id>
+	  <alive-interval>120000</alive-interval>
+	  <address>interval=100;eventProb=0.8;inRangeProb=1.0;outDeadBandProb=0.0;outDeadBandProb=0.0;switchProb=0.5;startIn=0.01;aliveInterval=30000</address>
+	  <SubEquipmentUnits>
+	  </SubEquipmentUnits>
+	    <DataTags>
+	    <DataTag id="4" name="CP.PRE.AIRH4STP887:DEFAUT_PROCESSEUR" control="false">
+	      <data-type>Boolean</data-type>
+	      <DataTagAddress>
+	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	          <block-type>5</block-type>
+	          <word-id>0</word-id>
+	          <bit-id>1</bit-id>
+	          <physical-min-val>0.0</physical-min-val>
+	          <physical-max-val>0.0</physical-max-val>
+	          <resolution-factor>1</resolution-factor>
+	          <native-address>INT999</native-address>
+	          <command-pulse-length>0</command-pulse-length>
+	        </HardwareAddress>
+	        <time-to-live>9999999</time-to-live>
+	        <priority>7</priority>
+	        <guaranteed-delivery>true</guaranteed-delivery>
+	      </DataTagAddress>
+	    </DataTag>
+	  </DataTags>
+	  <CommandTags>
+	    <CommandTag id="2" name="CP.PRE.AIRH4STP02:TEST_PRESENCE_CONTROL">
+	      <source-timeout>4000</source-timeout>
+	      <source-retries>2</source-retries>
+	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	          <block-type>7</block-type>
+	          <word-id>1</word-id>
+	          <bit-id>0</bit-id>
+	          <physical-min-val>0.0</physical-min-val>
+	          <physical-max-val>0.0</physical-max-val>
+	          <resolution-factor>1</resolution-factor>
+	          <native-address>INT999</native-address>
+	          <command-pulse-length>100</command-pulse-length>
+	        </HardwareAddress>
+	    </CommandTag>
+	  </CommandTags>
+	</EquipmentUnit> 
+</EquipmentUnits>
+</ProcessConfiguration>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+
+<!-- ****************************
+
+  Spring configuration for creating second ActiveMQ connection channels
+  All relevant properties have a ".2" appended, although some are not duplicated (destination names f.eg.)
+  Notice some of the main converter beans are also used here (no performance problem as XML parsing is only
+  done for requests (rare), not data sending (constant).
+
+     ***************************** -->
+
+<bean id="secondActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+  <property name="brokerURL" value="${jms.broker.url.2}"/>
+  <property name="userName" value="${jms.daq.user.2}"/>
+  <property name="password" value="${jms.daq.password.2}"/>
+  <property name="clientIDPrefix" value="C2MON-DAQ-${tim.process.name}"/>
+  <property name="watchTopicAdvisories" value="false"/>
+</bean>
+
+<bean id="secondSingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+  <property name="targetConnectionFactory" ref="secondActiveMQConnectionFactory"/>
+</bean>
+
+<!-- *************************************************** -->
+<!-- * configuration of the JMS connection for sending * -->
+<!-- * updates to the server                           * -->
+<!-- *************************************************** -->
+
+<bean id="secondSourceUpdateDestination" class="org.apache.activemq.command.ActiveMQQueue">
+  <constructor-arg index="0" value="${jms.process.updateQueueTrunk}.${tim.process.name}"></constructor-arg>
+</bean>
+
+<!-- plugged into ActiveJmsSender -->
+<bean id="secondSourceUpdateJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+<!--  <qualifier value="sourceUpdateJmsTemplate"/>-->
+  <property name="connectionFactory" ref="secondSingleConnectionFactory"/>
+  <property name="defaultDestination" ref="secondSourceUpdateDestination"/>
+  <property name="messageConverter" ref="sourceUpdateMessageConverter"/>
+</bean>
+
+<!-- **************************************************** 
+     * Configuration of the JMS connection for sending  *
+     * connection and disconnection messages to the     *
+     * server, and receiving a response.                * 
+     **************************************************** -->
+     
+<bean id="secondProcessRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+  <constructor-arg index="0" value="${jms.process.requestQueue}"></constructor-arg>
+</bean>
+
+<bean id="secondProcessRequestJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+  <property name="connectionFactory" ref="secondSingleConnectionFactory"/>
+  <property name="defaultDestination" ref="secondProcessRequestDestination"/>
+</bean>
+
+
+<!-- **************************************************** -->
+<!-- * Configuration of the JMS connection for handling * -->
+<!-- * server requests and responding.                  * -->
+<!-- **************************************************** -->
+
+<!-- the destination and listener are set in the listener init() method (ActiveMessageReceiver) -->
+<!-- reasons: destination is known at runtime only -->
+<!--          listener to resolve circular reference -->
+<bean id="secondServerRequestListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+    <property name="connectionFactory" ref="secondSingleConnectionFactory"/>
+    <property name="destinationName" value="replacedAtRuntime"/> <!-- replaced at runtime to DAQ-specific destination -->  
+    <property name="maxConcurrentConsumers" value="${jms.daq.consumers.2}"/>
+    <property name="concurrentConsumers" value="${jms.daq.consumers.2}"/>      
+    <property name="sessionTransacted" value="false"/>
+    <property name="maxMessagesPerTask" value="1"/>
+    <property name="receiveTimeout" value="1000"/>
+    <property name="idleTaskExecutionLimit" value="10"/>
+    <property name="autoStartup" value="false"/> <!-- do not start listening until we set the correct destination (init of processMessageReceiver) -->
+</bean>
+ 
+</beans>

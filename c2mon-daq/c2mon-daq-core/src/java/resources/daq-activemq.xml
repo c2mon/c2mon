@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+
+<!-- ****************************
+     * Common JMS configuration *
+     * (to all DAQ - server     *
+     *  communication)          *
+     **************************** -->
+
+<bean id="activeMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+  <property name="brokerURL" value="${jms.broker.url}"/>
+  <property name="userName" value="${jms.daq.user}"/>
+  <property name="password" value="${jms.daq.password}"/>
+  <property name="clientIDPrefix" value="C2MON-DAQ-${tim.process.name}"/>
+  <property name="watchTopicAdvisories" value="false"/>
+</bean>
+
+<bean id="singleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+  <property name="targetConnectionFactory" ref="activeMQConnectionFactory"/>
+</bean>
+
+<!-- *************************************************** -->
+<!-- * configuration of the JMS connection for sending * -->
+<!-- * updates to the server                           * -->
+<!-- *************************************************** -->
+
+<!-- set the default JMS destination -->
+<bean id="sourceUpdateDestination" class="org.apache.activemq.command.ActiveMQQueue">
+  <constructor-arg index="0" value="${jms.process.updateQueueTrunk}.${tim.process.name}"></constructor-arg>
+</bean>
+
+<!-- initialize the DataTagValueUpdateConverter -->
+<bean id="sourceUpdateMessageConverter" class="cern.tim.shared.daq.datatag.DataTagValueUpdateConverter"/>
+
+<!-- plugged into ActiveJmsSender -->
+<bean id="sourceUpdateJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+<!--  <qualifier value="sourceUpdateJmsTemplate"/>-->
+  <property name="connectionFactory" ref="singleConnectionFactory"/>
+  <property name="defaultDestination" ref="sourceUpdateDestination"/>
+  <property name="messageConverter" ref="sourceUpdateMessageConverter"/>
+</bean>
+
+<!-- **************************************************** 
+     * Configuration of the JMS connection for sending  *
+     * PIK, connection and disconnection messages to the*
+     * server, and receiving a response.                * 
+     **************************************************** -->
+     
+<bean id="processRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+  <constructor-arg index="0" value="${jms.process.requestQueue}"></constructor-arg>
+</bean>
+
+<!-- initialize the converters for sending and receiving a response. Backward compatibility -->
+<bean id="processRequestMessageConverterBC" class="cern.tim.shared.daq.process.backward.ProcessRequestConverterBC"/>
+<bean id="processRequestResponseConverterBC" class="cern.c2mon.driver.common.messaging.impl.backward.ProcessRequestResponseConverterBC"/>
+
+<!-- converters are set manually for sending and receiving a response -->
+<bean id="processRequestJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+  <property name="connectionFactory" ref="singleConnectionFactory"/>
+  <property name="defaultDestination" ref="processRequestDestination"/>
+</bean>
+
+
+<!-- **************************************************** -->
+<!-- * Configuration of the JMS connection for handling * -->
+<!-- * server requests and responding.                  * -->
+<!-- **************************************************** -->
+
+<!-- the destination and listener are set in the listener init() method (ActiveMessageReceiver) -->
+<!-- reasons: destination is known at runtime only -->
+<!--          listener to resolve circular reference -->
+<bean id="serverRequestListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+    <property name="connectionFactory" ref="singleConnectionFactory"/>
+    <property name="destinationName" value="replacedAtRuntime"/> <!-- replaced at runtime to DAQ-specific destination -->  
+    <property name="maxConcurrentConsumers" value="${jms.daq.consumers}"/>
+    <property name="concurrentConsumers" value="${jms.daq.consumers}"/>      
+    <property name="sessionTransacted" value="false"/>
+    <property name="maxMessagesPerTask" value="1"/>
+    <property name="receiveTimeout" value="1000"/>
+    <property name="idleTaskExecutionLimit" value="10"/>
+    <property name="autoStartup" value="false"/> <!-- do not start listening until we set the correct destination (init of processMessageReceiver) -->
+<!--      <property name="errorHandler" ref="processRequestHandler"/>         -->
+</bean>
+  
+  
+<!-- for pool of parsers: -->
+<!--  <bean id="parserTargetSource" class="org.springframework.aop.target.CommonsPoolTargetSource">-->
+<!--    <property name="maxSize" value="30"/>-->
+<!--    <property name="targetBeanName" value="parserTarget"/>-->
+<!--  </bean>-->
+<!--  -->
+<!--  <bean id="parserTarget" class="ch.cern.tim.shared.common.SimpleXMLParser" scope="prototype"/>-->
+<!--  -->
+<!--  <bean id="parser" class="org.springframework.aop.framework.ProxyFactoryBean">-->
+<!--    <property name="targetSource" ref="parserTargetSource"/>-->
+<!--  </bean>-->
+
+<!-- ****************************** -->
+<!-- * Filter connection settings * -->
+<!-- ****************************** -->
+
+<bean id="filterActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+  <property name="brokerURL" value="${c2mon.jms.statistics.url}"/>
+  <property name="userName" value="${c2mon.jms.statistics.user}"/>
+  <property name="password" value="${c2mon.jms.statistics.pwd}"/>
+  <property name="clientIDPrefix" value="C2MON-DAQ-FILTER"/>
+  <property name="watchTopicAdvisories" value="false"/>
+</bean>
+
+<bean id="filterConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+  <property name="targetConnectionFactory" ref="filterActiveMQConnectionFactory"/>
+</bean>
+
+<bean id="filterDestination" class="org.apache.activemq.command.ActiveMQQueue">
+  <constructor-arg index="0" value="${c2mon.jms.filter.queue}"></constructor-arg>
+</bean>
+
+<!-- converters are set manually for sending and receiving a response -->
+<bean id="filterJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+  <property name="connectionFactory" ref="filterConnectionFactory"/>
+  <property name="defaultDestination" ref="filterDestination"/>
+  <property name="deliveryPersistent" value="false"/>  <!-- NON-PERSISTENT -->
+  <property name="priority" value="1"/> <!-- VERY LOW -->
+  <property name="timeToLive" value="1800000"/> <!-- 1/2 hour -->
+</bean>
+
+</beans>

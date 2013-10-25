@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<!--
+		contains core beans that are used in both daq-core-service and
+		daq-core-transition
+	-->
+
+	<!-- scan the DAQ package for Spring annotations -->
+	<context:annotation-config />
+	<context:component-scan base-package="cern.c2mon.driver.common,cern.c2mon.driver.filter" />
+
+	<!-- load daqProperties so that they can be used in the XML -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<!--    <property name="location" value="${daq.conf.url}" />-->
+		<!--    <property name="location" value="${c2mon.properties.url}" />-->
+		<property name="properties" ref="daqProperties" />
+	</bean>
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<props>
+				<prop key="jms.daq.user.2">user-default</prop>
+				<prop key="jms.daq.password.2">password-default</prop>
+				<prop key="jms.daq.consumers.2">1</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- singleton parser should be sufficient here -->
+	<bean id="simpleXMLparser" class="cern.tim.util.parser.SimpleXMLParser" />
+
+
+	<bean id="equipmentConfigurationFactory"
+		class="cern.c2mon.driver.common.conf.core.EquipmentConfigurationFactory"
+		factory-method="getInstance" />
+
+
+	<bean id="messageHandler" class="cern.c2mon.driver.common.messaging.impl.RequestController" />
+	<bean id="configurationController"
+		class="cern.c2mon.driver.common.conf.core.ConfigurationController">
+		<property name="processConfigurationLoader" ref="processConfigurationLoader"></property>
+	</bean>
+	<bean id="processConfigurationLoader"
+		class="cern.c2mon.driver.common.conf.core.ProcessConfigurationLoader" />
+		
+	<bean id="equipmentMessageSender" class="cern.c2mon.driver.common.EquipmentMessageSender"
+		scope="prototype" />
+
+</beans>

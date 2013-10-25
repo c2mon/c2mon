@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- This is the counter implementation -->
+	<!-- 0: Number of counters -->
+	<!-- 1: interval in which the tags will be checked-->
+	<!-- 2: number of tags per interval at which time deadband filtering will be activated -->
+	<!-- 3: number of tags per interval at which time deadband will be deactivated -->
+	<!-- 4: The time deadband time in ms -->
+	<bean id="lowDynamicTimeDeadbandFilterActivator" class="cern.c2mon.driver.filter.dynamic.CounterTimeDeadbandActivator" scope="prototype">
+	  <constructor-arg index="0" value="${deadband.counter.low.nbIntervals}"/>
+	  <constructor-arg index="1" value="${deadband.counter.low.interval}"/>   
+	  <constructor-arg index="2" value="${deadband.counter.low.activate}"/>    
+	  <constructor-arg index="3" value="${deadband.counter.low.deactivate}"/>
+	  <constructor-arg index="4" value="${deadband.counter.low.deadband}"/>
+	</bean>
+	
+	<!-- This is the counter implementation -->
+	<!-- 0: Number of counters -->
+	<!-- 1: interval in which the tags will be checked-->
+	<!-- 2: number of tags per interval at which time deadband filtering will be activated -->
+	<!-- 3: number of tags per interval at which time deadband will be deactivated -->
+	<!-- 4: The time deadband time in ms -->
+	<bean id="medDynamicTimeDeadbandFilterActivator" class="cern.c2mon.driver.filter.dynamic.CounterTimeDeadbandActivator" scope="prototype">
+	  <constructor-arg index="0" value="${deadband.counter.medium.nbIntervals}"/>
+	  <constructor-arg index="1" value="${deadband.counter.medium.interval}"/>   
+	  <constructor-arg index="2" value="${deadband.counter.medium.activate}"/>    
+	  <constructor-arg index="3" value="${deadband.counter.medium.deactivate}"/>
+	  <constructor-arg index="4" value="${deadband.counter.medium.deadband}"/>
+	</bean>
+
+</beans>

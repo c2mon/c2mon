@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+<!-- Configuration file example for connecting to 2 separate ActiveMQ channels -->
+<!-- Command receving is disabled below by default: uncomment all secondActiveMessageReceiver lines to enable it -->
+<!-- To use, copy into deployment directory and set c2mon.daq.spring.context to point to this file -->
+<!-- Properties must be set for the second ActiveMQ connection also: see daq-activemq-second.xml -->
+
+<import resource="classpath:resources/daq-deadband.xml"/>
+<import resource="classpath:resources/daq-core-common.xml"/>
+<import resource="classpath:resources/daq-activemq.xml"/>
+<import resource="classpath:resources/daq-activemq-second.xml"/>
+
+<bean id="driverKernel" class="cern.c2mon.driver.common.DriverKernel">
+  <property name="primaryRequestSender" ref="primaryRequestSender"/>
+  <property name="secondaryRequestSender" ref="secondaryRequestSender"/>
+  <property name="processMessageReceivers">
+    <list>      
+      <ref bean="activeMessageReceiver"/>
+<!--      <ref bean="secondActiveMessageReceiver"/>              -->
+    </list>
+  </property>
+</bean>
+
+<!-- initialize the ProcessRequestSender; can switch here between implementations (No dummy implementation needed if local conf used)-->
+<bean id="primaryRequestSender" class="cern.c2mon.driver.common.messaging.impl.ActiveRequestSender"/>
+<bean id="secondaryRequestSender" class="cern.c2mon.driver.common.messaging.impl.ActiveRequestSender">
+  <property name="jmsTemplate" ref="secondProcessRequestJmsTemplate"/>
+</bean>
+
+<!-- initialize the ProcessMessageReceiver; switch here between implementations (Dummy implementation available) -->
+<!--<bean id="processMessageReceiver" class="cern.c2mon.driver.common.messaging.impl.DirectoryMessageReceiver"/>-->
+<bean id="activeMessageReceiver" class="cern.c2mon.driver.common.messaging.impl.ActiveMessageReceiver"/>
+<!--<bean id="secondActiveMessageReceiver" class="cern.c2mon.driver.common.messaging.impl.ActiveMessageReceiver">-->
+<!--  <property name="listenerContainer" ref="secondServerRequestListenerContainer"/>-->
+<!--</bean>-->
+
+<!-- initialize the FilterMessageSender; switch here between implementations (Dummy implementation available) -->
+<!--<bean id="filterMessageSender" class="cern.c2mon.driver.filter.impl.DummyFilterSender"/>-->
+<bean id="filterMessageSender" class="cern.c2mon.driver.filter.impl.ActiveFilterSender"/>
+
+<!-- initialize the JmsSenders; any number of these can be plugged into the ProcessMessageSender below -->
+<bean id="activeJmsSender" class="cern.c2mon.driver.common.messaging.impl.ActiveJmsSender">
+    <property name="beanName" value="productionSender"/>
+</bean> 
+ 
+<bean id="secondActiveJmsSender" class="cern.c2mon.driver.common.messaging.impl.ActiveJmsSender">
+  <property name="jmsTemplate" ref="secondSourceUpdateJmsTemplate"/>
+  <property name="beanName" value="testSender"/>
+</bean>
+
+<!-- use proxyJmsSender in processMessageSender to shield DAQ from this connection -->
+<bean id="proxyJmsSender" class="cern.c2mon.driver.common.messaging.impl.ProxyJmsSender">
+  <property name="wrappedSender" ref="secondActiveJmsSender"/>
+  <property name="beanName" value="testProxySender"/>
+</bean>
+
+<!-- set the JMS message senders that will be used -->
+<bean id="processMessageSender" class="cern.c2mon.driver.common.messaging.impl.ProcessMessageSender">
+  <property name="jmsSenders">
+    <list>
+      <ref bean="activeJmsSender"/>
+      <ref bean="proxyJmsSender"/>
+    </list>
+  </property>
+</bean>
+
+</beans>

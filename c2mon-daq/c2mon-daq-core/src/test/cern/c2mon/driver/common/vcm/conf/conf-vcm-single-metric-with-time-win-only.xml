@@ -1,0 +1,32 @@
+<EquipmentUnit id="5250" name="E_ESP_ESP01">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address></address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+		<DataTag id="54675" name="BE.TEST:TEST1" control="false">
+			<data-type>Boolean</data-type>		
+
+			<DataTagAddress>
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+					<address>not-important</address>
+				</HardwareAddress>
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+				
+			    <!-- if present, the DAQ core will monitor this tag to check if the updates are arriving regularly, within the predefined time window. No value change is required-->
+	    	    <value-change-monitor timeWindow="2000"/>				
+								
+			</DataTagAddress>		
+	    	
+		</DataTag>
+
+	</DataTags>
+	<CommandTags />
+</EquipmentUnit>
