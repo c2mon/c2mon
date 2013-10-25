@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-daq</groupId>
+    <artifactId>c2mon-daq-pom</artifactId>
+    <version>1.0.24</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-daq</groupId>
+  <artifactId>c2mon-daq-laser</artifactId>
+  <version>1.0.7-SNAPSHOT</version>
+  <name>c2mon-daq-laser</name>
+  <packaging>jar</packaging>
+  <description>
+  This is a C2MON LASER DAQ. This DAQ allows TIM to acquire data from LASER (The LHC Alarm SERvice) system.
+  </description>
+  <url />
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-daq</artifactId>
+    </dependency>
+
+    <!-- Needed for hibernate 2.1.8 which is used by laser-source -->
+    <dependency>
+      <groupId>odmg</groupId>
+      <artifactId>odmg</artifactId>
+      <version>3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.laser</groupId>
+      <artifactId>laser-client</artifactId>
+      <version>[1.3.2,2.0.0)</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>oc4j-crimson</artifactId>
+          <groupId>com.oracle</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>concurrent</artifactId>
+          <groupId>concurrent</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>hibernate</artifactId>
+          <groupId>org.hibernate</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.japc</groupId>
+      <artifactId>japc-ext-mockito</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-laser</developerConnection>
+  </scm>
+  <build>
+
+    <plugins />
+
+  </build>
+
+  <developers />
+</project>

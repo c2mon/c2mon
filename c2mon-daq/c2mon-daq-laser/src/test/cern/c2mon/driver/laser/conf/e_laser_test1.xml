@@ -1,0 +1,57 @@
+<EquipmentUnit id="5250" name="E_DIP_DIP1">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address>Protocol=3</address>
+
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+
+		<DataTag id="124150" name="CS.SPS.CWO-BA3-EXT:MIL1553_PROBLEM"
+			control="false">
+			<data-type>Boolean</data-type>
+
+			<DataTagAddress>
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.LASERHardwareAddressImpl">
+					<alarm-category>CERN.SPS_OP.CTRL.COMPUTERS</alarm-category>
+					<fault-family>COMPUTER</fault-family>
+					<fault-member>CWO-BA3-EXT</fault-member>
+					<fault-code>4005</fault-code>
+				</HardwareAddress>
+
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+		<DataTag id="124149" name="CS.SPS.CWO-BA3-EXT:INTER_PROCESSFAULT"
+			control="false">
+			<data-type>Boolean</data-type>
+
+			<DataTagAddress>
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.LASERHardwareAddressImpl">
+					<alarm-category>CERN.SPS_OP.CTRL.COMPUTERS</alarm-category>
+					<fault-family>COMPUTER</fault-family>
+					<fault-member>CWO-BA3-EXT</fault-member>
+					<fault-code>4009</fault-code>
+				</HardwareAddress>
+
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+
+
+	</DataTags>
+
+	<CommandTags />
+
+</EquipmentUnit>
+
+ 
