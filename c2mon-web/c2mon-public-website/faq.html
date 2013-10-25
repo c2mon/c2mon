@@ -151,7 +151,7 @@
 
 			<!-- Navbar
 			================================================== -->
-			<div class="masthead">
+			<div class="masthead hidden-phone">
 				<h3 class="muted">C<sup>2</sup>MON</h3>
 				<div class="navbar">
 					<div class="navbar-inner">
@@ -246,8 +246,8 @@
 						<h2>What's inside?</h2>
 						<br />
 						<p class="well">
-							Short answer is 
-							<a href="http://en.wikipedia.org/wiki/Java_%28programming_language%29">Java</a>. 
+							Short answer is
+							<a href="http://en.wikipedia.org/wiki/Java_%28programming_language%29">Java</a>.
 							For more details on the internals, see below...
 						</p>
 						<br />
@@ -256,22 +256,22 @@
 						<br />
 						<p class="well">
 							C2MON is a 3-tier monitoring platform, made up of a data acquisition (DAQ) API, a server layer and a client API.
-							The inter-layer communication is done exclusively through 
+							The inter-layer communication is done exclusively through
 							<a href="http://en.wikipedia.org/wiki/Java_Message_Service">JMS</a>
-							(<a href="http://activemq.apache.org">ActiveMQ</a>). 
+							(<a href="http://activemq.apache.org">ActiveMQ</a>).
 							The acquired data is logged in the configured database and kept
 							in-memory in a cache (<a href="http://ehcache.org">Ehcache</a>).
-							 C2MON comes equipped with a number of available DAQ and client implementations (see below)
+							C2MON comes equipped with a number of available DAQ and client implementations (see below)
 						</p>
 						<br />
 
 						<h3>Server cluster configuration</h3>
 						<br />
 						<p class="well">
-							The C2MON server can run in a clustered setup, by making use of the 
+							The C2MON server can run in a clustered setup, by making use of the
 							<a href="http://ehcache.org">Ehcache</a>
-							 Terracotta distributed cache technology.
-							This allows to build high-availability services on top of C2MON. The cache can also make use of 
+							Terracotta distributed cache technology.
+							This allows to build high-availability services on top of C2MON. The cache can also make use of
 							<a href="http://terracotta.org/products/bigmemory">Terracotta BigMemory</a> &reg;,
 							for high-performance monitoring requirements of large data sets.
 						</p>
@@ -280,10 +280,10 @@
 						<h3>Supported databases</h3>
 						<br />
 						<p class="well">
-							At CERN we run with 
+							At CERN we run with
 							<a href="http://www.oracle.com/us/products/database/overview/index.html">Oracle</a>,
 							but the platform can run equally well with other standard databases (the demo package even
-							uses the in-memory 
+							uses the in-memory
 							<a href="http://en.wikipedia.org/wiki/HSQLDB">HSQLDB</a>
 							).
 						</p>
@@ -294,14 +294,14 @@
 						<p class="well">
 							A number of client applications are already available on top of C2MON (see screenshots). Some of them make use of the
 							<a href="http://www-01.ibm.com/software/integration/visualization/java">IBM ILOG</a> &reg;,
-							 framework, and hence require are licence, but a free GUI is also available.
+							framework, and hence require are licence, but a free GUI is also available.
 						</p>
 						<br />
 
 						<h3>Available data acquisition modules</h3>
 						<br />
 						<p class="well">
-							Data acquisition modules already exist for acquiring data from a variety of sources, in particular 
+							Data acquisition modules already exist for acquiring data from a variety of sources, in particular
 							<a href="http://en.wikipedia.org/wiki/OPC_Unified_Architecture">OPC UA</a>,
 							and Siemens/Schneider
 							<a href="http://en.wikipedia.org/wiki/Programmable_logic_controller">PLCs</a>.
@@ -317,14 +317,23 @@
 
 							<br>
 							<br>
-
+							
 							<a class="btn btn-large btn-primary" target="_blank" href="downloads/C2MON-manual.pdf">C2MON Manual (PDF) &raquo;</a>
 						</p>
 						<br />
-						
+
 						<h3>Other links to C2MON...</h3>
 						<br />
 						<p class="well">
+							"High-availability monitoring and big data: using java clustering and caching technologies to meet complex monitoring scenarios", paper about C2MON, presented in the <a target="_blank" href="http://www.icalepcs2013.org/">ICALEPS 2013 Conference</a> in California, USA.
+							<br>
+							<br>
+							<a class="btn btn-large btn-primary" target="_blank" href="downloads/C2MON-ICALEPCS13-Paper.pdf">High-availability monitoring and Big Data (ICALEPS 2013, California, USA) (PDF) &raquo;</a>
+						</p>
+						<p class="well">
+							Small article about monitoring at CERN with C2MON and Terracotta.
+							<br>
+							<br>
 							<a class="btn btn-large btn-primary" target="_blank" href="https://edms.cern.ch/file/1275202/1/SAG_Cern_RS_Feb13_print_office.pdf"> Failsafe cluster solution for CERN monitoring (PDF) &raquo; </a>
 						</p>
 						<br />
@@ -334,6 +343,32 @@
 			</div><!--/.fluid-container-->
 		</div>
 		<!-- /container -->
+
+		<!-- What's Next ?
+		================================================== -->
+		<section id="what-next" class="visible-phone">
+			<div class="page-header">
+				<h1>What's next !?</h1>
+			</div>
+			<p class="lead">
+				I would like to learn who is behind C2MON and how to contact you.
+			</p>
+			<a class="btn btn-large btn-primary" href="contact.html">To the Contact page</a>
+			<hr>
+
+		</section>
+
+		<!-- FOOTER -->
+		<div class="footer visible-phone">
+			<p class="pull-right">
+				<a href="#">Back to top</a>
+			</p>
+
+			<p class="pull-left">
+				(&copy; Cern 2013)
+				<a href="index.html">HOME</a>
+			</p>
+		</div>
 
 		<!-- Piwik Tracking
 		================================================== -->
