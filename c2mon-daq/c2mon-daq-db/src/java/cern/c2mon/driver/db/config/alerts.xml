@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="timdbdaq">
+	
+		<resultMap id="alerts" type="cern.c2mon.driver.db.Alert">
+			<result property="id" column="DBD_TAG_ID" javaType="java.lang.Long" jdbcType="INTEGER"/>
+			<result property="name" column="DBD_NAME" javaType="java.lang.String" jdbcType="VARCHAR"/>
+			<result property="value" column="DBD_VALUE" javaType="java.lang.String" jdbcType="VARCHAR"/>
+			<result property="timestamp" column="DBD_SOURCE_TIMESTAMP" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+			<result property="quality" column="DBD_QUALITY" javaType="java.lang.Short" jdbcType="INTEGER"/>
+			<result property="qualityDescription" column="DBD_QUALITY_DESCRIPTION" javaType="java.lang.String" jdbcType="VARCHAR"/>
+		</resultMap>
+		
+		<select id="getLastAlertsById" parameterType="map" resultMap="alerts">
+			SELECT  DBD_TAG_ID,
+					DBD_NAME,
+					DBD_VALUE,
+					DBD_SOURCE_TIMESTAMP,
+					DBD_QUALITY,
+					DBD_QUALITY_DESCRIPTION
+			FROM DB_DAQ 
+		   WHERE DBD_TAG_ID IN 
+		    <foreach collection="ids" item="item" open="(" separator="," close=")" >
+		   	#{item}
+		   </foreach> 
+		</select>
+
+
+		<select id="getLastAlertForDataTagById" resultMap="alerts"> 
+			SELECT  DBD_TAG_ID,
+					DBD_NAME,
+					DBD_VALUE,
+					DBD_SOURCE_TIMESTAMP,
+					DBD_QUALITY,
+					DBD_QUALITY_DESCRIPTION
+			FROM DB_DAQ 
+		   WHERE DBD_TAG_ID = #{id}  
+		</select>
+		
+		<select id="getDataTags" resultType="java.lang.Long">
+			SELECT DBD_TAG_ID
+			FROM DB_DAQ
+		</select>
+		
+		<parameterMap id="insert-datatag-map" type="java.util.Map">
+			<parameter property="tag_id" javaType="java.lang.Long" jdbcType="INTEGER"/>
+			<parameter property="tag_name" javaType="java.lang.String" jdbcType="VARCHAR"/>
+			<parameter property="tag_value" javaType="java.lang.String" jdbcType="VARCHAR"/>
+			<parameter property="tag_data_type" javaType="java.lang.String" jdbcType="VARCHAR"/>
+			<parameter property="timestamp" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+			<parameter property="tag_quality" javaType="java.lang.Short" jdbcType="INTEGER"/>
+			<parameter property="tag_quality_desc" javaType="java.lang.String" jdbcType="VARCHAR"/>
+			<parameter property="creation_date" javaType="java.util.Date" jdbcType="TIMESTAMP"/>
+		</parameterMap>
+	
+		<insert id="insertDataTag" parameterMap="insert-datatag-map">
+			INSERT INTO DB_DAQ (DBD_TAG_ID, DBD_NAME, DBD_VALUE, DBD_DATA_TYPE, DBD_SOURCE_TIMESTAMP, DBD_QUALITY, 
+								DBD_QUALITY_DESCRIPTION, DBD_CRE_DAT) 
+						VALUES (?,?,?,?,?,?,?,?)	
+		</insert> 
+	
+		<parameterMap id="wait-any-alert-map" type="java.util.Map">
+			<parameter property="name" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT"/>
+			<parameter property="message" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT"/>
+			<parameter property="status" javaType="java.lang.Integer" jdbcType="INTEGER" mode="OUT"/>
+			<parameter property="timeout" javaType="java.lang.Integer" jdbcType="INTEGER" mode="IN"/>
+		</parameterMap>
+		
+		<parameterMap id="wait-one-alert-map" type="java.util.Map">
+			<parameter property="name" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>
+			<parameter property="message" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT"/>
+			<parameter property="status" javaType="java.lang.Integer" jdbcType="INTEGER" mode="OUT"/>
+			<parameter property="timeout" javaType="java.lang.Integer" jdbcType="INTEGER" mode="IN"/>
+		</parameterMap>
+		
+		<update id="wait-one-alert" parameterMap="wait-one-alert-map" statementType="CALLABLE">
+			{call DBMS_ALERT.waitone(?,?,?,?)}
+		</update>
+		
+		<update id="wait-any-alert" parameterMap="wait-any-alert-map" statementType="CALLABLE">
+			{call DBMS_ALERT.waitany(?,?,?,?)}
+		</update>
+		
+		<update id="register-for-alert" parameterType="java.lang.String" statementType="CALLABLE">
+			{call DBMS_ALERT.register(#{alertId})}
+		</update>
+		
+		<update id="unregister-one-alert" parameterType="java.lang.String" statementType="CALLABLE">
+			{call DBMS_ALERT.remove(#{alertId})}
+		</update>
+		
+		<update id="unregister-all-alerts" statementType="CALLABLE">
+			{call DBMS_ALERT.removeall }
+		</update>
+            
+</mapper>

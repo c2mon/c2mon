@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<import resource="classpath:cern/c2mon/driver/db/config/daq-db-config.xml"/>
+
+	<bean id="dbMessageHandler" class="cern.c2mon.driver.db.DBMessageHandler">
+		<property name="dbDaqDao" ref="dbDaqDao" />
+	</bean>
+
+	<bean id="testDbDaqDao" class="cern.c2mon.driver.db.DbDaqDaoTest">
+		<property name="sqlSessionFactory" ref="testDbDaqSessionFactory" />
+	</bean>
+
+	<bean id="testDbDaqSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation"
+			value="classpath:cern/c2mon/driver/db/config/test-sqlmap-config.xml" />
+		<property name="dataSource" ref="dbDaqDataSource" />
+	</bean>
+
+</beans>
