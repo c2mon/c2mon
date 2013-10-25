@@ -13,7 +13,9 @@
 		<link href="assets/css/bootstrap.css" rel="stylesheet">
 		<link href="assets/css/bootstrap-lightbox.css" rel="stylesheet">
 		<link href="assets/css/bootstrap-image-gallery.min.css" rel="stylesheet" >
-
+		
+   
+		
 		<style>
 			/* GLOBAL STYLES
 			 -------------------------------------------------- */
@@ -110,7 +112,7 @@
 			/* MARKETING CONTENT
 			 -------------------------------------------------- */
 
-			/* Center align the text within the three columns below the carousel */
+			/* Center align the text */
 			.marketing .span4 {
 				text-align: center;
 			}
@@ -151,6 +153,8 @@
 				line-height: 1;
 				letter-spacing: -1px;
 			}
+			
+			.h3_smaller_text { font-size:40%; }
 
 			/* RESPONSIVE CSS
 			 -------------------------------------------------- */
@@ -245,6 +249,8 @@
 		<link rel="apple-touch-icon-precomposed" href=" assets/ico/apple-touch-icon-57-precomposed.png">
 		<link rel="shortcut icon" href="favicon.ico">
 
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
 		<!-- Let's switch on the tooltips -->
 		<script type="text/javascript">
 			$(document).ready(function() {
@@ -261,8 +267,12 @@
 			<!-- NAVIGATION BAR
 			================================================== -->
 
-			<div class="masthead">
-				<h3 class="muted">C<sup>2</sup>MON</h3>
+			<div class="masthead hidden-phone">
+				<h3 class="muted">C<sup>2</sup>MON 
+					<span class="h3_smaller_text">
+						 open source SCADA monitoring system
+					</span>
+				</h3>				
 				<div class="navbar">
 					<div class="navbar-inner">
 						<div class="container">
@@ -304,14 +314,14 @@
 						<br>
 						<br>
 
-						<video width="640" height="360" controls id="video-player" >
-							<source src="assets/video/CERN_C2MON.webmhd.webm" type='video/webm; codecs="vp8, vorbis"'> 
-							<source src="assets/video/CERN_C2MON.mp4" type="video/mp4">
-							<source src="assets/video/CERN_C2MON.oggtheora.ogv" type='video/ogg; codecs="theora, vorbis"'> 
+						<video width="640" height="360" class="hidden-phone" controls>
+							<source src="assets/video/CERN_C2MON-webmhd.webm"> 
+							<source src="assets/video/CERN_C2MON.mp4">
 						</video>
+						
 					</p>
 				</section>
-
+			
 				<hr>
 
 				<!-- TIM + DIAMON
@@ -397,6 +407,20 @@
 				</div><!-- /.row -->
 
 				<hr>
+				
+				<!-- What's Next ?
+				================================================== -->
+				<section id="what-next" class="visible-phone">
+					<div class="page-header">
+						<h1>What's next !?</h1>
+					</div>
+					<p class="lead">
+						Head to the F.A.Q for more information..
+					</p>
+					<a class="btn btn-large btn-primary" href="faq.html">To the F.A.Q please!</a>
+					<hr>
+
+				</section>
 
 				<!-- FOOTER -->
 				<div class="footer">
@@ -428,10 +452,10 @@
 			<script src=" assets/js/bootstrap-collapse.js"></script>
 			<script src=" assets/js/bootstrap-carousel.js"></script>
 			<script src=" assets/js/bootstrap-typeahead.js"></script>
-			
+
 			<!-- Image Carousel -->
-			<script src="assets/js/load-image-min.js"></script>
-			<script src="assets/js/bootstrap-image-gallery-min.js"></script>
+			<script src="http://blueimp.github.com/JavaScript-Load-Image/load-image.min.js"></script>
+			<script src="assets/js/bootstrap-image-gallery.min.js"></script>
 
 			<!-- Piwik Tracking
 			================================================== -->

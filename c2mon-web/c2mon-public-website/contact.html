@@ -15,7 +15,7 @@
 				padding-bottom: 60px;
 			}
 
-			/* Main marketing message and sign up button */
+			/* Main marketing message */
 			.jumbotron {
 				margin: 80px 0;
 				text-align: center;
@@ -69,6 +69,8 @@
 				border-right: 0;
 				border-radius: 0 3px 3px 0;
 			}
+			
+			.h3_smaller_text { font-size:40%; }
 		</style>
 		<link href=" assets/css/bootstrap-responsive.css" rel="stylesheet">
 
@@ -91,8 +93,12 @@
 
 			<!-- NAVIGATION BAR
 			================================================== -->
-			<div class="masthead">
-				<h3 class="muted">C<sup>2</sup>MON</h3>
+			<div class="masthead hidden-phone">
+				<h3 class="muted">C<sup>2</sup>MON 
+					<span class="h3_smaller_text">
+						 open source SCADA monitoring system
+					</span>
+				</h3>
 				<div class="navbar">
 					<div class="navbar-inner">
 						<div class="container">
@@ -171,8 +177,8 @@
 						</div>
 						<br class="clear">
 					</section><!-- end left -->
-
-					<section class="span6">
+					
+					<section class="span6 hidden-phone">
 						<div class="well">
 							<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=CERN,+Route+de+Meyrin+385,+1217+Meyrin,+Switzerland&amp;sll=46.236571,6.055956&amp;sspn=0.012838,0.027874&amp;ie=UTF8&amp;hq=CERN,+Route+de+Meyrin+385,+1217+Meyrin,+Switzerland&amp;ll=46.233959,6.056087&amp;spn=0.006419,0.013937&amp;t=m&amp;z=14&amp;iwloc=A&amp;cid=17714174897173458013&amp;output=embed"></iframe>
 						</div><!--end well -->
@@ -181,9 +187,15 @@
 
 				<hr>
 
+				<!-- FOOTER -->
 				<div class="footer">
-					<p>
-						&copy; Cern 2013
+					<p class="pull-right">
+						<a href="#">Back to top</a>
+					</p>
+
+					<p class="pull-left">
+						(&copy; Cern 2013)
+						<a href="index.html">HOME</a>
 					</p>
 				</div>
 

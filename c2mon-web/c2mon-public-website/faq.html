@@ -142,6 +142,8 @@
 				border-right: 0;
 				border-radius: 0 3px 3px 0;
 			}
+			
+			.h3_smaller_text { font-size:40%; }
 		</style>
 	</head>
 
@@ -152,7 +154,11 @@
 			<!-- Navbar
 			================================================== -->
 			<div class="masthead hidden-phone">
-				<h3 class="muted">C<sup>2</sup>MON</h3>
+				<h3 class="muted">C<sup>2</sup>MON 
+					<span class="h3_smaller_text">
+						 open source SCADA monitoring system
+					</span>
+				</h3>
 				<div class="navbar">
 					<div class="navbar-inner">
 						<div class="container">
@@ -212,7 +218,7 @@
 						</p>
 						<br />
 
-						<h2>What makes your product different from others?</h2>
+						<h2>What makes your product different from other SCADA systems?</h2>
 						<br />
 						<p class="well">
 							It's free. It's multi-platform. It can run as a high-availability cluster.  It's scalable to manage large amounts of data.
@@ -255,7 +261,7 @@
 						<h3>Overall architecture</h3>
 						<br />
 						<p class="well">
-							C2MON is a 3-tier monitoring platform, made up of a data acquisition (DAQ) API, a server layer and a client API.
+							C2MON is a 3-tier SCADA monitoring platform, made up of a data acquisition (DAQ) API, a server layer and a client API.
 							The inter-layer communication is done exclusively through
 							<a href="http://en.wikipedia.org/wiki/Java_Message_Service">JMS</a>
 							(<a href="http://activemq.apache.org">ActiveMQ</a>).
