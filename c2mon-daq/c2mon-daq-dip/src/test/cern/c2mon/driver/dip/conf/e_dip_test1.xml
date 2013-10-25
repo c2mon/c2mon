@@ -1,0 +1,33 @@
+<EquipmentUnit id="5250" name="E_DIP_DIP1">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address/>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+
+		<DataTag id="187051" name="YA.L05.YCVIC17=PM54:FAULT_CAMERA" control="false">
+			<mode>2</mode>
+			<data-type>Boolean</data-type>
+
+			<DataTagAddress>
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.DIPHardwareAddressImpl">
+					<item-name>dip/ts/LACS/ACCE/ZORA/L05/MadDetection/PM54</item-name>
+					<field-name>FAULT_Camera</field-name>
+					<field-index>-1</field-index>
+				</HardwareAddress>
+				<time-to-live>3600000</time-to-live>
+
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+
+	</DataTags>
+	<CommandTags/>
+	
+</EquipmentUnit>

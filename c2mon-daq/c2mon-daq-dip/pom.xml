@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-daq</groupId>
+    <artifactId>c2mon-daq-pom</artifactId>
+    <version>1.0.24</version>
+  </parent>
+
+  <groupId>cern.c2mon.c2mon-daq</groupId>
+  <artifactId>c2mon-daq-dip</artifactId>
+  <version>1.1.1-SNAPSHOT</version>
+  <name>c2mon-daq-dip</name>
+  <packaging>jar</packaging>
+  <description>C2MON data acquisition component for DIP.</description>
+  <url />
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-dip</developerConnection>
+  </scm>
+
+  <!-- This is needed to retrieve the DIP dependencies -->
+  <repositories>
+    <repository>
+      <id>cern-nexus</id>
+      <name>CERN Central Nexus</name>
+      <url>https://j2eeps.cern.ch/nexus/content/groups/public</url>
+    </repository>
+  </repositories>
+
+  <properties>
+    <dip.version>5.5.0</dip.version>
+    <dip.native.libs.dir.rel>dip-${dip.version}/lib</dip.native.libs.dir.rel>
+    <dip.native.libs.dir.abs>${project.build.directory}/lib_so/${dip.native.libs.dir.rel}</dip.native.libs.dir.abs>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.tim2.tim2-shared</groupId>
+      <artifactId>tim2-shared-daq</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>cern.dip</groupId>
+      <artifactId>dip</artifactId>
+      <version>${dip.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.japc</groupId>
+      <artifactId>japc-ext-mockito</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>-Djava.library.path=${dip.native.libs.dir.abs}</argLine>
+          <environmentVariables>
+            <LD_LIBRARY_PATH>${dip.native.libs.dir.abs}</LD_LIBRARY_PATH>
+          </environmentVariables>
+        </configuration>
+      </plugin>
+
+      <!-- Unpack native libraries -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <artifactItems>
+            <artifactItem>
+
+              <groupId>cern.dip</groupId>
+              <artifactId>dip</artifactId>
+              <version>${dip.version}</version>
+              <classifier>distribution</classifier>
+              <type>zip</type>
+              <includes>${dip.native.libs.dir.rel}/*</includes>
+              <overWrite>true</overWrite>
+              <outputDirectory>${project.build.directory}/lib_so</outputDirectory>
+            </artifactItem>
+          </artifactItems>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <!-- Ignore/Execute plugin execution -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <!-- copy-dependency plugin -->
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>unpack</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <developers />
+</project>
