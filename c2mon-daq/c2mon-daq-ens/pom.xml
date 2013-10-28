@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.c2mon.c2mon-daq</groupId>
+		<artifactId>c2mon-daq-pom</artifactId>
+		<version>1.0.24</version>
+	</parent>
+	<groupId>cern.c2mon.c2mon-daq</groupId>
+	<artifactId>c2mon-daq-ens</artifactId>
+	<version>1.0.7-SNAPSHOT</version>
+	<name>c2mon-daq-ens</name>
+	<packaging>jar</packaging>
+	<description>This is a C2MON ENS DAQ. It lets C2MON to acquiring data from and sending commands to the Electrical Network Supervisor (ENS), 
+	 which is used for monitoring electrical installations.
+    </description>
+	<url />
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-ens</developerConnection>
+	</scm>
+	<dependencies>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-daq</groupId>
+			<artifactId>c2mon-daq-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-daq</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+      <scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>cern.c2mon.c2mon-daq</groupId>
+			<artifactId>c2mon-daq-test</artifactId>
+      <scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+      <scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymockclassextension</artifactId>
+      <scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+		<plugins />
+
+	</build>
+
+	<developers />
+</project>

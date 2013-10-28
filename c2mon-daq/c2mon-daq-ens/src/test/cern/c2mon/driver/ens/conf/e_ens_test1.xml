@@ -1,0 +1,85 @@
+<EquipmentUnit id="5250" name="E_DIP_DIP1">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address>srv1=cs-ccr-elncc1;srv2=cs-ccr-elncc2;comm_tim_s=10;wdog_tim_s=30;max_bytes=4096;max_retries=2;gmt_correct=0
+	</address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+
+	<DataTags>
+
+		<DataTag id="133002" name="ES.MEY.ESD2*43:MESURE_TENSION_T_S"
+			control="false">
+			<mode>2</mode>
+			<data-type>Float</data-type>
+			<min-value data-type="Float">-500.0</min-value>
+			<max-value data-type="Float">500.0</max-value>
+			<DataTagAddress>
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl">
+
+					<address>ESD2*43_U3-2</address>
+					<data-type>ANL</data-type>
+				</HardwareAddress>
+				<time-to-live>3600000</time-to-live>
+				<value-deadband-type>1</value-deadband-type>
+				<value-deadband>5.0</value-deadband>
+
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+		<DataTag id="133001" name="ES.MEY.ESD2*43:MESURE_TENSION_S_R"
+			control="false">
+			<mode>2</mode>
+			<data-type>Float</data-type>
+
+			<min-value data-type="Float">-500.0</min-value>
+			<max-value data-type="Float">500.0</max-value>
+			<DataTagAddress>
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl">
+					<address>ESD2*43_U2-1*</address>
+					<data-type>ANL</data-type>
+				</HardwareAddress>
+
+				<time-to-live>3600000</time-to-live>
+				<value-deadband-type>1</value-deadband-type>
+				<value-deadband>5.0</value-deadband>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+
+		</DataTag>
+
+	</DataTags>
+	<CommandTags>
+
+		<CommandTag id="142206" name="EB.BA4.EBD215.07/A4:CMD_ECLAIRAGE">
+			<source-timeout>8000</source-timeout>
+			<source-retries>0</source-retries>
+
+			<HardwareAddress
+				class="ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl">
+				<address>EBD215.07/A4_O3</address>
+				<data-type>SETP_CTRL</data-type>
+			</HardwareAddress>
+		</CommandTag>
+		<CommandTag id="142214" name="EB.BA7.EBD217.15/A7:CMD_ECLAIRAGE">
+			<source-timeout>4000</source-timeout>
+
+			<source-retries>0</source-retries>
+			<HardwareAddress
+				class="ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl">
+				<address>EBD217.15/A7_O9</address>
+				<data-type>SETP_CTRL</data-type>
+			</HardwareAddress>
+		</CommandTag>
+	</CommandTags>
+
+</EquipmentUnit>
+
+ 
