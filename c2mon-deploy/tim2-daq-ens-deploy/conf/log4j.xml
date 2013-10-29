@@ -167,7 +167,7 @@
     <appender-ref ref="FileAppender" />
   </logger>
 
-  <logger name="cern.tim.driver.common.messaging.impl" additivity="false">
+  <logger name="cern.c2mon.driver.common.messaging.impl" additivity="false">
     <level value="debug"/>
     <appender-ref ref="FileAppender" />
   </logger>
@@ -178,6 +178,11 @@
     <appender-ref ref="ReconfigurationLogAppender" />
   </logger>
 
+  <logger name="cern.c2mon" additivity="false">
+    <level value="debug"/>
+    <appender-ref ref="FileAppender" />
+  </logger>
+  
   <logger name="cern.tim" additivity="false">
     <level value="debug"/>
     <appender-ref ref="FileAppender" />
@@ -188,7 +193,7 @@
     <appender-ref ref="FileAppender" />
   </logger>
   
-  <logger name="cern.tim.driver.common.messaging.impl.ProxyJmsSender" additivity="false">
+  <logger name="cern.c2mon.driver.common.messaging.impl.ProxyJmsSender" additivity="false">
     <level value="fatal"/>
     <appender-ref ref="FileAppender" />
   </logger>  
