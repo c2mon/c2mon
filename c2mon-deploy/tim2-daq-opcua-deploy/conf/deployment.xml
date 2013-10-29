@@ -15,7 +15,7 @@
         </backupPolicy>       
       </deployment>
       <startscript>
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
+        <main-class name="cern.c2mon.driver.common.startup.DaqStartup">
           <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
         </main-class>
         <initial-heap-size>256m</initial-heap-size>
@@ -53,7 +53,7 @@
         </directory>
       </deployment>
       <startscript name="TIM2-DAQ-STARTUP">
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
+        <main-class name="cern.c2mon.driver.common.startup.DaqStartup">
           <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
         </main-class>
         <property name="c2mon.daq.spring.context" value="classpath:resources/daq-core-service-double.xml" />
@@ -71,7 +71,7 @@
         </directory>
       </deployment>
       <startscript name="TIM2-DAQ-STARTUP">
-        <main-class name="cern.tim.driver.common.startup.DaqStartup">
+        <main-class name="cern.c2mon.driver.common.startup.DaqStartup">
           <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
         </main-class>
         <property name="c2mon.daq.spring.context" value="classpath:resources/daq-core-service-double.xml" />
