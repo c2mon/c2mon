@@ -3,27 +3,27 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cern.tim2.tim2-daq</groupId>
-    <artifactId>tim2-daq-pom</artifactId>
-    <version>1.0.20</version>
+    <groupId>cern.c2mon.c2mon-daq</groupId>
+    <artifactId>c2mon-daq-pom</artifactId>
+    <version>1.0.24</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>tim2-daq-laser-deploy</artifactId>
-  <name>TIM2 DAQ LASER deployment module</name>
+  <name>C2MON DAQ LASER deployment module</name>
   <version>1.1.2-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
-  <description>TIM2 DAQ LASER assembling all required libraries and configuration files for TIM2</description>
+  <description>C2MON DAQ LASER assembling all required libraries and configuration files for C2MON</description>
   <url></url>
 
   <developers />
 
   <dependencies>
     <dependency>
-      <groupId>cern.tim2.tim2-daq</groupId>
-      <artifactId>tim2-daq-laser</artifactId>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-laser</artifactId>
       <version>[1.0.0,2.0.0)</version>
     </dependency>
   </dependencies>
