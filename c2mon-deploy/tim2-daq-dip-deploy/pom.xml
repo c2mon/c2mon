@@ -3,14 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>cern.tim2.tim2-daq</groupId>
-    <artifactId>tim2-daq-pom</artifactId>
-    <version>1.0.11</version>
+    <groupId>cern.c2mon.c2mon-daq</groupId>
+    <artifactId>c2mon-daq-pom</artifactId>
+    <version>1.0.24</version>
   </parent>
 
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>tim2-daq-dip-deploy</artifactId>
-  <name>TIM2 DAQ DIP deployment module</name>
+  <name>C2MON DAQ DIP deployment module</name>
   <version>1.1.1-SNAPSHOT</version>
 
   <packaging>pom</packaging>
@@ -31,8 +31,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>cern.tim2.tim2-daq</groupId>
-      <artifactId>tim2-daq-dip</artifactId>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-dip</artifactId>
+      <version>[1.0.0,2.0.0)</version>
     </dependency>
   </dependencies>
 
