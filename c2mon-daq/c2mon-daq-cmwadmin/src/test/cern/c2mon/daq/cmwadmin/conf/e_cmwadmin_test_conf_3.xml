@@ -1,0 +1,36 @@
+	<EquipmentUnit id="5250" name="UNKNOWN">
+  		<handler-class-name>ch.cern.tim.driver.cmwadmin.CMWServerHandler</handler-class-name>
+  		<commfault-tag-id>107211</commfault-tag-id>
+  		<commfault-tag-value>false</commfault-tag-value>
+  		<address></address>
+  		<SubEquipmentUnits>
+  		</SubEquipmentUnits>
+
+  		<DataTags>
+    		<DataTag id="52501" name="TEST:REACHABLE" control="false">
+      			<data-type>Boolean</data-type>
+      			<DataTagAddress>
+        			<HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">           
+    	   			    <address>REACHABLE</address>        
+        			</HardwareAddress>
+        			<time-to-live>3600000</time-to-live>
+        			<priority>2</priority>
+        			<guaranteed-delivery>false</guaranteed-delivery>
+      			</DataTagAddress>
+    		</DataTag>
+
+    		<DataTag id="52502" name="TEST:STATUS" control="false">
+	      		<data-type>Integer</data-type>
+    	  		<DataTagAddress>
+        			<HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">           
+    	   			    <address>STATUS</address>        
+        			</HardwareAddress>
+        			<time-to-live>3600000</time-to-live>
+        			<priority>2</priority>
+        			<guaranteed-delivery>false</guaranteed-delivery>
+      			</DataTagAddress>
+    		</DataTag>	    	
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>
