@@ -16,11 +16,11 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 
 import cern.dmn2.agentlib.AgentClientConstants;
-import cern.tim.driver.test.GenericMessageHandlerTst;
-import cern.tim.driver.test.SourceDataTagValueCapture;
-import cern.tim.driver.test.UseConf;
-import cern.tim.driver.test.UseHandler;
-import cern.tim.driver.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.driver.test.GenericMessageHandlerTst;
+import cern.c2mon.driver.test.SourceDataTagValueCapture;
+import cern.c2mon.driver.test.UseConf;
+import cern.c2mon.driver.test.UseHandler;
+import cern.c2mon.driver.tools.equipmentexceptions.EqCommandTagException;
 import cern.tim.shared.daq.command.SourceCommandTagValue;
 import cern.tim.shared.daq.config.ChangeReport;
 import cern.tim.shared.daq.config.DataTagAdd;

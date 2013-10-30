@@ -17,7 +17,7 @@ import cern.dmn2.agentlib.AgentClient;
 import cern.dmn2.agentlib.AgentContext;
 import cern.dmn2.agentlib.CommandType;
 import cern.dmn2.agentlib.FieldDataType;
-import cern.tim.driver.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.driver.common.conf.equipment.IEquipmentConfiguration;
 import cern.tim.shared.common.datatag.address.JAPCHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 
