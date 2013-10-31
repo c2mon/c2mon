@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>cern.tim2.tim2-daq</groupId>
-		<artifactId>tim2-daq-pom</artifactId>
-		<version>1.0.16</version>
+		<groupId>cern.c2mon.c2mon-daq</groupId>
+		<artifactId>c2mon-daq-pom</artifactId>
+		<version>1.0.25</version>
 	</parent>
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
@@ -25,6 +25,7 @@
 		<dependency>
 			<groupId>cern.tim2.tim2-daq</groupId>
 			<artifactId>tim2-daq-jms</artifactId>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 	</dependencies>
 
