@@ -4,12 +4,12 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
 	http://www.springframework.org/schema/beans/spring-beans.xsd" >
 	
-	<bean id="dbDaqDao" class="cern.c2mon.driver.db.dao.DbDaqDaoImpl">
+	<bean id="dbDaqDao" class="cern.c2mon.daq.db.dao.DbDaqDaoImpl">
 		<property name="sqlSessionFactory" ref="dbDaqSessionFactory"/>
 	</bean> 
 
 	<bean id="dbDaqSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="configLocation" value="classpath:cern/c2mon/driver/db/config/sqlmap-config.xml" />
+		<property name="configLocation" value="classpath:cern/c2mon/daq/db/config/sqlmap-config.xml" />
 		<property name="dataSource" ref="dbDaqDataSource" />
 	</bean>
 

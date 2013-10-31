@@ -16,10 +16,10 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.db;
+package cern.c2mon.daq.db;
 
 import static java.lang.String.format;
-import cern.c2mon.driver.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.tim.shared.daq.config.ChangeReport;
 import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.tim.shared.daq.datatag.ISourceDataTag;

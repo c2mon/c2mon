@@ -1,4 +1,4 @@
-package cern.c2mon.driver.db;
+package cern.c2mon.daq.db;
 
 import java.util.List;
 

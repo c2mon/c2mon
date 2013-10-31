@@ -1,11 +1,11 @@
-package cern.c2mon.driver.db.dao;
+package cern.c2mon.daq.db.dao;
 
 import java.util.List;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
-import cern.c2mon.driver.db.Alert;
-import cern.c2mon.driver.db.AlertTimeOutException;
+import cern.c2mon.daq.db.Alert;
+import cern.c2mon.daq.db.AlertTimeOutException;
 
 
 

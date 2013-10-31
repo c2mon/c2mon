@@ -1,4 +1,4 @@
-package cern.c2mon.driver.db;
+package cern.c2mon.daq.db;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -13,9 +13,9 @@ import java.util.TimerTask;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.UncategorizedSQLException;
 
-import cern.c2mon.driver.db.dao.IDbDaqDao;
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.db.dao.IDbDaqDao;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.tim.shared.common.datatag.address.DBHardwareAddress;
 import cern.tim.shared.common.type.TypeConverter;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
@@ -370,7 +370,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * */
     public void setDBDataSourceAddress() throws EqIOException {
         parseDBAddress();
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:ch/cern/tim/driver/db/config/daq-db-config.xml");
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:cern/c2mon/daq/db/config/daq-db-config.xml");
         dbDaqDao = (IDbDaqDao) context.getBean("dbDaqDao");
         dbDaqDao.setDataSourceParams(dbAddress.get(DB_URL), dbAddress.get(DB_USERNAME), dbAddress.get(DB_PASSWORD));
     }

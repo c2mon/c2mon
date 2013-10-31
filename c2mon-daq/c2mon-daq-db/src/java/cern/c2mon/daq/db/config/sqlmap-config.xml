@@ -5,6 +5,6 @@
 
 <configuration>
 	<mappers>
-		<mapper resource="ch/cern/tim/driver/db/config/alerts.xml"/>
+		<mapper resource="cern/c2mon/daq/db/config/alerts.xml"/>
 	</mappers>
 </configuration>

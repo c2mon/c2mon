@@ -1,13 +1,13 @@
-package cern.c2mon.driver.db;
+package cern.c2mon.daq.db;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cern.c2mon.driver.db.dao.IDbDaqDao;
-import cern.c2mon.driver.common.EquipmentLogger;
-import cern.c2mon.driver.common.IEquipmentMessageSender;
-import cern.c2mon.driver.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.db.dao.IDbDaqDao;
+import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.IEquipmentMessageSender;
+import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.tim.shared.common.datatag.address.DBHardwareAddress;
 import cern.tim.shared.daq.config.ChangeReport;
 import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;

@@ -1,4 +1,4 @@
-package cern.c2mon.driver.db;
+package cern.c2mon.daq.db;
 
 /**
  * This class represents a timeout exception that is thrown if the process waiting for

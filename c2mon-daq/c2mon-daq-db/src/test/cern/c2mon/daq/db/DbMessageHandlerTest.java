@@ -1,4 +1,4 @@
-package cern.c2mon.driver.db;
+package cern.c2mon.daq.db;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,18 +19,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Document;
 
-import cern.c2mon.driver.db.Alert;
-import cern.c2mon.driver.db.AlertTimeOutException;
-import cern.c2mon.driver.db.DBMessageHandler;
-import cern.c2mon.driver.db.dao.DbDaqDaoImpl;
-import cern.c2mon.driver.db.dao.IDbDaqDao;
-import cern.c2mon.driver.common.conf.core.ConfigurationController;
-import cern.c2mon.driver.common.conf.core.EquipmentConfigurationHandler;
-import cern.c2mon.driver.common.conf.core.ProcessConfiguration;
-import cern.c2mon.driver.common.conf.core.ProcessConfigurationLoader;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
-import cern.c2mon.driver.tools.processexceptions.ConfRejectedTypeException;
-import cern.c2mon.driver.tools.processexceptions.ConfUnknownTypeException;
+import cern.c2mon.daq.db.Alert;
+import cern.c2mon.daq.db.AlertTimeOutException;
+import cern.c2mon.daq.db.DBMessageHandler;
+import cern.c2mon.daq.db.dao.DbDaqDaoImpl;
+import cern.c2mon.daq.db.dao.IDbDaqDao;
+import cern.c2mon.daq.common.conf.core.ConfigurationController;
+import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
+import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
+import cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
+import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.tim.shared.common.datatag.address.DBHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
@@ -39,7 +39,7 @@ import cern.tim.shared.daq.datatag.SourceDataQuality;
  * Test class for checking the communication of the dbdaq with the database. It allows testing of alert registering,
  * unregistering, sending and receiving alerts and timeouts.
  * */
-@ContextConfiguration(locations = {"classpath:ch/cern/tim/driver/db/config/test-daq-db-config.xml" })
+@ContextConfiguration(locations = {"classpath:cern/c2mon/daq/db/config/test-daq-db-config.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DbMessageHandlerTest {
   
@@ -86,7 +86,7 @@ public class DbMessageHandlerTest {
         e2.printStackTrace();
     } 
     
-    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:ch/cern/tim/driver/db/config/test-daq-db-config.xml");
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:cern/c2mon/daq/db/config/test-daq-db-config.xml");
     testDao = (DbDaqDaoTest) context.getBean("testDbDaqDao");
     dbMessageHandler = (DBMessageHandler) context.getBean("dbMessageHandler");  
     

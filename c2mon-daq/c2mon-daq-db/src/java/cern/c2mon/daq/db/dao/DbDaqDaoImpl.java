@@ -1,4 +1,4 @@
-package cern.c2mon.driver.db.dao;
+package cern.c2mon.daq.db.dao;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,8 +9,8 @@ import java.util.Map;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 
-import cern.c2mon.driver.db.Alert;
-import cern.c2mon.driver.db.AlertTimeOutException;
+import cern.c2mon.daq.db.Alert;
+import cern.c2mon.daq.db.AlertTimeOutException;
 
 
 /**

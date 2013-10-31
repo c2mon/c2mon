@@ -4,7 +4,7 @@
 
 <mapper namespace="timdbdaq">
 	
-		<resultMap id="alerts" type="cern.c2mon.driver.db.Alert">
+		<resultMap id="alerts" type="cern.c2mon.daq.db.Alert">
 			<result property="id" column="DBD_TAG_ID" javaType="java.lang.Long" jdbcType="INTEGER"/>
 			<result property="name" column="DBD_NAME" javaType="java.lang.String" jdbcType="VARCHAR"/>
 			<result property="value" column="DBD_VALUE" javaType="java.lang.String" jdbcType="VARCHAR"/>
