@@ -17,7 +17,7 @@
 	<url />
 
 	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/tim2/tim2-daq/tim2-daq-japc</developerConnection>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/tim2/c2mon/c2mon-daq/c2mon-daq-japc</developerConnection>
 	</scm>
 
 	<dependencies>
