@@ -32,7 +32,7 @@
 
 	</dependencies>
 
-	<build>"bin/daqprocess2.sh"
+	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
