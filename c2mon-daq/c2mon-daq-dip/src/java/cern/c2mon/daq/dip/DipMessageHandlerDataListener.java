@@ -16,7 +16,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.dip;
+package cern.c2mon.daq.dip;
 
 import java.sql.Timestamp;
 import java.util.Collection;

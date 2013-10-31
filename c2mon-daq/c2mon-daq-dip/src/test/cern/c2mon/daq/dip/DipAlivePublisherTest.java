@@ -1,18 +1,18 @@
-package cern.c2mon.driver.dip;
+package cern.c2mon.daq.dip;
 
 import org.easymock.classextension.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.driver.dip.DipAlivePublisher;
+import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.dip.DipAlivePublisher;
 import cern.dip.Dip;
 import cern.dip.DipData;
 import cern.dip.DipException;
 import cern.dip.DipFactory;
 import cern.dip.DipSubscription;
 import cern.dip.DipSubscriptionListener;
-import cern.c2mon.driver.common.EquipmentLogger;
 import cern.tim.shared.common.datatag.address.DIPHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 

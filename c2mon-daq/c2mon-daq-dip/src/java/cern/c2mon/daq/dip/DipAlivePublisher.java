@@ -1,4 +1,4 @@
-package cern.c2mon.driver.dip;
+package cern.c2mon.daq.dip;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,7 +12,7 @@ import cern.dip.DipPublication;
 import cern.dip.DipPublicationErrorHandler;
 import cern.dip.DipTimestamp;
 import cern.dip.TypeMismatch;
-import cern.c2mon.driver.common.EquipmentLogger;
+import cern.c2mon.daq.common.EquipmentLogger;
 import cern.tim.shared.common.datatag.address.DIPHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 

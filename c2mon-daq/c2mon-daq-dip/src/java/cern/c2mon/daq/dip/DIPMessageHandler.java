@@ -16,7 +16,7 @@
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
-package cern.c2mon.driver.dip;
+package cern.c2mon.daq.dip;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -25,8 +25,8 @@ import java.util.Vector;
 
 import cern.dip.Dip;
 import cern.dip.DipFactory;
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.tim.shared.common.datatag.address.DIPHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 

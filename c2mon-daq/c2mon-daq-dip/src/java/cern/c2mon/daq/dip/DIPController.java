@@ -16,7 +16,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.dip;
+package cern.c2mon.daq.dip;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -26,9 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import cern.dip.DipException;
 import cern.dip.DipFactory;
 import cern.dip.DipSubscription;
-import cern.c2mon.driver.common.EquipmentLogger;
-import cern.c2mon.driver.common.IEquipmentMessageSender;
-import cern.c2mon.driver.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.IEquipmentMessageSender;
+import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.tim.shared.common.datatag.address.DIPHardwareAddress;
 import cern.tim.shared.daq.config.ChangeReport;
 import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
