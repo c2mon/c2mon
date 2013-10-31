@@ -6,11 +6,11 @@ package cern.c2mon.daq.cmwadmin;
 import static java.lang.String.format;
 
 import cern.c2mon.daq.cmwadmin.TagOperationException;
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.driver.common.conf.equipment.IEquipmentConfiguration;
-import cern.c2mon.driver.common.conf.equipment.IEquipmentConfigurationChanger;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.tim.shared.common.datatag.address.SimpleHardwareAddress;
 import cern.tim.shared.daq.config.ChangeReport;
 import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;

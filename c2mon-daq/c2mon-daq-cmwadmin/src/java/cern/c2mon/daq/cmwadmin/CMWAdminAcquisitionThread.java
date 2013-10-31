@@ -7,8 +7,8 @@ import static java.lang.String.format;
 
 import cern.cmw.adm.ServerAdmin;
 import cern.c2mon.daq.cmwadmin.CMWServerHandler.TagType;
-import cern.c2mon.driver.common.EquipmentLogger;
-import cern.c2mon.driver.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
 

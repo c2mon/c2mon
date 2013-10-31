@@ -16,11 +16,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cern.c2mon.daq.cmwadmin.CMWServerHandler;
-import cern.c2mon.driver.test.GenericMessageHandlerTst;
-import cern.c2mon.driver.test.SourceDataTagValueCapture;
-import cern.c2mon.driver.test.UseConf;
-import cern.c2mon.driver.test.UseHandler;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.test.GenericMessageHandlerTst;
+import cern.c2mon.daq.test.SourceDataTagValueCapture;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.test.UseHandler;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
 
 /**
