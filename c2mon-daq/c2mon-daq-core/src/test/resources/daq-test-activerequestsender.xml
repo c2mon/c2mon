@@ -8,7 +8,7 @@
 
     <!-- ActiveRequestSenderTest Listener -->
 
-    <bean id="testMessageListener" class="cern.c2mon.driver.common.messaging.impl.ActiveRequestSenderTest$TestMessageListener" />
+    <bean id="testMessageListener" class="cern.c2mon.daq.common.messaging.impl.ActiveRequestSenderTest$TestMessageListener" />
 
     <!-- and this is the message listener container -->
     <bean id="testMessageListenerContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
