@@ -19,7 +19,7 @@ import java.util.List;
 
 import cern.c2mon.daq.japc.TestConfigGenerator;
 import cern.c2mon.daq.japc.fesa.FesaAlarmJapcMessageHandler;
-import cern.c2mon.driver.test.UseHandler;
+import cern.c2mon.daq.test.UseHandler;
 
 @UseHandler(FesaAlarmJapcMessageHandler.class)
 public class FesaAlarmTestConfigGenerator extends TestConfigGenerator {

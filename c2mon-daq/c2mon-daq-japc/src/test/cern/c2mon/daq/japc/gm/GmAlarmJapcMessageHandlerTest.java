@@ -34,8 +34,8 @@ import cern.japc.Parameter;
 import cern.japc.Selector;
 import cern.japc.ext.mockito.Cycle;
 import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
-import cern.c2mon.driver.test.UseConf;
-import cern.c2mon.driver.test.UseHandler;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.test.UseHandler;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
 import cern.tim.shared.daq.datatag.SourceDataTagValue;
 

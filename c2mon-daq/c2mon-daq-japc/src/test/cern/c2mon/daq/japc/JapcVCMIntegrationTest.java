@@ -17,12 +17,12 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import cern.c2mon.daq.japc.GenericJapcMessageHandler;
-import cern.c2mon.driver.common.DriverKernel;
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.common.ValueChangeMonitorEngine;
-import cern.c2mon.driver.test.SourceDataTagValueCapture;
-import cern.c2mon.driver.test.UseConf;
-import cern.c2mon.driver.test.UseHandler;
+import cern.c2mon.daq.common.DriverKernel;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.common.ValueChangeMonitorEngine;
+import cern.c2mon.daq.test.SourceDataTagValueCapture;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.test.UseHandler;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
 
 /**

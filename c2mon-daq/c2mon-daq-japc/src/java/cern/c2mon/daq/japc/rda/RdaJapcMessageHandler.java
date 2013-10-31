@@ -5,7 +5,7 @@ import javax.security.auth.login.LoginException;
 import cern.accsoft.security.rba.login.LoginPolicy;
 import cern.c2mon.daq.japc.GenericJapcMessageHandler;
 import cern.rba.util.relogin.RdaRbaLoginService;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 
 /**
  * a dedicated JAPC DAQ for RDA. just befor initialization it sets up RBAC token

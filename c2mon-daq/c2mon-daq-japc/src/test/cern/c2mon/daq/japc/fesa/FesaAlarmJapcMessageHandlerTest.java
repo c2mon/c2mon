@@ -35,8 +35,8 @@ import cern.japc.ParameterValueListener;
 import cern.japc.Selector;
 import cern.japc.SubscriptionHandle;
 import cern.japc.ext.mockito.JapcMock;
-import cern.c2mon.driver.test.UseConf;
-import cern.c2mon.driver.test.UseHandler;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.test.UseHandler;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
 import cern.tim.shared.daq.datatag.SourceDataTagValue;
 

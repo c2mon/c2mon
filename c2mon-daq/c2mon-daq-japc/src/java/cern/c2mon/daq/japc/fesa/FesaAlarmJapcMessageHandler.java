@@ -19,7 +19,7 @@ import cern.japc.MapParameterValue;
 import cern.japc.ParameterValue;
 import cern.japc.SimpleParameterValue;
 import cern.japc.Type;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.tim.shared.common.datatag.address.JAPCHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 import cern.tim.shared.daq.datatag.SourceDataQuality;

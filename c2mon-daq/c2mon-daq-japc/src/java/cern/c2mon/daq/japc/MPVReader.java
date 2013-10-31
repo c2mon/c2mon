@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import cern.japc.MapParameterValue;
 import cern.japc.SimpleParameterValue;
 import cern.japc.ValueType;
-import cern.c2mon.driver.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.tim.shared.common.datatag.address.JAPCHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 

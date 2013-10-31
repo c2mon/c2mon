@@ -35,11 +35,11 @@ import cern.japc.factory.ParameterFactory;
 import cern.japc.factory.ParameterValueFactory;
 import cern.japc.spi.ParameterUrl;
 import cern.japc.spi.ParameterUrlImpl;
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.common.ICommandRunner;
-import cern.c2mon.driver.tools.TIMDriverSimpleTypeConverter;
-import cern.c2mon.driver.tools.equipmentexceptions.EqCommandTagException;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.common.ICommandRunner;
+import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.tim.shared.common.datatag.address.JAPCHardwareAddress;
 import cern.tim.shared.daq.command.ISourceCommandTag;
 import cern.tim.shared.daq.command.SourceCommandTagValue;
@@ -515,7 +515,7 @@ public class JAPCMessageHandler extends EquipmentMessageHandler implements IComm
     // /**
     // * Make sure that the CommandTag to be added has a valid JAPCHardwareAddress
     // *
-    // * @throws ch.cern.tim.driver.tools.equipmentexceptions.EqCommandTagException
+    // * @throws ch.cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException
     // * @param pCommandTag
     // */
     // @Override
@@ -538,7 +538,7 @@ public class JAPCMessageHandler extends EquipmentMessageHandler implements IComm
     // /**
     // * Make sure that the DataTag to be added has a valid JAPCHardwareAddress
     // *
-    // * @throws ch.cern.tim.driver.tools.equipmentexceptions.EqDataTagException
+    // * @throws ch.cern.c2mon.daq.tools.equipmentexceptions.EqDataTagException
     // * @param pDataTag
     // */
     // @Override

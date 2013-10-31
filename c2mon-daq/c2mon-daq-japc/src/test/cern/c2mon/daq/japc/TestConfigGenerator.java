@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.test.UseHandler;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.test.UseHandler;
 
 public abstract class TestConfigGenerator {
 
