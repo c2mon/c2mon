@@ -1,0 +1,44 @@
+<EquipmentUnit id="5250" name="E_JMX_JMX1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+
+  <commfault-tag-value>false</commfault-tag-value>
+  <address></address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>
+
+
+  <!--  Represents the test for a two-head cluster -->
+
+  <DataTags>
+  
+   <!--  first broker -->
+    <DataTag id="54675" name="BE.TEST:TEST1" control="false">
+      <data-type>Float</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+         <address>TOPIC_PERF_TEST</address>                          
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    
+    <DataTag id="54675" name="BE.TEST:TEST1" control="false">
+      <data-type>Float</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+         <address>QUEUE_PERF_TEST;1</address>                          
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    
+          
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>  
