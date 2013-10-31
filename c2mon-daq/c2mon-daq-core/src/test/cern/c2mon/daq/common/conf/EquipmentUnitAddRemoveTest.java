@@ -42,7 +42,7 @@ public class EquipmentUnitAddRemoveTest {
 
         StringBuilder str = new StringBuilder();
         str.append("<EquipmentUnit id=\"2\" name=\"E_TEST2\">");
-        str.append("<handler-class-name>cern.c2mon.driver.common.conf.DummyMessageHandler</handler-class-name>");
+        str.append("<handler-class-name>cern.c2mon.daq.common.conf.DummyMessageHandler</handler-class-name>");
         str.append("<commfault-tag-id>47015</commfault-tag-id>");
         str.append("<commfault-tag-value>false</commfault-tag-value>");
         str.append("<alive-tag-id>47322</alive-tag-id>");
@@ -73,7 +73,7 @@ public class EquipmentUnitAddRemoveTest {
 
         StringBuilder str = new StringBuilder();
         str.append("<EquipmentUnit id=\"1\" name=\"E_TEST2\">");
-        str.append("<handler-class-name>cern.c2mon.driver.common.conf.DummyMessageHandler</handler-class-name>");
+        str.append("<handler-class-name>cern.c2mon.daq.common.conf.DummyMessageHandler</handler-class-name>");
         str.append("<commfault-tag-id>47015</commfault-tag-id>");
         str.append("<commfault-tag-value>false</commfault-tag-value>");
         str.append("<alive-tag-id>47322</alive-tag-id>");
@@ -107,7 +107,7 @@ public class EquipmentUnitAddRemoveTest {
 
         StringBuilder str = new StringBuilder();
         str.append("<EquipmentUnit id=\"2\" name=\"E_TEST2\">");
-        str.append("<handler-class-name>cern.c2mon.driver.common.conf.DummyMessageHandler</handler-class-name>");
+        str.append("<handler-class-name>cern.c2mon.daq.common.conf.DummyMessageHandler</handler-class-name>");
         str.append("<commfault-tag-id>47015</commfault-tag-id>");
         str.append("<commfault-tag-value>false</commfault-tag-value>");
         str.append("<alive-tag-id>47322</alive-tag-id>");
@@ -122,7 +122,7 @@ public class EquipmentUnitAddRemoveTest {
 
         str = new StringBuilder();
         str.append("<EquipmentUnit id=\"3\" name=\"E_TEST3\">");
-        str.append("<handler-class-name>cern.c2mon.driver.common.conf.DummyMessageHandler</handler-class-name>");
+        str.append("<handler-class-name>cern.c2mon.daq.common.conf.DummyMessageHandler</handler-class-name>");
         str.append("<commfault-tag-id>47016</commfault-tag-id>");
         str.append("<commfault-tag-value>false</commfault-tag-value>");
         str.append("<alive-tag-id>47323</alive-tag-id>");

@@ -9,7 +9,7 @@
 	<!-- 2: number of tags per interval at which time deadband filtering will be activated -->
 	<!-- 3: number of tags per interval at which time deadband will be deactivated -->
 	<!-- 4: The time deadband time in ms -->
-	<bean id="lowDynamicTimeDeadbandFilterActivator" class="cern.c2mon.driver.filter.dynamic.DummyTimeDeadbandActivator" scope="prototype">
+	<bean id="lowDynamicTimeDeadbandFilterActivator" class="cern.c2mon.daq.filter.dynamic.DummyTimeDeadbandActivator" scope="prototype">
 	</bean>
 	
 	<!-- This is the counter implementation -->
@@ -18,7 +18,7 @@
 	<!-- 2: number of tags per interval at which time deadband filtering will be activated -->
 	<!-- 3: number of tags per interval at which time deadband will be deactivated -->
 	<!-- 4: The time deadband time in ms -->
-	<bean id="medDynamicTimeDeadbandFilterActivator" class="cern.c2mon.driver.filter.dynamic.DummyTimeDeadbandActivator" scope="prototype">	
+	<bean id="medDynamicTimeDeadbandFilterActivator" class="cern.c2mon.daq.filter.dynamic.DummyTimeDeadbandActivator" scope="prototype">	
 	</bean>
 
 </beans>

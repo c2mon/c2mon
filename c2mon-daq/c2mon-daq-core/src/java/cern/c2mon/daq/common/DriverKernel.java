@@ -51,14 +51,14 @@ import cern.tim.shared.daq.datatag.SourceDataQuality;
 import cern.tim.shared.daq.datatag.SourceDataTag;
 
 /**
- * This Kernel is the main class of the driver. It aggregates other classes specialized in taking individual actions,
+ * This Kernel is the main class of the daq. It aggregates other classes specialized in taking individual actions,
  * like EquipmentMessageHandlers, ProcessRequestHandler, ProcessMessageSender. Try to keep Spring code out of this class
  * to keep it generic! (only @Service at the moment)
  */
 public class DriverKernel implements ApplicationContextAware {
 
     /**
-     * The driver's internal logger
+     * The daq's internal logger
      */
     private static final Logger LOGGER = Logger.getLogger(DriverKernel.class);
 
@@ -280,7 +280,7 @@ public class DriverKernel implements ApplicationContextAware {
     }
     
     /**
-     * This method does all the driver's configuration job, basing on a DOM configuration XML document given as an
+     * This method does all the daq's configuration job, basing on a DOM configuration XML document given as an
      * argument.
      * 
      * @throws ConfUnknownTypeException Thrown if the configuration type is unknown. That means that the server does not
@@ -364,7 +364,7 @@ public class DriverKernel implements ApplicationContextAware {
         LOGGER.info("configure - Number of equipment units configured properly : " + eqUnitsConnectedProperly);
 
         // start "ticking" of the ProcessMessageSender's AliveTimer
-        // as soon as the first AliveTag arives to TIM server, the driver will
+        // as soon as the first AliveTag arives to TIM server, the daq will
         // be
         // considered as operational
         LOGGER.debug("configure - Starting DAQ alive timer.");

@@ -41,15 +41,15 @@ public class ValueChangeMonitorEngine implements UpdateListener {
 
     // the following pattern is used for missing event detection (in time window)
     static final String eplExpTemplate1_a = "insert into ValueChangeMonitorEventStream select '%d' as id, false as value "
-            + "from pattern [every (timer:interval(%d msec) and not cern.c2mon.driver.common.ValueChangeMonitorEvent(id=%d))]";
+            + "from pattern [every (timer:interval(%d msec) and not cern.c2mon.daq.common.ValueChangeMonitorEvent(id=%d))]";
 
     // the following pattern is used to detect events arriving as expected (in time window)
     static final String eplExpTemplate1_b = "insert into ValueChangeMonitorEventStream select '%d' as id, true as value "
-            + "from pattern [every (timer:interval(%d msec) and cern.c2mon.driver.common.ValueChangeMonitorEvent(id=%d))]";
+            + "from pattern [every (timer:interval(%d msec) and cern.c2mon.daq.common.ValueChangeMonitorEvent(id=%d))]";
 
     // the following pattern is used to detect pairs of events with value differences matching the expected criteria
     static final String eplExpTemplate2_a = "insert into ValueChangeMonitorEventStream select '%d' as id, true as value "
-            + "from cern.c2mon.driver.common.ValueChangeMonitorEvent(id=%d) "
+            + "from cern.c2mon.daq.common.ValueChangeMonitorEvent(id=%d) "
             + "match_recognize ( "
             + "partition by id "
             + "measures E1.value as v1, E2.value as v2 " 
@@ -57,7 +57,7 @@ public class ValueChangeMonitorEngine implements UpdateListener {
 
     // the following pattern is used to detect pairs of events with value differences NOT matching the expected criteria
     static final String eplExpTemplate2_b = "insert into ValueChangeMonitorEventStream select '%d' as id, false as value "
-            + "from cern.c2mon.driver.common.ValueChangeMonitorEvent(id=%d) "
+            + "from cern.c2mon.daq.common.ValueChangeMonitorEvent(id=%d) "
             + "match_recognize ( "
             + "partition by id "
             + "measures E1.value as v1, E2.value as v2 " 

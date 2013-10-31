@@ -71,7 +71,7 @@ public class ProcessConfigurationLoaderTest {
         assertEquals(2, equipmentMap.values().size());
         
         EquipmentConfiguration equipmentConfiguration1 = equipmentMap.get(1L);
-        assertEquals("ch.cern.tim.driver.testhandler.TestMessageHandler", 
+        assertEquals("cern.c2mon.daq.testhandler.TestMessageHandler", 
                 equipmentConfiguration1.getHandlerClassName());
         assertEquals(47014L, equipmentConfiguration1.getCommFaultTagId());
         assertFalse(equipmentConfiguration1.getCommFaultTagValue());

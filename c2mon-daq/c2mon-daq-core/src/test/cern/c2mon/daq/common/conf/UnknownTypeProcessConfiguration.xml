@@ -10,7 +10,7 @@
   <max-message-delay>1000</max-message-delay>
   <EquipmentUnits>
 	<EquipmentUnit id="1" name="E_JEC_AIRH4STP887">
-	  <handler-class-name>ch.cern.tim.driver.testhandler.TestMessageHandler</handler-class-name>
+	  <handler-class-name>cern.c2mon.daq.testhandler.TestMessageHandler</handler-class-name>
 	  <commfault-tag-id>47014</commfault-tag-id>
 	  <commfault-tag-value>false</commfault-tag-value>
 	  <alive-tag-id>47321</alive-tag-id>
@@ -102,7 +102,7 @@
 	  </CommandTags>
 	</EquipmentUnit>
 	<EquipmentUnit id="2" name="E_JEC_AIRH4STP887">
-	  <handler-class-name>ch.cern.tim.driver.testhandler.TestMessageHandler</handler-class-name>
+	  <handler-class-name>cern.c2mon.daq.testhandler.TestMessageHandler</handler-class-name>
 	  <commfault-tag-id>47014</commfault-tag-id>
 	  <commfault-tag-value>false</commfault-tag-value>
 	  <alive-tag-id>47321</alive-tag-id>

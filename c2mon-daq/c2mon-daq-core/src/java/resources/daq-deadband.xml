@@ -8,7 +8,7 @@
 	<!-- 1: difference at which time deadband filtering will be activated in ms -->
 	<!-- 2: difference at which time deadband will be deactivated in ms -->
 	<!-- 3: The time deadband time in ms -->
-<!--	<bean id="lowDynamicTimeDeadbandFilterActivator" class="cern.c2mon.driver.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator" scope="prototype">-->
+<!--	<bean id="lowDynamicTimeDeadbandFilterActivator" class="cern.c2mon.daq.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator" scope="prototype">-->
 <!--	  <constructor-arg index="0" value="10"/> -->
 <!--	  <constructor-arg index="1" value="25000"/>-->
 <!--	  <constructor-arg index="2" value="30000"/>-->
@@ -20,7 +20,7 @@
 	<!-- 1: difference at which time deadband filtering will be activated in ms -->
 	<!-- 2: difference at which time deadband will be deactivated in ms -->
 	<!-- 3: The time deadband time in ms -->
-	<!--<bean id="medDynamicTimeDeadbandFilterActivator" class="cern.c2mon.driver.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator" scope="prototype">-->
+	<!--<bean id="medDynamicTimeDeadbandFilterActivator" class="cern.c2mon.daq.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator" scope="prototype">-->
 	<!--  <constructor-arg index="0" value="10"/> -->
 	<!--  <constructor-arg index="1" value="500"/>-->
 	<!--  <constructor-arg index="2" value="1000"/>-->
@@ -33,7 +33,7 @@
 	<!-- 2: number of tags per interval at which time deadband filtering will be activated -->
 	<!-- 3: number of tags per interval at which time deadband will be deactivated -->
 	<!-- 4: The time deadband time in ms -->
-	<bean id="lowDynamicTimeDeadbandFilterActivator" class="cern.c2mon.driver.filter.dynamic.CounterTimeDeadbandActivator" scope="prototype">
+	<bean id="lowDynamicTimeDeadbandFilterActivator" class="cern.c2mon.daq.filter.dynamic.CounterTimeDeadbandActivator" scope="prototype">
 	  <constructor-arg index="0" value="${deadband.counter.low.nbIntervals}"/>
 	  <constructor-arg index="1" value="${deadband.counter.low.interval}"/>   
 	  <constructor-arg index="2" value="${deadband.counter.low.activate}"/>    
@@ -47,7 +47,7 @@
 	<!-- 2: number of tags per interval at which time deadband filtering will be activated -->
 	<!-- 3: number of tags per interval at which time deadband will be deactivated -->
 	<!-- 4: The time deadband time in ms -->
-	<bean id="medDynamicTimeDeadbandFilterActivator" class="cern.c2mon.driver.filter.dynamic.CounterTimeDeadbandActivator" scope="prototype">
+	<bean id="medDynamicTimeDeadbandFilterActivator" class="cern.c2mon.daq.filter.dynamic.CounterTimeDeadbandActivator" scope="prototype">
 	  <constructor-arg index="0" value="${deadband.counter.medium.nbIntervals}"/>
 	  <constructor-arg index="1" value="${deadband.counter.medium.interval}"/>   
 	  <constructor-arg index="2" value="${deadband.counter.medium.activate}"/>    

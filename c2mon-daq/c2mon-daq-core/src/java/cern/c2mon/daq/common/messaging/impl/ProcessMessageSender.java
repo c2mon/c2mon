@@ -44,12 +44,12 @@ import cern.tim.util.buffer.SynchroBufferListener;
 
 /**
  * The ProcessMessageSender class is responsible for sending JMS messages from
- * the driver to the application server. This class supports sending the updates
+ * the daq to the application server. This class supports sending the updates
  * to multiple JMS connections. The sending itself is performed by a JMSSender
  * class. Several of these can be specified in the jmsSenders collection field.
  * Notice that the calls to these senders are made on the same threads, so it is
  * up to the JMSSenders to release the threads, if for instance they are not
- * critical (see @see ch.cern.tim.driver.common.messaging.ActiveProxySender for
+ * critical (see @see cern.c2mon.daq.common.messaging.ActiveProxySender for
  * wrapping non-essential JMSSender's).
  * 
  * For low priority messages, two synchrobuffer's are used (one for persistent,

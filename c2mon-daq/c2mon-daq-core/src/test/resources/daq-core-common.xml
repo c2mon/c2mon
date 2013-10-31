@@ -11,7 +11,7 @@
 
 	<!-- scan the DAQ package for Spring annotations -->
 	<context:annotation-config />
-	<context:component-scan base-package="cern.c2mon.daq.common,cern.c2mon.driver.filter" />
+	<context:component-scan base-package="cern.c2mon.daq.common,cern.c2mon.daq.filter" />
 
 	<!-- load daqProperties so that they can be used in the XML -->
 	<bean	class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -50,10 +50,10 @@
   
   
   <bean id="processConfigurationFilePath" class="java.lang.String">
-    <constructor-arg index="0" value="./src/test/cern.c2mon.daq.common/conf/ProcessConfigurationWithDummyEquipment.xml"/>
+    <constructor-arg index="0" value="./src/test/cern/c2mon/daq/common/conf/ProcessConfigurationWithDummyEquipment.xml"/>
   </bean>
   
-  <bean id="commandParamsHandler" class="cern.c2mon.driver.tools.CommandParamsHandler">
+  <bean id="commandParamsHandler" class="cern.c2mon.daq.tools.CommandParamsHandler">
        <!--  <constructor-arg index="0" value="-c someLocalConfXMLFile.xml"/> -->
   </bean>
  
