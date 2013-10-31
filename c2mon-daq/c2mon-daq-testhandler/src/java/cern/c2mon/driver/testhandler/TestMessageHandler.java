@@ -25,12 +25,12 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.common.ICommandRunner;
-import cern.c2mon.driver.common.conf.equipment.ICommandTagChanger;
-import cern.c2mon.driver.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.driver.tools.equipmentexceptions.EqCommandTagException;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.common.ICommandRunner;
+import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
+import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.tim.shared.common.datatag.DataTagDeadband;
 import cern.tim.shared.common.type.TagDataType;
 import cern.tim.shared.daq.command.ISourceCommandTag;

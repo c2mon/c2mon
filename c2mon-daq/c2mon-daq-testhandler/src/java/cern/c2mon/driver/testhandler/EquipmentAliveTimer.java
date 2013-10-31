@@ -5,7 +5,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.driver.common.EquipmentMessageHandler;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
 
 /**
  * This class is responsible for generating the alive messages for the
