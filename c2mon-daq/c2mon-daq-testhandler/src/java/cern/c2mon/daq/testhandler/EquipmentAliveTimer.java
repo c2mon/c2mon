@@ -1,4 +1,4 @@
-package cern.c2mon.driver.testhandler;
+package cern.c2mon.daq.testhandler;
 
 import java.util.Timer;
 import java.util.TimerTask;

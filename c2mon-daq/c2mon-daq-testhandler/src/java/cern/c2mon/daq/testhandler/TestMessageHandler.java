@@ -16,7 +16,7 @@
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
-package cern.c2mon.driver.testhandler;
+package cern.c2mon.daq.testhandler;
 
 import java.util.HashMap;
 import java.util.Map;
