@@ -1,8 +1,0 @@
-dmn2-daq version history log
-==============================
-
- -----------------------------------------
-26/10/2012, wbuczak, release version 1.0.28
-* TIMD-1 - fixing problem:  DAQs send twice commfault tag  (tim2-daq-core)
-* TIMD-17 - fixing problem: JAPC-YAMI DAQ loses subscriptions and does not recover correctly after some hours of work
-
