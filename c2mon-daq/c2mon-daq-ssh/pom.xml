@@ -5,19 +5,17 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-daq</groupId>
 		<artifactId>c2mon-daq-pom</artifactId>
-		<version>1.0.24</version>
+		<version>1.0.25</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-daq</groupId>
 	<artifactId>c2mon-daq-ssh</artifactId>
 	<version>1.0.7-SNAPSHOT</version>
 	<name>c2mon-daq-ssh</name>
 	<packaging>jar</packaging>
-	<description>
-     This JAR is part of the TIM Data Acquisition layer. TIM uses a Secure Shell (SSH)
+	<description>This JAR is part of the C2MON Data Acquisition layer. C2MON uses a Secure Shell (SSH)
      data acquisition module for executing SSH commands. This DAQ is mainly used internally,
      e.g. for restarting DAQ modules, OPC servers etc. via simple commands sent from the TIM Viewer.
-     Adapted for TIM2 shared libraries.     
-    </description>
+     Adapted for TIM2 and C2MON shared libraries.</description>
 	<url>http://timweb.cern.ch</url>
 	
 	<scm>
