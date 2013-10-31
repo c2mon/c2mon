@@ -20,22 +20,21 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.w3c.dom.Element;
 
-import cern.c2mon.driver.common.EquipmentCommandHandler;
-import cern.c2mon.driver.common.EquipmentLoggerFactory;
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.common.EquipmentMessageSender;
-import cern.c2mon.driver.common.conf.core.ConfigurationController;
-import cern.c2mon.driver.common.conf.core.EquipmentConfiguration;
-import cern.c2mon.driver.common.conf.core.EquipmentConfigurationFactory;
-import cern.c2mon.driver.common.conf.core.EquipmentConfigurationHandler;
-import cern.c2mon.driver.common.conf.core.ProcessConfiguration;
-import cern.c2mon.driver.common.conf.core.RunOptions;
-import cern.c2mon.driver.common.messaging.IProcessMessageSender;
-import cern.c2mon.driver.common.messaging.impl.RequestController;
-import cern.c2mon.driver.filter.IFilterMessageSender;
-import cern.c2mon.driver.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
-import cern.c2mon.driver.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator;
-//import cern.c2mon.driver.common.conf.core.ProcessConfigurationLoader;
+import cern.c2mon.daq.common.EquipmentCommandHandler;
+import cern.c2mon.daq.common.EquipmentLoggerFactory;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.common.EquipmentMessageSender;
+import cern.c2mon.daq.common.conf.core.ConfigurationController;
+import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
+import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
+import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
+import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
+import cern.c2mon.daq.common.conf.core.RunOptions;
+import cern.c2mon.daq.common.messaging.IProcessMessageSender;
+import cern.c2mon.daq.common.messaging.impl.RequestController;
+import cern.c2mon.daq.filter.IFilterMessageSender;
+import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
+import cern.c2mon.daq.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator;
 
 /**
  * This class implements a common parent class for JUnit testing framework for EquipmentMessageHandlers.

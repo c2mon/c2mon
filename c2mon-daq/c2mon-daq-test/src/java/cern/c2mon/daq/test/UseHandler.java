@@ -8,7 +8,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import cern.c2mon.driver.common.EquipmentMessageHandler;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
 
 /*
  * This annotation is used to mark which handler needs to be used for particular test
