@@ -17,7 +17,7 @@
 	<description>TIM2/DIAMON2 data acquisition component for JMS Brokers..</description>
 
 	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/tim2/tim2-daq/tim2-daq-jms</developerConnection>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-jms</developerConnection>
 	</scm>
 
 	<dependencies>
