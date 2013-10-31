@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-daq</groupId>
     <artifactId>c2mon-daq-pom</artifactId>
-    <version>1.0.24</version>
+    <version>1.0.25</version>
   </parent>
   <groupId>cern.c2mon.c2mon-daq</groupId>
   <artifactId>c2mon-daq-laser</artifactId>
@@ -79,10 +79,6 @@
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymockclassextension</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cern.japc</groupId>
-      <artifactId>japc-ext-mockito</artifactId>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
