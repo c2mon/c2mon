@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>cern.tim2.tim2-daq</groupId>
-		<artifactId>tim2-daq-pom</artifactId>
-		<version>1.0.17</version>
+		<groupId>cern.c2mon.c2mon-daq</groupId>
+		<artifactId>c2mon-daq-pom</artifactId>
+		<version>1.0.25</version>
 	</parent>
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
@@ -27,11 +27,12 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-daq</groupId>
 			<artifactId>c2mon-daq-clic</artifactId>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 
 	</dependencies>
 
-	<build>
+	<build>"bin/daqprocess2.sh"
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
