@@ -1,0 +1,31 @@
+<EquipmentUnit id="5250" name="E_JMX_JMX1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+
+  <commfault-tag-value>false</commfault-tag-value>
+  <address>service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi;10000</address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>
+
+  <DataTags>
+          
+   <DataTag id="54675" name="BE.TEST:TEST2" control="false">
+      <data-type>String</data-type>
+        <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+    	   <object-name>java.lang:type=Runtime</object-name>
+    	   <attribute>SystemProperties</attribute>  
+    	   <map-field>java.vm.version</map-field>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <value-deadband-type>1</value-deadband-type>
+        <value-deadband>1.0</value-deadband>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>          
+                        
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>  

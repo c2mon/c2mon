@@ -1,0 +1,30 @@
+<EquipmentUnit id="5250" name="E_JMX_JMX1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+
+  <commfault-tag-value>false</commfault-tag-value>
+  <address>service:jmx:rmi:///jndi/rmi://cs-ccr-cmw2:1098/jmxrmi;6000</address>
+  
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>  
+  <DataTags>
+  <DataTag id="54676" name="JMX:Test" control="false">
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+    	   <object-name>cern.cmw.log:type=Converter,name=cern.cmw.log.sources.converter.Cmwlog</object-name>
+    	   <attribute>TotalProcessed</attribute>    	  
+    	   <receive-method>poll</receive-method>                     
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>         
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+        
+        <value-change-monitor timeWindow="5000" /> 
+      </DataTagAddress>
+    </DataTag>              
+    
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>  

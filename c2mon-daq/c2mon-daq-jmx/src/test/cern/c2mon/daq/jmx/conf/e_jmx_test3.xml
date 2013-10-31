@@ -1,0 +1,14 @@
+<EquipmentUnit id="5250" name="E_JMX_JMX1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+
+  <commfault-tag-value>false</commfault-tag-value>
+  <address></address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>
+
+  <DataTags>
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>

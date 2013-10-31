@@ -1,0 +1,37 @@
+<EquipmentUnit id="5250" name="E_JMX_JMX1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+  <commfault-tag-value>false</commfault-tag-value>
+  <address>service:jmx:rmi:///jndi/rmi://cs-ccr-apdev:63001/jmxrmi;3000</address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>  
+  <DataTags>
+    
+  <DataTag id="54675" name="BE.TEST:TEST1" control="false">
+      <data-type>Integer</data-type>
+        <min-value data-type="Integer">0</min-value>
+        <max-value data-type="Integer">64000</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+    	   <object-name>cern.accdm.logging.process:name=subscriberProcess</object-name>
+    	   <!--  the attribute defines a CompositeData attribute of a JMX bean -->
+    	   <attribute>ParametersFaultState</attribute>      	   
+    	   <!--  the composite-field defines a map which is expected to be inside the attribute defined by "attribute" tag -->
+<!--     	   <composite-field>map</composite-field> -->
+    	   <!--  the map field defines a key to be used inside the map defined by "composite-field" tag -->
+<!--            <map-field>LHC.STATISTICS.APP/Logging</map-field> -->
+           
+           <!--  subscribe to the attribute -->
+<!--            <receive-method>poll</receive-method>                          	     	                   -->
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>         
+        <value-deadband-type>1</value-deadband-type>
+        <value-deadband>10</value-deadband>               
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>                  
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>  

@@ -1,0 +1,29 @@
+<EquipmentUnit id="5250" name="E_JMX_JMX1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+
+  <commfault-tag-value>false</commfault-tag-value>
+  <address>service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi;200</address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>  
+  <DataTags>    
+  </DataTags>
+  <CommandTags>
+    <CommandTag id="100847" name="TEST:TESTCMD1">
+      <source-timeout>4000</source-timeout>
+      <source-retries>2</source-retries>
+         <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+    	   <object-name>cern.example.mbeans:type=Cache</object-name>    	       	     	         
+    	   <attribute>CurrentSrvTime</attribute>
+         </HardwareAddress>        
+    </CommandTag>
+    <CommandTag id="100848" name="TEST:TESTCMD2">
+      <source-timeout>4000</source-timeout>
+      <source-retries>2</source-retries>
+         <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+    	   <object-name>cern.example.mbeans:type=Cache</object-name>    	       	 
+           <call-method>test2</call-method>                     
+         </HardwareAddress>        
+    </CommandTag>  
+  </CommandTags>
+</EquipmentUnit>  
