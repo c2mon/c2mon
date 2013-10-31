@@ -26,11 +26,11 @@
 //
 // -------------------------------------------------------------------------
 
-package cern.c2mon.driver.laser;
+package cern.c2mon.daq.laser;
 
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.tools.equipmentexceptions.EqCommandTagException;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.tim.shared.daq.command.SourceCommandTagValue;
 
 

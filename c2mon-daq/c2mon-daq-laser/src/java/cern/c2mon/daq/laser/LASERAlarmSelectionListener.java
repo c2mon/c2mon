@@ -16,10 +16,10 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.laser;
+package cern.c2mon.daq.laser;
 
-import cern.c2mon.driver.laser.LASERController.LASERConnection;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.laser.LASERController.LASERConnection;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.laser.client.data.Alarm;
 import cern.laser.client.services.selection.AlarmSelectionListener;
 import cern.laser.client.services.selection.LaserHeartbeatException;

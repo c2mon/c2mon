@@ -16,7 +16,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.laser;
+package cern.c2mon.daq.laser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,10 +24,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import cern.c2mon.driver.common.EquipmentLogger;
-import cern.c2mon.driver.common.IEquipmentMessageSender;
-import cern.c2mon.driver.common.conf.equipment.IEquipmentConfiguration;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.IEquipmentMessageSender;
+import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.laser.client.LaserConnectionException;
 import cern.laser.client.LaserException;
 import cern.laser.client.LaserTimeOutException;
