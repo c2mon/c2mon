@@ -16,15 +16,15 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.ssh;
+package cern.c2mon.daq.ssh;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import cern.c2mon.driver.common.ICommandRunner;
-import cern.c2mon.driver.ssh.tools.SSHHelper;
-import cern.c2mon.driver.ssh.tools.SSHXMLExecutionFeedback;
-import cern.c2mon.driver.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.daq.common.ICommandRunner;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.daq.ssh.tools.SSHHelper;
+import cern.c2mon.daq.ssh.tools.SSHXMLExecutionFeedback;
 import cern.tim.shared.common.datatag.address.SSHHardwareAddress;
 import cern.tim.shared.daq.command.ISourceCommandTag;
 import cern.tim.shared.daq.command.SourceCommandTagValue;

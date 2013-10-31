@@ -16,7 +16,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-//Source file: E:\\development\\CERN\\tim-daq\\tim-daq-ssh\\src\\java\\ch\\cern\\tim\\driver\\ssh\\SSHMessageHandler.java
+//Source file: E:\\development\\CERN\\tim-daq\\tim-daq-ssh\\src\\java\\cern\\c2mon\\daq\\ssh\\SSHMessageHandler.java
 
 // TIM. CERN. All rights reserved.
 //  
@@ -27,12 +27,12 @@
 // 
 // -------------------------------------------------------------------------
 
-package cern.c2mon.driver.ssh;
+package cern.c2mon.daq.ssh;
 
-import cern.c2mon.driver.common.EquipmentMessageHandler;
-import cern.c2mon.driver.ssh.tools.SSHHelper;
-import cern.c2mon.driver.tools.equipmentexceptions.EqException;
-import cern.c2mon.driver.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.tools.equipmentexceptions.EqException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.daq.ssh.tools.SSHHelper;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 
 /**
@@ -64,7 +64,7 @@ public class SSHMessageHandler extends EquipmentMessageHandler {
 
   
   /**
-   * @throws cern.c2mon.driver.tools.equipmentexceptions.EqIOException
+   * @throws cern.c2mon.daq.tools.equipmentexceptions.EqIOException
    */
   public void connectToDataSource() throws EqIOException {
     if (getEquipmentLogger().isDebugEnabled()) {

@@ -16,12 +16,12 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.ssh;
+package cern.c2mon.daq.ssh;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import cern.c2mon.driver.ssh.tools.PeriodicSSHCommandExecutor;
-import cern.c2mon.driver.ssh.tools.SSHHelper;
+import cern.c2mon.daq.ssh.tools.PeriodicSSHCommandExecutor;
+import cern.c2mon.daq.ssh.tools.SSHHelper;
 import cern.tim.shared.common.datatag.address.SSHHardwareAddress;
 import cern.tim.shared.daq.config.ChangeReport;
 import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;

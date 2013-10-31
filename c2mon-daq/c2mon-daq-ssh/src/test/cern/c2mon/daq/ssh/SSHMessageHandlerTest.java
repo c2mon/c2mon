@@ -5,16 +5,16 @@
  * 
  * Copyright CERN ${year}, All Rights Reserved.
  */
-package cern.c2mon.driver.ssh;
+package cern.c2mon.daq.ssh;
 
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cern.c2mon.driver.ssh.SSHMessageHandler;
-import cern.c2mon.driver.test.GenericMessageHandlerTst;
-import cern.c2mon.driver.test.UseConf;
-import cern.c2mon.driver.test.UseHandler;
+import cern.c2mon.daq.ssh.SSHMessageHandler;
+import cern.c2mon.daq.test.GenericMessageHandlerTst;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.test.UseHandler;
 
 /**
  * This class implements a set of JUnit tests for <code>SSHMessageHandler</code>. All tests that require
@@ -22,7 +22,7 @@ import cern.c2mon.driver.test.UseHandler;
  * annotation, specifying the XML file to be used.
  * 
  * @see
- * @see cern.c2mon.driver.jmx.JMXMessageHandler
+ * @see cern.c2mon.daq.jmx.JMXMessageHandler
  * @author wbuczak
  */
 @UseHandler(SSHMessageHandler.class)

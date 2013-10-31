@@ -16,7 +16,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.ssh.tools;
+package cern.c2mon.daq.ssh.tools;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -33,13 +33,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import cern.c2mon.driver.common.EquipmentLogger;
-import cern.c2mon.driver.common.IEquipmentMessageSender;
-import cern.c2mon.driver.common.conf.equipment.IEquipmentConfiguration;
-import cern.c2mon.driver.tools.TIMDriverSimpleTypeConverter;
-import cern.c2mon.driver.tools.equipmentexceptions.EqCommandTagException;
-import cern.c2mon.driver.tools.equipmentexceptions.EqDataTagException;
-import cern.c2mon.driver.tools.equipmentexceptions.EqException;
+import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.IEquipmentMessageSender;
+import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqDataTagException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqException;
 import cern.tim.shared.common.datatag.address.SSHHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 
@@ -52,7 +52,7 @@ import com.mindbright.util.RandomSeed;
 import com.mindbright.util.SecureRandomAndPad;
 
 /**
- * Helper class implementing some common methods used all over the SSH driver
+ * Helper class implementing some common methods used all over the SSH daq
  * 
  * @author vilches
  *

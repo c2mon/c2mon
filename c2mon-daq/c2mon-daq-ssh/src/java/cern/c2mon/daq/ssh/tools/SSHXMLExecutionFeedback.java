@@ -16,43 +16,24 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.ssh.tools;
-
-import java.util.TimerTask;
-
-import cern.c2mon.driver.tools.equipmentexceptions.EqDataTagException;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+package cern.c2mon.daq.ssh.tools;
 
 /**
- * This class models the action/task that is taken each timer's 'tick'
+ * The structure for the ssh-command-execution feedback
  * 
  * @author vilches
  */
-public class PeriodicSSHTask extends TimerTask {
+public class SSHXMLExecutionFeedback {
 
-  ISourceDataTag tag;
+    public int statusCode;
+    public String statusDescription;
+    public String type;
+    public Object value;
 
-  /**
-   * SSH Helper class with some helping methods.
-   */
-  private SSHHelper sshHelper;
-
-  public PeriodicSSHTask(ISourceDataTag tag, SSHHelper sshHelper) {
-    this.tag = tag;
-    this.sshHelper = sshHelper;
-  }
-
-  /**
-   * @roseuid 43302FED02AF
-   */
-  public void run() {
-    try {
-      this.sshHelper.recalculateDataTagValue(tag.getId());
-    } catch (EqDataTagException ex) {
-      this.sshHelper.getEquipmentLogger().warn(ex.getMessage());
-      this.sshHelper.getEquipmentLogger().debug("invalidating tag");
-      this.sshHelper.getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.DATA_UNAVAILABLE, ex.getErrorDescription());
+    public SSHXMLExecutionFeedback(int execStatus, String pStatusDescr, String pType, Object pValue) {
+        this.statusCode = execStatus;
+        this.statusDescription = pStatusDescr;
+        this.type = pType;
+        this.value = pValue;
     }
-  }
 }

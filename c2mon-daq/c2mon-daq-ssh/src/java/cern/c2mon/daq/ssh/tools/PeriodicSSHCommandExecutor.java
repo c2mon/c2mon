@@ -16,7 +16,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.driver.ssh.tools;
+package cern.c2mon.daq.ssh.tools;
 
 import java.util.Timer;
 
