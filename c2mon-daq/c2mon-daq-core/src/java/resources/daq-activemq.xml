@@ -55,7 +55,7 @@
 
 <!-- initialize the converters for sending and receiving a response. Backward compatibility -->
 <bean id="processRequestMessageConverterBC" class="cern.tim.shared.daq.process.backward.ProcessRequestConverterBC"/>
-<bean id="processRequestResponseConverterBC" class="cern.c2mon.driver.common.messaging.impl.backward.ProcessRequestResponseConverterBC"/>
+<bean id="processRequestResponseConverterBC" class="cern.c2mon.daq.common.messaging.impl.backward.ProcessRequestResponseConverterBC"/>
 
 <!-- converters are set manually for sending and receiving a response -->
 <bean id="processRequestJmsTemplate" class="org.springframework.jms.core.JmsTemplate">

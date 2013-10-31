@@ -11,7 +11,7 @@
 <import resource="classpath:resources/daq-core-common.xml"/>
 <import resource="classpath:resources/daq-activemq.xml"/>
 
-<bean id="driverKernel" class="cern.c2mon.driver.common.DriverKernel">
+<bean id="driverKernel" class="cern.c2mon.daq.common.DriverKernel">
   <property name="primaryRequestSender" ref="primaryRequestSender"/>
   <property name="processMessageReceivers">
     <list>      
@@ -21,24 +21,24 @@
 </bean>
 
 <!-- initialize the ProcessRequestSender; can switch here between implementations (No dummy implementation needed if local conf used)-->
-<bean id="activeRequestSender" class="cern.c2mon.driver.common.messaging.impl.ActiveRequestSender"/>
-<bean id="primaryRequestSender" class="cern.c2mon.driver.common.messaging.impl.TestModeRequestSender"/>
+<bean id="activeRequestSender" class="cern.c2mon.daq.common.messaging.impl.ActiveRequestSender"/>
+<bean id="primaryRequestSender" class="cern.c2mon.daq.common.messaging.impl.TestModeRequestSender"/>
 
 <!-- initialize the ProcessMessageReceiver; switch here between implementations (Dummy implementation available) -->
-<!--<bean id="processMessageReceiver" class="cern.c2mon.driver.common.messaging.impl.DirectoryMessageReceiver"/>-->
-<bean id="activeMessageReceiver" class="cern.c2mon.driver.common.messaging.impl.DummyMessageReceiver"/>
+<!--<bean id="processMessageReceiver" class="cern.c2mon.daq.common.messaging.impl.DirectoryMessageReceiver"/>-->
+<bean id="activeMessageReceiver" class="cern.c2mon.daq.common.messaging.impl.DummyMessageReceiver"/>
 
 <!-- initialize the FilterMessageSender; switch here between implementations (Dummy implementation available) -->
 <bean id="filterMessageSender" class="cern.c2mon.driver.filter.impl.DummyFilterSender"/>
 
 <!-- initialize the JmsSenders; any number of these can be plugged into the ProcessMessageSender below -->
-<bean id="activeJmsSender" class="cern.c2mon.driver.common.messaging.impl.DummyJmsSender">
+<bean id="activeJmsSender" class="cern.c2mon.daq.common.messaging.impl.DummyJmsSender">
     <property name="beanName" value="productionSender"/>
 </bean>
 
 <!-- set the JMS message senders that will be used; ActiveMQ is initialized
      automatically and can be wired in here -->
-<bean id="processMessageSender" class="cern.c2mon.driver.common.messaging.impl.ProcessMessageSender">
+<bean id="processMessageSender" class="cern.c2mon.daq.common.messaging.impl.ProcessMessageSender">
   <property name="jmsSenders">
     <list>
       <ref bean="activeJmsSender"/>
