@@ -1,0 +1,39 @@
+<EquipmentUnit id="5250" name="E_JAPC_JAPC1">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address></address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+
+		<DataTag id="100909" name="TEST" control="false">
+			<data-type>Boolean</data-type>			
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>mockito</protocol>
+					<service>mockito</service>
+					<device-name>cryo.S34.CryoStart</device-name>
+					<property-name>AMR3</property-name>
+					<index-field-name></index-field-name>
+					<index-name></index-name>
+					<data-field-name></data-field-name>					
+				</HardwareAddress>
+
+				<time-to-live>3600000</time-to-live>
+
+				<value-deadband-type>1</value-deadband-type>
+				<value-deadband>1.0</value-deadband>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+
+	</DataTags>
+	<CommandTags>
+	</CommandTags>
+</EquipmentUnit>  

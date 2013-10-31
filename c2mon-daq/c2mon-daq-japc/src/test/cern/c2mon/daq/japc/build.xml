@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<project name="tim2-daq-japc" default="default">
+  <!--
+     Defines project variables
+  -->
+  <property file="project.properties"/>
+  <!--
+     import the standard target from cmmnbuild
+  -->
+  <property environment="env"/>
+  <property name="cmmnbuild.home" value="${env.CMMNBUILD_HOME}"/>
+  <property name="cmmnbuild.targets" value="${cmmnbuild.home}/targets.xml"/>
+  <import file="${cmmnbuild.targets}"/>
+</project>

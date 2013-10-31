@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.c2mon.c2mon-daq</groupId>
+		<artifactId>c2mon-daq-pom</artifactId>
+		<version>1.0.25</version>
+	</parent>
+
+	<artifactId>c2mon-daq-japc</artifactId>	
+	<name>c2mon-daq-japc</name>
+	<version>1.0.26-SNAPSHOT</version>
+	
+	<packaging>jar</packaging>
+	<description>TIM data acquisition component for JAPC.</description>
+	<url />
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/tim2/tim2-daq/tim2-daq-japc</developerConnection>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-daq</groupId>
+			<artifactId>c2mon-daq-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.tim2.tim2-shared</groupId>
+			<artifactId>tim2-shared-daq</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>cern.c2mon.c2mon-daq</groupId>
+			<artifactId>c2mon-daq-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymockclassextension</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.japc</groupId>
+			<artifactId>japc-ext-mockito</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.japc</groupId>
+			<artifactId>japc</artifactId>		
+		</dependency>
+		<dependency>
+			<groupId>cern.japc</groupId>
+			<artifactId>japc-ext-remote</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-aop</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>cern.japc</groupId>
+			<artifactId>japc-ext-cmwrda</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.japc</groupId>
+			<artifactId>japc-ext-snmp</artifactId>
+		</dependency>		
+
+	</dependencies>
+	<developers />
+
+</project>

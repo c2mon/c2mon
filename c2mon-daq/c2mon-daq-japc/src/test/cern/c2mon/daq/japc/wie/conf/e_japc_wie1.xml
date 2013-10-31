@@ -1,0 +1,97 @@
+<EquipmentUnit id="5250" name="E_JAPC_JAPC1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+
+  <commfault-tag-value>false</commfault-tag-value>
+  <address></address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>
+
+  <DataTags>
+    <DataTag id="54675" name="wie.temp.airfan" control="false">
+      <data-type>Integer</data-type>
+        <min-value data-type="Integer">0</min-value>
+        <max-value data-type="Integer">64000</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>mockito</protocol>
+          <service>mockito</service>
+          <device-name>BFCT10T-FAN</device-name>
+          <property-name>Acquisition</property-name>
+          <data-field-name>agent.snmp.wiener.fanAirTemperatureOid</data-field-name>               
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+   
+ 
+ <!--   
+    <DataTag id="54677" name="wie.mainswitch" control="false">
+      <data-type>Integer</data-type>
+        <min-value data-type="Integer">0</min-value>
+        <max-value data-type="Integer">64000</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>mockito</protocol>
+          <service>mockito</service>
+          <device-name>BFCT10T-FAN</device-name>
+          <property-name>Acquisition</property-name>
+          <data-field-name>agent.snmp.wiener.mainSwitchStateOid</data-field-name>               
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+ 
+
+ -->
+    <DataTag id="54678" name="wie.voltage.plus5V0" control="false">
+      <data-type>Float</data-type>
+        <min-value data-type="Float">0.0</min-value>
+        <max-value data-type="Float">64000.0</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>mockito</protocol>
+          <service>mockito</service>
+          <device-name>BFCT10T-FAN</device-name>
+          <property-name>Acquisition</property-name>
+          <index-field-name>+5V0</index-field-name>          
+          <data-field-name>agent.snmp.wiener.outputVoltageOid</data-field-name>                  
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>       
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    
+             
+    
+    <DataTag id="54679" name="wie.fanrotation.0" control="false">
+      <data-type>Integer</data-type>
+        <min-value data-type="Integer">0</min-value>
+        <max-value data-type="Integer">64000</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>mockito</protocol>
+          <service>mockito</service>
+          <device-name>BFCT10T-FAN</device-name>
+          <property-name>Acquisition</property-name>
+          <data-field-name>agent.snmp.wiener.fanRotationSpeedOid</data-field-name>
+          <column-index>0</column-index>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>       
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>          
+      
+      
+       
+   
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>  

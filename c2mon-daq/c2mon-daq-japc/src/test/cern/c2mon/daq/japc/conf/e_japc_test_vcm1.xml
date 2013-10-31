@@ -1,0 +1,39 @@
+<EquipmentUnit id="5250" name="E_JAPC_JAPC1">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address></address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+
+		<DataTag id="100909" name="TEST" control="false">
+			<data-type>String</data-type>
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>rda</protocol>
+					<service>rda</service>
+					<device-name>ACCCON_SYS.ANYDATA_QUEUE</device-name>
+					<property-name>QUEUE_STATUS</property-name>
+					<index-field-name></index-field-name>
+					<index-name></index-name>
+					<data-field-name></data-field-name>
+				</HardwareAddress>
+				<time-to-live>3600000</time-to-live>
+
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+
+				<value-change-monitor timeWindow="15000" /> 
+			</DataTagAddress>
+		</DataTag>
+
+	</DataTags>
+	<CommandTags>
+	</CommandTags>
+</EquipmentUnit>  
+

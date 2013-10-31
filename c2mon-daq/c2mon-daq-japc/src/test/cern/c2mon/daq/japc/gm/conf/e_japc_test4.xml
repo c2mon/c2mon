@@ -1,0 +1,38 @@
+<EquipmentUnit id="5250" name="E_JAPC_JAPC1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+
+  <commfault-tag-value>false</commfault-tag-value>
+  <address></address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>
+
+  <DataTags>
+   
+    <DataTag id="54677" name="RK.PSX.PSB_EJ+TR-KICKERS:TOTAL_COUNT" control="false">
+
+      <data-type>Integer</data-type>
+        <min-value data-type="Integer">0</min-value>
+        <max-value data-type="Integer">64000</max-value>
+        <DataTagAddress>
+          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+            <protocol>mockito</protocol>
+            <service>mockito</service>
+            <device-name>GTPMGRP.PSB</device-name>
+            <property-name>AlarmGroups</property-name>
+            <index-field-name>groups</index-field-name>
+            <index-name>PSB:EJ+TR-KICKERS</index-name>
+            <data-field-name>totals</data-field-name>           
+          </HardwareAddress>
+          <time-to-live>3600000</time-to-live>
+          <value-deadband-type>1</value-deadband-type>
+          <value-deadband>1.0</value-deadband>
+          <priority>2</priority>
+          <guaranteed-delivery>false</guaranteed-delivery>
+        </DataTagAddress>
+    </DataTag>
+
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>  

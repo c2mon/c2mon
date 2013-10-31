@@ -1,0 +1,63 @@
+<EquipmentUnit id="5250" name="E_JAPC_JAPC1">
+  <handler-class-name>automatically-set-by-test</handler-class-name>
+  <commfault-tag-id>107211</commfault-tag-id>
+
+  <commfault-tag-value>false</commfault-tag-value>
+  <address></address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>
+      
+  <DataTags/>
+  <CommandTags>
+
+    <!--
+    a mapped command 
+     -->            
+    <CommandTag id="100847" name="TEST:TESTCMD1">
+      <source-timeout>4000</source-timeout>
+      <source-retries>2</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>mockito</protocol>
+          <service>mockito</service>
+          <device-name>D7</device-name>
+          <property-name>P7</property-name>
+          <data-field-name>field1</data-field-name>
+          <cycle-selector>SPS.USER.TESTCYCLE</cycle-selector>
+          <command-type>SET</command-type>                
+        </HardwareAddress>
+    </CommandTag>
+
+    <!--
+    a simple command 
+     -->        
+    <CommandTag id="100848" name="TEST:TESTCMD2">
+      <source-timeout>4000</source-timeout>
+      <source-retries>1</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>mockito</protocol>
+          <service>mockito</service>
+          <device-name>D8</device-name>
+          <property-name>P8</property-name>
+          <command-type>SET</command-type>                 
+        </HardwareAddress>
+    </CommandTag>    
+
+    <!--
+    a simple command 
+     -->        
+    <CommandTag id="100849" name="TEST:TESTCMD2">
+      <source-timeout>4000</source-timeout>
+      <source-retries>1</source-retries>
+        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>mockito</protocol>
+          <service>mockito</service>
+          <device-name>D9</device-name>
+          <property-name>P9</property-name>                   
+          <column-index>-1</column-index>
+          <row-index>-1</row-index>    
+          <command-type>SET</command-type>                  
+        </HardwareAddress>
+    </CommandTag>        
+      
+  </CommandTags>
+</EquipmentUnit>  

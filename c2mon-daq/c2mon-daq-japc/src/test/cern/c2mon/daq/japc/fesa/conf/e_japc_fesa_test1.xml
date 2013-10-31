@@ -1,0 +1,90 @@
+<EquipmentUnit id="5250" name="E_FESA_JAPC1">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address></address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+
+		<DataTag id="10001" name="CE.SCOPE07.CH01:Alarm:noHwScopeAlarm" control="false">
+			<data-type>Boolean</data-type>			
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>mockito</protocol>
+					<service>mockito</service>
+					<device-name>CE.SCOPE07.CH01</device-name>
+					<property-name>Alarm</property-name>					
+					<data-field-name>noHwScopeAlarm</data-field-name>					
+				</HardwareAddress>
+				
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+				
+        <DataTag id="10002" name="CE.SCOPE07.CH01:Alarm:timingUnsyncTStampsAlarm" control="false">
+			<data-type>Boolean</data-type>			
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>mockito</protocol>
+					<service>mockito</service>
+					<device-name>CE.SCOPE07.CH01</device-name>
+					<property-name>Alarm</property-name>					
+					<data-field-name>timingUnsyncTStampsAlarm</data-field-name>				
+				</HardwareAddress>
+				
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>		
+		
+        <DataTag id="10003" name="CE.SCOPE07.CH01:Alarm:badConfigAlarm" control="false">
+			<data-type>Boolean</data-type>			
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>mockito</protocol>
+					<service>mockito</service>
+					<device-name>CE.SCOPE07.CH01</device-name>
+					<property-name>Alarm</property-name>					
+					<data-field-name>badConfigAlarm</data-field-name>				
+				</HardwareAddress>
+				
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>		
+		  		
+        <DataTag id="10004" name="MTV0253:Alarm:badConfigAlarm" control="false">
+			<data-type>Boolean</data-type>			
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>mockito</protocol>
+					<service>mockito</service>
+					<device-name>MTV0253</device-name>
+					<property-name>Alarm</property-name>					
+					<data-field-name>screenIn</data-field-name>				
+				</HardwareAddress>
+				
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>				
+	</DataTags>
+	<CommandTags>
+	</CommandTags>
+</EquipmentUnit>  

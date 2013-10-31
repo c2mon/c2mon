@@ -1,0 +1,34 @@
+<EquipmentUnit id="5250" name="E_LASERPROXY_JAPC1">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address></address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+
+		<DataTag id="100909" name="LaserProxy:Metrics:fault_member_test1:fault_family_test1:fault_code_test1" control="false">
+			<data-type>Boolean</data-type>			
+			<DataTagAddress>
+
+				<HardwareAddress
+					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					<protocol>mockito</protocol>
+					<service>mockito</service>
+					<device-name>LaserProxy</device-name>
+					<property-name>Metrics</property-name>					
+					<data-field-name>fault_member_test1:fault_family_test1:fault_code_test1</data-field-name>					
+				</HardwareAddress>
+				
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>false</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+
+	</DataTags>
+	<CommandTags>
+	</CommandTags>
+</EquipmentUnit>  
