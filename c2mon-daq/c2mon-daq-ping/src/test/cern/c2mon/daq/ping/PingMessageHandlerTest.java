@@ -12,10 +12,10 @@ import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import cern.tim.driver.test.GenericMessageHandlerTst;
-import cern.tim.driver.test.SourceDataTagValueCapture;
-import cern.tim.driver.test.UseConf;
-import cern.tim.driver.test.UseHandler;
+import cern.c2mon.driver.test.GenericMessageHandlerTst;
+import cern.c2mon.driver.test.SourceDataTagValueCapture;
+import cern.c2mon.driver.test.UseConf;
+import cern.c2mon.driver.test.UseHandler;
 import cern.tim.shared.daq.datatag.SourceDataQuality;
 
 /**

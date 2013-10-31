@@ -3,12 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>cern.tim2.tim2-daq</groupId>
-		<artifactId>tim2-daq-pom</artifactId>
-		<version>1.0.19</version>
+		<groupId>cern.c2mon.c2mon-daq</groupId>
+		<artifactId>c2mon-daq-pom</artifactId>
+		<version>1.0.25</version>
 	</parent>
 
-	<groupId>cern.c2mon.c2mon-daq</groupId>
 	<artifactId>c2mon-daq-ping</artifactId>
 	<version>1.0.5-SNAPSHOT</version>
 
@@ -22,12 +21,12 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>cern.tim2.tim2-daq</groupId>
-			<artifactId>tim2-daq-core</artifactId>
+			<groupId>cern.c2mon.c2mon-daq</groupId>
+			<artifactId>c2mon-daq-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-daq</groupId>
-			<artifactId>tim2-daq-test</artifactId>
+			<groupId>cern.c2mon.c2mon-daq</groupId>
+			<artifactId>c2mon-daq-test</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cern.tim2.tim2-shared</groupId>
