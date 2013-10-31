@@ -1,4 +1,4 @@
-package cern.c2mon.driver.test;
+package cern.c2mon.daq.test;
 
 import java.util.ArrayList;
 import java.util.HashMap;

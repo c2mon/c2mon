@@ -2,7 +2,7 @@
  * Copyright CERN 2010, All Rights Reserved.
  */
 
-package cern.c2mon.driver.test;
+package cern.c2mon.daq.test;
 
 import static java.lang.String.format;
 import static org.easymock.classextension.EasyMock.createMock;

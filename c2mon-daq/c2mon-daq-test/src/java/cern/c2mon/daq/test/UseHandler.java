@@ -1,7 +1,7 @@
 /* 
  * Copyright CERN 2011, All Rights Reserved.
  */
-package cern.c2mon.driver.test;
+package cern.c2mon.daq.test;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
