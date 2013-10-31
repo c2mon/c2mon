@@ -167,7 +167,7 @@
     <appender-ref ref="FileAppender" />
   </logger>
 
-  <logger name="cern.c2mon.driver.common.messaging.impl" additivity="false">
+  <logger name="cern.c2mon.daq.common.messaging.impl" additivity="false">
     <level value="debug"/>
     <appender-ref ref="FileAppender" />
   </logger>
