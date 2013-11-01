@@ -188,15 +188,20 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
    */
   @Override
   public void disconnectFromDataSource()  {
-    getEquipmentLogger().debug("disconnectFromDataSource() called.");
+    getEquipmentLogger().debug("disconnectFromDataSource - disconnectFromDataSource() called.");
 
     if (alivePublisher != null) {
       alivePublisher.stop();
     }
 
-    for (String key :  dipController.getDipSubscriptions().keySet()) {
-      // The Key is the TopicName and the Value the DipSubscription
-      this.dipController.disconnection(dipController.getDipSubscriptions().get(key), null);
+    if (this.dipController != null) {
+    	for (String key :  this.dipController.getDipSubscriptions().keySet()) {
+    		// The Key is the TopicName and the Value the DipSubscription
+    		this.dipController.disconnection(dipController.getDipSubscriptions().get(key), null);
+    	}
+    }
+    else {
+    	getEquipmentLogger().debug("disconnectFromDataSource - dipController was not initialice (null)");
     }
   }
 
