@@ -38,8 +38,7 @@ public class DIPMessageHandlerTest extends GenericMessageHandlerTst {
 
     @Override
     protected void afterTest() throws Exception {
-    	// If there is no connection the disconnection will faille since the dipController was not initialice and is null
-//        dipHandler.disconnectFromDataSource();       
+        dipHandler.disconnectFromDataSource();       
     }
     
 
