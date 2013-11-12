@@ -4,18 +4,18 @@ import java.net.InetAddress;
 
 import javax.annotation.PostConstruct;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.cluster.CacheCluster;
+import net.sf.ehcache.cluster.ClusterNode;
+import net.sf.ehcache.cluster.ClusterScheme;
+import net.sf.ehcache.cluster.ClusterTopologyListener;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
-
-import com.tc.cluster.DsoCluster;
-import com.tc.cluster.DsoClusterEvent;
-import com.tc.cluster.DsoClusterListener;
-import com.tc.injection.annotations.InjectedDsoInstance;
-import com.tcclient.cluster.DsoNode;
 
 /**
  * Whenever this Terracotta node leaves the cluster, this bean
@@ -29,70 +29,95 @@ import com.tcclient.cluster.DsoNode;
  * @author Mark Brightwell
  *
  */
-public class NodeShutdownListener implements DsoClusterListener, ApplicationContextAware {
+public class NodeShutdownListener implements ClusterTopologyListener, ApplicationContextAware {
   
   private static final Logger LOGGER = Logger.getLogger(NodeShutdownListener.class);
   
   private final static Logger SMS_LOGGER = Logger.getLogger("AdminSmsLogger");
   
-  @InjectedDsoInstance
-  private DsoCluster dsoCluster;
+  @Autowired
+  public CacheManager cacheManager;
  
   @Autowired
   private LifeCycleController lifeCycleController;
   
-  private DsoNode thisNode;
+  private CacheCluster cacheCluster;
   
   private AbstractApplicationContext context;
   
   @PostConstruct
   public void init() {    
-    thisNode = dsoCluster.getCurrentNode();
-    dsoCluster.addClusterListener(this);
+    cacheManager.getCluster(ClusterScheme.TERRACOTTA);
+    cacheCluster.addTopologyListener(this);
   }
-
-  @Override
-  public void nodeJoined(final DsoClusterEvent arg0) {
-    //do nothing
-  }
-
-  @Override
-  public void nodeLeft(final DsoClusterEvent clusterEvent) {
-    LOGGER.info("Detected Terracotta node left event for node " + clusterEvent.getNode().getId());
-    if (clusterEvent.getNode().getId().equals(thisNode.getId())) {
-      LOGGER.info("Initiating server shutdown since this node has left the Terracotta cluster.");
-      String hostname;
-      try {
-        hostname = InetAddress.getLocalHost().getHostName();
-      } catch (Exception e) {
-        LOGGER.error("Unable to get local hostname", e);
-        hostname = "#unknown host#";
-      }
-      SMS_LOGGER.info("Initiating C2MON server shutdown of " + System.getProperty("c2mon.process.name") + " on " + hostname);
-      Thread shutdownThread = new Thread(new Runnable() {               
-        public void run() {
-          lifeCycleController.prepareForShutdown();
-          context.close();          
-        }
-      }, "Terracotta-node-left-thread");
-      shutdownThread.setDaemon(true);
-      shutdownThread.start();
-    }        
-  }
-
-  @Override
-  public void operationsDisabled(final DsoClusterEvent arg0) {
-    //do nothing 
-  }
-
-  @Override
-  public void operationsEnabled(final DsoClusterEvent arg0) {
-    //do nothing
-  }
-
+  
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     this.context = (AbstractApplicationContext) applicationContext;
   }
-  
+
+  /**
+   * A node has joined the cluster
+   *
+   * @param node The joining node
+   */
+  @Override
+  public void nodeJoined(final ClusterNode arg0) {
+    //do nothing
+  }
+
+  /**
+   * A node has left the cluster
+   *
+   * @param node The departing node
+   */
+  @Override
+  public void nodeLeft(final ClusterNode clusterNode) {
+    //do nothing        
+  }
+
+  /**
+   * This node has lost contact (possibly temporarily) with the cluster and cannot execute
+   * clustered operations
+   *
+   * @param node The current node
+   */
+  @Override
+  public void clusterOffline(ClusterNode clusterNode) {
+    LOGGER.info("Detected Terracotta cluster offline event for node " + clusterNode.getId());
+    LOGGER.info("Initiating server shutdown since this node has left the Terracotta cluster.");
+    String hostname;
+    try {
+      hostname = InetAddress.getLocalHost().getHostName();
+    } catch (Exception e) {
+      LOGGER.error("Unable to get local hostname", e);
+      hostname = "#unknown host#";
+    }
+    SMS_LOGGER.info("Initiating C2MON server shutdown of " + System.getProperty("c2mon.process.name") + " on " + hostname);
+    Thread shutdownThread = new Thread(new Runnable() {               
+      public void run() {
+        lifeCycleController.prepareForShutdown();
+        context.close();          
+      }
+    }, "Terracotta-node-left-thread");
+    shutdownThread.setDaemon(true);
+    shutdownThread.start();
+  }
+
+  /**
+   * This node has established contact with the cluster and can execute clustered operations.
+   *
+   * @param node The current node
+   */
+  @Override
+  public void clusterOnline(ClusterNode node) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void clusterRejoined(ClusterNode arg0, ClusterNode arg1) {
+    // TODO Auto-generated method stub
+    
+  }
 }

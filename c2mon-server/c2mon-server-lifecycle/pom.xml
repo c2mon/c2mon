@@ -5,11 +5,11 @@
 	<parent>
 		<groupId>cern.tim2.tim2-server</groupId>
 		<artifactId>tim2-server-pom</artifactId>
-		<version>1.0.11</version>
+		<version>1.1.0</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-server</groupId>
 	<artifactId>c2mon-server-lifecycle</artifactId>
-	<version>1.0.13-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<name>c2mon-server-lifecycle</name>
 	<packaging>jar</packaging>
 	<description>
@@ -35,15 +35,6 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 		</dependency>
-    
-    <dependency>
-      <groupId>org.terracotta.toolkit</groupId>
-      <artifactId>terracotta-toolkit-1.3</artifactId>      
-    </dependency>  
-    <dependency>
-      <groupId>org.terracotta.api</groupId>
-      <artifactId>tim-api</artifactId>
-    </dependency>  
 
     <dependency>
       <groupId>cern.tim2.tim2-server</groupId>
@@ -81,6 +72,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-client</artifactId>
+      <version>[1.0.0,2.0.0)</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -92,18 +84,20 @@
       <groupId>cern.tim2.tim2-server</groupId>
       <artifactId>tim2-server-cachepersistence</artifactId>
       <scope>runtime</scope>
-    </dependency>    
+    </dependency> 
+    <!-- 
+      The following dependencies are required for using Ehcache.
+    -->
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-ee</artifactId>
+    </dependency>
+    <dependency>
+    <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>runtime</scope>
+    </dependency>
 	</dependencies>
 
 	<developers />
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.terracotta.maven.plugins</groupId>
-        <artifactId>tc-maven-plugin</artifactId>
-        <version>1.6.1</version>        
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

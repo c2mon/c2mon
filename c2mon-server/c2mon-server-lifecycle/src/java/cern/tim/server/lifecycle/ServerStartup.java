@@ -31,8 +31,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * The class containing the main method for starting a server.
  * It loads the Spring XML files (one for each module). 
  * 
- * Distributed configuration details are kept in the DistributedParams
- * Spring bean (in server-common).
+ * Distributed configuration details are kept in the ClusterCache
+ * Spring bean (in server-cache).
  * 
  * The following system properties are available:
  * 

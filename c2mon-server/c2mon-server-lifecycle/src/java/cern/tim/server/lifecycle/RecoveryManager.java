@@ -207,24 +207,24 @@ public class RecoveryManager implements SmartLifecycle {
   @ManagedOperation(description = "Notifies all Tag cache listeners (status confirmation). Refresh supervision status after this call!")
   public void notifyAllTagCacheListeners() {
     LOGGER.info("Recovery task: notifying all tag listeners.");
-    for (Long key : controlTagCache.getKeys()) {
-      ControlTag controlTag = controlTagCache.get(key);
-      controlTag.getWriteLock().lock();      
-      try {        
+    for (Long key : controlTagCache.getKeys()) {      
+      controlTagCache.acquireWriteLockOnKey(key);
+      try {
+        ControlTag controlTag = controlTagCache.getCopy(key);
         long eventTime = System.currentTimeMillis();
         controlTagCache.notifyListenerStatusConfirmation(controlTag, eventTime);
       } finally {
-        controlTag.getWriteLock().unlock();
+        controlTagCache.releaseWriteLockOnKey(key);
       }      
     }
-    for (Long key : dataTagCache.getKeys()) {
-      DataTag dataTag = dataTagCache.get(key);
-      dataTag.getWriteLock().lock();
+    for (Long key : dataTagCache.getKeys()) {      
+      dataTagCache.acquireWriteLockOnKey(key);
       try {
+        DataTag dataTag = dataTagCache.getCopy(key);
         long eventTime = System.currentTimeMillis();
         dataTagCache.notifyListenerStatusConfirmation(dataTag, eventTime);
       } finally {
-        dataTag.getWriteLock().unlock();
+        dataTagCache.releaseWriteLockOnKey(key);
       }      
     }
     LOGGER.info("Recovery task: finished notifying all tag listeners.");
@@ -243,14 +243,14 @@ public class RecoveryManager implements SmartLifecycle {
   @ManagedOperation(description = "Notifies all Alarm cache listeners (status confirmation).")
   public void notifyAllAlarmCacheListeners() {
     LOGGER.info("Recovery task: notifying all alarm cache listeners (cache persistence to DB, re-publication to clients, publication to LASER if not already done)");
-    for (Long key : alarmCache.getKeys()) {
-      Alarm alarm = alarmCache.get(key);
-      alarm.getWriteLock().lock();
+    for (Long key : alarmCache.getKeys()) {      
+      alarmCache.acquireWriteLockOnKey(key);
       try {
+        Alarm alarm = alarmCache.getCopy(key);
         long eventTime = System.currentTimeMillis();
         alarmCache.notifyListenerStatusConfirmation(alarm, eventTime);
       } finally {
-        alarm.getWriteLock().unlock();
+        alarmCache.releaseWriteLockOnKey(key);
       }
     }
     LOGGER.info("Recovery task: finished notifying all alarm cache listeners.");
@@ -270,15 +270,15 @@ public class RecoveryManager implements SmartLifecycle {
   @ManagedOperation(description="Republish all non-published alarms (use if alarm publication thread did not shutdown correctly)")
   public void publishUnpublishedAlarms() {
     LOGGER.info("Publishing all unpublished alarms to LASER and re-publishing to clients.");
-    for (Long key : alarmCache.getKeys()) {
-      Alarm alarm = alarmCache.get(key);
-      alarm.getReadLock().lock();
+    for (Long key : alarmCache.getKeys()) {      
+      alarmCache.acquireWriteLockOnKey(key);
       try {        
+        Alarm alarm = alarmCache.getCopy(key);
         alarmCache.notifyListenersOfUpdate(alarm);      
       } catch (Exception e) {
         LOGGER.error("Exception caught while checking for unpublished alarms", e);
       } finally {
-        alarm.getReadLock().unlock();      
+        alarmCache.releaseWriteLockOnKey(key);
       }
     }
   }
