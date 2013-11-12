@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.CacheRegistrationService;
+import cern.tim.server.cache.ClusterCache;
 import cern.tim.server.cachepersistence.common.BatchPersistenceManager;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.component.Lifecycle;
@@ -35,6 +36,7 @@ import cern.tim.server.test.CacheObjectCreation;
 public class LaserAlarmPublisherImplTest {
 
 	IMocksControl mockControl = EasyMock.createNiceControl();
+	ClusterCache clusterCache;
 	CacheRegistrationService registrationService;
 	AlarmCache alarmCache;
 	BatchPersistenceManager alarmPersistenceManager;
@@ -61,7 +63,8 @@ public class LaserAlarmPublisherImplTest {
     alarmCache = mockControl.createMock(AlarmCache.class);
     alarmPersistenceManager = mockControl.createMock(BatchPersistenceManager.class);
     listenerContainer = mockControl.createMock(Lifecycle.class);
-    publisher = new LaserPublisherImpl(registrationService, alarmCache, alarmPersistenceManager);
+    clusterCache = mockControl.createMock(ClusterCache.class);
+    publisher = new LaserPublisherImpl(registrationService, alarmCache, alarmPersistenceManager, clusterCache);
 	}
 	
 	@Test
@@ -75,7 +78,7 @@ public class LaserAlarmPublisherImplTest {
 		Alarm alarmInCache = CacheObjectCreation.createTestAlarm2();
 		assertFalse(alarmInCache.isPublishedToLaser()); //not yet published
 		
-		expect(alarmMock.getId()).andReturn(alarmInCache.getId());
+		expect(alarmMock.getId()).andReturn(alarmInCache.getId()).times(2);
 		expect(alarmCache.get(alarmInCache.getId())).andReturn(alarmInCache);
 		alarmPersistenceManager.addElementToPersist(alarmInCache.getId());
 		mockControl.replay();
@@ -117,7 +120,7 @@ public class LaserAlarmPublisherImplTest {
     Alarm alarmInCache = CacheObjectCreation.createTestAlarm1();
     assertFalse(alarmInCache.isPublishedToLaser()); //not yet published
     
-    expect(alarmMock.getId()).andReturn(alarmInCache.getId());
+    expect(alarmMock.getId()).andReturn(alarmInCache.getId()).times(2);
     expect(alarmCache.get(alarmInCache.getId())).andReturn(alarmInCache);
     alarmPersistenceManager.addElementToPersist(alarmInCache.getId());
     mockControl.replay();

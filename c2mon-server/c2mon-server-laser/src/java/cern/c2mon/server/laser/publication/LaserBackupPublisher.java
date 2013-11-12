@@ -26,6 +26,7 @@ import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterfaceFactory;
 import cern.laser.source.alarmsysteminterface.FaultState;
 import cern.tim.server.cache.AlarmCache;
+import cern.tim.server.cache.ClusterCache;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.AlarmPublication;
 import cern.tim.server.common.config.ServerConstants;
@@ -91,6 +92,11 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   private AlarmCache alarmCache;
   
   /**
+   * Reference to clustered cache for accessing locks
+   */
+  private ClusterCache clusterCache;
+  
+  /**
    * For generating the backup.
    */
   private ThreadPoolExecutor backupExecutor;
@@ -110,17 +116,13 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
    */
   private LaserPublisher publisher = null;
 
-  /**
-   * Constructor.
-   * 
-   * @param alarmCache
-   *          ref to Alarm cache bean
-   */
+  
   @Autowired
-  public LaserBackupPublisher(AlarmCache alarmCache, LaserPublisher publisher) {
+  public LaserBackupPublisher(final AlarmCache alarmCache, final LaserPublisher publisher, final ClusterCache clusterCache) {
     super();
     this.alarmCache = alarmCache;
-    this.publisher = publisher;        
+    this.publisher = publisher;
+    this.clusterCache = clusterCache;
   }
   
   @PostConstruct
@@ -133,7 +135,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
   public void run() {    
     // lock to only allow a single backup at a time, and no concurrent publication of alarms
     if (running){
-      publisher.getBackupLock().writeLock().lock();
+      clusterCache.acquireWriteLockOnKey(LaserPublisher.backupLock);
       try {
         LOGGER.debug("Creating LASER active alarm backup list.");                     
         LinkedList<BackupTask> tasks = new LinkedList<BackupTask>();
@@ -165,7 +167,7 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
       } catch (Exception e) {
         LOGGER.error("Exception caught while publishing active Alarm backup list", e);
       } finally {
-        publisher.getBackupLock().writeLock().unlock();
+        clusterCache.releaseWriteLockOnKey(LaserPublisher.backupLock);
       }
     } else {
       LOGGER.warn("Unable to publish LASER backup as module not running.");
@@ -302,10 +304,10 @@ public class LaserBackupPublisher extends TimerTask implements SmartLifecycle {
     public FaultState call() throws Exception {   
       FaultState fs = null;
       if (!shutdownRequested) {
-        Alarm timAlarm = alarmCache.getCopy(id);
-        AlarmPublication alarmPublication = timAlarm.getLastPublication();
+        Alarm alarm = alarmCache.getCopy(id);
+        AlarmPublication alarmPublication = alarm.getLastPublication();
         if (alarmPublication != null && alarmPublication.isActivePublication()) {
-          fs = AlarmSystemInterfaceFactory.createFaultState(timAlarm.getFaultFamily(), timAlarm.getFaultMember(), timAlarm.getFaultCode());
+          fs = AlarmSystemInterfaceFactory.createFaultState(alarm.getFaultFamily(), alarm.getFaultMember(), alarm.getFaultCode());
           fs.setUserTimestamp(alarmPublication.getPublicationTime());              
           fs.setDescriptor(alarmPublication.getState());
           if (alarmPublication.getInfo() != null) {

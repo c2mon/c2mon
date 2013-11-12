@@ -13,6 +13,7 @@ import org.junit.Test;
 import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
 import cern.tim.server.cache.AlarmCache;
+import cern.tim.server.cache.ClusterCache;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.test.CacheObjectCreation;
 
@@ -52,7 +53,8 @@ public class LaserBackupPublisherTest {
     alarmCache = controller.createMock(AlarmCache.class);
     laserPublisher = controller.createMock(LaserPublisher.class);
     asi = controller.createMock(AlarmSystemInterface.class);
-    laserBackupPublisher = new LaserBackupPublisher(alarmCache, laserPublisher);    
+    ClusterCache clusterCache = controller.createMock(ClusterCache.class);
+    laserBackupPublisher = new LaserBackupPublisher(alarmCache, laserPublisher, clusterCache);    
     laserBackupPublisher.setNbBackupThreads(2);
     laserBackupPublisher.setBackupInterval(60000);
     laserBackupPublisher.init();
@@ -66,7 +68,6 @@ public class LaserBackupPublisherTest {
     alarm2.hasBeenPublished(new Timestamp(System.currentTimeMillis()));
     EasyMock.expect(laserPublisher.getAsi()).andReturn(asi).times(2);
     asi.pushActiveList(EasyMock.isA(List.class));
-    EasyMock.expect(laserPublisher.getBackupLock()).andReturn(backupLock).times(2);
     EasyMock.expect(alarmCache.getKeys()).andReturn(Arrays.asList(alarm1.getId(), alarm2.getId()));
     EasyMock.expect(alarmCache.getCopy(alarm1.getId())).andReturn(alarm1);
     EasyMock.expect(alarmCache.getCopy(alarm2.getId())).andReturn(alarm2);

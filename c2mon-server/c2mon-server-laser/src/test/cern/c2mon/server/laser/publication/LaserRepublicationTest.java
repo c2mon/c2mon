@@ -6,19 +6,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import oracle.net.aso.p;
-
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.CacheRegistrationService;
+import cern.tim.server.cache.ClusterCache;
 import cern.tim.server.cachepersistence.common.BatchPersistenceManager;
 import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.common.alarm.AlarmCacheObject;
 import cern.tim.server.common.component.Lifecycle;
 import cern.tim.server.test.CacheObjectCreation;
 
@@ -72,7 +69,9 @@ public class LaserRepublicationTest {
     System.setProperty("laser.hosts", "non-existent");
     System.setProperty("cmw.mom.brokerlist", "non-existent:2506");
     
-    publisher = new LaserPublisherImpl(registrationService, alarmCache, alarmPersistenceManager);
+    ClusterCache clusterCache = mockControl.createMock(ClusterCache.class);
+    
+    publisher = new LaserPublisherImpl(registrationService, alarmCache, alarmPersistenceManager, clusterCache);
     
     Alarm alarmMock = mockControl.createMock(Alarm.class);
     expect(alarmMock.getId()).andReturn(10L).times(3);
@@ -105,7 +104,9 @@ public class LaserRepublicationTest {
   @Test 
   public void testRepublicationAfterFailure() throws Exception {
     
-    publisher = new LaserPublisherImpl(registrationService, alarmCache, alarmPersistenceManager);
+    ClusterCache clusterCache = mockControl.createMock(ClusterCache.class);
+
+    publisher = new LaserPublisherImpl(registrationService, alarmCache, alarmPersistenceManager, clusterCache);
     
     expect(registrationService.registerToAlarms(publisher)).andReturn(listenerContainer);
     listenerContainer.start();  
@@ -117,7 +118,7 @@ public class LaserRepublicationTest {
     Alarm freshAlarmInCache = CacheObjectCreation.createTestAlarm1(); //used to fake a non-publication
     assertFalse(alarmInCache.isPublishedToLaser());  //not published 
     
-    expect(alarmMock.getId()).andReturn(alarmInCache.getId());    
+    expect(alarmMock.getId()).andReturn(alarmInCache.getId()).times(3);    
     expect(alarmCache.get(alarmInCache.getId())).andReturn(alarmInCache);
     expect(alarmCache.get(alarmInCache.getId())).andReturn(freshAlarmInCache);
     expect(alarmCache.getCopy(alarmInCache.getId())).andReturn(freshAlarmInCache);
@@ -128,19 +129,19 @@ public class LaserRepublicationTest {
     mockControl.replay();
         
     publisher.setSourceName("TEST-SOURCE");  
-    publisher.setRepublishDelay(8000);
+    publisher.setRepublishDelay(10000);
     publisher.init();
     publisher.start();    
     
     //wait as LASER connection done in separate thread
-    Thread.sleep(5000);
+    Thread.sleep(4000);
     publisher.notifyElementUpdated(alarmMock);
     
     //now has unpublished alarms
     assertTrue(publisher.hasUnpublishedAlarms());          
     
     //successful after wait
-    Thread.sleep(8000);       
+    Thread.sleep(10000);       
     mockControl.verify();
     assertFalse(publisher.hasUnpublishedAlarms());
     

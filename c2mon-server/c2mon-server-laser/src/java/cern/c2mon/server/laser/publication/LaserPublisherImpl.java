@@ -8,7 +8,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
@@ -26,7 +25,8 @@ import cern.laser.source.alarmsysteminterface.AlarmSystemInterfaceFactory;
 import cern.laser.source.alarmsysteminterface.FaultState;
 import cern.tim.server.cache.AlarmCache;
 import cern.tim.server.cache.CacheRegistrationService;
-import cern.tim.server.cache.TimCacheListener;
+import cern.tim.server.cache.ClusterCache;
+import cern.tim.server.cache.C2monCacheListener;
 import cern.tim.server.cachepersistence.common.BatchPersistenceManager;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.alarm.AlarmCacheObject.AlarmChangeState;
@@ -37,13 +37,9 @@ import cern.tim.server.common.config.ServerConstants;
  * Bean responsible for submitting C2MON alarms to LASER.
  */
 @ManagedResource(objectName = "cern.c2mon:type=LaserPublisher,name=LaserPublisher")
-public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean, LaserPublisher {
-
-  /**
-   * Lock used to only allow one backup to run at any time across a server
-   * cluster.
-   */
-  private ReentrantReadWriteLock backupLock = new ReentrantReadWriteLock();
+public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifecycle, LaserPublisherMBean, LaserPublisher {
+  
+  private ClusterCache clusterCache;
   
   /**
    * Time between connection attempts at start-up (in millis)
@@ -161,11 +157,13 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
    */
   @Autowired
   public LaserPublisherImpl(final CacheRegistrationService cacheRegistrationService, final AlarmCache alarmCache,
-                        @Qualifier("alarmPersistenceManager") final BatchPersistenceManager batchPersistenceManager) {
+                        @Qualifier("alarmPersistenceManager") final BatchPersistenceManager batchPersistenceManager,
+                          final ClusterCache clusterCache) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.alarmCache = alarmCache;
     this.alarmPersistenceManager = batchPersistenceManager;
+    this.clusterCache = clusterCache;
   }
 
   /**
@@ -204,12 +202,12 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
   @Override
   public void notifyElementUpdated(Alarm alarmCopy) {  
     if (running && initialConnection) {
-      backupLock.readLock().lock();
+      clusterCache.acquireWriteLockOnKey(backupLock);
       try {
-        //get most recent alarm in cache and lock access
-        Alarm alarm = alarmCache.get(alarmCopy.getId());
-        alarm.getWriteLock().lock();
+        //get most recent alarm in cache and lock access        
+        alarmCache.acquireWriteLockOnKey(alarmCopy.getId());
         try {
+          Alarm alarm = alarmCache.get(alarmCopy.getId());        
           if (!alarm.isPublishedToLaser()) {
             try {
               publishToLaser(alarm);
@@ -242,10 +240,10 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
             toBePublished.remove(alarm.getId()); //remove in case re-publicaton thread attempts a publication but other server has already published it
           }
         } finally {
-          alarm.getWriteLock().unlock();
+          alarmCache.releaseWriteLockOnKey(alarmCopy.getId());
         }         
       } finally {
-        backupLock.readLock().unlock();
+        clusterCache.releaseWriteLockOnKey(backupLock);
       }
     } else {
       log.warn("Unable to publish alarm as LASER publisher module not running/connected - adding to re-publication list (alarm id " + alarmCopy.getId() + ")");
@@ -444,14 +442,6 @@ public class LaserPublisherImpl implements TimCacheListener<Alarm>, SmartLifecyc
 
   public void confirmStatus(Alarm cacheable) {
     notifyElementUpdated(cacheable);
-  }
-
-  /**
-   * @return the backupLock
-   */
-  @Override
-  public ReentrantReadWriteLock getBackupLock() {
-    return backupLock;
   }
   
   @ManagedOperation(description = "Does this publisher have failed publications waiting to be published again?")

@@ -5,11 +5,11 @@
   <parent>
     <groupId>cern.tim2.tim2-server</groupId>
     <artifactId>tim2-server-pom</artifactId>
-    <version>1.0.11</version>
+    <version>1.1.0</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-laser</artifactId>
-  <version>1.0.16-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
   <name>c2mon-server-laser</name>
   <packaging>jar</packaging>
   <description>The C2MON server module responsible for submitting alarms to LASER.</description>
@@ -43,7 +43,14 @@
     </dependency>   
     <dependency>
     	<groupId>cern.laser</groupId>
-    	<artifactId>laser-source-ext</artifactId>    	
+    	<artifactId>laser-source-ext</artifactId>
+    	<version>[1.7.1,2.0.0)</version>
+    	<exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring</artifactId>
+        </exclusion>
+      </exclusions>  	
     </dependency>
     <dependency>
     	<groupId>org.easymock</groupId>

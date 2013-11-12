@@ -13,12 +13,6 @@ import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
 public interface LaserPublisher {
 
   /**
-   * The lock synchronizing publications to LASER.
-   * @return lock
-   */
-  ReentrantReadWriteLock getBackupLock();
-
-  /**
    * Returns the LASER source name used.
    * @return source name
    */
@@ -44,4 +38,9 @@ public interface LaserPublisher {
    */
   AlarmSystemInterface getAsi();
 
+  /**
+   * Lock string used to only allow one backup to run at any time across a server
+   * cluster.
+   */
+  final static String backupLock = "c2mon.laser.backupLock";
 }
