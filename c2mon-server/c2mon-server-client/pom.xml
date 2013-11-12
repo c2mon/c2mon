@@ -5,11 +5,11 @@
   <parent>
     <groupId>cern.tim2.tim2-server</groupId>
     <artifactId>tim2-server-pom</artifactId>
-    <version>1.0.11</version>
+    <version>1.1.0</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-client</artifactId>
-  <version>1.0.16-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
   <name>c2mon-server-client</name>
   <packaging>jar</packaging>
   <description>The TIM2 server Client module handles the communication to the client layer API.</description>
