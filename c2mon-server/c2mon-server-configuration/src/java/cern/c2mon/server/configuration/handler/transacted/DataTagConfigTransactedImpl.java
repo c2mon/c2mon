@@ -105,7 +105,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       equipmentFacade.addTagToEquipment(dataTag.getEquipmentId(), dataTag.getId());
       DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), 
                                       ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));      
-      return new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagAdd);          
+      return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), dataTagAdd);          
     } catch (Exception ex) {
       LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
       tagCache.remove(dataTag.getId());
@@ -140,22 +140,24 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       throw new ConfigurationException(ConfigurationException.UNDEFINED, 
           "Attempting to change the equipment to which a tag is attached - this is not currently supported!");
     }
-    Change dataTagUpdate = null;
-    DataTag dataTag = tagCache.get(id);
+    Change dataTagUpdate = null;   
+    tagCache.acquireWriteLockOnKey(id);
     try {
-      dataTag.getWriteLock().lock();
+      DataTag dataTag = tagCache.get(id);      
       dataTagUpdate = commonTagFacade.updateConfig(dataTag, properties);
       configurableDAO.updateConfig(dataTag);
       if (((DataTagUpdate) dataTagUpdate).isEmpty()) {
         return new ProcessChange();
       } else {
-        return new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), dataTagUpdate);      
-      }      
+        return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), dataTagUpdate);      
+      } 
+    } catch (CacheElementNotFoundException ex) { //tag not found
+      throw ex;
     } catch (Exception ex) {
       LOGGER.error("Exception caught while updating a datatag. Rolling back transaction and removing from cache.", ex);           
       throw new UnexpectedRollbackException("Unexpected exception caught while updating a DataTag configuration.", ex);
     } finally {
-      dataTag.getWriteLock().unlock();
+      tagCache.releaseWriteLockOnKey(id);
     }           
   }
   
@@ -176,7 +178,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
           }          
         }
       }
-      dataTag.getWriteLock().lock();
+      tagCache.acquireWriteLockOnKey(id);
       try {                
         Collection<Long> alarmIds = dataTag.getCopyAlarmIds();
         if (!alarmIds.isEmpty()) {
@@ -194,15 +196,15 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
         LOGGER.error("Exception caught while removing datatag with id " + id + "; rolling back DB transaction.", ex);
         throw new UnexpectedRollbackException("Exception caught while removing datatag.", ex);      
       } finally {
-        if (dataTag.getWriteLock().isHeldByCurrentThread()) {
-          dataTag.getWriteLock().unlock();
+        if (tagCache.isWriteLockedByCurrentThread(id)) {
+          tagCache.releaseWriteLockOnKey(id);
         }      
       }
       //if successful so far add remove event for DAQ layer
       DataTagRemove removeEvent = new DataTagRemove();  
       removeEvent.setDataTagId(id);
       removeEvent.setEquipmentId(dataTag.getEquipmentId());      
-      processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId()).getId(), removeEvent));
+      processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), removeEvent));
     } catch (CacheElementNotFoundException e) {
       LOGGER.warn("Attempting to remove a non-existent DataTag - no action taken.");
       throw new CacheElementNotFoundException("Attempting to remove a non-existent DataTag - no action taken", e);      

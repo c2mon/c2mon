@@ -111,7 +111,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     try {
       Process process = processCache.get(processId);
       try {                
-        Collection<Long> equipmentIds = process.getCopyEquipmentIds();
+        Collection<Long> equipmentIds = new ArrayList<Long>(process.getEquipmentIds());
         if (processFacade.isRunning(process) && !allowRunningProcessRemoval) {
           String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
           LOGGER.warn(message); 
@@ -119,7 +119,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
           processChange = new ProcessChange();
         } else {
           //remove all associated equipment from system   
-          for (Long equipmentId : new ArrayList<Long>(equipmentIds)) {
+          for (Long equipmentId : equipmentIds) {
             ConfigurationElementReport childElementReport = new ConfigurationElementReport(Action.REMOVE, Entity.EQUIPMENT, equipmentId);
             try {        
               processReport.addSubReport(childElementReport);
@@ -131,10 +131,10 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
               throw new UnexpectedRollbackException("Unexpected exception caught while removing an Equipment.", ex);
             }      
           }
-          process.getWriteLock().lock();
+          processCache.acquireWriteLockOnKey(processId);          
           processChange = processConfigTransacted.doRemoveProcess(process, processReport);
           removeProcessControlTags(process, processReport);          
-          process.getWriteLock().unlock();
+          processCache.releaseWriteLockOnKey(processId);
           //remove alive out of lock (in fact no longer necessary); always after removing control tags, or could be pulled back in from DB to cache
           processFacade.removeAliveTimer(processId);
           jmsContainerManager.unsubscribe(process);
@@ -145,8 +145,8 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
         LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes.", ex);        
         throw new UnexpectedRollbackException("Unexpected exception caught while removing Process.", ex);
       } finally {
-        if (process.getWriteLock().isHeldByCurrentThread()) {
-          process.getWriteLock().unlock();
+        if (processCache.isWriteLockedByCurrentThread(processId)) {
+          processCache.releaseWriteLockOnKey(processId);
         }        
       } 
     } catch (CacheElementNotFoundException cacheEx) {
@@ -169,7 +169,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
       process = processCache.get(element.getEntityId());      
       jmsContainerManager.subscribe(process);
       processFacade.loadAndStartAliveTag(element.getEntityId());
-      processCache.lockAndNotifyListeners(process);
+      processCache.lockAndNotifyListeners(element.getEntityId());
       return change;
     } catch (RuntimeException ex) {
       LOGGER.error("Exception caught while creating a new Process - rolling back DB changes and removing from cache.");
@@ -199,13 +199,14 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     boolean aliveConfigure = false;
     if (elementProperties.containsKey("aliveInterval") || elementProperties.containsKey("aliveTagId")) {
       aliveConfigure = true;
-    }    
-    try {      
-      Change processUpdate; //not used so far, as no change sent to DAQ
-      Process process = processCache.get(processId);
-      Long oldAliveId = process.getAliveTagId();
-      process.getWriteLock().lock();
-      try {        
+    }
+    Change processUpdate; //not used so far, as no change sent to DAQ            
+    processCache.acquireWriteLockOnKey(processId);
+    Process process;
+    try {
+      process = processCache.get(processId);
+      try {
+        Long oldAliveId = process.getAliveTagId();
         processUpdate = processFacade.updateConfig(process, elementProperties);
         processConfigTransacted.doUpdateProcess(processId, elementProperties);
         //stop old, start new - transaction is committed here   
@@ -227,12 +228,12 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
           processFacade.loadAndStartAliveTag(processId);
         }
         throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);
-      } finally {               
-        process.getWriteLock().unlock();        
       }
-    } catch (CacheElementNotFoundException e) {
+    } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.warn("Unable to locate Process " + processId + " in cache so unable to update it.");
-      throw e;
+      throw cacheEx;
+    } finally {               
+      processCache.releaseWriteLockOnKey(processId);        
     }    
     return new ProcessChange(processId);
   }

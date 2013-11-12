@@ -73,8 +73,7 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   public void createRuleTag(ConfigurationElement element) throws IllegalAccessException {
     ruleTagConfigTransacted.doCreateRuleTag(element);
     ruleEvaluator.evaluateRule(element.getEntityId());
-    RuleTag rule = ruleTagCache.get(element.getEntityId());
-    ruleTagCache.lockAndNotifyListeners(rule);    
+    ruleTagCache.lockAndNotifyListeners(element.getEntityId());    
   }
 
   @Override
@@ -82,8 +81,7 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
     try {
       ruleTagConfigTransacted.doUpdateRuleTag(id, elementProperties);
       ruleEvaluator.evaluateRule(id);
-      RuleTag rule = ruleTagCache.get(id);
-      ruleTagCache.lockAndNotifyListeners(rule);
+      ruleTagCache.lockAndNotifyListeners(id);
     } catch (UnexpectedRollbackException e) {
       LOGGER.error("Rolling back Rule update in cache");
       ruleTagCache.remove(id);

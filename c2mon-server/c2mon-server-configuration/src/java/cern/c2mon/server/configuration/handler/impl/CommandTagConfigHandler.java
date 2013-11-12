@@ -73,13 +73,13 @@ public class CommandTagConfigHandler {
     commandTagCache.putQuiet(commandTag);
     equipmentFacade.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
     
-    commandTagCache.lockAndNotifyListeners(commandTag);
+    commandTagCache.lockAndNotifyListeners(commandTag.getId());
     
     CommandTagAdd commandTagAdd = new CommandTagAdd(element.getSequenceId(), 
                                                     commandTag.getEquipmentId(), 
                                                     commandTagFacade.generateSourceCommandTag(commandTag));    
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(commandTag.getEquipmentId()).getId(), commandTagAdd));
+    processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(commandTag.getEquipmentId()), commandTagAdd));
     return processChanges;      
   }
   
@@ -89,22 +89,20 @@ public class CommandTagConfigHandler {
     if (properties.containsKey("equipmentId")) {
       throw new ConfigurationException(ConfigurationException.UNDEFINED, 
           "Attempting to change the equipment to which a command is attached - this is not currently supported!");
-    }
-    CommandTag commandTag = commandTagCache.get(id);
+    }    
     Change commandTagUpdate = null;
+    Long equipmentId = commandTagCache.get(id).getEquipmentId();
+    commandTagCache.acquireWriteLockOnKey(id);
     try {
-      commandTag.getWriteLock().lock();
+      CommandTag commandTag = commandTagCache.get(id);      
       commandTagUpdate = commandTagFacade.updateConfig(commandTag, properties);
       commandTagDAO.updateCommandTag(commandTag);
       commandTagCache.get(commandTag.getId());
-    } catch (RuntimeException ex) {
-      
-      throw ex; 
     } finally {
-      commandTag.getWriteLock().unlock();
+      commandTagCache.releaseWriteLockOnKey(id);
     }    
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(commandTag.getEquipmentId()).getId(), commandTagUpdate));
+    processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(equipmentId), commandTagUpdate));
     return processChanges;    
   }
   
@@ -116,33 +114,33 @@ public class CommandTagConfigHandler {
    */
   public List<ProcessChange> removeCommandTag(final Long id, final ConfigurationElementReport elementReport) {
     LOGGER.trace("Removing CommandTag " + id); 
-    ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
+    ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();    
+    Long equipmentId;
+    commandTagCache.acquireWriteLockOnKey(id);
     try {
       CommandTag commandTag = commandTagCache.get(id);
-      try {
-        commandTag.getWriteLock().lock();            
-        commandTagDAO.deleteCommandTag(commandTag.getId());
-        commandTagCache.remove(commandTag.getId());
-        commandTag.getWriteLock().unlock();
-        //unlock before accessing equipment
-        equipmentFacade.removeCommandFromEquipment(commandTag.getEquipmentId(), commandTag.getId());
-      } catch (Exception ex) {      
-        elementReport.setFailure("Exception caught while removing a commandtag.", ex);
-        LOGGER.error("Exception caught while removing a commandtag (id: " + id + ")", ex);
-        throw new RuntimeException(ex);
-      } finally {
-        if (commandTag.getWriteLock().isHeldByCurrentThread()) {
-          commandTag.getWriteLock().unlock();
-        }      
-      }      
+      equipmentId = commandTag.getEquipmentId();
+      commandTagDAO.deleteCommandTag(commandTag.getId());
+      commandTagCache.remove(commandTag.getId());
+      commandTagCache.releaseWriteLockOnKey(id);        
+      //unlock before accessing equipment
+      equipmentFacade.removeCommandFromEquipment(commandTag.getEquipmentId(), commandTag.getId());
       CommandTagRemove removeEvent = new CommandTagRemove();  
       removeEvent.setCommandTagId(id);
-      removeEvent.setEquipmentId(commandTag.getEquipmentId());     
-      processChanges.add(new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(commandTag.getEquipmentId()).getId(), removeEvent));
+      removeEvent.setEquipmentId(equipmentId);     
+      processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(commandTag.getEquipmentId()), removeEvent));
     } catch (CacheElementNotFoundException e) {
       LOGGER.warn("Attempting to remove a non-existent Command - no action taken.");
-      elementReport.setWarning("Attempting to remove a non-existent CommandTag");
-    } 
+      elementReport.setWarning("Attempting to remove a non-existent CommandTag");       
+    } catch (Exception ex) {      
+      elementReport.setFailure("Exception caught while removing a commandtag.", ex);
+      LOGGER.error("Exception caught while removing a commandtag (id: " + id + ")", ex);
+      throw new RuntimeException(ex);
+    } finally {
+      if (commandTagCache.isWriteLockedByCurrentThread(id)) {
+        commandTagCache.releaseWriteLockOnKey(id);          
+      }      
+    }             
     return processChanges;    
   }
   

@@ -98,11 +98,11 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
       //WARNING: outside equipment lock, as all these use methods that access a Process (to create ProcessChange object)!
       removeEquipmentTags(equipment, equipmentReport);
       removeEquipmentCommands(equipment, equipmentReport);
-      removeSubEquipments(equipment.getCopySubEquipmentIds(), equipmentReport);      
-      equipment.getWriteLock().lock();
+      removeSubEquipments(new ArrayList<Long>(equipment.getSubEquipmentIds()), equipmentReport);      
+      equipmentCache.acquireWriteLockOnKey(equipmentid);
       try {
         equipmentConfigTransacted.doRemoveEquipment(equipment, equipmentReport);        
-        equipment.getWriteLock().unlock();
+        equipmentCache.releaseWriteLockOnKey(equipmentid);
         removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them; when this returns are removed from cache and DB permanently
         //remove alive & commfault after control tags, or could be pulled back in from DB to cache!        
         equipmentFacade.removeAliveTimer(equipmentid);
@@ -112,8 +112,8 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
         EquipmentUnitRemove equipmentUnitRemove = new EquipmentUnitRemove(0L, equipmentid); //id is reset
         return new ProcessChange(equipment.getProcessId(), equipmentUnitRemove);        
       } finally {
-        if (equipment.getWriteLock().isHeldByCurrentThread())
-        equipment.getWriteLock().unlock();
+        if (equipmentCache.isWriteLockedByCurrentThread(equipmentid))
+          equipmentCache.releaseWriteLockOnKey(equipmentid);
       }      
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.debug("Equipment not found in cache - unable to remove it.");
@@ -125,8 +125,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Override
   public ProcessChange createEquipment(ConfigurationElement element) throws IllegalAccessException {
     ProcessChange change = equipmentConfigTransacted.doCreateEquipment(element);
-    Equipment equipment = equipmentCache.get(element.getEntityId());
-    equipmentCache.lockAndNotifyListeners(equipment);
+    equipmentCache.lockAndNotifyListeners(element.getEntityId());
     return change;
   }
 

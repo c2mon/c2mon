@@ -10,7 +10,7 @@ import cern.c2mon.server.configuration.handler.transacted.CommonEquipmentConfigT
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.AliveTimerCache;
 import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.TimCache;
+import cern.tim.server.cache.C2monCache;
 import cern.tim.server.cache.equipment.CommonEquipmentFacade;
 import cern.tim.server.common.equipment.AbstractEquipment;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
@@ -33,7 +33,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
   
   private CommonEquipmentConfigTransacted<T> abstractEquipmentConfigTransacted;
   
-  private TimCache<T> abstractEquipmentCache;
+  private C2monCache<Long, T> abstractEquipmentCache;
   
   private AliveTimerCache aliveTimerCache;
 
@@ -46,7 +46,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    */
   public AbstractEquipmentConfigHandler(ControlTagConfigHandler controlTagConfigHandler,
                                           CommonEquipmentConfigTransacted<T> abstractEquipmentConfigTransacted,
-                                          TimCache<T> abstractEquipmentCache,
+                                          C2monCache<Long, T> abstractEquipmentCache,
                                           AliveTimerCache aliveTimerCache,
                                           CommFaultTagCache commFaultTagCache,
                                           CommonEquipmentFacade<T> commonEquipmentFacade) {
@@ -118,42 +118,44 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     boolean commFaultConfigure = false;
     if (elementProperties.containsKey("commFaultTagId")) {
       commFaultConfigure = true;
-    }    
-    T abstractEquipment = abstractEquipmentCache.get(abstractEquipmentId);    
-    Long oldAliveId = abstractEquipment.getAliveTagId();
-    Long oldCommFaultId = abstractEquipment.getCommFaultTagId();
-    abstractEquipment.getWriteLock().lock();
-    try {      
-      List<ProcessChange> processChanges = abstractEquipmentConfigTransacted.doUpdateAbstractEquipment(abstractEquipment, elementProperties);
-      abstractEquipment.getWriteLock().unlock();
-      if (aliveConfigure) {
-        if (oldAliveId != null)
-          commonEquipmentFacade.removeAliveDirectly(oldAliveId);
-        if (abstractEquipment.getAliveTagId() != null)
-          commonEquipmentFacade.loadAndStartAliveTag(abstractEquipment.getId());
+    }        
+    abstractEquipmentCache.acquireWriteLockOnKey(abstractEquipmentId);
+    try {
+      T abstractEquipment = abstractEquipmentCache.get(abstractEquipmentId);        
+      try {
+        Long oldAliveId = abstractEquipment.getAliveTagId();
+        Long oldCommFaultId = abstractEquipment.getCommFaultTagId();
+        List<ProcessChange> processChanges = abstractEquipmentConfigTransacted.doUpdateAbstractEquipment(abstractEquipment, elementProperties);
+        abstractEquipmentCache.releaseWriteLockOnKey(abstractEquipmentId);
+        if (aliveConfigure) {
+          if (oldAliveId != null)
+            commonEquipmentFacade.removeAliveDirectly(oldAliveId);
+          if (abstractEquipment.getAliveTagId() != null)
+            commonEquipmentFacade.loadAndStartAliveTag(abstractEquipment.getId());
+        }
+        if (commFaultConfigure && abstractEquipment.getCommFaultTagId() != null) {
+          if (oldCommFaultId != null)
+            commFaultTagCache.remove(oldCommFaultId);
+          if (abstractEquipment.getCommFaultTagId() != null)
+            commFaultTagCache.loadFromDb(abstractEquipment.getCommFaultTagId());
+        }
+        return processChanges;
+      } catch (RuntimeException ex) {
+        LOGGER.error("Exception caught while updating Sub-equipment - rolling back changes to the Sub-equipment", ex);
+        //reload all potentially updated cache elements now DB changes are rolled back 
+        if (abstractEquipmentCache.isWriteLockedByCurrentThread(abstractEquipmentId))
+          abstractEquipmentCache.releaseWriteLockOnKey(abstractEquipmentId);
+        commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());      
+        aliveTimerCache.remove(abstractEquipment.getAliveTagId());
+        abstractEquipmentCache.remove(abstractEquipmentId);
+        T oldAbstractEquipment = abstractEquipmentCache.get(abstractEquipmentId);
+        commFaultTagCache.loadFromDb(oldAbstractEquipment.getCommFaultTagId());      
+        commonEquipmentFacade.loadAndStartAliveTag(abstractEquipmentId); //reloads alive from DB
+        throw ex;
       }
-      if (commFaultConfigure && abstractEquipment.getCommFaultTagId() != null) {
-        if (oldCommFaultId != null)
-          commFaultTagCache.remove(oldCommFaultId);
-        if (abstractEquipment.getCommFaultTagId() != null)
-          commFaultTagCache.loadFromDb(abstractEquipment.getCommFaultTagId());
-      }
-      return processChanges;
-    } catch (RuntimeException ex) {
-      LOGGER.error("Exception caught while updating Sub-equipment - rolling back changes to the Sub-equipment", ex);
-      //reload all potentially updated cache elements now DB changes are rolled back 
-      if (abstractEquipment.getWriteLock().isHeldByCurrentThread())
-        abstractEquipment.getWriteLock().unlock();
-      commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());      
-      aliveTimerCache.remove(abstractEquipment.getAliveTagId());
-      abstractEquipmentCache.remove(abstractEquipmentId);
-      T oldAbstractEquipment = abstractEquipmentCache.get(abstractEquipmentId);
-      commFaultTagCache.loadFromDb(oldAbstractEquipment.getCommFaultTagId());      
-      commonEquipmentFacade.loadAndStartAliveTag(abstractEquipmentId); //reloads alive from DB
-      throw ex;
     } finally {
-      if (abstractEquipment.getWriteLock().isHeldByCurrentThread()) 
-        abstractEquipment.getWriteLock().unlock();
+      if (abstractEquipmentCache.isWriteLockedByCurrentThread(abstractEquipmentId)) 
+        abstractEquipmentCache.releaseWriteLockOnKey(abstractEquipmentId);
     }
   }
   

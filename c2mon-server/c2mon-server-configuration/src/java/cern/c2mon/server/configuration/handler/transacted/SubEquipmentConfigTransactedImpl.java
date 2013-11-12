@@ -22,7 +22,6 @@ import cern.tim.server.cache.loading.SubEquipmentDAO;
 import cern.tim.server.common.subequipment.SubEquipment;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.common.ConfigurationException;
 
 /**
  * See interface docs.
@@ -44,11 +43,6 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
   private SubEquipmentFacade subEquipmentFacade;
 
   /**
-   * Cache.
-   */
-  private SubEquipmentCache subEquipmentCache;
-
-  /**
    * DAO.
    */
   private SubEquipmentDAO subEquipmentDAO;
@@ -64,7 +58,6 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
       ProcessCache processCache, EquipmentCache equipmentCache) {
     super(controlTagConfigHandler, subEquipmentFacade, subEquipmentCache, subEquipmentDAO, aliveTimerCache, commFaultTagCache);
     this.subEquipmentFacade = subEquipmentFacade;
-    this.subEquipmentCache = subEquipmentCache;
     this.subEquipmentDAO = subEquipmentDAO;
     this.equipmentCache = equipmentCache;
   }
@@ -84,7 +77,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
   public ProcessChange doCreateSubEquipment(final ConfigurationElement element) throws IllegalAccessException {
     SubEquipment subEquipment = super.createAbstractEquipment(element);
     subEquipmentFacade.addSubEquipmentToEquipment(subEquipment.getId(), subEquipment.getParentId());
-    return new ProcessChange(subEquipmentFacade.getEquipmentForSubEquipment(subEquipment.getId()).getProcessId());
+    return new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipment.getId()));
   }
 
   @Override

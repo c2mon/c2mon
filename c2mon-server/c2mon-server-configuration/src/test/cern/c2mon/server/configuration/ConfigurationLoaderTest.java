@@ -391,11 +391,11 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
     
+    equipmentCache.acquireWriteLockOnKey(cacheObject.getEquipmentId());
     Equipment equipment = equipmentCache.get(cacheObject.getEquipmentId());
-    equipment.getWriteLock().lock();
     //check equipment now has datatag in list
     assertTrue(equipmentCache.get(cacheObject.getEquipmentId()).getDataTagIds().contains(5000000L));
-    equipment.getWriteLock().unlock();
+    equipmentCache.releaseWriteLockOnKey(cacheObject.getEquipmentId());
     
     //test update of this datatag
     report = configurationLoader.applyConfiguration(4);
@@ -413,10 +413,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, updatedCacheObject);
     equipment = equipmentCache.get(cacheObject.getEquipmentId());
     
-    equipment.getWriteLock().lock();
+    equipmentCache.acquireWriteLockOnKey(cacheObject.getEquipmentId());
     System.out.println(equipment.getDataTagIds().toString());
     System.out.println(equipmentCache.get(cacheObject.getEquipmentId()).getDataTagIds().toString());    
-    equipment.getWriteLock().unlock(); 
+    equipmentCache.releaseWriteLockOnKey(cacheObject.getEquipmentId()); 
   }
   
   @Test

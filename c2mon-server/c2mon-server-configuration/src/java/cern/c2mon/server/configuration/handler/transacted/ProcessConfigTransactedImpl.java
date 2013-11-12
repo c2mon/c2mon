@@ -13,6 +13,7 @@ import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.ProcessFacade;
+import cern.tim.server.cache.exception.CacheElementNotFoundException;
 import cern.tim.server.cache.loading.ProcessDAO;
 import cern.tim.server.common.process.Process;
 import cern.tim.server.daqcommunication.in.JmsContainerManager;
@@ -113,34 +114,36 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
     if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
       aliveConfigure = true;
     }
-    Change processUpdate;
-    Process process = processCache.get(id);
+    Change processUpdate;    
+    processCache.acquireWriteLockOnKey(id);
     try {
-      process.getWriteLock().lock();
-      if (aliveConfigure) {
-        processFacade.removeAliveTimer(process.getId());
-      }
-      processUpdate = processFacade.updateConfig(process, properties); // always
-                                                                       // empty
-                                                                       // return
-      processDAO.updateConfig(process);
-      process.getWriteLock().unlock();
-      if (aliveConfigure) {
-        processFacade.loadAndStartAliveTag(process.getId());
-      }
-    } catch (RuntimeException e) {
-      LOGGER.error("Exception caught while updating a new Process - rolling back DB changes and removing from cache.");
-      processCache.remove(id);
-      if (aliveConfigure) {
-        processFacade.removeAliveTimer(process.getId());
-      }
-      throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);
+      Process process = processCache.get(id);
+      try {                
+        if (aliveConfigure) {
+          processFacade.removeAliveTimer(process.getId());
+        }
+        processUpdate = processFacade.updateConfig(process, properties); // always
+                                                                         // empty
+                                                                         // return
+        processDAO.updateConfig(process);
+        processCache.releaseWriteLockOnKey(id);
+        if (aliveConfigure) {
+          processFacade.loadAndStartAliveTag(process.getId());
+        }
+      } catch (RuntimeException e) {
+        LOGGER.error("Exception caught while updating a new Process - rolling back DB changes and removing from cache.");
+        processCache.remove(id);
+        if (aliveConfigure) {
+          processFacade.removeAliveTimer(process.getId());
+        }
+        throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);
+      }   
     } finally {
-      if (process.getWriteLock().isHeldByCurrentThread()) {
-        process.getWriteLock().unlock();
+      if (processCache.isWriteLockedByCurrentThread(id)) {
+        processCache.releaseWriteLockOnKey(id);
       }
     }
-    return new ProcessChange(process.getId());
+    return new ProcessChange(id);
   }
 
   @Override
@@ -153,13 +156,13 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
   @Override
   public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
     LOGGER.debug("Removing Process Equipments for process " + processId);
-    try {
-      Process process = processCache.get(processId);
-      process.getWriteLock().lock();
+    try {      
+      processCache.acquireWriteLockOnKey(processId);
       try {
+        Process process = processCache.get(processId);
         process.getEquipmentIds().remove(equipmentId);
       } finally {
-        process.getWriteLock().unlock();
+        processCache.releaseWriteLockOnKey(processId);
       }
     } catch (RuntimeException e) {
       throw new UnexpectedRollbackException("Unable to remove equipment reference in process.", e);

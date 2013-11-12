@@ -17,9 +17,10 @@
     <property name="daqConfigEnabled" value="${c2mon.server.config.daq.enabled}"/>
     <property name="reportDirectory" value="${c2mon.home}/reports"/>    
   </bean>
-  
+    
   <bean id="configurationRequestConverter" class="cern.tim.shared.client.configuration.ConfigurationRequestConverter" init-method="init"/>
   
+  <!-- the connection below is not currently used: configuration requests are made via the client module -->
   <bean id="configRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
    <constructor-arg index="0" value="${jms.config.destination}"/>
   </bean>

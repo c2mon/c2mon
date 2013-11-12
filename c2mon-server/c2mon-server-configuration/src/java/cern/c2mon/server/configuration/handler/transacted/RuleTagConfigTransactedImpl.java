@@ -119,10 +119,10 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public void doUpdateRuleTag(Long id, Properties properties) throws IllegalAccessException {
-    LOGGER.trace("Updating RuleTag " + id);
-    RuleTag ruleTag = tagCache.get(id);
-    ruleTag.getWriteLock().lock();
+    LOGGER.trace("Updating RuleTag " + id);   
+    tagCache.acquireWriteLockOnKey(id);
     try {
+      RuleTag ruleTag = tagCache.get(id);
       Collection<Long> oldTagIds = null;
       //first record the old tag Ids before reconfiguring
       if (properties.containsKey("ruleText")) {
@@ -168,12 +168,12 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         } 
         throw new UnexpectedRollbackException(errMessage, e);
       }
-      ruleTag.getWriteLock().unlock();
+      tagCache.releaseWriteLockOnKey(id);      
       //reset all parent DAQ/Equipment ids of rules higher up the pile - if fails, no rolling back possible, so rule cache may be left inconsistent
       try {
         LOGGER.trace("Resetting all relevant Rule parent Process/Equipment ids");
         for (Long parentRuleId : ruleTag.getRuleIds()) {
-          ruleTagFacade.setParentSupervisionIds(tagCache.get(parentRuleId));
+          ruleTagFacade.setParentSupervisionIds(parentRuleId);
         }
       } catch (Exception e) {
         String msg = "Exception while reloading rule parent ids: cache may be left in inconsistent state! - need to remove this rule to try and recover consistency";
@@ -181,8 +181,8 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         throw new UnexpectedRollbackException(msg, e);
       }
     } finally {
-      if (ruleTag.getWriteLock().isHeldByCurrentThread()) {
-        ruleTag.getWriteLock().unlock();      
+      if (tagCache.isWriteLockedByCurrentThread(id)) {
+        tagCache.releaseWriteLockOnKey(id);     
       }      
     }
   }
@@ -205,7 +205,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
           }         
         }                
       }
-      ruleTag.getWriteLock().lock();
+      tagCache.acquireWriteLockOnKey(id);      
       Collection<Long> ruleInputTagIds = Collections.EMPTY_LIST;
       try {
         ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();                
@@ -228,8 +228,8 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         LOGGER.error(errMessage, rEx); 
         throw new UnexpectedRollbackException(errMessage, rEx);   
       } finally {
-        if (ruleTag.getWriteLock().isHeldByCurrentThread()) {
-          ruleTag.getWriteLock().unlock();
+        if (tagCache.isWriteLockedByCurrentThread(id)) {
+          tagCache.releaseWriteLockOnKey(id);
         }        
       }
     } catch (CacheElementNotFoundException e) {

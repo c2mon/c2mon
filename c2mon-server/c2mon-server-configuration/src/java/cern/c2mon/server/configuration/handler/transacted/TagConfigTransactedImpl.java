@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.tim.server.cache.CommonTagFacade;
 import cern.tim.server.cache.DataTagFacade;
 import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.TimCache;
+import cern.tim.server.cache.C2monCache;
 import cern.tim.server.cache.loading.ConfigurableDAO;
 import cern.tim.server.common.tag.Tag;
 import cern.tim.shared.common.ConfigurationException;
@@ -42,7 +42,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
    */
   private static final Logger LOGGER = Logger.getLogger(TagConfigTransactedImpl.class);
   
-  protected TimCache<T> tagCache;
+  protected C2monCache<Long, T> tagCache;
   
   /**
    * The Facade bean for which this TagConfigHandler
@@ -62,7 +62,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   
   protected TagLocationService tagLocationService;
   
-  public TagConfigTransactedImpl(ConfigurableDAO<T> configurableDAO, CommonTagFacade<T> configurableTagFacade, TimCache<T> tagCache, TagLocationService tagLocationService) {
+  public TagConfigTransactedImpl(ConfigurableDAO<T> configurableDAO, CommonTagFacade<T> configurableTagFacade, C2monCache<Long, T> tagCache, TagLocationService tagLocationService) {
     super();
     this.commonTagFacade = configurableTagFacade;   
     this.configurableDAO = configurableDAO;
@@ -93,31 +93,31 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   @Transactional("cacheTransactionManager")
   public void addRuleToTag(final Long tagId, final Long ruleId) {
     LOGGER.trace("Adding rule " + ruleId + " reference from Tag " + tagId);
-    T tag = tagCache.get(tagId);
-    tag.getWriteLock().lock();
-    try {      
+    tagCache.acquireWriteLockOnKey(tagId);    
+    try {
+      T tag = tagCache.get(tagId);
       if (!tag.getRuleIds().contains(ruleId)) {
-        commonTagFacade.addDependentRuleToTag(tag, ruleId);   
-        configurableDAO.updateConfig(tag);      
+        commonTagFacade.addDependentRuleToTag(tag, ruleId);  
+        configurableDAO.updateConfig(tag);
       }
     } finally {
-      tag.getWriteLock().unlock();
+      tagCache.releaseWriteLockOnKey(tagId);    
     }  
   }
   
   @Override
   @Transactional("cacheTransactionManager")
   public void removeRuleFromTag(final Long tagId, final Long ruleId) {
-    LOGGER.trace("Removing rule " + ruleId + " reference from Tag " + tagId);
-    T tag = tagCache.get(tagId);
-    tag.getWriteLock().lock();
+    LOGGER.trace("Removing rule " + ruleId + " reference from Tag " + tagId);    
+    tagCache.acquireWriteLockOnKey(tagId);
     try {      
+      T tag = tagCache.get(tagId);
       if (tag.getRuleIds().contains(ruleId)) {
         commonTagFacade.removeDependentRuleFromTag(tag, ruleId);
-        configurableDAO.updateConfig(tag);      
+        configurableDAO.updateConfig(tag);
       }
     } finally {    
-      tag.getWriteLock().unlock();
+      tagCache.releaseWriteLockOnKey(tagId);
     }
   }
   
@@ -125,25 +125,25 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   @Transactional("cacheTransactionManager")
   public void addAlarmToTag(final Long tagId, final Long alarmId) {
     LOGGER.trace("Adding Alarm " + alarmId + " reference from Tag " + tagId);
-    T tag = tagCache.get(tagId);
-    tag.getWriteLock().lock();
-    try {      
-      commonTagFacade.addAlarm(tag, alarmId);      
+    tagCache.acquireWriteLockOnKey(tagId);
+    try {
+      T tag = tagCache.get(tagId);
+      commonTagFacade.addAlarm(tag, alarmId);
     } finally {
-      tag.getWriteLock().unlock();
+      tagCache.releaseWriteLockOnKey(tagId);
     }  
   }
   
   @Override
   @Transactional("cacheTransactionManager")
   public void removeAlarmFromTag(final Long tagId, final Long alarmId) {
-    LOGGER.trace("Removing Alarm " + alarmId + " reference from Tag " + tagId);    
-    Tag tag = tagCache.get(tagId);
-    tag.getWriteLock().lock();
+    LOGGER.trace("Removing Alarm " + alarmId + " reference from Tag " + tagId);        
+    tagCache.acquireWriteLockOnKey(tagId);
     try {      
-      tag.getAlarmIds().remove(alarmId); 
+      T tag = tagCache.get(tagId);
+      tag.getAlarmIds().remove(alarmId);
     } finally {
-      tag.getWriteLock().unlock();
+      tagCache.releaseWriteLockOnKey(tagId);
     }
   }
   

@@ -118,47 +118,47 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
     if (properties.containsKey("dataTagId")) {
       throw new ConfigurationException(ConfigurationException.UNDEFINED, 
           "Attempting to change the tag to which the alarm is attached - this is not currently supported!");
-    }
-    Alarm alarm = alarmCache.get(alarmId);
-    alarm.getWriteLock().lock();
-    try {      
+    }        
+    alarmCache.acquireWriteLockOnKey(alarmId);    
+    try {
+      Alarm alarm = alarmCache.get(alarmId);
       alarmFacade.updateConfig(alarm, properties);
       alarmDAO.updateConfig(alarm);
+    } catch (CacheElementNotFoundException ex) {
+      throw ex;
     } catch (Exception ex) {      
       LOGGER.error("Exception caught while updating alarm" + alarmId, ex);
       throw new UnexpectedRollbackException("Unexpected exception caught while updating Alarm " + alarmId, ex);
     } finally {
-      alarm.getWriteLock().unlock();
+      alarmCache.releaseWriteLockOnKey(alarmId);
     }            
   }
  
   @Override
   @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
-  public void doRemoveAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
+  public void doRemoveAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {     
+    alarmCache.acquireWriteLockOnKey(alarmId);
     try {
-      Alarm alarm = alarmCache.get(alarmId);
-      alarm.getWriteLock().lock();
-      try {                
-        alarmDAO.deleteItem(alarmId);        
-        alarm.getWriteLock().unlock(); //unlock before locking tag
-        try {
-          removeDataTagReference(alarm);
-        } catch (CacheElementNotFoundException e) {
-          LOGGER.warn("Unable to remove Alarm reference from Tag, as could not locate Tag " + alarm.getTagId() + " in cache");
-        }        
-      } catch (Exception ex) {      
-        LOGGER.error("Exception caught while removing Alarm " + alarmId, ex);
-        alarmReport.setFailure("Unable to remove Alarm with id " + alarmId);
-        throw new UnexpectedRollbackException("Exception caught while attempting to remove an alarm", ex);
-      } finally {
-        if (alarm.getWriteLock().isHeldByCurrentThread()) {
-          alarm.getWriteLock().unlock();
-        }        
+      Alarm alarm = alarmCache.get(alarmId);     
+      alarmDAO.deleteItem(alarmId);
+      alarmCache.releaseWriteLockOnKey(alarmId); //unlock before locking tag
+      try {
+        removeDataTagReference(alarm);
+      } catch (CacheElementNotFoundException e) {
+        LOGGER.warn("Unable to remove Alarm reference from Tag, as could not locate Tag " + alarm.getTagId() + " in cache");
       }
     } catch (CacheElementNotFoundException e) {
       LOGGER.debug("Attempting to remove a non-existent Alarm - no action taken.");
-      alarmReport.setWarning("Attempting to remove a non-existent Alarm");
-    }    
+      alarmReport.setWarning("Attempting to remove a non-existent Alarm");      
+    } catch (Exception ex) {      
+      LOGGER.error("Exception caught while removing Alarm " + alarmId, ex);
+      alarmReport.setFailure("Unable to remove Alarm with id " + alarmId);
+      throw new UnexpectedRollbackException("Exception caught while attempting to remove an alarm", ex);
+    } finally {
+      if (alarmCache.isWriteLockedByCurrentThread(alarmId)) {
+        alarmCache.releaseWriteLockOnKey(alarmId);
+      }        
+    }      
   }
 
   /**

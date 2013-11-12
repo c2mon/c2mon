@@ -29,7 +29,7 @@ import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.tim.server.cache.AliveTimerCache;
 import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.TimCache;
+import cern.tim.server.cache.C2monCache;
 import cern.tim.server.cache.equipment.CommonEquipmentFacade;
 import cern.tim.server.cache.loading.ConfigurableDAO;
 import cern.tim.server.common.equipment.AbstractEquipment;
@@ -66,7 +66,7 @@ public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipm
   /**
    * The cache.
    */
-  private TimCache<T> abstractEquipmentCache;
+  private C2monCache<Long, T> abstractEquipmentCache;
 
   /**
    * The DB acces object.
@@ -100,7 +100,7 @@ public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipm
    *          ref to cache
    */
   protected AbstractEquipmentConfigTransacted(final ControlTagConfigHandler controlTagConfigHandler, final CommonEquipmentFacade<T> commonEquipmentFacade,
-      final TimCache<T> abstractEquipmentCache, final ConfigurableDAO<T> configurableDAO, final AliveTimerCache aliveTimerCache,
+      final C2monCache<Long, T> abstractEquipmentCache, final ConfigurableDAO<T> configurableDAO, final AliveTimerCache aliveTimerCache,
       final CommFaultTagCache commFaultTagCache) {
     super();
     this.controlTagConfigHandler = controlTagConfigHandler;
@@ -188,9 +188,9 @@ public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipm
     configurableDAO.updateConfig(abstractEquipment);
     
     // create change event for DAQ layer
-    Long processId = commonEquipmentFacade.getProcessForAbstractEquipment(abstractEquipment.getId()).getId();
+    Long processId = commonEquipmentFacade.getProcessIdForAbstractEquipment(abstractEquipment.getId());
     ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(commonEquipmentFacade.getProcessForAbstractEquipment(abstractEquipment.getId()).getId(), equipmentUpdate));
+    processChanges.add(new ProcessChange(commonEquipmentFacade.getProcessIdForAbstractEquipment(abstractEquipment.getId()), equipmentUpdate));
     // if alive tags associated to equipment are changed and have an address,
     // inform DAQ also (use same changeId so these become sub-reports of the
     // correct report)

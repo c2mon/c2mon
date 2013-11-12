@@ -88,8 +88,7 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
   public void createAlarm(ConfigurationElement element) throws IllegalAccessException {
     alarmConfigTransacted.doCreateAlarm(element);
     alarmFacade.evaluateAlarm(element.getEntityId());
-    Alarm alarm = alarmCache.get(element.getEntityId());
-    alarmCache.lockAndNotifyListeners(alarm);
+    alarmCache.lockAndNotifyListeners(element.getEntityId());
   }
 
   @Override

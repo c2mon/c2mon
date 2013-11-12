@@ -82,8 +82,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
   @Override
   public ProcessChange createDataTag(ConfigurationElement element) throws IllegalAccessException {
     ProcessChange change = dataTagConfigTransacted.doCreateDataTag(element);
-    DataTag dataTag = dataTagCache.get(element.getEntityId());
-    dataTagCache.lockAndNotifyListeners(dataTag);    
+    dataTagCache.lockAndNotifyListeners(element.getEntityId());    
     return change;
   }
 

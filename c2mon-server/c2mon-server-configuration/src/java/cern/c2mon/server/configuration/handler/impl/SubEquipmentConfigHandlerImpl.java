@@ -83,12 +83,12 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   @Override
   public ProcessChange removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
     LOGGER.debug("Removing SubEquipment " + subEquipmentId);
+    subEquipmentCache.acquireWriteLockOnKey(subEquipmentId);
     try {
-      SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
-      subEquipment.getWriteLock().lock();      
+      SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);            
       try {    
         ProcessChange change = subEquipmentConfigTransacted.doRemoveSubEquipment(subEquipment, subEquipmentReport);
-        subEquipment.getWriteLock().unlock();        
+        subEquipmentCache.releaseWriteLockOnKey(subEquipmentId);        
         removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB        
         subEquipmentFacade.removeAliveTimer(subEquipmentId);
         subEquipmentFacade.removeCommFault(subEquipmentId);
@@ -97,23 +97,22 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       } catch (RuntimeException e) {
         subEquipmentReport.setFailure("Exception caught while removing Sub-equipment " + subEquipmentId);
         throw new UnexpectedRollbackException("Exception caught while removing Sub-equipment", e);
-      } finally {
-        if (subEquipment.getWriteLock().isHeldByCurrentThread()) {
-          subEquipment.getWriteLock().unlock();
-        }        
-      } 
+      }       
     } catch (CacheElementNotFoundException e) {
       LOGGER.debug("SubEquipment not found in cache - unable to remove it.", e);
       subEquipmentReport.setWarning("SubEquipment not found in cache so cannot be removed.");
       return new ProcessChange(); 
-    }  
+    } finally {
+      if (subEquipmentCache.isWriteLockedByCurrentThread(subEquipmentId)) {
+        subEquipmentCache.releaseWriteLockOnKey(subEquipmentId);
+      }        
+    }
   }
 
   @Override
   public ProcessChange createSubEquipment(ConfigurationElement element) throws IllegalAccessException {
     ProcessChange change = subEquipmentConfigTransacted.doCreateSubEquipment(element);
-    SubEquipment subEquipment = subEquipmentCache.get(element.getEntityId());
-    subEquipmentCache.lockAndNotifyListeners(subEquipment);
+    subEquipmentCache.lockAndNotifyListeners(element.getEntityId());
     return change;
   }
 

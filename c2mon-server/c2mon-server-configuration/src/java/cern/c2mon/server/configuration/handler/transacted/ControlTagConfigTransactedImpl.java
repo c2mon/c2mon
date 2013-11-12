@@ -105,8 +105,8 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
     try {
       tagCache.putQuiet(controlTag);      
       ProcessChange processChange = new ProcessChange();
-      if (processFacade.getProcessFromControlTag(controlTag.getId()) != null) {
-        processChange = new ProcessChange(processFacade.getProcessFromControlTag(controlTag.getId()));
+      if (processFacade.getProcessIdFromControlTag(controlTag.getId()) != null) {
+        processChange = new ProcessChange(processFacade.getProcessIdFromControlTag(controlTag.getId()));
       }
       return processChange;
     } catch (Exception e) {
@@ -126,24 +126,26 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public ProcessChange doUpdateControlTag(Long id, Properties elementProperties) {
     LOGGER.trace("Updating ControlTag " + id);
-    Change controlTagUpdate;
-    ControlTag controlTag = tagCache.get(id);   
-    controlTag.getWriteLock().lock();
+    Change controlTagUpdate;       
+    tagCache.acquireWriteLockOnKey(id);
     try {      
+      ControlTag controlTag = tagCache.get(id);
       configurableDAO.updateConfig(controlTag);
       controlTagUpdate = commonTagFacade.updateConfig(controlTag, elementProperties); //sets id of controlTagUpdate also     
       if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTag)) {
-        controlTag.getWriteLock().unlock();
+        tagCache.releaseWriteLockOnKey(id);
         return getProcessChanges((DataTagUpdate) controlTagUpdate, id);  
       } else {        
         return new ProcessChange(); //no event for DAQ layer
-      }           
+      }
+    } catch (CacheElementNotFoundException ex) {
+      throw ex;
     } catch (Exception ex) {
       LOGGER.error("Exception caught while updating a ControlTag - rolling back DB transaction", ex);      
       throw new UnexpectedRollbackException("Unexpected exception caught while updating a ControlTag configuration", ex);
     } finally {
-      if (controlTag.getWriteLock().isHeldByCurrentThread()) {
-        controlTag.getWriteLock().unlock();
+      if (tagCache.isWriteLockedByCurrentThread(id)) {
+        tagCache.releaseWriteLockOnKey(id);
       }      
     }  
       
@@ -152,19 +154,19 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
   @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
   public ProcessChange doRemoveControlTag(Long id, ConfigurationElementReport tagReport) {
     LOGGER.trace("Removing ControlTag " + id);
-    try {
-      ControlTag controlTag = tagCache.get(id);
-      Collection<Long> ruleIds = controlTag.getCopyRuleIds();
+    try {      
+      Collection<Long> ruleIds = tagCache.get(id).getCopyRuleIds();
       if (!ruleIds.isEmpty()) {
-        LOGGER.trace("Removing rules dependent on ControlTag " + controlTag.getId());
+        LOGGER.trace("Removing rules dependent on ControlTag " + id);
         for (Long ruleId : ruleIds) {
           ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
           tagReport.addSubReport(newReport);
           ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
         }       
       }
-      controlTag.getWriteLock().lock();
-      try {                 
+      tagCache.acquireWriteLockOnKey(id);      
+      try {                
+        ControlTag controlTag = tagCache.get(id);
         if (!controlTag.getAlarmIds().isEmpty()) {
           LOGGER.trace("Removing Alarms dependent on ControlTag " + controlTag.getId());
           for (Long alarmId : new ArrayList<Long>(controlTag.getAlarmIds())) {
@@ -177,7 +179,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
         configurableDAO.deleteItem(controlTag.getId());        
         //if the ControlTag has no Address, do not send anything to the DAQ so return null
         if (((ControlTagFacade) commonTagFacade).isInProcessList(controlTag)) {
-          controlTag.getWriteLock().unlock();
+          tagCache.releaseWriteLockOnKey(id);
           //if the ControlTag is associated to some Equipment(or SubEquipment) inform the DAQ   
           DataTagRemove removeEvent = new DataTagRemove();
           removeEvent.setDataTagId(id);
@@ -191,8 +193,8 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
         tagReport.setFailure("Unable to remove ControlTag with id " + id); 
         throw new UnexpectedRollbackException("Unable to remove control tag " + id, ex);
       } finally {
-        if (controlTag.getWriteLock().isHeldByCurrentThread()) {
-          controlTag.getWriteLock().unlock();
+        if (tagCache.isWriteLockedByCurrentThread(id)) {
+          tagCache.releaseWriteLockOnKey(id);
         }      
       } 
     } catch (CacheElementNotFoundException e) {
@@ -217,11 +219,11 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
     if (equipmentControlTags.containsKey(tagId)) {
       Long equipmentId = equipmentControlTags.get(tagId);
       tagChange.setEquipmentId(equipmentId);
-      return new ProcessChange(equipmentFacade.getProcessForAbstractEquipment(equipmentId).getId(), tagChange);      
+      return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(equipmentId), tagChange);      
     } else if (subEquipmentControlTags.containsKey(tagId)) {
       Long subEquipmentId = subEquipmentControlTags.get(tagId);
-      tagChange.setEquipmentId(subEquipmentFacade.getEquipmentForSubEquipment(subEquipmentId).getId());
-      return new ProcessChange(subEquipmentFacade.getProcessForAbstractEquipment(subEquipmentId).getId(), tagChange);      
+      tagChange.setEquipmentId(subEquipmentFacade.getEquipmentIdForSubEquipment(subEquipmentId));
+      return new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipmentId), tagChange);      
     } else {      
       return new ProcessChange();
     } 
@@ -247,11 +249,11 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
    * @return the change event including the process id
    */
   @Override
-  public ProcessChange getCreateEvent(final Long configId, final Long controlTagId, final Long equipmentId, final Long processId) { 
-    ControlTag controlTag = tagCache.get(controlTagId);
-    controlTag.getWriteLock().lock();
+  public ProcessChange getCreateEvent(final Long configId, final Long controlTagId, final Long equipmentId, final Long processId) {     
+    tagCache.acquireWriteLockOnKey(controlTagId);    
     ProcessChange processChange = null;
     try {
+      ControlTag controlTag = tagCache.get(controlTagId);
       if (controlTag.getAddress() != null) {
          DataTagAdd dataTagAdd = new DataTagAdd(configId, equipmentId, 
                                                  dataTagFacade.generateSourceDataTag(controlTag));
@@ -259,7 +261,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
       }
       return processChange;
     } finally {
-      controlTag.getWriteLock().unlock();
+      tagCache.releaseWriteLockOnKey(controlTagId);
     }    
   } 
   

@@ -67,13 +67,15 @@ public class DataTagConfigTransactedImplTest {
     DataTagUpdate update = new DataTagUpdate();
     update.setDataTagId(dataTag.getId());
     update.setEquipmentId(dataTag.getEquipmentId());
-    EasyMock.expect(dataTagCache.get(10L)).andReturn(dataTag);
+    dataTagCache.acquireWriteLockOnKey(dataTag.getId());
+    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
     EasyMock.expect(dataTagFacade.updateConfig(dataTag, new Properties())).andReturn(update);
     dataTagLoaderDAO.updateConfig(dataTag);
+    dataTagCache.releaseWriteLockOnKey(dataTag.getId());
     
     control.replay();
     
-    ProcessChange change = dataTagConfigTransacted.doUpdateDataTag(10L, new Properties());
+    ProcessChange change = dataTagConfigTransacted.doUpdateDataTag(dataTag.getId(), new Properties());
     assertTrue(!change.processActionRequired());    
     
     control.verify();
@@ -93,14 +95,16 @@ public class DataTagConfigTransactedImplTest {
     update.setDataTagId(dataTag.getId());
     update.setEquipmentId(dataTag.getEquipmentId());
     update.setName("new name");
-    EasyMock.expect(dataTagCache.get(10L)).andReturn(dataTag);
+    dataTagCache.acquireWriteLockOnKey(dataTag.getId());
+    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
     EasyMock.expect(dataTagFacade.updateConfig(dataTag, new Properties())).andReturn(update);
-    EasyMock.expect(equipmentFacade.getProcessForAbstractEquipment(dataTag.getEquipmentId())).andReturn(new ProcessCacheObject(50L));
+    EasyMock.expect(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId())).andReturn(50L);
     dataTagLoaderDAO.updateConfig(dataTag);
+    dataTagCache.releaseWriteLockOnKey(dataTag.getId());
     
     control.replay();
     
-    ProcessChange change = dataTagConfigTransacted.doUpdateDataTag(10L, new Properties());
+    ProcessChange change = dataTagConfigTransacted.doUpdateDataTag(dataTag.getId(), new Properties());
     assertTrue(change.processActionRequired());    
     assertEquals(Long.valueOf(50), change.getProcessId());
     

@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +41,16 @@ import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
+import cern.tim.server.cache.ClusterCache;
 import cern.tim.server.cache.ProcessCache;
 import cern.tim.server.cache.ProcessFacade;
-import cern.tim.server.common.config.DistributedParams;
+import cern.tim.server.daqcommunication.in.JmsContainerManager;
 import cern.tim.server.daqcommunication.out.ProcessCommunicationManager;
+import cern.tim.shared.client.configuration.ConfigConstants.Status;
 import cern.tim.shared.client.configuration.ConfigurationElement;
 import cern.tim.shared.client.configuration.ConfigurationElementReport;
 import cern.tim.shared.client.configuration.ConfigurationException;
 import cern.tim.shared.client.configuration.ConfigurationReport;
-import cern.tim.shared.client.configuration.ConfigConstants.Status;
 import cern.tim.shared.daq.config.Change;
 import cern.tim.shared.daq.config.ChangeReport;
 import cern.tim.shared.daq.config.ConfigurationChangeEventReport;
@@ -81,12 +81,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private static final Logger LOGGER = Logger.getLogger(ConfigurationLoaderImpl.class);
   
   int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
-  
-  /**
-   * Distributed lock used to get exclusive configuration access to the server
-   * (applying configurations is forced to be sequential).
-   */
-  private ReentrantReadWriteLock.WriteLock exclusiveConfigLock;
   
   private ProcessCommunicationManager processCommunicationManager;
   
@@ -126,6 +120,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * Flag indicating if a cancel request has been made.
    */
   private volatile boolean cancelRequested = false;
+  
+  private ClusterCache clusterCache;
     
   @Autowired
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
@@ -133,7 +129,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       ControlTagConfigHandler controlTagConfigHandler, CommandTagConfigHandler commandTagConfigHandler,
       final AlarmConfigHandler alarmConfigHandler, RuleTagConfigHandler ruleTagConfigHandler,
       EquipmentConfigHandler equipmentConfigHandler, SubEquipmentConfigHandler subEquipmentConfigHandler,
-      ProcessConfigHandler processConfigHandler, ProcessFacade processFacade, DistributedParams distributedParams,
+      ProcessConfigHandler processConfigHandler, ProcessFacade processFacade, ClusterCache clusterCache,
       ProcessCache processCache) {
     super();
     this.processCommunicationManager = processCommunicationManager;
@@ -147,8 +143,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.subEquipmentConfigHandler = subEquipmentConfigHandler;
     this.processConfigHandler = processConfigHandler;
     this.processFacade = processFacade;
-    this.processCache = processCache;
-    exclusiveConfigLock = distributedParams.getExclusiveConfigLock();
+    this.processCache = processCache; 
+    this.clusterCache = clusterCache;
   }
 
 
@@ -158,8 +154,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     
     LOGGER.info("Applying configuration " + configId);
     ConfigurationReport report = null;
-    try {
-      exclusiveConfigLock.lock();
+    clusterCache.acquireWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
+    try {     
                 
       String configName = configurationDAO.getConfigName(configId);    
       if (configName == null) {
@@ -341,10 +337,10 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       }
       throw new ConfigurationException(report, ex);
     } finally {
+      clusterCache.releaseWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
       if (report != null) {
         archiveReport(configId, report.toXML());
       }
-      exclusiveConfigLock.unlock();
     }
   }
   

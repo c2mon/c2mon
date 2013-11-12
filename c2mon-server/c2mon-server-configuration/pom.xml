@@ -5,10 +5,10 @@
   <parent>
     <groupId>cern.tim2.tim2-server</groupId>
     <artifactId>tim2-server-pom</artifactId>
-    <version>1.0.11</version>
+    <version>1.1.0</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
-  <version>1.0.10-SNAPSHOT</version>
+  <version>1.1.0-SNAPSHOT</version>
   <name>c2mon-server-configuration</name>
   <artifactId>c2mon-server-configuration</artifactId>
   <packaging>jar</packaging>
@@ -104,6 +104,9 @@
         <configuration>
           <argLine>
             -Dc2mon.properties.location=${c2mon.properties.location}
+            -Dc2mon.log.dir=${java.io.tmpdir}/c2mon-cache
+            <!-- Terracotta license key path -->
+            -Dcom.tc.productkey.path=${com.tc.productkey.path}
             -Ddatasource.config.connections.initial=1
             -Ddatasource.config.connections.max=2
             -Djms.config.destination=tim.config.test
