@@ -98,7 +98,7 @@ Request from clients
 <!-- set phase to intermediate, as shutdown is managed in ClientModuleLifecycle, so do to wish this bean to shutdown before then -->
 <bean id="clientRequestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
       <!-- include exception listener here? -->    
-      <property name="connectionFactory" ref="clientActiveMQConnectionFactory"/>
+      <property name="connectionFactory" ref="clientSingleConnectionFactory"/>
       <property name="destination" ref="clientRequestDestination"/>
       <property name="messageListener" ref="clientRequestHandler" />
       <property name="concurrentConsumers" value="${c2mon.jms.client.consumers.min}"/>

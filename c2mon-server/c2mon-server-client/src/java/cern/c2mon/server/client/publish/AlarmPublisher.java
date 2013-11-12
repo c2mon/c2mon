@@ -15,7 +15,7 @@ import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.tim.server.cache.CacheRegistrationService;
 import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.TimCacheListener;
+import cern.tim.server.cache.C2monCacheListener;
 import cern.tim.server.common.alarm.Alarm;
 import cern.tim.server.common.component.Lifecycle;
 import cern.tim.server.common.config.ServerConstants;
@@ -41,7 +41,7 @@ import com.google.gson.Gson;
  */
 @Service
 @ManagedResource(description = "Bean publishing Alarm updates to the clients")
-public class AlarmPublisher implements TimCacheListener<Alarm>, SmartLifecycle, Publisher<AlarmValue>  {
+public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle, Publisher<AlarmValue>  {
   
   /** Class logger */
   private static final Logger LOGGER = Logger.getLogger(AlarmPublisher.class);
