@@ -152,7 +152,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             while (!mbeanServiceConnected && !Thread.interrupted()) {
                 try {
                     if (logger.isDebugEnabled())
-                        logger.debug(format("trying to connect to MBean service: %s", handler.getJmxServiceUrl()));
+                        logger.debug(format("trying to connect to JMX service: %s", handler.getJmxServiceUrl()));
 
                     JMXServiceURL url = new JMXServiceURL(jmxServiceUrl);
 
@@ -181,10 +181,10 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                     connectionTestFuture = executor.scheduleAtFixedRate(new ConnectionTestingTask(handler), 0,
                             CONNECTION_TEST_INTERVAL, TimeUnit.MILLISECONDS);
 
-                    logger.info(format("successfully connected to MBean service: %s", jmxServiceUrl));
+                    logger.info(format("successfully connected to JMX service: %s", jmxServiceUrl));
                 } catch (Exception ex) {
-                    StringBuilder bld = new StringBuilder("failed to connect to MBean service: ").append(jmxServiceUrl)
-                            .append(" Exception caught: ").append(ex.getMessage());
+                    StringBuilder bld = new StringBuilder("failed to connect to JMX service: ").append(jmxServiceUrl)
+                            .append(" ").append(ex.getMessage());
                     logger.error(bld);
 
                     if (!comfaultSent) {

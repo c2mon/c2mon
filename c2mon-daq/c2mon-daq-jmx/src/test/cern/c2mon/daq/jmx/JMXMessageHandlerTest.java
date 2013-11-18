@@ -163,7 +163,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
         verify(messageSender);
 
         assertEquals(
-                "failed to connect to MBean service: service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi Exception caught: "
+                "failed to connect to JMX service: service:jmx:rmi:///jndi/rmi://localhost:9999/jmxrmi "
                         + "Authentication failed! Invalid username or password", msg.getValue());
 
         assertEquals(107211L, id.getValue().longValue());
