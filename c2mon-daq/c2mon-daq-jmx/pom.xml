@@ -70,9 +70,9 @@
 						-Dcom.sun.management.jmxremote.port=9999
 						-Dcom.sun.management.jmxremote.ssl=false
 						-Dcom.sun.management.jmxremote.authenticate=true
-						-Dcom.sun.management.jmxremote.password.file=src/test/ch/cern/tim/driver/jmx/testsrv.password
-						-Dcom.sun.management.jmxremote.access.file=src/test/ch/cern/tim/driver/jmx/testsrv.access
-						-Djmx.daq.passwd.file=src/test/ch/cern/tim/driver/jmx/pcache-passwords.txt
+						-Dcom.sun.management.jmxremote.password.file=src/test/cern/c2mon/daq/jmx/testsrv.password
+						-Dcom.sun.management.jmxremote.access.file=src/test/cern/c2mon/daq/jmx/testsrv.access
+						-Djmx.daq.passwd.file=src/test/cern/c2mon/daq/jmx/pcache-passwords.txt
 					</argLine>
 				</configuration>
 			</plugin>
@@ -95,7 +95,7 @@
 								<!--set rw permissions only to files owner -->
 								<chmod perm="600" os="Linux">
 									<fileset
-										dir="${project.build.testSourceDirectory}/ch/cern/tim/driver/jmx/">
+										dir="${project.build.testSourceDirectory}/cern/c2mon/daq/jmx/">
 										<include name="testsrv.*" />
 									</fileset>
 								</chmod>
