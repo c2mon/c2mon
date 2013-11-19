@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.c2mon.c2mon-shared</groupId>
+		<artifactId>c2mon-shared-pom</artifactId>
+		<version>1.1.0</version>
+	</parent>
+	<groupId>cern.c2mon.c2mon-shared</groupId>
+	<artifactId>c2mon-shared-rule</artifactId>
+	<version>1.2.3-SNAPSHOT</version>
+	<name>c2mon-shared-rule</name>
+	<packaging>jar</packaging>
+	<description>
+    	Contains the core rule classes used to evaluate and parse rule expressions.
+    </description>
+	<url>http://timweb.cern.ch</url>
+	
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-shared/c2mon-shared-rule</developerConnection>
+	</scm>
+	
+	<dependencies>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-common</artifactId>			
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
+	</dependencies>
+	<developers />
+</project>
