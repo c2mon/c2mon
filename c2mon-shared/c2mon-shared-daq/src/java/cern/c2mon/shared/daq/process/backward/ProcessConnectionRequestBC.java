@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
  
-import cern.c2mon.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.ParserException;
  
 /**
  * @author J. Stowisek

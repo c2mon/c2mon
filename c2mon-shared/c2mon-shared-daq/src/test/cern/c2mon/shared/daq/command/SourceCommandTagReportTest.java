@@ -7,8 +7,8 @@ import org.junit.Test;
 import static junit.framework.Assert.*;
 import org.w3c.dom.Document;
 
-import cern.c2mon.util.parser.ParserException;
-import cern.c2mon.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 public class SourceCommandTagReportTest {
     

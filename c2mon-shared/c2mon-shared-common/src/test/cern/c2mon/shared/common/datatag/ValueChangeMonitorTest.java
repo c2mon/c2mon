@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.shared.common.datatag.ValueChangeMonitor.OPERATOR;
-import cern.c2mon.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * JUnit test of class <code>ValueChangeMonitorTest</code>

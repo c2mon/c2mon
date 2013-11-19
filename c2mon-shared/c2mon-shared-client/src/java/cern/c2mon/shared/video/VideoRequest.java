@@ -28,7 +28,7 @@ import com.google.gson.reflect.TypeToken;
 
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.command.AuthorizationDetails;
-import cern.c2mon.util.json.GsonFactory;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 
 

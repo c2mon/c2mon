@@ -3,7 +3,7 @@ package cern.c2mon.shared.common.datatag.address.impl;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
-import cern.c2mon.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

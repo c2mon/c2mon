@@ -31,7 +31,7 @@ import org.springframework.jms.support.converter.MessageConverter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import cern.c2mon.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * Converter class used to convert between JMS XML messages and DataTagValueUpdate objects.

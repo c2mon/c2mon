@@ -30,8 +30,8 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.w3c.dom.Document;
  
-import cern.c2mon.util.parser.ParserException;
-import cern.c2mon.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
  
 /**
  * Spring message converter converting between objects and messages along the

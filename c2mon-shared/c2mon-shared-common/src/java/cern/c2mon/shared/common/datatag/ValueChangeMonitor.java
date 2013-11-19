@@ -10,7 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Element;
 
-import cern.c2mon.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * The <code>ValueChangeMonitor</code> class (or VCM) defines the value-change-monitoring factors for selected metrics

@@ -27,7 +27,7 @@ import javax.validation.constraints.Past;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import cern.c2mon.util.json.GsonFactory;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 

@@ -2,7 +2,7 @@ package cern.c2mon.shared.client.request;
 
 import javax.validation.constraints.NotNull;
 
-import cern.c2mon.util.json.GsonFactory;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 

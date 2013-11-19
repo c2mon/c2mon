@@ -11,7 +11,7 @@ import org.w3c.dom.Document;
 
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 public class SourceDataTagValueTest {
 

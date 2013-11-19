@@ -25,7 +25,7 @@ import org.simpleframework.xml.core.Persister;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagDeadband;
-import cern.c2mon.util.json.GsonFactory;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 @Root(name = "TagConfig")
 public class TagConfigImpl extends ClientRequestReport implements TagConfig {

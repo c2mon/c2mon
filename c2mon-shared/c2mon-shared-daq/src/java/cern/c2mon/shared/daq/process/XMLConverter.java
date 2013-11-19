@@ -32,8 +32,8 @@ import org.simpleframework.xml.core.Persister;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.w3c.dom.Document;
 
-import cern.c2mon.util.parser.ParserException;
-import cern.c2mon.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 
 /**

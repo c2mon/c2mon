@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
-import cern.c2mon.util.json.GsonFactory;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 

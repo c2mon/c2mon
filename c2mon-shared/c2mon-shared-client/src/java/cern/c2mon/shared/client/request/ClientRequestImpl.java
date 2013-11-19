@@ -28,7 +28,7 @@ import cern.c2mon.shared.client.command.CommandReportImpl;
 import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.util.json.GsonFactory;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;

@@ -5,8 +5,8 @@ import java.io.Serializable;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
-import cern.c2mon.util.parser.ParserException;
-import cern.c2mon.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
