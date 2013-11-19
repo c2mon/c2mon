@@ -9,7 +9,7 @@
 
 	<groupId>cern.c2mon.c2mon-shared</groupId>
 	<artifactId>c2mon-shared-pom</artifactId>
-	<version>1.0.7-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<description>
@@ -28,10 +28,10 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<!--  tim2 shared libraries -->
+			<!--  c2mon shared libraries -->
 			<dependency>
-				<groupId>cern.tim2.tim2-shared</groupId>
-				<artifactId>tim2-shared-util</artifactId>
+				<groupId>cern.c2mon.c2mon-shared</groupId>
+				<artifactId>c2mon-shared-util</artifactId>
 				<version>[1.0.0,2.0.0)</version>
 				<exclusions>
 					<exclusion>
@@ -41,13 +41,13 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>cern.tim2.tim2-shared</groupId>
-				<artifactId>tim2-shared-common</artifactId>
+				<groupId>cern.c2mon.c2mon-shared</groupId>
+				<artifactId>c2mon-shared-common</artifactId>
 				<version>[1.0.0,2.0.0)</version>
 			</dependency>
 			<dependency>
-				<groupId>cern.tim2.tim2-shared</groupId>
-				<artifactId>tim2-shared-daq</artifactId>
+				<groupId>cern.c2mon.c2mon-shared</groupId>
+				<artifactId>c2mon-shared-daq</artifactId>
 				<version>[1.0.0,2.0.0)</version>
 				<exclusions>
 					<exclusion>
@@ -57,13 +57,13 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>cern.tim2.tim2-shared</groupId>
-				<artifactId>tim2-shared-client</artifactId>
+				<groupId>cern.c2mon.c2mon-shared</groupId>
+				<artifactId>c2mon-shared-client</artifactId>
 				<version>[0.9.9,2.0.0)</version>
 			</dependency>
 			<dependency>
-				<groupId>cern.tim2.tim2-shared</groupId>
-				<artifactId>tim2-shared-rule</artifactId>
+				<groupId>cern.c2mon.c2mon-shared</groupId>
+				<artifactId>c2mon-shared-rule</artifactId>
 				<version>[1.0.0,2.0.0)</version>
 			</dependency>
 			<dependency>
@@ -79,7 +79,19 @@
 				<version>1.2.14</version>
 			</dependency>
 			<dependency>
-				<groupId>org.hibernate</groupId>
+			  <groupId>org.slf4j</groupId>       
+			  <artifactId>slf4j-api</artifactId>       
+			  <version>1.6.6</version>       
+			  <scope>runtime</scope>     
+			</dependency>     
+			<dependency>       
+			  <groupId>org.slf4j</groupId>       
+			  <artifactId>slf4j-log4j12</artifactId>       
+			  <version>1.6.6</version>       
+			  <scope>runtime</scope>     
+			</dependency>
+			<dependency>
+		 	  <groupId>org.hibernate</groupId>
 				<artifactId>hibernate-validator</artifactId>
 				<version>4.2.0.Beta2</version>
 			</dependency>
