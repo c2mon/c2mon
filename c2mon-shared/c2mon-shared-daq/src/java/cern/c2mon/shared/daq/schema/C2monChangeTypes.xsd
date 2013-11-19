@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+    targetNamespace="http://timweb.cern.ch/schemas/c2mon-daq/Configuration"
+    xmlns="http://timweb.cern.ch/schemas/c2mon-daq/C2monChangeTypes"
+    xmlns:conf="http://timweb.cern.ch/schemas/c2mon-daq/Configuration"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+    <xs:include schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/C2monConfigTypes.xsd" />
+
+    <!-- The equipment unit update type It contains the structure of a possible equipment unit update -->
+    <xs:complexType name="equipmentConfigurationUpdate">
+      <xs:all>
+        <xs:element minOccurs="0" name="name" type="conf:string-update-type" />
+        <xs:element minOccurs="0" name="commfault-tag-id" type="conf:long-update-type" />
+        <xs:element minOccurs="0" name="commfault-tag-value" type="conf:stringBoolean-update-type" />
+        <xs:element minOccurs="0" name="alive-tag-id" type="conf:long-update-type" />
+        <xs:element minOccurs="0" name="alive-interval" type="conf:long-update-type" />
+      </xs:all>
+      <xs:attribute name="equipment-id" use="required" type="xs:long"/>
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- The process update type (currently empty) -->
+    <xs:complexType name="processConfigurationUpdate">
+      <xs:attribute name="process-id" use="required" type="xs:long"/>
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- The data tag update type -->
+    <xs:complexType name="dataTagUpdate">
+      <xs:all>
+        <xs:element minOccurs="0" name="name" type="conf:string-update-type" />
+        <xs:element minOccurs="0" name="mode" type="conf:short-update-type" />
+        <xs:element minOccurs="0" name="data-type" type="conf:string-update-type" />
+        <xs:element minOccurs="0" name="min-value" type="conf:typeable-update-type" />
+        <xs:element minOccurs="0" name="max-value" type="conf:typeable-update-type" />
+        <xs:element minOccurs="0" name="DataTagAddress" type="conf:dataTagAddressUpdate" />
+      </xs:all>
+      <xs:attribute name="data-tag-id" use="required" type="xs:long"/>
+      <xs:attribute name="equipment-id" use="required" type="xs:long"/>
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+      </xs:complexType>
+
+    <!-- The command tag update type -->
+    <xs:complexType name="commandTagUpdate">
+      <xs:all>
+        <xs:element minOccurs="0" name="name" type="conf:string-update-type" />
+        <xs:element minOccurs="0" name="source-timeout" type="conf:int-update-type" />
+        <xs:element minOccurs="0" name="source-retries" type="conf:int-update-type" />
+        <xs:element minOccurs="0" name="HardwareAddress" type="conf:hardwareAddressUpdate" />
+      </xs:all>
+      <xs:attribute name="command-tag-id" use="required" type="xs:long"/>
+      <xs:attribute name="equipment-id" use="required" type="xs:long"/>
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- Type for all integer update elements -->
+    <xs:complexType name="int-update-type">
+      <xs:simpleContent>
+        <xs:extension base="xs:int">
+          <xs:attribute name="update-type" type="conf:update-switch"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Type for all integer update elements -->
+    <xs:complexType name="typeable-update-type">
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="update-type" type="conf:update-switch"/>
+          <xs:attribute name="data-type" use="required" type="xs:string" />
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Type for all integer update elements -->
+    <xs:complexType name="long-update-type">
+      <xs:simpleContent>
+        <xs:extension base="xs:long">
+          <xs:attribute name="update-type" type="conf:update-switch"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Type for all integer update elements -->
+    <xs:complexType name="float-update-type">
+      <xs:simpleContent>
+        <xs:extension base="xs:float">
+          <xs:attribute name="update-type" type="conf:update-switch"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Type for all string update elements -->
+    <xs:complexType name="string-update-type">
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="update-type" type="conf:update-switch"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Type for all stringBoolean update elements -->
+    <xs:complexType name="stringBoolean-update-type">
+      <xs:simpleContent>
+        <xs:extension base="xs:boolean">
+          <xs:attribute name="update-type" type="conf:update-switch"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Type for all short update elements -->
+    <xs:complexType name="short-update-type">
+      <xs:simpleContent>
+        <xs:extension base="xs:short">
+          <xs:attribute name="update-type" type="conf:update-switch"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- Simple type which has just two value 'update' and 'remove' -->
+    <xs:simpleType name="update-switch">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="update" />
+        <xs:enumeration value="remove" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- The data tag add type -->
+    <xs:complexType name="dataTagAdd">
+      <xs:sequence>
+        <xs:element name="DataTag" minOccurs="1" type="conf:dataTag"/>
+      </xs:sequence>
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+      <xs:attribute name="equipment-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- The data tag remove type -->
+    <xs:complexType name="dataTagRemove">
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+      <xs:attribute name="data-tag-id" use="required" type="xs:long"/>
+      <xs:attribute name="equipment-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- The command tag add type -->
+    <xs:complexType name="commandTagAdd">
+      <xs:sequence>
+        <xs:element name="CommandTag" minOccurs="1" type="conf:commandTag"/>
+      </xs:sequence>
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+      <xs:attribute name="equipment-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- The command tag remove type -->
+    <xs:complexType name="commandTagRemove">
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+        <xs:attribute name="command-tag-id" use="required" type="xs:long"/>
+        <xs:attribute name="equipment-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- The hardware address update type -->
+    <xs:complexType name="hardwareAddressUpdate">
+      <xs:sequence>
+        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+      </xs:sequence>
+      <xs:attribute name="class" use="required" type="xs:string" />
+    </xs:complexType>
+
+    <!-- The data tag address update type -->
+    <xs:complexType name="dataTagAddressUpdate">
+      <xs:all>
+        <xs:element minOccurs="0" name="time-to-live" type="conf:int-update-type"/>
+        <xs:element minOccurs="0" name="value-deaband-type" type="conf:short-update-type"/>
+        <xs:element minOccurs="0" name="value-deadband" type="conf:float-update-type"/>
+        <xs:element minOccurs="0" name="value-deadband-type" type="conf:short-update-type"/>
+        <xs:element minOccurs="0" name="priority" type="conf:int-update-type"/>
+        <xs:element minOccurs="0" name="time-deadband" type="conf:int-update-type"/>
+        <xs:element minOccurs="0" name="guaranteed-delivery" type="conf:stringBoolean-update-type" />
+        <xs:element minOccurs="0" name="HardwareAddress" type="conf:hardwareAddressUpdate"/>
+      </xs:all>
+    </xs:complexType>
+
+    <!-- The equipment unit add type -->
+    <xs:complexType name="equipmentUnitAdd">
+      <xs:all>
+        <xs:element minOccurs="1" maxOccurs="1" name="equipment-unit-xml" type="xs:string"/>
+      </xs:all>
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+      <xs:attribute name="equipment-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- The equipment unit remove type -->
+    <xs:complexType name="equipmentUnitRemove">
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+      <xs:attribute name="equipment-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+</xs:schema>

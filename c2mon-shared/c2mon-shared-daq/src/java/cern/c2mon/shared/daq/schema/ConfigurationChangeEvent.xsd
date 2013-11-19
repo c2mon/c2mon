@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+    targetNamespace="http://timweb.cern.ch/schemas/c2mon-daq/Configuration"
+    xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified">
+    <xs:include schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/C2monChangeTypes.xsd" />
+    <xs:element name="ConfigurationChangeEvent">
+      <xs:complexType>
+        <xs:choice minOccurs="1" maxOccurs="unbounded">
+          <xs:element name="DataTagUpdate" type="dataTagUpdate" />
+          <xs:element name="CommandTagUpdate" type="commandTagUpdate"/>
+          <xs:element name="EquipmentConfigurationUpdate" type="equipmentConfigurationUpdate" />
+          <xs:element name="ProcessConfigurationUpdate" type="processConfigurationUpdate" />
+          <xs:element name="DataTagAdd" type="dataTagAdd" />
+          <xs:element name="CommandTagAdd" type="commandTagAdd" />
+          <xs:element name="DataTagRemove" type="dataTagRemove" />
+          <xs:element name="CommandTagRemove" type="commandTagRemove" />
+          <xs:element name="EquipmentUnitAdd" type="equipmentUnitAdd" />
+          <xs:element name="EquipmentUnitRemove" type="equipmentUnitRemove" />
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+</xs:schema>

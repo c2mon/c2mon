@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ConfigurationChangeEvent
+	xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/Configuration http://timweb.cern.ch/schemas/c2mon-daq/ConfigurationChangeEvent.xsd">
+	<DataTagUpdate change-id="1" data-tag-id="5" equipment-id="1">
+		<data-type>Integer</data-type>
+		<min-value data-type="Integer">2</min-value>
+		<max-value data-type="Integer">4</max-value>
+		<test-number>12</test-number>
+		<mode update-type="remove">0</mode>
+		<DataTagAddress>
+			<priority>7</priority>
+			<HardwareAddress
+				class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+				<opc-item-name>asd</opc-item-name>
+				<command-pulse-length>1</command-pulse-length>
+			</HardwareAddress>
+		</DataTagAddress>
+	</DataTagUpdate>
+</ConfigurationChangeEvent>
