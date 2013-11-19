@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.c2mon.c2mon-shared</groupId>
+		<artifactId>c2mon-shared-pom</artifactId>
+		<version>1.1.0</version>
+	</parent>
+	<groupId>cern.c2mon.c2mon-shared</groupId>
+	<artifactId>c2mon-shared-client</artifactId>
+	<version>1.2.0-SNAPSHOT</version>
+	<name>c2mon-shared-client</name>
+	<packaging>jar</packaging>
+	<description>
+    	Classes shared across the server and client tiers of the C2MON system.
+    </description>
+	<url>http://cern.ch/c2mon</url>
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-shared/c2mon-shared-client</developerConnection>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-util</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<!-- add slf4j interfaces to classpath -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.5.11</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- add log4j binding to classpath -->
+		<!-- routes slf4j calls to log4j -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.5.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-rule</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-persistence-manager</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.simpleframework</groupId>
+			<artifactId>simple-xml</artifactId>
+		</dependency>
+		<!-- Gson: Java to Json conversion -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+		</dependency>
+	</dependencies>
+	<developers />
+</project>

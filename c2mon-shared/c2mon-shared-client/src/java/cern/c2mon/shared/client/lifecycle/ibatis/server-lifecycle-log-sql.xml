@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cern.c2mon.shared.client.lifecycle.ServerLifecycleMapper">
+
+  <resultMap id="lifecycleEventResultMap" type="cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent">    
+      <result property="eventTime" column="SLL_TIME"/>
+      <result property="serverName" column="SLL_SERVER_NAME"/>
+      <result property="eventType" column="SLL_EVENT_TYPE"/>             
+  </resultMap>
+    
+  <insert id="logEvent" parameterType="cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent">
+    INSERT INTO server_lifecycle_log (sll_time, sll_server_name, sll_event_type)
+    VALUES (
+    SYS_EXTRACT_UTC(#{eventTime}), #{serverName}, #{eventType})
+  </insert>
+  
+  <select id="getEventsForServer" parameterType="String" resultMap="lifecycleEventResultMap" >
+    SELECT sll_time, sll_server_name, sll_event_type
+      FROM server_lifecycle_log
+     WHERE sll_server_name = #{name}    
+  </select>
+  
+  <delete id="deleteAllForServer" parameterType="String">
+    DELETE FROM server_lifecycle_log
+          WHERE sll_server_name = #{name}        
+  </delete>
+  
+</mapper>

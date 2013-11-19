@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<!-- Mybatis mapper XML for logging and retrieving Command logs in the STL account -->
+<mapper namespace="cern.c2mon.server.shorttermlog.mapper.CommandTagLogMapper">
+
+  <resultMap id="commandResultMap" type="CommandTagLog">    
+      <result property="tagId" column="CMDID"/>
+      <result property="name" column="CMDNAME" jdbcType="VARCHAR"/>
+      <result property="mode" column="CMDMODE" jdbcType="NUMERIC"/>
+      <result property="executionTime" column="CMDTIME" jdbcType="TIMESTAMP"/>  
+      <result property="value" column="CMDVALUE" jdbcType="VARCHAR"/> 
+      <result property="dataType" column="CMDDATATYPE" jdbcType="VARCHAR"/> 
+      <result property="user" column="CMDUSER" jdbcType="VARCHAR"/>             
+      <result property="host" column="CMDHOST" jdbcType="VARCHAR"/>
+      <result property="reportTime" column="CMDREPORTTIME" jdbcType="TIMESTAMP"/>             
+      <result property="reportStatus" column="CMDREPORTSTATUS" jdbcType="VARCHAR"/>             
+      <result property="reportDescription" column="CMDREPORTDESC" jdbcType="VARCHAR"/>                          
+  </resultMap>
+    
+  <insert id="insertLog" parameterType="CommandTagLog">
+    INSERT INTO commandtaglog (CMDID, CMDNAME, CMDMODE, CMDTIME, CMDVALUE, CMDDATATYPE, CMDUSER, CMDHOST,
+                               CMDREPORTTIME, CMDREPORTSTATUS, CMDREPORTDESC)
+    VALUES (
+    #{tagId}, #{name, jdbcType=VARCHAR}, #{mode, jdbcType=NUMERIC}, SYS_EXTRACT_UTC(#{executionTime, jdbcType=TIMESTAMP}),
+    #{value, jdbcType=VARCHAR}, #{dataType, jdbcType=VARCHAR}, #{user, jdbcType=VARCHAR}, #{host, jdbcType=VARCHAR},
+    SYS_EXTRACT_UTC(#{reportTime, jdbcType=TIMESTAMP}), #{reportStatus, jdbcType=VARCHAR}, #{reportDescription, jdbcType=VARCHAR})
+    
+  </insert>
+  
+  <select id="getCommandTagLog" parameterType="Long" resultMap="commandResultMap" >
+    SELECT CMDID, CMDNAME, CMDMODE, CMDTIME, CMDVALUE, CMDDATATYPE, 
+            CMDUSER, CMDHOST, CMDREPORTTIME, CMDREPORTSTATUS, CMDREPORTDESC
+      FROM commandtaglog
+     WHERE CMDID = #{id}    
+  </select>
+  
+  <delete id="deleteAllLogs" parameterType="Long">
+    DELETE FROM commandtaglog
+          WHERE CMDID = #{id}        
+  </delete>
+  
+</mapper>
