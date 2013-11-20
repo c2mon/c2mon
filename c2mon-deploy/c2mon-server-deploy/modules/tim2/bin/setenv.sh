@@ -15,11 +15,12 @@ JMX_PORT=
 TERRACOTTA_HOST=
 #Terracotta installation directory (only used to access start-up script)
 TERRACOTTA_HOME=
-#terracotta DSO port
+#Terracotta TSA port
 TERRACOTTA_PORT=
 
 #Terracotta mirror
 TERRACOTTA_MIRROR_HOST=
+#Terracotta mirror TSA port
 TERRACOTTA_MIRROR_PORT=
 
 #LASER settings

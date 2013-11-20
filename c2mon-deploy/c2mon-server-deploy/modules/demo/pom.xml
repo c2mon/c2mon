@@ -74,10 +74,12 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-client</artifactId>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-video</artifactId>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.tim2.tim2-server</groupId>

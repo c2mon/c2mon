@@ -80,28 +80,28 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-client</artifactId>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-video</artifactId>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-laser</artifactId>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-shorttermlog</artifactId>
 		</dependency>
-
+		
 		<!-- for distributed cache only -->
 		<dependency>
-			<groupId>org.terracotta.modules</groupId>
-			<artifactId>tim-ehcache-2.x</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.terracotta.toolkit</groupId>
-			<artifactId>terracotta-toolkit-1.3</artifactId>
+			<groupId>org.terracotta.bigmemory</groupId>
+			<artifactId>bigmemory</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- for logging -->

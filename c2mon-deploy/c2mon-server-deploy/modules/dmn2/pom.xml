@@ -74,6 +74,7 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-client</artifactId>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
@@ -82,6 +83,7 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
 			<artifactId>c2mon-server-laser</artifactId>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 	</dependencies>
 

@@ -19,8 +19,8 @@
 	</componentDescriptors>
 
 	<files>
-
-		<!--  copy sthe starting script -->
+	
+		<!-- copy sthe starting script -->
 		<file>
 			<source>${basedir}/bin/tim2-c2mon.sh</source>
 			<outputDirectory>bin/</outputDirectory>
@@ -28,8 +28,8 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0755</fileMode>
 		</file>
-
-		<!--  copy changelog -->
+	
+		<!-- copy changelog -->
 		<file>
 			<source>${basedir}/changelog/tim2-srv-changelog.txt</source>
 			<outputDirectory>/</outputDirectory>
@@ -37,8 +37,8 @@
 			<fileMode>0444</fileMode>
 			<lineEnding>unix</lineEnding>
 		</file>
-
-		<!--  deployment descriptor -->
+	
+		<!-- deployment descriptor -->
 		<file>
 			<source>${basedir}/conf/tim2-deployment.xml</source>
 			<outputDirectory>/</outputDirectory>
@@ -46,8 +46,8 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-
-		<!--  log4j configuration -->
+	
+		<!-- log4j configuration -->
 		<file>
 			<source>${basedir}/conf/tim2-log4j.xml</source>
 			<outputDirectory>conf/</outputDirectory>
@@ -83,13 +83,13 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-    <file>
-      <source>${basedir}/conf/tim2-datasource.xml</source>
-      <outputDirectory>conf/</outputDirectory>
-      <destName>c2mon-datasource.xml</destName>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
-    </file>
+		<file>
+			<source>${basedir}/conf/tim2-datasource.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>c2mon-datasource.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
 		<file>
 			<source>${basedir}/conf/tim2-tc-config.xml</source>
 			<outputDirectory>conf/</outputDirectory>
@@ -97,15 +97,22 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-		<!--  copy she jmx shutdown script -->
+		<!-- copy the license file for Terracotta -->
+		<file>
+			<source>${basedir}/conf/terracotta-license.key</source>
+			<outputDirectory>conf/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+		<!-- copy the jmx shutdown script -->
 		<file>
 			<source>${basedir}/bin/jmx-shutdown-script.txt</source>
 			<outputDirectory>bin/</outputDirectory>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0755</fileMode>
 		</file>
-		
-		<!--  copy the version file -->
+	
+		<!-- copy the version file -->
 		<file>
 			<source>${project.build.outputDirectory}/version.txt</source>
 			<outputDirectory>/</outputDirectory>

@@ -19,8 +19,8 @@
 	</componentDescriptors>
 
 	<files>
-
-		<!--  copy sthe starting script -->
+	
+		<!-- copy the starting script -->
 		<file>
 			<source>${basedir}/bin/dmn2-c2mon.sh</source>
 			<outputDirectory>bin/</outputDirectory>
@@ -28,8 +28,8 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0755</fileMode>
 		</file>
-
-		<!--  copy changelog -->
+	
+		<!-- copy changelog -->
 		<file>
 			<source>${basedir}/changelog/dmn2-srv-changelog.txt</source>
 			<outputDirectory>/</outputDirectory>
@@ -37,8 +37,8 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-
-		<!--  deployment descriptor -->
+	
+		<!-- deployment descriptor -->
 		<file>
 			<source>${basedir}/conf/dmn2-deployment.xml</source>
 			<outputDirectory>/</outputDirectory>
@@ -46,19 +46,18 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-
-		<!--  log4j configuration -->
-	<!--  
-   		don't take log4j configuration. it will be put in correct place by deployment tool 
-	-->		
-<!--		<file>-->
-<!--			<source>${basedir}/conf/dmn2-log4j.xml</source>-->
-<!--			<outputDirectory>conf/</outputDirectory>-->
-<!--			<destName>log4j.xml</destName>-->
-<!--			<lineEnding>unix</lineEnding>-->
-<!--			<fileMode>0444</fileMode>-->
-<!--		</file>-->
-
+	
+		<!-- log4j configuration -->
+		<!-- don't take log4j configuration. it will be put in correct place by 
+			deployment tool -->
+		<!-- <file> -->
+		<!-- <source>${basedir}/conf/dmn2-log4j.xml</source> -->
+		<!-- <outputDirectory>conf/</outputDirectory> -->
+		<!-- <destName>log4j.xml</destName> -->
+		<!-- <lineEnding>unix</lineEnding> -->
+		<!-- <fileMode>0444</fileMode> -->
+		<!-- </file> -->
+	
 		<file>
 			<source>${basedir}/conf/dmn2-cache.properties</source>
 			<outputDirectory>conf/</outputDirectory>
@@ -87,13 +86,13 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-    <file>
-      <source>${basedir}/conf/dmn2-datasource.xml</source>
-      <outputDirectory>conf/</outputDirectory>
-      <destName>c2mon-datasource.xml</destName>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0444</fileMode>
-    </file>
+		<file>
+			<source>${basedir}/conf/dmn2-datasource.xml</source>
+			<outputDirectory>conf/</outputDirectory>
+			<destName>c2mon-datasource.xml</destName>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
 		<file>
 			<source>${basedir}/conf/dmn2-tc-config.xml</source>
 			<outputDirectory>conf/</outputDirectory>
@@ -101,8 +100,15 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-		
-		<!--  copy the version file -->
+		<!-- copy the license file for Terracotta -->
+		<file>
+			<source>${basedir}/conf/terracotta-license.key</source>
+			<outputDirectory>conf/</outputDirectory>
+			<lineEnding>unix</lineEnding>
+			<fileMode>0444</fileMode>
+		</file>
+	
+		<!-- copy the version file -->
 		<file>
 			<source>${project.build.outputDirectory}/version.txt</source>
 			<outputDirectory>/</outputDirectory>

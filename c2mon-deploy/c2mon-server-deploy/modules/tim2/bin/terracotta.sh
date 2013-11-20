@@ -9,48 +9,48 @@
 #If both nodes of the cluster fail, the "init" option must be used to start the initial node of the cluster (if this
 # fails, the file DB may need deleting under $TC_LOG_DIR/server-data, possibly on both node machines)
 
-TC_HOME=/opt/terracotta
-TC_CONFIG_DIR=$TC_HOME/conf
+TC_INSTALL_DIR=/opt/terracotta
+TC_CONFIG_DIR=$TC_INSTALL_DIR/conf
 TC_CONFIG_FILE=$TC_CONFIG_DIR/c2mon-tc-config.xml
-TC_LOG_DIR=$TC_HOME/log
-TC_MAIN_HOST=cs-ccr-tim11
+TC_LOG_DIR=$TC_INSTALL_DIR/log
+TC_MAIN_HOST=tim-cache-pro1
 TC_MAIN_NAME=timcache1
-TC_MAIN_DSO_PORT=9510
+TC_MAIN_TSA_PORT=9510
 TC_MAIN_JMX_PORT=9520
 
-TC_MIRROR_HOST=cs-ccr-tim12
-TC_MIRROR_NAME=server2
-TC_MIRROR_DSO_PORT=9511
+TC_MIRROR_HOST=tim-cache-pro2
+TC_MIRROR_NAME=timcache2
+TC_MIRROR_TSA_PORT=9511
 TC_MIRROR_JMX_PORT=9521
 
 if [ "$2" == "standby" ]; then
     TC_HOST=$TC_MIRROR_HOST
     TC_NAME=$TC_MIRROR_NAME
-    TC_DSO_PORT=$TC_MIRROR_DSO_PORT
+    TC_TSA_PORT=$TC_MIRROR_TSA_PORT
     TC_JMX_PORT=$TC_MIRROR_JMX_PORT
     TC_OTHER_HOST=$TC_MAIN_HOST
-    TC_OTHER_DSO_PORT=$TC_MAIN_DSO_PORT
+    TC_OTHER_TSA_PORT=$TC_MAIN_TSA_PORT
 else
     TC_HOST=$TC_MAIN_HOST
     TC_NAME=$TC_MAIN_NAME
-    TC_DSO_PORT=$TC_MAIN_DSO_PORT
+    TC_TSA_PORT=$TC_MAIN_TSA_PORT
     TC_JMX_PORT=$TC_MAIN_JMX_PORT
     TC_OTHER_HOST=$TC_MIRROR_HOST
-    TC_OTHER_DSO_PORT=$TC_MIRROR_DSO_PORT
+    TC_OTHER_TSA_PORT=$TC_MIRROR_TSA_PORT
 fi
 
 #if initial start (both TC servers stopped), get config from file (ssh if necessary)
 if [ "$1" == "start" ]; then
     echo "Initialising the cluster by starting a Terracotta server on $TC_HOST"
-    ssh $TC_HOST "source ~/.profile; setsid $TC_HOME/bin/start-tc-server.sh -n $TC_NAME -f $TC_CONFIG_FILE > $TC_LOG_DIR/out.log 2> $TC_LOG_DIR/err.log &"
+    ssh $TC_HOST "source ~/.profile; setsid $TC_INSTALL_DIR/bin/start-tc-server.sh -n $TC_NAME -f $TC_CONFIG_FILE > $TC_LOG_DIR/out.log 2> $TC_LOG_DIR/err.log &"
 #if start with other TC server running, get config from other server (ssh if necessary)
 elif [ "$1" == "join" ]; then
     echo "Starting a Terracotta server on $TC_HOST to join the existing cluster (running server is on host $TC_OTHER_HOST)"
-    ssh $TC_HOST "source ~/.profile; setsid $TC_HOME/bin/start-tc-server.sh -n $TC_NAME -f $TC_OTHER_HOST:$TC_OTHER_DSO_PORT > $TC_LOG_DIR/out.log 2> $TC_LOG_DIR/err.log &"
-#ssh to make sure TC_HOME exists
+    ssh $TC_HOST "source ~/.profile; setsid $TC_INSTALL_DIR/bin/start-tc-server.sh -n $TC_NAME -f $TC_OTHER_HOST:$TC_OTHER_TSA_PORT > $TC_LOG_DIR/out.log 2> $TC_LOG_DIR/err.log &"
+#ssh to make sure TC_INSTALL_DIR exists
 elif [ "$1" == "stop" ]; then
     echo "Stopping the Terracotta server on host $TC_HOST"
-    ssh $TC_HOST "source ~/.profile; $TC_HOME/bin/stop-tc-server.sh $TC_HOST $TC_JMX_PORT"
+    ssh $TC_HOST "source ~/.profile; $TC_INSTALL_DIR/bin/stop-tc-server.sh $TC_HOST $TC_JMX_PORT"
 elif [ "$1" == "clean" ]; then
     echo "Cleaning the Terracotta cache on host $TC_HOST"
     ssh $TC_HOST "cd $TC_LOG_DIR; rm -R server-data"

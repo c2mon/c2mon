@@ -21,9 +21,6 @@ if [ -f $C2MON_HOME/bin/setenv.sh ] ; then
   . $C2MON_HOME/bin/setenv.sh
 fi
 
-# make sure JAVA_HOME is set correctly to Java 1.6
-export JAVA_HOME=/usr/java/jdk1.6
-
 #.c2mon.properties location
 C2MON_PROPERTIES=$C2MON_HOME/conf/c2mon.properties
 
@@ -93,13 +90,12 @@ fi
 
 if [ ! MODE == "single" ]; then
     C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $CLUSTER_JAVA_ARGS $C2MON_RECOVERY_ARG"  
-    C2MON_START_CMD="$TERRACOTTA_HOME/platform/bin/dso-java.sh $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.tim.server.lifecycle.ServerStartup  $C2MON_ARGS"
     C2MON_STOP_CMD="$JAVA_HOME/jre/bin/java -jar $JMXJAR -i $C2MON_HOME/bin/jmx-shutdown-script.txt -n -e -l localhost:$JMX_PORT  -u $JMX_USER -p $JMX_PASSWORD"
 else
     C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $C2MON_RECOVERY_ARG"
-    C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS"
     C2MON_STOP_CMD="echo \"attempting to shutdown the server with kill call\""
 fi
+C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS"
 
 # Source function library.
 
