@@ -5,6 +5,9 @@ use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Cwd;
 
+
+my $appName = "dmn2-viewer-dev";
+
 #find out the name of the home folder of the application
 #home folder is: cgi-bin/../
 
@@ -88,6 +91,14 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 		<j2se version=\"1.7+\"  initial-heap-size=\"512M\" max-heap-size=\"512M\"/>" , "\n";
 
 jarlist ("$jardir");
+
+# set app.name and app.version 
+if (param('appName')) {
+  print  "		<property name=\"app.name\" value=\"", param('appName'),"\"/>\n";
+}
+else {
+  print  "		<property name=\"app.name\" value=\"$appName\"/>\n";
+}
 
 # Defines the version number that is shown in the DMN2 Viewer about dialog
 print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
