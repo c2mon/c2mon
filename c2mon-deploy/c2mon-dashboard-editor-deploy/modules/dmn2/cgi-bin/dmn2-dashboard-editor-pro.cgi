@@ -7,6 +7,8 @@ use Config::Properties;
 use Cwd;
 
 
+my $appName = "dmn2-dashboard-editor-pro";
+
 #find out the name of the home folder of the application #home folder is: cgi-bin/../
 my $cdir = getcwd;
 my @pathtokens = split(/\//,$cdir);
@@ -44,6 +46,36 @@ my $jdbcRoUser           = $c2monProperties->getProperty("c2mon.jdbc.ro.user");
 my $jdbcRoPassword       = $c2monProperties->getProperty("c2mon.jdbc.ro.password");
 
 close PROPS;
+
+
+# Peter's code to retrieve key-values from query string
+my $buffer = $ENV{"QUERY_STRING"};  # Containts key1=value,key2=value2 type stuff
+if (defined $buffer)
+{
+my @KVPairs = split(",", $buffer); # Are separated by ,
+my %var;
+my $keyValue;
+
+foreach $keyValue (@KVPairs) 
+{
+  my $key;
+  my $value;
+
+  ($key, $value) = split("=", $keyValue); # Split key and value    
+  $value =~ tr/+/ /;    # replace + with space
+  $value =~ s/%([\dA-Fa-f][\dA-Fa-f])/pack("C", hex($1))/eg ; # in case if the browser encodes the dash   
+
+  $var{$key} = $value;
+}
+
+if(defined $var{"appName"})
+{
+  $appName = $var{"appName"};
+}
+
+}
+
+
 
 
 ##
@@ -101,6 +133,11 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
     <java version=\"1.6+\" initial-heap-size=\"256M\"  max-heap-size=\"512M\"/>" , "\n";
 
 jarlist ("$jardir");
+
+# set app.name and app.version 
+print "	   <property name=\"app.name\" value=\"$appName\"/>\n";
+print "	   <property name=\"app.version\" value=\"$viewerVersion\"/>\n";
+
 
 # Defines the version number that is shown in the TIM Viewer about dialog
 print "   <property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
