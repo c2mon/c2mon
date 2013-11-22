@@ -104,8 +104,7 @@ public final class ServerStartup {
     }
     
     //core modules (in classpath); optional modules are imported in server-startup.xml
-    List<String> coreModules = new ArrayList<String>(Arrays.asList(
-                                         "cern/tim/server/common/config/server-common.xml",                                         
+    List<String> coreModules = new ArrayList<String>(Arrays.asList(                                         
                                          "cern/tim/server/cache/dbaccess/config/server-cachedbaccess.xml",
                                          "cern/tim/server/cache/loading/config/server-cacheloading.xml",
                                          "cern/tim/server/supervision/config/server-supervision.xml",
