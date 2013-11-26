@@ -1,4 +1,4 @@
-package cern.c2mon.daq.common;
+package cern.c2mon.daq.common.messaging.impl;
 import static org.junit.Assert.*;
 
 import static org.easymock.EasyMock.*;
@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.daq.common.ICommandRunner;
-import cern.c2mon.daq.common.SourceCommandExecutor;
+import cern.c2mon.daq.common.messaging.impl.SourceCommandExecutor;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.tim.shared.daq.command.SourceCommandTagReport;
 import cern.tim.shared.daq.command.SourceCommandTagValue;

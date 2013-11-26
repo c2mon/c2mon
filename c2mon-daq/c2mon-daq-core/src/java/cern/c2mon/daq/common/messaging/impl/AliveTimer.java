@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.daq.common;
+package cern.c2mon.daq.common.messaging.impl;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,7 +27,7 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 /**
  * This is a timer used for sending alive tags notification
  */
-public class AliveTimer {
+class AliveTimer {
     /**
      * Flag indicating if the timer is currently running
      */

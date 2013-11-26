@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.daq.common.ICommandRunner;
-import cern.c2mon.daq.common.SourceCommandExecutor;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;

@@ -1,0 +1,241 @@
+/******************************************************************************
+ * This file is part of the CERN Control and Monitoring (C2MON) platform.
+ * 
+ * See http://cern.ch/c2mon
+ * 
+ * Copyright (C) 2005-2013 CERN.
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version. This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details. You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * 
+ * Author: C2MON team, c2mon-support@cern.ch
+ *****************************************************************************/
+package cern.c2mon.daq.common.impl;
+
+import static java.lang.String.format;
+
+import java.sql.Timestamp;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
+import cern.c2mon.daq.common.messaging.IProcessMessageSender;
+import cern.c2mon.daq.filter.IFilterMessageSender;
+import cern.c2mon.daq.tools.DataTagValueFilter;
+import cern.c2mon.daq.tools.EquipmentSenderHelper;
+import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.tim.shared.daq.datatag.SourceDataTag;
+import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.tim.shared.daq.filter.FilteredDataTagValue;
+
+/**
+ * This class is used to send invalid messages to the server.
+ * 
+ * @author vilches
+ *
+ */
+class EquipmentSenderInvalid {
+    
+    /**
+     * The logger for this class.
+     */
+    private EquipmentLogger equipmentLogger;
+    
+    /**
+     * The process message sender takes the messages actually send to the server.
+     */
+    private IProcessMessageSender processMessageSender;
+    
+    /**
+     * The equipment sender helper with many common and useful methods shared by sending classes
+     */
+    private EquipmentSenderHelper equipmentSenderHelper = new EquipmentSenderHelper();
+    
+    /**
+     * Filters for Data Tag outgoing Values
+     */    
+    private DataTagValueFilter dataTagValueFilter;
+    
+    /**
+     * The dynamic time dead band filterer for recording the current source data tag
+     */
+    private IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer;
+    
+    /**
+     * Filter Message Sender
+     */
+    private EquipmentSenderFilterModule equipmentSenderFilterModule;
+    
+    /**
+     * Equipment Time Deadband
+     */
+    private EquipmentTimeDeadband equipmentTimeDeadband;
+    
+    /**
+     * Creates a new EquipmentInvalidSender. 
+     * 
+     * @param processMessageSender The process message sender to send tags to the server.
+     * @param equipmentSenderHelper
+     * @param equipmentLogger
+     */
+    @Autowired
+    public EquipmentSenderInvalid (final IFilterMessageSender filterMessageSender,
+    		final IProcessMessageSender processMessageSender, 
+    		final IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer,
+    		final EquipmentLoggerFactory equipmentLoggerFactory) {
+    	this.processMessageSender = processMessageSender;
+    	this.dynamicTimeDeadbandFilterer = dynamicTimeDeadbandFilterer;
+    	this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
+    	
+    	this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
+    	this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(filterMessageSender, equipmentLoggerFactory);
+    }
+    
+    /**
+     * init
+     * 
+     * @param equipmentTimeDeadband
+     */
+    public void init(EquipmentTimeDeadband equipmentTimeDeadband) {
+        setEquipmentTimeDeadband(equipmentTimeDeadband);
+    }
+    
+    /**
+     * Setter
+     * 
+     * @param equipmentTimeDeadband
+     */
+    public void setEquipmentTimeDeadband(EquipmentTimeDeadband equipmentTimeDeadband) {
+        this.equipmentTimeDeadband = equipmentTimeDeadband;
+    }
+    
+	/**
+     * This method sends an invalid SourceDataTagValue to the server. Source and DAQ timestamps are set to the current
+     * DAQ system time.
+     * 
+     * @param sourceDataTag SourceDataTag object
+     * @param pQualityCode the SourceDataTag's quality see {@link SourceDataQuality} class for details
+     * @param pDescription the quality description (optional)
+     */
+    public void sendInvalidTag(final SourceDataTag sourceDataTag, final short pQualityCode, final String pDescription) {
+        sendInvalidTag(sourceDataTag, pQualityCode, pDescription, null);
+    }
+
+    /**
+     * This method sends an invalid SourceDataTagValue to the server, without changing its origin value.
+     * 
+     * @param sourceDataTag SourceDataTag object
+     * @param pQualityCode the SourceDataTag's quality see {@link SourceDataQuality} class for details
+     * @param qualityDescription the quality description (optional)
+     * @param pTimestamp time when the SourceDataTag's value has become invalid; if null the source timestamp and DAQ
+     *            timestamp will be set to the current DAQ system time
+     */
+    public void sendInvalidTag(final SourceDataTag sourceDataTag, final short qualityCode, final String qualityDescription, 
+        final Timestamp pTimestamp) {
+      // Get the source data quality from the quality code
+      SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(qualityCode, qualityDescription);
+      
+      // The sendInvalidTag function with the value argument will take are of it
+      if (sourceDataTag.getCurrentValue() != null) {
+        sendInvalidTag(sourceDataTag, sourceDataTag.getCurrentValue().getValue(), sourceDataTag.getCurrentValue().getValueDescription(), 
+            newSDQuality, pTimestamp);
+      }
+      else {
+        sendInvalidTag(sourceDataTag, null, "", newSDQuality, pTimestamp);
+      }
+    }
+
+    /**
+     * This method sends both an invalid and updated SourceDataTagValue to the server.
+     * 
+     * @param sourceDataTag SourceDataTag object
+     * @param newValue The new update value that we want set to the tag 
+     * @param newTagValueDesc The new value description
+     * @param newSDQuality the new SourceDataTag see {@link SourceDataQuality}
+     * @param pTimestamp time when the SourceDataTag's value has become invalid; if null the source timestamp and DAQ
+     *            timestamp will be set to the current DAQ system time
+     */
+    protected void sendInvalidTag(final SourceDataTag sourceDataTag,
+                               final Object newValue,
+                               final String newTagValueDesc,
+                               final SourceDataQuality newSDQuality,
+                               final Timestamp pTimestamp) {
+      this.equipmentLogger.debug("sendInvalidTag - entering sendInvalidTag() for tag #" + sourceDataTag.getId());
+
+      // Create time stamp for filterng or invalidating
+      Timestamp timestamp;
+      if (pTimestamp == null) {
+        timestamp = new Timestamp(System.currentTimeMillis());
+      } else {
+        timestamp = pTimestamp;
+      }
+
+      try {
+        // We check first is the new value has to be filtered out or not
+        if (this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValue, newTagValueDesc, newSDQuality)) {
+          // If we are here the new Value will be filtered out
+          if (this.equipmentLogger.isDebugEnabled()) {
+            StringBuilder msgBuf = new StringBuilder();
+            msgBuf.append("\tthe tag : " + sourceDataTag.getId()
+                + " has already been invalidated with quality code : " + newSDQuality.getQualityCode());
+            msgBuf.append(" at " + sourceDataTag.getCurrentValue().getTimestamp());
+            msgBuf.append(" The DAQ has not received any values with different quality since than, Hence, the");
+            msgBuf.append(" invalidation procedure will be canceled this time");
+            this.equipmentLogger.debug(msgBuf.toString());
+          }
+
+          /*
+           * the value object can be null if several invalid data tags are sent when the DAQ is started up (the
+           * value object is still null, but the currentValue object is not anymore) in this case, we choose not
+           * to send it to the filter path
+           */
+          if (newValue != null) {
+            // send a corresponding INVALID tag to the statistics module
+            this.equipmentLogger.debug("sendInvalidTag - sending an invalid tag to the statistics module");
+
+            // send filtered message to statistics module
+            this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, newSDQuality, newValue, timestamp.getTime(), newTagValueDesc, false,
+                FilteredDataTagValue.REPEATED_INVALID);
+
+          } else if (this.equipmentLogger.isDebugEnabled()) {
+            this.equipmentLogger.debug("sendInvalidTag - value has still not been initialised: not sending the invalid tag to the statistics module");
+          }
+        } else {
+          // If we are here the new value will not be filtered out
+          
+          // If time deadband is enabled for that tag stop it
+          if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
+            this.equipmentLogger.debug("sendInvalidTag - flush and reset time-deadband scheduler for tag " + sourceDataTag.getId());
+            this.equipmentTimeDeadband.flushAndResetTimeDeadband(sourceDataTag);
+          }
+
+          this.equipmentLogger.debug(format("sendInvalidTag - invalidating and sending invalid tag (%d) update to the server", sourceDataTag.getId()));
+          
+          SourceDataTagValue newSDValue = sourceDataTag.invalidate(newSDQuality, newValue, newTagValueDesc, timestamp);
+          // Special case Quality OK     
+          if (newSDValue == null) {
+            // this means we have a valid quality code 0 (OK)
+            this.equipmentLogger.warn("sendInvalidTag - method called with 0(OK) quality code for tag " + sourceDataTag.getId()
+                + ". This should normally not happen! sendTagFiltered() method should have been called before.");
+          }
+          else {
+            // All checks and filters are done
+            this.processMessageSender.addValue(newSDValue);
+            this.dynamicTimeDeadbandFilterer.recordTag(sourceDataTag);
+          }
+        }
+      } catch (Exception ex) {
+        this.equipmentLogger.error("\tsendInvalidTag - Unexpected exception caught !", ex);
+      }
+      this.equipmentLogger.debug("sendInvalidTag - leaving sendInvalidTag()");
+    }
+}

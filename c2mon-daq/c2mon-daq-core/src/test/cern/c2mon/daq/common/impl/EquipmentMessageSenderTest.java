@@ -1,4 +1,4 @@
-package cern.c2mon.daq.common;
+package cern.c2mon.daq.common.impl;
 
 import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expectLastCall;
@@ -13,14 +13,15 @@ import java.sql.Timestamp;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.daq.common.EquipmentLoggerFactory;
-import cern.c2mon.daq.common.EquipmentMessageSender;
 import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
 import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
+import cern.c2mon.daq.common.impl.EquipmentMessageSender;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
+import cern.c2mon.daq.tools.EquipmentSenderHelper;
 import cern.tim.shared.common.datatag.DataTagAddress;
 import cern.tim.shared.common.datatag.DataTagConstants;
 import cern.tim.shared.common.datatag.DataTagDeadband;
@@ -47,6 +48,7 @@ public class EquipmentMessageSenderTest {
     private SourceDataTag sdt3;
 
     private EquipmentMessageSender equipmentMessageSender;
+    private EquipmentSenderHelper equipmentSenderHelper = new EquipmentSenderHelper();
 
     @Before
     public void setUp() {
@@ -75,13 +77,18 @@ public class EquipmentMessageSenderTest {
         equipmentConfiguration.getSubEqCommFaultValues().put(SUB_KEY1, false);
         equipmentConfiguration.getSubEqCommFaultValues().put(SUB_KEY2, true);
 
-        equipmentMessageSender.setEquipmentConfiguration(equipmentConfiguration);
+//        equipmentMessageSender.setEquipmentConfiguration(equipmentConfiguration);
         ProcessConfiguration processConf = new ProcessConfiguration();
         processConf.setProcessID(1L);
         processConf.setProcessName("ad");
         equipmentConfiguration.setHandlerClassName("asd");
-        equipmentMessageSender.setEquipmentLoggerFactory(EquipmentLoggerFactory.createFactory(equipmentConfiguration,
-                processConf, new RunOptions()));
+//        equipmentMessageSender.setEquipmentLoggerFactory(EquipmentLoggerFactory.createFactory(equipmentConfiguration,
+//                processConf, new RunOptions()));
+        EquipmentLoggerFactory equipmentLoggerFactory = EquipmentLoggerFactory.createFactory(equipmentConfiguration,
+                processConf, new RunOptions());
+        
+        this.equipmentMessageSender.init(equipmentConfiguration, equipmentLoggerFactory);
+        
         // Setup calls should not affect later tests
         reset(lowDynamicTimeDeadbandFilterActivator, medDynamicTimeDeadbandFilterActivator, filterMessageSender,
                 processMessageSender);     
@@ -238,7 +245,7 @@ public class EquipmentMessageSenderTest {
 
       SourceDataTagValue sourceDTValue = this.sdt2.getCurrentValue();
       // Get the source data quality from the quality code and description
-      SourceDataQuality newSDQuality = this.equipmentMessageSender.createTagQualityObject(SourceDataQuality.FUTURE_SOURCE_TIMESTAMP,
+      SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.FUTURE_SOURCE_TIMESTAMP,
           sourceDTValue.getQuality().getDescription());
       
       // It has:
@@ -279,7 +286,7 @@ public class EquipmentMessageSenderTest {
 
       SourceDataTagValue sourceDTValue = this.sdt1.getCurrentValue();
       // Get the source data quality from the quality code and description
-      SourceDataQuality newSDQuality = this.equipmentMessageSender.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, 
+      SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, 
           sourceDTValue.getQuality().getDescription());
       
       // It has:
@@ -314,7 +321,7 @@ public class EquipmentMessageSenderTest {
 
       SourceDataTagValue sourceDTValue = this.sdt2.getCurrentValue();
       // Get the source data quality from the quality code and description
-      SourceDataQuality newSDQuality = this.equipmentMessageSender.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, 
+      SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, 
           sourceDTValue.getQuality().getDescription());
       
       // It has:
@@ -353,7 +360,7 @@ public class EquipmentMessageSenderTest {
       SourceDataTagValue sourceDTValue = this.sdt3.getCurrentValue();
       // Get the source data quality from the quality code and description 
       //  - quality code is OK by default and it will never go for invalidation because is a special case. New quality code added
-      SourceDataQuality newSDQuality = this.equipmentMessageSender.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, 
+      SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, 
           sourceDTValue.getQuality().getDescription());
 
       // Relative. Should not be filtered      
@@ -388,7 +395,7 @@ public class EquipmentMessageSenderTest {
       // absolute
       sourceDTValue = this.sdt2.getCurrentValue();
       //    - quality code is OK by default and it will never go for invalidation because is a special case. New quality code added
-      newSDQuality = this.equipmentMessageSender.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, 
+      newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, 
           sourceDTValue.getQuality().getDescription());
 
       // Should not be filtered (different Value and Quality Code)
@@ -417,14 +424,12 @@ public class EquipmentMessageSenderTest {
 
         equipmentConfiguration.getDataTags().put(1L, sdt1);
 
-        equipmentMessageSender.setEquipmentConfiguration(equipmentConfiguration);
-
         ProcessConfiguration processConf = new ProcessConfiguration();
         processConf.setProcessID(1L);
         processConf.setProcessName("ad");
         equipmentConfiguration.setHandlerClassName("asd");
 
-        equipmentMessageSender.setEquipmentLoggerFactory(EquipmentLoggerFactory.createFactory(equipmentConfiguration,
+        equipmentMessageSender.init(equipmentConfiguration, EquipmentLoggerFactory.createFactory(equipmentConfiguration,
                 processConf, new RunOptions()));
 
         // setup calls should not affect later tests

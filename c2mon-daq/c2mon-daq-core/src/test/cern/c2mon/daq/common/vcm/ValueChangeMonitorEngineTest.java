@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.common.ValueChangeMonitorEngine;
 import cern.c2mon.daq.common.vcm.testhandler.EspMessageHandler;
 import cern.c2mon.daq.common.vcm.testhandler.GenericMessageHandlerTst;
 import cern.c2mon.daq.common.vcm.testhandler.SourceDataTagValueCapture;

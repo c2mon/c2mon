@@ -1,4 +1,4 @@
-package cern.c2mon.daq.common;
+package cern.c2mon.daq.common.logger;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;

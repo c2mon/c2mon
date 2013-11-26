@@ -15,10 +15,11 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.daq.common;
+package cern.c2mon.daq.common.messaging.impl;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.tim.shared.daq.command.SourceCommandTagReport;
 import cern.tim.shared.daq.command.SourceCommandTagValue;
@@ -26,7 +27,7 @@ import cern.tim.shared.daq.command.SourceCommandTagValue;
 /**
  * This class models the threads responsible for command execution
  */
-public class SourceCommandExecutor extends Thread {
+class SourceCommandExecutor extends Thread {
 
     /**
      * Log4j Logger for this class

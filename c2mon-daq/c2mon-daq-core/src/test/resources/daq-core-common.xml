@@ -74,7 +74,7 @@
 	</bean>
 	<bean id="processConfigurationLoader"
 		class="cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader" />
-	<bean id="equipmentMessageSender" class="cern.c2mon.daq.common.EquipmentMessageSender"
+	<bean id="equipmentMessageSender" class="cern.c2mon.daq.common.impl.EquipmentMessageSender"
 		scope="prototype" />
 
 </beans>

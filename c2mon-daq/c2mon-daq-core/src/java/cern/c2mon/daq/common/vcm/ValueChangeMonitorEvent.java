@@ -2,7 +2,7 @@
  * Copyright (c) 2013 European Organisation for Nuclear Research (CERN), All Rights Reserved.
  */
 
-package cern.c2mon.daq.common;
+package cern.c2mon.daq.common.vcm;
 
 /**
  * The <code>ValueChangeMonitorEngine</code> class represents events that can be registered inside the

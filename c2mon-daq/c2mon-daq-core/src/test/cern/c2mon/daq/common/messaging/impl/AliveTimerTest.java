@@ -1,12 +1,12 @@
-package cern.c2mon.daq.common;
+package cern.c2mon.daq.common.messaging.impl;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.daq.common.AliveTimer;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
+import cern.c2mon.daq.common.messaging.impl.AliveTimer; 
 import static org.easymock.classextension.EasyMock.*;
 
 public class AliveTimerTest {

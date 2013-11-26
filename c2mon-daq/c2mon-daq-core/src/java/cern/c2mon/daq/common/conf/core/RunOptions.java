@@ -168,7 +168,7 @@ public class RunOptions {
      * 
      * @return boolean
      */
-    public final boolean getEqLoggers() {
+    public boolean getEqLoggers() {
         return this.eqLoggers;
     }
 
@@ -189,7 +189,7 @@ public class RunOptions {
      * 
      * @return boolean
      */
-    public final boolean getEqAppendersOnly() {
+    public boolean getEqAppendersOnly() {
         return this.eqAppendersOnly;
     }
 

@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import cern.c2mon.daq.common.ValueChangeMonitorEngine;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
 import cern.tim.shared.common.datatag.DataTagAddress;
 import cern.tim.shared.common.datatag.ValueChangeMonitor;
 import cern.tim.shared.daq.command.SourceCommandTag;

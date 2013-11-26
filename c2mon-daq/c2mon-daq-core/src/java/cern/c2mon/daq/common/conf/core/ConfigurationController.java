@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.w3c.dom.Document;
 
-import cern.c2mon.daq.common.ValueChangeMonitorEngine;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.ICoreCommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.ICoreDataTagChanger;
@@ -35,6 +34,7 @@ import cern.c2mon.daq.common.conf.equipment.ICoreEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
+import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
 import cern.c2mon.daq.tools.CommandParamsHandler;
 import cern.c2mon.daq.tools.StackTraceHelper;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;

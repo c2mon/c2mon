@@ -20,16 +20,16 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.w3c.dom.Element;
 
-import cern.c2mon.daq.common.EquipmentCommandHandler;
-import cern.c2mon.daq.common.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.common.EquipmentMessageSender;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
 import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
+import cern.c2mon.daq.common.impl.EquipmentCommandHandler;
+import cern.c2mon.daq.common.impl.EquipmentMessageSender;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
 import cern.c2mon.daq.filter.IFilterMessageSender;
@@ -179,8 +179,9 @@ public abstract class GenericMessageHandlerTst {
                     new EquipmentConfigurationHandler(equipmentId, configurationController), 
                     equipmentMessageSender);
             msgHandler.setEquipmentLoggerFactory(factory);
-            equipmentMessageSender.setEquipmentConfiguration(equipmentConfiguration);
-            equipmentMessageSender.setEquipmentLoggerFactory(factory);
+//            equipmentMessageSender.setEquipmentConfiguration(equipmentConfiguration);
+//            equipmentMessageSender.setEquipmentLoggerFactory(factory);
+            equipmentMessageSender.init(equipmentConfiguration, factory);
             pconf.getEquipmentConfigurations().put(equipmentId, equipmentConfiguration);
             msgHandler.setEquipmentMessageSender(equipmentMessageSender);
             msgHandler.setEquipmentLoggerFactory(new EquipmentLoggerFactory(equipmentConfiguration.getHandlerClassName(), equipmentId, 

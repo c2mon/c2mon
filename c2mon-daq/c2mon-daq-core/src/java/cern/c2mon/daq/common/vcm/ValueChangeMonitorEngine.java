@@ -2,7 +2,7 @@
  * Copyright (c) 2013 European Organisation for Nuclear Research (CERN), All Rights Reserved.
  */
 
-package cern.c2mon.daq.common;
+package cern.c2mon.daq.common.vcm;
 
 import static java.lang.String.format;
 
@@ -14,6 +14,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.daq.common.DriverKernel;
+import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.tim.shared.common.datatag.ValueChangeMonitor;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 import com.espertech.esper.client.EPServiceProvider;
@@ -41,15 +43,15 @@ public class ValueChangeMonitorEngine implements UpdateListener {
 
     // the following pattern is used for missing event detection (in time window)
     static final String eplExpTemplate1_a = "insert into ValueChangeMonitorEventStream select '%d' as id, false as value "
-            + "from pattern [every (timer:interval(%d msec) and not cern.c2mon.daq.common.ValueChangeMonitorEvent(id=%d))]";
+            + "from pattern [every (timer:interval(%d msec) and not " + ValueChangeMonitorEvent.class.getName() + "(id=%d))]";
 
     // the following pattern is used to detect events arriving as expected (in time window)
     static final String eplExpTemplate1_b = "insert into ValueChangeMonitorEventStream select '%d' as id, true as value "
-            + "from pattern [every (timer:interval(%d msec) and cern.c2mon.daq.common.ValueChangeMonitorEvent(id=%d))]";
+            + "from pattern [every (timer:interval(%d msec) and " + ValueChangeMonitorEvent.class.getName() + "(id=%d))]";
 
     // the following pattern is used to detect pairs of events with value differences matching the expected criteria
     static final String eplExpTemplate2_a = "insert into ValueChangeMonitorEventStream select '%d' as id, true as value "
-            + "from cern.c2mon.daq.common.ValueChangeMonitorEvent(id=%d) "
+            + "from " + ValueChangeMonitorEvent.class.getName() + "(id=%d) "
             + "match_recognize ( "
             + "partition by id "
             + "measures E1.value as v1, E2.value as v2 " 
@@ -57,7 +59,7 @@ public class ValueChangeMonitorEngine implements UpdateListener {
 
     // the following pattern is used to detect pairs of events with value differences NOT matching the expected criteria
     static final String eplExpTemplate2_b = "insert into ValueChangeMonitorEventStream select '%d' as id, false as value "
-            + "from cern.c2mon.daq.common.ValueChangeMonitorEvent(id=%d) "
+            + "from " + ValueChangeMonitorEvent.class.getName() + "(id=%d) "
             + "match_recognize ( "
             + "partition by id "
             + "measures E1.value as v1, E2.value as v2 " 

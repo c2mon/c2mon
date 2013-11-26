@@ -26,7 +26,6 @@ import javax.jms.JMSException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.daq.common.AliveTimer;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;

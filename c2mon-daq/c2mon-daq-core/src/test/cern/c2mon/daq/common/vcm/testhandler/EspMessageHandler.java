@@ -12,11 +12,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import cern.c2mon.daq.common.EquipmentLogger;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.tim.shared.daq.config.ChangeReport;
 import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;

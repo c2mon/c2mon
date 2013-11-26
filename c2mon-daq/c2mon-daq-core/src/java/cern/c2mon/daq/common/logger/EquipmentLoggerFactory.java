@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.daq.common;
+package cern.c2mon.daq.common.logger;
 
 import java.util.Hashtable;
 
