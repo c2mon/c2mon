@@ -144,7 +144,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         }
         
         // Controller
-        this.dbController = new DBController(dbDaqDao, getEquipmentLogger(), getEquipmentConfiguration(), getEquipmentMessageSender());
+        this.dbController = new DBController(dbDaqDao, getEquipmentLoggerFactory(), getEquipmentConfiguration(), getEquipmentMessageSender());
         
         // Data Tag Changer
         DBDataTagChanger dataTagChanger = new DBDataTagChanger(this.dbController);
