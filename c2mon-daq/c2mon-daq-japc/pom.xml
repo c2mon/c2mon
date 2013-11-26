@@ -63,16 +63,7 @@
 			<groupId>cern.japc</groupId>
 			<artifactId>japc</artifactId>		
 		</dependency>
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-remote</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>spring-aop</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+		
 		<dependency>
 			<groupId>cern.japc</groupId>
 			<artifactId>japc-ext-cmwrda</artifactId>

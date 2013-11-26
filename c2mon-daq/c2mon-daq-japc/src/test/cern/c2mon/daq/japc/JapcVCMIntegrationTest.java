@@ -19,7 +19,7 @@ import org.junit.Test;
 import cern.c2mon.daq.japc.GenericJapcMessageHandler;
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.common.ValueChangeMonitorEngine;
+import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
