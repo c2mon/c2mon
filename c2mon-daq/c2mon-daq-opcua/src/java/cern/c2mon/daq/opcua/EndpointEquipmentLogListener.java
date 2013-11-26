@@ -3,7 +3,8 @@ package cern.c2mon.daq.opcua;
 import java.util.Date;
 
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpointListener;
-import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
@@ -16,18 +17,18 @@ import cern.tim.shared.daq.datatag.ISourceDataTag;
  */
 public class EndpointEquipmentLogListener implements IOPCEndpointListener {
     /**
-     * The equipment logger used to log the events.
+     * The equipment equipmentLogger used to log the events.
      */
-    private final EquipmentLogger logger;
+    private final EquipmentLogger equipmentLogger;
 
     /**
      * Creates a new endpoint log listener.
      * 
-     * @param logger
-     *            The logger to use to log the events.
+     * @param equipmentLoggerFactory
+     *            The equipmentLogger creator to use to log the events.
      */
-    public EndpointEquipmentLogListener(final EquipmentLogger logger) {
-        this.logger = logger;
+    public EndpointEquipmentLogListener(final EquipmentLoggerFactory equipmentLoggerFactory) {
+        this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
     }
 
     /**
@@ -51,10 +52,10 @@ public class EndpointEquipmentLogListener implements IOPCEndpointListener {
         else
             convertedValue = TIMDriverSimpleTypeConverter.convert(
                     dataTag, tagValue.toString());
-        if (logger.isDebugEnabled()) {
-            logger.debug("Original value: '" + (tagValue != null ? tagValue.toString() : "null") + "', Tag type: '" + dataTag.getDataType() + "', Original type: '"
+        if (equipmentLogger.isDebugEnabled()) {
+            equipmentLogger.debug("Original value: '" + (tagValue != null ? tagValue.toString() : "null") + "', Tag type: '" + dataTag.getDataType() + "', Original type: '"
                     + (tagValue != null ? tagValue.getClass().getSimpleName() : "null") + "'");
-            logger.debug("New tag value (ID: '" + dataTag.getId() + "'," + " converted value: '" + convertedValue + "', converted type: '"
+            equipmentLogger.debug("New tag value (ID: '" + dataTag.getId() + "'," + " converted value: '" + convertedValue + "', converted type: '"
                     + (convertedValue != null ? convertedValue.getClass().getSimpleName() : "null") + "', Timestamp: '" + timestamp +  " " + new Date(timestamp) + "').");
         }
     }
@@ -67,7 +68,7 @@ public class EndpointEquipmentLogListener implements IOPCEndpointListener {
      */
     @Override
     public void onSubscriptionException(final Throwable cause) {
-        logger.error("Exception in OPC subscription.", cause);
+        equipmentLogger.error("Exception in OPC subscription.", cause);
     }
 
     /**
@@ -80,7 +81,7 @@ public class EndpointEquipmentLogListener implements IOPCEndpointListener {
      */
     @Override
     public void onTagInvalidException(final ISourceDataTag dataTag, final Throwable cause) {
-        logger.warn("Tag with id '" + dataTag.getId() + "' caused exception. " + "Check configuration. Address: " 
+        equipmentLogger.warn("Tag with id '" + dataTag.getId() + "' caused exception. " + "Check configuration. Address: " 
         		+ ((OPCHardwareAddress)dataTag.getHardwareAddress()).getOPCItemName(), cause);
     }
 

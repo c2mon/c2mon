@@ -13,8 +13,8 @@ import cern.c2mon.daq.opcua.connection.common.impl.AliveWriter;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.daq.opcua.connection.common.impl.StatusChecker;
-import cern.c2mon.daq.common.EquipmentLogger;
-import cern.c2mon.daq.common.EquipmentLoggerFactory;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
@@ -118,8 +118,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         this.sender = sender;
         this.factory = factory;
         this.logger = factory.getEquipmentLogger(getClass());
-        logListener = new EndpointEquipmentLogListener(
-                factory.getEquipmentLogger(EndpointEquipmentLogListener.class));
+        logListener = new EndpointEquipmentLogListener(factory);
         this.opcAddresses = opcAddresses;
         this.equipmentConfiguration = equipmentConfiguration;
     }
@@ -207,9 +206,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
           logger.error("No equipment alive tag is specified. Check the configuration! ==> Alive Timer has not been started.");
         }
         else {
-            writer = new AliveWriter(
-                    endpoint, equipmentConfiguration.getAliveTagInterval() / 2,
-                    targetTag, factory.getEquipmentLogger(AliveWriter.class));
+            writer = new AliveWriter(endpoint, equipmentConfiguration.getAliveTagInterval() / 2, targetTag, factory);
             writer.startWriter();
         }
     }

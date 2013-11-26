@@ -1,5 +1,16 @@
 package cern.c2mon.daq.opcua;
 
+
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -7,28 +18,19 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
-
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.daq.opcua.EndpointController;
-import cern.c2mon.daq.opcua.EndpointEquipmentLogListener;
-import cern.c2mon.daq.opcua.EndpointTypesUnknownException;
-import cern.c2mon.daq.opcua.OPCUAAddress;
-import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
-import cern.c2mon.daq.opcua.connection.common.IOPCEndpointFactory;
-import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint.STATE;
-import cern.c2mon.daq.opcua.connection.common.impl.AliveWriter;
-import cern.c2mon.daq.common.EquipmentLogger;
-import cern.c2mon.daq.common.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
+import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
+import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint.STATE;
+import cern.c2mon.daq.opcua.connection.common.IOPCEndpointFactory;
 import cern.tim.shared.common.ConfigurationException;
 import cern.tim.shared.common.datatag.DataTagAddress;
-import cern.tim.shared.common.datatag.DataTagQuality;
 import cern.tim.shared.common.datatag.address.HardwareAddress;
 import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
 import cern.tim.shared.daq.command.ISourceCommandTag;
@@ -43,15 +45,13 @@ import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
 
 public class EndpointControllerTest {
     
-    private IOPCEndpointFactory factory = createMock(IOPCEndpointFactory.class);
+    private IOPCEndpointFactory factory = EasyMock.createMock(IOPCEndpointFactory.class);
     
-    private IOPCEndpoint endpoint = createMock(IOPCEndpoint.class);
+    private IOPCEndpoint endpoint = EasyMock.createMock(IOPCEndpoint.class);
     
-    private IEquipmentMessageSender sender =
-        createMock(IEquipmentMessageSender.class);
+    private IEquipmentMessageSender sender = EasyMock.createMock(IEquipmentMessageSender.class);
     
-    private IEquipmentConfiguration conf =
-        createMock(IEquipmentConfiguration.class);
+    private IEquipmentConfiguration conf = EasyMock.createMock(IEquipmentConfiguration.class);
 
     private OPCUAAddress opcAddress;
 

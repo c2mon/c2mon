@@ -5,7 +5,8 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
-import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 
@@ -38,9 +39,9 @@ public class AliveWriter extends TimerTask {
     private AtomicInteger writeCounter = new AtomicInteger(0);
 
     /**
-     * The logger for this alive writer.
+     * The equipmentLogger for this alive writer.
      */
-    private EquipmentLogger logger;
+    private EquipmentLogger equipmentLogger;
 
     /**
      * Creates a new alive writer.
@@ -51,12 +52,12 @@ public class AliveWriter extends TimerTask {
      *            The time between two write operations.
      * @param targetTag
      *            The tag which represents the value to write to.
-     * @param logger
-     *            equipment specific logger for this class.
+     * @param equipmentLoggerFactory
+     *            for creating the proper equipment loggers EquipmentLoggerFactory 
      */
     public AliveWriter(final IOPCEndpoint endpoint, final long writeTime, 
-            final ISourceDataTag targetTag, final EquipmentLogger logger) {
-        this.logger = logger;
+            final ISourceDataTag targetTag, final EquipmentLoggerFactory equipmentLoggerFactory) {
+        this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
         this.endpoint = endpoint;
         this.writeTime = writeTime;
         this.targetTag = targetTag;
@@ -72,16 +73,16 @@ public class AliveWriter extends TimerTask {
             (OPCHardwareAddress) targetTag.getHardwareAddress();
         // We send an Integer since Long could cause problems to the OPC
         Object castedValue = Integer.valueOf(writeCounter.intValue());
-        logger.debug("Writing value: " + castedValue 
+        equipmentLogger.debug("Writing value: " + castedValue 
                 + " type: " + castedValue.getClass().getName());
         try {
             endpoint.write(hardwareAddress, castedValue);
             writeCounter.incrementAndGet();
             writeCounter.compareAndSet(Byte.MAX_VALUE, 0);
         } catch (OPCCommunicationException exception) {
-            logger.error("Error while writing alive. Going to retry...", exception);
+            equipmentLogger.error("Error while writing alive. Going to retry...", exception);
         } catch (OPCCriticalException exception) {
-            logger.error("Critical error while writing alive. Stopping alive...", exception);
+            equipmentLogger.error("Critical error while writing alive. Stopping alive...", exception);
             synchronized (this) {
                 cancel();
             }
@@ -96,7 +97,7 @@ public class AliveWriter extends TimerTask {
             timer.cancel();
         }
         timer = new Timer("OPCAliveWriter");
-        logger.info("Starting OPCAliveWriter...");
+        equipmentLogger.info("Starting OPCAliveWriter...");
         timer.schedule(this, writeTime, writeTime);
     }
 
@@ -105,7 +106,7 @@ public class AliveWriter extends TimerTask {
      */
     public synchronized void stopWriter() {
         if (timer != null) {
-            logger.info("Stopping OPCAliveWriter...");
+            equipmentLogger.info("Stopping OPCAliveWriter...");
             timer.cancel();
             timer = null;
         }
