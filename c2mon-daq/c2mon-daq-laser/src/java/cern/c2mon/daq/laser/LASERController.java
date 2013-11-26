@@ -24,7 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
@@ -140,9 +141,9 @@ public class LASERController {
    * @param equipmentMessageSender
    * 
    */
-  public LASERController(final EquipmentLogger equipmentLogger, final IEquipmentConfiguration equipmentConfiguration, 
+  public LASERController(final EquipmentLoggerFactory equipmentLoggerFactory, final IEquipmentConfiguration equipmentConfiguration, 
       final IEquipmentMessageSender equipmentMessageSender) {
-    this.equipmentLogger = equipmentLogger;
+    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
     this.equipmentConfiguration = equipmentConfiguration;
     this.equipmentMessageSender = equipmentMessageSender;
     this.laserAlarmSelectionListener = new LASERAlarmSelectionListener(this);

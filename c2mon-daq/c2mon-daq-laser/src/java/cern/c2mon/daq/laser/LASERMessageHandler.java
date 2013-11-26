@@ -68,7 +68,7 @@ public class LASERMessageHandler extends EquipmentMessageHandler {
     }
     
     // Controller
-    this.laserController = new LASERController(getEquipmentLogger(), getEquipmentConfiguration(), getEquipmentMessageSender());
+    this.laserController = new LASERController(getEquipmentLoggerFactory(), getEquipmentConfiguration(), getEquipmentMessageSender());
     
     // Data Tag Changer
     LASERDataTagChanger dataTagChanger = new LASERDataTagChanger(this.laserController);
