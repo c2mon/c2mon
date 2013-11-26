@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-daq</groupId>
     <artifactId>c2mon-daq-pom</artifactId>
-    <version>1.0.25</version>
+    <version>1.0.26</version>
   </parent>
 
   <artifactId>c2mon-daq-dip</artifactId>

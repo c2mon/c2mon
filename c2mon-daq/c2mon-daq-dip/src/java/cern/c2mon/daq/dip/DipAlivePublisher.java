@@ -12,7 +12,8 @@ import cern.dip.DipPublication;
 import cern.dip.DipPublicationErrorHandler;
 import cern.dip.DipTimestamp;
 import cern.dip.TypeMismatch;
-import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.tim.shared.common.datatag.address.DIPHardwareAddress;
 import cern.tim.shared.daq.datatag.ISourceDataTag;
 
@@ -35,7 +36,7 @@ public class DipAlivePublisher extends TimerTask implements DipPublicationErrorH
   /**
    * Logger for this DAQ implementation.
    */
-  private EquipmentLogger logger;
+  private EquipmentLogger equipmentLogger;
   
   /**
    * Waits between reconnect attempts.
@@ -83,13 +84,13 @@ public class DipAlivePublisher extends TimerTask implements DipPublicationErrorH
    * @param equipmentName name of the Equipment (only used in publication id).
    * @param aliveTag the alive tag
    * @param aliveInterval the interval between publications
-   * @param logger the EquipmentLogger used to log all log messages
+   * @param equipmentLogger the EquipmentLogger used to log all log messages
    */
   protected DipAlivePublisher(final String equipmentName, final ISourceDataTag aliveTag, 
-                                    final long aliveInterval, final EquipmentLogger logger) {
+                                    final long aliveInterval, final EquipmentLoggerFactory equipmentLoggerFactory) {
     this.aliveTag = aliveTag;    
     this.aliveInterval = aliveInterval;
-    this.logger = logger;
+    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());;
     this.equipmentName = equipmentName;
     if (aliveTag != null) {
       if (aliveTag.getHardwareAddress() instanceof DIPHardwareAddress) {
@@ -97,15 +98,15 @@ public class DipAlivePublisher extends TimerTask implements DipPublicationErrorH
         try {
           initDipConnection();
         } catch (DipException e) {
-          logger.error("Unable to initialize DIP alive connection; will try again in " + CONNECT_RETRY_INTERVAL + "milliseconds.");
+          equipmentLogger.error("Unable to initialize DIP alive connection; will try again in " + CONNECT_RETRY_INTERVAL + "milliseconds.");
           startReconnectThread();
         }     
       } else {
-        logger.error("Alive Tag has incorrect HardwareAddress type: unable to initialize the DIP Equipment alive publication.");
+        equipmentLogger.error("Alive Tag has incorrect HardwareAddress type: unable to initialize the DIP Equipment alive publication.");
         aliveTimer = null;
       }
     } else {
-      logger.warn("No alive tag defined for this DIP Equipment - unable to initialize a DIP Equipment alive publication.");
+      equipmentLogger.warn("No alive tag defined for this DIP Equipment - unable to initialize a DIP Equipment alive publication.");
       aliveTimer = null;
     }
   }
@@ -131,12 +132,12 @@ public class DipAlivePublisher extends TimerTask implements DipPublicationErrorH
     try {
       dipData.insert(millis);
     } catch (TypeMismatch e) {
-      logger.error("DIP Type mismatch on creating DIP Equipment alive update - unable to publish.", e);
+      equipmentLogger.error("DIP Type mismatch on creating DIP Equipment alive update - unable to publish.", e);
     }
     try {
       dipPublication.send(dipData, dipTimestamp);
     } catch (DipException e) {
-      logger.error("DipException when attempting to publish DIP Equipment alive - resetting alive DIP connection in " 
+      equipmentLogger.error("DipException when attempting to publish DIP Equipment alive - resetting alive DIP connection in " 
           + CONNECT_RETRY_INTERVAL + "millseconds.", e);
       stop();
       startReconnectThread();
@@ -174,7 +175,7 @@ public class DipAlivePublisher extends TimerTask implements DipPublicationErrorH
    */
   @Override
   public void handleException(final DipPublication publication, final DipException ex) {
-    logger.error("Exception caught by DipPublicationErrorHandler - resetting connection.", ex);
+    equipmentLogger.error("Exception caught by DipPublicationErrorHandler - resetting connection.", ex);
     startReconnectThread();
   }
 
@@ -194,7 +195,7 @@ public class DipAlivePublisher extends TimerTask implements DipPublicationErrorH
             initTimer();
             start();            
           } catch (Exception e) {
-            logger.error("Exception caught in alive publication reconnection thread - "
+            equipmentLogger.error("Exception caught in alive publication reconnection thread - "
              + "attempting to restart alive publication in " + CONNECT_RETRY_INTERVAL + "milliseconds");            
           }          
           reconnecting.set(false);

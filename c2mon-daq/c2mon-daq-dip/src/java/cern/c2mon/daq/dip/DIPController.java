@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import cern.dip.DipException;
 import cern.dip.DipFactory;
 import cern.dip.DipSubscription;
-import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.tim.shared.common.datatag.address.DIPHardwareAddress;

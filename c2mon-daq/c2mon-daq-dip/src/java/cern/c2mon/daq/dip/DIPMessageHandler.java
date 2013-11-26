@@ -70,7 +70,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
     // initialize alive mechanism
     alivePublisher = new DipAlivePublisher(getEquipmentConfiguration().getName(), 
         getEquipmentConfiguration().getSourceDataTag(getEquipmentConfiguration().getAliveTagId()), // null if not Tag found
-        getEquipmentConfiguration().getAliveTagInterval(), getEquipmentLogger());
+        getEquipmentConfiguration().getAliveTagInterval(), getEquipmentLoggerFactory());
     alivePublisher.start();
     
     // Controller

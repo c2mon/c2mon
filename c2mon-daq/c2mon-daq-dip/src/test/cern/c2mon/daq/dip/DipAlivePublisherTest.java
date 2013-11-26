@@ -1,12 +1,13 @@
 package cern.c2mon.daq.dip;
 
-import org.easymock.classextension.EasyMock;
+
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.daq.common.EquipmentLogger;
-import cern.c2mon.daq.dip.DipAlivePublisher;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.dip.Dip;
 import cern.dip.DipData;
 import cern.dip.DipException;
@@ -34,11 +35,12 @@ public class DipAlivePublisherTest {
    */
   private ISourceDataTag mockAliveTag;  
   private DIPHardwareAddress mockAddress;
+  private EquipmentLoggerFactory equipmentLoggerFactoryMock;
   
   /**
    * Logger needed for Publisher initialization.
    */
-  private EquipmentLogger logger;
+  private EquipmentLogger equipmentLogger;
   
   /**
    * Field used for recording number of listener calls in test.
@@ -51,8 +53,9 @@ public class DipAlivePublisherTest {
   @Before
   public void setUp() {
     mockAliveTag = EasyMock.createMock(ISourceDataTag.class);
-    logger = new EquipmentLogger("Test logger", "Test logger", "DIPHandler");    
+    this.equipmentLogger = new EquipmentLogger("Test equipmentLogger", "Test equipmentLogger", "DipAlivePublisher");    
     mockAddress = EasyMock.createMock(DIPHardwareAddress.class);
+    this.equipmentLoggerFactoryMock = EasyMock.createMock(EquipmentLoggerFactory.class); 
   }
   
   /**
@@ -70,12 +73,12 @@ public class DipAlivePublisherTest {
     
     EasyMock.expect(mockAliveTag.getHardwareAddress()).andReturn(mockAddress);
     EasyMock.expectLastCall().times(2);
-    EasyMock.expect(mockAddress.getItemName()).andReturn(TEST_DIP_PUBLICATION_NAME);     
+    EasyMock.expect(mockAddress.getItemName()).andReturn(TEST_DIP_PUBLICATION_NAME); 
+    EasyMock.expect(this.equipmentLoggerFactoryMock.getEquipmentLogger(DipAlivePublisher.class)).andReturn(this.equipmentLogger).times(1); 
     
-    EasyMock.replay(mockAliveTag);
-    EasyMock.replay(mockAddress);
+    EasyMock.replay(mockAliveTag, mockAddress, this.equipmentLoggerFactoryMock);
     
-    DipAlivePublisher publisher = new DipAlivePublisher("Test DIP alive", mockAliveTag, 5000, logger);
+    DipAlivePublisher publisher = new DipAlivePublisher("Test DIP alive", mockAliveTag, 5000, this.equipmentLoggerFactoryMock);
     publisher.start();
     //wait for first 2 publications
     Thread.sleep(8000);    
