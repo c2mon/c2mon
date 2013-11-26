@@ -33,9 +33,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import cern.c2mon.daq.common.EquipmentLogger;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqDataTagException;
@@ -121,11 +122,11 @@ public class SSHHelper {
    * @param address
    * @throws EqException
    */
-  public SSHHelper(EquipmentLogger equipmentLogger, IEquipmentConfiguration equipmentConfiguration, 
-      IEquipmentMessageSender equipmentMessageSender) {
-    this.equipmentLogger = equipmentLogger;
-    this.equipmentConfiguration = equipmentConfiguration;
-    this.equipmentMessageSender = equipmentMessageSender;
+  public SSHHelper(final EquipmentLoggerFactory equipmentLoggerFactory, final IEquipmentConfiguration equipmentConfiguration, 
+          final IEquipmentMessageSender equipmentMessageSender) {
+      this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
+      this.equipmentConfiguration = equipmentConfiguration;
+      this.equipmentMessageSender = equipmentMessageSender;
   }
 
 

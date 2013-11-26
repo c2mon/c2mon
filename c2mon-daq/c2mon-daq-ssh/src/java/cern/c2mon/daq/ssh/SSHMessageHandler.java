@@ -72,7 +72,7 @@ public class SSHMessageHandler extends EquipmentMessageHandler {
     }
     
     // Create the Helper object
-    this.sshHelper = new SSHHelper(getEquipmentLogger(), getEquipmentConfiguration(), getEquipmentMessageSender());
+    this.sshHelper = new SSHHelper(getEquipmentLoggerFactory(), getEquipmentConfiguration(), getEquipmentMessageSender());
 
     // try to parse the equipment address
     try {
