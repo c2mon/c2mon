@@ -14,7 +14,7 @@
 	<description>
      This module is a core component of the C2MON Data Acqisition Modules (DAQs)
     </description>
-	<url>http://timweb.cern.ch</url>
+	<url>https://wikis/display/C2MON/C2MON+DAQ+core</url>
 
 	<scm>
 		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-core</developerConnection>
