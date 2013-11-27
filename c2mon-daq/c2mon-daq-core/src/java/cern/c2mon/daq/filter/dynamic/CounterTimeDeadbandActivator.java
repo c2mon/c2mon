@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
-import cern.tim.shared.common.datatag.DataTagAddress;
-import cern.tim.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
 /**
  * Counter deadband activator which counts the tags in a provided time and 
  * activates/deactivates them if necessary. 

@@ -19,7 +19,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common;
 
-import cern.tim.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * Interface to expose the record method for dynamic deadband filtering

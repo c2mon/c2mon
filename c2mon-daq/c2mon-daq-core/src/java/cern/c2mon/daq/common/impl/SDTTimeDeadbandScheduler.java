@@ -25,9 +25,9 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.daq.tools.DataTagValueFilter;
-import cern.tim.shared.daq.datatag.SourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
-import cern.tim.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
 
 /**
  * The SourceDataTagTimeDeadbandScheduler class models threads responsible for handling source time deadband filtering

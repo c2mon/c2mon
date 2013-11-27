@@ -2,7 +2,7 @@
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
  * 
- * Copyright (C) 2005-2010 CERN.
+ * Copyright (C) 2005-2013 CERN.
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  * 
- * Author: TIM team, tim.support@cern.ch
+ * Author: C2MON team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.common.startup;
 
@@ -66,8 +66,8 @@ public final class DaqStartup {
    * The DAQ main start up method. Accesses the required command line arguments, parses the properties
    * file and loads the Spring context.
    * 
-   * The properties are loaded from .tim2.properties in the user home directory unless specified otherwise
-   * with the -timProperties command line argument. Further properties can also be loaded using the
+   * The properties are loaded from .c2mon.properties in the user home directory unless specified otherwise
+   * with the -c2monProperties command line argument. Further properties can also be loaded using the
    * optional -daqConf option.
    * 
    * @param args the required start up arguments are -log4j and -processName
@@ -85,10 +85,10 @@ public final class DaqStartup {
         || !commandParams.hasParam("-processName")) {
        System.out.println();
        System.out.println("********************************************************************************");
-       System.out.println("**                TIM Data Acquisition                                        **");
+       System.out.println("**                C2MON Data Acquisition                                       **");
        System.out.println("** usage :                                                                    **");
-       System.out.println("** java DaqStartup [-timProperties tim.properties file path]                  **");
-       System.out.println("**                   (defaults to .tim2.properties in home dir)               **");
+       System.out.println("** java DaqStartup [-c2monProperties c2mon.properties file path]                  **");
+       System.out.println("**                   (defaults to .c2mon.properties in home dir)               **");
        System.out.println("**                   -daqConf common DAQ configuration file                   **");       
        System.out.println("**                   -log4j logerConfXMLFile                                  **");
        System.out.println("**                   -processName ProcessName                                 **");
@@ -106,7 +106,7 @@ public final class DaqStartup {
     }
     
     // set the process name (used in the log4j file name)
-    System.setProperty("tim.process.name", commandParams.getParamValue("-processName"));
+    System.setProperty("c2mon.process.name", commandParams.getParamValue("-processName"));
     
     configureLogging(commandParams);
     
@@ -126,17 +126,17 @@ public final class DaqStartup {
     commandParamsBean.setConstructorArgumentValues(constructorArgs);
         
     //create Java Properties Spring bean from the provided properties file 
-    //(defaults to .tim.properties in user home directory)
+    //(defaults to .c2mon.properties in user home directory)
     GenericBeanDefinition propertiesFactoryBean = new GenericBeanDefinition();
     propertiesFactoryBean.setBeanClass(PropertiesFactoryBean.class);
     MutablePropertyValues propertyValues = new MutablePropertyValues();
     List<String> propertyList = new ArrayList<String>();
-    if (commandParams.hasParam("-timProperties")) {
-      propertyList.add("file:" + commandParams.getParamValue("-timProperties"));
-      logger.info("Using tim.properties at " + commandParams.getParamValue("-timProperties"));
+    if (commandParams.hasParam("-c2monProperties")) {
+      propertyList.add("file:" + commandParams.getParamValue("-c2monProperties"));
+      logger.info("Using c2mon.properties at " + commandParams.getParamValue("-c2monProperties"));
     } else {
-      propertyList.add("file:" + System.getProperty("user.home") + "/.tim2.properties"); 
-      logger.info("Using tim.properties at " + System.getProperty("user.home") + "/.tim2.properties");
+      propertyList.add("file:" + System.getProperty("user.home") + "/.c2mon.properties"); 
+      logger.info("Using c2mon.properties at " + System.getProperty("user.home") + "/.c2mon.properties");
     }
     if (commandParams.hasParam("-daqConf")) {
       propertyList.add("file:" + commandParams.getParamValue("-daqConf"));  

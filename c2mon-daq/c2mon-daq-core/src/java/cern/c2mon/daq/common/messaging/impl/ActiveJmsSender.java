@@ -31,8 +31,8 @@ import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
 import cern.c2mon.daq.common.messaging.JmsSender;
-import cern.tim.shared.daq.datatag.DataTagValueUpdate;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * Implementation of the JMSSender interface for sending update messages to

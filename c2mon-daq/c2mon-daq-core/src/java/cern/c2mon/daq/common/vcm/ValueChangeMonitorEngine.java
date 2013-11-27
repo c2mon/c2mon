@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.tim.shared.common.datatag.ValueChangeMonitor;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ValueChangeMonitor;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EPStatement;

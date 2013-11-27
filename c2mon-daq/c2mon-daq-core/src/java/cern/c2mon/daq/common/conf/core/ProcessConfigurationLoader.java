@@ -30,12 +30,12 @@ import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
-import cern.tim.shared.daq.config.ConfigurationXMLConstants;
-import cern.tim.shared.daq.process.ProcessConfigurationRequest;
-import cern.tim.shared.daq.process.ProcessConfigurationResponse;
-import cern.tim.shared.daq.process.ProcessConnectionResponse;
-import cern.tim.util.parser.ParserException;
-import cern.tim.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.daq.config.ConfigurationXMLConstants;
+import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
+import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
+import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
+import cern.c2mon.shared.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * Loads the configuration from the server or from a file.

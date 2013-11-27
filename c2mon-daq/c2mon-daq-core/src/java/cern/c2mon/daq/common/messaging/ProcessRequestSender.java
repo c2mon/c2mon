@@ -2,8 +2,8 @@ package cern.c2mon.daq.common.messaging;
 
 import org.w3c.dom.Document;
 
-import cern.tim.shared.daq.process.ProcessConfigurationResponse;
-import cern.tim.shared.daq.process.ProcessConnectionResponse;
+import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
+import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 
 /**
  * The interface that must be implemented by the class responsible for requesting

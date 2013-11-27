@@ -15,9 +15,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.messaging.impl.DummyJmsSender;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.EquipmentUnitAdd;
-import cern.tim.shared.daq.config.EquipmentUnitRemove;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
+import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:resources/daq-core-service.xml" })

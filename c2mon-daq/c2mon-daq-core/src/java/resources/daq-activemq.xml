@@ -33,7 +33,7 @@
 </bean>
 
 <!-- initialize the DataTagValueUpdateConverter -->
-<bean id="sourceUpdateMessageConverter" class="cern.tim.shared.daq.datatag.DataTagValueUpdateConverter"/>
+<bean id="sourceUpdateMessageConverter" class="cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter"/>
 
 <!-- plugged into ActiveJmsSender -->
 <bean id="sourceUpdateJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
@@ -54,7 +54,7 @@
 </bean>
 
 <!-- initialize the converters for sending and receiving a response. Backward compatibility -->
-<bean id="processRequestMessageConverterBC" class="cern.tim.shared.daq.process.backward.ProcessRequestConverterBC"/>
+<bean id="processRequestMessageConverterBC" class="cern.c2mon.shared.daq.process.backward.ProcessRequestConverterBC"/>
 <bean id="processRequestResponseConverterBC" class="cern.c2mon.daq.common.messaging.impl.backward.ProcessRequestResponseConverterBC"/>
 
 <!-- converters are set manually for sending and receiving a response -->
@@ -92,7 +92,7 @@
 <!--    <property name="targetBeanName" value="parserTarget"/>-->
 <!--  </bean>-->
 <!--  -->
-<!--  <bean id="parserTarget" class="ch.cern.tim.shared.common.SimpleXMLParser" scope="prototype"/>-->
+<!--  <bean id="parserTarget" class="cern.c2mon.shared.util.parser.SimpleXMLParser" scope="prototype"/>-->
 <!--  -->
 <!--  <bean id="parser" class="org.springframework.aop.framework.ProxyFactoryBean">-->
 <!--    <property name="targetSource" ref="parserTargetSource"/>-->

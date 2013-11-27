@@ -20,8 +20,8 @@ package cern.c2mon.daq.common.conf.equipment;
 import java.util.Hashtable;
 import java.util.Map;
 
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The equipment configuration interface covers all for the implementation

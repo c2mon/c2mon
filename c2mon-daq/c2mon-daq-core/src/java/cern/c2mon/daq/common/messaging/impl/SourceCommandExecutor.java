@@ -21,8 +21,8 @@ import org.apache.log4j.Logger;
 
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
-import cern.tim.shared.daq.command.SourceCommandTagReport;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.command.SourceCommandTagReport;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 
 /**
  * This class models the threads responsible for command execution

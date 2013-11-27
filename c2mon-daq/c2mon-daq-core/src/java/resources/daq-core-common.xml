@@ -38,7 +38,7 @@
 	</bean>
 
 	<!-- singleton parser should be sufficient here -->
-	<bean id="simpleXMLparser" class="cern.tim.util.parser.SimpleXMLParser" />
+	<bean id="simpleXMLparser" class="cern.c2mon.shared.util.parser.SimpleXMLParser" />
 
 
 	<bean id="equipmentConfigurationFactory"

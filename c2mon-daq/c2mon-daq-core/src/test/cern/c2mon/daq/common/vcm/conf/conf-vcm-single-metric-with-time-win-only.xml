@@ -13,7 +13,7 @@
 
 			<DataTagAddress>
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
 					<address>not-important</address>
 				</HardwareAddress>
 				<time-to-live>3600000</time-to-live>

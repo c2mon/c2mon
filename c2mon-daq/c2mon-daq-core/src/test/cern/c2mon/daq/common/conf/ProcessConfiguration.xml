@@ -30,7 +30,7 @@
 	    <DataTag id="1" name="CP.PRE.AIRH4STP887:DEFAUT_PROCESSEUR" control="false">
 	      <data-type>Boolean</data-type>
 	      <DataTagAddress>
-	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl">
 	          <block-type>5</block-type>
 	          <word-id>0</word-id>
 	          <bit-id>1</bit-id>
@@ -48,7 +48,7 @@
 	    <DataTag id="2" name="CP.PRE.AIRH4STP887:DEFAUT_GENERAL_PLC" control="false">
 	      <data-type>Boolean</data-type>
 	      <DataTagAddress>
-	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl">
 	          <block-type>5</block-type>
 	          <word-id>0</word-id>
 	          <bit-id>0</bit-id>
@@ -68,7 +68,7 @@
 	    <CommandTag id="1" name="CP.PRE.AIRH4STP01:TEST_PRESENCE_CONTROL">
 	      <source-timeout>4000</source-timeout>
 	      <source-retries>2</source-retries>
-	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl">
 	          <block-type>7</block-type>
 	          <word-id>1</word-id>
 	          <bit-id>0</bit-id>
@@ -94,7 +94,7 @@
 	    <DataTag id="4" name="CP.PRE.AIRH4STP887:DEFAUT_PROCESSEUR" control="false">
 	      <data-type>Boolean</data-type>
 	      <DataTagAddress>
-	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl">
 	          <block-type>5</block-type>
 	          <word-id>0</word-id>
 	          <bit-id>1</bit-id>
@@ -114,7 +114,7 @@
 	    <CommandTag id="2" name="CP.PRE.AIRH4STP02:TEST_PRESENCE_CONTROL">
 	      <source-timeout>4000</source-timeout>
 	      <source-retries>2</source-retries>
-	        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl">
+	        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl">
 	          <block-type>7</block-type>
 	          <word-id>1</word-id>
 	          <bit-id>0</bit-id>

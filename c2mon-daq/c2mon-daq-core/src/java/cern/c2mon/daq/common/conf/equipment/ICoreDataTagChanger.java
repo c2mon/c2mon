@@ -17,8 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
 /**
  * This interface may be implemented and registered by core classes.
  * It uses the whole SourceDataTag and not the restricted interface

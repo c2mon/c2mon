@@ -8,9 +8,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
-import cern.tim.shared.daq.command.SourceCommandTagReport;
-import cern.tim.shared.daq.config.ConfigurationChangeEventReport;
-import cern.tim.shared.daq.datatag.SourceDataTagValueResponse;
+import cern.c2mon.shared.daq.command.SourceCommandTagReport;
+import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 
 /**
  * Dummy implementation of the ProcessMessageReceiver that can be used in the

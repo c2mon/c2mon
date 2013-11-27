@@ -14,12 +14,12 @@ import org.w3c.dom.NodeList;
 
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
-import cern.tim.shared.common.datatag.DataTagAddress;
-import cern.tim.shared.common.datatag.ValueChangeMonitor;
-import cern.tim.shared.daq.command.SourceCommandTag;
-import cern.tim.shared.daq.config.ConfigurationXMLConstants;
-import cern.tim.shared.daq.datatag.SourceDataTag;
-import cern.tim.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.ValueChangeMonitor;
+import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.daq.config.ConfigurationXMLConstants;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 
 public class EquipmentConfigurationFactory extends XMLTagValueExtractor implements ConfigurationXMLConstants {

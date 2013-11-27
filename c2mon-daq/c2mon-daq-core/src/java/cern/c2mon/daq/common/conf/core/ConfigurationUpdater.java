@@ -24,19 +24,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
-import cern.tim.shared.common.NoSimpleValueParseException;
-import cern.tim.shared.common.SimpleTypeReflectionHandler;
-import cern.tim.shared.common.datatag.DataTagAddress;
-import cern.tim.shared.common.datatag.address.HardwareAddress;
-import cern.tim.shared.daq.command.SourceCommandTag;
-import cern.tim.shared.daq.config.CommandTagUpdate;
-import cern.tim.shared.daq.config.ConfigurationJavaConstants;
-import cern.tim.shared.daq.config.DataTagAddressUpdate;
-import cern.tim.shared.daq.config.DataTagUpdate;
-import cern.tim.shared.daq.config.EquipmentConfigurationUpdate;
-import cern.tim.shared.daq.config.HardwareAddressUpdate;
-import cern.tim.shared.daq.config.ProcessConfigurationUpdate;
-import cern.tim.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.NoSimpleValueParseException;
+import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.daq.config.CommandTagUpdate;
+import cern.c2mon.shared.daq.config.ConfigurationJavaConstants;
+import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
+import cern.c2mon.shared.daq.config.DataTagUpdate;
+import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
+import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
+import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * Updater for the values in the reconfiguration objects.

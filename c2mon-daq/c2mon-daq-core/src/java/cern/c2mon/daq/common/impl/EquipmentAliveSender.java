@@ -26,10 +26,10 @@ import java.sql.Timestamp;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
-import cern.tim.shared.common.datatag.DataTagConstants;
-import cern.tim.shared.common.type.TypeConverter;
-import cern.tim.shared.daq.datatag.SourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.type.TypeConverter;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This class has all methods for sending the Equipment Supervision Alive Tags to the 

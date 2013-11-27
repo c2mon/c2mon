@@ -25,15 +25,15 @@ import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.backward.ProcessRequestResponseConverterBC;
-import cern.tim.shared.daq.process.ProcessConfigurationRequest;
-import cern.tim.shared.daq.process.ProcessConfigurationResponse;
-import cern.tim.shared.daq.process.ProcessConnectionRequest;
-import cern.tim.shared.daq.process.ProcessConnectionResponse;
-import cern.tim.shared.daq.process.ProcessDisconnectionRequest;
-import cern.tim.shared.daq.process.ProcessMessageConverter;
-import cern.tim.shared.daq.process.backward.ProcessConnectionRequestBC;
-import cern.tim.shared.daq.process.backward.ProcessDisconnectionBC;
-import cern.tim.shared.daq.process.backward.ProcessRequestConverterBC;
+import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
+import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
+import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
+import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
+import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
+import cern.c2mon.shared.daq.process.ProcessMessageConverter;
+import cern.c2mon.shared.daq.process.backward.ProcessConnectionRequestBC;
+import cern.c2mon.shared.daq.process.backward.ProcessDisconnectionBC;
+import cern.c2mon.shared.daq.process.backward.ProcessRequestConverterBC;
 
 /**
  * Implementation of ProcessRequestSender interface for ActiveMQ JMS middleware.

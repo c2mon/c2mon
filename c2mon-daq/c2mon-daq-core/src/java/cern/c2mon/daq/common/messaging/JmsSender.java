@@ -2,8 +2,8 @@ package cern.c2mon.daq.common.messaging;
 
 import javax.jms.JMSException;
 
-import cern.tim.shared.daq.datatag.DataTagValueUpdate;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * The interface that must be implemented by a class used to send updates

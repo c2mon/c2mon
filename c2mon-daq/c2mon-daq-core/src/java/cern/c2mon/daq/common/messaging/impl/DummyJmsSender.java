@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
 import cern.c2mon.daq.common.messaging.JmsSender;
-import cern.tim.shared.daq.datatag.DataTagValueUpdate;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * this class is used for testing purposes and for the TestMode

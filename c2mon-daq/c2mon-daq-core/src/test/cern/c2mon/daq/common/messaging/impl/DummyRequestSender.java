@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
-import cern.tim.shared.daq.process.ProcessConfigurationResponse;
-import cern.tim.shared.daq.process.ProcessConnectionResponse;
+import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
+import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 
 public class DummyRequestSender implements ProcessRequestSender {
 

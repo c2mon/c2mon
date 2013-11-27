@@ -32,14 +32,14 @@ import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.jmx.JmxRegistrationMXBean;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.JmsSender;
-import cern.tim.shared.common.datatag.DataTagAddress;
-import cern.tim.shared.daq.datatag.DataTagValueUpdate;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
-import cern.tim.util.buffer.PullEvent;
-import cern.tim.util.buffer.PullException;
-import cern.tim.util.buffer.SynchroBuffer;
-import cern.tim.util.buffer.SynchroBufferListener;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.util.buffer.PullEvent;
+import cern.c2mon.shared.util.buffer.PullException;
+import cern.c2mon.shared.util.buffer.SynchroBuffer;
+import cern.c2mon.shared.util.buffer.SynchroBufferListener;
 
 /**
  * The ProcessMessageSender class is responsible for sending JMS messages from
@@ -344,7 +344,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
          * @param event
          *            the pull event, containing the collection of objects to be
          *            sent
-         * @throws ch.cern.tim.tools.synchrobuffer.PullException
+         * @throws cern.c2mon.shared.util.buffer.PullException
          * @throws cern.laser.util.buffer.PullException
          */
         public void pull(PullEvent event) throws PullException {

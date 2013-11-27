@@ -30,8 +30,8 @@ import org.apache.log4j.Logger;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.jms.support.converter.MessageConverter;
  
-import cern.tim.util.parser.ParserException;
-import cern.tim.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
  
 /**
  * JMS converter class that should be imported into tim-shared as a more general converter

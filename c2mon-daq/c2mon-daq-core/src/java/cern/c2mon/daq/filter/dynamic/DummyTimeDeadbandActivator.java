@@ -6,7 +6,7 @@ package cern.c2mon.daq.filter.dynamic;
 
 import java.util.Map;
 
-import cern.tim.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * The <code>DummyTimeDeadbandActivator</code> is used to satisfy spring dependencies for DAQs which are not using time

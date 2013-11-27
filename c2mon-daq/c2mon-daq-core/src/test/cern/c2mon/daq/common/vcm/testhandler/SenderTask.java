@@ -4,7 +4,7 @@
 
 package cern.c2mon.daq.common.vcm.testhandler;
 
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The<code>SenderTask</code> class implements a runnable responsible for sending periodic updates. It emulates the

@@ -20,8 +20,8 @@ package cern.c2mon.daq.common.conf.core;
 import cern.c2mon.daq.common.conf.equipment.EquipmentConfigurationChangerHelper;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 /**
  * This is a default implementation. of the equipment configuration changer.
  * It returns for every change which might affect the implementation

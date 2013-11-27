@@ -18,9 +18,9 @@
 package cern.c2mon.daq.common.conf.core;
 
 import cern.c2mon.daq.common.conf.equipment.CommandTagChangerHelper;
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 /**
  * This is a default implementation. of the command tag changer.
  * It returns for every change which might affect the implementation

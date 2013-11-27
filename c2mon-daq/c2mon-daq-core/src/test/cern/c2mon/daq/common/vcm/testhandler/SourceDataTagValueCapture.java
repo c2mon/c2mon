@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.easymock.Capture;
 
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This toolkit class extends JUnit Capture class providing a mechanism to store multiple objects 

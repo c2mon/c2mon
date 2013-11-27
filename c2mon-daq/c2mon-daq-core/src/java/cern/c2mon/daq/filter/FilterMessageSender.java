@@ -28,12 +28,12 @@ import cern.c2mon.daq.common.conf.core.CommonConfiguration;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.messaging.JmsLifecycle;
-import cern.tim.shared.daq.filter.FilteredDataTagValue;
-import cern.tim.shared.daq.filter.FilteredDataTagValueUpdate;
-import cern.tim.util.buffer.PullEvent;
-import cern.tim.util.buffer.PullException;
-import cern.tim.util.buffer.SynchroBuffer;
-import cern.tim.util.buffer.SynchroBufferListener;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValueUpdate;
+import cern.c2mon.shared.util.buffer.PullEvent;
+import cern.c2mon.shared.util.buffer.PullException;
+import cern.c2mon.shared.util.buffer.SynchroBuffer;
+import cern.c2mon.shared.util.buffer.SynchroBufferListener;
 
 
 /**

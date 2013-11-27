@@ -15,7 +15,7 @@ import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.filter.FilterMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
-import cern.tim.shared.daq.filter.FilteredDataTagValueUpdate;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValueUpdate;
 
 /**
  * ActiveMQ implementation of the FilterMessageSender, sending filtered updates

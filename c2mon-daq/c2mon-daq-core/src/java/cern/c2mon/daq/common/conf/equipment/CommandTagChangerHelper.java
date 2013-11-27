@@ -17,7 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
-import cern.tim.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
 
 /**
  * Helper class which can be used by all command tag changer it has 

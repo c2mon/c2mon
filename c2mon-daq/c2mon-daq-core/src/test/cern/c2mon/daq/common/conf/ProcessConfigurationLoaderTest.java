@@ -19,8 +19,8 @@ import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
-import cern.tim.shared.daq.datatag.SourceDataTag;
-import ch.cern.tim.shared.datatag.address.impl.PLCHardwareAddressImpl;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 
 
 public class ProcessConfigurationLoaderTest {

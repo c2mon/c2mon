@@ -44,14 +44,14 @@ import cern.c2mon.daq.tools.StackTraceHelper;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.daq.command.SourceCommandTag;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.tim.shared.daq.config.EquipmentUnitAdd;
-import cern.tim.shared.daq.config.EquipmentUnitRemove;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
+import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * This Kernel is the main class of the daq. It aggregates other classes specialized in taking individual actions,

@@ -29,8 +29,8 @@ import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.tools.DataTagValueFilter;
-import cern.tim.shared.daq.datatag.SourceDataTag;
-import cern.tim.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
 
 /**
  * This class has all methods related with the Equipment Time Deadband (filter, scheduled, ...)

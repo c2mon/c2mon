@@ -17,7 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
-import cern.tim.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport;
 
 /**
  * Interface to be implemented from parts of the core which are interested in

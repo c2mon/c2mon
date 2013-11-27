@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.daq.filter.dynamic.CounterTimeDeadbandActivator;
-import cern.tim.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 public class CounterTimeDeadbandActivatorTest extends AbstractTestDyanmicTimeDeadbandActivator {
     

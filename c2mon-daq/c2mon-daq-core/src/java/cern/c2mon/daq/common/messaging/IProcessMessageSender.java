@@ -17,7 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging;
 
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This interface specifies all operations, that ProcessMessageSender class MUST

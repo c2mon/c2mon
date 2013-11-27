@@ -12,7 +12,7 @@ package cern.c2mon.daq.common;
 
 import java.sql.Timestamp;
 
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * Interface for equipment message senders.

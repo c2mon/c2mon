@@ -10,12 +10,12 @@ import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
 import cern.c2mon.daq.common.messaging.JmsSender;
-import cern.tim.shared.daq.datatag.DataTagValueUpdate;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
-import cern.tim.util.buffer.PullEvent;
-import cern.tim.util.buffer.PullException;
-import cern.tim.util.buffer.SynchroBuffer;
-import cern.tim.util.buffer.SynchroBufferListener;
+import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.util.buffer.PullEvent;
+import cern.c2mon.shared.util.buffer.PullException;
+import cern.c2mon.shared.util.buffer.SynchroBuffer;
+import cern.c2mon.shared.util.buffer.SynchroBufferListener;
 
 /**
  * This class wraps a JMSSender so that all JMS sending occurs on separate threads from

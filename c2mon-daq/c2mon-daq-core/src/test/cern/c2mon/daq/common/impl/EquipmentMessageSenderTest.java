@@ -22,14 +22,14 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.daq.tools.EquipmentSenderHelper;
-import cern.tim.shared.common.datatag.DataTagAddress;
-import cern.tim.shared.common.datatag.DataTagConstants;
-import cern.tim.shared.common.datatag.DataTagDeadband;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.SourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
-import cern.tim.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.datatag.DataTagDeadband;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
 
 public class EquipmentMessageSenderTest {
 

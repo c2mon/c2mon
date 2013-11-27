@@ -40,12 +40,12 @@ import org.w3c.dom.Document;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
-import cern.tim.shared.daq.command.SourceCommandTagReport;
-import cern.tim.shared.daq.config.ConfigurationChangeEventReport;
-import cern.tim.shared.daq.config.ConfigurationDOMFactory;
-import cern.tim.shared.daq.datatag.SourceDataTagValueResponse;
-import cern.tim.util.parser.ParserException;
-import cern.tim.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.daq.command.SourceCommandTagReport;
+import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import cern.c2mon.shared.daq.config.ConfigurationDOMFactory;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
+import cern.c2mon.shared.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * Implementation of the ProcessMessageReceiver interface for ActiveMQ JMS

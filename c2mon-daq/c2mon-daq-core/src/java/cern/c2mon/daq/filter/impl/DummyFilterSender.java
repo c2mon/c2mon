@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 
 import cern.c2mon.daq.common.messaging.JmsLifecycle;
 import cern.c2mon.daq.filter.IFilterMessageSender;
-import cern.tim.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
 
 /**
  * Dummy implementation of the FilterMessageSender which can be plugged into the

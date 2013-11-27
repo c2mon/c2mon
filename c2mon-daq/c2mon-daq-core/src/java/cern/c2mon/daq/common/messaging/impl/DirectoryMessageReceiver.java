@@ -25,10 +25,10 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
-import cern.tim.shared.daq.command.SourceCommandTagReport;
-import cern.tim.shared.daq.config.ConfigurationChangeEventReport;
-import cern.tim.shared.daq.config.ConfigurationXMLConstants;
-import cern.tim.shared.daq.datatag.SourceDataTagValueResponse;
+import cern.c2mon.shared.daq.command.SourceCommandTagReport;
+import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import cern.c2mon.shared.daq.config.ConfigurationXMLConstants;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 
 /**
  * This is just a small implementation to test the program by 'sending'

@@ -18,7 +18,7 @@
 package cern.c2mon.daq.common;
 
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 
 /**
  * Interface for a command runner.

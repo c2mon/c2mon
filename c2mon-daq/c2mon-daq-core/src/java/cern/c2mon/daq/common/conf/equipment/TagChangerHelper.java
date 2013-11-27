@@ -20,8 +20,8 @@ package cern.c2mon.daq.common.conf.equipment;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import cern.tim.shared.common.SimpleTypeReflectionHandler;
-import cern.tim.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 
 /**
  * Helper class with method to check for differences in the hardware address.

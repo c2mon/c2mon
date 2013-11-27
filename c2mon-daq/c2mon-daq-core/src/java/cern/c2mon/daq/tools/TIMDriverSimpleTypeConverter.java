@@ -17,8 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.daq.tools;
 
-import cern.tim.shared.common.type.TagDataType;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.type.TagDataType;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * This class is used for converting the data types of the data sources to the

@@ -16,7 +16,7 @@ import java.util.Map;
 import static org.easymock.classextension.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 
-import static cern.tim.shared.common.datatag.ValueChangeMonitor.OPERATOR;
+import static cern.c2mon.shared.common.datatag.ValueChangeMonitor.OPERATOR;
 
 import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
@@ -29,9 +29,9 @@ import cern.c2mon.daq.common.vcm.testhandler.GenericMessageHandlerTst;
 import cern.c2mon.daq.common.vcm.testhandler.SourceDataTagValueCapture;
 import cern.c2mon.daq.common.vcm.testhandler.UseConf;
 import cern.c2mon.daq.common.vcm.testhandler.UseHandler;
-import cern.tim.shared.common.datatag.ValueChangeMonitor;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.ValueChangeMonitor;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This class implements a set of JUnit tests for <code>JMXMessageHandler</code>. All tests that require

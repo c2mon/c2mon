@@ -17,7 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.filter;
 
-import cern.tim.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
 
 /**
  * The interface that the EquipmentMessageHandler class uses to access the

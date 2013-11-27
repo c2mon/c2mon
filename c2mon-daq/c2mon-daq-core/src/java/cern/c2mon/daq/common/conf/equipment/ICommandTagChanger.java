@@ -17,8 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.config.ChangeReport;
 /**
  * Specific DAQ implementations should implement and register (or configure via
  * Spring) this interface to react to changes of a command tag.

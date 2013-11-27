@@ -54,15 +54,15 @@ import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.messaging.impl.ActiveRequestSender;
 import cern.c2mon.daq.common.messaging.impl.backward.ProcessRequestResponseConverterBC;
 import cern.c2mon.daq.tools.CommandParamsHandler;
-import cern.tim.shared.daq.process.ProcessConfigurationRequest;
-import cern.tim.shared.daq.process.ProcessConfigurationResponse;
-import cern.tim.shared.daq.process.ProcessConnectionRequest;
-import cern.tim.shared.daq.process.ProcessConnectionResponse;
-import cern.tim.shared.daq.process.ProcessDisconnectionRequest;
-import cern.tim.shared.daq.process.ProcessMessageConverter;
-import cern.tim.shared.daq.process.ProcessRequest;
-import cern.tim.shared.daq.process.XMLConverter;
-import cern.tim.shared.daq.process.backward.ProcessRequestConverterBC;
+import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
+import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
+import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
+import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
+import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
+import cern.c2mon.shared.daq.process.ProcessMessageConverter;
+import cern.c2mon.shared.daq.process.ProcessRequest;
+import cern.c2mon.shared.daq.process.XMLConverter;
+import cern.c2mon.shared.daq.process.backward.ProcessRequestConverterBC;
 
 /**
  * Integration test of ActiveRequestSenderTest with broker.

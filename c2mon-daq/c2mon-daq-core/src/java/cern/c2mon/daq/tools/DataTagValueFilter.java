@@ -3,11 +3,11 @@ package cern.c2mon.daq.tools;
 import static java.lang.String.format;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.tim.shared.common.datatag.DataTagDeadband;
-import cern.tim.shared.common.type.TagDataType;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.SourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.DataTagDeadband;
+import cern.c2mon.shared.common.type.TagDataType;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * Class with all possible filters for Data Tag Values
