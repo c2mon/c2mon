@@ -14,7 +14,7 @@
 			<DataTagAddress>
 
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">					
+					class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">					
 					<device-name>DMN.CLIC.TEST</device-name>
 					<property-name>Acquisition</property-name>					
 					<data-field-name>test.property.1</data-field-name>					

@@ -14,7 +14,7 @@
 			<DataTagAddress>
 
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
 					<protocol>mockito</protocol>
 					<service>mockito</service>
 					<device-name>DMN.CLIC.TEST</device-name>
@@ -33,7 +33,7 @@
 			<DataTagAddress>
 
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
 					<protocol>mockito</protocol>
 					<service>mockito</service>
 					<device-name>DMN.CLIC.TEST</device-name>

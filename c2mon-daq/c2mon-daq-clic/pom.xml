@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-daq</groupId>
 		<artifactId>c2mon-daq-pom</artifactId>
-		<version>1.0.25</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>c2mon-daq-clic</artifactId>
 	<version>1.0.8-SNAPSHOT</version>
 	<name>c2mon-daq-clic</name>
 	<packaging>jar</packaging>
-	<description>C2MON data acquisition component for communication with the JMS-STOMP CLIC agents</description>
+	<description>C2MON data acquisition component for communication with the CLIC agents</description>
 	<url />
 
 	<scm>
@@ -25,12 +25,12 @@
 			<artifactId>c2mon-daq-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-common</artifactId>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-daq</artifactId>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-daq</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

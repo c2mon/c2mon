@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-	<!-- default log4j configuration for JUnit tests -->
+<!-- default log4j configuration for JUnit tests -->
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
 <log4j:configuration debug="false" threshold="debug"
 	xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-	<!--
-		Create a ConsoleAppender. Log messages are written to the console
-	-->
+	<!-- Create a ConsoleAppender. Log messages are written to the console -->
 
-	<renderer renderedClass="cern.tim.shared.daq.datatag.SourceDataTagValue"
-		renderingClass="cern.tim.shared.daq.datatag.SourceDataTagValueRenderer" />
+	<renderer renderedClass="cern.c2mon.shared.daq.datatag.SourceDataTagValue"
+		renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
 
 
 	<appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
@@ -21,7 +19,12 @@
 	</appender>
 
 	<logger name="org.springframework" additivity="false">
-		<level value="warn" />
+		<level value="debug" />
+		<appender-ref ref="ConsoleAppender" />
+	</logger>
+
+	<logger name="com.espertech.esper" additivity="false">
+		<level value="info" />
 		<appender-ref ref="ConsoleAppender" />
 	</logger>
 
@@ -31,7 +34,7 @@
 	</logger>
 
 	<root>
-		<level value="info" />
+		<level value="debug" />
 		<appender-ref ref="ConsoleAppender" />
 	</root>
 

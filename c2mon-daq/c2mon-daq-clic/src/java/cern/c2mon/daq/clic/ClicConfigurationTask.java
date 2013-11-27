@@ -18,8 +18,8 @@ import cern.dmn2.agentlib.AgentContext;
 import cern.dmn2.agentlib.CommandType;
 import cern.dmn2.agentlib.FieldDataType;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
-import cern.tim.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The <code>ClicConfigurationTask</code> class implements a task responsible for automatic CLIC reconfiguration
