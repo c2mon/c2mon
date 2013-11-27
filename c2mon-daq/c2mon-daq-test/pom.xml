@@ -11,7 +11,7 @@
 	<name>c2mon-daq-test</name>
 	<artifactId>c2mon-daq-test</artifactId>
 	<packaging>jar</packaging>
-	<description>c2mon/DIAMON2 testing module for DAQs</description>
+	<description>C2MON testing module for DAQs</description>
 	<url />
 	
     <scm>
