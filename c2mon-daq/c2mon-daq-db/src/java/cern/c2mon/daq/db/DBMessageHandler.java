@@ -16,10 +16,10 @@ import org.springframework.jdbc.UncategorizedSQLException;
 import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.tim.shared.common.datatag.address.DBHardwareAddress;
-import cern.tim.shared.common.type.TypeConverter;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.DBHardwareAddress;
+import cern.c2mon.shared.common.type.TypeConverter;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This class represents the DB DAQ. It establishes the connection with the TIM

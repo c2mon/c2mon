@@ -31,9 +31,9 @@ import cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
-import cern.tim.shared.common.datatag.address.DBHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.DBHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * Test class for checking the communication of the dbdaq with the database. It allows testing of alert registering,

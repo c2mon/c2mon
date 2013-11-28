@@ -38,7 +38,7 @@ INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE, TAGCONTROLTA
 VALUES (216, 'E_SUB_EDMS:COMM_FAULT', 'TEST',  0,'Boolean', 1, 0, 1, 1, 'UNINITIALISED', SYSTIMESTAMP, SYSTIMESTAMP);
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGSIMULATED, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGTIMESTAMP, TAGSRVTIMESTAMP, TAGADDRESS)
 VALUES (217, 'E_SUB_EDMS:ALIVE', 'TEST',  0,'Integer', 1, 0, 1, 1, 'UNINITIALISED', SYSTIMESTAMP, SYSTIMESTAMP,
-'<DataTagAddress><HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.DBHardwareAddressImpl"><db-item-name>EDMS.CEDARMGR.TEST_DATATAG_ALIVE</db-item-name></HardwareAddress></DataTagAddress>');
+'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.datatag.address.impl.DBHardwareAddressImpl"><db-item-name>EDMS.CEDARMGR.TEST_DATATAG_ALIVE</db-item-name></HardwareAddress></DataTagAddress>');
 
 -- subequipment control tags
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGSIMULATED, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGTIMESTAMP, TAGSRVTIMESTAMP)
@@ -47,7 +47,7 @@ INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE, TAGCONTROLTA
 VALUES (219, 'E_SUB_ZABBIX:COMM_FAULT',  'TEST', 0,'Boolean', 1, 0, 1, 1, 'UNINITIALISED', SYSTIMESTAMP, SYSTIMESTAMP);
 INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE, TAGCONTROLTAG, TAGSIMULATED, TAGLOGGED, TAGQUALITYCODE, TAGQUALITYDESC, TAGTIMESTAMP, TAGSRVTIMESTAMP, TAGADDRESS)
 VALUES (230, 'E_SUB_ZABBIX:ALIVE',  'TEST', 0,'Integer', 1, 0, 1, 1, 'UNINITIALISED', SYSTIMESTAMP, SYSTIMESTAMP,
-'<DataTagAddress><HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.DBHardwareAddressImpl"><db-item-name>ZABBIX.DB_ACCOUNT.FRANCESCO_TEST_DATATAG_ALIVE</db-item-name></HardwareAddress></DataTagAddress>');
+'<DataTagAddress><HardwareAddress class="cern.c2mon.shared.datatag.address.impl.DBHardwareAddressImpl"><db-item-name>ZABBIX.DB_ACCOUNT.FRANCESCO_TEST_DATATAG_ALIVE</db-item-name></HardwareAddress></DataTagAddress>');
 
 
 -- routine to insert test datatags:
@@ -63,7 +63,7 @@ l_insert_stmt := 'INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATA
 																						TAGTIMESTAMP, TAGSRVTIMESTAMP, TAGADDRESS)
 					VALUES (:value1, :value2, ''test datatag'', 0, :value3, 0, 0, 1, 1, ''UNINITIALISED'', 52,
 					SYSTIMESTAMP, SYSTIMESTAMP,
-                  ''<DataTagAddress><HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.DBHardwareAddressImpl"><db-item-name>''||:value4||''</db-item-name></HardwareAddress></DataTagAddress>'')';
+                  ''<DataTagAddress><HardwareAddress class="cern.c2mon.shared.datatag.address.impl.DBHardwareAddressImpl"><db-item-name>''||:value4||''</db-item-name></HardwareAddress></DataTagAddress>'')';
 
 -- standard datatags for SUB_EDMS
 FOR l_id IN 405000..405100 LOOP
