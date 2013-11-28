@@ -41,8 +41,8 @@ import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqDataTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqException;
-import cern.tim.shared.common.datatag.address.SSHHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.SSHHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 import com.mindbright.jca.security.SecureRandom;
 import com.mindbright.ssh2.SSH2ConsoleRemote;

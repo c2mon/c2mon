@@ -20,9 +20,9 @@ package cern.c2mon.daq.ssh;
 
 import static java.lang.String.format;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The SSHDataTagChanger is used for dynamic reconfiguration of Data Tags

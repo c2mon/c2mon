@@ -2,7 +2,7 @@
 <CommandTag id="42839" name="command_name.name">
   <source-timeout>4000</source-timeout>
   <source-retries>1</source-retries>
-  <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+  <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
       <server-alias>tcrpl4</server-alias>
       <user-name>timoper</user-name>
       <!-- not obligatory - the connection may be authenticated externally -->

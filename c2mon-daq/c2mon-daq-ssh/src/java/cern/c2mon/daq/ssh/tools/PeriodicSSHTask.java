@@ -21,8 +21,8 @@ package cern.c2mon.daq.ssh.tools;
 import java.util.TimerTask;
 
 import cern.c2mon.daq.tools.equipmentexceptions.EqDataTagException;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This class models the action/task that is taken each timer's 'tick'

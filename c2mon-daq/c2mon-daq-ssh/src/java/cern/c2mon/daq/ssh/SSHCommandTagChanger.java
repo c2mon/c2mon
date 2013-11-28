@@ -20,9 +20,9 @@ package cern.c2mon.daq.ssh;
 
 import static java.lang.String.format;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
  * The SSHCommandTagChanger is used for dynamic reconfiguration of Commands

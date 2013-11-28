@@ -22,10 +22,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import cern.c2mon.daq.ssh.tools.PeriodicSSHCommandExecutor;
 import cern.c2mon.daq.ssh.tools.SSHHelper;
-import cern.tim.shared.common.datatag.address.SSHHardwareAddress;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.SSHHardwareAddress;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * SSH Controller to control tag and command configuration

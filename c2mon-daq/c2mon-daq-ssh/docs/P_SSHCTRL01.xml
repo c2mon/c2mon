@@ -23,7 +23,7 @@
           <time-to-live>9999999</time-to-live>
           <priority>7</priority>
           <guaranteed-delivery>false</guaranteed-delivery>
-          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+          <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
              <system-call>cat /proc/meminfo | grep MemFree | awk '{ print $2}'</system-call>
 	     <ssh-key>$HOME/.ssh/id_dsa</ssh-key>
 	     <protocol>simple-io</protocol>
@@ -39,7 +39,7 @@
           <time-to-live>9999999</time-to-live>
           <priority>7</priority>
           <guaranteed-delivery>false</guaranteed-delivery>
-          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+          <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
              <system-call>vmstat 1 2 | tail -1 | awk '{print $1}'</system-call>
 	     <protocol>simple-io</protocol>
              <call-interval>60</call-interval>
@@ -53,7 +53,7 @@
           <time-to-live>9999999</time-to-live>
           <priority>7</priority>
           <guaranteed-delivery>false</guaranteed-delivery>
-          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+          <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
              <system-call>vmstat 1 2 | tail -1 | awk '{print $13}' </system-call>
 	     <protocol>simple-io</protocol>
              <call-interval>60</call-interval>
@@ -67,7 +67,7 @@
           <time-to-live>9999999</time-to-live>
           <priority>7</priority>
           <guaranteed-delivery>false</guaranteed-delivery>
-          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+          <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
              <system-call>vmstat 1 2 | tail -1 | awk '{print $14}' </system-call>
 	     <protocol>simple-io</protocol>
              <call-interval>60</call-interval>
@@ -81,7 +81,7 @@
           <time-to-live>9999999</time-to-live>
           <priority>7</priority>
           <guaranteed-delivery>false</guaranteed-delivery>
-          <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+          <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
              <system-call>vmstat 1 2 | tail -1 | awk '{print $15}' </system-call>
 	     <protocol>simple-io</protocol>
              <call-interval>60</call-interval>
@@ -95,7 +95,7 @@
        <CommandTag id="1" name="P_DIP01.start">
          <source-timeout>4000</source-timeout>
          <source-retries>0</source-retries>
-         <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+         <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
             <system-call>daqprocess -xml P_DIP01 start</system-call>
 	    <protocol>xml</protocol>
          </HardwareAddress>
@@ -103,7 +103,7 @@
        <CommandTag id="2" name="P_DIP01.stop">
          <source-timeout>4000</source-timeout>
          <source-retries>0</source-retries>
-         <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+         <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
             <system-call>daqprocess_remote.sh -xml P_DIP01 stop</system-call>
 	    <protocol>xml</protocol>
          </HardwareAddress>

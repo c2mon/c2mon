@@ -13,7 +13,7 @@
 
 			<DataTagAddress>
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
 					<system-call>dummy</system-call>
 					<call-interval>-1</call-interval>
 					<call-delay>-1</call-delay>
@@ -32,7 +32,7 @@
 			<source-timeout>8000</source-timeout>
 			<source-retries>0</source-retries>
 			<HardwareAddress
-				class="ch.cern.tim.shared.datatag.address.impl.SSHHardwareAddressImpl">
+				class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
 				<system-call>curl -k https://cvops/cgi-bin/opcreset.pl -d account=user -d pw='password' -d machine=machineName</system-call>
 				<call-interval>-1</call-interval>
 				<call-delay>-1</call-delay>

@@ -25,9 +25,9 @@ import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.ssh.tools.SSHHelper;
 import cern.c2mon.daq.ssh.tools.SSHXMLExecutionFeedback;
-import cern.tim.shared.common.datatag.address.SSHHardwareAddress;
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.common.datatag.address.SSHHardwareAddress;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 
 import com.mindbright.ssh2.SSH2ConsoleRemote;
 import com.mindbright.ssh2.SSH2SimpleClient;

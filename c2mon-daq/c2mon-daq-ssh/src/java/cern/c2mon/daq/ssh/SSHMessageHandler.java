@@ -33,7 +33,7 @@ import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.daq.ssh.tools.SSHHelper;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The SSHMessageHandler is used for handling TIM ssh requests in the data

@@ -20,8 +20,8 @@ package cern.c2mon.daq.ssh.tools;
 
 import java.util.Timer;
 
-import cern.tim.shared.common.datatag.address.SSHHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.SSHHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * This class implements periodic ssh task execution mechanisms. It is used
