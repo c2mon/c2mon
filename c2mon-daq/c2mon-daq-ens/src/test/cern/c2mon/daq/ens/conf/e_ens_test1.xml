@@ -19,7 +19,7 @@
 			<max-value data-type="Float">500.0</max-value>
 			<DataTagAddress>
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.ENSHardwareAddressImpl">
 
 					<address>ESD2*43_U3-2</address>
 					<data-type>ANL</data-type>
@@ -41,7 +41,7 @@
 			<max-value data-type="Float">500.0</max-value>
 			<DataTagAddress>
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.ENSHardwareAddressImpl">
 					<address>ESD2*43_U2-1*</address>
 					<data-type>ANL</data-type>
 				</HardwareAddress>
@@ -63,7 +63,7 @@
 			<source-retries>0</source-retries>
 
 			<HardwareAddress
-				class="ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl">
+				class="cern.c2mon.shared.common.datatag.address.impl.ENSHardwareAddressImpl">
 				<address>EBD215.07/A4_O3</address>
 				<data-type>SETP_CTRL</data-type>
 			</HardwareAddress>
@@ -73,7 +73,7 @@
 
 			<source-retries>0</source-retries>
 			<HardwareAddress
-				class="ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl">
+				class="cern.c2mon.shared.common.datatag.address.impl.ENSHardwareAddressImpl">
 				<address>EBD217.15/A7_O9</address>
 				<data-type>SETP_CTRL</data-type>
 			</HardwareAddress>

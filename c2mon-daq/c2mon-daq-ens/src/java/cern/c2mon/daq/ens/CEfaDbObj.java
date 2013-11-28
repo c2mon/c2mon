@@ -4,10 +4,10 @@
  */
 package cern.c2mon.daq.ens;
 
-import cern.tim.shared.common.datatag.DataTagAddress;
-import cern.tim.shared.common.datatag.DataTagDeadband;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.DataTagDeadband;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.impl.ENSHardwareAddressImpl;
 
 /**
  * @author Filipe Campos - EFACEC SE

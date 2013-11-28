@@ -29,12 +29,12 @@ import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.tim.shared.common.datatag.address.ENSHardwareAddress;
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import ch.cern.tim.shared.datatag.address.impl.ENSHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.impl.ENSHardwareAddressImpl;
 
 /**
  * This is a skeleton of the specialised EquipmentMessageHandler component for
