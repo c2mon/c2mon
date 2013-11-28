@@ -36,17 +36,17 @@
                      threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <renderer renderedClass="cern.tim.shared.daq.filter.FilteredDataTagValue"
-          renderingClass="cern.tim.shared.daq.filter.FilteredDataTagValueRenderer" />
+  <renderer renderedClass="cern.c2mon.shared.daq.filter.FilteredDataTagValue"
+          renderingClass="cern.c2mon.shared.daq.filter.FilteredDataTagValueRenderer" />
 
-  <renderer  renderedClass="cern.tim.shared.daq.datatag.SourceDataTagValue"
-             renderingClass="cern.tim.shared.daq.datatag.SourceDataTagValueRenderer" />
+  <renderer  renderedClass="cern.c2mon.shared.daq.datatag.SourceDataTagValue"
+             renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
 
-  <renderer  renderedClass="cern.tim.shared.daq.command.SourceCommandTagValue"
-             renderingClass="cern.tim.shared.daq.command.SourceCommandTagValueRenderer" />
+  <renderer  renderedClass="cern.c2mon.shared.daq.command.SourceCommandTagValue"
+             renderingClass="cern.c2mon.shared.daq.command.SourceCommandTagValueRenderer" />
 
-  <renderer  renderedClass="cern.tim.shared.daq.command.SourceCommandTagReport"
-             renderingClass="cern.tim.shared.daq.command.SourceCommandReportRenderer" />
+  <renderer  renderedClass="cern.c2mon.shared.daq.command.SourceCommandTagReport"
+             renderingClass="cern.c2mon.shared.daq.command.SourceCommandReportRenderer" />
 
 
   <!--
@@ -179,16 +179,6 @@
   </logger>
 
   <logger name="cern.c2mon" additivity="false">
-    <level value="debug"/>
-    <appender-ref ref="FileAppender" />
-  </logger>
-  
-  <logger name="cern.tim" additivity="false">
-    <level value="debug"/>
-    <appender-ref ref="FileAppender" />
-  </logger>
-
-  <logger name="ch.cern.tim" additivity="false">
     <level value="debug"/>
     <appender-ref ref="FileAppender" />
   </logger>
