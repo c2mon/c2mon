@@ -6,9 +6,9 @@ import org.opcfoundation.ua.builtintypes.NodeId;
 import org.opcfoundation.ua.builtintypes.UnsignedInteger;
 
 import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
-import cern.tim.shared.common.datatag.address.HardwareAddress;
-import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
-import cern.tim.shared.common.datatag.address.OPCHardwareAddress.ADDRESS_TYPE;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
+import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress.ADDRESS_TYPE;
 
 /**
  * ItemDefinitionFactory implementation for the UA endpoint.

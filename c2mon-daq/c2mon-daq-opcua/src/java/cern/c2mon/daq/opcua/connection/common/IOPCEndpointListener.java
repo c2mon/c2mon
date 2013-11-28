@@ -1,6 +1,6 @@
 package cern.c2mon.daq.opcua.connection.common;
 
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * Generic listener for an OPCEndpoint.

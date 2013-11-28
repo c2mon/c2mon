@@ -6,8 +6,8 @@ import cern.c2mon.daq.opcua.connection.common.IOPCEndpointListener;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
-import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * Listener for endpoint events. Makes sure all important events are logged.

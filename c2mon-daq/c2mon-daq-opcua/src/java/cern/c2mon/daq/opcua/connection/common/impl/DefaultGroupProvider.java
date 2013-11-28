@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
-import cern.tim.shared.common.datatag.DataTagDeadband;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.DataTagDeadband;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The default group provider. Provides groups based on a GroupIdentifier object.

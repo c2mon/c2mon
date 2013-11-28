@@ -1,8 +1,8 @@
 package cern.c2mon.daq.opcua.connection.common.impl;
 
 import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
-import cern.tim.shared.common.datatag.address.HardwareAddress;
-import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
 
 /**
  * Base class for the classic item definitions. This means all those which need

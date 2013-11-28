@@ -7,8 +7,8 @@ import org.junit.Test;
 
 import cern.c2mon.daq.opcua.connection.common.impl.ClassicItemDefinitionFactory;
 import cern.c2mon.daq.opcua.connection.common.impl.ItemDefinition;
-import cern.tim.shared.common.ConfigurationException;
-import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 
 public class ClassicItemDefinitionFactoryTest {
     

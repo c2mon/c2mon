@@ -7,11 +7,11 @@ import org.opcfoundation.ua.core.IdType;
 
 import cern.c2mon.daq.opcua.connection.ua.UAItemDefintion;
 import cern.c2mon.daq.opcua.connection.ua.UaItemDefintionFactory;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.common.datatag.address.HardwareAddress;
-import cern.tim.shared.common.datatag.address.OPCHardwareAddress.ADDRESS_TYPE;
-import ch.cern.tim.shared.datatag.address.impl.HardwareAddressImpl;
-import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress.ADDRESS_TYPE;
+import cern.c2mon.shared.common.datatag.address.impl.HardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 
 public class UAItemDefintionFactoryTest {
     

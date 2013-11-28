@@ -1,7 +1,7 @@
 package cern.c2mon.daq.opcua.connection.common;
 
 import cern.c2mon.daq.opcua.connection.common.impl.ItemDefinition;
-import cern.tim.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 /**
  * Factory to create item definitions based on a HardwareAddress.
  * 

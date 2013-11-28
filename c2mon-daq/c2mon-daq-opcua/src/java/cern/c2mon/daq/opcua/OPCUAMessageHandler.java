@@ -11,11 +11,11 @@ import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 /**
  * The OPCMessageHandler is the entry point of the application. It is created
  * and called by the core. Here the OPC module can access the configuration and

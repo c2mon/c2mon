@@ -19,16 +19,16 @@ import cern.c2mon.daq.opcua.connection.common.impl.ItemDefinition;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCEndpoint;
 import cern.c2mon.daq.opcua.connection.common.impl.SubscriptionGroup;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.common.datatag.DataTagAddress;
-import cern.tim.shared.common.datatag.address.HardwareAddress;
-import cern.tim.shared.common.datatag.address.OPCCommandHardwareAddress.COMMAND_TYPE;
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.command.SourceCommandTag;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataTag;
-import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.OPCCommandHardwareAddress.COMMAND_TYPE;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import static org.easymock.classextension.EasyMock.*;
 
 public class OPCEndpointTest {

@@ -5,10 +5,10 @@ import java.util.Collection;
 import cern.c2mon.daq.opcua.OPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
-import cern.tim.shared.common.datatag.address.OPCHardwareAddress;
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * Defines an OPC endpoint. An OPC endpoint has exactly the functionality
