@@ -27,8 +27,8 @@ import cern.dip.Dip;
 import cern.dip.DipFactory;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.tim.shared.common.datatag.address.DIPHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The
@@ -183,7 +183,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
   /**
    * This method closes all previously opened subscriptions.
    * 
-   * @throws ch.cern.tim.tools.equipmentexceptions.EqIOException
+   * @throws cern.c2mon.tools.equipmentexceptions.EqIOException
    * @roseuid 409A0D1502EF
    */
   @Override

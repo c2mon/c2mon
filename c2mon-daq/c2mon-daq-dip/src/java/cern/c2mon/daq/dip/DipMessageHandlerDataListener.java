@@ -34,9 +34,9 @@ import cern.dip.DipQuality;
 import cern.dip.DipSubscription;
 import cern.dip.DipSubscriptionListener;
 import cern.dip.TypeMismatch;
-import cern.tim.shared.common.datatag.address.DIPHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This class is a handler for connect/disconnect/data reception events

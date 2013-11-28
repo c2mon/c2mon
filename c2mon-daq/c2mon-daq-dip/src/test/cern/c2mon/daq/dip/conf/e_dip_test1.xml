@@ -15,7 +15,7 @@
 
 			<DataTagAddress>
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.DIPHardwareAddressImpl">
+					class="cern.c2mon.shared.datatag.address.impl.DIPHardwareAddressImpl">
 					<item-name>dip/ts/LACS/ACCE/ZORA/L05/MadDetection/PM54</item-name>
 					<field-name>FAULT_Camera</field-name>
 					<field-index>-1</field-index>

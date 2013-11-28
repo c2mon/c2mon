@@ -14,8 +14,8 @@ import cern.dip.DipException;
 import cern.dip.DipFactory;
 import cern.dip.DipSubscription;
 import cern.dip.DipSubscriptionListener;
-import cern.tim.shared.common.datatag.address.DIPHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * Junit test of the DipAlivePublisher class.

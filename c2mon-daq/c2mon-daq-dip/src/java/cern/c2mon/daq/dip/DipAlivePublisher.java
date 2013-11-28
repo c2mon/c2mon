@@ -14,8 +14,8 @@ import cern.dip.DipTimestamp;
 import cern.dip.TypeMismatch;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.tim.shared.common.datatag.address.DIPHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * Publishes the Equipment alive message to DIP, so that it can be read back
