@@ -16,7 +16,7 @@
 
 			<DataTagAddress>
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.LASERHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.LASERHardwareAddressImpl">
 					<alarm-category>CERN.SPS_OP.CTRL.COMPUTERS</alarm-category>
 					<fault-family>COMPUTER</fault-family>
 					<fault-member>CWO-BA3-EXT</fault-member>
@@ -34,7 +34,7 @@
 
 			<DataTagAddress>
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.LASERHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.LASERHardwareAddressImpl">
 					<alarm-category>CERN.SPS_OP.CTRL.COMPUTERS</alarm-category>
 					<fault-family>COMPUTER</fault-family>
 					<fault-member>CWO-BA3-EXT</fault-member>

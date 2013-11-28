@@ -39,12 +39,12 @@ import cern.laser.client.services.browsing.CategoryBrowsingHandler;
 import cern.laser.client.services.filtering.CategorySelection;
 import cern.laser.client.services.filtering.Selection;
 import cern.laser.client.services.selection.AlarmSelectionHandler;
-import cern.tim.shared.common.datatag.address.LASERHardwareAddress;
-import cern.tim.shared.common.type.TagDataType;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.LASERHardwareAddress;
+import cern.c2mon.shared.common.type.TagDataType;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * LASER Controller to control tag and command configuration common and most used methods

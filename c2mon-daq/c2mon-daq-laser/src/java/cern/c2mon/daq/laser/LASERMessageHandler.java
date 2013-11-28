@@ -31,7 +31,7 @@ package cern.c2mon.daq.laser;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 
 
 /**
