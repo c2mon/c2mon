@@ -11,7 +11,7 @@
   <DataTag id="54676" name="JMX:Test" control="false">
       <data-type>Boolean</data-type>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>cern.cmw.log:type=Converter,name=cern.cmw.log.sources.converter.Cmwlog</object-name>
     	   <attribute>TotalProcessed</attribute>    	  
     	   <receive-method>poll</receive-method>                     

@@ -35,7 +35,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import cern.c2mon.patterncache.PatternCache;
 import cern.c2mon.patterncache.PatternCacheFileWatchdog;
 
-import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
@@ -44,14 +44,14 @@ import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.tim.shared.common.datatag.address.JMXHardwareAddress;
-import cern.tim.shared.common.datatag.address.JMXHardwareAddress.ReceiveMethod;
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.JMXHardwareAddress;
+import cern.c2mon.shared.common.datatag.address.JMXHardwareAddress.ReceiveMethod;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an

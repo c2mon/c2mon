@@ -20,12 +20,12 @@ import org.junit.Test;
 import cern.c2mon.daq.jmx.JMXMessageHandler;
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.common.ValueChangeMonitorEngine;
+import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This class implements integration tests for VCMs using real JMX publication. This tests should normally 

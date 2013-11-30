@@ -11,7 +11,7 @@
       <data-type>Integer</data-type>
         <min-value data-type="Integer">0</min-value>       
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>java.lang:type=Memory</object-name>    	                            
     	   <!--  the attribute defines a CompositeData attribute of a JMX bean -->
     	   <attribute>HeapMemoryUsage</attribute>      	       	   

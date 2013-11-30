@@ -12,7 +12,7 @@
    <DataTag id="54675" name="BE.TEST:TEST2" control="false">
       <data-type>String</data-type>
         <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>java.lang:type=Runtime</object-name>
     	   <attribute>SystemProperties</attribute>  
     	   <map-field>java.vm.version</map-field>

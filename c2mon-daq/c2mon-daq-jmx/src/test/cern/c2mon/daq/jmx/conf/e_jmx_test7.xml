@@ -12,7 +12,7 @@
     <CommandTag id="100847" name="TEST:TESTCMD1">
       <source-timeout>4000</source-timeout>
       <source-retries>2</source-retries>
-         <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+         <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>cern.example.mbeans:type=Cache</object-name>    	       	     	         
     	   <attribute>CurrentSrvTime</attribute>
          </HardwareAddress>        
@@ -20,7 +20,7 @@
     <CommandTag id="100848" name="TEST:TESTCMD2">
       <source-timeout>4000</source-timeout>
       <source-retries>2</source-retries>
-         <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+         <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>cern.example.mbeans:type=Cache</object-name>    	       	 
            <call-method>test2</call-method>                     
          </HardwareAddress>        

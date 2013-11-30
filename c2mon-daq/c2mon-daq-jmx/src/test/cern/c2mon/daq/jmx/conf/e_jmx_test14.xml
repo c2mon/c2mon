@@ -13,7 +13,7 @@
         <min-value data-type="Integer">0</min-value>
         <max-value data-type="Integer">64000</max-value>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>cern.example.mbeans:type=QueueSampler</object-name>
     	   <!--  the attribute defines a CompositeData attribute of a JMX bean -->
     	   <attribute>QueueSample</attribute>      	   

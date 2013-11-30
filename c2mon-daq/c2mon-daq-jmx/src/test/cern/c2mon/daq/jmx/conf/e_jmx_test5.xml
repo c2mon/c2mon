@@ -14,7 +14,7 @@
 			<max-value data-type="Integer">64000</max-value>
 			<DataTagAddress>
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
 					<object-name>cern.example.mbeans:type=Cache</object-name>
 					<attribute>CacheSize</attribute>
 					<receive-method>notification</receive-method>
@@ -33,7 +33,7 @@
 			<max-value data-type="Integer">64000</max-value>
 			<DataTagAddress>
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
 					<object-name>cern.example.mbeans:type=Cache</object-name>
 					<attribute>CachedObjects</attribute>
 					<receive-method>notification</receive-method>

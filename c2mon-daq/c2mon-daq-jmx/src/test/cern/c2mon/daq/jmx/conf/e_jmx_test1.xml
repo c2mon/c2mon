@@ -13,7 +13,7 @@
       <min-value data-type="Integer">0</min-value>
       <max-value data-type="Integer">64000</max-value>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">           
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">           
     	   <object-name>java.lang:type=Runtime</object-name>
     	   <attribute>java.vm.version</attribute>  
     	   <receive-method>poll</receive-method>                      
@@ -31,7 +31,7 @@
       <min-value data-type="Integer">0</min-value>
       <max-value data-type="Integer">64000</max-value>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>java.lang:type=Runtime</object-name>
     	   <call-method>getValue</call-method>
     	   <receive-method>poll</receive-method>        

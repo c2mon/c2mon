@@ -12,7 +12,7 @@
         <min-value data-type="Integer">0</min-value>
         <max-value data-type="Integer">64000</max-value>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>cern.example.mbeans:type=Cache</object-name>
     	   <attribute>CacheSize</attribute>   
     	   <receive-method>notification</receive-method>                     
@@ -28,7 +28,7 @@
    <DataTag id="54676" name="BE.TEST:TEST2" control="false">
       <data-type>String</data-type>
         <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>cern.example.mbeans:type=Cache</object-name>
     	   <call-method>test1</call-method>      	                       
         </HardwareAddress>
@@ -43,7 +43,7 @@
     <DataTag id="54677" name="BE.TEST:TEST3" control="false">
       <data-type>String</data-type>
         <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JMXHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JMXHardwareAddressImpl">
     	   <object-name>cern.example.mbeans:type=WrongMBean</object-name>
     	   <call-method>test1</call-method>      	                       
         </HardwareAddress>
