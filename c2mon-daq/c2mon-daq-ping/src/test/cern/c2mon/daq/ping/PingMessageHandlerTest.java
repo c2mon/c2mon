@@ -16,7 +16,7 @@ import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This class implements a set of JUnit tests for <code>PingMessageHandler</code>. All tests that require

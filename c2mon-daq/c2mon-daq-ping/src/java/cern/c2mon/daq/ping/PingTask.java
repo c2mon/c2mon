@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * This class implements a polling task. PingTask tasks are executed periodically to check the computer state
