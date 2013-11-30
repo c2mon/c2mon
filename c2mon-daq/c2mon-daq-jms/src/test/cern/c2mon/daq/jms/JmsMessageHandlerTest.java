@@ -29,7 +29,7 @@ import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 @UseHandler(JMSMessageHandler.class)
 public class JmsMessageHandlerTest extends GenericMessageHandlerTst {

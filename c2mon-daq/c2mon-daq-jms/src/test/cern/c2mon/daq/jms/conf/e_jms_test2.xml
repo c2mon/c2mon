@@ -21,7 +21,7 @@
             <data-type>Float</data-type>
             <DataTagAddress>
                <HardwareAddress
-                  class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+                  class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
                   <address>TOPIC_PERF_TEST</address>
                </HardwareAddress>
                <time-to-live>3600000</time-to-live>
@@ -34,7 +34,7 @@
             <data-type>Float</data-type>
             <DataTagAddress>
                <HardwareAddress
-                  class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+                  class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
                   <address>QUEUE_PERF_TEST</address>
                </HardwareAddress>
                <time-to-live>3600000</time-to-live>
@@ -49,7 +49,7 @@
             <data-type>Float</data-type>
             <DataTagAddress>
                <HardwareAddress
-                  class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+                  class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
                   <address>BRIDGE_TOPIC_PERF_TEST;tcp://localhost:61617</address>
                </HardwareAddress>
                <time-to-live>3600000</time-to-live>
@@ -62,7 +62,7 @@
             <data-type>Float</data-type>
             <DataTagAddress>
                <HardwareAddress
-                  class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+                  class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
                   <address>BRIDGE_QUEUE_PERF_TEST;tcp://localhost:61617</address>
                </HardwareAddress>
                <time-to-live>3600000</time-to-live>

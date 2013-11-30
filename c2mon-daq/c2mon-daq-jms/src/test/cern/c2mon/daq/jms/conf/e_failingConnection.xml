@@ -16,7 +16,7 @@
     <DataTag id="54676" name="BE.TEST:TEST2" control="false">
       <data-type>Float</data-type>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
          <address>QUEUE_PERF_TEST</address>                          
         </HardwareAddress>
         <time-to-live>3600000</time-to-live>
@@ -28,7 +28,7 @@
     <DataTag id="54677" name="BE.TEST:TEST3" control="false">
       <data-type>Float</data-type>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
          <address>TOPIC_PERF_TEST</address>                          
         </HardwareAddress>
         <time-to-live>3600000</time-to-live>
