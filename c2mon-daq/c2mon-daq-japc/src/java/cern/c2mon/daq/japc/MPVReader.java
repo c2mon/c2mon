@@ -19,8 +19,8 @@ import cern.japc.MapParameterValue;
 import cern.japc.SimpleParameterValue;
 import cern.japc.ValueType;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
-import cern.tim.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * This is a wrapper class for the MapParameterValue objects. It helps reading the value that is specified by a

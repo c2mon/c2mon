@@ -27,7 +27,7 @@ public class FesaAlarmTestConfigGenerator extends TestConfigGenerator {
     static final String dataTagTemplate = "         <DataTag id=\"%d\" name=\"%s\" control=\"false\">\n"
             + "            <data-type>%s</data-type>\n"
             + "            <DataTagAddress>\n"
-            + "                <HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl\">\n"
+            + "                <HardwareAddress class=\"ch.cern.c2mon.shared.datatag.address.impl.JAPCHardwareAddressImpl\">\n"
             + "                   <protocol>rda</protocol>\n" + "                   <service>rda</service>\n"
             + "                   <device-name>%s</device-name>\n"
             + "                   <property-name>%s</property-name>\n"

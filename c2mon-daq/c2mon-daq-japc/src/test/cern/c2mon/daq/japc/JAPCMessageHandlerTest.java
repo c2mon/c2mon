@@ -54,9 +54,9 @@ import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This class implements a set of JUnit tests for JAPCMessageHandler. THe class uses mockito for JAPC simulation. All

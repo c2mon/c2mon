@@ -15,9 +15,9 @@ import cern.japc.ParameterValue;
 import cern.japc.SimpleParameterValue;
 import cern.japc.Type;
 import cern.japc.ValueType;
-import cern.tim.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * A dedicated JAPC handler for Wiener Fan Traydevices

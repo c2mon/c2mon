@@ -12,7 +12,7 @@
     <DataTag id="1000000" name="JAPC-TEST-TAG01" control="false">
       <data-type>Integer</data-type>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">        
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">        
           <protocol>mockito</protocol>
           <service>mockito</service>
           <device-name>D1</device-name>
@@ -28,7 +28,7 @@
     <DataTag id="1000001" name="JAPC-TEST-TAG02" control="false">
       <data-type>Integer</data-type>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">        
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">        
           <protocol>mockito</protocol>
           <service>mockito</service>
           <device-name>D1</device-name>

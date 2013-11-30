@@ -37,8 +37,8 @@ import cern.japc.SubscriptionHandle;
 import cern.japc.ext.mockito.JapcMock;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This class implements a set of JUnit tests for FesaJapcMessageHandler. THe class uses mockito for JAPC simulation.

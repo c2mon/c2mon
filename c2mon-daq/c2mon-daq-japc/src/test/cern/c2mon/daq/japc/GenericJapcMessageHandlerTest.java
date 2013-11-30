@@ -33,16 +33,16 @@ import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.DataTagAdd;
-import cern.tim.shared.daq.config.DataTagRemove;
-import cern.tim.shared.daq.config.DataTagUpdate;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.SourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
-import cern.tim.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.DataTagAdd;
+import cern.c2mon.shared.daq.config.DataTagRemove;
+import cern.c2mon.shared.daq.config.DataTagUpdate;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * This class implements a set of JUnit tests for GenericJapcMessageHandler. THe class uses mockito for JAPC simulation.
@@ -339,7 +339,7 @@ public class GenericJapcMessageHandlerTest extends AbstractGenericJapcMessageHan
         str.append("<DataTag id=\"1000001\" name=\"JAPC-TEST-TAG02\" control=\"false\">");
         str.append("  <data-type>Integer</data-type>");
         str.append("  <DataTagAddress>");
-        str.append("    <HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl\">");
+        str.append("    <HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl\">");
         str.append("       <protocol>mockito</protocol>");
         str.append("       <service>mockito</service>");
         str.append("       <device-name>D1</device-name>");

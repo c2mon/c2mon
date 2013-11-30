@@ -48,8 +48,8 @@ import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This class implements a common parent class for JUnit testing framework for JAPC EquipmentMessageHandlers.

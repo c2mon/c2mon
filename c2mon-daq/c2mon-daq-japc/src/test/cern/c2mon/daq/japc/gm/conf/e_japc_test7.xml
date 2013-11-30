@@ -16,7 +16,7 @@
     <CommandTag id="100847" name="TEST:TESTCMD1">
       <source-timeout>4000</source-timeout>
       <source-retries>2</source-retries>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
           <protocol>mockito</protocol>
           <service>mockito</service>
           <device-name>D7</device-name>
@@ -33,7 +33,7 @@
     <CommandTag id="100848" name="TEST:TESTCMD2">
       <source-timeout>4000</source-timeout>
       <source-retries>1</source-retries>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
           <protocol>mockito</protocol>
           <service>mockito</service>
           <device-name>D8</device-name>
@@ -48,7 +48,7 @@
     <CommandTag id="100849" name="TEST:TESTCMD2">
       <source-timeout>4000</source-timeout>
       <source-retries>1</source-retries>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
           <protocol>mockito</protocol>
           <service>mockito</service>
           <device-name>D9</device-name>

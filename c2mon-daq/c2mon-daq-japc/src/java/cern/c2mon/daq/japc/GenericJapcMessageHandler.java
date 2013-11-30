@@ -38,13 +38,13 @@ import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.tim.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.tim.shared.daq.command.ISourceCommandTag;
-import cern.tim.shared.daq.command.SourceCommandTagValue;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
@@ -53,8 +53,8 @@ import cern.tim.shared.daq.datatag.SourceDataQuality;
 public class GenericJapcMessageHandler extends EquipmentMessageHandler implements ICommandRunner, IDataTagChanger,
         ICommandTagChanger, Runnable {
 
-    public static final String DEFAULT_PROTOCOL = "yami";
-    public static final String DEFAULT_SERVICE = "yami";
+    public static final String DEFAULT_PROTOCOL = "rda";
+    public static final String DEFAULT_SERVICE = "rda";
 
     public static final String DEFAULT_TIMESTAMP_FIELD = "ts";
     public static final String DEFAULT_DETAILS_FIELD = "details";

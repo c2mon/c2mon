@@ -36,8 +36,8 @@ import cern.japc.ext.mockito.Cycle;
 import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This class implements a set of JUnit tests for GmJapcMessageHandler. THe class uses mockito for JAPC simulation. All

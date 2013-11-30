@@ -18,7 +18,7 @@ import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 @UseHandler(WieJapcMessageHandler.class)
 public class WieJapcMessageHandlerTest extends AbstractGenericJapcMessageHandlerTst {

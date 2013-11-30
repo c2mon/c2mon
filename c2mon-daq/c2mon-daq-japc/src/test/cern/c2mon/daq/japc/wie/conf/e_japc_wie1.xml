@@ -13,7 +13,7 @@
         <min-value data-type="Integer">0</min-value>
         <max-value data-type="Integer">64000</max-value>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
           <protocol>mockito</protocol>
           <service>mockito</service>
           <device-name>BFCT10T-FAN</device-name>
@@ -33,7 +33,7 @@
         <min-value data-type="Integer">0</min-value>
         <max-value data-type="Integer">64000</max-value>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
           <protocol>mockito</protocol>
           <service>mockito</service>
           <device-name>BFCT10T-FAN</device-name>
@@ -53,7 +53,7 @@
         <min-value data-type="Float">0.0</min-value>
         <max-value data-type="Float">64000.0</max-value>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
           <protocol>mockito</protocol>
           <service>mockito</service>
           <device-name>BFCT10T-FAN</device-name>
@@ -74,7 +74,7 @@
         <min-value data-type="Integer">0</min-value>
         <max-value data-type="Integer">64000</max-value>
       <DataTagAddress>
-        <HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
           <protocol>mockito</protocol>
           <service>mockito</service>
           <device-name>BFCT10T-FAN</device-name>

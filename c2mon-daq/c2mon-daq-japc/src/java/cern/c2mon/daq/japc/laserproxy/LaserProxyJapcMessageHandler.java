@@ -13,9 +13,9 @@ import cern.japc.MapParameterValue;
 import cern.japc.ParameterValue;
 import cern.japc.SimpleParameterValue;
 import cern.japc.Type;
-import cern.tim.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 public class LaserProxyJapcMessageHandler extends GenericJapcMessageHandler {
 

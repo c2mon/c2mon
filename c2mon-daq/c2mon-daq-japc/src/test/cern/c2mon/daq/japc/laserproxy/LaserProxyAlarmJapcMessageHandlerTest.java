@@ -34,8 +34,8 @@ import cern.japc.ext.mockito.Cycle;
 import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
-import cern.tim.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 @UseHandler(LaserProxyJapcMessageHandler.class)
 public class LaserProxyAlarmJapcMessageHandlerTest extends AbstractGenericJapcMessageHandlerTst {

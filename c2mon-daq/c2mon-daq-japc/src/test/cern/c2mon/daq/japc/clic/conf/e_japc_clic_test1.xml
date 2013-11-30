@@ -14,7 +14,7 @@
 			<DataTagAddress>
 
 				<HardwareAddress
-					class="ch.cern.tim.shared.datatag.address.impl.JAPCHardwareAddressImpl">
+					class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
 					<protocol>mockito</protocol>
 					<service>mockito</service>
 					<device-name>DIAMON.CLIC.CS-CCR-LASERTEST1.13999</device-name>
