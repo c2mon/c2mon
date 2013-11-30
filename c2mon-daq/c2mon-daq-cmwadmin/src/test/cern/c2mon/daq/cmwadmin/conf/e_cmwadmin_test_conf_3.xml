@@ -10,7 +10,7 @@
     		<DataTag id="52501" name="TEST:REACHABLE" control="false">
       			<data-type>Boolean</data-type>
       			<DataTagAddress>
-        			<HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">           
+        			<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">           
     	   			    <address>REACHABLE</address>        
         			</HardwareAddress>
         			<time-to-live>3600000</time-to-live>
@@ -22,7 +22,7 @@
     		<DataTag id="52502" name="TEST:STATUS" control="false">
 	      		<data-type>Integer</data-type>
     	  		<DataTagAddress>
-        			<HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.SimpleHardwareAddressImpl">           
+        			<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">           
     	   			    <address>STATUS</address>        
         			</HardwareAddress>
         			<time-to-live>3600000</time-to-live>

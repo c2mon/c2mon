@@ -7,10 +7,10 @@ import static java.lang.String.format;
 
 import cern.cmw.adm.ServerAdmin;
 import cern.c2mon.daq.cmwadmin.CMWServerHandler.TagType;
-import cern.c2mon.daq.common.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
-import cern.tim.shared.daq.datatag.ISourceDataTag;
-import cern.tim.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * The thread that connects to the server and queries for status information. As it is a single thread per server, there
