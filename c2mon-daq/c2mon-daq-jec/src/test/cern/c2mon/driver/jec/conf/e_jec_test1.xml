@@ -1,0 +1,41 @@
+<EquipmentUnit id="5250" name="E_DIP_DIP1">
+	<handler-class-name>automatically-set-by-test</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+
+	<commfault-tag-value>false</commfault-tag-value>
+	<address>plc_name=APIMMD03;Protocol=SiemensISO;Time_sync=Jec;Port=102;S_tsap=TCP-1;D_tsap=TCP-1;Alive_handler_period=5000;Dp_slave_address=4,5;
+	</address>
+	<SubEquipmentUnits>
+	</SubEquipmentUnits>
+
+	<DataTags>
+
+		<DataTag id="37335" name="UA.MEY.SP-124-R:ALARME_TEMPERATURE"
+			control="false">
+			<data-type>Boolean</data-type>
+			<DataTagAddress>
+				<HardwareAddress
+					class="cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl">
+					<block-type>1</block-type>
+					<word-id>11</word-id>
+					<bit-id>10</bit-id>
+
+					<physical-min-val>0.0</physical-min-val>
+					<physical-max-val>0.0</physical-max-val>
+					<resolution-factor>1</resolution-factor>
+					<native-address>PWA004-47b</native-address>
+					<command-pulse-length>0</command-pulse-length>
+				</HardwareAddress>
+
+				<time-to-live>9999999</time-to-live>
+				<priority>7</priority>
+				<guaranteed-delivery>true</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+
+	</DataTags>
+	<CommandTags />
+
+</EquipmentUnit>
+
+ 
