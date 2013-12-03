@@ -6,8 +6,8 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 ##
 # Default variable definition for production
 #
-my $configsubdir = "/test/javaws/tim2-jviews-viewer-stable/conf";
-my $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer-stable/conf";
+my $configsubdir = "/javaws/tim2-jviews-viewer/conf";
+my $configdir = "/user/timoper/dist/public/html/javaws/tim2-jviews-viewer/conf";
 
 ##
 # Reading version number from ../version.txt
@@ -18,15 +18,7 @@ my $viewerVersion = <VFILE>;
 chomp $viewerVersion; # removes new line character
 close VFILE;
 
-##
-# In case of a SNAPSHOT we have to change the directory
-#
-if ($viewerVersion =~ /-SNAPSHOT/) {
-  $configsubdir = "/test/javaws/tim2-jviews-viewer/conf";
-  $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-jviews-viewer/conf"; 
-}
-
-my $title = "TIM2 Viewer Test (" . $viewerVersion . "): Connecting to the C2MON(TIM2) test server";
+my $title = "TIM2 Viewer (" . $viewerVersion . ") Configurations";
 my $configurl = "http://" . $ENV{'HTTP_HOST'} . $configsubdir;
 
 print header;
@@ -40,7 +32,7 @@ foreach (@files) {
   my $fn = $_;
   $fn =~ s/.xml//g;
   print "Start the TIM Viewer with configuration ";
-  print a({-href=>"../bin/tim-viewer-dev-$fn.jnlpx"}, $fn);
+  print a({-href=>"jnlpgenerator-pro.cgi?configurl=$configurl/$_"}, $fn);
   print "<br>";
   
   next;
