@@ -94,7 +94,7 @@ print "<?xml version = '1.0' encoding = 'utf-8'?>
 jarlist ("$jardir");
 
 # Defines the application name for RBAC
-print "    <property name=\"app.name\" value=\"tim-dashboard-editor-test\"/>\n";
+print "    <property name=\"app.name\" value=\"tim-dashboard-editor\"/>\n";
 # Defines the version number for RBAC
 print "    <property name=\"app.version\" value=\"$viewerVersion\"/>\n";
 # Defines the version number that is shown in the TIM Viewer about dialog
