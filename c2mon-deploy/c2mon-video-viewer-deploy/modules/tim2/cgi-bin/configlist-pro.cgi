@@ -7,10 +7,10 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 
 
 ##
-# Default variable definition for NEXT release in test
+# Default variable definition for production
 #
-my $configsubdir = "/test/javaws/tim2-video-viewer-stable/conf";
-my $configdir = "/user/timtest/dist/public/test/html/javaws/tim2-video-viewer-stable/conf";
+my $configsubdir = "/javaws/tim2-video-viewer/conf";
+my $configdir = "/user/timoper/dist/public/html/javaws/tim2-video-viewer/conf";
 
 
 ##
@@ -23,7 +23,7 @@ chomp $viewerVersion; # removes new line character
 close VFILE;
 
 ##
-# In case of a SNAPSHOT the codebase changes
+# In case of a SNAPSHOT the codebase will point to test
 #
 if ($viewerVersion =~ /-SNAPSHOT/) {
   $configsubdir = "/test/javaws/tim2-video-viewer/conf";
@@ -50,10 +50,10 @@ if($ENV{'HTTP_USER_AGENT'} =~ /Windows/) {
 print header;
 print start_html(-title=>'TIM Video Viewer', -style=>"/css/tim.css");
 if ($os_ eq "linux") {
-  print h1('TIM Video Viewer TEST (' . $viewerVersion . ') Configurations (Linux) for VLC (version >= 1.1.4)');
+  print h1('TIM Video Viewer (' . $viewerVersion . ') Configurations (Linux) for VLC (version >= 1.1.4)');
 }
 else {
-  print h1('TIM Video Viewer TEST (' . $viewerVersion . ') Configurations (Windows)');
+  print h1('TIM Video Viewer (' . $viewerVersion . ') Configurations (Windows)');
 }
 
 # Browsing the configuration files
@@ -72,7 +72,7 @@ foreach (@files) {
   my $fn = $_;
   $fn =~ s/.xml//g;
   print "<LI>";
-  print a({-href=>"../bin/$os_/tim-video-viewer-test-$fn.jnlpx"}, $fn);
+  print a({-href=>"../bin/$os_/tim-video-viewer-$fn.jnlpx"}, $fn);
   print "</LI>";
   
   next;

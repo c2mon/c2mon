@@ -72,7 +72,7 @@ foreach (@files) {
   my $fn = $_;
   $fn =~ s/.xml//g;
   print "<LI>";
-  print a({-href=>"../bin/$os_/tim-video-viewer-test-$fn.jnlpx"}, $fn);
+  print a({-href=>"jnlpgenerator-test.cgi?configurl=$configurl/$os_/$_"}, $fn);
   print "</LI>";
   
   next;
