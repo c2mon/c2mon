@@ -44,7 +44,7 @@ public class AbstractJECFrameProcessorTest extends ThreadCatchHelper {
     public void testPush() throws InterruptedException, IOException {
         JECPFrames frame = plcObjectFactory.getRawRecvFrame();
         frame.SetSequenceNumber((byte) 1);
-        abstractJECPFrameProcessor.pushJECPFrame(frame);
+        abstractJECPFrameProcessor.pushJECPFrame(frame, false);
 
         // methods which should be called
         abstractJECPFrameProcessor.processJECPFrame(frame);
@@ -60,7 +60,7 @@ public class AbstractJECFrameProcessorTest extends ThreadCatchHelper {
         JECPFrames frame = plcObjectFactory.getRawRecvFrame();
         frame.SetMessageIdentifier((byte) 2);
         frame.SetSequenceNumber((byte) 1);
-        abstractJECPFrameProcessor.pushJECPFrame(frame);
+        abstractJECPFrameProcessor.pushJECPFrame(frame, false);
 
         // methods which should be called
         abstractJECPFrameProcessor.acknowledgeReceivedMessage(frame);
@@ -75,7 +75,7 @@ public class AbstractJECFrameProcessorTest extends ThreadCatchHelper {
     public void testPushWrongSeqId() throws InterruptedException, IOException {
         JECPFrames frame = plcObjectFactory.getRawRecvFrame();
         frame.SetSequenceNumber((byte) 0);
-        abstractJECPFrameProcessor.pushJECPFrame(frame);
+        abstractJECPFrameProcessor.pushJECPFrame(frame, false);
 
         // methods which should be called
         abstractJECPFrameProcessor.acknowledgeReceivedMessage(frame);
@@ -90,11 +90,11 @@ public class AbstractJECFrameProcessorTest extends ThreadCatchHelper {
     public void testClearDataQueue() throws InterruptedException, IOException {
         JECPFrames frame = plcObjectFactory.getRawRecvFrame();
         frame.SetSequenceNumber((byte) 0);
-        abstractJECPFrameProcessor.pushJECPFrame(frame);
+        abstractJECPFrameProcessor.pushJECPFrame(frame, false);
         frame.SetSequenceNumber((byte) 1);
-        abstractJECPFrameProcessor.pushJECPFrame(frame);
+        abstractJECPFrameProcessor.pushJECPFrame(frame, false);
         frame.SetSequenceNumber((byte) 2);
-        abstractJECPFrameProcessor.pushJECPFrame(frame);
+        abstractJECPFrameProcessor.pushJECPFrame(frame, false);
         abstractJECPFrameProcessor.clearDataQueue();
         assertFalse(abstractJECPFrameProcessor.processNextJECPFrame());
     }
@@ -103,7 +103,7 @@ public class AbstractJECFrameProcessorTest extends ThreadCatchHelper {
     public void testPause() throws InterruptedException, IOException {
         JECPFrames frame = plcObjectFactory.getRawRecvFrame();
         frame.SetSequenceNumber((byte) 1);
-        abstractJECPFrameProcessor.pushJECPFrame(frame);
+        abstractJECPFrameProcessor.pushJECPFrame(frame, false);
         abstractJECPFrameProcessor.setPause(true);
 
         // methods which should be called

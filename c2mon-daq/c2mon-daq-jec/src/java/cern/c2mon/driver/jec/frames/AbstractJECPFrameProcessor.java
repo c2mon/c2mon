@@ -116,19 +116,28 @@ public abstract class AbstractJECPFrameProcessor extends Thread {
      * 
      * @param jecpFrame
      *            The JECPFrame to add.
-     * @return True if the frame was successfully added.
+     * @param processImmediately True if the frame should be processed immediately.
+     * @return True if the frame was successfully added ( and processed).
      */
-    public synchronized boolean pushJECPFrame(final JECPFrames jecpFrame) {
+    public synchronized boolean pushJECPFrame(final JECPFrames jecpFrame, final boolean processImmediately) {
         boolean success = false;
         try {
             if (acknowledgeReceivedMessage(jecpFrame)) {
                 lastSequenceNumber = jecpFrame.GetSequenceNumber();
                 success = dataQueue.add(jecpFrame);
-                notify();
+                if (success) {
+                  if (processImmediately) {
+                    return processNextJECPFrame();
+                  }
+                  else {
+                    notify();
+                  }
+                }
             }
         } catch (IOException e) {
             getEquipmentLogger().error("INFO MESSAGE: Error while acknowledging received message to JEC");
         }
+        
         return success;
     }
 

@@ -358,10 +358,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
             }
         }
         if (currentProcessor != null) {
-            success = currentProcessor.pushJECPFrame(frame);
-            if (processImmediately) {
-                success = currentProcessor.processNextJECPFrame();
-            }
+            success = currentProcessor.pushJECPFrame(frame, processImmediately);
         } else {
             success = false;
         }
