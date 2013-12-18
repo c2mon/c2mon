@@ -1,6 +1,7 @@
 package cern.c2mon.web.configviewer.service;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -31,15 +32,19 @@ public class HistoryService {
    * HistoryService logger
    * */
   private static Logger logger = Logger.getLogger(HistoryService.class);
+  
+  /** Date format used in our trend views */
+  private static final String CHART_DATE_FORMAT = "yyyy/MM/dd hh:mm:ss";
 
   /** the path to the xslt document */
   private static final String XSLT_PATH = "/history_xslt.xsl";
 
   /**
-   * Gets the XML representation of the configuration of a command
+   * @return XML representation of Tag's History 
+   * 
    * @param dataTagId id of the datatag
    * @param numberOfRecords number of records to look back in the history
-   * @return XML representation of tag's history 
+   * 
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
    * @throws Exception if tag was not found or a non-numeric id was requested
@@ -49,18 +54,58 @@ public class HistoryService {
   public String getHistoryXml(final String dataTagId, final int numberOfRecords) 
       throws HistoryProviderException, LoadingParameterException  {
 
-    return requestHistoryData(dataTagId, numberOfRecords);
+    final List<HistoryTagValueUpdate> historyValues = requestHistoryData(dataTagId, numberOfRecords);
+    return toXml(historyValues, dataTagId);
+  }
+  
+
+  /**
+   * @return CSV representation of Tag's History 
+   * 
+   * @param dataTagId id of the datatag
+   * @param numberOfRecords number of records to look back in the history
+   * 
+   * @throws HistoryProviderException in case a HistoryProvider cannot be created
+   * @throws LoadingParameterException in case of an invalid configurations
+   * @throws Exception if tag was not found or a non-numeric id was requested
+   *  ({@link TagIdException}), or any other exception
+   * thrown by the underlying service gateway.
+   * */
+  public String getHistoryCSV(final List<HistoryTagValueUpdate> historyValues, final boolean isBooleanData) {
+
+    return toCSV(historyValues, isBooleanData);
+  }
+
+  /**
+   * @return CSV representation of Tag's History 
+   * 
+   * @param dataTagId id of the datatag
+   * @param numberOfRecords number of records to look back in the history
+   * 
+   * @throws HistoryProviderException in case a HistoryProvider cannot be created
+   * @throws LoadingParameterException in case of an invalid configurations
+   * @throws Exception if tag was not found or a non-numeric id was requested
+   *  ({@link TagIdException}), or any other exception
+   * thrown by the underlying service gateway.
+   * */
+  public String getHistoryCSV(final String dataTagId, final int numberOfRecords) 
+      throws HistoryProviderException, LoadingParameterException  {
+
+    final List<HistoryTagValueUpdate> historyValues = requestHistoryData(dataTagId, numberOfRecords);
+    final boolean isBooleanData = isBooleanData(historyValues);
+    return toCSV(historyValues, isBooleanData);
   }
 
   /**
    * Used to make a request for HistoryData.
    * @param dataTagId The tag id whose history we are looking for
    * @param numberOfRecords number of records to retrieve from history
+   * 
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
-   * @return history in xml format
+   * @return history as a List of HistoryTagValueUpdates
    */
-  private String requestHistoryData(final String dataTagId, final int numberOfRecords) 
+  public List<HistoryTagValueUpdate> requestHistoryData(final String dataTagId, final int numberOfRecords) 
       throws HistoryProviderException, LoadingParameterException {
 
     // other values that can be used //
@@ -73,11 +118,13 @@ public class HistoryService {
 
     HistoryProvider historyProvider;
     try {
-      historyProvider = C2monHistoryGateway.getHistoryManager().getHistoryProviderFactory().createHistoryProvider();
+      historyProvider = C2monHistoryGateway.getHistoryManager().
+          getHistoryProviderFactory().createHistoryProvider();
     }
     catch (HistoryProviderException e) {
       logger.error("Can't load any history because a HistoryProvider cannot be created.", e);
-      throw new HistoryProviderException("Cannot retrieve the data from the Short term log because no history provider is accessible.");
+      throw new HistoryProviderException("Cannot retrieve the data from the Short term log " +
+      		"because no history provider is accessible.");
     }
 
     final long id = Long.parseLong(dataTagId);
@@ -102,6 +149,13 @@ public class HistoryService {
     for (final Long tagId : dataTagIds) {
       historyValues.addAll(loadingManager.getAllHistoryConverted(tagId));
     }
+    return historyValues;
+  }
+  
+  /**
+   * @return History values of the specified TagId in XML format.
+   */
+  public String toXml(final List<HistoryTagValueUpdate> historyValues, final String id) {
     // example: <history id="15685">
     String historyXml = "<history" + " id=\"" + id + "\" >";
     for (HistoryTagValueUpdate h : historyValues) {
@@ -113,7 +167,98 @@ public class HistoryService {
 
     return historyXml;
   }
+  
+  /**
+   * @return True if the list of history values represent Boolean Data, false otherwise.
+   * This is useful when creating a Trend View, so that the data is represented in the best way.
+   */
+  public boolean isBooleanData(final List<HistoryTagValueUpdate> historyValues) {
 
+    final int size = historyValues.size();
+    if (size > 0) {
+      final HistoryTagValueUpdate h = historyValues.iterator().next();
+      final String type = h.getDataType();
+      final boolean isBooleanData = type.equals("Boolean");
+      return isBooleanData;
+    }
+    return false;
+  }
+  
+  /**
+   * @return History values of the specified TagId in CSV format.
+   * 
+   * @see http://dygraphs.com/data.html#csv
+   */
+  public String toCSV(final List<HistoryTagValueUpdate> historyValues, final boolean isBooleanData) {
+    
+    StringBuffer historyCSV = new StringBuffer();
+    final int size = historyValues.size();
+    for (int i = 0; i < size; i++) {
+      
+      final HistoryTagValueUpdate h = historyValues.get(i);
+      HistoryTagValueUpdateImpl q = (HistoryTagValueUpdateImpl) h;
+      double value;
+      
+      historyCSV.append("\"");
+      
+      try {
+        if (isBooleanData) {
+          value = getChartCompatibleBooleanValue(q.getValue());
+        } else {
+          value = (new Double(q.getValue().toString())).doubleValue();
+        }
+      } catch (final Exception e) {
+        value = 0;
+      }
+      
+      historyCSV.append(
+          formatToDygraphCompatibleDate(new Date(q.getServerTimestamp().getTime()))
+          + ", " + value);
+      
+      historyCSV.append("\\n\"");
+      
+      if (i != size - 1) {
+        historyCSV.append(" + ");
+      }
+      historyCSV.append("\n");
+    }
+    return historyCSV.toString();
+  }
+  
+  
+  /**
+   * @return A Date formated to be compatible with the Dygraph chart library.
+   * @see http://dygraphs.com/data.html#csv
+   * 
+   * For example: 2009/07/12 12:34:56
+   * 
+   */
+  private static String formatToDygraphCompatibleDate(final Date inputDate) {
+
+    // 2009/07/12 12:34:56
+    SimpleDateFormat dateFormat = new SimpleDateFormat(CHART_DATE_FORMAT); 
+    String outputDate = null;
+    outputDate = dateFormat.format(inputDate); 
+    return outputDate;
+  }
+  
+
+  /**
+   * @return Boolean values should be replaced with 0 or 1 
+   * to be represented in the chart.
+   * 
+   * @param booleanValue The boolean value (as String).
+   */
+  private double getChartCompatibleBooleanValue(final Object booleanValue) {
+    
+    if (booleanValue.toString().equals("true")) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
   /**
    * Used to make a request for HistoryData.
    * @param dataTagId The tag id whose history we are looking for
