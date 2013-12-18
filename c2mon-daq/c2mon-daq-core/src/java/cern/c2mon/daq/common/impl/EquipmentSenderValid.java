@@ -29,13 +29,13 @@ import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
 import cern.c2mon.daq.common.vcm.ValueChangeMonitorEvent;
-import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.daq.tools.DataTagValueValidator;
 import cern.c2mon.daq.tools.EquipmentSenderHelper;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue.FilterType;
 
 /**
  * This class is used to send valid messages to the server.
@@ -99,49 +99,22 @@ class EquipmentSenderValid {
      * @param dynamicTimeDeadbandFilterer 
      * @param equipmentLoggerFactory 
      */
-    public EquipmentSenderValid (
-            final IFilterMessageSender filterMessageSender,
-            final IProcessMessageSender processMessageSender, 
-            final IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer,
-            final EquipmentLoggerFactory equipmentLoggerFactory) {
+    public EquipmentSenderValid (final EquipmentSenderFilterModule equipmentSenderFilterModule,
+                                 final IProcessMessageSender processMessageSender, 
+                                 final EquipmentSenderInvalid equipmentSenderInvalid, 
+                                 final EquipmentTimeDeadband equipmentTimeDeadband,
+                                 final IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer,
+                                 final EquipmentLoggerFactory equipmentLoggerFactory) {
    
+        this.equipmentSenderFilterModule = equipmentSenderFilterModule;
         this.processMessageSender = processMessageSender;
+        this.equipmentSenderInvalid = equipmentSenderInvalid;
+        this.equipmentTimeDeadband = equipmentTimeDeadband;
         this.dynamicTimeDeadbandFilterer = dynamicTimeDeadbandFilterer;
         this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
         
         this.dataTagValueFilter = new DataTagValueFilter(equipmentLoggerFactory);
         this.dataTagValueValidator = new DataTagValueValidator(equipmentLoggerFactory);
-        this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(filterMessageSender, equipmentLoggerFactory);
-    }
-    
-    /**
-     * init
-     * 
-     * @param equipmentSenderInvalid
-     * @param equipmentTimeDeadband
-     */
-    public void init(EquipmentSenderInvalid equipmentSenderInvalid, EquipmentTimeDeadband equipmentTimeDeadband) {
-        setEquipmentSenderInvalid(equipmentSenderInvalid);
-        setEquipmentTimeDeadband(equipmentTimeDeadband);
-    }
-    
-    /**
-     * Setter
-     * 
-     * @param equipmentTimeDeadband
-     */
-    public void setEquipmentTimeDeadband(EquipmentTimeDeadband equipmentTimeDeadband) {
-        this.equipmentTimeDeadband = equipmentTimeDeadband;
-    }
-    
-    
-    /**
-     * Setter
-     * 
-     * @param equipmentSenderInvalid
-     */
-    public void setEquipmentSenderInvalid(EquipmentSenderInvalid equipmentSenderInvalid) {
-        this.equipmentSenderInvalid = equipmentSenderInvalid;
     }
     
     /**
@@ -175,12 +148,12 @@ class EquipmentSenderValid {
      * 
      * @param currentTag The tag to which the value belongs.
      * @param milisecTimestamp The timestamp of the tag.
-     * @param tagValue The tag value to send.
+     * @param newTagValue The tag value to send.
      * @param pValueDescr A description belonging to the value.
      * @return True if the tag has been send successfully to the server.
      */
-    public boolean sendTagFiltered(final SourceDataTag currentSourceDataTag, final Object tagValue, 
-    		final long milisecTimestamp,String pValueDescr, boolean sentByValueCheckMonitor) {
+    public boolean sendTagFiltered(final SourceDataTag currentSourceDataTag, final Object newTagValue, 
+    		final long milisecTimestamp, String pValueDescr, boolean sentByValueCheckMonitor) {
 
     	this.equipmentLogger.trace("sendTagFiltered - entering sendTagFiltered()");
 
@@ -200,17 +173,17 @@ class EquipmentSenderValid {
     				"Value received with source timestamp in the future! Time on server was: " + new Timestamp(System.currentTimeMillis()));
 
     		// Send Invalid Tag
-    		this.equipmentSenderInvalid.sendInvalidTag(currentSourceDataTag, tagValue, pValueDescr, newSDQuality, new Timestamp(milisecTimestamp));
+    		this.equipmentSenderInvalid.sendInvalidTag(currentSourceDataTag, newTagValue, pValueDescr, newSDQuality, new Timestamp(milisecTimestamp));
 
     		// if tag has value checker monitor registered
     	} else if (currentSourceDataTag.hasValueCheckMonitor() && !sentByValueCheckMonitor) {
 
-    		if (tagValue instanceof Number) {
+    		if (newTagValue instanceof Number) {
     			ValueChangeMonitorEngine.getInstance().sendEvent(
-    					new ValueChangeMonitorEvent(currentSourceDataTag.getId(), ((Number) tagValue).doubleValue(), pValueDescr,
+    					new ValueChangeMonitorEvent(currentSourceDataTag.getId(), ((Number) newTagValue).doubleValue(), pValueDescr,
     							milisecTimestamp));
-    		} else if (tagValue instanceof Boolean) {
-    			Boolean v = (Boolean) tagValue;
+    		} else if (newTagValue instanceof Boolean) {
+    			Boolean v = (Boolean) newTagValue;
     			ValueChangeMonitorEngine.getInstance().sendEvent(
     					new ValueChangeMonitorEvent(currentSourceDataTag.getId(), v.booleanValue() == true ? 1 : 0, pValueDescr,
     							milisecTimestamp));
@@ -224,10 +197,10 @@ class EquipmentSenderValid {
     		}
 
     		// Remove tags which have not convertable values
-    	} else if (!this.dataTagValueValidator.isConvertable(currentSourceDataTag, tagValue)) {
+    	} else if (!this.dataTagValueValidator.isConvertable(currentSourceDataTag, newTagValue)) {
     		String descr = format(
     				"dataTagValueChecker : The value (%s) received for tag[%d] and the DataTag's type are not compatible.",
-    				tagValue, currentSourceDataTag.getId());
+    				newTagValue, currentSourceDataTag.getId());
 
     		this.equipmentLogger.warn(descr);
     		this.equipmentLogger.debug(format("\tinvalidating tag[%d] with quality CONVERSION_ERROR", currentSourceDataTag.getId()));
@@ -235,7 +208,7 @@ class EquipmentSenderValid {
     		this.equipmentSenderInvalid.sendInvalidTag(currentSourceDataTag, SourceDataQuality.CONVERSION_ERROR, descr, new Timestamp(milisecTimestamp));
 
     		// Remove tags which are out of their range
-    	} else if (!this.dataTagValueValidator.isInRange(currentSourceDataTag, tagValue)) {
+    	} else if (!this.dataTagValueValidator.isInRange(currentSourceDataTag, newTagValue)) {
     		this.equipmentLogger.warn(format(
     				"\tdeadband filtering : the value of tag[%d] was out of range and will only be propagated the first time to the server",
     				currentSourceDataTag.getId()));
@@ -252,37 +225,39 @@ class EquipmentSenderValid {
     		SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.OUT_OF_BOUNDS, qDesc.toString());
 
     		// Send Invalid Tag
-    		this.equipmentSenderInvalid.sendInvalidTag(currentSourceDataTag, tagValue, pValueDescr, newSDQuality, new Timestamp(milisecTimestamp));
+    		this.equipmentSenderInvalid.sendInvalidTag(currentSourceDataTag, newTagValue, pValueDescr, newSDQuality, new Timestamp(milisecTimestamp));
 
     		// Filter tags through value deadband filtering
-    	} else if (this.dataTagValueFilter.isValueDeadbandFiltered(currentSourceDataTag, tagValue, pValueDescr)) {
+    	} else if (this.dataTagValueFilter.isValueDeadbandFiltered(currentSourceDataTag, newTagValue, pValueDescr)) {
     		this.equipmentLogger.debug(format(
     				"\tvalue-deadband filtering : the value of tag [%d] was filtered out due to value-deadband filtering rules and will not be sent to the server",
     				currentSourceDataTag.getId()));
 
-    		this.equipmentLogger.debug("sending value to statistics module");
-    		this.equipmentSenderFilterModule.sendToFilterModule(currentSourceDataTag, tagValue, milisecTimestamp, pValueDescr, false,
-    				FilteredDataTagValue.VALUE_DEADBAND);
+    		this.equipmentLogger.debug("sendTagFiltered - sending value to statistics module: Value Deadband Filter");
+    		this.equipmentSenderFilterModule.sendToFilterModule(currentSourceDataTag, newTagValue, milisecTimestamp, pValueDescr, false,
+    		    FilterType.VALUE_DEADBAND.getNumber());
 
     		// Filter tags which didn't change their value
-    	} else if (this.dataTagValueFilter.isSameValue(currentSourceDataTag, tagValue, pValueDescr)) {
+    	} else if (this.dataTagValueFilter.isSameValue(currentSourceDataTag, newTagValue, pValueDescr)) {
     		this.equipmentLogger.debug(format(
     				"\ttrying to send twice the same tag [%d] update (with exactly the same value and value description). Rejecting by default",
     				currentSourceDataTag.getId()));
     		// send this value to the statistics module
     		this.equipmentLogger.debug("sending the value to the statistics module");
-    		this.equipmentSenderFilterModule.sendToFilterModule(currentSourceDataTag, tagValue, milisecTimestamp, pValueDescr, false,
-    				FilteredDataTagValue.REPEATED_VALUE);
+    		this.equipmentSenderFilterModule.sendToFilterModule(currentSourceDataTag, newTagValue, milisecTimestamp, pValueDescr, false,
+    		    FilterType.REPEATED_VALUE.getNumber());
 
     	} else if (currentSourceDataTag.getAddress().isTimeDeadbandEnabled()) {
-    		// get the reference to the time deadband scheduler
-    		this.equipmentTimeDeadband.addToTimeDeadband(currentSourceDataTag, tagValue, milisecTimestamp, pValueDescr);
+    	  this.equipmentLogger.debug("sendTagFiltered - add time-deadband scheduler for tag " + currentSourceDataTag.getId());
+    		this.equipmentTimeDeadband.addToTimeDeadband(currentSourceDataTag, newTagValue, milisecTimestamp, pValueDescr);
     	} else {
-    		if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(currentSourceDataTag.getId()))
+    		if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(currentSourceDataTag.getId())) {
+    		  this.equipmentLogger.debug("sendInvalidTag - remove time-deadband scheduler for tag " + currentSourceDataTag.getId());
     			this.equipmentTimeDeadband.removeFromTimeDeadband(currentSourceDataTag);
+    		}
 
     		// All checks and filters are done
-    		sendTag(tagValue, milisecTimestamp, pValueDescr, currentSourceDataTag);
+    		sendTag(newTagValue, milisecTimestamp, pValueDescr, currentSourceDataTag);
     		this.dynamicTimeDeadbandFilterer.recordTag(currentSourceDataTag);
     		successfulSent = true;
     	}
@@ -312,15 +287,6 @@ class EquipmentSenderValid {
         equipmentLogger.debug("Sending all time deadband delayed values to the server");
         
         this.equipmentTimeDeadband.sendDelayedTimeDeadbandValues();
-    }
-    
-    /**
-     * Get the Equipment Sender Filter Module
-     * 
-     * @return equipmentSenderFilterModule
-     */
-    public EquipmentSenderFilterModule getEquipmentSenderFilterModule() {
-    	return equipmentSenderFilterModule;
     }
     
     /**

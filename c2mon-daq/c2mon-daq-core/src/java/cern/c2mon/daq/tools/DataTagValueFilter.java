@@ -8,6 +8,7 @@ import cern.c2mon.shared.common.type.TagDataType;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue.FilterType;
 
 /**
  * Class with all possible filters for Data Tag Values
@@ -203,9 +204,10 @@ public class DataTagValueFilter {
      * @param newTagValueDesc The new update value description
      * @param newSDQuality The new quality info for the {@link SourceDataTag} that shall be updated
      * 
-     * @return <code>true</code>, if this the new quality is a candidate for being filtered out. Otherwise <code>false</code>. 
+     * @return <code>FilterType</code>, if this the new quality is a candidate for being filtered out it will return the 
+     * reason if not it will return <code>FilterType.NO_FILTERING</code> 
      */
-    public boolean isCandidateForFiltering(final SourceDataTag currentTag, final Object newValue, final String newTagValueDesc,
+    public FilterType isCandidateForFiltering(final SourceDataTag currentTag, final Object newValue, final String newTagValueDesc,
         final SourceDataQuality newSDQuality) {
       short newQualityCode = newSDQuality.getQualityCode(); 
     
@@ -216,7 +218,7 @@ public class DataTagValueFilter {
           this.equipmentLogger.trace("isCandidateForFiltering - Current Value null but we have a New value. Not candidate for filtering" 
               + currentSDValue.getId());
 
-          return false;
+          return FilterType.NO_FILTERING;
         }        
         else if (currentSDValue.getValue() != null && !currentSDValue.getValue().equals(newValue)) {  
           // The two value are different, hence we do not want to filter it out ... unless the Value dead band filter said the opposite
@@ -224,14 +226,14 @@ public class DataTagValueFilter {
             this.equipmentLogger.trace("isCandidateForFiltering - New value update but within value deadband filter." 
                 + " Candidate for filtering" + currentSDValue.getId());
             
-            return true;
+            return FilterType.VALUE_DEADBAND;
           }
           
           // The two value are different, so it is clear we do not want to filter it out!
           this.equipmentLogger.trace("isCandidateForFiltering - Both Values are different. Not candidate for filtering" 
               + currentSDValue.getId());
           
-          return false;
+          return FilterType.NO_FILTERING;
         }
         // Current and new value are both null or equal! Now we check, for redundant quality information
         else if (currentSDValue.getQuality() != null) {
@@ -247,7 +249,7 @@ public class DataTagValueFilter {
                 this.equipmentLogger.trace("isCandidateForFiltering - Both Descriptions are null. Candidate for filtering" 
                     + currentSDValue.getId());
                
-                return true;
+                return FilterType.REPEATED_VALUE;
               }
               else {
                 this.equipmentLogger.trace("isCandidateForFiltering - Current Description null but we have a New Description. " 
@@ -263,7 +265,7 @@ public class DataTagValueFilter {
                 this.equipmentLogger.trace("isCandidateForFiltering - Both Descriptions are equal. Candidate for filtering" 
                     + currentSDValue.getId());
                 
-                return true;
+                return FilterType.REPEATED_VALUE;
               }
               else if (newQualityCode == SourceDataQuality.FUTURE_SOURCE_TIMESTAMP) {
                 // If we are here, it means we received a new event with the same value and quality code but with a different quality description.
@@ -271,7 +273,7 @@ public class DataTagValueFilter {
                 this.equipmentLogger.trace("isCandidateForFiltering - Both Descriptions are different but special Quality code case: " 
                     + "FUTURE_SOURCE_TIMESTAMP. Candidate for filtering" + currentSDValue.getId());
                 
-                return true;
+                return FilterType.REPEATED_INVALID;
               }
             }
           }
@@ -284,7 +286,7 @@ public class DataTagValueFilter {
       } // in case the SourceDataTag value has never been initialized we don't want to filter
       
       // We got a new quality information that we want to send to the server.
-      return false;
+      return FilterType.NO_FILTERING;
     }
 	
 	/**
@@ -345,20 +347,5 @@ public class DataTagValueFilter {
 			this.equipmentLogger.trace(format("isCurrentValueAvailable - Tag %d : %b", tag.getId(), isAvailable));
 
 		return isAvailable;
-	}
-	
-	/**
-	 * This method is responsible for checking if the new value of the particular SourceDataTag should be sent to the
-	 * application server or not. The decision is taken based on the deadband specification of the considered tag
-	 * 
-	 * @param currentTag the current of the tag
-	 * @param newTagValue new value of the SourceDataTag, received from a data source.
-	 * @param newTagValueDesc the new value description
-	 * @param newSDQuality the new tag quality
-	 * @return True if the value is filtered else false.
-	 */
-	public boolean isTimeDeadbandFiltered(final SourceDataTag currentTag, final Object newTagValue,
-			final String newTagValueDesc, final SourceDataQuality newSDQuality) {
-		return false;
 	}
 }

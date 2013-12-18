@@ -43,7 +43,6 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
 
 /**
  * EquipmentMessageSender to control all filtering and sending.
@@ -51,11 +50,6 @@ import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
  * @author vilches
  */
 public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMessageSender, IDynamicTimeDeadbandFilterer {
-    
-	/**
-     * EquipmentLoggerFactory of this class.
-     */
-    private EquipmentLoggerFactory equipmentLoggerFactory;
     
     /**
      * The logger for this class.
@@ -113,6 +107,11 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
      * Time deadband helper class
      */
     private EquipmentTimeDeadband equipmentTimeDeadband;
+    
+    /**
+     * The class with the message sender to send filtered tag values
+     */
+    private EquipmentSenderFilterModule equipmentSenderFilterModule;
 
     /**
      * Creates a new EquipmentMessageSender.
@@ -147,20 +146,21 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     	setEquipmentConfiguration(equipmentConfiguration);
     	// Logger
     	setEquipmentLoggerFactory(equipmentLoggerFactory);
+    	
+    	// Filter module
+    	this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSender, equipmentLoggerFactory);
 
     	// Time Deadband
-        this.equipmentTimeDeadband = new EquipmentTimeDeadband(this, equipmentLoggerFactory);
-    	// Valid Sender
-    	this.equipmentSenderValid = new EquipmentSenderValid(this.filterMessageSender, this.processMessageSender, this,
-    			equipmentLoggerFactory);
+    	this.equipmentTimeDeadband = new EquipmentTimeDeadband(this, this.processMessageSender, this.equipmentSenderFilterModule, 
+    	    equipmentLoggerFactory);
+
     	// Invalid Sender
-    	this.equipmentSenderInvalid = new EquipmentSenderInvalid(this.filterMessageSender, this.processMessageSender, this,
-    			equipmentLoggerFactory);
-    	 
-    	// Inits
-    	this.equipmentTimeDeadband.init(equipmentSenderValid);
-    	this.equipmentSenderValid.init(equipmentSenderInvalid, equipmentTimeDeadband);
-    	this.equipmentSenderInvalid.init(equipmentTimeDeadband);
+    	this.equipmentSenderInvalid = new EquipmentSenderInvalid(this.equipmentSenderFilterModule, this.processMessageSender, 
+    	    this.equipmentTimeDeadband, this, equipmentLoggerFactory);
+    	
+    	// Valid Sender
+    	this.equipmentSenderValid = new EquipmentSenderValid(this.equipmentSenderFilterModule, this.processMessageSender, 
+    	    this.equipmentSenderInvalid, this.equipmentTimeDeadband, this, equipmentLoggerFactory);
     	
     	// Alive Sender
     	this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId(), 
@@ -455,7 +455,6 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
      * @param equipmentLoggerFactory the equipmentLoggerFactory to set
      */
     private void setEquipmentLoggerFactory(final EquipmentLoggerFactory equipmentLoggerFactory) {
-        this.equipmentLoggerFactory = equipmentLoggerFactory;
         this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
     }
 
