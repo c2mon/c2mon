@@ -311,7 +311,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * @return A SourceDataTag value object to send to the server.
      */
     public synchronized SourceDataTagValue update(final Object value) {
-        return update(new SourceDataQuality(), value, null, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
+        return doUpdate(new SourceDataQuality(), value, null, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
     }
     
     /**
@@ -322,7 +322,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * @return A SourceDataTag value object to send to the server.
      */
     public synchronized SourceDataTagValue update(final Object value, final Timestamp srcTimestamp) {
-        return update(new SourceDataQuality(), value, null, srcTimestamp, new Timestamp(System.currentTimeMillis()));
+        return doUpdate(new SourceDataQuality(), value, null, srcTimestamp, new Timestamp(System.currentTimeMillis()));
     }
 
     /**
@@ -334,7 +334,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * @return A SourceDataTag value object to send to the server.
      */
     public synchronized SourceDataTagValue update(final Object value, final String valueDescription, final Timestamp srcTimestamp) {
-      return update(new SourceDataQuality(), value, valueDescription, srcTimestamp, new Timestamp(System.currentTimeMillis()));  
+      return doUpdate(new SourceDataQuality(), value, valueDescription, srcTimestamp, new Timestamp(System.currentTimeMillis()));  
     }
     
     /**
@@ -348,7 +348,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * 
      * @return A SourceDataTag value object to send to the server.
      */
-    private synchronized SourceDataTagValue update(final SourceDataQuality sourceDataQuality, final Object value, 
+    private synchronized SourceDataTagValue doUpdate(final SourceDataQuality sourceDataQuality, final Object value, 
         final String valueDescription, final Timestamp srcTimestamp, final Timestamp daqTimestamp) {
       if (this.currentValue != null) {
         this.currentValue.setValue(value);
@@ -443,13 +443,12 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * <LI>the quality code of the SourceDataQuality object is OK
      * <LI>the timestamp passed as a parameter is older than the timestamp of the current value
      * </UL>
-     * No deadband checks are applied for invalidation.
      * 
      * @param quality The quality of the source data tag value.
      * @return The SourceDataTagValue to send to the server.
      */
     public SourceDataTagValue invalidate(final SourceDataQuality quality) {
-        return invalidate(quality, null, null, null);
+        return update(quality, null, null, null);
     }
     
     /**
@@ -460,7 +459,6 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * <LI>the quality code of the SourceDataQuality object is OK
      * <LI>the timestamp passed as a parameter is older than the timestamp of the current value
      * </UL>
-     * No deadband checks are applied for invalidation.
      * <p>
      * If the timestamp passed is null, the current time is taken as source invalidation.
      * 
@@ -469,36 +467,36 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * @return The SourceDataTagValue to send to the server.
      */
     public synchronized SourceDataTagValue invalidate(final SourceDataQuality quality, final Timestamp timestamp) {
+      if (quality == null || quality.isValid()) {
+        return null;
+      } 
+      
       if (this.currentValue != null) {
-        return invalidate(quality, this.currentValue.getValue(), this.currentValue.getValueDescription(), timestamp);
+        return update(quality, this.currentValue.getValue(), this.currentValue.getValueDescription(), timestamp);
       } else {
-        return invalidate(quality, null, null, timestamp);   
+        return update(quality, null, null, timestamp);   
       }
     }
     
     /**
-     * Invalidate the current value of a SourceDataTag The invalidate method will always return a SourceDataTagValue
+     * Updates the current value of a SourceDataTag and its quality. The method will always return a SourceDataTagValue
      * object, unless
      * <UL>
-     * <LI>the quality object passed as a parameter is null
-     * <LI>the quality code of the SourceDataQuality object is OK
      * <LI>the timestamp passed as a parameter is older than the timestamp of the current value
      * </UL>
-     * No deadband checks are applied for invalidation.
      * 
      * @param quality The quality of the source data tag value.
+     * @param value The new value. (Should match the right data type)
+     * @param valueDescription The description of the new value.
+     * @param timestamp Timestamp for the invalidation.
      * @return The SourceDataTagValue to send to the server.
      */
-    public SourceDataTagValue invalidate(final SourceDataQuality quality, final Object value, final String valueDescription, 
-        final Timestamp timestamp) {
-      if (quality == null || quality.isValid()) {
-        return null;
-      }
-      
+    public SourceDataTagValue update(final SourceDataQuality quality, final Object value, final String valueDescription, 
+        final Timestamp timestamp) {  
       Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis());
       Timestamp srcTimestamp = timestamp == null ? daqTimestamp : timestamp;
       
-      return update(quality, value, valueDescription, srcTimestamp, daqTimestamp);
+      return doUpdate(quality, value, valueDescription, srcTimestamp, daqTimestamp);
     }
 
     // ----------------------------------------------------------------------------

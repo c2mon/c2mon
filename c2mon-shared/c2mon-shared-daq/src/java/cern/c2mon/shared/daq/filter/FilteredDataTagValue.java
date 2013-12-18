@@ -42,6 +42,54 @@ public class FilteredDataTagValue {
      * The general logger.
      */
     private static final Logger LOGGER = Logger.getLogger(FilteredDataTagValue.class);
+    
+    /**
+     * Filter Type enum
+     */
+    public enum FilterType {
+      /*
+       * Tag value was filtered out as the previously received
+       * value had a similar invalid quality flag.
+       */
+      REPEATED_INVALID((short)0), 
+      /*
+       * Tag value was filtered out as the value was in the value deadband.
+       */
+      VALUE_DEADBAND((short)1), 
+      /*
+       *  Filtering occurred because the value received was the same as the current value.
+       */
+      REPEATED_VALUE((short)2), 
+      /*
+       * Filtering occurred because the value was received during the time deadband.
+       */
+      TIME_DEADBAND((short)3), 
+      /*
+       * No filtering
+       */
+      NO_FILTERING((short)4);
+
+      /**
+       * The Filter type name
+       */
+      private short number;
+
+      /**
+       * The Filter type number
+       * 
+       * @param number The Filter type number
+       */
+      FilterType(final short number) {
+        this.number = number;
+      }
+
+      /**
+       * @return The Filter object number
+       */
+      public final short getNumber() {
+        return this.number;
+      }
+    }
 
     /**
      * The log of all tag values sent to the filter module.
@@ -63,31 +111,6 @@ public class FilteredDataTagValue {
      * The name attribute in the XML encoding of the object. 
      */
     private static final String XML_ATTRIBUTE_NAME = "name";
-
-    // Constants for describing the filtering that occurred
-    /**
-     * Constant meaning the tag value was filtered out as the previously received
-     * value had a similar invalid quality flag.
-     */
-    public static final short REPEATED_INVALID = 0;
-    
-    /**
-     * Constant meaning the tag value was filtered out as the value was in the 
-     * value deadband.
-     */
-    public static final short VALUE_DEADBAND = 1;
-    
-    /**
-     *  Constant indicating the filtering occurred because the value received was
-     *  the same as the current value.
-     */
-    public static final short REPEATED_VALUE = 2;
-    
-    /**
-     * Constant indicating the filtering occurred because the value was received during
-     * the time deadband.
-     */
-    public static final short TIME_DEADBAND = 3;
 
     /** Unique numeric identifier of the tag */
     private Long id;
