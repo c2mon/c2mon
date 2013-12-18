@@ -26,6 +26,9 @@
 	<xsl:variable name="history_url">
 		historyviewer/
 	</xsl:variable>		
+	<xsl:variable name="trend_viewer_url">
+		trendviewer/
+	</xsl:variable>		
 	<xsl:variable name="history_xml_url">
 		historyviewer/xml/
 	</xsl:variable>		
@@ -80,7 +83,11 @@
           (<xsl:value-of select="/*/@id" />)
           
        	<A href="{$base_url}{$history_xml_url}{/*/@id}/" 
-					class="large blue awesome xml_button" target="_blank">View History XML >>
+					class="large blue awesome xml_button" target="_blank">History XML >>
+				</A>	
+				<A href="{$base_url}{$trend_viewer_url}{/*/@id}/" 
+					class="large blue awesome xml_button" target="_blank">
+					Trend >>
 				</A>	
         </p>
         <table class="inline">

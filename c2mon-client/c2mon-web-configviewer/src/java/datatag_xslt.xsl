@@ -18,6 +18,9 @@
 	<xsl:variable name="history_url">
 		historyviewer/
 	</xsl:variable>		
+	<xsl:variable name="trend_viewer_url">
+		trendviewer/
+	</xsl:variable>		
 	<xsl:variable name="process_xml_url">
 		process/xml/
 	</xsl:variable>
@@ -50,7 +53,10 @@
 				class="large blue awesome xml_button" target="_blank">View ClientDataTag XML >>
 			</A>
 			<A href="{$base_url}{$history_url}{@id}/" 
-				class="large blue awesome xml_button" target="_blank">View History >>
+				class="large blue awesome xml_button" target="_blank">History >>
+			</A>	
+			<A href="{$base_url}{$trend_viewer_url}{/*/@id}/" 
+				class="large blue awesome xml_button" target="_blank">Trend >>
 			</A>	
 			<A href="{$help_point_url}{@id}" 
 				class="large red awesome xml_button" target="_blank">View Help Alarm >>
