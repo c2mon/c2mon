@@ -83,11 +83,6 @@ public class TrendViewController {
       model.addAttribute("labels", new String[]{"Server Timestamp", 
           "[" + id + "] " + tagValue.getName()});
 
-      model.addAttribute("highlight_start", historyService.getHistoryInvalidTimes(historyValues)
-          / 1000);
-      model.addAttribute("highlight_end"
-          , historyService.getHistoryInvalidTimes(historyValues) / 1000 + 10000);
-      
       model.addAttribute("legend", tagValue.getName());
       model.addAttribute("is_boolean", ((Boolean)(isBooleanData)));
       model.addAttribute("unit", tagValue.getUnit());
