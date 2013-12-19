@@ -63,12 +63,12 @@ public class FilteredDataTagValueRenderer implements ObjectRenderer {
                 str.append(tag.isDynamicFiltered());
                 str.append('\t');
                 str.append(tag.getFilterApplied());
-                if (tag.getQualityCode() != null) {
+                if (tag.getQualityCode() != null || tag.getQualityCode() != 0) {
                     str.append('\t');
                     str.append(tag.getQualityCode());
 
                 } else {
-                    str.append("\t0\tOK");
+                    str.append("\tOK");
                 }
                 if (tag.getQualityDescription() != null) {
                     str.append('\t');
