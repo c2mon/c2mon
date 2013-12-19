@@ -248,22 +248,22 @@ public class EquipmentMessageSenderTest {
         // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
         this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
         assertEquals(false, this.sdt1.getCurrentValue().getValue());
-        Thread.sleep(3);
+        Thread.sleep(200);
         
         // The second one is also sent to the server since the value is different
         this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
-        Thread.sleep(3);
+        Thread.sleep(200);
         
         // The third one is filtered with REPEATED_VALUE because the value is the same (dif description)
         this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "Nacho");
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
-        Thread.sleep(3);
+        Thread.sleep(200);
         
         // The fourth one is also sent to the server since the value is different
         this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
         assertEquals(false, this.sdt1.getCurrentValue().getValue());
-        Thread.sleep(3);
+        Thread.sleep(200);
 
         verify(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock, this.filterMessageSenderMock);
     }
@@ -282,17 +282,17 @@ public class EquipmentMessageSenderTest {
 
         // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
         this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(false, this.sdt1.getCurrentValue().getValue());
         
         // The second one is also sent to the server since the value is different
         this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
         
         // The third one is invalid so it flush and cancel. It run the run() for the first time so the second value is sent to the server
         this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "");
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
 
         verify(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock);
@@ -312,22 +312,22 @@ public class EquipmentMessageSenderTest {
 
         // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
         this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(false, this.sdt1.getCurrentValue().getValue());
         
         // The second one is also sent to the server since the value is different
         this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
         
         // The third one is invalid so it flush and cancel. It run the run() for the first time so the second value is sent to the server
         this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "");
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
         
         // The forth one is also sent to the server since the value is different (flush and cancel again since the last one was invalid)
         this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
         assertEquals(SourceDataQuality.OK, this.sdt1.getCurrentValue().getQuality().getQualityCode());
 
@@ -348,7 +348,7 @@ public class EquipmentMessageSenderTest {
         
         // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
         this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "");
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
 
         
@@ -357,7 +357,7 @@ public class EquipmentMessageSenderTest {
         
         // The second one is also sent to the server since all the checks are done and there is no Time Deadband
         this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.UNKNOWN, "");
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(SourceDataQuality.UNKNOWN, this.sdt1.getCurrentValue().getQuality().getQualityCode());
 
         verify(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock);
@@ -377,7 +377,7 @@ public class EquipmentMessageSenderTest {
 
         // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
         this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(false, this.sdt1.getCurrentValue().getValue());
         
         // Time dead band disable
@@ -385,7 +385,7 @@ public class EquipmentMessageSenderTest {
         
         // The second one is also sent to the server since all the checks are done and there is no Time Deadband
         this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
-        Thread.sleep(3);
+        Thread.sleep(200);
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
 
         verify(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock);
