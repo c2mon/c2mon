@@ -41,13 +41,11 @@ public class NodeShutdownListener implements ClusterTopologyListener, Applicatio
   @Autowired
   private LifeCycleController lifeCycleController;
   
-  private CacheCluster cacheCluster;
-  
   private AbstractApplicationContext context;
   
   @PostConstruct
   public void init() {    
-    cacheManager.getCluster(ClusterScheme.TERRACOTTA);
+    CacheCluster cacheCluster = cacheManager.getCluster(ClusterScheme.TERRACOTTA);
     cacheCluster.addTopologyListener(this);
   }
   
