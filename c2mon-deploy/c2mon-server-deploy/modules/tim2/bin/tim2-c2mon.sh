@@ -8,6 +8,7 @@
 
 #set this mode to SINGLE to start a single non-clustered server
 MODE=distributed
+#MODE=single
 
 #export Java for TC script also!
 
@@ -43,11 +44,11 @@ SHARED_LIB_HOME=$HOME/dist/libs
 ###################
 
 #Terracotta configuration location (either file or host:port)
-TERRACOTTA_CONFIG=$TERRACOTTA_HOST:$TERRACOTTA_PORT
+TC_CONFIG_PATH=$TERRACOTTA_HOST:$TERRACOTTA_TSA_PORT
 
 #add Terracotta mirror if set
-if [ ! -z $TERRACOTTA_MIRROR_HOST ] && [ ! -z $TERRACOTTA_MIRROR_PORT ]; then
-    TERRACOTTA_CONFIG=$TERRACOTTA_CONFIG,$TERRACOTTA_MIRROR_HOST:$TERRACOTTA_MIRROR_PORT
+if [ ! -z $TERRACOTTA_MIRROR_HOST ] && [ ! -z $TERRACOTTA_MIRROR_TSA_PORT ]; then
+    TC_CONFIG_PATH=$TC_CONFIG_PATH,$TERRACOTTA_MIRROR_HOST:$TERRACOTTA_MIRROR_TSA_PORT
 fi
 
 ####################
@@ -80,7 +81,7 @@ CACHE_MODE_PROPERTY="-Dcern.c2mon.cache.mode=multi"
 
 COMMON_JAVA_ARGS="-Xms2048m -Xmx2048m -XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100 -Dserver.process.name=$PROCESS_NAME -Dc2mon.process.name=$PROCESS_NAME -Dc2mon.home=$C2MON_HOME -Dlog4j.configuration=$LOG4J_CONF_FILE -Dc2mon.log.dir=$LOG_DIR -Dc2mon.properties.location=$C2MON_PROPERTIES -Dcom.sun.management.jmxremote.port=$JMX_PORT -Dcom.sun.management.jmxremote.password.file=$C2MON_JMX_REMOTE_PASSWD -Dcom.sun.management.jmxremote.access.file=$C2MON_JMX_REMOTE_ACCESS -Dcom.sun.management.jmxremote.ssl=false -Dlaser.hosts=$LASER_HOSTS -Dcmw.mom.brokerlist=$CMW_BROKER_LIST"
 
-CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dtc.config=$TERRACOTTA_CONFIG $CACHE_MODE_PROPERTY"
+CLUSTER_JAVA_ARGS="-Dcom.tc.l1.cachemanager.percentageToEvict=10 -Dcom.tc.l1.cachemanager.threshold=70 -Dcom.tc.l1.cachemanager.monitorOldGenOnly=false -Dterracotta.config.location=$TC_CONFIG_PATH $CACHE_MODE_PROPERTY -Dcom.tc.productkey.path=$C2MON_HOME/conf/terracotta-license.key"
 
 if [ "$1" == "recover" ]; then
     C2MON_RECOVERY_ARG="-Dc2mon.recovery=true"

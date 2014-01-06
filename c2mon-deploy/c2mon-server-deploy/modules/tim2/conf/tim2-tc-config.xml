@@ -4,12 +4,9 @@
  xsi:schemaLocation="http://www.terracotta.org/schema/terracotta-8.xsd">
   <tc-properties>
      <!-- Evenutally all this is obsolete -->
-     <property name="l2.berkeleydb.je.cleaner.bytesInterval" value="20000000" />
      <property name="l1.objectmanager.remote.maxDNALRUSize" value="200000" />
      <property name="l1.cachemanager.criticalThreshold" value="90" />
      <property name="l1.cachemanager.threshold" value="70" />
-     <property name="l2.objectmanager.dgc.young.enabled" value="true" />
-     <property name="l2.objectmanager.dgc.young.frequencyInMillis" value="360000" />
      
      <!-- allow a client to attempt reconnection to a TC server (for 5 seconds, 2 is default) -->          
      <property name="l2.l1reconnect.enabled" value="true" />
@@ -23,7 +20,6 @@
       <!-- Specifies the path where the server should store its data. -->
       <data>/opt/terracotta/log/server-data</data>
       <logs>/opt/terracotta/log/server-logs</logs>
-      <statistics>/opt/terracotta/log/cluster-statistics</statistics>
       <!-- Specify the port where the server should listen for client traffic. -->
       <tsa-port>9510</tsa-port>
       <!-- The port that the Terracotta server uses to communicate with other Terracotta servers -->
@@ -40,7 +36,6 @@
     <server host="tim-cache-pro2" name="TIM cache2 (mirror)">
       <data>/opt/terracotta/log/server-data</data>
       <logs>/opt/terracotta/log/server-logs</logs>
-      <statistics>/opt/terracotta/log/cluster-statistics</statistics>
       <tsa-port>9511</tsa-port>
       <tsa-group-port>9531</tsa-group-port>
       <jmx-port>9521</jmx-port>
