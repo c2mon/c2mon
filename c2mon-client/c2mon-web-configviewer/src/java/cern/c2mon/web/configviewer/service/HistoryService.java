@@ -1,10 +1,11 @@
 package cern.c2mon.web.configviewer.service;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
@@ -34,7 +35,7 @@ public class HistoryService {
   private static Logger logger = Logger.getLogger(HistoryService.class);
   
   /** Date format used in our trend views */
-  private static final String CHART_DATE_FORMAT = "yyyy/MM/dd hh:mm:ss";
+  private static final String CHART_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
   /** the path to the xslt document */
   private static final String XSLT_PATH = "/history_xslt.xsl";
@@ -212,7 +213,7 @@ public class HistoryService {
       }
       
       historyCSV.append(
-          formatToDygraphCompatibleDate(new Date(q.getServerTimestamp().getTime()))
+          formatToDygraphCompatibleDate(q.getServerTimestamp())
           + ", " + value);
       
       historyCSV.append("\\n\"");
@@ -233,12 +234,13 @@ public class HistoryService {
    * For example: 2009/07/12 12:34:56
    * 
    */
-  private static String formatToDygraphCompatibleDate(final Date inputDate) {
+  private static String formatToDygraphCompatibleDate(final Timestamp timestamp) {
 
     // 2009/07/12 12:34:56
     SimpleDateFormat dateFormat = new SimpleDateFormat(CHART_DATE_FORMAT); 
+    dateFormat.setLenient(false);
     String outputDate = null;
-    outputDate = dateFormat.format(inputDate); 
+    outputDate = dateFormat.format(timestamp); 
     return outputDate;
   }
   
