@@ -90,13 +90,6 @@
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
 		</file>
-		<file>
-			<source>${basedir}/conf/tim2-tc-config.xml</source>
-			<outputDirectory>conf/</outputDirectory>
-			<destName>c2mon-tc-config.xml</destName>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0444</fileMode>
-		</file>
 		<!-- copy the license file for Terracotta -->
 		<file>
 			<source>${basedir}/conf/terracotta-license.key</source>
