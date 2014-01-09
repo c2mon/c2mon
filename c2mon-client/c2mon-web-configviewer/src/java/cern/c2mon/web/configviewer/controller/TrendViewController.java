@@ -1,6 +1,7 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -37,7 +38,7 @@ public class TrendViewController {
   /** Instruction for the form page */
   public static final String INSTRUCTION = "Enter a Tag Id to create a Trend View.";
 
-  /** How many records in history to ask for. 100 looks ok! */
+  /** How many records in history to ask for: 100 looks ok! */
   private static final int RECORDS_TO_ASK_FOR = 100;
   
   @Autowired
@@ -73,11 +74,13 @@ public class TrendViewController {
     try {
       final List<HistoryTagValueUpdate> historyValues = 
           historyService.requestHistoryData(id, RECORDS_TO_ASK_FOR);
-      final boolean isBooleanData = historyService.isBooleanData(historyValues);
       
-      ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
+      final boolean isBooleanData = historyService.isBooleanData(historyValues);
+      final Collection<String> invalidPoints = historyService.getInvalidPoints(historyValues);
+      final ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
       
       model.addAttribute("CSV", historyService.getHistoryCSV(historyValues, isBooleanData));
+      model.addAttribute("invalidPoints", invalidPoints);
       model.addAttribute("id", id);
       model.addAttribute("ylabel", tagValue.getUnit());
       model.addAttribute("labels", new String[]{"Server Timestamp", 
