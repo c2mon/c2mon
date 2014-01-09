@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
@@ -242,6 +243,27 @@ public class HistoryService {
     String outputDate = null;
     outputDate = dateFormat.format(timestamp); 
     return outputDate;
+  }
+  
+  /**
+   * @return Scans the specified list of history points and returns a list
+   * of the invalid ones.
+   * 
+   * @param historyValues A list of history points.
+   */
+  public Collection<String> getInvalidPoints(final List<HistoryTagValueUpdate> historyValues) {
+    
+    final Collection<String> invalidPoints = new ArrayList<String>();
+    
+    final Iterator<HistoryTagValueUpdate> i = historyValues.iterator();
+    
+    while (i.hasNext()) {
+      final HistoryTagValueUpdate h = i.next();
+      if (!h.getDataTagQuality().isValid()) {
+        invalidPoints.add(formatToDygraphCompatibleDate(h.getServerTimestamp()));
+      }
+    }
+    return invalidPoints;
   }
   
 
