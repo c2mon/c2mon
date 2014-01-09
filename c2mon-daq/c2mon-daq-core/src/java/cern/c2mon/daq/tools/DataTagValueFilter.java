@@ -239,7 +239,7 @@ public class DataTagValueFilter {
         else if (currentSDValue.getQuality() != null) {
           // Check, if quality code did not change
           if ((currentSDValue.getQuality().getQualityCode() == newQualityCode)) {
-            this.equipmentLogger.trace("isCandidateForFiltering - Both Quality codes are equal. Check Descriptions to take a decition" 
+            this.equipmentLogger.trace("isCandidateForFiltering - Both Quality codes are equal. Check Descriptions to take a decision" 
                 + currentSDValue.getId());
             // Check if quality description did not change. If it is not null we compare it with the new one
             if (currentSDValue.getQuality().getDescription() == null) {
@@ -249,7 +249,7 @@ public class DataTagValueFilter {
                 this.equipmentLogger.trace("isCandidateForFiltering - Both Descriptions are null. Candidate for filtering" 
                     + currentSDValue.getId());
                
-                return FilterType.REPEATED_VALUE;
+                return FilterType.REPEATED_INVALID;
               }
               else {
                 this.equipmentLogger.trace("isCandidateForFiltering - Current Description null but we have a New Description. " 
@@ -259,22 +259,12 @@ public class DataTagValueFilter {
               }
             } 
             // Description is not null. We can compare it with the new description
-            else {
-              if (currentSDValue.getQuality().getDescription().equals(newSDQuality.getDescription())) {
-                // If we are here, it means we have received a redundant quality code and description ==> should be filtered out.
-                this.equipmentLogger.trace("isCandidateForFiltering - Both Descriptions are equal. Candidate for filtering" 
-                    + currentSDValue.getId());
-                
-                return FilterType.REPEATED_VALUE;
-              }
-              else if (newQualityCode == SourceDataQuality.FUTURE_SOURCE_TIMESTAMP) {
-                // If we are here, it means we received a new event with the same value and quality code but with a different quality description.
-                // However, for FUTURE TIMESTAMPS we still want to filter out the message.
-                this.equipmentLogger.trace("isCandidateForFiltering - Both Descriptions are different but special Quality code case: " 
-                    + "FUTURE_SOURCE_TIMESTAMP. Candidate for filtering" + currentSDValue.getId());
-                
-                return FilterType.REPEATED_INVALID;
-              }
+            else if (currentSDValue.getQuality().getDescription().equals(newSDQuality.getDescription())) {
+              // If we are here, it means we have received a redundant quality code and description ==> should be filtered out.
+              this.equipmentLogger.trace("isCandidateForFiltering - Both Descriptions are equal. Candidate for filtering" 
+                  + currentSDValue.getId());
+
+              return FilterType.REPEATED_INVALID;
             }
           }
           // Different Quality Codes 

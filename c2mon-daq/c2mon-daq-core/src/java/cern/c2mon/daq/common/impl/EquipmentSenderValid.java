@@ -170,7 +170,7 @@ class EquipmentSenderValid {
 
     		// Get the source data quality from the quality code and description
     		SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.FUTURE_SOURCE_TIMESTAMP, 
-    				"Value received with source timestamp in the future! Time on server was: " + new Timestamp(System.currentTimeMillis()));
+    				"Value received with source timestamp in the future! Please inform the data source responsible about this issue.");
 
     		// Send Invalid Tag
     		this.equipmentSenderInvalid.sendInvalidTag(currentSourceDataTag, newTagValue, pValueDescr, newSDQuality, new Timestamp(milisecTimestamp));

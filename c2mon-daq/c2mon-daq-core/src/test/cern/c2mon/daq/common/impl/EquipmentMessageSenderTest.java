@@ -428,7 +428,7 @@ public class EquipmentMessageSenderTest {
       // - same Quality Code (FUTURE_SOURCE_TIMESTAMP)
       // - same Quality Description
       // 
-      // Normally should not be filtered but FUTURE_SOURCE_TIMESTAMP is is a especial case. Should be filtered 
+      //Should be filtered 
       this.equipmentMessageSender.sendInvalidTag(this.sdt2, sourceDTValue.getValue(), sourceDTValue.getValueDescription(), 
           newSDQuality, sourceDTValue.getDaqTimestamp());
 

@@ -198,8 +198,8 @@ class EquipmentSenderInvalid {
             this.equipmentLogger.debug("sendInvalidTag - sending an invalid tag to the statistics module");
 
             // send filtered message to statistics module
-            this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, newSDQuality, newValue, timestamp.getTime(), newTagValueDesc, false,
-                FilterType.REPEATED_INVALID.getNumber());
+            this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, newSDQuality, newValue, timestamp.getTime(), 
+                newTagValueDesc, false, filterType.getNumber());
 
           } else if (this.equipmentLogger.isDebugEnabled()) {
             this.equipmentLogger.debug("sendInvalidTag - value has still not been initialised: not sending the invalid tag to the statistics module");
