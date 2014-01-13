@@ -28,6 +28,9 @@ public class TrendViewController {
 
   /** Base URL for the viewer */
   public static final String TREND_VIEW_URL = "/trendviewer/";
+  
+  /** URL to define Last Records */
+  public static final String LAST_RECORDS_URL = "/records/";
 
   /** A URL to the viewer with input form */
   public static final String TREND_VIEW_FORM_URL = "/trendviewer/form";
@@ -53,11 +56,59 @@ public class TrendViewController {
   private static Logger logger = Logger.getLogger(TrendViewController.class);
 
   @RequestMapping(value = TREND_VIEW_URL, method = { RequestMethod.GET })
-  public String viewHistory(final Model model) {
+  public String viewTrend(final Model model) {
     logger.info(TREND_VIEW_URL);
     return ("redirect:" + TREND_VIEW_FORM_URL);
   }    
+  
+  /**
+   * Displays a Trend View for a given id.
+   * @param id the last records of the given tag id are being shown
+   * @param response the html result is written to that HttpServletResponse response
+   * @param lastRecords number of records to be shown
+   * @return nothing
+   * @throws IOException 
+   * */
+  @RequestMapping(value = TREND_VIEW_URL + "{id}" 
+      + LAST_RECORDS_URL + "{lastRecords}"
+        , method = { RequestMethod.GET })
+  public String viewTrendLastRecords(@PathVariable(value = "id") final String id,
+      @PathVariable(value = "lastRecords") final int lastRecords,
+      final Model model) throws IOException  {
+    
+    logger.info(TREND_VIEW_URL + "{id} " + id + LAST_RECORDS_URL + "{lastRecords} ");
 
+    try {
+      final List<HistoryTagValueUpdate> historyValues = 
+          historyService.requestHistoryData(id, lastRecords);
+      
+      final boolean isBooleanData = historyService.isBooleanData(historyValues);
+      final Collection<String> invalidPoints = historyService.getInvalidPoints(historyValues);
+      final ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
+      
+      model.addAttribute("CSV", historyService.getHistoryCSV(historyValues, isBooleanData));
+      model.addAttribute("invalidPoints", invalidPoints);
+      model.addAttribute("id", id);
+      model.addAttribute("ylabel", tagValue.getUnit());
+      model.addAttribute("tagName", tagValue.getName());
+      model.addAttribute("labels", new String[]{"Server Timestamp", 
+          "[" + id + "] " });
+
+      model.addAttribute("legend", tagValue.getName());
+      model.addAttribute("is_boolean", ((Boolean)(isBooleanData)));
+      model.addAttribute("unit", tagValue.getUnit());
+      model.addAttribute("fill_graph", true);
+      
+      model.addAttribute("records", lastRecords);
+      
+      return "trend_views/trend_view";
+      
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+    }
+    return null;
+  }
+  
   /**
    * Displays a Trend View for a given id.
    * @param id the last 100 records of the given tag id are being shown
@@ -66,7 +117,7 @@ public class TrendViewController {
    * @throws IOException 
    * */
   @RequestMapping(value = TREND_VIEW_URL + "{id}", method = { RequestMethod.GET })
-  public String viewHistory(@PathVariable(value = "id") final String id,
+  public String viewTrendDefault(@PathVariable(value = "id") final String id,
       final Model model) throws IOException  {
     
     logger.info(TREND_VIEW_URL + "{id} " + id);
@@ -83,8 +134,9 @@ public class TrendViewController {
       model.addAttribute("invalidPoints", invalidPoints);
       model.addAttribute("id", id);
       model.addAttribute("ylabel", tagValue.getUnit());
+      model.addAttribute("tagName", tagValue.getName());
       model.addAttribute("labels", new String[]{"Server Timestamp", 
-          "[" + id + "] " + tagValue.getName()});
+          "[" + id + "] " });
 
       model.addAttribute("legend", tagValue.getName());
       model.addAttribute("is_boolean", ((Boolean)(isBooleanData)));
@@ -101,13 +153,13 @@ public class TrendViewController {
   
 
   /**
-   * Displays an input form for a tag id, and if a POST was made with a tag id, also the history data.
+   * Displays an input form for a tag id.
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = TREND_VIEW_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
-  public String viewHistoryFormPost(@RequestParam(value = "id", required = false) final String id,
+  public String viewTrendFormPost(@RequestParam(value = "id", required = false) final String id,
       final Model model) {
     
     logger.info(TREND_VIEW_FORM_URL + id);
