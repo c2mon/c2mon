@@ -8,6 +8,9 @@
    <title>TrendViewer</title>
 	<script type="text/javascript" src="/c2mon-web-configviewer/js/dygraph-combined.js"></script>
 	
+	<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
+	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
 </head>
 
 <body>
@@ -18,7 +21,22 @@
 }
 </style>
 
-<div style="width:1000px; height:700px;" id="trend_view"></div>
+		<p style="width:1000px; height:50px;" class="links">
+			<A href="{$base_url}{$history_url}{@id}/" 
+				class="large blue awesome xml_button" target="_blank">History >>
+			</A>	
+			<A href="{$base_url}{$datatag_url}{/*/@id}/" 
+				class="large blue awesome xml_button" target="_blank">View Tag >>
+			</A>
+			<A href="{$help_point_url}{@id}" 
+				class="large red awesome xml_button" target="_blank">View Help Alarm >>
+			</A>	
+
+		</p>
+
+		<div style="width:1000px; height:700px;" id="trend_view"></div>
+
+
 <script type="text/javascript">
   trend = new Dygraph(
 
@@ -29,7 +47,7 @@
     ${CSV}
     
 		,{
-     title: "History chart for: ${id}",
+     // title: "History chart for: ${id}",
      legend: 'always',
      stepPlot: ${is_boolean},
      fillGraph: ${fill_graph},
