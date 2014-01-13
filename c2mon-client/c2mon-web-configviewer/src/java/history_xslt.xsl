@@ -45,6 +45,9 @@
 		tagconfig/xml/
 	</xsl:variable>		
 	
+	<xsl:variable name="help_alarm_url">http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=</xsl:variable>
+	<xsl:variable name="help_point_url">https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=</xsl:variable>
+	
 	<xsl:template match="p">
 		<xsl:copy-of select="." />
 	</xsl:template>
@@ -86,9 +89,15 @@
 					class="large blue awesome xml_button" target="_blank">History XML >>
 				</A>	
 				<A href="{$base_url}{$trend_viewer_url}{/*/@id}/" 
-					class="large blue awesome xml_button" target="_blank">
-					Trend >>
+					class="large blue awesome xml_button" target="_blank"> Trend >>
 				</A>	
+				<A href="{$base_url}{$datatag_url}{/*/@id}/" 
+					class="large blue awesome xml_button" target="_blank">View Tag >>
+				</A>
+				<A href="{$help_point_url}{/*/@id}" 
+					class="large red awesome xml_button" target="_blank">View Help Alarm >>
+				</A>	
+				
         </p>
         <table class="inline">
           <tr>
