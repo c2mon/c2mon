@@ -41,6 +41,11 @@ public class HistoryController {
    * The URL to view the history of a tag in RAW XML format
    */
   public static final String HISTORY_XML_URL = HISTORY_URL + "xml";
+  
+  /**
+   * The URL to view the history of a tag in CSV format
+   */
+  public static final String HISTORY_CSV_URL = HISTORY_URL + "csv";
 
   /**
    * Title for the history form page
@@ -103,6 +108,36 @@ public class HistoryController {
     return null;
   }
   
+
+  /**
+   * Displays the history of a given id.
+   * @param id
+   * @param response the html result is written to that HttpServletResponse response
+   * @return nothing
+   * @throws IOException 
+   * */
+  @RequestMapping(value = "/historyviewer/{id}/records/{records}", method = { RequestMethod.GET })
+  public String viewHistory(@PathVariable(value = "id") final String id,
+        @PathVariable(value = "records") final int lastRecords,
+          final HttpServletResponse response) throws IOException  {
+    
+    logger.info("/historyviewer/{id}/records/{records}" + id + " ," + lastRecords);
+
+    try {
+      response.getWriter().println(service.generateHtmlResponse(id, lastRecords));
+    } catch (TagIdException e) {
+      return ("redirect:" + "/historyviewer/errorform/" + id);
+    } catch (TransformerException e) {
+      response.getWriter().println(e.getMessage());
+      logger.error(e.getMessage());
+    }
+    catch (Exception e) {
+      response.getWriter().println(e.getMessage());
+      logger.error(e.getMessage());
+    }
+    return null;
+  }
+  
   /**
    * Displays the History in RAW XML for a tag with the given id.
    * @param id tag id
@@ -123,6 +158,8 @@ public class HistoryController {
     }
     return "raw_xml_views/rawXml";
   }
+  
+
 
   /**
    * In case of an error this form is shown.
