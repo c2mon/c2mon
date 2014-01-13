@@ -48,6 +48,8 @@
 			(
 			<xsl:value-of select="@id" />
 			)
+			<br></br>
+			<br></br>
 			
 			<A href="{$base_url}{$tag_value_xml_url}{@id}/" 
 				class="large blue awesome xml_button" target="_blank">View ClientDataTag XML >>
