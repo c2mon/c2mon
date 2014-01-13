@@ -2,7 +2,6 @@ package cern.c2mon.web.configviewer.service;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +39,22 @@ public class HistoryService {
 
   /** the path to the xslt document */
   private static final String XSLT_PATH = "/history_xslt.xsl";
+  
+  /** Used to retrieve Historical Data */
+  private HistoryProvider historyProvider;
+  
+  public HistoryService() throws HistoryProviderException {
+    
+    try {
+      historyProvider = C2monHistoryGateway.getHistoryManager().
+          getHistoryProviderFactory().createHistoryProvider();
+    }
+    catch (HistoryProviderException e) {
+      logger.error("Can't load any history because a HistoryProvider cannot be created.", e);
+      throw new HistoryProviderException("Cannot retrieve the data from the Short term log " +
+          "because no history provider is accessible.");
+    }
+  }
 
   /**
    * @return XML representation of Tag's History 
@@ -118,16 +133,6 @@ public class HistoryService {
     Timestamp endTime = null;
     // other values that can be used //
 
-    HistoryProvider historyProvider;
-    try {
-      historyProvider = C2monHistoryGateway.getHistoryManager().
-          getHistoryProviderFactory().createHistoryProvider();
-    }
-    catch (HistoryProviderException e) {
-      logger.error("Can't load any history because a HistoryProvider cannot be created.", e);
-      throw new HistoryProviderException("Cannot retrieve the data from the Short term log " +
-      		"because no history provider is accessible.");
-    }
 
     final long id = Long.parseLong(dataTagId);
     Collection<Long> dataTagIds = new ArrayList<Long>();
@@ -159,15 +164,14 @@ public class HistoryService {
    */
   public String toXml(final List<HistoryTagValueUpdate> historyValues, final String id) {
     // example: <history id="15685">
-    String historyXml = "<history" + " id=\"" + id + "\" >";
+    StringBuffer historyXml = new StringBuffer();
+    historyXml.append("<history" + " id=\"" + id + "\" >");
     for (HistoryTagValueUpdate h : historyValues) {
-
       HistoryTagValueUpdateImpl q = (HistoryTagValueUpdateImpl) h;
-      historyXml += q.getXml();
+      historyXml.append(q.getXml());
     }
-    historyXml += "</history>";
-
-    return historyXml;
+    historyXml.append("</history>");
+    return historyXml.toString();
   }
   
   /**
