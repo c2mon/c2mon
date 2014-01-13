@@ -21,6 +21,10 @@
 }
 </style>
 
+		<div id="title" style="width:1000px; height:30px;">
+			<h2 style="width:100%;text-align:center;">${tagName} (Last ${records} records for [${id}])</h2>
+		</div>
+
 		<p style="width:1000px; height:50px;" class="links">
 			<A href="{$base_url}{$history_url}{@id}/" 
 				class="large blue awesome xml_button" target="_blank">History >>
