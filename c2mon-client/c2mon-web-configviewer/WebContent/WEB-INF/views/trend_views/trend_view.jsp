@@ -26,13 +26,13 @@
 		</div>
 
 		<p style="width:1000px; height:50px;" class="links">
-			<A href="{$base_url}{$history_url}{@id}/" 
+			<A href="/c2mon-web-configviewer/historyviewer/${id}/" 
 				class="large blue awesome xml_button" target="_blank">History >>
 			</A>	
-			<A href="{$base_url}{$datatag_url}{/*/@id}/" 
+			<A href="/c2mon-web-configviewer/tagviewer/${id}/" 
 				class="large blue awesome xml_button" target="_blank">View Tag >>
 			</A>
-			<A href="{$help_point_url}{@id}" 
+			<A href="https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=${id}" 
 				class="large red awesome xml_button" target="_blank">View Help Alarm >>
 			</A>	
 
