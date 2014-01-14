@@ -14,7 +14,7 @@
   <property name="brokerURL" value="${jms.broker.url}"/>
   <property name="userName" value="${jms.daq.user}"/>
   <property name="password" value="${jms.daq.password}"/>
-  <property name="clientIDPrefix" value="C2MON-DAQ-${tim.process.name}"/>
+  <property name="clientIDPrefix" value="C2MON-DAQ-${c2mon.process.name}"/>
   <property name="watchTopicAdvisories" value="false"/>
 </bean>
 
@@ -29,7 +29,7 @@
 
 <!-- set the default JMS destination -->
 <bean id="sourceUpdateDestination" class="org.apache.activemq.command.ActiveMQQueue">
-  <constructor-arg index="0" value="${jms.process.updateQueueTrunk}.${tim.process.name}"></constructor-arg>
+  <constructor-arg index="0" value="${jms.process.updateQueueTrunk}.${c2mon.process.name}"></constructor-arg>
 </bean>
 
 <!-- initialize the DataTagValueUpdateConverter -->

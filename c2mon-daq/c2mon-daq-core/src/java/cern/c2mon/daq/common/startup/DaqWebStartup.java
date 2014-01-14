@@ -73,25 +73,25 @@ public final class DaqWebStartup {
     if (!commandParams.hasParam("-log4j")
         || !commandParams.hasParam("-processName")) {
        System.out.println();
-       System.out.println("****************************************************************");
-       System.out.println("**                TIM Data Acquisition                        **");
-       System.out.println("** usage :                                                    **");
-       System.out.println("** java DriverKernel [-basicConf basicConfFilePath]           **");
-       System.out.println("**                   (defaults to .tim.properties in home dir)**");
-       System.out.println("**                   -log4j logerConfXMLFile                  **");
-       System.out.println("**                   -processName ProcessName                 **");
-       System.out.println("**                   [-s saveConfXMLFile]                     **");
-       System.out.println("**                   [-c ProcessconfXML]                      **");
-       System.out.println("**                   [-eqLoggers]                             **");
-       System.out.println("**                   [-eqAppendersOnly]                       **");
-       System.out.println("**                   [-t | -testMode]                         **");
-       System.out.println("**                   [-nf | -nofilter]                        **");
-       System.out.println("****************************************************************");
+       System.out.println("******************************************************************");
+       System.out.println("**                TIM Data Acquisition                          **");
+       System.out.println("** usage :                                                      **");
+       System.out.println("** java DriverKernel [-basicConf basicConfFilePath]             **");
+       System.out.println("**                   (defaults to .c2mon.properties in home dir)**");
+       System.out.println("**                   -log4j logerConfXMLFile                    **");
+       System.out.println("**                   -processName ProcessName                   **");
+       System.out.println("**                   [-s saveConfXMLFile]                       **");
+       System.out.println("**                   [-c ProcessconfXML]                        **");
+       System.out.println("**                   [-eqLoggers]                               **");
+       System.out.println("**                   [-eqAppendersOnly]                         **");
+       System.out.println("**                   [-t | -testMode]                           **");
+       System.out.println("**                   [-nf | -nofilter]                          **");
+       System.out.println("******************************************************************");
        System.exit(-1);
     }
     
     // set the process name (used in the log4j file name)
-    System.setProperty("tim.process.name", commandParams.getParamValue("-processName"));
+    System.setProperty("c2mon.process.name", commandParams.getParamValue("-processName"));
     
     configureLogging(commandParams);
     

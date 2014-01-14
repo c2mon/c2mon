@@ -32,7 +32,7 @@
 	        <prop key="jms.daq.user">user-default</prop>
 	        <prop key="jms.daq.password">password-default</prop>
 	        <prop key="jms.daq.consumers">1</prop>
-	        <prop key="tim.process.name">C2MON-DAQ-TEST_PROCESS</prop>
+	        <prop key="c2mon.process.name">C2MON-DAQ-TEST_PROCESS</prop>
 	        <prop key="jms.process.requestQueue">c2mon.process.request</prop>
 	        <prop key="jms.process.updateQueueTrunk">c2mon.process.update</prop>
 	        
