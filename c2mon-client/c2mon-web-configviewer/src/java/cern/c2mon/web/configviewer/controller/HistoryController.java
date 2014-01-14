@@ -31,6 +31,9 @@ public class HistoryController {
    * Base URL for the history viewer
    * */
   public static final String HISTORY_URL = "/historyviewer/";
+  
+  /** URL to define Last Records */
+  public static final String LAST_RECORDS_URL = "/records/";
 
   /**
    * A URL to the history viewer with input form
@@ -197,12 +200,17 @@ public class HistoryController {
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/historyviewer/form", method = { RequestMethod.GET, RequestMethod.POST })
-  public String viewHistoryFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
+  public String viewHistoryFormPost(@RequestParam(value = "id", required = false) final String id,
+      @RequestParam(value = "records", required = false) final String records,
+      final Model model) {
     logger.info("/historyviewer/form " + id);
-    if (id == null)
-      model.addAllAttributes(FormUtility.getFormModel(HISTORY_FORM_TITLE, HISTORY_FORM_INSTR, HISTORY_FORM_URL, null, null));
-    else
-      return ("redirect:" + HISTORY_URL + id);
-    return "formWithData";
+    if (id == null) {
+      model.addAllAttributes(FormUtility
+          .getFormModel(HISTORY_FORM_TITLE, HISTORY_FORM_INSTR, HISTORY_FORM_URL, null, null));
+    }
+    else {
+      return ("redirect:" + HISTORY_URL + id + LAST_RECORDS_URL + records);
+    }
+    return "trend_views/trend_view_form";
   }
 }
