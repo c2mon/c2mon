@@ -155,11 +155,13 @@ public class TrendViewController {
   /**
    * Displays an input form for a tag id.
    * @param id tag id
+   * @param records how many records to retrieve
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = TREND_VIEW_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
   public String viewTrendFormPost(@RequestParam(value = "id", required = false) final String id,
+      @RequestParam(value = "records", required = false) final String records,
       final Model model) {
     
     logger.info(TREND_VIEW_FORM_URL + id);
@@ -168,7 +170,7 @@ public class TrendViewController {
           TREND_VIEW_FORM_URL, null, null));
     }
     else {
-      return ("redirect:" + TREND_VIEW_URL + id);
+      return ("redirect:" + TREND_VIEW_URL + id + LAST_RECORDS_URL + records);
     }
     return "trend_views/trend_view_form";
   }
