@@ -43,7 +43,14 @@
 
 
 <form class="well form-inline" action="" method="post">
-		<input class="span2" style="display:inline"  type="text" name="id" value="${formTagValue}" /> 
+
+		<div class="input-prepend">
+			<span class="add-on">Id</span>
+			<input class="span3" style="display:inline" type="text" name="id" value="${formTagValue}" /> 
+			<span class="add-on">Records</span>
+			<input class="span3" style="display:inline"  type="text" name="records" value="100" /> 
+		</div>
+		
 		<input class="btn btn-large btn-primary" type="submit" value="Submit">
 </form>
 
