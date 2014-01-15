@@ -19,7 +19,7 @@
   <url>http://timweb.cern.ch</url>
 
   <scm>
-    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/reps/c2mon/c2mon-server/c2mon-server-pom</developerConnection>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-pom</developerConnection>
   </scm>
 
   <!-- Shared version number properties -->
