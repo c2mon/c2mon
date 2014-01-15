@@ -1,7 +1,7 @@
 
-
-<html>
+<!DOCTYPE html>
 <head>
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9; IE=EmulateIE10"> 
 <title>${title}</title>
 
 <link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap.css" />
@@ -44,12 +44,12 @@
 </div>
 
 
-		<ul id="tabs" class="nav nav-tabs">
+		<ul class="nav nav-tabs">
 			<li><a href="#records" data-toggle="tab">Last Records</a></li>
 			<li><a href="#days" data-toggle="tab">Last Days</a></li>
 			<li><a href="#date" data-toggle="tab">From date to date</a></li>
 		</ul>
-		<div id="tab-content" class="tab-content">
+		<div id="myTabContent" class="tab-content">
               <div class="tab-pane fade in active" id="records">
                 <form class="well form-inline" action="" method="post">
 		<div class="input-prepend">
@@ -146,21 +146,22 @@
     <script src="/c2mon-web-configviewer/js/bootstrap-collapse.js"></script>
     <script src="/c2mon-web-configviewer/js/bootstrap-carousel.js"></script>
     <script src="/c2mon-web-configviewer/js/bootstrap-typeahead.js"></script>
-		<script src="/c2mon-web-configviewer/js/bootstrap-datepicker.js"></script>
+	<script src="/c2mon-web-configviewer/js/bootstrap-datepicker.js"></script>
 	
 <script type="text/javascript">
-
-$('#tabs a:first').tab('show'); // Select first tab
-
 $('.input-daterange').datepicker({
     todayBtn: true,
     forceParse: false,
     autoclose: true,
-	 format: "dd/mm/yyyy",
     todayHighlight: true,
     beforeShowDay: function (date){
       if (date.getMonth() == (new Date()).getMonth())
         switch (date.getDate()){
+          case 4:
+            return {
+              tooltip: 'Example tooltip',
+              classes: 'active'
+            };
           case 8:
             return false;
           case 12:
