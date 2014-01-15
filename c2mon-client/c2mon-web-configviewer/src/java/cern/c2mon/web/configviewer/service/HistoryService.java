@@ -77,10 +77,10 @@ public class HistoryService {
   
 
   /**
-   * @return CSV representation of Tag's History 
+   * @return XML representation of Tag's History 
    * 
    * @param dataTagId id of the datatag
-   * @param numberOfRecords number of records to look back in the history
+   * @param numberOfDays number of days to go back in History
    * 
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
@@ -88,11 +88,25 @@ public class HistoryService {
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
+  public String getHistoryXmlForLastDays(final String dataTagId, final int numberOfDays) 
+      throws HistoryProviderException, LoadingParameterException  {
+
+    final List<HistoryTagValueUpdate> historyValues = requestHistoryDataForLastDays(dataTagId, numberOfDays);
+    return toXml(historyValues, dataTagId);
+  }
+  
+
+  /**
+   * @return CSV representation of Tag's History 
+   * 
+   *  ({@link TagIdException}), or any other exception
+   * thrown by the underlying service gateway.
+   * */
   public String getHistoryCSV(final List<HistoryTagValueUpdate> historyValues, final boolean isBooleanData) {
 
     return toCSV(historyValues, isBooleanData);
   }
-
+  
   /**
    * @return CSV representation of Tag's History 
    * 
@@ -137,11 +151,91 @@ public class HistoryService {
     final long id = Long.parseLong(dataTagId);
     Collection<Long> dataTagIds = new ArrayList<Long>();
     dataTagIds.add(id);
-    final HistoryLoadingManager loadingManager = C2monHistoryGateway.getHistoryManager().createHistoryLoadingManager(historyProvider, dataTagIds);
+    final HistoryLoadingManager loadingManager = C2monHistoryGateway.getHistoryManager()
+        .createHistoryLoadingManager(historyProvider, dataTagIds);
 
     final HistoryLoadingConfiguration configuration = new HistoryLoadingConfiguration();
     configuration.setLoadInitialValues(true);
     configuration.setMaximumRecords(numberOfRecords);
+
+    loadingManager.setConfiguration(configuration);
+    try {
+      loadingManager.beginLoading(false);
+    }
+    catch (LoadingParameterException e) {
+      logger.error("The configurations is invalid.", e);
+      throw new LoadingParameterException("The configuration is invalid", e);
+    }
+
+    final List<HistoryTagValueUpdate> historyValues = new ArrayList<HistoryTagValueUpdate>();
+    for (final Long tagId : dataTagIds) {
+      historyValues.addAll(loadingManager.getAllHistoryConverted(tagId));
+    }
+    return historyValues;
+  }
+  
+  /**
+   * Used to make a request for HistoryData.
+   * @param dataTagId The tag id whose history we are looking for
+   * 
+   * @throws HistoryProviderException in case a HistoryProvider cannot be created
+   * @throws LoadingParameterException in case of an invalid configurations
+   * @return history as a List of HistoryTagValueUpdates
+   */
+  public List<HistoryTagValueUpdate> requestHistoryData(final String dataTagId
+      , final Timestamp startTime
+      , final Timestamp endTime) 
+      throws HistoryProviderException, LoadingParameterException {
+
+    final long id = Long.parseLong(dataTagId);
+    Collection<Long> dataTagIds = new ArrayList<Long>();
+    dataTagIds.add(id);
+    final HistoryLoadingManager loadingManager = C2monHistoryGateway.getHistoryManager()
+        .createHistoryLoadingManager(historyProvider, dataTagIds);
+
+    final HistoryLoadingConfiguration configuration = new HistoryLoadingConfiguration();
+    configuration.setLoadInitialValues(true);
+    configuration.setStartTime(startTime);
+    configuration.setEndTime(endTime);
+
+    loadingManager.setConfiguration(configuration);
+    try {
+      loadingManager.beginLoading(false);
+    }
+    catch (LoadingParameterException e) {
+      logger.error("The configurations is invalid.", e);
+      throw new LoadingParameterException("The configuration is invalid", e);
+    }
+
+    final List<HistoryTagValueUpdate> historyValues = new ArrayList<HistoryTagValueUpdate>();
+    for (final Long tagId : dataTagIds) {
+      historyValues.addAll(loadingManager.getAllHistoryConverted(tagId));
+    }
+    return historyValues;
+  }
+
+  /**
+   * Used to make a request for HistoryData.
+   * 
+   * @param dataTagId The tag id whose history we are looking for
+   * @param numberOfDays number of days to go back in History
+   * 
+   * @throws HistoryProviderException in case a HistoryProvider cannot be created
+   * @throws LoadingParameterException in case of an invalid configurations
+   * @return history as a List of HistoryTagValueUpdates
+   */
+  public List<HistoryTagValueUpdate> requestHistoryDataForLastDays(final String dataTagId, final int numberOfDays) 
+      throws HistoryProviderException, LoadingParameterException {
+
+    final long id = Long.parseLong(dataTagId);
+    Collection<Long> dataTagIds = new ArrayList<Long>();
+    dataTagIds.add(id);
+    final HistoryLoadingManager loadingManager = C2monHistoryGateway.getHistoryManager()
+        .createHistoryLoadingManager(historyProvider, dataTagIds);
+
+    final HistoryLoadingConfiguration configuration = new HistoryLoadingConfiguration();
+    configuration.setLoadInitialValues(true);
+    configuration.setNumberOfDays(numberOfDays);
 
     loadingManager.setConfiguration(configuration);
     try {
