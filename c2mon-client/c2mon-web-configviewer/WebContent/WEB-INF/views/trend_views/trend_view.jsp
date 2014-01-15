@@ -22,7 +22,7 @@
 </style>
 
 		<div id="title" style="width:1000px; height:30px;">
-			<h2 style="width:100%;text-align:center;">${tagName} (Last ${records} records for [${id}])</h2>
+			<h2 style="width:100%;text-align:center;">${view_title}</h2>
 		</div>
 
 		<p style="width:1000px; height:50px;" class="links">
