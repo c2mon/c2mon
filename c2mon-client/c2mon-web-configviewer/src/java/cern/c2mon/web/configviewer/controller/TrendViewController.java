@@ -128,7 +128,7 @@ public class TrendViewController {
 
       model.addAttribute("records", lastRecords);
       model.addAttribute("view_title", tagValue.getName() + "(Last " 
-          + lastRecords + " records.");
+          + lastRecords + " records)");
       
       return "trend_views/trend_view";
       
