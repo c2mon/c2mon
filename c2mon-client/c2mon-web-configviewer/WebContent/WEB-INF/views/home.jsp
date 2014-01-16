@@ -61,8 +61,11 @@
               <p><a class="btn" href="tagviewer/form">Go! &raquo;</a></p>
             </div><!--/span-->
             <div class="span4">
-              <h2>Tag History Viewer</h2>
-              <p><a class="btn" href="historyviewer/form">Go! &raquo;</a></p>
+              <h2>History Viewer</h2>
+              <p>
+				<a class="btn" href="historyviewer/form">Table &raquo;</a>
+				<a class="btn" href="trendviewer/form">Trend &raquo;</a>
+			 </p>
             </div><!--/span-->
             <div class="span4">
               <h2>Alarm Viewer</h2>
