@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProcessConfiguration xmlns="http://timweb.cern.ch/schemas/tim-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xsi:schemaLocation="http://timweb.cern.ch/schemas/tim-daq/Configuration http://timweb/schemas/tim-daq/ProcessConfiguration.xsd"
+                      process-id="50" type="initialise">
+  <jms-user>P_TESTHANDLER03</jms-user>
+  <jms-password>TESTHANDLER03_P</jms-password>
+  <jms-qcf-jndi-name>jms/process/factories/QCF</jms-qcf-jndi-name>
+  <jms-queue-jndi-name>jms/process/destinations/queues/processmessage/P_TESTHANDLER03</jms-queue-jndi-name>
+  <jms-listener-topic>c2mon.process.NOHOST.P_TESTHANDLER03.NOTIME</jms-listener-topic>
+  <alive-tag-id>1221</alive-tag-id>
+  <alive-interval>60000</alive-interval>
+  <max-message-size>100</max-message-size>
+  <max-message-delay>300</max-message-delay>
+  <EquipmentUnits>
+<EquipmentUnit id="150" name="E_TESTHANDLER_TESTHANDLER03">
+  <handler-class-name>cern.c2mon.driver.testhandler.TestMessageHandler</handler-class-name>
+  <commfault-tag-id>1223</commfault-tag-id>
+  <commfault-tag-value>false</commfault-tag-value>
+  <alive-tag-id>1224</alive-tag-id>
+  <alive-interval>60000</alive-interval>
+  <address>interval=1000;eventProb=0.02;inRangeProb=1;outDeadBandProb=1;switchProb=1;startIn=0.2;aliveInterval=30000</address>
+  <SubEquipmentUnits>
+    <SubEquipmentUnit id="250" name="SUB_E_TESTHANDLER_TESTHANDLER03">
+      <commfault-tag-id>1232</commfault-tag-id>
+      <commfault-tag-value>false</commfault-tag-value>
+      <alive-tag-id>1231</alive-tag-id>
+      <alive-interval>30000</alive-interval>
+    </SubEquipmentUnit>
+  </SubEquipmentUnits>
+  <DataTags>
+    <DataTag control="false" id="200000" name="sys.proc.serverinit">
+      <data-type>Integer</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>yami</protocol>
+          <service>yami</service>
+          <device-name>TEST.CLIC.DIAMON.1</device-name>
+          <property-name>Acquisition</property-name>
+          <data-field-name>sys.proc.serverinit</data-field-name>
+          <column-index>-1</column-index>
+          <row-index>-1</row-index>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag control="false" id="200001" name="sys.mem.inactpct">
+      <data-type>Integer</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>yami</protocol>
+          <service>yami</service>
+          <device-name>TEST.CLIC.DIAMON.1</device-name>
+          <property-name>Acquisition</property-name>
+          <data-field-name>sys.mem.inactpct</data-field-name>
+          <column-index>-1</column-index>
+          <row-index>-1</row-index>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag control="false" id="200002" name="sys.loadavg">
+      <data-type>Integer</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>yami</protocol>
+          <service>yami</service>
+          <device-name>TEST.CLIC.DIAMON.1</device-name>
+          <property-name>Acquisition</property-name>
+          <data-field-name>sys.loadavg</data-field-name>
+          <column-index>-1</column-index>
+          <row-index>-1</row-index>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag control="false" id="200003" name="tag_200003">
+      <data-type>Integer</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>yami</protocol>
+          <service>yami</service>
+          <device-name>TEST.CLIC.DIAMON.1</device-name>
+          <property-name>Acquisition</property-name>
+          <data-field-name>sys.mem.inactpct</data-field-name>
+          <column-index>-1</column-index>
+          <row-index>-1</row-index>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag control="false" id="200004" name="tag_200004">
+      <data-type>Integer</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>yami</protocol>
+          <service>yami</service>
+          <device-name>TEST.CLIC.DIAMON.1</device-name>
+          <property-name>Acquisition</property-name>
+          <data-field-name>sys.mem.inactpct</data-field-name>
+          <column-index>-1</column-index>
+          <row-index>-1</row-index>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag control="false" id="200005" name="tag_200005">
+      <data-type>Integer</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
+          <protocol>yami</protocol>
+          <service>yami</service>
+          <device-name>TEST.CLIC.DIAMON.1</device-name>
+          <property-name>Acquisition</property-name>
+          <data-field-name>sys.mem.inactpct</data-field-name>
+          <column-index>-1</column-index>
+          <row-index>-1</row-index>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>    
+  </DataTags>
+  <CommandTags>
+    <CommandTag id="11000" name="CMD_11000">
+      <source-timeout>1000</source-timeout>
+      <source-retries>1</source-retries>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+          <namespace>0</namespace>
+          <opc-item-name>CDE_N2_ARR_EJP_UAPE_X93X94</opc-item-name>
+          <command-pulse-length>100</command-pulse-length>
+          <address-type>STRING</address-type>
+          <command-type>CLASSIC</command-type>
+        </HardwareAddress>
+    </CommandTag>
+    <CommandTag id="11001" name="CMD_11001">
+      <source-timeout>1000</source-timeout>
+      <source-retries>1</source-retries>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+          <namespace>0</namespace>
+          <opc-item-name>CDE_N2_ARR_EJP_UAPE_X93X94</opc-item-name>
+          <command-pulse-length>100</command-pulse-length>
+          <address-type>STRING</address-type>
+          <command-type>CLASSIC</command-type>
+        </HardwareAddress>
+    </CommandTag>
+  </CommandTags>
+</EquipmentUnit><EquipmentUnit id="160" name="E_TEST_2">
+  <handler-class-name>cern.c2mon.driver.testhandler.TestMessageHandler</handler-class-name>
+  <commfault-tag-id>1241</commfault-tag-id>
+  <commfault-tag-value>false</commfault-tag-value>
+  <address>interval=1000;eventProb=0.02;inRangeProb=1;outDeadBandProb=1;switchProb=1;startIn=0.2;aliveInterval=30000</address>
+  <SubEquipmentUnits>
+  </SubEquipmentUnits>
+  <DataTags>
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>  </EquipmentUnits>
+</ProcessConfiguration>

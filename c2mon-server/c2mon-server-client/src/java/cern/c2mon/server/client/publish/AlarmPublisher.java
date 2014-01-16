@@ -13,18 +13,18 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.tim.server.cache.CacheRegistrationService;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.C2monCacheListener;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.common.component.Lifecycle;
-import cern.tim.server.common.config.ServerConstants;
-import cern.tim.server.common.republisher.Publisher;
-import cern.tim.server.common.republisher.Republisher;
-import cern.tim.server.common.republisher.RepublisherFactory;
-import cern.tim.server.common.tag.Tag;
-import cern.tim.util.jms.JmsSender;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.server.cache.CacheRegistrationService;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.C2monCacheListener;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.republisher.Publisher;
+import cern.c2mon.server.common.republisher.Republisher;
+import cern.c2mon.server.common.republisher.RepublisherFactory;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.util.jms.JmsSender;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 

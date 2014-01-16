@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <import resource="classpath:cern/c2mon/server/test/cache/config/server-cache-common-test.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-equipment.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>
+  
+  <!--  loader already in XML for equipment -->
+  <bean id="equipmentCache" class="cern.c2mon.server.cache.equipment.EquipmentCacheImpl" autowire="constructor"/>
+  <bean id="equipmentDAO" class="cern.c2mon.server.cache.loading.impl.EquipmentDAOImpl"/>
+  
+  <!-- test specific settings (cache not in TC mode) -->
+<!--  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">-->
+<!--    <property name="configLocation" value="classpath:resources/ehcache-notTCmode.xml"/>-->
+<!--  </bean>-->
+
+</beans>

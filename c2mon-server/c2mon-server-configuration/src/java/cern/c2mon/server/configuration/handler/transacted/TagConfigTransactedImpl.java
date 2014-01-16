@@ -4,13 +4,13 @@ import org.apache.log4j.Logger;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.tim.server.cache.CommonTagFacade;
-import cern.tim.server.cache.DataTagFacade;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.C2monCache;
-import cern.tim.server.cache.loading.ConfigurableDAO;
-import cern.tim.server.common.tag.Tag;
-import cern.tim.shared.common.ConfigurationException;
+import cern.c2mon.server.cache.CommonTagFacade;
+import cern.c2mon.server.cache.DataTagFacade;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.C2monCache;
+import cern.c2mon.server.cache.loading.ConfigurableDAO;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.common.ConfigurationException;
 
 /**
  * Public methods in this class should perform the complete

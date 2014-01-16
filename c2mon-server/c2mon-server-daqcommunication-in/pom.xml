@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-server</groupId>
+    <artifactId>c2mon-server-pom</artifactId>
+    <version>1.1.0</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-server</groupId>
+  <artifactId>c2mon-server-daqcommunication-in</artifactId>
+  <version>1.2.0-SNAPSHOT</version>
+  <name>c2mon-server-daqcommunication-in</name>
+  <packaging>jar</packaging>
+  <description>C2MON server module managing DAQ-initiated JMS communication to the server</description>
+  <url>http://timweb.cern.ch</url>
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-daqcommunication-in</developerConnection>
+  </scm>
+  
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-all</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jencks</groupId>
+      <artifactId>jencks-amqpool</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jms</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-supervision</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cachepersistence</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+    </dependency>
+  </dependencies>
+
+  <developers />
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>   
+        <version>2.8.1</version><!--$NO-MVN-MAN-VER$-->     
+        <configuration>
+          <argLine>
+            -Dc2mon.properties.location=${c2mon.properties.location}
+            -Dc2mon.log.dir=${java.io.tmpdir}/c2mon-cache
+            <!-- Terracotta license key path -->
+            -Dcom.tc.productkey.path=${com.tc.productkey.path}
+            <!--
+              for this module
+            -->           
+            -Djms.update.consumers.max=1
+            -Djms.update.consumers.initial=1
+            -Djms.update.consumers.warmuptime=1
+            -Djms.process.updateQueueTrunk=test.tim.process.update
+            -Djms.update.transacted=true
+            -Djms.process.requestQueue=test.tim.process.request
+            -Djms.request.connections.max=1
+            -Djms.request.consumers.initial=1
+            -Djms.request.consumers.max=1
+            -Djms.request.transacted=false
+            -Djms.daq.out.connections=1
+            -Dc2mon.jms.process.listener.trunk=test.process.listener.trunk
+            -Dc2mon.jms.update.task.idle.limit=1
+            -Dc2mon.jms.update.task.max.messages=1
+            -Dc2mon.jms.update.executor.threads=5
+            -Dc2mon.jms.update.task.timeout=50            
+            
+            <!--
+              integration testing: cache module settings
+            -->
+            -Ddatasource.persistence.connections.initial=2
+            -Ddatasource.persistence.connections.max=2
+            -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test
+            -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test
+            -Dcache.loader.batch.size=10000
+            -Dcache.loader.threads.max=2
+            -Dcache.loader.queue.size=1000
+            -Dcache.loader.equipment.batch.size=5
+            -Dcache.loader.equipment.threads.max=2
+            -Dcache.loader.equipment.queue.size=1000   
+            
+            <!--
+              for supervision module
+            -->
+            -Dc2mon.heartbeat.interval=60000
+            -Dc2mon.jms.heartbeat.topic=test.tim.sys.hearbeat
+            -Dc2mon.jms.heartbeat.user=not-used
+            -Dc2mon.jms.heartbeat.password=not-used   
+            
+            <!--
+              for persistence module
+            -->
+            -Dc2mon.persistence.buffer.min=2000
+            -Dc2mon.persistence.buffer.max=3000
+            -Dc2mon.persistence.buffer.growth=100
+            -Dc2mon.persistence.timeout=5000
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

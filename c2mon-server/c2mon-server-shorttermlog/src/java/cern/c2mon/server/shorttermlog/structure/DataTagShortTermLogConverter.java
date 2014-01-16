@@ -20,12 +20,12 @@
 
 package cern.c2mon.server.shorttermlog.structure;
 
-import cern.tim.server.common.control.ControlTag;
-import cern.tim.server.common.datatag.DataTag;
-import cern.tim.server.common.tag.Tag;
-import cern.tim.shared.common.datatag.TagQualityStatus;
-import cern.tim.shared.common.type.TypeConverter;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.type.TypeConverter;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 

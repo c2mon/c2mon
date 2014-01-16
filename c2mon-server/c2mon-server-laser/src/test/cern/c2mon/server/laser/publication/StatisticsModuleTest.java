@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import cern.tim.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.Alarm;
 
 /**
  * @author felixehm

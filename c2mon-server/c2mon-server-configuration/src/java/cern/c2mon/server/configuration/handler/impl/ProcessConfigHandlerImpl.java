@@ -31,17 +31,17 @@ import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.ProcessCache;
-import cern.tim.server.cache.ProcessFacade;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.common.process.Process;
-import cern.tim.server.daqcommunication.in.JmsContainerManager;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.client.configuration.ConfigConstants.Action;
-import cern.tim.shared.client.configuration.ConfigConstants.Entity;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.daq.config.Change;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.ProcessFacade;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.config.Change;
 
 /**
  * See interface documentation.

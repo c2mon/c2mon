@@ -13,15 +13,15 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.tim.server.common.component.Lifecycle;
-import cern.tim.server.common.config.ServerConstants;
-import cern.tim.server.common.republisher.Publisher;
-import cern.tim.server.common.republisher.Republisher;
-import cern.tim.server.common.republisher.RepublisherFactory;
-import cern.tim.server.supervision.SupervisionListener;
-import cern.tim.server.supervision.SupervisionNotifier;
-import cern.tim.util.jms.JmsSender;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.republisher.Publisher;
+import cern.c2mon.server.common.republisher.Republisher;
+import cern.c2mon.server.common.republisher.RepublisherFactory;
+import cern.c2mon.server.supervision.SupervisionListener;
+import cern.c2mon.server.supervision.SupervisionNotifier;
+import cern.c2mon.shared.util.jms.JmsSender;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 

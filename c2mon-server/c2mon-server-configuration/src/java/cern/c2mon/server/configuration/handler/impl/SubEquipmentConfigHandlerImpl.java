@@ -30,16 +30,16 @@ import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.SubEquipmentConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.AliveTimerCache;
-import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.SubEquipmentCache;
-import cern.tim.server.cache.SubEquipmentFacade;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.common.equipment.Equipment;
-import cern.tim.server.common.subequipment.SubEquipment;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.common.ConfigurationException;
+import cern.c2mon.server.cache.AliveTimerCache;
+import cern.c2mon.server.cache.CommFaultTagCache;
+import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.cache.SubEquipmentFacade;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.ConfigurationException;
 
 /**
  * See interface documentation.

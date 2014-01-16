@@ -18,8 +18,8 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration;
 
-import cern.tim.shared.client.configuration.ConfigurationException;
-import cern.tim.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationException;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 
 /**
  * Public bean that can be accessed to load configurations into

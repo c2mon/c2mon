@@ -26,7 +26,6 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -39,63 +38,61 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.AliveTimerCache;
+import cern.c2mon.server.cache.CommFaultTagCache;
+import cern.c2mon.server.cache.CommandTagCache;
+import cern.c2mon.server.cache.ControlTagCache;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.EquipmentCache;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.ProcessFacade;
+import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.dbaccess.AlarmMapper;
+import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
+import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
+import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
+import cern.c2mon.server.cache.dbaccess.ProcessMapper;
+import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
+import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.server.common.command.CommandTagCacheObject;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.equipment.EquipmentCacheObject;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuraton.helper.ObjectEqualityComparison;
-import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.AliveTimerCache;
-import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.CommandTagCache;
-import cern.tim.server.cache.ControlTagCache;
-import cern.tim.server.cache.DataTagCache;
-import cern.tim.server.cache.EquipmentCache;
-import cern.tim.server.cache.ProcessCache;
-import cern.tim.server.cache.ProcessFacade;
-import cern.tim.server.cache.RuleTagCache;
-import cern.tim.server.cache.SubEquipmentCache;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.dbaccess.AlarmMapper;
-import cern.tim.server.cache.dbaccess.CommandTagMapper;
-import cern.tim.server.cache.dbaccess.ControlTagMapper;
-import cern.tim.server.cache.dbaccess.DataTagMapper;
-import cern.tim.server.cache.dbaccess.EquipmentMapper;
-import cern.tim.server.cache.dbaccess.ProcessMapper;
-import cern.tim.server.cache.dbaccess.RuleTagMapper;
-import cern.tim.server.cache.dbaccess.SubEquipmentMapper;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.common.alarm.AlarmCacheObject;
-import cern.tim.server.common.command.CommandTagCacheObject;
-import cern.tim.server.common.control.ControlTagCacheObject;
-import cern.tim.server.common.datatag.DataTagCacheObject;
-import cern.tim.server.common.equipment.Equipment;
-import cern.tim.server.common.equipment.EquipmentCacheObject;
-import cern.tim.server.common.process.Process;
-import cern.tim.server.common.process.ProcessCacheObject;
-import cern.tim.server.common.rule.RuleTagCacheObject;
-import cern.tim.server.common.subequipment.SubEquipment;
-import cern.tim.server.common.subequipment.SubEquipmentCacheObject;
-import cern.tim.server.common.tag.Tag;
-import cern.tim.server.daqcommunication.out.ProcessCommunicationManager;
-import cern.tim.server.test.TestDataInserter;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
-import cern.tim.shared.client.configuration.ConfigConstants;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.client.configuration.ConfigurationReport;
-import cern.tim.shared.client.configuration.ConfigConstants.Entity;
-import cern.tim.shared.client.configuration.ConfigConstants.Status;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.common.NoSimpleValueParseException;
-import cern.tim.shared.common.datatag.DataTagAddress;
-import cern.tim.shared.common.datatag.DataTagConstants;
-import cern.tim.shared.common.datatag.DataTagQuality;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.datatag.DataTagValueDictionary;
-import cern.tim.shared.common.datatag.TagQualityStatus;
-import cern.tim.shared.common.datatag.address.HardwareAddressFactory;
-import cern.tim.shared.daq.config.Change;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ConfigurationChangeEventReport;
-import cern.tim.shared.daq.config.ChangeReport.CHANGE_STATE;
-import ch.cern.tim.shared.alarm.AlarmCondition;
-import ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
+import cern.c2mon.server.test.TestDataInserter;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.NoSimpleValueParseException;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
+import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.daq.config.Change;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 
 /**
  * Component/integration tests of the configuration module (integrates
@@ -310,7 +307,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     details.setRbacDevice("RBAC device");
     details.setRbacProperty("RBAC property");
     expectedObject.setAuthorizationDetails(details);
-    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));   
+    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));   
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObject);
    
     //test update
@@ -323,7 +320,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setName("Test CommandTag Updated");
     expectedObject.getAuthorizationDetails().setRbacClass("new RBAC class");
     expectedObject.getAuthorizationDetails().setRbacDevice("new RBAC device");
-    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>"));
+    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>"));
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObjectUpdated);
   }
   
@@ -627,7 +624,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setAddress("serverHostName=VGTCVENTTEST");
     expectedObject.setStateTagId(1250L);
     expectedObject.setCommFaultTagId(1252L);    
-    expectedObject.setHandlerClassName("ch.cern.tim.driver.");
+    expectedObject.setHandlerClassName("cern.c2mon.driver.");
     expectedObject.setProcessId(50L);
     expectedObject.setDescription("test description");
     
@@ -931,7 +928,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     boolean failed = false;
     try {
       report = configurationLoader.applyConfiguration(20);     
-    } catch (cern.tim.shared.client.configuration.ConfigurationException e) {
+    } catch (cern.c2mon.shared.client.configuration.ConfigurationException e) {
       System.out.println(e.getConfigurationReport());
       failed = true;
     }      
@@ -990,7 +987,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setFaultFamily("fault family");
     expectedObject.setFaultMember("fault member");
     expectedObject.setFaultCode(223);
-    expectedObject.setCondition(AlarmCondition.fromConfigXML("<AlarmCondition class=\"ch.cern.tim.shared.alarm.ValueAlarmCondition\"><alarm-value type=\"Boolean\">true</alarm-value></AlarmCondition>"));
+    expectedObject.setCondition(AlarmCondition.fromConfigXML("<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\"><alarm-value type=\"Boolean\">true</alarm-value></AlarmCondition>"));
     
     ObjectEqualityComparison.assertAlarmEquals(expectedObject, cacheObject);
     

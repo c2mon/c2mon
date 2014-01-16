@@ -2,8 +2,8 @@ package cern.c2mon.server.configuration.handler.transacted;
 
 import java.util.Properties;
 
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * Internal class with transacted methods.

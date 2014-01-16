@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-server</groupId>
+    <artifactId>c2mon-server-pom</artifactId>
+    <version>1.1.0</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-server</groupId>
+  <artifactId>c2mon-server-cache</artifactId>
+  <version>1.2.0-SNAPSHOT</version>
+  <name>c2mon-server-cache</name>
+  <packaging>jar</packaging>
+  <description>
+    	C2MON server cache module
+    </description>
+  <url>http://timweb.cern.ch</url>
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-cache</developerConnection>
+  </scm>
+
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>runtime</scope>      
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+    </dependency>
+    
+    <!-- 
+      The following dependencies are required for using Ehcache.
+    -->
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-ee</artifactId>
+    </dependency>
+    <dependency>
+    <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-daq</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cacheloading</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cachedbaccess</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <developers />
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8.1</version>
+        <configuration>
+          <argLine>
+            -Dc2mon.properties.location=${c2mon.properties.location}
+            -Dc2mon.log.dir=${java.io.tmpdir}/c2mon-cache
+            <!-- Terracotta license key path -->
+            -Dcom.tc.productkey.path=${com.tc.productkey.path}
+            -Ddatasource.persistence.connections.initial=2
+            -Ddatasource.persistence.connections.max=2
+            -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test
+            -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test
+            -Dcache.loader.batch.size=1000
+            -Dcache.loader.threads.max=2
+            -Dcache.loader.queue.size=1000
+            -Dcache.loader.equipment.batch.size=5
+            -Dcache.loader.equipment.threads.max=2
+            -Dcache.loader.equipment.queue.size=1000      
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

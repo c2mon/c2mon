@@ -10,14 +10,14 @@ import cern.c2mon.shared.client.tag.TagConfigImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.common.alarm.TagWithAlarms;
-import cern.tim.server.common.control.ControlTag;
-import cern.tim.server.common.datatag.DataTag;
-import cern.tim.server.common.process.Process;
-import cern.tim.server.common.rule.RuleTag;
-import cern.tim.server.common.tag.Tag;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 /**
  * Factory class for creating transfer objects for sending to the C2MON client layer  

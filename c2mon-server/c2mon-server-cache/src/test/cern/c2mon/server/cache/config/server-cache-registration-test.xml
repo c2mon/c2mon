@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <import resource="classpath:cern/c2mon/server/cache/config/server-cache-datatag-test.xml"/>
+   <import resource="classpath:cern/c2mon/server/cache/config/server-cache-control-test.xml"/>
+   <import resource="classpath:cern/c2mon/server/cache/config/server-cache-rule-test.xml"/>
+   <import resource="classpath:cern/c2mon/server/cache/config/server-cache-alarm-test.xml"/>
+   <import resource="classpath:cern/c2mon/server/cache/config/server-cache-alive-test.xml"/>
+   
+ 
+   <bean id="equipmentFacade" class="org.easymock.EasyMock" factory-method="createMock">
+      <constructor-arg value="cern.c2mon.server.cache.EquipmentFacade"/>
+   </bean>
+  
+   <bean id="cacheRegistrationService" class="cern.c2mon.server.cache.listener.CacheRegistrationServiceImpl" autowire="constructor"/>
+   <bean id="dataTagFacade" class="cern.c2mon.server.cache.datatag.DataTagFacadeImpl" autowire="constructor"/>
+   <bean id="controlTagFacade" class="cern.c2mon.server.cache.control.ControlTagFacadeImpl" autowire="constructor"/>
+   <bean id="alarmFacade" class="cern.c2mon.server.cache.alarm.AlarmFacadeImpl" autowire="constructor"/>
+   <bean id="qualityConverter" class="cern.c2mon.server.cache.datatag.QualityConverterImpl"/> 
+  
+</beans>

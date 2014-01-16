@@ -11,10 +11,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.configuration.mybatis.ConfigurationMapper;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigConstants.Action;
-import cern.tim.shared.client.configuration.ConfigConstants.Entity;
-import cern.tim.shared.client.configuration.ConfigConstants.Status;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 
 /**
  * Integration tests of the configuration Mybatis mapper with
@@ -61,7 +61,7 @@ public class ConfigurationMapperTest {
     assertEquals("2", elementFirst.getElementProperties().get("mode"));
     assertEquals("false", elementFirst.getElementProperties().get("isLogged"));
     assertEquals("<DataTagAddress>"
-                  + "<HardwareAddress class=\"ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl\">"
+                  + "<HardwareAddress class=\"cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl\">"
                   + "<opc-item-name>CW_TEMP_IN_COND4</opc-item-name>"
                   + "</HardwareAddress>"
                   + "</DataTagAddress>"

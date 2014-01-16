@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+  
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.SubEquipmentMapper">
+    
+    <resultMap id="subEquipmentResultMap" type="SubEquipment" extends="cern.c2mon.server.cache.dbaccess.EquipmentMapper.abstractEquipmentResultMap">            
+      <result property="parentId" column="equipment_parentid" />
+    </resultMap>  
+  
+    <select id="getAll" resultMap="subEquipmentResultMap">
+      SELECT EQID as equipment_id, EQNAME as equipment_name, EQDESC as equipment_description,
+             EQHANDLERCLASS as equipment_handlerclass, EQSTATE_TAGID as equipment_statetagid,
+             EQALIVE_TAGID as equipment_alivetagid, EQALIVEINTERVAL as equipment_aliveinterval,
+             EQCOMMFAULT_TAGID as equipment_commfaulttagid, EQ_PARENT_ID as equipment_parentid, EQSTATE as equipment_state,
+             EQSTATUSTIME AS equipment_status_time, EQSTATUSDESC AS equipment_status_desc
+        FROM EQUIPMENT
+       WHERE EQ_PROCID IS NULL
+    </select>
+    
+    <!-- getItem needed for persistence caches -->
+    <select id="getItem" resultMap="subEquipmentResultMap" parameterType="Long">
+      SELECT EQID as equipment_id, EQNAME as equipment_name, EQDESC as equipment_description,
+             EQHANDLERCLASS as equipment_handlerclass, EQSTATE_TAGID as equipment_statetagid,
+             EQALIVE_TAGID as equipment_alivetagid, EQALIVEINTERVAL as equipment_aliveinterval,
+             EQCOMMFAULT_TAGID as equipment_commfaulttagid, EQ_PARENT_ID as equipment_parentid, EQSTATE as equipment_state,
+             EQSTATUSTIME AS equipment_status_time, EQSTATUSDESC AS equipment_status_desc
+        FROM EQUIPMENT
+       WHERE EQ_PROCID IS NULL
+         AND EQID = #{id}
+    </select>      
+  
+    <!--  Inserts a new row into the equipment database table -->
+    <insert id="insertSubEquipment" parameterType="SubEquipment">
+      INSERT INTO equipment(EQID, EQNAME, EQDESC, 
+                            EQHANDLERCLASS, EQSTATE_TAGID, EQALIVE_TAGID, 
+                            EQALIVEINTERVAL, EQCOMMFAULT_TAGID, 
+                            EQ_PARENT_ID, EQSTATE, EQSTATUSTIME, EQSTATUSDESC)
+      VALUES (#{id}, #{name}, #{description,jdbcType=VARCHAR}, 
+              #{handlerClassName,jdbcType=VARCHAR}, #{stateTagId}, #{aliveTagId,jdbcType=NUMERIC}, 
+              #{aliveInterval}, #{commFaultTagId,jdbcType=NUMERIC}, 
+              #{parentId}, #{supervisionStatus,jdbcType=VARCHAR}, 
+              #{statusTime,jdbcType=TIMESTAMP}, #{statusDescription,jdbcType=VARCHAR})   
+    </insert>
+    
+    <update id="updateSubEquipmentConfig" parameterType="SubEquipment">
+      UPDATE EQUIPMENT
+         SET EQNAME = #{name},
+             EQDESC = #{description,jdbcType=VARCHAR},                                      
+             EQSTATE_TAGID = #{stateTagId,jdbcType=NUMERIC},             
+             EQALIVE_TAGID = #{aliveTagId,jdbcType=NUMERIC},
+             EQALIVEINTERVAL = #{aliveInterval,jdbcType=NUMERIC},
+             EQCOMMFAULT_TAGID = #{commFaultTagId,jdbcType=NUMERIC},             
+             EQ_PARENT_ID = #{parentId,jdbcType=NUMERIC}
+       WHERE EQID = #{id}
+    </update>
+    
+    <!-- Returns all the subEquipments attached to a given equipment -->
+    <select id="selectSubEquipmentsByEquipment" parameterType="Long" resultMap="subEquipmentResultMap">
+      SELECT EQID as equipment_id, EQNAME as equipment_name, EQDESC as equipment_description,
+             EQHANDLERCLASS as equipment_handlerclass, EQSTATE_TAGID as equipment_statetagid,
+             EQALIVE_TAGID as equipment_alivetagid, EQALIVEINTERVAL as equipment_aliveinterval,
+             EQCOMMFAULT_TAGID as equipment_commfaulttagid, EQ_PARENT_ID as equipment_parentid,
+             EQSTATE as equipment_state, EQSTATUSTIME AS equipment_status_time, EQSTATUSDESC AS equipment_status_desc
+        FROM equipment
+       WHERE EQ_PARENT_ID=#{equipmentId} 
+         AND EQ_PROCID IS NULL  
+    </select>
+    
+    <!-- Returns a SubEquipmentBean representing an entry in the equipment database table selected by subEquipmentId -->
+    <select id="selectSubEquipmentById" parameterType="Long" resultMap="subEquipmentResultMap">
+      SELECT EQID as equipment_id, EQNAME as equipment_name, EQDESC as equipment_description,
+             EQHANDLERCLASS as equipment_handlerclass, EQSTATE_TAGID as equipment_statetagid,
+             EQALIVE_TAGID as equipment_alivetagid, EQALIVEINTERVAL as equipment_aliveinterval,
+             EQCOMMFAULT_TAGID as equipment_commfaultagid, EQ_PARENT_ID as equipment_parentid,
+             EQSTATE as equipment_state, EQSTATUSTIME AS equipment_status_time, EQSTATUSDESC AS equipment_status_desc
+        FROM equipment 
+       WHERE EQID=#{id} 
+         AND EQ_PROCID IS NULL
+    </select>  
+  
+    <!--  Removes an entry from the equipment database table -->
+    <delete id="deleteSubEquipment" parameterType="Long">
+      DELETE FROM equipment WHERE EQID=#{id} and EQ_PROCID IS NULL
+    </delete>
+    
+    <update id="updateCacheable" parameterType="SubEquipment">
+      UPDATE EQUIPMENT
+         SET EQSTATE = #{supervisionStatus,jdbcType=VARCHAR},            
+             EQSTATUSTIME = #{statusTime,jdbcType=TIMESTAMP},
+             EQSTATUSDESC = #{statusDescription,jdbcType=VARCHAR}
+       WHERE EQID = #{id} 
+    </update>
+    
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM EQUIPMENT E1
+       WHERE EQID = #{id}
+         AND E1.EQ_PROCID IS NULL
+    </select>
+            
+  </mapper>

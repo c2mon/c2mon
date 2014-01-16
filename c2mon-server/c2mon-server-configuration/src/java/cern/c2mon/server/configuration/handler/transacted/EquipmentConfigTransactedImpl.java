@@ -16,19 +16,19 @@ import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.AliveTimerCache;
-import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.EquipmentCache;
-import cern.tim.server.cache.EquipmentFacade;
-import cern.tim.server.cache.ProcessCache;
-import cern.tim.server.cache.ProcessXMLProvider;
-import cern.tim.server.cache.loading.EquipmentDAO;
-import cern.tim.server.common.equipment.Equipment;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.daq.config.EquipmentUnitAdd;
-import cern.tim.shared.daq.config.EquipmentUnitRemove;
+import cern.c2mon.server.cache.AliveTimerCache;
+import cern.c2mon.server.cache.CommFaultTagCache;
+import cern.c2mon.server.cache.EquipmentCache;
+import cern.c2mon.server.cache.EquipmentFacade;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.ProcessXMLProvider;
+import cern.c2mon.server.cache.loading.EquipmentDAO;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
+import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
 
 /**
  * Equipment configuration transacted methods.

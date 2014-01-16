@@ -8,15 +8,15 @@ import org.apache.log4j.Logger;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.CommonEquipmentConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.AliveTimerCache;
-import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.C2monCache;
-import cern.tim.server.cache.equipment.CommonEquipmentFacade;
-import cern.tim.server.common.equipment.AbstractEquipment;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.client.configuration.ConfigConstants.Action;
-import cern.tim.shared.client.configuration.ConfigConstants.Entity;
-import cern.tim.shared.common.ConfigurationException;
+import cern.c2mon.server.cache.AliveTimerCache;
+import cern.c2mon.server.cache.CommFaultTagCache;
+import cern.c2mon.server.cache.C2monCache;
+import cern.c2mon.server.cache.equipment.CommonEquipmentFacade;
+import cern.c2mon.server.common.equipment.AbstractEquipment;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.common.ConfigurationException;
 
 /**
  * Common part of Equipment-SubEquipment handler.

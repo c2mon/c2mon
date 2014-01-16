@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  
+  <!-- This Spring configuration file instantiates the beans listening for incoming DataTag
+        updates on the appropriate JMS queue. It uses a Jencks a JCA container that manages
+        the pool of JMS connections to the brokers. A pool of MDPojos are processing the
+        incoming messages. -->
+  
+  <!-- the transaction manager for the JCA container; should re-deliver messages if not acknowledged? -->
+  <bean id="jmsTransactionManager" class="org.jencks.factory.TransactionManagerFactoryBean"/>
+  
+  <!--  the JCA container -->
+  <bean id="jencks" class="org.jencks.JCAContainer">
+    <property name="transactionManager" ref="jmsTransactionManager"/>
+    <property name="threadPoolSize" value="25"/>
+    <!-- the JCA Resource Adapter -->
+    <property name="resourceAdapter">
+      <bean id="activeMQResourceAdapter" class="org.apache.activemq.ra.ActiveMQResourceAdapter">
+       <property name="serverUrl" value="tcp://cs-ccr-tim8:61616"/>
+      </bean>
+    </property>
+  </bean>
+  
+  <!-- the JCA connector -->
+  <bean id="inboundConnectorB" class="org.jencks.JCAConnector">
+    <property name="jcaContainer" ref="jencks" />
+    <!-- subscription details -->
+    <property name="activationSpec">
+      <bean class="org.apache.activemq.ra.ActiveMQActivationSpec">
+        <property name="destination" value="queue.daq.source.*"/>
+        <property name="destinationType" value="javax.jms.Queue"/>
+        <property name="maxSessions" value="20"/>
+      </bean>
+    </property>
+    <!-- using a pool of beans -->
+    <property name="ref" value="pooledMyMdpPojo"/>
+  </bean>
+  
+  <!-- the pool of MDP beans -->
+  <bean id="pooledMyMdpPojo" class="org.jencks.TargetSourceMessageListener">
+    <property name="targetSource">
+      <bean id="pooledEchoBeanTargetSource" class="org.springframework.aop.target.CommonsPoolTargetSource">
+        <property name="targetBeanName">
+          <value>myMdpPojo</value>
+        </property>
+        <property name="maxSize">
+          <value>25</value>
+        </property>
+      </bean>
+    </property>
+  </bean>
+  
+  <!-- instantiate the hook to the Source Update Management module and the class converting
+       incoming messages to DataTagValueUpdate's -->
+  <bean id="sourceUpdateModuleHook" class="cern.c2mon.server.daqcommunication.in.impl.SourceUpdateManagerImpl" scope="prototype" />
+  <bean id="sourceUpdateConverter" class="cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter" scope="prototype"/>    
+  
+  <!-- specifies the MDP class (in the Source Update Management module), it's listening method and the converter to use -->
+  <bean id="myMdpPojo" class="org.springframework.jms.listener.adapter.MessageListenerAdapter" scope="prototype">
+    <property name="delegate" ref="sourceUpdateModuleHook"/>
+    <property name="defaultListenerMethod" value="processUpdates"/>
+    <property name="messageConverter" ref="sourceUpdateConverter"/>
+  </bean>
+
+</beans>

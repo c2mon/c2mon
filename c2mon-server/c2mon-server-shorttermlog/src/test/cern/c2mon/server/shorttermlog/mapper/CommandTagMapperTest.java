@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.tim.shared.client.command.CommandExecutionStatus;
-import cern.tim.shared.client.command.CommandTagLog;
+import cern.c2mon.shared.client.command.CommandExecutionStatus;
+import cern.c2mon.shared.client.command.CommandTagLog;
 
 /**
  * Test of Mybatis Mapper implementation.

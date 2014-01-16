@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- the xsd schema is never used by ehcache and can be omitted -->
+<!-- updateCheck=false means ehcache will not seek to update via internet -->
+<ehcache xsi:noNamespaceSchemaLocation="classpath:resources/ehcache.xsd" updateCheck="false" name="tim-cachemanager">
+    <diskStore path="${c2mon.log.dir}/ehcache-diskstore"/>       
+		<defaultCache 
+			eternal="true" 
+			maxElementsInMemory="500" 
+			memoryStoreEvictionPolicy="LRU">
+      <persistence strategy="localRestartable"/>
+    </defaultCache>
+			
+<!-- notice maxElementsInMemory below must be large enough for all data tags, since all are in memory -->
+		<cache 
+			name="tagCache" 
+			eternal="true" 
+			maxElementsInMemory="500000" 			
+			memoryStoreEvictionPolicy="FIFO">
+      <!-- 
+        Enables the RestartStore and copies all cache entries (on-heap and/or off-heap) to disk. 
+        This option provides fast restartability with fault tolerant cache persistence on disk.
+        This option is available for BigMemory Go only.
+      -->
+      <persistence strategy="localRestartable"/>
+    </cache>
+				
+		<cache 
+      name="controlCache" 
+      eternal="true" 
+      maxElementsInMemory="100000"       
+      memoryStoreEvictionPolicy="LFU">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+    </cache>
+      
+    <cache 
+      name="commandCache" 
+      eternal="true" 
+      maxElementsInMemory="500000"      
+      memoryStoreEvictionPolicy="LFU">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+    </cache>
+          
+    <cache 
+      name="ruleCache" 
+      eternal="true" 
+      maxElementsInMemory="500000"       
+      memoryStoreEvictionPolicy="LFU">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+    </cache>
+
+    <cache 
+      name="processCache" 
+      eternal="true" 
+      maxElementsInMemory="50000"       
+      memoryStoreEvictionPolicy="LFU">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+      <searchable>
+        <searchAttribute name="processName" expression="value.getName()"/>
+      </searchable>
+    </cache>
+      
+    <cache 
+      name="equipmentCache" 
+      eternal="true" 
+      maxElementsInMemory="50000"       
+      memoryStoreEvictionPolicy="LFU">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+    </cache>
+      
+    <cache 
+      name="subEquipmentCache" 
+      eternal="true" 
+      maxElementsInMemory="50000"       
+      memoryStoreEvictionPolicy="LFU">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+    </cache>
+      
+    <cache 
+      name="aliveTimerCache" 
+      eternal="true" 
+      maxElementsInMemory="50000"       
+      memoryStoreEvictionPolicy="LFU">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+    </cache>
+      
+    <cache 
+      name="commFaultTagCache" 
+      eternal="true" 
+      maxElementsInMemory="50000"       
+      memoryStoreEvictionPolicy="LFU">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+    </cache>
+      
+    <cache 
+      name="alarmCache" 
+      eternal="true" 
+      maxElementsInMemory="500000"       
+      memoryStoreEvictionPolicy="FIFO">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+    </cache>
+      
+    <cache 
+      name="clusterCache" 
+      eternal="true" 
+      maxElementsInMemory="500000"       
+      memoryStoreEvictionPolicy="FIFO">
+      <persistence strategy="localRestartable" synchronousWrites="false"/>
+    </cache>
+      
+<!-- Caches used by core repository c2mon-server-supervision -->
+    <cache 
+      name="processEventCache" 
+      eternal="true" 
+      maxElementsInMemory="50000"       
+      memoryStoreEvictionPolicy="LFU"
+    />
+    
+    <cache 
+      name="equipmentEventCache" 
+      eternal="true" 
+      maxElementsInMemory="50000"       
+      memoryStoreEvictionPolicy="LFU"
+    />
+<!-- ************************************* -->
+				
+<!--		overflowToDisk="false" 	-->
+<!--		<terracottaConfig url="localhost:9510"></terracottaConfig>-->
+</ehcache>

@@ -10,14 +10,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
-import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.AlarmFacade;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.cache.loading.AlarmLoaderDAO;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.common.ConfigurationException;
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.AlarmFacade;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.ConfigurationException;
 
 /**
  * Implementation of transacted methods.

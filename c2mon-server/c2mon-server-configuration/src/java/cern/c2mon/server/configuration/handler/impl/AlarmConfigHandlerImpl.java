@@ -27,11 +27,11 @@ import org.springframework.transaction.UnexpectedRollbackException;
 
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
-import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.AlarmFacade;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.AlarmFacade;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * See interface documentation.

@@ -10,7 +10,7 @@ import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.stereotype.Service;
 
-import cern.tim.server.common.config.ServerConstants;
+import cern.c2mon.server.common.config.ServerConstants;
 
 /**
  * Bean managing lifecycle of client module.

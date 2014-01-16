@@ -13,15 +13,15 @@ import org.junit.Test;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.DataTagCache;
-import cern.tim.server.cache.DataTagFacade;
-import cern.tim.server.cache.EquipmentFacade;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.loading.DataTagLoaderDAO;
-import cern.tim.server.common.datatag.DataTagCacheObject;
-import cern.tim.server.common.process.ProcessCacheObject;
-import cern.tim.server.test.CacheObjectCreation;
-import cern.tim.shared.daq.config.DataTagUpdate;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.DataTagFacade;
+import cern.c2mon.server.cache.EquipmentFacade;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.daq.config.DataTagUpdate;
 
 /**
  * Unit test.

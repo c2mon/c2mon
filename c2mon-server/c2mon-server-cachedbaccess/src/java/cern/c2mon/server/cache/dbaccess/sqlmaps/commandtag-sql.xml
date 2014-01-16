@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!-- take "namespace=Mapper interface" for the mapper SQL statements to be picked up automatically -->
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.CommandTagMapper">
+    
+    <resultMap id="commandTagResultMap"  type="cern.c2mon.server.common.command.CommandTagCacheObject">      
+      <constructor>
+        <idArg column="CMDID" javaType="Long"/>
+        <arg column="CMDNAME" javaType="String"/>   
+        <arg column="CMDDESC" javaType="String"/>
+        <arg column="CMDDATATYPE" javaType="String"/>
+        <arg column="CMDMODE" javaType="Short"/>        
+      </constructor>      
+      <result property="equipmentId" column="CMD_EQID" jdbcType="NUMERIC"/>     
+      <result property="hwAddress" column="CMDHARDWAREADDRESS" jdbcType="VARCHAR"/>
+      <result property="sourceTimeout" column="CMDSOURCETIMEOUT" jdbcType="NUMERIC"/>
+      <result property="sourceRetries" column="CMDSOURCERETRIES" jdbcType="NUMERIC"/>
+      <result property="execTimeout" column="CMDEXECTIMEOUT" jdbcType="NUMERIC"/>
+      <result property="clientTimeout" column="CMDCLIENTTIMEOUT" jdbcType="NUMERIC"/>      
+      <result property="minimum" column="CMDMINVALUE" javaType="java.lang.Comparable" jdbcType="BLOB"/>
+      <result property="maximum" column="CMDMAXVALUE" javaType="java.lang.Comparable" jdbcType="BLOB"/>
+       <!-- commands belong to a single equipment (not subequipment so far! - would need to change this) -->
+      <result property="processId" column="EQ_PROCID" jdbcType="NUMERIC"/>
+      
+      <association property="authorizationDetails" javaType="RbacAuthorizationDetails">
+        <result property="rbacClass" column="CMDRBACCLASS"/>
+        <result property="rbacDevice" column="CMDRBACDEVICE"/>
+        <result property="rbacProperty" column="CMDRBACPROPERTY"/>
+      </association>         
+    </resultMap>
+    
+    <select id="getAll" resultMap="commandTagResultMap">
+      SELECT CMDID, CMDNAME, CMDDESC, CMDDATATYPE, CMDMODE, CMD_EQID, 
+             CMDHARDWAREADDRESS, CMDSOURCETIMEOUT, CMDSOURCERETRIES,
+             CMDEXECTIMEOUT, CMDCLIENTTIMEOUT,
+             CMDMINVALUE, CMDMAXVALUE, 
+             EQ_PROCID, CMDRBACCLASS, CMDRBACDEVICE, CMDRBACPROPERTY
+        FROM COMMANDTAG, EQUIPMENT
+       WHERE CMD_EQID = EQID
+    </select>
+    
+    <select id="getItem" resultMap="commandTagResultMap" parameterType="Long">
+      SELECT CMDID, CMDNAME, CMDDESC, CMDDATATYPE, CMDMODE, CMD_EQID, 
+             CMDHARDWAREADDRESS, CMDSOURCETIMEOUT, CMDSOURCERETRIES,
+             CMDEXECTIMEOUT, CMDCLIENTTIMEOUT,
+             CMDMINVALUE, CMDMAXVALUE, 
+             EQ_PROCID, CMDRBACCLASS, CMDRBACDEVICE, CMDRBACPROPERTY             
+        FROM COMMANDTAG, EQUIPMENT
+       WHERE CMDID = #{id}
+         AND CMD_EQID = EQID
+    </select>
+    
+    <!-- the command table only contains configuration information, so this method would only be used for reconfigurations -->
+    <update id="updateCommandTag" parameterType="cern.c2mon.server.common.command.CommandTagCacheObject">
+      UPDATE COMMANDTAG
+         SET CMDNAME = #{name,jdbcType=VARCHAR},
+             CMDDESC = #{description,jdbcType=VARCHAR},
+             CMDDATATYPE = #{dataType,jdbcType=VARCHAR}, 
+             CMDMODE = #{mode,jdbcType=NUMERIC},
+             CMD_EQID = #{equipmentId,jdbcType=NUMERIC},              
+             CMDHARDWAREADDRESS = #{hwAddress,javaType=cern.c2mon.shared.common.datatag.address.HardwareAddress,jdbcType=VARCHAR},
+             CMDSOURCETIMEOUT = #{sourceTimeout,jdbcType=NUMERIC},
+             CMDSOURCERETRIES = #{sourceRetries,jdbcType=NUMERIC},
+             CMDEXECTIMEOUT = #{execTimeout,jdbcType=NUMERIC},
+             CMDCLIENTTIMEOUT = #{clientTimeout,jdbcType=NUMERIC},                        
+             CMDMINVALUE = #{minimum,javaType=java.lang.Comparable,jdbcType=BLOB},
+             CMDMAXVALUE = #{maximum,javaType=java.lang.Comparable,jdbcType=BLOB},
+             CMDRBACCLASS = #{authorizationDetails.rbacClass,javaType=java.lang.String,jdbcType=VARCHAR},
+             CMDRBACDEVICE = #{authorizationDetails.rbacDevice,javaType=java.lang.String,jdbcType=VARCHAR},
+             CMDRBACPROPERTY = #{authorizationDetails.rbacProperty,javaType=java.lang.String,jdbcType=VARCHAR}                  
+       WHERE CMDID = #{id} 
+    </update>
+    
+    <!-- must specify jdbcType for parameters that can be null in DB -->
+    <insert id="insertCommandTag" parameterType="cern.c2mon.server.common.command.CommandTagCacheObject">
+      INSERT INTO COMMANDTAG (CMDID, CMDNAME, CMDDESC, 
+                              CMDDATATYPE, CMDMODE,
+                              CMD_EQID, CMDHARDWAREADDRESS,
+                              CMDSOURCETIMEOUT, CMDSOURCERETRIES,
+                              CMDEXECTIMEOUT, CMDCLIENTTIMEOUT,
+                              CMDMINVALUE, CMDMAXVALUE, CMDRBACCLASS, CMDRBACDEVICE, CMDRBACPROPERTY                                                                        
+                              )
+      VALUES (#{id,jdbcType=NUMERIC},#{name,jdbcType=VARCHAR},#{description,jdbcType=VARCHAR},
+              #{dataType,jdbcType=VARCHAR}, #{mode,jdbcType=NUMERIC},
+              #{equipmentId,jdbcType=NUMERIC},
+              #{hwAddress,javaType=cern.c2mon.shared.common.datatag.address.HardwareAddress,jdbcType=VARCHAR},
+              #{sourceTimeout,jdbcType=NUMERIC},#{sourceRetries,jdbcType=NUMERIC},
+              #{execTimeout,jdbcType=NUMERIC},#{clientTimeout,jdbcType=NUMERIC},
+              #{minimum,javaType=java.lang.Comparable,jdbcType=BLOB},#{maximum,javaType=java.lang.Comparable,jdbcType=BLOB},
+              #{authorizationDetails.rbacClass,javaType=java.lang.String,jdbcType=VARCHAR},
+              #{authorizationDetails.rbacDevice,javaType=java.lang.String,jdbcType=VARCHAR},
+              #{authorizationDetails.rbacProperty,javaType=java.lang.String,jdbcType=VARCHAR}            
+              )
+    </insert>            
+    
+    <delete id="deleteCommandTag" parameterType="Long">
+      delete from COMMANDTAG where CMDID = #{id}
+    </delete>
+    
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM commandtag
+       WHERE cmdid = #{id}
+    </select>
+    
+                                                                 
+  </mapper>

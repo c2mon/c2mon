@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+  
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.RuleTagMapper">
+        
+    <resultMap id="ruleTagResultMap" type="cern.c2mon.server.common.rule.RuleTagCacheObject"
+                                                                  extends="cern.c2mon.server.cache.dbaccess.DataTagMapper.abstractTagResultMap">
+      <result property="ruleText" column="TAGRULE" jdbcType="VARCHAR"/>    
+    </resultMap>
+  
+    <!-- getAll needed for persistent caches -->
+    <select id="getAll" resultMap="ruleTagResultMap">
+     SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+            TAGVALUE, TAGVALUEDESC, TAGSRVTIMESTAMP,
+            TAGQUALITYDESC,
+            TAGUNIT, TAGSIMULATED, TAGLOGGED, 
+            TAGVALUEDICTIONARY, TAGDIPADDRESS,
+            TAGJAPCADDRESS, TAGRULE, 
+            TAGRULEIDS, ALARMID
+       FROM DATATAG LEFT OUTER JOIN ALARM 
+         ON ALARM_TAGID = TAGID     
+      WHERE TAGCONTROLTAG=0 
+        AND TAGRULE IS NOT NULL
+    </select>
+    
+    <select id="getRowBatch" resultMap="ruleTagResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch">    
+     SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+            TAGVALUE, TAGVALUEDESC, TAGSRVTIMESTAMP,
+            TAGQUALITYDESC,
+            TAGUNIT, TAGSIMULATED, TAGLOGGED, 
+            TAGVALUEDICTIONARY, TAGDIPADDRESS,
+            TAGJAPCADDRESS, TAGRULE, 
+            TAGRULEIDS, ALARMID
+       FROM DATATAG LEFT OUTER JOIN ALARM 
+         ON ALARM_TAGID = TAGID     
+      WHERE TAGCONTROLTAG=0 
+        AND TAGRULE IS NOT NULL
+        AND TAGID <![CDATA[ >= ]]> #{firstId}
+        AND TAGID <![CDATA[ <= ]]> #{lastId}
+    </select>
+    
+    <!-- getItem needed for persistence caches -->
+    <select id="getItem" resultMap="ruleTagResultMap" parameterType="Long">
+     SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+            TAGVALUE, TAGVALUEDESC, TAGSRVTIMESTAMP,
+            TAGQUALITYDESC,
+            TAGUNIT, TAGSIMULATED, TAGLOGGED, 
+            TAGVALUEDICTIONARY, TAGDIPADDRESS,
+            TAGJAPCADDRESS, TAGRULE,
+            TAGRULEIDS, ALARMID
+       FROM DATATAG LEFT OUTER JOIN ALARM 
+         ON ALARM_TAGID = TAGID     
+      WHERE TAGCONTROLTAG=0 
+        AND TAGRULE IS NOT NULL      
+        AND TAGID=#{id}
+    </select>
+    
+    <update id="updateCacheable" parameterType="cern.c2mon.server.common.rule.RuleTagCacheObject">
+      UPDATE DATATAG
+         SET TAGVALUE = #{value,javaType=java.lang.Object,jdbcType=BLOB},
+             TAGVALUEDESC = #{valueDescription,jdbcType=VARCHAR},
+             TAGSRVTIMESTAMP = #{cacheTimestamp, jdbcType=TIMESTAMP},                                                   
+             TAGQUALITYDESC = #{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR},
+             TAGSIMULATED = #{simulated,jdbcType=NUMERIC}
+       WHERE TAGID=#{id} 
+    </update>
+    
+    <update id="updateConfig" parameterType="cern.c2mon.server.common.rule.RuleTagCacheObject">      
+      UPDATE DATATAG
+         SET TAGNAME = #{name},
+             TAGDESC = #{description,jdbcType=VARCHAR},
+             TAGMODE = #{mode},
+             TAGDATATYPE = #{dataType},            
+             TAGUNIT =  #{unit,jdbcType=VARCHAR},
+             TAGLOGGED = #{logged,jdbcType=NUMERIC},
+             TAGVALUEDICTIONARY = #{valueDictionary,jdbcType=VARCHAR},             
+             TAGDIPADDRESS = #{dipAddress,jdbcType=VARCHAR},
+             TAGJAPCADDRESS = #{japcAddress,jdbcType=VARCHAR},
+             TAGRULEIDS = #{ruleIdsString, jdbcType=VARCHAR},
+             TAGRULE = #{ruleText,jdbcType=VARCHAR}
+       WHERE TAGID=#{id}     
+    </update>
+    
+    <!-- must specify jdbcType for parameters that can be null in DB  -->
+    <insert id="insertRuleTag" parameterType="cern.c2mon.server.common.rule.RuleTagCacheObject">
+      INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+                           TAGVALUE, TAGVALUEDESC, TAGSRVTIMESTAMP,
+                           TAGQUALITYDESC,
+                           TAGUNIT, TAGSIMULATED, TAGLOGGED, 
+                           TAGVALUEDICTIONARY, TAGDIPADDRESS,
+                           TAGJAPCADDRESS, TAGRULE,
+                           TAGRULEIDS, TAGCONTROLTAG                                 
+                )
+      VALUES (#{id},#{name},#{description, jdbcType=VARCHAR},#{mode},#{dataType},
+              #{value,javaType=java.lang.Object,jdbcType=BLOB},#{valueDescription,jdbcType=VARCHAR},
+              #{cacheTimestamp, jdbcType=TIMESTAMP},
+              #{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR},              
+              #{unit,jdbcType=VARCHAR},#{simulated,jdbcType=NUMERIC},#{logged,jdbcType=NUMERIC},
+              #{valueDictionary,jdbcType=VARCHAR},
+              #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR}, #{ruleText,jdbcType=VARCHAR},
+              #{ruleIdsString, jdbcType=VARCHAR},
+              0
+                )
+    </insert>        
+    
+    <select id="getNumberItems" resultType="Integer">
+      SELECT COUNT(DISTINCT TAGID)
+        FROM DATATAG
+       WHERE TAGRULE is not NULL
+         AND TAGCONTROLTAG=0
+    </select>
+    
+    <select id="getMaxId" resultType="Long">
+      SELECT MAX(TAGID)
+        FROM DATATAG
+       WHERE TAGRULE is not NULL
+         AND TAGCONTROLTAG=0
+    </select>
+    
+    <select id="getMinId" resultType="Long">
+      SELECT MIN(TAGID)
+        FROM DATATAG
+       WHERE TAGRULE is not NULL
+         AND TAGCONTROLTAG=0
+    </select>
+    
+    <delete id="deleteRuleTag" parameterType="Long">
+      delete from DATATAG where TAGID = #{id}
+    </delete>
+    
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM DATATAG
+       WHERE TAGID = #{id}
+         AND TAGCONTROLTAG=0
+         AND TAGRULE IS NOT NULL
+    </select>
+    
+  </mapper>

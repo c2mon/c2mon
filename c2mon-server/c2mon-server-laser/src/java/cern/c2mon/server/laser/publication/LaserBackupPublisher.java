@@ -25,11 +25,11 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterfaceFactory;
 import cern.laser.source.alarmsysteminterface.FaultState;
-import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.ClusterCache;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.common.alarm.AlarmPublication;
-import cern.tim.server.common.config.ServerConstants;
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmPublication;
+import cern.c2mon.server.common.config.ServerConstants;
 
 /**
  * Sends regular backups of all active alarms to LASER.

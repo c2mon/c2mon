@@ -12,16 +12,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.AliveTimerCache;
-import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.EquipmentCache;
-import cern.tim.server.cache.ProcessCache;
-import cern.tim.server.cache.SubEquipmentCache;
-import cern.tim.server.cache.SubEquipmentFacade;
-import cern.tim.server.cache.loading.SubEquipmentDAO;
-import cern.tim.server.common.subequipment.SubEquipment;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.server.cache.AliveTimerCache;
+import cern.c2mon.server.cache.CommFaultTagCache;
+import cern.c2mon.server.cache.EquipmentCache;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.cache.SubEquipmentFacade;
+import cern.c2mon.server.cache.loading.SubEquipmentDAO;
+import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * See interface docs.

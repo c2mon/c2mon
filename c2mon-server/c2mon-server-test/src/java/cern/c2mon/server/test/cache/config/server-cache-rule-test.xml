@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <import resource="classpath:cern/c2mon/server/test/cache/config/server-cache-common-test.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-rule.xml"/>  
+  <import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>
+  
+  <!-- need datatags also to reference Eqs and Processes from rules (info not in DB) -->
+  <import resource="classpath:cern/c2mon/server/test/cache/config/server-cache-datatag-test.xml"/>
+  <import resource="classpath:cern/c2mon/server/test/cache/config/server-cache-alarm-test.xml"/>
+  
+  <bean id="ruleTagLoaderDAO" class="cern.c2mon.server.cache.loading.impl.RuleTagLoaderDAOImpl" autowire="constructor"/>  
+  <bean id="ruleTagCache" class="cern.c2mon.server.cache.rule.RuleTagCacheImpl" autowire="constructor" init-method="init"/>
+  <bean id="ruleTagPostLoaderProcessor" class="cern.c2mon.server.cache.rule.RuleTagPostLoaderProcessor" autowire="constructor" init-method="loadRuleParentIds">
+    <property name="threadPoolMax" value="1"/>
+    <property name="threadPoolMin" value="1"/>
+  </bean>
+  <bean id="ruleTagFacade" class="cern.c2mon.server.cache.rule.RuleTagFacadeImpl" autowire="constructor" />
+  <bean id="ruleTagCacheObjectFacade" class="cern.c2mon.server.cache.rule.RuleTagCacheObjectFacade"/>
+
+</beans>

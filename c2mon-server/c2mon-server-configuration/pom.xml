@@ -3,8 +3,8 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>cern.tim2.tim2-server</groupId>
-    <artifactId>tim2-server-pom</artifactId>
+    <groupId>cern.c2mon.c2mon-server</groupId>
+    <artifactId>c2mon-server-pom</artifactId>
     <version>1.1.0</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
@@ -74,24 +74,24 @@
 
     <!-- C2MON server dependencies -->
     <dependency>
-      <groupId>cern.tim2.tim2-server</groupId>
-      <artifactId>tim2-server-cache</artifactId>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.tim2.tim2-server</groupId>
-      <artifactId>tim2-server-common</artifactId>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.tim2.tim2-server</groupId>
-      <artifactId>tim2-server-daqcommunication-out</artifactId>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-daqcommunication-out</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.tim2.tim2-server</groupId>
-      <artifactId>tim2-server-rule</artifactId>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-rule</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.tim2.tim2-server</groupId>
-      <artifactId>tim2-server-daqcommunication-in</artifactId>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-daqcommunication-in</artifactId>
     </dependency>
   </dependencies>
 

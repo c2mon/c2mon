@@ -18,7 +18,7 @@
     <property name="reportDirectory" value="${c2mon.home}/reports"/>    
   </bean>
     
-  <bean id="configurationRequestConverter" class="cern.tim.shared.client.configuration.ConfigurationRequestConverter" init-method="init"/>
+  <bean id="configurationRequestConverter" class="cern.c2mon.shared.client.configuration.ConfigurationRequestConverter" init-method="init"/>
   
   <!-- the connection below is not currently used: configuration requests are made via the client module -->
   <bean id="configRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
@@ -35,7 +35,7 @@
       <property name="sessionTransacted" value="false"/>
       <property name="taskExecutor" ref="clientExecutor"/>
       <property name="phase">
-      	 <util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_START_LAST"/>
+      	 <util:constant static-field="cern.c2mon.server.common.config.ServerConstants.PHASE_START_LAST"/>
       </property>     
 <!--      <property name="errorHandler" ref="processRequestHandler"/>         -->
   </bean>

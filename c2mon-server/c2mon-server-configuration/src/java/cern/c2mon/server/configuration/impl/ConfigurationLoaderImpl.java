@@ -41,19 +41,19 @@ import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
-import cern.tim.server.cache.ClusterCache;
-import cern.tim.server.cache.ProcessCache;
-import cern.tim.server.cache.ProcessFacade;
-import cern.tim.server.daqcommunication.in.JmsContainerManager;
-import cern.tim.server.daqcommunication.out.ProcessCommunicationManager;
-import cern.tim.shared.client.configuration.ConfigConstants.Status;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.client.configuration.ConfigurationException;
-import cern.tim.shared.client.configuration.ConfigurationReport;
-import cern.tim.shared.daq.config.Change;
-import cern.tim.shared.daq.config.ChangeReport;
-import cern.tim.shared.daq.config.ConfigurationChangeEventReport;
+import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.ProcessFacade;
+import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
+import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigurationException;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.daq.config.Change;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 
 /**
  * Implementation of the server ConfigurationLoader bean.

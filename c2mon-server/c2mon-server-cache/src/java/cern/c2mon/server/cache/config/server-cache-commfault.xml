@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+  
+  <bean id="commFaultTagEhcache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+    <property name="cacheManager" ref="cacheManager"/>
+    <property name="cacheName" value="commFaultTagCache"/>
+  </bean>
+  
+   <bean id="commFaultTagEhcacheLoader" class="cern.c2mon.server.cache.common.EhcacheLoaderImpl">
+    <constructor-arg ref="commFaultTagEhcache"/>
+    <constructor-arg ref="commFaultTagDAO"/>
+  </bean>
+  
+  <bean id="commFaultTagCacheLoader" class="cern.c2mon.server.cache.common.SimpleTimCacheLoader">
+    <constructor-arg ref="commFaultTagEhcache"/>
+    <constructor-arg ref="commFaultTagDAO"/>    
+  </bean>
+
+</beans>

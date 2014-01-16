@@ -29,11 +29,11 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.shorttermlog.logger.BatchLogger;
-import cern.tim.server.cache.BufferedTimCacheListener;
-import cern.tim.server.cache.CacheRegistrationService;
-import cern.tim.server.common.component.Lifecycle;
-import cern.tim.server.common.config.ServerConstants;
-import cern.tim.server.common.tag.Tag;
+import cern.c2mon.server.cache.BufferedTimCacheListener;
+import cern.c2mon.server.cache.CacheRegistrationService;
+import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.tag.Tag;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO

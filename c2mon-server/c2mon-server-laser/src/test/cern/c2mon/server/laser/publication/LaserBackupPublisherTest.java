@@ -12,10 +12,10 @@ import org.junit.Test;
 
 import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
-import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.ClusterCache;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.test.CacheObjectCreation;
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.test.CacheObjectCreation;
 
 /**
  * Unit test of LaserBackupPublisher.

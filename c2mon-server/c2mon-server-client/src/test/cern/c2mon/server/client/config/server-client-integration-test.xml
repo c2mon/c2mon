@@ -8,10 +8,10 @@
   <!-- integration test of client module -->
   
   <!-- start server core in test mode -->
-  <import resource="classpath:cern/tim/server/test/core/config/server-core-test.xml"/>
+  <import resource="classpath:cern.c2mon/server/test/core/config/server-core-test.xml"/>
   
   <!-- also needs alarm module -->
-  <import resource="classpath:cern/tim/server/alarm/config/server-alarm.xml"/>
+  <import resource="classpath:cern.c2mon/server/alarm/config/server-alarm.xml"/>
   
   <bean id="control" class="org.easymock.EasyMock" factory-method="createControl"/>    
   
@@ -24,7 +24,7 @@
   
   <bean id="commandExecutionManager" factory-bean="control" factory-method="createMock">
   	<constructor-arg>
-  		<value>cern.tim.server.command.CommandExecutionManager</value>
+  		<value>cern.c2mon.server.command.CommandExecutionManager</value>
   	</constructor-arg>
   </bean>
   

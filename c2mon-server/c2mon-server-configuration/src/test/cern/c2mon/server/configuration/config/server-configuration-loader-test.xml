@@ -14,10 +14,10 @@
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-hsqldb.xml"/>  
 
   <!-- choose the configuration below to run against the Oracle or HSQLDB cache schema -->
-  <!--  <import resource="classpath:cern/tim/server/test/cache/config/server-test-datasource-hsqldb.xml"/>-->
-  <import resource="classpath:cern/tim/server/cache/dbaccess/config/server-cachedbaccess-datasource.xml" />
+  <!--  <import resource="classpath:cern.c2mon/server/test/cache/config/server-test-datasource-hsqldb.xml"/>-->
+  <import resource="classpath:cern.c2mon/server/cache/dbaccess/config/server-cachedbaccess-datasource.xml" />
 
   <!-- import properties -->
-  <import resource="classpath:cern/tim/server/test/server-test-properties.xml" />
+  <import resource="classpath:cern.c2mon/server/test/server-test-properties.xml" />
 
 </beans>

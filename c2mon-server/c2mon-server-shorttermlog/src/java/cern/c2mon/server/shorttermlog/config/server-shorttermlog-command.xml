@@ -17,7 +17,7 @@
 			<bean class="cern.c2mon.server.shorttermlog.alarm.AlarmListener" />
 		</constructor-arg>
 		<constructor-arg>
-			<bean class="cern.tim.shared.client.command.CommandTagLog" />
+			<bean class="cern.c2mon.shared.client.command.CommandTagLog" />
 		</constructor-arg>
 	</bean>
 

@@ -38,9 +38,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.server.client.request.ClientRequestReportHandler;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
-import cern.tim.server.command.CommandExecutionManager;
-import cern.tim.server.test.broker.TestBrokerService;
-import cern.tim.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.server.command.CommandExecutionManager;
+import cern.c2mon.server.test.broker.TestBrokerService;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 
 /**
  * Integration test of client module with server core.

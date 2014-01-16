@@ -15,16 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
-import cern.tim.server.cache.RuleTagCache;
-import cern.tim.server.cache.RuleTagFacade;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.cache.loading.RuleTagLoaderDAO;
-import cern.tim.server.common.rule.RuleTag;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.client.configuration.ConfigConstants.Action;
-import cern.tim.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.cache.RuleTagFacade;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 
 /**
  * Implementation of transacted configuration methods.

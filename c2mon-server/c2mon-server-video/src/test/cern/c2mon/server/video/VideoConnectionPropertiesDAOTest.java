@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.video.VideoConnectionMapper;
 import cern.c2mon.shared.video.VideoConnectionProperties;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
 /**
  * Tests the iBatis mapper against the Oracle DB.

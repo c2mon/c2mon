@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- contains beans for processing incoming updates from the DAQ layer -->
+
+  <bean id="updateConverter"
+    class="cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter"
+    init-method="init" />
+
+<!--   <bean id="updateListenerAdapter" -->
+<!--     class="org.springframework.jms.listener.adapter.MessageListenerAdapter"> -->
+<!--     <property name="delegate" ref="sourceUpdateManager" /> -->
+<!--     <property name="defaultListenerMethod" value="processUpdates" /> -->
+<!--     <property name="messageConverter" ref="updateConverter" />     -->
+<!--   </bean> -->
+  
+  <bean id="jmsContainerManager" class="cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl" autowire="constructor">
+    <property name="consumersInitial" value="${jms.update.consumers.initial}"/>
+    <property name="consumersMax" value="${jms.update.consumers.max}"/>
+    <property name="jmsUpdateQueueTrunk" value="${jms.process.updateQueueTrunk}"/>
+    <property name="sessionTransacted" value="${jms.update.transacted}"/>
+    <property name="updateWarmUpSeconds" value="${jms.update.consumers.warmuptime}"/>
+    <property name="idleTaskExecutionLimit" value="${c2mon.jms.update.task.idle.limit}"/>
+    <property name="maxMessages" value="${c2mon.jms.update.task.max.messages}"/>
+    <property name="nbExecutorThreads" value="${c2mon.jms.update.executor.threads}"/>
+    <property name="receiveTimeout" value="${c2mon.jms.update.task.timeout}"/>    
+  </bean>
+  
+<!---->
+<!--  <bean id="updateDestination" class="org.apache.activemq.command.ActiveMQQueue">-->
+<!--    <constructor-arg index="0" value="${jms.process.updateQueueTrunk}.*" />-->
+<!--  </bean>-->
+<!---->
+<!--  <bean id="updateJmsContainer"-->
+<!--    class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
+<!--     include exception listener here? -->
+<!--    <property name="connectionFactory" ref="updateConnectionFactory" />-->
+<!--    <property name="destination" ref="updateDestination" />-->
+<!--    <property name="messageListener" ref="updateMessageListener" />-->
+<!--    <property name="concurrentConsumers" value="${jms.update.consumers.initial}" />-->
+<!--    <property name="maxConcurrentConsumers" value="${jms.update.consumers.initial}" />-->
+<!--    <property name="sessionTransacted" value="${jms.update.transacted}" />-->
+<!--    <property name="autoStartup" value="false" />-->
+<!--    <property name="maxMessagesPerTask" value="1" />-->
+<!--    <property name="receiveTimeout" value="100" />-->
+<!--    <property name="idleTaskExecutionLimit" value="120000" />-->
+<!--     <property name="taskExecutor" ref="threadPoolTaskExecutor"/> -->
+<!--     <property name="errorHandler" ref="processRequestHandler"/> -->
+<!--  </bean>-->
+  
+
+</beans>

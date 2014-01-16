@@ -76,7 +76,7 @@
 		<property name="taskExecutor" ref="videoClientExecutor" />
 		<property name="autoStartup" value="false" />
 		<property name="phase">
-			<util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_START_LAST" />
+			<util:constant static-field="cern.c2mon.server.common.config.ServerConstants.PHASE_START_LAST" />
 		</property>
 	</bean>
 

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Properties;
 
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.common.equipment.AbstractEquipment;
+import cern.c2mon.server.common.equipment.AbstractEquipment;
 
 /**
  * Common parts of transacted config bean for Equipment/Sub-equipment. 

@@ -2,9 +2,9 @@ package cern.c2mon.server.configuration.handler.transacted;
 
 import java.util.Properties;
 
-import cern.tim.server.common.rule.RuleTag;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * For internal use only. Allows use of Spring AOP for transaction management.

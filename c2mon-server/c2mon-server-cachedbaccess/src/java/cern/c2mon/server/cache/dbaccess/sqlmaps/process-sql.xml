@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+  
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.ProcessMapper">
+    
+    <resultMap id="processResultMap" type="cern.c2mon.server.common.process.ProcessCacheObject">
+      
+      <constructor>
+        <idArg column="process_id" javaType="Long"/>
+        <arg column="process_name" javaType="String"/>   
+        <arg column="process_statetagid" javaType="Long"/>
+        <arg column="process_maxmsgsize" javaType="Integer"/>
+        <arg column="process_maxmsgdelay" javaType="Integer"/>        
+      </constructor>      
+      <result property="description" column="process_description"/> 
+      <result property="stateTagId" column="process_statetagid"/>     
+      <result property="aliveTagId" column="process_alivetagid"/>
+      <result property="aliveInterval" column="process_aliveinterval"/>      
+      <result property="currentHost" column="process_currenthost"/>
+      <result property="supervisionStatus" column="process_state"/>
+      <result property="statusDescription" column="process_status_message"/>
+      <result property="statusTime" column="process_status_time"/>
+      <result property="startupTime" column="process_startuptime"/>
+      <result property="requiresReboot" column="process_reboot"/>
+      <result property="processPIK" column="process_pik"/>    
+      <result property="localConfig" column="process_localconfig"/>  
+      <collection property="equipmentIds" ofType="Long" javaType="ArrayList" resultMap="equipmentIdsResultMap"/>
+    </resultMap>    
+    
+    <resultMap id="equipmentIdsResultMap" type="Long">
+      <id column="equipment_id"/>
+    </resultMap>
+    
+    <!-- getAll needed for persistent caches -->
+    <select id="getAll" resultMap="processResultMap">
+      SELECT PROCID as process_id, PROCNAME as process_name, PROCDESC as process_description, 
+             PROCSTATE_TAGID as process_statetagid, PROCALIVE_TAGID as process_alivetagid,
+             PROCALIVEINTERVAL as process_aliveinterval, PROCMAXMSGSIZE as process_maxmsgsize,
+             PROCMAXMSGDELAY as process_maxmsgdelay,
+             PROCCURRENTHOST as process_currenthost, PROCSTATE as process_state, 
+             PROCSTATUSTIME as process_status_time, PROCSTATUSDESC as process_status_message,
+             PROCREBOOT as process_reboot,
+             PROCSTARTUPTIME as process_startuptime, EQID as equipment_id,
+             PROCPIK as process_pik, PROCLOCALCONFIG as process_localconfig
+        FROM PROCESS LEFT OUTER JOIN EQUIPMENT
+          ON EQ_PROCID = PROCID
+    </select>
+    
+    <!-- getItem needed for persistence caches -->
+    <select id="getItem" resultMap="processResultMap" parameterType="Long">
+      SELECT PROCID as process_id, PROCNAME as process_name, PROCDESC as process_description, 
+             PROCSTATE_TAGID as process_statetagid, PROCALIVE_TAGID as process_alivetagid,
+             PROCALIVEINTERVAL as process_aliveinterval, PROCMAXMSGSIZE as process_maxmsgsize,
+             PROCMAXMSGDELAY as process_maxmsgdelay,
+             PROCCURRENTHOST as process_currenthost, PROCSTATE as process_state,
+             PROCSTATUSTIME as process_status_time, PROCSTATUSDESC as process_status_message,
+             PROCREBOOT as process_reboot,
+             PROCSTARTUPTIME as process_startuptime, EQID as equipment_id,
+             PROCPIK as process_pik, PROCLOCALCONFIG as process_localconfig
+        FROM PROCESS LEFT OUTER JOIN EQUIPMENT
+          ON EQ_PROCID = PROCID
+       WHERE PROCID = #{id}
+    </select>
+    
+    <insert id="insertProcess" parameterType="cern.c2mon.server.common.process.ProcessCacheObject">
+      INSERT INTO PROCESS (PROCID, PROCNAME, PROCDESC, PROCSTATE_TAGID, PROCALIVE_TAGID,
+                           PROCALIVEINTERVAL, PROCMAXMSGSIZE, PROCMAXMSGDELAY,
+                           PROCCURRENTHOST, PROCSTATE, PROCSTATUSTIME, PROCSTATUSDESC, PROCSTARTUPTIME, PROCREBOOT, PROCPIK, PROCLOCALCONFIG)
+                   VALUES (#{id}, #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{stateTagId,jdbcType=NUMERIC}, #{aliveTagId,jdbcType=NUMERIC},
+                           #{aliveInterval,jdbcType=NUMERIC}, #{maxMessageSize,jdbcType=NUMERIC}, #{maxMessageDelay,jdbcType=NUMERIC},
+                           #{currentHost,jdbcType=VARCHAR}, #{supervisionStatus,jdbcType=VARCHAR}, 
+                           #{statusTime,jdbcType=TIMESTAMP}, #{statusDescription,jdbcType=VARCHAR}, 
+                           #{startupTime,jdbcType=TIMESTAMP}, #{requiresReboot,jdbcType=NUMERIC},
+                            #{processPIK,jdbcType=NUMERIC}, #{localConfig,jdbcType=VARCHAR})
+    </insert>
+    
+    <update id="updateCacheable" parameterType="Process">
+      UPDATE PROCESS
+         SET PROCSTARTUPTIME = #{startupTime,jdbcType=TIMESTAMP},
+             PROCSTATE = #{supervisionStatus,jdbcType=VARCHAR},
+             PROCSTATUSTIME = #{statusTime,jdbcType=TIMESTAMP},
+             PROCSTATUSDESC = #{statusDescription,jdbcType=VARCHAR},
+             PROCREBOOT = #{requiresReboot,jdbcType=NUMERIC},
+             PROCPIK = #{processPIK,jdbcType=NUMERIC},
+             PROCLOCALCONFIG = #{localConfig,jdbcType=VARCHAR}
+       WHERE PROCID = #{id} 
+    </update>
+    
+    <update id="updateProcessConfig" parameterType="Process">
+      UPDATE PROCESS
+         SET PROCNAME = #{name},
+             PROCDESC = #{description,jdbcType=VARCHAR},                                     
+             PROCSTATE_TAGID = #{stateTagId},             
+             PROCALIVE_TAGID = #{aliveTagId},
+             PROCALIVEINTERVAL = #{aliveInterval},
+             PROCMAXMSGSIZE = #{maxMessageSize}, 
+             PROCMAXMSGDELAY = #{maxMessageDelay}
+       WHERE PROCID = #{id} 
+    </update>
+    
+    <delete id="deleteProcess" parameterType="Long">
+      DELETE FROM PROCESS
+            WHERE PROCID = #{id}
+    </delete>
+    
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM PROCESS
+       WHERE PROCID = #{id}        
+    </select>
+            
+  </mapper>

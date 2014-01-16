@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>cern.tim2.tim2-server</groupId>
-		<artifactId>tim2-server-pom</artifactId>
-		<version>1.0.5</version>
+		<groupId>cern.c2mon.c2mon-server</groupId>
+		<artifactId>c2mon-server-pom</artifactId>
+		<version>1.1.0</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-server</groupId>
 	<version>1.0.9-SNAPSHOT</version>
@@ -71,24 +71,24 @@
 
 		<!-- C2MON dependencies -->
 		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-util</artifactId>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-util</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-common</artifactId>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-cache</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-cache</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-supervision</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-supervision</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-command</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-command</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>

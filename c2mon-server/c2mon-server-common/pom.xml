@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.c2mon.c2mon-server</groupId>
+		<artifactId>c2mon-server-pom</artifactId>
+		<version>1.1.0</version>		
+	</parent>
+	<groupId>cern.c2mon.c2mon-server</groupId>
+	<artifactId>c2mon-server-common</artifactId>
+	<version>1.2.0-SNAPSHOT</version>
+	<name>c2mon-server-common</name>
+	<packaging>jar</packaging>
+	<description>
+      Classes that are shared across the server modules (but not outside the server).
+    </description>
+	<url>http://timweb.cern.ch</url>
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-common</developerConnection>
+	</scm>
+
+
+	<dependencies>
+
+		<!-- test deps -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+		</dependency>
+
+		<!-- C2MON dependencies -->
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-daq</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-rule</artifactId>
+		</dependency>
+	</dependencies>
+	<developers />
+</project>

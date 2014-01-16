@@ -37,7 +37,7 @@ Alarm Publications
 </bean>
 
 <!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
-<bean name="alarmTopicPublisher" class="cern.tim.util.jms.ActiveJmsSender">
+<bean name="alarmTopicPublisher" class="cern.c2mon.shared.util.jms.ActiveJmsSender">
   <property name="jmsTemplate" ref="alarmTopicPublisherJmsTemplate"></property>
 </bean>
 
@@ -62,7 +62,7 @@ Publication of Supervision events
 </bean>
 
 <!-- JmsSender for publishing to supervision events to the client  -->
-<bean name="supervisionTopicPublisher" class="cern.tim.util.jms.ActiveJmsSender">
+<bean name="supervisionTopicPublisher" class="cern.c2mon.shared.util.jms.ActiveJmsSender">
   <property name="jmsTemplate" ref="supervisionTopicPublisherJmsTemplate"></property>
 </bean>
 
@@ -111,7 +111,7 @@ Request from clients
       <property name="errorHandler" ref="tagRequestErrorHandler"/>   
       <property name="autoStartup" value="false"/>
       <property name="phase">
-        <util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_INTERMEDIATE"/>
+        <util:constant static-field="cern.c2mon.server.common.config.ServerConstants.PHASE_INTERMEDIATE"/>
       </property>  
 </bean>
 
@@ -131,7 +131,7 @@ Request from clients
       <property name="errorHandler" ref="tagRequestErrorHandler"/>   
       <property name="autoStartup" value="false"/>
       <property name="phase">
-        <util:constant static-field="cern.tim.server.common.config.ServerConstants.PHASE_INTERMEDIATE"/>
+        <util:constant static-field="cern.c2mon.server.common.config.ServerConstants.PHASE_INTERMEDIATE"/>
       </property>  
 </bean>
 

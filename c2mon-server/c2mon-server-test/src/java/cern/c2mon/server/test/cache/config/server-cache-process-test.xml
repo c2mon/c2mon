@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+<import resource="classpath:cern/c2mon/server/test/cache/config/server-cache-common-test.xml"/>
+<import resource="classpath:cern/c2mon/server/cache/config/server-cache-process.xml"/>
+<import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>
+
+<bean id="processCache" class="cern.c2mon.server.cache.process.ProcessCacheImpl" autowire="constructor"/>
+<bean id="processDAO" class="cern.c2mon.server.cache.loading.impl.ProcessDAOImpl" autowire="constructor"/>
+<!--<bean id="processCacheLoader" class="cern.c2mon.server.cache.process.ProcessCacheLoader"/>-->
+
+</beans>

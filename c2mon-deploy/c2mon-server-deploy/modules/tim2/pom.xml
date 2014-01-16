@@ -20,52 +20,52 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-rule</artifactId>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-rule</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-common</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-cache</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-cache</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-cacheloading</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-cacheloading</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-cachedbaccess</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-cachedbaccess</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-cachepersistence</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-cachepersistence</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-benchmark</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-benchmark</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-command</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-command</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-daqcommunication-in</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-daqcommunication-in</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-daqcommunication-out</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-daqcommunication-out</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-rule</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-rule</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-server</groupId>
-			<artifactId>tim2-server-supervision</artifactId>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-supervision</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>

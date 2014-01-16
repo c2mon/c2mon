@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import cern.c2mon.shared.video.VideoConnectionProperties;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
 /**
  * @author ekoufaki

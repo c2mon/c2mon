@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-server</groupId>
+    <artifactId>c2mon-server-pom</artifactId>
+    <version>1.1.0</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-server</groupId>
+  <artifactId>c2mon-server-command</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
+  <name>c2mon-server-command</name>
+  <packaging>jar</packaging>
+  <description>
+		C2MON server module coordinating command execution (can be called by other modules
+    and will execute command on DAQ layer).
+	</description>
+  <url>http://timweb.cern.ch</url>
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-command</developerConnection>
+  </scm>
+
+  <dependencies>
+    <!-- test -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
+
+    <!-- 3rd party -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+
+    <!-- C2MON -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-daq</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-daqcommunication-out</artifactId>
+    </dependency>
+
+    <!-- C2MON for testing -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-supervision</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-daqcommunication-in</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8.1</version>
+        <configuration>
+          <argLine>
+            -Dc2mon.properties.location=${c2mon.properties.location}
+            -Dc2mon.log.dir=${java.io.tmpdir}/c2mon-cache
+            <!-- Terracotta license key path -->
+            -Dcom.tc.productkey.path=${com.tc.productkey.path}   
+
+            <!-- for other modules -->
+            -Ddatasource.persistence.connections.initial=2
+            -Ddatasource.persistence.connections.max=2
+            -Dc2mon.jms.controltag.publication.topic=c2mon.controltag.publication.test
+            -Dc2mon.jms.tag.publication.topic=c2mon.tag.publication.test
+            -Dcache.loader.batch.size=1000
+            -Dcache.loader.threads.max=2
+            -Dcache.loader.queue.size=1000
+            -Dcache.loader.equipment.batch.size=5
+            -Dcache.loader.equipment.threads.max=2
+            -Dcache.loader.equipment.queue.size=1000
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <developers />
+</project>

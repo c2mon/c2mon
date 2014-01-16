@@ -18,7 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
-import cern.tim.shared.daq.config.IChange;
+import cern.c2mon.shared.daq.config.IChange;
 
 /**
  * Change event to be sent to a Process. Contains the event itself that

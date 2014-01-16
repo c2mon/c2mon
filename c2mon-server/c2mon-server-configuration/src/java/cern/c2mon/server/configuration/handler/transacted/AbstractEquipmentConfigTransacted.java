@@ -27,15 +27,15 @@ import org.springframework.transaction.UnexpectedRollbackException;
 
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.AliveTimerCache;
-import cern.tim.server.cache.CommFaultTagCache;
-import cern.tim.server.cache.C2monCache;
-import cern.tim.server.cache.equipment.CommonEquipmentFacade;
-import cern.tim.server.cache.loading.ConfigurableDAO;
-import cern.tim.server.common.equipment.AbstractEquipment;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.daq.config.EquipmentConfigurationUpdate;
+import cern.c2mon.server.cache.AliveTimerCache;
+import cern.c2mon.server.cache.CommFaultTagCache;
+import cern.c2mon.server.cache.C2monCache;
+import cern.c2mon.server.cache.equipment.CommonEquipmentFacade;
+import cern.c2mon.server.cache.loading.ConfigurableDAO;
+import cern.c2mon.server.common.equipment.AbstractEquipment;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 
 /**
  * Common functionalities for configuring Equipment and SubEquipment.

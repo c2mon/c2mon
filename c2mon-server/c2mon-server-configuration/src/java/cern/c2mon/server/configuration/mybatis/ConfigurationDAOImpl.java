@@ -25,8 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
-import cern.tim.shared.client.configuration.ConfigurationDescriptor;
-import cern.tim.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationDescriptor;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
 
 /**
  * Mybatis implementation of the ConfigurationDAO for the server

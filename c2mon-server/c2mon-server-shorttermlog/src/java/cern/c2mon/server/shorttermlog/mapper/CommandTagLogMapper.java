@@ -2,7 +2,7 @@ package cern.c2mon.server.shorttermlog.mapper;
 
 import java.util.List;
 
-import cern.tim.shared.client.command.CommandTagLog;
+import cern.c2mon.shared.client.command.CommandTagLog;
 
 /**
  * Mybatis mapper interface for logging executed Commands to

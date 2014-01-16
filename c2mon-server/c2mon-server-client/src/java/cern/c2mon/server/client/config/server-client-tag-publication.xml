@@ -20,7 +20,7 @@
 </bean>
 
 <!-- Initialization of the JMS sender which is used for all communication with the C2MON client layer -->
-<bean name="clientTopicPublisher" class="cern.tim.util.jms.ActiveJmsSender">
+<bean name="clientTopicPublisher" class="cern.c2mon.shared.util.jms.ActiveJmsSender">
   <property name="jmsTemplate" ref="clientTopicPublisherJmsTemplate"></property>
 </bean>
 

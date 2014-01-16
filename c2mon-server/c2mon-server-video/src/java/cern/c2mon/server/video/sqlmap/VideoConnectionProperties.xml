@@ -21,7 +21,7 @@
     <result property="keysTakenTagId"  column="TIV_KEYSTAKENDATA_TAGID"/>
   </resultMap>
 
-  <resultMap id="RbacAuthorizationDetailsResult" type="cern.tim.shared.client.command.RbacAuthorizationDetails">
+  <resultMap id="RbacAuthorizationDetailsResult" type="cern.c2mon.shared.client.command.RbacAuthorizationDetails">
     <result property="rbacClass"             column="TVS_RBAC_CLASS"/>
     <result property="rbacDevice"            column="TVS_RBAC_DEVICE"/>
     <result property="rbacProperty"          column="TVS_RBAC_PROPERTY"/>

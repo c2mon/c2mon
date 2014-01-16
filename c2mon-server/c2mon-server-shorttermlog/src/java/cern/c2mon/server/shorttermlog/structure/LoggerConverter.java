@@ -18,7 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.shorttermlog.structure;
 
-import cern.tim.shared.common.Cacheable;
+import cern.c2mon.shared.common.Cacheable;
 
 /**
  * Implementations should be thread safe.

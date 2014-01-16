@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+  
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.EquipmentMapper">
+        
+    <resultMap id="abstractEquipmentResultMap" type="AbstractEquipment">
+      <id property="id" column="equipment_id" />
+      <result property="name" column="equipment_name" />
+      <result property="description" column="equipment_description"/>
+      <result property="handlerClassName" column="equipment_handlerclass"/>
+      <result property="stateTagId" column="equipment_statetagid"/>
+      <result property="aliveTagId" column="equipment_alivetagid"/>
+      <result property="aliveInterval" column="equipment_aliveinterval" />
+      <result property="commFaultTagId" column="equipment_commfaulttagid" />
+      <result property="supervisionStatus" column="equipment_state" />
+      <result property="statusDescription" column="equipment_status_desc"/>
+      <result property="statusTime" column="equipment_status_time"/>      
+    </resultMap>
+    
+    <resultMap id="equipmentResultMap" type="Equipment" extends="abstractEquipmentResultMap">
+      <result property="address" column="equipment_address"/>
+      <result property="processId" column="equipment_procid"/>
+      <collection property="subEquipmentIds" ofType="Long" javaType="java.util.LinkedList" resultMap="subEquipmentIdsResultMap"/>
+      <collection property="dataTagIds" ofType="Long" javaType="java.util.LinkedList" resultMap="dataTagIdsResultMap"/>
+      <collection property="commandTagIds" ofType="Long" javaType="java.util.LinkedList" resultMap="commandTagIdsResultMap"/>
+    </resultMap>    
+    
+    <resultMap id="subEquipmentIdsResultMap" type="Long">
+      <id column="subequipment_id"/>
+    </resultMap>
+    
+    <resultMap id="dataTagIdsResultMap" type="Long">
+      <id column="datatag_id"/>
+    </resultMap>
+    
+    <resultMap id="commandTagIdsResultMap" type="Long">
+      <id column="commandtag_id"/>
+    </resultMap>
+    
+    <!-- get all equipments, including references to the subequipments and datatags (EXCLUDING CONTROL TAGS!)-->
+    <select id="getAll" resultMap="equipmentResultMap">
+      SELECT E1.EQID AS equipment_id, E1.EQNAME AS equipment_name, E1.EQDESC AS equipment_description,
+             E1.EQHANDLERCLASS AS equipment_handlerclass, E1.EQSTATE_TAGID AS equipment_statetagid, E1.EQALIVE_TAGID AS equipment_alivetagid,
+             E1.EQALIVEINTERVAL AS equipment_aliveinterval, E1.EQCOMMFAULT_TAGID AS equipment_commfaulttagid,
+             E1.EQADDRESS AS equipment_address, E1.EQ_PROCID AS equipment_procid, 
+             E1.EQSTATUSTIME AS equipment_status_time, E1.EQSTATUSDESC AS equipment_status_desc,
+             E2.EQID AS subequipment_id, D.TAGID as datatag_id,
+             C.CMDID AS commandtag_id, E1.EQSTATE as equipment_state
+        FROM EQUIPMENT E1 LEFT OUTER JOIN EQUIPMENT E2
+                         ON E1.EQID = E2.EQ_PARENT_ID
+              LEFT OUTER JOIN DATATAG D
+                         ON (E1.EQID = D.TAG_EQID AND D.TAGRULE IS NULL AND D.TAGCONTROLTAG = 0)                         
+              LEFT OUTER JOIN COMMANDTAG C
+                         ON E1.EQID = C.CMD_EQID          
+       WHERE E1.EQ_PROCID IS NOT NULL   <!-- i.e. not SubEquipments -->
+<!--         AND D.TAGRULE IS NULL    both this and the next row needed moving above so as not to exclude equipments with no tags attached! -->
+<!--         AND D.TAGCONTROLTAG = 0-->
+         <!-- AND D.TAG_EQID IS NOT NULL     i.e. no Control tags - excludes rule tags also  - FIXED BUG: not needed as excluded by outer join! and we want all equipments!-->
+    </select>
+    
+    <!-- getItem needed for persistence caches -->
+    <select id="getItem" resultMap="equipmentResultMap" parameterType="Long">
+      SELECT E1.EQID AS equipment_id, E1.EQNAME AS equipment_name, E1.EQDESC AS equipment_description,
+             E1.EQHANDLERCLASS AS equipment_handlerclass, E1.EQSTATE_TAGID AS equipment_statetagid, E1.EQALIVE_TAGID AS equipment_alivetagid,
+             E1.EQALIVEINTERVAL AS equipment_aliveinterval, E1.EQCOMMFAULT_TAGID AS equipment_commfaulttagid,
+             E1.EQSTATUSTIME AS equipment_status_time, E1.EQSTATUSDESC AS equipment_status_desc,
+             E1.EQADDRESS AS equipment_address, E1.EQ_PROCID AS equipment_procid, E2.EQID AS subequipment_id, D.TAGID as datatag_id,
+             C.CMDID AS commandtag_id, E1.EQSTATE as equipment_state
+        FROM EQUIPMENT E1 LEFT OUTER JOIN EQUIPMENT E2
+                         ON E1.EQID = E2.EQ_PARENT_ID
+              LEFT OUTER JOIN DATATAG D
+                         ON (E1.EQID = D.TAG_EQID AND D.TAGRULE IS NULL AND D.TAGCONTROLTAG = 0)
+              LEFT OUTER JOIN COMMANDTAG C
+                         ON E1.EQID = C.CMD_EQID
+       WHERE E1.EQ_PROCID IS NOT NULL
+         AND E1.EQID = #{id}               
+    </select>
+    
+     <select id="getRowBatch" resultMap="equipmentResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch">
+       SELECT E1.EQID AS equipment_id, E1.EQNAME AS equipment_name, E1.EQDESC AS equipment_description,
+             E1.EQHANDLERCLASS AS equipment_handlerclass, E1.EQSTATE_TAGID AS equipment_statetagid, E1.EQALIVE_TAGID AS equipment_alivetagid,
+             E1.EQALIVEINTERVAL AS equipment_aliveinterval, E1.EQCOMMFAULT_TAGID AS equipment_commfaulttagid,
+             E1.EQSTATUSTIME AS equipment_status_time, E1.EQSTATUSDESC AS equipment_status_desc,
+             E1.EQADDRESS AS equipment_address, E1.EQ_PROCID AS equipment_procid, E2.EQID AS subequipment_id, D.TAGID as datatag_id,
+             C.CMDID AS commandtag_id, E1.EQSTATE as equipment_state
+        FROM EQUIPMENT E1 LEFT OUTER JOIN EQUIPMENT E2
+                         ON E1.EQID = E2.EQ_PARENT_ID
+              LEFT OUTER JOIN DATATAG D
+                         ON (E1.EQID = D.TAG_EQID AND D.TAGRULE IS NULL AND D.TAGCONTROLTAG = 0)
+              LEFT OUTER JOIN COMMANDTAG C
+                         ON E1.EQID = C.CMD_EQID
+       WHERE E1.EQ_PROCID IS NOT NULL
+         AND E1.EQID <![CDATA[ >= ]]> #{firstId}
+         AND E1.EQID <![CDATA[ <= ]]> #{lastId}
+    </select>
+    
+    <!-- inserts the equipment (subequipments must be added separately) -->
+    <insert id="insertEquipment" parameterType="Equipment">
+      INSERT INTO EQUIPMENT (EQID, EQNAME, EQDESC,
+                             EQHANDLERCLASS, EQSTATE_TAGID, EQALIVE_TAGID,
+                             EQALIVEINTERVAL, EQCOMMFAULT_TAGID,
+                             EQADDRESS, EQ_PROCID, EQSTATE, EQSTATUSTIME, EQSTATUSDESC)
+                     VALUES (#{id}, #{name}, #{description,jdbcType=VARCHAR},
+                             #{handlerClassName,jdbcType=VARCHAR}, #{stateTagId}, #{aliveTagId,jdbcType=NUMERIC}, 
+                             #{aliveInterval}, #{commFaultTagId,jdbcType=NUMERIC},
+                             #{address,jdbcType=VARCHAR}, #{processId}, 
+                             #{supervisionStatus,jdbcType=VARCHAR}, 
+                             #{statusTime,jdbcType=TIMESTAMP}, #{statusDescription,jdbcType=VARCHAR})
+    </insert> 
+    
+    <update id="updateEquipmentConfig" parameterType="Equipment">
+      UPDATE EQUIPMENT
+         SET EQNAME = #{name},
+             EQDESC = #{description,jdbcType=VARCHAR},
+             EQHANDLERCLASS = #{handlerClassName,jdbcType=VARCHAR},                          
+             EQSTATE_TAGID = #{stateTagId,jdbcType=NUMERIC},             
+             EQALIVE_TAGID = #{aliveTagId,jdbcType=NUMERIC},
+             EQALIVEINTERVAL = #{aliveInterval,jdbcType=NUMERIC},
+             EQCOMMFAULT_TAGID = #{commFaultTagId,jdbcType=NUMERIC},
+             EQADDRESS = #{address,jdbcType=VARCHAR},
+             EQ_PROCID = #{processId,jdbcType=NUMERIC}
+       WHERE EQID = #{id} 
+    </update>
+    
+    <select id="getNumberItems" resultType="Integer">
+      SELECT COUNT(*)
+        FROM EQUIPMENT
+       WHERE EQ_PROCID IS NOT NULL  
+    </select>
+    
+    <select id="getMaxId" resultType="Long">
+      SELECT MAX(EQID)
+        FROM EQUIPMENT
+       WHERE EQ_PROCID IS NOT NULL    
+    </select>
+    
+    <select id="getMinId" resultType="Long">
+      SELECT MIN(EQID)
+        FROM EQUIPMENT
+       WHERE EQ_PROCID IS NOT NULL  
+    </select>
+    
+    <delete id="deleteEquipment" parameterType="Long">
+      DELETE FROM EQUIPMENT
+            WHERE EQID = #{id}
+    </delete>
+    
+    <update id="updateCacheable" parameterType="Equipment">
+      UPDATE EQUIPMENT
+         SET EQSTATE = #{supervisionStatus,jdbcType=VARCHAR},            
+             EQSTATUSTIME = #{statusTime,jdbcType=TIMESTAMP},
+             EQSTATUSDESC = #{statusDescription,jdbcType=VARCHAR}
+       WHERE EQID = #{id} 
+    </update>
+            
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM EQUIPMENT E1
+       WHERE EQID = #{id}
+         AND E1.EQ_PROCID IS NOT NULL
+    </select>
+    
+  </mapper>

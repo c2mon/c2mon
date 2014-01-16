@@ -27,18 +27,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.CommandTagCache;
-import cern.tim.server.cache.CommandTagFacade;
-import cern.tim.server.cache.EquipmentFacade;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.cache.loading.CommandTagDAO;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.daq.command.CommandTag;
-import cern.tim.shared.daq.config.Change;
-import cern.tim.shared.daq.config.CommandTagAdd;
-import cern.tim.shared.daq.config.CommandTagRemove;
+import cern.c2mon.server.cache.CommandTagCache;
+import cern.c2mon.server.cache.CommandTagFacade;
+import cern.c2mon.server.cache.EquipmentFacade;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.loading.CommandTagDAO;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.daq.config.Change;
+import cern.c2mon.shared.daq.config.CommandTagAdd;
+import cern.c2mon.shared.daq.config.CommandTagRemove;
 
 /**
  * See interface documentation.

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-server</groupId>
+    <artifactId>c2mon-server-pom</artifactId>
+    <version>1.1.0</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-server</groupId>
+  <artifactId>c2mon-server-rule</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
+  <name>c2mon-server-rule</name>
+  <packaging>jar</packaging>
+  <description>
+		C2MON server module managing rule evaluation (cache listener module)
+    </description>
+  <url>http://timweb.cern.ch</url>
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-rule</developerConnection>
+  </scm>
+
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-rule</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+    
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
+
+    <!-- C2MON test dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cachepersistence</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-supervision</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-daqcommunication-in</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+  <developers />
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8.1</version>
+        <configuration>
+         <!--  use in-memory broker (overrite the default test broker urls defined in c2mon.properties -->
+          <argLine>
+            -Djms.broker.url=tcp://localhost:61620   
+            -Djms.broker.client.url=tcp://localhost:61620          
+            -Dc2mon.properties.location=${c2mon.properties.location}
+            -Dc2mon.log.dir=${java.io.tmpdir}/c2mon-cache
+            <!-- Terracotta license key path -->
+            -Dcom.tc.productkey.path=${com.tc.productkey.path}                
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

@@ -1,0 +1,386 @@
+/******************************************************************************
+ * This file is part of the Technical Infrastructure Monitoring (TIM) project.
+ * See http://ts-project-tim.web.cern.ch
+ * 
+ * Copyright (C) 2005-2010 CERN.
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version. This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details. You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * 
+ * Author: TIM team, tim.support@cern.ch
+ *****************************************************************************/
+package cern.c2mon.server.cache.process;
+
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import cern.c2mon.server.cache.AliveTimerCache;
+import cern.c2mon.server.cache.AliveTimerFacade;
+import cern.c2mon.server.cache.EquipmentFacade;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.ProcessFacade;
+import cern.c2mon.server.cache.SubEquipmentFacade;
+import cern.c2mon.server.cache.common.AbstractSupervisedFacade;
+import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
+
+/**
+ * Facade object containing all the logic for modifying a ProcessCacheObject.
+ * @author Mark Brightwell
+ *
+ */
+@Service
+public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> implements ProcessFacade {
+ 
+  /**
+   * Class logger.
+   */
+  private static final Logger LOGGER = Logger.getLogger(ProcessFacadeImpl.class);
+  
+  /** PIK numbers limit (max) */
+  private static final int PIK_MAX = 999999;
+  /** PIK numbers limit (min) */
+  private static final int PIK_MIN = 100000;
+  
+  @Value("${c2mon.jms.process.listener.trunk}") 
+  private String processListenerTrunk = "c2mon.jms.process.listener.trunk.default";
+  
+  private EquipmentFacade equipmentFacade;
+  
+  private SubEquipmentFacade subEquipmentFacade;
+  
+  private ProcessCache processCache;
+  
+  private AliveTimerCache aliveTimerCache;
+  
+  @Autowired
+  public ProcessFacadeImpl(final EquipmentFacade equipmentFacade, final ProcessCache processCache,                            
+                           final SubEquipmentFacade subEquipmentFacade,
+                           final AliveTimerCache aliveTimerCache, final AliveTimerFacade aliveTimerFacade) {
+    super(processCache, aliveTimerCache, aliveTimerFacade);
+    this.equipmentFacade = equipmentFacade;
+    this.processCache = processCache;
+    this.subEquipmentFacade = subEquipmentFacade;
+    this.aliveTimerCache = aliveTimerCache;
+  }
+
+  @Override
+  public Process createCacheObject(final Long id, final Properties properties) {
+    ProcessCacheObject process = new ProcessCacheObject(id);
+    configureCacheObject(process, properties);
+    process.setSupervisionStatus(SupervisionStatus.DOWN);    
+    validateConfig(process);
+    return process;    
+  }
+
+  protected ProcessConfigurationUpdate configureCacheObject(final Process process, final Properties properties) {
+    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
+    ProcessConfigurationUpdate configurationUpdate = new ProcessConfigurationUpdate();
+    configurationUpdate.setProcessId(process.getId());
+    String tmpStr = null;       
+    if (properties.getProperty("name") != null) {
+      processCacheObject.setName(properties.getProperty("name"));
+    }    
+    if (properties.getProperty("description") != null) {
+      processCacheObject.setDescription(properties.getProperty("description"));
+    }
+    if ((tmpStr = properties.getProperty("aliveInterval")) != null) {
+      try {
+        processCacheObject.setAliveInterval(Integer.valueOf(tmpStr));
+      }
+      catch (NumberFormatException e) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"aliveInterval\" to Integer: " + tmpStr);
+      }
+    }     
+    if ((tmpStr = properties.getProperty("aliveTagId")) != null) {
+      try {
+        processCacheObject.setAliveTagId(Long.valueOf(tmpStr));
+      }
+      catch (NumberFormatException e) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"aliveTagId\" to Long: " + tmpStr);
+      }
+    }  
+    if ((tmpStr = properties.getProperty("stateTagId")) != null) {
+      try {
+        processCacheObject.setStateTagId(Long.valueOf(tmpStr));
+      }
+      catch (NumberFormatException e) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"stateTagId\" to Long: " + tmpStr);
+      }
+    }    
+    if ((tmpStr = properties.getProperty("maxMessageSize")) != null) {
+      try {        
+        processCacheObject.setMaxMessageSize(Integer.parseInt(tmpStr));
+      }
+      catch (NumberFormatException e) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"maxMessageSize\" to int: " + tmpStr);
+      }
+    }
+    
+    if ((tmpStr = properties.getProperty("maxMessageDelay")) != null) {
+      try {
+        processCacheObject.setMaxMessageDelay(Integer.parseInt(tmpStr));
+      }
+      catch (NumberFormatException e) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"maxMessageDelay\" to int: " + tmpStr);
+      }
+    }
+    
+//    if (properties.getProperty("processPIK") != null) {
+//      processCacheObject.setName(properties.getProperty("processPIK"));
+//    }
+//    
+//    if (properties.getProperty("localConfig") != null) {
+//      processCacheObject.setName(properties.getProperty("localConfig"));
+//    }
+    
+    //TODO: The default command queue name should be changed once all DAQs are migrated to the new kernel
+    processCacheObject.setJmsListenerTopic(processListenerTrunk + ".NOHOST." + processCacheObject.getName() + ".NOTIME");
+    return configurationUpdate;
+  }  
+  
+  /**
+   * Adds an Equipment to the list of Equipments under this Process.
+   * @param processCacheObject the Process
+   * @param pEquipmentId id of the Equipment to add
+   */
+  public void addEquipmentId(final ProcessCacheObject processCacheObject, final Long pEquipmentId) {
+    if (!processCacheObject.getEquipmentIds().contains(pEquipmentId)) {
+      processCacheObject.getEquipmentIds().add(pEquipmentId);
+    }
+  }
+
+  /**
+   * Removes an Equipment from the list of Equipments under this Process.
+   * @param processCacheObject the process
+   * @param pEquipmentId the id of the Equipment
+   */
+  public void removeEquipmentId(final ProcessCacheObject processCacheObject, final Long pEquipmentId) {
+    if (processCacheObject.getEquipmentIds().contains(pEquipmentId)) {
+      processCacheObject.getEquipmentIds().remove(pEquipmentId);
+    }
+  }
+
+  @Override
+  public void stop(final Process process, Timestamp timestamp) {
+    processCache.acquireWriteLockOnKey(process.getId());
+    try {
+      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;      
+      processCacheObject.setCurrentHost(null);
+      processCacheObject.setStartupTime(null);
+      processCacheObject.setRequiresReboot(Boolean.FALSE);
+      processCacheObject.setProcessPIK(null);
+      processCacheObject.setLocalConfig(null);
+      super.stop(process, timestamp);      
+    } finally {
+      processCache.releaseWriteLockOnKey(process.getId());
+    }
+  } 
+  
+  @Override
+  public void start(final Process process, final String pHostName, final Timestamp pStartupTime) {
+    processCache.acquireWriteLockOnKey(process.getId());
+    try {
+      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
+      if (!isRunning(processCacheObject)) {
+        final Long newPIK = createProcessPIK();
+        processCacheObject.setCurrentHost(pHostName);
+        processCacheObject.setStartupTime(pStartupTime);
+        processCacheObject.setRequiresReboot(Boolean.FALSE);
+        processCacheObject.setProcessPIK(newPIK);
+        processCacheObject.setLocalConfig(LocalConfig.Y);
+        processCacheObject.setJmsListenerTopic(processListenerTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+            + processCacheObject.getName() + "." + newPIK.toString());
+        super.start(process, pStartupTime);
+      }
+    } finally {
+      processCache.releaseWriteLockOnKey(process.getId());
+    }
+  }
+  
+  @Override
+  public void errorStatus(final Process process, final String errorMessage) {
+    processCache.acquireWriteLockOnKey(process.getId());
+    try {
+      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;      
+      processCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
+      processCache.notifyListenersOfUpdate(process);
+    } finally {
+      processCache.releaseWriteLockOnKey(process.getId());
+    }
+  }
+  
+  /**
+   * Validate the configuration of the Process object. 
+   * If the configuration information contained in the object
+   * is inconsistent or doesn't meet a set of predefined 
+   * constraints, a ConfigurationException will be thrown.
+   * The ConfigurationException will contain more information
+   * about the source of the problem. 
+   * @throws ConfigurationException
+   */
+  protected void validateConfig(final Process process) throws ConfigurationException {
+    processCache.acquireReadLockOnKey(process.getId());
+    try {
+      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
+      if (processCacheObject.getId() == null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
+      }
+      if (processCacheObject.getName() == null) { 
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be null");
+      }
+      if (processCacheObject.getName().length() == 0 || processCacheObject.getName().length() > 60) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" must be 1 to 60 characters long");
+      }
+      if (!ProcessCacheObject.PROCESS_NAME_PATTERN.matcher(processCacheObject.getName()).matches()) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" must match the following pattern: " + ProcessCacheObject.PROCESS_NAME_PATTERN.toString());
+      }
+      if (processCacheObject.getDescription() == null) { 
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"description\" cannot be null");
+      }
+      if (processCacheObject.getDescription().length() == 0 || processCacheObject.getDescription().length() > 100) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"description\" must be 1 to 100 characters long");
+      }
+      if (processCacheObject.getStateTagId() == null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"stateTagId\" cannot be null");
+      }
+      if (processCacheObject.getAliveTagId() == null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"aliveTagId\" cannot be null");
+      }
+      if (processCacheObject.getAliveInterval() < 10000) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"aliveInterval\" must be >= 10000 milliseconds");
+      }
+      if (processCacheObject.getJmsListenerTopic() == null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "JMS listener topic cannot be null");
+      }
+      if (processCacheObject.getMaxMessageSize() < 1) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"maxMessageSize\" must be >= 1");
+      }
+      if (processCacheObject.getMaxMessageDelay() < 100) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"maxMessageDelay\" must be >= 100");
+      }
+      if (processCacheObject.getEquipmentIds() == null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Collection \"equipmentIds\" cannot be null");
+      }
+    } finally {
+      processCache.releaseReadLockOnKey(process.getId());
+    }    
+  }
+ 
+  @Override
+  public Collection<Long> getDataTagIds(final Long processId) {
+    processCache.acquireReadLockOnKey(processId);
+    try {
+      ProcessCacheObject process = (ProcessCacheObject) processCache.get(processId);
+      LinkedList<Long> dataTagIds = new LinkedList<Long>();
+      for (long equipmentId : process.getEquipmentIds()) {
+        dataTagIds.addAll(equipmentFacade.getDataTagIds(equipmentId));
+      }
+      return dataTagIds;
+    } finally {
+      processCache.releaseReadLockOnKey(processId);
+    }    
+  }
+  
+  @Override
+  public Long getProcessIdFromAlive(final Long aliveTimerId) {
+    AliveTimer aliveTimer = aliveTimerCache.getCopy(aliveTimerId);   
+    if (aliveTimer.isProcessAliveType()) {               
+      return aliveTimer.getRelatedId();
+    } else if (aliveTimer.isEquipmentAliveType()) {      
+      return equipmentFacade.getProcessIdForAbstractEquipment(aliveTimer.getRelatedId());
+    } else {
+      Long equipmentId = subEquipmentFacade.getEquipmentIdForSubEquipment(aliveTimer.getRelatedId());
+      return equipmentFacade.getProcessIdForAbstractEquipment(equipmentId);
+    }      
+  }
+  
+  @Override
+  public Long getProcessIdFromControlTag(final Long controlTagId) {    
+    Map<Long, Long> equipmentControlTags = equipmentFacade.getAbstractEquipmentControlTags();
+    Map<Long, Long> subEquipmentControlTags = subEquipmentFacade.getAbstractEquipmentControlTags(); 
+    if (equipmentControlTags.containsKey(controlTagId)) {
+      Long equipmentId = equipmentControlTags.get(controlTagId);
+      return equipmentFacade.getProcessIdForAbstractEquipment(equipmentId);            
+    } else if (subEquipmentControlTags.containsKey(controlTagId)) {
+      Long subEquipmentId = subEquipmentControlTags.get(controlTagId);
+      return subEquipmentFacade.getEquipmentIdForSubEquipment(subEquipmentId);
+    } else return null;
+  }
+
+  @Override
+  protected SupervisionEntity getSupervisionEntity() {
+    return SupervisionEntity.PROCESS;
+  }
+
+  @Override
+  public Boolean isRebootRequired(final Long processId) {
+    processCache.acquireReadLockOnKey(processId);
+    try {
+      ProcessCacheObject process = (ProcessCacheObject) processCache.get(processId);
+      return process.getRequiresReboot();
+    } finally {
+      processCache.releaseReadLockOnKey(processId);
+    }
+  }
+
+  @Override
+  public void requiresReboot(final Long processId, final Boolean reboot) {
+    processCache.acquireReadLockOnKey(processId);
+    try {
+      ProcessCacheObject process = (ProcessCacheObject) processCache.get(processId);
+      process.setRequiresReboot(reboot);
+      processCache.notifyListenersOfUpdate(process);
+    } finally {
+      processCache.releaseReadLockOnKey(processId);
+    }
+  }
+  
+  /**
+   * Creation of the random PIK (between PIK_MIN and PIK_MAX)
+   */
+  private Long createProcessPIK() {
+    Random r = new Random();
+    
+    int pik = r.nextInt(PIK_MAX + 1);
+    if (pik < PIK_MIN) {
+      pik += PIK_MIN;
+    }
+
+    return Long.valueOf(pik);
+  }
+
+  @Override
+  public void setProcessPIK(final Process process, final Long processPIK) {
+    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
+    processCacheObject.setProcessPIK(processPIK);
+  }
+
+  @Override
+  public void setLocalConfig(final Process process, final LocalConfig localConfig) {
+    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
+    processCacheObject.setLocalConfig(localConfig);
+  }
+}

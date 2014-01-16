@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+  
+  <!-- XML parser for the ProcessCommunicationManager -->
+  <bean id="processCommunicationXMLParser" class="cern.c2mon.util.parser.SimpleXMLParser"/>
+  
+  <bean id="daqOutActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="${jms.broker.url}"/>
+    <property name="userName" value="${jms.client.user}"/>
+    <property name="password" value="${jms.client.password}"/>
+    <property name="clientIDPrefix" value="C2MON-DAQ-OUT"/> 
+    <property name="watchTopicAdvisories" value="false"/>
+  </bean>
+  
+  <!-- TODO rename as connection factory all factories in C2MON core, and specify one as priority -->
+  <bean id="processOutConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+    <property name="targetConnectionFactory" ref="daqOutActiveMQConnectionFactory"/>   
+  </bean>
+  
+  <bean id="processOutJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+    <property name="connectionFactory" ref="processOutConnectionFactory"/>
+<!--    <property name="receiveTimeout" value="10000"/>     set default time for waiting for response from DAQs  - now in properties  -->
+  </bean>
+
+</beans>

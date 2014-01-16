@@ -20,8 +20,8 @@ package cern.c2mon.server.configuration.dao;
 
 import java.util.List;
 
-import cern.tim.shared.client.configuration.ConfigurationDescriptor;
-import cern.tim.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationDescriptor;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
 
 /**
  * DAO interface that must be implemented for use by the C2MON server

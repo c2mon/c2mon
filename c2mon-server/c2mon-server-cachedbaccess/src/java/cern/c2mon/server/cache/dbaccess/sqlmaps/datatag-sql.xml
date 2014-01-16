@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!-- take "namespace=Mapper interface" for the mapper SQL statements to be picked up automatically -->
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.DataTagMapper">
+    
+    <!-- result map for constructing a ValueDictionary from the database String -->
+<!--    <resultMap id="valueDictionaryResultMap" type="cern.c2mon.shared.client.datatag.DataTagValueDictionary">-->
+<!--      <constructor>-->
+<!--        <arg column="TAGVALUEDICTIONARY" javaType="String"/>-->
+<!--      </constructor>-->
+<!--    </resultMap>-->
+  
+    <!-- result map below corresponds to the abstract AbstractTagCacheObject -->
+    <resultMap id="abstractTagResultMap" type="cern.c2mon.server.common.tag.AbstractTagCacheObject">
+      <id property="id" column="TAGID"/>
+      <result property="name" column="TAGNAME"/>
+      <result property="description" column="TAGDESC" jdbcType="VARCHAR"/>
+      <result property="mode" column="TAGMODE"/>
+      <result property="dataType" column="TAGDATATYPE"/>
+      
+      <result property="value" column="TAGVALUE" javaType="java.lang.Object" jdbcType="BLOB"/>
+      <result property="valueDescription" column="TAGVALUEDESC" jdbcType="VARCHAR"/>
+       
+      <result property="cacheTimestamp" column="TAGSRVTIMESTAMP" jdbcType="TIMESTAMP"/>
+            
+      <result property="dataTagQuality" column="TAGQUALITYDESC" javaType="DataTagQuality" jdbcType="VARCHAR"/>
+      
+      <result property="unit" column="TAGUNIT" jdbcType="VARCHAR"/>
+      <result property="simulated" column="TAGSIMULATED" jdbcType="NUMERIC"/>
+      <result property="logged" column="TAGLOGGED" jdbcType="NUMERIC"/>      
+      
+      <result property="dipAddress" column="TAGDIPADDRESS" jdbcType="VARCHAR"/>
+      <result property="japcAddress" column="TAGJAPCADDRESS" jdbcType="VARCHAR"/>
+      
+      <result property="valueDictionary" column="TAGVALUEDICTIONARY" javaType="cern.c2mon.shared.common.datatag.DataTagValueDictionary" jdbcType="VARCHAR"/>
+      <result property="address" column="TAGADDRESS" javaType="cern.c2mon.shared.common.datatag.DataTagAddress" jdbcType="VARCHAR"/>
+      
+      <result property="ruleIdsString" column="TAGRULEIDS" jdbcType="VARCHAR"/>
+      
+      <collection property="alarmIds" ofType="Long" javaType="java.util.ArrayList" resultMap="tagAlarmIdsResultMap"/>
+         
+    </resultMap>
+    
+    <resultMap id="tagAlarmIdsResultMap" type="Long">
+      <id column="ALARMID"/>
+    </resultMap>     
+
+<!--      <result property="" column="TAGCONTROLTAG"/>-->
+  
+    <resultMap id="dataTagResultMap" type="cern.c2mon.server.common.datatag.DataTagCacheObject"
+                                                                  extends="abstractTagResultMap">                   
+      <result property="sourceTimestamp" column="TAGTIMESTAMP" jdbcType="TIMESTAMP"/>
+      <result property="daqTimestamp" column="DAQTIMESTAMP" jdbcType="TIMESTAMP"/>
+      <result property="equipmentId" column="TAG_EQID" jdbcType="NUMERIC"/>
+      <result property="processId" column="PROCID" jdbcType="NUMERIC"/>
+      <result property="minValue" column="TAGMINVAL" javaType="java.lang.Comparable" jdbcType="BLOB"/>
+      <result property="maxValue" column="TAGMAXVAL" javaType="java.lang.Comparable" jdbcType="BLOB"/>
+      <result property="address" column="TAGADDRESS" jdbcType="VARCHAR"/>               
+    </resultMap>
+    
+    
+                                                                  
+    <resultMap id="ruleTagResultMap" type="cern.c2mon.server.common.rule.RuleTagCacheObject"
+                                                                  extends="abstractTagResultMap">
+      <result property="" column="TAGRULE" jdbcType="VARCHAR"/>
+      <result property="" column="TAGRULEIDS" jdbcType="VARCHAR"/>                                               
+    </resultMap>
+    
+    <select id="getAll" resultMap="dataTagResultMap">
+    <!-- fill in with adapted SQL for datatags only -->
+     SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+            TAGVALUE, TAGVALUEDESC, TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP,
+            TAGQUALITYDESC, TAG_EQID,
+            TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
+            TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
+            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
+     FROM DATATAG LEFT OUTER JOIN ALARM 
+            ON ALARM_TAGID = TAGID
+          INNER JOIN EQUIPMENT
+            ON EQID = TAG_EQID
+          INNER JOIN PROCESS
+            ON PROCID = EQ_PROCID  
+     WHERE TAGCONTROLTAG=0 
+       AND TAGRULE IS NULL
+    </select>
+    
+    <select id="getRowBatch" resultMap="dataTagResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch">
+    <!-- fill in with adapted SQL for datatags only -->     
+     SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+            TAGVALUE, TAGVALUEDESC, TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP,
+            TAGQUALITYDESC, TAG_EQID,
+            TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
+            TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
+            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
+     FROM DATATAG LEFT OUTER JOIN ALARM 
+            ON ALARM_TAGID = TAGID
+          INNER JOIN EQUIPMENT
+            ON EQID = TAG_EQID
+          INNER JOIN PROCESS
+            ON PROCID = EQ_PROCID  
+     WHERE TAGCONTROLTAG=0 
+       AND TAGRULE IS NULL
+       AND TAGID <![CDATA[ >= ]]> #{firstId}
+       AND TAGID <![CDATA[ <= ]]> #{lastId}
+    </select>
+    
+    <select id="getItem" resultMap="dataTagResultMap" parameterType="Long">
+		      SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+		            TAGVALUE, TAGVALUEDESC, TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP,
+		            TAGQUALITYDESC, TAG_EQID,
+		            TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
+		            TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
+		            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
+		     FROM DATATAG LEFT OUTER JOIN ALARM 
+		            ON ALARM_TAGID = TAGID
+		          INNER JOIN EQUIPMENT
+		            ON EQID = TAG_EQID
+		          INNER JOIN PROCESS
+		            ON PROCID = EQ_PROCID  
+		     WHERE TAGCONTROLTAG=0 
+		       AND TAGRULE IS NULL      
+           AND TAGID=#{id}
+    </select>
+    
+    <update id="updateCacheable" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
+      UPDATE DATATAG
+         SET TAGVALUE = #{value,javaType=java.lang.Object,jdbcType=BLOB},
+             TAGVALUEDESC = #{valueDescription,jdbcType=VARCHAR},
+             TAGTIMESTAMP = #{sourceTimestamp, jdbcType=TIMESTAMP}, 
+             TAGDAQTIMESTAMP = #{daqTimestamp, jdbcType=TIMESTAMP},             
+             TAGSRVTIMESTAMP = #{cacheTimestamp,jdbcType=TIMESTAMP},             
+             TAGQUALITYDESC = #{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR},
+             TAGSIMULATED = #{simulated,jdbcType=NUMERIC}
+       WHERE TAGID=#{id} 
+    </update>
+    
+    <update id="updateConfig" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
+      UPDATE DATATAG
+         SET TAGNAME = #{name},
+             TAGDESC = #{description,jdbcType=VARCHAR},
+             TAGMODE = #{mode},
+             TAGDATATYPE = #{dataType},
+             TAG_EQID = #{equipmentId,jdbcType=NUMERIC},
+             TAGMINVAL = #{minValue,javaType=java.lang.Comparable,jdbcType=BLOB},
+             TAGMAXVAL = #{maxValue,javaType=java.lang.Comparable,jdbcType=BLOB},
+             TAGUNIT =  #{unit,jdbcType=VARCHAR},
+             TAGLOGGED = #{logged,jdbcType=NUMERIC},
+             TAGVALUEDICTIONARY = #{valueDictionary,jdbcType=VARCHAR},
+             TAGADDRESS = #{address,jdbcType=VARCHAR},
+             TAGDIPADDRESS = #{dipAddress,jdbcType=VARCHAR},
+             TAGJAPCADDRESS = #{japcAddress,jdbcType=VARCHAR},
+             TAGRULEIDS = #{ruleIdsString, jdbcType=VARCHAR}
+       WHERE TAGID=#{id} 
+    </update>
+    
+    <!-- must specify jdbcType for parameters that can be null in DB  -->
+    <insert id="testInsertDataTag" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
+      INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+                            TAGVALUE, TAGVALUEDESC,
+                            TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP, 
+                            TAGQUALITYDESC, TAG_EQID,
+                            TAGMINVAL, TAGMAXVAL,
+                            TAGUNIT, TAGSIMULATED, TAGLOGGED,
+                            TAGVALUEDICTIONARY, TAGADDRESS,
+                            TAGDIPADDRESS, TAGJAPCADDRESS,
+                            TAGRULEIDS, TAGCONTROLTAG
+                )
+      VALUES (#{id},#{name},#{description, jdbcType=VARCHAR},#{mode},#{dataType},
+              #{value,javaType=java.lang.Object,jdbcType=BLOB},#{valueDescription,jdbcType=VARCHAR},
+              #{sourceTimestamp, jdbcType=TIMESTAMP},#{daqTimestamp,jdbcType=TIMESTAMP},#{cacheTimestamp,jdbcType=TIMESTAMP},
+              #{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR},#{equipmentId,jdbcType=NUMERIC},
+              #{minValue,javaType=java.lang.Comparable,jdbcType=BLOB},#{maxValue,javaType=java.lang.Comparable,jdbcType=BLOB},
+              #{unit,jdbcType=VARCHAR},#{simulated,jdbcType=NUMERIC},#{logged,jdbcType=NUMERIC},
+              #{valueDictionary,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},
+              #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR},
+              #{ruleIdsString, jdbcType=VARCHAR},
+              0
+                )
+    </insert>        
+    
+    <select id="getNumberItems" resultType="Integer">
+      SELECT COUNT(DISTINCT TAGID)
+        FROM DATATAG
+       WHERE TAGRULE is NULL
+         AND TAGCONTROLTAG=0
+    </select>
+    
+    <select id="getMaxId" resultType="Long">
+      SELECT MAX(TAGID)
+        FROM DATATAG
+       WHERE TAGRULE is NULL
+         AND TAGCONTROLTAG=0
+    </select>
+    
+    <select id="getMinId" resultType="Long">
+      SELECT MIN(TAGID)
+        FROM DATATAG
+       WHERE TAGRULE is NULL
+         AND TAGCONTROLTAG=0
+    </select>
+    
+    <delete id="deleteDataTag" parameterType="Long">
+      delete from DATATAG where TAGID = #{id}
+    </delete>
+    
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM DATATAG
+       WHERE TAGID = #{id}
+         AND TAGCONTROLTAG=0
+         AND TAGRULE IS NULL
+    </select>
+    
+                                                                 
+  </mapper>

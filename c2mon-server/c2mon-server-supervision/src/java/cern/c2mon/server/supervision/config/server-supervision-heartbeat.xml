@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+  <bean id="heartbeatConnectionFactory" class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="${jms.broker.client.url}" />
+    <property name="userName" value="${jms.client.user}" />
+    <property name="password" value="${jms.client.password}" />
+    <property name="clientIDPrefix" value="C2MON-SERVER-HEARTBEAT" />
+    <property name="watchTopicAdvisories" value="false" />
+  </bean>
+
+  <bean id="heartbeatSingleConnectionFactory" class="org.springframework.jms.connection.SingleConnectionFactory">
+    <property name="targetConnectionFactory" ref="heartbeatConnectionFactory" />
+  </bean>
+
+  <bean name="heartbeatJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+    <property name="defaultDestination">
+      <bean class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="${c2mon.jms.heartbeat.topic}" />
+      </bean>
+    </property>
+    <property name="connectionFactory" ref="heartbeatSingleConnectionFactory" />
+    <property name="explicitQosEnabled" value="true" />
+    <property name="priority" value="7" />
+    <property name="timeToLive" value="5400000" />
+    <property name="deliveryPersistent" value="false" />
+    <property name="sessionTransacted" value="false" />
+  </bean>
+
+  <bean name="heartbeatSender" class="cern.c2mon.util.jms.ActiveJmsSender">
+    <property name="jmsTemplate" ref="heartbeatJmsTemplate" />
+  </bean>
+
+  <bean name="heartbeatManager" class="cern.c2mon.server.supervision.heartbeat.HeartbeatManagerImpl"/>
+   
+  
+</beans>

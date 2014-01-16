@@ -24,10 +24,10 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.common.control.ControlTag;
-import cern.tim.server.common.rule.RuleTag;
-import cern.tim.server.common.tag.Tag;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.tag.Tag;
 
 /**
  * Gateway bean used to call the TagConfigHandler methods on the

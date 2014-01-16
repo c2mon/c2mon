@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+  
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.CommFaultTagMapper">
+    
+    <resultMap id="commFaultTagResultMap" type="cern.c2mon.server.common.commfault.CommFaultTagCacheObject">
+      <id property="id" column="COMMFAULTID"/>
+      <result property="equipmentId" column="EQID" jdbcType="NUMERIC"/>
+      <result property="equipmentName" column="EQNAME" jdbcType="VARCHAR"/>      
+      <result property="stateTagId" column="EQSTATETAG" jdbcType="NUMERIC"/>
+      <result property="aliveTagId" column="EQALIVETAG" jdbcType="NUMERIC"/>   <!-- JDBC type required for nullable columns!! -->        
+    </resultMap>    
+    
+    
+    <!-- getAll needed for persistent caches -->
+    <select id="getAll" resultMap="commFaultTagResultMap">
+      SELECT COMMFAULTID, EQID, EQNAME, EQSTATETAG, EQALIVETAG 
+        FROM COMMFAULTTAG
+    </select>
+    
+    <!-- getItem needed for persistence caches -->
+    <select id="getItem" resultMap="commFaultTagResultMap" parameterType="Long">
+      SELECT COMMFAULTID, EQID, EQNAME, EQSTATETAG, EQALIVETAG 
+        FROM COMMFAULTTAG
+       WHERE COMMFAULTID = #{id}
+    </select>
+    
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM commfaulttag
+       WHERE commfaultid = #{id}
+    </select>
+            
+  </mapper>

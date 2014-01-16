@@ -16,16 +16,16 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.tim.server.alarm.AlarmAggregator;
-import cern.tim.server.alarm.AlarmAggregatorListener;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.common.alarm.TagWithAlarms;
-import cern.tim.server.common.alarm.TagWithAlarmsImpl;
-import cern.tim.server.common.republisher.Publisher;
-import cern.tim.server.common.republisher.Republisher;
-import cern.tim.server.common.republisher.RepublisherFactory;
-import cern.tim.server.common.tag.Tag;
-import cern.tim.util.jms.JmsSender;
+import cern.c2mon.server.alarm.AlarmAggregator;
+import cern.c2mon.server.alarm.AlarmAggregatorListener;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
+import cern.c2mon.server.common.republisher.Publisher;
+import cern.c2mon.server.common.republisher.Republisher;
+import cern.c2mon.server.common.republisher.RepublisherFactory;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.util.jms.JmsSender;
 
 /**
  * This class implements the <code>AlarmAggregatorListener</code>

@@ -10,9 +10,9 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.ControlTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.ControlTagCache;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.server.cache.ControlTagCache;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * See interface documentation.

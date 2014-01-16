@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>cern.c2mon.c2mon-server</groupId>
+		<artifactId>c2mon-server-pom</artifactId>
+		<version>1.1.0</version>
+	</parent>
+	<groupId>cern.c2mon.c2mon-server</groupId>
+	<artifactId>c2mon-server-daqcommunication-out</artifactId>
+	<version>1.1.0-SNAPSHOT</version>
+	<name>c2mon-server-daqcommunication-out</name>
+	<packaging>jar</packaging>
+	<description>
+    	C2MON module managing outgoing communication to the DAQ layer
+    </description>
+	<url>http://timweb.cern.ch</url>
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-server/c2mon-server-daqcommunication-out</developerConnection>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymockclassextension</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jencks</groupId>
+			<artifactId>jencks-amqpool</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>cern.c2mon.c2mon-server</groupId>
+			<artifactId>c2mon-server-cache</artifactId>
+		</dependency>
+	</dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8.1</version>
+        <configuration>
+          <argLine>
+            <!-- Terracotta license key path -->
+            -Dcom.tc.productkey.path=${com.tc.productkey.path}           
+          </argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+	<developers />
+</project>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//ibatis.apache.org//DTD Config 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-config.dtd">
+
+<configuration>
+<!--  <settings>-->
+<!--    <setting name="defaultExecutorType" value="BATCH"/>-->
+<!--  </settings>-->
+  <typeAliases>
+    <typeAlias alias="AbstractEquipment" type="cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject" />   
+    <typeAlias alias="Equipment" type="cern.c2mon.server.common.equipment.EquipmentCacheObject"/>
+    <typeAlias alias="SubEquipment" type="cern.c2mon.server.common.subequipment.SubEquipmentCacheObject" />       
+    <typeAlias alias="Alarm" type="cern.c2mon.server.common.alarm.AlarmCacheObject" />
+    <typeAlias alias="LaserPublication" type="cern.c2mon.server.common.alarm.AlarmPublication" />
+    <typeAlias alias="AlarmCondition" type="cern.c2mon.server.common.alarm.AlarmCondition" />        
+    <typeAlias alias="Process" type="cern.c2mon.server.common.process.ProcessCacheObject" />
+    <typeAlias alias="DataTagQuality" type="cern.c2mon.shared.common.datatag.DataTagQuality" />
+    <typeAlias alias="RbacAuthorizationDetails" type="cern.c2mon.shared.client.command.RbacAuthorizationDetails" />      
+  </typeAliases>
+  <typeHandlers>
+    <typeHandler javaType="java.lang.Comparable" jdbcType="BLOB" handler="cern.c2mon.server.cache.dbaccess.type.ComparableTypeHandler" />
+    <typeHandler javaType="java.lang.Object" jdbcType="BLOB" handler="cern.c2mon.server.cache.dbaccess.type.ComparableTypeHandler" />
+    <typeHandler javaType="cern.c2mon.shared.common.datatag.DataTagValueDictionary" jdbcType="VARCHAR" handler="cern.c2mon.server.cache.dbaccess.type.ValueDictionaryTypeHandler"/>    
+    <typeHandler javaType="cern.c2mon.shared.common.datatag.DataTagAddress" jdbcType="VARCHAR" handler="cern.c2mon.server.cache.dbaccess.type.DataTagAddressTypeHandler"/>    
+    <typeHandler javaType="cern.c2mon.shared.common.datatag.address.HardwareAddress" jdbcType="VARCHAR" handler="cern.c2mon.server.cache.dbaccess.type.HardwareAddressTypeHandler"/>    
+    <typeHandler javaType="cern.c2mon.server.common.alarm.AlarmCondition" jdbcType="VARCHAR" handler="cern.c2mon.server.cache.dbaccess.type.AlarmConditionTypeHandler"/>    
+    <typeHandler javaType="cern.c2mon.shared.common.datatag.DataTagQuality" jdbcType="VARCHAR" handler="cern.c2mon.shared.client.tag.ibatis.DataTagQualityTypeHandler"/>    
+  </typeHandlers>
+  <mappers>
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/datatag-sql.xml"/>
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/controltag-sql.xml"/>
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/process-sql.xml"/>
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/alivetimer-sql.xml"/>        
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/commfaulttag-sql.xml"/>        
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/equipment-sql.xml"/>        
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/subequipment-sql.xml"/>
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/ruletag-sql.xml"/>  
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/commandtag-sql.xml"/>      
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/alarm-sql.xml"/>
+  </mappers>
+</configuration>

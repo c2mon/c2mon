@@ -32,10 +32,10 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.configuration.ConfigurationLoader;
-import cern.tim.shared.client.configuration.ConfigurationException;
-import cern.tim.shared.client.configuration.ConfigurationReport;
-import cern.tim.shared.client.configuration.ConfigurationRequest;
-import cern.tim.shared.client.configuration.ConfigurationRequestConverter;
+import cern.c2mon.shared.client.configuration.ConfigurationException;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationRequest;
+import cern.c2mon.shared.client.configuration.ConfigurationRequestConverter;
 
 /**
  * Handles configuration requests received on JMS from

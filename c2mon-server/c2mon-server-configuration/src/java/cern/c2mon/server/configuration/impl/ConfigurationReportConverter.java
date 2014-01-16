@@ -20,9 +20,9 @@ package cern.c2mon.server.configuration.impl;
 
 import org.apache.log4j.Logger;
 
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.client.configuration.ConfigConstants.Status;
-import cern.tim.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
+import cern.c2mon.shared.daq.config.ChangeReport;
 
 /**
  * Utility class for converting between Process and Client configuration report formats.

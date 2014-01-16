@@ -14,8 +14,8 @@ import cern.c2mon.shared.client.request.ClientRequestErrorReport.RequestExecutio
 import cern.c2mon.shared.video.VideoConnectionProperties;
 import cern.c2mon.shared.video.VideoRequest;
 import cern.c2mon.shared.video.VideoRequest.RequestType;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 

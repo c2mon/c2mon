@@ -30,10 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.shorttermlog.mapper.SupervisionMapper;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.tim.server.common.component.Lifecycle;
-import cern.tim.server.common.config.ServerConstants;
-import cern.tim.server.supervision.SupervisionListener;
-import cern.tim.server.supervision.SupervisionNotifier;
+import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.supervision.SupervisionListener;
+import cern.c2mon.server.supervision.SupervisionNotifier;
 
 /**
  * Listens for supervision notifications from the core and logs

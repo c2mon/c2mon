@@ -76,7 +76,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'al
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'aliveInterval','60000');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'processId','25');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'description','Test MessageHandler');
-insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'handlerClass','ch.cern.tim.driver.testhandler.TestMessageHandler');
+insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'handlerClass','cern.c2mon.driver.testhandler.TestMessageHandler');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'name','E_TEST_TESTHANDLER01');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'commFaultTagId','1004');
 
@@ -97,6 +97,6 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'eq
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'rbacClass','RBAC class');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'rbacDevice','RBAC device');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'rbacProperty','RBAC property');
-insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'hardwareAddress','<HardwareAddress class="ch.cern.tim.shared.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'hardwareAddress','<HardwareAddress class="cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>');
 
 

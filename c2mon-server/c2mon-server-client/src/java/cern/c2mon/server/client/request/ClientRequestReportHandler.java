@@ -15,8 +15,8 @@ import org.apache.log4j.Logger;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.tim.shared.client.configuration.ConfigurationReport;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 

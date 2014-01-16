@@ -20,7 +20,7 @@ package cern.c2mon.server.shorttermlog.logger;
 
 import java.util.Collection;
 
-import cern.tim.shared.common.Cacheable;
+import cern.c2mon.shared.common.Cacheable;
 
 /**
  * Logger for logging cache objects to a log table

@@ -5,13 +5,13 @@
 
 <configuration>
   <typeAliases>
-    <typeAlias alias="ConfigurationDescriptor" type="cern.tim.shared.client.configuration.ConfigurationDescriptor" />
-    <typeAlias alias="ConfigurationElement" type="cern.tim.shared.client.configuration.ConfigurationElement" />
+    <typeAlias alias="ConfigurationDescriptor" type="cern.c2mon.shared.client.configuration.ConfigurationDescriptor" />
+    <typeAlias alias="ConfigurationElement" type="cern.c2mon.shared.client.configuration.ConfigurationElement" />
     <typeAlias alias="EntityTypeHandler" type="cern.c2mon.server.configuration.mybatis.EntityTypeHandler" />
   </typeAliases>
   <typeHandlers>
     <typeHandler javaType="java.util.Properties" handler="cern.c2mon.server.configuration.mybatis.PropertiesTypeHandler" />
-<!--    <typeHandler handler="cern.tim.server.configuration.mybatis.EntityTypeHandler" />    -->
+<!--    <typeHandler handler="cern.c2mon.server.configuration.mybatis.EntityTypeHandler" />    -->
   </typeHandlers>
   <mappers>
     <mapper resource="cern/c2mon/server/configuration/sqlmap/config-sql.xml"/>      

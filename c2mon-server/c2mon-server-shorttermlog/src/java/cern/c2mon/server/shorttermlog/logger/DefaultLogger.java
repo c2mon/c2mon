@@ -24,7 +24,7 @@ import java.util.Collection;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.shorttermlog.structure.Loggable;
 import cern.c2mon.server.shorttermlog.structure.LoggerConverter;
-import cern.tim.shared.common.Cacheable;
+import cern.c2mon.shared.common.Cacheable;
 
 /**
  * Default implementation of a BatchLogger for C2MON that

@@ -6,7 +6,7 @@
 	                    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
   
   <!-- import properties -->
-  <import resource="classpath:cern/tim/server/test/server-test-properties.xml" />
+  <import resource="classpath:cern.c2mon/server/test/server-test-properties.xml" />
   
   <!-- datasource & other DB beans -->
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-oracle.xml"/>
@@ -21,7 +21,7 @@
 	</bean>
 	<bean id="commandExecutionManager" class="org.easymock.EasyMock" factory-method="createMock">
 		<constructor-arg>
-			<value>cern.tim.server.command.CommandExecutionManager</value>
+			<value>cern.c2mon.server.command.CommandExecutionManager</value>
 		</constructor-arg>
 	</bean>
 	<!-- for test only, to check properly inserted -->
@@ -36,7 +36,7 @@
 	</bean>
   <bean id="cacheRegistrationService" class="org.easymock.EasyMock" factory-method="createMock">
     <constructor-arg>
-      <value>cern.tim.server.cache.CacheRegistrationService</value>
+      <value>cern.c2mon.server.cache.CacheRegistrationService</value>
     </constructor-arg>
   </bean>
 
@@ -46,7 +46,7 @@
 	</bean>
 	<bean id="supervisonNotifier" class="org.easymock.EasyMock" factory-method="createMock">
     <constructor-arg>
-      <value>cern.tim.server.supervision.SupervisionNotifier</value>
+      <value>cern.c2mon.server.supervision.SupervisionNotifier</value>
     </constructor-arg>
   </bean>
   	

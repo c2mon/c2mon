@@ -2,16 +2,16 @@ package cern.c2mon.server.configuraton.helper;
 
 import static org.junit.Assert.*;
 
-import cern.tim.server.common.alarm.AlarmCacheObject;
-import cern.tim.server.common.command.CommandTagCacheObject;
-import cern.tim.server.common.datatag.DataTagCacheObject;
-import cern.tim.server.common.equipment.AbstractEquipmentCacheObject;
-import cern.tim.server.common.equipment.EquipmentCacheObject;
-import cern.tim.server.common.process.ProcessCacheObject;
-import cern.tim.server.common.rule.RuleTagCacheObject;
-import cern.tim.server.common.subequipment.SubEquipmentCacheObject;
-import cern.tim.server.common.tag.AbstractTagCacheObject;
-import cern.tim.server.common.tag.Tag;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.command.CommandTagCacheObject;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
+import cern.c2mon.server.common.equipment.EquipmentCacheObject;
+import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
+import cern.c2mon.server.common.tag.AbstractTagCacheObject;
+import cern.c2mon.server.common.tag.Tag;
 
 /**
  * Junit helper class for comparing cache objects.

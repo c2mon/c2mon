@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- the xsd schema is never used by ehcache and can be omitted -->
+<!-- updateCheck=false means ehcache will not seek to update via internet -->
+<!-- See also: http://terracotta.org/documentation/4.0/bigmemorymax/configuration/configuration -->
+<ehcache xsi:noNamespaceSchemaLocation="classpath:resources/ehcache.xsd" updateCheck="false" name="tim-cachemanager">
+  <defaultCache
+    eternal="true"
+    maxElementsInMemory="500"
+    maxEntriesInCache="1000"
+    memoryStoreEvictionPolicy="LRU" />
+  <cache
+    name="tagCache"
+    eternal="true"
+    maxElementsInMemory="300000"
+    maxEntriesInCache="600000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="controlCache"
+    eternal="true"
+    maxElementsInMemory="10000"
+    maxEntriesInCache="20000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="ruleCache"
+    eternal="true"
+    maxElementsInMemory="300000"
+    maxEntriesInCache="600000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="commandCache"
+    eternal="true"
+    maxElementsInMemory="5000"
+    maxEntriesInCache="10000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="processCache"
+    eternal="true"
+    maxElementsInMemory="500"
+    maxEntriesInCache="1000">
+    <persistence strategy="distributed" />
+    <searchable>
+      <searchAttribute name="processName" expression="value.getName()" />
+    </searchable>
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="equipmentCache"
+    eternal="true"
+    maxElementsInMemory="500"
+    maxEntriesInCache="1000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="subEquipmentCache"
+    eternal="true"
+    maxElementsInMemory="500"
+    maxEntriesInCache="1000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="aliveTimerCache"
+    eternal="true"
+    maxElementsInMemory="2000"
+    maxEntriesInCache="4000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="commFaultTagCache"
+    eternal="true"
+    maxElementsInMemory="2000"
+    maxEntriesInCache="4000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="alarmCache"
+    eternal="true"
+    maxElementsInMemory="300000"
+    maxEntriesInCache="600000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="clusterCache"
+    eternal="true"
+    maxElementsInMemory="2000"
+    maxEntriesInCache="4000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+
+  <!-- Caches used by core repository c2mon-server-supervision -->
+  <cache
+    name="processEventCache"
+    eternal="true"
+    maxElementsInMemory="500"
+    maxEntriesInCache="1000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <cache
+    name="equipmentEventCache"
+    eternal="true"
+    maxElementsInMemory="500"
+    maxEntriesInCache="1000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+  <!-- ************************************* -->
+
+
+  <!-- overflowToDisk="false" -->
+  <terracottaConfig url="${terracotta.config.location}"></terracottaConfig>
+</ehcache>

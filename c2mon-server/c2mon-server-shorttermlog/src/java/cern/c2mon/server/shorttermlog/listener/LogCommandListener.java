@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.tim.server.command.CommandExecutionManager;
-import cern.tim.server.command.CommandPersistenceListener;
-import cern.tim.shared.client.command.CommandReport;
-import cern.tim.shared.client.command.CommandTagLog;
-import cern.tim.shared.daq.command.CommandTag;
+import cern.c2mon.server.command.CommandExecutionManager;
+import cern.c2mon.server.command.CommandPersistenceListener;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandTagLog;
+import cern.c2mon.shared.daq.command.CommandTag;
 
 /**
  * Bean listening to the command module and logging command executions to

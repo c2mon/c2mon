@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+  <!-- take "namespace=Mapper interface" for the mapper SQL statements to be picked up automatically -->
+  <mapper namespace="cern.c2mon.server.cachepersistence.mappers.TestDataMapper">
+    
+    <!-- must specify jdbcType for parameters that can be null in DB  -->
+    <insert id="testInsertDataTag" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
+      INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+                            TAGVALUE, TAGVALUEDESC,
+                            TAGTIMESTAMP, TAGSRVTIMESTAMP,
+                            TAGQUALITYCODE, TAGQUALITYDESC, TAG_EQID,
+                            TAGMINVAL, TAGMAXVAL,
+                            TAGUNIT, TAGSIMULATED, TAGLOGGED,
+                            TAGVALUEDICTIONARY, TAGADDRESS,
+                            TAGDIPADDRESS, TAGJAPCADDRESS,
+                            TAGRULEIDS, TAGCONTROLTAG
+                )
+      VALUES (500,'DATATAG_500','DATATAG_500 description',0,'Float',
+              null,'DATATAG_500 value description',
+              #{timestamp, jdbcType=TIMESTAMP},#{serverTimestamp,jdbcType=TIMESTAMP},
+              #{dataTagQuality.qualityCode,jdbcType=NUMERIC},#{dataTagQuality.qualityDesc,jdbcType=VARCHAR},#{equipmentId,jdbcType=NUMERIC},
+              #{minValue,javaType=java.lang.Comparable,jdbcType=BLOB},#{maxValue,javaType=java.lang.Comparable,jdbcType=BLOB},
+              #{unit,jdbcType=VARCHAR},#{simulated,jdbcType=NUMERIC},#{logged,jdbcType=NUMERIC},
+              #{valueDictionary,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},
+              #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR},
+              #{ruleIdsString, jdbcType=VARCHAR},
+              0
+                )
+    </insert>        
+    
+    
+                                                                 
+  </mapper>

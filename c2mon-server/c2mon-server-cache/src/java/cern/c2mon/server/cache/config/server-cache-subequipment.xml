@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+  
+  <bean id="subEquipmentEhcache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+    <property name="cacheManager" ref="cacheManager"/>
+    <property name="cacheName" value="subEquipmentCache"/>
+  </bean>
+  
+   <bean id="subEquipmentEhcacheLoader" class="cern.c2mon.server.cache.common.EhcacheLoaderImpl">
+    <constructor-arg ref="subEquipmentEhcache"/>
+    <constructor-arg ref="subEquipmentDAO"/>
+  </bean>
+  
+  <bean id="subEquipmentCacheLoader" class="cern.c2mon.server.cache.common.SimpleTimCacheLoader">
+    <constructor-arg ref="subEquipmentEhcache"/>
+    <constructor-arg ref="subEquipmentDAO"/>    
+  </bean>
+
+</beans>

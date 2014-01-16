@@ -16,22 +16,22 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.DataTagCache;
-import cern.tim.server.cache.DataTagFacade;
-import cern.tim.server.cache.EquipmentFacade;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.cache.loading.DataTagLoaderDAO;
-import cern.tim.server.common.datatag.DataTag;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
-import cern.tim.shared.client.configuration.ConfigConstants.Action;
-import cern.tim.shared.client.configuration.ConfigConstants.Entity;
-import cern.tim.shared.common.ConfigurationException;
-import cern.tim.shared.daq.config.Change;
-import cern.tim.shared.daq.config.DataTagAdd;
-import cern.tim.shared.daq.config.DataTagRemove;
-import cern.tim.shared.daq.config.DataTagUpdate;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.DataTagFacade;
+import cern.c2mon.server.cache.EquipmentFacade;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.config.Change;
+import cern.c2mon.shared.daq.config.DataTagAdd;
+import cern.c2mon.shared.daq.config.DataTagRemove;
+import cern.c2mon.shared.daq.config.DataTagUpdate;
 
 /**
  * Implementation of transacted methods.

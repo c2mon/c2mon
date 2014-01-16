@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Properties;
 
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * Bean managing configuration updates to C2MON SubEquipment.

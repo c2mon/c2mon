@@ -30,12 +30,12 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.DataTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.tim.server.cache.DataTagCache;
-import cern.tim.server.cache.EquipmentFacade;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.common.datatag.DataTag;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.EquipmentFacade;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * See interface documentation also.

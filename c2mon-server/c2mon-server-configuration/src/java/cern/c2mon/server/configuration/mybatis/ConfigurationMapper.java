@@ -21,7 +21,7 @@ package cern.c2mon.server.configuration.mybatis;
 import java.util.List;
 
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
-import cern.tim.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
 
 /**
  * Mybatis mapper for accessing configuration tables.

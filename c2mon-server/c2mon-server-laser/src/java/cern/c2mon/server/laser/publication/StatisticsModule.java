@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import cern.tim.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.Alarm;
 
 /** A Class which keep track on statistics for {@link Alarm} objects.
  *  

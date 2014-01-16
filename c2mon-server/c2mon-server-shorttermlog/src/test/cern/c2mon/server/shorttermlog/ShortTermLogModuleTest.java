@@ -17,12 +17,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.shorttermlog.listener.LogCommandListener;
 import cern.c2mon.server.shorttermlog.mapper.CommandTagLogMapper;
-import cern.tim.server.test.CacheObjectCreation;
-import cern.tim.shared.client.command.CommandExecutionStatus;
-import cern.tim.shared.client.command.CommandReport;
-import cern.tim.shared.client.command.CommandReportImpl;
-import cern.tim.shared.client.command.CommandTagLog;
-import cern.tim.shared.daq.command.CommandTag;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.client.command.CommandExecutionStatus;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandReportImpl;
+import cern.c2mon.shared.client.command.CommandTagLog;
+import cern.c2mon.shared.daq.command.CommandTag;
 
 /**
  * Tests the module works correctly, mocking all other

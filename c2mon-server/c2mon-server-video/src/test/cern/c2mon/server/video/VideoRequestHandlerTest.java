@@ -17,8 +17,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.shared.client.request.ServerRequestException;
 import cern.c2mon.shared.video.VideoConnectionProperties;
 import cern.c2mon.shared.video.VideoRequest;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

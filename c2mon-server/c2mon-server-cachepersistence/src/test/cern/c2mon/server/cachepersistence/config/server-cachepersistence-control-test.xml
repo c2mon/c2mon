@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+<!-- component scanning done in common xml file -->
+<import resource="classpath:cern/c2mon/server/cachepersistence/config/server-cachepersistence-common.xml"/>
+
+<!-- instantiate test helper bean-->
+
+<bean id="controlTagPersistenceDAO" class="cern.c2mon.server.cachepersistence.control.ControlTagPersistenceDAOImpl" autowire="constructor"/>
+
+<bean id="controlTagCache" class="cern.c2mon.server.cache.control.ControlTagCacheImpl" autowire="constructor"/>
+
+</beans>

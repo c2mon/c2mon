@@ -10,9 +10,9 @@
 		Use type aliases to avoid typing the full class name every time.
 	-->
 	<typeAlias alias="DataTagSTLog"
-		type="ch.cern.tim.server.log.bean.DataTagShortTermLog" />
+		type="cern.c2mon.server.log.bean.DataTagShortTermLog" />
 	<typeAlias alias="DataTagHistoryInput"
-		type="ch.cern.tim.server.log.bean.DataTagHistoryInput" />
+		type="cern.c2mon.server.log.bean.DataTagHistoryInput" />
 
 
 	<!--

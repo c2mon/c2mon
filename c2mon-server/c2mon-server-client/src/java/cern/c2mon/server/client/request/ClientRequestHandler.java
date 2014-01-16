@@ -33,22 +33,22 @@ import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.tag.TagConfig;
-import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.ProcessCache;
-import cern.tim.server.cache.ProcessXMLProvider;
-import cern.tim.server.cache.TagFacadeGateway;
-import cern.tim.server.cache.TagLocationService;
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.command.CommandExecutionManager;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.common.alarm.TagWithAlarms;
-import cern.tim.server.common.process.Process;
-import cern.tim.server.common.tag.Tag;
-import cern.tim.server.common.thread.Event;
-import cern.tim.server.supervision.SupervisionFacade;
-import cern.tim.shared.client.command.CommandExecuteRequest;
-import cern.tim.shared.client.command.CommandReport;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.ProcessXMLProvider;
+import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.command.CommandExecutionManager;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.common.thread.Event;
+import cern.c2mon.server.supervision.SupervisionFacade;
+import cern.c2mon.shared.client.command.CommandExecuteRequest;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 
@@ -297,7 +297,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
     while (iterator.hasNext()) {
 
-      cern.tim.server.common.process.Process o = processCache.get((Long) iterator.next());
+      cern.c2mon.server.common.process.Process o = processCache.get((Long) iterator.next());
       names.add(new ProcessNameResponseImpl(o.getName()));
     }
     return names;    

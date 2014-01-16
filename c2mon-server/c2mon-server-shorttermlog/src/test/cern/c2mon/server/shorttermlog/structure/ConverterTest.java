@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import org.apache.ibatis.migration.commands.NewCommand;
 import org.junit.Test;
 
-import cern.tim.server.common.datatag.DataTagCacheObject;
-import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
  * Unit test of DataTagShortTermLogConverter.

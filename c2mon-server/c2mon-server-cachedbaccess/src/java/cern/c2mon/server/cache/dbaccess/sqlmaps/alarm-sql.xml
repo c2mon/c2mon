@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+  
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.AlarmMapper">
+        
+    <resultMap id="alarmResultMap" type="Alarm">
+      <id property="id" column="ALARMID"/>
+      <result property="faultFamily" column="ALARMFFAMILY" jdbcType="VARCHAR"/>
+      <result property="faultMember" column="ALARMFMEMBER" jdbcType="VARCHAR"/>
+      <result property="faultCode" column="ALARMFCODE" jdbcType="NUMERIC"/>
+      <result property="state" column="ALARMSTATE" jdbcType="VARCHAR"/>
+      <result property="timestamp" column="ALARMTIME" jdbcType="TIMESTAMP"/>
+      <result property="published" column="ALA_PUBLISHED" jdbcType="NUMERIC"/>
+      <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>      
+      <result property="condition" column="ALARMCONDITION" javaType="AlarmCondition" jdbcType="VARCHAR"/>
+      <result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC"/>
+      <association property="lastPublication" javaType="LaserPublication">        
+        <result property="state" column="ALA_PUB_STATE" jdbcType="VARCHAR"/>
+        <result property="publicationTime" column="ALA_PUB_TIME" jdbcType="TIMESTAMP"/>
+        <result property="info" column="ALA_PUB_INFO" jdbcType="VARCHAR"/>              
+      </association>      
+    </resultMap>
+  
+    <!-- getAll needed for persistent caches -->
+    <select id="getAll" resultMap="alarmResultMap">
+     SELECT alarmid, alarm_tagid, alarmffamily, 
+            alarmfmember, alarmfcode, alarmcondition, 
+            alarmstate, alarmtime, ala_published, alarminfo,
+            ala_pub_state, ala_pub_time, ala_pub_info
+       FROM alarm
+    </select>
+    
+    <select id="getRowBatch" resultMap="alarmResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch">
+     SELECT alarmid, alarm_tagid, alarmffamily, 
+            alarmfmember, alarmfcode, alarmcondition, 
+            alarmstate, alarmtime, ala_published, alarminfo,
+            ala_pub_state, ala_pub_time, ala_pub_info
+       FROM alarm
+    WHERE alarmid <![CDATA[ >= ]]> #{firstId}
+      AND alarmid <![CDATA[ <= ]]> #{lastId}
+    </select>
+    
+    <!-- getItem needed for persistence caches -->
+    <select id="getItem" resultMap="alarmResultMap" parameterType="Long">
+       SELECT alarmid, alarm_tagid, alarmffamily,
+              alarmfmember, alarmfcode, alarmcondition, 
+              alarmstate, alarmtime, ala_published, alarminfo,
+              ala_pub_state, ala_pub_time, ala_pub_info
+         FROM alarm 
+        WHERE alarmid = #{id}                
+    </select>
+    
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM alarm
+       WHERE alarmid = #{id}
+    </select>
+    
+    <update id="updateCacheable" parameterType="Alarm">
+      UPDATE ALARM
+         SET ALARMSTATE = #{state,jdbcType=VARCHAR},
+             ALARMTIME = #{timestamp,jdbcType=TIMESTAMP},
+             ALA_PUBLISHED = #{published,jdbcType=NUMERIC},
+             ALARMINFO = #{info,jdbcType=VARCHAR},
+             ALA_PUB_STATE = #{lastPublication.state,jdbcType=VARCHAR},
+             ALA_PUB_TIME = #{lastPublication.publicationTime,jdbcType=TIMESTAMP},
+             ALA_PUB_INFO = #{lastPublication.info,jdbcType=VARCHAR}                                     
+       WHERE ALARMID = #{id} 
+    </update>
+    
+    <update id="updateConfig" parameterType="Alarm">
+      UPDATE ALARM
+         SET ALARMFFAMILY = #{faultFamily},
+             ALARMFMEMBER = #{faultMember},
+             ALARMFCODE = #{faultCode},
+             ALARMCONDITION = #{condition,javaType=AlarmCondition,jdbcType=VARCHAR}                           
+       WHERE ALARMID = #{id}
+    </update>
+    
+    <!-- must specify jdbcType for parameters that can be null in DB  -->
+    <insert id="insertAlarm" parameterType="Alarm">
+      INSERT INTO ALARM (ALARMID, ALARMFFAMILY, ALARMFMEMBER, ALARMFCODE,
+                         ALARMSTATE, ALARMTIME, ALA_PUBLISHED, ALARMINFO,
+                         ALARMCONDITION, ALARM_TAGID, 
+                         ALA_PUB_STATE, ALA_PUB_TIME, ALA_PUB_INFO                         
+                )
+      VALUES (#{id},#{faultFamily},#{faultMember},#{faultCode},
+              #{state,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, #{published,jdbcType=NUMERIC}, #{info,jdbcType=VARCHAR},
+              #{condition,javaType=AlarmCondition,jdbcType=VARCHAR},              
+              #{dataTagId,jdbcType=NUMERIC},
+              #{lastPublication.state,jdbcType=VARCHAR}, #{lastPublication.publicationTime,jdbcType=TIMESTAMP}, #{lastPublication.info,jdbcType=VARCHAR}
+             )
+    </insert>        
+    
+    <select id="getNumberItems" resultType="Integer">
+      SELECT COUNT(DISTINCT ALARMID)
+        FROM ALARM       
+    </select>
+    
+    <delete id="deleteAlarm" parameterType="Long">
+      delete from ALARM where ALARMID = #{id}
+    </delete>
+    
+    <select id="getMaxId" resultType="Long">
+      SELECT MAX(ALARMID)
+        FROM ALARM       
+    </select>
+    
+    <select id="getMinId" resultType="Long">
+      SELECT MIN(ALARMID)
+        FROM ALARM       
+    </select>
+    
+  </mapper>

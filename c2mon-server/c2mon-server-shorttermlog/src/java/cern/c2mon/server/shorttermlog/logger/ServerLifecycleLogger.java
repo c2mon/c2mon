@@ -13,7 +13,7 @@ import org.springframework.context.SmartLifecycle;
 import cern.c2mon.shared.client.lifecycle.LifecycleEventType;
 import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
 import cern.c2mon.shared.client.lifecycle.ServerLifecycleMapper;
-import cern.tim.server.common.config.ServerConstants;
+import cern.c2mon.server.common.config.ServerConstants;
 
 /**
  * Bean listening for server stops/starts and logging

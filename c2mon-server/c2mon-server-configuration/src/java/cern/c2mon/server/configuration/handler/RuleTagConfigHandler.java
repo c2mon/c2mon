@@ -21,9 +21,9 @@ package cern.c2mon.server.configuration.handler;
 import java.util.Properties;
 
 import cern.c2mon.server.configuration.handler.impl.TagConfigHandler;
-import cern.tim.server.common.rule.RuleTag;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * Bean managing configuration updates to C2MON RuleTags.

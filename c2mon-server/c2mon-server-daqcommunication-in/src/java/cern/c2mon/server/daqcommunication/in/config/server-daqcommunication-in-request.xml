@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <!-- contains beans for requests to DAQ layer; JMS container lifecycle is managed directly by Spring -->
+  		
+  	<!-- (Backward Compatibility for disconnection) Remove -->
+    <bean id="processRequestConverterBC" class="cern.c2mon.shared.daq.process.backward.ProcessRequestConverterBC" init-method="init"/>
+    
+	<bean id="requestDestination" class="org.apache.activemq.command.ActiveMQQueue">
+	 <constructor-arg index="0" value="${jms.process.requestQueue}"/>
+	</bean>
+		
+	<bean id="requestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+	    <!-- include exception listener here? -->    
+	    <property name="connectionFactory" ref="daqInConnectionFactory"/>
+	    <property name="destination" ref="requestDestination"/>
+	    <property name="messageListener" ref="processRequestHandler" />
+	    <property name="concurrentConsumers" value="${jms.request.consumers.initial}"/>
+	    <property name="maxConcurrentConsumers" value="${jms.request.consumers.max}"/>	    
+	    <property name="sessionTransacted" value="${jms.request.transacted}"/>
+      <property name="autoStartup" value="false"/>	
+      <property name="phase">
+        <bean class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" >
+          <property name="targetClass">
+             <value>cern.c2mon.server.common.config.ServerConstants</value>
+          </property>
+          <property name="targetField">
+             <value>PHASE_START_LAST</value>
+          </property>
+        </bean>      
+      </property>      
+      <property name="beanName" value="Process request JMS container"/>
+  </bean>
+  
+  
+</beans>

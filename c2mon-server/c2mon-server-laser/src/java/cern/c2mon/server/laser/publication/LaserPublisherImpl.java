@@ -23,15 +23,15 @@ import cern.laser.source.alarmsysteminterface.ASIException;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterface;
 import cern.laser.source.alarmsysteminterface.AlarmSystemInterfaceFactory;
 import cern.laser.source.alarmsysteminterface.FaultState;
-import cern.tim.server.cache.AlarmCache;
-import cern.tim.server.cache.CacheRegistrationService;
-import cern.tim.server.cache.ClusterCache;
-import cern.tim.server.cache.C2monCacheListener;
-import cern.tim.server.cachepersistence.common.BatchPersistenceManager;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.common.alarm.AlarmCacheObject.AlarmChangeState;
-import cern.tim.server.common.component.Lifecycle;
-import cern.tim.server.common.config.ServerConstants;
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.CacheRegistrationService;
+import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.C2monCacheListener;
+import cern.c2mon.server.cachepersistence.common.BatchPersistenceManager;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject.AlarmChangeState;
+import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.config.ServerConstants;
 
 /**
  * Bean responsible for submitting C2MON alarms to LASER.

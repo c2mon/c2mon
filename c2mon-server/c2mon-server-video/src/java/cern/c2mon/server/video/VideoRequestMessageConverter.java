@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.springframework.jms.support.converter.MessageConversionException;
 
 import cern.c2mon.shared.video.VideoRequest;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;

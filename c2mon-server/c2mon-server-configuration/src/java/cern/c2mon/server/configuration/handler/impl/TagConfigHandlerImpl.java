@@ -19,7 +19,7 @@
 package cern.c2mon.server.configuration.handler.impl;
 
 import cern.c2mon.server.configuration.handler.transacted.TagConfigTransacted;
-import cern.tim.server.common.tag.Tag;
+import cern.c2mon.server.common.tag.Tag;
 
 /**
  * Public methods in this class should perform the complete

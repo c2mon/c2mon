@@ -28,13 +28,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.tim.server.alarm.AlarmAggregator;
-import cern.tim.server.common.alarm.Alarm;
-import cern.tim.server.common.datatag.DataTag;
-import cern.tim.server.common.tag.Tag;
-import cern.tim.server.test.CacheObjectCreation;
-import cern.tim.server.test.broker.TestBrokerService;
-import cern.tim.util.jms.JmsSender;
+import cern.c2mon.server.alarm.AlarmAggregator;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.server.test.broker.TestBrokerService;
+import cern.c2mon.shared.util.jms.JmsSender;
 
 /**
  * Integration test of TagValuePublisher with broker.

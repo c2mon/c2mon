@@ -1,6 +1,6 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.tim.server.common.tag.Tag;
+import cern.c2mon.server.common.tag.Tag;
 
 /**
  * Common interface of the ConfigHandlers that

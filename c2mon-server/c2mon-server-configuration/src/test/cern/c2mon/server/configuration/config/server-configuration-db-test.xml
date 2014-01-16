@@ -5,6 +5,6 @@
 
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-mybatis.xml"/>
   <import resource="classpath:cern/c2mon/server/configuration/config/server-configuration-oracle.xml"/>
-  <import resource="classpath:cern/tim/server/test/server-test-properties.xml"/>
+  <import resource="classpath:cern.c2mon/server/test/server-test-properties.xml"/>
 
 </beans>

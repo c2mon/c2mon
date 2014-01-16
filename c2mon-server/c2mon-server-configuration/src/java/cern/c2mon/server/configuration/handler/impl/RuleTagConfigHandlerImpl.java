@@ -27,11 +27,11 @@ import org.springframework.transaction.UnexpectedRollbackException;
 
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.RuleTagConfigTransacted;
-import cern.tim.server.cache.RuleTagCache;
-import cern.tim.server.common.rule.RuleTag;
-import cern.tim.server.rule.RuleEvaluator;
-import cern.tim.shared.client.configuration.ConfigurationElement;
-import cern.tim.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.rule.RuleEvaluator;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * See interface documentation.

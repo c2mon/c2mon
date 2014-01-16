@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+  
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.AliveTimerMapper">
+    
+    <resultMap id="aliveTimerResultMap" type="cern.c2mon.server.common.alive.AliveTimerCacheObject">
+      <constructor>
+        <idArg column="alive_aliveid" javaType="Long"/>
+        <arg column="alive_relatedid" javaType="Long"/>
+        <arg column="alive_relatedname" javaType="String"/>
+        <arg column="alive_relatedstatetag" javaType="Long"/>               
+        <arg column="alive_alivetype" javaType="String"/>
+        <arg column="alive_aliveinterval" javaType="Integer"/>                      
+      </constructor>           
+      <collection property="dependentAliveTimerIds" ofType="Long" javaType="ArrayList" resultMap="dependentAliveTimersResultMap"/> 
+    </resultMap>        
+
+    <resultMap id="dependentAliveTimersResultMap" type="Long">
+      <id column="dependent_aliveid"/>
+    </resultMap>  
+    
+    <!-- getAll needed for persistent caches -->
+    <select id="getAll" resultMap="aliveTimerResultMap">
+      SELECT T1.ALIVEID as alive_aliveid, T1.ALIVETYPE as alive_alivetype, T1.ALIVEINTERVAL as alive_aliveinterval,
+             T1.RELATEDID as alive_relatedid, T1.RELATEDNAME as alive_relatedname, T1.RELATEDSTATETAG as alive_relatedstatetag,
+             T1.PARENTALIVEID as alive_parentaliveid, T2.ALIVEID as dependent_aliveid
+        FROM ALIVETIMER T1 LEFT OUTER JOIN ALIVETIMER T2
+          ON T1.ALIVEID = T2.PARENTALIVEID
+    </select>
+    
+    <!-- getItem needed for persistence caches -->
+    <select id="getItem" resultMap="aliveTimerResultMap" parameterType="Long">
+      SELECT T1.ALIVEID as alive_aliveid, T1.ALIVETYPE as alive_alivetype, T1.ALIVEINTERVAL as alive_aliveinterval,
+             T1.RELATEDID as alive_relatedid, T1.RELATEDNAME as alive_relatedname, T1.RELATEDSTATETAG as alive_relatedstatetag,
+             T1.PARENTALIVEID as alive_parentaliveid, T2.ALIVEID as dependent_aliveid
+        FROM ALIVETIMER T1 LEFT OUTER JOIN ALIVETIMER T2
+          ON T1.ALIVEID = T2.PARENTALIVEID
+       WHERE T1.ALIVEID = #{id}
+    </select>
+    
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM alivetimer
+       WHERE aliveid = #{id}
+    </select>
+    
+            
+  </mapper>

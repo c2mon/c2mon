@@ -1,7 +1,7 @@
 package cern.c2mon.server.configuration.handler.impl;
 
-import cern.tim.server.cache.exception.CacheElementNotFoundException;
-import cern.tim.server.common.tag.Tag;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.tag.Tag;
 
 /**
  * Common interface of the ConfigHandlers that

@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
-import cern.tim.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 
 public class EntityTypeHandler implements TypeHandler {
 
