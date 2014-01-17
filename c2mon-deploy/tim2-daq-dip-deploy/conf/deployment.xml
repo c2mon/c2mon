@@ -19,7 +19,7 @@
         <env name="LD_LIBRARY_PATH" value="$INSTALL_DIR/lib_so"/>
       
         <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
+          <arg>-c2monProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
         </main-class>
         <initial-heap-size>256m</initial-heap-size>
         <max-heap-size>256m</max-heap-size>
@@ -55,7 +55,7 @@
       </deployment>
       <startscript name="TIM2-DAQ-STARTUP">
         <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
+          <arg>-c2monProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
         </main-class>
         <property name="c2mon.daq.spring.context" value="classpath:resources/daq-core-service-double.xml" />
       </startscript>
@@ -73,7 +73,7 @@
       </deployment>
       <startscript name="TIM2-DAQ-STARTUP">
         <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-          <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
+          <arg>-c2monProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} ${ADDITIONAL_PARAMS}</arg>
         </main-class>
         <property name="c2mon.daq.spring.context" value="classpath:resources/daq-core-service-double.xml" />
       </startscript>
