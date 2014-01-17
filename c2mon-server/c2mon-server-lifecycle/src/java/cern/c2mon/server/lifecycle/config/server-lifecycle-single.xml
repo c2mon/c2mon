@@ -8,6 +8,6 @@
   <import resource="classpath:cern/c2mon/server/lifecycle/config/server-lifecycle-common.xml"/>
    
   <!-- import JMX configuration -->
-<!--  <import resource="classpath:cern.c2mon/server/lifecycle/config/server-lifecycle-jmx-single.xml"/>-->
+<!--  <import resource="classpath:cern/c2mon/server/lifecycle/config/server-lifecycle-jmx-single.xml"/>-->
  
 </beans>
