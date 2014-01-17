@@ -6,13 +6,13 @@
 	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
   
   <!-- for inserting test data -->
-  <import resource="classpath:cern.c2mon/server/test/server-test-data.xml"/>
+  <import resource="classpath:cern/c2mon/server/test/server-test-data.xml"/>
   
   <!-- requires all DB and cache modules for component testing of the configuration module -->  
-  <import resource="classpath:cern.c2mon/server/cache/config/server-cache-single-server.xml"/>
-  <import resource="classpath:cern.c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>   
-  <import resource="classpath:cern.c2mon/server/cache/loading/config/server-cacheloading.xml"/>
-  <import resource="classpath:cern.c2mon/server/rule/config/server-rule.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-single-server.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-common.xml"/>   
+  <import resource="classpath:cern/c2mon/server/cache/loading/config/server-cacheloading.xml"/>
+  <import resource="classpath:cern/c2mon/server/rule/config/server-rule.xml"/>
   
   <!-- mock the communication bean; needs to be before the configloader class -->
   <bean id="processCommunicationManager" class="org.easymock.EasyMock" factory-method="createStrictMock">
