@@ -52,11 +52,6 @@
 			<artifactId>activemq-all</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.espertech</groupId>
 			<artifactId>esper</artifactId>
 		</dependency>
