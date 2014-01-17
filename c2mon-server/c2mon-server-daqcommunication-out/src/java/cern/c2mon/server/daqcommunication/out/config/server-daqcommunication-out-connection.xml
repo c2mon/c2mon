@@ -6,7 +6,7 @@
 	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
   
   <!-- XML parser for the ProcessCommunicationManager -->
-  <bean id="processCommunicationXMLParser" class="cern.c2mon.util.parser.SimpleXMLParser"/>
+  <bean id="processCommunicationXMLParser" class="cern.c2mon.shared.util.parser.SimpleXMLParser"/>
   
   <bean id="daqOutActiveMQConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
     <property name="brokerURL" value="${jms.broker.url}"/>
