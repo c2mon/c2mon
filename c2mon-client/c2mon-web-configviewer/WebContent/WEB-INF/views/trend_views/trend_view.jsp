@@ -8,6 +8,8 @@
    <title>TrendViewer</title>
 	<script type="text/javascript" src="/c2mon-web-configviewer/js/dygraph-combined.js"></script>
 	
+	<link rel="shortcut icon" href="/c2mon-web-configviewer/img/chart_icon.png">
+	
 	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap.css" />
 	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap-responsive.css" />
 

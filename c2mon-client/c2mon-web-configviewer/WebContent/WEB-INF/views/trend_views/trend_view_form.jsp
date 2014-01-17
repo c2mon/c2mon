@@ -4,6 +4,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9; IE=EmulateIE10"> 
 <title>${title}</title>
 
+<link rel="shortcut icon" href="/c2mon-web-configviewer/img/chart_icon.png">
+
 <link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap.css" />
 <link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap-responsive.css" />
 <link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/datepicker.css" >
