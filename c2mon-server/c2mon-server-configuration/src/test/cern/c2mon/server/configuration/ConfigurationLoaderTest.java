@@ -307,7 +307,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     details.setRbacDevice("RBAC device");
     details.setRbacProperty("RBAC property");
     expectedObject.setAuthorizationDetails(details);
-    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));   
+    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));   
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObject);
    
     //test update
@@ -320,7 +320,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setName("Test CommandTag Updated");
     expectedObject.getAuthorizationDetails().setRbacClass("new RBAC class");
     expectedObject.getAuthorizationDetails().setRbacDevice("new RBAC device");
-    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>"));
+    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>"));
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObjectUpdated);
   }
   

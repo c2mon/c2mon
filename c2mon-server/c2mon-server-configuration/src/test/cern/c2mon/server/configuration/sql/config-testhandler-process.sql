@@ -97,6 +97,6 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'eq
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'rbacClass','RBAC class');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'rbacDevice','RBAC device');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'rbacProperty','RBAC property');
-insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'hardwareAddress','<HardwareAddress class="cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (1000008,'hardwareAddress','<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>');
 
 

@@ -28,7 +28,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (1,'minValue
 insert into timconfigval (seqid, elementfield, elementvalue) values (1,'maxValue','23.3');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1,'address',
         '<DataTagAddress>
-          <HardwareAddress class="cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl">
+          <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
            <opc-item-name>CW_TEMP_IN_COND3</opc-item-name>         
           </HardwareAddress>        
         </DataTagAddress>');
@@ -69,7 +69,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (3,'equipmen
 insert into timconfigval (seqid, elementfield, elementvalue) values (3,'rbacClass','RBAC class');
 insert into timconfigval (seqid, elementfield, elementvalue) values (3,'rbacDevice','RBAC device');
 insert into timconfigval (seqid, elementfield, elementvalue) values (3,'rbacProperty','RBAC property');
-insert into timconfigval (seqid, elementfield, elementvalue) values (3,'hardwareAddress','<HardwareAddress class="cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (3,'hardwareAddress','<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>');
 
 -- insert configuration for updating a datatag
 
@@ -85,7 +85,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (4,'dipAddre
 insert into timconfigval (seqid, elementfield, elementvalue) values (4,'maxValue','26');
 insert into timconfigval (seqid, elementfield, elementvalue) values (4,'address',
         '<DataTagAddress>
-          <HardwareAddress class="cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl">
+          <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
            <opc-item-name>CW_TEMP_IN_COND4</opc-item-name>         
           </HardwareAddress>        
         </DataTagAddress>');
@@ -101,7 +101,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (5,'name','T
 insert into timconfigval (seqid, elementfield, elementvalue) values (5,'rbacClass','new RBAC class');
 insert into timconfigval (seqid, elementfield, elementvalue) values (5,'rbacDevice','new RBAC device');
 -- updated command pulse length 100->150 in address
-insert into timconfigval (seqid, elementfield, elementvalue) values (5,'hardwareAddress','<HardwareAddress class="cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (5,'hardwareAddress','<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>');
 
 -- control tag update
 
@@ -203,7 +203,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (25,'dataTyp
 insert into timconfigval (seqid, elementfield, elementvalue) values (25,'mode','2');
 insert into timconfigval (seqid, elementfield, elementvalue) values (25,'isLogged','false');
 insert into timconfigval (seqid, elementfield, elementvalue) values (25,'address',
-        '<DataTagAddress><HardwareAddress class="cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>CW_TEMP_IN_COND4</opc-item-name></HardwareAddress></DataTagAddress>');
+        '<DataTagAddress><HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl"><opc-item-name>CW_TEMP_IN_COND4</opc-item-name></HardwareAddress></DataTagAddress>');
 
 insert into timconfigval (seqid, elementfield, elementvalue) values (25,'minValue','12');
 insert into timconfigval (seqid, elementfield, elementvalue) values (25,'maxValue','22');

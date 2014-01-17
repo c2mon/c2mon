@@ -61,7 +61,7 @@ public class ConfigurationMapperTest {
     assertEquals("2", elementFirst.getElementProperties().get("mode"));
     assertEquals("false", elementFirst.getElementProperties().get("isLogged"));
     assertEquals("<DataTagAddress>"
-                  + "<HardwareAddress class=\"cern.c2mon.shared.datatag.address.impl.OPCHardwareAddressImpl\">"
+                  + "<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\">"
                   + "<opc-item-name>CW_TEMP_IN_COND4</opc-item-name>"
                   + "</HardwareAddress>"
                   + "</DataTagAddress>"
