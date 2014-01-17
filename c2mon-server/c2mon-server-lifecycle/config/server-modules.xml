@@ -9,10 +9,10 @@
   
   <!-- Import a single XML configuration for each (optional) server module (the order is of no importance) -->
   <!-- If required, the file can be located in the server configuration directory (so not in the classpath) -->
-  <import resource="classpath:cern.c2mon/server/rule/config/server-rule.xml"/>
-  <import resource="classpath:cern.c2mon/server/cachepersistence/config/server-cachepersistence.xml"/>
-  <import resource="classpath:cern.c2mon/server/command/config/server-command.xml"/>
-  <import resource="classpath:cern.c2mon/server/benchmark/config/server-benchmark.xml"/>
+  <import resource="classpath:cern/c2mon/server/rule/config/server-rule.xml"/>
+  <import resource="classpath:cern/c2mon/server/cachepersistence/config/server-cachepersistence.xml"/>
+  <import resource="classpath:cern/c2mon/server/command/config/server-command.xml"/>
+  <import resource="classpath:cern/c2mon/server/benchmark/config/server-benchmark.xml"/>
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog.xml"/>
   
 
