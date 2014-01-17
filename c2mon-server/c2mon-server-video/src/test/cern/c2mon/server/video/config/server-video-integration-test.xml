@@ -8,7 +8,7 @@
   <!-- integration test of client module -->
   
   <!-- start server core in test mode -->
-  <import resource="classpath:cern.c2mon/server/test/core/config/server-core-test.xml"/>
+  <import resource="classpath:cern/c2mon/server/test/core/config/server-core-test.xml"/>
   
   <!-- start module -->
   <import resource="classpath:cern/c2mon/server/video/config/server-video.xml"/>
