@@ -14,7 +14,7 @@
   <import resource="file:${c2mon.home}/conf/c2mon-datasource.xml"/>
   
   <!-- import server properties -->
-  <import resource="classpath:cern.c2mon/server/lifecycle/config/server-lifecycle-properties.xml"/>
+  <import resource="classpath:cern/c2mon/server/lifecycle/config/server-lifecycle-properties.xml"/>
   
   <bean id="lifecycleProcessor" class="org.springframework.context.support.DefaultLifecycleProcessor">
     <!-- timeout value in milliseconds -->
