@@ -104,8 +104,9 @@
     				"<c:out value="${label}"/>",
 					</c:if>
 				</c:forEach>
-      x: "<c:out value="${invalidPoint}"/>",
+      x: "<c:out value="${invalidPoint.time}"/>",
       shortText: "?",
+      text: "<c:out value="${invalidPoint.invalidationReason}"/>",
       cssClass: 'invalidPoint'
     }
     	<c:if test="${ totalInvalidPoints !=  invalidPointCounter.count }">

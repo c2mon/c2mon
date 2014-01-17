@@ -24,6 +24,7 @@ import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
 import cern.c2mon.web.configviewer.service.HistoryService;
 import cern.c2mon.web.configviewer.service.TagService;
 import cern.c2mon.web.configviewer.util.FormUtility;
+import cern.c2mon.web.configviewer.util.InvalidPoint;
 
 
 /**
@@ -117,7 +118,7 @@ public class TrendViewController {
           historyService.requestHistoryData(id, lastRecords);
       
       final boolean isBooleanData = historyService.isBooleanData(historyValues);
-      final Collection<String> invalidPoints = historyService.getInvalidPoints(historyValues);
+      final Collection<InvalidPoint> invalidPoints = historyService.getInvalidPoints(historyValues);
       final ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
       
       model = getDefaultModel(model, tagValue);
@@ -160,7 +161,7 @@ public class TrendViewController {
           historyService.requestHistoryDataForLastDays(id, days);
       
       final boolean isBooleanData = historyService.isBooleanData(historyValues);
-      final Collection<String> invalidPoints = historyService.getInvalidPoints(historyValues);
+      final Collection<InvalidPoint> invalidPoints = historyService.getInvalidPoints(historyValues);
       final ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
       
       model.addAttribute("CSV", historyService.getHistoryCSV(historyValues, isBooleanData));
@@ -201,7 +202,7 @@ public class TrendViewController {
         historyService.requestHistoryData(id, records);
 
     final boolean isBooleanData = historyService.isBooleanData(historyValues);
-    final Collection<String> invalidPoints = historyService.getInvalidPoints(historyValues);
+    final Collection<InvalidPoint> invalidPoints = historyService.getInvalidPoints(historyValues);
     final ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
     final String historyCSV = historyService.getHistoryCSV(historyValues, isBooleanData);
     
@@ -244,7 +245,7 @@ public class TrendViewController {
             , stringToTimestamp(end));
     
     final boolean isBooleanData = historyService.isBooleanData(historyValues);
-    final Collection<String> invalidPoints = historyService.getInvalidPoints(historyValues);
+    final Collection<InvalidPoint> invalidPoints = historyService.getInvalidPoints(historyValues);
     final ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
     final String historyCSV = historyService.getHistoryCSV(historyValues, isBooleanData);
     

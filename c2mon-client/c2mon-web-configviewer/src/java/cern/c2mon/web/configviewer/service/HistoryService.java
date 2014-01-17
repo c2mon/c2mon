@@ -21,6 +21,7 @@ import cern.c2mon.client.ext.history.common.HistoryTagValueUpdate;
 import cern.c2mon.client.ext.history.common.exception.HistoryProviderException;
 import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
+import cern.c2mon.web.configviewer.util.InvalidPoint;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
 
 /**
@@ -349,16 +350,20 @@ public class HistoryService {
    * 
    * @param historyValues A list of history points.
    */
-  public Collection<String> getInvalidPoints(final List<HistoryTagValueUpdate> historyValues) {
+  public Collection<InvalidPoint> getInvalidPoints(final List<HistoryTagValueUpdate> historyValues) {
     
-    final Collection<String> invalidPoints = new ArrayList<String>();
+    final Collection<InvalidPoint> invalidPoints = new ArrayList<InvalidPoint>();
     
     final Iterator<HistoryTagValueUpdate> i = historyValues.iterator();
     
     while (i.hasNext()) {
       final HistoryTagValueUpdate h = i.next();
       if (!h.getDataTagQuality().isValid()) {
-        invalidPoints.add(formatToDygraphCompatibleDate(h.getServerTimestamp()));
+        
+        final String time = formatToDygraphCompatibleDate(h.getServerTimestamp());
+        final String invalidationReason = h.getDataTagQuality().getDescription();
+        
+        invalidPoints.add( new InvalidPoint(time, invalidationReason));
       }
     }
     return invalidPoints;
