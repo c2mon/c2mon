@@ -7,6 +7,7 @@ use DBD::Oracle;
 use File::Path;
 use Cwd 'abs_path';
 
+
 ##
 # Verification if this is the current running instance of the script
 ##
@@ -174,11 +175,10 @@ sub fetchEquipmentAlives {
 	my $equipment_type = $_[2];
 
 	my $fetch_equipments_sql = <<END;
-select EQUIPMENT_ALIVE_TAG_ID from DMN_EQUIPMENT_V where equipment_alive_tag_id is not null and process_id=
+select EQUIPMENT_ALIVE_TAG_ID from DMN_EQUIPMENT_V where equipment_alive_tag_id is not null and process_id= ?
 END
-
-	my $sth = $dbh->prepare("${fetch_equipments_sql} ${process_id}")
-	  || die "Couldn't prepare statement: " . $dbh->errstr;
+	my $sth = $dbh->prepare("${fetch_equipments_sql}");
+       $sth->bind_param(1,"${process_id}")	  || die "Couldn't prepare statement: " . $dbh->errstr;
 	my @data;
 	$sth->execute()
 	  || die "Couldn't execute statement: " . $sth->errstr;
@@ -211,11 +211,10 @@ sub fetchTags {
 	my $equipment_type = $_[2];
 
 	my $fetch_tags_sql = <<END;
-select metric_data_tag_id from DMN_METRICS_V m, DMN_EQUIPMENT_V e where e.equipment_id=m.equipment_id and m.metric_data_tag_id is not null and m.metric_control_flag='N' and e.process_id=
+select metric_data_tag_id from DMN_METR_DATATAG_ACTIVE_PROC_V where process_id= ?
 END
-
-	my $sth = $dbh->prepare("${fetch_tags_sql} ${process_id}")
-	  || die "Couldn't prepare statement: " . $dbh->errstr;
+	my $sth = $dbh->prepare("${fetch_tags_sql}");
+    $sth->bind_param(1,"${process_id}")	  || die "Couldn't prepare statement: " . $dbh->errstr;
 	my @data;
 	$sth->execute()
 	  || die "Couldn't execute statement: " . $sth->errstr;
@@ -247,10 +246,10 @@ sub fetchLimits {
 	my $equipment_type = $_[2];
 
 	my $fetch_tags_sql = <<END;
-select metric_rule_tag_id from DMN_METRICS_V m, DMN_EQUIPMENT_V e where e.equipment_id=m.equipment_id and m.metric_rule_tag_id is not null and limit_flag='Y' and e.process_id=
+select metric_rule_tag_id from DMN_METR_RULETAG_ACTIVE_PROC_V where process_id= ?
 END
-
-	my $sth = $dbh->prepare("${fetch_tags_sql} ${process_id}")
+	my $sth = $dbh->prepare("${fetch_tags_sql}");
+    $sth->bind_param(1,"${process_id}")
 	  || die "Couldn't prepare statement: " . $dbh->errstr;
 	my @data;
 	$sth->execute()
@@ -279,7 +278,7 @@ sub fetchEntities {
 	my $entity_type = $_[0];
 
 	my $fetch_entities_sql = <<END;
-select EQUIPMENT_RULE_TAG_ID from DMN_EQUIPMENT_V where RULE_FLAG = 'Y'  
+select EQUIPMENT_RULE_TAG_ID from DMN_EQUIPMENT_RULETAG_V where RULE_FLAG = 'Y'
 END
 
 	my $sth = $dbh->prepare("${fetch_entities_sql}")
@@ -309,7 +308,7 @@ sub fetchPublishedTags {
 
 
         my $fetch_tags_sql = <<END;
-select metric_data_tag_id from dmn_metrics_v where japc_metric_pub_flag='Y'
+select metric_data_tag_id from dmn_rda_pub_metric_datatag_v
 END
 
         my $sth = $dbh->prepare("${fetch_tags_sql}")
@@ -342,7 +341,7 @@ sub fetchPublishedLimits {
 
 
         my $fetch_tags_sql = <<END;
-select metric_rule_tag_id as metric_data_tag_id from dmn_metrics_v where japc_limit_pub_flag='Y'
+select metric_rule_tag_id as metric_data_tag_id from dmn_rda_pub_metric_ruletag_v
 END
 
         my $sth = $dbh->prepare("${fetch_tags_sql}")
