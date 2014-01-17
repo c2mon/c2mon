@@ -127,8 +127,9 @@ public class TrendViewController {
       model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
 
       model.addAttribute("records", lastRecords);
-      model.addAttribute("view_title", tagValue.getName() + "(Last " 
-          + lastRecords + " records)");
+      model.addAttribute("view_title", tagValue.getName());
+      model.addAttribute("view_description", "(Last " + lastRecords + " records)");
+
       
       return "trend_views/trend_view";
       
@@ -175,7 +176,8 @@ public class TrendViewController {
       model.addAttribute("unit", tagValue.getUnit());
       model.addAttribute("fill_graph", true);
       
-      model.addAttribute("view_title", tagValue.getName() + "(Last " + days + " days)");
+      model.addAttribute("view_title", tagValue.getName());
+      model.addAttribute("view_description", "(Last " + days + " days)");
       
       return "trend_views/trend_view";
       
@@ -210,8 +212,8 @@ public class TrendViewController {
     model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
 
     model.addAttribute("records", records);
-    model.addAttribute("view_title", tagValue.getName() 
-        + " (Last " + RECORDS_TO_ASK_FOR + " records)");
+    model.addAttribute("view_title", tagValue.getName());
+    model.addAttribute("view_description", "(Last " + records + " records)");
     
     return model;
   }
@@ -251,8 +253,8 @@ public class TrendViewController {
     model.addAttribute("CSV", historyCSV);
     model.addAttribute("invalidPoints", invalidPoints);
     model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
-    model.addAttribute("view_title", tagValue.getName() 
-        + " (From " + start + " to " + end + ")");
+    model.addAttribute("view_title", tagValue.getName());
+    model.addAttribute("view_description", " (From " + start + " to " + end + ")");
     
     return model;
   }
@@ -336,7 +338,10 @@ public class TrendViewController {
     if (id == null) {
       model.addAllAttributes(FormUtility.getFormModel(TREND_FORM_TITLE, INSTRUCTION,
           TREND_VIEW_FORM_URL, null, null));
+      // Displays an empty form -> 
+      return "trend_views/trend_view_form";
     }
+      
     else if (days != null) {
       return ("redirect:" + TREND_VIEW_URL + id + LAST_DAYS_URL + days);
     }
@@ -354,8 +359,10 @@ public class TrendViewController {
   }
 
   /**
-   * @return Converts a string 
-   * (it should represent a Date in the following format: {@link TrendViewController#DATE_FORMAT})
+   * @return Converts a string to Timestamp
+   * 
+   * @param dateString
+   * should represent a Date in the following format: {@link TrendViewController#DATE_FORMAT}
    * 
    * @throws ParseException in case of wrong Date Format
    */
