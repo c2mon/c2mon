@@ -8,12 +8,16 @@
    <title>TrendViewer</title>
 	<script type="text/javascript" src="/c2mon-web-configviewer/js/dygraph-combined.js"></script>
 	
+	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap.css" />
+	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap-responsive.css" />
+
 	<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
-	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
+	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"/>
+	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"/>
 </head>
 
 <body>
+
 
 <style media="screen" type="text/css">
 .invalidPoint {
@@ -21,11 +25,18 @@
 }
 </style>
 
-		<div id="title" style="width:1000px; height:30px;">
-			<h2 style="width:100%;text-align:center;">${view_title}</h2>
-		</div>
 
-		<p style="width:1000px; height:50px;" class="links">
+    <div class="container-fluid">
+      <div class="row-fluid">
+	  
+          <div class="page-header">
+			<h2 style="margin-left:50px;display:inline; text-align:center;">${view_title}</h2>
+			<div style="margin-left:50px;">
+				${view_description}
+			</div>
+          </div>
+		  
+		<p style="margin-left:50px;width:900px; height:30px;" class="links">
 			<A href="/c2mon-web-configviewer/historyviewer/${id}/" 
 				class="large blue awesome xml_button" target="_blank">History >>
 			</A>	
@@ -34,11 +45,17 @@
 			</A>
 			<A href="https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=${id}" 
 				class="large red awesome xml_button" target="_blank">View Help Alarm >>
-			</A>	
-
+			</A>
+			<A style="display:inline;float:left;" href="/c2mon-web-configviewer/" 
+			class="blue awesome xml_button">		
+				 <i class="icon-home"></i> Home
+			</A>
 		</p>
 
-		<div style="width:1000px; height:700px;" id="trend_view"></div>
+		<div style="width:1000px; height:650px;" id="trend_view"></div>
+		
+	</div>
+    </div><!--/.fluid-container-->
 
 
 <script type="text/javascript">
