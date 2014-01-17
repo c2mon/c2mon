@@ -51,10 +51,6 @@
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-all</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.jencks</groupId>
-			<artifactId>jencks-amqpool</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>cern.c2mon.c2mon-server</groupId>
