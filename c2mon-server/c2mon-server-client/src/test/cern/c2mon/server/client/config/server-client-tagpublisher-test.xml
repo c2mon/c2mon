@@ -9,7 +9,7 @@
 
   <import resource="classpath:cern/c2mon/server/client/config/server-client-connection.xml"/>
   <import resource="classpath:cern/c2mon/server/client/config/server-client-tag-publication.xml"/>
-  <import resource="classpath:cern.c2mon/server/test/server-test-properties.xml"/>
+  <import resource="classpath:cern/c2mon/server/test/server-test-properties.xml"/>
   
   
 </beans>
