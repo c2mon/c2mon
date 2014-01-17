@@ -29,7 +29,7 @@
     <property name="sessionTransacted" value="false" />
   </bean>
 
-  <bean name="heartbeatSender" class="cern.c2mon.util.jms.ActiveJmsSender">
+  <bean name="heartbeatSender" class="cern.c2mon.shared.util.jms.ActiveJmsSender">
     <property name="jmsTemplate" ref="heartbeatJmsTemplate" />
   </bean>
 
