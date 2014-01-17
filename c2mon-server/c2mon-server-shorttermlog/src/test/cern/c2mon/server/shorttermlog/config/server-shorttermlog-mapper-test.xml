@@ -12,7 +12,7 @@
   <import resource="classpath:cern/c2mon/server/shorttermlog/config/server-shorttermlog-oracle.xml"/>  
   
   <!-- import properties -->
-  <import resource="classpath:cern.c2mon/server/test/server-test-properties.xml" />
+  <import resource="classpath:cern/c2mon/server/test/server-test-properties.xml" />
   
   <bean id="dataTagLogMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
     <property name="sqlSessionFactory" ref="stlSqlSessionFactory"/>
