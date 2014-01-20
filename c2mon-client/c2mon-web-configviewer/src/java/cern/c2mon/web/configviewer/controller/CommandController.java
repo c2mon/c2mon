@@ -62,10 +62,8 @@ public class CommandController {
   private static Logger logger = Logger.getLogger(CommandController.class);
 
   /**
-   * Displays a form where an command id can be entered.
-   * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
-   * */
+   * @return Redirects to the form
+   */
   @RequestMapping(value = "/commandviewer/", method = { RequestMethod.GET })
   public String viewCommand(final Model model) {
     logger.info("/commandviewer/");
@@ -73,10 +71,11 @@ public class CommandController {
   }    
   
   /**
+   * @return
    * Displays command information in RAW XML about a tag with the given id.
+   * 
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = COMMAND_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewXml(@PathVariable final String id,  final Model model) {
@@ -90,10 +89,11 @@ public class CommandController {
   }
 
   /**
+   * @return
    * Displays command information for a given command id.
+   * 
    * @param id command id
    * @param response we write the html result to that HttpServletResponse response
-   * @throws IOException 
    * */
   @RequestMapping(value = "/commandviewer/{id}", method = { RequestMethod.GET })
   public String viewCommand(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
@@ -110,11 +110,13 @@ public class CommandController {
   }
 
   /**
+   * @return
    * In case of an error this form is shown.
-   * It displays the error and you can also make a new query.
+   * It displays the error and you can also make a new query. 
+   * New queries are redirected to COMMAND_URL + id
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/commandviewer/errorform/{id}")
   public String viewCommandErrorForm(@PathVariable(value = "id") final String errorId,
@@ -132,23 +134,27 @@ public class CommandController {
   }
 
   /**
+   * @return 
    * Displays a form where an command id can be entered.
+   * 
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/commandviewer/form/{id}", method = { RequestMethod.GET })
   public String viewCommandWithForm(@PathVariable final String id, final Model model) {
     logger.info("/commandviewer/form/{id} " + id);
-    model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR, COMMAND_FORM_URL, id, COMMAND_URL + id));
+    model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR,
+        COMMAND_FORM_URL, id, COMMAND_URL + id));
     return "formWithData";
   }
 
   /**
-   * Displays an input form for a command id, and if a POST was made with a command id, also the command data.
+   * @return name of a jsp page which will be displayed
+   * Displays an input form for a command id, and if a POST was made with a command id, 
+   * redirects to COMMAND_URL + id.
+   * 
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/commandviewer/form", method = { RequestMethod.GET, RequestMethod.POST })
   public String viewCommandFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
