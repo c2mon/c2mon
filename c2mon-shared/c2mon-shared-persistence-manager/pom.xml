@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-shared</groupId>
 		<artifactId>c2mon-shared-pom</artifactId>
-		<version>1.0.2</version>
+		<version>1.1.0</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-shared</groupId>
 	<artifactId>c2mon-shared-persistence-manager</artifactId>
@@ -36,8 +36,8 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-util</artifactId>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-util</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -27,7 +27,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 /**
- * JUnit test for the ch.cern.tim.persistence.fallback.FallbackFileController class
+ * JUnit test for the FallbackFileController class
  *
  * To execute this test you have to provide the following runtime arguments
  *  -Dtim.log.fallback.file=XXX.log

@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
 
 import cern.c2mon.pmanager.IAlarmListener;
 import cern.c2mon.pmanager.alarm.FallbackAlarmsInterface;
-import cern.tim.util.mail.bean.MailDetailsBean;
-import cern.tim.util.mail.exception.MailSenderException;
-import cern.tim.util.mail.impl.SMTPMailSender;
+import cern.c2mon.shared.util.mail.bean.MailDetailsBean;
+import cern.c2mon.shared.util.mail.exception.MailSenderException;
+import cern.c2mon.shared.util.mail.impl.SMTPMailSender;
 
 /**
  * Implements the IAlarmListener interface just for testing purposes

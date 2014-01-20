@@ -36,7 +36,7 @@ import junit.framework.TestCase;
 
 /**
  * JUnit test for the class
- * ch.cern.tim.server.log.fallback.DataTagFallbackHelper.java It tests that all
+ * DataTagFallbackHelper. It tests that all
  * DataTagFallbackHelper methods are properly working.
  * 
  * @author mruizgar

@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 
 /**
  * /**
- * JUnit test for the ch.cern.tim.persistence.impl.TimPersistenceManager class
+ * JUnit test for the TimPersistenceManager class
  *  
  * @author mruizgar
  *
