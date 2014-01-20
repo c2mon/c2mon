@@ -20,13 +20,11 @@
 
 <body>
 
-
-<style media="screen" type="text/css">
-.invalidPoint {
-    background-color: #66ffff; 
-}
-</style>
-
+	<style media="screen" type="text/css">
+		.invalidPoint {
+    		background-color: #66ffff; 
+		}
+	</style>
 
     <div class="container-fluid">
       <div class="row-fluid">
