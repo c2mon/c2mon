@@ -9,7 +9,7 @@
 
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-client-pom</artifactId>
-  <version>1.0.17-SNAPSHOT</version>
+  <version>1.1.0</version>
   <packaging>pom</packaging>
 
   <description>
@@ -70,8 +70,8 @@
 
       <!--  C2MON shared libraries -->
       <dependency>
-        <groupId>cern.tim2.tim2-shared</groupId>
-        <artifactId>tim2-shared-util</artifactId>
+        <groupId>cern.c2mon.c2mon-shared</groupId>
+        <artifactId>c2mon-shared-util</artifactId>
         <version>[1.0.0,2.0.0)</version>
         <exclusions>
           <exclusion>
@@ -81,18 +81,18 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>cern.tim2.tim2-shared</groupId>
-        <artifactId>tim2-shared-common</artifactId>
+        <groupId>cern.c2mon.c2mon-shared</groupId>
+        <artifactId>c2mon-shared-common</artifactId>
         <version>[1.0.0,2.0.0)</version>
       </dependency>
       <dependency>
-        <groupId>cern.tim2.tim2-shared</groupId>
-        <artifactId>tim2-shared-client</artifactId>
-        <version>[0.9.9,2.0.0)</version>
+        <groupId>cern.c2mon.c2mon-shared</groupId>
+        <artifactId>c2mon-shared-client</artifactId>
+        <version>[1.0.0,2.0.0)</version>
       </dependency>
       <dependency>
-        <groupId>cern.tim2.tim2-shared</groupId>
-        <artifactId>tim2-shared-rule</artifactId>
+        <groupId>cern.c2mon.c2mon-shared</groupId>
+        <artifactId>c2mon-shared-rule</artifactId>
         <version>[1.0.0,2.0.0)</version>
       </dependency>
 
