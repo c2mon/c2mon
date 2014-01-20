@@ -30,13 +30,13 @@ import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.rule.RuleEvaluationException;
+import cern.c2mon.shared.rule.RuleExpression;
+import cern.c2mon.shared.rule.RuleFormatException;
+import cern.c2mon.shared.rule.RuleValidationReport;
 import cern.dmn2.core.Status;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.datatag.TagQualityStatus;
-import cern.tim.shared.rule.RuleEvaluationException;
-import cern.tim.shared.rule.RuleExpression;
-import cern.tim.shared.rule.RuleFormatException;
-import cern.tim.shared.rule.RuleValidationReport;
 
 /**
  * @author felixehm

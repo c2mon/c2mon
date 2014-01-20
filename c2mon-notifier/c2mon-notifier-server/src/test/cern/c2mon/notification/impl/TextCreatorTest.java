@@ -13,10 +13,9 @@ import org.junit.Test;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.notification.Tag;
 import cern.c2mon.notification.TextCreator;
-import cern.tim.shared.common.datatag.DataTagQuality;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.rule.RuleExpression;
-import cern.tim.shared.rule.RuleFormatException;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.rule.RuleExpression;
+import cern.c2mon.shared.rule.RuleFormatException;
 import freemarker.template.TemplateException;
 
 /**

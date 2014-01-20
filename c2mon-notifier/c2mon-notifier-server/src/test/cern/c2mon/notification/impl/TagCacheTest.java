@@ -19,7 +19,7 @@ import org.junit.Test;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.notification.Tag;
-import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
 
 public class TagCacheTest {
 

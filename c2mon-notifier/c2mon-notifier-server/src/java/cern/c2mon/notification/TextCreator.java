@@ -21,8 +21,7 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.notification.shared.TagNotFoundException;
-import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;

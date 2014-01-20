@@ -19,9 +19,9 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.notification.Tag;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.datatag.TagQualityStatus;
-import cern.tim.shared.rule.RuleFormatException;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.rule.RuleFormatException;
 
 public class TagTest {
 

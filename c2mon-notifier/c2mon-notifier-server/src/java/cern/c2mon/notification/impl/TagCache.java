@@ -39,11 +39,11 @@ import cern.c2mon.notification.shared.ServiceException;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.notification.shared.TagNotFoundException;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.dmn2.core.Status;
 import cern.dmn2.db.DiamonDbGateway;
 import cern.dmn2.db.EntityData.Type;
 import cern.dmn2.db.MetricData;
-import cern.tim.shared.common.datatag.TagQualityStatus;
 
 import com.google.gson.Gson;
 
