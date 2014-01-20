@@ -20,7 +20,7 @@
 		padding: 9px 0;
 	}
 	</style>
-	
+
 </head>
 
 <body>
@@ -28,7 +28,7 @@
 
 	<div class="container-fluid">
 		<div class="row-fluid">
-			
+
 
 			<ul class="breadcrumb">
 				<li>
@@ -36,11 +36,11 @@
 				</li>
 				<li>${title}</li>
 			</ul>
-			
+
 			<div class="hero-unit">
 				<h1>${title}</h1>
 			</div>
-			
+
 			<div class="alert alert-info">
 				<strong>${instruction}</strong>
 			</div>
@@ -130,11 +130,11 @@
 			<p>&copy; CERN 2012</p>
 		</footer>
 	</div><!--/.fluid-container-->
-	
+
         <!-- Le javascript
         ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->
-        
+
         <script src="/c2mon-web-configviewer/js/jquery.js"></script>
         <script src="/c2mon-web-configviewer/js/bootstrap-transition.js"></script>
         <script src="/c2mon-web-configviewer/js/bootstrap-alert.js"></script>
@@ -149,28 +149,30 @@
         <script src="/c2mon-web-configviewer/js/bootstrap-carousel.js"></script>
         <script src="/c2mon-web-configviewer/js/bootstrap-typeahead.js"></script>
         <script src="/c2mon-web-configviewer/js/bootstrap-datepicker.js"></script>
-        
+
         <script type="text/javascript">
 
-$('#tabs a:first').tab('show'); // Select first tab
+		$('#tabs a:first').tab('show'); // Marks the first tab as selected in the interface 
 
-$('.input-daterange').datepicker({
-	todayBtn: true,
-	forceParse: false,
-	autoclose: true,
-	format: "dd/mm/yyyy",
-	todayHighlight: true,
-	beforeShowDay: function (date){
-		if (date.getMonth() == (new Date()).getMonth())
-			switch (date.getDate()){
-				case 8:
-				return false;
-				case 12:
-				return "green";
+		// Activates the datepicker plugin
+		// https://github.com/eternicode/bootstrap-datepicker
+		$('.input-daterange').datepicker({
+			todayBtn: true,
+			forceParse: false,
+			autoclose: true,
+			format: "dd/mm/yyyy", // Format should match the format expected in the TrendViewController class
+			todayHighlight: true,
+			beforeShowDay: function (date){
+			if (date.getMonth() == (new Date()).getMonth())
+				switch (date.getDate()){
+					case 8:
+						return false;
+					case 12:
+						return "green";
+				}
 			}
-		}
-	});
-</script>
+		});
+		</script>
 
 </body>
 </html>
