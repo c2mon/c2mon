@@ -69,10 +69,8 @@ public class AlarmController {
   private static Logger logger = Logger.getLogger(AlarmController.class);
 
   /**
-   * Displays a form where an alarm id can be entered.
-   * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
-   * */
+   * @return Redirects to the form
+   */
   @RequestMapping(value = ALARM_URL, method = { RequestMethod.GET })
   public String viewAlarm(final Model model) {
     logger.info("/alarmviewer/");
@@ -80,10 +78,10 @@ public class AlarmController {
   }    
 
   /**
-   * Displays alarm information in RAW XML about a tag with the given id.
+   * @return Displays alarm information in RAW XML about a tag with the given id.
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = ALARM_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewXml(@PathVariable final String id,  final Model model) {
@@ -97,10 +95,11 @@ public class AlarmController {
   }
 
   /**
+   * @return 
    * Displays alarm information for a given alarm id.
+   * 
    * @param id alarm id
    * @param response we write the html result to that HttpServletResponse response
-   * @throws IOException 
    * */
   @RequestMapping(value = ALARM_URL + "/{id}", method = { RequestMethod.GET })
   public String viewAlarm(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
@@ -119,10 +118,11 @@ public class AlarmController {
   }
 
   /**
+   * @return
    * Displays a form where an alarm id can be entered.
+   * 
    * @param id alarm id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/alarmviewer/form/{id}", method = { RequestMethod.GET })
   public String viewAlarmWithForm(@PathVariable final String id, final Model model) {
@@ -132,11 +132,13 @@ public class AlarmController {
   }
 
   /**
-   * In case of an error this form is shown.
+   * @return In case of an error this form is shown.
    * It displays the error and you can also make a new query.
+   * 
+   * New queries are simply redirected to ALARM_URL + id
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/alarmviewer/errorform/{id}")
   public String viewAlarmErrorForm(@PathVariable(value = "id") final String errorId,
@@ -154,10 +156,12 @@ public class AlarmController {
   }
 
   /**
-   * Displays an input form for an alarm id, and if a POST was made with an alarm id, also the alarm data.
+   * @return
+   * Displays an input form for an alarm id, 
+   * and if a POST was made with an alarm id, it is simply redirected to ALARM_URL + id
+   * 
    * @param id alarm id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/alarmviewer/form", method = { RequestMethod.GET, RequestMethod.POST })
   public String viewAlarmFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {

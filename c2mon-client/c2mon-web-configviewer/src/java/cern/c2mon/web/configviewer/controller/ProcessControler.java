@@ -29,34 +29,24 @@ import cern.c2mon.web.configviewer.service.TagIdException;
 @Controller
 public class ProcessControler {
 
-  /**
-   * A REST-style URL 
-   * */
+  /** A REST-style URL */
   public static final String PROCESS_URL = "/process/";
 
-  /**
-   * A URL to the process viewer with input form
-   * */
-  public static final String PROCESS_XML_URL = PROCESS_URL + "xml";
-
-  /**
-   * A URL to the process viewer with input form
-   * */
+  /** URL for the process form.  */
   public static final String PROCESS_FORM_URL = PROCESS_URL + "form";
+
+  /** Displays the configuration of a process in RAW xml format */
+  public static final String PROCESS_XML_URL = PROCESS_URL + "xml";
 
   /**
    * Title for the process form page
    * */
   public static final String PROCESS_FORM_TITLE = "DAQ XML Viewer";
 
-  /**
-   * Description for the process form page
-   * */
+  /** Description for the process form page */
   public static final String PROCESS_FORM_INSTR = "Select process Name.";
 
-  /**
-   * A process loader service
-   * */
+  /** process loader service */
   @Autowired
   private ProcessService service;
 
@@ -69,7 +59,6 @@ public class ProcessControler {
    * Displays configuration of a process with the given process name
    * @param processName the process name
    * @param response we write the html result to that HttpServletResponse response
-   * @throws IOException 
    * */
   @RequestMapping(value = PROCESS_URL + "/{processName}", method = { RequestMethod.GET })
   public void viewProcess(@PathVariable(value = "processName") final String processName, final HttpServletResponse response) throws IOException  {
@@ -83,10 +72,9 @@ public class ProcessControler {
   }
 
   /**
-   * Displays configuration of a process with the given id together with a form
-   * @param id command id
-   * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
+   * @return Displays configuration of a process with the given id together with a form
+   * 
+   * @param id the process name
    * */
   @RequestMapping(value = PROCESS_FORM_URL + "/{id}", method = { RequestMethod.GET })
   public String viewProcessWithForm(@PathVariable final String id,  final Model model) {
@@ -96,10 +84,10 @@ public class ProcessControler {
   }
 
   /**
-   * Displays configuration of a process with the given id together with a form
-   * @param id command id
-   * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
+   * @return  
+   * Displays configuration of a process with the given process name in RAW XML format
+   * 
+   * @param id process name
    * */
   @RequestMapping(value = PROCESS_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewXml(@PathVariable final String id,  final Model model) {
@@ -111,24 +99,31 @@ public class ProcessControler {
 
 
   /**
-   * Displays an input form, and if a POST was made, also the process xml data.
-   * @param id command id
-   * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
+   * @return
+   * Displays an input form.
+   * 
+   * If a POST was made, redirects to the PROCESS_URL.
+   * 
+   * @param id process name
    * */
   @RequestMapping(value = PROCESS_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
-  public String viewProcessFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
+  public String viewProcessFormPost(
+      @RequestParam(value = "id", required = false) final String id, final Model model) {
+    
     logger.info("/process/form " + id);
-    if (id == null)
-      model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, null, null));
-    else
+    if (id == null) {
+      model.addAllAttributes(
+          getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, null, null));
+    }
+    else {
       return ("redirect:" + PROCESS_URL + id);
+    }
 
     return "processFormWithData";
   }
 
   /**
-   * Gets a map of values to include later in the MVC model processed by a jsp.
+   * Returns a map of values to include later in the MVC model processed by a jsp.
    * This form is used for the process form and
    * includes a collection of all available process names in addition to the other forms.
    * @param title tag title of the form displayed on the jsp page (different for datatag, alarm, command)
