@@ -75,10 +75,8 @@ public class HistoryController {
   private static Logger logger = Logger.getLogger(HistoryController.class);
 
   /**
-   * Displays a form where a tag id can be entered.
-   * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
-   * */
+   * @return Redirects to the form
+   */
   @RequestMapping(value = HISTORY_URL, method = { RequestMethod.GET })
   public String viewHistory(final Model model) {
     logger.info(HISTORY_URL);
@@ -86,14 +84,15 @@ public class HistoryController {
   }    
 
   /**
-   * Displays the history of a given id.
+   * @return Displays the history of a given id.
+   * 
    * @param id the last 100 records of the given tag id are being shown
    * @param response the html result is written to that HttpServletResponse response
-   * @return nothing
-   * @throws IOException 
    * */
   @RequestMapping(value = "/historyviewer/{id}", method = { RequestMethod.GET })
-  public String viewHistory(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
+  public String viewHistory(
+      @PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException {
+    
     logger.info("/historyviewer/{id} " + id);
 
     try {
@@ -113,11 +112,12 @@ public class HistoryController {
   
 
   /**
-   * Displays the history of a given id.
-   * @param id
+   * @return 
+   * Displays the history of a given id, for a specified by the user number of records.
+   * 
+   * @param id History of this Id is shown.
+   * @param records User can specify how many records to go back in history.
    * @param response the html result is written to that HttpServletResponse response
-   * @return nothing
-   * @throws IOException 
    * */
   @RequestMapping(value = "/historyviewer/{id}/records/{records}", method = { RequestMethod.GET })
   public String viewHistory(@PathVariable(value = "id") final String id,
@@ -142,10 +142,10 @@ public class HistoryController {
   }
   
   /**
-   * Displays the History in RAW XML for a tag with the given id.
+   * @return Displays the History in RAW XML for a tag with the given id.
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = HISTORY_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewXml(@PathVariable final String id,  final Model model) {
@@ -162,14 +162,12 @@ public class HistoryController {
     return "raw_xml_views/rawXml";
   }
   
-
-
   /**
-   * In case of an error this form is shown.
+   * @return In case of an error this form is shown.
    * It displays the error and you can also make a new query.
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/historyviewer/errorform/{id}")
   public String viewHistoryErrorForm(@PathVariable(value = "id") final String id, final Model model) {
@@ -181,10 +179,10 @@ public class HistoryController {
   }
 
   /**
-   * Displays a form where a tag id can be entered.
+   * @return Displays a form where a tag id can be entered.
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/historyviewer/form/{id}", method = { RequestMethod.GET })
   public String viewHistoryWithForm(@PathVariable final String id, final Model model) {
@@ -194,10 +192,11 @@ public class HistoryController {
   }
 
   /**
-   * Displays an input form for a tag id, and if a POST was made with a tag id, also the history data.
+   * @return Displays an input form for a tag id, 
+   * and if a POST was made with a tag id, it redirects to HISTORY_URL + id + LAST_RECORDS_URL + records
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/historyviewer/form", method = { RequestMethod.GET, RequestMethod.POST })
   public String viewHistoryFormPost(@RequestParam(value = "id", required = false) final String id,
