@@ -24,7 +24,7 @@
 	<xsl:variable name="command_xml_url">
 		commandviewer/xml/
 	</xsl:variable>
-		<xsl:variable name="report_xml_url">
+	<xsl:variable name="report_xml_url">
 		configloader/progress/finalReport/xml/
 	</xsl:variable>
 	
@@ -75,7 +75,7 @@
 				</xsl:if>
 				
 			</xsl:for-each>
-		
+			
 		</table>
 		<xsl:apply-templates select="alarms"/>
 	</xsl:template>
@@ -126,8 +126,8 @@
 			<tr>
 				<td class="highlight bold"> Alarms </td>
 				<td>
-					 <xsl:for-each select="alarmIds">
-							<a href="{$base_url}{$alarm_url}{long}/"><xsl:value-of select="long"/></a>
+					<xsl:for-each select="alarmIds">
+						<a href="{$base_url}{$alarm_url}{long}/"><xsl:value-of select="long"/></a>
 					</xsl:for-each>
 				</td>
 			</tr>
@@ -144,334 +144,334 @@
 				<td class="highlight bold" style="background:red;"> Publications - no JAPC and DIP</td>
 				<td><xsl:value-of select="publications"/></td>
 			</tr>
-			-->
-			
-		</table>
-	
-	</xsl:template>
-
-	<!-- process the XML element AlarmValue -->
-	
-	
-	<xsl:template match="AlarmValue | alarmValue">
-	
-			<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
-		  <html>
-			<head>
-				<title>Configuration viewer</title>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
-				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
-				<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
-			</head>
-			<body>
-			
-		<p class="tagName"> 
-					<xsl:value-of select="faultFamily"/>
-					:<xsl:value-of select="faultMemeber"/>
-					:<xsl:value-of select="faultCode"/>
-					
-			<A href="{$base_url}{$alarm_xml_url}{@id}/" 
-				class="large blue awesome xml_button" target="_blank">View Alarm XML >>
-			</A>	
-			
-			<A href="{$help_alarm_url}{@id}" 
-				class="large red awesome xml_button" target="_blank">View Help Alarm >>
-			</A>		
-		</p>
-		<table class="inline">
-			<th colspan="4">Alarm Value</th>
-			
-			<tr>
-				<td class="highlight bold">Alarm id</td>
-				<td><xsl:value-of select="@id"/></td>	
-				<td class="highlight bold">Class</td>
-				<td><xsl:value-of select="@class"/></td>	
-			</tr>
-			
-			<tr>
-				<td class="highlight bold"> DataTag </td>
-				<td >
-					<a href="{$base_url}{$datatag_url}{tagId}/"><xsl:value-of select="tagId"/></a>
-				</td>
-				<td class="highlight bold"> State </td>
-				<td>
-					<xsl:choose>
-						<xsl:when test="active='false'">
-							<xsl:text>TERMINATED</xsl:text>
-						</xsl:when>
-						<xsl:when test="active='true'">
-							<xsl:text>ACTIVE</xsl:text>
-						</xsl:when>
-					</xsl:choose>
-				</td>
-			</tr>
-			
-			<xsl:for-each select="*[not((local-name() = 'tagId') or local-name() = 'active')]">
-				
-				<xsl:if  test="position() mod 2 = 0">
-					<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
-					<TD width="25%"><xsl:value-of select="."/></TD>		
-					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
-				</xsl:if>
-				
-				<xsl:if test="position() mod 2 = 1">
-					<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
-					<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
-					<TD width="25%"><xsl:value-of select="."/></TD>
-				</xsl:if>	
-				
-			</xsl:for-each>
-			
-		</table>
+		-->
 		
-		</body>
-		</html>
-	</xsl:template>
+	</table>
 	
-	
-	<!-- process the XML element ClientCommandTagImpl -->
-	<xsl:template match="clientCommandTagImpl">
-	
-			<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
-		  <html>
-			<head>
-				<title>Configuration viewer</title>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
-				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
-				<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
-			</head>
-			<body>
-	
-		<p class="tagName"> 
-					<xsl:value-of select="name"/>
-					(<xsl:value-of select="@id"/>)
-					
-			<A href="{$base_url}{$command_xml_url}{@id}/" 
-				class="large blue awesome xml_button" target="_blank">View Command XML >>
-			</A>		
-		</p>
-	<div class="column">
-		<table class="inline">
-			<th colspan="2">Command Tag</th>
-			
-			<tr>
-				<td class="highlight bold"> Command id </td>
-				<td class=""><xsl:value-of select="@id"/></td>
-			</tr>
+</xsl:template>
 
-			<xsl:for-each select="*">
-				<TR>
-					<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
-					<TD><xsl:value-of select="."/></TD>
-				</TR>
-			</xsl:for-each>
+<!-- process the XML element AlarmValue -->
+
+
+<xsl:template match="AlarmValue | alarmValue">
+	
+	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
+	<html>
+		<head>
+			<title>Configuration viewer</title>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
+			<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
+			<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
+		</head>
+		<body>
 			
-		</table>
-		</div>
-		
+			<p class="tagName"> 
+				<xsl:value-of select="faultFamily"/>
+				:<xsl:value-of select="faultMemeber"/>
+				:<xsl:value-of select="faultCode"/>
+				
+				<A href="{$base_url}{$alarm_xml_url}{@id}/" 
+					class="large blue awesome xml_button" target="_blank">View Alarm XML >>
+				</A>	
+				
+				<A href="{$help_alarm_url}{@id}" 
+					class="large red awesome xml_button" target="_blank">View Help Alarm >>
+				</A>		
+			</p>
+			<table class="inline">
+				<th colspan="4">Alarm Value</th>
+				
+				<tr>
+					<td class="highlight bold">Alarm id</td>
+					<td><xsl:value-of select="@id"/></td>	
+					<td class="highlight bold">Class</td>
+					<td><xsl:value-of select="@class"/></td>	
+				</tr>
+				
+				<tr>
+					<td class="highlight bold"> DataTag </td>
+					<td >
+						<a href="{$base_url}{$datatag_url}{tagId}/"><xsl:value-of select="tagId"/></a>
+					</td>
+					<td class="highlight bold"> State </td>
+					<td>
+						<xsl:choose>
+							<xsl:when test="active='false'">
+								<xsl:text>TERMINATED</xsl:text>
+							</xsl:when>
+							<xsl:when test="active='true'">
+								<xsl:text>ACTIVE</xsl:text>
+							</xsl:when>
+						</xsl:choose>
+					</td>
+				</tr>
+				
+				<xsl:for-each select="*[not((local-name() = 'tagId') or local-name() = 'active')]">
+					
+					<xsl:if  test="position() mod 2 = 0">
+						<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
+						<TD width="25%"><xsl:value-of select="."/></TD>		
+						<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
+					</xsl:if>
+					
+					<xsl:if test="position() mod 2 = 1">
+						<xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
+						<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
+						<TD width="25%"><xsl:value-of select="."/></TD>
+					</xsl:if>	
+					
+				</xsl:for-each>
+				
+			</table>
+			
 		</body>
-		</html>
-	</xsl:template>
+	</html>
+</xsl:template>
+
+
+<!-- process the XML element ClientCommandTagImpl -->
+<xsl:template match="clientCommandTagImpl">
 	
-	<!-- process the XML element ConfigurationReport -->
-	<xsl:template match="ConfigurationReport">
+	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
+	<html>
+		<head>
+			<title>Configuration viewer</title>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
+			<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
+			<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
+		</head>
+		<body>
+			
+			<p class="tagName"> 
+				<xsl:value-of select="name"/>
+				(<xsl:value-of select="@id"/>)
+				
+				<A href="{$base_url}{$command_xml_url}{@id}/" 
+					class="large blue awesome xml_button" target="_blank">View Command XML >>
+				</A>		
+			</p>
+			<div class="column">
+				<table class="inline">
+					<th colspan="2">Command Tag</th>
+					
+					<tr>
+						<td class="highlight bold"> Command id </td>
+						<td class=""><xsl:value-of select="@id"/></td>
+					</tr>
+
+					<xsl:for-each select="*">
+						<TR>
+							<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
+							<TD><xsl:value-of select="."/></TD>
+						</TR>
+					</xsl:for-each>
+					
+				</table>
+			</div>
+			
+		</body>
+	</html>
+</xsl:template>
+
+<!-- process the XML element ConfigurationReport -->
+<xsl:template match="ConfigurationReport">
 	
-			<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
-		  <html>
-			<head>
-				<title>Configuration viewer</title>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
-				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
-				<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
-			</head>
-			<body>
-	
-		<p class="tagName"> 
-			<A href="{$base_url}{$report_xml_url}{id}/" 
-				class="large blue awesome xml_button" target="_blank">View Configuration Report XML >>
-			</A>		
-		</p>
-     <p>
-     <h2>Overview</h2>
-     <table class="inline" border="1">
-       <tr>
-         <th class="bold">Identifier</th>
-         <td><xsl:value-of select="id" /></td>
-       </tr>
-       <tr>
-         <th class="bold">Name</th>
-         <td><xsl:value-of select="name" /></td>
-       </tr>
-       <tr>
-         <th class="bold">Applied by</th>
-         <td><xsl:value-of select="user" /></td>
-       </tr>
-       <tr>
-         <th class="bold">Applied on</th>
-         <td><xsl:value-of select="timestamp" /></td>
-       </tr>
-       <tr>
-         <th class="bold">Status</th>
-         <xsl:choose>
-         <xsl:when test="status='OK'">
-           <td bgcolor="green"><xsl:value-of select="status" /></td>
-         </xsl:when>  
-         <xsl:when test="status='WARNING' or status='RESTART'">
-           <td bgcolor="yellow"><xsl:value-of select="status" /></td>
-         </xsl:when>  
-         <xsl:otherwise>
-           <td bgcolor="red"><xsl:value-of select="status" /></td>
-         </xsl:otherwise>
-         </xsl:choose>
-       </tr>
-       <tr>
-         <th class="highlight bold">Message</th>
-         <td><pre><xsl:value-of select="status-description" /></pre></td>
-       </tr>
-       <tr>
-         <th class="highlight bold">DAQs to reboot</th>
-         <td><xsl:value-of select="daq-reboot" /></td>
-       </tr>
-     </table>
-     </p>
-     <xsl:apply-templates select="ConfigurationElementReports"/>
-     
-     </body>
-		</html>
+	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
+	<html>
+		<head>
+			<title>Configuration viewer</title>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
+			<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
+			<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
+		</head>
+		<body>
+			
+			<p class="tagName"> 
+				<A href="{$base_url}{$report_xml_url}{id}/" 
+					class="large blue awesome xml_button" target="_blank">View Configuration Report XML >>
+				</A>		
+			</p>
+			<p>
+				<h2>Overview</h2>
+				<table class="inline" border="1">
+					<tr>
+						<th class="bold">Identifier</th>
+						<td><xsl:value-of select="id" /></td>
+					</tr>
+					<tr>
+						<th class="bold">Name</th>
+						<td><xsl:value-of select="name" /></td>
+					</tr>
+					<tr>
+						<th class="bold">Applied by</th>
+						<td><xsl:value-of select="user" /></td>
+					</tr>
+					<tr>
+						<th class="bold">Applied on</th>
+						<td><xsl:value-of select="timestamp" /></td>
+					</tr>
+					<tr>
+						<th class="bold">Status</th>
+						<xsl:choose>
+							<xsl:when test="status='OK'">
+								<td bgcolor="green"><xsl:value-of select="status" /></td>
+							</xsl:when>  
+							<xsl:when test="status='WARNING' or status='RESTART'">
+								<td bgcolor="yellow"><xsl:value-of select="status" /></td>
+							</xsl:when>  
+							<xsl:otherwise>
+								<td bgcolor="red"><xsl:value-of select="status" /></td>
+							</xsl:otherwise>
+						</xsl:choose>
+					</tr>
+					<tr>
+						<th class="highlight bold">Message</th>
+						<td><pre><xsl:value-of select="status-description" /></pre></td>
+					</tr>
+					<tr>
+						<th class="highlight bold">DAQs to reboot</th>
+						<td><xsl:value-of select="daq-reboot" /></td>
+					</tr>
+				</table>
+			</p>
+			<xsl:apply-templates select="ConfigurationElementReports"/>
+			
+		</body>
+	</html>
 </xsl:template>
 
 
 <xsl:template match="ConfigurationElementReports">
-     <hr/>
-     <p>
-     <h2>Detailed Report</h2>
-     <table class="inline" border="1">
-       <tr>
-         <th class="bold">Action</th>
-         <th class="bold">Entity</th>
-         <th class="bold">Id</th>
-         <th class="bold">Status</th>
-         <th class="bold">Report</th>
-       </tr>
-       <xsl:for-each select="ConfigurationElementReport">
-         <tr>
-         <td><xsl:value-of select="action" /></td>
-         <td><xsl:value-of select="entity" /></td>
-         <td><xsl:value-of select="id" /></td>
-         <xsl:choose>
-         <xsl:when test="status='OK'">
-           <td bgcolor="green"><xsl:value-of select="status" /></td>
-         </xsl:when>  
-         <xsl:when test="status='WARNING'">
-           <td bgcolor="yellow"><xsl:value-of select="status" /></td>
-         </xsl:when>  
-         <xsl:otherwise>
-           <td bgcolor="red"><xsl:value-of select="status" /></td>
-         </xsl:otherwise>
-         </xsl:choose>
+	<hr/>
+	<p>
+		<h2>Detailed Report</h2>
+		<table class="inline" border="1">
+			<tr>
+				<th class="bold">Action</th>
+				<th class="bold">Entity</th>
+				<th class="bold">Id</th>
+				<th class="bold">Status</th>
+				<th class="bold">Report</th>
+			</tr>
+			<xsl:for-each select="ConfigurationElementReport">
+				<tr>
+					<td><xsl:value-of select="action" /></td>
+					<td><xsl:value-of select="entity" /></td>
+					<td><xsl:value-of select="id" /></td>
+					<xsl:choose>
+						<xsl:when test="status='OK'">
+							<td bgcolor="green"><xsl:value-of select="status" /></td>
+						</xsl:when>  
+						<xsl:when test="status='WARNING'">
+							<td bgcolor="yellow"><xsl:value-of select="status" /></td>
+						</xsl:when>  
+						<xsl:otherwise>
+							<td bgcolor="red"><xsl:value-of select="status" /></td>
+						</xsl:otherwise>
+					</xsl:choose>
 
-         <td>
-	   <pre><xsl:value-of select="status-message" /></pre>
-           <xsl:apply-templates select="sub-reports"/>
-	 </td>
-         </tr>
-       </xsl:for-each>
-     </table>
-     </p>
+					<td>
+						<pre><xsl:value-of select="status-message" /></pre>
+						<xsl:apply-templates select="sub-reports"/>
+					</td>
+				</tr>
+			</xsl:for-each>
+		</table>
+	</p>
 </xsl:template>
 
 <xsl:template match="sub-reports">
-    <ul>   
-         <xsl:for-each select="ConfigurationElementReport">
-	   <li>
-	     <xsl:value-of select="action" /> -  
-	     <xsl:value-of select="entity" /> - 
-	     <xsl:value-of select="id" /> -  
-	     <xsl:value-of select="status"/> - 
-		 
-         <xsl:if test="status-message!=''">
-	       <pre>
-    	       <xsl:value-of select="status-message"/>
-	       </pre>
-	     </xsl:if>  
-	     
-	   </li>
-	   <xsl:apply-templates select="sub-reports"/>
-	 </xsl:for-each>
-    </ul>	 
+	<ul>   
+		<xsl:for-each select="ConfigurationElementReport">
+			<li>
+				<xsl:value-of select="action" /> -  
+				<xsl:value-of select="entity" /> - 
+				<xsl:value-of select="id" /> -  
+				<xsl:value-of select="status"/> - 
+				
+				<xsl:if test="status-message!=''">
+					<pre>
+						<xsl:value-of select="status-message"/>
+					</pre>
+				</xsl:if>  
+				
+			</li>
+			<xsl:apply-templates select="sub-reports"/>
+		</xsl:for-each>
+	</ul>	 
 </xsl:template>
-	<!-- process the XML element ProcessConfiguration -->
-	<xsl:template match="ProcessConfiguration">
+<!-- process the XML element ProcessConfiguration -->
+<xsl:template match="ProcessConfiguration">
 	
-		<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
-		  <html>
-			<head>
-				<title>Configuration viewer</title>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
-				<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
-				
-				<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
-				<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
-				
-			</head>
-			<body>
-	
-		<div id="top"></div>
-		<p class="tagName"> 
-					DAQ Process XML Viewer 
-					<br></br><br></br>
-					<p>Process: <xsl:value-of select="jms-user"/>
-					<A href="{$base_url}{$process_xml_url}{jms-user}/" 
-						class="large blue awesome xml_button" target="_blank">View as XML >>
-						</A>
-					</p>
+	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
+	<html>
+		<head>
+			<title>Configuration viewer</title>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
+			<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
+			
+			<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
+			<script type="text/javascript" src="/c2mon-web-configviewer/js/bottom_panel.js"></script>
+			
+		</head>
+		<body>
+			
+			<div id="top"></div>
+			<p class="tagName"> 
+				DAQ Process XML Viewer 
+				<br></br><br></br>
+				<p>Process: <xsl:value-of select="jms-user"/>
+				<A href="{$base_url}{$process_xml_url}{jms-user}/" 
+					class="large blue awesome xml_button" target="_blank">View as XML >>
+				</A>
+			</p>
 		</p>
-	<div class="column">
-		<table class="inline">
-			<th colspan="2">Process Configuration</th>
-			<tr>
-				<td class="bold"> process id </td>
-				<td><xsl:value-of select="@process-id"/></td>
-			</tr>
-			<tr>
-				<td class="bold"> type </td>
-				<td><xsl:value-of select="@type"/></td>
-			</tr>
+		<div class="column">
+			<table class="inline">
+				<th colspan="2">Process Configuration</th>
+				<tr>
+					<td class="bold"> process id </td>
+					<td><xsl:value-of select="@process-id"/></td>
+				</tr>
+				<tr>
+					<td class="bold"> type </td>
+					<td><xsl:value-of select="@type"/></td>
+				</tr>
 
-		<xsl:for-each select="*[not(local-name() = 'EquipmentUnits')]">
-		<TR>
-			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
-			<TD><xsl:value-of select="."/></TD>
-		</TR>
-        </xsl:for-each>
-		
-		</table>
+				<xsl:for-each select="*[not(local-name() = 'EquipmentUnits')]">
+					<TR>
+						<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+						<TD><xsl:value-of select="."/></TD>
+					</TR>
+				</xsl:for-each>
+				
+			</table>
 		</div>
 		<xsl:apply-templates select="EquipmentUnits"/>
 		
-			</body>
-		</html>
-	</xsl:template>
-	
+	</body>
+</html>
+</xsl:template>
+
 <xsl:template match="EquipmentUnits">
 
 	<div class="message"> Scroll to <a href="#top"> top</a></div>
 	
-		<xsl:apply-templates select="EquipmentUnit"/>
+	<xsl:apply-templates select="EquipmentUnit"/>
 </xsl:template>
 
-	
+
 <xsl:template match="EquipmentUnit">
-		<p class="tagName"> 
-			<a name="{@name}"> <xsl:value-of select="@name"/> </a> : (<xsl:value-of select="@id"/>)
-		</p>
+	<p class="tagName"> 
+		<a name="{@name}"> <xsl:value-of select="@name"/> </a> : (<xsl:value-of select="@id"/>)
+	</p>
 	<div class="column">
 		<table class="inline">
 			<th colspan="2">EquipmentUnit</th>
@@ -484,102 +484,102 @@
 				<td><xsl:value-of select="@name"/></td>
 			</tr>
 
-		<xsl:for-each select="*[not(local-name() = 'DataTags' or local-name() = 'SubEquipmentUnits' 
-			or local-name() = 'CommandTags')]">
-		<TR>
-			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
-			<TD><xsl:value-of select="."/></TD>
-		</TR>
-        </xsl:for-each>
+			<xsl:for-each select="*[not(local-name() = 'DataTags' or local-name() = 'SubEquipmentUnits' 
+				or local-name() = 'CommandTags')]">
+				<TR>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD><xsl:value-of select="."/></TD>
+				</TR>
+			</xsl:for-each>
 			
 		</table>
-		</div>
-		<xsl:apply-templates select="SubEquipmentUnits"/>
-		<xsl:apply-templates select="DataTags"/>
-		<xsl:apply-templates select="CommandTags"/>
+	</div>
+	<xsl:apply-templates select="SubEquipmentUnits"/>
+	<xsl:apply-templates select="DataTags"/>
+	<xsl:apply-templates select="CommandTags"/>
 </xsl:template>
 
 <xsl:template match="SubEquipmentUnits">
-    <xsl:apply-templates select="SubEquipmentUnit"/>
+	<xsl:apply-templates select="SubEquipmentUnit"/>
 </xsl:template>
 
 <xsl:template match="SubEquipmentUnit">
-    <p class="tagName">
-      <a name="{@name}"> <xsl:value-of select="@name"/> </a> : (<xsl:value-of select="@id"/>)
-    </p>
-  <div class="column">
-    <table class="inline">
-      <th colspan="2">SubEquipmentUnit</th>
-      <tr>
-        <td class="bold">  id </td>
-        <td><xsl:value-of select="@id"/></td>
-      </tr>
-      <tr>
-        <td class="bold"> name </td>
-        <td><xsl:value-of select="@name"/></td>
-      </tr>
+	<p class="tagName">
+		<a name="{@name}"> <xsl:value-of select="@name"/> </a> : (<xsl:value-of select="@id"/>)
+	</p>
+	<div class="column">
+		<table class="inline">
+			<th colspan="2">SubEquipmentUnit</th>
+			<tr>
+				<td class="bold">  id </td>
+				<td><xsl:value-of select="@id"/></td>
+			</tr>
+			<tr>
+				<td class="bold"> name </td>
+				<td><xsl:value-of select="@name"/></td>
+			</tr>
 
-    <xsl:for-each select="*">
-    <TR>
-      <TD class="bold"><xsl:value-of select="local-name()"/></TD>
-      <TD><xsl:value-of select="."/></TD>
-    </TR>
-        </xsl:for-each>
-      
-    </table>
-    </div>
+			<xsl:for-each select="*">
+				<TR>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD><xsl:value-of select="."/></TD>
+				</TR>
+			</xsl:for-each>
+			
+		</table>
+	</div>
 </xsl:template>
 
 <xsl:template match="CommandTags">
-		<xsl:apply-templates select="CommandTag"/>
+	<xsl:apply-templates select="CommandTag"/>
 </xsl:template>
 
 <xsl:template match="CommandTag">
-		<p class="tagName"> 
-					<a href="{$base_url}{$command_url}{@id}/"><xsl:value-of select="@name"/>:(<xsl:value-of select="@id"/>)</a>&#160;
-		</p>
-		<p>
-					This CommandTag belongs to Equipment 
-					<a href="#{../../@name}"><xsl:value-of select="../../@name" /></a> 
-		</p>
+	<p class="tagName"> 
+		<a href="{$base_url}{$command_url}{@id}/"><xsl:value-of select="@name"/>:(<xsl:value-of select="@id"/>)</a>&#160;
+	</p>
+	<p>
+		This CommandTag belongs to Equipment 
+		<a href="#{../../@name}"><xsl:value-of select="../../@name" /></a> 
+	</p>
 	<div class="column">
 		<table class="inline">
 			<th colspan="2">CommandTag</th>
 			
-		<tr>
-			<td class="bold">  id </td>
-			<td><xsl:value-of select="@id"/></td>
-		</tr>
-		<tr>
-			<td class="bold">  name </td>
-			<td><xsl:value-of select="@name"/></td>
-		</tr>
+			<tr>
+				<td class="bold">  id </td>
+				<td><xsl:value-of select="@id"/></td>
+			</tr>
+			<tr>
+				<td class="bold">  name </td>
+				<td><xsl:value-of select="@name"/></td>
+			</tr>
 
-		<xsl:for-each select="*">
-		
-		<TR>
-			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
-			<TD><xsl:value-of select="."/></TD>
-		</TR>
-    </xsl:for-each>
-		
+			<xsl:for-each select="*">
+				
+				<TR>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD><xsl:value-of select="."/></TD>
+				</TR>
+			</xsl:for-each>
+			
 		</table>
 		<xsl:apply-templates select="HardwareAddress"/>
-		</div>
+	</div>
 </xsl:template>
 
 <xsl:template match="DataTags">
-		<xsl:apply-templates select="DataTag"/>
+	<xsl:apply-templates select="DataTag"/>
 </xsl:template>
 
 <xsl:template match="DataTag">
-		<p class="tagName"> 
-					<a href="{$base_url}{$datatag_url}{@id}/"><xsl:value-of select="@name"/>:(<xsl:value-of select="@id"/>)</a>&#160;
-		</p>
-		<p>
-					This DataTag belongs to Equipment 
-					<a href="#{../../@name}"><xsl:value-of select="../../@name" /></a> 
-		</p>
+	<p class="tagName"> 
+		<a href="{$base_url}{$datatag_url}{@id}/"><xsl:value-of select="@name"/>:(<xsl:value-of select="@id"/>)</a>&#160;
+	</p>
+	<p>
+		This DataTag belongs to Equipment 
+		<a href="#{../../@name}"><xsl:value-of select="../../@name" /></a> 
+	</p>
 	<div class="column">
 		<table class="inline">
 			<th colspan="2">DataTag</th>
@@ -592,16 +592,16 @@
 				<td><xsl:value-of select="@name"/></td>
 			</tr>
 
-		<xsl:for-each select="*[not(local-name() = 'DataTagAddress')]">
-		<TR>
-			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
-			<TD><xsl:value-of select="."/></TD>
-		</TR>
-        </xsl:for-each>
+			<xsl:for-each select="*[not(local-name() = 'DataTagAddress')]">
+				<TR>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD><xsl:value-of select="."/></TD>
+				</TR>
+			</xsl:for-each>
 			
 		</table>
 		<xsl:apply-templates select="DataTagAddress"/>
-		</div>
+	</div>
 </xsl:template>
 
 <xsl:template match="DataTagAddress">
@@ -610,35 +610,35 @@
 		<table class="inline">
 			<th colspan="2">DataTagAddress</th>
 
-		<xsl:for-each select="*[not(local-name() = 'HardwareAddress')]">
-		
-		<TR>
-			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
-			<TD><xsl:value-of select="."/></TD>
-		</TR>
-        </xsl:for-each>
+			<xsl:for-each select="*[not(local-name() = 'HardwareAddress')]">
+				
+				<TR>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD><xsl:value-of select="."/></TD>
+				</TR>
+			</xsl:for-each>
 		</table>
 		
 		<xsl:apply-templates select="HardwareAddress"/>
-		</div>
-		
+	</div>
+	
 </xsl:template>
 
 <xsl:template match="HardwareAddress">
 	<p class="tagName"></p>
 	<div class="column">
 		<table class="inline">
-<th colspan="2">HardwareAddress</th>
+			<th colspan="2">HardwareAddress</th>
 
-        <xsl:for-each select="*">
-		<TR>
-			<TD class="bold"><xsl:value-of select="local-name()"/></TD>
-			<TD><xsl:value-of select="."/></TD>
-		</TR>
-        </xsl:for-each>
+			<xsl:for-each select="*">
+				<TR>
+					<TD class="bold"><xsl:value-of select="local-name()"/></TD>
+					<TD><xsl:value-of select="."/></TD>
+				</TR>
+			</xsl:for-each>
 
-</table>
-</div>
+		</table>
+	</div>
 </xsl:template>
 
 
