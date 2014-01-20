@@ -71,12 +71,23 @@ public class DataTagController {
    * DataTagController logger
    * */
   private static Logger logger = Logger.getLogger(DataTagController.class);
+  
 
   /**
+   * @return Redirects to the form
+   * */
+  @RequestMapping(value = "/tagviewer/", method = { RequestMethod.GET })
+  public String viewTag(final Model model) {
+    logger.info("/tagviewer/");
+    return ("redirect:" + "/tagviewer/form");
+  }    
+
+  /**
+   * @return
    * Displays (TagConfig + TagValue) information for a tag with the specified id.
+   * 
    * @param id tag id
    * @param response we write the html result to that HttpServletResponse response
-   * @throws IOException 
    * */
   @RequestMapping(value = "/tagviewer/{id}", method = { RequestMethod.GET })
   public String viewTag(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
@@ -98,10 +109,13 @@ public class DataTagController {
   }
   
   /**
+   * @return 
    * Displays TagConfig information in RAW XML about a tag with the given id.
+   * 
+   * In case the TagId does not exist, redirects to an error form.
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = TAG_CONFIG_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewTagConfigXml(@PathVariable final String id,  final Model model) {
@@ -115,10 +129,13 @@ public class DataTagController {
   }
   
   /**
+   * @return
    * Displays TagValue information in RAW XML about a tag with the given id.
+   * 
+   * In case the TagId does not exist, redirects to an error form.
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = TAG_VALUE_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewTagValueXml(@PathVariable final String id,  final Model model) {
@@ -132,11 +149,12 @@ public class DataTagController {
   }
 
   /**
+   * @return
    * In case of an error this form is shown.
    * It displays the error and you can also make a new query.
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/tagviewer/errorform/{id}", method = { RequestMethod.GET, RequestMethod.POST })
   public String viewTagErrorForm(@PathVariable(value = "id") final String errorId,
@@ -144,25 +162,17 @@ public class DataTagController {
     
     logger.info("/tagviewer/errorform " + id);
     
-    if (id == null)
-      model.addAllAttributes(FormUtility.getFormModel(TAG_FORM_TITLE, TAG_FORM_INSTR, TAG_FORM_URL, null, null));
-    else
+    if (id == null) {
+      model.addAllAttributes(FormUtility.getFormModel(TAG_FORM_TITLE, 
+          TAG_FORM_INSTR, TAG_FORM_URL, null, null));
+    }
+    else {
       return ("redirect:" + TAG_URL + id);
+    }
 
     model.addAttribute("err", errorId);
     return "notFoundErrorFormWithData";
   }
-
-  /**
-   * Displays a form where a datatag id can be entered.
-   * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
-   * */
-  @RequestMapping(value = "/tagviewer/", method = { RequestMethod.GET })
-  public String viewTag(final Model model) {
-    logger.info("/tagviewer/");
-    return ("redirect:" + "/tagviewer/form");
-  }    
 
   /**
    * Displays a form where a datatag id can be entered.
@@ -186,11 +196,13 @@ public class DataTagController {
   @RequestMapping(value = "/tagviewer/form", method = { RequestMethod.GET, RequestMethod.POST })
   public String viewTagFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
     logger.info("/tagviewer/form " + id);
-    if (id == null)
+    if (id == null) {
       model.addAllAttributes(FormUtility.getFormModel(TAG_FORM_TITLE, TAG_FORM_INSTR, TAG_FORM_URL, null, null));
-    else
-      return ("redirect:" + TAG_URL + id);
-
+    }
+     else {
+       return ("redirect:" + TAG_URL + id);
+     }
+      
     return "formWithData";
   }
 }

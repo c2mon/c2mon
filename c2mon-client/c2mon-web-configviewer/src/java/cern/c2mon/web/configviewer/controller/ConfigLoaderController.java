@@ -61,7 +61,7 @@ public class ConfigLoaderController {
    * URL that retrieves a Stored Configuration Report and displays it in RAW XML.
    */
   public static final String CONFIG_LOADER_PROGRESS_FINAL_REPORT_XML_URL = 
-    CONFIG_LOADER_PROGRESS_REPORT_URL + "/finalReport/" + "xml" ;
+    CONFIG_LOADER_PROGRESS_REPORT_URL + "/finalReport/" + "xml";
 
   /**
    * Title for the config form page
@@ -85,10 +85,8 @@ public class ConfigLoaderController {
   private static Logger logger = Logger.getLogger(ConfigLoaderController.class);
 
   /**
-   * Displays configuration for the given id
-   * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
-   * */
+   * @return Redirects to the form
+   */
   @RequestMapping(value = CONFIG_LOADER_URL, method = { RequestMethod.GET })
   public String viewConfig(final Model model) {
     logger.debug(CONFIG_LOADER_URL);
@@ -96,10 +94,11 @@ public class ConfigLoaderController {
   }    
 
   /**
+   * @return 
    * Displays an --ALREADY APPLIED-- configuration report in RAW XML format.
+   * 
    * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_FINAL_REPORT_XML_URL + "/{id}", method = { RequestMethod.GET })
   public String viewXml(@PathVariable final String id,  final Model model) {
@@ -113,12 +112,12 @@ public class ConfigLoaderController {
   }
 
   /**
+   * @return
    * Applies the configuration for the given Configuration Id
    * and also displays the generated configuration report.
    * 
    * @param id the configuration it to be applied
    * @param response we write the html result to that HttpServletResponse response
-   * @return nothing
    * @throws IOException 
    * */
   @RequestMapping(value = CONFIG_LOADER_URL + "{id}", method = { RequestMethod.GET })
@@ -141,11 +140,11 @@ public class ConfigLoaderController {
   }
 
   /**
+   * @return 
    * Retrieves a stored Configuration Report and displays it.
    * 
    * @param id the Configuration Report id
    * @param response we write the html result to that HttpServletResponse response
-   * @return nothing
    * @throws IOException
    * */
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL + "{id}", method = { RequestMethod.GET })
@@ -168,11 +167,12 @@ public class ConfigLoaderController {
   }  
 
   /**
+   * @return 
    * In case of an error this form is shown.
    * It displays the error and you can also make a new query.
+   * 
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = "/configloader/errorform/{id}")
   public String viewConfigLoaderErrorForm(@PathVariable(value = "id") final String errorId,
@@ -180,50 +180,61 @@ public class ConfigLoaderController {
     
     logger.debug("/configloader/errorform " + id);
 
-   if (id == null)
-      model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, null, null));
-    else
+   if (id == null) {
+      model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE,
+          CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, null, null));
+   }
+    else {
       return ("redirect:" + CONFIG_LOADER_URL + id);
-
+    }
+   
     model.addAttribute("err", errorId);
     return "notFoundErrorFormWithData";
   }
 
   /**
+   * @return
    * Displays a form where a config id can be entered.
+   * 
    * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = CONFIG_LOADER_FORM_URL + "/{id}", method = { RequestMethod.GET })
   public String viewConfigLoaderWithForm(@PathVariable final String id, final Model model) {
     logger.debug("/configloader/form/{id} " + id);
-    model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
+    model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR,
+        CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
+    
     return "formWithData";
   }
 
   /**
-   * Displays an input form for a config id, and if a POST was made with a config id, also the config data.
+   * @return 
+   * Displays an input form for a config id.
+   * 
+   * If a POST was made with a config id, redirects to CONFIG_LOADER_URL + id.
+   *  
    * @param id config id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    * */
   @RequestMapping(value = CONFIG_LOADER_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
   public String viewConfigLoaderFormPost(@RequestParam(value = "id", required = false) final String id, final Model model) {
     logger.debug("/configloader/form " + id);
     if (id == null)
-      model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, null, null));
+      model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, 
+          CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, null, null));
     else
       return ("redirect:" + CONFIG_LOADER_URL + id);
     return "formWithData";
   }
 
   /**
+   * @return
    * Displays an input form for a configuration id.
    * If a request is made from this form, a listener is registered that
    * listens for ProgressReport updates.
+   * 
    * @param model Spring MVC Model instance to be filled in before jsp processes it
-   * @return name of a jsp page which will be displayed
    */
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_REPORT_URL, method = RequestMethod.GET)
   public String startConfigurationProcessWithProgressReportForm(final Model model) {
@@ -237,12 +248,13 @@ public class ConfigLoaderController {
   }  
   
   /**
+   * @return 
    * Directly makes an ApplyConfiguration request for the specified id.
    * A listener is registered that listens for ProgressReport updates.
    * The progress update is shown in a progress bar.
+   * 
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @param id The configuration id for which the request is made.
-   * @return name of a jsp page which will be displayed
    */
   @RequestMapping(value = CONFIG_LOADER_PROGRESS_REPORT_URL + "/{id}", method = RequestMethod.GET)
   public String startConfigurationProcessWithProgressReportWithoutForm(
@@ -290,7 +302,7 @@ public class ConfigLoaderController {
     logger.debug("returning:" + report.getCurrentProgressPart() + " out of " + report.getTotalProgressParts());
 
     // @ResponseBody will automatically convert the returned value into JSON format
-    // You must have Jackson in your classpath
+    // (Jackson)
     return currentProgress;
   }
   
@@ -313,7 +325,7 @@ public class ConfigLoaderController {
     }
     // @ResponseBody will automatically convert the returned value into JSON format
     // You must have Jackson in your classpath
-    // Jackson does not work as expected.. so Gson is used for this case
+    // Jackson does not work as expected in this case.. so Gson is used for this case
     return getGson().toJson(progressDescription);
   }
   
@@ -324,7 +336,6 @@ public class ConfigLoaderController {
     if (gson == null) {
       gson = GsonFactory.createGson();
     }
-
     return gson;
   }
 }
