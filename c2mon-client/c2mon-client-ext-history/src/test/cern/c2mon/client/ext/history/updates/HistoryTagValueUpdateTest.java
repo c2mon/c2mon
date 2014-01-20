@@ -24,8 +24,8 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import cern.c2mon.shared.client.tag.TagMode;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 public class HistoryTagValueUpdateTest {
 

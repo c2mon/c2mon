@@ -77,11 +77,11 @@
     <level value="info" />
     <appender-ref ref="FileAppender" />
   </logger>
-  <logger name="ch.cern.tim" additivity="false">
+  <logger name="cern.c2mon. additivity="false">
     <level value="all" />
     <appender-ref ref="FileAppender" />
   </logger>
-  <logger name="cern.tim" additivity="false">
+  <logger name="cern.c2mon. additivity="false">
     <level value="all" />
     <appender-ref ref="FileAppender" />
   </logger>

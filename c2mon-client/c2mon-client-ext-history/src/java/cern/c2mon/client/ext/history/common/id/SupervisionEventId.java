@@ -18,7 +18,7 @@
 package cern.c2mon.client.ext.history.common.id;
 
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This class is used to identify a {@link SupervisionEvent}

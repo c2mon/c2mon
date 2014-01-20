@@ -16,10 +16,10 @@ import org.simpleframework.xml.core.Persister;
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.manager.CommandManager;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
-import cern.tim.shared.client.command.CommandTagHandle;
-import cern.tim.shared.client.command.CommandTagValueException;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
-import cern.tim.shared.common.command.AuthorizationDetails;
+import cern.c2mon.shared.client.command.CommandTagHandle;
+import cern.c2mon.shared.client.command.CommandTagValueException;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
  * This class is used by the {@link CommandManager} to cache

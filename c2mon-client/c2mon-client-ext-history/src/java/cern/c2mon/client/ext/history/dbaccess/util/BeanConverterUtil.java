@@ -25,7 +25,7 @@ import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.type.TypeConverter;
+import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
  * Converts beans into common interfaces

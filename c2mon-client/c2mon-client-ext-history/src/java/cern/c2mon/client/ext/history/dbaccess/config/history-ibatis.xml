@@ -12,18 +12,18 @@
     <typeAlias alias="DailySnapshotRequestBean" type="cern.c2mon.client.ext.history.dbaccess.beans.DailySnapshotRequestBean" />
     <typeAlias alias="HistoryRecord" type="cern.c2mon.client.ext.history.dbaccess.beans.HistoryRecordBean" />
     <typeAlias alias="SavedHistoryEventRecord" type="cern.c2mon.client.ext.history.dbaccess.beans.SavedHistoryEventRecordBean" />
-    <typeAlias alias="DataTagQuality" type="cern.tim.shared.common.datatag.DataTagQuality" />
+    <typeAlias alias="DataTagQuality" type="cern.c2mon.shared.common.datatag.DataTagQuality" />
     <typeAlias alias="SupervisionRecordBean" type="cern.c2mon.client.ext.history.dbaccess.beans.SupervisionRecordBean" />
     <typeAlias alias="Timestamp" type="java.sql.Timestamp" />
     <typeAlias alias="Date" type="java.util.Date" />
-    <typeAlias alias="SupervisionEntity" type="cern.tim.shared.common.supervision.SupervisionConstants$SupervisionEntity" />
-    <typeAlias alias="SupervisionStatus" type="cern.tim.shared.common.supervision.SupervisionConstants$SupervisionStatus" />    
+    <typeAlias alias="SupervisionEntity" type="cern.c2mon.shared.common.supervision.SupervisionConstants$SupervisionEntity" />
+    <typeAlias alias="SupervisionStatus" type="cern.c2mon.shared.common.supervision.SupervisionConstants$SupervisionStatus" />    
     <typeAlias alias="SavedHistoryEventBean" type="cern.c2mon.client.ext.history.dbaccess.beans.SavedHistoryEventBean" />
   </typeAliases>
   
   <typeHandlers>
     <typeHandler 
-        javaType="cern.tim.shared.common.datatag.DataTagQuality" 
+        javaType="cern.c2mon.shared.common.datatag.DataTagQuality" 
         jdbcType="VARCHAR" 
         handler="cern.c2mon.shared.client.tag.ibatis.DataTagQualityTypeHandler" />
   </typeHandlers>

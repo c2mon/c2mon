@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cern.c2mon.client.core.C2monTagManager;
-import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
  * The tag simulator allows manipulating the value of already registered data

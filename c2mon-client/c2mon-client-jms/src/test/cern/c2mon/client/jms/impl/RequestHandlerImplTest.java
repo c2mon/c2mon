@@ -39,13 +39,13 @@ import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.JsonRequest;
-import cern.tim.shared.client.command.CommandExecuteRequest;
-import cern.tim.shared.client.command.CommandExecuteRequestImpl;
-import cern.tim.shared.client.command.CommandExecutionStatus;
-import cern.tim.shared.client.command.CommandReport;
-import cern.tim.shared.client.command.CommandReportImpl;
-import cern.tim.shared.client.command.CommandTagHandleImpl;
-import cern.tim.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.command.CommandExecuteRequest;
+import cern.c2mon.shared.client.command.CommandExecuteRequestImpl;
+import cern.c2mon.shared.client.command.CommandExecutionStatus;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandReportImpl;
+import cern.c2mon.shared.client.command.CommandTagHandleImpl;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 
 /**
  * Unit test of the RequestHandler implementation.

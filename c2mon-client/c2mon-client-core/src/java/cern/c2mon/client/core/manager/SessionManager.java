@@ -26,7 +26,7 @@ import cern.c2mon.client.auth.AuthenticationManager;
 import cern.c2mon.client.auth.AuthorizationManager;
 import cern.c2mon.client.common.listener.SessionListener;
 import cern.c2mon.client.core.C2monSessionManager;
-import cern.tim.shared.common.command.AuthorizationDetails;
+import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
  * The session manager handles the user authentication and allows registering SessionListener.

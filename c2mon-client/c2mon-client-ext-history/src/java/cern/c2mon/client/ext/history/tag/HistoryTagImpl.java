@@ -38,9 +38,9 @@ import cern.c2mon.client.ext.history.common.tag.HistoryTagRecord;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagResultType;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
-import cern.tim.shared.common.datatag.DataTagQuality;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.rule.RuleExpression;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.rule.RuleExpression;
 
 /**
  * This class takes an expression, and loads the data specified. An expression

@@ -28,9 +28,9 @@ import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.tim.shared.common.datatag.DataTagQuality;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.rule.RuleFormatException;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
  * Don't forget to add all required environment variables before you start your

@@ -52,7 +52,7 @@ import cern.c2mon.client.ext.history.util.KeyForValuesMap;
 import cern.c2mon.client.jms.ConnectionListener;
 import cern.c2mon.client.jms.SupervisionListener;
 
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 @Service
 public class HistoryManager implements C2monHistoryManager, TagSubscriptionListener {

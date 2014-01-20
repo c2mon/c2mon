@@ -17,13 +17,13 @@ import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monSessionManager;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.jms.RequestHandler;
-import cern.tim.shared.client.command.CommandExecuteRequest;
-import cern.tim.shared.client.command.CommandExecuteRequestImpl;
-import cern.tim.shared.client.command.CommandExecutionStatus;
-import cern.tim.shared.client.command.CommandReport;
-import cern.tim.shared.client.command.CommandReportImpl;
-import cern.tim.shared.client.command.CommandTagHandle;
-import cern.tim.shared.client.command.CommandTagValueException;
+import cern.c2mon.shared.client.command.CommandExecuteRequest;
+import cern.c2mon.shared.client.command.CommandExecuteRequestImpl;
+import cern.c2mon.shared.client.command.CommandExecutionStatus;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandReportImpl;
+import cern.c2mon.shared.client.command.CommandTagHandle;
+import cern.c2mon.shared.client.command.CommandTagValueException;
 
 @Service
 public class CommandManager implements C2monCommandManager {

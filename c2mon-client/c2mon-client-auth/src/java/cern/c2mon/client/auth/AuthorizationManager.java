@@ -17,7 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.client.auth;
 
-import cern.tim.shared.common.command.AuthorizationDetails;
+import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
  * The Authorization Manager allows you to check whether the an

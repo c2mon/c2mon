@@ -8,7 +8,7 @@ import javax.jms.TextMessage;
 
 import cern.c2mon.client.jms.HeartbeatListener;
 import cern.c2mon.shared.client.supervision.Heartbeat;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 

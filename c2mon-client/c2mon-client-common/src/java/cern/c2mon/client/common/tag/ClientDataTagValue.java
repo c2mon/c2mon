@@ -21,9 +21,9 @@ import java.util.Collection;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
-import cern.tim.shared.common.datatag.DataTagQuality;
-import cern.tim.shared.common.rule.RuleInputValue;
-import cern.tim.shared.rule.RuleExpression;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.rule.RuleInputValue;
+import cern.c2mon.shared.rule.RuleExpression;
 
 /**
  * The <code>ClientDataTagValue</code> interface is the immutable interface 

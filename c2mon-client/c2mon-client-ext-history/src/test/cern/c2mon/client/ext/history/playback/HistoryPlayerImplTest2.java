@@ -30,9 +30,9 @@ import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
  * This test is testing the {@link HistoryPlayerImpl} class, and checks that the

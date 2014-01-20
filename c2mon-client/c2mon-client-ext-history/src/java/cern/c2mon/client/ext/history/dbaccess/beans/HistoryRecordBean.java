@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import cern.c2mon.client.ext.history.dbaccess.util.TimeZoneUtil;
-import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
 
 /**
  * When rows from the history tables are retrieved from the database, it is

@@ -65,7 +65,7 @@ import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
-import cern.tim.shared.client.command.CommandExecuteRequest;
+import cern.c2mon.shared.client.command.CommandExecuteRequest;
 
 /**
  * Implementation of the JmsProxy singleton bean. Also see the interface for

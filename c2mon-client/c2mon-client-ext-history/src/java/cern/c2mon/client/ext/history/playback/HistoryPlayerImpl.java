@@ -55,7 +55,7 @@ import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This class implements a type of video player which provides functionality to

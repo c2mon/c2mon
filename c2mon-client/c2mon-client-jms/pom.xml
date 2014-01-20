@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>c2mon-client-pom</artifactId>
 		<groupId>cern.c2mon.c2mon-client</groupId>
-		<version>1.0.16</version>
+		<version>1.1.0</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-jms</artifactId>
@@ -40,16 +40,16 @@
 			<artifactId>spring-context</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-client</artifactId>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-client</groupId>
 			<artifactId>c2mon-client-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-util</artifactId>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-util</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>cern.accsoft.commons</groupId>
@@ -88,7 +88,7 @@
 				<configuration>
 					<argLine>
 						<!-- for this module -->
-						-Dc2mon.client.jms.url=tcp://tim2:61620
+						-Dc2mon.client.jms.url=tcp://c2mon:61620
 						-Dc2mon.client.jms.user=not-used
 						-Dc2mon.client.jms.password=not-used
 						-Dc2mon.client.jms.supervision.topic=c2mon.JmsProxy.test.supervision.topic

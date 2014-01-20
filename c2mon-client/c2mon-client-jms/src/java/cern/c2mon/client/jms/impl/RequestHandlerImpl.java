@@ -48,10 +48,10 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.client.command.CommandExecuteRequest;
-import cern.tim.shared.client.command.CommandReport;
-import cern.tim.shared.client.command.CommandTagHandle;
-import cern.tim.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.command.CommandExecuteRequest;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandTagHandle;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 
 /**
  * Implementation of the RequestHandler bean.

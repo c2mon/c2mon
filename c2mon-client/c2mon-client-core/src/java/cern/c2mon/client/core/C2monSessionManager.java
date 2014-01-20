@@ -20,7 +20,7 @@ package cern.c2mon.client.core;
 import java.util.Set;
 
 import cern.c2mon.client.common.listener.SessionListener;
-import cern.tim.shared.common.command.AuthorizationDetails;
+import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
  * This interface describes the methods which are provided by

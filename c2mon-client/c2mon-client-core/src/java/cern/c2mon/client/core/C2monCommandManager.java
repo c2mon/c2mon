@@ -3,8 +3,8 @@ package cern.c2mon.client.core;
 import java.util.Set;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.tim.shared.client.command.CommandReport;
-import cern.tim.shared.client.command.CommandTagValueException;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandTagValueException;
 
 /**
  * The <code>C2monCommandManager</code> allows to retrieve command
@@ -56,7 +56,7 @@ public interface C2monCommandManager {
    * @return <code>true</code>, if a user is logged in and has the priviledges
    *         to execute the command specified by the <code>commandId</code>
    *         parameter.
-   * @see C2monSessionManager#isAuthorized(String, cern.tim.shared.common.command.AuthorizationDetails)
+   * @see C2monSessionManager#isAuthorized(String, cern.c2mon.shared.common.command.AuthorizationDetails)
    * @see C2monSessionManager#getLoggedUserNames()
    */
   boolean isAuthorized(String userName, Long commandId);

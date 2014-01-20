@@ -36,7 +36,7 @@ import cern.c2mon.client.ext.history.common.id.TagValueUpdateId;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
 
 /**
  * Implementation of the {@link TagValueUpdate}

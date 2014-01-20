@@ -20,7 +20,7 @@ package cern.c2mon.client.ext.history.dbaccess.beans;
 import java.sql.Timestamp;
 
 import cern.c2mon.client.ext.history.dbaccess.HistoryMapper;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This class is passed as an argument when requesting data from through the

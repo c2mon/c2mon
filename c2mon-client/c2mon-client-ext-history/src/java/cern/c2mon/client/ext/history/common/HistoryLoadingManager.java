@@ -24,7 +24,7 @@ import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.ext.history.common.event.HistoryLoadingManagerListener;
 import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
 import cern.c2mon.client.ext.history.common.id.SupervisionEventId;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This interface describes the functions for a history loading manager.

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-client</groupId>
 		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.0.16</version>
+		<version>1.1.0</version>
 	</parent>
 	<groupId>cern.c2mon.c2mon-client</groupId>
 	<artifactId>c2mon-client-all</artifactId>
@@ -51,7 +51,6 @@
 							<artifactSet>
 								<includes>
 									<include>cern.c2mon.c2mon-client:*</include>
-									<include>cern.tim2.tim2-shared:*</include>
 									<include>cern.c2mon.c2mon-shared:*</include>
 								</includes>
 								<excludes>

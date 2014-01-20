@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-client</groupId>
     <artifactId>c2mon-client-pom</artifactId>
-    <version>1.0.14</version>
+    <version>1.1.0</version>
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-jviews-history</artifactId>
@@ -12,7 +12,7 @@
   <name>c2mon-jviews-history</name>
   <packaging>jar</packaging>
   <description>
-        Provides GUI used in history play back for the tim2-jviews-viewer.
+        Provides GUI used in history play back for the c2mon-jviews-viewer.
     </description>
   <url>http://timweb.cern.ch</url>
 

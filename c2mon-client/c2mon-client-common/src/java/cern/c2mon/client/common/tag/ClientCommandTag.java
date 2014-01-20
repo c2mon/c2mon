@@ -1,7 +1,7 @@
 package cern.c2mon.client.common.tag;
 
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
-import cern.tim.shared.common.command.AuthorizationDetails;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
  * This interface represents the read-only interface

@@ -20,7 +20,7 @@ package cern.c2mon.client.common.tag;
 import cern.c2mon.client.common.listener.TagUpdateListener;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.rule.RuleFormatException;
+import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
  * This interface extends the <code>ClientDataTagValue</code> interface 

@@ -25,7 +25,7 @@ import cern.c2mon.client.ext.history.common.tag.HistoryTagConfiguration;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagExpressionException;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagParameter;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagResultType;
-import cern.tim.shared.common.type.TypeConverter;
+import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
  * This is a configuration for a {@link HistoryTagImpl}. Can be used to create an

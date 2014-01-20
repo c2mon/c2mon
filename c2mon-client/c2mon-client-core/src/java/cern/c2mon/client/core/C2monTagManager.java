@@ -32,7 +32,7 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.tag.TagConfig;
-import cern.tim.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 
 /**
  * This interface describes the methods which are provided by

@@ -39,7 +39,7 @@ import cern.c2mon.client.core.C2monSessionManager;
 import cern.c2mon.client.jms.AdminMessageListener;
 import cern.c2mon.client.module.C2monAdminMessageManager;
 import cern.c2mon.client.module.adminmessage.handler.AdminMessageHandler;
-import cern.tim.shared.common.command.AuthorizationDetails;
+import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
  * The admin message manager allows registering

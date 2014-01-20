@@ -44,7 +44,7 @@ import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.client.ext.history.util.KeyForValuesMap;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 
 /**
  * This class implements the logical functions of a history loading manager. Ie.

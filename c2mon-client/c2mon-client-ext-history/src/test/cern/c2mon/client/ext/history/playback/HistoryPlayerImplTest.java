@@ -48,7 +48,7 @@ import cern.c2mon.client.ext.history.testUtil.UncaughtExceptionSetup;
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 /**
  * This test is testing the {@link HistoryPlayerImpl} class, and checks that the

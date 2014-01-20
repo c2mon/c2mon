@@ -22,9 +22,9 @@ import javax.xml.transform.TransformerException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.tim.shared.client.configuration.ConfigurationRequest;
-import cern.tim.shared.client.configuration.ConfigurationRequestConverter;
-import cern.tim.util.jms.JmsSender;
+import cern.c2mon.shared.client.configuration.ConfigurationRequest;
+import cern.c2mon.shared.client.configuration.ConfigurationRequestConverter;
+import cern.c2mon.shared.util.jms.JmsSender;
 
 /**
  * JMS sender class for sending the Configuration request

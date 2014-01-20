@@ -21,7 +21,7 @@ import java.util.Collection;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
  * This interface describes the methods for a history tag. A history tag should

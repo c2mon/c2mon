@@ -3,7 +3,7 @@ package cern.c2mon.client.common.util;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
 /**
  * Helper class.

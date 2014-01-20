@@ -10,8 +10,8 @@ import org.junit.Test;
 import cern.c2mon.client.ext.history.dbaccess.beans.HistoryRecordBean;
 import cern.c2mon.client.ext.history.dbaccess.util.BeanConverterUtil;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
  * Tests the {@link HistoryRecordBean}

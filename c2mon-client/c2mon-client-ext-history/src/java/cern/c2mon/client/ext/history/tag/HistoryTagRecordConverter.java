@@ -35,8 +35,8 @@ import cern.c2mon.client.ext.history.common.tag.HistoryTagConfiguration;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagParameter;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagRecord;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagResultType;
-import cern.tim.shared.common.datatag.DataTagQuality;
-import cern.tim.shared.common.type.TypeConverter;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
  * This class provides functions to convert a collection of

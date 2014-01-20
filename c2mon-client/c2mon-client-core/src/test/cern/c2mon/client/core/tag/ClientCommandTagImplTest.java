@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import cern.tim.shared.client.command.CommandTagHandleImpl;
-import cern.tim.shared.client.command.CommandTagValueException;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.client.command.CommandTagHandleImpl;
+import cern.c2mon.shared.client.command.CommandTagValueException;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
 public class ClientCommandTagImplTest {
 

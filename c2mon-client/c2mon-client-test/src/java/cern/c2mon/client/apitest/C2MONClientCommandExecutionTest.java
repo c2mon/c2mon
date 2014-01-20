@@ -24,7 +24,7 @@ import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monSessionManager;
 import cern.rba.util.holder.ClientTierSubjectHolder;
-import cern.tim.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandReport;
 
 public class C2MONClientCommandExecutionTest {
 

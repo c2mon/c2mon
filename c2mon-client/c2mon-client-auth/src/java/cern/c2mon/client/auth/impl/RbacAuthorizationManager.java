@@ -25,8 +25,8 @@ import cern.accsoft.security.rba.authorization.AccessChecker;
 import cern.accsoft.security.rba.authorization.AccessException;
 import cern.c2mon.client.auth.AuthorizationManager;
 import cern.rba.util.lookup.RbaTokenLookup;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
-import cern.tim.shared.common.command.AuthorizationDetails;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
  * This class implements the {@link AuthorizationManager} interface for RBAC authentication/authorization.

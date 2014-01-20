@@ -21,8 +21,8 @@ import java.sql.Timestamp;
 import java.util.TimeZone;
 
 import cern.c2mon.client.ext.history.dbaccess.util.TimeZoneUtil;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
  * A row from the supervision log is converted into this object

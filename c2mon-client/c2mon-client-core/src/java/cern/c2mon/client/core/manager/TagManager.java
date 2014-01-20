@@ -41,8 +41,8 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.tim.shared.client.configuration.ConfigurationReport;
-import cern.tim.shared.rule.RuleFormatException;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
  * The tag manager implements the <code>C2monTagManager</code> interface. It's main job is to delegate cache requests

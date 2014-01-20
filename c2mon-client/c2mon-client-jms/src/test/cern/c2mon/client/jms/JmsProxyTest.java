@@ -61,12 +61,12 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.tim.shared.client.configuration.ConfigurationReport;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import cern.tim.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import cern.tim.util.jms.ActiveJmsSender;
-import cern.tim.util.json.GsonFactory;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.util.jms.ActiveJmsSender;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 /**
  * Integration testing of JmsProxy implementation with ActiveMQ broker.

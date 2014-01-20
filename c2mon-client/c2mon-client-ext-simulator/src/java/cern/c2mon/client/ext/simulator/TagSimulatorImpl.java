@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
-import cern.tim.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
  * This class implements the {@link C2monTagSimulator} interface. For more

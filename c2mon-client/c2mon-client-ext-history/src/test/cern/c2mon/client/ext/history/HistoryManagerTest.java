@@ -63,7 +63,7 @@ import cern.c2mon.client.ext.history.common.exception.HistoryPlayerNotActiveExce
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.tim.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 /**
  * This tests the {@link HistoryManager} class for the following functions:<br/>

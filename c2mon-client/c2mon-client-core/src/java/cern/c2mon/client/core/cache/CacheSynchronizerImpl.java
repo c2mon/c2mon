@@ -41,9 +41,9 @@ import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.tim.shared.common.datatag.DataTagQuality;
-import cern.tim.shared.common.datatag.TagQualityStatus;
-import cern.tim.shared.rule.RuleFormatException;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.rule.RuleFormatException;
 
 
 /**
