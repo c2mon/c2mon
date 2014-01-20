@@ -21,11 +21,10 @@ import org.easymock.classextension.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.jmx.support.MetricType;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.shared.client.tag.TagConfig;
-import cern.tim.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
 
 /**
  * This class publishes JUnit test for LemonPublisher

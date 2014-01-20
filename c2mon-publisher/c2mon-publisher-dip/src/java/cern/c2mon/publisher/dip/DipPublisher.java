@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.shared.client.tag.TagConfig;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.dip.Dip;
 import cern.dip.DipData;
 import cern.dip.DipException;
@@ -38,7 +39,6 @@ import cern.dip.DipPublication;
 import cern.dip.DipPublicationErrorHandler;
 import cern.dip.DipQuality;
 import cern.dip.DipTimestamp;
-import cern.tim.shared.common.datatag.DataTagQuality;
 
 
 /**
