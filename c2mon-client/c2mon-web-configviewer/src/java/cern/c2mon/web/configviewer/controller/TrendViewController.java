@@ -22,6 +22,7 @@ import cern.c2mon.client.ext.history.common.HistoryTagValueUpdate;
 import cern.c2mon.client.ext.history.common.exception.HistoryProviderException;
 import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
 import cern.c2mon.web.configviewer.service.HistoryService;
+import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.service.TagService;
 import cern.c2mon.web.configviewer.util.FormUtility;
 import cern.c2mon.web.configviewer.util.InvalidPoint;
@@ -43,14 +44,17 @@ public class TrendViewController {
   /** URL to define Last Records */
   public static final String LAST_RECORDS_URL = "/records/";
 
-  /** URL to define Last Days */
-  public static final String LAST_DAYS_URL = "/days/";
-
-  /** URL to define Start Date */
-  public static final String START_DATE_URL = "START";
+  /** Last Days */
+  public static final String LAST_DAYS_PARAMETER = "DAYS";
   
-  /** URL to define End Date */
-  public static final String END_DATE_URL = "END";
+  /** RECORDS */
+  public static final String MAX_RECORDS_PARAMETER = "RECORDS";
+
+  /** Start Date */
+  public static final String START_DATE_PARAMETER = "START";
+  
+  /** End Date */
+  public static final String END_DATE_PARAMETER = "END";
   
   /** A URL to the viewer with input form */
   public static final String TREND_VIEW_FORM_URL = "/trendviewer/form";
@@ -141,51 +145,39 @@ public class TrendViewController {
   }
   
   /**
-   * @return Displays a Trend View for a given id.
    * 
-   * @param id The Tag Id whose trend will be shown.
-   * @param days number of days to go back in history
-   * @throws IOException 
-   * */
-  @RequestMapping(value = TREND_VIEW_URL + "{id}" 
-      + LAST_DAYS_URL + "{days}"
-        , method = { RequestMethod.GET })
-  public final String viewTrendLastDays(@PathVariable(value = "id") final String id,
-      @PathVariable(value = "days") final int days,
-      final Model model) throws IOException  {
+   * @return Model containing values needed to create a chart of type: Last days
+   * 
+   * @param id The chart is created for that id.
+   * @param days How many days to go back in history.
+   * @throws TagIdException In case the specified TagId does not exist.
+   */
+  public final Model getLastDaysModel(Model model, final String id, final int days) 
+      throws HistoryProviderException, LoadingParameterException, TagIdException {
+
+    final List<HistoryTagValueUpdate> historyValues = 
+        historyService.requestHistoryDataForLastDays(id, days);
+
+    final boolean isBooleanData = historyService.isBooleanData(historyValues);
+    final Collection<InvalidPoint> invalidPoints = historyService.getInvalidPoints(historyValues);
+    final ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
+    final String historyCSV = historyService.getHistoryCSV(historyValues, isBooleanData);
     
-    logger.info(TREND_VIEW_URL + "{id} " + id + LAST_DAYS_URL + days);
-
-    try {
-      final List<HistoryTagValueUpdate> historyValues = 
-          historyService.requestHistoryDataForLastDays(id, days);
-      
-      final boolean isBooleanData = historyService.isBooleanData(historyValues);
-      final Collection<InvalidPoint> invalidPoints = historyService.getInvalidPoints(historyValues);
-      final ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
-      
-      model.addAttribute("CSV", historyService.getHistoryCSV(historyValues, isBooleanData));
-      model.addAttribute("invalidPoints", invalidPoints);
-      model.addAttribute("id", id);
-      model.addAttribute("ylabel", tagValue.getUnit());
-      model.addAttribute("tagName", tagValue.getName());
-      model.addAttribute("labels", new String[]{"Server Timestamp", 
-          "[" + id + "] " });
-
-      model.addAttribute("legend", tagValue.getName());
-      model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
-      model.addAttribute("unit", tagValue.getUnit());
-      model.addAttribute("fill_graph", true);
-      
-      model.addAttribute("view_title", tagValue.getName());
-      model.addAttribute("view_description", "(Last " + days + " days)");
-      
-      return "trend_views/trend_view";
-      
-    } catch (Exception e) {
-      logger.error(e.getMessage());
+    if (tagValue == null) {
+      logger.debug("TagId: " + id + " not found!");
+      throw new TagIdException("TagId: " + id + " not found!");
     }
-    return null;
+    
+    model = getDefaultModel(model, tagValue);
+    
+    model.addAttribute("CSV", historyCSV);
+    model.addAttribute("invalidPoints", invalidPoints);
+    model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
+
+    model.addAttribute("view_title", tagValue.getName());
+    model.addAttribute("view_description", "(Last " + days + " days)");
+    
+    return model;
   }
   
   /**
@@ -194,9 +186,10 @@ public class TrendViewController {
    * 
    * @param id The chart is created for that id.
    * @param records How many records to go back in history.
+   * @throws TagIdException In case the specified TagId does not exist.
    */
   public final Model getLastRecordsModel(Model model, final String id, final int records) 
-      throws HistoryProviderException, LoadingParameterException {
+      throws HistoryProviderException, LoadingParameterException, TagIdException {
 
     final List<HistoryTagValueUpdate> historyValues = 
         historyService.requestHistoryData(id, records);
@@ -205,6 +198,11 @@ public class TrendViewController {
     final Collection<InvalidPoint> invalidPoints = historyService.getInvalidPoints(historyValues);
     final ClientDataTagValue tagValue = tagService.getDataTagValue(Long.parseLong(id));
     final String historyCSV = historyService.getHistoryCSV(historyValues, isBooleanData);
+    
+    if (tagValue == null) {
+      logger.debug("TagId: " + id + " not found!");
+      throw new TagIdException("TagId: " + id + " not found!");
+    }
     
     model = getDefaultModel(model, tagValue);
     
@@ -279,31 +277,43 @@ public class TrendViewController {
    * this will be the End Date of the history query.
    * {@link TrendViewController#DATE_FORMAT}
    * 
-   * @throws IOException 
    * */
   @RequestMapping(value = TREND_VIEW_URL + "{id}", method = { RequestMethod.GET })
   public final String viewTrend(@PathVariable(value = "id") final String id,
-      @RequestParam(value = START_DATE_URL, required = false) final String start,
-      @RequestParam(value = END_DATE_URL, required = false) final String end,
-      Model model) throws IOException  {
+      @RequestParam(value = MAX_RECORDS_PARAMETER, required = false) final String maxRecords,
+      @RequestParam(value = LAST_DAYS_PARAMETER, required = false) final String lastDays,
+      @RequestParam(value = START_DATE_PARAMETER, required = false) final String start,
+      @RequestParam(value = END_DATE_PARAMETER, required = false) final String end,
+      Model model)   {
     
     try {
-      
-      if (start == null && end == null) {
-        logger.info(TREND_VIEW_URL + "{id} " + id);
-        model = getLastRecordsModel(model, id, RECORDS_TO_ASK_FOR);
-      }
-      else {
+      if (start != null && end != null) {
         logger.info(TREND_VIEW_URL + "{id} " + id + "start:" + start + "end:" + end);
         model = getStartEndDateModel(model, id, start, end);
       }
+      else if (maxRecords != null) {
+        logger.info(TREND_VIEW_URL + "{id} " + id + "maxRecords:" + maxRecords);
+        model = getLastRecordsModel(model, id, Integer.parseInt(maxRecords));
+      }
+      else if (lastDays != null) {
+        logger.info(TREND_VIEW_URL + "{id} " + id + "lastDays:" + lastDays);
+        model = getLastDaysModel(model, id, Integer.parseInt(lastDays));
+      }
+      else {
+        logger.info(TREND_VIEW_URL + "{id} " + id);
+        model = getLastRecordsModel(model, id, RECORDS_TO_ASK_FOR);
+      }
       return "trend_views/trend_view";
-      
-    } catch (Exception e) {
+    }
+    catch (final TagIdException e) {
+      return ("redirect:" + TREND_VIEW_FORM_URL + "?error=" + id);
+    }
+    catch (Exception e) {
       logger.error(e.getMessage());
     }
-    return null;
+    return ("redirect:" + TREND_VIEW_FORM_URL + "?error=" + id);
   }
+  
 
   /**
    * @return Displays an input form for a tag id.
@@ -325,34 +335,45 @@ public class TrendViewController {
    * this will be the End Date of the history query.
    * {@link TrendViewController#DATE_FORMAT}
    * 
+   * @param wrongId: In case an error occurred while submitting the form.
+   * (TagId that does not exist is the most common case).
+   * 
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */
   @RequestMapping(value = TREND_VIEW_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
   public final String viewTrendFormPost(@RequestParam(value = "id", required = false) final String id,
+      @RequestParam(value = "error", required = false) final String wrongId,
       @RequestParam(value = "records", required = false) final String records,
       @RequestParam(value = "days", required = false) final String days,
-      @RequestParam(value = "start", required = false) final String start,
-      @RequestParam(value = "end", required = false) final String end,
+      @RequestParam(value = "start", required = false) final String startDate,
+      @RequestParam(value = "end", required = false) final String endDate,
+      @RequestParam(value = "startTime", required = false) final String startTime,
+      @RequestParam(value = "endTime", required = false) final String endTime,
       final Model model) {
     
     logger.info(TREND_VIEW_FORM_URL + id);
     if (id == null) {
       model.addAllAttributes(FormUtility.getFormModel(TREND_FORM_TITLE, INSTRUCTION,
           TREND_VIEW_FORM_URL, null, null));
+      
+      if (wrongId != null) {
+        model.addAttribute("error", wrongId);
+      }
+      
       // Displays an empty form -> 
       return "trend_views/trend_view_form";
     }
       
     else if (days != null) {
-      return ("redirect:" + TREND_VIEW_URL + id + LAST_DAYS_URL + days);
+      return ("redirect:" + TREND_VIEW_URL + id + "?" + LAST_DAYS_PARAMETER + "=" + days);
     }
-    else if (start != null) {
+    else if (startDate != null) {
       return ("redirect:" + TREND_VIEW_URL + id 
-          + "?" + START_DATE_URL + "=" + start + "-07:00" 
-          + "&" + END_DATE_URL + "=" + end + "-07:00");
+          + "?" + START_DATE_PARAMETER + "=" + startDate + "-" + startTime 
+          + "&" + END_DATE_PARAMETER + "=" + endDate + "-" + endTime);
     }
     else if (records != null) {
-      return ("redirect:" + TREND_VIEW_URL + id + LAST_RECORDS_URL + records);
+      return ("redirect:" + TREND_VIEW_URL + id + "?" + MAX_RECORDS_PARAMETER + "=" + records);
     }
     
     // Displays an empty form -> 
