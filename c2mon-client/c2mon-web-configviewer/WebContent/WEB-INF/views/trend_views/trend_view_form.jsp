@@ -1,3 +1,5 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!DOCTYPE html>
 <head>
@@ -45,6 +47,11 @@
 				<strong>${instruction}</strong>
 			</div>
 
+			<c:if test="${error != null}"> 
+				<div class="alert alert-error">
+					id: <strong>${error}</strong> NOT FOUND....  Sorry : /
+				</div>
+			</c:if>
 
 			<ul id="tabs" class="nav nav-tabs">
 				<li><a href="#records" data-toggle="tab">Last Records</a></li>
@@ -109,13 +116,19 @@
 					<form class="well form-inline" action="" method="post">
 						<div class="input-prepend">
 							<span class="add-on">Id</span>
-							<input class="span3" style="display:inline" type="text" name="id" value="${formTagValue}" /> 
-							<span class="input-daterange" id="datepicker">
+							<input class="span1" style="display:inline" type="text" name="id" value="${formTagValue}" /> 
+
+							<span class="input-daterange" id="datepickerFrom" style="margin-left:10px; margin-right:-10px;">
 								<span class="add-on">From</span>
-								<input type="text" class="input-small span3" name="start" />
-								<span class="add-on">to</span>
-								<input type="text" class="input-small span3" name="end" />
+								<input type="text" class="input-small span2" name="start" />
 							</span>
+							<input type="text" class="input-small span1" name="startTime" value="05:00"/>
+
+							<span class="input-daterange" id="datepickerTo" style="margin-left:10px; margin-right:-10px;">
+								<span class="add-on ">To</span>
+								<input type="text" class="input-small span2" name="end" />
+							</span>
+							<input type="text" class="input-small span1" name="endTime" value="05:00"/>
 						</div>
 						<input class="btn btn-large btn-primary" type="submit" value="Submit">
 					</form>
@@ -163,19 +176,19 @@
 			format: "dd/mm/yyyy", // Format should match the format expected in the TrendViewController class
 			todayHighlight: true,
 			beforeShowDay: function (date){
-			if (date.getMonth() == (new Date()).getMonth())
-				switch (date.getDate()){
-					case 8:
+				if (date.getMonth() == (new Date()).getMonth())
+					switch (date.getDate()){
+						case 8:
 						return false;
-					case 12:
+						case 12:
 						return "green";
+					}
 				}
-			}
-		});
+			});
 		</script>
 
-</body>
-</html>
+	</body>
+	</html>
 
 
 
