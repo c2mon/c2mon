@@ -9,7 +9,7 @@
 		<application name="default">
 
 			<startscript name="C2MON-SERVER-DMN2">
-				<main-class name="cern.tim.server.lifecycle.ServerStartup">
+				<main-class name="cern.c2mon.server.lifecycle.ServerStartup">
 					<output>
 						<file name="log/out.log" />
 					</output>

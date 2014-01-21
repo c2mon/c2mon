@@ -30,6 +30,6 @@ COMMON_JAVA_ARGS="-Xms512m -Xmx512m -XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseP
 #C2MON_RECOVERY_ARG="-Dc2mon.recovery=true"
 
 C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $C2MON_RECOVERY_ARG"
-C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS"
+C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.c2mon.server.lifecycle.ServerStartup $C2MON_ARGS"
 
 $C2MON_START_CMD 

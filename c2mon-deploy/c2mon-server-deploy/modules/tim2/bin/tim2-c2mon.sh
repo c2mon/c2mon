@@ -96,7 +96,7 @@ else
     C2MON_JAVA_ARGS="$COMMON_JAVA_ARGS $C2MON_RECOVERY_ARG"
     C2MON_STOP_CMD="echo \"attempting to shutdown the server with kill call\""
 fi
-C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.tim.server.lifecycle.ServerStartup $C2MON_ARGS"
+C2MON_START_CMD="$JAVA_HOME/jre/bin/java $C2MON_JAVA_ARGS -cp "${CLASSPATH}" cern.c2mon.server.lifecycle.ServerStartup $C2MON_ARGS"
 
 # Source function library.
 

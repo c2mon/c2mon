@@ -36,14 +36,14 @@
                      threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <renderer  renderedClass="cern.tim.shared.daq.datatag.SourceDataTagValue"
-             renderingClass="cern.tim.shared.daq.datatag.SourceDataTagValueRenderer" />
+  <renderer  renderedClass="cern.c2mon.shared.daq.datatag.SourceDataTagValue"
+             renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
              
-  <renderer  renderedClass="cern.tim.server.common.rule.RuleTag"
-             renderingClass="cern.tim.server.common.rule.RuleTagRenderer" />
+  <renderer  renderedClass="cern.c2mon.server.common.rule.RuleTag"
+             renderingClass="cern.c2mon.server.common.rule.RuleTagRenderer" />
              
-  <renderer  renderedClass="cern.tim.server.common.alarm.Alarm"
-             renderingClass="cern.tim.server.common.alarm.renderer.AlarmRenderer" />
+  <renderer  renderedClass="cern.c2mon.server.common.alarm.Alarm"
+             renderingClass="cern.c2mon.server.common.alarm.renderer.AlarmRenderer" />
                                           
              
   <appender name="FileAppender" class="org.apache.log4j.RollingFileAppender">
@@ -298,7 +298,7 @@
     <appender-ref ref="LoggingAppender"/>
     <appender-ref ref="CentralLoggingAppender"/>
   </logger>
-  <logger name="cern.tim.server.cachepersistence"  additivity="true">
+  <logger name="cern.c2mon.server.cachepersistence"  additivity="true">
     <level value="debug"/>    
     <appender-ref ref="PersistenceAppender"/>
     <appender-ref ref="CentralLoggingAppender"/>
