@@ -17,14 +17,14 @@
   
   <!-- datasource for the cache persistence -->
   <jdbc:embedded-database id="cacheDataSource">
-    <jdbc:script location="classpath:cern/tim/server/test/sql/cache-schema-generic.sql" />
-    <jdbc:script location="classpath:cern/tim/server/test/sql/cache-data-insert.sql" />
+    <jdbc:script location="classpath:cern/c2mon/server/test/sql/cache-schema-generic.sql" />
+    <jdbc:script location="classpath:cern/c2mon/server/test/sql/cache-data-insert.sql" />
   </jdbc:embedded-database>
   
   <!-- data source for loading configurations -->
   <jdbc:embedded-database id="configurationDataSource">
-    <jdbc:script location="classpath:cern/tim/server/test/sql/config-schema-generic.sql" />
-    <jdbc:script location="classpath:cern/tim/server/test/sql/config-data.sql" />
+    <jdbc:script location="classpath:cern/c2mon/server/test/sql/config-schema-generic.sql" />
+    <jdbc:script location="classpath:cern/c2mon/server/test/sql/config-data.sql" />
   </jdbc:embedded-database>
   
    <!-- datasource for logging functionalities -->
