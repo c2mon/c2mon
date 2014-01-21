@@ -212,7 +212,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
             processEventCache.put(entityId, event);
           break;
         case EQUIPMENT:
-          if (!equipmentEventCache.hasKey(entityId) || equipmentEventCache.get(entityId).getEventTime().after(event.getEventTime()))                        
+          if (!equipmentEventCache.hasKey(entityId) || !equipmentEventCache.get(entityId).getEventTime().after(event.getEventTime()))                        
             equipmentEventCache.put(event.getEntityId(), event);
           break;
         default:          
