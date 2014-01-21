@@ -274,12 +274,6 @@
     <appender-ref ref="FileAppender"/>
     <appender-ref ref="ErrorAppender"/>
   </logger>
-  <logger name="cern.tim"  additivity="false">
-    <level value="all"/>
-    <appender-ref ref="FileAppender"/>
-    <appender-ref ref="ErrorAppender"/>
-    <appender-ref ref="CentralLoggingAppender"/>
-  </logger>
   <logger name="cern.c2mon"  additivity="false">
     <level value="all"/>
     <appender-ref ref="FileAppender"/>
