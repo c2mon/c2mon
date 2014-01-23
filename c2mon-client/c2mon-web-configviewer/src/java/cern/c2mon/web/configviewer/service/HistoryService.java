@@ -2,6 +2,8 @@ package cern.c2mon.web.configviewer.service;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +47,9 @@ public class HistoryService {
   /** App base url */
   private static final String BASE_URL = "/c2mon-web-configviewer";
   
+  /** Date format used in History Queries */
+  private static final String DATE_FORMAT = "dd/MM/yyyy-HH:mm";
+
   /** Used to retrieve Historical Data */
   private HistoryProvider historyProvider;
   
@@ -130,7 +135,31 @@ public class HistoryService {
 
     final String description = " (From " + startTime + " to " + endTime + ")";
     final String trendURL = "?" + TrendViewController.START_DATE_PARAMETER + "=" + startTime
-        + "&" + TrendViewController.END_DATE_PARAMETER + "=" + endTime;
+        + "&amp;" + TrendViewController.END_DATE_PARAMETER + "=" + endTime;
+    return toXml(historyValues, dataTagId, description, trendURL);
+  }
+  
+
+  /**
+   * @return XML representation of Tag's History 
+   * 
+   * Same as {@link #getHistoryXml(String, Timestamp, Timestamp)}
+   * but startTime and endTime are given as strings (should follow {@link #DATE_FORMAT})
+   * 
+   * */
+  public final String getHistoryXml(final String dataTagId, 
+      final String startTime,
+      final String endTime) 
+      throws HistoryProviderException, LoadingParameterException, ParseException  {
+
+    final List<HistoryTagValueUpdate> historyValues = 
+        requestHistoryData(dataTagId, 
+            stringToTimestamp(startTime),
+            stringToTimestamp(endTime));
+
+    final String description = " (From " + startTime + " to " + endTime + ")";
+    final String trendURL = "?" + TrendViewController.START_DATE_PARAMETER + "=" + startTime
+        + "&amp;" + TrendViewController.END_DATE_PARAMETER + "=" + endTime;
     return toXml(historyValues, dataTagId, description, trendURL);
   }
   
@@ -488,4 +517,21 @@ public class HistoryService {
     }
     return html;
   }  
+
+  /**
+   * @return Converts a string to Timestamp
+   * 
+   * @param dateString
+   * should represent a Date in the following format: {@link TrendViewController#DATE_FORMAT}
+   * 
+   * @throws ParseException in case of wrong Date Format
+   */
+  public static Timestamp stringToTimestamp(final String dateString) throws ParseException {
+    
+    DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+    dateFormat.setLenient(false);
+    java.util.Date date = dateFormat.parse(dateString);
+    final long time = date.getTime();
+    return new Timestamp(time);
+  }
 }
