@@ -68,7 +68,7 @@
             (<xsl:value-of select="/*/@id" />)
             <xsl:value-of select="/*/@historyDescription" />
             
-            <A href="{$base_url}{$history_xml_url}{/*/@id}/" 
+            <A href="{$base_url}{$history_xml_url}{/*/@id}{$trend_parameter}" 
              class="large blue awesome xml_button" target="_blank">History XML >>
            </A>	
            <A href="{$trend_base_url}{/*/@id}{$trend_parameter}" 
