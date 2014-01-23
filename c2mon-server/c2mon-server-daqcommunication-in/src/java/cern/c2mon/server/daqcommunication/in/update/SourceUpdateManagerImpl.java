@@ -339,7 +339,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
         if (LOGGER.isTraceEnabled()) {
           LOGGER.trace("checkProcessPIK - Processing incoming update for Process ID " + process.getName() + " and saving PIK " + dataTagValueUpdate.getProcessPIK());
         }
-        this.processFacade.setProcessPIK(process, dataTagValueUpdate.getProcessPIK());
+        this.processFacade.setProcessPIK(process.getId(), dataTagValueUpdate.getProcessPIK());
       }
     } catch (CacheElementNotFoundException cacheEx) {      
       LOGGER.warn("checkProcessPIK - Receive updates from unrecognized Process ID " + dataTagValueUpdate.getProcessId() +  " - Ignoring the updates.", cacheEx);
