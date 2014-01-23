@@ -377,13 +377,13 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
 
   @Override
   public void requiresReboot(final Long processId, final Boolean reboot) {
-    processCache.acquireReadLockOnKey(processId);
+    processCache.acquireWriteLockOnKey(processId);
     try {
       ProcessCacheObject process = (ProcessCacheObject) processCache.get(processId);
       process.setRequiresReboot(reboot);
       processCache.put(processId, process);
     } finally {
-      processCache.releaseReadLockOnKey(processId);
+      processCache.releaseWriteLockOnKey(processId);
     }
   }
   
