@@ -37,8 +37,8 @@
           </div>
 		  
 		<p style="margin-left:50px;width:900px; height:30px;" class="links">
-			<A href="/c2mon-web-configviewer/historyviewer/${id}/" 
-				class="large blue awesome xml_button" target="_blank">History >>
+			<A href="/c2mon-web-configviewer/historyviewer/${id}?${queryParameters}" 
+				class="large blue awesome xml_button" target="_blank">Table >>
 			</A>	
 			<A href="/c2mon-web-configviewer/tagviewer/${id}/" 
 				class="large blue awesome xml_button" target="_blank">View Tag >>
