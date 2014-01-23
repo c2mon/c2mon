@@ -311,7 +311,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
               
                 // (5) LEGACY: TODO what does this comment mean?!
                 Timestamp stopTime = new Timestamp(System.currentTimeMillis());
-              this.processFacade.stop(process, stopTime); //also stops alive timer          
+              this.processFacade.stop(processId, stopTime); //also stops alive timer          
               
                 // (7) Update process state tag
                 stopStateTag(process.getStateTagId(), stopTime, processStopMessage);          
@@ -367,13 +367,13 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         equipmentCache.acquireWriteLockOnKey(equipmentId);
         try {
           currentEquipment = equipmentCache.get(equipmentId);                
-          equipmentFacade.stop(currentEquipment, timestamp);
+          equipmentFacade.stop(equipmentId, timestamp);
           stopStateTag(currentEquipment.getStateTagId(), timestamp, message);              
           for (Long subId : currentEquipment.getSubEquipmentIds()) {
             subEquipmentCache.acquireWriteLockOnKey(subId);
             try {
               SubEquipment subEquipment = subEquipmentCache.get(subId);
-              subEquipmentFacade.stop(subEquipment, timestamp);
+              subEquipmentFacade.stop(subId, timestamp);
               stopStateTag(subEquipment.getStateTagId(), timestamp, message);
             } catch (CacheElementNotFoundException ex) {
               LOGGER.error("Subequipment could not be retrieved from cache - unable to update Subequipment state.", ex);
@@ -444,7 +444,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
       	// Only If PIK is the same we have in cache we change Y(LOCAL_CONFIG) by N(SERVER_CONFIG) for the current process
         if(processConfigurationRequest.getProcessPIK().equals(process.getProcessPIK())) {
-          this.processFacade.setLocalConfig(process, LocalConfig.N);
+          this.processFacade.setLocalConfig(processId, LocalConfig.N);
      	  }
       
         // We get the configuration XML file (empty by default)
@@ -470,15 +470,17 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * on the type of alive that has expired. The method synchronizes on the containing
    * Process cache object and catches all cache-related exceptions that can be
    * thrown by the private methods.
-   * @param aliveTimer the alive cache object (copy is sufficient)
+   * @param aliveTimerId the alive cache id
    */
   @Override
-  public void onAliveTimerExpiration(final AliveTimer aliveTimer) {    
+  public void onAliveTimerExpiration(final Long aliveTimerId) {    
     // Protect the method against accidental null parameters
-    if (aliveTimer == null) {
+    if (aliveTimerId == null) {
       LOGGER.warn("onAliveTimerExpiration(null) called - ignoring the call.");
       return;
     }
+    
+    AliveTimer aliveTimer = aliveTimerCache.getCopy(aliveTimerId);
 
     // Build up a meaningful invalidation message -- USED TO DECIDE WHETHER TO REQUEST VALUES FROM DAQ WHEN UP AGAIN (SEE onProcessUp)
     StringBuffer msg = new StringBuffer("Alive of ");
@@ -541,7 +543,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     try {
       final Equipment equipment = equipmentCache.get(equipmentId);
       if (equipmentFacade.isRunning(equipment) || equipmentFacade.isUncertain(equipment)) {
-        equipmentFacade.suspend(equipment, timestamp, message);
+        equipmentFacade.suspend(equipmentId, timestamp, message);
       }
       Long stateTagId = equipment.getStateTagId();
       if (stateTagId == null) {
@@ -582,7 +584,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         LOGGER.debug(str);
       }    
       if (subEquipmentFacade.isRunning(subEquipment) || subEquipmentFacade.isUncertain(subEquipment)) {
-        subEquipmentFacade.suspend(subEquipment, timestamp, message);
+        subEquipmentFacade.suspend(subEquipmentId, timestamp, message);
       }
       Long stateTagId = subEquipment.getStateTagId();
       if (stateTagId == null) {
@@ -628,7 +630,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       final Process process = processCache.get(processId);
       //update the internal state of the Process and notify listeners 
       if (processFacade.isRunning(process) || processFacade.isUncertain(process)) {
-        processFacade.suspend(process, pTimestamp, pMessage);
+        processFacade.suspend(processId, pTimestamp, pMessage);
       }
       //try to update the stateTag of the Process
       try {
@@ -842,7 +844,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       //TODO state tag should never be invalid, so should be able to remove the check below
       if (!process.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {                    
         
-        processFacade.resume(process, pTimestamp, pMessage);
+        processFacade.resume(processId, pTimestamp, pMessage);
         
         //special treatment for any CommFaultTags which would otherwise stay invalid indefinitely
         // setControlTagsQuality(process, null, pTimestamp, //do not change quality description
@@ -899,7 +901,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     try {
       Equipment equipment = equipmentCache.get(pId);
       if (!equipment.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {               
-        equipmentFacade.resume(equipment, pTimestamp, pMessage);
+        equipmentFacade.resume(pId, pTimestamp, pMessage);
       }      
       //set state tag if necessary
       Long stateTagId = equipment.getStateTagId();
@@ -957,7 +959,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       try {    
         SubEquipment subEquipment = subEquipmentCache.get(pId);            
         if (!subEquipment.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {               
-          subEquipmentFacade.resume(subEquipment, pTimestamp, pMessage);
+          subEquipmentFacade.resume(pId, pTimestamp, pMessage);
         }
             
         Long stateTagId = subEquipment.getStateTagId();
@@ -1060,7 +1062,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             // Start Up the process
             this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.", 
                 processConnectionRequest.getProcessStartupTime());
-            this.processFacade.start(process, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
+            process = this.processFacade.start(processId, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
   
             // PIK
             processConnectionResponse.setprocessPIK(process.getProcessPIK());

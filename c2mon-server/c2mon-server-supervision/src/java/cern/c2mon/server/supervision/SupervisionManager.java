@@ -96,9 +96,9 @@ public interface SupervisionManager {
    * <p>Implements the synchronization and exception handling described
    * in the class documentation.
    * 
-   * @param pAliveTimer reference to the alive timer that has expired
+   * @param aliveTimerId Id of the alive timer that has expired
    */
-  void onAliveTimerExpiration(AliveTimer pAliveTimer);
+  void onAliveTimerExpiration(Long aliveTimerId);
 
   /**
    * Take the necessary DAQ <b>supervision</b> steps on the reception of a Control tag

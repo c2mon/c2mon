@@ -203,9 +203,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
             }
             
             if (aliveExpiration) {
-              // get fresh copy with all changes
-              aliveTimerCopy = aliveTimerCache.getCopy(currentId);
-              onAliveTimerExpiration(aliveTimerCopy);
+              onAliveTimerExpiration(currentId);
             }
             
           }
@@ -238,8 +236,8 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
    * 
    * @param pAliveTimer the alive timer that has expired
    */
-  private void onAliveTimerExpiration(final AliveTimer pAliveTimer) {
-    supervisionManager.onAliveTimerExpiration(pAliveTimer);        
+  private void onAliveTimerExpiration(final Long aliveTimerId) {
+    supervisionManager.onAliveTimerExpiration(aliveTimerId);        
   }
   
   @Override
