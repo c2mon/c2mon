@@ -11,39 +11,17 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     
     <!--  link variables  -->
-    <xsl:variable name="base_url">
-      /c2mon-web-configviewer/
-    </xsl:variable>
-    <xsl:variable name="alarm_url">
-      alarmviewer/
-    </xsl:variable>
-    <xsl:variable name="command_url">
-      commandviewer/
-    </xsl:variable>
-    <xsl:variable name="datatag_url">
-      tagviewer/
-    </xsl:variable>
-    <xsl:variable name="history_url">
-      historyviewer/
-    </xsl:variable>		
-    <xsl:variable name="trend_viewer_url">
-      trendviewer/
-    </xsl:variable>		
-    <xsl:variable name="history_xml_url">
-      historyviewer/xml/
-    </xsl:variable>		
-    <xsl:variable name="process_xml_url">
-      process/xml/
-    </xsl:variable>
-    <xsl:variable name="alarm_xml_url">
-      alarmviewer/xml/
-    </xsl:variable>
-    <xsl:variable name="tag_value_xml_url">
-      tagvalue/xml/
-    </xsl:variable>	
-    <xsl:variable name="tag_config_xml_url">
-      tagconfig/xml/
-    </xsl:variable>		
+    <xsl:variable name="base_url">/c2mon-web-configviewer/</xsl:variable>
+    <xsl:variable name="alarm_url">alarmviewer/</xsl:variable>
+    <xsl:variable name="command_url">commandviewer/</xsl:variable>
+    <xsl:variable name="datatag_url">tagviewer/</xsl:variable>
+    <xsl:variable name="history_url">historyviewer/</xsl:variable>		
+    <xsl:variable name="trend_viewer_url">trendviewer/</xsl:variable>		
+    <xsl:variable name="history_xml_url">historyviewer/xml/</xsl:variable>		
+    <xsl:variable name="process_xml_url">process/xml/</xsl:variable>
+    <xsl:variable name="alarm_xml_url">alarmviewer/xml/</xsl:variable>
+    <xsl:variable name="tag_value_xml_url">tagvalue/xml/</xsl:variable>	
+    <xsl:variable name="tag_config_xml_url">tagconfig/xml/</xsl:variable>		
     
     <xsl:variable name="help_alarm_url">http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=</xsl:variable>
     <xsl:variable name="help_point_url">https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=</xsl:variable>
@@ -80,15 +58,20 @@
           <script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
         </head>
 
+        
+    <xsl:variable name="trend_base_url"><xsl:value-of select="$base_url"/><xsl:value-of select="$trend_viewer_url"/></xsl:variable>   
+    <xsl:variable name="trend_parameter"><xsl:value-of select="/*/@trendURL" /></xsl:variable>   
+
         <body>
           <p class="tagName">
             Data Tag History
             (<xsl:value-of select="/*/@id" />)
+            <xsl:value-of select="/*/@historyDescription" />
             
             <A href="{$base_url}{$history_xml_url}{/*/@id}/" 
              class="large blue awesome xml_button" target="_blank">History XML >>
            </A>	
-           <A href="{$base_url}{$trend_viewer_url}{/*/@id}/" 
+           <A href="{$trend_base_url}{/*/@id}{$trend_parameter}" 
              class="large blue awesome xml_button" target="_blank"> Trend >>
            </A>	
            <A href="{$base_url}{$datatag_url}{/*/@id}/" 
