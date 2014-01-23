@@ -273,7 +273,7 @@ public class RecoveryManager implements SmartLifecycle {
     for (Long key : alarmCache.getKeys()) {      
       alarmCache.acquireWriteLockOnKey(key);
       try {        
-        Alarm alarm = alarmCache.getCopy(key);
+        Alarm alarm = alarmCache.get(key);
         alarmCache.notifyListenersOfUpdate(alarm);      
       } catch (Exception e) {
         LOGGER.error("Exception caught while checking for unpublished alarms", e);
