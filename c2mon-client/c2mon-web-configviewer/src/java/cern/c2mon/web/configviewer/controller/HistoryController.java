@@ -63,9 +63,6 @@ public class HistoryController {
    */
   public static final String HISTORY_CSV_URL = HISTORY_URL + "csv";
 
-  /** Date format used to pass a Date as a parameter */
-  private static final String DATE_FORMAT = "dd/MM/yyyy-HH:mm";
-
   /**
    * Title for the history form page
    * */
@@ -119,9 +116,7 @@ public class HistoryController {
     try {
       
       if (startTime != null && endTime != null) {
-        final String xml = service.getHistoryXml(id, 
-            stringToTimestamp(startTime), 
-            stringToTimestamp(endTime));
+        final String xml = service.getHistoryXml(id, startTime, endTime);
         response.getWriter().println(service.generateHtmlResponse(xml));
       }
       else if (lastDays != null) {
@@ -156,10 +151,31 @@ public class HistoryController {
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */
   @RequestMapping(value = HISTORY_XML_URL + "/{id}", method = { RequestMethod.GET })
-  public final String viewXml(@PathVariable final String id,  final Model model) {
+  public final String viewXml(@PathVariable final String id,
+      @RequestParam(value = MAX_RECORDS_PARAMETER, required = false) final String maxRecords,
+      @RequestParam(value = LAST_DAYS_PARAMETER, required = false) final String lastDays,
+      @RequestParam(value = START_DATE_PARAMETER, required = false) final String startTime,
+      @RequestParam(value = END_DATE_PARAMETER, required = false) final String endTime,
+      final Model model) throws ParseException {
+    
     logger.info(HISTORY_XML_URL + id);
     try {
-      model.addAttribute("xml", service.getHistoryXml(id, HISTORY_RECORDS_TO_ASK_FOR));
+      
+      if (id == null) {
+        model.addAttribute("xml", service.getHistoryXml(id, HISTORY_RECORDS_TO_ASK_FOR));
+      }
+      else if (lastDays != null) {
+        final String xml = service.getHistoryXmlForLastDays(id, Integer.parseInt(lastDays));
+        model.addAttribute("xml", xml);
+      }
+      if (startTime != null && endTime != null) {
+        final String xml = service.getHistoryXml(id, startTime, endTime);
+        model.addAttribute("xml", xml);
+      }
+      else if (maxRecords != null) {
+        model.addAttribute("xml", service.getHistoryXml(id, Integer.parseInt(maxRecords)));
+      }
+      
     } catch (HistoryProviderException e) {
       logger.error(e.getMessage());
       return ("redirect:" + "/historyviewer/errorform/" + id);
@@ -210,23 +226,5 @@ public class HistoryController {
       return ("redirect:" + HISTORY_URL + id + "?" + MAX_RECORDS_PARAMETER + "=" + records);
     }
     return "trend_views/trend_view_form";
-  }
-  
-
-  /**
-   * @return Converts a string to Timestamp
-   * 
-   * @param dateString
-   * should represent a Date in the following format: {@link TrendViewController#DATE_FORMAT}
-   * 
-   * @throws ParseException in case of wrong Date Format
-   */
-  private static Timestamp stringToTimestamp(final String dateString) throws ParseException {
-    
-    DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-    dateFormat.setLenient(false);
-    java.util.Date date = dateFormat.parse(dateString);
-    final long time = date.getTime();
-    return new Timestamp(time);
   }
 }
