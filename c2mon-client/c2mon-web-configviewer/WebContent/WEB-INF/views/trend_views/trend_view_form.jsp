@@ -120,15 +120,15 @@
 
 							<span class="input-daterange" id="datepickerFrom" style="margin-left:10px; margin-right:-10px;">
 								<span class="add-on">From</span>
-								<input type="text" class="input-small span2" name="start" />
+								<input type="text" class="input-small span2" name="start" value="${defaultFromDate}" />
 							</span>
-							<input type="text" class="input-small span1" name="startTime" value="05:00"/>
+							<input type="text" class="input-small span1" name="startTime" value="${defaultFromTime}"/>
 
 							<span class="input-daterange" id="datepickerTo" style="margin-left:10px; margin-right:-10px;">
 								<span class="add-on ">To</span>
-								<input type="text" class="input-small span2" name="end" />
+								<input type="text" class="input-small span2" name="end" value="${defaultToDate}" />
 							</span>
-							<input type="text" class="input-small span1" name="endTime" value="05:00"/>
+							<input type="text" class="input-small span1" name="endTime" value="${defaultToTime}"/>
 						</div>
 						<input class="btn btn-large btn-primary" type="submit" value="Submit">
 					</form>
