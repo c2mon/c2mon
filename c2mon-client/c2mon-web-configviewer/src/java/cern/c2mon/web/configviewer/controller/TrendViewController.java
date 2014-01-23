@@ -176,6 +176,7 @@ public class TrendViewController {
 
     model.addAttribute("view_title", tagValue.getName());
     model.addAttribute("view_description", "(Last " + days + " days)");
+    model.addAttribute("queryParameters", LAST_DAYS_PARAMETER + "=" + days);
     
     return model;
   }
@@ -213,6 +214,7 @@ public class TrendViewController {
     model.addAttribute("records", records);
     model.addAttribute("view_title", tagValue.getName());
     model.addAttribute("view_description", "(Last " + records + " records)");
+    model.addAttribute("queryParameters", MAX_RECORDS_PARAMETER + "=" + records);
     
     return model;
   }
@@ -254,6 +256,9 @@ public class TrendViewController {
     model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
     model.addAttribute("view_title", tagValue.getName());
     model.addAttribute("view_description", " (From " + start + " to " + end + ")");
+    model.addAttribute(
+        "queryParameters", 
+        START_DATE_PARAMETER + "=" + start + "&" + END_DATE_PARAMETER + "=" + end);
     
     return model;
   }
@@ -327,15 +332,15 @@ public class TrendViewController {
    * 
    * @param days (Optional parameter) how many days to go back in history
    * 
-   * @param start (Optional parameter) If given, 
+   * @param startDate (Optional parameter) If given, 
    * this will be the Start Date of the history query.
    * {@link TrendViewController#DATE_FORMAT}
    * 
-   * @param end (Optional parameter) If given, 
+   * @param endDate (Optional parameter) If given, 
    * this will be the End Date of the history query.
    * {@link TrendViewController#DATE_FORMAT}
    * 
-   * @param wrongId: In case an error occurred while submitting the form.
+   * @param wrongId In case an error occurred while submitting the form.
    * (TagId that does not exist is the most common case).
    * 
    * @param model Spring MVC Model instance to be filled in before jsp processes it
