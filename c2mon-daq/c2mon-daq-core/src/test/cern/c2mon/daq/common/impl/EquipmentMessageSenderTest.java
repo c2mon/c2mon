@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.sql.Timestamp;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -233,39 +234,42 @@ public class EquipmentMessageSenderTest {
     
     @Test
     public void testSendValidTagTimeDeadbandEnabled() throws Exception {
-        lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt1.getId());
-        expectLastCall().times(4);
-        processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
-        expectLastCall().times(3);
-        filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
-        expectLastCall().times(1);
-        
-        this.sdt1.getAddress().setTimeDeadband(1);
-        this.sdt1.update(true);
+      // 3 of the values will be recorded and the other one send to the filter
+      lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt1.getId());
+      expectLastCall().times(3);
+      
+      processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(3);
+      filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      expectLastCall().times(1);
 
-        replay(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock, this.filterMessageSenderMock);
+      // Lets figure out the Time Deadband is enabled (in this case would be the Dynamic)
+      this.sdt1.getAddress().setTimeDeadband(1);
+      this.sdt1.update(true);
 
-        // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
-        this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
-        assertEquals(false, this.sdt1.getCurrentValue().getValue());
-        Thread.sleep(200);
-        
-        // The second one is also sent to the server since the value is different
-        this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
-        assertEquals(true, this.sdt1.getCurrentValue().getValue());
-        Thread.sleep(200);
-        
-        // The third one is filtered with REPEATED_VALUE because the value is the same (dif description)
-        this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "Nacho");
-        assertEquals(true, this.sdt1.getCurrentValue().getValue());
-        Thread.sleep(200);
-        
-        // The fourth one is also sent to the server since the value is different
-        this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
-        assertEquals(false, this.sdt1.getCurrentValue().getValue());
-        Thread.sleep(200);
+      replay(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock, this.filterMessageSenderMock);
 
-        verify(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock, this.filterMessageSenderMock);
+      // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
+      this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+      Thread.sleep(200);
+
+      // The second one is also sent to the server since the value is different
+      this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
+      assertEquals(true, this.sdt1.getCurrentValue().getValue());
+      Thread.sleep(200);
+
+      // The third one is filtered with REPEATED_VALUE because the value is the same (dif description)
+      this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "Nacho");
+      assertEquals(true, this.sdt1.getCurrentValue().getValue());
+      Thread.sleep(200);
+
+      // The fourth one is also sent to the server since the value is different
+      this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+      Thread.sleep(200);
+
+      verify(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock, this.filterMessageSenderMock);
     }
     
     @Test
@@ -802,31 +806,63 @@ public class EquipmentMessageSenderTest {
 
     // @Test
     public void testSendTagFilteredTwiceSame() {
-        filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
 
-        replay(filterMessageSenderMock);
+      replay(filterMessageSenderMock, processMessageSenderMock);
 
-        equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
-        equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
+      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
+      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
 
-        verify(filterMessageSenderMock);
+      verify(filterMessageSenderMock, processMessageSenderMock);
     }
 
     @Test
     public void testSendTagFilteredTwiceSameValuesButDiffValueDesc() throws Exception {
-        processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
-        expectLastCall().times(2);
+      processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(1);
 
-        filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      expectLastCall().times(2);
 
-        replay(processMessageSenderMock, filterMessageSenderMock);
+      replay(processMessageSenderMock, filterMessageSenderMock);
 
-        equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description A");
-        Thread.sleep(110);
-        equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description B");
-        equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description B");
-        Thread.sleep(100);
-        verify(processMessageSenderMock, filterMessageSenderMock);
+      // Send to the server
+      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description A");
+      Thread.sleep(110);
+      // Filter with REPEATED_VALUE
+      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description B");
+      Thread.sleep(100);
+      // Filter with REPEATED_VALUE
+      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description B");
+
+
+      verify(processMessageSenderMock, filterMessageSenderMock);
+    }
+    
+    @Test
+    public void testSendInvalidTagFilteredTwiceSameValuesButDiffValueDesc() throws Exception {
+      processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(2);
+
+      filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      expectLastCall().times(1);
+      
+      this.sdt1.update(true);
+
+      replay(processMessageSenderMock, filterMessageSenderMock);
+
+      // Send to the server
+      this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "test description A");
+      Thread.sleep(110);
+      // Send to the server
+      this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "test description B");
+      Thread.sleep(100);
+      // Filter with REPEATED_INVALID
+      this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "test description B");
+
+
+      verify(processMessageSenderMock, filterMessageSenderMock);
     }
 
     private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType, int priority,

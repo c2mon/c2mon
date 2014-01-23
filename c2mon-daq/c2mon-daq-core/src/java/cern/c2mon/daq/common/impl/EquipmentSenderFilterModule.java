@@ -59,9 +59,45 @@ class EquipmentSenderFilterModule {
         this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
     }
     
+    /**
+     * Sends a message to the statistics module. Should only be used in the core.
+     * 
+     * @param currentSourceDataTag The tag to send.
+     * @param quality The quality of the tag.
+     * @param tagValue The value of the tag.
+     * @param milisecTimestamp The timestamp in ms.
+     * @param pValueDescr A description of the value (optional)
+     * @param filterType The type of the applied filter, see {@link FilteredDataTagValue} constants
+     */
+    public void sendToFilterModule(final SourceDataTag currentSourceDataTag, 
+                                   final SourceDataQuality quality,
+                                   final Object tagValue, 
+                                   final long milisecTimestamp, 
+                                   final String pValueDescr, 
+                                   final short filterType) {
+      doSendToFilterModule(currentSourceDataTag, quality, tagValue, milisecTimestamp, pValueDescr, false, filterType);
+    }
+
+    /**
+     * Sends a message to the statistics module with Dynamic Timedeadband. Should only be used in the core.
+     * 
+     * @param currentSourceDataTag The tag to send.
+     * @param quality The quality of the tag.
+     * @param tagValue The value of the tag.
+     * @param milisecTimestamp The timestamp in ms.
+     * @param pValueDescr A description of the value (optional)
+     * @param filterType The type of the applied filter, see {@link FilteredDataTagValue} constants
+     */
+    public void sendToFilterModuleByDynamicTimedeadbandFilterer(final SourceDataTag currentSourceDataTag, 
+                                                                final SourceDataQuality quality,
+                                                                final Object tagValue, 
+                                                                final long milisecTimestamp, 
+                                                                final String pValueDescr, 
+                                                                final short filterType) {
+      doSendToFilterModule(currentSourceDataTag, quality, tagValue, milisecTimestamp, pValueDescr, true, filterType);
+    }
     
-    
-	/**
+    /**
      * Sends a message to the statistics module. Should only be used in the core.
      * 
      * @param currentSourceDataTag The tag to send.
@@ -72,17 +108,54 @@ class EquipmentSenderFilterModule {
      * @param dynamicFiltered True if the tag was dynamic filtered.
      * @param filterType The type of the applied filter, see {@link FilteredDataTagValue} constants
      */
-    public void sendToFilterModule(final SourceDataTag currentSourceDataTag, final SourceDataQuality quality,
-            final Object tagValue, final long milisecTimestamp, final String pValueDescr,
-            final boolean dynamicFiltered, final short filterType) {
-    	this.equipmentLogger.trace("sendToFilterModule - entering sendToFilterModule() for tag #" + currentSourceDataTag.getId());
-
-    	this.filterMessageSender.addValue(currentSourceDataTag.makeFilterValue(quality, new Timestamp(milisecTimestamp),
-    			dynamicFiltered, filterType));
-
-    	this.equipmentLogger.trace("sendToFilterModule - leaving sendToFilterModule() for tag #" + currentSourceDataTag.getId());
+    private void doSendToFilterModule(final SourceDataTag currentSourceDataTag, 
+                                      final SourceDataQuality quality, 
+                                      final Object tagValue,
+                                      final long milisecTimestamp, 
+                                      final String pValueDescr, 
+                                      final boolean dynamicFiltered, 
+                                      final short filterType) {
+      this.equipmentLogger.trace("sendToFilterModule - entering sendToFilterModule() for tag #" + currentSourceDataTag.getId());
+  
+      this.filterMessageSender.addValue(currentSourceDataTag.makeFilterValue(quality, new Timestamp(milisecTimestamp), dynamicFiltered, filterType));
+  
+      this.equipmentLogger.trace("sendToFilterModule - leaving sendToFilterModule() for tag #" + currentSourceDataTag.getId());
     }
 
+    /**
+     * Sends a message to the filter log. Should only be used in the core.
+     * 
+     * @param currentSourceDataTag The tag to send.
+     * @param tagValue tagValue The value of the tag.
+     * @param milisecTimestamp The timestamp in ms.
+     * @param pValueDescr A description of the value (optional)
+     * @param filterType The type of the applied filter, see {@link FilteredDataTagValue} constants
+     */
+    public void sendToFilterModule(final SourceDataTag currentSourceDataTag, 
+                                   final Object tagValue,
+                                   final long milisecTimestamp, 
+                                   final String pValueDescr, 
+                                   final short filterType) {	
+      doSendToFilterModule(currentSourceDataTag, tagValue, milisecTimestamp, pValueDescr, false, filterType);
+    }
+    
+    /**
+     * Sends a message to the filter log with Dynamic Deadband. Should only be used in the core.
+     * 
+     * @param currentSourceDataTag The tag to send.
+     * @param tagValue tagValue The value of the tag.
+     * @param milisecTimestamp The timestamp in ms.
+     * @param pValueDescr A description of the value (optional)
+     * @param filterType The type of the applied filter, see {@link FilteredDataTagValue} constants
+     */
+    public void sendToFilterModuleByDynamicTimedeadbandFilterer(final SourceDataTag currentSourceDataTag, 
+                                   final Object tagValue,
+                                   final long milisecTimestamp, 
+                                   final String pValueDescr, 
+                                   final short filterType) {  
+      doSendToFilterModule(currentSourceDataTag, tagValue, milisecTimestamp, pValueDescr, true, filterType);
+    }
+    
     /**
      * Sends a message to the filter log. Should only be used in the core.
      * 
@@ -93,14 +166,17 @@ class EquipmentSenderFilterModule {
      * @param dynamicFiltered True if the tag was dynamic filtered.
      * @param filterType The type of the applied filter, see {@link FilteredDataTagValue} constants
      */
-    public void sendToFilterModule(final SourceDataTag currentSourceDataTag, final Object tagValue,
-            final long milisecTimestamp, final String pValueDescr, final boolean dynamicFiltered, 
-            final short filterType) {
-    	this.equipmentLogger.trace("sendToFilterModule - entering sendToFilterModule() for tag #" + currentSourceDataTag.getId());
-    	
-        this.filterMessageSender.addValue(currentSourceDataTag.makeFilterValue(new Timestamp(milisecTimestamp), tagValue,
-                pValueDescr, dynamicFiltered, filterType));
-        
-        this.equipmentLogger.trace("sendToFilterModule - leaving sendToFilterModule() for tag #" + currentSourceDataTag.getId());
+    private void doSendToFilterModule(final SourceDataTag currentSourceDataTag, 
+                                      final Object tagValue,
+                                      final long milisecTimestamp, 
+                                      final String pValueDescr, 
+                                      final boolean dynamicFiltered,
+                                      final short filterType) {
+      this.equipmentLogger.trace("sendToFilterModule - entering sendToFilterModule() for tag #" + currentSourceDataTag.getId());
+
+      this.filterMessageSender.addValue(currentSourceDataTag.makeFilterValue(new Timestamp(milisecTimestamp), tagValue,
+          pValueDescr, dynamicFiltered, filterType));
+      
+      this.equipmentLogger.trace("sendToFilterModule - leaving sendToFilterModule() for tag #" + currentSourceDataTag.getId());
     }
 }

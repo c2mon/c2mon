@@ -40,6 +40,7 @@ public class EquipmentTimeDeadbandTest {
   private EquipmentTimeDeadbandTester equipmentTimeDeadbandTester;
   
   private SourceDataTag sdt1;
+  
   private EquipmentSenderHelper equipmentSenderHelper = new EquipmentSenderHelper();
   
   /**
@@ -55,7 +56,8 @@ public class EquipmentTimeDeadbandTest {
     this.dynamicTimeDeadbandFiltererMock = createMock(IDynamicTimeDeadbandFilterer.class);
     this.processMessageSenderMock = createMock(IProcessMessageSender.class);
     this.equipmentSenderFilterModuleMock = EasyMock.createMockBuilder(EquipmentSenderFilterModule.class).
-        addMockedMethod("sendToFilterModule", SourceDataTag.class, Object.class, long.class, String.class, boolean.class, short.class).
+        addMockedMethod("sendToFilterModule", SourceDataTag.class, Object.class, long.class, String.class, short.class).
+        addMockedMethod("sendToFilterModuleByDynamicTimedeadbandFilterer", SourceDataTag.class, Object.class, long.class, String.class, short.class).
         createMock();  
     
     EquipmentConfiguration equipmentConfiguration = new EquipmentConfiguration();
@@ -63,10 +65,11 @@ public class EquipmentTimeDeadbandTest {
     equipmentConfiguration.setCommFaultTagId(EQ_COMFAULT_ID);
     equipmentConfiguration.setCommFaultTagValue(false);
 
-    sdt1 = createSourceDataTag(1L, "sdt1", "Boolean", DataTagDeadband.DEADBAND_PROCESS_RELATIVE, DataTagConstants.PRIORITY_LOW,
+    // No Time Deadband (we will call directly the addToTimeDeadband. Not needed)
+    this.sdt1 = createSourceDataTag(1L, "sdt1", "Boolean", DataTagDeadband.DEADBAND_PROCESS_RELATIVE, 0, DataTagConstants.PRIORITY_LOW,
             false);
    
-    equipmentConfiguration.getDataTags().put(1L, sdt1);
+    equipmentConfiguration.getDataTags().put(1L, this.sdt1);
 
     ProcessConfiguration processConf = new ProcessConfiguration();
     processConf.setProcessID(1L);
@@ -83,9 +86,11 @@ public class EquipmentTimeDeadbandTest {
   
   /**
    * Sending 3 valid values. The 2 first will be sent to the filter
+   * Dynamic Time Deadband filter disable
+   * Static Time Deadband filter enabled
    */
   @Test
-  public void testAddValidTimeDeadband() {
+  public void testAddValidStaticTimeDeadband() {
     
     long ms = System.currentTimeMillis();
 
@@ -94,12 +99,62 @@ public class EquipmentTimeDeadbandTest {
 
     // The first two values will be sent to the filter
     this.equipmentSenderFilterModuleMock.sendToFilterModule(this.sdt1, false, ms, 
-        "", true, FilterType.TIME_DEADBAND.getNumber());
+        "", FilterType.TIME_DEADBAND.getNumber());
     expectLastCall().times(1);
     this.equipmentSenderFilterModuleMock.sendToFilterModule(this.sdt1, true, ms+1L, 
-        "", true, FilterType.TIME_DEADBAND.getNumber());
+        "", FilterType.TIME_DEADBAND.getNumber());
     expectLastCall().times(1);
+    
+    // Dymanic Time Deadband disabled
+    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(this.sdt1)).andReturn(false).times(2);
 
+    // Lets figure out the Time Deadband is enabled (in this case would be the Static)
+    this.sdt1.getAddress().setTimeDeadband(1);
+    this.sdt1.update(true);
+
+    replay(this.dynamicTimeDeadbandFiltererMock, this.equipmentSenderFilterModuleMock);
+
+    // The first one does nothing
+    this.equipmentTimeDeadbandTester.addToTimeDeadband(this.sdt1, false, ms, "");
+    assertEquals(false, this.sdt1.getCurrentValue().getValue());
+
+    // The second one is valid so it sends the first one to the filter
+    this.equipmentTimeDeadbandTester.addToTimeDeadband(this.sdt1, true, ms+1L, "");
+    assertEquals(true, this.sdt1.getCurrentValue().getValue());
+
+    // The third one is valid so it sends the second one to the filter
+    this.equipmentTimeDeadbandTester.addToTimeDeadband(this.sdt1, false, ms+2L, "");
+    assertEquals(false, this.sdt1.getCurrentValue().getValue());
+
+    verify(this.dynamicTimeDeadbandFiltererMock, this.equipmentSenderFilterModuleMock);
+  }
+  
+  /**
+   * Sending 3 valid values. The 2 first will be sent to the filter
+   * Dynamic Time Deadband filter disable
+   * Static Time Deadband filter enabled
+   * 
+   */
+  @Test
+  public void testAddValidDynamicTimeDeadband() {
+    
+    long ms = System.currentTimeMillis();
+
+    this.dynamicTimeDeadbandFiltererMock.recordTag(isA(SourceDataTag.class));
+    expectLastCall().times(3);
+
+    // The first two values will be sent to the filter
+    this.equipmentSenderFilterModuleMock.sendToFilterModuleByDynamicTimedeadbandFilterer(this.sdt1, false, ms, 
+        "", FilterType.TIME_DEADBAND.getNumber());
+    expectLastCall().times(1);
+    this.equipmentSenderFilterModuleMock.sendToFilterModuleByDynamicTimedeadbandFilterer(this.sdt1, true, ms+1L, 
+        "", FilterType.TIME_DEADBAND.getNumber());
+    expectLastCall().times(1);
+    
+    // Dymanic Time Deadband enabled
+    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(this.sdt1)).andReturn(true).times(2);
+
+    // Lets figure out the Time Deadband is enabled (in this case would be the Dynamic only)
     this.sdt1.getAddress().setTimeDeadband(1);
     this.sdt1.update(true);
 
@@ -128,15 +183,19 @@ public class EquipmentTimeDeadbandTest {
   public void testAddValidInvalidTimeDeadband() {
     
     long ms = System.currentTimeMillis();
+    
+    // Dymanic Time Deadband disabled
+    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(this.sdt1)).andReturn(false).times(1);
 
     this.dynamicTimeDeadbandFiltererMock.recordTag(isA(SourceDataTag.class));
     expectLastCall().times(3);
 
     // Only the first value will be sent to the filter
     this.equipmentSenderFilterModuleMock.sendToFilterModule(this.sdt1, false, ms, 
-        "", true, FilterType.TIME_DEADBAND.getNumber());
+        "", FilterType.TIME_DEADBAND.getNumber());
     expectLastCall().times(1);
 
+    // Lets figure out the Time Deadband is enabled (in this case would be the Static)
     this.sdt1.getAddress().setTimeDeadband(1);
     this.sdt1.update(true);
 
@@ -175,6 +234,7 @@ public class EquipmentTimeDeadbandTest {
     this.dynamicTimeDeadbandFiltererMock.recordTag(isA(SourceDataTag.class));
     expectLastCall().times(3);
 
+    // Lets figure out the Time Deadband is enabled (in this case would be the Dynamic)
     this.sdt1.getAddress().setTimeDeadband(1);
     this.sdt1.update(true);
 
@@ -210,6 +270,7 @@ public class EquipmentTimeDeadbandTest {
     this.dynamicTimeDeadbandFiltererMock.recordTag(isA(SourceDataTag.class));
     expectLastCall().times(1);
 
+    // Lets figure out the Time Deadband is enabled (in this case would be the Static)
     this.sdt1.getAddress().setTimeDeadband(1);
     this.sdt1.update(true);
 
@@ -233,13 +294,14 @@ public class EquipmentTimeDeadbandTest {
    * @param name
    * @param dataType
    * @param deadBandType
+   * @param timeDeadband
    * @param priority
    * @param guaranteed
    * @return
    */
-  private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType, int priority,
-      boolean guaranteed) {
-  DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, 0, priority, guaranteed);
+  private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType,  int timeDeadband, 
+      int priority, boolean guaranteed) {
+  DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, timeDeadband, priority, guaranteed);
   return new SourceDataTag(id, name, false, DataTagConstants.MODE_OPERATIONAL, dataType, address);
 }
 }

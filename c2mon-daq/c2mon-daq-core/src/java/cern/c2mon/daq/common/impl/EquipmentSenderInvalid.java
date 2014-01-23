@@ -199,7 +199,7 @@ class EquipmentSenderInvalid {
 
             // send filtered message to statistics module
             this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, newSDQuality, newValue, timestamp.getTime(), 
-                newTagValueDesc, false, filterType.getNumber());
+                newTagValueDesc, filterType.getNumber());
 
           } else if (this.equipmentLogger.isDebugEnabled()) {
             this.equipmentLogger.debug("sendInvalidTag - value has still not been initialised: not sending the invalid tag to the statistics module");
@@ -226,7 +226,9 @@ class EquipmentSenderInvalid {
                                                 final String newTagValueDesc, 
                                                 final SourceDataQuality newSDQuality,
                                                 final Timestamp timestamp) {
-      // If time deadband is enabled for that tag stop it
+      
+      // TimeDeadband for the current Data Tag (Static or Dynamic since this variable can be enabled at runtime when the Dynamic 
+      // filter gets enabled)
       if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
         this.equipmentLogger.debug("sendInvalidTag - add time-deadband scheduler for tag " + sourceDataTag.getId());
         this.equipmentTimeDeadband.addToTimeDeadband(sourceDataTag, newValue, timestamp.getTime(), newTagValueDesc, newSDQuality);
@@ -248,6 +250,8 @@ class EquipmentSenderInvalid {
         }
         else {
           this.processMessageSender.addValue(newSDValue);
+          
+          // Checks if the dynamic TimeDeadband filter is enabled, Static disable and record it depending on the priority
           this.dynamicTimeDeadbandFilterer.recordTag(sourceDataTag);
         }
       }

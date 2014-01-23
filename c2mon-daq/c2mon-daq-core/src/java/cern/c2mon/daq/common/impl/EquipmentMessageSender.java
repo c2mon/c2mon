@@ -322,14 +322,27 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     }
 
     /**
-     * Depending on the tag priority it will be recorded for dynamic time deadband filtering.
+     * TimeDeadband policy:
+     * 
+     * Static TimeDeadband  Dynamic TimeDeadband  Filter applied
+     * -------------------  --------------------  --------------
+     *        Yes                   Yes             Static
+     *        yes                   No              Static
+     *        No                    Yes             Dynamic
+     *        No                    No              None
+     *        
+     * 
+     * Static TimeDeadband has more priority than the Dynamic one. So if the Static TimeDeadband for the 
+     * current Tag is disable and the DAQ has the Dynamic TimeDeadband enabled then the Tag will be 
+     * recorded for dynamic time deadband filtering
+     * depending on the tag priority (only LOW and MEDIUM are used).
      * 
      * @param tag The tag to be recorded.
      */
     @Override
     public void recordTag(final SourceDataTag tag) {
         DataTagAddress address = tag.getAddress();
-        if (!address.isStaticTimedeadband() && this.equipmentConfiguration.isDynamicTimeDeadbandEnabled()) {
+        if (isDynamicTimeDeadband(tag)) {
             switch (address.getPriority()) {
             case DataTagConstants.PRIORITY_LOW:
                 this.lowDynamicTimeDeadbandFilterActivator.newTagValueSent(tag.getId());
@@ -343,6 +356,18 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
             }
         }
     }
+    
+    /**
+     * Checks if Dynamic Timedeadband can be appliyed or not
+     * 
+     * @param tag The tag to be recorded.
+     * @return True if the Dynamic Timedeadband can be apply or false if not
+     */
+    @Override
+    public boolean isDynamicTimeDeadband(final SourceDataTag tag) {
+      DataTagAddress address = tag.getAddress();
+      return (!address.isStaticTimedeadband() && this.equipmentConfiguration.isDynamicTimeDeadbandEnabled());
+  }
 
     /**
      * Sends a note to the business layer, to confirm that the equipment is not properly configured, or connected to its

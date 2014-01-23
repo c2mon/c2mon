@@ -24,6 +24,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
@@ -34,7 +35,7 @@ import cern.c2mon.shared.daq.filter.FilteredDataTagValue.FilterType;
 
 /**
  * The SourceDataTagTimeDeadbandScheduler class models threads responsible for
- * handling source time deadband filtering
+ * handling source time deadband filtering. It will work with the Static TimeDeadband
  */
 public class SDTTimeDeadbandScheduler extends TimerTask {
   /**
@@ -76,6 +77,11 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    * The timer to schedule this task on
    */
   private Timer timeDeadbandTimer;
+  
+  /**
+   * The dynamic time dead band filterer for recording the current source data tag
+   */
+  private IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer;
 
   /**
    * Indicates if there is a new value to send to the server.
@@ -100,12 +106,19 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    *          The timer to schedule this task on.
    * @param valueChecker
    *          Value checker object to avoid repeated values.
+   * @param dynamicTimeDeadbandFilterer 
+   *          The dynamic time dead band filterer for recording the current source data tag
    */
-  public SDTTimeDeadbandScheduler(final SourceDataTag sourceDataTag, final IProcessMessageSender processMessageSender,
-      final EquipmentSenderFilterModule equipmentSenderFilterModule, final Timer timeDeadbandTimer, final DataTagValueFilter dataTagValueFilter) {
+  public SDTTimeDeadbandScheduler(final SourceDataTag sourceDataTag, 
+                                  final IProcessMessageSender processMessageSender,
+                                  final EquipmentSenderFilterModule equipmentSenderFilterModule, 
+                                  final Timer timeDeadbandTimer, 
+                                  final DataTagValueFilter dataTagValueFilter, 
+                                  final IDynamicTimeDeadbandFilterer dynamicTimeDeadbandFilterer) {
     this.dataTagValueFilter = dataTagValueFilter;
     this.processMessageSender = processMessageSender;
     this.equipmentSenderFilterModule = equipmentSenderFilterModule;
+    this.dynamicTimeDeadbandFilterer = dynamicTimeDeadbandFilterer;
 
     this.timeDeadbandTimer = timeDeadbandTimer;
 
@@ -207,11 +220,23 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           }
           // The new value is filtered out
           else {
-            this.equipmentSenderFilterModule.sendToFilterModule(this.sourceDataTag, value.getValue(), value.getTimestamp().getTime(),
-                value.getValueDescription(), false, filterType.getNumber());
-            
-            if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered: " + value.getValue());
+            // Send to filter module (Dynamic or Static information added)
+            if(this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(this.sourceDataTag)) {
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Dynamic TimeDeadband : " 
+                    + value.getValue());
+              }
+              
+              this.equipmentSenderFilterModule.sendToFilterModuleByDynamicTimedeadbandFilterer(this.sourceDataTag, value.getValue(), 
+                  value.getTimestamp().getTime(), value.getValueDescription(), filterType.getNumber());
+            } else {
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Static TimeDeadband: " 
+                    + value.getValue());
+              }
+              
+              this.equipmentSenderFilterModule.sendToFilterModule(this.sourceDataTag, value.getValue(), 
+                  value.getTimestamp().getTime(), value.getValueDescription(), filterType.getNumber());
             }
           }
 

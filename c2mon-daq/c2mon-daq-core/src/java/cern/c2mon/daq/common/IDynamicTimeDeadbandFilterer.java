@@ -29,10 +29,23 @@ import cern.c2mon.shared.daq.datatag.SourceDataTag;
  */
 public interface IDynamicTimeDeadbandFilterer {
 	 
-	/**
-     * Depending on the tag priority it will be recorded for dynamic time deadband filtering.
-     * 
-     * @param tag The tag to be recorded.
-     */
-    void recordTag(final SourceDataTag tag);
+  /**
+   * TimeDeadband policy:
+   * 
+   * Static TimeDeadband has more priority than the Dynamic one. So if the Static TimeDeadband for the 
+   * current Tag is disable and the DAQ has the Dynamic TimeDeadband enabled then the Tag will be 
+   * recorded for dynamic time deadband filtering depending on the tag priority 
+   * (only LOW and MEDIUM are used).
+   * 
+   * @param tag The tag to be recorded.
+   */
+  void recordTag(final SourceDataTag tag);
+  
+  /**
+   * Checks if Dynamic Time deadband can be applied or not
+   * 
+   * @param tag The tag to be recorded.
+   * @return True if the Dynamic Time deadband can be apply or false if not
+   */
+  public boolean isDynamicTimeDeadband(final SourceDataTag tag);
 }
