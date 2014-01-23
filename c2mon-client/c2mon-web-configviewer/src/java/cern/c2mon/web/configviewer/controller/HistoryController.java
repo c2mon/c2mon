@@ -66,12 +66,12 @@ public class HistoryController {
   /**
    * Title for the history form page
    * */
-  public static final String HISTORY_FORM_TITLE = "History Viewer";
+  public static final String HISTORY_FORM_TITLE = "History Viewer (table)";
 
   /**
    * Instruction for the history form page
    * */
-  public static final String HISTORY_FORM_INSTR = "Enter a tag id to view the last 100 records in History.";
+  public static final String HISTORY_FORM_INSTR = "Enter a Tag Id to create a Table View.";
 
   /** How many records in history to ask for. 100 looks ok! */
   private static final int HISTORY_RECORDS_TO_ASK_FOR = 100;
