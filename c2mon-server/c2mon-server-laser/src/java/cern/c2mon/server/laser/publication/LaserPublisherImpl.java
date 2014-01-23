@@ -239,6 +239,7 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
           } else {
             toBePublished.remove(alarm.getId()); //remove in case re-publicaton thread attempts a publication but other server has already published it
           }
+          alarmCache.putQuiet(alarm);
         } finally {
           alarmCache.releaseWriteLockOnKey(alarmCopy.getId());
         }         
