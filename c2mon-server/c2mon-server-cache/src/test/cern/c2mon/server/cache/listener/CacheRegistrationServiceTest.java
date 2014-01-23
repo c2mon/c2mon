@@ -136,7 +136,7 @@ public class CacheRegistrationServiceTest implements ApplicationContextAware {
     
     //check behaviour is as expected
     replay(mockCacheListener);
-    dataTagFacade.updateAndValidate(dataTag, Boolean.FALSE, "listener test value", new Timestamp(System.currentTimeMillis()));
+    dataTagFacade.updateAndValidate(dataTag.getId(), Boolean.FALSE, "listener test value", new Timestamp(System.currentTimeMillis()));
     dataTagCache.notifyListenersOfUpdate(dataTag);
     listenerContainer.stop();
     verify(mockCacheListener);
@@ -177,29 +177,30 @@ public class CacheRegistrationServiceTest implements ApplicationContextAware {
     assertNotNull(listenerContainer);
     
     //update tag in cache and notify listeners
-    dataTagFacade.updateAndValidate(dataTag, Boolean.FALSE, "listener test value", new Timestamp(System.currentTimeMillis()));
+    dataTagFacade.updateAndValidate(dataTag.getId(), Boolean.FALSE, "listener test value", new Timestamp(System.currentTimeMillis()));
     
     //sleep to allow separate thread to process
    
     Thread.sleep(200);
    
+    DataTag cacheCopy = dataTagCache.getCopy(dataTag.getId());
     //check listener received the value
     assertNotNull(testListener.receivedValue);
     assertNotNull(testListener.receivedId);
-    assertEquals(dataTag.getValue(), testListener.receivedValue);
-    assertEquals(dataTag.getValue(), Boolean.FALSE); //check is indeed false
-    assertEquals(dataTag.getId(), testListener.receivedId);
+    assertEquals(cacheCopy.getValue(), testListener.receivedValue);
+    assertEquals(cacheCopy.getValue(), Boolean.FALSE); //check is indeed false
+    assertEquals(cacheCopy.getId(), testListener.receivedId);
     
     //do the same for control tags
-    dataTagFacade.updateAndValidate(controlTag, Long.valueOf(100), "listener test control tag value", new Timestamp(System.currentTimeMillis()));
-        
+    controlTagFacade.updateAndValidate(controlTag.getId(), Long.valueOf(100L), "listener test control tag value", new Timestamp(System.currentTimeMillis()));
+    ControlTag controlTagFromCache = controlTagCache.getCopy(controlTag.getId());   
     //sleep to allow separate thread to process
     
     Thread.sleep(100);    
     
     //check listener notified
-    assertEquals(controlTag.getValue(), testListener.receivedValue);
-    assertEquals(controlTag.getValue(), Long.valueOf(100)); //check is indeed 100
+    assertEquals(controlTagFromCache.getValue(), testListener.receivedValue);
+    assertEquals(controlTagFromCache.getValue(), Long.valueOf(100)); //check is indeed 100
     assertEquals(controlTag.getId(), testListener.receivedId);
     listenerContainer.stop();
     

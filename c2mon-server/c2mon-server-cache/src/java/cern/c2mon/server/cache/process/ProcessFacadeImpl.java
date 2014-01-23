@@ -184,7 +184,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   }
 
   @Override
-  public void stop(final Process process, Timestamp timestamp) {
+  protected final void stop(final Process process, Timestamp timestamp) {
     processCache.acquireWriteLockOnKey(process.getId());
     try {
       ProcessCacheObject processCacheObject = (ProcessCacheObject) process;      
@@ -200,36 +200,65 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   } 
   
   @Override
-  public void start(final Process process, final String pHostName, final Timestamp pStartupTime) {
-    processCache.acquireWriteLockOnKey(process.getId());
+  public Process start(final Long processId, final String pHostName, final Timestamp pStartupTime) {
+    Process process = null;
+    processCache.acquireWriteLockOnKey(processId);
     try {
-      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
-      if (!isRunning(processCacheObject)) {
-        final Long newPIK = createProcessPIK();
-        processCacheObject.setCurrentHost(pHostName);
-        processCacheObject.setStartupTime(pStartupTime);
-        processCacheObject.setRequiresReboot(Boolean.FALSE);
-        processCacheObject.setProcessPIK(newPIK);
-        processCacheObject.setLocalConfig(LocalConfig.Y);
-        processCacheObject.setJmsListenerTopic(processListenerTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
-            + processCacheObject.getName() + "." + newPIK.toString());
-        super.start(process, pStartupTime);
-      }
+      process = processCache.get(processId);
+      start(process, pHostName, pStartupTime);
+      processCache.put(processId, process);
     } finally {
-      processCache.releaseWriteLockOnKey(process.getId());
+      processCache.releaseWriteLockOnKey(processId);
     }
+    
+    return process;
   }
   
+  /**
+   * Records the start up time of the process and the host it is running on,
+   * (and sets it's status to STARTUP - may remove this in the future as duplicate
+   * of state tag of the DAQ)
+   * 
+   * <p>Also starts the alive timer.
+   * 
+   * <p>Please note, that in case of a cache reference to the process it is up to the calling
+   * method to acquire a write lock. In case of a copy it is the calling method that has
+   * to take care of committing the changes made to the process object back to the cache. 
+   * 
+   * @param process the Process that is starting
+   * @param hostName the hostname of the Process
+   * @param startupTime the start up time
+   */
+  private void start(final Process process, final String pHostName, final Timestamp pStartupTime) {
+    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
+    if (!isRunning(processCacheObject)) {
+      final Long newPIK = createProcessPIK();
+      processCacheObject.setCurrentHost(pHostName);
+      processCacheObject.setStartupTime(pStartupTime);
+      processCacheObject.setRequiresReboot(Boolean.FALSE);
+      processCacheObject.setProcessPIK(newPIK);
+      processCacheObject.setLocalConfig(LocalConfig.Y);
+      processCacheObject.setJmsListenerTopic(processListenerTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+            + processCacheObject.getName() + "." + newPIK.toString());
+      super.start(processCacheObject, pStartupTime);
+    }
+  }
+
   @Override
-  public void errorStatus(final Process process, final String errorMessage) {
-    processCache.acquireWriteLockOnKey(process.getId());
+  public void errorStatus(final Long processId, final String errorMessage) {
+    processCache.acquireWriteLockOnKey(processId);
     try {
+      Process process = processCache.get(processId);
+      errorStatus(process, errorMessage);
+      processCache.put(processId, process);
+    } finally {
+      processCache.releaseWriteLockOnKey(processId);
+    }
+  }
+
+  private void errorStatus(final Process process, final String errorMessage) {
       ProcessCacheObject processCacheObject = (ProcessCacheObject) process;      
       processCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
-      processCache.notifyListenersOfUpdate(process);
-    } finally {
-      processCache.releaseWriteLockOnKey(process.getId());
-    }
   }
   
   /**
@@ -352,7 +381,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     try {
       ProcessCacheObject process = (ProcessCacheObject) processCache.get(processId);
       process.setRequiresReboot(reboot);
-      processCache.notifyListenersOfUpdate(process);
+      processCache.put(processId, process);
     } finally {
       processCache.releaseReadLockOnKey(processId);
     }
@@ -373,14 +402,26 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   }
 
   @Override
-  public void setProcessPIK(final Process process, final Long processPIK) {
-    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
-    processCacheObject.setProcessPIK(processPIK);
+  public void setProcessPIK(final Long processId, final Long processPIK) {
+    processCache.acquireWriteLockOnKey(processId);
+    try {
+      final ProcessCacheObject processCacheObject = (ProcessCacheObject) processCache.getCopy(processId);
+      processCacheObject.setProcessPIK(processPIK);
+      processCache.putQuiet(processCacheObject);
+    } finally {
+      processCache.releaseWriteLockOnKey(processId);
+    }
   }
 
   @Override
-  public void setLocalConfig(final Process process, final LocalConfig localConfig) {
-    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
-    processCacheObject.setLocalConfig(localConfig);
+  public void setLocalConfig(final Long processId, final LocalConfig localConfig) {
+    processCache.acquireWriteLockOnKey(processId);
+    try {
+      final ProcessCacheObject processCacheObject = (ProcessCacheObject) processCache.getCopy(processId);
+      processCacheObject.setLocalConfig(localConfig);
+      processCache.putQuiet(processCacheObject);
+    } finally {
+      processCache.releaseWriteLockOnKey(processId);
+    }
   }
 }

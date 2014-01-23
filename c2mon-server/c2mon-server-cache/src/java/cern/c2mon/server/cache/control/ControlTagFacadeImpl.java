@@ -99,24 +99,4 @@ public class ControlTagFacadeImpl extends AbstractDataTagFacade<ControlTag> impl
   public boolean isInProcessList(ControlTag controlTag) {
     return aliveTimerCache.getKeys().contains(controlTag.getId()) && (controlTag.getAddress() != null);
   }
-
-  /**
-   * For the time being, no control tags are affected by the
-   * supervision status of the Process/Equipment.
-   */
-  @Override
-  public Collection<Long> getParentEquipments(ControlTag tag) {
-    return Collections.emptyList();
-  }
-
-  /**
-   * For the time being, no control tags are affected by the
-   * supervision status of the Process/Equipment.
-   */
-  @Override
-  public Collection<Long> getParentProcesses(ControlTag tag) {
-    return Collections.emptyList();
-  }
-  
-
 }

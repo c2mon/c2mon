@@ -76,18 +76,6 @@ public class AbstractTagFacadeTest {
       }
       
       @Override
-      public Collection<Long> getParentProcesses(DataTag tag) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-      
-      @Override
-      public Collection<Long> getParentEquipments(DataTag tag) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-      
-      @Override
       protected void validateConfig(DataTag cacheObject) {
         // TODO Auto-generated method stub
         
@@ -97,12 +85,6 @@ public class AbstractTagFacadeTest {
       protected Change configureCacheObject(DataTag cacheObject, Properties properties) throws IllegalAccessException {
         // TODO Auto-generated method stub
         return null;
-      }
-      
-      @Override
-      public void notifyListenersOfUpdate(DataTag tag) {
-        // TODO Auto-generated method stub
-        
       }
       
       @Override

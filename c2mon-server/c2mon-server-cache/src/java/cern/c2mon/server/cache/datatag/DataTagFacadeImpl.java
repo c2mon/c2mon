@@ -296,33 +296,14 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
   }
   
   @Override
-  public void addDependentRule(DataTag dataTag, Long ruleTagId) {    
-    addDependentRuleToTag(dataTag, ruleTagId);
-    notifyListenersOfUpdate(dataTag);
-  }
-
-  @Override
-  public Collection<Long> getParentEquipments(DataTag tag) {
-    tagCache.acquireReadLockOnKey(tag.getId());
+  public void addDependentRule(final Long dataTagId, final Long ruleTagId) {
+    tagCache.acquireWriteLockOnKey(dataTagId);
     try {
-      List<Long> eqIds = new ArrayList<Long>(1);
-      eqIds.add(tag.getEquipmentId());
-      return eqIds;
+      DataTag dataTag = tagCache.get(dataTagId);
+      addDependentRuleToTag(dataTag, ruleTagId);
+      tagCache.put(dataTagId, dataTag);
     } finally {
-      tagCache.releaseReadLockOnKey(tag.getId());
+      tagCache.releaseWriteLockOnKey(dataTagId);
     }
-    
-  }
-
-  @Override
-  public Collection<Long> getParentProcesses(DataTag tag) {
-    tagCache.acquireReadLockOnKey(tag.getId());
-    try {
-      List<Long> processIds = new ArrayList<Long>(1);
-      processIds.add(tag.getProcessId());
-      return processIds;
-    } finally {
-      tagCache.releaseReadLockOnKey(tag.getId());
-    }    
   }
 }

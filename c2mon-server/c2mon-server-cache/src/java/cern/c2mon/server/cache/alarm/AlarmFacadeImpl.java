@@ -194,153 +194,157 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   }
   
   @Override
-  public Alarm update(final Long alarmId, final Tag tag) {
+  public Alarm update(final Long alarmId, final Long tagId) {
     alarmCache.acquireWriteLockOnKey(alarmId);
+    tagLocationService.acquireReadLockOnKey(tagId);
     try {
       Alarm alarm = alarmCache.get(alarmId);
+      Tag tag = tagLocationService.get(tagId);
+      // Notice, in this case the update() method is putting the changes back into the cache
       return update(alarm, tag);
     } finally {
+      tagLocationService.releaseReadLockOnKey(tagId);
       alarmCache.releaseWriteLockOnKey(alarmId);
     } 
   }
   
   /**
    * Logic kept the same as in TIM1 (see {@link AlarmFacade}).
+   * The locking of the objets is done in the public class.
+   * Notice, in this case the update() method is putting the changes back into the cache.
    */
-  @Override
-  public Alarm update(final Alarm alarm, final Tag tag) {
-    alarmCache.acquireWriteLockOnKey(alarm.getId());
-    try {
-      AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
-      // Reset previous change state
-      alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_NONE);
-      // this time is then used in LASER publication as user timestamp
-      Timestamp alarmTime = new Timestamp(System.currentTimeMillis());
-      // not possible to evaluate alarms with associated null tag; occurs during normal operation
-      // (may change in future is alarm state depends on quality f.eg.)
-      if (tag.getValue() == null) {
-        LOGGER.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at " + alarm.getState());
-        return alarm;
-      }
-      // timestamp should never be null
-      if (tag.getTimestamp() == null) {
-        LOGGER.warn("update() : tag value or timestamp null -> no update");      
-        throw new IllegalArgumentException("update method called on Alarm facade with either null tag value or null tag timestamp.");
-      }
-      
-      // Compute the alarm state corresponding to the new tag value
-      String newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
-    
-      // Return immediately if the alarm new state is null
-      if (newState == null) {
-        LOGGER.error("update() : new state would be NULL -> no update.");
-        throw new IllegalStateException("Alarm evaluated to null state!");
-      }
-      
-      // Return if new state is TERMINATE and old state was also TERMINATE, return original alarm (no need to save in cache)
-      if (newState.equals(AlarmCondition.TERMINATE) && alarmCacheObject.getState().equals(AlarmCondition.TERMINATE)) {
-        return alarm;
-      }
-            
-      // Build up a prefix according to the tag value's validity and mode
-      String additionalInfo = null;
-    
-      switch (tag.getMode()) {
-      case DataTagConstants.MODE_MAINTENANCE:
-        if (tag.isValid()) {
-          additionalInfo = "[M]";
-        } else {
-          additionalInfo = "[M][?]";
-        }
-        break;
-      case DataTagConstants.MODE_TEST:
-        if (tag.isValid()) {
-          additionalInfo = "[T]";
-        } else {
-          additionalInfo = "[T][?]";
-        }
-        break;
-      default:
-        if (tag.isValid()) {
-          additionalInfo = "";
-        } else {
-          additionalInfo = "[?]";
-        }
-      }
-    
-      // Add another flag to the info if the value is simulated
-      if (tag.isSimulated()) {
-        additionalInfo = additionalInfo + "[SIM]";
-      }
-    
-      // Default case: change the alarm's state
-      // (1) if the alarm has never been initialised
-      // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMIATE->ACTIVE
-      if (alarmCacheObject.getState() == null
-          || (tag.isValid() && !alarmCacheObject.getState().equals(newState))) {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-              .append(" changed STATE to ").append(newState));
-        }
-        alarmCacheObject.setState(newState);
-        alarmCacheObject.setTimestamp(alarmTime);
-        alarmCacheObject.setInfo(additionalInfo);     
-        alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_STATE);
-        alarmCacheObject.notYetPublished();
-        alarmCache.notifyListenersOfUpdate(alarmCacheObject);        
-        return alarmCacheObject;
-      }
-    
-      // Even if the alarm state itself hasn't change, the additional
-      // information
-      // related to the alarm (e.g. whether the alarm is valid or invalid)
-      // might
-      // have changed
-      if (alarmCacheObject.getInfo() == null) {
-        alarmCacheObject.setInfo("");
-      }
-      if (!alarmCacheObject.getInfo().equals(additionalInfo)) {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-              .append(" changed INFO to ").append(additionalInfo));
-        }
-        alarmCacheObject.setInfo(additionalInfo);
-        alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_PROPERTIES);
-        alarmCacheObject.setTimestamp(alarmTime);
-        if (!alarmCacheObject.getState().equals(AlarmCondition.TERMINATE)) {
-          // We only send a notification about a property change
-          // to the subscribed alarm listeners, if the alarm is active
-          alarmCacheObject.notYetPublished();
-          alarmCache.notifyListenersOfUpdate(alarmCacheObject);
-        }
-        return alarmCacheObject;
-      }
-    
-      // In all other cases, the value of the alarm related to the DataTag has
-      // not changed. No need to publish an alarm change.
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-            .append(" has not changed."));
-      }
-      //no change so no listener notification in this case
-      
-      //this.alarmChange = CHANGE_NONE;
-      return alarmCacheObject;
-    } finally {
-      alarmCache.releaseWriteLockOnKey(alarm.getId());     
+  private Alarm update(final Alarm alarm, final Tag tag) {
+    AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
+    // Reset previous change state
+    alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_NONE);
+    // this time is then used in LASER publication as user timestamp
+    Timestamp alarmTime = new Timestamp(System.currentTimeMillis());
+    // not possible to evaluate alarms with associated null tag; occurs during normal operation
+    // (may change in future is alarm state depends on quality f.eg.)
+    if (tag.getValue() == null) {
+      LOGGER.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at " + alarm.getState());
+      return alarm;
+    }
+    // timestamp should never be null
+    if (tag.getTimestamp() == null) {
+      LOGGER.warn("update() : tag value or timestamp null -> no update");      
+      throw new IllegalArgumentException("update method called on Alarm facade with either null tag value or null tag timestamp.");
     }
     
+    // Compute the alarm state corresponding to the new tag value
+    String newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
+  
+    // Return immediately if the alarm new state is null
+    if (newState == null) {
+      LOGGER.error("update() : new state would be NULL -> no update.");
+      throw new IllegalStateException("Alarm evaluated to null state!");
+    }
+    
+    // Return if new state is TERMINATE and old state was also TERMINATE, return original alarm (no need to save in cache)
+    if (newState.equals(AlarmCondition.TERMINATE) && alarmCacheObject.getState().equals(AlarmCondition.TERMINATE)) {
+      return alarm;
+    }
+          
+    // Build up a prefix according to the tag value's validity and mode
+    String additionalInfo = null;
+  
+    switch (tag.getMode()) {
+    case DataTagConstants.MODE_MAINTENANCE:
+      if (tag.isValid()) {
+        additionalInfo = "[M]";
+      } else {
+        additionalInfo = "[M][?]";
+      }
+      break;
+    case DataTagConstants.MODE_TEST:
+      if (tag.isValid()) {
+        additionalInfo = "[T]";
+      } else {
+        additionalInfo = "[T][?]";
+      }
+      break;
+    default:
+      if (tag.isValid()) {
+        additionalInfo = "";
+      } else {
+        additionalInfo = "[?]";
+      }
+    }
+  
+    // Add another flag to the info if the value is simulated
+    if (tag.isSimulated()) {
+      additionalInfo = additionalInfo + "[SIM]";
+    }
+  
+    // Default case: change the alarm's state
+    // (1) if the alarm has never been initialised
+    // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMIATE->ACTIVE
+    if (alarmCacheObject.getState() == null
+        || (tag.isValid() && !alarmCacheObject.getState().equals(newState))) {
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
+            .append(" changed STATE to ").append(newState));
+      }
+      alarmCacheObject.setState(newState);
+      alarmCacheObject.setTimestamp(alarmTime);
+      alarmCacheObject.setInfo(additionalInfo);     
+      alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_STATE);
+      alarmCacheObject.notYetPublished();
+      alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);        
+      return alarmCacheObject;
+    }
+  
+    // Even if the alarm state itself hasn't change, the additional
+    // information
+    // related to the alarm (e.g. whether the alarm is valid or invalid)
+    // might
+    // have changed
+    if (alarmCacheObject.getInfo() == null) {
+      alarmCacheObject.setInfo("");
+    }
+    if (!alarmCacheObject.getInfo().equals(additionalInfo)) {
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
+            .append(" changed INFO to ").append(additionalInfo));
+      }
+      alarmCacheObject.setInfo(additionalInfo);
+      alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_PROPERTIES);
+      alarmCacheObject.setTimestamp(alarmTime);
+      if (!alarmCacheObject.getState().equals(AlarmCondition.TERMINATE)) {
+        // We only send a notification about a property change
+        // to the subscribed alarm listeners, if the alarm is active
+        alarmCacheObject.notYetPublished();
+        alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
+      }
+      return alarmCacheObject;
+    }
+  
+    // In all other cases, the value of the alarm related to the DataTag has
+    // not changed. No need to publish an alarm change.
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
+          .append(" has not changed."));
+    }
+    //no change so no listener notification in this case
+    
+    //this.alarmChange = CHANGE_NONE;
+    return alarmCacheObject;
   } 
   
   @Override
   public void evaluateAlarm(Long alarmId) {
-    Alarm alarm = alarmCache.get(alarmId);
-    tagLocationService.acquireReadLockOnKey(alarm.getTagId());
+    alarmCache.acquireWriteLockOnKey(alarmId);
     try {
-      Tag tag = tagLocationService.get(alarm.getTagId());
-      update(alarm, tag);
+      Alarm alarm = alarmCache.get(alarmId);
+      tagLocationService.acquireReadLockOnKey(alarm.getTagId());
+      try {
+        Tag tag = tagLocationService.get(alarm.getTagId());
+        update(alarm, tag);
+      } finally {
+        tagLocationService.releaseReadLockOnKey(alarm.getTagId());
+      }
     } finally {
-      tagLocationService.releaseReadLockOnKey(alarm.getTagId());
+      alarmCache.releaseWriteLockOnKey(alarmId);
     }
   }
   

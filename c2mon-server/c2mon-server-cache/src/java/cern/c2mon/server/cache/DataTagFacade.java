@@ -73,24 +73,6 @@ public interface DataTagFacade extends CommonTagFacade<DataTag> {
   Event<Boolean> updateFromSource(Long dataTagId, SourceDataTagValue sourceDataTagValue);
   
   /**
-   * Validates the DataTag and updates it with the provided value. Should be used
-   * to update values within the server (only cache timestamp is set).
-   * 
-   * <p>The cache timestamp is set to the passed time and the DAQ and source timestamps are
-   * reset to null.
-   * 
-   * <p>If the update causes no changes, the cache object is not updated (see filterout method in AbstracTagFacade).
-   * 
-   * <p>Notifies registered listeners if an update takes place.
-   * 
-   * @param dataTag usually a reference to the DataTag object in the cache
-   * @param value new DataTag value
-   * @param valueDescription description of the new value
-   * @param timestamp time of the update
-   */
-  void updateAndValidate(DataTag dataTag, Object value, String valueDescription, Timestamp timestamp);
-  
-  /**
    * Same as other updateAndValidate method but takes a tag id as parameter and does the cache lookup
    * in the method.
    * 
@@ -216,9 +198,9 @@ public interface DataTagFacade extends CommonTagFacade<DataTag> {
   void validateConfig(DataTag dataTag);
 
   /**
-   * Notifies listeners.
-   * @param dataTag
-   * @param ruleTagId
+   * Adds the rule to the tag and notifies a listeners
+   * @param dataTagId The tag id
+   * @param ruleTagId the rule tag to add as reference
    */
-  void addDependentRule(DataTag dataTag, Long ruleTagId);
+  void addDependentRule(Long dataTagId, Long ruleTagId);
 }

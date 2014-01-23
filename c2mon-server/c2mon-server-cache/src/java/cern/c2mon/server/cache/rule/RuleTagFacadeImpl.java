@@ -180,7 +180,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
 //      ruleTag.getWriteLock().lock();
 //      try {
 //        ruleTagCacheObjectFacade.invalidate(ruleTag, dataTagQuality, timestamp);
-//        tagCache.notifyListenersOfUpdate(ruleTag);
+//        tagCache.put(ruleTag.getId, ruleTag);
 //        updateCount++;
 //        log((RuleTagCacheObject) ruleTag);        
 //      } finally {
@@ -199,7 +199,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
       if (!filterout(ruleTag, value, valueDescription, null, null, timestamp)) {          
         ruleTagCacheObjectFacade.validate(ruleTag);
         ruleTagCacheObjectFacade.update(ruleTag, value, valueDescription, timestamp);
-        tagCache.notifyListenersOfUpdate(ruleTag);
+        tagCache.put(id, ruleTag);
         updateCount++;
         log((RuleTagCacheObject) ruleTag);
       } else {
@@ -280,35 +280,5 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   protected void invalidateQuietly(final RuleTag tag, final TagQualityStatus statusToAdd, final String statusDescription,
       final Timestamp timestamp) {
     ruleTagCacheObjectFacade.invalidate((RuleTag) tag, statusToAdd, statusDescription, timestamp);
-  }
-
-  /**
-   * Need this abstract method for {@link DataTagCacheObjectFacade} which is also
-   * used for ControlTag's - TODO remove later once fixed this...
-   * @param tag the rule that has been updated
-   */
-  @Override
-  public void notifyListenersOfUpdate(final RuleTag tag) {
-    tagCache.notifyListenersOfUpdate(tag);
-  }
-
-  @Override
-  public Collection<Long> getParentEquipments(final RuleTag tag) {
-    tagCache.acquireReadLockOnKey(tag.getId());
-    try {
-      return tag.getEquipmentIds();
-    } finally {
-      tagCache.releaseReadLockOnKey(tag.getId());
-    }
-  }
-
-  @Override
-  public Collection<Long> getParentProcesses(final RuleTag tag) {
-    tagCache.acquireReadLockOnKey(tag.getId());
-    try {
-      return tag.getProcessIds();
-    } finally {
-      tagCache.releaseReadLockOnKey(tag.getId());
-    }
   }
 }

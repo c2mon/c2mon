@@ -53,28 +53,6 @@ public interface SupervisedFacade<T extends Supervised> {
    * @param id id of the cache element
    */
   void refreshAndnotifyCurrentSupervisionStatus(Long id);
-
-  /**
-   * Sets the status of the Supervised object to STARTUP,
-   * with associated message.
-   * 
-   * <p>Starts the alive timer if not already running.
-   * 
-   * @param supervised supervised object
-   * @param timestamp time of the start
-   */
-  void start(T supervised, Timestamp timestamp);
-  
-  /**
-   * Sets the status of the Supervised object to DOWN,
-   * with stop message. 
-   * 
-   * <p>Stops the alive timer for this object is running.
-   * 
-   * @param supervised supervised object
-   * @param timestamp time of the stop
-   */
-  void stop(T supervised, Timestamp timestamp);
   
   /**
    * Sets the status of the Supervised object to STARTUP,
@@ -103,20 +81,20 @@ public interface SupervisedFacade<T extends Supervised> {
    * back in after an alive expiration, or when a first
    * alive arrives at Process startup.
    * 
-   * @param supervised supervised object
+   * @param id The cache id of the supervised object
    * @param timestamp time of the running event
    * @param message details of the event
    */
-  void resume(T supervised, Timestamp timestamp, String message);
+  void resume(Long id, Timestamp timestamp, String message);
 
   /**
    * Called when an alive expires or a commfault tag is received.
    * 
-   * @param supervised supervised object
+   * @param id The cache id of the supervised object
    * @param timestamp time of problem
    * @param message details
    */
-  void suspend(T supervised, Timestamp timestamp, String message);
+  void suspend(Long id, Timestamp timestamp, String message);
   
   /**
    * Returns true if the object is either running or in 

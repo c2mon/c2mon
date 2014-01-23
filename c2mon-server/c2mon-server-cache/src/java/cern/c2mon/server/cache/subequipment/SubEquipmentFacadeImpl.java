@@ -162,6 +162,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
         LOGGER.warn("Trying to add existing SubEquipment to an Equipment!");
       } else {
         equipment.getSubEquipmentIds().add(id);
+        equipmentCache.putQuiet(equipment);
       }
     } finally {
       equipmentCache.releaseWriteLockOnKey(parentId);

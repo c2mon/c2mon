@@ -133,13 +133,11 @@ public class DataTagFacadeImplTest {
    */
   private final void recordUpdateFromSourceMock(final DataTag dataTag, boolean expectNotifyListeners) {
     dataTagCache.acquireWriteLockOnKey(dataTag.getId());
-    EasyMock.expectLastCall().times(2);
     EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
     if (expectNotifyListeners) {
-      dataTagCache.notifyListenersOfUpdate(EasyMock.isA(DataTag.class));
+      dataTagCache.put(dataTag.getId(), dataTag);
     }
     dataTagCache.releaseWriteLockOnKey(dataTag.getId());
-    EasyMock.expectLastCall().times(2);
   }
   
   /**
@@ -188,22 +186,7 @@ public class DataTagFacadeImplTest {
     
     control.verify();
   }
-  
-  /**
-   * DataTag should never be null here, but just in case...
-   */
-  @Test
-  public void testNoFailureOnNullTag() {
-    SourceDataTagValue sourceTag = new SourceDataTagValue(Long.valueOf(2), "test tag", false);
-    
-    control.replay();
-    
-    //when fed with null, log error but do not crash
-    boolean updated = dataTagFacade.updateFromSource(null, sourceTag).getReturnValue();
-    assertTrue(!updated);
-    
-    control.verify(); //no listener notification
-  }
+
   
   /**
    * SourceDataTagValue should never be null here, but just in case...
@@ -232,12 +215,7 @@ public class DataTagFacadeImplTest {
     DataTagCacheObject dataTag = new DataTagCacheObject(Long.valueOf(2), "test name", "Float", DataTagConstants.MODE_OPERATIONAL); 
     Timestamp cacheTime = new Timestamp(System.currentTimeMillis() - 1000); //reset to compare
     
-    dataTagCache.acquireWriteLockOnKey(dataTag.getId());
-    EasyMock.expectLastCall().times(2);
-    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
-    dataTagCache.notifyListenersOfUpdate(EasyMock.isA(DataTag.class));
-    dataTagCache.releaseWriteLockOnKey(dataTag.getId());
-    EasyMock.expectLastCall().times(2);
+    recordUpdateFromSourceMock(dataTag);
     
     control.replay();
     
@@ -271,7 +249,9 @@ public class DataTagFacadeImplTest {
     
     control.replay();
     
-    boolean updated = dataTagFacade.updateFromSource(dataTag.getId(), sourceTag).getReturnValue();
+    boolean updated = dataTagFacade.updateFromSource(2L, sourceTag).getReturnValue();
+    
+    control.verify();
     
     assertTrue(updated);
     
@@ -281,8 +261,6 @@ public class DataTagFacadeImplTest {
     assertNotNull(dataTag.getDaqTimestamp()); //set in constructor
     assertTrue(!dataTag.getCacheTimestamp().equals(cacheTime)); //cache time has been updated
     assertEquals("value desc", dataTag.getValueDescription());
-    
-    control.verify();
   }
   
   

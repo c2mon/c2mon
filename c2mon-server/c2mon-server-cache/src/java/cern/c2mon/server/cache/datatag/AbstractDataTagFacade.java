@@ -292,60 +292,46 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
    * @param sourceDataTagValue the source value received from the DAQ
    * @return true if an update was performed (i.e. the value was not filtered out)
    */
-  public final Event<Boolean> updateFromSource(final T dataTag, final SourceDataTagValue sourceDataTagValue) {
-    if (dataTag != null) {
-      tagCache.acquireWriteLockOnKey(dataTag.getId());
-      try {
-        long eventTime = 0;
-        Boolean updated = Boolean.FALSE;
-        if (sourceDataTagValue != null) {
-          if (!filterout(dataTag, sourceDataTagValue)) {
-            if (sourceDataTagValue.getValue() == null) {              
-              if (sourceDataTagValue.isValid()) {       
-                if (LOGGER.isDebugEnabled()) {
-                  LOGGER.debug("Null value received from source for datatag " + sourceDataTagValue.getId() + " - invalidating with quality UNKNOWN_REASON");
-                }
-                invalidateQuietly(dataTag, TagQualityStatus.UNKNOWN_REASON, 
-                                    "Null value received from DAQ", 
-                                    new Timestamp(System.currentTimeMillis()));
-              } else {                  
-                DataTagQuality newTagQuality = qualityConverter.convert(sourceDataTagValue.getQuality());                
-                dataTagCacheObjectFacade.setQuality(dataTag, newTagQuality, new Timestamp(System.currentTimeMillis()));
-              }                                          
-            } else {              
-              if (sourceDataTagValue.isValid()) {
-                updateAndValidateQuietly(dataTag, sourceDataTagValue.getValue(), sourceDataTagValue.getValueDescription(),                            
-                    sourceDataTagValue.getTimestamp(), sourceDataTagValue.getDaqTimestamp(), new Timestamp(System.currentTimeMillis()));                  
-              } else {
-                DataTagQuality newTagQuality = qualityConverter.convert(sourceDataTagValue.getQuality()); //TODO redesign so no object creation here           
-                dataTagCacheObjectFacade.updateAndInvalidate(dataTag, sourceDataTagValue.getValue(), sourceDataTagValue.getValueDescription(),                            
-                    sourceDataTagValue.getTimestamp(), sourceDataTagValue.getDaqTimestamp(), new Timestamp(System.currentTimeMillis()), newTagQuality);
-              }              
+  protected final Event<Boolean> updateFromSource(final T dataTag, final SourceDataTagValue sourceDataTagValue) {    
+    long eventTime = 0;
+    Boolean updated = Boolean.FALSE;
+    if (sourceDataTagValue != null) {
+      if (!filterout(dataTag, sourceDataTagValue)) {
+        if (sourceDataTagValue.getValue() == null) {              
+          if (sourceDataTagValue.isValid()) {       
+            if (LOGGER.isDebugEnabled()) {
+              LOGGER.debug("Null value received from source for datatag " + sourceDataTagValue.getId() + " - invalidating with quality UNKNOWN_REASON");
             }
-            updated = true;               
+            invalidateQuietly(dataTag, TagQualityStatus.UNKNOWN_REASON, 
+                                "Null value received from DAQ", 
+                                new Timestamp(System.currentTimeMillis()));
+          } else {                  
+            DataTagQuality newTagQuality = qualityConverter.convert(sourceDataTagValue.getQuality());                
+            dataTagCacheObjectFacade.setQuality(dataTag, newTagQuality, new Timestamp(System.currentTimeMillis()));
+          }                                          
+        } else {              
+          if (sourceDataTagValue.isValid()) {
+            updateAndValidateQuietly(dataTag, sourceDataTagValue.getValue(), sourceDataTagValue.getValueDescription(),                            
+                sourceDataTagValue.getTimestamp(), sourceDataTagValue.getDaqTimestamp(), new Timestamp(System.currentTimeMillis()));                  
           } else {
-            if (LOGGER.isTraceEnabled()) {
-              LOGGER.trace("Filtering out source update for tag " + dataTag.getId());
-            }
-          }
-        } else {
-          LOGGER.error("Attempting to update a dataTag with a null source value - ignoring update.");
+            DataTagQuality newTagQuality = qualityConverter.convert(sourceDataTagValue.getQuality()); //TODO redesign so no object creation here           
+            dataTagCacheObjectFacade.updateAndInvalidate(dataTag, sourceDataTagValue.getValue(), sourceDataTagValue.getValueDescription(),                            
+                sourceDataTagValue.getTimestamp(), sourceDataTagValue.getDaqTimestamp(), new Timestamp(System.currentTimeMillis()), newTagQuality);
+          }              
         }
-        
-        if (updated) {
-          notifyListenersOfUpdate(dataTag);
+        updated = true;               
+      } else {
+        if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace("Filtering out source update for tag " + dataTag.getId());
         }
-        
-        eventTime = dataTag.getCacheTimestamp().getTime();          
-        return new Event<Boolean>(eventTime, updated);
-      } finally {
-        tagCache.releaseWriteLockOnKey(dataTag.getId());
       }
     } else {
-      return new Event<Boolean>(System.currentTimeMillis(), Boolean.FALSE);
+      LOGGER.error("Attempting to update a dataTag with a null source value - ignoring update.");
     }
-  }
-  
+
+    eventTime = dataTag.getCacheTimestamp().getTime();          
+    return new Event<Boolean>(eventTime, updated);
+  }  
   
   /**
    * Updates the DataTag in the cache from the passed SourceDataTagValue. The method notifies
@@ -361,15 +347,14 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
    * @throws CacheElementNotFoundException if the Tag cannot be found in the cache
    */
   public final Event<Boolean> updateFromSource(final Long dataTagId, final SourceDataTagValue sourceDataTagValue) {
-    if (dataTagId == null) {
-      LOGGER.error("updateFromSource() - Attempting to update a dataTag with a null tag id - ignoring update.");
-      return new Event<Boolean>(System.currentTimeMillis(), Boolean.FALSE);
-    }
-      
     tagCache.acquireWriteLockOnKey(dataTagId);
     try {
       T dataTag = tagCache.get(dataTagId);
-      return updateFromSource(dataTag, sourceDataTagValue);
+      Event<Boolean> returnEvent = updateFromSource(dataTag, sourceDataTagValue);
+      if (returnEvent.getReturnValue()) {
+        tagCache.put(dataTagId, dataTag);
+      }
+      return returnEvent;
     } finally {
       tagCache.releaseWriteLockOnKey(dataTagId);
     }
@@ -378,19 +363,13 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   /**
    * To be called internally only within a dataTag synchronized block. Should not be made public.
    */  
-  public void updateAndValidate(final T dataTag, final Object value, final String valueDescription, final Timestamp timestamp) {
-    tagCache.acquireWriteLockOnKey(dataTag.getId());
-    try {
-      if (!filteroutValid(dataTag, value, valueDescription, timestamp)) {
-        updateAndValidateQuietly(dataTag, value, valueDescription, null, null, timestamp);
-        notifyListenersOfUpdate(dataTag);
-      } else {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Filtering out repeated update for datatag " + dataTag.getId());
-        }      
-      }
-    } finally {
-      tagCache.releaseWriteLockOnKey(dataTag.getId());
+  private void updateAndValidate(final T dataTag, final Object value, final String valueDescription, final Timestamp timestamp) {
+    if (!filteroutValid(dataTag, value, valueDescription, timestamp)) {
+      updateAndValidateQuietly(dataTag, value, valueDescription, null, null, timestamp);
+    } else {
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("Filtering out repeated update for datatag " + dataTag.getId());
+      }      
     }
   }
   
@@ -431,6 +410,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
       try {
         T dataTag = tagCache.get(dataTagId);      
         updateAndValidate(dataTag, value, valueDescription, timestamp);
+        tagCache.put(dataTag.getId(), dataTag);
       } catch (CacheElementNotFoundException cacheEx) {
         LOGGER.error("Unable to locate tag in cache (id " + dataTagId + ") - no update performed.", cacheEx);
       } finally {

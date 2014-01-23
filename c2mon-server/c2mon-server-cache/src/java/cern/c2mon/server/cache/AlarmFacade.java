@@ -74,44 +74,13 @@ public interface AlarmFacade extends ConfigurableCacheFacade<Alarm> {
    * 
    * <p>Never returns null.
    * 
-   * @param alarm the alarm to evaluate
-   * @param tag the tag on which the alarm is defined
-   * @return an individual *copy* of the current Alarm object (whether it changed or not);
-   *          intended for publication with the tag itself; never returns null
-   * @throws NullPointerException if called with null alarm or tag object
-   */
-  Alarm update(Alarm alarm, Tag tag);
-  
-  /**
-   * Updates the Alarm in the cache using the passed Tag value.
-   * Listeners will only be notified of an update if the Alarm state
-   * or the Alarm info changes.
-   * 
-   * <p>Updates the state, timestamp and additional information of the 
-   * Alarm if necessary. Three scenarios are possible:
-   * <UL>
-   * <LI>State update: if the new tag value has an impact on the alarm's
-   * state (change ACTIVE -> TERMINATE or vice versa), the alarm's state 
-   * and timestamp are updated. Listeners are notified.
-   * </LI>  
-   * <LI>Properties update: if the new tag value doesn't change the 
-   * alarm's state but changes the additional information related to 
-   * alarm, only the info field will be updated. Listeners are notified.
-   * </LI>
-   * <LI>No update: if the parameters neither change the alarm's state 
-   * nor its additional information. No listeners are notified.
-   * </LI>
-   * </UL>
-   * 
-   * <p>Never returns null.
-   * 
    * @param alarmId the id of the alarm to evaluate
-   * @param tag the tag on which the alarm is defined
-   * @return an individual *copy* of the current Alarm object (whether it changed or not);
+   * @param tagId the tag id on which the alarm is defined
+   * @return Reference of the current Alarm object (whether it changed or not);
    *          intended for publication with the tag itself; never returns null
    * @throws NullPointerException if called with null alarm or tag object
    */
-  Alarm update(Long alarmId, Tag tag);
+  Alarm update(Long alarmId, Long tagId);
 
   /**
    * Evaluates this alarm. Is only updated in cache if the alarm status has changed.

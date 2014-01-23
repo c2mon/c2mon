@@ -83,82 +83,91 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
    */
   protected abstract SupervisionEntity getSupervisionEntity();
   
-  @Override
-  public void start(final T supervised, final Timestamp timestamp) {    
-    c2monCache.acquireWriteLockOnKey(supervised.getId());
-    try {
-      if (supervised.getAliveTagId() != null) {
-        aliveTimerFacade.start(supervised.getAliveTagId());
-      }      
-      supervised.setSupervisionStatus(SupervisionStatus.STARTUP);      
-      supervised.setStatusDescription(supervised.getSupervisionEntity() + " " + supervised.getName() + " was started");
-      supervised.setStatusTime(new Timestamp(System.currentTimeMillis()));        
-      c2monCache.notifyListenersOfUpdate(supervised);
-    } finally {
-      c2monCache.releaseWriteLockOnKey(supervised.getId());
+  /**
+   * Sets the status of the Supervised object to STARTUP,
+   * with associated message.
+   * 
+   * <p>Starts the alive timer if not already running.
+   * 
+   * @param supervised supervised object
+   * @param timestamp time of the start
+   */
+  protected final void start(final T supervised, final Timestamp timestamp) {    
+    if (supervised.getAliveTagId() != null) {
+      aliveTimerFacade.start(supervised.getAliveTagId());
     }      
+    supervised.setSupervisionStatus(SupervisionStatus.STARTUP);      
+    supervised.setStatusDescription(supervised.getSupervisionEntity() + " " + supervised.getName() + " was started");
+    supervised.setStatusTime(new Timestamp(System.currentTimeMillis()));              
   }
   
   @Override
-  public void start(final Long id, final Timestamp timestamp) {    
+  public void start(final Long id, final Timestamp timestamp) {
     c2monCache.acquireWriteLockOnKey(id);
     try {
-      start(c2monCache.get(id), timestamp);
+      T supervised = c2monCache.getCopy(id);
+      start(supervised, timestamp);
+      c2monCache.put(id, supervised);
     } finally {
       c2monCache.releaseWriteLockOnKey(id);
-    }      
-  }
-  
-  @Override
-  public void stop(final T supervised, final Timestamp timestamp) {    
-    c2monCache.acquireWriteLockOnKey(supervised.getId());
-    try {
-      if (supervised.getAliveTagId() != null) {
-        aliveTimerFacade.stop(supervised.getAliveTagId());
-      }      
-      supervised.setSupervisionStatus(SupervisionStatus.DOWN);
-      supervised.setStatusTime(timestamp);
-      supervised.setStatusDescription(supervised.getSupervisionEntity() + " " + supervised.getName() + " was stopped");            
-      c2monCache.notifyListenersOfUpdate(supervised);
-    } finally {
-      c2monCache.releaseWriteLockOnKey(supervised.getId());
     }
   }
   
+  protected void stop(final T supervised, final Timestamp timestamp) {    
+    if (supervised.getAliveTagId() != null) {
+      aliveTimerFacade.stop(supervised.getAliveTagId());
+    }      
+    supervised.setSupervisionStatus(SupervisionStatus.DOWN);
+    supervised.setStatusTime(timestamp);
+    supervised.setStatusDescription(supervised.getSupervisionEntity() + " " + supervised.getName() + " was stopped");            
+  }
+  
   @Override
-  public void stop(final Long id, final Timestamp timestamp) {    
+  public void stop(final Long id, final Timestamp timestamp) {
     c2monCache.acquireWriteLockOnKey(id);
     try {
-      stop(c2monCache.get(id), timestamp);
+      T supervised = c2monCache.getCopy(id);
+      stop(supervised, timestamp);
+      c2monCache.put(id, supervised);
     } finally {
       c2monCache.releaseWriteLockOnKey(id);
-    }      
+    }
   }
 
-  @Override
-  public void resume(final T supervised, final Timestamp timestamp, final String message) {      
-    c2monCache.acquireWriteLockOnKey(supervised.getId());
-    try {      
-      supervised.setSupervisionStatus(SupervisionStatus.RUNNING);
-      supervised.setStatusTime(timestamp);
-      supervised.setStatusDescription(message);
-      c2monCache.notifyListenersOfUpdate(supervised);      
-    } finally {
-      c2monCache.releaseWriteLockOnKey(supervised.getId());
-    }
+  private void resume(final T supervised, final Timestamp timestamp, final String message) {      
+    supervised.setSupervisionStatus(SupervisionStatus.RUNNING);
+    supervised.setStatusTime(timestamp);
+    supervised.setStatusDescription(message);
   }
   
   @Override
-  public void suspend(final T supervised, final Timestamp timestamp, final String message) {
-    c2monCache.acquireWriteLockOnKey(supervised.getId());
+  public void resume(final Long id, final Timestamp timestamp, final String message) {      
+    c2monCache.acquireWriteLockOnKey(id);
     try {      
-      supervised.setSupervisionStatus(SupervisionStatus.DOWN);
-      supervised.setStatusDescription(message);
-      supervised.setStatusTime(timestamp);
-      c2monCache.notifyListenersOfUpdate(supervised);
+      T supervised = c2monCache.get(id);
+      resume(supervised, timestamp, message);
+      c2monCache.put(id, supervised);      
     } finally {
-      c2monCache.releaseWriteLockOnKey(supervised.getId());
-    }    
+      c2monCache.releaseWriteLockOnKey(id);
+    }
+  }
+  
+  private void suspend(final T supervised, final Timestamp timestamp, final String message) {
+    supervised.setSupervisionStatus(SupervisionStatus.DOWN);
+    supervised.setStatusDescription(message);
+    supervised.setStatusTime(timestamp);       
+  }
+  
+  @Override
+  public final void suspend(final Long id, final Timestamp timestamp, final String message) {
+    c2monCache.acquireWriteLockOnKey(id);
+    try {
+      T supervised = c2monCache.get(id);
+      suspend(supervised, timestamp, message);
+      c2monCache.put(id, supervised);
+    } finally {
+      c2monCache.releaseWriteLockOnKey(id);
+    }
   }
   
   @Override
@@ -228,7 +237,7 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
     try {
       T supervised = c2monCache.get(id);
       supervised.setStatusTime(refreshTime);
-      c2monCache.notifyListenersOfUpdate(supervised);
+      c2monCache.put(supervised.getId(), supervised);
     } finally {
       c2monCache.releaseWriteLockOnKey(id);
     }

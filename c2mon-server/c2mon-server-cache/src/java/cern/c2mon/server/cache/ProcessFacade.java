@@ -45,11 +45,13 @@ public interface ProcessFacade extends SupervisedFacade<Process>, ConfigurableCa
    * 
    * <p>Also starts the alive timer.
    * 
-   * @param process the Process that is starting
+   * @param processId the Id of the Process that is starting
    * @param hostName the hostname of the Process
    * @param startupTime the start up time
+   * 
+   * @return A copy of the last modifications that were added to the process cache, or <code>null</code>
    */
-  void start(Process process, String hostName, Timestamp startupTime);
+  Process start(Long processId, String hostName, Timestamp startupTime);
   
   /**
    * Returns a collection of the ids of all DataTags
@@ -62,9 +64,9 @@ public interface ProcessFacade extends SupervisedFacade<Process>, ConfigurableCa
   /**
    * Sets the status of the process to error AND updates
    * the state tag!!
-   * @param process
+   * @param processId id of the process
    */
-  void errorStatus(Process process, String errorMessage);
+  void errorStatus(Long processId, String errorMessage);
   
   /**
    * Returns the process id in the cache for a given Alive Timer id.
@@ -107,17 +109,17 @@ public interface ProcessFacade extends SupervisedFacade<Process>, ConfigurableCa
   /**
    * Sets the PIK of the process.
    * 
-   * @param process Reference to the process
+   * @param processId Id of the process
    * @param processPIK The process PIK
    */
-  void setProcessPIK(Process process, Long processPIK);
+  void setProcessPIK(Long processId, Long processPIK);
   
   /**
    * Sets the Configuration type to Y (Local) or N (Server)
    * 
-   * @param process Reference to the process
+   * @param processId Id of the process
    * @param localConfig Y(LOCAL_CONFIG)/N(SERVER_CONFIG)
    */
-  void setLocalConfig(Process process, LocalConfig localType);
+  void setLocalConfig(Long processId, LocalConfig localType);
   
 }

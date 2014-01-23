@@ -173,6 +173,7 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
     try {
       Equipment equipment = cache.get(equipmentId);
       equipment.getDataTagIds().add(dataTagId);
+      cache.putQuiet(equipment);
     } finally {
       cache.releaseWriteLockOnKey(equipmentId);
     }
@@ -184,6 +185,7 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
     try {      
       Equipment equipment = cache.get(equipmentId);
       equipment.getDataTagIds().remove(dataTagId);
+      cache.putQuiet(equipment);
     } finally {
       cache.releaseWriteLockOnKey(equipmentId);     
     }
@@ -195,6 +197,7 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
     try {
       Equipment equipment = cache.get(equipmentId);      
       equipment.getCommandTagIds().add(commandId);
+      cache.putQuiet(equipment);
     } finally {
       cache.releaseWriteLockOnKey(equipmentId);      
     }
@@ -206,6 +209,7 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
     try {
       Equipment equipment = cache.get(equipmentId);      
       equipment.getCommandTagIds().remove(commandId);
+      cache.putQuiet(equipment);
     } finally {
       cache.releaseWriteLockOnKey(equipmentId);       
     }
@@ -235,6 +239,7 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
         LOGGER.warn("Trying to add existing Equipment to a Process!");
       } else {
         process.getEquipmentIds().add(equipmentId);
+        processCache.putQuiet(process);
       }
     } finally {
       processCache.releaseWriteLockOnKey(processId);

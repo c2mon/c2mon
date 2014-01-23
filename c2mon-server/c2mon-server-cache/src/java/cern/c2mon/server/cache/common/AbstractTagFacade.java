@@ -34,7 +34,6 @@ import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
 import cern.c2mon.server.cache.CommonTagFacade;
-import cern.c2mon.server.cache.DataTagFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
@@ -112,46 +111,27 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
     this.alarmCache = alarmCache;
   }
   
-  /**
-   * Call this method to inform cache listeners that an update has
-   * been performed for the given object of type T (is not automatic if the
-   * cache object is not "put" back in the cache).
-   * 
-   * <p>(update = existing cache value is modified)
-   * 
-   * <p>This method should be called within a lock on the cache object,
-   * so that no modification to this object is made until
-   * the object has been cloned and passed to the listeners. This is taken care of
-   * by the {@link DataTagFacade} bean, which should preferably be used
-   * for making updates to the cache.
-   * 
-   * @param cacheable the cache object that has been updated 
-   * (a copy is passed; should not be modified as shared across listeners)
-   */
-  public void notifyListenersOfUpdate(T tag) {
-    tagCache.notifyListenersOfUpdate(tag);
-  }
-  
   protected abstract void invalidateQuietly(T tag, TagQualityStatus statusToAdd, String statusDescription, Timestamp timestamp);
-  
-  @Override
-  public void invalidate(T tag, final TagQualityStatus statusToAdd, final String statusDescription, Timestamp timestamp) {
-    tagCache.acquireWriteLockOnKey(tag.getId());
-    try {
-      if (!filteroutInvalidation(tag, statusToAdd, statusDescription, timestamp)) {              
-        invalidateQuietly(tag, statusToAdd, statusDescription, timestamp);
-        tagCache.notifyListenersOfUpdate(tag);      
-      } else {
-        if (LOGGER.isTraceEnabled()){
-          LOGGER.trace("Filtering out repeated invalidation for tag " + tag.getId());
-        }      
-      }
-    } finally {
-      tagCache.releaseWriteLockOnKey(tag.getId());
+  /**
+   * As for the other invalidate method, but the Tag is passed instead of this id.
+   * 
+   * <p>If the invalidation causes no changes, the cache object is not updated (see filterout method).
+   * 
+   * @param tag the Tag to invalidate
+   * @param statusToAdd status flag to add
+   * @param statusDescription description associated to this flag; leave as null if no description is required
+   * @param timestamp time of the invalidation
+   */
+  private void invalidate(T tag, final TagQualityStatus statusToAdd, final String statusDescription, Timestamp timestamp) {  
+    if (!filteroutInvalidation(tag, statusToAdd, statusDescription, timestamp)) {              
+      invalidateQuietly(tag, statusToAdd, statusDescription, timestamp);
+      tagCache.notifyListenersOfUpdate(tag);      
+    } else {
+      if (LOGGER.isTraceEnabled()){
+        LOGGER.trace("Filtering out repeated invalidation for tag " + tag.getId());
+      }      
     }    
   }
-  
-  
 
   @Override
   public void invalidate(Long tagId, final TagQualityStatus statusToAdd, final String statusDescription, Timestamp timestamp) {
@@ -172,13 +152,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
     tagCache.acquireReadLockOnKey(tag.getId());
     try {
       for (Long alarmId : tag.getAlarmIds()) {
-        alarmCache.acquireWriteLockOnKey(alarmId);
-        try {
-          Alarm alarm = alarmCache.get(alarmId);
-          linkedAlarms.add(alarmFacade.update(alarm, tag));          
-        } finally {
-          alarmCache.releaseWriteLockOnKey(alarmId);
-        }        
+        linkedAlarms.add(alarmFacade.update(alarmId, tag.getId()));          
       }
     } finally {
       tagCache.releaseReadLockOnKey(tag.getId());
@@ -383,18 +357,13 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    */
   @Override
   public void addDependentRuleToTag(final T tag, final Long ruleTagId) {
-    tagCache.acquireWriteLockOnKey(tag.getId());
-    try {
-      AbstractTagCacheObject cacheObject = (AbstractTagCacheObject) tag;
-      cacheObject.getRuleIds().add(ruleTagId);
-      StringBuilder bld = new StringBuilder();      
-      for (Long id : cacheObject.getRuleIds()) {
-        bld.append(id).append(", ");
-      }      
-      cacheObject.setRuleIdsString(bld.toString().substring(0, bld.length() - 2)); //remove ", "     
-    } finally {
-      tagCache.releaseWriteLockOnKey(tag.getId());
-    }
+    AbstractTagCacheObject cacheObject = (AbstractTagCacheObject) tag;
+    cacheObject.getRuleIds().add(ruleTagId);
+    StringBuilder bld = new StringBuilder();      
+    for (Long id : cacheObject.getRuleIds()) {
+      bld.append(id).append(", ");
+    }    
+    cacheObject.setRuleIdsString(bld.toString().substring(0, bld.length() - 2)); //remove ", "     
   }
   
   /**
@@ -437,7 +406,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
 //    try {     
 //      tagCache.acquireWriteLockOnKey(tag.getId());
 //      ((AbstractTagCacheObject) tag).setStatus(Status.RECONFIGURATION_ERROR); 
-//      tagCache.notifyListenersOfUpdate(tag);
+//      tagCache.put(tag.getId(), tag);
 //    } finally {
 //      tagCache.releaseWriteLockOnKey(tag.getId());
 //    }
@@ -445,20 +414,9 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    
   @Override
   public void addAlarm(final T tag, final Long alarmId) {
-    try {     
-      tagCache.acquireWriteLockOnKey(tag.getId());
-      tag.getAlarmIds().add(alarmId);      
-    } finally {
-      tagCache.releaseWriteLockOnKey(tag.getId());
-    }
-  }
-  
-  @Override
-  public void setQuality(final T tag, final Collection<TagQualityStatus> flagsToAdd, final Collection<TagQualityStatus> flagsToRemove, 
-                         final Map<TagQualityStatus, String> qualityDescription, final Timestamp timestamp) {
     tagCache.acquireWriteLockOnKey(tag.getId());
-    try {
-      doSetQuality(tag, flagsToAdd, flagsToRemove, qualityDescription, timestamp);
+    try {     
+      tag.getAlarmIds().add(alarmId);      
     } finally {
       tagCache.releaseWriteLockOnKey(tag.getId());
     }
@@ -471,6 +429,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
     try {
       T tag = tagCache.get(tagId);
       doSetQuality(tag, flagsToAdd, flagsToRemove, qualityDescription, timestamp);
+      tagCache.put(tag.getId(), tag);
     } finally {
       tagCache.releaseWriteLockOnKey(tagId);
     }    
@@ -498,8 +457,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
         tag.getDataTagQuality().addInvalidStatus(status, qualityDescription.get(status));
       }
     }      
-    ((AbstractTagCacheObject) tag).setCacheTimestamp(timestamp);            
-    notifyListenersOfUpdate(tag);
+    ((AbstractTagCacheObject) tag).setCacheTimestamp(timestamp);
   }
   
   /**

@@ -51,18 +51,6 @@ public interface CommonTagFacade<T extends Tag> extends ConfigurableCacheFacade<
    * @param timestamp time of the invalidation
    */
   void invalidate(Long tagId, TagQualityStatus statusToAdd, String statusDescription, Timestamp timestamp);
-
-  /**
-   * As for the other invalidate method, but the Tag is passed instead of this id.
-   * 
-   * <p>If the invalidation causes no changes, the cache object is not updated (see filterout method).
-   * 
-   * @param tag the Tag to invalidate
-   * @param statusToAdd status flag to add
-   * @param statusDescription description associated to this flag; leave as null if no description is required
-   * @param timestamp time of the invalidation
-   */
-  void invalidate(T tag, TagQualityStatus statusToAdd, String statusDescription, Timestamp timestamp);
   
   /**
    * Adds the rule to the list of rules that need evaluating when
@@ -95,7 +83,7 @@ public interface CommonTagFacade<T extends Tag> extends ConfigurableCacheFacade<
    */
   List<Alarm> evaluateAlarms(T tag);
 
-//TODO is this method too complicated below: maybe we never need to have more then one flag in the lists
+//TODO is this method too complicated below: maybe we never need to have more then one flag in the lists  
   /**
    * As opposed to the <code>invalidate()</code> methods, this method allows fine grained control of the quality of the 
    * datatag: in a single call, multiple quality flags can be added and/or removed and and new quality description
@@ -109,19 +97,6 @@ public interface CommonTagFacade<T extends Tag> extends ConfigurableCacheFacade<
    * 
    * <p>This method is (write-)synchronized on the DataTag object.
    * 
-   * 
-   * @param tag the Tag 
-   * @param flagsToAdd added flags 
-   * @param flagsToRemove removed flags
-   * @param qualityDescriptions for flags that are set, will attempt to retrieve descriptions from this map
-   * @param timestamp sets the cache timestamp
-   */
-  void setQuality(T tag, Collection<TagQualityStatus> flagsToAdd, Collection<TagQualityStatus> flagsToRemove, 
-                                            Map<TagQualityStatus, String> qualityDescriptions, Timestamp timestamp);
-  
-  /**
-   * As for other setQuality method but passing tag id instead of cache object.
-   * 
    * @param tagId unique id of the Tag
    * @param flagsToAdd added flags 
    * @param flagsToRemove removed flags
@@ -132,27 +107,27 @@ public interface CommonTagFacade<T extends Tag> extends ConfigurableCacheFacade<
   void setQuality(Long tagId, Collection<TagQualityStatus> flagsToAdd, Collection<TagQualityStatus> flagsToRemove, 
       Map<TagQualityStatus, String> qualityDescriptions, Timestamp timestamp);
   
-  /**
-   * Returns a collection of all the processes that are
-   * linked to this Tag hierarchy.
-   * 
-   * <p>(DataTags are attached to unique Process and Equipment, 
-   * while Rules can inherit from many).
-   * @param tag a Tag
-   * @return the collection of Process ids this tag is attached to
-   */
-  Collection<Long> getParentProcesses(T tag);
-  
-  /**
-   * Returns a collection of all the equipments that are
-   * linked to this Tag hierarchy.
-   * 
-   * <p>(DataTags are attached to unique Process and Equipment, 
-   * while Rules can inherit from many).
-   * @param tag a Tag
-   * @return the collection of Equipment ids this tag is attached to
-   */
-  Collection<Long> getParentEquipments(T tag);
+//  /**
+//   * Returns a collection of all the processes that are
+//   * linked to this Tag hierarchy.
+//   * 
+//   * <p>(DataTags are attached to unique Process and Equipment, 
+//   * while Rules can inherit from many).
+//   * @param tag a Tag
+//   * @return the collection of Process ids this tag is attached to
+//   */
+//  Collection<Long> getParentProcesses(T tag);
+//  
+//  /**
+//   * Returns a collection of all the equipments that are
+//   * linked to this Tag hierarchy.
+//   * 
+//   * <p>(DataTags are attached to unique Process and Equipment, 
+//   * while Rules can inherit from many).
+//   * @param tag a Tag
+//   * @return the collection of Equipment ids this tag is attached to
+//   */
+//  Collection<Long> getParentEquipments(T tag);
 
   /**
    * Removes this rule from the list of those that need evaluating when

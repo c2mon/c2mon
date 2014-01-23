@@ -110,16 +110,6 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
       tagLocationService.releaseWriteLockOnKey(tagId);
     }    
   }
-
-  @Override
-  public void invalidate(final Tag tag, final TagQualityStatus statusToAdd, final String statusDescription, final Timestamp timestamp) {
-    getFacade(tag).invalidate(tag, statusToAdd, statusDescription, timestamp);
-  }
-
-//  @Override
-//  public void setStatus(Tag tag, Status status) {
-//    getFacade(tag).setStatus(tag, status);
-//  }
  
   @Override
   public void addAlarm(final Tag tag, final Long alarmId) {
@@ -147,21 +137,6 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   }
 
   @Override
-  public void setQuality(Tag tag, Collection<TagQualityStatus> flagsToAdd, Collection<TagQualityStatus> flagsToRemove, Map<TagQualityStatus, String> qualityDescriptions, Timestamp timestamp) {
-    getFacade(tag).setQuality(tag, flagsToAdd, flagsToRemove, qualityDescriptions, timestamp);
-  }
-
-  @Override
-  public Collection<Long> getParentEquipments(Tag tag) {
-    return getFacade(tag).getParentEquipments(tag);
-  }
-
-  @Override
-  public Collection<Long> getParentProcesses(Tag tag) {
-    return getFacade(tag).getParentProcesses(tag); 
-  }
-
-  @Override
   public void removeDependentRuleFromTag(Tag tag, Long ruleTagId) {
     getFacade(tag).removeDependentRuleFromTag(tag, ruleTagId);
   }
@@ -176,7 +151,7 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   public void setQuality(Long tagId, Collection<TagQualityStatus> flagsToAdd,
       Collection<TagQualityStatus> flagsToRemove, Map<TagQualityStatus, String> qualityDescriptions, Timestamp timestamp) {
     Tag tag = tagLocationService.get(tagId);
-    getFacade(tag).setQuality(tag, flagsToAdd, flagsToRemove, qualityDescriptions, timestamp);
+    getFacade(tag).setQuality(tagId, flagsToAdd, flagsToRemove, qualityDescriptions, timestamp);
   }
 
   

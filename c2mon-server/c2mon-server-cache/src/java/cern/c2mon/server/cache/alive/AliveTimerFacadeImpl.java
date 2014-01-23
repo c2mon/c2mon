@@ -60,7 +60,8 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
     aliveTimerCache.acquireWriteLockOnKey(aliveId);
     try {
       AliveTimer aliveTimer = aliveTimerCache.get(aliveId);                
-      update(aliveTimer);                
+      update(aliveTimer);
+      aliveTimerCache.put(aliveId, aliveTimer);
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.error("Cannot locate the AliveTimer in the cache (Id is " + aliveId + ") - unable to update it.", cacheEx);
     } catch (Exception e) {
@@ -97,7 +98,8 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
     aliveTimerCache.acquireWriteLockOnKey(id);
     try {
       AliveTimer aliveTimer = aliveTimerCache.get(id);
-      start(aliveTimer);                   
+      start(aliveTimer);
+      aliveTimerCache.put(id, aliveTimer);
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to start it.");
     } catch (Exception e) {
@@ -137,6 +139,7 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
 //          stop(it.next());
 //        }
 //      }
+      aliveTimerCache.put(id, aliveTimer);
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to stop it.");
     } catch (Exception e) {

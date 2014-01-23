@@ -32,10 +32,12 @@ public class AlarmFacadeImplTest {
   
   private AlarmCache alarmCache;
   
+  private TagLocationService tagLocationService;
+  
   @Before
   public void setup() {
     alarmCache = EasyMock.createStrictMock(AlarmCache.class);
-    TagLocationService tagLocationService = EasyMock.createStrictMock(TagLocationService.class);
+    tagLocationService = EasyMock.createStrictMock(TagLocationService.class);
     alarmFacadeImpl = new AlarmFacadeImpl(alarmCache, tagLocationService);
   }
   
@@ -62,11 +64,15 @@ public class AlarmFacadeImplTest {
     
 
     alarmCache.acquireWriteLockOnKey(currentAlarmState.getId());
+    tagLocationService.acquireReadLockOnKey(tag.getId());
+    EasyMock.expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
+    EasyMock.expect(tagLocationService.get(tag.getId())).andReturn(tag);
+    tagLocationService.releaseReadLockOnKey(tag.getId());
     alarmCache.releaseWriteLockOnKey(currentAlarmState.getId());
-    EasyMock.replay(alarmCache);
+    EasyMock.replay(alarmCache, tagLocationService);
     //(1)test update works    
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(currentAlarmState, tag);
-    EasyMock.verify(alarmCache);
+    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(currentAlarmState.getId(), tag.getId());
+    EasyMock.verify(alarmCache, tagLocationService);
 
     assertEquals(AlarmCondition.TERMINATE, newAlarm.getState());
     assertTrue(newAlarm.getTimestamp().after(origTime));
@@ -95,15 +101,19 @@ public class AlarmFacadeImplTest {
     alarm.hasBeenPublished(new Timestamp(System.currentTimeMillis()));
     
     alarmCache.acquireWriteLockOnKey(alarm.getId());
+    tagLocationService.acquireReadLockOnKey(tag.getId());
+    EasyMock.expect(alarmCache.get(alarm.getId())).andReturn(alarm);
+    EasyMock.expect(tagLocationService.get(tag.getId())).andReturn(tag);
     // record expected notification call with EasyMock
-    alarmCache.notifyListenersOfUpdate(alarm);
+    alarmCache.put(alarm.getId(), alarm);
+    tagLocationService.releaseReadLockOnKey(tag.getId());
     alarmCache.releaseWriteLockOnKey(alarm.getId());
-    EasyMock.replay(alarmCache);
+    EasyMock.replay(alarmCache, tagLocationService);
     
     //(1)test update works    
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(alarm, tag);   
+    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(alarm.getId(), tag.getId());   
     
-    EasyMock.verify(alarmCache);
+    EasyMock.verify(alarmCache, tagLocationService);
     
     assertEquals(AlarmCondition.ACTIVE, newAlarm.getState());
     assertTrue(newAlarm.getTimestamp().after(origTime));
@@ -118,12 +128,19 @@ public class AlarmFacadeImplTest {
     assertEquals(AlarmCondition.TERMINATE, alarm2.getState()); //check is in correct start state
     tag.setValue("UP"); //alarm should be terminate
     
-    EasyMock.reset(alarmCache);
-    alarmCache.acquireWriteLockOnKey(alarm.getId());
-    alarmCache.releaseWriteLockOnKey(alarm.getId());
-    EasyMock.replay(alarmCache);
+    EasyMock.reset(alarmCache, tagLocationService);
+    alarmCache.acquireWriteLockOnKey(alarm2.getId());
+    tagLocationService.acquireReadLockOnKey(tag.getId());
+    EasyMock.expect(alarmCache.get(alarm2.getId())).andReturn(alarm2);
+    EasyMock.expect(tagLocationService.get(tag.getId())).andReturn(tag);
+    tagLocationService.releaseReadLockOnKey(tag.getId());
+    alarmCache.releaseWriteLockOnKey(alarm2.getId());
+    EasyMock.replay(alarmCache, tagLocationService);
     
-    AlarmCacheObject newAlarm2 = (AlarmCacheObject) alarmFacadeImpl.update(alarm2, tag);   
+    AlarmCacheObject newAlarm2 = (AlarmCacheObject) alarmFacadeImpl.update(alarm2.getId(), tag.getId());   
+    
+    EasyMock.verify(alarmCache, tagLocationService);
+    
     assertEquals(AlarmCondition.TERMINATE, newAlarm2.getState()); //original TERMINATE!
     assertEquals(newAlarm2.getTimestamp(), origTime);
     assertEquals(AlarmCondition.TERMINATE, alarm2.getState()); //original TERMINATE!
