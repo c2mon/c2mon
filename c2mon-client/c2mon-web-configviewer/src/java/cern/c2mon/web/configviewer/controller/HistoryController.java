@@ -1,10 +1,7 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
@@ -26,7 +23,10 @@ import cern.c2mon.web.configviewer.util.FormUtility;
 
 
 /**
- * A controller for the history viewer 
+ * A controller for the history viewer.
+ * 
+ * Creates Table views.
+ * Check {@link TrendViewController} for the trend views.
  * */
 @Controller
 public class HistoryController {
