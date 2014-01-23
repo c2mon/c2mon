@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -365,6 +366,18 @@ public class TrendViewController {
         model.addAttribute("error", wrongId);
       }
       
+      // let's pre-fill the date boxes with the current date
+      DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+      DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+      
+      Date currentDate = new Date();
+      model.addAttribute("defaultToDate", dateFormat.format(currentDate));
+      model.addAttribute("defaultToTime", timeFormat.format(currentDate));
+      
+      Date oneHourBeforeDate = new Date(currentDate.getTime() - 3600* 1000);
+      model.addAttribute("defaultFromDate", dateFormat.format(oneHourBeforeDate));
+      model.addAttribute("defaultFromTime", timeFormat.format(oneHourBeforeDate));
+
       // Displays an empty form -> 
       return "trend_views/trend_view_form";
     }

@@ -1,7 +1,10 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
@@ -213,6 +216,18 @@ public class HistoryController {
       if (wrongId != null) {
         model.addAttribute("error", wrongId);
       }
+      
+      // let's pre-fill the date boxes with the current date
+      DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+      DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+      
+      Date currentDate = new Date();
+      model.addAttribute("defaultToDate", dateFormat.format(currentDate));
+      model.addAttribute("defaultToTime", timeFormat.format(currentDate));
+      
+      Date oneHourBeforeDate = new Date(currentDate.getTime() - 3600* 1000);
+      model.addAttribute("defaultFromDate", dateFormat.format(oneHourBeforeDate));
+      model.addAttribute("defaultFromTime", timeFormat.format(oneHourBeforeDate));
     }
     else if (days != null) {
       return ("redirect:" + HISTORY_URL + id + "?" + LAST_DAYS_PARAMETER + "=" + days);
