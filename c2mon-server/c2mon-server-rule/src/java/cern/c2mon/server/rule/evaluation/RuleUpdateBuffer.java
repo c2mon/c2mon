@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -76,20 +75,20 @@ public final class RuleUpdateBuffer {
   private static RuleTagFacade ruleTagFacade;
   
   /** The internal buffer used for the */
-  private static final Map RULE_OBJECT_BUF = new Hashtable(INITIAL_BUFFER_SIZE);
+  private static final Map<Long, RuleBufferObject> RULE_OBJECT_BUF = new Hashtable<Long, RuleBufferObject>(INITIAL_BUFFER_SIZE);
   
   /** 
    * Map containing the flags which indicates that an update was received
    * within the last cache updater cycle.
    */
-  private static final Map UPDATE_RECEIVED_FLAGS  = new Hashtable(INITIAL_BUFFER_SIZE);
+  private static final Map<Long, Boolean> UPDATE_RECEIVED_FLAGS  = new Hashtable<Long, Boolean>(INITIAL_BUFFER_SIZE);
   
   /**
    * The counters for checking the cycles that a specific rule is already been buffered.
    * When the counter exceeds the MAX_CYCLES_WAIT the <code>CacheUpdaterTask</code> forces
    * a cache update.
    */
-  private static final Map CYCLE_COUNTERS = new Hashtable(INITIAL_BUFFER_SIZE);
+  private static final Map<Long, Integer> CYCLE_COUNTERS = new Hashtable<Long, Integer>(INITIAL_BUFFER_SIZE);
   
   /** Timer instance that schedules the <code>CacheUpdaterTask</code> */
   private final Timer timer;
@@ -103,7 +102,7 @@ public final class RuleUpdateBuffer {
   @Autowired
   private RuleUpdateBuffer(RuleTagFacade ruleTagFacade) {
     this.timer = new Timer();
-    this.ruleTagFacade = ruleTagFacade;
+    RuleUpdateBuffer.ruleTagFacade = ruleTagFacade;
   }
 
 
@@ -308,18 +307,15 @@ public final class RuleUpdateBuffer {
     public void run() {
       //keep logic in try clause as exception will kill the timer thread here
       try {        
-        Collection rulesToUpdate = null;
+        Collection<RuleBufferObject> rulesToUpdate = null;
   
         // create first a copy of all rule objects that needs to be updated
         synchronized (BUFFER_LOCK) {
-          Iterator iter = UPDATE_RECEIVED_FLAGS.keySet().iterator(); // rule id iterator
-          rulesToUpdate = new ArrayList(); // List of rules where the cache shall be updated
-          Long actTagId = null; // actual rule tag id pointer
+          rulesToUpdate = new ArrayList<RuleBufferObject>(); // List of rules where the cache shall be updated
           Integer actCounter = null; // actual cycle counter
           boolean hasJustBeenUpdated = false; // flag indicating, if the actual rule was updated since the last check
           boolean forceCacheUpdate = false; // true, if a cache update shall be forced due to an exceed of the MAX_CYCLE_WAIT
-          while (iter.hasNext()) {
-            actTagId = (Long) iter.next(); // get next rule id in the list
+          for (Long actTagId : UPDATE_RECEIVED_FLAGS.keySet()) {
             hasJustBeenUpdated = ((Boolean) UPDATE_RECEIVED_FLAGS.get(actTagId)).booleanValue();
             actCounter = (Integer) CYCLE_COUNTERS.get(actTagId);
             forceCacheUpdate = (actCounter != null && actCounter.intValue() >= MAX_CYCLES_WAIT);
@@ -348,10 +344,8 @@ public final class RuleUpdateBuffer {
           }
           
           // Cleaning the buffer from all objects that are going to be put into the cache.
-          iter = rulesToUpdate.iterator();
-          RuleBufferObject rbo = null;
-          while (iter.hasNext()) {
-            rbo = (RuleBufferObject) iter.next();
+          Long actTagId;
+          for (RuleBufferObject rbo : rulesToUpdate) {
             actTagId = rbo.id;
             UPDATE_RECEIVED_FLAGS.remove(actTagId);
             RULE_OBJECT_BUF.remove(actTagId);
@@ -367,11 +361,8 @@ public final class RuleUpdateBuffer {
         } // end of synchronization
         
         if (rulesToUpdate.size() > 0) {
-          final Iterator iter = rulesToUpdate.iterator();
-          RuleBufferObject rbo = null;
           // Updating the cache
-          while (iter.hasNext()) {
-            rbo = (RuleBufferObject) iter.next();
+          for (RuleBufferObject rbo : rulesToUpdate) {
             if (rbo.qualityCollection.isEmpty()) {
               if (LOG.isTraceEnabled())
                 LOG.trace("CacheUpdaterTask() - updating cache for rule id " + rbo.id 
@@ -398,7 +389,7 @@ public final class RuleUpdateBuffer {
                 LOG.warn("Unable to update rule as could not be located in cache (normal during rule reconfiguration)", cacheEx);
               }                          
             }
-          } // end while                    
+          } // end for                    
         }      
       } catch (Exception ex) {
         LOG.error("Exception caught during rule update - should not be ignored!", ex);
