@@ -67,20 +67,25 @@ public class CommandTagConfigHandler {
   private EquipmentFacade equipmentFacade;
   
   public List<ProcessChange> createCommandTag(ConfigurationElement element) throws IllegalAccessException {
-    LOGGER.trace("Creating CommandTag " + element.getEntityId());
-    CommandTag commandTag = commandTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-    commandTagDAO.insertCommandTag(commandTag);
-    commandTagCache.putQuiet(commandTag);
-    equipmentFacade.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
-    
-    commandTagCache.lockAndNotifyListeners(commandTag.getId());
-    
-    CommandTagAdd commandTagAdd = new CommandTagAdd(element.getSequenceId(), 
-                                                    commandTag.getEquipmentId(), 
-                                                    commandTagFacade.generateSourceCommandTag(commandTag));    
-    ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(commandTag.getEquipmentId()), commandTagAdd));
-    return processChanges;      
+    commandTagCache.acquireWriteLockOnKey(element.getEntityId());
+    try {
+      LOGGER.trace("Creating CommandTag " + element.getEntityId());
+      CommandTag commandTag = commandTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      commandTagDAO.insertCommandTag(commandTag);
+      commandTagCache.putQuiet(commandTag);
+      equipmentFacade.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
+      
+      commandTagCache.lockAndNotifyListeners(commandTag.getId());
+      
+      CommandTagAdd commandTagAdd = new CommandTagAdd(element.getSequenceId(), 
+                                                      commandTag.getEquipmentId(), 
+                                                      commandTagFacade.generateSourceCommandTag(commandTag));    
+      ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
+      processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(commandTag.getEquipmentId()), commandTagAdd));
+      return processChanges;      
+    } finally {
+      commandTagCache.releaseWriteLockOnKey(element.getEntityId());
+    }
   }
   
   public List<ProcessChange> updateCommandTag(Long id, Properties properties) throws IllegalAccessException {
@@ -97,7 +102,6 @@ public class CommandTagConfigHandler {
       CommandTag commandTag = commandTagCache.get(id);      
       commandTagUpdate = commandTagFacade.updateConfig(commandTag, properties);
       commandTagDAO.updateCommandTag(commandTag);
-      commandTagCache.get(commandTag.getId());
     } finally {
       commandTagCache.releaseWriteLockOnKey(id);
     }    

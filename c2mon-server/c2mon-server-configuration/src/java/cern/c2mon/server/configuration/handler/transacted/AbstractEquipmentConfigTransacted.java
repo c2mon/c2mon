@@ -124,38 +124,43 @@ public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipm
    *           creation).
    */
   protected T createAbstractEquipment(final ConfigurationElement element) throws IllegalAccessException {
-    LOGGER.debug("Creating (Sub)Equipment " + element.getEntityId());
-    T abstractEquipment = commonEquipmentFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+    abstractEquipmentCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      configurableDAO.insert(abstractEquipment);
-      abstractEquipmentCache.putQuiet(abstractEquipment);
-      
-      // clear alive and commfault caches and refresh
-      // (synch ok as locked equipment so no changes to these ids)
-      if (abstractEquipment.getAliveTagId() != null) {
-        commonEquipmentFacade.loadAndStartAliveTag(abstractEquipment.getId());
+      LOGGER.debug("Creating (Sub)Equipment " + element.getEntityId());
+      T abstractEquipment = commonEquipmentFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      try {
+        configurableDAO.insert(abstractEquipment);
+        abstractEquipmentCache.putQuiet(abstractEquipment);
+        
+        // clear alive and commfault caches and refresh
+        // (synch ok as locked equipment so no changes to these ids)
+        if (abstractEquipment.getAliveTagId() != null) {
+          commonEquipmentFacade.loadAndStartAliveTag(abstractEquipment.getId());
+        }
+        if (abstractEquipment.getCommFaultTagId() != null) {
+          commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
+          commFaultTagCache.loadFromDb(abstractEquipment.getCommFaultTagId());
+        }
+        
+      } catch (Exception e) {
+        if (abstractEquipment.getAliveTagId() != null) {
+          aliveTimerCache.remove(abstractEquipment.getId());
+        }
+        if (abstractEquipment.getCommFaultTagId() != null) {
+          commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
+        }
+        throw new UnexpectedRollbackException("Exception caught while creating equipment: rolling back changes", e);
       }
-      if (abstractEquipment.getCommFaultTagId() != null) {
-        commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
-        commFaultTagCache.loadFromDb(abstractEquipment.getCommFaultTagId());
-      }
-      
-    } catch (Exception e) {
-      if (abstractEquipment.getAliveTagId() != null) {
-        aliveTimerCache.remove(abstractEquipment.getId());
-      }
-      if (abstractEquipment.getCommFaultTagId() != null) {
-        commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
-      }
-      throw new UnexpectedRollbackException("Exception caught while creating equipment: rolling back changes", e);
+      // TODO necessary to use DB loading or not?? to check...
+      // removed as now rely on automatic cache loading from DB: problem: also
+      // used in checking if tag is alive or commfault, so added again
+      // abstractEquipmentCache.putQuiet(abstractEquipment);
+      // aliveTimerFacade.generateFromEquipment(abstractEquipment);
+      // commFaultTagFacade.generateFromEquipment(abstractEquipment);
+      return abstractEquipment;
+    } finally {
+      abstractEquipmentCache.releaseWriteLockOnKey(element.getEntityId());
     }
-    // TODO necessary to use DB loading or not?? to check...
-    // removed as now rely on automatic cache loading from DB: problem: also
-    // used in checking if tag is alive or commfault, so added again
-    // abstractEquipmentCache.putQuiet(abstractEquipment);
-    // aliveTimerFacade.generateFromEquipment(abstractEquipment);
-    // commFaultTagFacade.generateFromEquipment(abstractEquipment);
-    return abstractEquipment;
   }
 
   /**

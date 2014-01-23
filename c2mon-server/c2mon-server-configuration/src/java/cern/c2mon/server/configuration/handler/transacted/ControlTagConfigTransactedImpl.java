@@ -93,27 +93,32 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
   @Override
   @Transactional(value = "cacheTransactionManager")
   public ProcessChange doCreateControlTag(ConfigurationElement element) throws IllegalAccessException {
-    LOGGER.trace("Creating ControlTag " + element.getEntityId());
-    checkId(element.getEntityId());
-    ControlTag controlTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+    tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      configurableDAO.insert(controlTag);
-    } catch (Exception e) {
-      LOGGER.error("Exception caught while inserting a new Control Tag into the DB - rolling back changes", e);
-      throw new UnexpectedRollbackException("Unexpected exception while creating a Control Tag: rolling back the change", e);
-    }
-    try {
-      tagCache.putQuiet(controlTag);      
-      ProcessChange processChange = new ProcessChange();
-      if (processFacade.getProcessIdFromControlTag(controlTag.getId()) != null) {
-        processChange = new ProcessChange(processFacade.getProcessIdFromControlTag(controlTag.getId()));
+      LOGGER.trace("Creating ControlTag " + element.getEntityId());
+      checkId(element.getEntityId());
+      ControlTag controlTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      try {
+        configurableDAO.insert(controlTag);
+      } catch (Exception e) {
+        LOGGER.error("Exception caught while inserting a new Control Tag into the DB - rolling back changes", e);
+        throw new UnexpectedRollbackException("Unexpected exception while creating a Control Tag: rolling back the change", e);
       }
-      return processChange;
-    } catch (Exception e) {
-      LOGGER.error("Exception caught while creating a ControlTag in cache - "
-          + "rolling back DB transaction and removing from cache.", e);
-      tagCache.remove(controlTag.getId());
-      throw new UnexpectedRollbackException("Unexpected exception while creating a Control Tag: rolling back the change", e);
+      try {
+        tagCache.putQuiet(controlTag);      
+        ProcessChange processChange = new ProcessChange();
+        if (processFacade.getProcessIdFromControlTag(controlTag.getId()) != null) {
+          processChange = new ProcessChange(processFacade.getProcessIdFromControlTag(controlTag.getId()));
+        }
+        return processChange;
+      } catch (Exception e) {
+        LOGGER.error("Exception caught while creating a ControlTag in cache - "
+            + "rolling back DB transaction and removing from cache.", e);
+        tagCache.remove(controlTag.getId());
+        throw new UnexpectedRollbackException("Unexpected exception while creating a Control Tag: rolling back the change", e);
+      }
+    } finally {
+      tagCache.releaseWriteLockOnKey(element.getEntityId());
     }
      
   }

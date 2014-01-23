@@ -209,7 +209,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     ((AbstractApplicationContext) context).start();
     
     //make sure Process is "running" (o.w. nothing is sent to DAQ)
-    processFacade.start(processCache.get(50L), "hostname", new Timestamp(System.currentTimeMillis()));
+    processFacade.start(50L, "hostname", new Timestamp(System.currentTimeMillis()));
     
     //reset mock
     reset(mockManager);    
@@ -772,7 +772,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @DirtiesContext
   public void testRemoveProcess() {
     //stop DAQ else remove not allowed
-    processFacade.stop(processCache.get(50L), new Timestamp(System.currentTimeMillis()));
+    processFacade.stop(50L, new Timestamp(System.currentTimeMillis()));
     
     replay(mockManager);
     

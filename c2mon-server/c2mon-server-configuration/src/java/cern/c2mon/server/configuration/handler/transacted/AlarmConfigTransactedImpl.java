@@ -81,23 +81,28 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
   public void doCreateAlarm(final ConfigurationElement element) throws IllegalAccessException {
-    LOGGER.trace("Creating alarm " + element.getEntityId());
-    Alarm alarm = alarmFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+    alarmCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      alarmDAO.insert(alarm);
-    } catch (Exception e) {
-      LOGGER.error("Exception caught while inserting a new Alarm into the DB - rolling back changes", e);
-      throw new UnexpectedRollbackException("Unexpected exception while creating an Alarm: rolling back the change", e);
-    }    
-    try {
-      alarmCache.putQuiet(alarm);
-      //add alarm to tag in cache (no DB persistence here)
-      tagConfigGateway.addAlarmToTag(alarm.getTagId(), alarm.getId());
-    } catch (Exception e) {
-      LOGGER.error("Exception caught while loading a new Alarm", e);
-      alarmCache.remove(alarm.getId());
-      tagConfigGateway.removeAlarmFromTag(alarm.getTagId(), alarm.getId());
-      throw new UnexpectedRollbackException("Unexpected exception while creating an Alarm: rolling back the creation", e);
+      LOGGER.trace("Creating alarm " + element.getEntityId());
+      Alarm alarm = alarmFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      try {
+        alarmDAO.insert(alarm);
+      } catch (Exception e) {
+        LOGGER.error("Exception caught while inserting a new Alarm into the DB - rolling back changes", e);
+        throw new UnexpectedRollbackException("Unexpected exception while creating an Alarm: rolling back the change", e);
+      }    
+      try {
+        alarmCache.putQuiet(alarm);
+        //add alarm to tag in cache (no DB persistence here)
+        tagConfigGateway.addAlarmToTag(alarm.getTagId(), alarm.getId());
+      } catch (Exception e) {
+        LOGGER.error("Exception caught while loading a new Alarm", e);
+        alarmCache.remove(alarm.getId());
+        tagConfigGateway.removeAlarmFromTag(alarm.getTagId(), alarm.getId());
+        throw new UnexpectedRollbackException("Unexpected exception while creating an Alarm: rolling back the creation", e);
+      }
+    } finally {
+      alarmCache.releaseWriteLockOnKey(element.getEntityId());
     }
     
   }

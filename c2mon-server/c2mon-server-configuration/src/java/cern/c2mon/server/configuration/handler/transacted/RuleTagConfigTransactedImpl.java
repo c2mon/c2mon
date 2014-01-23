@@ -75,33 +75,38 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
   @Transactional("cacheTransactionManager")
   @Override
   public void doCreateRuleTag(ConfigurationElement element) throws IllegalAccessException {
-    LOGGER.trace("Creating RuleTag with id " + element.getEntityId());
-    checkId(element.getEntityId());
-    RuleTag ruleTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-    Collection<Long> tagIds = ruleTag.getRuleInputTagIds();
-    try {      
-      configurableDAO.insert(ruleTag);
-    } catch (Exception e) {
-      LOGGER.error("Exception caught while inserting a new Rule into the DB - rolling back changes", e);
-      throw new UnexpectedRollbackException("Unexpected exception while creating a Rule: rolling back the change", e);
-    }
+    tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      for (Long tagId : tagIds) {      
-        tagConfigGateway.addRuleToTag(tagId, ruleTag.getId()); 
+      LOGGER.trace("Creating RuleTag with id " + element.getEntityId());
+      checkId(element.getEntityId());
+      RuleTag ruleTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      Collection<Long> tagIds = ruleTag.getRuleInputTagIds();
+      try {      
+        configurableDAO.insert(ruleTag);
+      } catch (Exception e) {
+        LOGGER.error("Exception caught while inserting a new Rule into the DB - rolling back changes", e);
+        throw new UnexpectedRollbackException("Unexpected exception while creating a Rule: rolling back the change", e);
       }
-      tagCache.putQuiet(ruleTag); 
-    } catch (RuntimeException e) {
-      String errMessage = "Exception caught while adding a RuleTag - rolling back DB transaction.";
-      LOGGER.error(errMessage, e);
-      tagCache.remove(ruleTag.getId());
-      for (Long tagId : tagIds) {      
-        try {
-          tagConfigGateway.removeRuleFromTag(tagId, ruleTag.getId());
-        } catch (RuntimeException ex) {
-          LOGGER.warn("Exception caught while attempting to role back rule creation in cache (removing references from input tags)", ex);
+      try {
+        for (Long tagId : tagIds) {      
+          tagConfigGateway.addRuleToTag(tagId, ruleTag.getId()); 
         }
+        tagCache.putQuiet(ruleTag); 
+      } catch (RuntimeException e) {
+        String errMessage = "Exception caught while adding a RuleTag - rolling back DB transaction.";
+        LOGGER.error(errMessage, e);
+        tagCache.remove(ruleTag.getId());
+        for (Long tagId : tagIds) {      
+          try {
+            tagConfigGateway.removeRuleFromTag(tagId, ruleTag.getId());
+          } catch (RuntimeException ex) {
+            LOGGER.warn("Exception caught while attempting to role back rule creation in cache (removing references from input tags)", ex);
+          }
+        }
+        throw new UnexpectedRollbackException(errMessage, e);
       }
-      throw new UnexpectedRollbackException(errMessage, e);
+    } finally {
+      tagCache.releaseWriteLockOnKey(element.getEntityId());
     }
            
   }

@@ -99,6 +99,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
       if (!tag.getRuleIds().contains(ruleId)) {
         commonTagFacade.addDependentRuleToTag(tag, ruleId);  
         configurableDAO.updateConfig(tag);
+        tagCache.putQuiet(tag);
       }
     } finally {
       tagCache.releaseWriteLockOnKey(tagId);    
@@ -115,6 +116,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
       if (tag.getRuleIds().contains(ruleId)) {
         commonTagFacade.removeDependentRuleFromTag(tag, ruleId);
         configurableDAO.updateConfig(tag);
+        tagCache.putQuiet(tag);
       }
     } finally {    
       tagCache.releaseWriteLockOnKey(tagId);
@@ -129,6 +131,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
     try {
       T tag = tagCache.get(tagId);
       commonTagFacade.addAlarm(tag, alarmId);
+      tagCache.putQuiet(tag);
     } finally {
       tagCache.releaseWriteLockOnKey(tagId);
     }  
@@ -142,6 +145,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
     try {      
       T tag = tagCache.get(tagId);
       tag.getAlarmIds().remove(alarmId);
+      tagCache.putQuiet(tag);
     } finally {
       tagCache.releaseWriteLockOnKey(tagId);
     }

@@ -84,10 +84,15 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
   @Override
   @Transactional("cacheTransactionManager")
   public ProcessChange doCreateProcess(final ConfigurationElement element) throws IllegalAccessException {
-    Process process = (Process) processFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-    processDAO.insert(process);
-    processCache.putQuiet(process);
-    return new ProcessChange(process.getId());
+    processCache.acquireWriteLockOnKey(element.getEntityId());
+    try {
+      Process process = (Process) processFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      processDAO.insert(process);
+      processCache.putQuiet(process);
+      return new ProcessChange(process.getId());
+    } finally {
+      processCache.releaseWriteLockOnKey(element.getEntityId());
+    }
   }
 
   /**

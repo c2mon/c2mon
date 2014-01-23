@@ -91,28 +91,33 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   @Transactional("cacheTransactionManager")
   @Override
   public ProcessChange doCreateDataTag(final ConfigurationElement element) throws IllegalAccessException {
-    LOGGER.trace("Creating DataTag " + element.getEntityId());
-    checkId(element.getEntityId());
-    DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+    tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      configurableDAO.insert(dataTag);
-    } catch (Exception e) {
-      LOGGER.error("Exception caught while inserting a new DataTag into the DB - rolling back changes", e);
-      throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", e);
-    }
-    try {
-      tagCache.putQuiet(dataTag);
-      equipmentFacade.addTagToEquipment(dataTag.getEquipmentId(), dataTag.getId());
-      DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), 
-                                      ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));      
-      return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), dataTagAdd);          
-    } catch (Exception ex) {
-      LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
-      tagCache.remove(dataTag.getId());
-      if (equipmentFacade.getDataTagIds(dataTag.getEquipmentId()).contains(dataTag.getId())) {
-        equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
-      }      
-      throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", ex);
+      LOGGER.trace("Creating DataTag " + element.getEntityId());
+      checkId(element.getEntityId());
+      DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      try {
+        configurableDAO.insert(dataTag);
+      } catch (Exception e) {
+        LOGGER.error("Exception caught while inserting a new DataTag into the DB - rolling back changes", e);
+        throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", e);
+      }
+      try {
+        tagCache.putQuiet(dataTag);
+        equipmentFacade.addTagToEquipment(dataTag.getEquipmentId(), dataTag.getId());
+        DataTagAdd dataTagAdd = new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), 
+                                        ((DataTagFacade) commonTagFacade).generateSourceDataTag(dataTag));      
+        return new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId()), dataTagAdd);          
+      } catch (Exception ex) {
+        LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
+        tagCache.remove(dataTag.getId());
+        if (equipmentFacade.getDataTagIds(dataTag.getEquipmentId()).contains(dataTag.getId())) {
+          equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
+        }      
+        throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", ex);
+      }
+    } finally {
+      tagCache.releaseWriteLockOnKey(element.getEntityId());
     }
         
   }
