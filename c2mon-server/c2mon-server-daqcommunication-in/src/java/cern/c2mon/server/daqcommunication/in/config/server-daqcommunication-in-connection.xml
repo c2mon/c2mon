@@ -10,7 +10,7 @@
 <!--    <property name="userName" value="${jms.daq.in.user}"/>-->
 <!--    <property name="password" value="${jms.daq.in.password}"/>-->
     <property name="clientIDPrefix" value="C2MON-SERVER-DAQ-IN"/>
-    <property name="watchTopicAdvisories" value="false"/>  
+    <property name="watchTopicAdvisories" value="false"/> 
   </bean>
 
   <!-- pool used for request JmsTemplate (which provides no caching) -->
