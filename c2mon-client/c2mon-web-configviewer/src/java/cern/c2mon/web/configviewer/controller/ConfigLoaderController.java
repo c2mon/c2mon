@@ -17,14 +17,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.gson.Gson;
-
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
+import cern.c2mon.shared.util.json.GsonFactory;
 import cern.c2mon.web.configviewer.service.ConfigLoaderService;
 import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.FormUtility;
-import cern.tim.shared.client.configuration.ConfigurationReport;
-import cern.tim.util.json.GsonFactory;
+
+import com.google.gson.Gson;
 
 
 /**

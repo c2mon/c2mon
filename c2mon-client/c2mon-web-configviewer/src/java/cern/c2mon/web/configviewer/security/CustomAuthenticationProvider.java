@@ -2,9 +2,6 @@ package cern.c2mon.web.configviewer.security;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,8 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monSessionManager;
-import cern.c2mon.web.configviewer.controller.AlarmController;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
 /** Our own custom authentication Provider. */
 public class CustomAuthenticationProvider  implements AuthenticationProvider  {

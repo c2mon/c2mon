@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.NotFoundException;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.web.configviewer.util.ReportHandler;
 import cern.c2mon.web.configviewer.util.XsltTransformUtility;
-import cern.tim.shared.client.configuration.ConfigurationReport;
 
 /**
  * ConfigLoaderService service providing the XML representation for a given config

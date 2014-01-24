@@ -4,8 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
-
 public class RbacTest {
 
   

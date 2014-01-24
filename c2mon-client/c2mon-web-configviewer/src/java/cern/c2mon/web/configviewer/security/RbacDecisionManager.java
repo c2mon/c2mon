@@ -2,8 +2,6 @@ package cern.c2mon.web.configviewer.security;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -19,7 +17,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import cern.c2mon.client.common.util.RbacAuthorizationDetailsParser;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.C2monSessionManager;
-import cern.tim.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
 /**
  * Decides whether the current user has enough permissions 
