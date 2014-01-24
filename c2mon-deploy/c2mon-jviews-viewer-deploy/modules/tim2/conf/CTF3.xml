@@ -1,6 +1,6 @@
 <config>
 	<view>
-		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Eau_CTF3/CTF3_Cooling_Plant.ivl"/>
+		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Eau_CTF3/CTF3_Cooling_Plant.idbd"/>
 		<property name="external" type="java.lang.Boolean" value="false"/>
 	</view>
 	<property name="tree-open" type="java.lang.Boolean" value="false"/>
