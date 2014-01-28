@@ -259,7 +259,7 @@ class EquipmentSenderValid {
     	    // NO_FILTERING => TimeDeadband for the current Data Tag (Static or Dynamic since this variable can be enabled 
     	    // at runtime when the Dynamic filter gets enabled)
     	  } else if (currentSourceDataTag.getAddress().isTimeDeadbandEnabled()) {
-    	    this.equipmentLogger.debug("sendTagFiltered - add time-deadband scheduler for tag " + currentSourceDataTag.getId());
+    	    this.equipmentLogger.debug("sendTagFiltered - passing update to time-deadband scheduler for tag " + currentSourceDataTag.getId());
     	    this.equipmentTimeDeadband.addToTimeDeadband(currentSourceDataTag, newTagValue, milisecTimestamp, pValueDescr);
     	    // NO_FILTERING and NO Time Deadband => Send to the server
     	  } else {

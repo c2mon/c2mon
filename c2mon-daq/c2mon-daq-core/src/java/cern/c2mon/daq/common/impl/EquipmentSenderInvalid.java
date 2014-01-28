@@ -230,7 +230,7 @@ class EquipmentSenderInvalid {
       // TimeDeadband for the current Data Tag (Static or Dynamic since this variable can be enabled at runtime when the Dynamic 
       // filter gets enabled)
       if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
-        this.equipmentLogger.debug("sendInvalidTag - add time-deadband scheduler for tag " + sourceDataTag.getId());
+        this.equipmentLogger.debug("sendInvalidTag - passing update to time-deadband scheduler for tag " + sourceDataTag.getId());
         this.equipmentTimeDeadband.addToTimeDeadband(sourceDataTag, newValue, timestamp.getTime(), newTagValueDesc, newSDQuality);
       } else {
         if (this.equipmentTimeDeadband.getSdtTimeDeadbandSchedulers().containsKey(sourceDataTag.getId())) {

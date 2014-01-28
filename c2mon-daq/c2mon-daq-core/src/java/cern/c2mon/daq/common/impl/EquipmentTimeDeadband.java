@@ -104,6 +104,7 @@ class EquipmentTimeDeadband {
   private void createSDTtimeDeadbandScheduler(final SourceDataTag currentTag) {
     if (currentTag.getAddress().isTimeDeadbandEnabled()) {
       if (currentTag.getAddress().getTimeDeadband() > 0) {
+        this.equipmentLogger.debug("createSDTtimeDeadbandScheduler - creating time-deadband scheduler for tag " + currentTag.getId());
         this.sdtTimeDeadbandSchedulers.put(currentTag.getId(), new SDTTimeDeadbandScheduler(currentTag, this.processMessageSender,
             this.equipmentSenderFilterModule, timeDeadbandTimer, this.dataTagValueFilter, this.dynamicTimeDeadbandFilterer));
       }
