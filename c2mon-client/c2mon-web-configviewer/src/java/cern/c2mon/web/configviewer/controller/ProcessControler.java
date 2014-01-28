@@ -64,6 +64,7 @@ public class ProcessControler {
   public void viewProcess(@PathVariable(value = "processName") final String processName, final HttpServletResponse response) throws IOException  {
     logger.info(PROCESS_URL + processName);
     try {
+      response.setContentType("text/html; charset=UTF-8");
       response.getWriter().println(service.generateHtmlResponse(processName));
     } catch (TransformerException e) {
       response.getWriter().println(e.getMessage());

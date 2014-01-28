@@ -106,6 +106,7 @@ public class AlarmController {
     logger.info(ALARM_URL + id);
 
     try {
+      response.setContentType("text/html; charset=UTF-8");
       response.getWriter().println(service.generateHtmlResponse(id));
       return null;
     } catch (TransformerException e) {

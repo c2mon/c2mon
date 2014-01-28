@@ -93,6 +93,7 @@ public class DataTagController {
   public String viewTag(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
     logger.info("/tagviewer/{id} " + id);
     try {
+      response.setContentType("text/html; charset=UTF-8");
       response.getWriter().println(FormUtility.getHeader());
       response.getWriter().println(service.generateDataTagValueHtmlResponse(id));
       response.getWriter().println(service.generateDataTagConfigHtmlResponse(id));

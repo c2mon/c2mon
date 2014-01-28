@@ -99,6 +99,7 @@ public class CommandController {
   public String viewCommand(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
     logger.info("/commandviewer/{id} " + id);
     try {
+      response.setContentType("text/html; charset=UTF-8");
       response.getWriter().println(service.generateHtmlResponse(id));
     } catch (TransformerException e) {
       response.getWriter().println(e.getMessage());

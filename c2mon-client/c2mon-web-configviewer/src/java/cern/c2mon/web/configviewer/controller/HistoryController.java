@@ -115,6 +115,7 @@ public class HistoryController {
       final HttpServletResponse response) throws IOException {
     
     logger.info("/historyviewer/{id} " + id);
+    response.setContentType("text/html; charset=UTF-8");
 
     try {
       
