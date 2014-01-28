@@ -123,6 +123,7 @@ public class ConfigLoaderController {
   public String viewConfig(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
     logger.debug("/configloader/{id} " + id);
     try {
+      response.setContentType("text/html; charset=UTF-8");
       response.getWriter().println(service.generateHtmlResponse(id));
     } catch (TransformerException e) {
       response.setStatus(400);
@@ -150,6 +151,7 @@ public class ConfigLoaderController {
   public String viewFinalReport(@PathVariable(value = "id") final String id, final HttpServletResponse response) throws IOException  {
     logger.debug("/CONFIG_LOADER_PROGRESS_FINAL_REPORT_URL/{id} " + id);
     try {
+      response.setContentType("text/html; charset=UTF-8");
       response.getWriter().println(service.getStoredConfigurationReportHtml(id));
     } catch (TransformerException e) {
       response.setStatus(400);
