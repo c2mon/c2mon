@@ -229,20 +229,30 @@ public class DataTagValueFilter {
             return FilterType.VALUE_DEADBAND;
           }
           
-          // The two value are different, so it is clear we do not want to filter it out!
+          // The two values are different, so it is clear we do not want to filter it out!
           this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
               " - Both Values are different. Not candidate for filtering");
           
           return FilterType.NO_FILTERING;
         }
-        // Current and new value are both null or equal! Now we check, for redundant quality information
+        // The two values are both null or equal. Now we check for redundant Value Description information
+        // If we compare empty string with null for our purpose it would be same Value Description
+        else if ((newTagValueDesc != null) && (!currentSDValue.getValueDescription().isEmpty()) 
+            && !currentSDValue.getValueDescription().equalsIgnoreCase(newTagValueDesc)) {
+          // The two value Descriptions are different
+          this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+              " - Both Values are equal but Value Descriptions are different. Not candidate for filtering");
+
+          return FilterType.NO_FILTERING;
+        }
+        // Current and new Values and Value Descriptions are both null or equal! Now we check for redundant quality information
         else if (currentSDValue.getQuality() != null) {
           // Check, if quality code did not change
           if ((currentSDValue.getQuality().getQualityCode() == newQualityCode)) {
             // Only checks description is Quality is no OK (Invalids)
             if(newQualityCode != SourceDataQuality.OK) {
               this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                  " - Both Quality codes are equal. Check Descriptions to take a decision");
+                  " - Both Value, Value Description and Quality codes are equal. Check Quality Descriptions to take a decision");
               
               // Check if quality description did not change. If it is not null we compare it with the new one
               if (currentSDValue.getQuality().getDescription() == null) {
@@ -250,13 +260,13 @@ public class DataTagValueFilter {
                 if (newSDQuality.getDescription() == null) {
                   // We filter out since both are the same and null
                   this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                      " - Both Descriptions are null. Candidate for filtering");
+                      " - Both Quality Descriptions are null. Candidate for filtering");
 
                   return FilterType.REPEATED_INVALID;
                 }
                 else {
                   this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                      " - Current Description null but we have a New Description. Not candidate for filtering");
+                      " - Current Quality Description null but we have a New Quality Description. Not candidate for filtering");
 
                   // Goes directly to the final return
                 }
@@ -265,13 +275,13 @@ public class DataTagValueFilter {
               else if (currentSDValue.getQuality().getDescription().equals(newSDQuality.getDescription())) {
                 // If we are here, it means we have received a redundant quality code and description ==> should be filtered out.
                 this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                    " - Both Descriptions are equal. Candidate for filtering");
+                    " - Both Value, Value Description, Quality and Quality Descriptions are equal. Candidate for filtering");
 
                 return FilterType.REPEATED_INVALID;
               }
             } else {
               this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                  " - Both Quality codes are equal (OK)");
+                  " - Both Value, Value Description and Quality codes (OK) are equal");
               
               return FilterType.REPEATED_VALUE;
             }
@@ -279,10 +289,15 @@ public class DataTagValueFilter {
           // Different Quality Codes 
           else {
             this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                " - Both Quality Codes are different. Not candidate for filtering");
+                " - Both Value and Value Description are equal but Quality Codes are different. Not candidate for filtering");
           }
         }
-      } // in case the SourceDataTag value has never been initialized we don't want to filter
+      } 
+      // in case the SourceDataTag value has never been initialized we don't want to filter
+      else {
+        this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentTag.getId() + 
+            " - Current Source Data Tag Value null but we have a New value. Not candidate for filtering");
+      }
       
       // We got a new quality information that we want to send to the server.
       return FilterType.NO_FILTERING;

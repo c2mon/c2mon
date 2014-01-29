@@ -250,16 +250,16 @@ public class EquipmentMessageSenderTest {
       replay(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock, this.filterMessageSenderMock);
 
       // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
-      this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
+      this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis(), "Nacho");
       assertEquals(false, this.sdt1.getCurrentValue().getValue());
       Thread.sleep(200);
 
       // The second one is also sent to the server since the value is different
-      this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
+      this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "Nacho");
       assertEquals(true, this.sdt1.getCurrentValue().getValue());
       Thread.sleep(200);
 
-      // The third one is filtered with REPEATED_VALUE because the value is the same (dif description)
+      // The third one is filtered with REPEATED_VALUE because the value and value description are the same
       this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "Nacho");
       assertEquals(true, this.sdt1.getCurrentValue().getValue());
       Thread.sleep(200);
@@ -767,51 +767,62 @@ public class EquipmentMessageSenderTest {
 
     @Test
     public void testSendTagFilteredIsValueDeadbandFiltered() throws Exception {
-        filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
-                
+        filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));         
         expectLastCall().times(4);
+        
+        // Value deadband type 6: as long as value description stays unchanged, it works in exactly the same fashion as 
+        // DEADBAND_PROCESS_RELATIVE_VALUE. If, however value description change is detected, deadband filtering is skipped.
 
         replay(filterMessageSenderMock);
 
         // relative
+        
+        // Sent
         equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis(), "value description 1"); // <-
                                                                                                               // should
                                                                                                               // be sent
         
         //System.out.println("TIME DEADBAND: "+sdt3.getAddress().getTimeDeadband());
         
-        // should be sent, because value descr. is different from the previous one
+        // should be sent, because value descr. is different from the previous one. Deadband filtering skipped
         equipmentMessageSender.sendTagFiltered(sdt3, 108, System.currentTimeMillis());
-        // should be sent, because value descr. is different from the previous one
+        // should be sent, because value descr. is different from the previous one. Deadband filtering skipped
         equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis(), "value description 2");
-        // should be filtered, because value description has not changed
+        // should be filtered, because value description has not changed. Deadband filtering applied
         equipmentMessageSender.sendTagFiltered(sdt3, 110, System.currentTimeMillis(), "value description 2");
-  
-
-        // should be filtered out
+        // should be sent, because value descr. is different from the previous one. Deadband filtering skipped
         equipmentMessageSender.sendTagFiltered(sdt3, 108, System.currentTimeMillis());
-        // should be filtered out
+        // should be filtered. REPEATED_VALUE
         equipmentMessageSender.sendTagFiltered(sdt3, 108, System.currentTimeMillis());
-        // Should not be filtered out, because of bad quality
-        equipmentMessageSender.sendInvalidTag(sdt3, 108, "value description 2", new SourceDataQuality(SourceDataQuality.UNKNOWN), new Timestamp(System.currentTimeMillis()));
+        // Should not be filtered out, because of bad quality (Same Value, Value Descrp but dif Quality Code)
+        equipmentMessageSender.sendInvalidTag(sdt3, 108, "value description 2", new SourceDataQuality(SourceDataQuality.UNKNOWN), 
+            new Timestamp(System.currentTimeMillis()));
         assertEquals(SourceDataQuality.UNKNOWN, sdt3.getCurrentValue().getQuality().getQualityCode());
 
-        // absolute
+        // absolute (DEADBAND_PROCESS_ABSOLUTE)
+        // First Value => sent
         equipmentMessageSender.sendTagFiltered(sdt2, 9.0f, System.currentTimeMillis());
+        // should be filtered, because value description has not changed. Deadband filtering applied
         equipmentMessageSender.sendTagFiltered(sdt2, 9.1f, System.currentTimeMillis());
+        // should be filtered, because value description has not changed. Deadband filtering applied
         equipmentMessageSender.sendTagFiltered(sdt2, 9.2f, System.currentTimeMillis());
+        // should be sent, because value descr. is different from the previous one. Deadband filtering skipped
+        this.sdt2.getAddress().setValueDeadbandType(DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE_VALUE_DESCR_CHANGE);
+        equipmentMessageSender.sendTagFiltered(sdt2, 9.3f, System.currentTimeMillis(), "value description 3");
            
         verify(filterMessageSenderMock);
     }
 
-    // @Test
+    @Test
     public void testSendTagFilteredTwiceSame() {
       filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
       processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
 
       replay(filterMessageSenderMock, processMessageSenderMock);
 
+      // Sent
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
+      // Filter with REPEATED_VALUE
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
 
       verify(filterMessageSenderMock, processMessageSenderMock);
@@ -820,17 +831,17 @@ public class EquipmentMessageSenderTest {
     @Test
     public void testSendTagFilteredTwiceSameValuesButDiffValueDesc() throws Exception {
       processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
-      expectLastCall().times(1);
+      expectLastCall().times(2);
 
       filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
-      expectLastCall().times(2);
+      expectLastCall().times(1);
 
       replay(processMessageSenderMock, filterMessageSenderMock);
 
       // Send to the server
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description A");
       Thread.sleep(110);
-      // Filter with REPEATED_VALUE
+      // Send to the server. Equal Value but dif Value Description
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description B");
       Thread.sleep(100);
       // Filter with REPEATED_VALUE
