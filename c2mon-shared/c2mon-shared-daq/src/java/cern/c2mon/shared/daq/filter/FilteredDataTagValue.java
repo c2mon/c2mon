@@ -49,7 +49,7 @@ public class FilteredDataTagValue {
     public enum FilterType {
       /*
        * Tag value was filtered out as the previously received
-       * value had a similar invalid quality flag.
+       * value had a similar value, quality flag and quality description.
        */
       REPEATED_INVALID((short)0), 
       /*
