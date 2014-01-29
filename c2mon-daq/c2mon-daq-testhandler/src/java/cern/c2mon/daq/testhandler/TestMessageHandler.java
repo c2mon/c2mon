@@ -666,10 +666,30 @@ public class TestMessageHandler extends EquipmentMessageHandler {
         // Application Server, so can always be the same for test purposes - 
         // it is not filtered out if the same, and is saved as tag value)
         else {
+          // if the datatag has not being set yet
+          if (sdt.getCurrentValue() == null || sdt.getCurrentValue().getValue() == null) {
             if (getEquipmentLogger().isDebugEnabled()) {
-                getEquipmentLogger().debug("returning a value outside the min-max range");
+              getEquipmentLogger().debug("\ttag value is currently null; setting initial value");
             }
-            return Double.valueOf(max + 1);
+          } else {
+            double currentValue = ((Double) sdt.getCurrentValue().getValue()).doubleValue();
+            if (getEquipmentLogger().isDebugEnabled()) {
+              getEquipmentLogger().debug("current datatag value is " + currentValue);
+            }
+
+            // Swap between 2 values: max+1 and max+2
+            if (currentValue == Double.valueOf(max + 1)) {
+              if (getEquipmentLogger().isDebugEnabled()) {
+                getEquipmentLogger().debug("returning a value outside the min-max range " + Double.valueOf(max + 2));
+              }
+              return Double.valueOf(max + 2);
+            }
+          }
+
+          if (getEquipmentLogger().isDebugEnabled()) {
+            getEquipmentLogger().debug("returning a value outside the min-max range " + Double.valueOf(max + 1));
+          }
+          return Double.valueOf(max + 1);
         }
     }
 
@@ -824,10 +844,30 @@ public class TestMessageHandler extends EquipmentMessageHandler {
         // Application Server, so can always be the same for test purposes - 
         // it is not filtered out if the same, and is saved as tag value)
         else {
+          // if the datatag has not being set yet
+          if (sdt.getCurrentValue() == null || sdt.getCurrentValue().getValue() == null) {
             if (getEquipmentLogger().isDebugEnabled()) {
-                getEquipmentLogger().debug("returning a value outside the min-max range");
-            }           
-            return Float.valueOf(max + 1);
+              getEquipmentLogger().debug("\ttag value is currently null; setting initial value");
+            }
+          } else {
+            float currentValue = ((Float) sdt.getCurrentValue().getValue()).floatValue();
+            if (getEquipmentLogger().isDebugEnabled()) {
+              getEquipmentLogger().debug("current datatag value is " + currentValue);
+            }
+
+            // Swap between 2 values: max+1 and max+2
+            if (currentValue == Float.valueOf(max + 1)) {
+              if (getEquipmentLogger().isDebugEnabled()) {
+                getEquipmentLogger().debug("returning a value outside the min-max range " + Float.valueOf(max + 2));
+              }
+              return Float.valueOf(max + 2);
+            }
+          }
+
+          if (getEquipmentLogger().isDebugEnabled()) {
+            getEquipmentLogger().debug("returning a value outside the min-max range " + Float.valueOf(max + 1));
+          }
+          return Float.valueOf(max + 1);
         }
     }
 
@@ -1003,10 +1043,29 @@ public class TestMessageHandler extends EquipmentMessageHandler {
         // so can always be the same for test purposes - it is not filtered out if the same, and is
         // saved as tag value)
         else {
-            if (getEquipmentLogger().isDebugEnabled()) {
-                getEquipmentLogger().debug("returning a value outside the min-max range");
+            // if the datatag has not being set yet
+            if (sdt.getCurrentValue() == null || sdt.getCurrentValue().getValue() == null) {
+              if (getEquipmentLogger().isDebugEnabled()) {
+                getEquipmentLogger().debug("\ttag value is currently null; setting initial value");
+              }
+            } else {
+              int currentValue = ((Integer) sdt.getCurrentValue().getValue()).intValue();
+              if (getEquipmentLogger().isDebugEnabled()) {
+                getEquipmentLogger().debug("current datatag value is " + currentValue);
+              }
+
+              // Swap between 2 values: max+1 and max+2
+              if (currentValue == Integer.valueOf(max + 1)) {
+                if (getEquipmentLogger().isDebugEnabled()) {
+                  getEquipmentLogger().debug("returning a value outside the min-max range " + Integer.valueOf(max + 2));
+                }
+                return Integer.valueOf(max + 2);
+              }
             }
-            
+
+            if (getEquipmentLogger().isDebugEnabled()) {
+              getEquipmentLogger().debug("returning a value outside the min-max range " + Integer.valueOf(max + 1));
+            }
             return Integer.valueOf(max + 1);
         }
     }
@@ -1178,11 +1237,30 @@ public class TestMessageHandler extends EquipmentMessageHandler {
         // so can always be the same for test purposes - it is not filtered out if the same, and is
         // saved as tag value)
         else {
+          // if the datatag has not being set yet
+          if (sdt.getCurrentValue() == null || sdt.getCurrentValue().getValue() == null) {
             if (getEquipmentLogger().isDebugEnabled()) {
-                getEquipmentLogger().debug("returning a value outside the min-max range");
+              getEquipmentLogger().debug("\ttag value is currently null; setting initial value");
             }
-            
-            return Long.valueOf(max + 1);
+          } else {
+            long currentValue = ((Long) sdt.getCurrentValue().getValue()).longValue();
+            if (getEquipmentLogger().isDebugEnabled()) {
+              getEquipmentLogger().debug("current datatag value is " + currentValue);
+            }
+
+            // Swap between 2 values: max+1 and max+2
+            if (currentValue == Long.valueOf(max + 1)) {
+              if (getEquipmentLogger().isDebugEnabled()) {
+                getEquipmentLogger().debug("returning a value outside the min-max range " + Long.valueOf(max + 2));
+              }
+              return Long.valueOf(max + 2);
+            }
+          }
+
+          if (getEquipmentLogger().isDebugEnabled()) {
+            getEquipmentLogger().debug("returning a value outside the min-max range " + Long.valueOf(max + 1));
+          }
+          return Long.valueOf(max + 1);
         }
     }
 
