@@ -327,7 +327,7 @@ public class HistoryLoadingManagerImpl extends HistoryLoadingManagerAbs implemen
           }
         }
         
-        if (getConfiguration().isLoadInitialValues()) {
+        if (getConfiguration().isLoadInitialValues() && !maximumRecordsReached) {
           // Gets initial records
           addTagValueUpdates(historyProvider.getInitialValuesForTags(
               tags.keySet().toArray(new Long[0]), 
