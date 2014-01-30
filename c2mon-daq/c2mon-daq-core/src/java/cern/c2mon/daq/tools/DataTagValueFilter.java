@@ -236,9 +236,14 @@ public class DataTagValueFilter {
           return FilterType.NO_FILTERING;
         }
         // The two values are both null or equal. Now we check for redundant Value Description information
-        // If we compare empty string with null for our purpose it would be same Value Description
-        else if ((newTagValueDesc != null) && (!currentSDValue.getValueDescription().isEmpty()) 
-            && !currentSDValue.getValueDescription().equalsIgnoreCase(newTagValueDesc)) {
+        else if (!currentSDValue.getValueDescription().equalsIgnoreCase(newTagValueDesc) 
+            && ((newTagValueDesc != null) || !currentSDValue.getValueDescription().isEmpty())) {
+          /* 
+           * Note 1: currentSDValue.getValueDescription() will never be null
+           * Note 2: if getValueDescription is empty and newTagValueDesc is null we get not equal but 
+           *         for us will be equal (no value) so we take care of this special case and continue the checks
+           */
+          
           // The two value Descriptions are different
           this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
               " - Both Values are equal but Value Descriptions are different. Not candidate for filtering");

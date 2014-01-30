@@ -875,6 +875,49 @@ public class EquipmentMessageSenderTest {
 
       verify(processMessageSenderMock, filterMessageSenderMock);
     }
+    
+    @Test
+    /*
+     * This test checks isCandidate for filtering when the value is the same but the
+     * value descriptions changes. Cases
+     * Curent Vale Desc vs New Value Desc => isCandidate4Filtering?
+     * ----------------    --------------    ---------------------
+     *      empty             null                    Y
+     *      empty             not null                N
+     *      not empty         null                    N
+     *      not empty         not null                N/Y depends on the desc
+     */
+    public void testSendTagFilteredIsCandidateValueDescriptions() throws Exception {
+        filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));         
+        expectLastCall().times(2);
+        
+        processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+        expectLastCall().times(5);
+        
+        // Value deadband type 6: as long as value description stays unchanged, it works in exactly the same fashion as 
+        // DEADBAND_PROCESS_RELATIVE_VALUE. If, however value description change is detected, deadband filtering is skipped.
+
+        replay(filterMessageSenderMock, processMessageSenderMock);
+
+        // relative
+        
+        // NO_FILTERING
+        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis());
+        // REPEATED_VALUE Current Desc empty vs New Desc empty
+        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis(), "");
+        // REPEATED_VALUE Current Desc empty vs New Desc null
+        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis());
+        // NO_FILTERING Current Desc null vs New Desc not empty
+        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis(), "test description 1");
+        // NO_FILTERING Current Desc not empty vs New Desc null
+        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis());
+        // NO_FILTERING Current Desc null vs New Desc not empty
+        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis(), "test description 2");
+        // NO_FILTERING Current Desc not empty vs New Desc not empty
+        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis(), "test description 3");
+           
+        verify(filterMessageSenderMock, processMessageSenderMock);
+    }
 
     private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType, int priority,
             boolean guaranteed) {
