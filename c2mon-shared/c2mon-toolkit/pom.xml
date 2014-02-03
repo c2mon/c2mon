@@ -35,6 +35,11 @@
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cern.accsoft.security</groupId>
+      <artifactId>accsoft-security-rba-util</artifactId>
+      <version>1.5.1</version>
+    </dependency>
 
   </dependencies>
 

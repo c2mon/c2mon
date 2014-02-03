@@ -18,6 +18,9 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import cern.accsoft.security.rba.RBAToken;
+import cern.rba.util.lookup.RbaTokenLookup;
+
 /**
  * Checks the overall health of a C2MON platform.
  * 
@@ -118,7 +121,13 @@ public class HealthChecker {
     for (String url : brokerUrls) {  
       String c2monUser = properties.getProperty("jms.user");
       String c2monPwd= properties.getProperty("jms.pwd");
-      Map<String, Object> credentialsMap = createCredentials(c2monUser, c2monPwd);
+      Map<String, Object> credentialsMap = null;
+      if (c2monUser == null || c2monUser.equalsIgnoreCase("")) {
+       credentialsMap = createRBACCredentials();
+      }
+      else {
+       credentialsMap = createCredentials(c2monUser, c2monPwd);
+      }
       List<String> urlParts = splitUrl(url);
       healthReport.append("Health report for JMS broker " + urlParts.get(0) + " at " + urlParts.get(1) + ":" + urlParts.get(2) +  "\n\n");
       try {
@@ -150,7 +159,13 @@ public class HealthChecker {
     List<String> c2monServerUrls = parseUrls(properties.getProperty("c2mon.server.urls"));            
     String c2monUser = properties.getProperty("c2mon.server.user");
     String c2monPwd= properties.getProperty("c2mon.server.pwd");
-    Map<String, Object> credentialsMap = createCredentials(c2monUser, c2monPwd);
+    Map<String, Object> credentialsMap = null;
+    if (c2monUser == null || c2monUser.equalsIgnoreCase("")) {
+     credentialsMap = createRBACCredentials();
+    }
+    else {
+     credentialsMap = createCredentials(c2monUser, c2monPwd);
+    }
               
     for (String url : c2monServerUrls) {
       healthReport.append("Health report for C2MON server at " + url + "\n\n");
@@ -185,6 +200,21 @@ public class HealthChecker {
     MBeanServerConnection mBeanConnection = jmxConnector.getMBeanServerConnection();
     return mBeanConnection;
   }
+  
+  /**
+   * Creates the JMX connection.
+   */
+  private static Map<String, Object> createRBACCredentials() throws Exception {
+    HashMap<String, Object> credentialsMap = new HashMap<String, Object >();
+    
+    RBAToken rbaToken = RbaTokenLookup.findRbaToken();
+    if (rbaToken == null) {
+        throw new IllegalStateException("No RBAC by location token found. Please specify user and password instead in the property file.");
+    }
+    
+    credentialsMap.put(JMXConnector.CREDENTIALS, rbaToken);
+    return credentialsMap;
+  }
 
   /**
    * Creates the credentials map.
@@ -192,7 +222,7 @@ public class HealthChecker {
   private static Map<String, Object> createCredentials(String user, String pwd) {
     String[] credentials = new String[]{user, pwd}; 
     HashMap<String, Object> credentialsMap = new HashMap<String, Object >();
-    credentialsMap.put("jmx.remote.credentials", credentials);
+    credentialsMap.put(JMXConnector.CREDENTIALS, credentials);
     return credentialsMap;
   }
 
