@@ -25,6 +25,12 @@
       <artifactId>cmw-log-log4j</artifactId>
       <version>[1.0.0,2.0.0)</version>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 	</dependencies>
 
