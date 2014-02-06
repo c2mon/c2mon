@@ -83,6 +83,7 @@
              PROCSTATUSTIME = #{statusTime,jdbcType=TIMESTAMP},
              PROCSTATUSDESC = #{statusDescription,jdbcType=VARCHAR},
              PROCREBOOT = #{requiresReboot,jdbcType=NUMERIC},
+             PROCCURRENTHOST = #{currentHost,jdbcType=VARCHAR},
              PROCPIK = #{processPIK,jdbcType=NUMERIC},
              PROCLOCALCONFIG = #{localConfig,jdbcType=VARCHAR}
        WHERE PROCID = #{id} 
