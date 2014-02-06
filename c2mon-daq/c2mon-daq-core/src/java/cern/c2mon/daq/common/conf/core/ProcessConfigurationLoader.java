@@ -60,10 +60,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
    * Position of the command name token in the JMS listener topic
    */
   private static final int COMMAND_TOKEN = 2;
-  /**
-   * Position of the process name token in the JMS listener topic
-   */
-  private static final int PROCESS_NAME_TOKEN = 4;
+
 
   /**
    * Reference to the ProcessRequestSender (for requesting the XML config document). This reference is injected in the
@@ -248,16 +245,16 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
           // New format: tim.process.command.HOSTNAME.PROCESS_NAME.PIK
           //  - replace HOSTNAME with current one and PIK with the one taken from server while Connection phase
           String[] tokens = jmsListenerTopic.split("\\.");
-          LOGGER.debug("tokens.lenght : " + tokens.length);
+          LOGGER.debug("createProcessConfiguration - tokens.lenght : " + tokens.length);
           StringBuilder strBuf = new StringBuilder();
           try {
             strBuf.append(tokens[TIM_TOKEN]).append(".").append(tokens[PROCESS_TOKEN]).append(".").append(tokens[COMMAND_TOKEN]).append(".")
-              .append(processConfiguration.getHostName()).append(".").append(tokens[PROCESS_NAME_TOKEN]).append(".").append(pik);
+              .append(processConfiguration.getHostName()).append(".").append(tokens[tokens.length-2]).append(".").append(pik);
           } catch (Exception ex) {
-            LOGGER.debug("error while splitting the topic. Format: tim.process.command.HOSTNAME.PROCESS_NAME.PIK", ex);
+            LOGGER.debug("createProcessConfiguration - error while splitting the topic. Format: tim.process.command.HOSTNAME.PROCESS_NAME.PIK", ex);
           }
           String topic = strBuf.toString();
-          LOGGER.debug("setting the listener topic to: " + topic);
+          LOGGER.debug("createProcessConfiguration - setting the listener topic to: " + topic);
           processConfiguration.setListenerTopic(topic);
         }
       } else {
