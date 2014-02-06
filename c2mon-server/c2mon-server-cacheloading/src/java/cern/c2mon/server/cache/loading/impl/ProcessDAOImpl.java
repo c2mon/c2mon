@@ -18,6 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,43 +35,48 @@ import cern.c2mon.server.common.process.Process;
  */
 @Service("processDAO")
 public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements ProcessDAO {
+	/**
+	 * LOG4J Logger for this class.
+	 */
+	private static final Logger LOGGER = Logger.getLogger(ProcessDAOImpl.class);
 
-  private ProcessMapper processMapper;
+	private ProcessMapper processMapper;
 
-  @Value("${c2mon.jms.process.listener.trunk}") 
-  private String processListenerTrunk;
-  
-  @Autowired
-  public ProcessDAOImpl(ProcessMapper processMapper) {
-    super(500, processMapper); //initial buffer size
-    this.processMapper = processMapper;
-  }
+	@Value("${c2mon.jms.process.listener.trunk}") 
+	private String processListenerTrunk;
 
-  @Override
-  public void deleteProcess(Long processId) {
-    processMapper.deleteProcess(processId);
-  }
+	@Autowired
+	public ProcessDAOImpl(ProcessMapper processMapper) {
+		super(500, processMapper); //initial buffer size
+		this.processMapper = processMapper;
+	}
 
-  @Override
-  public void deleteItem(Long id) {
-     processMapper.deleteProcess(id);
-  }
+	@Override
+	public void deleteProcess(Long processId) {
+		processMapper.deleteProcess(processId);
+	}
 
-  @Override
-  public void insert(Process process) {
-    processMapper.insertProcess(process);
-  }
+	@Override
+	public void deleteItem(Long id) {
+		processMapper.deleteProcess(id);
+	}
 
-  @Override
-  public void updateConfig(Process process) {
-    processMapper.updateProcessConfig(process);
-  }
+	@Override
+	public void insert(Process process) {
+		processMapper.insertProcess(process);
+	}
 
-  @Override
-  protected Process doPostDbLoading(Process item) {
-    item.setJmsListenerTopic(processListenerTrunk + ".NOHOST" + "." + item.getName() + ".NOTIME");
-    return item;
-  }
- 
+	@Override
+	public void updateConfig(Process process) {
+		processMapper.updateProcessConfig(process);
+	}
 
+	@Override
+	protected Process doPostDbLoading(Process process) {
+		process.setJmsListenerTopic(processListenerTrunk + ".command." + process.getCurrentHost() + "." 
+				+ process.getName() + "." + process.getProcessPIK());
+		LOGGER.debug("doPostDbLoading - jmsListenerQueue: " + process.getJmsListenerTopic());
+
+		return process;
+	}
 }

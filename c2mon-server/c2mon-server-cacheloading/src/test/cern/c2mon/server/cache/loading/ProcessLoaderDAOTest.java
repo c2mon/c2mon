@@ -3,7 +3,6 @@ package cern.c2mon.server.cache.loading;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.security.KeyStore.Entry;
 import java.util.Map;
 
 import org.junit.Test;
@@ -53,7 +52,9 @@ public class ProcessLoaderDAOTest {
   }
   
   private void assertTopicSetCorrectly(Process process) {
-    assertEquals("c2mon.process" + ".NOHOST" + "." + process.getName() + ".NOTIME", process.getJmsListenerTopic());
+//    assertEquals("c2mon.process" + ".NOHOST" + "." + process.getName() + ".NOTIME", process.getJmsListenerTopic());
+    
+    assertEquals("c2mon.process.command." + process.getCurrentHost() + "." + process.getName() + "." + process.getProcessPIK(), process.getJmsListenerTopic());
   }
   
 }
