@@ -148,16 +148,10 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       }
     }
     
-//    if (properties.getProperty("processPIK") != null) {
-//      processCacheObject.setName(properties.getProperty("processPIK"));
-//    }
-//    
-//    if (properties.getProperty("localConfig") != null) {
-//      processCacheObject.setName(properties.getProperty("localConfig"));
-//    }
-    
     //TODO: The default command queue name should be changed once all DAQs are migrated to the new kernel
-    processCacheObject.setJmsListenerTopic(processListenerTrunk + ".NOHOST." + processCacheObject.getName() + ".NOTIME");
+//    processCacheObject.setJmsListenerTopic(processListenerTrunk + ".NOHOST." + processCacheObject.getName() + ".NOTIME");
+    processCacheObject.setJmsListenerTopic(processListenerTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+            + processCacheObject.getName() + "." + processCacheObject.getProcessPIK());
     return configurationUpdate;
   }  
   
