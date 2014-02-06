@@ -78,4 +78,11 @@ public interface Process extends Supervised, Cacheable {
    * @return The process PIK
    */
   Long getProcessPIK();
+  
+  /**
+   * Returns the name of the host on which the DAQ process has been started. 
+   * 
+   * @return the host
+   */
+  String getCurrentHost();
 }
