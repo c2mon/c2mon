@@ -171,31 +171,16 @@ public class ConfigurationController {
     try {
 
       // Connection
-
-      // Only if noPIK is disable we ask for the PIK request
-      if (!this.runOptions.isNoPIK()) {
-        // Get the PIK from the server
-        LOGGER.trace("initProcess - Process Connection called.");
-        this.loadProcessConnection();
-      } else {
-
-        // Provisional ProcessConfiguration for calling createProcessConfiguration. It is done on
-        // loadProcessConnection normally
-        this.processConfiguration = new ProcessConfiguration();
-        this.processConfiguration.setProcessName(getCommandParamsHandler().getParamValue(PROCESS_NAME_PARAM));
-        this.processConfiguration.setprocessPIK(ProcessConfigurationRequest.NO_PIK);
-      }
+      
+      // Get the PIK from the server
+      LOGGER.trace("initProcess - Process Connection called.");
+      this.loadProcessConnection();
 
       // Configuration
 
-      // If noPIK we call old Process Configuration method. Else the new one
-      if (this.runOptions.isNoPIK()) {
-        LOGGER.trace("initProcess - Old Process Configuration called.");
-        this.old_loadProcessConfiguration();
-      } else {
-        LOGGER.trace("initProcess - Process Configuration called.");
-        this.loadProcessConfiguration();
-      }
+      LOGGER.trace("initProcess - Process Configuration called.");
+      this.loadProcessConfiguration();
+      
     } catch (Exception ex) {
       LOGGER.error(ex);
       LOGGER.info("initProcess - Stopping the DAQ start up process...");
@@ -318,25 +303,20 @@ public class ConfigurationController {
    * Sends disconnection notifications to all request senders.
    */
   private void sendDisconnectionNotification() {
-    // If noPIK we call old Process Disconnection method. Else the new one
-    if (this.runOptions.isNoPIK()) {
-      old_sendDisconnectionNotification();
-    } else {
-      LOGGER.trace("sendDisconnectionNotification - Primary Request Sender disconnection");
-      primaryRequestSender.sendProcessDisconnectionRequest();
+    LOGGER.trace("sendDisconnectionNotification - Primary Request Sender disconnection");
+    primaryRequestSender.sendProcessDisconnectionRequest();
 
-      // send in separate thread as may block if broker problem
-      if (secondaryRequestSender != null) {
-        LOGGER.trace("sendDisconnectionNotification - Secondary Request Sender disconnection (new thread)");
-        Thread disconnectSend = new Thread(new Runnable() {                  
-          @Override
-          public void run() {          
-            secondaryRequestSender.sendProcessDisconnectionRequest();
-          }
-        });
-        disconnectSend.setDaemon(true);
-        disconnectSend.start();
-      }
+    // send in separate thread as may block if broker problem
+    if (secondaryRequestSender != null) {
+      LOGGER.trace("sendDisconnectionNotification - Secondary Request Sender disconnection (new thread)");
+      Thread disconnectSend = new Thread(new Runnable() {                  
+        @Override
+        public void run() {          
+          secondaryRequestSender.sendProcessDisconnectionRequest();
+        }
+      });
+      disconnectSend.setDaemon(true);
+      disconnectSend.start();
     }
   }
 
@@ -960,84 +940,4 @@ public class ConfigurationController {
   public void setCommandParamsHandler(final CommandParamsHandler commandParamsHandler) {
     this.commandParamsHandler = commandParamsHandler;
   }
-
-  /**
-   * TODO: Backward compatibility. remove after updating server
-   */
-
-  /**
-   * Loads the old process configuration.
-   */
-  public void old_loadProcessConfiguration() {
-    Document xmlConfiguration;
-    boolean localConfiguration = false;
-    if (getCommandParamsHandler().hasParam(CONFIGURATION_PARAM)) {
-      localConfiguration = true;
-      String fileSystemLocation = getCommandParamsHandler().getParamValue(CONFIGURATION_PARAM);
-      xmlConfiguration = processConfigurationLoader.loadConfigLocal(fileSystemLocation);
-    } else {
-      if (getCommandParamsHandler().hasParam(SAVE_PARAM)) {
-        String saveLocation = getCommandParamsHandler().getParamValue(SAVE_PARAM);
-        xmlConfiguration = processConfigurationLoader.loadConfigRemote(saveLocation);
-      } else {
-        xmlConfiguration = processConfigurationLoader.loadConfigRemote();
-      }
-    }
-    LOGGER.debug("Loading DAQ configuration properties from XML document...");
-    String processName = getCommandParamsHandler().getParamValue(PROCESS_NAME_PARAM);
-    // try to create process configuration object.
-    try {
-      processConfiguration = processConfigurationLoader.createProcessConfiguration(processName,
-          this.processConfiguration.getprocessPIK(), xmlConfiguration, localConfiguration);
-
-      LOGGER.debug("... properties loaded successfully.");
-    } catch (ConfUnknownTypeException ex) {
-      LOGGER.info("UNKNOWN configuration received!");
-      LOGGER.info("Sending ProcessDisconnection message and terminating..");
-      processConfiguration = new ProcessConfiguration();
-      processConfiguration.setProcessName(processName);
-      processConfiguration.setProcessID(-1L);
-      old_sendDisconnectionNotification();
-      System.exit(0);
-    } catch (ConfRejectedTypeException ex) {
-      LOGGER.info("REJECTED configuration received!");
-      LOGGER.info("Sending ProcessDisconnection message and terminating..");
-      processConfiguration = new ProcessConfiguration();
-      processConfiguration.setProcessName(processName);
-      processConfiguration.setProcessID(-1L);
-      // TODO remove this as would invalidate tags of DAQ already running?
-      old_sendDisconnectionNotification();
-      System.exit(0);
-    } catch (Exception ex) {
-      LOGGER.fatal("Exception caught while trying to configure the driver! Ex. message =", ex);
-      LOGGER.info("The ProcessConfiguration XML might contain some errors ! Check it please.");
-      LOGGER.info("Sending ProcessDisconnecttion message and terminating..");
-      processConfiguration = new ProcessConfiguration();
-      processConfiguration.setProcessName(processName);
-      processConfiguration.setProcessID(-1L);
-      old_sendDisconnectionNotification();
-      System.exit(0);
-    }
-  }
-
-  /**
-   * Sends disconnection notifications to all request senders.
-   */
-  private void old_sendDisconnectionNotification() {
-    LOGGER.trace("old_sendDisconnectionNotification - Primary Request Sender disconnection");
-    primaryRequestSender.old_sendProcessDisconnection();
-    // send in separate thread as may block if broker problem
-    if (secondaryRequestSender != null) {
-      LOGGER.trace("old_sendDisconnectionNotification - Secondary Request Sender disconnection (new Thread)");
-      Thread disconnectSend = new Thread(new Runnable() {                  
-        @Override
-        public void run() {          
-          secondaryRequestSender.old_sendProcessDisconnection();
-        }
-      });
-      disconnectSend.setDaemon(true);
-      disconnectSend.start();
-    }
-  }
-
 }

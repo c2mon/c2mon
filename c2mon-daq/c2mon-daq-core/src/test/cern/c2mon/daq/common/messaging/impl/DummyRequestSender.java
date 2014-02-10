@@ -88,22 +88,4 @@ public class DummyRequestSender implements ProcessRequestSender {
        
         return confXMLDoc;
     }
-
-    @Override
-    public Document old_sendProcessConfigurationRequest() {
-      return loadConfigLocal(processConfigurationFilePath);
-    }
-
-    @Override
-    public Document old_sendProcessConfigurationRequest(String fileToSaveConf) {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override
-    public void old_sendProcessDisconnection() {
-      // TODO Auto-generated method stub
-      
-    }
-
 }

@@ -290,14 +290,9 @@ public class RequestController {
         Long processPIK = this.configurationController.getProcessConfiguration().getprocessPIK();
         
         RunOptions runOptions = this.configurationController.getRunOptions();
-        // If we don't work with the PIK we act as we used to before PIK era, else we add the PIK to our communication process
+        // We add the PIK to our communication process
         DataTagValueUpdate dataTagValueUpdate;
-        if (runOptions.isNoPIK()) {
-          dataTagValueUpdate = new DataTagValueUpdate(processId);
-        }
-        else {
-          dataTagValueUpdate = new DataTagValueUpdate(processId, processPIK);
-        }
+        dataTagValueUpdate = new DataTagValueUpdate(processId, processPIK);
         
         if (sourceDataTag.getCurrentValue() != null)
             dataTagValueUpdate.addValue(sourceDataTag.getCurrentValue().clone());

@@ -99,8 +99,6 @@ public final class DaqStartup {
        System.out.println("**                   [-t | -testMode]                                         **");
        System.out.println("**                   [-nf | -nofilter]                                        **");
        System.out.println("**                   [-noDeadband] (disables dynamic deadband)                **");
-       System.out.println("**                   [-noPIK] (starts DAQ without asking C2MON for a Process  **");
-       System.out.println("**                             Identification Key)                            **");
        System.out.println("********************************************************************************");
        System.exit(-1);
     }

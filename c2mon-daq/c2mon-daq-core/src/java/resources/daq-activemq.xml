@@ -53,10 +53,6 @@
   <constructor-arg index="0" value="${jms.process.requestQueue}"></constructor-arg>
 </bean>
 
-<!-- initialize the converters for sending and receiving a response. Backward compatibility -->
-<bean id="processRequestMessageConverterBC" class="cern.c2mon.shared.daq.process.backward.ProcessRequestConverterBC"/>
-<bean id="processRequestResponseConverterBC" class="cern.c2mon.daq.common.messaging.impl.backward.ProcessRequestResponseConverterBC"/>
-
 <!-- converters are set manually for sending and receiving a response -->
 <bean id="processRequestJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
   <property name="connectionFactory" ref="singleConnectionFactory"/>

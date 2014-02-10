@@ -72,14 +72,6 @@ public class RunOptions {
      * only equipment
      */
     private boolean eqAppendersOnly = false;
-    
-    /**
-     * If this flag is set to true, the daq will not send the PIK request
-     * to the server. Use to be backward compatible with all versions with
-     * no PIK reply. It will work as if the PIK procedure was never 
-     * implemented
-     */
-    private boolean noPIK = false;
 
     /**
      * Initialization of the bean.
@@ -104,33 +96,6 @@ public class RunOptions {
             LOGGER.info("The DAQ process is starting without filtering (no JMS connections will be opened with Filter module)");
             setFilterMode(false);
         }
-        
-        // Check if we don't want to send the PIK requested from the server (default is we do want)
-        if (commandParamsHandler.hasParam("-noPIK")) {
-          LOGGER.info("The DAQ process is starting in noPIK mode (no PIK will be requested from the server and old communication protocol will be used)");
-          this.setNoPIK(true);
-        }
-    }
-    
-    /**
-     * This method sets the noPIK flag
-     * 
-     * @param value
-     *            - the value to be set
-     */
-    public final void setNoPIK(final boolean value) {
-        this.noPIK = value;
-    }
-
-    /**
-     * This method returns the current state of noPIK flag.
-     *  - if noPIK is set the we will not have the PIK value into account
-     *  - otherwise we will use the PIK as part of our communication processes
-     * 
-     * @return boolean
-     */
-    public final boolean isNoPIK() {
-        return this.noPIK;
     }
 
     /**

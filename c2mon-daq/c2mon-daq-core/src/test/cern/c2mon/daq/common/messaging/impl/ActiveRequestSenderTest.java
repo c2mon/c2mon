@@ -51,8 +51,6 @@ import cern.c2mon.daq.common.conf.core.CommonConfiguration;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
-import cern.c2mon.daq.common.messaging.impl.ActiveRequestSender;
-import cern.c2mon.daq.common.messaging.impl.backward.ProcessRequestResponseConverterBC;
 import cern.c2mon.daq.tools.CommandParamsHandler;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
@@ -62,7 +60,6 @@ import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessMessageConverter;
 import cern.c2mon.shared.daq.process.ProcessRequest;
 import cern.c2mon.shared.daq.process.XMLConverter;
-import cern.c2mon.shared.daq.process.backward.ProcessRequestConverterBC;
 
 /**
  * Integration test of ActiveRequestSenderTest with broker.
@@ -189,24 +186,6 @@ public class ActiveRequestSenderTest {
    * The CommonConfiguration object to be used in the Configuration test call
    */
   private CommonConfiguration commonConfigurationMock;
-  
-  /**
-   * TODO: Backward compatibility. remove after updating server
-   */
-  
-  /**
-   * Reference to converter called explicitly when sending the connection
-   * request.
-   */
-  @Autowired
-  private ProcessRequestConverterBC processRequestConverterBC;
-  
-  /**
-   * Reference to the converter for processing the reply (converts Message ->
-   * DOM document).
-   */
-  @Autowired
- private ProcessRequestResponseConverterBC processRequestResponseConverterBC;
 
 
   /**
@@ -254,8 +233,7 @@ public class ActiveRequestSenderTest {
         createMock(); 
 
     // Class to test ActiveRequestSender
-    this.activeRequestSender = new ActiveRequestSender(this.commonConfigurationMock, this.jmsTemplate, processRequestConverterBC,  
-        processRequestResponseConverterBC, this.configurationControllerMock);
+    this.activeRequestSender = new ActiveRequestSender(this.commonConfigurationMock, this.jmsTemplate, this.configurationControllerMock);
   }
 
   /**

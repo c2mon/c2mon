@@ -161,12 +161,7 @@ public class DriverKernel implements ApplicationContextAware {
 
 			LOGGER.debug("\tcalling ProcessRequestSender's sendProcessDisconnection()..");
 			if (primaryRequestSender != null) {
-				// If noPIK we call old Process Disconnection method. Else the new one
-				if (configurationController.getRunOptions().isNoPIK()) {
-					primaryRequestSender.old_sendProcessDisconnection();
-				} else {
-					primaryRequestSender.sendProcessDisconnectionRequest();
-				}
+			  primaryRequestSender.sendProcessDisconnectionRequest();
 			}
 
 			//send in separate thread as may block if broker problem
@@ -174,12 +169,7 @@ public class DriverKernel implements ApplicationContextAware {
 				Thread disconnectSend = new Thread(new Runnable() {                  
 					@Override
 					public void run() {
-						// If noPIK we call old Process Disconnection method. Else the new one
-						if (configurationController.getRunOptions().isNoPIK()) {
-							secondaryRequestSender.old_sendProcessDisconnection();
-						} else {
-							secondaryRequestSender.sendProcessDisconnectionRequest();
-						}
+					  secondaryRequestSender.sendProcessDisconnectionRequest();
 					}
 				});
 				disconnectSend.setDaemon(true);
@@ -264,20 +254,12 @@ public class DriverKernel implements ApplicationContextAware {
 		// disconnect the FilterMessageSender object from JMS
 		// and perform and shutdown logic
 		filterMessageSender.shutdown();
-
-		// If noPIK we call old Process Disconnection method. Else the new one
-		if (configurationController.getRunOptions().isNoPIK()) {
-			this.primaryRequestSender.sendProcessDisconnectionRequest();
-			if (secondaryRequestSender != null) {
-				secondaryRequestSender.sendProcessDisconnectionRequest();
-			}
-		} else {
-			this.primaryRequestSender.old_sendProcessDisconnection();
-			if (secondaryRequestSender != null) {
-				secondaryRequestSender.old_sendProcessDisconnection();
-			}
+		
+		this.primaryRequestSender.sendProcessDisconnectionRequest();
+		if (secondaryRequestSender != null) {
+		  secondaryRequestSender.sendProcessDisconnectionRequest();
 		}
-
+		
 		LOGGER.info("terminateDAQ - Process terminated gently");
 		System.exit(0);
 	}

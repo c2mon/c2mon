@@ -9,10 +9,6 @@
 
 <import resource="classpath:resources/daq-core-common.xml"/>
 
-<bean id="runOptions" class="cern.c2mon.daq.common.conf.core.RunOptions">
-  <property name="noPIK" value="false"/>
-</bean>
-
 <bean id="driverKernel" class="cern.c2mon.daq.common.DriverKernel">
   <property name="primaryRequestSender" ref="primaryRequestSender"/>
   <property name="processMessageReceivers">

@@ -39,41 +39,4 @@ public interface ProcessRequestSender {
    *  Send a ProcessDisconnectionRequest to the server. No reply is expected.
    */
   void sendProcessDisconnectionRequest();
-
-  /**
-   * TODO: Backward compatibility. remove after updating server
-   */
-
-  /**
-   * This method publishes the ProcessConnection message on the configured topic. 
-   * As a result it expects to receive the ProcessConfiguration message. The 
-   * XML content of the message is then automatically parsed, and the DOM Document
-   * object is returned for further processing. If the server does not reply
-   * within the specified timeout, null is returned.
-   * @return the parsed XML document
-   */
-  Document old_sendProcessConfigurationRequest();
-
-  /**
-   * This method publishes the ProcessConnection message on the configured topic. 
-   * As a result it suspects to receive the ProcessConfiguration message. The 
-   * XML content of the message is then automatically parsed, and the DOM Document
-   * object is returned for further processing. If the argument contains a 
-   * non-empty string (file name), the method will try to save received XML 
-   * in a specified file.
-   * @param fileToSaveConf the name of the file to save the config to
-   * @return the parsed XML document
-   */
-  Document old_sendProcessConfigurationRequest(String fileToSaveConf);
-
-  /**
-   *  This method is invoked by the Kernel just before the 
-   *  driver (clearly) exits. The server application stops 
-   *  supervising the process in question and invalidates all 
-   *  associated tags.The driver is also supposed to send a 
-   *  ProcessDisconnection message in reply to a 
-   *  ProcessTerminationRequest message (TODO is this implemented in the server?!).
-   *  No response from the server is expected.
-   */
-  void old_sendProcessDisconnection();
 }

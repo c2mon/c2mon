@@ -32,19 +32,4 @@ public class TestModeRequestSender implements ProcessRequestSender {
     // TODO Auto-generated method stub
     
   }
-
-  @Override
-  public Document old_sendProcessConfigurationRequest() {
-    return wrapperRequestSender.old_sendProcessConfigurationRequest();
-  }
-
-  @Override
-  public Document old_sendProcessConfigurationRequest(String fileToSaveConf) {
-    return wrapperRequestSender.old_sendProcessConfigurationRequest(fileToSaveConf);
-  }
-
-  @Override
-  public void old_sendProcessDisconnection() {
-    // TODO Auto-generated method stub 
-  }
 }

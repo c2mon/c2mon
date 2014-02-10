@@ -352,15 +352,9 @@ public class ProcessMessageSender implements IProcessMessageSender {
             LOGGER.debug("entering pull()..");
             LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());
             
-            RunOptions runOptions = getConfigurationController().getRunOptions();
-            // If we don't work with the PIK we act as we used to before PIK era, else we add the PIK to our communication process
+            // We add the PIK to our communication process
             DataTagValueUpdate dataTagValueUpdate;
-            if (runOptions.isNoPIK()) {
-              dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID());
-            }
-            else {
-              dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
-            }
+            dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
 
             Iterator it = event.getPulled().iterator();
             long currentMsgSize = 0;
@@ -383,13 +377,8 @@ public class ProcessMessageSender implements IProcessMessageSender {
                     
                     // create new dataTagValueUpdate object
                     
-                    // If we don't work with the PIK we act as we used to before PIK era, else we add the PIK to our communication process
-                    if (runOptions.isNoPIK()) {
-                      dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID());
-                    }
-                    else {
-                      dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
-                    }
+                    // We add the PIK to our communication process
+                    dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
                 } // if
 
                 // append next SourceDataTagValue object to the message

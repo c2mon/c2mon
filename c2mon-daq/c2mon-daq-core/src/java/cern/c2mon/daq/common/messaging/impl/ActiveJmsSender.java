@@ -108,16 +108,10 @@ public class ActiveJmsSender implements JmsSender, JmsSenderMXBean {
     public final void processValue(final SourceDataTagValue sourceDataTagValue) {
         LOGGER.debug("entering processValue()..");
         ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
-        RunOptions runOptions = configurationController.getRunOptions();
+        
         // The PIK is also check before building the XML in DataTagValueUpdate class
-        DataTagValueUpdate dataTagValueUpdate;
-        // If we don't work with the PIK we act as we used to before PIK era, else we add the PIK to our communication process
-        if (runOptions.isNoPIK()) { 
-          dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID());
-        }
-        else {
-          dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
-        }
+        DataTagValueUpdate dataTagValueUpdate;  
+        dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
 
         dataTagValueUpdate.addValue(sourceDataTagValue);
         LOGGER.trace("value added to value update message");
