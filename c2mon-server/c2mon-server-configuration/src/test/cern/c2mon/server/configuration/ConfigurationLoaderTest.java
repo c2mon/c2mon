@@ -746,7 +746,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setMaxMessageSize(200);
     expectedObject.setMaxMessageDelay(1000);
     expectedObject.setDescription("test description");
-    expectedObject.setJmsListenerTopic(processListenerTrunk + ".NOHOST" + "." + expectedObject.getName() + ".NOTIME");
+    // Current host and PIK will be null
+    expectedObject.setJmsListenerTopic(processListenerTrunk + ".command.null" + "." + expectedObject.getName() + ".null");
     
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
     
