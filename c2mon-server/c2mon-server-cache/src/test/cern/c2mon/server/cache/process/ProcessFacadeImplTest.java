@@ -72,6 +72,7 @@ public class ProcessFacadeImplTest {
     control.replay();
     Process process = processFacade.createCacheObject(1L, properties);    
     control.verify();
-    assertEquals("c2mon.jms.process.listener.trunk.default" + ".NOHOST" + "." + "P_NAME" + ".NOTIME", process.getJmsListenerTopic());
+    assertEquals("c2mon.jms.process.listener.trunk.default" + ".command." + process.getCurrentHost() + "." 
+    		+ "P_NAME" + "." + process.getProcessPIK(), process.getJmsListenerTopic());
   }
 }
