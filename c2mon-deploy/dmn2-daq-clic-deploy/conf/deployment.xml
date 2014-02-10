@@ -6,11 +6,11 @@
          this application section is a parent configuration for both
          PROD and TEST
       -->
-      <application name="default">
-
+      <application>
+         
          <startscript name="DMN2-DAQ">
             <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-               <arg>-timProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
+               <arg>-c2monProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
 
                <output>
                   <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
@@ -38,55 +38,65 @@
     #  uncomment the following 2 lines if you need to enable remote debugging
     #  REMOTE_DEBUG="-Xrunjdwp:transport=dt_socket,address=8012,server=y,suspend=n"
     #  JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUG}"    
+    
+export DAQ_LOG_HOME=${DAQ_HOME}/log
+export DAQ_CONF_HOME=${DAQ_HOME}/conf
+DAQ_LOG_FILE=${DAQ_LOG_HOME}/daqprocess.log
+export C2MON_PROPERTIES_FILE=${DAQ_CONF_HOME}/daq.properties
+    
+# Check which log4j configuration script should be used
+if [ -f ${DAQ_CONF_HOME}/${PROCESS_NAME}_log4j.xml ] ; then
+  export  LOG4J_CONF_FILE=${DAQ_CONF_HOME}/${PROCESS_NAME}_log4j.xml
+else
+  # set the default one
+  export LOG4J_CONF_FILE=${DAQ_CONF_HOME}/log4j.xml
+fi
        
                            ]]>
             </preExec>
          </startscript>
 
+         
+      </application>
+      
+      <application name="prod" >
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-clic">
             <backupPolicy keepBackups="2">
                <preserve type="dir" name="log" />
             </backupPolicy>
-         </deployment>
-
-      </application>
-
-      <application name="dmn2-daq-clic-pro" extends="default">
-
-         <deployment>
             <directory name="conf">
                <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
-               <!-- copy over pro. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
                <file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
-            </directory>
-            <directory name="bin">
-               <file name="DMN2-DAQ-CLIC*.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-            </directory>
-
-            <notification>
-               <!-- you can give more than one mail for deployment notification -->
+             </directory>
+             <notification>
                <mail address="diamon-developers@cern.ch" />
             </notification>
-
          </deployment>
       </application>
-
-      <application name="dmn2-daq-clic-dev" extends="default">
-
-         <deployment>
+      
+      <application name="dev" >
+         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-clic">
+            <backupPolicy keepBackups="2">
+               <preserve type="dir" name="log" />
+            </backupPolicy>
             <directory name="conf">
-               <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
-               <!-- copy over dev. daq log4j configuration -->
-               <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
-               <file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
-            </directory>
-            <directory name="bin">
-               <file name="DMN2-DAQ-CLIC*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-            </directory>
+               <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
+               <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
+               <file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
+             </directory>
          </deployment>
+      </application>
+      
 
+      <application name="dmn2-daq-clic-pro" extends="dev">
+         <startscript name="DMN2-DAQ-CLIC-VMW.jvm" />
+         <startscript name="DMN2-DAQ-CLIC-VML.jvm" />
+         <startscript name="DMN2-DAQ-CLIC-LHC.jvm" />
+         <startscript name="DMN2-DAQ-CLIC-MISC.jvm" />
+         <startscript name="DMN2-DAQ-CLIC-MISC_FEC.jvm" />
       </application>
 
+      
    </product>
 </products>
