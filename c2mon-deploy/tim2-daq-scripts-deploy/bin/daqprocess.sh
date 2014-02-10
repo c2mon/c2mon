@@ -388,8 +388,7 @@ TIMDAQ_printBasicUsageInfo() {
     echo "                     established}                                            "
     echo "  -noDeadband       {disables all dynamic deadband filtering; static         "
     echo "                     deadbands remain active}                                "
-    echo "  -transition       {starts the DAQ in transiton configuration (TIM1 as main "
-    echo "                     , TIM2 as second}                                       "
+    echo "                                                                             "
     echo " e.g: $0 start P_TEST01 -testMode -c /tmp/testconf.xml                       "
     echo "*****************************************************************************"
   else
