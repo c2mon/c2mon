@@ -73,11 +73,16 @@ fi
                <mail address="diamon-developers@cern.ch" />
             </notification>
          </deployment>
+         <startscript name="DMN2-DAQ-CLIC-VMW.jvm" />
+         <startscript name="DMN2-DAQ-CLIC-VML.jvm" />
+         <startscript name="DMN2-DAQ-CLIC-LHC.jvm" />
+         <startscript name="DMN2-DAQ-CLIC-MISC.jvm" />
+         <startscript name="DMN2-DAQ-CLIC-MISC_FEC.jvm" />
       </application>
       
       <application name="dev" >
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-clic">
-            <backupPolicy keepBackups="2">
+            <backupPolicy keepBackups="1">
                <preserve type="dir" name="log" />
             </backupPolicy>
             <directory name="conf">
@@ -86,16 +91,14 @@ fi
                <file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
              </directory>
          </deployment>
-      </application>
-      
-
-      <application name="dmn2-daq-clic-pro" extends="dev">
          <startscript name="DMN2-DAQ-CLIC-VMW.jvm" />
          <startscript name="DMN2-DAQ-CLIC-VML.jvm" />
          <startscript name="DMN2-DAQ-CLIC-LHC.jvm" />
          <startscript name="DMN2-DAQ-CLIC-MISC.jvm" />
          <startscript name="DMN2-DAQ-CLIC-MISC_FEC.jvm" />
       </application>
+      
+
 
       
    </product>
