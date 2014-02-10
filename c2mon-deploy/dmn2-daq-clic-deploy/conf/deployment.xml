@@ -6,7 +6,7 @@
          this application section is a parent configuration for both
          PROD and TEST
       -->
-      <application name="default">
+      <application>
          
          <startscript>
             <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
@@ -59,7 +59,7 @@ fi
          
       </application>
       
-      <application name="prod" extends="default">
+      <application name="prod" >
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-clic">
             <backupPolicy keepBackups="2">
                <preserve type="dir" name="log" />
@@ -75,7 +75,7 @@ fi
          </deployment>
       </application>
       
-      <application name="dev" extends="default">
+      <application name="dev" >
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-clic">
             <backupPolicy keepBackups="2">
                <preserve type="dir" name="log" />
