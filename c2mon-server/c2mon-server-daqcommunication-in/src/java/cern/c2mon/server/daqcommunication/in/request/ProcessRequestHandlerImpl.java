@@ -36,9 +36,6 @@ import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessMessageConverter;
 import cern.c2mon.shared.daq.process.ProcessRequest;
-import cern.c2mon.shared.daq.process.backward.ProcessDisconnectionBC;
-import cern.c2mon.shared.daq.process.backward.ProcessRequestBC;
-import cern.c2mon.shared.daq.process.backward.ProcessRequestConverterBC;
 
 
 /**
@@ -66,27 +63,15 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
    */
   private ProcessMessageConverter processMessageConverter;
   
-  /**   
-   * Reference to the converter object. 
-   * 
-   * TODO: ProcessRequestConverterBC (Backward Compatibility) Remove   
-   */ 
-  private ProcessRequestConverterBC processRequestConverterBC;
-  
   /**
    * Constructor used to instantiate the bean.
    * @param supervisionManager the supervision manager to wire in
-   * @param processRequestConverterBC the converter to wire in (Backward Compatibility) Remove
    */
   @Autowired
-  public ProcessRequestHandlerImpl(final SupervisionManager supervisionManager, 
-                  final ProcessRequestConverterBC processRequestConverterBC) {
+  public ProcessRequestHandlerImpl(final SupervisionManager supervisionManager) {
     super();
     this.supervisionManager = supervisionManager;   
     this.processMessageConverter = new ProcessMessageConverter();
-    
-    // TODO: ProcessRequestConverterBC (Backward Compatibility) Remove
-    this.processRequestConverterBC = processRequestConverterBC;
   }
 
 
@@ -104,23 +89,6 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
   @Override
   public void onMessage(final Message message, final Session session) throws JMSException {
     LOGGER.debug("onMessage() - Message coming " + message);
-    
-    // TODO: ProcessDisconnection (Backward Compatibility) Remove
-    try {
-      ProcessRequestBC processRequestBC = (ProcessRequestBC) processRequestConverterBC.fromMessage(message);
-      
-      // ProcessDisconnection
-      if (processRequestBC instanceof ProcessDisconnectionBC) {             
-        supervisionManager.old_onProcessDisconnection((ProcessDisconnectionBC) processRequestBC);                   
-        if (LOGGER.isDebugEnabled()) {         
-          LOGGER.debug("Process disconnection completed for DAQ " + ((ProcessDisconnectionBC) processRequestBC).getProcessName());       
-        } 
-        
-        return;
-      }
-    } catch (MessageConversionException e) {
-      LOGGER.info("onMessage - Backward Compatibility - Exception caught while converting incoming DAQ request for Disconnection- unable to process request", e);
-    }
     
     try {
       ProcessRequest processRequest = (ProcessRequest) this.processMessageConverter.fromMessage(message);

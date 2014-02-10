@@ -6,9 +6,6 @@
 	                    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
   <!-- contains beans for requests to DAQ layer; JMS container lifecycle is managed directly by Spring -->
-  		
-  	<!-- (Backward Compatibility for disconnection) Remove -->
-    <bean id="processRequestConverterBC" class="cern.c2mon.shared.daq.process.backward.ProcessRequestConverterBC" init-method="init"/>
     
 	<bean id="requestDestination" class="org.apache.activemq.command.ActiveMQQueue">
 	 <constructor-arg index="0" value="${jms.process.requestQueue}"/>
