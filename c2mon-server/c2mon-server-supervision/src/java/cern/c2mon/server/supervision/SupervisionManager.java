@@ -19,12 +19,10 @@
 package cern.c2mon.server.supervision;
 
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
-import cern.c2mon.shared.daq.process.backward.ProcessDisconnectionBC;
 
 /**
  * Module interface of the bean in charge of the overall supervision
@@ -116,20 +114,4 @@ public interface SupervisionManager {
    * @param sourceDataTagValue the incoming value of the ControlTag
    */
   void processControlTag(SourceDataTagValue sourceDataTagValue);
-  
-  /**
-   * TODO: Backward compatibility. remove after updating server
-   */
-  
-  /**
-   * Take the necessary action on the reception of a {@link ProcessDisconnectionBC}
-   * message sent by a DAQ.
-   * 
-   * <p>Implements the synchronization and exception handling described
-   * in the class documentation.
-   * 
-   * @param processDisconnection the disconnection message
-   */
- void old_onProcessDisconnection(ProcessDisconnectionBC processDisconnection);
-  
 }

@@ -61,7 +61,6 @@ import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
 import cern.c2mon.shared.daq.process.XMLConverter;
-import cern.c2mon.shared.daq.process.backward.ProcessDisconnectionBC;
 
 
 /**
@@ -1086,79 +1085,5 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     }
 
     return this.xmlConverter.toXml(processConnectionResponse);
-  }
-  
-  /**
-   * TODO: Backward compatibility. remove after updating server
-   */
-  
-  @Override
-  public void old_onProcessDisconnection(ProcessDisconnectionBC processDisconnectionBC) {
-    // (1) Print some debug output
-  
-    if (LOGGER.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("onProcessDisconnection([");
-      str.append(processDisconnectionBC.getProcessName());
-      str.append(", ");
-      str.append(processDisconnectionBC.getStartupTime());
-      str.append("]) called.");
-      LOGGER.debug(str);
-    }
-    //TODO remove inaccessible once fixed on client
-    //int invalidationFlags = DataTagQuality.INACCESSIBLE + DataTagQuality.PROCESS_DOWN;
-    
-    Process process;
-    //check if id was sent - if not use name field
-    
-    try {
-      Long processId;
-      // (2) Check if the process exists (get methods throw exception otherwise)
-      if (processDisconnectionBC.getProcessId() != null) {
-        processId = processDisconnectionBC.getProcessId();
-      } else {
-        processId = processCache.getProcessId(processDisconnectionBC.getProcessName());
-      }
-      processCache.acquireWriteLockOnKey(processId);  
-      try {
-        process = processCache.get(processId);
-        try {
-          // (4) Only proceed if the process is actually running
-          if (processFacade.isRunning(process)) {
-           
-            String processStopMessage = "DAQ process " + process.getName() + "was stopped.";
-            
-            // (5) LEGACY: TODO what does this comment mean?!
-            Timestamp stopTime = new Timestamp(System.currentTimeMillis());
-            processFacade.stop(processId, stopTime); //also stops alive timer          
-            
-            // (7) Update process state tag
-            stopStateTag(process.getStateTagId(), stopTime, processStopMessage);          
-            stopEquipments(process.getEquipmentIds(), stopTime, processStopMessage); //state tags to stopped
-            // (8) Invalidate alive tag (no need to synchronize here as no "if then" update statement
-            //dataTagFacade.setQuality(aliveTag, invalidationFlags, 0, processStopMessage, stopTime);              
-            // (9) Invalidate attached equipment (if any) -- keep lock on parent process (TODO config loader should hold lock on process while it runs?)
-            //setControlTagsQuality(process, processStopMessage, stopTime, 
-            //                        true, true, true,                       //invalidate state, alive and commfault tags
-            //                        invalidationFlags, 0);
-          } else {
-            LOGGER.warn("Received Process disconnection message for "
-                + "a process that is not running (Id is " + process.getId() + ")");
-          }
-         
-        } catch (CacheElementNotFoundException cacheEx) {          
-          LOGGER.error("State tag " + process.getStateTagId() + " or the alive tag "
-              + process.getAliveTagId() + " for process " + process.getId() + "could not be found in the "
-              + "cache - disconnection actions could not be completed.");
-        }
-      } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.error("Process object could not be retrieved from cache - disconnection actions may be incomplete.", cacheEx);
-      } finally {
-        processCache.releaseWriteLockOnKey(processId);
-      }      
-    } catch (IllegalArgumentException argEx) {
-      LOGGER.error("IllegalArgument exception caught on processing DAQ disconnection - disconnection actions may be incomplete.", argEx);      
-    } catch (NullPointerException nullEx) {
-      LOGGER.error("NullPointer exception caught on processing DAQ disconnection - disconnection actions may be incomplete.", nullEx);
-    }
   }
 }

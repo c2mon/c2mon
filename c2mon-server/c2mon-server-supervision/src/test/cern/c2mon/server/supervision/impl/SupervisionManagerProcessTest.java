@@ -22,7 +22,6 @@ import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
 import cern.c2mon.shared.daq.process.XMLConverter;
-import cern.c2mon.shared.daq.process.backward.ProcessDisconnectionBC;
 
 /**
  * Integration test of supervision module for all Process Messaging (PIK, Connection, Disconnection)
@@ -82,11 +81,6 @@ public class SupervisionManagerProcessTest {
    * Process Disconnection Request
    */
   private ProcessDisconnectionRequest processDisconnectionRequest;
-  
-  /**
-   * Process Disconnection (Backward Compatibility)
-   */
-//  private ProcessDisconnectionBC processDisconnectionBC;
   
   /**
    * XML Converter helper class
@@ -390,31 +384,5 @@ public class SupervisionManagerProcessTest {
     LOGGER.info(processDisconnectionRequest);
     
     this.supervisionManager.onProcessDisconnection(this.processDisconnectionRequest); 
-  }
-  
-  /**
-   * TODO: Backward compatibility. remove after updating server
-   */
-  
-//  @Test
-//  public void testOnProcessDisconnectionBC() {
-//    LOGGER.info("Starting test testOnProcessDisconnectionBC");
-//    
-//    // Guess we have an old DAQ running
-//    
-//    this.processDisconnectionBC = new ProcessDisconnectionBC(GOOD_PROCESSNAME, new Timestamp(System.currentTimeMillis()).getTime());
-//    
-//    old_onProcessDisconnection();
-//  }
-//  
-//  /**
-//   * Process Disconnection call for BC
-//   */
-//  public void old_onProcessDisconnection() {   
-//    LOGGER.info("BC Disconnection");
-//    
-//    LOGGER.info(processDisconnectionRequest);
-//    
-//    this.supervisionManager.old_onProcessDisconnection(this.processDisconnectionBC); 
-//  }
+  } 
 }
