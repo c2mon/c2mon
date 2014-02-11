@@ -56,6 +56,10 @@
 			<artifactId>spring-beans</artifactId>
 		</dependency>
 
+		<dependency>
+		   <groupId>cern.accsoft.security</groupId>
+		   <artifactId>accsoft-security-rba-util</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
