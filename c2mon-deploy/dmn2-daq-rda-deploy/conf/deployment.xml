@@ -49,6 +49,12 @@
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
                <file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
             </directory>
+            <startscript name="DMN2-DAQ-RDA_BIS">
+               <env name="PROCESS_NAME" value="P_RDA_BIS" />
+            </startscript>
+            <startscript name="DMN2-DAQ-RDA_PLC">
+               <env name="PROCESS_NAME" value="P_RDA_PLC" />
+            </startscript>
          </deployment>
 
       </application>
