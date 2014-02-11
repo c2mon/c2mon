@@ -109,7 +109,6 @@ TIMDAQ_EchoXMLFeedback() {
   echo "  <status-code>${EXEC_CODE}</status-code>";
   echo "  <status-description><![CDATA[${EXEC_DESCR}]]></status-description>";
   echo "</execution-status>";
-  exit 0;
 }
 
 # This procedure starts the DAQ process only if it was not running yet.
@@ -130,10 +129,10 @@ TIMDAQ_start() {
       if [ $USE_XML_PROTOCOL -eq 0 ] ; then
          echo_warning
          echo "DAQ Process ${PROCESS_NAME} seems to be running on host $host. Stop it first."
-         echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTART\tFAILED\t(running)" >> $DAQ_LOG_FILE
       else
          TIMDAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} seems to be running. Stop it first."
       fi
+      echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTART\tFAILED\t(running)" >> $DAQ_LOG_FILE
     fi
   else
     really_start
@@ -168,20 +167,20 @@ really_start() {
       echo_failure
       echo "DAQ Process ${PROCESS_NAME} could not be started."
       echo
-      echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTART\tFAILED" >> $DAQ_LOG_FILE
     else
       TIMDAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} could not be started."
     fi
+    echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTART\tFAILED" >> $DAQ_LOG_FILE
 
   else
     echo "$pid $DAQ_HOST" > ${PID_FILE}
     if [ $USE_XML_PROTOCOL -eq 0 ] ; then
       echo_success
       echo
-      echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTART\tOK" >> $DAQ_LOG_FILE
     else
       TIMDAQ_EchoXMLFeedback 0 OK
     fi
+    echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTART\tOK" >> $DAQ_LOG_FILE
 
   fi
 }
@@ -221,10 +220,10 @@ TIMDAQ_stop() {
 
    if [ $? -eq 0 ] ; then
 
-    if [ $USE_XML_PROTOCOL -eq 0 ] ; then
-      echo_warning
-      echo
-      echo -n "Unable to stop DAQ Process ${PROCESS_NAME} gently... killing it..."
+     if [ $USE_XML_PROTOCOL -eq 0 ] ; then
+       echo_warning
+       echo
+       echo -n "Unable to stop DAQ Process ${PROCESS_NAME} gently... killing it..."
      fi
 
      kill -9 $pid
@@ -237,10 +236,10 @@ TIMDAQ_stop() {
        if [ $USE_XML_PROTOCOL -eq 0 ] ; then
          echo_success
          echo
-         echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTOP\tOK\t(kill -9)" >> $DAQ_LOG_FILE
        else
          TIMDAQ_EchoXMLFeedback 0 OK
        fi
+       echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTOP\tOK\t(kill -9)" >> $DAQ_LOG_FILE
 
        RETVAL=0
      else
@@ -248,11 +247,11 @@ TIMDAQ_stop() {
        if [ $USE_XML_PROTOCOL -eq 0 ] ; then
          echo_failure
          echo
-         echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTOP\tFAILED" >> $DAQ_LOG_FILE
          echo "Unable to stop DAQ Process ${PROCESS_NAME}."
        else
          TIMDAQ_EchoXMLFeedback -1 "Unable to stop DAQ Process ${PROCESS_NAME}."
        fi
+       echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTOP\tFAILED" >> $DAQ_LOG_FILE
 
        RETVAL=1
      fi
@@ -262,7 +261,6 @@ TIMDAQ_stop() {
      if [ $USE_XML_PROTOCOL -eq 0 ] ; then
        echo_success
        echo
-       echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTOP\tOK" >> $DAQ_LOG_FILE
      else
        checkProcess=TIMDAQ_status4XML
        if [ $? -eq 0 ] ; then
@@ -270,8 +268,8 @@ TIMDAQ_stop() {
        else
          TIMDAQ_EchoXMLFeedback -1 "DAQ Process ${PROCESS_NAME} does not seem to be running"
        fi
-
      fi
+     echo -e "$TIME\t$PROCESS_NAME\t$DAQ_HOST\tSTOP\tOK" >> $DAQ_LOG_FILE
 
      rm -f $PID_FILE
    fi
