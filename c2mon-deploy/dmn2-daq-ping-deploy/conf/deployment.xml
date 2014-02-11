@@ -7,7 +7,7 @@
          PROD and TEST
       -->
       <application>
-         <startscript name="DMN2-DAQ-PING" >
+         <startscript name="DMN2-DAQ-PING_01" >
             <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
                <arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName ${PROCESS_NAME} -noDeadband </arg>
                <output>
@@ -30,9 +30,6 @@
                <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
                <file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
-            </directory>
-            <directory name="bin">
-               <file name="DMN2-DAQ-PING*.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
             </directory>
             <notification>
                <mail address="diamon-developers@cern.ch" />
