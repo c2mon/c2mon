@@ -6,80 +6,47 @@
          this application section is a parent configuration for both
          c2mon-dmn2-prod and c2mon-dmn2-test
       -->
-      <application name="default">
+      <!-- this application section is a parent configuration for both PROD and TEST -->
+      <application>
 
-         <startscript name="DMN2-DAQ">
+         <startscript name="DMN2-DAQ-CMWADM" >
             <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-               <arg>-c2monProperties ${C2MON_PROPERTIES_FILE} -log4j ${LOG4J_CONF_FILE} -daqConf ${DAQ_CONF_HOME}/daq.conf -processName ${PROCESS_NAME} -noDeadband ${ADDITIONAL_PARAMS}</arg>
-
+               <arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName ${PROCESS_NAME} -noDeadband </arg>
                <output>
                   <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
                </output>
-
             </main-class>
-
-            <java-vm-args>${DAQ_VM_ARGS}</java-vm-args>
-
             <property name="c2mon.process.name" value="${PROCESS_NAME}" />
-            <property name="c2mon.log.dir" value="${DAQ_LOG_HOME}" />
-            <property name="c2mon.daq.spring.context" value="file:${DAQ_CONF_HOME}/daq-core-service.xml" />
-
-            <preExec>
-                          <![CDATA[
-                            [[ -z $DAQ_VM_ARGS ]] && echo "DAQ_VM_ARGS not set!" && exit 1
-                            [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
-                            [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
-                            [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
-                            [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
-                            [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
-                            [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
-                           ]]>
-            </preExec>
+            <property name="c2mon.log.dir" value="log" />
+            <property name="c2mon.daq.spring.context" value="file:conf/daq-core-service.xml" />
+            <java-vm-args>-Xms512m -Xmx512m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+            <env name="PROCESS_NAME" value="P_CMWADM" />
          </startscript>
-
-         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-cmwadm">
-            <backupPolicy keepBackups="2">
-               <preserve type="dir" name="log" />
-            </backupPolicy>
-         </deployment>
-
       </application>
 
-      <application name="dmn2-daq-cmwadm-pro" extends="default">
 
-         <deployment>
+      <application name="dmn2-daq-cmwadm-pro">
+         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-cmwadm">
             <directory name="conf">
                <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
-               <!-- copy over pro. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
                <file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
             </directory>
-            <directory name="bin">
-               <file name="DMN2-DAQ-CMWADM*.jvm" sourceDir="~diamonop/c2mon/daq/bin" mask="744" />
-            </directory>
-
             <notification>
-               <!-- you can give more than one mail for deployment notification -->
                <mail address="diamon-developers@cern.ch" />
             </notification>
-
          </deployment>
+         
       </application>
 
-      <application name="dmn2-daq-cmwadm-dev" extends="default">
-
-         <deployment>
+      <application name="dmn2-daq-cmwadm-dev">
+         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-cmwadm-dev">
             <directory name="conf">
                <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
-               <!-- copy over dev. daq log4j configuration -->
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
                <file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
             </directory>
-            <directory name="bin">
-               <file name="DMN2-DAQ-CMWADM*.jvm" sourceDir="~dmndev/c2mon/daq/bin" mask="744" />
-            </directory>
          </deployment>
-
       </application>
 
    </product>

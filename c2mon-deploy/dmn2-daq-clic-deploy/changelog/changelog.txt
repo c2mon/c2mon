@@ -1,6 +1,11 @@
 dmn2-daq-clic version history log
 ==============================
 
+10/02/2014
+ -----------------------------------------
+ * FE: DMN-1583 Cleanup of DMN DAQ script generation Restructured the CLIC DAQ startup scripts.
+
+
  -----------------------------------------
 10/04/2013, mmitev, release version 1.0.0
 * DMN-1414 - improvement: Create new deployment module for the DIAMON CLIC DAQ
