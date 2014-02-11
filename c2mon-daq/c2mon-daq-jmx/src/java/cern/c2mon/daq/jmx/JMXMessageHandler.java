@@ -32,18 +32,17 @@ import javax.management.remote.JMXServiceURL;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
-import cern.c2mon.patterncache.PatternCache;
-import cern.c2mon.patterncache.PatternCacheFileWatchdog;
-
-import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.patterncache.PatternCache;
+import cern.c2mon.patterncache.PatternCacheFileWatchdog;
 import cern.c2mon.shared.common.datatag.address.JMXHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.JMXHardwareAddress.ReceiveMethod;
 import cern.c2mon.shared.daq.command.ISourceCommandTag;
@@ -52,6 +51,7 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.rba.util.lookup.RbaTokenLookup;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
@@ -151,8 +151,8 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
             while (!mbeanServiceConnected && !Thread.interrupted()) {
                 try {
-                    if (logger.isDebugEnabled())
-                        logger.debug(format("trying to connect to JMX service: %s", handler.getJmxServiceUrl()));
+                    
+                    logger.debug(format("trying to connect to JMX service: %s", handler.getJmxServiceUrl()));
 
                     JMXServiceURL url = new JMXServiceURL(jmxServiceUrl);
 
@@ -166,7 +166,21 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                         env.put("jmx.remote.credentials", credentials);
                         jmxc = JMXConnectorFactory.connect(url, env);
                     } else {
-                        jmxc = JMXConnectorFactory.connect(url, null);
+                        //try rbac credentials
+                        try {
+                            Map<String, Object> e = new HashMap<String, Object>();
+                            e.put(JMXConnector.CREDENTIALS, RbaTokenLookup.findRbaToken());
+                            jmxc = JMXConnectorFactory.connect(url, null);
+                        } catch (final Exception ignore) {
+                            // IGNORE
+                        }
+                        
+                        // try no password
+                        try {
+                            jmxc = JMXConnectorFactory.connect(url, null);
+                        } catch (final Exception error) {
+                            throw new Exception("RBAC token & plain text authorization failed.");
+                        }
                     }
 
                     srvcon = jmxc.getMBeanServerConnection();
@@ -197,7 +211,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                     try {
                         Thread.sleep(MBEAN_CONNECTION_RETRY_TIMOUT);
                     } catch (InterruptedException e) {
-                        logger.warn(e);
+                        logger.warn("Interrupted while waiting for connection timeout " + e);
                         interrupted = true;
                     }
                 }// catch
@@ -207,19 +221,13 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             // NOTE: this thread may be interrupted from method disconnectFromDataSource()
             if (!interrupted) {
 
-                logger.info(format("requesting update for %d tags belonging to service: %s", this.tags.size(),
+                logger.info(format("requesting update for %d tags belonging to service: %s", Integer.valueOf(this.tags.size()),
                         handler.getJmxServiceUrl()));
                 initDataTags();
 
                 // iterate throughout the tag list and register tags
                 for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
-                    try {
-                        registerTag(tag);
-                    } catch (TagOperationException ex) {
-                        logger.error(ex.getMessage());
-                        getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
-                                ex.getMessage());
-                    }
+                    registerTag(tag);
                 }
             }
 
@@ -304,7 +312,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         }
 
         @Override
-        public void handleNotification(Notification notification, @SuppressWarnings("unused") Object handback) {
+        public void handleNotification(Notification notification, Object handback) {
             if (logger.isTraceEnabled())
                 logger.trace(format("handleNotification: received notification [%s]", notification.getMessage()));
 
@@ -362,7 +370,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
      */
     void jmxStartPoller(final ISourceDataTag tag, final int pollingTime) {
         if (logger.isTraceEnabled())
-            logger.trace(format("entering startPoller(%d,%d)..", tag.getId(), pollingTime));
+            logger.trace(format("entering startPoller(%d,%d)..", tag.getId(), Integer.valueOf(pollingTime)));
 
         scheduledFutures.put(tag.getId(), executor.scheduleAtFixedRate(new PollerTask(this, tag), pollingTime,
                 pollingTime, TimeUnit.MILLISECONDS));
@@ -407,7 +415,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
         JMXHardwareAddress addr = (JMXHardwareAddress) tag.getHardwareAddress();
 
-        StringBuilder errorMsg = null;
+        String errorMsg = null;
         boolean invalidateTag = false;
 
         if (addr.getReceiveMethod() == ReceiveMethod.notification) {
@@ -417,21 +425,19 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                 srvcon.addNotificationListener(mbeanName, updateListener, null, null);
                 this.jmxUpdateListeners.put(tag.getId(), updateListener);
             } catch (InstanceNotFoundException ex) {
-                errorMsg = new StringBuilder("The specified MBean does not exist in the repository: ").append(ex
-                        .getMessage());
+                errorMsg = "The specified MBean does not exist in the repository: " + ex.getMessage();
                 invalidateTag = true;
             } catch (Exception ex) {
-                errorMsg = new StringBuilder("Could not register notification listener for mbean :").append(ex
-                        .getMessage());
+                errorMsg = "Could not register notification listener for mbean :" + ex.getMessage();
                 invalidateTag = true;
             }
 
             if (invalidateTag) {
                 logger.error(format("Exception caught while trying to open subscription for tag[%d]. error: %s",
-                        tag.getId(), errorMsg.toString()));
+                        tag.getId(), errorMsg));
                 logger.error(format("Invalidating tag[%d] with quality: INCORRECT_NATIVE_ADDRESS", tag.getId()));
                 getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
-                        errorMsg.toString());
+                        errorMsg);
             }
 
         } else {
@@ -635,7 +641,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         JMXHardwareAddress addr = (JMXHardwareAddress) tag.getHardwareAddress();
 
         boolean sendInvalid = false;
-        StringBuilder errorMsg = null;
+        String errorMsg = null;
 
         try {
 
@@ -663,7 +669,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
             if (rawValue == null) {
 
-                errorMsg = new StringBuilder("Could not extract value from JMX attribute. Check your configuration");
+                errorMsg = "Could not extract value from JMX attribute. Check your configuration";
                 sendInvalid = true;
             }
 
@@ -684,28 +690,26 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             }// !sendInvalid
 
         } catch (MalformedObjectNameException ex) {
-            errorMsg = new StringBuilder("The format of the string does not correspond to a valid ObjectName: ")
-                    .append(ex.getMessage());
+            errorMsg = "The format of the string does not correspond to a valid ObjectName: " + ex.getMessage();
             sendInvalid = true;
         } catch (AttributeNotFoundException ex) {
-            errorMsg = new StringBuilder("The specified attribute does not exist or cannot be retrieved: ").append(ex
-                    .getMessage());
+            errorMsg = "The specified attribute does not exist or cannot be retrieved: " + ex
+                    .getMessage();
             sendInvalid = true;
         } catch (InstanceNotFoundException ex) {
-            errorMsg = new StringBuilder("The specified MBean does not exist in the repository: ").append(ex
-                    .getMessage());
+            errorMsg = "The specified MBean does not exist in the repository: " + ex.getMessage();
             sendInvalid = true;
         } catch (Exception ex) {
             sendInvalid = true;
-            errorMsg = new StringBuilder("Extracting data from JMX bean failed: " + ex.getMessage());
+            errorMsg = "Extracting data from JMX bean failed: " + ex.getMessage();
         }
 
         if (sendInvalid) {
             if (logger.isDebugEnabled())
                 logger.debug(format("Invalidating tag[%d] with quality INCORRECT_NATIVE_ADDRESS and description: %s",
-                        tag.getId(), errorMsg.toString()));
+                        tag.getId(), errorMsg));
             getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
-                    errorMsg.toString());
+                    errorMsg);
         }
 
         if (logger.isTraceEnabled())
@@ -811,7 +815,6 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     }
 
     @Override
-    @SuppressWarnings("unused")
     public void disconnectFromDataSource() throws EqIOException {
         logger.debug("entering diconnectFromDataSource()..");
 
@@ -864,7 +867,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     }
 
     @Override
-    public void refreshDataTag(@SuppressWarnings("unused") long dataTagId) {
+    public void refreshDataTag(long dataTagId) {
         // TODO Auto-generated method stub
 
     }
@@ -933,13 +936,8 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         changeReport.setState(CHANGE_STATE.SUCCESS);
 
         // register tag
-        try {
-            registerTag(sourceDataTag);
-        } catch (TagOperationException ex) {
-            changeReport.setState(CHANGE_STATE.FAIL);
-            changeReport.appendError(ex.getMessage());
-        }
-
+        registerTag(sourceDataTag);
+        
         if (logger.isDebugEnabled())
             logger.debug(format("leaving onAddDataTag(%d)", sourceDataTag.getId()));
     }
@@ -977,13 +975,10 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             } catch (TagOperationException ex) {
                 changeReport.appendWarn(ex.getMessage());
             }
-            try {
-                logger.debug(format("calling  registerTag(%d)..", sourceDataTag.getId()));
-                registerTag(sourceDataTag);
-            } catch (TagOperationException ex) {
-                changeReport.setState(CHANGE_STATE.FAIL);
-                changeReport.appendError(ex.getMessage());
-            }
+            
+            logger.debug(format("calling  registerTag(%d)..", sourceDataTag.getId()));
+            registerTag(sourceDataTag);
+            
         }// if
         else {
             changeReport.appendInfo("No change detected in the tag hardware address. No action effected");
@@ -993,7 +988,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             logger.debug(format("leaving onUpdateDataTag(%d,%d)", sourceDataTag.getId(), oldSourceDataTag.getId()));
     }
 
-    boolean isTagAlreadyRegistered(final long tagId) {
+    boolean isTagAlreadyRegistered(final Long tagId) {
         boolean result = true;
         if (!this.jmxUpdateListeners.containsKey(tagId)) {
             if (!this.scheduledFutures.containsKey(tagId)) {
@@ -1004,7 +999,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         return result;
     }
 
-    boolean isTagPollerRegistered(final long tagId) {
+    boolean isTagPollerRegistered(final Long tagId) {
         boolean result = true;
         if (!this.scheduledFutures.containsKey(tagId)) {
             result = false;
@@ -1013,7 +1008,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         return result;
     }
 
-    boolean isTagUpdateListenerRegistered(final long tagId) {
+    boolean isTagUpdateListenerRegistered(final Long tagId) {
         boolean result = true;
         if (!this.jmxUpdateListeners.containsKey(tagId)) {
             result = false;
@@ -1022,7 +1017,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         return result;
     }
 
-    void registerTag(ISourceDataTag tag) throws TagOperationException {
+    void registerTag(ISourceDataTag tag) {
         if (logger.isTraceEnabled())
             logger.trace(format("entering registerTag(%d)", tag.getId()));
 
