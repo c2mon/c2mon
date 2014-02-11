@@ -156,7 +156,7 @@ public class SSHCommandRunner implements ICommandRunner {
 
       StringBuffer feedbackBuffer = new StringBuffer("");
       String line;
-      while ((line = stdout.readLine()) != null) {
+      while ((line = stdout.readLine()) != null && !line.equalsIgnoreCase("logout")) {
         feedbackBuffer.append(line);
       }
 

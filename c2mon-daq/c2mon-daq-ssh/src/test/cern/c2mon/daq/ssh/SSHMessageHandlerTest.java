@@ -8,13 +8,17 @@
 package cern.c2mon.daq.ssh;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import cern.c2mon.daq.ssh.SSHMessageHandler;
+import cern.c2mon.daq.ssh.tools.SSHHelper;
+import cern.c2mon.daq.ssh.tools.SSHXMLExecutionFeedback;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 
 /**
  * This class implements a set of JUnit tests for <code>SSHMessageHandler</code>. All tests that require
@@ -32,9 +36,7 @@ public class SSHMessageHandlerTest extends GenericMessageHandlerTst {
 
     @Override
     protected void beforeTest() throws Exception {
-
         sshHandler = (SSHMessageHandler) msgHandler;
-
     }
 
     @Override
@@ -45,8 +47,13 @@ public class SSHMessageHandlerTest extends GenericMessageHandlerTst {
 
     @Test
     @UseConf("e_ssh_test1.xml")
-    public void test1() {
-        //TODO: a set of tests for SSHMessageHandler needs to be provided
-        assertTrue(true);
+    public void testParseSSHExecutionFeedback() throws EqCommandTagException, EqIOException {
+      sshHandler.connectToDataSource();
+      String xmlFeedback = "<?xml version = \"1.0\"?><execution-status><status-code>0</status-code><status-description><![CDATA[OK]]></status-description></execution-status>";
+    
+      SSHHelper helper = sshHandler.getSSHHelper();
+      SSHXMLExecutionFeedback  sshXMLExecutionFeedback = 
+          helper.parseSSHExecutionFeedback(xmlFeedback);
+      assertEquals(sshXMLExecutionFeedback.statusCode, 0);
     }
 }

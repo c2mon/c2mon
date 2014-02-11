@@ -76,7 +76,7 @@ public class SSHMessageHandler extends EquipmentMessageHandler {
 
     // try to parse the equipment address
     try {
-      this.sshHelper.parseExuipmentAddress(this.getEquipmentConfiguration().getAddress());
+      this.sshHelper.parseEquipmentAddress(this.getEquipmentConfiguration().getAddress());
     } catch (EqException ex) {
       throw new EqIOException(ex.getErrorDescription());
     }
@@ -140,5 +140,13 @@ public class SSHMessageHandler extends EquipmentMessageHandler {
   @Override
   public void refreshDataTag(long dataTagId) {
     // TODO Implement this method.
+  }
+  
+  /**
+   * This method is only used for testing purposes
+   * @return The SSH helper class
+   */
+  protected SSHHelper getSSHHelper() {
+    return sshHelper;
   }
 }

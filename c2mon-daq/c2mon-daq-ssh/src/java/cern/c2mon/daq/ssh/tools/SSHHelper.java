@@ -130,8 +130,8 @@ public class SSHHelper {
   }
 
 
-  public void parseExuipmentAddress(String address) throws EqException {
-    this.equipmentLogger.debug("parseExuipmentAddress - entering parseEquipmentAddress()..");
+  public void parseEquipmentAddress(String address) throws EqException {
+    this.equipmentLogger.debug("parseEquipmentAddress - entering parseEquipmentAddress()..");
     // example address :
     // default_server_alias=TIMDAQTEST01:22;default_user_name=timtest;default_user_password=passwd
     // or :
@@ -173,7 +173,7 @@ public class SSHHelper {
       }// while tokens2
     }// while tokens
 
-    this.equipmentLogger.debug("parseExuipmentAddress - leaving parseExuipmentAddress()");
+    this.equipmentLogger.debug("parseEquipmentAddress - leaving parseEquipmentAddress()");
   }
 
   /**
