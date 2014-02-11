@@ -2,14 +2,12 @@
 <products>
    <product name="dmn2-daq-rda">
 
-      <!--
-         this application section is a parent configuration for both
-         PROD and TEST
-      -->
+      <!-- this application section is a parent configuration for both PROD and TEST -->
       <application>
-         <startscript name="DMN2-DAQ-SNMP" >
+         <startscript>
             <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-               <arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName ${PROCESS_NAME} -noDeadband </arg>
+               <arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName
+                  ${PROCESS_NAME} -noDeadband </arg>
                <output>
                   <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
                </output>
@@ -32,31 +30,29 @@
             <notification>
                <mail address="diamon-developers@cern.ch" />
             </notification>
-            <startscript name="DMN2-DAQ-RDA_BIS">
-               <env name="PROCESS_NAME" value="P_RDA_BIS" />
-            </startscript>
-            <startscript name="DMN2-DAQ-RDA_PLC">
-               <env name="PROCESS_NAME" value="P_RDA_PLC" />
-            </startscript>
          </deployment>
+         <startscript name="DMN2-DAQ-RDA_BIS">
+            <env name="PROCESS_NAME" value="P_RDA_BIS" />
+         </startscript>
+         <startscript name="DMN2-DAQ-RDA_PLC">
+            <env name="PROCESS_NAME" value="P_RDA_PLC" />
+         </startscript>
       </application>
 
-      <application name="dmn2-daq-rda-dev" >
-
+      <application name="dmn2-daq-rda-dev">
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-rda-dev">
             <directory name="conf">
                <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
                <file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
             </directory>
-            <startscript name="DMN2-DAQ-RDA_BIS">
-               <env name="PROCESS_NAME" value="P_RDA_BIS" />
-            </startscript>
-            <startscript name="DMN2-DAQ-RDA_PLC">
-               <env name="PROCESS_NAME" value="P_RDA_PLC" />
-            </startscript>
          </deployment>
-
+         <startscript name="DMN2-DAQ-RDA_BIS">
+            <env name="PROCESS_NAME" value="P_RDA_BIS" />
+         </startscript>
+         <startscript name="DMN2-DAQ-RDA_PLC">
+            <env name="PROCESS_NAME" value="P_RDA_PLC" />
+         </startscript>
       </application>
 
    </product>
