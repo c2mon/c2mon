@@ -24,7 +24,7 @@
       </application>
       
 
-      <application name="prod">
+      <application name="dmn2-daq-clic">
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-clic">
             <backupPolicy keepBackups="2">
                <preserve type="dir" name="log" />
@@ -64,7 +64,7 @@
          </startscript>
       </application>
 
-      <application name="dev">
+      <application name="dmn2-daq-clic-dev">
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-clic-dev">
             <backupPolicy keepBackups="1">
                <preserve type="dir" name="log" />
