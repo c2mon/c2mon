@@ -7,7 +7,7 @@
          PROD and TEST
       -->
       <application>
-         <startscript name="DMN2-DAQ-SNMP" >
+         <startscript>
             <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
                <arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName ${PROCESS_NAME} -noDeadband </arg>
                <output>
@@ -18,8 +18,12 @@
             <property name="c2mon.log.dir" value="log" />
             <property name="c2mon.daq.spring.context" value="file:conf/daq-core-service.xml" />
             <java-vm-args>-Xms384m -Xmx384m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+         </startscript>
+         
+         <startscript name="DMN2-DAQ-SNMP_WIE" >
             <env name="PROCESS_NAME" value="P_SNMP_WIE" />
          </startscript>
+         
       </application>
 
       <application name="dmn2-daq-snmp-pro">

@@ -17,6 +17,33 @@
             <property name="c2mon.daq.spring.context" value="file:conf/daq-core-service.xml" />
             <java-vm-args>-Xms512m -Xmx512m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
          </startscript>
+         
+         <!--  these inherit from the unnamed script (above) -->
+         <startscript name="DMN2-DAQ-CLIC_VMW">
+            <env name="PROCESS_NAME" value="P_CLIC_VMW" />
+         </startscript>
+         <startscript name="DMN2-DAQ-CLIC_VML">
+            <env name="PROCESS_NAME" value="P_CLIC_VML" />
+         </startscript>
+         <startscript name="DMN2-DAQ-CLIC_LHC">
+            <env name="PROCESS_NAME" value="P_CLIC_LHC" />
+         </startscript>
+         <startscript name="DMN2-DAQ-CLIC_INJ">
+            <env name="PROCESS_NAME" value="P_CLIC_INJ" />
+         </startscript>
+         <startscript name="DMN2-DAQ-CLIC_SPS">
+            <env name="PROCESS_NAME" value="P_CLIC_SPS" />
+         </startscript>
+         <startscript name="DMN2-DAQ-CLIC_MISC">
+            <env name="PROCESS_NAME" value="P_CLIC_MISC" />
+         </startscript>
+         <startscript name="DMN2-DAQ-CLIC_MISC_FEC">
+            <env name="PROCESS_NAME" value="P_CLIC_MISC_FEC" />
+         </startscript>
+         <startscript name="DMN2-DAQ-CLIC_MISC_WS">
+            <env name="PROCESS_NAME" value="P_CLIC_MISC_WS" />
+         </startscript>
+         
       </application>
 
 
@@ -34,30 +61,6 @@
                <mail address="diamon-developers@cern.ch" />
             </notification>
          </deployment>
-         <startscript name="DMN2-DAQ-CLIC_VMW">
-            <env name="PROCESS_NAME" value="P_CLIC_VMW" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_VML">
-            <env name="PROCESS_NAME" value="P_CLIC_VML" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_LHC">
-            <env name="PROCESS_NAME" value="P_CLIC_LHC" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_INJ">
-            <env name="PROCESS_NAME" value="P_CLIC_INJ" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_SPS">
-            <env name="PROCESS_NAME" value="P_CLIC_SPS" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_MISC">
-            <env name="PROCESS_NAME" value="P_CLIC_MISC" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_MISC_FEC">
-            <env name="PROCESS_NAME" value="P_CLIC_MISC_FEC" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_MISC_WS">
-            <env name="PROCESS_NAME" value="P_CLIC_MISC_WS" />
-         </startscript>
       </application>
 
       <application name="dmn2-daq-clic-dev">
@@ -71,31 +74,6 @@
                <file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
             </directory>
          </deployment>
-
-         <startscript name="DMN2-DAQ-CLIC_VMW">
-            <env name="PROCESS_NAME" value="P_CLIC_VMW" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_VML">
-            <env name="PROCESS_NAME" value="P_CLIC_VML" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_LHC">
-            <env name="PROCESS_NAME" value="P_CLIC_LHC" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_INJ">
-            <env name="PROCESS_NAME" value="P_CLIC_INJ" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_SPS">
-            <env name="PROCESS_NAME" value="P_CLIC_SPS" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_MISC">
-            <env name="PROCESS_NAME" value="P_CLIC_MISC" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_MISC_FEC">
-            <env name="PROCESS_NAME" value="P_CLIC_MISC_FEC" />
-         </startscript>
-         <startscript name="DMN2-DAQ-CLIC_MISC_WS">
-            <env name="PROCESS_NAME" value="P_CLIC_MISC_WS" />
-         </startscript>
       </application>
 
    </product>
