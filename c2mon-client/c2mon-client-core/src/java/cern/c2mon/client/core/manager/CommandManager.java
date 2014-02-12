@@ -75,11 +75,12 @@ public class CommandManager implements C2monCommandManager {
           CommandExecutionStatus.STATUS_AUTHORISATION_FAILED, "No user is logged-in.");
     }
     
-    if (!commandCache.containsKey(commandId)) {
-        getCommandTag(commandId);
+    ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
+    if (cct == null && getCommandTag(commandId) == null) {
+        return new CommandReportImpl(commandId, CommandExecutionStatus.STATUS_CMD_UNKNOWN, "The Command is not known to the server");
     }
         
-    ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
+    cct = commandCache.get(commandId);
     CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, value);
     
     if (!isAuthorized(userName, commandId)) {
