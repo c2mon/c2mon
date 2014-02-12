@@ -74,30 +74,32 @@ public class CommandManager implements C2monCommandManager {
       return new CommandReportImpl(commandId, 
           CommandExecutionStatus.STATUS_AUTHORISATION_FAILED, "No user is logged-in.");
     }
-    else if (!isAuthorized(userName, commandId)) {
-      return new CommandReportImpl(commandId,
-          CommandExecutionStatus.STATUS_AUTHORISATION_FAILED,
-          "The logged user has not the priviledges to execute command " + commandId + ".");
-    }
-    else {
-      if (!commandCache.containsKey(commandId)) {
+    
+    if (!commandCache.containsKey(commandId)) {
         getCommandTag(commandId);
-      }
-        
-      ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
-      CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, value);
-      try {
-        LOG.info("executeCommand() - Executing command " + commandId + " for authorized user " + userName);
-        return clientRequestHandler.executeCommand(executeRequest);
-      }
-      catch (Exception e) {
-        LOG.error("executeCommand() - Catched JMS execption while trying to execute command "
-                  + commandId + ". ", e);
-        return new CommandReportImpl(commandId,
-            CommandExecutionStatus.STATUS_SERVER_ERROR, 
-            "Could not execute the command due to a communication error with the server. Error: " + e.getMessage());
-      }
     }
+        
+    ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
+    CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, value);
+    
+    if (!isAuthorized(userName, commandId)) {
+        return new CommandReportImpl(commandId,
+            CommandExecutionStatus.STATUS_AUTHORISATION_FAILED,
+            "The logged user has not the priviledges to execute command " + commandId + ".");
+    }
+    
+    try {
+      LOG.info("executeCommand() - Executing command " + commandId + " for authorized user " + userName);
+      return clientRequestHandler.executeCommand(executeRequest);
+    }
+    catch (Exception e) {
+      LOG.error("executeCommand() - Catched JMS execption while trying to execute command "
+                + commandId + ". ", e);
+      return new CommandReportImpl(commandId,
+          CommandExecutionStatus.STATUS_SERVER_ERROR, 
+          "Could not execute the command due to a communication error with the server. Error: " + e.getMessage());
+    }
+    
   }
 
   
