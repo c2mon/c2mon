@@ -75,12 +75,16 @@ public class CommandManager implements C2monCommandManager {
           CommandExecutionStatus.STATUS_AUTHORISATION_FAILED, "No user is logged-in.");
     }
     
-    ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
-    if (cct == null && getCommandTag(commandId) == null) {
-        return new CommandReportImpl(commandId, CommandExecutionStatus.STATUS_CMD_UNKNOWN, "The Command is not known to the server");
+    if (!commandCache.containsKey(commandId)) {
+      getCommandTag(commandId);
     }
         
-    cct = commandCache.get(commandId);
+    ClientCommandTagImpl<Object> cct = commandCache.get(commandId);
+    
+    if (!cct.isExistingCommand()) {
+        return new CommandReportImpl(commandId, CommandExecutionStatus.STATUS_CMD_UNKNOWN, "The command with tagId '" + commandId + "' is not known to the server");
+    }
+    
     CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, value);
     
     if (!isAuthorized(userName, commandId)) {
@@ -190,9 +194,17 @@ public class CommandManager implements C2monCommandManager {
     if (value == null) {
       throw new CommandTagValueException("Null value : command values cannot be set to null");
     }
+    
+    if (!commandTag.isExistingCommand()) {
+        throw new CommandTagValueException("Unknown command : " + commandTag.getId() + " is not known to the server.");
+    }
+    
+    if (commandTag.getValueType() == null) {
+        throw new CommandTagValueException("Null value : command value type cannot be set to null");
+    }
 
     if (value.getClass() != commandTag.getValueType()) {
-      throw new CommandTagValueException("Data type : " + commandTag.getValueType().getName() + " expected. Cannot set value of type " + value.getClass().getName() + ".");
+      throw new CommandTagValueException("Data type : " + commandTag.getValueType() + " expected but got type " + value.getClass().getName() + ".");
     }
 
     try {
