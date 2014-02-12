@@ -75,12 +75,12 @@ public interface AlarmFacade extends ConfigurableCacheFacade<Alarm> {
    * <p>Never returns null.
    * 
    * @param alarmId the id of the alarm to evaluate
-   * @param tagId the tag id on which the alarm is defined
+   * @param tag the tag on which the alarm is defined
    * @return Reference of the current Alarm object (whether it changed or not);
    *          intended for publication with the tag itself; never returns null
    * @throws NullPointerException if called with null alarm or tag object
    */
-  Alarm update(Long alarmId, Long tagId);
+  Alarm update(Long alarmId, Tag tag);
 
   /**
    * Evaluates this alarm. Is only updated in cache if the alarm status has changed.

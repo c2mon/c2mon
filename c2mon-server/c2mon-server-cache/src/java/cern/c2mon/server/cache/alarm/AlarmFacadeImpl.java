@@ -194,16 +194,13 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   }
   
   @Override
-  public Alarm update(final Long alarmId, final Long tagId) {
+  public Alarm update(final Long alarmId, final Tag tag) {
     alarmCache.acquireWriteLockOnKey(alarmId);
-    tagLocationService.acquireReadLockOnKey(tagId);
     try {
       Alarm alarm = alarmCache.get(alarmId);
-      Tag tag = tagLocationService.get(tagId);
       // Notice, in this case the update() method is putting the changes back into the cache
       return update(alarm, tag);
     } finally {
-      tagLocationService.releaseReadLockOnKey(tagId);
       alarmCache.releaseWriteLockOnKey(alarmId);
     } 
   }

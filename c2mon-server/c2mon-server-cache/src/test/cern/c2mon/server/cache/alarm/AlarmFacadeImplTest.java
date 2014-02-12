@@ -71,7 +71,7 @@ public class AlarmFacadeImplTest {
     alarmCache.releaseWriteLockOnKey(currentAlarmState.getId());
     EasyMock.replay(alarmCache, tagLocationService);
     //(1)test update works    
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(currentAlarmState.getId(), tag.getId());
+    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(currentAlarmState.getId(), tag);
     EasyMock.verify(alarmCache, tagLocationService);
 
     assertEquals(AlarmCondition.TERMINATE, newAlarm.getState());
@@ -111,7 +111,7 @@ public class AlarmFacadeImplTest {
     EasyMock.replay(alarmCache, tagLocationService);
     
     //(1)test update works    
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(alarm.getId(), tag.getId());   
+    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(alarm.getId(), tag);   
     
     EasyMock.verify(alarmCache, tagLocationService);
     
@@ -137,7 +137,7 @@ public class AlarmFacadeImplTest {
     alarmCache.releaseWriteLockOnKey(alarm2.getId());
     EasyMock.replay(alarmCache, tagLocationService);
     
-    AlarmCacheObject newAlarm2 = (AlarmCacheObject) alarmFacadeImpl.update(alarm2.getId(), tag.getId());   
+    AlarmCacheObject newAlarm2 = (AlarmCacheObject) alarmFacadeImpl.update(alarm2.getId(), tag);   
     
     EasyMock.verify(alarmCache, tagLocationService);
     

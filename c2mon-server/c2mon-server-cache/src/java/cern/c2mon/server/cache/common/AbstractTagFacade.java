@@ -152,7 +152,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
     tagCache.acquireReadLockOnKey(tag.getId());
     try {
       for (Long alarmId : tag.getAlarmIds()) {
-        linkedAlarms.add(alarmFacade.update(alarmId, tag.getId()));          
+        linkedAlarms.add(alarmFacade.update(alarmId, tag));          
       }
     } finally {
       tagCache.releaseReadLockOnKey(tag.getId());
