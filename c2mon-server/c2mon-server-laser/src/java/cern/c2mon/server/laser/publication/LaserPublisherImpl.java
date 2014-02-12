@@ -202,7 +202,7 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
   @Override
   public void notifyElementUpdated(Alarm alarmCopy) {  
     if (running && initialConnection) {
-      clusterCache.acquireWriteLockOnKey(backupLock);
+      clusterCache.acquireReadLockOnKey(LaserPublisher.backupLock);
       try {
         //get most recent alarm in cache and lock access        
         alarmCache.acquireWriteLockOnKey(alarmCopy.getId());
@@ -244,7 +244,7 @@ public class LaserPublisherImpl implements C2monCacheListener<Alarm>, SmartLifec
           alarmCache.releaseWriteLockOnKey(alarmCopy.getId());
         }         
       } finally {
-        clusterCache.releaseWriteLockOnKey(backupLock);
+        clusterCache.releaseReadLockOnKey(LaserPublisher.backupLock);
       }
     } else {
       log.warn("Unable to publish alarm as LASER publisher module not running/connected - adding to re-publication list (alarm id " + alarmCopy.getId() + ")");
