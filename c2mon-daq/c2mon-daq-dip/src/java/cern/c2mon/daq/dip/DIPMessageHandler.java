@@ -72,10 +72,6 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
         getEquipmentConfiguration().getSourceDataTag(getEquipmentConfiguration().getAliveTagId()), // null if not Tag found
         getEquipmentConfiguration().getAliveTagInterval(), getEquipmentLoggerFactory());
     alivePublisher.start();
-    
-    // Controller
-    this.dipController = new DIPController(this.dipFactory, this.handler, getEquipmentLogger(), 
-        getEquipmentConfiguration(), getEquipmentMessageSender());
 
     if (this.dipFactory == null) {
       try {
@@ -95,6 +91,10 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
 
     // we assume that DIP works
     getEquipmentMessageSender().confirmEquipmentStateOK();
+    
+    // Controller
+    this.dipController = new DIPController(this.dipFactory, this.handler, getEquipmentLogger(), 
+        getEquipmentConfiguration(), getEquipmentMessageSender());
 
     // Add Data Tag Changer
     DIPDataTagChanger dataTagChanger = new DIPDataTagChanger(this.dipController);
