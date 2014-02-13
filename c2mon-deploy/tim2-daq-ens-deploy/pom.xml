@@ -11,7 +11,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>tim2-daq-ens-deploy</artifactId>
   <name>C2MON DAQ ENS deployment module</name>
-  <version>1.1.1-SNAPSHOT</version>
+  <version>1.2.0</version>
 
   <packaging>pom</packaging>
 
