@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>cern.c2mon.c2mon-daq</groupId>
 	<artifactId>c2mon-daq-ens</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1-SNAPSHOT</version>
 	<name>c2mon-daq-ens</name>
 	<packaging>jar</packaging>
 	<description>This is a C2MON ENS DAQ. It lets C2MON to acquiring data from and sending commands to the Electrical Network Supervisor (ENS), 
