@@ -8,7 +8,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-command</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1-SNAPSHOT</version>
   <name>c2mon-server-command</name>
   <packaging>jar</packaging>
   <description>
