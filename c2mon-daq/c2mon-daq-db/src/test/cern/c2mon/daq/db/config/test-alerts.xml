@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="test-timdbdaq">
+	<update id="testUpdateDataTag">
+		UPDATE DB_DAQ
+		SET DBD_VALUE =
+		DECODE(DBD_DATA_TYPE,'Boolean','false',DBD_VALUE + 1),
+		DBD_SOURCE_TIMESTAMP = SYSTIMESTAMP
+		WHERE DBD_TAG_ID = #{dbdTagId}
+	</update>
+
+	<select id="getAllDataTagsNames" resultType="java.lang.String">
+		SELECT DBD_NAME
+		FROM
+		DB_DAQ
+		ORDER BY DBD_TAG_ID
+	</select>
+
+	<select id="getAllDataTagsIds" resultType="java.lang.Long">
+		SELECT DBD_TAG_ID
+		FROM
+		DB_DAQ
+		ORDER BY DBD_TAG_ID
+	</select>
+</mapper>

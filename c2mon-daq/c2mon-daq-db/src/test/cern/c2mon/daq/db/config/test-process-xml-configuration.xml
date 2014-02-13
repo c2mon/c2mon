@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ProcessConfiguration process-id="4208" type="initialise">
+  <jms-user>P_DBDAQ01</jms-user>
+  <jms-password>DBDAQ01_P</jms-password>
+  <jms-qcf-jndi-name>jms/process/factories/QCF</jms-qcf-jndi-name>
+  <jms-queue-jndi-name>jms/process/destinations/queues/processmessage/P_DBDAQ01</jms-queue-jndi-name>
+  <jms-listener-topic>tim.process.command.NOHOST.P_DBDAQ01.NOPIK</jms-listener-topic>
+  <alive-tag-id>145092</alive-tag-id>
+  <alive-interval>60000</alive-interval>
+  <max-message-size>100</max-message-size>
+  <max-message-delay>1000</max-message-delay>
+  <EquipmentUnits>
+<EquipmentUnit id="5365" name="E_DBC_DB01">
+  <handler-class-name>cern.c2mon.daq.db.DBMessageHandler</handler-class-name>
+  <commfault-tag-id>145096</commfault-tag-id>
+  <commfault-tag-value>false</commfault-tag-value>
+  <alive-tag-id>145094</alive-tag-id>
+  <alive-interval>60000</alive-interval>
+  <address></address>
+  <SubEquipmentUnits>
+    <SubEquipmentUnit  id="5366" name="E_DBC_SSMTIM">
+      <commfault-tag-id>145113</commfault-tag-id>
+      <commfault-tag-value>false</commfault-tag-value>
+      <alive-tag-id>145111</alive-tag-id>
+      <alive-interval>60000</alive-interval>
+    </SubEquipmentUnit>
+  </SubEquipmentUnits>
+  <DataTags>
+    <DataTag id="145099" name="CS.MEY.DBTAG_01:ALARM" control="false">
+      <mode>2</mode>
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CEDARMGR.MY_TAG_01</db-item-name>
+        </HardwareAddress>
+        <time-to-live>9999999</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145100" name="CS.MEY.DBTAG_02:ALARM" control="false">
+      <mode>2</mode>
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CEDARMGR.MY_TAG_02</db-item-name>
+        </HardwareAddress>
+        <time-to-live>9999999</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145101" name="CS.MEY.DBTAG_03:ALARM" control="false">
+      <mode>2</mode>
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CEDARMGR.MY_TAG_03</db-item-name>
+        </HardwareAddress>
+        <time-to-live>9999999</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145102" name="CS.MEY.DBTAG_04:STATE" control="false">
+      <mode>2</mode>
+      <data-type>Integer</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CEDARMGR.MY_TAG_04</db-item-name>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145103" name="CS.MEY.DBTAG_05:STATE" control="false">
+      <mode>2</mode>
+      <data-type>Integer</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CEDARMGR.MY_TAG_05</db-item-name>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145104" name="CS.MEY.DBTAG_06:STATE" control="false">
+      <mode>2</mode>
+      <data-type>Integer</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CEDARMGR.MY_TAG_06</db-item-name>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145105" name="CS.MEY.DBTAG_07:VALUE" control="false">
+      <mode>2</mode>
+      <data-type>Float</data-type>
+        <min-value data-type="Float">0.0</min-value>
+        <max-value data-type="Float">100.0</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CEDARMGR.MY_TAG_07</db-item-name>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <value-deadband-type>1</value-deadband-type>
+        <value-deadband>1.0</value-deadband>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145106" name="CS.MEY.DBTAG_08:VALUE" control="false">
+      <mode>2</mode>
+      <data-type>Float</data-type>
+        <min-value data-type="Float">0.0</min-value>
+        <max-value data-type="Float">100.0</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CEDARMGR.MY_TAG_08</db-item-name>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <value-deadband-type>1</value-deadband-type>
+        <value-deadband>1.0</value-deadband>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145107" name="CS.MEY.DBTAG_09:VALUE" control="false">
+      <mode>2</mode>
+      <data-type>Float</data-type>
+        <min-value data-type="Float">0.0</min-value>
+        <max-value data-type="Float">100.0</max-value>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CEDARMGR.MY_TAG_09</db-item-name>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <value-deadband-type>1</value-deadband-type>
+        <value-deadband>1.0</value-deadband>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145094" name="CS.PRE.TIMDB-TEST:EQUIP_ALIVE" control="true">
+      <data-type>Long</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>TIMDB.TIMDBDAQ.ALIVE</db-item-name>
+        </HardwareAddress>
+        <time-to-live>300000</time-to-live>
+        <priority>7</priority>
+        <guaranteed-delivery>true</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+    <DataTag id="145111" name="CS.MEY.EDMSDB:SUBEQUIP_ALIVE" control="true">
+      <data-type>Long</data-type>
+      <DataTagAddress>
+        <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.DBHardwareAddressImpl">
+          <db-item-name>EDMSDB.CERADRMG.SUBEQ_ALIVE</db-item-name>
+        </HardwareAddress>
+        <time-to-live>3600000</time-to-live>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+      </DataTagAddress>
+    </DataTag>
+  </DataTags>
+  <CommandTags>
+  </CommandTags>
+</EquipmentUnit>  </EquipmentUnits>
+</ProcessConfiguration>
