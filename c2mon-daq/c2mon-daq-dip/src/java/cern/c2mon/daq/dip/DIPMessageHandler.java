@@ -72,6 +72,10 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
         getEquipmentConfiguration().getSourceDataTag(getEquipmentConfiguration().getAliveTagId()), // null if not Tag found
         getEquipmentConfiguration().getAliveTagInterval(), getEquipmentLoggerFactory());
     alivePublisher.start();
+    
+    // Controller
+    this.dipController = new DIPController(this.dipFactory, this.handler, getEquipmentLogger(), 
+        getEquipmentConfiguration(), getEquipmentMessageSender());
 
     if (this.dipFactory == null) {
       try {
@@ -82,6 +86,9 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
         // each time
         this.dipFactory = Dip.create(getEquipmentConfiguration().getId() + "_" + Long.valueOf(time).toString());
         this.handler = new DipMessageHandlerDataListener(this.dipController);
+        
+        this.dipController.setDipFactory(this.dipFactory);
+        this.dipController.setHandler(this.handler);
       } catch (Exception ex) {
         getEquipmentLogger().error("connectToDataSource - The handler cound not initialise properly its connection", ex);
         getEquipmentMessageSender().confirmEquipmentStateIncorrect(
@@ -91,10 +98,6 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
 
     // we assume that DIP works
     getEquipmentMessageSender().confirmEquipmentStateOK();
-    
-    // Controller
-    this.dipController = new DIPController(this.dipFactory, this.handler, getEquipmentLogger(), 
-        getEquipmentConfiguration(), getEquipmentMessageSender());
 
     // Add Data Tag Changer
     DIPDataTagChanger dataTagChanger = new DIPDataTagChanger(this.dipController);

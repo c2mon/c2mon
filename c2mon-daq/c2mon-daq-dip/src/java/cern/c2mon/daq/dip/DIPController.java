@@ -299,5 +299,22 @@ public class DIPController {
   public ConcurrentHashMap<String, DipSubscription> getDipSubscriptions() {
       return this.dipSubscriptions;
   }
+  
+  /**
+   * 
+   * @param dipFactory
+   */
+  public void setDipFactory(final DipFactory dipFactory) {
+    this.dipFactory = dipFactory;
+  }
+  
+  /**
+   * 
+   * @param handler
+   */
+  public void setHandler(final DipMessageHandlerDataListener handler) {
+    this.handler = handler;
+  }
+
 
 }
