@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>cern.c2mon.c2mon-daq</groupId>
 	<artifactId>c2mon-daq-db</artifactId>
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 	<name>c2mon-daq-db</name>
 	<packaging>jar</packaging>
 	<description>TIM data acquisition component for DB.</description>
