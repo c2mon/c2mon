@@ -93,11 +93,9 @@ public class DbMessageHandlerTest {
     ProcessConfigurationLoader processLoader = new ProcessConfigurationLoader();
     
     try {
-        URL turl = DbMessageHandlerTest.class.getResource("./config/test-process-xml-configuration.xml");
-        String path = turl.getPath();
-        
-        
-        Document xmlDoc = processLoader.loadConfigLocal(path);
+//        URL turl = DbMessageHandlerTest.class.getResource("./config/test-process-xml-configuration.xml");
+//        String path = turl.getPath();
+        Document xmlDoc = processLoader.loadConfigLocal("cern/c2mon/daq/db/config/test-process-xml-configuration.xml");
         ProcessConfiguration processConfig = processLoader.createProcessConfiguration("P_DBDAQ01", 1234L, xmlDoc, true);
         ConfigurationController controller = new ConfigurationController(null, null);
         controller.setProcessConfiguration(processConfig);
