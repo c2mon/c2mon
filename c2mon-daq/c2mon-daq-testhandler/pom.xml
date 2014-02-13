@@ -9,7 +9,7 @@
 	</parent>
 	
 	<artifactId>c2mon-daq-testhandler</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1-SNAPSHOT</version>
 	<name>c2mon-daq-testhandler</name>
 	<packaging>jar</packaging>
 	<description>This is a C2MON Testing DAQ.  This DAQ simulates the behavior of a DAQ connected to some equipment. It reads a DAQ configuration XML file to determine the tags that the equipment should produce, and sends simulated values of these to the C2MON server.
