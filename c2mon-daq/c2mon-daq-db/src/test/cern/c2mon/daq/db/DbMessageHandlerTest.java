@@ -39,7 +39,7 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
  * Test class for checking the communication of the dbdaq with the database. It allows testing of alert registering,
  * unregistering, sending and receiving alerts and timeouts.
  * */
-@ContextConfiguration(locations = {"classpath:cern/c2mon/daq/db/config/test-daq-db-config.xml" })
+@ContextConfiguration(locations = {"classpath:cern/c2mon/daq/db/config/daq-db-config.xml" })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DbMessageHandlerTest {
   
@@ -86,7 +86,7 @@ public class DbMessageHandlerTest {
         e2.printStackTrace();
     } 
     
-    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:cern/c2mon/daq/db/config/test-daq-db-config.xml");
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:cern/c2mon/daq/db/config/daq-db-config.xml");
     testDao = (DbDaqDaoTest) context.getBean("testDbDaqDao");
     dbMessageHandler = (DBMessageHandler) context.getBean("dbMessageHandler");  
     
