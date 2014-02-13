@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>cern.c2mon.c2mon-daq</groupId>
 	<artifactId>c2mon-daq-ssh</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1-SNAPSHOT</version>
 	<name>c2mon-daq-ssh</name>
 	<packaging>jar</packaging>
 	<description>This JAR is part of the C2MON Data Acquisition layer. C2MON uses a Secure Shell (SSH)
