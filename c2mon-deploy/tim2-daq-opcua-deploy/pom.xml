@@ -11,7 +11,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>tim2-daq-opcua-deploy</artifactId>
   <name>C2MON DAQ OPC UA deployment module</name>
-  <version>1.2.1</version>
+  <version>1.2.2-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
