@@ -162,7 +162,7 @@ class EquipmentSenderValid {
     	if (!this.dataTagValueValidator.isTimestampValid(milisecTimestamp)) {
     		equipmentLogger
     		.warn(format(
-    				"\tdeadband filtering : the timestamp of tag[%d] is out of range (in the future) and will not be propagated to the server",
+    				"\tdeadband filtering : the timestamp of tag[%d] is out of range (in the future)",
     				currentSourceDataTag.getId()));
 
     		equipmentLogger.debug(format("\tinvalidating tag [%d] with quality FUTURE_SOURCE_TIMESTAMP", currentSourceDataTag.getId()));
@@ -218,7 +218,6 @@ class EquipmentSenderValid {
     			qDesc.append("min: ").append(currentSourceDataTag.getMinValue()).append(" ");
     		if (currentSourceDataTag.getMaxValue() != null)
     			qDesc.append("max: ").append(currentSourceDataTag.getMaxValue());
-    		qDesc.append(")! No further updates will be processed and the tag's value will stay unchanged, until this problem is fixed");
 
     		// Get the source data quality from the quality code and description
     		SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.OUT_OF_BOUNDS, qDesc.toString());
