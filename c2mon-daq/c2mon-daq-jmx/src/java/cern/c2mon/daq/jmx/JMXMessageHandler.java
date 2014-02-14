@@ -168,9 +168,9 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                     } else {
                         //try rbac credentials
                         try {
-                            Map<String, Object> e = new HashMap<String, Object>();
-                            e.put(JMXConnector.CREDENTIALS, RbaTokenLookup.findRbaToken());
-                            jmxc = JMXConnectorFactory.connect(url, null);
+                            Map<String, Object> credEnv = new HashMap<String, Object>();
+                            credEnv.put(JMXConnector.CREDENTIALS, RbaTokenLookup.findRbaToken());
+                            jmxc = JMXConnectorFactory.connect(url, credEnv);
                         } catch (final Exception ignore) {
                             // IGNORE
                         }
