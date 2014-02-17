@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>c2mon-daq-clic</artifactId>
-	<version>1.0.8-SNAPSHOT</version>
+	<version>1.0.8</version>
 	<name>c2mon-daq-clic</name>
 	<packaging>jar</packaging>
 	<description>C2MON data acquisition component for communication with the CLIC agents</description>
