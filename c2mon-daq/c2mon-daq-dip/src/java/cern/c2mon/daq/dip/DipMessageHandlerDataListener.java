@@ -259,7 +259,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -286,7 +286,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -311,7 +311,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -339,7 +339,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
                   
@@ -365,7 +365,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -392,7 +392,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -418,7 +418,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -445,7 +445,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -471,7 +471,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -499,7 +499,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -525,7 +525,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -553,7 +553,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -579,7 +579,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -604,7 +604,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -628,7 +628,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -653,7 +653,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -701,7 +701,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -723,7 +723,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -744,7 +744,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -766,7 +766,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -787,7 +787,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
                   
@@ -809,7 +809,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -831,7 +831,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -853,7 +853,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -874,7 +874,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -897,7 +897,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
                   
@@ -918,7 +918,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
                   
@@ -941,7 +941,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -962,7 +962,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -985,7 +985,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -1006,7 +1006,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -1028,7 +1028,7 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                     dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems seding new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
