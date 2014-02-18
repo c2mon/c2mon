@@ -1046,13 +1046,14 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
         } catch (Exception ex) {
           if (t4topic != null) {
             for (ISourceDataTag tag : t4topic) {
-              dipController.getEquipmentLogger().error("Received exception while treating incoming DIP value update for tag " + tag.getId(), ex);  
+              dipController.getEquipmentLogger().error("\tReceived exception while treating incoming DIP value update for tag " + tag.getId(), ex);
+              dipController.getEquipmentLogger().error(ex);
               dipController.getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.UNKNOWN, 
                   "Problem occured when receiving DIP value: " + ex.getMessage() + ". Review tag configuration.");
             }
           }
         }
-        dipController.getEquipmentLogger().debug("handleMessage - leaving handleMessage");
+        dipController.getEquipmentLogger().debug("\thandleMessage - leaving handleMessage");
       }
     });
   }
