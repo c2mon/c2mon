@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-daq</groupId>
 		<artifactId>c2mon-daq-pom</artifactId>
-		<version>1.1.0</version>
+		<version>1.1.1</version>
 	</parent>
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
@@ -35,6 +35,10 @@
 					<groupId>cern.japc</groupId>
 					<artifactId>japc-ext-cmwrda</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>cern.japc</groupId>
+					<artifactId>japc-ext-cmwrda3</artifactId>
+				</exclusion>				
 				<exclusion>
 					<groupId>cern.japc</groupId>
 					<artifactId>japc-ext-yami</artifactId>
