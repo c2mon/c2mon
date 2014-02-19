@@ -727,6 +727,23 @@ public class EquipmentMessageSenderTest {
     }
 
     @Test
+    public void testSendTagFilteredNotConvertableTimeDeadbandEnabled() {
+        medDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt2.getId());
+        processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+        
+        this.sdt2.getAddress().setTimeDeadband(1);
+
+        replay(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+
+        equipmentMessageSender.sendTagFiltered(sdt2, "Nacho", System.currentTimeMillis());
+        equipmentMessageSender.sendTagFiltered(sdt2, "Nacho", System.currentTimeMillis());
+
+        assertEquals(SourceDataQuality.CONVERSION_ERROR, sdt2.getCurrentValue().getQuality().getQualityCode());
+
+        verify(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
+    }
+    
+    @Test
     public void testSendTagFilteredNotInRange() {
         this.lowDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt3.getId());
         this.medDynamicTimeDeadbandFilterActivatorMock.newTagValueSent(sdt2.getId());

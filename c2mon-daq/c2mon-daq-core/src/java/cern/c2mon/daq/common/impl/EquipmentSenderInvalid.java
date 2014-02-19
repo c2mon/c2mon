@@ -180,8 +180,8 @@ class EquipmentSenderInvalid {
           // If we are here the new Value will be filtered out
           if (this.equipmentLogger.isDebugEnabled()) {
             StringBuilder msgBuf = new StringBuilder();
-            msgBuf.append("\tthe tag : " + sourceDataTag.getId()
-                + " has already been invalidated with quality code : " + newSDQuality.getQualityCode());
+            msgBuf.append("\tthe tag [" + sourceDataTag.getId()
+                + "] has already been invalidated with quality code : " + newSDQuality.getQualityCode());
             msgBuf.append(" at " + sourceDataTag.getCurrentValue().getTimestamp());
             msgBuf.append(" The DAQ has not received any values with different quality since than, Hence, the");
             msgBuf.append(" invalidation procedure will be canceled this time");
@@ -195,18 +195,19 @@ class EquipmentSenderInvalid {
            */
           if (newValue != null) {
             // send a corresponding INVALID tag to the statistics module
-            this.equipmentLogger.debug("sendInvalidTag - sending an invalid tag to the statistics module");
+            this.equipmentLogger.debug("sendInvalidTag - sending an invalid tag ["+sourceDataTag.getId()+"] to the statistics module");
 
             // send filtered message to statistics module
             this.equipmentSenderFilterModule.sendToFilterModule(sourceDataTag, newSDQuality, newValue, timestamp.getTime(), 
                 newTagValueDesc, filterType.getNumber());
 
           } else if (this.equipmentLogger.isDebugEnabled()) {
-            this.equipmentLogger.debug("sendInvalidTag - value has still not been initialised: not sending the invalid tag to the statistics module");
+            this.equipmentLogger.debug("sendInvalidTag - value has still not been initialised: not sending the invalid tag ["+sourceDataTag.getId()+"] to the statistics module");
           }
         }
       } catch (Exception ex) {
-        this.equipmentLogger.error("\tsendInvalidTag - Unexpected exception caught !", ex);
+        this.equipmentLogger.error("sendInvalidTag - Unexpected exception caught for tag " + sourceDataTag.getId() + ", " + ex.getStackTrace(), ex);
+        
       }
       this.equipmentLogger.debug("sendInvalidTag - leaving sendInvalidTag()");
     }

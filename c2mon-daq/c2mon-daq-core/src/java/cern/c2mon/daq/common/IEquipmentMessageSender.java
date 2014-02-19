@@ -42,6 +42,7 @@ public interface IEquipmentMessageSender {
      * @param milisecTimestamp The timestamp of the tag.
      * @param tagValue The tag value to send.
      * @return True if the tag has been send successfully to the server.
+     * False if the tag has been invalidated or filtered out.
      */
     boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp);
 
@@ -53,10 +54,22 @@ public interface IEquipmentMessageSender {
      * @param tagValue The tag value to send.
      * @param pValueDescr A description belonging to the value.
      * @return True if the tag has been send successfully to the server.
+     * False if the tag has been invalidated or filtered out.
      */
     boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp,
             final String pValueDescr);
 
+    /**
+     * Tries to send a new value to the server.
+     * 
+     * @param currentTag The tag to which the value belongs.
+     * @param milisecTimestamp The timestamp of the tag.
+     * @param tagValue The tag value to send.
+     * @param pValueDescr A description belonging to the value.
+     * @param sentByValueCheckMonitor
+     * @return True if the tag has been send successfully to the server.
+     * False if the tag has been invalidated or filtered out.
+     */
     boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp,
             final String pValueDescr, boolean sentByValueCheckMonitor);
 

@@ -198,6 +198,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
      * @param milisecTimestamp The timestamp of the tag.
      * @param tagValue The tag value to send.
      * @return True if the tag has been send successfully to the server.
+     * False if the tag has been invalidated or filtered out.
      */
     @Override
     public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp) {
@@ -212,6 +213,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
      * @param milisecTimestamp The timestamp of the tag.
      * @param pValueDescr A description belonging to the value.
      * @return True if the tag has been send successfully to the server.
+     * False if the tag has been invalidated or filtered out.
      */
     @Override
     public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp,
@@ -227,6 +229,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
      * @param tagValue The tag value to send.
      * @param pValueDescr A description belonging to the value.
      * @return True if the tag has been send successfully to the server.
+     * False if the tag has been invalidated or filtered out.
      */
     @Override
     public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp,

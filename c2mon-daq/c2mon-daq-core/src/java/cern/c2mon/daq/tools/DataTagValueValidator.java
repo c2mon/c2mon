@@ -42,9 +42,12 @@ public class DataTagValueValidator {
 		this.equipmentLogger.trace("isInRange - entering isInRange()..");
 
 		boolean isInRange = true;
+		Object convertedValue;
 		if (sdt.getMinValue() != null) {
-			if (sdt.getMinValue().compareTo(value) > 0) {
-				this.equipmentLogger.trace("\tisInRange - out of range : " + value + " is less than the authorized minimum value "
+		  // Convert value before comparing (we assume if we get here the value is convertible)
+		  convertedValue = TypeConverter.cast(value.toString(), sdt.getDataType());
+			if (sdt.getMinValue().compareTo(convertedValue) > 0) {
+				this.equipmentLogger.trace("\tisInRange - out of range : " + convertedValue + " is less than the authorized minimum value "
 						+ sdt.getMinValue());
 				isInRange = false;
 			}
@@ -52,9 +55,11 @@ public class DataTagValueValidator {
 
 		if (isInRange) {
 			if (sdt.getMaxValue() != null) {
-				if (sdt.getMaxValue().compareTo(value) < 0) {
-					this.equipmentLogger.trace("\tisInRange - out of range : " + value
-							+ " is greater than the authorized maximum value " + sdt.getMaxValue());
+			  // Convert value before comparing (we assume if we get here the value is convertible)
+	      convertedValue = TypeConverter.cast(value.toString(), sdt.getDataType());
+				if (sdt.getMaxValue().compareTo(convertedValue) < 0) {
+					this.equipmentLogger.trace("\tisInRange - out of range : " + convertedValue + " is greater than the authorized maximum value " 
+					    + sdt.getMaxValue());
 					isInRange = false;
 				}
 			}
@@ -84,13 +89,13 @@ public class DataTagValueValidator {
 	}
 	
 	/**
-     * Checks if the tagValue is convertable to the value of the current tag.
+     * Checks if the tagValue is convertible to the value of the current tag.
      * 
      * @param tag The tag to check.
      * @param tagValue The value to check.
-     * @return True if the value is convertable else false.
+     * @return True if the value is convertible else false.
      */
-    public boolean isConvertable(final SourceDataTag tag, final Object tagValue) {
+    public boolean isConvertible(final SourceDataTag tag, final Object tagValue) {
         this.equipmentLogger.trace("entering isConvertable()..");
         String value = tagValue.toString();
         boolean isConvertable = TypeConverter.cast(value, tag.getDataType()) != null;
