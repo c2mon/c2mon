@@ -28,10 +28,15 @@ import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.security.auth.login.LoginException;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
+import cern.accsoft.commons.util.proc.ProcUtils;
+import cern.accsoft.security.rba.login.DefaultCallbackHandler;
+import cern.accsoft.security.rba.login.LoginPolicy;
+import cern.accsoft.security.rba.login.RBALoginContext;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
@@ -51,7 +56,9 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.rba.util.holder.ClientTierSubjectHolder;
 import cern.rba.util.lookup.RbaTokenLookup;
+import cern.rba.util.relogin.RbaLoginService;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
@@ -77,6 +84,8 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     static final String JVM_UPTIME_OBJECT_NAME = "java.lang:type=Runtime";
     static String JVM_UPTIME_OBJECT_ATTRIBUTE = "Uptime";
 
+    volatile static RbaLoginService service = null;
+    
     private String jmxServiceUrl;
     private int jmxPollingTime;
 
@@ -169,6 +178,13 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                         //try rbac credentials
                         try {
                             Map<String, Object> credEnv = new HashMap<String, Object>();
+                            if (service == null) {
+                                service.setLoginPolicy(LoginPolicy.LOCATION);
+                                service.setAutoRefresh(true);
+                                service.setApplicationName(ProcUtils.getApplicationName());
+                                service.startAndLogin();
+                            }
+                            
                             credEnv.put(JMXConnector.CREDENTIALS, RbaTokenLookup.findRbaToken());
                             jmxc = JMXConnectorFactory.connect(url, credEnv);
                         } catch (final Exception ignore) {
@@ -234,7 +250,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         }// run
     }// OpenMBeanConnectionTask
 
-    /**
+   /**
      * This class implements a polling task. Polling tasks are executed periodically in order to get most recent values
      * of tags, that support polling as reception method
      * 
