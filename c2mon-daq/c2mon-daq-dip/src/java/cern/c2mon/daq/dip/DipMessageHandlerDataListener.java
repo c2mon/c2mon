@@ -256,10 +256,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, boolValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -283,10 +283,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                   
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, boolValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -308,10 +308,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                   
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, byteValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+byteValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+byteValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -336,10 +336,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, byteValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+byteValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+byteValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
                   
@@ -362,10 +362,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, shortValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+shortValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+shortValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -389,10 +389,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, shortValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+shortValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+shortValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -415,10 +415,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, intValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+intValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+intValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -442,10 +442,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, intValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+intValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+intValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -468,10 +468,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, longValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+longValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+longValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -496,10 +496,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, longValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+longValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+longValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -522,10 +522,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, floatValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+floatValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+floatValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -550,10 +550,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, floatValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+floatValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+floatValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -576,10 +576,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, doubleValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+doubleValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+doubleValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -601,10 +601,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                   
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, doubleValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+doubleValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+doubleValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -625,10 +625,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, stringValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("\tNew value ("+stringValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("\tProblems sending new value ("+stringValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -650,10 +650,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                   
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, stringValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+stringValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+stringValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -698,10 +698,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                   
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, boolValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -720,10 +720,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
                   
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, boolValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -741,10 +741,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, byteValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -763,10 +763,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, byteValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+boolValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+boolValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -784,10 +784,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, shortValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+shortValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+shortValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
                   
@@ -806,10 +806,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, shortValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+shortValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+shortValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -828,10 +828,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, intValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+intValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+intValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -850,10 +850,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, intValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+intValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+intValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -871,10 +871,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, longValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+longValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+longValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -894,10 +894,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, longValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+longValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+longValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
                   
@@ -915,10 +915,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, floatValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+floatValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+floatValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
                   
@@ -938,10 +938,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, floatValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+floatValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+floatValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -959,10 +959,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, doubleValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+doubleValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+doubleValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -982,10 +982,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, doubleValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+doubleValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+doubleValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -1003,10 +1003,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, stringValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+stringValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+stringValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -1025,10 +1025,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
 
                   // Send the new value to the server
                   if (dipController.getEquipmentMessageSender().sendTagFiltered(sdt, stringValue, timestamp)) {
-                    dipController.getEquipmentLogger().info("\tNew value sent to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	New value ("+stringValue+") sent to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   } else {
-                    dipController.getEquipmentLogger().warn("\tProblems sending new value to the server for Tag name : " 
+                    dipController.getEquipmentLogger().debug("	Problems sending new value ("+stringValue+") to the server for Tag name : " 
                         + sdt.getName() + " tag id : " + sdt.getId());
                   }
 
@@ -1043,11 +1043,10 @@ public class DipMessageHandlerDataListener implements DipSubscriptionListener {
             } // if complex
 
           }// while
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
           if (t4topic != null) {
             for (ISourceDataTag tag : t4topic) {
-              dipController.getEquipmentLogger().error("\tReceived exception while treating incoming DIP value update for tag " + tag.getId(), ex);
-              dipController.getEquipmentLogger().error(ex);
+              dipController.getEquipmentLogger().error("\tReceived exception while treating incoming DIP value update for tag " + tag.getId() + ", " + ex.getStackTrace(), ex);
               dipController.getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.UNKNOWN, 
                   "Problem occured when receiving DIP value: " + ex.getMessage() + ". Review tag configuration.");
             }
