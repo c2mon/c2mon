@@ -218,7 +218,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     }
 
     
-    public void checkCacheForChanges() throws IOException, TemplateException {
+    public void checkCacheForChanges() {
 
         logger.info(updatedTags.size() + " tags have changed. Triggering notifications (if required)");
         HashSet<Tag> leftOver = new HashSet<Tag>();
@@ -261,6 +261,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
      * Marks the passed Tag as to be notified in the next round.
      * @param newElement a {@link Tag} which was decided to send notifications for.
      */
+    @Override
     public void onUpdate(Tag newElement) {
         newElement.setToBeNotified(true);
         updatedTags.add(newElement);

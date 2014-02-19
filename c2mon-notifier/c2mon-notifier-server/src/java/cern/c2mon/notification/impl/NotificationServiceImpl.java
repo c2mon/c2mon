@@ -122,7 +122,7 @@ public class NotificationServiceImpl implements MessageListener {
             switch (request.getType()) {
             case UpdateSubscriber:
                 Subscriber subscriber = gson.fromJson(body, Subscriber.class);
-                registry.setSubscriber(subscriber);
+                subscriber = registry.setSubscriber(subscriber);
                 response = new ClientResponse(
                         ClientResponse.Type.GetSubscriberReponse, gson.toJson(
                                 registry.getSubscriber(subscriber.getUserName())));

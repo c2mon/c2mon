@@ -57,6 +57,7 @@ public class DbBackupWriter implements BackupWriter {
     /**
      * @return Returns the lastStoreTime.
      */
+    @Override
     @ManagedAttribute
     public long getLastStoreTime() {
         return lastStoreTime;
@@ -65,6 +66,7 @@ public class DbBackupWriter implements BackupWriter {
     /**
      * @return Returns the lastLoadTime.
      */
+    @Override
     @ManagedAttribute
     public long getLastLoadTime() {
         return lastLoadTime;
@@ -115,6 +117,7 @@ public class DbBackupWriter implements BackupWriter {
                 + ")");
     }
     
+    @Override
     public void addSubscriber(Subscriber s) {
         logger.trace("entering addSubscriber()");
         
@@ -160,6 +163,7 @@ public class DbBackupWriter implements BackupWriter {
      * 
      * @param sup the Subscription to add
      */
+    @Override
     public void addSubscription(Subscription sup) {
        
         if (logger.isTraceEnabled()) {
@@ -171,6 +175,7 @@ public class DbBackupWriter implements BackupWriter {
                 new int [] {Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER}, Types.INTEGER);
     }
     
+    @Override
     public Subscriber getSubscriber(String id) throws UserNotFoundException {
         if (logger.isTraceEnabled()) {
             logger.trace("entering getSubscriber() for User " + id);
@@ -218,6 +223,7 @@ public class DbBackupWriter implements BackupWriter {
         
     }
     
+    @Override
     public void removeSubscriber(Subscriber s) {
         if (logger.isTraceEnabled()) {
             logger.trace("entering removeSubscriber() for User=" + s.getUserName());
@@ -233,6 +239,7 @@ public class DbBackupWriter implements BackupWriter {
         
     }
     
+    @Override
     public void removeSubscription(Subscription sub) {
         if (logger.isTraceEnabled()) {
             logger.trace("entering removeSubscription() for User=" + sub.getSubscriberId() + ", tagId= " + sub.getTagId());
@@ -263,6 +270,7 @@ public class DbBackupWriter implements BackupWriter {
      * @see DbBackupWriter#setSubscriber(Subscriber)
      * @param toStore the HashMap of subscribers to store in the DB.
      */
+    @Override
     public void store(final ConcurrentHashMap<String, Subscriber> toStore) {
         logger.trace("entering store()");
                 
@@ -271,8 +279,8 @@ public class DbBackupWriter implements BackupWriter {
             @Override
             protected void doInTransactionWithoutResult(TransactionStatus arg0) {
                 
+                logger.info("Storing subscriptions");
                 if (logger.isTraceEnabled()) {
-                    logger.trace("Storing subscriptions");
                     for (Subscriber s : toStore.values()) {
                         logger.trace("Storing :" + s.getUserName() + " " + s.getSubscriptions());
                     }
@@ -325,7 +333,7 @@ public class DbBackupWriter implements BackupWriter {
                             new int [] {Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER});
                     
                     lastStoreTime = (System.currentTimeMillis() - t1);
-                    //logger.info("Stored " + addedSubscribers.length + " Subscribers and " + addedSubscriptions.length + " Subscriptions in " + getLastStoreTime() + " millis");
+                    logger.info("Stored " + addedSubscribers.length + " Subscribers and " + addedSubscriptions.length + " Subscriptions in " + getLastStoreTime() + " millis");
                     
                     lastFullStorageTime = System.currentTimeMillis();
                     
@@ -344,6 +352,7 @@ public class DbBackupWriter implements BackupWriter {
      * 
      * @return the registry will all users and their subscriptions.
      */
+    @Override
     public ConcurrentHashMap<String, Subscriber> load() {
         
         long t1 = System.currentTimeMillis(); 
@@ -382,8 +391,9 @@ public class DbBackupWriter implements BackupWriter {
                 // SHOULD NEVER HAPPEN as db constraints should make this sure.
                 logger.error("Found Subscription without user : " + s);
                 removeSubscription(s);
+            } else {
+                owner.addSubscription(s);
             }
-            owner.addSubscription(s);
         }
         
         lastLoadTime = (System.currentTimeMillis() - t1);

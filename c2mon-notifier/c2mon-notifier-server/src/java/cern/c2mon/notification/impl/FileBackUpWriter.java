@@ -54,6 +54,7 @@ public class FileBackUpWriter implements BackupWriter {
     /**
      * @return Returns the lastStoreTime.
      */
+    @Override
     @ManagedAttribute
     public long getLastStoreTime() {
         return lastStoreTime;
@@ -62,6 +63,7 @@ public class FileBackUpWriter implements BackupWriter {
     /**
      * @return Returns the lastLoadTime.
      */
+    @Override
     @ManagedAttribute
     public long getLastLoadTime() {
         return lastLoadTime;
@@ -83,6 +85,7 @@ public class FileBackUpWriter implements BackupWriter {
      * @param fileName the name of the file to load the registry from .
      * @return a HashMap with the {@link Subscriber#getUserName()} as key and the {@link Subscriber} as value.
      */
+    @Override
     public ConcurrentHashMap<String, Subscriber> load() {
         ConcurrentHashMap<String, Subscriber> newUsers = new ConcurrentHashMap<String, Subscriber>();
         // load newUsers from DB, File, etc....
@@ -101,7 +104,10 @@ public class FileBackUpWriter implements BackupWriter {
               contents.append(System.getProperty("line.separator"));
             }
             Gson gson = new Gson();
-            newUsers = gson.fromJson(contents.toString(), new TypeToken<HashMap<String, Subscriber>>(){} .getType());
+            newUsers = gson.fromJson(contents.toString(), 
+                        new TypeToken<HashMap<String, Subscriber>>(){
+                                                                        //
+                                                                    } .getType());
             input.close();
         } catch (Exception ex) {
             logger.error(ex.getMessage());
@@ -129,6 +135,7 @@ public class FileBackUpWriter implements BackupWriter {
      * 
      * @param toStore the data to store.
      */
+    @Override
     public void store(final ConcurrentHashMap<String, Subscriber> toStore) {
         FileWriter fr = null;
         BufferedWriter output = null;
@@ -144,8 +151,8 @@ public class FileBackUpWriter implements BackupWriter {
         } catch (Exception ex) {
             logger.error(ex.getMessage());
         } finally {
-            try { output.close(); } catch (IOException e) { e.printStackTrace(); }
-            try { fr.close(); } catch (IOException e) { e.printStackTrace(); }
+            try { if (output != null) output.close(); } catch (Exception e) { e.printStackTrace(); }
+            try { if (fr != null) fr.close(); } catch (IOException e) { e.printStackTrace(); }
         }
         lastStoreTime = System.currentTimeMillis() - t1;
         

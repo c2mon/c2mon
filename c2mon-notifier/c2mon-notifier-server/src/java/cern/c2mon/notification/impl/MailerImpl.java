@@ -95,6 +95,7 @@ public class MailerImpl implements Mailer {
 
         // get the session / connection to the mailserver
         session = Session.getInstance(props, new Authenticator() {
+            @Override
             public PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(name, password);
             }
@@ -127,6 +128,7 @@ public class MailerImpl implements Mailer {
      * @throws MessagingException in case the message cannot be sent
      * @throws IllegalArgumentException in case the passed user mail is null.
      */
+    @Override
     public synchronized void sendEmail(String to, String subject, String mailText) throws MessagingException,
             IllegalArgumentException {
         if (to == null) {
@@ -140,7 +142,7 @@ public class MailerImpl implements Mailer {
         if (mailText == null) {
             mailText = "";
         }
-
+        
         MimeMessage simpleMessage = new MimeMessage(session);
 
         // MimeMultipart content = new MimeMultipart();
