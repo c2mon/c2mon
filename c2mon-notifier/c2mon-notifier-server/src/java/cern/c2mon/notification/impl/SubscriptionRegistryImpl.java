@@ -216,7 +216,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 * @param subscriber the {@link Subscriber} to set. 
 	 * @throws TagNotFoundException in case one of the associated tags cannot be found.
 	 */
-    public void setSubscriber(Subscriber subscriber) throws TagNotFoundException {
+    public Subscriber setSubscriber(final Subscriber subscriber) throws TagNotFoundException {
 	    checkNull(subscriber);
 
 	    // a bit of a hack : we need to find the differences to cancel the c2mon subscriptions
@@ -278,9 +278,10 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 		/*
 		 * we modify the passed object to and set it to the current object in our registry.
 		 */
-		subscriber = inReg;
-		
 		logger.trace("leaving setSubscriber()");
+		return inReg;
+		
+		
 	}
 	
 	/**

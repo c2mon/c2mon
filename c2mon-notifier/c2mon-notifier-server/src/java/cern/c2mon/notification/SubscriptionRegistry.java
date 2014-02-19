@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import cern.c2mon.notification.impl.NotifierImpl;
 import cern.c2mon.notification.impl.TagCache;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
@@ -27,9 +26,10 @@ public interface SubscriptionRegistry {
 	/**
 	 * 
 	 * @param subscriber the {@link Subscriber} object to update/add
+	 * @return 
 	 * @throws TagNotFoundException in case one of the associated tags is not defined.
 	 */
-	public void setSubscriber(Subscriber subscriber) throws TagNotFoundException;
+	public Subscriber setSubscriber(Subscriber subscriber) throws TagNotFoundException;
 	
 	/**
 	 * @return a list of all tagids for which a subscription exists.
