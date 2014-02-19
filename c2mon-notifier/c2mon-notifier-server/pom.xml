@@ -39,18 +39,9 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			</dependency>
-		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.6.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
@@ -120,6 +111,21 @@
 			<artifactId>dmn2-db-service</artifactId>
 			<type>jar</type>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+		   <groupId>org.apache.activemq</groupId>
+		   <artifactId>activemq-all</artifactId>
+		   <version>5.9.0</version>
+		</dependency>
+		<dependency>
+		   <groupId>org.slf4j</groupId>
+		   <artifactId>slf4j-api</artifactId>
+		   <version>1.7.5</version>
+		</dependency>
+		<dependency>
+		   <groupId>org.slf4j</groupId>
+		   <artifactId>slf4j-log4j12</artifactId>
+		   <version>1.7.5</version>
 		</dependency>
 	</dependencies>
 	
