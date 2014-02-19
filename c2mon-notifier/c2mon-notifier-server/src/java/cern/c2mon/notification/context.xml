@@ -55,6 +55,10 @@
       <property name="username" value="${jdbc.config.user}" />
       <property name="password" value="${jdbc.config.password}" />
       <property name="maxActive" value="1" />
+      <property name="validationQuery" value="SELECT 0 FROM DUAL" />
+      <property name="testWhileIdle" value="true" />
+      <property name="timeBetweenEvictionRunsMillis" value="3600000" />
+      <property name="initialSize" value="1" />
    </bean>
    <!--  optional : we can use transacted datasource -->
    <bean id="transactedDataSource"
