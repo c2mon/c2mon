@@ -11,7 +11,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>tim2-daq-dip-deploy</artifactId>
   <name>C2MON DAQ DIP deployment module</name>
-  <version>1.2.2</version>
+  <version>1.2.3-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
