@@ -179,6 +179,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                         try {
                             Map<String, Object> credEnv = new HashMap<String, Object>();
                             if (service == null) {
+                                service = new RbaLoginService();
                                 service.setLoginPolicy(LoginPolicy.LOCATION);
                                 service.setAutoRefresh(true);
                                 service.setApplicationName(ProcUtils.getApplicationName());
