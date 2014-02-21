@@ -25,22 +25,29 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.c2mon.server.alarm.AlarmAggregator;
+import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.configuration.ConfigurationUpdate;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.server.test.broker.TestBrokerService;
+import cern.c2mon.shared.client.tag.TagMode;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.c2mon.shared.client.tag.TransferTagImpl;
+import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.c2mon.shared.util.jms.JmsSender;
 
 /**
  * Integration test of TagValuePublisher with broker.
  * Tests publication & re-publication works. 
  * 
- * @author Mark Brightwell
+ * @author Mark Brightwell, Ignacio Vilches
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -60,6 +67,9 @@ public class TagValuePublisherTest {
    * Mocks of other modules.
    */
   private AlarmAggregator alarmAggregator;  
+  private ConfigurationUpdate configurationUpdate;
+  private TagFacadeGateway tagFacadeGateway;
+  private TagLocationService tagLocationService;
 
   /**
    * Instantiated in XML.
@@ -71,6 +81,7 @@ public class TagValuePublisherTest {
    * Used for holding update received in test with lock.
    */
   private TagValueUpdate update;
+  private TagUpdate updateFromConfig;
   private Object updateLock = new Object();
   
   @BeforeClass
@@ -80,11 +91,14 @@ public class TagValuePublisherTest {
   
   @Before
   public void setUp() {    
-    alarmAggregator = control.createMock(AlarmAggregator.class);   
+    this.alarmAggregator = control.createMock(AlarmAggregator.class);  
+    this.configurationUpdate =  control.createMock(ConfigurationUpdate.class);
+    this.tagFacadeGateway = this.control.createMock(TagFacadeGateway.class);
+    this.tagLocationService = this.control.createMock(TagLocationService.class);
     //alarmAggregator.registerForTagUpdates(tagValuePublisher);
-    tagValuePublisher = new TagValuePublisher(jmsSender, alarmAggregator);
-    tagValuePublisher.setRepublicationDelay(1000);
-    tagValuePublisher.init();
+    this.tagValuePublisher = new TagValuePublisher(this.jmsSender, this.alarmAggregator, this.configurationUpdate, this.tagFacadeGateway, this.tagLocationService);
+    this.tagValuePublisher.setRepublicationDelay(1000);
+    this.tagValuePublisher.init();
   }
   
   @After
@@ -100,8 +114,8 @@ public class TagValuePublisherTest {
    */
   @Test
   public void testPublication() throws JMSException, InterruptedException {
-    control.reset();
-    update = null; //make sure update is null before testing
+    this.control.reset();
+    this.update = null; //make sure update is null before testing
     final DataTag tag = CacheObjectCreation.createTestDataTag3();
     List<Alarm> alarms = new ArrayList<Alarm>();
     alarms.add(CacheObjectCreation.createTestAlarm1()); //attached to this tag
@@ -109,17 +123,49 @@ public class TagValuePublisherTest {
     
     Thread listenerThread = startListenerThread(tag);
     
-    control.replay();    
+    this.control.replay();    
     
-    tagValuePublisher.notifyOnUpdate(tag, alarms);
+    this.tagValuePublisher.notifyOnUpdate(tag, alarms);
     
     listenerThread.join(1000);
     
-    compareTagAndUpdate(tag, alarms, update);
+    compareTagAndUpdate(tag, alarms, this.update);
     
-    control.verify();
+    this.control.verify();
   }
   
+  @Test
+  public void testPublicationConfigUpdate() throws JMSException, InterruptedException {
+    this.control.reset();
+    this.updateFromConfig = null; //make sure update is null before testing
+    final DataTag tag = CacheObjectCreation.createTestDataTag3();
+    List<Alarm> alarms = new ArrayList<Alarm>();
+    alarms.add(CacheObjectCreation.createTestAlarm1()); //attached to this tag
+    alarms.add(CacheObjectCreation.createTestAlarm3()); //attached to this tag
+    
+    TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
+    EasyMock.expect(this.tagFacadeGateway.getTagWithAlarms(tag.getId())).andReturn(tagWithAlarms);
+    
+    
+    Thread listenerThread = startListenerThreadForTransferTag(tag);
+    
+    this.control.replay();    
+    
+    this.tagValuePublisher.notifyOnConfigurationUpdate(tag.getId());
+    
+    listenerThread.join(1000);
+    
+    compareTagAndUpdate(tag, alarms, this.updateFromConfig);
+    
+    this.control.verify();
+  }
+  
+  /**
+   * 
+   * @param tag
+   * @param alarms
+   * @param update
+   */
   private void compareTagAndUpdate(DataTag tag, List<Alarm> alarms, TagValueUpdate update) {
     synchronized (updateLock) {
       assertNotNull(update); //message or update were null
@@ -160,6 +206,31 @@ public class TagValuePublisherTest {
     listenerThread.start();
     return listenerThread;
   }
+  
+  /**
+   * Listens for 1s for updates on the tag topic.
+   */
+  private Thread startListenerThreadForTransferTag(final Tag tag) {
+    // start listener in separate thread (to catch update to topic)
+    Thread listenerThread = new Thread(new Runnable() {
+      
+      @Override
+      public void run() {
+        try {
+          JmsTemplate template = new JmsTemplate(testBrokerService.getConnectionFactory());
+          template.setReceiveTimeout(1000);
+          Message message = template.receive(new ActiveMQTopic(tag.getTopic()));                   
+          synchronized (updateLock) {
+            updateFromConfig = TransferTagImpl.fromJson(((TextMessage) message).getText());
+          }                                  
+        } catch (Exception e) {          
+          updateFromConfig = null;          
+        }       
+      }
+    });
+    listenerThread.start();
+    return listenerThread;
+  }
 
   /**
    * Tests behaviour when publication fails when broker is down, and that re-publication occurs
@@ -169,8 +240,8 @@ public class TagValuePublisherTest {
    */
   @Test
   public void testRepublication() throws Exception {
-    control.reset();
-    update = null;
+    this.control.reset();
+    this.update = null;
     testBrokerService.stopBroker();
     
     //try publication
@@ -183,10 +254,10 @@ public class TagValuePublisherTest {
     
     Thread listenerThread = startListenerThread(tag); //will throw exception
     
-    control.replay();
+    this.control.replay();
     tagValuePublisher.notifyOnUpdate(tag, alarms);
     listenerThread.join(1000); //will fail after 100ms (failover timeout)
-    assertTrue(update == null); //update failed as broker stopped
+    assertTrue(this.update == null); //update failed as broker stopped
    
     Thread.sleep(1000); //allow another republication to fail (after 1s=republication delay)
                         //then start broker & listener before next republication attempt!
@@ -195,9 +266,45 @@ public class TagValuePublisherTest {
     
     listenerThread.join(1000);
     
-    compareTagAndUpdate(tag, alarms, update);
+    compareTagAndUpdate(tag, alarms, this.update);
     
-    control.verify();    
+    this.control.verify();    
+  }
+  
+  @Test
+  public void testRepublicationConfigUpdate() throws Exception {
+    this.control.reset();
+    this.updateFromConfig = null;
+    testBrokerService.stopBroker();
+    
+    //try publication
+    final DataTag tag = CacheObjectCreation.createTestDataTag3();
+    List<Alarm> alarms = new ArrayList<Alarm>();
+    Alarm alarm1 = CacheObjectCreation.createTestAlarm1();
+    Alarm alarm2 = CacheObjectCreation.createTestAlarm3(); 
+    alarms.add(alarm1); //attached to this tag
+    alarms.add(alarm2); //attached to this tag
+    
+    TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
+    EasyMock.expect(this.tagFacadeGateway.getTagWithAlarms(tag.getId())).andReturn(tagWithAlarms);
+    
+    Thread listenerThread = startListenerThreadForTransferTag(tag); //will throw exception
+    
+    this.control.replay();
+    tagValuePublisher.notifyOnConfigurationUpdate(tag.getId());
+    listenerThread.join(1000); //will fail after 100ms (failover timeout)
+    assertTrue(this.updateFromConfig == null); //update failed as broker stopped
+   
+    Thread.sleep(1000); //allow another republication to fail (after 1s=republication delay)
+                        //then start broker & listener before next republication attempt!
+    testBrokerService.createAndStartBroker();  //connection to listener thread must have time to establish itself before republication
+    listenerThread = startListenerThreadForTransferTag(tag); //new thread     
+    
+    listenerThread.join(1000);
+    
+    compareTagAndUpdate(tag, alarms, this.updateFromConfig);
+    
+    this.control.verify();    
   }
   
   @AfterClass
