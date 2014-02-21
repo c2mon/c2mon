@@ -93,6 +93,10 @@
     	<artifactId>c2mon-server-command</artifactId>    	
     </dependency>
     <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-configuration</artifactId>
+    </dependency>
+    <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-all</artifactId>
       </dependency>
