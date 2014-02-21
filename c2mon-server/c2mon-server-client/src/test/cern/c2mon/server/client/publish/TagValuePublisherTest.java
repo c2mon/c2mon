@@ -115,7 +115,9 @@ public class TagValuePublisherTest {
   @Test
   public void testPublication() throws JMSException, InterruptedException {
     this.control.reset();
-    this.update = null; //make sure update is null before testing
+    synchronized (updateLock) {
+      this.update = null; //make sure update is null before testing
+    }
     final DataTag tag = CacheObjectCreation.createTestDataTag3();
     List<Alarm> alarms = new ArrayList<Alarm>();
     alarms.add(CacheObjectCreation.createTestAlarm1()); //attached to this tag
@@ -137,7 +139,9 @@ public class TagValuePublisherTest {
   @Test
   public void testPublicationConfigUpdate() throws JMSException, InterruptedException {
     this.control.reset();
-    this.updateFromConfig = null; //make sure update is null before testing
+    synchronized (updateLock) {
+      this.updateFromConfig = null; //make sure update is null before testing
+    }
     final DataTag tag = CacheObjectCreation.createTestDataTag3();
     List<Alarm> alarms = new ArrayList<Alarm>();
     alarms.add(CacheObjectCreation.createTestAlarm1()); //attached to this tag
@@ -198,8 +202,10 @@ public class TagValuePublisherTest {
           synchronized (updateLock) {
             update = TransferTagValueImpl.fromJson(((TextMessage) message).getText());
           }                                  
-        } catch (Exception e) {          
-          update = null;          
+        } catch (Exception e) {  
+          synchronized (updateLock) {
+            update = null;         
+          }
         }       
       }
     });
@@ -223,8 +229,10 @@ public class TagValuePublisherTest {
           synchronized (updateLock) {
             updateFromConfig = TransferTagImpl.fromJson(((TextMessage) message).getText());
           }                                  
-        } catch (Exception e) {          
-          updateFromConfig = null;          
+        } catch (Exception e) {     
+          synchronized (updateLock) {
+            updateFromConfig = null;  
+          }
         }       
       }
     });
@@ -241,7 +249,9 @@ public class TagValuePublisherTest {
   @Test
   public void testRepublication() throws Exception {
     this.control.reset();
-    this.update = null;
+    synchronized (updateLock) {
+      this.update = null;
+    }
     testBrokerService.stopBroker();
     
     //try publication
@@ -257,7 +267,9 @@ public class TagValuePublisherTest {
     this.control.replay();
     tagValuePublisher.notifyOnUpdate(tag, alarms);
     listenerThread.join(1000); //will fail after 100ms (failover timeout)
-    assertTrue(this.update == null); //update failed as broker stopped
+    synchronized (updateLock) {
+      assertTrue(this.update == null); //update failed as broker stopped
+    }
    
     Thread.sleep(1000); //allow another republication to fail (after 1s=republication delay)
                         //then start broker & listener before next republication attempt!
@@ -274,7 +286,9 @@ public class TagValuePublisherTest {
   @Test
   public void testRepublicationConfigUpdate() throws Exception {
     this.control.reset();
-    this.updateFromConfig = null;
+    synchronized (updateLock) {
+      this.updateFromConfig = null;
+    }
     testBrokerService.stopBroker();
     
     //try publication
@@ -293,7 +307,9 @@ public class TagValuePublisherTest {
     this.control.replay();
     tagValuePublisher.notifyOnConfigurationUpdate(tag.getId());
     listenerThread.join(1000); //will fail after 100ms (failover timeout)
-    assertTrue(this.updateFromConfig == null); //update failed as broker stopped
+    synchronized (updateLock) {
+      assertTrue(this.updateFromConfig == null); //update failed as broker stopped
+    }
    
     Thread.sleep(1000); //allow another republication to fail (after 1s=republication delay)
                         //then start broker & listener before next republication attempt!
