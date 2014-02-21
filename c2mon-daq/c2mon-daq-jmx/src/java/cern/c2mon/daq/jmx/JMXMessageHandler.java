@@ -28,15 +28,12 @@ import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import javax.security.auth.login.LoginException;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 import cern.accsoft.commons.util.proc.ProcUtils;
-import cern.accsoft.security.rba.login.DefaultCallbackHandler;
 import cern.accsoft.security.rba.login.LoginPolicy;
-import cern.accsoft.security.rba.login.RBALoginContext;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
@@ -56,7 +53,6 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.rba.util.holder.ClientTierSubjectHolder;
 import cern.rba.util.lookup.RbaTokenLookup;
 import cern.rba.util.relogin.RbaLoginService;
 
@@ -72,7 +68,6 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     static long CONNECTION_TEST_INTERVAL = 30000; // ms
 
     static final int EQ_ADDRESS_MIN_NUMBER_OF_EXPECTED_PARAMETERS = 2;
-    // static final int EQ_ADDRESS_MAX_NUMBER_OF_EXPECTED_PARAMETER = 4;
 
     static final int SERVICE_URL_INDEX = 0;
     static final int USER_INDEX = 1;
@@ -85,7 +80,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     static String JVM_UPTIME_OBJECT_ATTRIBUTE = "Uptime";
 
     volatile static RbaLoginService service = null;
-    
+
     private String jmxServiceUrl;
     private int jmxPollingTime;
 
@@ -160,7 +155,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
             while (!mbeanServiceConnected && !Thread.interrupted()) {
                 try {
-                    
+
                     logger.debug(format("trying to connect to JMX service: %s", handler.getJmxServiceUrl()));
 
                     JMXServiceURL url = new JMXServiceURL(jmxServiceUrl);
@@ -175,7 +170,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                         env.put("jmx.remote.credentials", credentials);
                         jmxc = JMXConnectorFactory.connect(url, env);
                     } else {
-                        //try rbac credentials
+                        // try rbac credentials
                         try {
                             Map<String, Object> credEnv = new HashMap<String, Object>();
                             if (service == null) {
@@ -185,13 +180,13 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                                 service.setApplicationName(ProcUtils.getApplicationName());
                                 service.startAndLogin();
                             }
-                            
+
                             credEnv.put(JMXConnector.CREDENTIALS, RbaTokenLookup.findRbaToken());
                             jmxc = JMXConnectorFactory.connect(url, credEnv);
-                        } catch (final Exception ignore) {
-                            // IGNORE
+                        } catch (final Exception ex) {
+                            logger.warn("RBAC authentication by location failed", ex);
                         }
-                        
+
                         // try no password
                         try {
                             jmxc = JMXConnectorFactory.connect(url, null);
@@ -238,8 +233,8 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             // NOTE: this thread may be interrupted from method disconnectFromDataSource()
             if (!interrupted) {
 
-                logger.info(format("requesting update for %d tags belonging to service: %s", Integer.valueOf(this.tags.size()),
-                        handler.getJmxServiceUrl()));
+                logger.info(format("requesting update for %d tags belonging to service: %s",
+                        Integer.valueOf(this.tags.size()), handler.getJmxServiceUrl()));
                 initDataTags();
 
                 // iterate throughout the tag list and register tags
@@ -251,7 +246,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
         }// run
     }// OpenMBeanConnectionTask
 
-   /**
+    /**
      * This class implements a polling task. Polling tasks are executed periodically in order to get most recent values
      * of tags, that support polling as reception method
      * 
@@ -453,8 +448,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                 logger.error(format("Exception caught while trying to open subscription for tag[%d]. error: %s",
                         tag.getId(), errorMsg));
                 logger.error(format("Invalidating tag[%d] with quality: INCORRECT_NATIVE_ADDRESS", tag.getId()));
-                getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
-                        errorMsg);
+                getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, errorMsg);
             }
 
         } else {
@@ -710,8 +704,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             errorMsg = "The format of the string does not correspond to a valid ObjectName: " + ex.getMessage();
             sendInvalid = true;
         } catch (AttributeNotFoundException ex) {
-            errorMsg = "The specified attribute does not exist or cannot be retrieved: " + ex
-                    .getMessage();
+            errorMsg = "The specified attribute does not exist or cannot be retrieved: " + ex.getMessage();
             sendInvalid = true;
         } catch (InstanceNotFoundException ex) {
             errorMsg = "The specified MBean does not exist in the repository: " + ex.getMessage();
@@ -725,8 +718,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             if (logger.isDebugEnabled())
                 logger.debug(format("Invalidating tag[%d] with quality INCORRECT_NATIVE_ADDRESS and description: %s",
                         tag.getId(), errorMsg));
-            getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
-                    errorMsg);
+            getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, errorMsg);
         }
 
         if (logger.isTraceEnabled())
@@ -954,7 +946,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
         // register tag
         registerTag(sourceDataTag);
-        
+
         if (logger.isDebugEnabled())
             logger.debug(format("leaving onAddDataTag(%d)", sourceDataTag.getId()));
     }
@@ -992,10 +984,10 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             } catch (TagOperationException ex) {
                 changeReport.appendWarn(ex.getMessage());
             }
-            
+
             logger.debug(format("calling  registerTag(%d)..", sourceDataTag.getId()));
             registerTag(sourceDataTag);
-            
+
         }// if
         else {
             changeReport.appendInfo("No change detected in the tag hardware address. No action effected");
