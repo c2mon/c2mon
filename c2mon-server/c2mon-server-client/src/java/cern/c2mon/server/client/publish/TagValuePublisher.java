@@ -85,6 +85,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
    * @param alarmAggregator Used to register this <code>AlarmAggregatorListener</code>
    * @param configurationUpdate Used to register this <code>ConfigurationUpdateListener</code>
    * @param pTagFacadeGateway Reference to the tag facade gateway singleton
+   * @param tagLocationService Reference to the tag location service
    */
   @Autowired
   public TagValuePublisher(@Qualifier("clientTopicPublisher") final JmsSender jmsSender, 

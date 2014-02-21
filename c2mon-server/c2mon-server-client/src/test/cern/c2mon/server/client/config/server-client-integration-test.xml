@@ -21,6 +21,12 @@
   	</constructor-arg>
   </bean>
   
+   <bean id="configurationUpdate" factory-bean="control" factory-method="createMock">  
+    <constructor-arg>
+        <value>cern.c2mon.server.configuration.ConfigurationUpdate</value>
+    </constructor-arg>
+  </bean>
+  
   
   <bean id="commandExecutionManager" factory-bean="control" factory-method="createMock">
   	<constructor-arg>
