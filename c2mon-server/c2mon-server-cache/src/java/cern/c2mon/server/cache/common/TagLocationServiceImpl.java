@@ -59,7 +59,7 @@ public class TagLocationServiceImpl implements TagLocationService {
   }
   
   @SuppressWarnings("unchecked")
-  private <T extends Tag> C2monCache<Long, T> getCache(final Long id) {
+  private synchronized <T extends Tag> C2monCache<Long, T> getCache(final Long id) {
     if (ruleTagCache.hasKey(id)) {
       return (C2monCache<Long, T>) ruleTagCache;
     } else if (controlTagCache.hasKey(id)) {

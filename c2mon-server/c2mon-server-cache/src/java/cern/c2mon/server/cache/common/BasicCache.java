@@ -60,7 +60,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    * @see Ehcache#isKeyInCache(Object)
    * @throws NullPointerException In case a null pointer is passed as key
    */
-  public final boolean hasKey(final K id) {
+  public synchronized final boolean hasKey(final K id) {
     if (id == null) {
       throw new NullPointerException("Querying cache with a null key.");
     }
