@@ -30,6 +30,8 @@
     <property name="daqConfigEnabled" value="true"/>
   </bean>
   <bean id="configurationDAO" class="cern.c2mon.server.configuration.mybatis.ConfigurationDAOImpl"/>
+  
+   <bean id="configurationUpdate" class="cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl"/>
     
   <bean id="dataTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DataTagConfigHandlerImpl" autowire="constructor"/>
   <bean id="controlTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.ControlTagConfigHandlerImpl" autowire="constructor"/>
