@@ -169,22 +169,31 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                         Map<String, Object> env = new HashMap<String, Object>();
                         env.put("jmx.remote.credentials", credentials);
                         jmxc = JMXConnectorFactory.connect(url, env);
+
                     } else {
-                        // try rbac credentials
+                        
+                        if (service == null) {
+                            service = new RbaLoginService();
+                            service.setLoginPolicy(LoginPolicy.LOCATION);
+                            service.setAutoRefresh(true);
+                            service.setApplicationName(ProcUtils.getApplicationName());
+                            service.startAndLogin();
+                        }
+                        
+                        //try rbac credentials
                         try {
                             Map<String, Object> credEnv = new HashMap<String, Object>();
-                            if (service == null) {
-                                service = new RbaLoginService();
-                                service.setLoginPolicy(LoginPolicy.LOCATION);
-                                service.setAutoRefresh(true);
-                                service.setApplicationName(ProcUtils.getApplicationName());
-                                service.startAndLogin();
-                            }
-
                             credEnv.put(JMXConnector.CREDENTIALS, RbaTokenLookup.findRbaToken());
-                            jmxc = JMXConnectorFactory.connect(url, credEnv);
-                        } catch (final Exception ex) {
-                            logger.warn("RBAC authentication by location failed", ex);
+                        } catch (final Exception ignore) {
+                            logger.warn("Failed to connect using RBAC Token: " + ignore.getMessage());
+                            
+                            logger.info("Trying plain text authorization..");
+                            // try no password
+                            try {
+                                jmxc = JMXConnectorFactory.connect(url, null);
+                            } catch (final Exception error) {
+                                throw new Exception("Plain text authorization failed:" + error.getMessage());
+                            }
                         }
 
                         // try no password
