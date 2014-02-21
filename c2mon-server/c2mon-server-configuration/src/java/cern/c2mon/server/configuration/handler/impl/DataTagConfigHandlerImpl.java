@@ -27,13 +27,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 
-import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.DataTagConfigTransacted;
-import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.EquipmentFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
+import cern.c2mon.server.configuration.handler.transacted.DataTagConfigTransacted;
+import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
@@ -48,7 +49,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
  *
  */
 @Service
-public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
+public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   
   /**
    * Class logger.
@@ -62,6 +63,12 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
   private DataTagConfigTransacted dataTagConfigTransacted;
   
   /**
+   * Helper class for accessing the List of registered listeners
+   * for configuration updates.
+   */
+  private ConfigurationUpdateImpl configurationUpdateImpl;
+  
+  /**
    * Cache for final removal.
    */
   private DataTagCache dataTagCache;
@@ -70,19 +77,25 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
 
   /**
    * Constructor.
-   * @param dataTagConfigTransacted bean with transactions.
    * @param dataTagCache cache
+   * @param equipmentFacade
+   * @param configurationUpdateImpl
    */
   @Autowired
-  public DataTagConfigHandlerImpl(DataTagCache dataTagCache, EquipmentFacade equipmentFacade) {        
+  public DataTagConfigHandlerImpl(DataTagCache dataTagCache, EquipmentFacade equipmentFacade, ConfigurationUpdateImpl configurationUpdateImpl) {        
     this.dataTagCache = dataTagCache;
     this.equipmentFacade = equipmentFacade;
+    this.configurationUpdateImpl = configurationUpdateImpl;
   }
 
   @Override
   public ProcessChange createDataTag(ConfigurationElement element) throws IllegalAccessException {
     ProcessChange change = dataTagConfigTransacted.doCreateDataTag(element);
     dataTagCache.lockAndNotifyListeners(element.getEntityId());    
+    if (LOGGER.isTraceEnabled()) {
+    	LOGGER.trace("createDataTag - Notifying Configuration update listeners");
+    }
+    this.configurationUpdateImpl.notifyListeners(element.getEntityId());
     return change;
   }
 
@@ -104,15 +117,19 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
 
   @Override
   public ProcessChange updateDataTag(Long id, Properties elementProperties) {
-    try {
-      return dataTagConfigTransacted.doUpdateDataTag(id, elementProperties);
-    } catch (UnexpectedRollbackException e) {
-      LOGGER.error("Rolling back update in cache");
-      dataTagCache.remove(id); //DB transaction is rolled back here: reload the tag
-      dataTagCache.loadFromDb(id);
-      throw e;
-    }
-    
+	  try {
+		  ProcessChange processChange = dataTagConfigTransacted.doUpdateDataTag(id, elementProperties);
+		  if (LOGGER.isTraceEnabled()) {
+		    	LOGGER.trace("createDataTag - Notifying Configuration update listeners");
+		    }
+		  this.configurationUpdateImpl.notifyListeners(id);
+		  return processChange;
+	  } catch (UnexpectedRollbackException e) {
+		  LOGGER.error("Rolling back update in cache");
+		  dataTagCache.remove(id); //DB transaction is rolled back here: reload the tag
+		  dataTagCache.loadFromDb(id);
+		  throw e;
+	  }
   }
 
   @Override
@@ -133,9 +150,5 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler  {
   @Override
   public void removeRuleFromTag(Long tagId, Long ruleId) {
     dataTagConfigTransacted.removeRuleFromTag(tagId, ruleId);
-  }
-
-  
-  
-  
+  }  
 }

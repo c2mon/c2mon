@@ -25,10 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 
+import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.RuleTagConfigTransacted;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
 import cern.c2mon.server.rule.RuleEvaluator;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -48,6 +48,12 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   private static final Logger LOGGER = Logger.getLogger(RuleTagConfigHandlerImpl.class);  
   
   /**
+   * Helper class for accessing the List of registered listeners
+   * for configuration updates.
+   */
+  private ConfigurationUpdateImpl configurationUpdateImpl;
+  
+  /**
    * Transacted bean.
    */
   @Autowired
@@ -57,10 +63,18 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   
   private RuleEvaluator ruleEvaluator;
   
+  /**
+   * Default constructor
+   * 
+   * @param ruleTagCache
+   * @param ruleEvaluator
+   * @param configurationUpdateImpl
+   */
   @Autowired
-  public RuleTagConfigHandlerImpl(final RuleTagCache ruleTagCache, final RuleEvaluator ruleEvaluator) {    
+  public RuleTagConfigHandlerImpl(final RuleTagCache ruleTagCache, final RuleEvaluator ruleEvaluator, final ConfigurationUpdateImpl configurationUpdateImpl) {    
     this.ruleTagCache = ruleTagCache;
     this.ruleEvaluator = ruleEvaluator;
+    this.configurationUpdateImpl = configurationUpdateImpl;
   }
 
   @Override
@@ -73,21 +87,29 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   public void createRuleTag(ConfigurationElement element) throws IllegalAccessException {
     ruleTagConfigTransacted.doCreateRuleTag(element);
     ruleEvaluator.evaluateRule(element.getEntityId());
-    ruleTagCache.lockAndNotifyListeners(element.getEntityId());    
+    ruleTagCache.lockAndNotifyListeners(element.getEntityId());
+    if (LOGGER.isTraceEnabled()) {
+    	LOGGER.trace("createRuleTag - Notifying Configuration update listeners");
+    }
+    this.configurationUpdateImpl.notifyListeners(element.getEntityId());
   }
 
   @Override
   public void updateRuleTag(Long id, Properties elementProperties) throws IllegalAccessException {
-    try {
-      ruleTagConfigTransacted.doUpdateRuleTag(id, elementProperties);
-      ruleEvaluator.evaluateRule(id);
-      ruleTagCache.lockAndNotifyListeners(id);
-    } catch (UnexpectedRollbackException e) {
-      LOGGER.error("Rolling back Rule update in cache");
-      ruleTagCache.remove(id);
-      ruleTagCache.loadFromDb(id);
-      throw e;
-    }
+	  try {
+		  ruleTagConfigTransacted.doUpdateRuleTag(id, elementProperties);
+		  ruleEvaluator.evaluateRule(id);
+		  ruleTagCache.lockAndNotifyListeners(id);
+		  if (LOGGER.isTraceEnabled()) {
+			  LOGGER.trace("updateRuleTag - Notifying Configuration update listeners");
+		  }
+		  this.configurationUpdateImpl.notifyListeners(id);
+	  } catch (UnexpectedRollbackException e) {
+		  LOGGER.error("Rolling back Rule update in cache");
+		  ruleTagCache.remove(id);
+		  ruleTagCache.loadFromDb(id);
+		  throw e;
+	  }
   }
   
   @Override
