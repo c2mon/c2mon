@@ -184,6 +184,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                         try {
                             Map<String, Object> credEnv = new HashMap<String, Object>();
                             credEnv.put(JMXConnector.CREDENTIALS, RbaTokenLookup.findRbaToken());
+                            jmxc = JMXConnectorFactory.connect(url, credEnv);
                         } catch (final Exception ignore) {
                             logger.warn("Failed to connect using RBAC Token: " + ignore.getMessage());
                             
@@ -194,13 +195,6 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                             } catch (final Exception error) {
                                 throw new Exception("Plain text authorization failed:" + error.getMessage());
                             }
-                        }
-
-                        // try no password
-                        try {
-                            jmxc = JMXConnectorFactory.connect(url, null);
-                        } catch (final Exception error) {
-                            throw new Exception("RBAC token & plain text authorization failed.");
                         }
                     }
 
