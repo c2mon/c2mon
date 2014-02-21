@@ -286,6 +286,8 @@ public abstract class AbstractParser {
       final Object result = calculateExpr(xResult, yResult, Operator.fromString(op));
       return result;
 
+    } catch (ClassCastException cce) {
+      throw cce;
     } catch (Exception e) {
       throw new RuntimeException("Unexpected error during rule evaluation.", e);
     }
