@@ -145,50 +145,45 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
       subEquipmentCache.acquireWriteLockOnKey(equipmentId);
     }
     else {
-      String errorMsg = "Equipment id " + equipmentId + " unknown in in both equipment and subequipment cache.";
-      LOGGER.error(errorMsg);
-      throw new UnexpectedRollbackException(errorMsg);
+      String msg = "Equipment id " + equipmentId + " unknown in in both equipment and subequipment cache. Do write lock in both caches.";
+      LOGGER.debug(msg);
+      equipmentCache.acquireWriteLockOnKey(equipmentId);
+      subEquipmentCache.acquireWriteLockOnKey(equipmentId);
     }
   }
   
   private void acquireEquipmentWriteLockForElement(final Long id, Properties elementProperties) {
     String equipmentIdValue = elementProperties.getProperty(EQUIPMENT_ID);
     if (equipmentIdValue == null || equipmentIdValue.equalsIgnoreCase("")) {
-      String errorMsg = "Required property '" + EQUIPMENT_ID + "' is missing to create Control Tag " + id;
-      LOGGER.error(errorMsg);
-      throw new UnexpectedRollbackException(errorMsg);
+      String msg = "Property '" + EQUIPMENT_ID + "' is not set for Control Tag " + id + " => no write lock on equipment possible.";
+      LOGGER.trace(msg);
+    } else{
+      Long equipmentId = Long.valueOf(equipmentIdValue);
+      acquireEquipmentWriteLock(equipmentId);
     }
-    Long equipmentId = Long.valueOf(equipmentIdValue);
-    acquireEquipmentWriteLock(equipmentId);
   }
   
   /**
-   * Checks whether the equipment id belongs to the equipment or subequipment
-   * cache and releases the lock on it.
+   * Releases the write locks on equipment and subequipment cache, if owned by this thread.
    * @param equipmentId The id of the equipment of subequipment.
    */
   private void releaseEquimentWriteLock(final Long equipmentId) {
-    if (equipmentCache.hasKey(equipmentId)) {
-      equipmentCache.releaseWriteLockOnKey(equipmentId);
-    }
-    else if (subEquipmentCache.hasKey(equipmentId)) {
+    if (subEquipmentCache.isWriteLockedByCurrentThread(equipmentId)) {
       subEquipmentCache.releaseWriteLockOnKey(equipmentId);
     }
-    else {
-      String errorMsg = "Equipment id " + equipmentId + " unknown in both equipment and subequipment cache.";
-      LOGGER.error(errorMsg);
-      throw new UnexpectedRollbackException(errorMsg);
+    if (equipmentCache.isWriteLockedByCurrentThread(equipmentId)) {
+      equipmentCache.releaseWriteLockOnKey(equipmentId);
     }
   }
   
   private void releaseEquipmentWriteLockForElement(final Long id, final Properties elementProperties) {
     String equipmentIdValue = elementProperties.getProperty(EQUIPMENT_ID);
     if (equipmentIdValue == null || equipmentIdValue.equalsIgnoreCase("")) {
-      String errorMsg = "Required property '" + EQUIPMENT_ID + "' is missing to create Control Tag " + id;
-      LOGGER.error(errorMsg);
-      throw new UnexpectedRollbackException(errorMsg);
+      String msg = "Property '" + EQUIPMENT_ID + "' is not set for Control Tag " + id + " => no release of equipment write lock needed.";
+      LOGGER.trace(msg);
+    } else {
+      Long equipmentId = Long.valueOf(equipmentIdValue);
+      releaseEquimentWriteLock(equipmentId);
     }
-    Long equipmentId = Long.valueOf(equipmentIdValue);
-    releaseEquimentWriteLock(equipmentId);
   } 
 }
