@@ -45,7 +45,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (2,'descript
 insert into timconfigval (seqid, elementfield, elementvalue) values (2,'dataType','Integer');
 insert into timconfigval (seqid, elementfield, elementvalue) values (2,'mode','2');
 insert into timconfigval (seqid, elementfield, elementvalue) values (2,'isLogged','false');
-
+insert into timconfigval (seqid, elementfield, elementvalue) values (2,'equipmentId','150');
 insert into timconfigval (seqid, elementfield, elementvalue) values (2,'minValue','12');
 insert into timconfigval (seqid, elementfield, elementvalue) values (2,'maxValue','22');
 
@@ -111,6 +111,7 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (6,6,'UPDATE','ControlTag','500');
         
 insert into timconfigval (seqid, elementfield, elementvalue) values (6,'description','modified description');
+insert into timconfigval (seqid, elementfield, elementvalue) values (6,'equipmentId','150');
 insert into timconfigval (seqid, elementfield, elementvalue) values (6,'minValue','null');
 insert into timconfigval (seqid, elementfield, elementvalue) values (6,'maxValue','null');
 
@@ -197,6 +198,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (26,'aliveTa
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (25,25,'CREATE','ControlTag','501');
         
+insert into timconfigval (seqid, elementfield, elementvalue) values (25,'equipmentId','110');
 insert into timconfigval (seqid, elementfield, elementvalue) values (25,'name','Equipment alive');
 insert into timconfigval (seqid, elementfield, elementvalue) values (25,'description','test');
 insert into timconfigval (seqid, elementfield, elementvalue) values (25,'dataType','Integer');

@@ -11,13 +11,17 @@ import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.ControlTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.cache.ControlTagCache;
+import cern.c2mon.server.cache.EquipmentCache;
+import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * See interface documentation.
+ * <p>Please note that all changes on control tags will require a lock of the equipment. Otherwise
+ * it can lead to a deadlock situation in the running server.
  *  
- * <p>TODO update and remove are same as {@link DataTagConfigHandlerImpl} so could extend it
+ * <p>TODO: update and remove are same as {@link DataTagConfigHandlerImpl} so could extend it
  * 
  * @author Mark Brightwell
  *
@@ -30,6 +34,13 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
    */
   private static final Logger LOGGER = Logger.getLogger(ControlTagConfigHandlerImpl.class);  
   
+  /** Variable definition in configuration element for equipment ID */
+  private static final String EQUIPMENT_ID = "equipmentId";
+  
+  private final EquipmentCache equipmentCache;
+  
+  private final SubEquipmentCache subEquipmentCache;
+  
   /**
    * Wrapped bean with transacted methods.
    */
@@ -40,8 +51,12 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
 
 
   @Autowired  
-  public ControlTagConfigHandlerImpl(ControlTagCache controlTagCache) {    
+  public ControlTagConfigHandlerImpl(ControlTagCache controlTagCache, 
+                                     EquipmentCache equipmentCache,
+                                     SubEquipmentCache subEquipmentCache) {    
     this.controlTagCache = controlTagCache;
+    this.equipmentCache = equipmentCache;
+    this.subEquipmentCache = subEquipmentCache;
   }
   
   /**
@@ -65,13 +80,21 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
 
   @Override
   public ProcessChange createControlTag(ConfigurationElement element) throws IllegalAccessException {
-    ProcessChange change = controlTagConfigTransacted.doCreateControlTag(element);
-    controlTagCache.lockAndNotifyListeners(element.getEntityId());
+    ProcessChange change;
+    Long controlTagId = element.getEntityId();
+    acquireEquipmentWriteLockForElement(controlTagId, element.getElementProperties());
+    try {
+      change = controlTagConfigTransacted.doCreateControlTag(element);
+    } finally {
+      releaseEquipmentWriteLockForElement(controlTagId, element.getElementProperties());
+    }
+    controlTagCache.lockAndNotifyListeners(controlTagId);
     return change;
   }
 
   @Override
   public ProcessChange updateControlTag(Long id, Properties elementProperties) throws IllegalAccessException {
+    acquireEquipmentWriteLockForElement(id, elementProperties);
     try {
       return controlTagConfigTransacted.doUpdateControlTag(id, elementProperties); 
     } catch (UnexpectedRollbackException e) {
@@ -79,7 +102,9 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
       controlTagCache.remove(id);
       controlTagCache.loadFromDb(id);
       throw e;
-    }    
+    } finally {
+      releaseEquipmentWriteLockForElement(id, elementProperties);
+    }
   }
   
   @Override
@@ -107,4 +132,63 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
     controlTagConfigTransacted.removeRuleFromTag(tagId, ruleId);
   }
   
+  /**
+   * Checks whether the equipment id belongs to the equipment or subequipment
+   * cache and locks it.
+   * @param equipmentId The id of the equipment of subequipment.
+   */
+  private void acquireEquipmentWriteLock(final Long equipmentId) {
+    if (equipmentCache.hasKey(equipmentId)) {
+      equipmentCache.acquireWriteLockOnKey(equipmentId);
+    }
+    else if (subEquipmentCache.hasKey(equipmentId)) {
+      subEquipmentCache.acquireWriteLockOnKey(equipmentId);
+    }
+    else {
+      String errorMsg = "Equipment id " + equipmentId + " unknown in in both equipment and subequipment cache.";
+      LOGGER.error(errorMsg);
+      throw new UnexpectedRollbackException(errorMsg);
+    }
+  }
+  
+  private void acquireEquipmentWriteLockForElement(final Long id, Properties elementProperties) {
+    String equipmentIdValue = elementProperties.getProperty(EQUIPMENT_ID);
+    if (equipmentIdValue == null || equipmentIdValue.equalsIgnoreCase("")) {
+      String errorMsg = "Required property '" + EQUIPMENT_ID + "' is missing to create Control Tag " + id;
+      LOGGER.error(errorMsg);
+      throw new UnexpectedRollbackException(errorMsg);
+    }
+    Long equipmentId = Long.valueOf(equipmentIdValue);
+    acquireEquipmentWriteLock(equipmentId);
+  }
+  
+  /**
+   * Checks whether the equipment id belongs to the equipment or subequipment
+   * cache and releases the lock on it.
+   * @param equipmentId The id of the equipment of subequipment.
+   */
+  private void releaseEquimentWriteLock(final Long equipmentId) {
+    if (equipmentCache.hasKey(equipmentId)) {
+      equipmentCache.releaseWriteLockOnKey(equipmentId);
+    }
+    else if (subEquipmentCache.hasKey(equipmentId)) {
+      subEquipmentCache.releaseWriteLockOnKey(equipmentId);
+    }
+    else {
+      String errorMsg = "Equipment id " + equipmentId + " unknown in both equipment and subequipment cache.";
+      LOGGER.error(errorMsg);
+      throw new UnexpectedRollbackException(errorMsg);
+    }
+  }
+  
+  private void releaseEquipmentWriteLockForElement(final Long id, final Properties elementProperties) {
+    String equipmentIdValue = elementProperties.getProperty(EQUIPMENT_ID);
+    if (equipmentIdValue == null || equipmentIdValue.equalsIgnoreCase("")) {
+      String errorMsg = "Required property '" + EQUIPMENT_ID + "' is missing to create Control Tag " + id;
+      LOGGER.error(errorMsg);
+      throw new UnexpectedRollbackException(errorMsg);
+    }
+    Long equipmentId = Long.valueOf(equipmentIdValue);
+    releaseEquimentWriteLock(equipmentId);
+  } 
 }
