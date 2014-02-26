@@ -104,20 +104,15 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
       T cacheObject;
       for (Long key : keyList) {
         try {
-          cache.acquireReadLockOnKey(key);          
-          try {
-            cacheObject = cache.get(key);         
-            //do not persist unconfigured tags TODO could remove as unconfigured not used
-            if (cacheObject != null && (!(cacheObject instanceof Tag) || !((Tag) cacheObject).isInUnconfigured())) {                        
-              persistenceMapper.updateCacheable(cacheObject);
-            }
-          } finally {
-            cache.releaseReadLockOnKey(key);
+          cacheObject = cache.getCopy(key);         
+          //do not persist unconfigured tags TODO could remove as unconfigured not used
+          if (cacheObject != null && (!(cacheObject instanceof Tag) || !((Tag) cacheObject).isInUnconfigured())) {                        
+            persistenceMapper.updateCacheable(cacheObject);
           }
         } catch (CacheElementNotFoundException ex) {
           LOGGER.warn("Cache element with id " + key + " could not be persisted as not found in cache (may have been "
           		+ "removed in the meantime by a re-configuration). Cache is " + cache.getClass().getSimpleName(), ex);
-        }                    
+        }
       }
     } finally {
       clusterCache.releaseWriteLockOnKey(cachePersistenceLock);
