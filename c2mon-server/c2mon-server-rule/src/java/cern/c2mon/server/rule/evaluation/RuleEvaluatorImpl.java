@@ -13,16 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.rule.RuleEvaluator;
+import cern.c2mon.server.rule.evaluation.RuleUpdateBuffer;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleEvaluationException;
 
@@ -111,7 +112,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     Iterator<Long> rulesIterator = tag.getRuleIds().iterator(); // Rule Ids Collection 
     // For each rule id related to the tag
     while (rulesIterator.hasNext()) {
-       evaluateRule((Long) rulesIterator.next());
+       evaluateRule(rulesIterator.next());
     }
   }
   
@@ -135,9 +136,15 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
 
     // We synchronize on the rule reference object from the cache
     // in order to avoid simultaneous evaluations for the same rule
+    LOGGER.debug("Trying to acquiring write lock on rule " + pRuleId);
     ruleTagCache.acquireWriteLockOnKey(pRuleId);
+    LOGGER.trace("Got write lock on rule " + pRuleId);
+    
     try {
+      LOGGER.debug("Trying to get rule tag object from cache " + pRuleId);
       RuleTag rule = ruleTagCache.get(pRuleId);
+      LOGGER.trace("Got rule tag object from cache " + pRuleId);
+      
       if (rule.getRuleExpression() != null) {
         final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
         // Retrieve all input tags for the rule
@@ -151,7 +158,9 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
             // We don't use a read lock here, because a tag change would anyway
             // result in another rule evaluation
             // look for tag in datatag, rule and control caches
+            LOGGER.debug("Trying to get rule input tag object from cache " + inputTagId);
             tag = tagLocationService.get(inputTagId);
+            LOGGER.trace("Got rule tag object from cache " + inputTagId);
             // put reference to cache object in map
             tags.put(inputTagId, tag);
           }
@@ -190,6 +199,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
       // switched from INACCESSIBLE in old code
       ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
     } finally {
+      LOGGER.trace("Releasing lock on rule " + pRuleId);
       ruleTagCache.releaseWriteLockOnKey(pRuleId);
     }
   }
