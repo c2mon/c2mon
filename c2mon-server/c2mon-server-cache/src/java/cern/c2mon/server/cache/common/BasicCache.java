@@ -143,7 +143,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    */
   @ManagedOperation(description="Manually remove a given object from the cache (will need re-loading manually from DB)")
   public boolean remove(K id) {
-    return cache.remove(id);
+    return cache.removeWithWriter(id);
   }
   
   /**
