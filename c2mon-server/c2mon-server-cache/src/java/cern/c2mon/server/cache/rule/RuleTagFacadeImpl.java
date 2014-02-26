@@ -19,7 +19,6 @@
 package cern.c2mon.server.cache.rule;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
 
@@ -34,7 +33,6 @@ import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.RuleTagFacade;
 import cern.c2mon.server.cache.common.AbstractTagFacade;
-import cern.c2mon.server.cache.datatag.DataTagCacheObjectFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
@@ -108,6 +106,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
     try {
       RuleTag ruleTag = tagCache.get(ruleTagId);
       setParentSupervisionIds(ruleTag);
+      tagCache.putQuiet(ruleTag);
     } finally {
       tagCache.releaseWriteLockOnKey(ruleTagId);
     }
@@ -115,48 +114,46 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   
   /**
    * Sets the parent process and equipment fields for RuleTags.
+   * Please notice that the caller method should first make a write lock 
+   * on the RuleTag reference.
    * 
    * @param ruleTag the RuleTag for which the fields should be set
    */
   @Override
   public void setParentSupervisionIds(final RuleTag ruleTag) {
-    tagCache.acquireWriteLockOnKey(ruleTag.getId());
-    try {
-      //sets for this ruleTag
-      HashSet<Long> processIds = new HashSet<Long>();
-      HashSet<Long> equipmentIds = new HashSet<Long>();
-      for (Long tagKey : ruleTag.getRuleInputTagIds()) {
-        if (dataTagCache.hasKey(tagKey)) {
-          DataTag dataTag = dataTagCache.get(tagKey);
-          processIds.add(dataTag.getProcessId());
-          equipmentIds.add(dataTag.getEquipmentId());
-        } else if (tagCache.hasKey(tagKey)) {
-          tagCache.acquireWriteLockOnKey(tagKey);
-          try {
-            RuleTag childRuleTag = (RuleTag) tagCache.get(tagKey);
-            //if not empty, already processed; if empty, needs processing
-            if (!childRuleTag.getProcessIds().isEmpty()) {
-              processIds.addAll(childRuleTag.getProcessIds());
-              equipmentIds.addAll(childRuleTag.getEquipmentIds());
-            } else {
-              setParentSupervisionIds(childRuleTag);
-              processIds.addAll(childRuleTag.getProcessIds());
-              equipmentIds.addAll(childRuleTag.getEquipmentIds());
-            }
-          } finally {
-            tagCache.releaseWriteLockOnKey(tagKey);
-          }          
-        } else {
-          throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
-                    + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)");
-          }       
-      }
-      LOGGER.trace("Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds);
-      ruleTag.setProcessIds(processIds);
-      ruleTag.setEquipmentIds(equipmentIds);
-    } finally {
-      tagCache.releaseWriteLockOnKey(ruleTag.getId());
-    }   
+    //sets for this ruleTag
+    HashSet<Long> processIds = new HashSet<Long>();
+    HashSet<Long> equipmentIds = new HashSet<Long>();
+    for (Long tagKey : ruleTag.getRuleInputTagIds()) {
+      if (dataTagCache.hasKey(tagKey)) {
+        DataTag dataTag = dataTagCache.get(tagKey);
+        processIds.add(dataTag.getProcessId());
+        equipmentIds.add(dataTag.getEquipmentId());
+      } else if (tagCache.hasKey(tagKey)) {
+        tagCache.acquireWriteLockOnKey(tagKey);
+        try {
+          RuleTag childRuleTag = (RuleTag) tagCache.get(tagKey);
+          //if not empty, already processed; if empty, needs processing
+          if (!childRuleTag.getProcessIds().isEmpty()) {
+            processIds.addAll(childRuleTag.getProcessIds());
+            equipmentIds.addAll(childRuleTag.getEquipmentIds());
+          } else {
+            setParentSupervisionIds(childRuleTag);
+            tagCache.putQuiet(childRuleTag);
+            processIds.addAll(childRuleTag.getProcessIds());
+            equipmentIds.addAll(childRuleTag.getEquipmentIds());
+          }
+        } finally {
+          tagCache.releaseWriteLockOnKey(tagKey);
+        }          
+      } else {
+        throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
+                  + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)");
+        }       
+    }
+    LOGGER.trace("Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds);
+    ruleTag.setProcessIds(processIds);
+    ruleTag.setEquipmentIds(equipmentIds); 
   } 
   
   /**
@@ -195,7 +192,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   public void updateAndValidate(final Long id, final Object value, final String valueDescription, final Timestamp timestamp) {
     tagCache.acquireWriteLockOnKey(id);
     try {
-      RuleTag ruleTag = (RuleTag) tagCache.get(id);
+      RuleTag ruleTag = tagCache.get(id);
       if (!filterout(ruleTag, value, valueDescription, null, null, timestamp)) {          
         ruleTagCacheObjectFacade.validate(ruleTag);
         ruleTagCacheObjectFacade.update(ruleTag, value, valueDescription, timestamp);

@@ -59,13 +59,13 @@ public class TagLocationServiceImpl implements TagLocationService {
   }
   
   @SuppressWarnings("unchecked")
-  private synchronized <T extends Tag> C2monCache<Long, T> getCache(final Long id) {
-    if (ruleTagCache.hasKey(id)) {
+  private <T extends Tag> C2monCache<Long, T> getCache(final Long id) {
+    if (dataTagCache.hasKey(id)) {       
+      return (C2monCache<Long, T>) dataTagCache;
+    } else if (ruleTagCache.hasKey(id)) {
       return (C2monCache<Long, T>) ruleTagCache;
     } else if (controlTagCache.hasKey(id)) {
       return (C2monCache<Long, T>) controlTagCache;
-    } else if (dataTagCache.hasKey(id)) {       
-      return (C2monCache<Long, T>) dataTagCache;
     } else {
       throw new CacheElementNotFoundException("TagLocationService failed to locate tag with id " + id + " in any of the rule, control or datatag caches.");
     }

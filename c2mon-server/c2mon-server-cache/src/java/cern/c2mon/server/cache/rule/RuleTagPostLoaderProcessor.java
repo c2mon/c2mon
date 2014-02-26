@@ -105,6 +105,7 @@ public class RuleTagPostLoaderProcessor {
           //if not empty, already processed
           if (ruleTag.getProcessIds().isEmpty()) {
             ruleTagFacade.setParentSupervisionIds(ruleTag);
+            ruleTagCache.putQuiet(ruleTag);
           }
         } finally {
           ruleTagCache.releaseWriteLockOnKey(ruleKey);
