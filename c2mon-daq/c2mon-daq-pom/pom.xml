@@ -161,7 +161,7 @@
 			<dependency>
 				<groupId>cern.japc</groupId>
 				<artifactId>japc-ext-snmp</artifactId>
-				<version>1.0.1</version>
+				<version>1.0.2</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.springframework</groupId>
