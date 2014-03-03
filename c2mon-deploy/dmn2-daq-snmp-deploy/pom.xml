@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-daq</groupId>
 		<artifactId>c2mon-daq-pom</artifactId>
-		<version>1.1.1</version>
+		<version>1.1.2</version>
 	</parent>
 
 	<groupId>cern.dmn2.dmn2-daq</groupId>
@@ -38,7 +38,7 @@
 				<exclusion>
 					<groupId>cern.japc</groupId>
 					<artifactId>japc-ext-cmwrda3</artifactId>
-				</exclusion>				
+				</exclusion>
 				<exclusion>
 					<groupId>cern.japc</groupId>
 					<artifactId>japc-ext-yami</artifactId>
@@ -49,6 +49,13 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
