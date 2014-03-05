@@ -538,7 +538,7 @@ public class NotifierImplTest {
         notifier.setMailer(mailer);
         EasyMock.replay(mailer);
         
-        reg.setSubscriber(s);
+        s = reg.setSubscriber(s);
         
         printToSubmitNicely(toBeNotifiedFor.getId());
         
@@ -572,7 +572,7 @@ public class NotifierImplTest {
         notifier.setMailer(mailer);
         EasyMock.replay(mailer);
         
-        reg.setSubscriber(s);
+        s = reg.setSubscriber(s);
         
         // we put the rule in warning and then submit changed values and expect notifications
         sendUpdateRuleTag(2L, Status.ERROR.toInt());
