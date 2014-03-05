@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 
@@ -33,7 +34,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	/**
 	 * our logger.
 	 */
-	private Logger logger = Logger.getLogger(SubscriptionRegistryImpl.class);
+	private Logger logger = LoggerFactory.getLogger(SubscriptionRegistryImpl.class);
 
 	/**
 	 * our list of subscriptions organized by users. 
@@ -106,6 +107,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 * 
 	 */
 	//@PostConstruct
+    @Override
     public void reloadConfig() {
 	    
 	    /*
@@ -159,7 +161,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	/**
 	 * 
 	 */
-	public void start() {
+	@Override
+    public void start() {
 	    /*
          *  check if autosaver is demanded and start it in case it is. 
          */
@@ -216,6 +219,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 * @param subscriber the {@link Subscriber} to set. 
 	 * @throws TagNotFoundException in case one of the associated tags cannot be found.
 	 */
+    @Override
     public Subscriber setSubscriber(final Subscriber subscriber) throws TagNotFoundException {
 	    checkNull(subscriber);
 
@@ -434,7 +438,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 * @param subscription the subscription to remove.
 	 * @throws UserNotFoundException in case the owner of this subscription does not even exist.
 	 */
-	public void removeSubscription(Subscription subscription) throws UserNotFoundException {
+	@Override
+    public void removeSubscription(Subscription subscription) throws UserNotFoundException {
 	    checkNull(subscription);
 	    if (logger.isTraceEnabled()) {
 	        logger.trace("entering removeSubscription() : USER=" + subscription.getSubscriberId() + " TagId=" + subscription.getTagId());
@@ -460,7 +465,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 * @return HashMap<Subscriber, Subscription> A list of Subscribers and their subscriptions.
 	 * @param tagId the id of the tag
 	 */
-	public HashMap<Subscriber, Subscription> getSubscriptionsForTagId(Long tagId) {
+	@Override
+    public HashMap<Subscriber, Subscription> getSubscriptionsForTagId(Long tagId) {
 		HashMap<Subscriber, Subscription> result = new HashMap<Subscriber, Subscription>();
 		for (Subscriber s : users.values()) {
 			Subscription toAdd = s.getSubscriptions().get(tagId);
@@ -474,14 +480,16 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	/**
 	 * @return a list of all current registered subscribers.
 	 */
-	public List<Subscriber> getRegisteredUsers() {
+	@Override
+    public List<Subscriber> getRegisteredUsers() {
 		return new ArrayList<Subscriber>(users.values());
 	}
 	
 	/**
 	 * @return a list of current registered subscriptions
 	 */
-	public HashSet<Subscription> getRegisteredSubscriptions() {
+	@Override
+    public HashSet<Subscription> getRegisteredSubscriptions() {
 	    HashSet<Subscription> result = new HashSet<Subscription>();
 	    for (Subscriber s : users.values()) {
 	        for (Subscription sup : s.getSubscriptions().values()) {
@@ -494,7 +502,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	/**
 	 * @return a string representation of the registry.
 	 */
-	public String toString() {
+	@Override
+    public String toString() {
 		StringBuilder ret = new StringBuilder();
 		ret.append("Registered Users:\n");
 		for (Subscriber user : users.values()) {
@@ -546,6 +555,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
      */
     private void startDatabaseBackupWriter(final BackupWriter writer) {
         new Thread(new Runnable() {
+            @Override
             public void run() {
                 logger.trace("Starting DB BackupWriter.");
                 
@@ -584,6 +594,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
     /**
      * calls {@link #setLastModificationTime(long)} with the current Time.
      */
+    @Override
     public void updateLastModificationTime() {
         setLastModificationTime(System.currentTimeMillis());
     }
@@ -598,6 +609,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
     /**
      * @return Returns the notifier.
      */
+    @Override
     public TagCache getTagCache() {
         return tagCache;
     }
@@ -605,6 +617,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
     /**
      * @param tagCache The {@link TagCache} to set.
      */
+    @Override
     public void setTagCache(TagCache tagCache) {
         this.tagCache = tagCache;
     }

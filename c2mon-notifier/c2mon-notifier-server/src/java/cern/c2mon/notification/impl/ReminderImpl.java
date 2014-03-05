@@ -11,7 +11,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.notification.Notifier;
 import cern.c2mon.notification.Reminder;
@@ -26,7 +27,7 @@ import cern.dmn2.core.Status;
  */
 public class ReminderImpl implements Reminder {
 
-    private static Logger logger = Logger.getLogger(Reminder.class);
+    private static Logger logger = LoggerFactory.getLogger(Reminder.class);
 
     /**
      * the time when we sent the reminders
@@ -59,6 +60,7 @@ public class ReminderImpl implements Reminder {
      * @param time the reminder time in hours
      * @param unit the {@link TimeUnit}
      */
+    @Override
     public void setReminderTime(long time, TimeUnit unit) {
         reminderTime = unit.toMillis(time);
         logger.info("Setting new reminder time to " + time + " " + unit.toString());
@@ -74,6 +76,7 @@ public class ReminderImpl implements Reminder {
     /**
      * @return the reminder time in milliseconds
      */
+    @Override
     public long getReminderTime() {
         return reminderTime;
     }

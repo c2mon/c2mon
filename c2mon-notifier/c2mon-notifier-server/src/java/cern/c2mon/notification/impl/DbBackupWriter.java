@@ -21,7 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -47,7 +48,7 @@ public class DbBackupWriter implements BackupWriter {
     
     final JdbcTemplate jdbcTemplate;
     
-    Logger logger = Logger.getLogger(DbBackupWriter.class);
+    Logger logger = LoggerFactory.getLogger(DbBackupWriter.class);
     
     private long lastStoreTime = 0;
     private long lastLoadTime = 0;

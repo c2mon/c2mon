@@ -18,7 +18,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 
 import cern.c2mon.notification.shared.Subscriber;
@@ -46,7 +47,7 @@ public class FileBackUpWriter implements BackupWriter {
     /**
      * our Logger.
      */
-    private Logger logger = Logger.getLogger(FileBackUpWriter.class);
+    private Logger logger = LoggerFactory.getLogger(FileBackUpWriter.class);
     
     private long lastStoreTime = 0;
     private long lastLoadTime = 0;

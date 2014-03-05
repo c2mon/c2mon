@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -37,7 +38,7 @@ public class TextCreator {
     /**
      * our Logger.
      */
-    private Logger logger = Logger.getLogger(TextCreator.class);
+    private Logger logger = LoggerFactory.getLogger(TextCreator.class);
 
     /**
      * maximum subject length

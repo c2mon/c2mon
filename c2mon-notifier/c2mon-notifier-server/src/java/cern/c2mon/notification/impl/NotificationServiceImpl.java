@@ -16,7 +16,8 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
@@ -41,7 +42,7 @@ public class NotificationServiceImpl implements MessageListener {
     /**
      * our Logger.
      */
-	private Logger logger = Logger.getLogger(NotificationServiceImpl.class);
+	private Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
 	
 	/**
 	 * our registry for keeping subscriptions.
@@ -163,15 +164,15 @@ public class NotificationServiceImpl implements MessageListener {
 	 * 
 	 * @param message the JMS Message from the client.
 	 */
-	public void onMessage(Message message) {
+	@Override
+    public void onMessage(Message message) {
 
 		if (message instanceof TextMessage) {
 			TextMessage text = (TextMessage) message;
 			Destination replyDestination = null;
 			ClientResponse response = null;
 			
-			final Gson gson = new Gson();
-
+			
 			try {
 			    if (logger.isInfoEnabled()) {
 	                logger.info("Handling message " + message.getJMSCorrelationID() + ". Need to respond to " + message.getJMSReplyTo());
@@ -192,7 +193,7 @@ public class NotificationServiceImpl implements MessageListener {
 			    PrintWriter printWriter = new PrintWriter(result);
 			    ex.printStackTrace(printWriter);
 				response = new ClientResponse(ClientResponse.Type.ErrorResponse, result.toString());
-				logger.warn(ex);
+				logger.warn("While handling message from client: {}", ex.getMessage(), ex);
 				ex.printStackTrace();
 			}
 
@@ -202,7 +203,7 @@ public class NotificationServiceImpl implements MessageListener {
 			} catch (JMSException e) {
 				// we can't do anything here
 				e.printStackTrace();
-				logger.error(e);
+				logger.error("Can't send reply to client: {}", e.getMessage());
 			} catch (Exception e) {
 				// we try to send the cause to the client.
 				if (replyDestination != null) {

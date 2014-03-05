@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
@@ -22,7 +24,7 @@ public class Tag {
 
     public static int MAX_STATE_HISTORY_ENTRIES = 10;
 
-    private static Logger logger = Logger.getLogger(Tag.class);
+    private static Logger logger = LoggerFactory.getLogger(Tag.class);
 
     private boolean isRule = false;
 

@@ -15,7 +15,8 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.notification.Mailer;
 
@@ -32,7 +33,7 @@ public class MailerImpl implements Mailer {
     /**
      * our logger
      */
-    private Logger logger = Logger.getLogger(MailerImpl.class);
+    private Logger logger = LoggerFactory.getLogger(MailerImpl.class);
 
     /**
      * For speed reasons we initialize it only once.

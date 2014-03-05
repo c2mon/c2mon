@@ -12,7 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.client.core.C2monServiceGateway;
@@ -37,7 +38,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     /**
      * our Logger.
      */
-    private Logger logger = Logger.getLogger(NotifierImpl.class);
+    private Logger logger = LoggerFactory.getLogger(NotifierImpl.class);
 
     /**
      * our registry which keep information on who is registered to what.

@@ -24,7 +24,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
@@ -56,7 +57,7 @@ import com.google.gson.Gson;
  */
 public class TagCache implements DataTagUpdateListener {
 
-    private Logger logger = Logger.getLogger(TagCache.class);
+    private Logger logger = LoggerFactory.getLogger(TagCache.class);
 
     /**
      * Our internal list of tags.
@@ -105,7 +106,7 @@ public class TagCache implements DataTagUpdateListener {
             HashMap<Long, Tag> list = new HashMap<Long, Tag>();
             root = metricTagResolver2(id, list);
             if (root == null) {
-                logger.fatal("Tag " + id + " cannot be resolved!");
+                logger.error("Tag " + id + " cannot be resolved!");
             } else {
                 for (Entry<Long, Tag> e : list.entrySet()) {
                     cache.put(e.getKey(), e.getValue());
@@ -373,19 +374,6 @@ public class TagCache implements DataTagUpdateListener {
     }
     
     
-    private class CacheBackupThread implements Runnable {
-
-        @Override
-        public void run() {
-            try {
-                writeToPersistence();
-            } catch (Exception ex) {
-               logger.error(ex.getMessage(), ex);
-            }
-        }
-    }
-
-
     public long getSize() {
         return cache.size();
     }
@@ -512,8 +500,7 @@ public class TagCache implements DataTagUpdateListener {
             }
             
         } catch (Exception ex) {
-            ex.printStackTrace();
-            logger.error(ex);
+            logger.error("while getting an update from the server: ",ex.getMessage(), ex);
         }
     }
   
@@ -576,7 +563,7 @@ public class TagCache implements DataTagUpdateListener {
                     sub.setLastStatusForResolvedTSubTag(child.getId(), Status.OK);
                 }
             } else {
-                
+                // anything here ?
             }
         }
         if (logger.isTraceEnabled()) {
