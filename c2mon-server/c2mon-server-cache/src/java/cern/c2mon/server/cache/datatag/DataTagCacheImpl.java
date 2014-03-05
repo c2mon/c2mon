@@ -70,7 +70,7 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
     LOGGER.info("Initializing the DataTag cache...");    
 
     try {
-      getCache().setNodeBulkLoadEnabled(false);
+      getCache().setNodeBulkLoadEnabled(true);
     } catch (UnsupportedOperationException ex) {
       LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
           + "loading the cache (UnsupportedOperationException) - this is "
@@ -81,7 +81,7 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
     commonInit();
     
     try {
-      getCache().setNodeBulkLoadEnabled(true);
+      getCache().setNodeBulkLoadEnabled(false);
     } catch (UnsupportedOperationException ex) {
       LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
           + "loading the cache (UnsupportedOperationException) - this is "
