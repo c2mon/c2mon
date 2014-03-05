@@ -11,7 +11,7 @@
 
 	<groupId>cern.c2mon.notification</groupId>
 	<artifactId>c2mon-server-notification</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>notifier</name>
 	<packaging>jar</packaging>
 
