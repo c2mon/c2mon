@@ -88,10 +88,12 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
   @Override
   public void notifyElementUpdated(Tag tag) {    
     try {
+      LOGGER.trace(tag.getId() + " Entering notifyElementUpdated()");
       evaluateRules(tag);
     } catch (Exception e) {
-      LOGGER.error("Error caught when evaluating rules dependent on Tag " + tag.getId() + "(these are " + tag.getRuleIds() + ")", e);
-    }    
+      LOGGER.error(tag.getId() + " Error caught when evaluating rules (these are " + tag.getRuleIds() + ")", e);
+    }
+    LOGGER.debug(tag.getId() + " Finished processing.");
   }
   
   /**
@@ -111,8 +113,11 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     //TODO no synch here, since no harm if rule is removed or added ?
     Iterator<Long> rulesIterator = tag.getRuleIds().iterator(); // Rule Ids Collection 
     // For each rule id related to the tag
-    while (rulesIterator.hasNext()) {
-       evaluateRule(rulesIterator.next());
+    if (tag.getRuleIds().size() > 0) {
+        LOGGER.trace(tag.getId() + " Iterating over " + tag.getRuleIds().size() + " input tags : " + tag.getRuleIds());
+        while (rulesIterator.hasNext()) {
+           evaluateRule(rulesIterator.next());
+        }
     }
   }
   
@@ -126,9 +131,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
   @Override
   public final void evaluateRule(final Long pRuleId) {
     if (LOGGER.isTraceEnabled()) {
-      StringBuffer str = new StringBuffer("evaluateRule(");
-      str.append(pRuleId);
-      str.append(") called.");
+      StringBuffer str = new StringBuffer("").append(pRuleId).append(" evaluateRule() called");
       LOGGER.trace(str);
     }
 
@@ -136,17 +139,24 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
 
     // We synchronize on the rule reference object from the cache
     // in order to avoid simultaneous evaluations for the same rule
-    LOGGER.debug("Trying to acquiring write lock on rule " + pRuleId);
+    
+    if (ruleTagCache.isWriteLockedByCurrentThread(pRuleId)) {
+        LOGGER.info(pRuleId + " Attention: I already have a write lock on rule " + pRuleId);
+    } 
+    LOGGER.trace(pRuleId + " Trying to acquiring write lock...");
     ruleTagCache.acquireWriteLockOnKey(pRuleId);
-    LOGGER.trace("Got write lock on rule " + pRuleId);
+    LOGGER.debug(pRuleId + " Got write lock");      
     
     try {
-      LOGGER.debug("Trying to get rule tag object from cache " + pRuleId);
+      LOGGER.trace(pRuleId + " Trying to get rule tag object from cache...");
       RuleTag rule = ruleTagCache.get(pRuleId);
-      LOGGER.trace("Got rule tag object from cache " + pRuleId);
+      LOGGER.debug(pRuleId + " Got rule tag object from cache ");
       
       if (rule.getRuleExpression() != null) {
         final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
+        
+        LOGGER.trace(pRuleId + " RuleInputTags: " + ruleInputTagIds);
+        
         // Retrieve all input tags for the rule
         final Map<Long, Object> tags = new Hashtable<Long, Object>(ruleInputTagIds.size());
 
@@ -158,9 +168,9 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
             // We don't use a read lock here, because a tag change would anyway
             // result in another rule evaluation
             // look for tag in datatag, rule and control caches
-            LOGGER.debug("Trying to get rule input tag object from cache " + inputTagId);
+            LOGGER.trace(pRuleId + " Trying to get input tag object from cache...");
             tag = tagLocationService.get(inputTagId);
-            LOGGER.trace("Got rule tag object from cache " + inputTagId);
+            LOGGER.debug(pRuleId + " Got input tag '" + inputTagId + "' object from cache");
             // put reference to cache object in map
             tags.put(inputTagId, tag);
           }
@@ -172,34 +182,34 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
           Object value = rule.getRuleExpression().evaluate(tags, ruleResultClass);
           ruleUpdateBuffer.update(pRuleId, value, "Rule result", ruleResultTimestamp);
         } catch (CacheElementNotFoundException cacheEx) {
-          LOGGER.warn("evaluateRule - Failed to locate tag with id " + actualTag + " in any tag cache (during rule evaluation) - unable to evaluate rule.",
+          LOGGER.warn(pRuleId + " evaluateRule - Failed to locate tag with id " + actualTag + " in any tag cache (during rule evaluation) - unable to evaluate rule.",
               cacheEx);
           ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON,
               "Unable to evaluate rule as cannot find required Tag in cache: " + cacheEx.getMessage(), ruleResultTimestamp);
         } catch (RuleEvaluationException re) {
           // TODO change in rule engine: this should NOT be done using an
           // exception since it is normal behavior switched to trace
-          LOGGER.trace("evaluateRule - Problem evaluating expresion for rule with Id (" + pRuleId + ") - invalidating rule with quality UNKNOWN_REASON ("
+          LOGGER.trace(pRuleId + " evaluateRule - Problem evaluating expresion for rule with Id (" + pRuleId + ") - invalidating rule with quality UNKNOWN_REASON ("
               + re.getMessage() + ").");
           // switched from INACCESSIBLE in old code
           ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, re.getMessage(), ruleResultTimestamp);
         } catch (Exception e) {
-          LOGGER.error(
-              "evaluateRule - Unexpected Error evaluating expresion of rule with Id (" + pRuleId + ") - invalidating rule with quality UNKNOWN_REASON", e);
+          LOGGER.error(pRuleId + 
+              " evaluateRule - Unexpected Error evaluating expresion of rule with Id (" + pRuleId + ") - invalidating rule with quality UNKNOWN_REASON", e);
           // switched from INACCESSIBLE in old code
           ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
         }
       } else {
-        LOGGER.error("evaluateRule - Unable to evaluate rule with Id (" + pRuleId + ") as RuleExpression is null.");
+        LOGGER.error(pRuleId + " evaluateRule - Unable to evaluate rule with Id (" + pRuleId + ") as RuleExpression is null.");
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("evaluateRule - Rule with id " + pRuleId + " not found in cache - unable to evaluate it.", cacheEx);
+      LOGGER.error(pRuleId + " evaluateRule - Rule with id " + pRuleId + " not found in cache - unable to evaluate it.", cacheEx);
     } catch (Exception e) {
       LOGGER.error("evaluateRule - Unexpected Error caught while retrieving " + pRuleId + " from rule cache.", e);
       // switched from INACCESSIBLE in old code
       ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
     } finally {
-      LOGGER.trace("Releasing lock on rule " + pRuleId);
+      LOGGER.debug(pRuleId + " Releasing write lock");
       ruleTagCache.releaseWriteLockOnKey(pRuleId);
     }
   }
