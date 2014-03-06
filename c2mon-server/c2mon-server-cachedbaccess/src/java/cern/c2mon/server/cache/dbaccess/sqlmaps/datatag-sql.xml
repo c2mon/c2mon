@@ -128,11 +128,11 @@
     <update id="updateCacheable" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
       UPDATE DATATAG
          SET TAGVALUE = #{value,javaType=java.lang.Object,jdbcType=BLOB},
-             TAGVALUEDESC = #{valueDescription,jdbcType=VARCHAR},
+             TAGVALUEDESC = SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
              TAGTIMESTAMP = #{sourceTimestamp, jdbcType=TIMESTAMP}, 
              TAGDAQTIMESTAMP = #{daqTimestamp, jdbcType=TIMESTAMP},             
              TAGSRVTIMESTAMP = #{cacheTimestamp,jdbcType=TIMESTAMP},             
-             TAGQUALITYDESC = #{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR},
+             TAGQUALITYDESC = SUBSTR(#{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR}, 1, 1000),
              TAGSIMULATED = #{simulated,jdbcType=NUMERIC}
        WHERE TAGID=#{id} 
     </update>
@@ -140,7 +140,7 @@
     <update id="updateConfig" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
       UPDATE DATATAG
          SET TAGNAME = #{name},
-             TAGDESC = #{description,jdbcType=VARCHAR},
+             TAGDESC = SUBSTR(#{description,jdbcType=VARCHAR}, 1, 100),
              TAGMODE = #{mode},
              TAGDATATYPE = #{dataType},
              TAG_EQID = #{equipmentId,jdbcType=NUMERIC},
