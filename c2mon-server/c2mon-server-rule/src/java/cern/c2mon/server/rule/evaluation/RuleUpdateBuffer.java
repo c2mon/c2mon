@@ -165,11 +165,11 @@ public final class RuleUpdateBuffer {
     if (!isCacheUpdaterRunning) {
       try {
         if (LOG.isTraceEnabled())
-          LOG.trace("scheduleCacheUpdaterTask() - Initialize new cache updater task");
+          LOG.trace(pId + " scheduleCacheUpdaterTask() - Initialize new cache updater task");
         timer.schedule(new CacheUpdaterTask(), BUFFER_TIMER_MILLIS, BUFFER_TIMER_MILLIS);
         isCacheUpdaterRunning = true;
       } catch (IllegalStateException ise) {
-        LOG.error("scheduleCacheUpdaterTask() - Catched illegal state exception", ise);
+        LOG.error(pId + "scheduleCacheUpdaterTask() - Catched illegal state exception", ise);
       }      
     }
   }
