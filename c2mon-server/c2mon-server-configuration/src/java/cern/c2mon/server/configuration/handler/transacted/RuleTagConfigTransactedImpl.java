@@ -72,8 +72,8 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
    * @throws {@link UnexpectedRollbackException} if RuntimeException caught; DB transaction is rolled back and Rule & associated
    *                                                Tags are removed from cache 
    */
-  @Transactional("cacheTransactionManager")
   @Override
+  @Transactional(value = "cacheTransactionManager")
   public void doCreateRuleTag(ConfigurationElement element) throws IllegalAccessException {
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
