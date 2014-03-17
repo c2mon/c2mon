@@ -194,8 +194,14 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
   @SuppressWarnings("unchecked")
   public final T getCopy(final K id) {
     if (id != null) {
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace(id + " Trying to get READ lock...");
+      }
       cache.acquireReadLockOnKey(id);
       try {
+        if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace(id + " Got READ lock");
+        }
         T reference = get(id);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -212,6 +218,9 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
         throw new UnsupportedOperationException("The getCopy() method is not supported for this cache element since the cache object is not entirely serializable. Please revisit your object.", ex);
       } finally {
         cache.releaseReadLockOnKey(id);
+        if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace(id + " Released READ lock");
+        }
       }
     }
     else {
@@ -340,9 +349,16 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
    */
   public T loadFromDb(final K id) {
     T result;
+    if (LOGGER.isTraceEnabled()) {
+      LOGGER.trace(cache.getName() + " Acquiring WRITE lock for id=" + String.valueOf(id));
+    }
     cache.acquireWriteLockOnKey(id);
     try {
-      if (!cache.isKeyInCache(id)) { 
+      if (!cache.isKeyInCache(id)) {
+        if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace(cache.getName() + " Got WRITE lock for id=" + String.valueOf(id));
+        }
+          
         //try to load from DB; is put in cache if successful; returns null o.w.
         try {
           result = getFromDb(id);
@@ -363,6 +379,9 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
       }      
     } finally {
       cache.releaseWriteLockOnKey(id);
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace(cache.getName() + " Released WRITE lock for id=" + String.valueOf(id));
+      }
     }   
   }
   

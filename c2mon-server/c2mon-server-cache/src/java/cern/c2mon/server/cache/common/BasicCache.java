@@ -15,7 +15,6 @@ import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.shared.common.Cacheable;
 
 /**
  * Provides all core functionalities that are required to manage a cache. This class uses
@@ -98,10 +97,12 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   public final T get(final K id) {
     T result = null;
     if (id != null) {
+      if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace(cache.getName() + " Trying to get ID=" + id);
+      }
       cache.acquireReadLockOnKey(id);
       try {
-        Element element = cache.get((Object) id);
-        
+        Element element = cache.get(id);
         if (element != null) {
           result = (T) element.getObjectValue();
         } else {
@@ -119,6 +120,10 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
       throw new IllegalArgumentException("Accessing cache with null key!");
     }
     
+    if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace(cache.getName() + " Returning object for ID=" + id);
+    }
+    
     return result;
   }
   
@@ -129,7 +134,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    */
   @SuppressWarnings("unchecked")
   public List<K> getKeys() {
-    return (List<K>) cache.getKeys();
+    return cache.getKeys();
   }
   
   public void put(K key, T value) {
@@ -160,7 +165,13 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   
   public void acquireReadLockOnKey(K id) {
     if (id != null) {
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace(cache.getName() + " Acquiring READ lock for id=" + String.valueOf(id));
+      }
       cache.acquireReadLockOnKey(id);
+      if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace(cache.getName() + " Got READ lock for id=" + String.valueOf(id));
+      }
     } else {
       LOGGER.error("Trying to acquire read lock with a NULL key - throwing an exception!");
       throw new IllegalArgumentException("Acquiring read lock with null key!");
@@ -170,6 +181,9 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   public void releaseReadLockOnKey(K id) {
     if (id != null) {
       cache.releaseReadLockOnKey(id);
+      if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace(cache.getName() + " Released READ lock for id=" + String.valueOf(id));
+      }
     } else {
       LOGGER.error("Trying to release read lock with a NULL key - throwing an exception!");
       throw new IllegalArgumentException("Trying to release read lock with null key!");
@@ -178,7 +192,13 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   
   public void acquireWriteLockOnKey(K id) {
     if (id != null) {
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace(cache.getName() + " Acquiring WRITE lock for id=" + String.valueOf(id));
+      }
       cache.acquireWriteLockOnKey(id);
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace(cache.getName() + " Got WRITE lock for id=" + String.valueOf(id));
+      }
     } else {
       LOGGER.error("Trying to acquire write lock with a NULL key - throwing an exception!");
       throw new IllegalArgumentException("Acquiring write lock with null key!");
@@ -188,6 +208,9 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   public void releaseWriteLockOnKey(K id) {
     if (id != null) {
       cache.releaseWriteLockOnKey(id);
+      if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace(cache.getName() + " Released WRITE lock for id=" + String.valueOf(id));
+      }
     } else {
       LOGGER.error("Trying to release write lock with a NULL key - throwing an exception!");
       throw new IllegalArgumentException("Trying to release write lock with null key!");
