@@ -145,8 +145,10 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
     c2monCache.acquireWriteLockOnKey(id);
     try {      
       T supervised = c2monCache.get(id);
-      resume(supervised, timestamp, message);
-      c2monCache.put(id, supervised);      
+      if (!supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {
+        resume(supervised, timestamp, message);
+        c2monCache.put(id, supervised);
+      }
     } finally {
       c2monCache.releaseWriteLockOnKey(id);
     }
@@ -163,8 +165,10 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
     c2monCache.acquireWriteLockOnKey(id);
     try {
       T supervised = c2monCache.get(id);
-      suspend(supervised, timestamp, message);
-      c2monCache.put(id, supervised);
+      if (isRunning(supervised) || isUncertain(supervised)) {
+          suspend(supervised, timestamp, message);
+          c2monCache.put(id, supervised);
+      }
     } finally {
       c2monCache.releaseWriteLockOnKey(id);
     }
