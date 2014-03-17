@@ -85,13 +85,17 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
 
   @Override
   public void createRuleTag(ConfigurationElement element) throws IllegalAccessException {
-    ruleTagConfigTransacted.doCreateRuleTag(element);
-    ruleEvaluator.evaluateRule(element.getEntityId());
-    ruleTagCache.lockAndNotifyListeners(element.getEntityId());
-    if (LOGGER.isTraceEnabled()) {
-    	LOGGER.trace("createRuleTag - Notifying Configuration update listeners");
+    ruleTagCache.acquireWriteLockOnKey(element.getEntityId());
+    try {
+      ruleTagConfigTransacted.doCreateRuleTag(element);
+      ruleEvaluator.evaluateRule(element.getEntityId());
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("createRuleTag - Notifying Configuration update listeners");
+      }
+      this.configurationUpdateImpl.notifyListeners(element.getEntityId());
+    } finally {
+        ruleTagCache.releaseWriteLockOnKey(element.getEntityId());
     }
-    this.configurationUpdateImpl.notifyListeners(element.getEntityId());
   }
 
   @Override
@@ -99,7 +103,6 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
 	  try {
 		  ruleTagConfigTransacted.doUpdateRuleTag(id, elementProperties);
 		  ruleEvaluator.evaluateRule(id);
-		  ruleTagCache.lockAndNotifyListeners(id);
 		  if (LOGGER.isTraceEnabled()) {
 			  LOGGER.trace("updateRuleTag - Notifying Configuration update listeners");
 		  }
