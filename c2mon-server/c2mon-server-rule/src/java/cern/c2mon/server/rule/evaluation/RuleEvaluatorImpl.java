@@ -114,7 +114,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     Iterator<Long> rulesIterator = tag.getRuleIds().iterator(); // Rule Ids Collection 
     // For each rule id related to the tag
     if (tag.getRuleIds().size() > 0) {
-        LOGGER.trace(tag.getId() + " Iterating over " + tag.getRuleIds().size() + " input tags : " + tag.getRuleIds());
+        LOGGER.trace(tag.getId() + " Triggering re-evaluation for " + tag.getRuleIds().size() + " rules : " + tag.getRuleIds());
         while (rulesIterator.hasNext()) {
            evaluateRule(rulesIterator.next());
         }
@@ -143,9 +143,9 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     if (ruleTagCache.isWriteLockedByCurrentThread(pRuleId)) {
         LOGGER.info(pRuleId + " Attention: I already have a write lock on rule " + pRuleId);
     } 
-    LOGGER.trace(pRuleId + " Trying to acquiring write lock...");
+    LOGGER.trace(pRuleId + " Trying to acquire WRITE lock...");
     ruleTagCache.acquireWriteLockOnKey(pRuleId);
-    LOGGER.debug(pRuleId + " Got write lock");      
+    LOGGER.debug(pRuleId + " Got WRITE lock");      
     
     try {
       LOGGER.trace(pRuleId + " Trying to get rule tag object from cache...");
@@ -168,9 +168,9 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
             // We don't use a read lock here, because a tag change would anyway
             // result in another rule evaluation
             // look for tag in datatag, rule and control caches
-            LOGGER.trace(pRuleId + " Trying to get input tag object from cache...");
+            LOGGER.trace(pRuleId + " Trying to get object for input tag '" + inputTagId + "' from cache...");
             tag = tagLocationService.get(inputTagId);
-            LOGGER.debug(pRuleId + " Got input tag '" + inputTagId + "' object from cache");
+            LOGGER.debug(pRuleId + " Got object for input tag '" + inputTagId + "' object from cache");
             // put reference to cache object in map
             tags.put(inputTagId, tag);
           }
@@ -209,8 +209,8 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
       // switched from INACCESSIBLE in old code
       ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
     } finally {
-      LOGGER.debug(pRuleId + " Releasing write lock");
       ruleTagCache.releaseWriteLockOnKey(pRuleId);
+      LOGGER.debug(pRuleId + " Released WRITE lock");
     }
   }
 

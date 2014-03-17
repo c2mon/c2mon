@@ -116,6 +116,7 @@ public final class RuleUpdateBuffer {
   public void update(final Long pId, final Object pValue, final String pValueDesc, final Timestamp pTimestamp) {
     final RuleBufferObject bufferObj;
     
+    LOG.trace(pId + " entering update()");
     synchronized (BUFFER_LOCK) {
       if (!RULE_OBJECT_BUF.containsKey(pId)) {
         bufferObj = new RuleBufferObject(pId, pValue, pValueDesc, pTimestamp);
@@ -127,6 +128,7 @@ public final class RuleUpdateBuffer {
       }
       scheduleCacheUpdaterTask(pId);
     }
+    LOG.trace(pId + " leaving update()");
   }
 
 
@@ -140,6 +142,7 @@ public final class RuleUpdateBuffer {
   public void invalidate(final Long pId, final TagQualityStatus pReason, final String pDescription, final Timestamp pTimestamp) {
     final RuleBufferObject bufferObj;
     
+    LOG.trace(pId + " entering invalidate()");
     synchronized (BUFFER_LOCK) {
       if (!RULE_OBJECT_BUF.containsKey(pId)) {
         bufferObj = new RuleBufferObject(pId, null, pReason, pDescription, null, pTimestamp);
@@ -151,6 +154,7 @@ public final class RuleUpdateBuffer {
       }
       scheduleCacheUpdaterTask(pId);
     }
+    LOG.trace(pId + " leaving invalidate()");
   }
 
 
