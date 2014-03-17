@@ -90,7 +90,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
    * @param ruleId the rule id
    */
   @Override
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   public void addRuleToTag(final Long tagId, final Long ruleId) {
     LOGGER.trace("Adding rule " + ruleId + " reference from Tag " + tagId);
     tagCache.acquireWriteLockOnKey(tagId);    
@@ -107,7 +107,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   }
   
   @Override
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   public void removeRuleFromTag(final Long tagId, final Long ruleId) {
     LOGGER.trace("Removing rule " + ruleId + " reference from Tag " + tagId);    
     tagCache.acquireWriteLockOnKey(tagId);
@@ -124,7 +124,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   }
   
   @Override
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   public void addAlarmToTag(final Long tagId, final Long alarmId) {
     LOGGER.trace("Adding Alarm " + alarmId + " reference from Tag " + tagId);
     tagCache.acquireWriteLockOnKey(tagId);
@@ -138,7 +138,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   }
   
   @Override
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   public void removeAlarmFromTag(final Long tagId, final Long alarmId) {
     LOGGER.trace("Removing Alarm " + alarmId + " reference from Tag " + tagId);        
     tagCache.acquireWriteLockOnKey(tagId);

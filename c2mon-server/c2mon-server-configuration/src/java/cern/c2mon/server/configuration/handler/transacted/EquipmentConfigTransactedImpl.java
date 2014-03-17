@@ -10,12 +10,6 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
-import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
-import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
-import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
-import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
-import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.EquipmentCache;
@@ -24,11 +18,11 @@ import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
-import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
 
 /**
  * Equipment configuration transacted methods.
@@ -77,7 +71,7 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
    * @throws IllegalAccessException 
    */
   @Override
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   public ProcessChange doCreateEquipment(ConfigurationElement element) throws IllegalAccessException {
     Equipment equipment = super.createAbstractEquipment(element);
     equipmentFacade.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
@@ -86,7 +80,7 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
   }
   
   @Override
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   public List<ProcessChange> doUpdateAbstractEquipment(Equipment equipment, Properties properties) throws IllegalAccessException {   
     return super.updateAbstractEquipment(equipment, properties);        
   }

@@ -156,6 +156,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
       
   }    
   
+  @Override
   @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
   public ProcessChange doRemoveControlTag(Long id, ConfigurationElementReport tagReport) {
     LOGGER.trace("Removing ControlTag " + id);

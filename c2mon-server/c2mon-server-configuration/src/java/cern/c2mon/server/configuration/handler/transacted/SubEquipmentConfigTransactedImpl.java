@@ -73,7 +73,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
    *           should not be thrown here (in common interface for Tags)
    */
   @Override
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   public ProcessChange doCreateSubEquipment(final ConfigurationElement element) throws IllegalAccessException {
     SubEquipment subEquipment = super.createAbstractEquipment(element);
     subEquipmentFacade.addSubEquipmentToEquipment(subEquipment.getId(), subEquipment.getParentId());

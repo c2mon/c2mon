@@ -9,13 +9,12 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.configuration.ConfigurationLoader;
-import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.configuration.ConfigurationLoader;
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -82,7 +81,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
    *           not thrown (inherited from common facade interface)
    */
   @Override
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   public ProcessChange doCreateProcess(final ConfigurationElement element) throws IllegalAccessException {
     processCache.acquireWriteLockOnKey(element.getEntityId());
     try {
@@ -107,7 +106,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
    * @throws IllegalAccessException
    */
   @Override
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   public ProcessChange doUpdateProcess(final Long id, final Properties properties) throws IllegalAccessException {
     if (properties.containsKey("id")) {
       throw new ConfigurationException(ConfigurationException.UNDEFINED, "Attempting to change the process id - this is not currently supported!");

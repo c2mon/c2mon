@@ -88,8 +88,8 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
    * @throws IllegalAccessException 
    * @throws RuntimeException if any error occurs during reconfiguration; DB transaction is rolled back and cache elements are removed
    */
-  @Transactional("cacheTransactionManager")
   @Override
+  @Transactional(value = "cacheTransactionManager")
   public ProcessChange doCreateDataTag(final ConfigurationElement element) throws IllegalAccessException {
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
@@ -136,8 +136,8 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
    * @param properties the properties containing the changes
    * @return an change event if action is necessary by the DAQ; otherwise null
    */
-  @Transactional(propagation = Propagation.REQUIRES_NEW) //("cacheTransactionManager")
   @Override
+  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW) //("cacheTransactionManager")
   public ProcessChange doUpdateDataTag(final Long id, final Properties properties) {
     LOGGER.trace("Updating DataTag " + id);
     //reject if trying to change equipment it is attached to - not currently allowed
