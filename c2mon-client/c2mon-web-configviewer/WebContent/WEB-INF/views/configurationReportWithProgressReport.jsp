@@ -26,15 +26,6 @@ $(function(){
 	$("#progressbar").progressbar({
 		value: 0
 	});
-
-	// Pressing enter should start the process.
-	$('#config_id_input').bind('keypress', function(e) {
-
-        if(e.keyCode==13){
-            // Enter pressed...
-            startProcess();
-        }
-	});
 });
 
 
