@@ -111,12 +111,9 @@ public class NotificationServiceImpl implements MessageListener {
 	public ClientResponse prepareResponse(ClientRequest request) {
 	    ClientResponse response = new ClientResponse(ClientResponse.Type.EmptyResponse, "");
 	    
-	    if (logger.isDebugEnabled()) {
-	        logger.debug(request.getId() + " Handling " + request.getType() + " from " + request.getOriginHostName());
-        }
-	    if (logger.isTraceEnabled()) {
-	        logger.trace(request.getId() + " Content of request " + request.getBody());
-	    }
+        logger.debug("{} Handling {} from {} ", request.getId(), request.getType(), request.getOriginHostName());
+	    
+        logger.trace("{} Content:\n{}", request.getId(), request.getBody());
 	    
         try {
             String body = (String) request.getBody();
@@ -174,18 +171,14 @@ public class NotificationServiceImpl implements MessageListener {
 			
 			
 			try {
-			    if (logger.isInfoEnabled()) {
-	                logger.info("Handling message " + message.getJMSCorrelationID() + ". Need to respond to " + message.getJMSReplyTo());
-	            }
+                logger.info("Handling JMS message with ID {}. Need to respond to {}.", message.getJMSCorrelationID(), message.getJMSReplyTo());
 			    
 			    ClientRequest request = new ClientRequest(Type.valueOf(message.getStringProperty("TYPE")), text.getText());
 			    request.setId(message.getJMSCorrelationID());
 			    request.setOriginHostName(message.getStringProperty("FROM"));
 			    //gson.fromJson(text.getText(), ClientRequest.class);
 			    
-			    if (logger.isDebugEnabled()) {
-			        logger.debug(request.getId() + " Request was identified as " + request.getType() + " from " + request.getOriginHostName());
-			    }
+		        logger.debug("{} Request from {} was identified as {} ", request.getId(), request.getType(), request.getOriginHostName());
 				response = prepareResponse(request);
 			} catch (Exception ex) {
 			    // full trace to the client.
@@ -203,7 +196,7 @@ public class NotificationServiceImpl implements MessageListener {
 			} catch (JMSException e) {
 				// we can't do anything here
 				e.printStackTrace();
-				logger.error("Can't send reply to client: {}", e.getMessage());
+				logger.error("Can't send reply to client.",  e.getMessage());
 			} catch (Exception e) {
 				// we try to send the cause to the client.
 				if (replyDestination != null) {
@@ -211,8 +204,7 @@ public class NotificationServiceImpl implements MessageListener {
 					// ret.setText(gson.toJson(response));
 					// producer.send()
 				}
-				e.printStackTrace();
-				logger.error(e.getMessage());
+				logger.error("Cannot handle incoming message. ", e.getMessage());
 			}
 		} else {
 			logger.error("Received a Message which was not of type TextMessage :" + message);

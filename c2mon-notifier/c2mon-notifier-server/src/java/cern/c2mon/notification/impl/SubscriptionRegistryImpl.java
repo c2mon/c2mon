@@ -131,7 +131,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
                 localBackupWriter.store(users);
                 logger.info("Loading data from DB was successful.");
             } catch (Exception ex) {
-                logger.info("Could not load data from DB : " + ex.getMessage(), ex);
+                logger.info("Could not load data from DB", ex);
                 users = localBackupWriter.load();
                 updateTagIdList();
                 setLastModificationTime(System.currentTimeMillis());
@@ -140,7 +140,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
     	    /*
     	     *  remote db didn't work or not configured. Reload locally.
     	     */
-            logger.info("Loading data from local backup " + getLocalBackupFileName());
+            logger.info("Loading data from local backup file '{}'", getLocalBackupFileName());
             users = localBackupWriter.load();
             updateTagIdList();
 	        logger.info("Loading data from local backup was successful.");
@@ -151,9 +151,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	            setAutoSaveInterval(AUTO_SAVE_INTERVAL); // set auto-saving
 	        }
         }
-        if (logger.isTraceEnabled()) {
-            logger.trace(this.toString());
-        }
+
+        logger.trace("Current content:\n", this.toString());
         
         logger.info("Registry load finished.");
 	}	
@@ -167,7 +166,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
          *  check if autosaver is demanded and start it in case it is. 
          */
         if (getAutoSaveInterval() > 0) {
-            logger.info("Creating default local backup file writer with fileName " + getLocalBackupFileName());
+            logger.info("Creating default local backup file writer with fileName {}", getLocalBackupFileName());
             
             startDatabaseBackupWriter(localBackupWriter);
             if (dbWriter != null) {
@@ -185,7 +184,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	 */
 	@ManagedAttribute
 	public void setAutoSaveInterval(long time) {
-	    logger.info("Setting autoSaveInterval to " + time);
+	    logger.info("Setting autoSaveInterval to {}", Long.valueOf(time));
 	    autoSaveLocal = time;
 	}
 	
@@ -224,9 +223,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	    checkNull(subscriber);
 
 	    // a bit of a hack : we need to find the differences to cancel the c2mon subscriptions
-	    if (logger.isTraceEnabled()) {
-	        logger.trace("Entering setSubscriber() for user " + subscriber);
-	    }
+
+        logger.trace("Entering setSubscriber() for user ", subscriber.getUserName());
 	    /*
 	     * lets get the subscriber we have in the registry
 	     */
@@ -282,7 +280,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 		/*
 		 * we modify the passed object to and set it to the current object in our registry.
 		 */
-		logger.trace("leaving setSubscriber()");
+		logger.trace("Leaving setSubscriber() for user ", subscriber.getUserName());
 		return inReg;
 		
 		
@@ -326,7 +324,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	public void addSubscriber(Subscriber user) throws TagNotFoundException {
 	    checkNull(user);
 	    
-	    logger.trace("Entering addSubscriber()" + user);
+	    logger.trace("Entering addSubscriber() for user {}", user.getUserName());
 
 	    users.put(user.getUserName(), user);
         updateTagIdList();
@@ -339,9 +337,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
         }
 	    
 	    setLastModificationTime(System.currentTimeMillis());
-	    if (logger.isTraceEnabled()) {
-	        logger.trace("Leaving addSubscriber() for user " + user.getUserName());
-	    }
+        logger.trace("Leaving addSubscriber() for user ", user.getUserName());
 	}
 	
 	@Override
@@ -349,13 +345,11 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	    checkNull(subscription);
 	    String userId = subscription.getSubscriberId();
 
-	    if (logger.isTraceEnabled()) {
-	        logger.trace("Adding subscription for TagID=" + subscription.getTagId() + " to user " + subscription.getSubscriberId());
-	    }
+        logger.trace("Adding subscription for TagID={} to user {}.", subscription.getTagId(), subscription.getSubscriberId());
 	    
 	    // thread-safe in Subscriber object
 	    Subscriber owner = getSubscriber(userId);
-	    logger.trace("Subscriber : " + owner);
+	    logger.trace("Subscriber:", owner);
 	    if (owner.getSubscriptions().containsKey(subscription.getTagId())) {
 	        // throw an exception if the user is already subscribed ?
 	        //throw new IllegalStateException("User is already subscribed to " + subscription.getTagId());
@@ -417,15 +411,16 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	    checkNull(userName);
 	    
 		if (users.containsKey(userName)) {
-		    logger.debug("Found user " + userName + " : " + users.get(userName));
-			return users.get(userName);
+		    Subscriber s = users.get(userName);
+		    logger.trace("Found for key {}: ", userName, s);
+			return s;
 		} else {
 		    PersonData p = DiamonDbGateway.getDbService().getPersonData(userName.toUpperCase());
 		    if (p == null) {
 		        throw new UserNotFoundException("User " + userName + " is not registered.");
 		    } else {
 		        Subscriber s = new Subscriber(userName, p.getMail(), p.getMobile());
-		        logger.trace("Creating new Subscriber " + s);
+		        logger.trace("Creating new Subscriber : {} ", s);
 		        users.put(s.getUserName(), s);
 		        return s;
 		    }
@@ -441,9 +436,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	@Override
     public void removeSubscription(Subscription subscription) throws UserNotFoundException {
 	    checkNull(subscription);
-	    if (logger.isTraceEnabled()) {
-	        logger.trace("entering removeSubscription() : USER=" + subscription.getSubscriberId() + " TagId=" + subscription.getTagId());
-	    }
+
+        logger.trace("Entering removeSubscription(): User={}, TagaId= {}" , subscription.getSubscriberId(), subscription.getTagId());
 	    
 	    Subscriber subscriber = getSubscriber(subscription.getSubscriberId());
 	    subscription = subscriber.getSubscription(subscription.getTagId());
@@ -459,6 +453,7 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 		}
 		
 		setLastModificationTime(System.currentTimeMillis());
+		logger.trace("Leaving removeSubscription(): User={}, TagaId= {}" , subscription.getSubscriberId(), subscription.getTagId());
 	}
 	
 	/**

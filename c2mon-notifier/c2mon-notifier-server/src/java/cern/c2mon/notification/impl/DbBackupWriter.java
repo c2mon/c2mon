@@ -122,6 +122,8 @@ public class DbBackupWriter implements BackupWriter {
     public void addSubscriber(Subscriber s) {
         logger.trace("entering addSubscriber()");
         
+        logger.debug("Adding Subscriber Name={}, TagIds={}", s.getUserName(), s.getSubscribedTagIds());
+        
         jdbcTemplate.update(
                 "INSERT INTO DMN_NOTIFY_SUBSCRIBERS (userid, email, sms, reportinterval) VALUES (?,?,?,?)", 
                 new Object [] {s.getUserName(), s.getEmail(), s.getSms(), s.getReportInterval()}, 
@@ -129,6 +131,7 @@ public class DbBackupWriter implements BackupWriter {
         
         List<Object[]> toAdd = new ArrayList<Object[]>();
         for (Subscription sup : s.getSubscriptions().values()) {
+            logger.trace("Adding Subscription to batch: {}", sup);
             toAdd.add(new Object [] {sup.getSubscriberId(), sup.isEnabled(), sup.getNotificationLevel().toString(), sup.getTagId(), sup.getLastNotifiedStatus().toInt(), sup.getLastNotification(), getResolvedTagsAsString(sup), sup.isNotifyOnMetricChange(), sup.isSmsNotification()});
         }
         
@@ -167,9 +170,8 @@ public class DbBackupWriter implements BackupWriter {
     @Override
     public void addSubscription(Subscription sup) {
        
-        if (logger.isTraceEnabled()) {
-            logger.trace("entering addSubscription() for User=" + sup.getSubscriberId() + ", tagId= " + sup.getTagId());
-        }
+        logger.trace("entering addSubscription() for User={}" + sup.getSubscriberId() + ", tagId= " + sup.getTagId());
+
         jdbcTemplate.update(
                 "INSERT INTO DMN_NOTIFY_SUBSCRIPTIONS (userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts, resolvedtags, onvaluechange) VALUES (?,?,?,?,?,?,?,?,?)", 
                 new Object [] {sup.getSubscriberId(), sup.isEnabled(), sup.getNotificationLevel().toString(), sup.getTagId(), sup.getLastNotifiedStatus().toInt(), sup.getLastNotification(), getResolvedTagsAsString(sup), sup.isNotifyOnMetricChange(), sup.isSmsNotification()}, 
@@ -178,9 +180,7 @@ public class DbBackupWriter implements BackupWriter {
     
     @Override
     public Subscriber getSubscriber(String id) throws UserNotFoundException {
-        if (logger.isTraceEnabled()) {
-            logger.trace("entering getSubscriber() for User " + id);
-        }
+        logger.trace("entering getSubscriber() for User {} ", id);
         
         Subscriber result = jdbcTemplate.query(
                 "SELECT userid, email, sms, reportinterval FROM DMN_NOTIFY_SUBSCRIBERS where userid = ?", 
@@ -199,9 +199,9 @@ public class DbBackupWriter implements BackupWriter {
         if (result == null) {
             throw new UserNotFoundException("User " + id + " was not found in DB");
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Getting subscriptions for Subscriber " + result.getUserName());
-        }
+        
+        logger.debug("Getting subscriptions for Subscriber {} ", result.getUserName());
+        
 
         List<Subscription> subscriptions = jdbcTemplate.query(
                 "SELECT userid, enabled, notifylevel, tagid, lastnotifiedstate, lastnotifiedts, resolvedtags, onvaluechange, sms_enabled  FROM DMN_NOTIFY_SUBSCRIPTIONS where userid = ?", 
@@ -216,9 +216,9 @@ public class DbBackupWriter implements BackupWriter {
         for (Subscription s : subscriptions) {
             result.addSubscription(s);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Returning Subscriber : " + result);
-        }
+        
+        logger.debug("Returning Subscriber {}", result);
+        
         
         return result;
         
@@ -226,9 +226,7 @@ public class DbBackupWriter implements BackupWriter {
     
     @Override
     public void removeSubscriber(Subscriber s) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("entering removeSubscriber() for User=" + s.getUserName());
-        }
+        logger.trace("entering removeSubscriber() for User={}", s.getUserName());
         jdbcTemplate.update(
                 "DELETE FROM DMN_NOTIFY_SUBSCRIBERS where userid = ?", 
                 new Object[] {s.getUserName()});
@@ -242,9 +240,8 @@ public class DbBackupWriter implements BackupWriter {
     
     @Override
     public void removeSubscription(Subscription sub) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("entering removeSubscription() for User=" + sub.getSubscriberId() + ", tagId= " + sub.getTagId());
-        }
+
+        logger.trace("entering removeSubscription() for User={}, tagId={} ", sub.getSubscriberId() , sub.getTagId());
         jdbcTemplate.update(
                 "DELETE FROM DMN_NOTIFY_SUBSCRIPTIONS where userid = ? and tagid= ?", 
                 new Object[] {sub.getSubscriberId(), sub.getTagId()});
@@ -257,9 +254,7 @@ public class DbBackupWriter implements BackupWriter {
      * @param s the {@link Subscriber} to update/insert
      */
     public void setSubscriber(Subscriber s) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("entering setSubscriber() for User=" + s.getUserName());
-        }
+        logger.trace("entering setSubscriber() for User={}", s.getUserName());
         removeSubscriber(s);
         addSubscriber(s);
     }
@@ -334,7 +329,8 @@ public class DbBackupWriter implements BackupWriter {
                             new int [] {Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER});
                     
                     lastStoreTime = (System.currentTimeMillis() - t1);
-                    logger.info("Stored " + addedSubscribers.length + " Subscribers and " + addedSubscriptions.length + " Subscriptions in " + getLastStoreTime() + " millis");
+                    logger.info("Stored {} Subscribers and {} Subscriptions in {}msec", 
+                            addedSubscribers.length , addedSubscriptions.length,  getLastStoreTime());
                     
                     lastFullStorageTime = System.currentTimeMillis();
                     
@@ -428,7 +424,7 @@ public class DbBackupWriter implements BackupWriter {
         if (rs == null) {
             return s;
         }
-        Long tagId = rs.getLong("tagid");
+        Long tagId = Long.valueOf(rs.getLong("tagid"));
         String userId = rs.getString("userid");
         int enabled = rs.getInt("enabled");
         int onvalueChange = rs.getInt("onvaluechange");
@@ -449,7 +445,7 @@ public class DbBackupWriter implements BackupWriter {
             for (String t2 : tmp.split(",")) {
                 String childTag = t2.split("=")[0];
                 String savedStatus = t2.split("=")[1];
-                Long id = Long.parseLong(childTag);
+                Long id = Long.valueOf(childTag);
                 s.addResolvedSubTag(id);
                 s.setLastStatusForResolvedTSubTag(id, Status.fromString(savedStatus));
             }

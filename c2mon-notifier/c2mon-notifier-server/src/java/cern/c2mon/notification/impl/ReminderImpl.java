@@ -63,7 +63,7 @@ public class ReminderImpl implements Reminder {
     @Override
     public void setReminderTime(long time, TimeUnit unit) {
         reminderTime = unit.toMillis(time);
-        logger.info("Setting new reminder time to " + time + " " + unit.toString());
+        logger.info("Setting new reminder time to {}{}", Long.valueOf(time), unit.toString());
     }
 
     /**
@@ -96,11 +96,11 @@ public class ReminderImpl implements Reminder {
 
         
         if (getReminderTime() > 0) {
-            logger.info("Starting Reminder Service with reminderTime=" + getReminderTime() + " msec");
+            logger.info("Starting Reminder Service with reminderTime={}msec" , Long.valueOf(getReminderTime()));
             myChecker = service.scheduleWithFixedDelay(getWorker(), getReminderTime(), getReminderTime(),
                     TimeUnit.MILLISECONDS);
         } else {
-            logger.info("Reminder not started as reminder time =" + getReminderTime());
+            logger.info("Reminder not started as reminderTime <= 0 ");
         }
 
         logger.trace("Leaving start();");
@@ -144,42 +144,31 @@ public class ReminderImpl implements Reminder {
 
         Timestamp maxTimeBeforeReminder = new Timestamp(System.currentTimeMillis() - getReminderTime());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Using maxTimeBEforeReminder=" + maxTimeBeforeReminder);
-        }
+        logger.debug("Using maxTimeBeforeReminder={}", maxTimeBeforeReminder);
         
         for (Subscription sup : registry.getRegisteredSubscriptions()) {
             Timestamp lastNotification = sup.getLastNotification();
 
             if (lastNotification.before(maxTimeBeforeReminder) && sup.isEnabled()
                     && sup.getLastNotifiedStatus().worserThan(Status.OK)) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Subscription Tag=" + sup.getTagId() + ", User=" + sup.getSubscriberId()
-                            + ", LastNotifiedStatus=" + sup.getLastNotifiedStatus() + " had last notification at "
-                            + lastNotification);
-                }
+                logger.trace("Subscription Tag={}, User={}: LastNotifiedStatus={} had last notification at {}", 
+                        sup.getTagId(), sup.getSubscriberId(), sup.getLastNotifiedStatus(), lastNotification);
                 
                 sendReminder(sup);
                 Timestamp ts = new Timestamp(System.currentTimeMillis());
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Subscription Tag=" + sup.getTagId() + ", User=" + sup.getSubscriberId()
-                            + " Setting lastReminderTime to " + ts);
-                }
+
+                logger.debug("Subscription Tag={}, User= {}: Setting lastReminderTime to {}.", sup.getTagId(), sup.getSubscriberId(), ts);
             } else {
-                logger.debug("Subscription Tag=" + sup.getTagId() + ", User=" + sup.getSubscriberId()
-                        + " No reminder required");
+                logger.debug("Subscription Tag={}, User= {}: No reminder required", sup.getTagId(), sup.getSubscriberId() );
             }
         }
         logger.trace("Leaving checkForReminder()");
     }
 
     void sendReminder(Subscription sub) {
-        logger.trace("Leaving sendReminder()");
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Sending reminder to " + sub.getSubscriberId() + " for Tag " + sub.getTagId());
-        }
+        logger.debug("Subscription Tag={}, User= {}: Sending reminder...", sub.getTagId(), sub.getSubscriberId() );
         notifier.sendReminder(sub);
+        logger.trace("Leaving sendReminder()");
     }
 
 }

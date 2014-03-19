@@ -111,7 +111,7 @@ public class FileBackUpWriter implements BackupWriter {
                                                                     } .getType());
             input.close();
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.error("Cannot store to file " + fileName, ex.getMessage());
         } finally {
             try { if (input != null) input.close(); } catch (IOException e) {
                 e.printStackTrace();
@@ -127,7 +127,7 @@ public class FileBackUpWriter implements BackupWriter {
             subs += s.getSubscribedTagIds().size();
         }
         
-        logger.info("Loaded " + newUsers.size() + " and " + subs + " Subscriptions in " + getLastLoadTime() + " millis");
+        logger.info("Loaded {} users and {} subscriptions in {msec" , newUsers.size() , subs , getLastLoadTime());
         return newUsers;
     }
     
@@ -150,7 +150,7 @@ public class FileBackUpWriter implements BackupWriter {
             output.write(toStoreString);
             output.close();
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.error("Cannot store to file " + fileName, ex.getMessage());
         } finally {
             try { if (output != null) output.close(); } catch (Exception e) { e.printStackTrace(); }
             try { if (fr != null) fr.close(); } catch (IOException e) { e.printStackTrace(); }
@@ -163,7 +163,7 @@ public class FileBackUpWriter implements BackupWriter {
             subs += s.getSubscribedTagIds().size();
         }
         // info message on storage
-        logger.info("Stored " + toStore.size() + " Subscribers and " + subs + " Subscriptions in " + getLastStoreTime() + " millis");
+        logger.info("Stored {} users and {} subscriptions in {}msec." , toStore.size() , subs , getLastStoreTime());
         lastFullStorageTime = System.currentTimeMillis();
     }
     

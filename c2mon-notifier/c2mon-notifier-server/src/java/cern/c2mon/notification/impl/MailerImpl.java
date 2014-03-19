@@ -82,7 +82,7 @@ public class MailerImpl implements Mailer {
         Properties props = System.getProperties();
 
         props.put("mail.smtp.host", server);
-        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.port", Integer.valueOf(port));
         props.put("mail.smtp.from", from);
         // props.put("mail.smtp.auth", "true");
 
@@ -102,7 +102,7 @@ public class MailerImpl implements Mailer {
             }
         });
 
-        logger.info("Started Mailer. FROM=" + from + ", SERVER=" + server + ":" + port);
+        logger.info("Started Mailer. FROM={}, SERVER={}:{}", from , server , port);
     }
 
     /**
