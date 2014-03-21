@@ -348,22 +348,22 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * 
      * @return A SourceDataTag value object to send to the server.
      */
-    private synchronized SourceDataTagValue doUpdate(final SourceDataQuality sourceDataQuality, final Object value, 
-        final String valueDescription, final Timestamp srcTimestamp, final Timestamp daqTimestamp) {
+    private synchronized SourceDataTagValue doUpdate(final SourceDataQuality sourceDataQuality, final Object value, final String valueDescription,
+        final Timestamp srcTimestamp, final Timestamp daqTimestamp) {
       if (this.currentValue != null) {
         this.currentValue.setValue(value);
         this.currentValue.setValueDescription(valueDescription);
         this.currentValue.setTimestamp(srcTimestamp);
         this.currentValue.setDaqTimestamp(daqTimestamp);
         this.currentValue.setQuality(sourceDataQuality);
-    } else {
-        this.currentValue = new SourceDataTagValue(this.id, this.name, this.control, value,
-            sourceDataQuality, srcTimestamp, this.address.getPriority(), this.address.isGuaranteedDelivery(),
-            valueDescription, this.address.getTimeToLive());
+      }
+      else {
+        this.currentValue = new SourceDataTagValue(this.id, this.name, this.control, value, sourceDataQuality, srcTimestamp, this.address.getPriority(),
+            this.address.isGuaranteedDelivery(), valueDescription, this.address.getTimeToLive());
         this.currentValue.setDaqTimestamp(daqTimestamp);
-    }
-
-    return this.currentValue.clone();
+      }
+  
+      return this.currentValue.clone();
     }
 
 
@@ -636,10 +636,14 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
         SourceDataTag clonedSourceDataTag = null;
         try {
             clonedSourceDataTag = (SourceDataTag) super.clone();
-
-            DataTagAddress address = getAddress();
-            if (address != null)
-                clonedSourceDataTag.setAddress(address.clone());
+            
+            if (this.address != null) {
+                clonedSourceDataTag.setAddress(this.address.clone());
+            }
+            if (this.currentValue != null) {
+              clonedSourceDataTag.currentValue = this.currentValue.clone();
+            }
+            // TODO Comparables needs also cloning!
         } catch (CloneNotSupportedException e) {
             // This should not happen if nobody changes the address class
             e.printStackTrace();

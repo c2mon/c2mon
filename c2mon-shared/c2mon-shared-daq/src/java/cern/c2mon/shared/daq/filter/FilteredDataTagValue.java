@@ -63,11 +63,23 @@ public class FilteredDataTagValue {
       /*
        * Filtering occurred because the value was received during the time deadband.
        */
-      TIME_DEADBAND((short)3), 
+      TIME_DEADBAND((short)3),
+      /*
+       * Filtering occurred while checking current TS vs New TS and current Quality vs new Quality
+       * 
+       * Filter when:
+       * - New TS <= Current TS + Current Good Quality 
+       * - New TS <= Current TS + Current Bad Quality + New Bad Quality
+       * 
+       * No filter when:
+       * - New TS <= Current TS + New Good Quality + Current Bad Quality
+       * - New TS > Current TS
+       */
+      OLD_UPDATE((short)4),
       /*
        * No filtering
        */
-      NO_FILTERING((short)4);
+      NO_FILTERING((short)5);
 
       /**
        * The Filter type name
