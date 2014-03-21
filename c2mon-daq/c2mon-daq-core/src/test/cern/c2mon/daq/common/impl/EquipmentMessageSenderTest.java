@@ -351,7 +351,7 @@ public class EquipmentMessageSenderTest {
         replay(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock);
         
         // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
-        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "");
+        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "",  new Timestamp(System.currentTimeMillis() + 1L));
         Thread.sleep(500);
         assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
 
@@ -360,7 +360,7 @@ public class EquipmentMessageSenderTest {
         this.sdt1.getAddress().setTimeDeadband(0);
         
         // The second one is also sent to the server since all the checks are done and there is no Time Deadband
-        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.UNKNOWN, "");
+        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.UNKNOWN, "", new Timestamp(System.currentTimeMillis() + 2L));
         Thread.sleep(300);
         assertEquals(SourceDataQuality.UNKNOWN, this.sdt1.getCurrentValue().getQuality().getQualityCode());
 
