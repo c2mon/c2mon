@@ -168,7 +168,8 @@ class EquipmentSenderInvalid {
 
       try {
         // We check first is the new value has to be filtered out or not
-        FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValue, newTagValueDesc, newSDQuality);
+        FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValue, newTagValueDesc, 
+            newSDQuality, timestamp.getTime());
         
         // The new value will not be filtered out
         if(filterType == FilterType.NO_FILTERING) {

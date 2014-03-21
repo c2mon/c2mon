@@ -237,12 +237,21 @@ class EquipmentSenderValid {
           SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.OK, "");
 
           // is Candidate for filtering?
-          FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(currentSourceDataTag, newTagValue, pValueDescr, newSDQuality); 
-
+          FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(currentSourceDataTag, newTagValue, pValueDescr, 
+                newSDQuality, milisecTimestamp); 
+          
           // Check filters on (VALUE_DEADBAND, REPEATED_VALUE or none)
           if (filterType != FilterType.NO_FILTERING) {
+            // OLD_UPDATE filter on
+            if ((filterType == FilterType.OLD_UPDATE)) {
+              this.equipmentLogger.debug(format(
+                  "\told update filtering : [%d] update was filtered out because the new value timestamp is equal or older than the current value timestamp " 
+                      + " and the current value has Good Quality or both new and current value has Bad Quality.",
+                  currentSourceDataTag.getId()));
+
+              this.equipmentLogger.debug("sendTagFiltered - sending value to statistics module: old update Filter");
             // VALUE_DEADBAND filter on
-            if ((filterType == FilterType.VALUE_DEADBAND)) {
+            } else if ((filterType == FilterType.VALUE_DEADBAND)) {
               this.equipmentLogger.debug(format(
                   "\tvalue-deadband filtering : the value of tag [%d] was filtered out due to value-deadband filtering rules and will not be sent to the server",
                   currentSourceDataTag.getId()));
@@ -251,7 +260,7 @@ class EquipmentSenderValid {
               // REPEATED_VALUE filter on
             } else if ((filterType == FilterType.REPEATED_VALUE)) {
               this.equipmentLogger.debug(format(
-                  "\ttrying to send twice the same tag [%d] update (with exactly the same value and value description). Rejecting by default",
+                  "\ttrying to send twice the same tag [%d] update (with exactly the same value and value description).",
                   currentSourceDataTag.getId()));
 
               this.equipmentLogger.debug("sendTagFiltered - sending value to statistics module: Same Value Filter");

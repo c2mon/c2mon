@@ -57,11 +57,11 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    * True if the current value should be send in the next run cycle.
    */
   private volatile boolean sendValue = false;
-
+  
   /**
    * Last source Data Tag Value sent to the server
    */
-  private SourceDataTagValue lastSentSDTagValue;
+  private SourceDataTag lastSourceDataTag;
 
   /**
    * The class with the message sender to send filtered tag values
@@ -162,7 +162,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
       // Execute the run method to empty the scheduler
       this.cancel();
       this.run();
-      this.lastSentSDTagValue = null;
+      this.lastSourceDataTag = null;
     }
   }
 
@@ -187,9 +187,11 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
       synchronized (this.sourceDataTag) {
         if (isScheduledForSending()) {
           
+          SourceDataTagValue currentSDValue = this.sourceDataTag.getCurrentValue();
+          
           FilterType filterType;
           // The first time the lastSentSDTagValue is empty
-          if (this.lastSentSDTagValue == null) {
+          if (this.lastSourceDataTag == null) {
             filterType = FilterType.NO_FILTERING;
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : first time running scheduler");
@@ -197,25 +199,25 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           }
           else {
             // Check the current Source Data tag against the last one sent since
-            // they have never been compared
-            filterType = this.dataTagValueFilter.isCandidateForFiltering(this.sourceDataTag, this.lastSentSDTagValue.getValue(),
-                this.lastSentSDTagValue.getValueDescription(), this.lastSentSDTagValue.getQuality());
+            // they have never been compared        
+            filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, currentSDValue.getValue(),
+                currentSDValue.getValueDescription(), currentSDValue.getQuality(), 
+                currentSDValue.getTimestamp().getTime());
             
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : Filter type: " + filterType);
             }
           }
 
-          SourceDataTagValue value = sourceDataTag.getCurrentValue();
           // The new value is not filtered out
           if (filterType == FilterType.NO_FILTERING) {
             // Clone the last value sent to the server
-            this.lastSentSDTagValue = value.clone();
+            this.lastSourceDataTag = this.sourceDataTag.clone();
             // Add the value sent
-            this.processMessageSender.addValue(value);
+            this.processMessageSender.addValue(currentSDValue);
             
             if (LOGGER.isDebugEnabled()) {
-              LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : sending value: " + value.getValue());
+              LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : sending value: " + currentSDValue.getValue());
             }
           }
           // The new value is filtered out
@@ -224,19 +226,19 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             if(this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(this.sourceDataTag)) {
               if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Dynamic TimeDeadband : " 
-                    + value.getValue());
+                    + currentSDValue.getValue());
               }
               
-              this.equipmentSenderFilterModule.sendToFilterModuleByDynamicTimedeadbandFilterer(this.sourceDataTag, value.getValue(), 
-                  value.getTimestamp().getTime(), value.getValueDescription(), filterType.getNumber());
+              this.equipmentSenderFilterModule.sendToFilterModuleByDynamicTimedeadbandFilterer(this.sourceDataTag, currentSDValue.getValue(), 
+                  currentSDValue.getTimestamp().getTime(), currentSDValue.getValueDescription(), filterType.getNumber());
             } else {
               if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : value filtered with Static TimeDeadband: " 
-                    + value.getValue());
+                    + currentSDValue.getValue());
               }
               
-              this.equipmentSenderFilterModule.sendToFilterModule(this.sourceDataTag, value.getValue(), 
-                  value.getTimestamp().getTime(), value.getValueDescription(), filterType.getNumber());
+              this.equipmentSenderFilterModule.sendToFilterModule(this.sourceDataTag, currentSDValue.getValue(), 
+                  currentSDValue.getTimestamp().getTime(), currentSDValue.getValueDescription(), filterType.getNumber());
             }
           }
 
@@ -270,12 +272,13 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    */
   public boolean isNewQualityStatus(final SourceDataQuality newSDQuality) {    
     // if the scheduler has sent a value before we compare against it
-    if (this.lastSentSDTagValue != null) {
-      if ((this.lastSentSDTagValue.getValue() != null)
-          && (this.lastSentSDTagValue.getQuality().getQualityCode() != newSDQuality.getQualityCode())) {
+    if (this.lastSourceDataTag != null) {
+      SourceDataTagValue lastSentSDTagValue = this.lastSourceDataTag.getCurrentValue();
+      if ((lastSentSDTagValue.getValue() != null)
+          && (lastSentSDTagValue.getQuality().getQualityCode() != newSDQuality.getQualityCode())) {
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Last Sent Quality [ " 
-              + this.lastSentSDTagValue.getQuality() + "] vs New Quality [" + newSDQuality + "]");
+              + lastSentSDTagValue.getQuality() + "] vs New Quality [" + newSDQuality + "]");
         }
         
         return true;

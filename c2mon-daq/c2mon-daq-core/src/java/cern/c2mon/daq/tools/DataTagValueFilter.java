@@ -203,16 +203,24 @@ public class DataTagValueFilter {
      * @param newValue The new update value that we want set to the tag 
      * @param newTagValueDesc The new update value description
      * @param newSDQuality The new quality info for the {@link SourceDataTag} that shall be updated
+     * @param newSourceTimestamp The new source timestamp
      * 
      * @return <code>FilterType</code>, if this the new quality is a candidate for being filtered out it will return the 
      * reason if not it will return <code>FilterType.NO_FILTERING</code> 
      */
     public FilterType isCandidateForFiltering(final SourceDataTag currentTag, final Object newValue, final String newTagValueDesc,
-        final SourceDataQuality newSDQuality) {
+        final SourceDataQuality newSDQuality, final long newSourceTimestamp) {
       short newQualityCode = newSDQuality.getQualityCode(); 
     
       SourceDataTagValue currentSDValue = currentTag.getCurrentValue();
+      
       if (currentSDValue != null) {
+        // Check if the new update is older or equal than the current value
+        if (isOlderUpdate(newSDQuality, currentSDValue.getQuality(), newSourceTimestamp, currentSDValue.getTimestamp().getTime())) {
+          // The value will be filtered out
+          return FilterType.OLD_UPDATE;
+        }
+        
         if (currentSDValue.getValue() == null && newValue != null) {
           // Got a new value which is initializing our SourceDataTag. Hence we do not want to filter it out!
           this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
@@ -366,5 +374,47 @@ public class DataTagValueFilter {
 			this.equipmentLogger.trace(format("isCurrentValueAvailable - Tag %d : %b", tag.getId(), isAvailable));
 
 		return isAvailable;
+	}
+	
+	/**
+	 * Checks if the new Timestamp is older than the current one and if so it checks the Quality code
+	 * to decide if the value has to be filtered out or not. 
+	 * 
+	 * Filter when:
+	 * - New TS <= Current TS + Current Good Quality 
+	 * - New TS <= Current TS + Current Bad Quality + New Bad Quality
+	 * 
+	 * No filter when:
+	 * - New TS <= Current TS + New Good Quality + Current Bad Quality
+	 * - New TS > Current TS
+	 * 
+	 * @param newSDQuality new Source Data Tag Quality
+	 * @param currentSDQuality current Source Data Tag Quality
+	 * @param newTimestamp new source Timestamp
+	 * @param currentTimestamp current source Timestamp
+	 * @return True if the New value has to be filter out. False if any other case.
+	 */
+	protected boolean isOlderUpdate(final SourceDataQuality newSDQuality, final SourceDataQuality currentSDQuality, 
+	    final long newTimestamp, final long currentTimestamp) {
+	  // if New TS is older or equal to the current TS we may have a filtering use case	  
+	  if (newTimestamp <= currentTimestamp) {
+      // New timestamp is older or equal than current TS. Check the Quality
+      if (currentSDQuality.isValid()) {
+        // The current value has Good Quality. Filter
+        return true;
+      } else {
+        // New current value has Bad Quality. Check the new value Quality
+        if (newSDQuality.isValid()) {
+          // New value has Good Quality. Swapping to valid to invalid case. No filter
+          return false;
+        } else {
+          // New value has Bad Quality as well. Filter
+          return true;
+        }
+      }
+	  }
+
+	  // New TS is newer than current TS
+	  return false;
 	}
 }

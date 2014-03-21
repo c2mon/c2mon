@@ -782,6 +782,106 @@ public class EquipmentMessageSenderTest {
         verify(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock, this.filterMessageSenderMock);
     }
 
+    /**
+     * Filter when:
+     * - New TS <= Current TS + Current Good Quality 
+     * - New TS <= Current TS + Current Bad Quality + New Bad Quality
+     * 
+     * No filter when:
+     * - New TS <= Current TS + New Good Quality + Current Bad Quality
+     * - New TS > Current TS
+     */
+    @Test
+    public void testSendTagFilteredOldUpdateSent() {
+      // update the value
+      this.sdt1.update(false);
+      // Timestamps to use
+      long sourceTS = System.currentTimeMillis() + 1000;
+      long sourceTS_2 = sourceTS + 2000;
+      long sourceTS_3 = sourceTS + 3000;
+      
+      SourceDataQuality newSDBadQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, "");
+      
+      this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(4);
+      this.filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      expectLastCall().times(1);
+
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+
+      // The first one: the run method sends it to the server with NO_FILTERING
+      this.equipmentMessageSender.sendTagFiltered(sdt1, true, sourceTS);
+      assertEquals(true, this.sdt1.getCurrentValue().getValue());
+      
+      // This one should NOT be filtered out. New TS > Current TS
+      this.equipmentMessageSender.sendTagFiltered(sdt1, false, sourceTS_2);
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+      
+      // This one should be filtered out. New TS <= Current TS + Current Good Quality
+      this.equipmentMessageSender.sendTagFiltered(sdt1, true, sourceTS);
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+      
+      // Changing quality to BAD. Not filtering
+      this.equipmentMessageSender.sendInvalidTag(this.sdt1, false, "", newSDBadQuality, new Timestamp(sourceTS_3));
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+      assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
+
+      // This one should NOT be filtered out. New TS <= Current TS + New Good Quality + Current Bad Quality
+      this.equipmentMessageSender.sendTagFiltered(sdt1, true, sourceTS);
+      assertEquals(true, this.sdt1.getCurrentValue().getValue());
+           
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+    
+    /**
+     * Filter when:
+     * - New TS <= Current TS + Current Good Quality 
+     * - New TS <= Current TS + Current Bad Quality + New Bad Quality
+     * 
+     * No filter when:
+     * - New TS <= Current TS + New Good Quality + Current Bad Quality
+     * - New TS > Current TS
+     */
+    @Test
+    public void testSendInvalidTagFilteredOldUpdateSent() {
+      // update the value
+      this.sdt1.update(false);
+      // Timestamps to use
+      long sourceTS = System.currentTimeMillis() + 1000;
+      long sourceTS_2 = sourceTS + 2000;
+      
+      // Creating Bad and Good Quality for testing 
+      SourceDataQuality newSDBadQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.DATA_UNAVAILABLE, "");
+      SourceDataQuality newSDGoodQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.OK, "");
+      
+      this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
+      expectLastCall().times(3);
+      this.filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      expectLastCall().times(1);
+
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+      
+      // The first one: the run method sends it to the server with NO_FILTERING
+      this.equipmentMessageSender.sendInvalidTag(this.sdt1, true, "", newSDBadQuality, new Timestamp(sourceTS));
+      assertEquals(true, this.sdt1.getCurrentValue().getValue());
+      
+      // This one should NOT be filtered out. New TS > Current TS
+      this.equipmentMessageSender.sendInvalidTag(this.sdt1, false, "", newSDBadQuality, new Timestamp(sourceTS_2));
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+      assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
+      
+      // This one should be filtered out. New TS <= Current TS + Current Bad Quality + New Bad Quality 
+      this.equipmentMessageSender.sendInvalidTag(this.sdt1, true, "", newSDBadQuality, new Timestamp(sourceTS));
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+      
+      // This one should NOT be filtered out. New TS <= Current TS + New Good Quality + Current Bad Quality
+      // This should normally not happen! Redirecting call to sendTagFiltered() method.
+      this.equipmentMessageSender.sendInvalidTag(this.sdt1, true, "", newSDGoodQuality, new Timestamp(sourceTS));
+      assertEquals(true, this.sdt1.getCurrentValue().getValue());
+           
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+    
     @Test
     public void testSendTagFilteredIsValueDeadbandFiltered() throws Exception {
         filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));         

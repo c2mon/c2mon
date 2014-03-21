@@ -317,9 +317,12 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     	  this.equipmentLogger.warn("sendInvalidTag - method called with 0(OK) quality code for tag " + sourceDataTag.getId()
     			  + ". This should normally not happen! Redirecting call to sendTagFiltered() method.");
     	  this.equipmentSenderValid.sendTagFiltered(tag, newValue, pTimestamp.getTime(), newTagValueDesc);
+      } else {
+        if (this.equipmentLogger.isDebugEnabled()) {
+          this.equipmentLogger.debug("sendInvalidTag - Bad Quality confirmed. Invalidating ...");
+        }
+        this.equipmentSenderInvalid.sendInvalidTag(tag, newValue, newTagValueDesc, newSDQuality, pTimestamp);
       }
-      
-      this.equipmentSenderInvalid.sendInvalidTag(tag, newValue, newTagValueDesc, newSDQuality, pTimestamp);
       
       this.equipmentLogger.debug("sendInvalidTag - leaving sendInvalidTag()");
     }
