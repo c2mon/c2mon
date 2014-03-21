@@ -180,4 +180,8 @@ public class ValueChangeMonitor implements Serializable, Cloneable {
         return bld.toString();
     }
     
+    @Override
+    public ValueChangeMonitor clone() throws CloneNotSupportedException {
+      return (ValueChangeMonitor) super.clone();
+    }
 }

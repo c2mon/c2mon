@@ -193,9 +193,12 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         DataTagAddress clonedAddress = null;
         try {
             clonedAddress = (DataTagAddress) super.clone();
-            HardwareAddress hardwareAddress = getHardwareAddress();
-            if (hardwareAddress != null)
-                clonedAddress.setHardwareAddress(getHardwareAddress().clone());
+            if (this.hardwareAddress != null) {
+                clonedAddress.hardwareAddress = this.hardwareAddress.clone();
+            }
+            if (this.valueChangeMonitor != null) {
+              clonedAddress.valueChangeMonitor = this.valueChangeMonitor.clone();
+            }
         } catch (CloneNotSupportedException e) {
             // Should not happen if the hardware addresses remain as they are.
             e.printStackTrace();
