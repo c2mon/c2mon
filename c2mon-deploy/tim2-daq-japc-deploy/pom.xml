@@ -11,7 +11,7 @@
   <groupId>cern.c2mon.c2mon-deploy</groupId>
   <artifactId>tim2-daq-japc-deploy</artifactId>
   <name>C2MON DAQ JAPC deployment module</name>
-  <version>1.2.3-SNAPSHOT</version>
+  <version>1.2.3</version>
 
   <packaging>pom</packaging>
 
