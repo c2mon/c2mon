@@ -608,9 +608,31 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
 
   /**
    * Create a clone of this SourceDataTagValue object.
+   * @throws CloneNotSupportedException 
    */
   public SourceDataTagValue clone() {
-    return new SourceDataTagValue(this);
+    
+    SourceDataTagValue clone = null;
+    try {
+      clone = (SourceDataTagValue) super.clone();
+      
+      if (this.daqTimestamp != null) {
+        clone.daqTimestamp = (Timestamp) this.daqTimestamp.clone();
+      }
+      if (this.quality != null) {
+        clone.quality = this.quality.clone();
+      }
+      if (this.timestamp != null) {
+        clone.timestamp = (Timestamp) this.timestamp.clone();
+      }
+      // TODO: We assume that the value field is always a primitve Object. In case this changes in the future
+      // you have to make sure that the value field gets cloned as well!
+    }
+    catch (CloneNotSupportedException e) {
+      throw new RuntimeException("Catched CloneNotSupportedException when trying to create a clone from SourceDataTagValue! Please check the code", e);
+    }
+    
+    return clone;
   }
 
   public void log() {

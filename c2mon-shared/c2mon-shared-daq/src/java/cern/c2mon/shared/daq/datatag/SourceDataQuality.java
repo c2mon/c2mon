@@ -19,7 +19,7 @@ import org.w3c.dom.NodeList;
  * @see cern.c2mon.server.datatag.impl.DataTagBean
  */
  
-public final class SourceDataQuality implements Serializable {
+public final class SourceDataQuality implements Serializable, Cloneable {
   // ----------------------------------------------------------------------------
   // CONSTANT DEFINITIONS
   // ----------------------------------------------------------------------------
@@ -371,8 +371,9 @@ public final class SourceDataQuality implements Serializable {
   
   /**
    * Return a clone of this SourceDataQuality object
+   * @throws CloneNotSupportedException 
    */
-  public Object clone() {
-    return new SourceDataQuality(this);
+  public SourceDataQuality clone() throws CloneNotSupportedException {
+    return (SourceDataQuality) super.clone();
   }
 }
