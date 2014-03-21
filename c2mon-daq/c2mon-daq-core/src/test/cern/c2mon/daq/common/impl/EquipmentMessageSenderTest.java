@@ -614,17 +614,17 @@ public class EquipmentMessageSenderTest {
         equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 1L);
 
         // invalidate the tag
-        equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "");
+        equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "",  new Timestamp(System.currentTimeMillis() + 2L));
 
         // send again value "true" to the server ( it should not be filtered out, because
         // it was invalidated previously)
-        equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 2L);
+        equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 3L);
 
         // sleep a bit
         Thread.sleep(120);
 
         // update again, with unchanged value this update should go to filter module
-        equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() +3L);
+        equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 4L);
 
         verify(processMessageSenderMock, filterMessageSenderMock);
     }
