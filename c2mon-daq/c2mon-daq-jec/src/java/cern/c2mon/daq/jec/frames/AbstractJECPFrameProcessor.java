@@ -45,7 +45,14 @@ public abstract class AbstractJECPFrameProcessor extends Thread {
     /**
      * This is to store the last messageId to avoid repetition.
      */
-    private byte lastSequenceNumber;
+    private byte lastRegisteredSequenceNumber;
+    
+    /**
+     * This variable stores the source time stamp of the last received message frame
+     * corresponding to the last registered sequence number.
+     */
+    private long lastRegisteredMsgFrameTime = System.currentTimeMillis();
+    
     /**
      * This is the id of the JECFrame message type which will be processed.
      * Other messages will be ignored.
@@ -123,7 +130,8 @@ public abstract class AbstractJECPFrameProcessor extends Thread {
         boolean success = false;
         try {
             if (acknowledgeReceivedMessage(jecpFrame)) {
-                lastSequenceNumber = jecpFrame.GetSequenceNumber();
+                lastRegisteredSequenceNumber = jecpFrame.GetSequenceNumber();
+                lastRegisteredMsgFrameTime = jecpFrame.GetJECCurrTimeMilliseconds();
                 success = dataQueue.add(jecpFrame);
                 if (success) {
                   if (processImmediately) {
@@ -151,7 +159,20 @@ public abstract class AbstractJECPFrameProcessor extends Thread {
      * else false.
      */
     public boolean isInSequence(final JECPFrames jecpFrame) {
-        return lastSequenceNumber != jecpFrame.GetSequenceNumber();
+        boolean isInSequence = true;
+        
+        isInSequence = lastRegisteredSequenceNumber != jecpFrame.GetSequenceNumber();
+        
+        // This is a safeguard against black listing messages, since older JEC PLCs have only one sequence number for all message types 
+        if (!isInSequence && ((lastRegisteredMsgFrameTime + 5000L ) < jecpFrame.GetJECCurrTimeMilliseconds())) {
+          getEquipmentLogger().info(
+              "Applying safeguard mechanism and accepting incoming message "
+               + "which is not in sequence (lastRegisteredSequenceNumber = receivedSequenceNumber = " 
+               + lastRegisteredSequenceNumber + "), but PLC keeps sending message since more than 5 seconds!");
+          isInSequence = true;
+        }
+        
+        return isInSequence;
     }
 
     /**
@@ -214,8 +235,11 @@ public abstract class AbstractJECPFrameProcessor extends Thread {
             acknowledged = true;
         }
         else {
-            if (getEquipmentLogger().isDebugEnabled())
-                getEquipmentLogger().warn("Message not in sequence or incorrect message id - discarded.");
+          getEquipmentLogger().warn(
+              "Message not in sequence (lastRegisteredSequenceNumber(" 
+              + lastRegisteredSequenceNumber + ") vs receivedSequenceNumber ("
+              + recvMsg.GetSequenceNumber() +")) or incorrect message id (expectedMessageID("
+              + getSupervisedMessagesId() +") vs receivedMessageID(" + recvMsg.getMsgID() +")) - discarded.");
         }
         return acknowledged;
     }
