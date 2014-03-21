@@ -956,13 +956,13 @@ public class EquipmentMessageSenderTest {
       replay(processMessageSenderMock, filterMessageSenderMock);
 
       // Send to the server
-      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 3L, "test description A");
-      Thread.sleep(110);
+      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 1L, "test description A");
+      Thread.sleep(300);
       // Send to the server. Equal Value but dif Value Description
-      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 4L, "test description B");
-      Thread.sleep(100);
+      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 2L, "test description B");
+      Thread.sleep(300);
       // Filter with REPEATED_VALUE
-      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 5L, "test description B");
+      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 3L, "test description B");
 
 
       verify(processMessageSenderMock, filterMessageSenderMock);
