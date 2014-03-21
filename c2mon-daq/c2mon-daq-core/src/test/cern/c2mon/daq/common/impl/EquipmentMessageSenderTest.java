@@ -285,12 +285,12 @@ public class EquipmentMessageSenderTest {
         replay(this.lowDynamicTimeDeadbandFilterActivatorMock, this.processMessageSenderMock);
 
         // The first one: the run method sends it to the server with NO_FILTERING (first time running the schedule)
-        this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis());
+        this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis() + 1L);
         Thread.sleep(300);
         assertEquals(false, this.sdt1.getCurrentValue().getValue());
         
         // The second one is also sent to the server since the value is different
-        this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis());
+        this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 2L);
         Thread.sleep(300);
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
         
@@ -422,7 +422,7 @@ public class EquipmentMessageSenderTest {
       // 
       // Should not be filtered 
       this.equipmentMessageSender.sendInvalidTag(this.sdt2, sourceDTValue.getValue(), sourceDTValue.getValueDescription(), 
-          newSDQuality, new Timestamp(System.currentTimeMillis()));
+          newSDQuality, new Timestamp(System.currentTimeMillis() + 1L));
       
       assertEquals(SourceDataQuality.FUTURE_SOURCE_TIMESTAMP, this.sdt2.getCurrentValue().getQuality().getQualityCode());
       
@@ -463,7 +463,7 @@ public class EquipmentMessageSenderTest {
       //
       // Should not be filtered 
       this.equipmentMessageSender.sendInvalidTag(this.sdt1, sourceDTValue.getValue(), sourceDTValue.getValueDescription(), 
-          newSDQuality, sourceDTValue.getDaqTimestamp());
+          newSDQuality, new Timestamp(System.currentTimeMillis() + 1L));
       
       // The Quality Code has changed
       assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
@@ -509,7 +509,7 @@ public class EquipmentMessageSenderTest {
     }
     
     @Test
-    public void testSendInvaliTagIsValueDeadbandFiltered() throws Exception {
+    public void testSendInvalidTagIsValueDeadbandFiltered() throws Exception {
       // Give current values (are null be default)
       this.sdt2.update(1);
       this.sdt3.update(1);
@@ -531,27 +531,27 @@ public class EquipmentMessageSenderTest {
 
       // Relative. Should not be filtered      
       this.equipmentMessageSender.sendInvalidTag(this.sdt3, 109, "value description 1", newSDQuality, 
-          new Timestamp(System.currentTimeMillis()));
+          new Timestamp(System.currentTimeMillis() + 2L));
 
       // Should not be filtered because value descr. is different from the previous one
       this.equipmentMessageSender.sendInvalidTag(this.sdt3, 108, "", newSDQuality, 
-          new Timestamp(System.currentTimeMillis()));
+          new Timestamp(System.currentTimeMillis() + 3L));
 
       // Should not be filtered because value descr. is different from the previous one
       this.equipmentMessageSender.sendInvalidTag(this.sdt3, 109, "value description 2", newSDQuality, 
-          new Timestamp(System.currentTimeMillis()));
+          new Timestamp(System.currentTimeMillis() + 4L));
 
       // Should be filtered because value descr. has not change
       this.equipmentMessageSender.sendInvalidTag(this.sdt3, 110, "value description 2", newSDQuality, 
-          new Timestamp(System.currentTimeMillis()));
+          new Timestamp(System.currentTimeMillis() + 5L));
 
       // Should be filtered (is Relative Value Deadband) 
       this.equipmentMessageSender.sendInvalidTag(this.sdt3, 108, "value description 2", newSDQuality, 
-          new Timestamp(System.currentTimeMillis()));
+          new Timestamp(System.currentTimeMillis() + 6L));
 
       // Should be filtered (is Relative Value Deadband)
       this.equipmentMessageSender.sendInvalidTag(this.sdt3, 108, "value description 2", newSDQuality, 
-          new Timestamp(System.currentTimeMillis()));
+          new Timestamp(System.currentTimeMillis() + 7L));
       
       // Should not be filtered because quality is OK even if value is very close to previous one
       this.equipmentMessageSender.sendTagFiltered(this.sdt3, 107, System.currentTimeMillis(), "value description 2");
@@ -565,11 +565,11 @@ public class EquipmentMessageSenderTest {
           sourceDTValue.getQuality().getDescription());
 
       // Should not be filtered (different Value and Quality Code)
-      this.equipmentMessageSender.sendInvalidTag(this.sdt2, 9.0f, "", newSDQuality, new Timestamp(System.currentTimeMillis()));
+      this.equipmentMessageSender.sendInvalidTag(this.sdt2, 9.0f, "", newSDQuality, new Timestamp(System.currentTimeMillis() + 8L));
       // Should be filtered (is Absolute ValueDeadband)
-      this.equipmentMessageSender.sendInvalidTag(this.sdt2, 9.1f, "", newSDQuality, new Timestamp(System.currentTimeMillis()));
+      this.equipmentMessageSender.sendInvalidTag(this.sdt2, 9.1f, "", newSDQuality, new Timestamp(System.currentTimeMillis() + 9L));
       // Should be filtered (is Absolute ValueDeadband)
-      this.equipmentMessageSender.sendInvalidTag(this.sdt2, 9.2f, "", newSDQuality, new Timestamp(System.currentTimeMillis()));
+      this.equipmentMessageSender.sendInvalidTag(this.sdt2, 9.2f, "", newSDQuality, new Timestamp(System.currentTimeMillis() + 10L));
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);
     }
@@ -895,37 +895,37 @@ public class EquipmentMessageSenderTest {
         // relative
         
         // Sent
-        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis(), "value description 1"); // <-
+        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis() + 1L, "value description 1"); // <-
                                                                                                               // should
                                                                                                               // be sent
         
         //System.out.println("TIME DEADBAND: "+sdt3.getAddress().getTimeDeadband());
         
         // should be sent, because value descr. is different from the previous one. Deadband filtering skipped
-        equipmentMessageSender.sendTagFiltered(sdt3, 108, System.currentTimeMillis());
+        equipmentMessageSender.sendTagFiltered(sdt3, 108, System.currentTimeMillis() + 2L);
         // should be sent, because value descr. is different from the previous one. Deadband filtering skipped
-        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis(), "value description 2");
+        equipmentMessageSender.sendTagFiltered(sdt3, 109, System.currentTimeMillis() + 3L, "value description 2");
         // should be filtered, because value description has not changed. Deadband filtering applied
-        equipmentMessageSender.sendTagFiltered(sdt3, 110, System.currentTimeMillis(), "value description 2");
+        equipmentMessageSender.sendTagFiltered(sdt3, 110, System.currentTimeMillis() + 4L, "value description 2");
         // should be sent, because value descr. is different from the previous one. Deadband filtering skipped
-        equipmentMessageSender.sendTagFiltered(sdt3, 108, System.currentTimeMillis());
+        equipmentMessageSender.sendTagFiltered(sdt3, 108, System.currentTimeMillis() + 5L);
         // should be filtered. REPEATED_VALUE
-        equipmentMessageSender.sendTagFiltered(sdt3, 108, System.currentTimeMillis());
+        equipmentMessageSender.sendTagFiltered(sdt3, 108, System.currentTimeMillis() + 6L);
         // Should not be filtered out, because of bad quality (Same Value, Value Descrp but dif Quality Code)
         equipmentMessageSender.sendInvalidTag(sdt3, 108, "value description 2", new SourceDataQuality(SourceDataQuality.UNKNOWN), 
-            new Timestamp(System.currentTimeMillis()));
+            new Timestamp(System.currentTimeMillis() + 7L));
         assertEquals(SourceDataQuality.UNKNOWN, sdt3.getCurrentValue().getQuality().getQualityCode());
 
         // absolute (DEADBAND_PROCESS_ABSOLUTE)
         // First Value => sent
-        equipmentMessageSender.sendTagFiltered(sdt2, 9.0f, System.currentTimeMillis());
+        equipmentMessageSender.sendTagFiltered(sdt2, 9.0f, System.currentTimeMillis() + 8L);
         // should be filtered, because value description has not changed. Deadband filtering applied
-        equipmentMessageSender.sendTagFiltered(sdt2, 9.1f, System.currentTimeMillis());
+        equipmentMessageSender.sendTagFiltered(sdt2, 9.1f, System.currentTimeMillis() + 9L);
         // should be filtered, because value description has not changed. Deadband filtering applied
-        equipmentMessageSender.sendTagFiltered(sdt2, 9.2f, System.currentTimeMillis());
+        equipmentMessageSender.sendTagFiltered(sdt2, 9.2f, System.currentTimeMillis() + 10L);
         // should be sent, because value descr. is different from the previous one. Deadband filtering skipped
         this.sdt2.getAddress().setValueDeadbandType(DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE_VALUE_DESCR_CHANGE);
-        equipmentMessageSender.sendTagFiltered(sdt2, 9.3f, System.currentTimeMillis(), "value description 3");
+        equipmentMessageSender.sendTagFiltered(sdt2, 9.3f, System.currentTimeMillis() + 11L, "value description 3");
            
         verify(filterMessageSenderMock);
     }
