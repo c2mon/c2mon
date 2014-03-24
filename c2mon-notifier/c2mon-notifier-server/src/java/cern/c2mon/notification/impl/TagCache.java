@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.notification.Notifier;
 import cern.c2mon.notification.SubscriptionRegistry;
@@ -40,6 +41,7 @@ import cern.c2mon.notification.shared.ServiceException;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.notification.shared.TagNotFoundException;
+import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.dmn2.core.Status;
 import cern.dmn2.db.DiamonDbGateway;
@@ -81,7 +83,7 @@ public class TagCache implements DataTagUpdateListener {
      * Constructor
      */
     public TagCache() {
-       
+        
     }
     
     /**
@@ -395,25 +397,26 @@ public class TagCache implements DataTagUpdateListener {
      * @param tagUpdate the update
      */
     private void checkUpdateOk(ClientDataTagValue tagUpdate) {
-        logger.debug("TagID={} Update incoming: Name={}, isRule={}, value={}, valid={}, isAccessible={}", 
-                tagUpdate.getId(), tagUpdate.getName(), tagUpdate.isRuleResult(), tagUpdate.getValue(), 
-                tagUpdate.getDataTagQuality().isValid(), tagUpdate.getDataTagQuality().isAccessible());
         
-        if (!tagUpdate.getDataTagQuality().isExistingTag()) {
-            for (Subscription s : registry.getSubscriptionsForTagId(tagUpdate.getId()).values()) {
-                registry.removeSubscription(s);
-            }
-            throw new IllegalStateException("TagID=" + tagUpdate.getId() + ": Is not known by the C2Mon server!");
-        }
         
-        if (tagUpdate.getDataTagQuality().getInvalidQualityStates().containsKey(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)
-                || tagUpdate.getDataTagQuality().getInvalidQualityStates().containsKey(TagQualityStatus.PROCESS_DOWN)
-                || tagUpdate.getDataTagQuality().getInvalidQualityStates().containsKey(TagQualityStatus.JMS_CONNECTION_DOWN)
-        ) {
-            logger.warn("TagID={} Server Heartbeat lost. Waiting for revival...", tagUpdate.getId());
-        } else if (!tagUpdate.getDataTagQuality().isAccessible()) {
-            logger.warn("TagID={} is reported as not accessible.", tagUpdate.getId());
-        } 
+        
+        // we cannot do this, as we may have a remove/add operation for the same equipment
+//        if (!tagUpdate.getDataTagQuality().isExistingTag()) {
+//            for (Subscription s : registry.getSubscriptionsForTagId(tagUpdate.getId()).values()) {
+//                registry.removeSubscription(s);
+//            }
+//            throw new IllegalStateException("TagID=" + tagUpdate.getId() + ": Is not known by the C2Mon server!");
+//        }
+        
+//        if (tagUpdate.getDataTagQuality().isInvalidStatusSet(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)
+//                || tagUpdate.getDataTagQuality().isInvalidStatusSet(TagQualityStatus.PROCESS_DOWN)
+//                || tagUpdate.getDataTagQuality().isInvalidStatusSet(TagQualityStatus.JMS_CONNECTION_DOWN)
+//                || tagUpdate.getDataTagQuality().isInvalidStatusSet(TagQualityStatus.SUBEQUIPMENT_DOWN)
+//        ) {
+//            logger.warn("TagID={} Got {}..", tagUpdate.getId());
+//        } else if (!tagUpdate.getDataTagQuality().isAccessible()) {
+//            logger.warn("TagID={} is reported as not accessible.", tagUpdate.getId());
+//        } 
     }
     
     /**
@@ -463,6 +466,11 @@ public class TagCache implements DataTagUpdateListener {
     public void onUpdate(ClientDataTagValue tagUpdate) {
         
         try {
+            
+            logger.debug("TagID={} Update incoming: Name={}, isRule={}, value={}, valid={}, isAccessible={}, isExisting={}", 
+                    tagUpdate.getId(), tagUpdate.getName(), tagUpdate.isRuleResult(), tagUpdate.getValue(), 
+                    tagUpdate.getDataTagQuality().isValid(), tagUpdate.getDataTagQuality().isAccessible(), tagUpdate.getDataTagQuality().isExistingTag());
+            
             checkUpdateOk(tagUpdate);
             Tag tag = cache.get(tagUpdate.getId());
             
@@ -479,14 +487,6 @@ public class TagCache implements DataTagUpdateListener {
             }
             
             tag.update(tagUpdate);
-            
-//            if (tag.isSourceDown() && tag.isRule() && registry.getAllRegisteredTagIds().contains(tag.getId())) {
-//                notifier.sendSourceAvailabilityReport(tag);
-//            } else if (tag.isRule()) {
-//                notifier.sendReportOnRuleChange(tag);
-//            } else {
-//                notifier.sendReportOnValueChange(tag);
-//            }
             
             /*
              * triggers the notifier to notify for this tag
