@@ -77,7 +77,7 @@ public class TextCreator {
     @ManagedAttribute
     public void setTemplateDir(String directory) throws IOException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Setting directory for templates to " + directory);
+            logger.debug("Setting directory for templates to {}", directory);
         }
         this.directory = directory;
         reLoadTemplates();
@@ -103,7 +103,7 @@ public class TextCreator {
 
         if (logger.isDebugEnabled()) {
             logger.debug("Entering reLoadTemplates().");
-            logger.debug("Using " + getTemplateDir() + " for reading the templates");
+            logger.debug("Using {} for reading the templates", getTemplateDir());
         }
 
         c = new Configuration();
@@ -134,9 +134,7 @@ public class TextCreator {
      * @return the subject for the message
      */
     public String getMailSubjectForStateChange(Tag update, List<Tag> interestingTags) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("Entering getMailSubjectForStateChange() for " + update.getId());
-        }
+        logger.trace("TagID={} Building Mail subject..", update.getId());
 
         StringBuilder subject = new StringBuilder();
         if (interestingTags.size() == 0) {
@@ -270,7 +268,7 @@ public class TextCreator {
          * Log DEBUG/TRACE
          */
         if (logger.isDebugEnabled()) {
-            logger.debug("Rendering text for " + list.size() + " elements.");
+            logger.debug("Rendering text for {} elements.", Integer.valueOf(list.size()));
             if (logger.isTraceEnabled()) {
                 StringBuilder b = new StringBuilder();
                 for (Tag t : list) {
