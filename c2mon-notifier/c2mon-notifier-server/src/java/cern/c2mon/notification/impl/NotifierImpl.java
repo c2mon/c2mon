@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.notification.Mailer;
 import cern.c2mon.notification.Notifier;
 import cern.c2mon.notification.SubscriptionRegistry;
@@ -25,6 +26,9 @@ import cern.c2mon.notification.TagCacheUpdateListener;
 import cern.c2mon.notification.TextCreator;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
+import cern.c2mon.shared.client.supervision.Heartbeat;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.dmn2.core.Status;
 import freemarker.template.TemplateException;
 
@@ -67,7 +71,8 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     /**
      * runs our worker which checks regularly if notifications should be send.
      */
-    private ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService updatedTagsCheckerService = Executors.newSingleThreadScheduledExecutor();
+    
     /**
      * the list of tags which were updated between our checks.
      */
@@ -167,7 +172,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 throw new RuntimeException("Error while waiting for C2Mon serivce to start up.");
             }
         }
-
+        
         logger.info("Step 2 of 4: Intializing subscription registry .");
         registry.reloadConfig();
         registry.setTagCache(cache);
@@ -202,18 +207,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
 
         logger.info("Step 6 of 6 : Starting the cache checker...");
         // start the cache checker
-        service.scheduleAtFixedRate(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    checkCacheForChanges();
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                    e.printStackTrace();
-                }
-            }
-        }, 2, 10, TimeUnit.SECONDS);
+        startUpdateChecker();
 
         logger.info("Notification service fully started.");
     }
@@ -221,14 +215,14 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     
     public void checkCacheForChanges() {
 
-        logger.info(" {} tags have changed. Triggering notifications (if required)", updatedTags.size());
+        logger.info(" {} tags have changed. Triggering notifications (if required) ...", Integer.valueOf(updatedTags.size()));
         HashSet<Tag> leftOver = new HashSet<Tag>();
         
         synchronized (updatedTags) {
             for (Tag changed : updatedTags) {
+
                 if (registry.getAllRegisteredTagIds().contains(changed.getId())) {
                     sendReportOnRuleChange(changed);
-                    changed.setToBeNotified(false);
                     for (Tag c : changed.getAllChildTagsRecursive()) {
                         c.setToBeNotified(false);
                     }
@@ -238,20 +232,22 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
             }
 
             // second iteration: now notify every
-            logger.info("{} Tags have changed and are indirectly subscribed to. Triggering notifications (if required)", leftOver.size());
-            for (Tag changed : leftOver) {
-                if (changed.getToBeNotified().get() && !changed.isSourceDown()) {
-                    if (changed.isRule()) {
-                        sendReportOnRuleChange(changed);
+            if (!leftOver.isEmpty()) {
+                logger.info("{} Tags have changed and are indirectly subscribed to. Triggering notifications (if required)", leftOver.size());
+                for (Tag changed : leftOver) {
+                    if (changed.getToBeNotified()) {
+                        if (changed.isRule()) {
+                            sendReportOnRuleChange(changed);
+                        } else {
+                            sendReportOnValueChange(changed);
+                        }
+                        changed.setToBeNotified(false);
                     } else {
-                        sendReportOnValueChange(changed);
+                        // not a valid item. IGNORE as we only announce down's for direct tag subscriptions
                     }
-                    changed.setToBeNotified(false);
-                } else {
-                    // not a valid item. IGNORE as we only announce down's for direct tag subscriptions
                 }
-
             }
+            
             updatedTags.clear();
         }
     }
@@ -306,27 +302,26 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                         update.getId(), parent.getLatestStatus(), parent.getSubscribers().size());
 
                 for (Subscription s : parent.getSubscribers()) {
-                    boolean toNotify = true;
                     if (!s.isEnabled()) {
-                        toNotify = false;
                         logger.debug("TagID={}:  Subscription {} is not enabled.", update.getId(), s.getSubscriberId());
+                        continue;
                     }
                     
                     if (!requiredtoSend) {
                         // let do some additional checks
                         if (s.isNotifyOnMetricChange()) {
                             logger.debug("TagID={}: '{}' wants notification for metric change.", update.getId(), s.getSubscriberId());
-                            toNotify = false;
+                            requiredtoSend = true;
                         } 
                         if (!s.isInterestedInLevel(parent.getLatestStatus())) {
-                            toNotify = false;
+                            requiredtoSend = false;
                             logger.debug("TagID={}: '{}' is not interested in this level.", update.getId(), s.getSubscriberId());
                         }
                     } else {
                         // No log message for required notification 
                     }
                     
-                    if (toNotify) {
+                    if (requiredtoSend) {
                         Subscriber owner = registry.getSubscriber(s.getSubscriberId());
                         String body = textCreator.getTextForMetricUpdate(update, parent);
                         String subject = "Value changed for " + update.getLatestUpdate().getName();
@@ -408,10 +403,34 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
 
         logger.trace("Entering sendReportOnRuleChange()");
 
-        if (update.isSourceDown()) {
-            sendSourceAvailabilityReport(update);
-            return;
-        }
+        DataTagQuality quality = update.getLatestUpdate().getDataTagQuality();
+        
+        //
+        // quality check first
+        // Should we announce this anyhow ?
+        //
+        if (!quality.isValid()) {
+            if (quality.isInvalidStatusSet(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)
+              || quality.isInvalidStatusSet(TagQualityStatus.JMS_CONNECTION_DOWN)
+              || quality.isInvalidStatusSet(TagQualityStatus.PROCESS_DOWN)) {
+              logger.trace("TagId={} quality invalid. No announcement with these states: {}", 
+                      update.getId(), quality.getInvalidQualityStates());
+                return;
+            }
+            else if (
+                  quality.isInvalidStatusSet(TagQualityStatus.SUBEQUIPMENT_DOWN)
+               || quality.isInvalidStatusSet(TagQualityStatus.EQUIPMENT_DOWN)
+               || quality.isInvalidStatusSet(TagQualityStatus.INACCESSIBLE)) {
+                // tell user that the source is down
+                sendSourceAvailabilityReport(update);
+                return;
+            } else {
+                // tag is invalid, but we announce this reason to the user in the following ...
+                logger.trace("TagId={} quality invalid, but we announce this these states: {}", 
+                        update.getId(), quality.getInvalidQualityStates());
+            }
+        } 
+        
 
         if (update.getAllChildRules().size() == 0) {
             // R->M
@@ -559,4 +578,54 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         }
         logger.trace("Leaving sendReminder()");
     }
+    
+    /**
+     * our c2mon server heartbeat listener.
+     * @return a {@link HeartbeatListener}
+     */
+    HeartbeatListener getC2MonHeartbeatListener() {
+        return new HeartbeatListener() {
+            
+            @Override
+            public void onHeartbeatResumed(Heartbeat pHeartbeat) {
+                logger.info("C2MON Server Heartbeat resumed.");
+                stopUpdateChecker();
+                
+            }
+            
+            @Override
+            public void onHeartbeatReceived(Heartbeat pHeartbeat) {
+                logger.trace("C2MON Server Heartbeat from {} received.", pHeartbeat.getHostName());
+                startUpdateChecker();
+                
+            }
+            
+            @Override
+            public void onHeartbeatExpired(Heartbeat pHeartbeat) {
+                logger.warn("C2MON Server Heartbeat lost.");
+                
+            }
+        };
+    }
+    
+    void stopUpdateChecker() {
+        updatedTagsCheckerService.shutdownNow();
+    }
+    
+    void startUpdateChecker() {
+        
+        updatedTagsCheckerService.scheduleAtFixedRate(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    checkCacheForChanges();
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+            
+        }, 2, 10, TimeUnit.SECONDS);
+    }
+    
 }
