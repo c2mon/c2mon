@@ -3,7 +3,6 @@ use lib '/user/alaser/perllib/Config-Properties-1.71/blib/lib';
 use CGI qw(:standard);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Config::Properties;
-use DBD::Oracle;
 use File::Path;
 use Cwd;
 
@@ -34,19 +33,6 @@ my $c2monProperties = new Config::Properties();
 
 $c2monProperties->load(*PROPS);
 
-# Separate database connection URL is neccesary for the perl DBI connector
-
-my $dbiUser = $c2monProperties->getProperty("c2mon.jdbc.config.user");
-my $dbiPassword = $c2monProperties->getProperty("c2mon.jdbc.config.password");
-
-# get the url (in java jdbc format)
-my $dbiUrl = $c2monProperties->getProperty("c2mon.jdbc.config.url");
-# change it to perl dbi format
-$dbiUrl =~ s/jdbc:oracle:thin:@/dbi:Oracle:/g;
-
-
-my $dbh = DBI->connect( $dbiUrl, $dbiUser, $dbiPassword )
-  || die( $DBI::errstr . "\n" );
 
 ### Start of configuration file generation
 #
