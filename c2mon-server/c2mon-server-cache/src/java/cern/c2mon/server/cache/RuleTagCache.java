@@ -38,5 +38,14 @@ import cern.c2mon.server.common.rule.RuleTag;
 public interface RuleTagCache extends C2monCacheWithSupervision<Long, RuleTag> {
   
   String cacheInitializedKey = "c2mon.cache.rule.initialized";
-  
+
+  /**
+   * Sets the parent process and equipment fields for RuleTags.
+   * Please notice that the caller method should first make a write lock 
+   * on the RuleTag reference. The caller is also responsible for putting 
+   * the change back to the cache.
+   * 
+   * @param ruleTag the RuleTag for which the fields should be set
+   */
+  void setParentSupervisionIds(RuleTag ruleTag);
 }
