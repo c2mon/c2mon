@@ -84,29 +84,34 @@ public class EhcacheLoaderImpl<T extends Cacheable> implements CacheLoader {
   }
   
   
-  public CacheLoader clone(Ehcache arg0) throws CloneNotSupportedException {
+  @Override
+public CacheLoader clone(Ehcache arg0) throws CloneNotSupportedException {
     // TODO Auto-generated method stub
     return null;
   }
 
-  public void dispose() throws CacheException {
+  @Override
+public void dispose() throws CacheException {
     // TODO Auto-generated method stub
   }
 
 
-  public String getName() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  public Status getStatus() {
+  @Override
+public String getName() {
     // TODO Auto-generated method stub
     return null;
   }
 
 
-  public void init() {
+  @Override
+public Status getStatus() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+public void init() {
     // TODO Auto-generated method stub
   }
   
@@ -125,7 +130,8 @@ public class EhcacheLoaderImpl<T extends Cacheable> implements CacheLoader {
    * {@link C2monCache}, in which case a {@link CacheElementNotFoundException} is
    * thrown.
    */
-  public Object load(Object key) throws CacheException {
+  @Override
+public Object load(Object key) throws CacheException {
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Fetching cache object with Id " + key + " from database.");
@@ -140,17 +146,20 @@ public class EhcacheLoaderImpl<T extends Cacheable> implements CacheLoader {
     return result;
   }
 
-  public Object load(Object arg0, Object arg1) {
+  @Override
+public Object load(Object arg0, Object arg1) {
     System.out.println("load(Object,Object): should not be here as not implemented!");
     return null;
   }
 
-  public Map loadAll(Collection arg0) {
+  @Override
+public Map loadAll(Collection arg0) {
     // TODO Auto-generated method stub
     return null;
   }
 
-  public Map loadAll(Collection arg0, Object arg1) {
+  @Override
+public Map loadAll(Collection arg0, Object arg1) {
     // TODO Auto-generated method stub
     return null;
   }
