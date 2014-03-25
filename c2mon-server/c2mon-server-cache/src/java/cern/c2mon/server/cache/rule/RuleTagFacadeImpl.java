@@ -121,39 +121,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    */
   @Override
   public void setParentSupervisionIds(final RuleTag ruleTag) {
-    //sets for this ruleTag
-    HashSet<Long> processIds = new HashSet<Long>();
-    HashSet<Long> equipmentIds = new HashSet<Long>();
-    for (Long tagKey : ruleTag.getRuleInputTagIds()) {
-      if (dataTagCache.hasKey(tagKey)) {
-        DataTag dataTag = dataTagCache.get(tagKey);
-        processIds.add(dataTag.getProcessId());
-        equipmentIds.add(dataTag.getEquipmentId());
-      } else if (tagCache.hasKey(tagKey)) {
-        tagCache.acquireWriteLockOnKey(tagKey);
-        try {
-          RuleTag childRuleTag = (RuleTag) tagCache.get(tagKey);
-          //if not empty, already processed; if empty, needs processing
-          if (!childRuleTag.getProcessIds().isEmpty()) {
-            processIds.addAll(childRuleTag.getProcessIds());
-            equipmentIds.addAll(childRuleTag.getEquipmentIds());
-          } else {
-            setParentSupervisionIds(childRuleTag);
-            tagCache.putQuiet(childRuleTag);
-            processIds.addAll(childRuleTag.getProcessIds());
-            equipmentIds.addAll(childRuleTag.getEquipmentIds());
-          }
-        } finally {
-          tagCache.releaseWriteLockOnKey(tagKey);
-        }          
-      } else {
-        throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
-                  + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)");
-        }       
-    }
-    LOGGER.trace("Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds);
-    ruleTag.setProcessIds(processIds);
-    ruleTag.setEquipmentIds(equipmentIds); 
+    ((RuleTagCache) tagCache).setParentSupervisionIds(ruleTag);
   } 
   
   /**

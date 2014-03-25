@@ -23,6 +23,7 @@ import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.cache.common.DefaultCacheImpl;
+import cern.c2mon.server.cache.rule.RuleTagPostLoaderProcessor;
 
 @Service("clusterCache")
 @ManagedResource(objectName="cern.c2mon:type=cache,name=clusterCache")
@@ -58,6 +59,7 @@ public class ClusterCacheImpl extends DefaultCacheImpl<String, Serializable> imp
         this.put(DataTagCache.cacheInitializedKey, Boolean.FALSE);
         this.put(CommandTagCache.cacheInitializedKey, Boolean.FALSE);
         this.put(RuleTagCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(RuleTagPostLoaderProcessor.ruleCachePostProcessedKey, Boolean.FALSE);
         this.put(ControlTagCache.cacheInitializedKey, Boolean.FALSE);
         this.put(ProcessCache.cacheInitializedKey, Boolean.FALSE);
         this.put(EquipmentCache.cacheInitializedKey, Boolean.FALSE);

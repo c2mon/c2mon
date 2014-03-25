@@ -40,6 +40,9 @@ public class RuleTagPostLoaderProcessor {
    */
   private int threadPoolMax = 16;
   private int threadPoolMin = 4;
+  
+  /** Cluster Cache key to avoid loading twice the parent rule ids at startup */
+  public static final String ruleCachePostProcessedKey = "c2mon.cache.rule.ruleCachePostProcessed";
     
   @Autowired
   public RuleTagPostLoaderProcessor(RuleTagFacade ruleTagFacade, RuleTagCache ruleTagCache, ClusterCache clusterCache) {
@@ -58,7 +61,7 @@ public class RuleTagPostLoaderProcessor {
     clusterCache.acquireWriteLockOnKey(RuleTagCache.cacheInitializedKey);
     
     try {
-      Boolean isRuleCachePostProcessed = (Boolean) clusterCache.getCopy(RuleTagCache.cacheInitializedKey);
+      Boolean isRuleCachePostProcessed = (Boolean) clusterCache.getCopy(ruleCachePostProcessedKey);
       if (!isRuleCachePostProcessed) {
         LOGGER.info("Setting parent ids for rules...");
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadPoolMin, threadPoolMax, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
@@ -81,7 +84,7 @@ public class RuleTagPostLoaderProcessor {
           LOGGER.warn("Exception caught while waiting for rule parent id loading threads to complete (waited longer then timeout?): ", e);      
         }
         LOGGER.info("... rule parent ids set.");
-        clusterCache.put(RuleTagCache.cacheInitializedKey, Boolean.TRUE);
+        clusterCache.put(ruleCachePostProcessedKey, Boolean.TRUE);
       }
     } finally {
       clusterCache.releaseWriteLockOnKey(RuleTagCache.cacheInitializedKey);

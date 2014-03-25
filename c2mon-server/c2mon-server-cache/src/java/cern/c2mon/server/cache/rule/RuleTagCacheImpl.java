@@ -65,37 +65,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
   @Override
   protected void doPostDbLoading(RuleTag ruleTag) {
     LOGGER.trace("doPostDbLoading() - Post processing RuleTag " + ruleTag.getId() + " ...");
-    // sets for this ruleTag
-    HashSet<Long> processIds = new HashSet<Long>();
-    HashSet<Long> equipmentIds = new HashSet<Long>();
-    for (Long tagKey : ruleTag.getRuleInputTagIds()) {
-      if (dataTagCache.hasKey(tagKey)) {
-        DataTag dataTag = dataTagCache.getCopy(tagKey);
-        processIds.add(dataTag.getProcessId());
-        equipmentIds.add(dataTag.getEquipmentId());
-      } else if (hasKey(tagKey)) {
-        acquireWriteLockOnKey(tagKey);        
-        try {
-          RuleTag childRuleTag = getCopy(tagKey);        
-          //if not empty, already processed; if empty, needs processing
-          if (childRuleTag.getProcessIds().isEmpty()) {
-            doPostDbLoading(childRuleTag);
-            // commit changes to the cache
-            putQuiet(childRuleTag);
-          }
-          processIds.addAll(childRuleTag.getProcessIds());
-          equipmentIds.addAll(childRuleTag.getEquipmentIds());
-        } finally {
-          releaseWriteLockOnKey(tagKey);
-        }          
-      } else {
-        throw new CacheElementNotFoundException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
-                  + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)");
-        }       
-    }
-    LOGGER.trace("doPostDbLoading() - Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds);
-    ruleTag.setProcessIds(processIds);
-    ruleTag.setEquipmentIds(equipmentIds);
+    setParentSupervisionIds(ruleTag);
     LOGGER.trace("doPostDbLoading() - ... RuleTag " + ruleTag.getId() + " done!");
   }
 
@@ -109,6 +79,47 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
     return cacheInitializedKey;
   }
 
+  /**
+   * Sets the parent process and equipment fields for RuleTags.
+   * Please notice that the caller method should first make a write lock 
+   * on the RuleTag reference.
+   * 
+   * @param ruleTag the RuleTag for which the fields should be set
+   */
+  @Override
+  public void setParentSupervisionIds(final RuleTag ruleTag) {
+    LOGGER.trace("setParentSupervisionIds() - Setting supervision ids for rule " + ruleTag.getId() + " ...");
+    //sets for this ruleTag
+    HashSet<Long> processIds = new HashSet<Long>();
+    HashSet<Long> equipmentIds = new HashSet<Long>();
+    for (Long tagKey : ruleTag.getRuleInputTagIds()) {
+      if (dataTagCache.hasKey(tagKey)) {
+        DataTag dataTag = dataTagCache.get(tagKey);
+        processIds.add(dataTag.getProcessId());
+        equipmentIds.add(dataTag.getEquipmentId());
+      } else if (this.hasKey(tagKey)) {
+        this.acquireWriteLockOnKey(tagKey);
+        try {
+          RuleTag childRuleTag = (RuleTag) this.get(tagKey);
+          //if not empty, already processed; if empty, needs processing
+          if (childRuleTag.getProcessIds().isEmpty()) {
+            setParentSupervisionIds(childRuleTag);
+            this.putQuiet(childRuleTag);
+          }          
+          processIds.addAll(childRuleTag.getProcessIds());
+          equipmentIds.addAll(childRuleTag.getEquipmentIds());
+        } finally {
+          this.releaseWriteLockOnKey(tagKey);
+        }          
+      } else {
+        throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
+                  + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)");
+        }       
+    }
+    LOGGER.debug("setParentSupervisionIds() - Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds);
+    ruleTag.setProcessIds(processIds);
+    ruleTag.setEquipmentIds(equipmentIds);
+  } 
   
 
 }
