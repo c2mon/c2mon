@@ -85,33 +85,33 @@ public class EhcacheLoaderImpl<T extends Cacheable> implements CacheLoader {
   
   
   @Override
-public CacheLoader clone(Ehcache arg0) throws CloneNotSupportedException {
+  public CacheLoader clone(Ehcache arg0) throws CloneNotSupportedException {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-public void dispose() throws CacheException {
+  public void dispose() throws CacheException {
     // TODO Auto-generated method stub
   }
 
 
   @Override
-public String getName() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-public Status getStatus() {
+  public String getName() {
     // TODO Auto-generated method stub
     return null;
   }
 
 
   @Override
-public void init() {
+  public Status getStatus() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override
+  public void init() {
     // TODO Auto-generated method stub
   }
   
@@ -131,7 +131,7 @@ public void init() {
    * thrown.
    */
   @Override
-public Object load(Object key) throws CacheException {
+  public Object load(Object key) throws CacheException {
 
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("Fetching cache object with Id " + key + " from database.");
@@ -147,19 +147,19 @@ public Object load(Object key) throws CacheException {
   }
 
   @Override
-public Object load(Object arg0, Object arg1) {
+  public Object load(Object arg0, Object arg1) {
     System.out.println("load(Object,Object): should not be here as not implemented!");
     return null;
   }
 
   @Override
-public Map loadAll(Collection arg0) {
+  public Map loadAll(Collection arg0) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-public Map loadAll(Collection arg0, Object arg1) {
+  public Map loadAll(Collection arg0, Object arg1) {
     // TODO Auto-generated method stub
     return null;
   }
