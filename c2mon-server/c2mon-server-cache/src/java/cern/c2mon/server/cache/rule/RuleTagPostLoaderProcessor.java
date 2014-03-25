@@ -58,11 +58,13 @@ public class RuleTagPostLoaderProcessor {
    */
   @PostConstruct
   public void loadRuleParentIds() {  
-    clusterCache.acquireWriteLockOnKey(RuleTagCache.cacheInitializedKey);
+    LOGGER.trace("Entering loadRuleParentIds()...");
     
+    LOGGER.trace("Trying to get cache lock for " + RuleTagCache.cacheInitializedKey);
+    clusterCache.acquireWriteLockOnKey(RuleTagCache.cacheInitializedKey);
     try {
       Boolean isRuleCachePostProcessed = (Boolean) clusterCache.getCopy(ruleCachePostProcessedKey);
-      if (!isRuleCachePostProcessed) {
+      if (!isRuleCachePostProcessed.booleanValue()) {
         LOGGER.info("Setting parent ids for rules...");
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadPoolMin, threadPoolMax, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
         LoaderTask task = new LoaderTask();
@@ -85,10 +87,15 @@ public class RuleTagPostLoaderProcessor {
         }
         LOGGER.info("... rule parent ids set.");
         clusterCache.put(ruleCachePostProcessedKey, Boolean.TRUE);
+      } else {
+        LOGGER.info("Cache " + RuleTagCache.cacheInitializedKey + " was already initialized. No need for action..");
       }
     } finally {
       clusterCache.releaseWriteLockOnKey(RuleTagCache.cacheInitializedKey);
-    }   
+      LOGGER.trace("Released cache lock .. for " + RuleTagCache.cacheInitializedKey);
+    }  
+    
+    LOGGER.trace("Leaving loadRuleParentIds()");
   }
   
   private class LoaderTask implements Runnable {
