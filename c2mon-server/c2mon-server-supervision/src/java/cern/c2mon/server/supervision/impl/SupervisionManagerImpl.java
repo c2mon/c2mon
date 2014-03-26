@@ -779,7 +779,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     final Process process = processCache.getCopy(processId); 
     //check state tag is correctly set
     Long stateTagId = process.getStateTagId(); //never null
-    controlTagCache.acquireReadLockOnKey(stateTagId);
+    controlTagCache.acquireWriteLockOnKey(stateTagId);
     try {
       ControlTag stateTag = controlTagCache.get(stateTagId);     
       if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
@@ -788,7 +788,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     } catch (CacheElementNotFoundException  controlCacheEx) {          
       LOGGER.error("Unable to locate state tag in cache (id is " + stateTagId + ")", controlCacheEx);
     } finally {
-      controlTagCache.releaseReadLockOnKey(stateTagId);
+      controlTagCache.releaseWriteLockOnKey(stateTagId);
     }
   }
 
