@@ -185,7 +185,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
           for (Long currentId : aliveTimerCache.getKeys()) {
             AliveTimer aliveTimerCopy = null;
             boolean aliveExpiration = false;
-            aliveTimerCache.acquireWriteLockOnKey(currentId);
+            aliveTimerCache.acquireReadLockOnKey(currentId);
             try {
               aliveTimerCopy = aliveTimerCache.getCopy(currentId);        
 
@@ -199,7 +199,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
                 aliveDownCount++;
               }
             } finally {
-              aliveTimerCache.releaseWriteLockOnKey(currentId);          
+              aliveTimerCache.releaseReadLockOnKey(currentId);          
             }
             
             if (aliveExpiration) {

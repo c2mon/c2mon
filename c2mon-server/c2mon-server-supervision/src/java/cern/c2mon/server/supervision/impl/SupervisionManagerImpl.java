@@ -779,16 +779,16 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     final Process process = processCache.getCopy(processId); 
     //check state tag is correctly set
     Long stateTagId = process.getStateTagId(); //never null
-    controlTagCache.acquireWriteLockOnKey(stateTagId);
+    controlTagCache.acquireReadLockOnKey(stateTagId);
     try {
       ControlTag stateTag = controlTagCache.get(stateTagId);     
       if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
-        controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp); 
+        controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
       }
     } catch (CacheElementNotFoundException  controlCacheEx) {          
       LOGGER.error("Unable to locate state tag in cache (id is " + stateTagId + ")", controlCacheEx);
     } finally {
-      controlTagCache.releaseWriteLockOnKey(stateTagId);
+      controlTagCache.releaseReadLockOnKey(stateTagId);
     }
   }
 
