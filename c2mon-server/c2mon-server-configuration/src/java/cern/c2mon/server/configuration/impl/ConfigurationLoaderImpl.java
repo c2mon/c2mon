@@ -152,14 +152,14 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   @Override
   public ConfigurationReport applyConfiguration(final int configId, final ConfigProgressMonitor configProgressMonitor) {
     
-    LOGGER.info("Applying configuration " + configId);
+    LOGGER.info(configId + " Applying configuration ");
     ConfigurationReport report = null;
     clusterCache.acquireWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
     try {     
                 
       String configName = configurationDAO.getConfigName(configId);    
       if (configName == null) {
-        LOGGER.warn("Unable to locate configuration with id " + configId + " - cannot be applied.");
+        LOGGER.warn(configId + " Unable to locate configuration - cannot be applied.");
         return new ConfigurationReport(
             configId, 
             "UNKNOWN",
@@ -182,9 +182,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       
       List<ConfigurationElement> configElements;
       try {
-        configElements = configurationDAO.getConfigElements(configId);            
+        LOGGER.debug(configId + " Fetching configuration items from DB...");
+        configElements = configurationDAO.getConfigElements(configId);
+        LOGGER.debug(configId + " Got " + configElements.size() + "elements from DB");
       } catch (Exception e) {
-        String message = "Exception caught while loading the configuration from the DB, so unable to apply any elements of this configuration."; 
+        String message = "Exception caught while loading the configuration for " + configId + " from the DB: " + e.getMessage(); 
         LOGGER.error(message, e);
         throw new RuntimeException(message, e);
       }
@@ -208,6 +210,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
               
               Long processId = processChange.getProcessId();
               if (processChange.processActionRequired()) {
+                
                 if (!processLists.containsKey(processId)) {
                   processLists.put(processId, new ArrayList<Change>());
                 }
@@ -215,17 +218,19 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                 daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
                 elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
                 element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
-              } else if (processChange.requiresReboot()) { 
+              } else if (processChange.requiresReboot()) {
+                if (LOGGER.isDebugEnabled()) {
+                  LOGGER.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
+                }
                 element.setDaqStatus(Status.RESTART);
-                elementReport.requiresReboot();
                 report.addStatus(Status.RESTART);
                 report.addProcessToReboot(processCache.get(processId).getName());
                 element.setStatus(Status.RESTART);
-                processFacade.requiresReboot(processId, true);
+                processFacade.requiresReboot(processId, Boolean.TRUE);
               }              
             }                      
           } catch (Exception ex) {
-            String errMessage = "Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
+            String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, Entity id) = (" 
               + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")"; 
             LOGGER.error(errMessage, ex);
             elementReport.setFailure("Exception caught while applying the configuration change.", ex);
@@ -237,7 +242,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             configProgressMonitor.onServerProgress(progressCounter.getAndIncrement());
           }
         } else {
-          LOGGER.info("Interrupting configuration " + configId + " due to cancel request.");
+          LOGGER.info(configId + " Interrupting configuration due to cancel request.");
         }               
       }
       
@@ -246,18 +251,21 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         if (configProgressMonitor != null){
           configProgressMonitor.daqTotalParts(processLists.size());
         }
+        
+        LOGGER.info(configId + " Reconfiguring " + processLists.keySet().size()+ " processes ...");  
+        
         AtomicInteger daqProgressCounter = new AtomicInteger(1);
         for (Long processId : processLists.keySet()) {
           if (!cancelRequested){
             List<Change> processChangeEvents = processLists.get(processId);
             if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
               try {
-                LOGGER.trace("Sending " + processChangeEvents.size() + " change events to Process " + processId + "...");
+                LOGGER.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
                 ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
                 if (!processReport.getChangeReports().isEmpty()) {
-                  LOGGER.trace("Received " + processReport.getChangeReports().size() + " back from Process.");
+                  LOGGER.trace(configId + "Received " + processReport.getChangeReports().size() + " back from process.");
                 } else {
-                  LOGGER.trace("Received 0 reports back from Process");
+                  LOGGER.trace(configId + "Received 0 reports back from process");
                 }                
                 for (ChangeReport changeReport : processReport.getChangeReports()) {
                   ConfigurationElementReport convertedReport = 
@@ -269,6 +277,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                     elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
                     //TODO set flag & tag to indicate that process restart is needed
                   } else if (changeReport.isFail()) {
+                    LOGGER.debug(configId + " changeRequest failed at process " + processCache.get(processId).getName()); 
                     report.addStatus(Status.FAILURE);
                     report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
                     elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
@@ -309,7 +318,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         }        
       }
       
-      
+      //LOGGER.info(configId + " Saving configuration ")
       //save Configuration element status information in the DB tables
       for (ConfigurationElement element : configElements) {
         configurationDAO.saveStatusInfo(element);
@@ -361,7 +370,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private List<ProcessChange> applyConfigElement(final ConfigurationElement element, 
                                                  final ConfigurationElementReport elementReport) throws IllegalAccessException {
     if (LOGGER.isTraceEnabled()){
-      LOGGER.trace("Applying configuration element with sequence id " + element.getSequenceId());
+      LOGGER.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
     }
     
     if (element.getAction() == null || element.getEntity() == null || element.getEntityId() == null) {
