@@ -15,7 +15,7 @@
     <constructor-arg ref="subEquipmentDAO"/>
   </bean>
   
-  <bean id="subEquipmentCacheLoader" class="cern.c2mon.server.cache.common.SimpleTimCacheLoader">
+  <bean id="subEquipmentCacheLoader" class="cern.c2mon.server.cache.common.SimpleC2monCacheLoader">
     <constructor-arg ref="subEquipmentEhcache"/>
     <constructor-arg ref="subEquipmentDAO"/>    
   </bean>

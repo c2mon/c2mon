@@ -19,7 +19,7 @@
     <constructor-arg ref="aliveTimerDAO"/>
   </bean>
   
-   <bean id="aliveTimerCacheLoader" class="cern.c2mon.server.cache.common.SimpleTimCacheLoader">
+   <bean id="aliveTimerCacheLoader" class="cern.c2mon.server.cache.common.SimpleC2monCacheLoader">
     <constructor-arg ref="aliveTimerEhcache"/>
     <constructor-arg ref="aliveTimerDAO"/>    
    </bean>

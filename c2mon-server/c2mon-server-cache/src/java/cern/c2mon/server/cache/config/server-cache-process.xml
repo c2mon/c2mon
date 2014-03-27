@@ -15,7 +15,7 @@
     <constructor-arg ref="processDAO"/>
   </bean>
   
-  <bean id="processCacheLoader" class="cern.c2mon.server.cache.common.SimpleTimCacheLoader">
+  <bean id="processCacheLoader" class="cern.c2mon.server.cache.common.SimpleC2monCacheLoader">
     <constructor-arg ref="processEhcache"/>
     <constructor-arg ref="processDAO"/>    
   </bean>

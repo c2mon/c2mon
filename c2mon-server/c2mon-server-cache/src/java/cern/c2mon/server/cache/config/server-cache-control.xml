@@ -20,7 +20,7 @@
     <constructor-arg ref="controlTagLoaderDAO"/>
   </bean>
   
-  <bean id="controlTagCacheLoader" class="cern.c2mon.server.cache.common.SimpleTimCacheLoader">
+  <bean id="controlTagCacheLoader" class="cern.c2mon.server.cache.common.SimpleC2monCacheLoader">
     <constructor-arg ref="controlTagEhcache"/>
     <constructor-arg ref="controlTagLoaderDAO"/>
   </bean>

@@ -15,7 +15,7 @@
     <constructor-arg ref="commandTagDAO"/>
   </bean>
   
-  <bean id="commandTagCacheLoader" class="cern.c2mon.server.cache.common.SimpleTimCacheLoader">
+  <bean id="commandTagCacheLoader" class="cern.c2mon.server.cache.common.SimpleC2monCacheLoader">
     <constructor-arg ref="commandTagEhcache"/>
     <constructor-arg ref="commandTagDAO"/>   
   </bean>

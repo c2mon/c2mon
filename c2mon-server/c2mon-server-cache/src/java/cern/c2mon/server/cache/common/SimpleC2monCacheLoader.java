@@ -57,12 +57,12 @@ import cern.c2mon.shared.common.Cacheable;
  * @deprecated use {@link BatchCacheLoader} instead if starting from scratch
  *              as better performance for large caches
  */
-public class SimpleTimCacheLoader<T extends Cacheable> implements C2monCacheLoader {
+public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLoader {
   
   /**
    * Private logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(SimpleTimCacheLoader.class);
+  private static final Logger LOGGER = Logger.getLogger(SimpleC2monCacheLoader.class);
   
   /**
    * Reference to the distributed parameters (used to lock server start up).
@@ -101,7 +101,7 @@ public class SimpleTimCacheLoader<T extends Cacheable> implements C2monCacheLoad
    * @param loaderThreads the number of threads processing the loading tasks (fixed)
    * @param taskQueueSize the size of the executor's queue
    */
-  public SimpleTimCacheLoader(final Ehcache cache, final CacheLoaderDAO<T> cacheLoaderDAO) {  
+  public SimpleC2monCacheLoader(final Ehcache cache, final CacheLoaderDAO<T> cacheLoaderDAO) {  
     this.cache = cache;
     this.cacheLoaderDAO = cacheLoaderDAO;
   }
@@ -163,7 +163,7 @@ public class SimpleTimCacheLoader<T extends Cacheable> implements C2monCacheLoad
    */
   public void loadNode() {
     try {
-      cache.setNodeBulkLoadEnabled(false);
+      cache.setNodeBulkLoadEnabled(true);
     } catch (UnsupportedOperationException ex) {
       LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
           + "loading the cache (UnsupportedOperationException) - this is "
@@ -171,7 +171,7 @@ public class SimpleTimCacheLoader<T extends Cacheable> implements C2monCacheLoad
     }
     loadCache(cache.getKeys());
     try {
-      cache.setNodeBulkLoadEnabled(true);
+      cache.setNodeBulkLoadEnabled(false);
     } catch (UnsupportedOperationException ex) {
       LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
           + "loading the cache (UnsupportedOperationException) - this is "
