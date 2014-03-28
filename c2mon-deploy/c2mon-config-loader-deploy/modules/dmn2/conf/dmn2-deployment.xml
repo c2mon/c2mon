@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+	<product name="c2mon">
+
+		<!-- this application section is a parent configuration for both dmn2-config-loader-pro and dmn2-config-loader-test -->
+		<application name="default">
+			<deployment>
+				<backupPolicy keepBackups="2">
+					<preserve type="dir" name="log" />
+					<preserve type="dir" name="tmp" />
+				</backupPolicy>
+
+			</deployment>
+		</application>
+
+
+		<application name="dmn2-config-loader-pro" extends="default">
+			<deployment installLocation="/opt/dmn2/dmn2-config-loader">
+				<notification>
+					<!-- you can give more than one mail for deployment notification -->
+					<mail address="project-diamon-core@cern.ch" />
+				</notification>
+
+				<directory name="conf">
+					<!-- copy over the c2mon-client.properties file into the /conf directory -->
+					<file name="client.properties" sourceDir="~diamonop/repo/c2mon/client" mask="644" />
+					<file name="configloader.properties" sourceDir="~diamonop/repo/c2mon/client/configloader" mask="644" />
+					<file name="log4j.xml" sourceDir="~diamonop/repo/c2mon/client/configloader" mask="644" />
+					
+				</directory>
+			</deployment>
+			<startscript name="dmn2-config-loader">
+				<initial-heap-size>256m</initial-heap-size>
+				<max-heap-size>256m</max-heap-size>
+
+				<main-class name="cern.c2mon.configloader.C2MonConfigLoaderMain" />
+
+				<!-- JVM arguments -->
+				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
+				<property name="c2mon.process.name" value="DMN2-CONFIG-LOADER" />
+				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
+				<property name="c2mon-configloader.properties" value="file://${INSTALL_DIR}/conf/configloader.properties" />				
+
+			</startscript>
+
+		</application>
+
+		<application name="dmn2-config-loader-dev" extends="default">
+			<deployment installLocation="/opt/dmn2/dmn2-config-loader-dev">
+				<directory name="conf">
+					<!-- Copy over the c2mon-client.properties file into the /conf directory -->
+					<file name="client.properties" sourceDir="~dmndev/c2mon/client" mask="644" />
+					<file name="configloader.properties" sourceDir="~dmndev/repo/c2mon/client/configloader" mask="644" />
+					<file name="log4j.xml" sourceDir="~dmndev/c2mon/client/configloader" mask="644" />
+				</directory>
+			</deployment>
+			<startscript name="dmn2-config-loader">
+				<initial-heap-size>256m</initial-heap-size>
+				<max-heap-size>256m</max-heap-size>
+
+				<!-- enable eclipse remote debugging on port 8100 -->
+				<java-vm-args>-Xdebug -Xrunjdwp:transport=dt_socket,address=8100,server=y,suspend=n	</java-vm-args>
+
+				<main-class name="cern.c2mon.configloader.C2MonConfigLoaderMain" />
+
+				<!-- JVM arguments -->
+				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
+				<property name="c2mon.process.name" value="DMN2-CONFIG-LOADER-DEV" />
+				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
+				<property name="c2mon-configloader.properties" value="file://${INSTALL_DIR}/conf/configloader.properties" />
+
+			</startscript>
+
+		</application>
+
+	</product>
+</products>

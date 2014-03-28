@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cern.c2mon.c2mon-client</groupId>
+		<artifactId>c2mon-client-pom</artifactId>
+		<version>1.1.0</version>
+	</parent>
+
+	<groupId>cern.c2mon.c2mon-deploy</groupId>
+	<artifactId>c2mon-config-loader-deploy</artifactId>
+	<name>C2MON Configuration Loader deployment module</name>
+	<version>1.0.0-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
+
+	<description>
+		Assembly module gathering all required modules and configuration files for C2MON configuration loader
+        </description>
+	<url></url>
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-config-loader-deploy</developerConnection>
+	</scm>
+
+
+	<developers />
+
+	<dependencies>
+		<dependency>
+			<groupId>cern.c2mon.c2mon-client</groupId>
+			<artifactId>c2mon-config-loader</artifactId>
+			<version>[0.9.9,2.0.0)</version>
+		</dependency>
+	</dependencies>
+
+	<modules>
+		<module>modules/dmn2</module>
+	</modules>
+
+	<build />
+	
+
+</project>
