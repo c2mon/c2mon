@@ -59,6 +59,11 @@
 			<version>${org.springframework.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>cern.accsoft.commons</groupId>
+			<artifactId>accsoft-commons-jmxdirectory-registration</artifactId>
+			<version>1.1.10</version>
+		</dependency>
 
 		<!-- Spring AOP + AspectJ -->
 		<dependency>

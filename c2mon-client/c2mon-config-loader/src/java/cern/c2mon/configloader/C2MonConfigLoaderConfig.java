@@ -23,10 +23,10 @@ public class C2MonConfigLoaderConfig {
 
     @Value("${cern.c2mon.configloader.db.user:dmntest}")
     private String dbUserName;
-    
+
     @Value("${cern.c2mon.configloader.db.password:#{null}}")
     private String dbPassword;
-   
+
     @Value("${cern.c2mon.configloader.db.config_table:C2MON_CONFIG}")
     private String dbConfigTableName;
 
@@ -39,9 +39,11 @@ public class C2MonConfigLoaderConfig {
     @Value("#{${cern.c2mon.configloader.db.polling_period:900}}")
     private int dbPollingPeriod;
 
-
     @Value("${cern.c2mon.configloader.loader_user:C2MONCONFLOADER}")
     private String loaderUserName;
+
+    @Value("${cern.c2mon.configloader.jmx_bootstrap_enabledled:true}")
+    private boolean jmxBootstrapEnabled;
 
     @ManagedAttribute
     public String getDbUrl() {
@@ -93,6 +95,11 @@ public class C2MonConfigLoaderConfig {
             + "applying configurations")
     public String getLoaderUserName() {
         return loaderUserName;
+    }
+
+    @ManagedAttribute
+    public boolean isJmxBootstrapEnabled() {
+        return jmxBootstrapEnabled;
     }
 
 }

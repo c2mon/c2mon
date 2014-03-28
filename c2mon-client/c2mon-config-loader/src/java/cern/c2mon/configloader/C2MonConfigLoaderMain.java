@@ -4,6 +4,7 @@
 
 package cern.c2mon.configloader;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
+import cern.accsoft.commons.jmxdirectory.client.JmxBootstrap;
 import cern.c2mon.configloader.dao.ConfigLoaderDAO;
 
 /**
@@ -56,6 +58,11 @@ public class C2MonConfigLoaderMain {
 
     public void init() {
         LOG.info("starting and initializing C2MON Configuration loader");
+
+        if (config.isJmxBootstrapEnabled()) {
+            // bind process to the JMX directory service
+            JmxBootstrap.start("c2mon-config-loader", new HashMap<String, String>());
+        }
 
         executor = Executors.newSingleThreadScheduledExecutor();
 

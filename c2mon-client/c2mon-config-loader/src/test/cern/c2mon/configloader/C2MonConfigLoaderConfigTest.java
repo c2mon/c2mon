@@ -5,6 +5,7 @@
 package cern.c2mon.configloader;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -17,8 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import cern.c2mon.configloader.C2MonConfigLoaderConfig;
 
 /**
  * @author wbuczak
@@ -43,6 +42,7 @@ public class C2MonConfigLoaderConfigTest {
         assertEquals("C2MON_CONFIG", config.getDbConfigTableName());
         assertEquals(2, config.getDbPollingPeriod());
         assertEquals("C2MONCONFLOADER", config.getLoaderUserName());
+        assertFalse(config.isJmxBootstrapEnabled());
     }
 
 }
