@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	       http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+
+	<bean id="dao" class="cern.c2mon.configloader.dao.impl.ConfigLoaderDaoImpl"/>
+ 
+	<bean id="ds" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="${cern.c2mon.configloader.db.url}" />
+		<property name="username" value="${cern.c2mon.configloader.db.user}" />
+		<property name="password" value="${cern.c2mon.configloader.db.password}" />
+		<property name="defaultAutoCommit" value="false" />
+		<property name="validationQuery" value="SELECT 0 FROM DUAL" />
+		<property name="testWhileIdle" value="true" />
+		<property name="timeBetweenEvictionRunsMillis" value="3600000" />
+		<property name="initialSize" value="1" />
+		<property name="maxActive" value="2" />
+	</bean>
+
+
+
+</beans>

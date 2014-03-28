@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>cern.c2mon.c2mon-client</groupId>
+		<artifactId>c2mon-client-pom</artifactId>
+		<version>1.1.0</version>
+	</parent>
+
+	<artifactId>c2mon-config-loader</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>The C2MON configuration loader</name>
+	<description>The C2MON configuration loader is a process used for automatic application of the C2MON reconfigurations to the C2MON server</description>
+
+	<scm>
+		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-client/c2mon-config-loader</developerConnection>
+	</scm>
+
+	<dependencies>
+
+		<!-- C2MON Client API dependencies -->
+		<dependency>
+			<groupId>cern.c2mon.c2mon-client</groupId>
+			<artifactId>c2mon-client-core</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>c2mon-shared-rule</artifactId>
+					<groupId>cern.c2mon.c2mon-shared</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>c2mon-client-auth</artifactId>
+					<groupId>cern.c2mon.c2mon-client</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>c2mon-shared-persistence-manager</artifactId>
+					<groupId>cern.c2mon.c2mon-shared</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>mail</artifactId>
+					<groupId>javax.mail</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>mybatis</artifactId>
+					<groupId>org.mybatis</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!-- 3rd party dependencies -->
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<optional>true</optional>
+			<version>1.7.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+
+		<!-- Spring AOP + AspectJ -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.6.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.6.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc</artifactId>
+			<version>11.2.0.3</version>
+		</dependency>
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.2.4</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
