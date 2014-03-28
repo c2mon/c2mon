@@ -8,7 +8,7 @@
 
 	<bean id="dao" class="cern.c2mon.configloader.dao.impl.ConfigLoaderDaoImpl"/>
  
-	<bean id="ds" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
 		<property name="url" value="${cern.c2mon.configloader.db.url}" />
 		<property name="username" value="${cern.c2mon.configloader.db.user}" />
