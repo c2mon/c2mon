@@ -4,6 +4,9 @@
 
 		<!-- this application section is a parent configuration for both dmn2-config-loader-pro and dmn2-config-loader-test -->
 		<application name="default">
+
+			<property name="oracle.net.tns_admin" value="/etc" />
+
 			<deployment>
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
@@ -26,7 +29,7 @@
 					<file name="client.properties" sourceDir="~diamonop/repo/c2mon/client" mask="644" />
 					<file name="configloader.properties" sourceDir="~diamonop/repo/c2mon/client/configloader" mask="644" />
 					<file name="log4j.xml" sourceDir="~diamonop/repo/c2mon/client/configloader" mask="644" />
-					
+
 				</directory>
 			</deployment>
 			<startscript name="dmn2-config-loader">
@@ -36,12 +39,12 @@
 				<main-class name="cern.c2mon.configloader.C2MonConfigLoaderMain" />
 
 				<!-- JVM arguments -->
-				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.properties" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-CONFIG-LOADER" />
 				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
 				<property name="c2mon-configloader.properties" value="file://${INSTALL_DIR}/conf/configloader.properties" />
-				<property name="spring.profiles.active" value="PRO" />				
+				<property name="spring.profiles.active" value="PRO" />
 
 			</startscript>
 
@@ -66,7 +69,7 @@
 				<main-class name="cern.c2mon.configloader.C2MonConfigLoaderMain" />
 
 				<!-- JVM arguments -->
-				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
+				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.properties" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-CONFIG-LOADER-DEV" />
 				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
