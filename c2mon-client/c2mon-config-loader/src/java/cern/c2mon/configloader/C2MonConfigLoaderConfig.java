@@ -21,25 +21,26 @@ public class C2MonConfigLoaderConfig {
     @Value("${cern.c2mon.configloader.db.url}")
     private String dbUrl;
 
+    @Value("${cern.c2mon.configloader.db.user:dmntest}")
+    private String dbUserName;
+    
+    @Value("${cern.c2mon.configloader.db.password:#{null}}")
+    private String dbPassword;
+   
+    @Value("${cern.c2mon.configloader.db.config_table:C2MON_CONFIG}")
+    private String dbConfigTableName;
+
     @Value("${cern.c2mon.configloader.db.get_config_query:#{null}}")
     private String dbGetConfigQuery;
 
     @Value("${cern.c2mon.configloader.db.update_config_query:#{null}}")
     private String dbUpdateConfigQuery;
 
-    @Value("${cern.c2mon.configloader.db.user:dmntest}")
-    private String dbUserName;
-
-    @Value("${cern.c2mon.configloader.db.password:#{null}}")
-    private String dbPassword;
-
     @Value("#{${cern.c2mon.configloader.db.polling_period:900}}")
     private int dbPollingPeriod;
 
-    @Value("${cern.c2mon.configloader.db.config_table:C2MON_CONFIG}")
-    private String dbConfigTableName;
 
-    @Value("${cern.c2mon.configloader.db.user:C2MONCONFLOADER}")
+    @Value("${cern.c2mon.configloader.loader_user:C2MONCONFLOADER}")
     private String loaderUserName;
 
     @ManagedAttribute

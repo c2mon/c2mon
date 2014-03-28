@@ -40,8 +40,9 @@ public class C2MonConfigLoaderConfigTest {
         assertEquals("jdbc:oracle:thin:@devdb11", config.getDbUrl());
         assertNull(config.getDbPassword());
         assertEquals("dmntest", config.getDbUserName());
-        assertEquals("C2MON_CONFIG", config.getDbConfigTableName());        
-        assertEquals(2, config.getDbPollingPeriod());        
+        assertEquals("C2MON_CONFIG", config.getDbConfigTableName());
+        assertEquals(2, config.getDbPollingPeriod());
+        assertEquals("C2MONCONFLOADER", config.getLoaderUserName());
     }
 
 }
