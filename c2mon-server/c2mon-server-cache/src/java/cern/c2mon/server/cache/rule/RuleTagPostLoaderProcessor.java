@@ -109,17 +109,12 @@ public class RuleTagPostLoaderProcessor {
     @Override
     public void run() {
       for (Long ruleKey : keyList) {
-        ruleTagCache.acquireWriteLockOnKey(ruleKey);       
-        try {
-          RuleTag ruleTag = ruleTagCache.get(ruleKey);
-          //if not empty, already processed
-          if (ruleTag.getProcessIds().isEmpty()) {
-            ruleTagFacade.setParentSupervisionIds(ruleTag);
-            ruleTagCache.putQuiet(ruleTag);
-          }
-        } finally {
-          ruleTagCache.releaseWriteLockOnKey(ruleKey);
-        }       
+        RuleTag ruleTag = ruleTagCache.get(ruleKey);
+        //if not empty, already processed
+        if (ruleTag.getProcessIds().isEmpty()) {
+          ruleTagFacade.setParentSupervisionIds(ruleTag);
+          ruleTagCache.putQuiet(ruleTag);
+        }
       }      
     }
     
