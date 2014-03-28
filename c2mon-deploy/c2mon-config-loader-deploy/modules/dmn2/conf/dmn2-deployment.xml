@@ -28,7 +28,7 @@
 					<!-- copy over the c2mon-client.properties file into the /conf directory -->
 					<file name="client.properties" sourceDir="~diamonop/repo/c2mon/client" mask="644" />
 					<file name="configloader.properties" sourceDir="~diamonop/repo/c2mon/client/configloader" mask="644" />
-					<file name="log4j.xml" sourceDir="~diamonop/repo/c2mon/client/configloader" mask="644" />
+					<file name="log4j.properties" sourceDir="~diamonop/repo/c2mon/client/configloader" mask="644" />
 
 				</directory>
 			</deployment>
@@ -56,7 +56,7 @@
 					<!-- Copy over the c2mon-client.properties file into the /conf directory -->
 					<file name="client.properties" sourceDir="~dmndev/c2mon/client" mask="644" />
 					<file name="configloader.properties" sourceDir="~dmndev/repo/c2mon/client/configloader" mask="644" />
-					<file name="log4j.xml" sourceDir="~dmndev/c2mon/client/configloader" mask="644" />
+					<file name="log4j.properties" sourceDir="~dmndev/c2mon/client/configloader" mask="644" />
 				</directory>
 			</deployment>
 			<startscript name="dmn2-config-loader">
