@@ -25,7 +25,6 @@
 		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-config-loader-deploy</developerConnection>
 	</scm>
 
-
 	<developers />
 
 	<dependencies>
@@ -41,6 +40,6 @@
 	</modules>
 
 	<build />
-	
+
 
 </project>

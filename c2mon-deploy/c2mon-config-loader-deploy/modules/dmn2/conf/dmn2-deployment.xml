@@ -15,7 +15,7 @@
 		</application>
 
 
-		<application name="dmn2-config-loader-pro" extends="default">
+		<application name="DMN2-CONFIG-LOADER-PRO" extends="default">
 			<deployment installLocation="/opt/dmn2/dmn2-config-loader">
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
@@ -50,7 +50,7 @@
 
 		</application>
 
-		<application name="dmn2-config-loader-dev" extends="default">
+		<application name="DMN2-CONFIG-LOADER-DEV" extends="default">
 			<deployment installLocation="/opt/dmn2/dmn2-config-loader-dev">
 				<directory name="conf">
 					<!-- Copy over the c2mon-client.properties file into the /conf directory -->
