@@ -82,7 +82,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
    */
   @PostConstruct
   public void init() {   
-    listenerContainer = cacheRegistrationService.registerToAllTags(this, 2);
+    listenerContainer = cacheRegistrationService.registerToAllTags(this, 1);
   }
 
   @Override
@@ -219,7 +219,9 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
    */
   @Override
   public void confirmStatus(Tag tag) {
+    LOGGER.trace(tag.getId() + " Entering confirmStatus()");
     notifyElementUpdated(tag);
+    LOGGER.trace(tag.getId() + " Leaving confirmStatus()");
   }
   
   @Override
