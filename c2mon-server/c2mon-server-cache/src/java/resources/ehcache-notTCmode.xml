@@ -6,7 +6,8 @@
 		<defaultCache 
 			eternal="true" 
 			maxElementsInMemory="500" 
-			memoryStoreEvictionPolicy="LRU">
+			memoryStoreEvictionPolicy="LRU"
+            transactionalMode="off">
       <persistence strategy="localRestartable"/>
     </defaultCache>
 			
@@ -14,7 +15,9 @@
 		<cache 
 			name="tagCache" 
 			eternal="true" 
-			maxElementsInMemory="500000" 			
+			maxElementsInMemory="500000"
+            statistics="true"
+            transactionalMode="off"  			
 			memoryStoreEvictionPolicy="FIFO">
       <!-- 
         Enables the RestartStore and copies all cache entries (on-heap and/or off-heap) to disk. 
@@ -27,7 +30,9 @@
 		<cache 
       name="controlCache" 
       eternal="true" 
-      maxElementsInMemory="100000"       
+      maxElementsInMemory="100000"
+      statistics="true"
+      transactionalMode="off"        
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
     </cache>
@@ -35,7 +40,9 @@
     <cache 
       name="commandCache" 
       eternal="true" 
-      maxElementsInMemory="500000"      
+      maxElementsInMemory="500000"
+      statistics="true"
+      transactionalMode="off"       
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
     </cache>
@@ -43,7 +50,9 @@
     <cache 
       name="ruleCache" 
       eternal="true" 
-      maxElementsInMemory="500000"       
+      maxElementsInMemory="500000"
+      statistics="true"        
+      transactionalMode="off"
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
     </cache>
@@ -51,7 +60,9 @@
     <cache 
       name="processCache" 
       eternal="true" 
-      maxElementsInMemory="50000"       
+      maxElementsInMemory="50000"
+      statistics="true"        
+      transactionalMode="off"      
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
       <searchable>
@@ -62,7 +73,9 @@
     <cache 
       name="equipmentCache" 
       eternal="true" 
-      maxElementsInMemory="50000"       
+      maxElementsInMemory="50000" 
+      statistics="true"       
+      transactionalMode="off"      
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
     </cache>
@@ -70,7 +83,9 @@
     <cache 
       name="subEquipmentCache" 
       eternal="true" 
-      maxElementsInMemory="50000"       
+      maxElementsInMemory="50000" 
+      statistics="true"  
+      transactionalMode="off"           
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
     </cache>
@@ -78,7 +93,9 @@
     <cache 
       name="aliveTimerCache" 
       eternal="true" 
-      maxElementsInMemory="50000"       
+      maxElementsInMemory="50000" 
+      statistics="true"      
+      transactionalMode="off"       
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
     </cache>
@@ -86,7 +103,8 @@
     <cache 
       name="commFaultTagCache" 
       eternal="true" 
-      maxElementsInMemory="50000"       
+      maxElementsInMemory="50000"   
+      transactionalMode="off"          
       memoryStoreEvictionPolicy="LFU">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
     </cache>
@@ -94,7 +112,9 @@
     <cache 
       name="alarmCache" 
       eternal="true" 
-      maxElementsInMemory="500000"       
+      maxElementsInMemory="500000"
+      statistics="true"        
+      transactionalMode="off"      
       memoryStoreEvictionPolicy="FIFO">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
     </cache>
@@ -102,7 +122,9 @@
     <cache 
       name="clusterCache" 
       eternal="true" 
-      maxElementsInMemory="500000"       
+      maxElementsInMemory="500000"
+      statistics="true"     
+      transactionalMode="off"         
       memoryStoreEvictionPolicy="FIFO">
       <persistence strategy="localRestartable" synchronousWrites="false"/>
     </cache>
@@ -111,14 +133,18 @@
     <cache 
       name="processEventCache" 
       eternal="true" 
-      maxElementsInMemory="50000"       
+      maxElementsInMemory="50000"
+      statistics="true"    
+      transactionalMode="off"          
       memoryStoreEvictionPolicy="LFU"
     />
     
     <cache 
       name="equipmentEventCache" 
       eternal="true" 
-      maxElementsInMemory="50000"       
+      maxElementsInMemory="50000"
+      statistics="true"  
+      transactionalMode="off"           
       memoryStoreEvictionPolicy="LFU"
     />
 <!-- ************************************* -->
