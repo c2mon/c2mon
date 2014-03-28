@@ -23,28 +23,6 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-client</groupId>
 			<artifactId>c2mon-client-all</artifactId>
-<!-- 			<exclusions> -->
-<!-- 				<exclusion> -->
-<!-- 					<artifactId>c2mon-shared-rule</artifactId> -->
-<!-- 					<groupId>cern.c2mon.c2mon-shared</groupId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<artifactId>c2mon-client-auth</artifactId> -->
-<!-- 					<groupId>cern.c2mon.c2mon-client</groupId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<artifactId>c2mon-shared-persistence-manager</artifactId> -->
-<!-- 					<groupId>cern.c2mon.c2mon-shared</groupId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<artifactId>mail</artifactId> -->
-<!-- 					<groupId>javax.mail</groupId> -->
-<!-- 				</exclusion> -->
-<!-- 				<exclusion> -->
-<!-- 					<artifactId>mybatis</artifactId> -->
-<!-- 					<groupId>org.mybatis</groupId> -->
-<!-- 				</exclusion> -->
-<!-- 			</exclusions> -->
 		</dependency>
 
 		<!-- 3rd party dependencies -->
