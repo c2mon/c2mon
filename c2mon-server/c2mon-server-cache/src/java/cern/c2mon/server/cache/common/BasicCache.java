@@ -98,9 +98,10 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     T result = null;
     if (id != null) {
       if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace(cache.getName() + " Trying to get ID=" + id);
+        LOGGER.trace(cache.getName() + " entering get()");
       }
-      cache.acquireReadLockOnKey(id);
+        
+      acquireReadLockOnKey(id);
       try {
         Element element = cache.get(id);
         if (element != null) {
@@ -112,7 +113,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
         LOGGER.error("getReference() - Caught cache exception thrown by Ehcache while accessing object with id " + id, cacheException);
         throw new RuntimeException("An error occured when accessing the cache object with id " + id, cacheException);
       } finally {
-        cache.releaseReadLockOnKey(id);
+        releaseReadLockOnKey(id);
       }
     } else {
       LOGGER.error("getReference() - Trying to access cache with a NULL key - throwing an exception!");
@@ -121,7 +122,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
     }
     
     if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace(cache.getName() + " Returning object for ID=" + id);
+        LOGGER.trace(cache.getName() + " get() Returning object for ID=" + id);
     }
     
     return result;
@@ -195,6 +196,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace(cache.getName() + " Acquiring WRITE lock for id=" + String.valueOf(id));
       }
+      
       cache.acquireWriteLockOnKey(id);
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace(cache.getName() + " Got WRITE lock for id=" + String.valueOf(id));
