@@ -79,6 +79,10 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cachepersistence</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
       <artifactId>c2mon-server-common</artifactId>
     </dependency>
     <dependency>

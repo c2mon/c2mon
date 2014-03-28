@@ -37,11 +37,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.transaction.TransactionTimedOutException;
 
 import cern.c2mon.server.cache.C2monCache;
+import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.shared.common.Cacheable;
@@ -90,6 +93,12 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
    * persistence module). Needs setting in constructor.
    */
   private C2monCache<Long, T> cache;
+  
+  /**
+   * Autowired as always the same singleton.
+   */
+  @Autowired
+  private ClusterCache clusterCache;
   
   /**
    * Set of tags that the server failed to persist successfully and
@@ -142,28 +151,29 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
 
   @Override  
   public void persistList(final Collection<Long> keyCollection) {
-    
-    LOGGER.debug("Submitting new persistence task (currently " + persistenceExecutor.getQueue().size() + " tasks in queue)");
-    
-    //local set, no synch needed; removes duplicates from collection (though unnecessary with current SynchroBuffer)
-    Set<Long> localToBePersisted = new HashSet<Long>(keyCollection);
-    
-    toBePersistedLock.writeLock().lock();
+    clusterCache.acquireWriteLockOnKey(cachePersistenceLock);
     try {
-      localToBePersisted.addAll(toBePersisted);  //gets rid of all duplicates
-      toBePersisted.clear();
-    } finally {
-      toBePersistedLock.writeLock().unlock();
-    }
-    
-    int size = localToBePersisted.size();
-    
-    LOGGER.debug("Persisting " + size + " cache object(s) to the database (" + cache.getClass() + ")");      
-    
-    LinkedList<Future< ? >> taskResults = new LinkedList<Future< ? >>();
-    Map<Future< ? >, Collection<Long>> submittedSets = new HashMap<Future<?>, Collection<Long>>();
-    
-    Iterator<Long> it = localToBePersisted.iterator();      
+      LOGGER.debug("Submitting new persistence task (currently " + persistenceExecutor.getQueue().size() + " tasks in queue)");
+      
+      //local set, no synch needed; removes duplicates from collection (though unnecessary with current SynchroBuffer)
+      Set<Long> localToBePersisted = new HashSet<Long>(keyCollection);
+      
+      toBePersistedLock.writeLock().lock();
+      try {
+        localToBePersisted.addAll(toBePersisted);  //gets rid of all duplicates
+        toBePersisted.clear();
+      } finally {
+        toBePersistedLock.writeLock().unlock();
+      }
+      
+      int size = localToBePersisted.size();
+      
+      LOGGER.debug("Persisting " + size + " cache object(s) to the database (" + cache.getClass() + ")");      
+      
+      LinkedList<Future< ? >> taskResults = new LinkedList<Future< ? >>();
+      Map<Future< ? >, Collection<Long>> submittedSets = new HashMap<Future<?>, Collection<Long>>();
+      
+      Iterator<Long> it = localToBePersisted.iterator();      
       while (it.hasNext()) {
         PersistenceTask task = new PersistenceTask();
         LinkedList<Long> persistedIds = new LinkedList<Long>();
@@ -219,7 +229,10 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
         LOGGER.debug("Completed persistence of all " + count + " batches");
       } else {
         LOGGER.debug(exceptionCount + " out of " + count + " persistence batches failed and will be resubmitted.");
-      }    
+      }
+    } finally {
+      clusterCache.releaseWriteLockOnKey(cachePersistenceLock);
+    }
   }
   
   @Override

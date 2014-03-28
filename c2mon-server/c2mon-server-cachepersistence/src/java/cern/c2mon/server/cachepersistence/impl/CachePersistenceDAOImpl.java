@@ -21,11 +21,9 @@ package cern.c2mon.server.cachepersistence.impl;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.cache.C2monCache;
-import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.dbaccess.PersistenceMapper;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
@@ -47,14 +45,6 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
    * Private class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(CachePersistenceDAOImpl.class);
-  
-  private static final String cachePersistenceLock = "c2mon.cachepersistence.cachePersistenceLock";
-  
-  /**
-   * Autowired as always the same singleton.
-   */
-  @Autowired
-  private ClusterCache clusterCache;
   
   /**
    * Mapper for persisting cache updates. Needs setting in
@@ -85,8 +75,8 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
    * Persists a single cacheable
    * setting).
    */
-  @Override
   @Transactional("cacheTransactionManager")
+  @Override
   public void updateCacheable(final T cacheable) {
     persistenceMapper.updateCacheable(cacheable);
   }
@@ -96,26 +86,21 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
    * An object that is not found in the cache will not be persisted and skipped.
    * @param keyList keys of the elements that need persisting
    */
-  @Transactional("cacheTransactionManager")
+  @Transactional(value = "cacheTransactionManager")
   @Override
   public void persistBatch(final List<Long> keyList) {
-    clusterCache.acquireWriteLockOnKey(cachePersistenceLock);
-    try {
-      T cacheObject;
-      for (Long key : keyList) {
-        try {
-          cacheObject = cache.getCopy(key);         
-          //do not persist unconfigured tags TODO could remove as unconfigured not used
-          if (cacheObject != null && (!(cacheObject instanceof Tag) || !((Tag) cacheObject).isInUnconfigured())) {                        
-            persistenceMapper.updateCacheable(cacheObject);
-          }
-        } catch (CacheElementNotFoundException ex) {
-          LOGGER.warn("Cache element with id " + key + " could not be persisted as not found in cache (may have been "
-          		+ "removed in the meantime by a re-configuration). Cache is " + cache.getClass().getSimpleName(), ex);
+    T cacheObject;
+    for (Long key : keyList) {
+      try {
+        cacheObject = cache.getCopy(key);         
+        //do not persist unconfigured tags TODO could remove as unconfigured not used
+        if (cacheObject != null && (!(cacheObject instanceof Tag) || !((Tag) cacheObject).isInUnconfigured())) {                        
+          persistenceMapper.updateCacheable(cacheObject);
         }
+      } catch (CacheElementNotFoundException ex) {
+        LOGGER.warn("Cache element with id " + key + " could not be persisted as not found in cache (may have been "
+        		+ "removed in the meantime by a re-configuration). Cache is " + cache.getClass().getSimpleName(), ex);
       }
-    } finally {
-      clusterCache.releaseWriteLockOnKey(cachePersistenceLock);
     }
   }
   

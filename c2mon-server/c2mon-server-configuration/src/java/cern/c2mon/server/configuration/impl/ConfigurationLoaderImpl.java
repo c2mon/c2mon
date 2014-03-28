@@ -44,6 +44,7 @@ import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessFacade;
+import cern.c2mon.server.cachepersistence.common.BatchPersistenceManager;
 import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
@@ -369,92 +370,99 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    **/
   private List<ProcessChange> applyConfigElement(final ConfigurationElement element, 
                                                  final ConfigurationElementReport elementReport) throws IllegalAccessException {
-    if (LOGGER.isTraceEnabled()){
-      LOGGER.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
-    }
-    
-    if (element.getAction() == null || element.getEntity() == null || element.getEntityId() == null) {
-      elementReport.setFailure("Parameter missing in configuration line with sequence id " + element.getSequenceId());
-      return null; 
-    }   
-        
+    // Write lock needed to avoid parallel Batch persistence transactions 
+    clusterCache.acquireWriteLockOnKey(BatchPersistenceManager.cachePersistenceLock);
+    //initialize the DAQ config event
+    List<ProcessChange> daqConfigEvents = new ArrayList<ProcessChange>();
+    try {
+      if (LOGGER.isTraceEnabled()){
+        LOGGER.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
+      }
+      
+      if (element.getAction() == null || element.getEntity() == null || element.getEntityId() == null) {
+        elementReport.setFailure("Parameter missing in configuration line with sequence id " + element.getSequenceId());
+        return null; 
+      }   
+          
 //    String fieldName = element.getEntity().toString().toLowerCase() + "ConfigHandler";
 //    Object configHandler = this.getClass().getField(fieldName).get(this);
 //    Method createMethod = configHandler.getClass().getMethod("create" + element.getEntity().toString().toLowerCase(), parameterTypes)
-    
-    //initialize the DAQ config event
-    List<ProcessChange> daqConfigEvents = new ArrayList<ProcessChange>();
-         
-    switch (element.getAction()) {
-    case CREATE :
-      switch (element.getEntity()) {
-      case DATATAG : daqConfigEvents.add(dataTagConfigHandler.createDataTag(element)); break;
-      case RULETAG : ruleTagConfigHandler.createRuleTag(element); break;
-      case CONTROLTAG: daqConfigEvents.add(controlTagConfigHandler.createControlTag(element));
+           
+      switch (element.getAction()) {
+      case CREATE :
+        switch (element.getEntity()) {
+        case DATATAG : daqConfigEvents.add(dataTagConfigHandler.createDataTag(element)); break;
+        case RULETAG : ruleTagConfigHandler.createRuleTag(element); break;
+        case CONTROLTAG: daqConfigEvents.add(controlTagConfigHandler.createControlTag(element));
+                         element.setDaqStatus(Status.RESTART); break;
+        case COMMANDTAG : daqConfigEvents = commandTagConfigHandler.createCommandTag(element); break;
+        case ALARM : alarmConfigHandler.createAlarm(element); break;
+        case PROCESS : daqConfigEvents.add(processConfigHandler.createProcess(element));
                        element.setDaqStatus(Status.RESTART); break;
-      case COMMANDTAG : daqConfigEvents = commandTagConfigHandler.createCommandTag(element); break;
-      case ALARM : alarmConfigHandler.createAlarm(element); break;
-      case PROCESS : daqConfigEvents.add(processConfigHandler.createProcess(element));
-                     element.setDaqStatus(Status.RESTART); break;
-      case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.createEquipment(element)); break;
-      case SUBEQUIPMENT : daqConfigEvents.add(subEquipmentConfigHandler.createSubEquipment(element));
-                          element.setDaqStatus(Status.RESTART); break;
-      default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
+        case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.createEquipment(element)); break;
+        case SUBEQUIPMENT : daqConfigEvents.add(subEquipmentConfigHandler.createSubEquipment(element));
+                            element.setDaqStatus(Status.RESTART); break;
+        default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
+          LOGGER.warn("Unrecognized reconfiguration entity: " + element.getEntity() 
+              + " - see reconfiguration report for details.");
+        }
+        break;
+      case UPDATE :
+        switch (element.getEntity()) {
+        case DATATAG :           
+          daqConfigEvents.add(dataTagConfigHandler.updateDataTag(element.getEntityId(), element.getElementProperties())); break;      
+        case CONTROLTAG : 
+          daqConfigEvents.add(controlTagConfigHandler.updateControlTag(element.getEntityId(), element.getElementProperties())); break;
+        case RULETAG : 
+          ruleTagConfigHandler.updateRuleTag(element.getEntityId(), element.getElementProperties()); break;
+        case COMMANDTAG : 
+          daqConfigEvents.addAll(commandTagConfigHandler.updateCommandTag(element.getEntityId(), element.getElementProperties())); break;
+        case ALARM : 
+          alarmConfigHandler.updateAlarm(element.getEntityId(), element.getElementProperties()); break;
+        case PROCESS : 
+          daqConfigEvents.add(processConfigHandler.updateProcess(element.getEntityId(), element.getElementProperties())); break;
+        case EQUIPMENT : 
+          daqConfigEvents.addAll(equipmentConfigHandler.updateEquipment(element.getEntityId(), element.getElementProperties())); break;
+        case SUBEQUIPMENT : 
+          daqConfigEvents.addAll(subEquipmentConfigHandler.updateSubEquipment(element.getEntityId(), element.getElementProperties())); break;
+        default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
+          LOGGER.warn("Unrecognized reconfiguration entity: " + element.getEntity() 
+              + " - see reconfiguration report for details.");
+        }
+        break;
+      case REMOVE :
+        switch (element.getEntity()) {
+        case DATATAG : daqConfigEvents.addAll(dataTagConfigHandler.removeDataTag(element.getEntityId(), elementReport)); break;   
+        case CONTROLTAG : daqConfigEvents.add(controlTagConfigHandler.removeControlTag(element.getEntityId(), elementReport)); break;  
+        case RULETAG : ruleTagConfigHandler.removeRuleTag(element.getEntityId(), elementReport); break;  
+        case COMMANDTAG : daqConfigEvents.addAll(commandTagConfigHandler.removeCommandTag(element.getEntityId(), elementReport)); break;
+        case ALARM : alarmConfigHandler.removeAlarm(element.getEntityId(), elementReport); break; 
+        case PROCESS : daqConfigEvents.add(processConfigHandler.removeProcess(element.getEntityId(), elementReport)); break;
+        case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.removeEquipment(element.getEntityId(), elementReport)); break;
+        case SUBEQUIPMENT : subEquipmentConfigHandler.removeSubEquipment(element.getEntityId(), elementReport); break;                          
+        default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
         LOGGER.warn("Unrecognized reconfiguration entity: " + element.getEntity() 
             + " - see reconfiguration report for details.");
+        }                 
+        break;
+      default : elementReport.setFailure("Unrecognized reconfiguration action: " + element.getAction());
+      LOGGER.warn("Unrecognized reconfiguration action: " + element.getAction() 
+          + " - see reconfiguration report for details."); 
       }
-      break;
-    case UPDATE :
-      switch (element.getEntity()) {
-      case DATATAG :           
-        daqConfigEvents.add(dataTagConfigHandler.updateDataTag(element.getEntityId(), element.getElementProperties())); break;      
-      case CONTROLTAG : 
-        daqConfigEvents.add(controlTagConfigHandler.updateControlTag(element.getEntityId(), element.getElementProperties())); break;
-      case RULETAG : 
-        ruleTagConfigHandler.updateRuleTag(element.getEntityId(), element.getElementProperties()); break;
-      case COMMANDTAG : 
-        daqConfigEvents.addAll(commandTagConfigHandler.updateCommandTag(element.getEntityId(), element.getElementProperties())); break;
-      case ALARM : 
-        alarmConfigHandler.updateAlarm(element.getEntityId(), element.getElementProperties()); break;
-      case PROCESS : 
-        daqConfigEvents.add(processConfigHandler.updateProcess(element.getEntityId(), element.getElementProperties())); break;
-      case EQUIPMENT : 
-        daqConfigEvents.addAll(equipmentConfigHandler.updateEquipment(element.getEntityId(), element.getElementProperties())); break;
-      case SUBEQUIPMENT : 
-        daqConfigEvents.addAll(subEquipmentConfigHandler.updateSubEquipment(element.getEntityId(), element.getElementProperties())); break;
-      default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
-        LOGGER.warn("Unrecognized reconfiguration entity: " + element.getEntity() 
-            + " - see reconfiguration report for details.");
+    
+      //set *unique* change id (single element may trigger many changes e.g. rule removal)
+      if (!daqConfigEvents.isEmpty()) {            
+        for (ProcessChange processChange : daqConfigEvents) { 
+          if (processChange.processActionRequired()) {
+            processChange.getChangeEvent().setChangeId(changeId);       
+            changeId++;
+          }        
+        }
       }
-      break;
-    case REMOVE :
-      switch (element.getEntity()) {
-      case DATATAG : daqConfigEvents.addAll(dataTagConfigHandler.removeDataTag(element.getEntityId(), elementReport)); break;   
-      case CONTROLTAG : daqConfigEvents.add(controlTagConfigHandler.removeControlTag(element.getEntityId(), elementReport)); break;  
-      case RULETAG : ruleTagConfigHandler.removeRuleTag(element.getEntityId(), elementReport); break;  
-      case COMMANDTAG : daqConfigEvents.addAll(commandTagConfigHandler.removeCommandTag(element.getEntityId(), elementReport)); break;
-      case ALARM : alarmConfigHandler.removeAlarm(element.getEntityId(), elementReport); break; 
-      case PROCESS : daqConfigEvents.add(processConfigHandler.removeProcess(element.getEntityId(), elementReport)); break;
-      case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.removeEquipment(element.getEntityId(), elementReport)); break;
-      case SUBEQUIPMENT : subEquipmentConfigHandler.removeSubEquipment(element.getEntityId(), elementReport); break;                          
-      default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
-      LOGGER.warn("Unrecognized reconfiguration entity: " + element.getEntity() 
-          + " - see reconfiguration report for details.");
-      }                 
-      break;
-    default : elementReport.setFailure("Unrecognized reconfiguration action: " + element.getAction());
-    LOGGER.warn("Unrecognized reconfiguration action: " + element.getAction() 
-        + " - see reconfiguration report for details."); 
+    } finally {
+      clusterCache.releaseWriteLockOnKey(BatchPersistenceManager.cachePersistenceLock);
     }
-    //set *unique* change id (single element may trigger many changes e.g. rule removal)
-    if (!daqConfigEvents.isEmpty()) {            
-      for (ProcessChange processChange : daqConfigEvents) { 
-        if (processChange.processActionRequired()) {
-          processChange.getChangeEvent().setChangeId(changeId);       
-          changeId++;
-        }        
-      }
-    }      
+    
     return daqConfigEvents;
   }
 
