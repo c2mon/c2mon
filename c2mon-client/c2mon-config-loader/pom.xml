@@ -108,9 +108,14 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.oracle</groupId>
+			<groupId>oracle</groupId>
 			<artifactId>ojdbc</artifactId>
-			<version>11.2.0.3</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>oracle</groupId>
+			<artifactId>orai18n</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- Test dependencies -->
