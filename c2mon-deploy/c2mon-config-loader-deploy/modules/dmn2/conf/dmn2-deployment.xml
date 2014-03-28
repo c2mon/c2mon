@@ -5,8 +5,6 @@
 		<!-- this application section is a parent configuration for both dmn2-config-loader-pro and dmn2-config-loader-test -->
 		<application name="default">
 
-			<property name="oracle.net.tns_admin" value="/etc" />
-
 			<deployment>
 				<backupPolicy keepBackups="2">
 					<preserve type="dir" name="log" />
@@ -39,11 +37,13 @@
 				<main-class name="cern.c2mon.configloader.C2MonConfigLoaderMain" />
 
 				<!-- JVM arguments -->
+				<property name="oracle.net.tns_admin" value="/etc" />
 				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.properties" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-CONFIG-LOADER" />
 				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
 				<property name="c2mon-configloader.properties" value="file://${INSTALL_DIR}/conf/configloader.properties" />
+
 				<property name="spring.profiles.active" value="PRO" />
 
 			</startscript>
@@ -64,17 +64,20 @@
 				<max-heap-size>256m</max-heap-size>
 
 				<!-- enable eclipse remote debugging on port 8100 -->
-				<java-vm-args>-Xdebug -Xrunjdwp:transport=dt_socket,address=8100,server=y,suspend=n	</java-vm-args>
+				<java-vm-args>-Xdebug -Xrunjdwp:transport=dt_socket,address=8100,server=y,suspend=n</java-vm-args>
 
 				<main-class name="cern.c2mon.configloader.C2MonConfigLoaderMain" />
 
 				<!-- JVM arguments -->
+				<property name="oracle.net.tns_admin" value="/etc" />
 				<property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.properties" />
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-CONFIG-LOADER-DEV" />
 				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
 				<property name="c2mon-configloader.properties" value="file://${INSTALL_DIR}/conf/configloader.properties" />
-				<property name="spring.profiles.active" value="TEST" />
+
+				<!-- use also PRO profile in order to connect to a real database -->
+				<property name="spring.profiles.active" value="PRO" />
 
 			</startscript>
 
