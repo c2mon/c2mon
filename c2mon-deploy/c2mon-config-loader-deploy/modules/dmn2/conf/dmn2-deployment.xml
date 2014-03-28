@@ -40,7 +40,8 @@
 				<property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
 				<property name="c2mon.process.name" value="DMN2-CONFIG-LOADER" />
 				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
-				<property name="c2mon-configloader.properties" value="file://${INSTALL_DIR}/conf/configloader.properties" />				
+				<property name="c2mon-configloader.properties" value="file://${INSTALL_DIR}/conf/configloader.properties" />
+				<property name="spring.profiles.active" value="PRO" />				
 
 			</startscript>
 
@@ -70,6 +71,7 @@
 				<property name="c2mon.process.name" value="DMN2-CONFIG-LOADER-DEV" />
 				<property name="c2mon.client.conf.url" value="file://${INSTALL_DIR}/conf/client.properties" />
 				<property name="c2mon-configloader.properties" value="file://${INSTALL_DIR}/conf/configloader.properties" />
+				<property name="spring.profiles.active" value="TEST" />
 
 			</startscript>
 
