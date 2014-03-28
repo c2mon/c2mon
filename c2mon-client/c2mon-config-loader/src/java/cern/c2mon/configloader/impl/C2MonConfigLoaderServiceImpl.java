@@ -26,6 +26,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
 @Service
 public class C2MonConfigLoaderServiceImpl implements C2MonConfigLoaderService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(C2MonConfigLoaderServiceImpl.class);
     private static final Logger APPLIED_CONFIG_LOG = LoggerFactory.getLogger("configLog");
 
     @Resource
@@ -40,9 +41,21 @@ public class C2MonConfigLoaderServiceImpl implements C2MonConfigLoaderService {
 
     @Override
     public void applyConfiguration(Configuration conf) {
-        dao.update(conf.getId(), userName);
-        ConfigurationReport report = requestor.applyConfiguration(conf);
-        log(conf, report);
+        ConfigurationReport report = null;
+        try {
+            report = requestor.applyConfiguration(conf);
+            dao.update(conf.getId(), userName);
+            log(conf, report);
+        } catch (Exception ex) {
+            LOG.error("exception caught trying to apply configuration", ex);
+            log(conf, ex);
+        }
+    }
+
+    private void log(Configuration conf, Exception ex) {
+        APPLIED_CONFIG_LOG.info("{} [ {} ]  {} {} {} {} {} {}",
+                new Object[] { userName, conf.getId(), "FAILED", ex.getMessage(), conf.getName(),
+                        conf.getDescription(), conf.getAuthor(), conf.getCreateTimestampStr() });
     }
 
     private void log(Configuration conf, ConfigurationReport report) {

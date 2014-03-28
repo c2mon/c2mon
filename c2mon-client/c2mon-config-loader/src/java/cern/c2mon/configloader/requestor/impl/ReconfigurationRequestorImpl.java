@@ -49,7 +49,7 @@ public class ReconfigurationRequestorImpl implements ServerReconfigurationReques
 
     @Override
     public synchronized ConfigurationReport applyConfiguration(Configuration conf) {
-        LOG.info("applying configuration: {}", conf.toString());
+        LOG.info("applying configuration: {}", conf.getId());
 
         ConfigurationReport report = tagManager.applyConfiguration(conf.getId());
 
