@@ -92,29 +92,36 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
     //sets for this ruleTag
     HashSet<Long> processIds = new HashSet<Long>();
     HashSet<Long> equipmentIds = new HashSet<Long>();
+    int cnt = 0;
+    
+    LOGGER.trace(ruleTag.getId() + " Has "+ ruleTag.getRuleInputTagIds().size() + " input rule tags"); 
     for (Long tagKey : ruleTag.getRuleInputTagIds()) {
+        
+      cnt++;
+      LOGGER.trace(ruleTag.getId() + " Trying to find rule input tag No#" + cnt + " with id=" + tagKey + " in caches.. ");
       if (dataTagCache.hasKey(tagKey)) {
-        DataTag dataTag = dataTagCache.get(tagKey);
+        DataTag dataTag = dataTagCache.getCopy(tagKey);
         processIds.add(dataTag.getProcessId());
         equipmentIds.add(dataTag.getEquipmentId());
-      } else if (this.hasKey(tagKey)) {
-        this.acquireWriteLockOnKey(tagKey);
-        try {
-          RuleTag childRuleTag = (RuleTag) this.get(tagKey);
-          //if not empty, already processed; if empty, needs processing
-          if (childRuleTag.getProcessIds().isEmpty()) {
-            setParentSupervisionIds(childRuleTag);
-            this.putQuiet(childRuleTag);
-          }          
-          processIds.addAll(childRuleTag.getProcessIds());
-          equipmentIds.addAll(childRuleTag.getEquipmentIds());
-        } finally {
-          this.releaseWriteLockOnKey(tagKey);
-        }          
       } else {
-        throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
-                  + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)");
-        }       
+          this.acquireWriteLockOnKey(tagKey);
+          try {
+              RuleTag childRuleTag = (RuleTag) this.get(tagKey);
+              //if not empty, already processed; if empty, needs processing
+              if (childRuleTag.getProcessIds().isEmpty()) {
+                setParentSupervisionIds(childRuleTag);
+                this.putQuiet(childRuleTag);
+              }          
+              processIds.addAll(childRuleTag.getProcessIds());
+              equipmentIds.addAll(childRuleTag.getEquipmentIds());                
+          } catch(CacheElementNotFoundException cenfe) {
+              throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
+                      + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)", cenfe);
+          } finally {
+            this.releaseWriteLockOnKey(tagKey);
+          }
+      }
+            
     }
     LOGGER.debug("setParentSupervisionIds() - Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds);
     ruleTag.setProcessIds(processIds);
