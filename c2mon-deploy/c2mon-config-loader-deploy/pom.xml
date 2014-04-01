@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>cern.c2mon.c2mon-client</groupId>
 			<artifactId>c2mon-config-loader</artifactId>
-			<version>[0.9.9,2.0.0)</version>
+			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 	</dependencies>
 
