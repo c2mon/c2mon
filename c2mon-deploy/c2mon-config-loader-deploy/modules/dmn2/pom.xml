@@ -6,14 +6,14 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-deploy</groupId>
 		<artifactId>c2mon-config-loader-deploy</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
 	<artifactId>c2mon-config-loader-dmn2</artifactId>
 	<name>The DMN2 Configuration Loader</name>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 
 	<description>C2MON Configuration Loader assembly module gathering all required modules and configuration files for DMN2</description>
 	<url></url>
