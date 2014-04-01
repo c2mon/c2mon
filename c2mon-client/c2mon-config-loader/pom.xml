@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>c2mon-config-loader</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>The C2MON configuration loader</name>
 	<description>The C2MON configuration loader is a process used for automatic application of the C2MON reconfigurations to the C2MON server</description>
 
