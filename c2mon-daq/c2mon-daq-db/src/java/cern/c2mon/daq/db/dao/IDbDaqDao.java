@@ -6,6 +6,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 
 import cern.c2mon.daq.db.Alert;
 import cern.c2mon.daq.db.AlertTimeOutException;
+import cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl;
 
 
 
@@ -57,6 +58,48 @@ public interface IDbDaqDao {
      * */
     void insertNewDataTag(final long dataTagId, final String name, final String value, 
             final String type, final short quality, final String qualityDesc);
+    
+    /**
+     * Registers an update of the datatag  Hardware address item name for the equipment (db account). 
+     * When there is a configuration that changes the item name of the data tag Hardware address (normally done using Modesti) 
+     * we need to store the new name on the data base.
+     * @param dataTagId     id of the datatag
+     * @param itemName      New item name of the datatag Hardware adress
+     * */
+    void updateDataTagItemName(final long dataTagId, final String itemName);
+    
+    /**
+     * Registers an update of the datatag Data Type for the equipment (db account). 
+     * When there is a configuration that changes the Data Type of the data tag (normally done using Modesti) 
+     * we need to store the new Data Type on the data base.
+     * @param dataTagId     id of the datatag
+     * @param dataType      New data type for the data tag
+     * */
+    void updateDataTagDataType(final long dataTagId, final String dataType);
+    
+    /**
+     * Retrieves from the data base the Data Tag hardware address Item name
+     * 
+     * @param dataTagId
+     * @return The Data Tag hardware address Item name
+     */
+    public String getItemName(final long dataTagId);
+    
+    /**
+     * Retrieves from the data base the Data Tag Data Type
+     * 
+     * @param dataTagId
+     * @return The Data Tag Data Type
+     */
+    public String getDataType(final long dataTagId);
+    
+    /**
+     * Retrieves from the data base the Data Tag hardware address Item name and the Data Type
+     * 
+     * @param dataTagId
+     * @return The Data Tag hardware address Item name and the Data Type
+     */
+    public DBDAQHardwareAdressImpl getItemNameAndDataType(final long dataTagId);
     
     /**
      * Registers an interest in receiveing alerts identified by alertId

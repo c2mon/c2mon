@@ -94,5 +94,39 @@
 		<update id="unregister-all-alerts" statementType="CALLABLE">
 			{call DBMS_ALERT.removeall }
 		</update>
+    
+        <update id="updateDataTagItemName" parameterType="cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl">
+            UPDATE DB_DAQ
+                SET DBD_NAME = #{dbItemName,javaType=java.lang.String,jdbcType=VARCHAR}
+            WHERE DBD_TAG_ID=#{tagId} 
+        </update>
+        
+        <select id="getItemNameForDataTagById" parameterType="java.lang.Long" resultType="java.lang.String">
+            SELECT DBD_NAME FROM DB_DAQ WHERE DBD_TAG_ID=#{dataTagId} 
+        </select>
+        
+        <update id="updateDataTagDataType" parameterType="cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl">
+            UPDATE DB_DAQ
+                SET DBD_DATA_TYPE = #{dataType,javaType=java.lang.String,jdbcType=VARCHAR}
+            WHERE DBD_TAG_ID=#{tagId} 
+        </update>
+        
+        <select id="getDataTypeForDataTagById" parameterType="java.lang.Long" resultType="java.lang.String">
+            SELECT DBD_DATA_TYPE FROM DB_DAQ WHERE DBD_TAG_ID=#{dataTagId} 
+        </select>
+        
+        <resultMap id="datatag" type="cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl">
+            <result property="tagId" column="DBD_TAG_ID" javaType="java.lang.Long" jdbcType="INTEGER"/>
+            <result property="dbItemName" column="DBD_NAME" javaType="java.lang.String" jdbcType="VARCHAR"/>
+            <result property="dataType" column="DBD_DATA_TYPE" javaType="java.lang.String" jdbcType="VARCHAR"/>
+        </resultMap>
+        
+        <select id="getItemNameAndDataTypeById" parameterType="java.lang.Long" resultMap="datatag"> 
+            SELECT  DBD_TAG_ID,
+                    DBD_NAME,
+                    DBD_DATA_TYPE
+            FROM DB_DAQ 
+           WHERE DBD_TAG_ID = #{tagId}  
+        </select>
             
 </mapper>
