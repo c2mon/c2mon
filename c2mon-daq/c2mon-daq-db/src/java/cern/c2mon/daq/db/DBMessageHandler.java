@@ -11,10 +11,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.UncategorizedSQLException;
 
-import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.address.DBHardwareAddress;
 import cern.c2mon.shared.common.type.TypeConverter;
@@ -160,7 +162,23 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         List<Long> registeredDataTags = this.dbDaqDao.getDataTags();
         for (ISourceDataTag dataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
             if (dataTag.getHardwareAddress() instanceof DBHardwareAddress) {
-              this.dbController.connection(dataTag, null, registeredDataTags);
+              try {
+                this.dbController.connection(dataTag, null, registeredDataTags);
+              } catch (DuplicateKeyException de) {
+                // Invalidate
+                String description =  de.getCause().getMessage().replaceAll("\n", "") + ". Manual DB intervention is required."
+                    + " Please contact Admin Support.";
+
+                getEquipmentLogger().error("connectToDataSource - " + de.getCause().getMessage(), de);
+                getEquipmentMessageSender().sendInvalidTag(dataTag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, description);
+              } catch (DataAccessException dae) {
+                // Invalidate
+                String description =  dae.getCause().getMessage().replaceAll("\n", "") + ". Unexpected DB exception caught." 
+                    + " Please contact Admin Support";
+
+                getEquipmentLogger().error("connectToDataSource - " + dae.getCause().getMessage().replaceAll("\n", ""), dae);
+                getEquipmentMessageSender().sendInvalidTag(dataTag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, description);
+              }
             } else {
                 String errorMsg = "Unsupported HardwareAddress: " + dataTag.getHardwareAddress().getClass();
                 throw new EqIOException(errorMsg);
