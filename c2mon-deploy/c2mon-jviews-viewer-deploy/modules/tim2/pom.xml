@@ -21,10 +21,11 @@
 
 	<dependencies>
     <dependency>
-    <groupId>cern.cmw</groupId>
-    <artifactId>cmw-log-log4j</artifactId>
-    <version>[1.5.4,2.0.0)</version>
-  </dependency>
+      <groupId>cern.cmw</groupId>
+      <artifactId>cmw-log-log4j</artifactId>
+      <version>[1.5.4,2.0.0)</version>
+    </dependency>
+  </dependencies>
 
 	<developers />
 	<scm>
