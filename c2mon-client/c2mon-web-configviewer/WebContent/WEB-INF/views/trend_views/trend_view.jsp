@@ -4,30 +4,33 @@
 <!DOCTYPE html>
 <head>    
 	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9; IE=EmulateIE10"> 
-	<!--[if IE]><script src="/c2mon-web-configviewer/js/excanvas.js"></script><![endif]-->
+	<!--[if IE]><script src="../js/excanvas.js"></script><![endif]-->
    <title>TrendViewer</title>
-	<script type="text/javascript" src="/c2mon-web-configviewer/js/dygraph-combined.js"></script>
+	<script type="text/javascript" src="../js/dygraph-combined.js"></script>
 	
-	<link rel="shortcut icon" href="/c2mon-web-configviewer/img/chart_icon.png">
+	<link rel="shortcut icon" href="../img/chart_icon.png">
 	
-	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap.css" />
-	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap-responsive.css" />
+	<link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
+	<link rel="stylesheet" type="text/css" href="../css/bootstrap-responsive.css" />
 
-	<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"/>
-	<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"/>
+	<script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/tim.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/buttons.css"/>
 </head>
 
-<body>
-
+<body onresize="myFunction()" onload="myFunction()">
+	
+	
 	<style media="screen" type="text/css">
 		.invalidPoint {
     		background-color: #66ffff; 
-		}
+		}`
+		
 	</style>
+	
 
     <div class="container-fluid">
-      <div class="row-fluid">
+      <div class="row-fluid" id="row-fluid">
 	  
           <div class="page-header">
 			<h2 style="margin-left:50px;display:inline; text-align:center;">${view_title}</h2>
@@ -36,23 +39,38 @@
 			</div>
           </div>
 		  
-		<p style="margin-left:50px;width:900px; height:30px;" class="links">
-			<A href="/c2mon-web-configviewer/historyviewer/${id}?${queryParameters}" 
+		<p style="margin-left:50px;width:90%; height:30px; min-width:550px; margin-bottom:5%;" class="links">
+			<A href="../historyviewer/${id}?${queryParameters}" 
 				class="large blue awesome xml_button" target="_blank">Table >>
 			</A>	
-			<A href="/c2mon-web-configviewer/tagviewer/${id}/" 
+			<A href="../tagviewer/${id}" 
 				class="large blue awesome xml_button" target="_blank">View Tag >>
 			</A>
 			<A href="https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=${id}" 
 				class="large red awesome xml_button" target="_blank">View Help Alarm >>
 			</A>
-			<A style="display:inline;float:left;" href="/c2mon-web-configviewer/" 
+			<A style="display:inline;float:left;" href="../" 
 			class="blue awesome xml_button">		
 				 <i class="icon-home"></i> Home
 			</A>
 		</p>
 
-		<div style="width:1000px; height:650px;" id="trend_view"></div>
+		<div style="width:100%; height:650px; ;" id="trend_view" ></div>
+		
+		<script>
+		function myFunction()
+		{
+		var w=window.innerWidth;
+		var h=window.innerHeight;
+		document.getElementById("row-fluid").style.height = window.innerHeight;
+		if(w<680)
+			w=680;
+			
+		if(h<400)
+			h=400;	
+		trend.resize(w-130,h-215);
+		}
+		</script>
 		
 	</div>
     </div><!--/.fluid-container-->
@@ -88,6 +106,7 @@
      ]
     }
   );
+ 
   
    trend.ready(function(g) {
     g.setAnnotations( [
@@ -114,6 +133,8 @@
     ] );
   });
 </script>
+
+
 
 </body>
 </html>
