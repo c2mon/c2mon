@@ -23,14 +23,8 @@
     <dependency>
       <groupId>cern.cmw.java.log.sources</groupId>
       <artifactId>cmw-log-log4j</artifactId>
-      <version>[1.0.0,2.0.0)</version>
+      <version>1.5.4</version>
       <scope>runtime</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 	</dependencies>
 
