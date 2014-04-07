@@ -1,0 +1,10 @@
+<config>
+	<view>
+		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Energy/Puissance_Totale_Ete.idbd"/>
+		<property name="external" type="java.lang.Boolean" value="true"/>
+	</view>
+	<view>
+		<property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Secu_Gaz/LHC_Tunnel_ODH/LHCodhOverview.idbd"/>
+		<property name="external" type="java.lang.Boolean" value="true"/>
+	</view>
+</config>
