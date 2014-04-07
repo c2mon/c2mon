@@ -92,7 +92,7 @@
 			<sec:authorize ifNotGranted="ROLE_ANONYMOUS">
 				<div class="alert alert-success">
 					<p>You are currently logged in. 
-						<a href="/c2mon-web-configviewer/j_spring_security_logout">Logout</a>
+						<a href="j_spring_security_logout">Logout</a>
     		</div>
    		</sec:authorize>
 

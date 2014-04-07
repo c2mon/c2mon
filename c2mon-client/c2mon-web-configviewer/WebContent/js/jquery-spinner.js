@@ -80,7 +80,7 @@
     // default spinner options
     $.fn.spinner.defaults = {
         position    : 'left'       // left, right, center
-        , img       : '/c2mon-web-configviewer/img/spinner.gif' // path to spinner img
+        , img       : '../img/spinner.gif' // path to spinner img
         , height    : 16            // height of spinner img
         , width     : 16            // width of spinner img
         , zIndex    : 1001          // z-index of spinner

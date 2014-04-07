@@ -3,8 +3,8 @@
 <html>
 <head>
 <title>${title}</title>
-<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap.css" />
-<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap-responsive.css" />
+<link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="../css/bootstrap-responsive.css" />
 
     <style type="text/css">
       body {
@@ -26,7 +26,7 @@
       
     <ul class="breadcrumb">
     <li>
-    <a href="/c2mon-web-configviewer">Home</a> <span class="divider">/</span>
+    <a href="../">Home</a> <span class="divider">/</span>
     </li>
     <li>${title}</li>
     </ul>
@@ -47,7 +47,7 @@
 	<input class="btn btn-large btn-primary" type="submit" value="Submit">
 </form>
 
-<a href="/c2mon-web-configviewer/j_spring_security_logout">Logout</a>
+<a href="j_spring_security_logout">Logout</a>
 </div><!--/row-->
 
       <hr>
@@ -58,9 +58,9 @@
     </div><!--/.fluid-container-->
     
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/c2mon-web-configviewer/js/jquery.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-alert.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-dropdown.js"></script>
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap-alert.js"></script>
+    <script src="../js/bootstrap-dropdown.js"></script>
 
 </body>
 </html>

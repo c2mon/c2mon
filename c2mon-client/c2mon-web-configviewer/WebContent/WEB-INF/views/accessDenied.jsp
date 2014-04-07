@@ -18,7 +18,7 @@
 	<p style="text-align:center;">If you need access to this application, please contact 
 	<a href="mailto:tim.support@cern.ch">TIM Support</A>.</p>
 
-	<p style="text-align:center;"><a href="/c2mon-web-configviewer">Click here to go back</a>.</p>
+	<p style="text-align:center;"><a href="../">Click here to go back</a>.</p>
 	
 </sec:authorize>
 

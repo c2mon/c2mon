@@ -11,7 +11,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     
     <!--  link variables  -->
-    <xsl:variable name="base_url">/c2mon-web-configviewer/</xsl:variable>
+    <xsl:variable name="base_url">../</xsl:variable>
     <xsl:variable name="alarm_url">alarmviewer/</xsl:variable>
     <xsl:variable name="command_url">commandviewer/</xsl:variable>
     <xsl:variable name="datatag_url">tagviewer/</xsl:variable>
@@ -52,10 +52,10 @@
             background : #66FFFF;
             }
           </style>
-          <link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/tim.css"></link>
-          <link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/webConfigViewer.css"></link>
-          <link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/buttons.css"></link>
-          <script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-1.7.min.js"></script>
+          <link rel="stylesheet" type="text/css" href="../css/tim.css"></link>
+          <link rel="stylesheet" type="text/css" href="../css/webConfigViewer.css"></link>
+          <link rel="stylesheet" type="text/css" href="../css/buttons.css"></link>
+          <script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
         </head>
 
         
@@ -74,8 +74,8 @@
            <A href="{$trend_base_url}{/*/@id}{$trend_parameter}" 
              class="large blue awesome xml_button" target="_blank"> Trend >>
            </A>	
-           <A href="{$base_url}{$datatag_url}{/*/@id}/" 
-             class="large blue awesome xml_button" target="_blank">View Tag >>
+           <A href="{$base_url}{$datatag_url}{/*/@id}" 
+             class="large blue awesome xml_button" target="_blank">View Tag>>
            </A>
            <A href="{$help_point_url}{/*/@id}" 
              class="large red awesome xml_button" target="_blank">View Help Alarm >>

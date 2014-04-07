@@ -4,8 +4,8 @@
 <head>
 <title>${title}</title>
 
-<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap.css" />
-<link rel="stylesheet" type="text/css" href="/c2mon-web-configviewer/css/bootstrap-responsive.css" />
+<link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="../css/bootstrap-responsive.css" />
 
     <style type="text/css">
       body {
@@ -21,14 +21,13 @@
 </head>
 
 <body>
-
-	    <div class="container-fluid">
+	  <div class="container-fluid">
       <div class="row-fluid">
       
 
     <ul class="breadcrumb">
     <li>
-    <a href="/c2mon-web-configviewer">Home</a> <span class="divider">/</span>
+    <a href="../">Home</a> <span class="divider">/</span>
     </li>
     <li>${title}</li>
     </ul>
@@ -59,19 +58,19 @@
         <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/c2mon-web-configviewer/js/jquery.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-transition.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-alert.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-modal.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-dropdown.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-scrollspy.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-tab.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-tooltip.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-popover.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-button.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-collapse.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-carousel.js"></script>
-    <script src="/c2mon-web-configviewer/js/bootstrap-typeahead.js"></script>
+    <script src="../js/jquery.js"></script>
+    <script src="../js/bootstrap-transition.js"></script>
+    <script src="../js/bootstrap-alert.js"></script>
+    <script src="../js/bootstrap-modal.js"></script>
+    <script src="../js/bootstrap-dropdown.js"></script>
+    <script src="../js/bootstrap-scrollspy.js"></script>
+    <script src="../js/bootstrap-tab.js"></script>
+    <script src="../js/bootstrap-tooltip.js"></script>
+    <script src="../js/bootstrap-popover.js"></script>
+    <script src="../js/bootstrap-button.js"></script>
+    <script src="../js/bootstrap-collapse.js"></script>
+    <script src="../js/bootstrap-carousel.js"></script>
+    <script src="../js/bootstrap-typeahead.js"></script>
 
 </body>
 </html>

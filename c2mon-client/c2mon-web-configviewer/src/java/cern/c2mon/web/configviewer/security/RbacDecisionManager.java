@@ -26,9 +26,6 @@ import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
  */
 public class RbacDecisionManager implements AccessDecisionManager {
 
-  /** So that the SessionManager knows who we are : ) */
-  private final String APP_NAME = "c2mon-web-configviewer";
-
   /** A map of (PageUrls, AuthorizationDetails) required to access each page. */
   private Map<String, String> authorizationDetails;
 

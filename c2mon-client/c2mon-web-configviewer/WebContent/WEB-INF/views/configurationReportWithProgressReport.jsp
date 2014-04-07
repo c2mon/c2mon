@@ -4,14 +4,14 @@
 <html>
 <head>
 <title>Configuration viewer</title>
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/form.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/tim.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/webConfigViewer.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="../css/form.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="../css/tim.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="../css/webConfigViewer.css"/>" />
 
-<link type="text/css" href="/c2mon-web-configviewer/css/ui-lightness/jquery-ui.css" rel="stylesheet" />
-<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery.js"></script>
-<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-spinner.js"></script>
-<script type="text/javascript" src="/c2mon-web-configviewer/js/jquery-ui.js"></script>
+<link type="text/css" href="../css/ui-lightness/jquery-ui.css" rel="stylesheet" />
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/jquery-spinner.js"></script>
+<script type="text/javascript" src="../js/jquery-ui.js"></script>
 
 
 <script type="text/javascript">
@@ -58,7 +58,7 @@ function startProcess() {
  */
  function progressFinished() {
 
-		window.location = "/c2mon-web-configviewer/configloader/progress/finalReport/" 
+		window.location = "../configloader/progress/finalReport/" 
 			+ document.theOnlyFormInThisPage.id.value;
 }
 
@@ -73,7 +73,7 @@ function startProcess() {
 function startConfigurationRequest() {
     $.ajax({ 
     		type: "POST",
-        url: "/c2mon-web-configviewer/configloader/progress/start",
+        url: "../configloader/progress/start",
         data: { configurationId : parseInt (document.theOnlyFormInThisPage.id.value) },
 				async: true,
 				complete: progressFinished
@@ -88,7 +88,7 @@ function getProgress() {
 	
     $.ajax({ 
 		type: "POST",
-    url: "/c2mon-web-configviewer/configloader/progress/getProgress",
+    url: "../configloader/progress/getProgress",
     data: { configurationId : document.theOnlyFormInThisPage.id.value },
 			async: true,
     success: function(data){
@@ -110,7 +110,7 @@ function getProgressDescription() {
 	
     $.ajax({ 
 		type: "POST",
-    url: "/c2mon-web-configviewer/configloader/progress/getProgressDescription",
+    url: "../configloader/progress/getProgressDescription",
     data: { configurationId : document.theOnlyFormInThisPage.id.value },
 			async: true,
     success: function(data){
@@ -159,10 +159,10 @@ function getProgressDescription() {
 		<tr>
 			<td align="center">
 			
-				<a href="/c2mon-web-configviewer/configloader/progress/finalReport/${report.key}">
+				<a href="../configloader/progress/finalReport/${report.key}">
 					${report.key}</a>
 				
-				(<a href="/c2mon-web-configviewer/configloader/progress/finalReport/xml/${report.key}" target="_blank">XML</a>)
+				(<a href="../configloader/progress/finalReport/xml/${report.key}" target="_blank">XML</a>)
 				
 			</td>
 		</tr>

@@ -45,7 +45,7 @@ public class HistoryService {
   private static final String XSLT_PATH = "/history_xslt.xsl";
   
   /** App base url */
-  private static final String BASE_URL = "/c2mon-web-configviewer";
+  private static final String BASE_URL = "../";
   
   /** Date format used in History Queries */
   private static final String DATE_FORMAT = "dd/MM/yyyy-HH:mm";

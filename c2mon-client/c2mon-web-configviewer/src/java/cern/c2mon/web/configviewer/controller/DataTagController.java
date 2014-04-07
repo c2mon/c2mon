@@ -32,7 +32,7 @@ public class DataTagController {
   /**
    * A REST-style URL to tagviewer, combined with tag id displays datatag configuration
    * */
-  public static final String TAG_URL = "/tagviewer/";
+  public static final String TAG_URL = "../";
 
   /**
    * A URL to the tagviewer with input form
