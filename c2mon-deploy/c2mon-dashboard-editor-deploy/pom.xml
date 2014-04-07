@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>cern.tim.tim-client</groupId>
 		<artifactId>tim-client-pom</artifactId>
-		<version>1.0.10</version>
+		<version>1.0.11</version>
 	</parent>
 
 	<groupId>cern.c2mon.c2mon-deploy</groupId>
