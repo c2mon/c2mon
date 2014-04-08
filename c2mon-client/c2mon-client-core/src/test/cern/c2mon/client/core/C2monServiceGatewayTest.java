@@ -18,17 +18,14 @@
  *****************************************************************************/
 package cern.c2mon.client.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
-import java.lang.management.ManagementFactory;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
