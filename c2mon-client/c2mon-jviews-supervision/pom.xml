@@ -8,7 +8,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-client</groupId>
   <artifactId>c2mon-jviews-supervision</artifactId>
-  <version>1.0.4-SNAPSHOT</version>
+  <version>1.0.4</version>
   <name>c2mon-jviews-supervision</name>
   <packaging>jar</packaging>
   <description>Contains the graphical toolbars to show the C2MON Client Heartbeat and JMS connection state.</description>
