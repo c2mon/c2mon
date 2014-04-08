@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern</groupId>
-		<artifactId>parent-pom</artifactId>
-		<version>1.0.5-SNAPSHOT</version>
-	</parent>
-	<groupId>cern.c2mon.c2mon-statistics</groupId>
-	<artifactId>c2mon-statistics-generator</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
-	<name>c2mon-statistics-generator</name>
-	<packaging>jar</packaging>
-	<description>Standalone application that generates charts from the Statistics database account.</description>
-	<url>http://timweb.cern.ch</url>
-	<properties>
-		<org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-	</properties>
-	<profiles>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern</groupId>
+    <artifactId>parent-pom</artifactId>
+    <version>1.0.5-SNAPSHOT</version>
+  </parent>
+  <groupId>cern.c2mon.c2mon-statistics</groupId>
+  <artifactId>c2mon-statistics-generator</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+  <name>c2mon-statistics-generator</name>
+  <packaging>jar</packaging>
+  <description>Standalone application that generates charts from the Statistics database account.</description>
+  <url>http://timweb.cern.ch</url>
+  <properties>
+    <org.springframework.version>3.2.3.RELEASE</org.springframework.version>
+  </properties>
+  <profiles>
     <profile>
       <id>win</id>
       <activation>
@@ -43,31 +42,31 @@
       </properties>
     </profile>
   </profiles>
-	<dependencies>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>[4.8.1, 5.0.0)</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-			<version>3.0</version>
-			<scope>test</scope>
-		</dependency>
-	
-		<dependency>
-			<groupId>org.apache.ibatis</groupId>
-			<artifactId>ibatis-sqlmap</artifactId>
-			<version>2.3.0</version>
-		</dependency>	
-		<dependency>
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.14</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>[4.8.1, 5.0.0)</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <version>3.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.ibatis</groupId>
+      <artifactId>ibatis2-sqlmap</artifactId>
+      <version>2.1.7.597</version>
+    </dependency>
+    <dependency>
       <groupId>jfree</groupId>
       <artifactId>jfreechart</artifactId>
       <version>1.0.13</version>
@@ -77,12 +76,12 @@
       <artifactId>xercesImpl</artifactId>
       <version>2.10.0</version>
     </dependency>
-		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
+    <dependency>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-io</artifactId>
       <version>1.3.2</version>
@@ -90,14 +89,14 @@
     <dependency>
       <groupId>oracle</groupId>
       <artifactId>ojdbc6</artifactId>
-      <version>11.2.0.3</version>     
+      <version>11.2.0.3</version>
     </dependency>
-	</dependencies>
+  </dependencies>
 
-	<developers />
-	<build>
-	<plugins>
-	<plugin>
+  <developers />
+  <build>
+    <plugins>
+      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.2.1</version>
       </plugin>
@@ -107,15 +106,15 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>          
-        <version>2.8.1</version>    
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.8.1</version>
         <configuration>
           <argLine>
-            -Dc2mon.properties=${c2mon.properties.location}            
+            -Dc2mon.properties=${c2mon.properties.location}
           </argLine>
         </configuration>
       </plugin>
-    </plugins>		
-	</build>
+    </plugins>
+  </build>
 
 </project>
