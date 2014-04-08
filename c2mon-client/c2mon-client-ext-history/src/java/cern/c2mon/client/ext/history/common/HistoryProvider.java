@@ -73,15 +73,13 @@ public interface HistoryProvider {
   Collection<HistoryTagValueUpdate> getHistory(final Long[] tagIds, final Timestamp from, final Timestamp to, final int maximumTotalRecords);
 
   /**
-   * 
+   * Returns a historical list of the last received values for the given tags (specified by tag ids).
    * @param tagIds
    *          The tag ids to get the historical data for
    * @param maximumTotalRecords
-   *          The maximum records to return in total. Does NOT spread the
-   *          records evenly among the tag ids.
-   * @return A collection of all the records that was found for the given tag
-   *         ids in the given time periode <br/>
-   *         Does never return <code>null</code>.
+   *          The maximum records to return in total
+   * @return A collection of the newest records that are found for the given tag
+   *         ids. The maximum records to return in total for each tag is set by maximumTotalRecords
    */
   Collection<HistoryTagValueUpdate> getHistory(final Long[] tagIds, final int maximumTotalRecords);
 
@@ -103,14 +101,14 @@ public interface HistoryProvider {
   Collection<HistoryTagValueUpdate> getHistory(final int maximumRecordsPerTag, final Long[] tagIds, final Timestamp from, final Timestamp to);
 
   /**
-   * 
+   * Returns a historical list of the last received values for the given tags (specified by tag ids).
    * @param maximumRecordsPerTag
-   *          The maximum records to return per tag
+   *          The maximum records to return <b>per tag</b>
    * @param tagIds
    *          The tag ids to get the historical data for
-   * @return A collection of all the records that was found for the given tag
-   *         ids in the given time periode <br/>
-   *         Does never return <code>null</code>.
+   * @return A collection of the newest records that are found for the given tag
+   *         ids. The maximum records to return per tag is set by maximumRecordsPerTag
+   * @see #getHistory(Long[], int)
    */
   Collection<HistoryTagValueUpdate> getHistory(final int maximumRecordsPerTag, final Long[] tagIds);
 

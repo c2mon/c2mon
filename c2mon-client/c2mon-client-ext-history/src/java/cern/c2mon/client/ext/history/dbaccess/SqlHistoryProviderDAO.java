@@ -139,13 +139,14 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
   }
 
   /**
-   * 
+   * Returns a historical list of the last received values for the given tags (specified by tag ids).
    * @param tagIds
    *          The tag ids to get the historical data for
    * @param maximumTotalRecords
-   *          The maximum records to return in total
-   * @return A collection of all the records that was found for the given tag
-   *         ids in the given time periode
+   *          The maximum records to return <b>in total</b>
+   * @return A collection of the newest records that are found for the given tag
+   *         ids. The maximum records to return in total for all tags is set by maximumTotalRecords
+   * @see #getHistory(int, Long[])
    */
   @Override
   public Collection<HistoryTagValueUpdate> getHistory(final Long[] tagIds, final int maximumTotalRecords) {
@@ -172,13 +173,14 @@ class SqlHistoryProviderDAO extends HistoryProviderAbs {
   }
 
   /**
-   * 
+   * Returns a historical list of the last received values for the given tags (specified by tag ids).
    * @param maximumRecordsPerTag
-   *          The maximum records to return per tag
+   *          The maximum records to return <b>per tag</b>
    * @param tagIds
    *          The tag ids to get the historical data for
-   * @return A collection of all the records that was found for the given tag
-   *         ids in the given time periode
+   * @return A collection of the newest records that are found for the given tag
+   *         ids. The maximum records to return per tag is set by maximumRecordsPerTag
+   * @see #getHistory(Long[], int)
    */
   @Override
   public Collection<HistoryTagValueUpdate> getHistory(final int maximumRecordsPerTag, final Long[] tagIds) {
