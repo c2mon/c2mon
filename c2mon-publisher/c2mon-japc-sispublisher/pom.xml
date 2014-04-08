@@ -25,15 +25,8 @@
   	<dependency>
   		<groupId>cern.japc</groupId>
   		<artifactId>japc-ext-remote</artifactId>
-  		<version>3.8.5</version>
+  		<version>3.9.3</version>
   		<type>jar</type>
-  		<scope>compile</scope>
-  		<exclusions>
-  		  <exclusion>
-  		    <artifactId>spring</artifactId>
-  		    <groupId>org.springframework</groupId>
-  		  </exclusion>
-  		</exclusions>
   	</dependency>
   	
   	<!-- Test dependencies -->
