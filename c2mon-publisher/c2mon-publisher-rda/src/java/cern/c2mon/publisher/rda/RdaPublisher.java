@@ -29,12 +29,13 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.publisher.Publisher;
+import cern.c2mon.publisher.core.Gateway;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.cmw.BadParameter;
 import cern.cmw.Data;
 import cern.cmw.IOError;
 import cern.cmw.InternalException;
-import cern.cmw.rda.examples.SimpleServer;
+import cern.cmw.rda.demo.SimpleServer;
 import cern.cmw.rda.server.DeviceServerBase;
 import cern.cmw.rda.server.IOPoint;
 import cern.cmw.rda.server.ValueChangeListener;
