@@ -226,6 +226,7 @@ public class DBController {
    * 
    */
   public void registerForAlert(long alertId) {
+    this.equipmentLogger.trace("registerForAlert - Registering for Alert: " + alertId);
     this.dbDaqDao.registerForAlert(Long.toString(alertId));
   }
   
@@ -236,6 +237,7 @@ public class DBController {
    * @param alertId 
    */
   public void unregisterFromAlert(long alertId) {
+    this.equipmentLogger.trace("unregisterFromAlert - Unregistering from Alert: " + alertId);
     dbDaqDao.unregisterFromAlert(Long.toString(alertId));
   }
 

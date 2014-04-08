@@ -146,7 +146,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         }
         
         // Controller
-        this.dbController = new DBController(dbDaqDao, getEquipmentLoggerFactory(), getEquipmentConfiguration(), getEquipmentMessageSender());
+        this.dbController = new DBController(this.dbDaqDao, getEquipmentLoggerFactory(), getEquipmentConfiguration(), getEquipmentMessageSender());
         
         // Data Tag Changer
         DBDataTagChanger dataTagChanger = new DBDataTagChanger(this.dbController);
@@ -299,7 +299,11 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         getEquipmentLogger().info("registerForAlerts - Registering for alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
         synchronized (dbDaqDao) {
             for (long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
-              this.dbController.registerForAlert(alertId);
+              try {
+                this.dbController.registerForAlert(alertId);
+              } catch (DataAccessException dae) {
+                getEquipmentLogger().error("registerForAlerts - " + dae.getCause().getMessage(), dae);
+              }
             }
         }
     }
@@ -338,11 +342,15 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * */
     private void unregisterAlerts() {
         getEquipmentLogger().info("unregisterAlerts - Unregistering alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
-        synchronized (dbDaqDao) {
+//        synchronized (dbDaqDao) {
             for (Long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
-              this.dbController.unregisterFromAlert(alertId);
+              try {
+                this.dbController.unregisterFromAlert(alertId);
+              } catch (DataAccessException dae) {
+                getEquipmentLogger().error("unregisterAlerts - " + dae.getCause().getMessage(), dae);
+              }
             }
-        }
+//        }
     }
     
     /**
@@ -437,6 +445,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
     @Override
     public void disconnectFromDataSource() {
         if (this.running && this.connected) {
+          
             unregisterAlerts();
             setDisconnected();
         }
