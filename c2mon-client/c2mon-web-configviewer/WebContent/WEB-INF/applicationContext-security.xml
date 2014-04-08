@@ -39,6 +39,7 @@
 
 	</beans:bean>
 
+  <http pattern="/accessDenied" security="none"/>
 
 	<http auto-config="true" access-decision-manager-ref="RbacAccessDecisionManager">
 		<!--
@@ -49,7 +50,6 @@
 		<intercept-url pattern="/process/**" access="hasAnyRole('ROLE_ADMIN')" />
 
 		<access-denied-handler error-page="/accessDenied" />
-		<intercept-url pattern="/accessDenied" filters="none" />
 	</http>
 
 	<beans:bean id="customAuthenticationProvider"
