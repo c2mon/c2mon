@@ -80,8 +80,8 @@
 			<version>${org.springframework.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>cern.tim2.tim2-shared</groupId>
-			<artifactId>tim2-shared-daq</artifactId>
+			<groupId>cern.c2mon.c2mon-shared</groupId>
+			<artifactId>c2mon-shared-daq</artifactId>
 			<version>[1.0.0,2.0.0)</version>
 		</dependency>
 		<dependency>
@@ -111,8 +111,8 @@
 		</dependency>
 		<dependency>
 			<groupId>oracle</groupId>
-			<artifactId>ojdbc14</artifactId>
-			<version>10.2.0.4</version>
+			<artifactId>ojdbc6</artifactId>
+			<version>11.2.0.3</version>
 		</dependency>
 	</dependencies>
 

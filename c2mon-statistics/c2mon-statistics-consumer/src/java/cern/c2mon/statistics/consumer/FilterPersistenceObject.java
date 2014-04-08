@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
-import cern.tim.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
 
 /**
  * Wrapper class for FilterDataTagValue objects, implementing the

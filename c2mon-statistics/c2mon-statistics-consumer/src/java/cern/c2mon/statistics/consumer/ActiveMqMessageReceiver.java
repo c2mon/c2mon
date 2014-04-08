@@ -11,8 +11,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 
-import cern.tim.shared.daq.filter.FilteredDataTagValueUpdate;
-import cern.tim.util.parser.SimpleXMLParser;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValueUpdate;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * ActiveMQ implementation of the MessageListener processing

@@ -27,17 +27,16 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
 
 import cern.c2mon.pmanager.IAlarmListener;
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
-import cern.tim.shared.daq.filter.FilteredDataTagValue;
-import cern.tim.util.buffer.PullEvent;
-import cern.tim.util.buffer.SynchroBuffer;
-import cern.tim.util.buffer.SynchroBufferListener;
+import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.util.buffer.PullEvent;
+import cern.c2mon.shared.util.buffer.SynchroBuffer;
+import cern.c2mon.shared.util.buffer.SynchroBufferListener;
 
 /**
  * A wrapper class for the SynchroBuffer containing the tag values. The class
