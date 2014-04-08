@@ -1,144 +1,145 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>c2mon-server-deploy</artifactId>
-		<groupId>cern.c2mon.c2mon-deploy</groupId>
-		<version>1.3.3-SNAPSHOT</version>
-		<relativePath>../../pom.xml</relativePath>
-	</parent>
+  <parent>
+    <artifactId>c2mon-server-deploy</artifactId>
+    <groupId>cern.c2mon.c2mon-deploy</groupId>
+    <version>1.3.3-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
 
-	<groupId>cern.c2mon.c2mon-deploy</groupId>
-	<artifactId>c2mon-srv-tim2</artifactId>
-	<name>The TIM2 SRV module</name>
-	<version>1.3.3-SNAPSHOT</version>
+  <groupId>cern.c2mon.c2mon-deploy</groupId>
+  <artifactId>c2mon-srv-tim2</artifactId>
+  <name>The TIM2 SRV module</name>
+  <version>1.3.3-SNAPSHOT</version>
 
-	<description>C2MON server assembling all required modules and configuration files for TIM2</description>
-	<url></url>
+  <description>C2MON server assembling all required modules and configuration files for TIM2</description>
+  <url></url>
 
-	<dependencies>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-rule</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cache</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cacheloading</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cachedbaccess</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-cachepersistence</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-benchmark</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-command</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-daqcommunication-in</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-daqcommunication-out</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-rule</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-supervision</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-configuration</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-lifecycle</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-client</artifactId>
-			<version>[1.0.0,2.0.0)</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-video</artifactId>
-			<version>[1.0.0,2.0.0)</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-laser</artifactId>
-			<version>[1.0.0,2.0.0)</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-server</groupId>
-			<artifactId>c2mon-server-shorttermlog</artifactId>
-		</dependency>
-		
-		<!-- for distributed cache only -->
-		<dependency>
-			<groupId>org.terracotta.bigmemory</groupId>
-			<artifactId>bigmemory</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency> 
-		  <groupId>org.terracotta</groupId> 
-		  <artifactId>terracotta-toolkit-runtime-ee</artifactId> 
-		  <scope>runtime</scope> 
-		</dependency> 
-		
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-rule</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cacheloading</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cachedbaccess</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-cachepersistence</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-benchmark</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-command</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-daqcommunication-in</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-daqcommunication-out</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-rule</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-supervision</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-configuration</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-lifecycle</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-client</artifactId>
+      <version>[1.0.0,2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-video</artifactId>
+      <version>[1.0.0,2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-laser</artifactId>
+      <version>[1.0.0,2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-server</groupId>
+      <artifactId>c2mon-server-shorttermlog</artifactId>
+    </dependency>
 
-		<!-- for logging -->
-		<dependency>
-			<groupId>cern.cmw.java.log.sources</groupId>
-			<artifactId>cmw-log-log4j</artifactId>
-		</dependency>
+    <!-- for distributed cache only -->
+    <dependency>
+      <groupId>org.terracotta.bigmemory</groupId>
+      <artifactId>bigmemory</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.terracotta</groupId>
+      <artifactId>terracotta-toolkit-runtime-ee</artifactId>
+      <scope>runtime</scope>
+    </dependency>
 
-	</dependencies>
 
-	<developers />
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
+    <!-- for logging -->
+    <dependency>
+      <groupId>cern.cmw</groupId>
+      <artifactId>cmw-log-log4j</artifactId>
+      <scope>runtime</scope>
+      <version>[1.5.4,2.0.0)</version>
+    </dependency>
 
-					<descriptors>
-						<descriptor>src/assembly/tim2-srv-assembly.xml</descriptor>
-					</descriptors>
+  </dependencies>
 
-				</configuration>
-				<executions>
-					<execution>
-						<id>create-assembly-file</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+  <developers />
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+
+          <descriptors>
+            <descriptor>src/assembly/tim2-srv-assembly.xml</descriptor>
+          </descriptors>
+
+        </configuration>
+        <executions>
+          <execution>
+            <id>create-assembly-file</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
