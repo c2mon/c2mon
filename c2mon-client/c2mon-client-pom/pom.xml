@@ -68,33 +68,7 @@
         <version>${org.springframework.version}</version>
       </dependency>
 
-      <!--  C2MON shared libraries -->
-      <dependency>
-        <groupId>cern.c2mon.c2mon-shared</groupId>
-        <artifactId>c2mon-shared-util</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-shared</groupId>
-        <artifactId>c2mon-shared-common</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-shared</groupId>
-        <artifactId>c2mon-shared-client</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-shared</groupId>
-        <artifactId>c2mon-shared-rule</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
+
 
       <!--  C2MON client libraries -->
       <dependency>
@@ -107,31 +81,6 @@
             <artifactId>spring</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-common</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-core</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-jms</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-auth</artifactId>
-        <version>[1.0.0,2.0.0)</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.c2mon-client</groupId>
-        <artifactId>c2mon-client-heartbeat</artifactId>
-        <version>[1.0.0,2.0.0)</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-client</groupId>
