@@ -81,10 +81,6 @@ public interface ConfigurationXMLConstants {
      */
     String HW_CLASS_ATTRIBUTE = "class";
     /**
-     * The JMS queue JNDI name element.
-     */
-    String JMS_QUEUE_JNDI_NAME_ELEMENT = "jms-queue-jndi-name";
-    /**
      * The alive tag id element.
      */
     String ALIVE_TAG_ID_ELEMENT = "alive-tag-id";
@@ -124,22 +120,6 @@ public interface ConfigurationXMLConstants {
      * The process id attribute.
      */
     String PROCESS_ID_ATTRIBUTE = "process-id";
-    /**
-     * The JMS user element.
-     */
-    String JMS_USER_ELEMENT = "jms-user";
-    /**
-     * The JMS password element.
-     */
-    String JMS_PASSWORD_ELEMENT = "jms-password";
-    /**
-     * The JMS qcf JNDI element.
-     */
-    String JMS_QCF_JNDI_NAME_ELEMENT = "jms-qcf-jndi-name";
-    /**
-     * The JMS listener topic.
-     */
-    String JMS_LISTENER_TOPIC = "jms-listener-topic";
     /**
      * The ID attribute.
      */
