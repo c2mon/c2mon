@@ -52,8 +52,8 @@
             background : #66FFFF;
             }
           </style>
-          <link rel="stylesheet" type="text/css" href="../css/tim.css"></link>
-          <link rel="stylesheet" type="text/css" href="../css/webConfigViewer.css"></link>
+          <link rel="stylesheet" type="text/css" href="../css/c2mon.css"></link>
+          <link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
           <link rel="stylesheet" type="text/css" href="../css/buttons.css"></link>
           <script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
         </head>
