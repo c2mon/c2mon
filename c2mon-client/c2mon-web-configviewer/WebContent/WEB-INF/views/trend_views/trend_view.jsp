@@ -14,11 +14,12 @@
 	<link rel="stylesheet" type="text/css" href="../css/bootstrap-responsive.css" />
 
 	<script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="../css/tim.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/c2mon.css"/>
 	<link rel="stylesheet" type="text/css" href="../css/buttons.css"/>
+	<script type="text/javascript" src="../js/hide-menu.js"></script>
 </head>
 
-<body onresize="myFunction()" onload="myFunction()">
+<body >
 	
 	
 	<style media="screen" type="text/css">
@@ -56,21 +57,6 @@
 		</p>
 
 		<div style="width:100%; height:650px; ;" id="trend_view" ></div>
-		
-		<script>
-		function myFunction()
-		{
-		var w=window.innerWidth;
-		var h=window.innerHeight;
-		document.getElementById("row-fluid").style.height = window.innerHeight;
-		if(w<680)
-			w=680;
-			
-		if(h<400)
-			h=400;	
-		trend.resize(w-130,h-215);
-		}
-		</script>
 		
 	</div>
     </div><!--/.fluid-container-->

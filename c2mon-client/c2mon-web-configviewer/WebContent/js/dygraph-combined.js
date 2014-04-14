@@ -6444,7 +6444,7 @@ Dygraph.Plugins.Legend = (function () {
     this.legend_div_.style.left = g.x+g.w-f-1+"px";
     this.legend_div_.style.top = g.y+"px";
     this.legend_div_.style.width = f + "px"
-	this.legend_div_.style.marginTop = "-4%";
+	//this.legend_div_.style.marginTop = "-4%";
 	this.legend_div_.style.position = 'absolute';
 	//this.legend_div_.style.zIndex = 9999;
 
