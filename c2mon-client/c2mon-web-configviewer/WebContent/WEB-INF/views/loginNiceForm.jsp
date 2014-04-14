@@ -4,8 +4,8 @@
 	<head>
 		<title>Please Login</title>
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/form.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/tim.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/webConfigViewer.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/c2mon.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/web-config-viewer.css"/>" />
 	</head>
 	
 	<body>

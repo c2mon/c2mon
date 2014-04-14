@@ -12,11 +12,9 @@
 
 	<p style="text-align:center;">
 	Sorry, 
-	your account is not authorised to access this page.
+	your session expired, you're going to be redirect in few seconds.
 	</p>
 	
-	<p style="text-align:center;">If you need access to this application, please contact 
-	<a href="mailto:tim.support@cern.ch">TIM Support</A>.</p>
 
 	<p style="text-align:center;"><a href="../">Click here to go back</a>.</p>
 	
@@ -24,7 +22,11 @@
 
 </div>
 
+<script>
 
+window.location.replace('../j_spring_security_logout');
+
+</script>
 
 </body>
 </html>
