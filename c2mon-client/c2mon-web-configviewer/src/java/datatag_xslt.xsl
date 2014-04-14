@@ -54,10 +54,10 @@
 			<A href="{$base_url}{$tag_value_xml_url}{@id}/" 
 				class="large blue awesome xml_button" target="_blank">View ClientDataTag XML >>
 			</A>
-			<A href="{$base_url}{$history_url}{@id}/" 
+			<A href="{$base_url}{$history_url}{@id}" 
 				class="large blue awesome xml_button" target="_blank">History >>
 			</A>	
-			<A href="{$base_url}{$trend_viewer_url}{/*/@id}/" 
+			<A href="{$base_url}{$trend_viewer_url}{/*/@id}" 
 				class="large blue awesome xml_button" target="_blank">Trend >>
 			</A>	
 			<A href="{$help_point_url}{@id}" 
@@ -197,18 +197,31 @@
 				</xsl:if>
 				
 				<xsl:if  test="position() mod 2 = 0">
-					<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
-					<TD width="25%"><xsl:value-of select="."/></TD>		
-					<xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
+				<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
+				<xsl:choose>
+					<xsl:when test="local-name() = 'priority'">
+					<xsl:choose>
+						<xsl:when test=".= '2'">
+							<TD width="25%">LOW</TD>  
+						</xsl:when>
+						<xsl:otherwise>						  
+							<TD width="25%">HIGH</TD>
+						</xsl:otherwise>
+						</xsl:choose>	   
+						</xsl:when>
+						<xsl:otherwise>
+							<TD width="25%"><xsl:value-of select="."/></TD>							  
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:if>
 				
 			</xsl:for-each>
 			
 			<tr>
-				<td class="highlight bold"> Alarms </td>
+				<td class="highlight bold"> Alarms</td>
 				<td>
 					<xsl:for-each select="alarmIds">
-						<a href="{$base_url}{$alarm_url}{long}/"><xsl:value-of select="long"/></a>
+						<a href="{$base_url}{$alarm_url}{long}"><xsl:value-of select="long"/></a>
 					</xsl:for-each>
 				</td>
 			</tr>
@@ -305,8 +318,8 @@
 	<html>
 		<head>
 			<title>Configuration viewer</title>
-			<link rel="stylesheet" type="text/css" href="../css/tim.css"></link>
-			<link rel="stylesheet" type="text/css" href="../css/webConfigViewer.css"></link>
+			<link rel="stylesheet" type="text/css" href="../css/c2mon.css"></link>
+			<link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
 			<script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
 			<script type="text/javascript" src="../js/bottom_panel.js"></script>
 		</head>
@@ -346,8 +359,8 @@
 	<html>
 		<head>
 			<title>Configuration viewer</title>
-			<link rel="stylesheet" type="text/css" href="../css/tim.css"></link>
-			<link rel="stylesheet" type="text/css" href="../css/webConfigViewer.css"></link>
+			<link rel="stylesheet" type="text/css" href="../css/c2mon.css"></link>
+			<link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
 			<script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
 			<script type="text/javascript" src="../js/bottom_panel.js"></script>
 		</head>
@@ -470,8 +483,8 @@
 	<html>
 		<head>
 			<title>Configuration viewer</title>
-			<link rel="stylesheet" type="text/css" href="../css/tim.css"></link>
-			<link rel="stylesheet" type="text/css" href="../css/webConfigViewer.css"></link>
+			<link rel="stylesheet" type="text/css" href="../css/c2mon.css"></link>
+			<link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
 			<link rel="stylesheet" type="text/css" href="../css/buttons.css"></link>
 			
 			<script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
