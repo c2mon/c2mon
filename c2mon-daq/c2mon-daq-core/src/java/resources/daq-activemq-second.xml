@@ -31,7 +31,7 @@
 <!-- *************************************************** -->
 
 <bean id="secondSourceUpdateDestination" class="org.apache.activemq.command.ActiveMQQueue">
-  <constructor-arg index="0" value="${jms.process.updateQueueTrunk}.${c2mon.process.name}"></constructor-arg>
+  <constructor-arg index="0" value="${c2mon.jms.daq.queue.trunk}.update.${c2mon.process.name}"></constructor-arg>
 </bean>
 
 <!-- plugged into ActiveJmsSender -->
@@ -49,7 +49,7 @@
      **************************************************** -->
      
 <bean id="secondProcessRequestDestination" class="org.apache.activemq.command.ActiveMQQueue">
-  <constructor-arg index="0" value="${jms.process.requestQueue}"></constructor-arg>
+  <constructor-arg index="0" value="${c2mon.jms.daq.queue.trunk}.request"></constructor-arg>
 </bean>
 
 <bean id="secondProcessRequestJmsTemplate" class="org.springframework.jms.core.JmsTemplate">

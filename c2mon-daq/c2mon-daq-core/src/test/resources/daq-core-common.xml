@@ -24,14 +24,16 @@
 				<prop key="jms.daq.user.2">user-default</prop>
 				<prop key="jms.daq.password.2">password-default</prop>
 				<prop key="jms.daq.consumers.2">1</prop>
+				<prop key="c2mon.jms.daq.queue.trunk">c2mon.process.default</prop>
+				
 
         <!--  for tests those are daq properties normally defined -->
         <!--  in the daq.conf file -->				
 				<prop key="deadband.counter.medium.nbIntervals">6</prop>
-        <prop key="deadband.counter.medium.interval">600000</prop>
-        <prop key="deadband.counter.medium.activate">20</prop>
-        <prop key="deadband.counter.medium.deactivate">15</prop>
-        <prop key="deadband.counter.medium.deadband">30000</prop>
+                <prop key="deadband.counter.medium.interval">600000</prop>
+                <prop key="deadband.counter.medium.activate">20</prop>
+                <prop key="deadband.counter.medium.deactivate">15</prop>
+                <prop key="deadband.counter.medium.deadband">30000</prop>
 												
 		    <prop key="deadband.counter.low.nbIntervals">6</prop>
 		    <prop key="deadband.counter.low.interval">600000</prop>
@@ -72,9 +74,12 @@
 		class="cern.c2mon.daq.common.conf.core.ConfigurationController">
 		<property name="processConfigurationLoader" ref="processConfigurationLoader"></property>
 	</bean>
-	<bean id="processConfigurationLoader"
-		class="cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader" />
 	<bean id="equipmentMessageSender" class="cern.c2mon.daq.common.impl.EquipmentMessageSender"
 		scope="prototype" />
+		
+	<bean id="processConfigurationLoader"
+       class="cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader">
+        <property name="jmsDaqQueueTrunk" value="${c2mon.jms.daq.queue.trunk}" />
+    </bean>
 
 </beans>

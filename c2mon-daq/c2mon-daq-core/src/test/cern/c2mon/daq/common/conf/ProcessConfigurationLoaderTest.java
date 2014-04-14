@@ -11,6 +11,11 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Document;
 
 import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
@@ -19,12 +24,15 @@ import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
+import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({ "classpath:resources/daq-core-service.xml"})
 public class ProcessConfigurationLoaderTest {
     
+    @Autowired
     private ProcessConfigurationLoader processConfigurationLoader;
     
     private static final String PROCESS_CONFIGURATION_XML = "ProcessConfiguration.xml";
@@ -35,12 +43,17 @@ public class ProcessConfigurationLoaderTest {
     
     private static final Long PROCESS_PIK = 12345L;
     
+    private static final String PROCESS_NAME = "P_NACHO";
+    
     private String processHostName;
+    
+    @Value("${c2mon.jms.daq.queue.trunk}") 
+    private String jmsDaqQueueTrunk;
     
     @Before
     public void setUp() {
-        processConfigurationLoader = new ProcessConfigurationLoader();
-        processConfigurationLoader.setEquipmentCononfigurationFactory(EquipmentConfigurationFactory.getInstance());
+//        processConfigurationLoader = new ProcessConfigurationLoader();
+        processConfigurationLoader.setEquipmentConfigurationFactory(EquipmentConfigurationFactory.getInstance());
         
         try {
           this.processHostName = InetAddress.getLocalHost().getHostName();
@@ -55,12 +68,7 @@ public class ProcessConfigurationLoaderTest {
         ProcessConfiguration processConfiguration = getProcessConfiguration(PROCESS_CONFIGURATION_XML);
         
         assertEquals(4092L, processConfiguration.getProcessID().longValue());
-        assertEquals("P_AIRH4STP887", processConfiguration.getJMSUser());
-        assertEquals("AIRH4STP887_P", processConfiguration.getJMSPassword());
-        assertEquals("jms/process/factories/QCF", processConfiguration.getJMSQueueConFactJNDIName());
-        assertEquals("jms/process/destinations/queues/processmessage/P_AIRH4STP887", processConfiguration.getJMSQueueJNDIName());
-//        assertEquals("tim.process.*.P_AIRH4STP887.*", processConfiguration.getListenerTopic());
-        assertEquals("tim.process.command."+this.processHostName+".P_AIRH4STP887."+PROCESS_PIK, processConfiguration.getListenerTopic());
+        assertEquals(this.jmsDaqQueueTrunk + ".command."+this.processHostName+"."+PROCESS_NAME+"."+PROCESS_PIK, processConfiguration.getJmsDaqCommandQueue());
         assertEquals(100730, processConfiguration.getAliveTagID());
         assertEquals(60000, processConfiguration.getAliveInterval());
         assertEquals(100, processConfiguration.getMaxMessageSize());
@@ -132,7 +140,7 @@ public class ProcessConfigurationLoaderTest {
     private ProcessConfiguration getProcessConfiguration(String name) throws ConfUnknownTypeException, ConfRejectedTypeException {
         String path = ProcessConfigurationLoaderTest.class.getResource(name).getPath();
         Document pconfDocument = processConfigurationLoader.fromFiletoDOC(path);
-        ProcessConfiguration processConfiguration = processConfigurationLoader.createProcessConfiguration("asd", PROCESS_PIK, pconfDocument, true);
+        ProcessConfiguration processConfiguration = processConfigurationLoader.createProcessConfiguration(PROCESS_NAME, PROCESS_PIK, pconfDocument, true);
         return processConfiguration;
     }
 }

@@ -956,11 +956,11 @@ public class EquipmentMessageSenderTest {
       replay(processMessageSenderMock, filterMessageSenderMock);
 
       // Send to the server
-      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 1L, "test description A");
-      Thread.sleep(300);
+      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description A");
+      Thread.sleep(500);
       // Send to the server. Equal Value but dif Value Description
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 2L, "test description B");
-      Thread.sleep(300);
+      Thread.sleep(500);
       // Filter with REPEATED_VALUE
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 3L, "test description B");
 
@@ -1035,7 +1035,43 @@ public class EquipmentMessageSenderTest {
            
         verify(filterMessageSenderMock, processMessageSenderMock);
     }
+    
+    @Test
+    public void testSendTagFilteredSameSourceTS() {
+      // Timestamps to use
+      long sourceTS = 1395210136000L;
+      // update the value
+      this.sdt1.update(false, new Timestamp(sourceTS));
+            
+      this.filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      expectLastCall().times(1);
 
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+
+      // Should be filtered out since the TS is the same as the one just updated
+      this.equipmentMessageSender.sendTagFiltered(sdt1, false, sourceTS);
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+           
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+
+    @Test
+    public void testSendTagFilteredSameSourceValue() {
+      // update the value
+      this.sdt1.update(false);
+            
+      this.filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
+      expectLastCall().times(1);
+
+      replay(this.processMessageSenderMock, this.filterMessageSenderMock);
+
+      // Should be filtered out since the value is the same as the one just updated
+      this.equipmentMessageSender.sendTagFiltered(sdt1, false, System.currentTimeMillis() + 1L);
+      assertEquals(false, this.sdt1.getCurrentValue().getValue());
+           
+      verify(this.processMessageSenderMock, this.filterMessageSenderMock);
+    }
+    
     private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType, int priority,
             boolean guaranteed) {
         DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, 0, priority, guaranteed);

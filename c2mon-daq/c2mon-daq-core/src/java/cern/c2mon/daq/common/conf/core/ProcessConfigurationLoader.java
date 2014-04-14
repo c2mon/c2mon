@@ -49,18 +49,9 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
   private static final Logger LOGGER = Logger.getLogger(ProcessConfigurationLoader.class);
 
   /**
-   * Position of the tim token in the JMS listener topic
+   * JMS DAq queue trunk
    */
-  private static final int TIM_TOKEN = 0;
-  /**
-   * Position of the process token in the JMS listener topic
-   */
-  private static final int PROCESS_TOKEN = 1;
-  /**
-   * Position of the command name token in the JMS listener topic
-   */
-  private static final int COMMAND_TOKEN = 2;
-
+  private String jmsDaqQueueTrunk;
 
   /**
    * Reference to the ProcessRequestSender (for requesting the XML config document). This reference is injected in the
@@ -79,8 +70,13 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
 
 
   @Autowired
-  public void setEquipmentCononfigurationFactory(EquipmentConfigurationFactory eqConfFactory) {
+  public void setEquipmentConfigurationFactory(EquipmentConfigurationFactory eqConfFactory) {
     this.equipmentConfigurationFactory = eqConfFactory;
+  }
+  
+  @Autowired
+  public void setJmsDaqQueueTrunk(String jmsDaqQueueTrunk) {
+    this.jmsDaqQueueTrunk = jmsDaqQueueTrunk;
   }
 
   /**
@@ -99,7 +95,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
     processConfigurationResponse = processRequestSender.sendProcessConfigurationRequest();
 
     if (processConfigurationResponse == null) {
-      LOGGER.warn("getProcessConfiguration - Connection request to server: timeout waiting for server response.");
+      LOGGER.warn("getProcessConfiguration - Configuration request to server: timeout waiting for server response.");
       LOGGER.info("getProcessConfiguration - Could not receive any configuration - stopping the DAQ process...");
       System.exit(0);
     }
@@ -182,6 +178,24 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
     LOGGER.trace("fromXMLtoDOC - Configuration XML loaded and parsed");
     return confXMLDoc;
   }
+  
+  /**
+   * Takes the configuration DOM document and returns an ProcessConfiguration.
+   * 
+   * @param processName The name of the process.
+   * @param processPIK The process PIK.
+   * @param confXMLDoc the configuration XML document
+   * @param localConfiguration flag indicating if the configuration is locally or from the server
+   * @param jmsDaqQueueTrunk
+   * @return The ProcessConfiguration object.
+   * @throws ConfUnknownTypeException Thrown if the configuration has the type 'unknown'.
+   * @throws ConfRejectedTypeException Thrown if the configuration has the type 'rejected'.
+   */
+  public ProcessConfiguration createProcessConfiguration(final String processName, final Long processPIK, 
+      final Document confXMLDoc, final boolean localConfiguration, String jmsDaqQueueTrunk) throws ConfUnknownTypeException, ConfRejectedTypeException {
+    this.jmsDaqQueueTrunk = jmsDaqQueueTrunk;
+    return createProcessConfiguration(processName, processPIK, confXMLDoc, localConfiguration);
+  }
 
   /**
    * Takes the configuration DOM document and returns an ProcessConfiguration.
@@ -223,45 +237,19 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
       } catch (UnknownHostException e) {
         processConfiguration.setHostName("NOHOST");
       }
-
-      processConfiguration.setJMSUser(getTagValue(rootElem, JMS_USER_ELEMENT));
-
-      processConfiguration.setJMSPassword(getTagValue(rootElem, JMS_PASSWORD_ELEMENT));
-
-      processConfiguration.setJMSQueueConFactJNDIName(getTagValue(rootElem, JMS_QCF_JNDI_NAME_ELEMENT));
-
-      String jmsListenerTopic = getTagValue(rootElem, JMS_LISTENER_TOPIC);
-      if (localConfiguration) {
-        if (jmsListenerTopic != null && jmsListenerTopic.length() > 0) {  
-          String pik;
-          if (processConfiguration.getprocessPIK() == ProcessConfigurationRequest.NO_PIK) {
-            pik = "NOPIK";
-          }
-          else {
-            pik = processConfiguration.getprocessPIK().toString();
-          }
-          // Old format: tim.process.HOSTNAME.PROCESS_NAME.START_TIMESTAMP
-          //  - replace the HOSTNAME and START_TIMESTAMP parts of the topic with *
-          // New format: tim.process.command.HOSTNAME.PROCESS_NAME.PIK
-          //  - replace HOSTNAME with current one and PIK with the one taken from server while Connection phase
-          String[] tokens = jmsListenerTopic.split("\\.");
-          LOGGER.debug("createProcessConfiguration - tokens.lenght : " + tokens.length);
-          StringBuilder strBuf = new StringBuilder();
-          try {
-            strBuf.append(tokens[TIM_TOKEN]).append(".").append(tokens[PROCESS_TOKEN]).append(".").append(tokens[COMMAND_TOKEN]).append(".")
-              .append(processConfiguration.getHostName()).append(".").append(tokens[tokens.length-2]).append(".").append(pik);
-          } catch (Exception ex) {
-            LOGGER.debug("createProcessConfiguration - error while splitting the topic. Format: tim.process.command.HOSTNAME.PROCESS_NAME.PIK", ex);
-          }
-          String topic = strBuf.toString();
-          LOGGER.debug("createProcessConfiguration - setting the listener topic to: " + topic);
-          processConfiguration.setListenerTopic(topic);
-        }
-      } else {
-        processConfiguration.setListenerTopic(jmsListenerTopic);
+      
+      String pik;
+      if (processConfiguration.getprocessPIK() == ProcessConfigurationRequest.NO_PIK) {
+        pik = "NOPIK";
       }
-
-      processConfiguration.setJMSQueueJNDIName(getTagValue(rootElem, JMS_QUEUE_JNDI_NAME_ELEMENT));
+      else {
+        pik = processConfiguration.getprocessPIK().toString();
+      }
+      
+      String jmsDaqQueue = this.jmsDaqQueueTrunk + ".command." + processConfiguration.getHostName() + "." 
+          + processConfiguration.getProcessName() + "." + pik;
+      processConfiguration.setJmsDaqCommandQueue(jmsDaqQueue);
+      LOGGER.trace("createProcessConfiguration - jms Daq Queue: " + jmsDaqQueue);
 
       processConfiguration.setAliveTagID(Long.parseLong(getTagValue(rootElem, ALIVE_TAG_ID_ELEMENT)));
 

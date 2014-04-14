@@ -118,10 +118,10 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
     public void init() {
         ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("init - Setting ActiveMessageReceiver listener destination to " + processConfiguration.getListenerTopic());
+            LOGGER.debug("init - Setting ActiveMessageReceiver listener destination to " + processConfiguration.getJmsDaqCommandQueue());
         }
         listenerContainer.setMessageListener(this);
-        listenerContainer.setDestination(new ActiveMQQueue(processConfiguration.getListenerTopic()));
+        listenerContainer.setDestination(new ActiveMQQueue(processConfiguration.getJmsDaqCommandQueue()));
         listenerContainer.initialize();
         listenerContainer.start();
     }
@@ -142,7 +142,7 @@ public class ActiveMessageReceiver extends ProcessMessageReceiver implements Ses
     public void disconnect() {
       ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("disconnect - Disconnecting ActiveMessageReceiver listener with destination to " + processConfiguration.getListenerTopic());
+        LOGGER.debug("disconnect - Disconnecting ActiveMessageReceiver listener with destination to " + processConfiguration.getJmsDaqCommandQueue());
     }
         listenerContainer.shutdown();
     }

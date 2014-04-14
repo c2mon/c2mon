@@ -31,7 +31,7 @@
 
 <!-- initialize the JmsSenders; any number of these can be plugged into the ProcessMessageSender below -->
 <bean id="dummyJmsSender" class="cern.c2mon.daq.common.messaging.impl.DummyJmsSender">
-    <property name="name" value="dummySender"/>
+    <property name="beanName" value="dummySender"/>
 </bean>
 
 

@@ -20,17 +20,6 @@ public class DummyRequestSender implements ProcessRequestSender {
     private DummyRequestSender(final String processConfigurationFilePath) {
       this.processConfigurationFilePath = processConfigurationFilePath;   
     }
-    
-//    @Override
-//    public Document sendProcessConfigurationRequest() {        
-//        return loadConfigLocal(processConfigurationFilePath); 
-//    }
-//
-//    @Override
-//    public Document sendProcessConfigurationRequest(String fileToSaveConf) {
-//        // TODO Auto-generated method stub
-//        return null;
-//    }
 
     @Override
     public void sendProcessDisconnectionRequest() {
@@ -40,8 +29,7 @@ public class DummyRequestSender implements ProcessRequestSender {
     
     @Override
     public ProcessConnectionResponse sendProcessConnectionRequest() {
-      // TODO Auto-generated method stub
-      return null;
+      return new ProcessConnectionResponse("P_NACHO", new Long(12345));
     }
 
     @Override

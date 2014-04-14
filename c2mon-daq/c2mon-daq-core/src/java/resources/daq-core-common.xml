@@ -33,6 +33,8 @@
 				<prop key="jms.daq.user.2">user-default</prop>
 				<prop key="jms.daq.password.2">password-default</prop>
 				<prop key="jms.daq.consumers.2">1</prop>
+				<!-- JMS DAQ PROPERTIES --> 
+                <prop key="c2mon.jms.daq.queue.trunk">c2mon.process</prop>
 			</props>
 		</property>
 	</bean>
@@ -51,8 +53,10 @@
 		class="cern.c2mon.daq.common.conf.core.ConfigurationController">
 		<property name="processConfigurationLoader" ref="processConfigurationLoader"></property>
 	</bean>
-	<bean id="processConfigurationLoader"
-		class="cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader" />
+	
+	<bean id="processConfigurationLoader" class="cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader" >
+        <property name="jmsDaqQueueTrunk" value="${c2mon.jms.daq.queue.trunk}"/>
+    </bean>
 		
 	<bean id="equipmentMessageSender" class="cern.c2mon.daq.common.impl.EquipmentMessageSender"
 		scope="prototype" />

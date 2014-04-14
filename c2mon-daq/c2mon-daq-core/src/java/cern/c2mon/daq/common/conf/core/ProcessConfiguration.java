@@ -46,34 +46,10 @@ public class ProcessConfiguration {
     private Long processPIK;
 
     /**
-     * Private topic on which the daq will permanently listen for incoming
+     * Private queue on which the daq will permanently listen for incoming
      * messages from the application server.
      */
-    private String listenerTopic;
-
-    /**
-     * User name to be used when creating the JMS queue connection for sending
-     * data to the application server.
-     */
-    private String jmsUser;
-
-    /**
-     * Password to be used when creating the JMS queue connection for sending
-     * data to the application server
-     */
-    private String jmsPassword;
-
-    /**
-     * JNDI lookup name of the QueueConnectionFactory to be used for creating
-     * the JMS connection for sending data
-     */
-    private String jmsQcfJndiName;
-
-    /**
-     * JNDI lookup name of the JMS Queue to be used for sending data to the
-     * application server.
-     */
-    private String jmsQueueJndiName;
+    private String jmsDaqCommandQueue;
 
     /**
      * Identifier of the data tag that shall be used as an alive tag for this
@@ -115,81 +91,6 @@ public class ProcessConfiguration {
      *  The DAQ process Host Name
      */
       private String hostName;
-
-    /**
-     * This method sets the JMS queue connection factory JNDI name
-     * 
-     * @param jmsQcfJndiName
-     *            the JMS queue connection factory JNDI name
-     */
-    public void setJMSQueueConFactJNDIName(final String jmsQcfJndiName) {
-        this.jmsQcfJndiName = jmsQcfJndiName;
-    }
-
-    /**
-     * This method gets the JMS queue connection factory JNDI name
-     * 
-     * @return String
-     */
-    public String getJMSQueueConFactJNDIName() {
-        return jmsQcfJndiName;
-    }
-
-    /**
-     * This method sets the JMS queue JNDI name
-     * 
-     * @param jmsQueueJndiName
-     *            the queue JNDI name
-     */
-    public void setJMSQueueJNDIName(final String jmsQueueJndiName) {
-        this.jmsQueueJndiName = jmsQueueJndiName;
-    }
-
-    /**
-     * This method gets the JMS queue JNDI name
-     * 
-     * @return String
-     */
-    public String getJMSQueueJNDIName() {
-        return jmsQueueJndiName;
-    }
-
-    /**
-     * This method sets JMS user name
-     * 
-     * @param user
-     *            the JMS user name
-     */
-    public void setJMSUser(final String user) {
-        jmsUser = user;
-    }
-
-    /**
-     * This method gets the JMS user name
-     * 
-     * @return Returns the JMS user.
-     */
-    public String getJMSUser() {
-        return jmsUser;
-    }
-
-    /**
-     * This method sets the JMS password
-     * 
-     * @param passwd The new value for the JMS password
-     */
-    public void setJMSPassword(final String passwd) {
-        jmsPassword = passwd;
-    }
-
-    /**
-     * This method gets the JMS password
-     * 
-     * @return The JMS password.
-     */
-    public String getJMSPassword() {
-        return jmsPassword;
-    }
 
     /**
      * This method sets the Alive Tag identifier
@@ -266,23 +167,21 @@ public class ProcessConfiguration {
     }
 
     /**
-     * This method sets the topic name for the ProcessMessageReceiver
+     * This method sets the queue name for sending commands to the ProcessMessageReceiver
      * 
-     * @param topic the topic name
+     * @param jmsDaqCommandQueue the queue name
      */
-    public void setListenerTopic(final String topic) {
-        listenerTopic = topic;
-        // set also system property for use in Spring XML file
-        // System.setProperty("tim.process.listenerQueue", topic); unused now
+    public void setJmsDaqCommandQueue(final String jmsDaqCommandQueue) {
+          this.jmsDaqCommandQueue = jmsDaqCommandQueue;
     }
 
     /**
-     * This method gets the topic name for the ProcessMessageReceiver
+     * This method gets the queue name for the ProcessMessageReceiver
      * 
-     * @return The listener topic for the process message receiver.
+     * @return The listener queue for the process message receiver.
      */
-    public final String getListenerTopic() {
-        return listenerTopic;
+    public final String getJmsDaqCommandQueue() {
+        return this.jmsDaqCommandQueue;
     }
 
     /**
