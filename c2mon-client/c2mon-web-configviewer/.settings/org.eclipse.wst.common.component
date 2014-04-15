@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="c2mon-web-configviewer">
+        <wb-resource deploy-path="/WEB-INF/web.xml" source-path="/WebContent/WEB-INF/web.xml"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/java"/>
+        <wb-resource deploy-path="/" source-path="/build/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        <property name="context-root" value="c2mon-web-configviewer"/>
+        <property name="component.exclusion.patterns" value="WebContent/WEB-INF/lib/*.jar"/>
+        <property name="java-output-path" value="/c2mon-web-configviewer/build/classes"/>
+    </wb-module>
+</project-modules>
