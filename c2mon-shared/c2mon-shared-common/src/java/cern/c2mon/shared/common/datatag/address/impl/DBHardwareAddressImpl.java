@@ -12,18 +12,6 @@ public class DBHardwareAddressImpl extends HardwareAddressImpl implements DBHard
 	@Element
 	protected String dbItemName;
 	
-	/**
-   * Tag id
-   */
-	@Element(required = false)
-  private transient Long tagId;
-  
-  /**
-   * Tag Data Type
-   */
-  @Element(required = false)
-  private transient String dataType;
-	
 	public DBHardwareAddressImpl(){}
     
 	
@@ -44,39 +32,4 @@ public class DBHardwareAddressImpl extends HardwareAddressImpl implements DBHard
   public final void setDbItemName(String dbItemName) {
     this.dbItemName = dbItemName;
   }
-
-
-  /**
-   * This method is only needed on the DAQ layer to store
-   * additional information
-   * @param dataType the dataType to set
-   */
-  public final void setDataType(String dataType) {
-    this.dataType = dataType;
-  }
-
-
-  /**
-   * @return the tagId
-   */
-  public final Long getTagId() {
-    return tagId;
-  }
-
-
-  /**
-   * @param tagId the tagId to set
-   */
-  public final void setTagId(Long tagId) {
-    this.tagId = tagId;
-  }
-
-
-  /**
-   * @return the dataType
-   */
-  public final String getDataType() {
-    return dataType;
-  }
-
 }
