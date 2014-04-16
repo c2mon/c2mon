@@ -1,29 +1,32 @@
 package cern.c2mon.client.core.tag;
 
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
 import cern.c2mon.shared.client.command.CommandTagHandleImpl;
+import cern.c2mon.shared.client.command.CommandTagHandleImpl.Builder;
 import cern.c2mon.shared.client.command.CommandTagValueException;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
 
 public class ClientCommandTagImplTest {
 
   @Test
   public void testXMLSerialization() throws Exception {
       
-    ClientCommandTagImpl commandTag = createCommandTag (12342L);
+    ClientCommandTagImpl<String> commandTag = createCommandTag(12342L);
     
     String xml = commandTag.getXml();
     commandTag.toString();
     
-    ClientCommandTagImpl newCommandTag = ClientCommandTagImpl.fromXml(xml);
+    ClientCommandTagImpl<String> newCommandTag = ClientCommandTagImpl.fromXml(xml);
     
     assertTrue(commandTag.getClientTimeout() == newCommandTag.getClientTimeout());
     assertTrue(commandTag.getId().equals(newCommandTag.getId()));
     assertTrue(commandTag.getMaxValue().equals(newCommandTag.getMaxValue()));
+    assertTrue(commandTag.getHardwareAddress().equals(newCommandTag.getHardwareAddress()));
   }  
   
   /**
@@ -46,19 +49,25 @@ public class ClientCommandTagImplTest {
   /**
    * Private helper method. Used to create ClientCommandTagImpl.
    */
-  private CommandTagHandleImpl createCommandTagHandleImpl (final Long id) {
+  private CommandTagHandleImpl<String> createCommandTagHandleImpl (final Long id) {
+    Builder<String> builder = new Builder<String>(id);
+    builder = builder.clientTimeout(666)
+                     .dataType(String.class.getName())
+                     .description("test descriptor")
+                     .hardwareAddress(createHardwareAddress())
+                     .maxValue("666")
+                     .minValue("1")
+                     .name("test name")
+                     .rbacAuthorizationDetails(createAuthDetails())
+                     .processId(123L);
     
-    CommandTagHandleImpl commandTagHandle = new CommandTagHandleImpl(id, "test name",
-        "test description", new String("LALA").getClass().getName(), 666, "666", "666"
-        , "test Host Name", createAuthDetails());
-    
-    return commandTagHandle;
+    return new CommandTagHandleImpl<String>(builder);
   }
   
   /**
    * Private helper method. Used to create ClientCommandTagImpl.
    */
-  private RbacAuthorizationDetails createAuthDetails () {
+  private RbacAuthorizationDetails createAuthDetails() {
 
     RbacAuthorizationDetails authDetails = new RbacAuthorizationDetails();
     
@@ -67,5 +76,9 @@ public class ClientCommandTagImplTest {
     authDetails.setRbacProperty("Matias");
     
     return authDetails;
+  }
+  
+  private HardwareAddress createHardwareAddress() {
+   return new SimpleHardwareAddressImpl("test-address");
   }
 }

@@ -1,5 +1,7 @@
 package cern.c2mon.shared.common.datatag.address.impl;
 
+import org.simpleframework.xml.Element;
+
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
 
@@ -18,16 +20,19 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
     // ---------------------------------------------------------------------------
     // Private member definitions
     // ---------------------------------------------------------------------------
+    @Element
     protected int namespace;
     /**
      * The name of the OPC tag name to which we subscribe.
      */
+    @Element
     protected String opcItemName;
 
     /**
      * The name of the OPC tag name to which we subscribe in case the
      * subscription to "opcItemName" fails
      */
+    @Element(required = false)
     protected String opcRedundantItemName = null;
 
     /**
@@ -39,10 +44,13 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
     /**
      * Command pulse length in milliseconds for boolean commands.
      */
+    @Element
     protected int commandPulseLength;
 
+    @Element
     protected ADDRESS_TYPE addressType = ADDRESS_TYPE.STRING;
 
+    @Element
     protected COMMAND_TYPE commandType = COMMAND_TYPE.CLASSIC;
 
     // ---------------------------------------------------------------------------

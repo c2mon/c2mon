@@ -1,5 +1,7 @@
 package cern.c2mon.shared.common.datatag.address.impl;
 
+import org.simpleframework.xml.Element;
+
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
 
@@ -33,18 +35,21 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * @see PLCHardwareAddress#STRUCT_BOOLEAN_COMMAND
    * @see PLCHardwareAddress#STRUCT_ANALOG_COMMAND
    */
+  @Element
   protected int blockType = 0;
   
   /**
    * Identifier of the word within the data block.
    * The word id is an integer number >=0
    */
+  @Element
   protected int wordId = 0;
   
   /**
    * Identifier of the bit within the word.
    * The bit id is -1 for analog values, [0..15] for boolean values.
    */
+  @Element
   protected int bitId = 0;
   
   /**
@@ -53,6 +58,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * convert hardware values sent by the PLC to engineering values.
    * @see #physicalMaxVal
    */
+  @Element
   protected float physicalMinVal = 0f;
   
   /**
@@ -61,21 +67,25 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * convert hardware values sent by the PLC to engineering values.
    * @see #physicalMinVal
    */
+  @Element
   protected float physicalMaxVal = 0f;
 
   /**
    * Resolution of the A/D converter.
    */
+  @Element
   protected int resolutionFactor = 0;
 
   /**
    * Physical address of the tag, depending on PLC model used.
    */
+  @Element
   protected String nativeAddress = null;
 
   /**
    * Command pulse length in milliseconds for boolean commands.
    */
+  @Element
   protected int commandPulseLength;
   
   // ----------------------------------------------------------------------------

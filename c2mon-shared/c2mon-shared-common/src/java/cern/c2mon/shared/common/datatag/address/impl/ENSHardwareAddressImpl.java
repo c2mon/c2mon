@@ -1,5 +1,7 @@
 package cern.c2mon.shared.common.datatag.address.impl;
 
+import org.simpleframework.xml.Element;
+
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
 
@@ -16,11 +18,13 @@ import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
   /**
    * ENS address of the tag.
    */
+  @Element
   protected String address = null;
 
   /**
    * ENS data type of the tag.
    */
+  @Element
   protected String dataType = null;
   
   /**

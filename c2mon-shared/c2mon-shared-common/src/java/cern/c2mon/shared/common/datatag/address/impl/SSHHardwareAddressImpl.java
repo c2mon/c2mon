@@ -2,6 +2,8 @@
 
 package cern.c2mon.shared.common.datatag.address.impl;
 
+import org.simpleframework.xml.Element;
+
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.SSHHardwareAddress;
 
@@ -18,28 +20,33 @@ public class SSHHardwareAddressImpl extends HardwareAddressImpl implements SSHHa
   public static final String XML_PROTOCOL = "xml";
   public static final String SIMPLE_IO_PROTOCOL = "simple-io";
   
- /*
-      <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SSHHardwareAddressImpl">
-             <server-alias>tcrpl4</server-alias>
-             <user-name>timoper</user-name>
-             <user-password>some_passwd</user-password>
-             <system-call>/user/timtest/dist/daqprocess/bin/testControlProcess</system-call>
-             <call-interval>30000</call-interval>
-             <call-delay>30000</call-delay>
-             <protocol>xml</protocol>
-      </HardwareAddress>
-  */
+  
+   @Element(required = false)
    protected String userName;
-   protected String userPassword;
-   protected String systemCall;
-   protected long callInterval=-1;
-   protected long callDelay=-1;
-   protected String serverAlias;
-   protected String protocol;
-   protected String sshKey;
-   protected String keyPassphrase;
    
-
+   @Element(required = false)
+   protected String userPassword;
+   
+   @Element
+   protected String systemCall;
+   
+   @Element
+   protected long callInterval=-1;
+   
+   @Element
+   protected long callDelay=-1;
+   
+   @Element(required = false)
+   protected String serverAlias;
+   
+   @Element
+   protected String protocol;
+   
+   @Element(required = false)
+   protected String sshKey;
+   
+   @Element(required = false)
+   protected String keyPassphrase;
   
    /**
    * Internal constructor required by the fromConfigXML method of the super class.

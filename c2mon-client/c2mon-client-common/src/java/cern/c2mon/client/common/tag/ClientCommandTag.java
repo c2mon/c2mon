@@ -2,6 +2,7 @@ package cern.c2mon.client.common.tag;
 
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.command.AuthorizationDetails;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 
 /**
  * This interface represents the read-only interface
@@ -74,4 +75,15 @@ public interface ClientCommandTag<T> {
    * @return The authorizations details for this command.
    */
   AuthorizationDetails getAuthorizationDetails();
+  
+  /**
+   * @return the hardware address of the command
+   */
+  HardwareAddress getHardwareAddress();
+
+  /**
+   * @return the ID of the DAQ process to which the command is sent
+   *         for execution.
+   */
+  Long getProcessId();
 }

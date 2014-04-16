@@ -1,5 +1,7 @@
 package cern.c2mon.shared.common.datatag.address.impl;
 
+import org.simpleframework.xml.Element;
+
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.SimpleHardwareAddress;
 
@@ -24,6 +26,7 @@ public class SimpleHardwareAddressImpl extends HardwareAddressImpl implements Si
   /** 
    * The actual hardware address in String format 
    */
+  @Element
   protected String address;
   
   // ----------------------------------------------------------------------------

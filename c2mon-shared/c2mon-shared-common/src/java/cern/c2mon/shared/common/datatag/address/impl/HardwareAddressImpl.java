@@ -1,10 +1,5 @@
 package cern.c2mon.shared.common.datatag.address.impl;
 
-import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -16,13 +11,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
+
 /**
  * Implementation of the HardwareAddress interface and of the abstract HardwareAddressFactory class.
  * 
  * @author J. Stowisek
  * @version $Revision: 1.4 $ ($Date: 2009/04/02 16:54:50 $ - $State: Exp $)
  */
-
 public class HardwareAddressImpl extends HardwareAddressFactory implements HardwareAddress {
 
     /** Serial UID */
@@ -364,4 +363,8 @@ public class HardwareAddressImpl extends HardwareAddressFactory implements Hardw
         return result;
     }
 
+    @Override
+    public String toString() {
+      return toConfigXML();
+    }
 }

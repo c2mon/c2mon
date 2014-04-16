@@ -9,17 +9,18 @@ import javax.validation.constraints.NotNull;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.core.manager.CommandManager;
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.command.CommandTagValueException;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.command.AuthorizationDetails;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 
 /**
  * This class is used by the {@link CommandManager} to cache
@@ -31,6 +32,7 @@ import cern.c2mon.shared.common.command.AuthorizationDetails;
  * @author Matthias Braeger
  * @see CommandManager
  */
+@Root(name = "ClientCommandTag")
 public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
 
   /** standard String used for unknown commands */
@@ -43,19 +45,24 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
   private static final String VALUE_TYPE_PREFIX = "java.lang.";
 
   /**
+   * Name of the CommandTag represented by the present CommandTagHandle object.
+   */
+  @NotNull
+  @Attribute
+  private String name;
+  
+  /**
    * Unique numeric identifier of the CommandTag represented by the 
    * present CommandTagHandle object.
    */
   @NotNull @Min(1)
   @Attribute
   private Long id;
-
-  /**
-   * Name of the CommandTag represented by the present CommandTagHandle object.
-   */
-  @NotNull
+  
+  /** The ID of the DAQ process to which the command belongs to */
+  @NotNull @Min(1)
   @Element
-  private String name;
+  private Long processId;
 
   /**
    * (Optional) free-text description of the CommandTag represented by 
@@ -77,8 +84,8 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * has not received a CommandTagReport after 'clientTimeout' milliseconds,
    * it should consider the command execution as failed.
    */
-  @NotNull
-  @Element @Min(0)
+  @NotNull @Min(0) 
+  @Element 
   private int clientTimeout;
 
   /**
@@ -100,6 +107,11 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    */
   @Element(required = false)
   private Comparable<T> maxValue;
+  
+  /** The hardware address of the command that comes with CommandTagHandle update */
+  @NotNull
+  @Element(name = "HardwareAddress")
+  private HardwareAddress hardwareAddress;
 
   /**
    * The command's value as set by the user.
@@ -112,6 +124,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
    * Details needed to authorise the command on the client.
    */
   private AuthorizationDetails authorizationDetails;
+
 
   /**
    * Public default constructor.
@@ -162,6 +175,9 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
         this.value = commandTagHandle.getValue();
       }
       this.authorizationDetails = commandTagHandle.getAuthorizationDetails();
+      this.hardwareAddress = commandTagHandle.getHardwareAddress();
+      this.processId = commandTagHandle.getProcessId();
+      // TODO: We should also send the equipment ID!
     }
   }
 
@@ -350,5 +366,15 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
   @Override
   public String toString() {
     return this.getXml();
+  }
+
+  @Override
+  public final HardwareAddress getHardwareAddress() {
+    return hardwareAddress;
+  }
+
+  @Override
+  public final Long getProcessId() {
+    return processId;
   }
 }

@@ -246,7 +246,7 @@ public class CommandTagHandleImpl<T> implements CommandTagHandle<T>, Serializabl
     }
   }
   
-  private CommandTagHandleImpl(Builder<T> builder) {
+  public CommandTagHandleImpl(Builder<T> builder) {
     
     id = builder.id;
     name = builder.name;

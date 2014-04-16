@@ -1,36 +1,51 @@
 package cern.c2mon.shared.common.datatag.address.impl;
 
+import org.simpleframework.xml.Element;
+
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
 
 public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPCHardwareAddress {
 
     private static final long serialVersionUID = 6770995924304633009L;
-
+    
+    @Element(required = false)
     protected String protocol = null;
 
+    @Element(required = false)
     protected String service = null;
 
+    @Element
     protected String deviceName = null;
 
+    @Element
     protected String propertyName = null;
 
+    @Element(required = false)
     protected String cycleSelector = null;
 
+    @Element(required = false)
     protected String indexFieldName = null;
 
+    @Element(required = false)
     protected String indexName = null;
 
+    @Element(required = false)
     protected String dataFieldName = null;
 
+    @Element
     protected int columnIndex = -1;
 
+    @Element
     protected int rowIndex = -1;
 
+    @Element(required = false)
     protected String commandType = null;
 
+    @Element(required = false)
     protected String contextField = null;
     
+    @Element(required = false)
     protected String filter = null;
 
     protected JAPCHardwareAddressImpl() {
