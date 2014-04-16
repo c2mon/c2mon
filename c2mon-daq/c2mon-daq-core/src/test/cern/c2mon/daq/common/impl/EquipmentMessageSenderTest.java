@@ -965,25 +965,18 @@ public class EquipmentMessageSenderTest {
     public void testSendInvalidTagFilteredTwiceSameValuesButDiffValueDesc() throws Exception {
       processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
       expectLastCall().times(2);
-
-      filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
-      expectLastCall().times(1);
       
       this.sdt1.update(true);
 
-      replay(processMessageSenderMock, filterMessageSenderMock);
+      replay(processMessageSenderMock);
 
       // Send to the server
       this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "test description A");
-      Thread.sleep(300);
       // Send to the server
       this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "test description B");
-      Thread.sleep(300);
-      // Filter with REPEATED_INVALID
-      this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "test description B");
 
 
-      verify(processMessageSenderMock, filterMessageSenderMock);
+      verify(processMessageSenderMock);
     }
     
     @Test
