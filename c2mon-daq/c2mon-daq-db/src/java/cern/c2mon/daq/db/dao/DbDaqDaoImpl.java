@@ -11,7 +11,7 @@ import org.mybatis.spring.support.SqlSessionDaoSupport;
 
 import cern.c2mon.daq.db.Alert;
 import cern.c2mon.daq.db.AlertTimeOutException;
-import cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl;
+import cern.c2mon.daq.db.DBDAQConfigInfo;
 
 
 /**
@@ -172,8 +172,8 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
     
     @Override
     public void updateDataTagItemName(final long dataTagId, final String itemName) {
-        DBDAQHardwareAdressImpl dbDAQHardwareAdressImpl = new DBDAQHardwareAdressImpl(dataTagId, itemName, null);
-        this.getSqlSession().update("updateDataTagItemName", dbDAQHardwareAdressImpl);
+        DBDAQConfigInfo dbDAQConfigInfo = new DBDAQConfigInfo(dataTagId, itemName, null);
+        this.getSqlSession().update("updateDataTagItemName", dbDAQConfigInfo);
     }
     
     @Override
@@ -183,8 +183,8 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
 
     @Override
     public void updateDataTagDataType(long dataTagId, String dataType) {
-      DBDAQHardwareAdressImpl dbDAQHardwareAdressImpl = new DBDAQHardwareAdressImpl(dataTagId, null, dataType);
-      this.getSqlSession().update("updateDataTagDataType", dbDAQHardwareAdressImpl);
+      DBDAQConfigInfo dbDAQConfigInfo = new DBDAQConfigInfo(dataTagId, null, dataType);
+      this.getSqlSession().update("updateDataTagDataType", dbDAQConfigInfo);
     }
 
     @Override
@@ -193,8 +193,8 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
     }
 
     @Override
-    public DBDAQHardwareAdressImpl getItemNameAndDataType(long dataTagId) {
-      return (DBDAQHardwareAdressImpl) (this.getSqlSession().selectOne("getItemNameAndDataTypeById", dataTagId));
+    public DBDAQConfigInfo getItemNameAndDataType(long dataTagId) {
+      return (DBDAQConfigInfo) (this.getSqlSession().selectOne("getItemNameAndDataTypeById", dataTagId));
     }
   
     

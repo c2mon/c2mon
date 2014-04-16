@@ -10,7 +10,6 @@ import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.shared.common.datatag.address.DBHardwareAddress;
-import cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -105,19 +104,19 @@ public class DBController {
     else {
       ISourceDataTag sdt = getEquipmentConfiguration().getSourceDataTags().get(dataTagId); 
       // Take info from data base
-      DBDAQHardwareAdressImpl dbDAQHardwareAdressImpl = this.dbDaqDao.getItemNameAndDataType(dataTagId);
+      DBDAQConfigInfo dbDAQConfigInfo = this.dbDaqDao.getItemNameAndDataType(dataTagId);
       
-      if ((dbDAQHardwareAdressImpl != null) && (sdt != null)) {
+      if ((dbDAQConfigInfo != null) && (sdt != null)) {
         // Compare Item Name from data base with the one on the config
         String newItemName = ((DBHardwareAddress) sdt.getHardwareAddress()).getDBItemName();
-        String oldItemName = dbDAQHardwareAdressImpl.getDBItemName();
+        String oldItemName = dbDAQConfigInfo.getDBItemName();
         if (!oldItemName.equals(newItemName)) {
           updateDataTagItemName(dataTagId, changeReport, newItemName, oldItemName);
         }
 
         // Compare Data Type from data base with the one on the config
         String newDataType = sdt.getDataType();
-        String oldDataType = dbDAQHardwareAdressImpl.getDataType();
+        String oldDataType = dbDAQConfigInfo.getDataType();
         if (!oldDataType.equals(newDataType)) {
           updateDataTagDataType(dataTagId, changeReport, newDataType, oldDataType);
         }

@@ -6,7 +6,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 
 import cern.c2mon.daq.db.Alert;
 import cern.c2mon.daq.db.AlertTimeOutException;
-import cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl;
+import cern.c2mon.daq.db.DBDAQConfigInfo;
 
 
 
@@ -99,7 +99,7 @@ public interface IDbDaqDao {
      * @param dataTagId
      * @return The Data Tag hardware address Item name and the Data Type
      */
-    public DBDAQHardwareAdressImpl getItemNameAndDataType(final long dataTagId);
+    public DBDAQConfigInfo getItemNameAndDataType(final long dataTagId);
     
     /**
      * Registers an interest in receiveing alerts identified by alertId

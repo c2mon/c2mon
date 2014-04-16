@@ -95,7 +95,7 @@
 			{call DBMS_ALERT.removeall }
 		</update>
     
-        <update id="updateDataTagItemName" parameterType="cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl">
+        <update id="updateDataTagItemName" parameterType="cern.c2mon.daq.db.DBDAQConfigInfo">
             UPDATE DB_DAQ
                 SET DBD_NAME = #{dbItemName,javaType=java.lang.String,jdbcType=VARCHAR}
             WHERE DBD_TAG_ID=#{tagId} 
@@ -105,7 +105,7 @@
             SELECT DBD_NAME FROM DB_DAQ WHERE DBD_TAG_ID=#{dataTagId} 
         </select>
         
-        <update id="updateDataTagDataType" parameterType="cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl">
+        <update id="updateDataTagDataType" parameterType="cern.c2mon.daq.db.DBDAQConfigInfo">
             UPDATE DB_DAQ
                 SET DBD_DATA_TYPE = #{dataType,javaType=java.lang.String,jdbcType=VARCHAR}
             WHERE DBD_TAG_ID=#{tagId} 
@@ -115,7 +115,7 @@
             SELECT DBD_DATA_TYPE FROM DB_DAQ WHERE DBD_TAG_ID=#{dataTagId} 
         </select>
         
-        <resultMap id="datatag" type="cern.c2mon.shared.common.datatag.address.impl.DBDAQHardwareAdressImpl">
+        <resultMap id="datatag" type="cern.c2mon.daq.db.DBDAQConfigInfo">
             <result property="tagId" column="DBD_TAG_ID" javaType="java.lang.Long" jdbcType="INTEGER"/>
             <result property="dbItemName" column="DBD_NAME" javaType="java.lang.String" jdbcType="VARCHAR"/>
             <result property="dataType" column="DBD_DATA_TYPE" javaType="java.lang.String" jdbcType="VARCHAR"/>
