@@ -950,22 +950,15 @@ public class EquipmentMessageSenderTest {
       processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
       expectLastCall().times(2);
 
-      filterMessageSenderMock.addValue(isA(FilteredDataTagValue.class));
-      expectLastCall().times(1);
-
-      replay(processMessageSenderMock, filterMessageSenderMock);
+      replay(processMessageSenderMock);
 
       // Send to the server
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description A");
-//      Thread.sleep(300);
       // Send to the server. Equal Value but dif Value Description
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 2L, "test description B");
-//      Thread.sleep(300);
-      // Filter with REPEATED_VALUE
-      equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 3L, "test description B");
 
 
-      verify(processMessageSenderMock, filterMessageSenderMock);
+      verify(processMessageSenderMock);
     }
     
     @Test
