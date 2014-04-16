@@ -60,8 +60,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
   private Long id;
   
   /** The ID of the DAQ process to which the command belongs to */
-  @NotNull @Min(1)
-  @Element
+  @Element(required = false)
   private Long processId;
 
   /**
