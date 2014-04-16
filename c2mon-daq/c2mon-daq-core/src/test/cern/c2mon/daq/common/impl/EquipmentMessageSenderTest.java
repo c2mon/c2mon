@@ -957,10 +957,10 @@ public class EquipmentMessageSenderTest {
 
       // Send to the server
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis(), "test description A");
-      Thread.sleep(300);
+//      Thread.sleep(300);
       // Send to the server. Equal Value but dif Value Description
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 2L, "test description B");
-      Thread.sleep(300);
+//      Thread.sleep(300);
       // Filter with REPEATED_VALUE
       equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 3L, "test description B");
 
