@@ -92,4 +92,9 @@ public interface ClientCommandTag<T> {
    *         for execution.
    */
   Long getEquipmentId();
+
+  /**
+   * @return an XML representation of this ClientCommandTag
+   */
+  String getXml();
 }

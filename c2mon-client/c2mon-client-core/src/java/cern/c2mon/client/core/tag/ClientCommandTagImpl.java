@@ -325,10 +325,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
     return clone;
   }
 
-  /**
-   * 
-   * @return an Xml representation of this ClientCommandTag
-   */
+  @Override
   public String getXml() {
     Serializer serializer = new Persister(new AnnotationStrategy());
     StringWriter fw = null;
