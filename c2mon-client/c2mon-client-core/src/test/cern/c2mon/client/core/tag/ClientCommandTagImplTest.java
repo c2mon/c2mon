@@ -1,9 +1,12 @@
 package cern.c2mon.client.core.tag;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import cern.c2mon.client.common.tag.ClientCommandTag;
+import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl.Builder;
 import cern.c2mon.shared.client.command.CommandTagValueException;
@@ -27,7 +30,23 @@ public class ClientCommandTagImplTest {
     assertTrue(commandTag.getId().equals(newCommandTag.getId()));
     assertTrue(commandTag.getMaxValue().equals(newCommandTag.getMaxValue()));
     assertTrue(commandTag.getHardwareAddress().equals(newCommandTag.getHardwareAddress()));
-  }  
+  } 
+  
+  /**
+   * This test is useful when checking that changes made on the server are supported by the client. However
+   * it is not a good idea to run this in a continuous deployment environment since the test is
+   * dependent on the life test system.
+   */
+//  @Test
+  public void startClientWithProperties() throws InterruptedException {
+    System.setProperty("c2mon.client.conf.url", "http://timweb/test/conf/c2mon-client.properties");
+    C2monServiceGateway.startC2monClientSynchronous();
+    ClientCommandTag<Boolean> commandTag = C2monServiceGateway.getCommandManager().getCommandTag(104974L);
+    assertNotNull(commandTag.getName());
+    assertTrue(!commandTag.getName().equalsIgnoreCase(""));
+    assertNotNull(commandTag.getProcessId());
+    assertNotNull(commandTag.getHardwareAddress());
+  }
   
   /**
    * Private helper method. Creates ClientCommandTagImpl.
