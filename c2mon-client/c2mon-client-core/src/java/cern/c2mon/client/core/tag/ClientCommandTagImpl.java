@@ -60,8 +60,16 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
   private Long id;
   
   /** The ID of the DAQ process to which the command belongs to */
+//  @NotNull @Min(1)
   @Element(required = false)
+  //TODO: remove required = false once TIMS-798 is applied on production!
   private Long processId;
+  
+  /** The ID of the DAQ equipment to which the command belongs to */
+//  @NotNull @Min(1)
+  @Element(required = false)
+  //TODO: remove required = false once TIMS-798 is applied on production!
+  private Long equipmentId;
 
   /**
    * (Optional) free-text description of the CommandTag represented by 
@@ -108,8 +116,9 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
   private Comparable<T> maxValue;
   
   /** The hardware address of the command that comes with CommandTagHandle update */
-  @NotNull
-  @Element(name = "HardwareAddress")
+//  @NotNull
+  @Element(name = "HardwareAddress", required = false)
+  // TODO: remove required = false once TIMS-798 is applied on production!
   private HardwareAddress hardwareAddress;
 
   /**
@@ -120,7 +129,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
   private T value;
 
   /**
-   * Details needed to authorise the command on the client.
+   * Details needed to authorize the command on the client.
    */
   private AuthorizationDetails authorizationDetails;
 
@@ -176,7 +185,7 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
       this.authorizationDetails = commandTagHandle.getAuthorizationDetails();
       this.hardwareAddress = commandTagHandle.getHardwareAddress();
       this.processId = commandTagHandle.getProcessId();
-      // TODO: We should also send the equipment ID!
+      this.equipmentId = commandTagHandle.getEquipmentId();
     }
   }
 
@@ -375,5 +384,10 @@ public class ClientCommandTagImpl<T> implements ClientCommandTag<T>, Cloneable {
   @Override
   public final Long getProcessId() {
     return processId;
+  }
+  
+  @Override
+  public final Long getEquipmentId() {
+    return equipmentId;
   }
 }

@@ -112,6 +112,9 @@ public class CommandTagHandleImpl<T> implements CommandTagHandle<T>, Serializabl
   
   /** processId */
   private Long processId;
+  
+  /** equipment ID */
+  private Long equipmentId;
 
   /** hardwareAddress */
   private HardwareAddress hardwareAddress;
@@ -170,6 +173,7 @@ public class CommandTagHandleImpl<T> implements CommandTagHandle<T>, Serializabl
     private int execTimeout;
     private int sourceRetries;
     private Long processId;
+    private Long equipmentId;
     private HardwareAddress hardwareAddress;    
     
     public Builder(Long id) {
@@ -213,6 +217,11 @@ public class CommandTagHandleImpl<T> implements CommandTagHandle<T>, Serializabl
     
     public Builder<T> processId(Long processId) {
       this.processId = processId;
+      return this;
+    }
+    
+    public Builder<T> equipmentId(Long equipmentId) {
+      this.equipmentId = equipmentId;
       return this;
     }
     
@@ -261,6 +270,7 @@ public class CommandTagHandleImpl<T> implements CommandTagHandle<T>, Serializabl
     execTimeout = builder.execTimeout;
     sourceRetries = builder.sourceRetries;
     processId = builder.processId;
+    equipmentId = builder.equipmentId;
     hardwareAddress = builder.hardwareAddress;
   }
 
@@ -438,6 +448,11 @@ public class CommandTagHandleImpl<T> implements CommandTagHandle<T>, Serializabl
   @Override
   public Long getProcessId() {
     return processId;
+  }
+  
+  @Override
+  public Long getEquipmentId() {
+    return equipmentId;
   }
 
   @Override

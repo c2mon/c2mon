@@ -86,4 +86,10 @@ public interface ClientCommandTag<T> {
    *         for execution.
    */
   Long getProcessId();
+
+  /**
+   * @return the ID of the DAQ equipment to which the command is sent
+   *         for execution.
+   */
+  Long getEquipmentId();
 }

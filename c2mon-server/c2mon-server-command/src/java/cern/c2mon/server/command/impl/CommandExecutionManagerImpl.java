@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.activemq.console.CommandContext;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,7 @@ import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandReportImpl;
 import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl;
+import cern.c2mon.shared.client.command.CommandTagHandleImpl.Builder;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.daq.command.CommandExecutionDetails;
 import cern.c2mon.shared.daq.command.CommandTag;
@@ -147,10 +149,11 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
     return report;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> Collection<CommandTagHandle<T>> processRequest(final Collection<Long> commandIds) {     
     //String hostname = request.getHostName();    
-    CommandTag<T> cacheObj = null;
+    CommandTag<T> commandTagCopy = null;
     Collection<CommandTagHandle<T>> commandTagHandles = new ArrayList<CommandTagHandle<T>>();
     
     if (commandIds.isEmpty()) {
@@ -166,11 +169,19 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
         LOGGER.warn("Received request for command with null id - ignoring this request. Check your client code!");
       } else {
         try {
-          cacheObj = commandTagCache.get(id);                  
-          commandTagHandles.add(new CommandTagHandleImpl<T>(cacheObj.getId(), cacheObj.getName(), cacheObj.getDescription(), 
-              cacheObj.getDataType(), cacheObj.getClientTimeout(), 
-              cacheObj.getMinimum(), cacheObj.getMaximum(), null,
-              (RbacAuthorizationDetails) cacheObj.getAuthorizationDetails()));
+          commandTagCopy = commandTagCache.getCopy(id);
+          Builder<T> builder = new Builder<>(id);
+          builder.name(commandTagCopy.getName())
+                 .description(commandTagCopy.getDescription())
+                 .dataType(commandTagCopy.getDataType())
+                 .clientTimeout(commandTagCopy.getClientTimeout())
+                 .hardwareAddress(commandTagCopy.getHardwareAddress())
+                 .minValue(commandTagCopy.getMinimum())
+                 .maxValue(commandTagCopy.getMaximum())
+                 .rbacAuthorizationDetails((RbacAuthorizationDetails) commandTagCopy.getAuthorizationDetails())
+                 .processId(commandTagCopy.getProcessId())
+                 .equipmentId(commandTagCopy.getEquipmentId());
+          commandTagHandles.add(new CommandTagHandleImpl<T>(builder));
         } catch (CacheElementNotFoundException cacheEx) {
           /* The specified CommandTag is not defined in the system. */
           commandTagHandles.add(new CommandTagHandleImpl<T>(id, null));

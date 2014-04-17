@@ -121,4 +121,9 @@ public interface CommandTagHandle<T> extends Serializable, ClientRequestResult {
    * @return The authorizations details for this command.
    */
   AuthorizationDetails getAuthorizationDetails();
+
+  /**
+   * @return The ID of the equipment on which the command shall be executed
+   */
+  Long getEquipmentId();
 }
