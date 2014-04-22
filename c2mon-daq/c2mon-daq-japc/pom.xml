@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-daq</groupId>
 		<artifactId>c2mon-daq-pom</artifactId>
-		<version>1.1.1</version>
+		<version>1.1.4</version>
 	</parent>
 
 	<artifactId>c2mon-daq-japc</artifactId>
@@ -13,7 +13,7 @@
 	<version>1.2.4-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
-	<description>TIM data acquisition component for JAPC.</description>
+	<description>C2MON data acquisition component for JAPC.</description>
 	<url />
 
 	<scm>
@@ -25,6 +25,7 @@
 			<groupId>cern.c2mon.c2mon-daq</groupId>
 			<artifactId>c2mon-daq-core</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-common</artifactId>
@@ -33,9 +34,15 @@
 			<groupId>cern.c2mon.c2mon-shared</groupId>
 			<artifactId>c2mon-shared-daq</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
 		</dependency>
 
 		<dependency>
@@ -50,40 +57,44 @@
 			<groupId>org.easymock</groupId>
 			<artifactId>easymockclassextension</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-mockito</artifactId>
-		</dependency>
 
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
+		<!-- JAPC -->
 		<dependency>
 			<groupId>cern.japc</groupId>
 			<artifactId>japc</artifactId>
+			<version>[2.23.11,3.0.0)</version>
+		</dependency>
+
+		<dependency>
+			<groupId>cern.japc</groupId>
+			<artifactId>japc-ext-remote</artifactId>
+			<version>[3.9.3,4.0.0)</version>
 		</dependency>
 
 		<dependency>
 			<groupId>cern.japc</groupId>
 			<artifactId>japc-ext-cmwrda</artifactId>
+			<version>[2.16.0,3.0.0)</version>
 		</dependency>
+
 		<dependency>
 			<groupId>cern.japc</groupId>
 			<artifactId>japc-ext-cmwrda3</artifactId>
+			<version>[1.0.2,2.0.0)</version>
 		</dependency>
-
 		<dependency>
 			<groupId>cern.japc</groupId>
 			<artifactId>japc-ext-snmp</artifactId>
+			<version>[1.0.4,2.0.0)</version>
 		</dependency>
 		<dependency>
 			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-cache</artifactId>
-			<version>2.2.1</version>
+			<artifactId>japc-ext-mockito</artifactId>
+			<version>[0.1.4,1.0.0)</version>
+			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
+
 	<developers />
 
 </project>
