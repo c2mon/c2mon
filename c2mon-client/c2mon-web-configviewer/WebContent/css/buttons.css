@@ -35,10 +35,10 @@ DIV.page-header H1 {
 	PADDING-BOTTOM: 0px; LINE-HEIGHT: 27px; MARGIN: 0px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; LETTER-SPACING: 0px; FONT-SIZE: 24px; PADDING-TOP: 0px
 }
 .awesome {
-	POSITION: relative; PADDING-BOTTOM: 6px; PADDING-LEFT: 10px; PADDING-RIGHT: 10px; DISPLAY: inline-block; BACKGROUND: url(/images/alert-overlay.png) #222 repeat-x; COLOR: #fff; CURSOR: pointer; TEXT-DECORATION: none; PADDING-TOP: 5px; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25); -webkit-border-radius: 5px; -moz-border-radius: 5px; -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5)
+	POSITION: relative; PADDING-BOTTOM: 6px; PADDING-LEFT: 10px; PADDING-RIGHT: 10px; DISPLAY: inline-block; BACKGROUND:  #222 repeat-x; COLOR: #fff; CURSOR: pointer; TEXT-DECORATION: none; PADDING-TOP: 5px; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25); -webkit-border-radius: 5px; -moz-border-radius: 5px; -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5)
 }
 .awesome:visited {
-	POSITION: relative; PADDING-BOTTOM: 6px; PADDING-LEFT: 10px; PADDING-RIGHT: 10px; DISPLAY: inline-block; BACKGROUND: url(/images/alert-overlay.png) #222 repeat-x; COLOR: #fff; CURSOR: pointer; TEXT-DECORATION: none; PADDING-TOP: 5px; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25); -webkit-border-radius: 5px; -moz-border-radius: 5px; -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5)
+	POSITION: relative; PADDING-BOTTOM: 6px; PADDING-LEFT: 10px; PADDING-RIGHT: 10px; DISPLAY: inline-block; BACKGROUND:  #222 repeat-x; COLOR: #fff; CURSOR: pointer; TEXT-DECORATION: none; PADDING-TOP: 5px; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25); -webkit-border-radius: 5px; -moz-border-radius: 5px; -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5)
 }
 .awesome:hover {
 	BACKGROUND-COLOR: #111; COLOR: #fff
