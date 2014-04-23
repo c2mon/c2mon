@@ -20,7 +20,7 @@ public class InvalidPoint {
   
   public InvalidPoint(final String time, final String invalidationReason) {
     this.time = time;
-    this.invalidationReason = invalidationReason;
+    this.invalidationReason = invalidationReason.replaceAll("\n","");
   }
   
   public String getTime() {
