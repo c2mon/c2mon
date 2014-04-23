@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>cern.c2mon.c2mon-daq</groupId>
 		<artifactId>c2mon-daq-pom</artifactId>
-		<version>1.1.4</version>
+		<version>1.1.5</version>
 	</parent>
 
 	<artifactId>c2mon-daq-japc</artifactId>
@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>cern.japc</groupId>
 			<artifactId>japc-ext-mockito</artifactId>
-			<version>[0.1.4,1.0.0)</version>
+			<version>[0.1.6,1.0.0)</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
