@@ -232,7 +232,7 @@
 
 
 <!-- process the XML element ClientCommandTagImpl -->
-<xsl:template match="clientCommandTagImpl">
+<xsl:template match="ClientCommandTag">
 	
 	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
 	<html>
@@ -247,7 +247,7 @@
 		<body>
 			
 			<p class="tagName"> 
-				<xsl:value-of select="name"/>
+				<xsl:value-of select="@name"/>
 				(<xsl:value-of select="@id"/>)
 				
 				<A href="{$base_url}{$command_xml_url}{@id}/" 
@@ -257,13 +257,16 @@
 			<div class="column">
 				<table class="inline">
 					<th colspan="2">Command Tag</th>
-					
 					<tr>
 						<td class="highlight bold"> Command id </td>
 						<td class=""><xsl:value-of select="@id"/></td>
 					</tr>
+					<tr>
+						<td class="highlight bold"> Name </td>
+						<td class=""><xsl:value-of select="@name"/></td>
+					</tr>
 
-					<xsl:for-each select="*">
+					<xsl:for-each select="*[not(local-name() = 'HardwareAddress')]">
 						<TR>
 							<TD class="highlight bold"><xsl:value-of select="local-name()"/></TD>
 							<TD><xsl:value-of select="."/></TD>
@@ -275,7 +278,7 @@
 				<xsl:template match="HardwareAddress">
 						<table class="inline">
 							<th colspan="2">HardwareAddress</th>
-							<xsl:for-each select="HardwareAddress">
+							<xsl:for-each select="HardwareAddress/*">
 								<TR>
 									<TD class="bold"><xsl:value-of select="local-name()"/></TD>
 									<TD><xsl:value-of select="."/></TD>

@@ -312,7 +312,7 @@
 
 
 <!-- process the XML element ClientCommandTagImpl -->
-<xsl:template match="clientCommandTagImpl">
+<xsl:template match="ClientCommandTag">
 	
 	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
 	<html>
@@ -326,7 +326,7 @@
 		<body>
 			
 			<p class="tagName"> 
-				<xsl:value-of select="name"/>
+				<xsl:value-of select="@name"/>
 				(<xsl:value-of select="@id"/>)
 			</p>
 			<div class="column">
@@ -666,7 +666,7 @@
 	<div class="column">
 		<table class="inline">
 			<th colspan="2">HardwareAddress</th>
-
+			
 			<xsl:for-each select="*">
 				<TR>
 					<TD class="bold"><xsl:value-of select="local-name()"/></TD>

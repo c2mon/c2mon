@@ -34,6 +34,7 @@
 			<beans:map>
 				<beans:entry key="configloader" value="${c2mon.web.rbac.admin}" />
 				<beans:entry key="process" value="${c2mon.web.rbac.user}" />
+				<beans:entry key="commandviewer" value="${c2mon.web.rbac.user}" />
 			</beans:map>
 		</beans:constructor-arg>
 
@@ -48,7 +49,7 @@
 		-->
 		<intercept-url pattern="/configloader/**" access="hasAnyRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/process/**" access="hasAnyRole('ROLE_ADMIN')" />
-
+		<intercept-url pattern="/commandviewer/**" access="hasAnyRole('ROLE_ADMIN')" />
 		<access-denied-handler error-page="/accessDenied" />
 	</http>
 
