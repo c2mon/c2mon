@@ -79,6 +79,8 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     static final String JVM_UPTIME_OBJECT_NAME = "java.lang:type=Runtime";
     static String JVM_UPTIME_OBJECT_ATTRIBUTE = "Uptime";
 
+    static final int MAX_VALUE_DESCR_LENGTH = 500;
+
     volatile static RbaLoginService service = null;
 
     private String jmxServiceUrl;
@@ -171,7 +173,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                         jmxc = JMXConnectorFactory.connect(url, env);
 
                     } else {
-                        
+
                         if (service == null) {
                             service = new RbaLoginService();
                             service.setLoginPolicy(LoginPolicy.LOCATION);
@@ -179,15 +181,15 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                             service.setApplicationName(ProcUtils.getApplicationName());
                             service.startAndLogin();
                         }
-                        
-                        //try rbac credentials
+
+                        // try rbac credentials
                         try {
                             Map<String, Object> credEnv = new HashMap<String, Object>();
                             credEnv.put(JMXConnector.CREDENTIALS, RbaTokenLookup.findRbaToken());
                             jmxc = JMXConnectorFactory.connect(url, credEnv);
                         } catch (final Exception ignore) {
                             logger.warn("Failed to connect using RBAC Token: " + ignore.getMessage());
-                            
+
                             logger.info("Trying plain text authorization..");
                             // try no password
                             try {
@@ -550,7 +552,25 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             valueDescription = ((java.util.Set<?>) attrVal).toString();
         }
 
-        return new Object[] { result, valueDescription };
+        return new Object[] { result, normalize(valueDescription) };
+    }
+
+    private static String normalize(String str) {
+        if (str == null)
+            return str;
+
+        String result = str;
+
+        if (str.length() > MAX_VALUE_DESCR_LENGTH) {
+            result = str.substring(0, MAX_VALUE_DESCR_LENGTH);
+        }
+
+        // XML 1.0
+        // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        String xml10pattern = "[^" + "\u0009\r\n" + "\u0020-\uD7FF" + "\uE000-\uFFFD" + "\ud800\udc00-\udbff\udfff"
+                + "]";
+
+        return result.replaceAll(xml10pattern, str);
     }
 
     private static String arrayToString(Object array) {
@@ -596,7 +616,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             }
         }
 
-        return new Object[] { result, valueDescription };
+        return new Object[] { result, normalize(valueDescription) };
     }
 
     /**
