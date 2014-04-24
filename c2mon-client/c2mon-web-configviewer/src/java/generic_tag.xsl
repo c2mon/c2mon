@@ -167,11 +167,18 @@
 		</head>
 		<body>
 			
-			<p class="tagName"> 
-				<xsl:value-of select="faultFamily"/>
-				:<xsl:value-of select="faultMemeber"/>
-				:<xsl:value-of select="faultCode"/>
-				
+			<div class="page-header"> 
+				<h2>
+					<xsl:value-of select="faultFamily"/>
+					:<xsl:value-of select="faultMemeber"/>
+					:<xsl:value-of select="faultCode"/>
+				</h2>
+			</div>
+			<div class="links" style="margin-bottom:5%;">
+			    <A style="display:inline;float:left;" href="../" 
+				class="large blue awesome xml_button">		
+				<i class="icon-home"></i> Home
+				</A>
 				<A href="{$base_url}{$alarm_xml_url}{@id}/" 
 					class="large blue awesome xml_button" target="_blank">View Alarm XML >>
 				</A>	
@@ -179,7 +186,7 @@
 				<A href="{$help_alarm_url}{@id}" 
 					class="large red awesome xml_button" target="_blank">View Help Alarm >>
 				</A>		
-			</p>
+			</div>
 			<table class="inline">
 				<th colspan="4">Alarm Value</th>
 				
@@ -246,15 +253,23 @@
 		</head>
 		<body>
 			
-			<p class="tagName"> 
-				<xsl:value-of select="@name"/>
-				(<xsl:value-of select="@id"/>)
-				
+			<div class="page-header">
+				<h2>
+					<xsl:value-of select="@name"/>
+					(<xsl:value-of select="@id"/>)
+				</h2>
+			</div>
+			
+			<div class="links" style="margin-bottom:2%;"> 
+				<A style="display:inline;float:left;" href="../" 
+				class="large blue awesome xml_button">		
+				<i class="icon-home"></i> Home
+				</A>
 				<A href="{$base_url}{$command_xml_url}{@id}/" 
 					class="large blue awesome xml_button" target="_blank">View Command XML >>
 				</A>		
-			</p>
-			<div class="column">
+			</div>
+			<div class="column" style="margin-top:5%;">
 				<table class="inline">
 					<th colspan="2">Command Tag</th>
 					<tr>
@@ -440,15 +455,21 @@
 		<body>
 			
 			<div id="top"></div>
-			<p class="tagName"> 
-				DAQ Process XML Viewer 
-				<br></br><br></br>
-				<p>Process: <xsl:value-of select="jms-user"/>
+			<div class="page-header"> 
+				<h2>DAQ Process XML Viewer</h2> 
+			</div>	
+			<div class="links" style="margin-bottom:2%;"> 			
+				<A style="display:inline;float:left;" href="../" 
+				class="large blue awesome xml_button">		
+				<i class="icon-home"></i> Home
+				</A>
 				<A href="{$base_url}{$process_xml_url}{jms-user}/" 
 					class="large blue awesome xml_button" target="_blank">View as XML >>
 				</A>
-			</p>
-		</p>
+			</div>	
+			<br/><br/>
+			<p>Process: <xsl:value-of select="jms-user"/></p>
+
 		<div class="column">
 			<table class="inline">
 				<th colspan="2">Process Configuration</th>

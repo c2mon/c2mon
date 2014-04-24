@@ -43,14 +43,19 @@
 	</xsl:template>
 
 	<xsl:template match="ClientDataTag">
-		<p class="tagName">
-			<xsl:value-of select="tagName" />
-			(
-			<xsl:value-of select="@id" />
-			)
-			<br></br>
-			<br></br>
-			
+		<div class="page-header"> 
+			<h2>
+				<xsl:value-of select="tagName" />
+				(
+				<xsl:value-of select="@id" />
+				)
+			</h2>
+		</div>
+		<div class="links" style="margin-bottom:5%;">	
+			<A style="display:inline;float:left;" href="../" 
+				class="large blue awesome xml_button">		
+				Home
+			</A>
 			<A href="{$base_url}{$tag_value_xml_url}{@id}/" 
 				class="large blue awesome xml_button" target="_blank">View ClientDataTag XML >>
 			</A>
@@ -63,7 +68,7 @@
 			<A href="{$help_point_url}{@id}" 
 				class="large red awesome xml_button" target="_blank">View Help Alarm >>
 			</A>	
-		</p>
+		</div>
 		<table class="inline">
 			<th colspan="4">ClientDataTag</th>
 

@@ -63,11 +63,18 @@
     <xsl:variable name="trend_parameter"><xsl:value-of select="/*/@trendURL" /></xsl:variable>   
 
         <body>
-          <p class="tagName">
-            Data Tag History
-            (<xsl:value-of select="/*/@id" />)
-            <xsl:value-of select="/*/@historyDescription" />
+          <div class="page-header">
+            <h2>Data Tag History
+	            (<xsl:value-of select="/*/@id" />)
+	            <xsl:value-of select="/*/@historyDescription" />
+            </h2>
+            </div>
             
+            <div class="links" style="margin-bottom:5%;">
+            <A style="display:inline;float:left;" href="../" 
+				class="large blue awesome xml_button">		
+				<i class="icon-home"></i> Home
+			</A>
             <A href="{$base_url}{$history_xml_url}{/*/@id}{$trend_parameter}" 
              class="large blue awesome xml_button" target="_blank">History XML >>
            </A>	
@@ -80,9 +87,9 @@
            <A href="{$help_point_url}{/*/@id}" 
              class="large red awesome xml_button" target="_blank">View Help Alarm >>
            </A>	
-           
-         </p>
-         <table class="inline">
+          </div> 
+         
+         <table class="inline" >
           <tr>
             <th>Server Timestamp</th>
             <th>Value</th>
