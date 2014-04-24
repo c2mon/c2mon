@@ -63,7 +63,7 @@
 
 
 <script type="text/javascript">
-  trend = new Dygraph(
+  	trend = new Dygraph(
 
     // containing div
     document.getElementById("trend_view"),
@@ -89,7 +89,32 @@
     				,
 					</c:if>
 				</c:forEach>
-     ]
+     ],
+     xAxisLabelWidth: 70,
+     axes: {
+         x: {
+           axisLabelFormatter: function(d) {
+        		var month=new Array();
+        		month[01]="Jan";
+        		month[02]="Feb";
+        		month[03]="Mar";
+        		month[04]="Apr";
+        		month[05]="May";
+        		month[06]="Jun";
+        		month[07]="Jul";
+        		month[08]="Aug";
+        		month[09]="Sep";
+        		month[10]="Oct";
+        		month[11]="Nov";
+        		month[12]="Dec";
+               return d.getDate()+"-"
+               + month[(d.getMonth())]/*+"-"
+               + Dygraph.zeropad(d.getFullYear())*/+"\n"
+               + Dygraph.zeropad(d.getHours()) + ":"
+               + Dygraph.zeropad(d.getMinutes());
+           }
+  
+         }}
     }
   );
  
@@ -118,6 +143,8 @@
 		</c:forEach>
     ] );
   });
+   
+
 </script>
 
 
