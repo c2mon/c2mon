@@ -53,5 +53,10 @@
 		<servlet-name>appServlet</servlet-name>
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
+	
+	<error-page>
+        <error-code>405</error-code>
+        <location>/WEB-INF/views/loginNiceForm.jsp</location>
+    </error-page>
 
 </web-app>

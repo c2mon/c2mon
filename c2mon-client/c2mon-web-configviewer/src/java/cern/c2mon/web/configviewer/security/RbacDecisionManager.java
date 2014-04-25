@@ -72,12 +72,20 @@ public class RbacDecisionManager implements AccessDecisionManager {
       return; // bye - bye!
     }
     
-    if (!sessionManager.isAuthorized(username, details))  {
-      logger.info(username 
-          + " tried to access:" + pageUrl + " but does not have permission to do so!");
-      throw new AccessDeniedException("go away"); // user does not have permission!
-    }
     
+	if (!sessionManager.isAuthorized(username, details))  {
+	    if (sessionManager.isUserLogged(username)){	      
+		    logger.info(username 
+			          + " tried to access:" + pageUrl + " but does not have permission to do so!");
+			   throw new AccessDeniedException("go away"); // user does not have permission!	    
+	    }
+	    else{
+	      logger.info(username 
+             + " tried to access:" + pageUrl + " but he is not connected!");
+	      authentication.setAuthenticated(false);
+	      throw new AccessDeniedException("User not logged"); // user is not logged     
+	    }
+	}
     logger.info(username 
         + " succesfully authorised to access:" + pageUrl);
   }
@@ -120,12 +128,14 @@ public class RbacDecisionManager implements AccessDecisionManager {
     return details;
   }
 
+  @Override
   public boolean supports(Class clazz) {
     // This manager should be used for FilterInvocations (authorizing web
     // requests)
     return FilterInvocation.class.isAssignableFrom(clazz);
   }
 
+  @Override
   public boolean supports(ConfigAttribute config) {
     return true;
   }

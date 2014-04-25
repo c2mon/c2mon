@@ -50,6 +50,8 @@
 		<intercept-url pattern="/configloader/**" access="hasAnyRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/process/**" access="hasAnyRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/commandviewer/**" access="hasAnyRole('ROLE_ADMIN')" />
+    <form-login login-page="/login"
+    authentication-failure-url="/login?error=true" />
 		<access-denied-handler error-page="/accessDenied" />
 	</http>
 
