@@ -6,6 +6,7 @@
 <title>Configuration viewer</title>
 <link rel="stylesheet" type="text/css" href="<c:url value="../css/form.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="../css/c2mon.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="../css/bootstrap.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="../css/web-config-viewer.css"/>" />
 
 <link type="text/css" href="../css/ui-lightness/jquery-ui.css" rel="stylesheet" />
@@ -129,6 +130,13 @@ function getProgressDescription() {
 </head>
 
 <body>
+<div class="breadcrumb">
+	<A style="color: blue;" href="../" 
+	class="large blue awesome xml_button">		
+	Home
+	</A>
+</div>
+
 <h1>${title}</h1>
 
 <c:url var="submitUrl" value="${formSubmitUrl}"/>

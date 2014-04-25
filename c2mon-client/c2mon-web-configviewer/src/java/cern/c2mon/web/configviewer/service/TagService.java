@@ -3,8 +3,10 @@ package cern.c2mon.web.configviewer.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.transform.TransformerException;
 
@@ -12,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.shared.client.tag.TagConfig;
@@ -37,6 +40,12 @@ public class TagService {
    * */
   @Autowired
   private ServiceGateway gateway;
+  
+  public boolean subscribeTag(final long tagId, DataTagUpdateListener listener) {
+    Set<Long> set = new HashSet<Long>(1);
+    set.add(tagId);
+    return gateway.getTagManager().subscribeDataTags(set, listener);
+  }
 
   /**
    * Gets the XML representation of the current value of datatag

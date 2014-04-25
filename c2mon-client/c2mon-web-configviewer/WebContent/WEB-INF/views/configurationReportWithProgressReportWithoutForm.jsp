@@ -116,6 +116,13 @@ function getProgressDescription() {
 </head>
 
 <body>
+<div class="breadcrumb">
+	<A style="color: blue;" href="../" 
+	class="large blue awesome xml_button">		
+	Home
+	</A>
+</div>
+
 <h1>${title}</h1>
 
 <c:url var="submitUrl" value="${formSubmitUrl}"/>
