@@ -4,8 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import cern.c2mon.web.configviewer.security.CustomAuthenticationProvider;
-
 /**
  * Utility class to ease preparation of data for the MVC model
  * */
@@ -36,8 +34,8 @@ public final class FormUtility {
     +  "<html>"
     + "<head>"
     +  " <title>Configuration viewer</title>"
-    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/tim.css\"></link>"
-    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/webConfigViewer.css\"></link>"
+    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/c2mon.css\"></link>"
+    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/web-config-viewer.css\"></link>"
     + "<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/buttons.css\"></link>"
     +  " <script type=\"text/javascript\" src=\"../js/jquery-1.7.min.js\"></script>"
     +  " <script type=\"text/javascript\" src=\"../js/bottom_panel.js\"></script>"

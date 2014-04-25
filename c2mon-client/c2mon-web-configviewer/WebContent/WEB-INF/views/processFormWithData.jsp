@@ -47,7 +47,7 @@
 	<input class="btn btn-large btn-primary" type="submit" value="Submit">
 </form>
 
-<a href="j_spring_security_logout">Logout</a>
+<a href="../j_spring_security_logout">Logout</a>
 </div><!--/row-->
 
       <hr>
