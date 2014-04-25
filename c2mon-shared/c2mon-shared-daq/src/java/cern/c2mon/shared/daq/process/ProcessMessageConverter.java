@@ -56,7 +56,8 @@ public final class ProcessMessageConverter implements MessageConverter {
       throw new MessageFormatException("Expected TextMessage as response but received " + message.getClass());
     } else {           
       try {
-        LOGGER.debug("fromMessage() - Message received: " + ((TextMessage) message).getText());
+//        LOGGER.debug("fromMessage() - Message received: " + ((TextMessage) message).getText());
+        LOGGER.debug("fromMessage() - Message properly received");
         return this.xmlConverter.fromXml(((TextMessage) message).getText());
       } catch (Exception ex) {
         LOGGER.error("fromMessage() - Error caught in conversion of JMS message to Process Object");
