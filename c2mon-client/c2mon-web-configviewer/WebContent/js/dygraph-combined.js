@@ -1920,7 +1920,7 @@ Dygraph.DEFAULT_ATTRS = {
   plugins: [],
   axes: {
     x: {
-      pixelsPerLabel: 60,
+      pixelsPerLabel: 70,
       axisLabelFormatter: Dygraph.dateAxisFormatter,
       valueFormatter: Dygraph.dateString_,
       drawGrid: true,

@@ -76,7 +76,7 @@
      legend: 'always',
      stepPlot: ${is_boolean},
      fillGraph: ${fill_graph},
-	 	 colors: ['#2e8b57'],
+     colors: ['#2e8b57'],
      ylabel: '${ylabel}',
      	<c:if test="${is_boolean}"> 
      		valueRange: [-1, 2],  
