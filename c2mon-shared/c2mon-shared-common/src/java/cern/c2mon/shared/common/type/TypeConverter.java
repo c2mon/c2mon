@@ -63,7 +63,6 @@ public final class TypeConverter  {
    * @throws ClassCastException In case of a cast exception
    * @deprecated Please use method {@link #castToType(Object, Class)} instead
    */
-  @Deprecated
   public static final Object cast(final Object pValue, final Class< ? > pTargetType) throws ClassCastException {
     if (pValue == null || pTargetType == null) {
       return null;
@@ -93,8 +92,7 @@ public final class TypeConverter  {
         inputType = Double.class;
       }
       catch (NumberFormatException e) {
-        // if we are here, then the String does not
-        // represent a number
+        throw new ClassCastException(new StringBuffer("Cannot convert received value \"").append(inputValue).append("\" to Double").toString());
       }
     }
     
