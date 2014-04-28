@@ -1,10 +1,12 @@
 $(document).ready(function(){
   
+  // Display the error message
   if(typeof getUrlVars()["error"] != 'undefined')
   {
     $('#error').append("<p style='color:red;'>Invalid username or password !</p>")
   }
   
+  // Function to get the parameter in an URL
   function getUrlVars()
   {
     var vars = [], hash;
