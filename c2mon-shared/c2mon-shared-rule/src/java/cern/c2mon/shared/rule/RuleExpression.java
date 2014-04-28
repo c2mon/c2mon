@@ -1,10 +1,8 @@
 package cern.c2mon.shared.rule;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,13 +19,28 @@ import cern.c2mon.shared.common.type.TypeConverter;
 
 public abstract class RuleExpression 
     implements IRuleExpression {
-
+  
+  /**
+   * Enum for defining the rule type of this instance
+   * @author jlopezco
+   * @see RuleTransferObject#getRuleType()
+   */
+  public enum RuleType {
+    /** Simple rule type */
+    Simple,
+    /** Conditioned rule type */
+    ConditionedRule
+  }
+  
   private static final long serialVersionUID = -8053889874595191829L;
 
   /**
    * Text of the rule expression (as defined by the user)
    */
   protected final String expression;
+  
+  /** This value must be set by the underlying rule expression Implementation; */
+  private final RuleType ruleType;
 
   /**
    * Rules extracted from the database use the following tag in the xml file 
@@ -40,8 +53,9 @@ public abstract class RuleExpression
    * 
    * @param pExpression The rule expression string
    */
-  public RuleExpression(final String pExpression) {
+  protected RuleExpression(final String pExpression, RuleType ruleType) {
     this.expression = pExpression.trim();
+    this.ruleType = ruleType;
   }
 
   /**
@@ -185,50 +199,15 @@ public abstract class RuleExpression
     str.append("</RuleExpression>\n");
     return str.toString();
   }
-
-  // TODO: Turn into JUnit tests!
-  public static void main(String[] args) {
-    try {
-      Hashtable<Long, Object> tags = new Hashtable<Long, Object>();
-      RuleExpression exp = RuleExpression.createExpression("#1 = #2 [5], true [2]");
-      System.out.println("input tags needed: " + exp.getInputTagIds());
-      tags.put(new Long(1), new Integer(5));
-      tags.put(new Long(2), new Float(5));
-      Object result = exp.evaluate(tags, Float.class);
-      System.out.println("result     : " + result);
-      System.out.println("result type: " + result.getClass().getName());
-
-      /*
-       * 
-       * System.out.println("creating rule"); RuleExpression exp = RuleExpression.createExpression("2 = 2"); System.out.println("evaluating rule: " +
-       * exp.getExpression()); System.out.println(exp.evaluate(new Hashtable())); System.out.println("creating rule"); exp =
-       * RuleExpression.createExpression("2 != 2"); System.out.println("evaluating rule: " + exp.getExpression()); System.out.println(exp.evaluate(new
-       * Hashtable())); System.out.println("creating rule"); exp = RuleExpression.createExpression("(2 = 2)"); System.out.println("evaluating rule: " +
-       * exp.getExpression()); System.out.println(exp.evaluate(new Hashtable())); System.out.println("creating rule"); exp =
-       * RuleExpression.createExpression("(2 != 2)"); System.out.println("evaluating rule: " + exp.getExpression()); System.out.println(exp.evaluate(new
-       * Hashtable())); System.out.println("creating rule"); exp = RuleExpression.createExpression("!(2 = 2)"); System.out.println("evaluating rule: " +
-       * exp.getExpression()); System.out.println(exp.evaluate(new Hashtable())); System.out.println("creating rule"); exp =
-       * RuleExpression.createExpression("!(2 != 2)"); System.out.println("evaluating rule: " + exp.getExpression()); System.out.println(exp.evaluate(new
-       * Hashtable()));
-       * 
-       * System.out.println("creating rule"); exp = RuleExpression.createExpression("!(2 = 2) & true"); System.out.println("evaluating rule: " +
-       * exp.getExpression()); System.out.println(exp.evaluate(new Hashtable())); System.out.println("creating rule"); exp =
-       * RuleExpression.createExpression("!(2 = 2) | false"); System.out.println("evaluating rule: " + exp.getExpression()); System.out.println(exp.evaluate(new
-       * Hashtable())); System.out.println("creating rule"); exp = RuleExpression.createExpression("(2 = 2) | true"); System.out.println("evaluating rule: " +
-       * exp.getExpression()); System.out.println(exp.evaluate(new Hashtable())); System.out.println("creating rule"); exp =
-       * RuleExpression.createExpression("(2 = 2) | false"); System.out.println("evaluating rule: " + exp.getExpression()); System.out.println(exp.evaluate(new
-       * Hashtable())); exp = RuleExpression.createExpression("(2 = 2) | true"); System.out.println("evaluating rule: " + exp.getExpression());
-       * System.out.println(exp.evaluate(new Hashtable())); System.out.println("creating rule"); exp = RuleExpression.createExpression("(2 = 2) | !(2=2)");
-       * System.out.println("evaluating rule: " + exp.getExpression()); System.out.println(exp.evaluate(new Hashtable())); exp =
-       * RuleExpression.createExpression("(2 = 2) | !(2=2)"); System.out.println("evaluating rule: " + exp.getExpression()); System.out.println(exp.evaluate(new
-       * Hashtable()));
-       * 
-       * exp = RuleExpression.createExpression( "(!(1 != 2) & (18000 > 17000)) & (!(3 = 2) & (19000 > 17000) & (2 = 2) & (18000 > 17000))");
-       * System.out.println("evaluating rule: " + exp.getExpression()); System.out.println(exp.evaluate(new Hashtable()));
-       */
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  
+  /**
+   * The rule type is either SIMPLE or a conditioned rule. In case of a conditioned
+   * Rule type the user might want to cast the {@link RuleExpression} into an
+   * {@link IConditionedRule} to access internal information of the conditions.
+   * @see RuleType
+   */
+  public RuleType getRuleType() {
+    return ruleType;
   }
 
   /**

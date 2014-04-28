@@ -21,7 +21,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
     private Object[] tokens = null;
 
     public SimpleRuleExpression(final String pExpression) throws RuleFormatException {
-        super(pExpression);
+        super(pExpression, RuleType.Simple);
         this.tokens = tokenize(pExpression);
     }
 

@@ -1,9 +1,7 @@
 package cern.c2mon.shared.rule;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -24,7 +22,7 @@ public class MultipleReturnValueRuleExpression extends RuleExpression
     implements IConditionedRule, IRuleCondition {
 
   public MultipleReturnValueRuleExpression(final String pExpression) throws RuleFormatException {
-    super(pExpression);
+    super(pExpression, RuleType.ConditionedRule);
     this.conditions = splitToConditions(pExpression);
   }
   

@@ -40,7 +40,7 @@ class DefaultRuleCondition extends RuleExpression implements IRuleCondition, Clo
      * @throws RuleFormatException In case of problems during the parsing of the default rule string
      */
     DefaultRuleCondition(final String pExpression) throws RuleFormatException {
-        super(pExpression);
+        super(pExpression, RuleType.ConditionedRule);
         try {
             // Extract result value
             String resultValueStr = expression.substring(expression.indexOf("[") + 1,

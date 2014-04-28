@@ -47,7 +47,7 @@ public final class ConditionedRuleExpression extends RuleExpression
    */
   public ConditionedRuleExpression(final String pExpression) throws RuleFormatException {
     
-    super(pExpression);
+    super(pExpression, RuleType.ConditionedRule);
     String[] subConditions = pExpression.split(",");
     this.conditions = new ArrayList<IRuleCondition>();
     for (int i = 0; i != subConditions.length; i++) {

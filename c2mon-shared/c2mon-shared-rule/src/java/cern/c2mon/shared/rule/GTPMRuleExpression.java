@@ -21,7 +21,7 @@ public class GTPMRuleExpression extends RuleExpression implements IConditionedRu
      * Create a GTPM rule expression object from a string expression.
      */
     public GTPMRuleExpression(final String pExpression) throws RuleFormatException {
-        super(pExpression);
+        super(pExpression, RuleType.ConditionedRule);
         String[] subConditions = pExpression.split(",");
         this.conditions = new ArrayList<IRuleCondition>();
         for (int i = 0; i != subConditions.length; i++) {
