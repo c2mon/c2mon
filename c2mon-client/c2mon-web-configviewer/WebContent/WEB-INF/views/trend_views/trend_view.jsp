@@ -95,18 +95,18 @@
          x: {
            axisLabelFormatter: function(d) {
         		var month=new Array();
-        		month[01]="Jan";
-        		month[02]="Feb";
-        		month[03]="Mar";
-        		month[04]="Apr";
-        		month[05]="May";
-        		month[06]="Jun";
-        		month[07]="Jul";
-        		month[08]="Aug";
-        		month[09]="Sep";
-        		month[10]="Oct";
-        		month[11]="Nov";
-        		month[12]="Dec";
+        		month[00]="Jan";
+        		month[01]="Feb";
+        		month[02]="Mar";
+        		month[03]="Apr";
+        		month[04]="May";
+        		month[05]="Jun";
+        		month[06]="Jul";
+        		month[07]="Aug";
+        		month[08]="Sep";
+        		month[09]="Oct";
+        		month[10]="Nov";
+        		month[11]="Dec";
                return d.getDate()+"-"
                + month[(d.getMonth())]/*+"-"
                + Dygraph.zeropad(d.getFullYear())*/+"\n"
