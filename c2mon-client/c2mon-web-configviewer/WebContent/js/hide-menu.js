@@ -1,21 +1,24 @@
 $(document).ready(function(){
 	
+  //If the div is empty that's mean there is no longer the data
 	if ($('#trend_view').is(':empty')){
 		$('#trend_view').append('<h3 style="margin-left:20%;">Records are only kept for the last 30 days</h3>');
 	}
 	
 	
-	
+	// Remove the superimposition
 	$(".dygraph-legend").css("margin-top","-4%");
 	
 	location();	
 	resizeGraph();	
-		
+	
+	//If the window is resize, the graph too
 	$(window).resize(function() {
 		location();
 		resizeGraph();
 	});
 	
+	//Function to get the parameter in an URL
 	function getUrlVars()
 	{
 		var vars = [], hash;
@@ -29,13 +32,14 @@ $(document).ready(function(){
 		return vars;
 	}
 	
-	function location(){
-				
+	// Hide and set the margin of the graph
+	function location(){	
 		if(getUrlVars()["MENU"]=="false" && getUrlVars()["TITLE"]=="false"){
 			$(".page-header").hide();
 			$(".links").hide();
 			$(".dygraph-legend").css("margin-top","0%");
 		}	
+		// hide title
 		else if(getUrlVars()["TITLE"]=="false"){
 			$(".page-header").hide();
 			if(window.innerHeight<600)
@@ -43,15 +47,14 @@ $(document).ready(function(){
 			else
 				$(".dygraph-legend").css("margin-top","-2%");
 			}
-		
+		// hide buttons
 		else if(getUrlVars()["MENU"]=="false"){
 			$(".links").hide();
 			if(window.innerHeight<600)
 				$(".dygraph-legend").css("margin-top","-4%");
 			else
 				$(".dygraph-legend").css("margin-top","-2%");
-		}
-		
+		}	
 		else
 		{
 			if(window.innerHeight<600)
@@ -62,7 +65,7 @@ $(document).ready(function(){
 		
 	};
 	
-	
+	//Resize the graph and set a minimum size
 	function resizeGraph(){
 		var w=window.innerWidth;
 		var h=window.innerHeight;
