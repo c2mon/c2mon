@@ -1,9 +1,4 @@
 <ProcessConfiguration process-id="4092" type="initialise">
-  <jms-user>P_AIRH4STP887</jms-user>
-  <jms-password>AIRH4STP887_P</jms-password>
-  <jms-qcf-jndi-name>jms/process/factories/QCF</jms-qcf-jndi-name>
-  <jms-queue-jndi-name>jms/process/destinations/queues/processmessage/P_AIRH4STP887</jms-queue-jndi-name>
-  <jms-listener-topic>tim.process.command.NOHOST.P_AIRH4STP887.NOPIK</jms-listener-topic>
   <alive-tag-id>100730</alive-tag-id>
   <alive-interval>60000</alive-interval>
   <max-message-size>100</max-message-size>
