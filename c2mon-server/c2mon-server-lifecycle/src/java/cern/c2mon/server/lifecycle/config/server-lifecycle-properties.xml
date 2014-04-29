@@ -47,7 +47,8 @@
             
             <prop key="jms.daq.out.connections">1</prop>
             <prop key="c2mon.jms.daq.configuration.timeout">180000</prop>
-            <prop key="c2mon.jms.process.listener.trunk">c2mon.process</prop>
+            <prop key="c2mon.jms.daq.queue.trunk">c2mon.process</prop>
+            
             
             <prop key="c2mon.jms.heartbeat.topic">c2mon.client.heartbeat</prop>            
             
@@ -61,9 +62,6 @@
             <prop key="c2mon.jms.tag.publication.topic">c2mon.client.tag</prop>
               
             <prop key="c2mon.client.jms.video.request.queue">c2mon.video.request</prop>
-            
-            <prop key="jms.process.requestQueue">c2mon.process.request</prop>
-            <prop key="jms.process.updateQueueTrunk">c2mon.process.update</prop>
                        
             <!-- CACHE PROPERTIES --> 
             <!-- the cache mode indicates if the cache is running in distributed(="multi") or single mode -->
