@@ -92,7 +92,8 @@ public final class TypeConverter  {
         inputType = Double.class;
       }
       catch (NumberFormatException e) {
-        throw new ClassCastException(new StringBuffer("Cannot convert received value \"").append(inputValue).append("\" to Double").toString());
+        // if we are here, then the String does not represent a number
+        // an exception is not needed
       }
     }
     
