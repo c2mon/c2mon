@@ -42,8 +42,8 @@ public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements
 
 	private ProcessMapper processMapper;
 
-	@Value("${c2mon.jms.process.listener.trunk}") 
-	private String processListenerTrunk;
+  @Value("${c2mon.jms.daq.queue.trunk}") 
+  private String jmsDaqQueueTrunk;
 
 	@Autowired
 	public ProcessDAOImpl(ProcessMapper processMapper) {
@@ -73,9 +73,14 @@ public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements
 
 	@Override
 	protected Process doPostDbLoading(Process process) {
-		process.setJmsListenerTopic(processListenerTrunk + ".command." + process.getCurrentHost() + "." 
-				+ process.getName() + "." + process.getProcessPIK());
-		LOGGER.debug("doPostDbLoading - jmsListenerQueue: " + process.getJmsListenerTopic());
+	  process.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + process.getCurrentHost() + "." 
+        + process.getName() + "." + process.getProcessPIK());
+	  
+	  if(process.getProcessPIK() != null) {
+	    LOGGER.debug("doPostDbLoading - jmsDaqCommandQueue: " + process.getJmsDaqCommandQueue());
+	  } else {
+	    LOGGER.warn("doPostDbLoading - Null PIK registered. Probably empty Data Base info. Waiting to fill it up through the cache persistence");
+	  }
 
 		return process;
 	}

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,6 +22,9 @@ public class ProcessLoaderDAOTest {
 
   @Autowired
   private ProcessDAO processDAO;
+  
+  @Value("${c2mon.jms.daq.queue.trunk}") 
+  private String jmsDaqQueueTrunk;
   
   @Test
   public void testGetItem() {
@@ -52,9 +56,7 @@ public class ProcessLoaderDAOTest {
   }
   
   private void assertTopicSetCorrectly(Process process) {
-//    assertEquals("c2mon.process" + ".NOHOST" + "." + process.getName() + ".NOTIME", process.getJmsListenerTopic());
-    
-    assertEquals("c2mon.process.command." + process.getCurrentHost() + "." + process.getName() + "." + process.getProcessPIK(), process.getJmsListenerTopic());
+    assertEquals(this.jmsDaqQueueTrunk + ".command." + process.getCurrentHost() + "." + process.getName() + "." + process.getProcessPIK(), process.getJmsDaqCommandQueue());
   }
   
 }
