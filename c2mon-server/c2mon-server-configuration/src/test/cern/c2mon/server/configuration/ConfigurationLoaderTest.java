@@ -196,8 +196,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Value("${c2mon.jms.controltag.publication.topic}")
   private String controlTagPublicationTopic;
   
-  @Value("${c2mon.jms.process.listener.trunk}") 
-  private String processListenerTrunk;
+  @Value("${c2mon.jms.daq.queue.trunk}") 
+  private String jmsDaqQueueTrunk;
   
   /**
    * Clears DB of failed previous tests and resets the
@@ -747,7 +747,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setMaxMessageDelay(1000);
     expectedObject.setDescription("test description");
     // Current host and PIK will be null
-    expectedObject.setJmsListenerTopic(processListenerTrunk + ".command.null" + "." + expectedObject.getName() + ".null");
+    expectedObject.setJmsDaqCommandQueue(this.jmsDaqQueueTrunk + ".command.null." + expectedObject.getName() + ".null");
+
     
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
     

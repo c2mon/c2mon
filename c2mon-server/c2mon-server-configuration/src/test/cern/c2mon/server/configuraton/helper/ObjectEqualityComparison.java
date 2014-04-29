@@ -124,7 +124,7 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getMaxMessageSize(), cacheObject.getMaxMessageSize());
     assertEquals(expectedObject.getStateTagId(), cacheObject.getStateTagId());
     assertEquals(expectedObject.getEquipmentIds(), cacheObject.getEquipmentIds());
-    assertEquals(expectedObject.getJmsListenerTopic(), cacheObject.getJmsListenerTopic());
+    assertEquals(expectedObject.getJmsDaqCommandQueue(), cacheObject.getJmsDaqCommandQueue());
   }
   
   public static void assertAlarmEquals(AlarmCacheObject expectedObject, AlarmCacheObject cacheObject) {
