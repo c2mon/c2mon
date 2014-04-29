@@ -37,12 +37,6 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
 
     private static final long serialVersionUID = -2235204911515127976L;
 
-    public static final String JMS_QUEUE_JNDI_ROOT = "jms/process/destinations/queues/processmessage/";
-
-    public static final String JMS_QCF = "jms/process/factories/QCF";
-
-    public static final String JMS_TOPIC_PREFIX = "tim.process.";
-
     public static final Pattern PROCESS_NAME_PATTERN = Pattern.compile("P_([A-Z_0-9])+", Pattern.CASE_INSENSITIVE);
     
     public static final String LOCAL_CONFIG = "Y";
@@ -60,26 +54,6 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     private String description;
 
     /**
-     * JMS user name used for old Sonic connection.
-     */
-    private String jmsUserName;
-
-    /**
-     * JMS password used for old Sonic connection.
-     */
-    private String jmsPassword;
-
-    /**
-     * JNDI Name of the JMS queue for old Sonic connection (not used for ActiveMQ).
-     */
-    private String jmsMessageQueue;
-
-    /**
-     * Connection factory for old Sonic JMS connection.
-     */
-    private String jmsQueueConnectionFactory;
-
-    /**
      * Max number of updates in a single message from the DAQ process.
      */
     private int maxMessageSize = 100;
@@ -95,10 +69,10 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     private ArrayList<Long> equipmentIds = new ArrayList<Long>();
 
     /**
-     * Name of the temporary topic on which the process listens for server requests. Currently set after loading or in
+     * Name of the temporary queue on which the process (daq) listens for server requests. Currently set after loading or in
      * facade creation.
      */
-    private String jmsListenerTopic;
+    private String jmsDaqCommandQueue;
 
     /**
      * Host the DAQ process is running on.
@@ -170,73 +144,12 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     }
 
     /**
-     * Initalises the Sonic JMS configuration properties, which are all derived from the process name. Only the
-     * jmsListenerTopic is used by the ActiveMQ implementation and is no longer set here...
-     * <p>
-     * TODO remove/modify this and all related fields once Sonic has gone...
-     */
-    private void initJmsProperties() {
-        this.jmsUserName = getName();
-
-        // Assuming that the process name follows the pattern P_XXX, the jms
-        // password will be XXX_P
-
-        String[] parts = getName().split("_");
-        if (parts.length > 1) {
-            this.jmsPassword = parts[1] + "_P";
-        } else {
-            this.jmsPassword = getName();
-        }
-
-        this.jmsMessageQueue = JMS_QUEUE_JNDI_ROOT + getName();
-
-        this.jmsQueueConnectionFactory = JMS_QCF;
-
-    }
-
-    /**
      * Get an optional free-text description for the process.
      * 
      * @return
      */
     public String getDescription() {
         return this.description;
-    }
-
-    /**
-     * Get the user name to be used by the process for connecting to the JMS provider.
-     * 
-     * @return
-     */
-    public String getJMSUserName() {
-        return this.jmsUserName;
-    }
-
-    /**
-     * Get the user name to be used by the process for connecting to the JMS provider.
-     * 
-     * @return
-     */
-    public String getJMSPassword() {
-        return this.jmsPassword;
-    }
-
-    /**
-     * Get the JNDI name of the JMS message queue on which the DAQ process is expected to send its value updates.
-     * 
-     * @return the JNDI name of the DAQ's JMS message queue
-     */
-    public String getJmsMessageQueue() {
-        return this.jmsMessageQueue;
-    }
-
-    /**
-     * Get the JNDI name of the queue connection factory to be used by the DAQ process to connect to the JMS broker.
-     * 
-     * @return the JNDI name of the DAQ's queue connection factory
-     */
-    public String getJmsQueueConnectionFactory() {
-        return this.jmsQueueConnectionFactory;
     }
 
     /**
@@ -322,43 +235,12 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     }
 
     /**
-     * Setter method.
-     * 
-     * @param name
-     */
-    public void setJmsUserName(String name) {
-        this.jmsUserName = name;
-    }
-
-    /**
-     * @param jmsPassword the jmsPassword to set
-     */
-    public void setJmsPassword(String jmsPassword) {
-        this.jmsPassword = jmsPassword;
-    }
-
-    /**
-     * @param jmsMessageQueue the jmsMessageQueue to set
-     */
-    public void setJmsMessageQueue(String jmsMessageQueue) {
-        this.jmsMessageQueue = jmsMessageQueue;
-    }
-
-    /**
-     * @param jmsQueueConnectionFactory the jmsQueueConnectionFactory to set
-     */
-    public void setJmsQueueConnectionFactory(String jmsQueueConnectionFactory) {
-        this.jmsQueueConnectionFactory = jmsQueueConnectionFactory;
-    }
-
-    /**
      * Sets the name of the process and (re-)sets the associated JMS properties.
      * 
      * @param name the name to set
      */
     public void setName(String name) {
         super.setName(name);
-        initJmsProperties();
     }
 
     /**
@@ -404,8 +286,8 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     }
 
     @Override
-    public String getJmsListenerTopic() {
-        return jmsListenerTopic;
+    public String getJmsDaqCommandQueue() {
+        return this.jmsDaqCommandQueue;
     }
 
     /**
@@ -440,8 +322,8 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     }
 
     @Override
-    public void setJmsListenerTopic(String jmsListenerTopic) {
-        this.jmsListenerTopic = jmsListenerTopic;
+    public void setJmsDaqCommandQueue(String jmsDaqCommandQueue) {
+        this.jmsDaqCommandQueue = jmsDaqCommandQueue;
     }
 
 }
