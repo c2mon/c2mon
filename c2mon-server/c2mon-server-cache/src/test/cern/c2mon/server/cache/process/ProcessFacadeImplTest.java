@@ -8,6 +8,12 @@ import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.common.process.Process;
 
@@ -70,9 +76,7 @@ public class ProcessFacadeImplTest {
     processCache.releaseReadLockOnKey(1L);
         
     control.replay();
-    Process process = processFacade.createCacheObject(1L, properties);    
+    Process process = processFacade.createCacheObject(1L, properties);   
     control.verify();
-    assertEquals("c2mon.jms.process.listener.trunk.default" + ".command." + process.getCurrentHost() + "." 
-    		+ "P_NAME" + "." + process.getProcessPIK(), process.getJmsListenerTopic());
   }
 }

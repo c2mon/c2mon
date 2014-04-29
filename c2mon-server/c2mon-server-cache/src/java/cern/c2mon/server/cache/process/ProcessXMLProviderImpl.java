@@ -85,36 +85,15 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       ProcessCacheObject processCacheObject = (ProcessCacheObject) process;    
     
       //EquipmentFacadeLocal equipmentFacadeLocal = null;
+      String schemaInfo = "xmlns=\"http://timweb.cern.ch/schemas/c2mon-daq/Configuration\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+          "xsi:schemaLocation=\"http://timweb.cern.ch/schemas/c2mon-daq/Configuration http://timweb/schemas/c2mon-daq/ProcessConfiguration.xsd\" ";
       
-      String schemaInfo = "xmlns=\"http://timweb.cern.ch/schemas/tim-daq/Configuration\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
-        "xsi:schemaLocation=\"http://timweb.cern.ch/schemas/tim-daq/Configuration http://timweb/schemas/tim-daq/ProcessConfiguration.xsd\" ";
-
       StringBuffer str = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
       str.append("<ProcessConfiguration ").append(schemaInfo).append(" process-id=\"");
       
       str.append(processCacheObject.getId());
       str.append("\" type=\"initialise\">\n");
-
-      str.append("  <jms-user>");
-      str.append(processCacheObject.getJMSUserName());
-      str.append("</jms-user>\n");
-
-      str.append("  <jms-password>");
-      str.append(processCacheObject.getJMSPassword());
-      str.append("</jms-password>\n");
-
-      str.append("  <jms-qcf-jndi-name>");
-      str.append(processCacheObject.getJmsQueueConnectionFactory());
-      str.append("</jms-qcf-jndi-name>\n");
-
-      str.append("  <jms-queue-jndi-name>");
-      str.append(processCacheObject.getJmsMessageQueue());
-      str.append("</jms-queue-jndi-name>\n");
-
-      str.append("  <jms-listener-topic>");
-      str.append(processCacheObject.getJmsListenerTopic());
-      str.append("</jms-listener-topic>\n");
 
       str.append("  <alive-tag-id>");
       str.append(processCacheObject.getAliveTagId());

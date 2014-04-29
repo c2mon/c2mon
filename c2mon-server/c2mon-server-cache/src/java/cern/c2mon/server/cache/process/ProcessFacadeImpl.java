@@ -63,9 +63,9 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   private static final int PIK_MAX = 999999;
   /** PIK numbers limit (min) */
   private static final int PIK_MIN = 100000;
-  
-  @Value("${c2mon.jms.process.listener.trunk}") 
-  private String processListenerTrunk = "c2mon.jms.process.listener.trunk.default";
+    
+  @Value("${c2mon.jms.daq.queue.trunk}") 
+  private String jmsDaqQueueTrunk;
   
   private EquipmentFacade equipmentFacade;
   
@@ -148,10 +148,8 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       }
     }
     
-    //TODO: The default command queue name should be changed once all DAQs are migrated to the new kernel
-//    processCacheObject.setJmsListenerTopic(processListenerTrunk + ".NOHOST." + processCacheObject.getName() + ".NOTIME");
-    processCacheObject.setJmsListenerTopic(processListenerTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
-            + processCacheObject.getName() + "." + processCacheObject.getProcessPIK());
+    processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+        + processCacheObject.getName() + "." + processCacheObject.getProcessPIK());
     return configurationUpdate;
   }  
   
@@ -232,8 +230,8 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       processCacheObject.setRequiresReboot(Boolean.FALSE);
       processCacheObject.setProcessPIK(newPIK);
       processCacheObject.setLocalConfig(LocalConfig.Y);
-      processCacheObject.setJmsListenerTopic(processListenerTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
-            + processCacheObject.getName() + "." + newPIK.toString());
+      processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+          + processCacheObject.getName() + "." + newPIK.toString());
       super.start(processCacheObject, pStartupTime);
     }
   }
@@ -295,8 +293,8 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       if (processCacheObject.getAliveInterval() < 10000) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"aliveInterval\" must be >= 10000 milliseconds");
       }
-      if (processCacheObject.getJmsListenerTopic() == null) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "JMS listener topic cannot be null");
+      if (processCacheObject.getJmsDaqCommandQueue() == null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "JMS DAQ command queue cannot be null");
       }
       if (processCacheObject.getMaxMessageSize() < 1) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"maxMessageSize\" must be >= 1");
@@ -400,8 +398,12 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     processCache.acquireWriteLockOnKey(processId);
     try {
       final ProcessCacheObject processCacheObject = (ProcessCacheObject) processCache.getCopy(processId);
+      // Set the PIK
       processCacheObject.setProcessPIK(processPIK);
-      processCache.putQuiet(processCacheObject);
+      // update the JMS Daq command queue
+      processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+          + processCacheObject.getName() + "." + processPIK);
+      processCache.put(processId, processCacheObject);
     } finally {
       processCache.releaseWriteLockOnKey(processId);
     }
@@ -413,7 +415,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     try {
       final ProcessCacheObject processCacheObject = (ProcessCacheObject) processCache.getCopy(processId);
       processCacheObject.setLocalConfig(localConfig);
-      processCache.putQuiet(processCacheObject);
+      processCache.put(processId, processCacheObject);
     } finally {
       processCache.releaseWriteLockOnKey(processId);
     }

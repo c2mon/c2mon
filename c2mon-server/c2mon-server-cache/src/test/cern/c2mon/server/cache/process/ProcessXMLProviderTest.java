@@ -51,7 +51,7 @@ public class ProcessXMLProviderTest {
   @Test
   public void testGetProcessConfigXMl() throws ParserConfigurationException, SAXException, IOException, TransformerException {
     //validator
-    Schema schema = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema").newSchema(new URL("http://timweb.cern.ch/schemas/tim-daq/ProcessConfiguration.xsd"));
+    Schema schema = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema").newSchema(new URL("http://timweb.cern.ch/schemas/c2mon-daq/ProcessConfiguration.xsd"));
     Validator validator = schema.newValidator();
     
     //read in expected XML from file
