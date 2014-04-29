@@ -308,7 +308,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
         // If no PIK sent by the DAQ update or wrong PIK is sent by DAQ update ignore message
         if (dataTagValueUpdate.getProcessPIK() == null) {
           if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("checkProcessPIK - Processing incoming update for DataTag " + process.getName() + 
+            LOGGER.warn("checkProcessPIK - Processing incoming update for DataTag " + process.getName() + 
                 " PIK registered in Server(" + process.getProcessPIK() + ") but no PIK received from update - Ignoring the update.");
           }
 
@@ -316,7 +316,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
           return IGNORE_UPDATE;
         } else if (!process.getProcessPIK().equals(dataTagValueUpdate.getProcessPIK())) {
           if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("checkProcessPIK - Processing incoming updates for Process ID " + process.getName() + 
+            LOGGER.warn("checkProcessPIK - Processing incoming updates for Process ID " + process.getName() + 
                 " Received wrong PIK - cache vs update (" + process.getProcessPIK() + " vs " + 
                 dataTagValueUpdate.getProcessPIK() + ") - Ignoring the update.");
           }
@@ -327,13 +327,13 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
       }
       // If no PIK register in server cache (ie. corrupted) save the PIK and Accept
       else {
-        // Backward compatibility use case
+        // If no PIK sent by the DAQ update ignore message
         if (dataTagValueUpdate.getProcessPIK() == null) {
           if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("checkProcessPIK - Processing incoming update for Process ID " + process.getName() + " with no PIK (Backward Compatibility)");
+            LOGGER.warn("checkProcessPIK - Processing incoming update for Process ID " + process.getName() + " with no PIK - Ignoring the update.");
           }
 
-          return ACCEPT_UPDATE;
+          return IGNORE_UPDATE;
         }
 
         if (LOGGER.isTraceEnabled()) {

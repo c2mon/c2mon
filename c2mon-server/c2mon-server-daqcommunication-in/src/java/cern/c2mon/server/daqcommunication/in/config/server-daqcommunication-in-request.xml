@@ -8,7 +8,7 @@
   <!-- contains beans for requests to DAQ layer; JMS container lifecycle is managed directly by Spring -->
     
 	<bean id="requestDestination" class="org.apache.activemq.command.ActiveMQQueue">
-	 <constructor-arg index="0" value="${jms.process.requestQueue}"/>
+	 <constructor-arg index="0" value="${c2mon.jms.daq.queue.trunk}.request"/>
 	</bean>
 		
 	<bean id="requestJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">

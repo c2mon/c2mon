@@ -20,7 +20,7 @@
   <bean id="jmsContainerManager" class="cern.c2mon.server.daqcommunication.in.update.JmsContainerManagerImpl" autowire="constructor">
     <property name="consumersInitial" value="${jms.update.consumers.initial}"/>
     <property name="consumersMax" value="${jms.update.consumers.max}"/>
-    <property name="jmsUpdateQueueTrunk" value="${jms.process.updateQueueTrunk}"/>
+    <property name="jmsUpdateQueueTrunk" value="${c2mon.jms.daq.queue.trunk}.update"/>
     <property name="sessionTransacted" value="${jms.update.transacted}"/>
     <property name="updateWarmUpSeconds" value="${jms.update.consumers.warmuptime}"/>
     <property name="idleTaskExecutionLimit" value="${c2mon.jms.update.task.idle.limit}"/>
@@ -31,7 +31,7 @@
   
 <!---->
 <!--  <bean id="updateDestination" class="org.apache.activemq.command.ActiveMQQueue">-->
-<!--    <constructor-arg index="0" value="${jms.process.updateQueueTrunk}.*" />-->
+<!--    <constructor-arg index="0" value="${c2mon.jms.daq.queue.trunk}.update.*" />-->
 <!--  </bean>-->
 <!---->
 <!--  <bean id="updateJmsContainer"-->
