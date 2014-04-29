@@ -87,7 +87,7 @@ public class ProcessCommunicationManagerTest {
             String reportString = new ConfigurationDOMFactory().createConfigurationChangeEventReportXMLString(new ConfigurationChangeEventReport());
             @Override
             public Object doInJms(Session session) throws JMSException {
-              MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(processCache.get(50L).getJmsListenerTopic()));
+              MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(processCache.get(50L).getJmsDaqCommandQueue()));
               Message incomingMessage = consumer.receive(100000);
               MessageProducer messageProducer = session.createProducer(incomingMessage.getJMSReplyTo());      
               TextMessage replyMessage = session.createTextMessage();

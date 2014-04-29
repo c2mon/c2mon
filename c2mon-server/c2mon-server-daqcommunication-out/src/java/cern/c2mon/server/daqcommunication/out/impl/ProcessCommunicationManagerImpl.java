@@ -192,7 +192,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
               LOGGER.debug("requestDataTagValues() : associated process is running.");
             }
             //treat request
-            String reply = jmsProcessOut.sendTextMessage(pRequest.toXML(), process.getJmsListenerTopic(), 10000);            
+            String reply = jmsProcessOut.sendTextMessage(pRequest.toXML(), process.getJmsDaqCommandQueue(), 10000);            
             if (reply != null) {
               if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("requestDataTagValues() : reply received: " + reply);
@@ -250,7 +250,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
         SourceCommandTagValue val = 
           new SourceCommandTagValue(commandTag.getId(), commandTag.getName(), commandTag.getEquipmentId(), commandTag.getMode(), 
                                     value, commandTag.getDataType());
-        String reply = jmsProcessOut.sendTextMessage(val.toXML(), process.getJmsListenerTopic(), commandTag.getExecTimeout());         
+        String reply = jmsProcessOut.sendTextMessage(val.toXML(), process.getJmsDaqCommandQueue(), commandTag.getExecTimeout());         
         if (LOGGER.isDebugEnabled()) {
           LOGGER.debug("executeCommand() : reply received: " + reply);
         }
@@ -298,7 +298,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
     ConfigurationDOMFactory domFactory = new ConfigurationDOMFactory();
   
     String xmlConfigString = domFactory.createConfigurationXMLString(changeList);
-    String reply = jmsProcessOut.sendTextMessage(xmlConfigString, processCache.get(processId).getJmsListenerTopic(), configurationTimeout);
+    String reply = jmsProcessOut.sendTextMessage(xmlConfigString, processCache.get(processId).getJmsDaqCommandQueue(), configurationTimeout);
     if (reply != null) {
       Document replyDoc = xmlParser.parse(reply);
       ConfigurationObjectFactory objectFactory = new ConfigurationObjectFactory();
