@@ -26,6 +26,7 @@ import cern.c2mon.notification.TagCacheUpdateListener;
 import cern.c2mon.notification.TextCreator;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
+import cern.c2mon.notification.shared.TagNotFoundException;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -188,7 +189,14 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
          */
         cache.setRegistry(registry);
         logger.info("Step 5 of 6: Starting subscriptions...");
-        cache.startSubscription(registry.getRegisteredSubscriptions());
+        for (Subscription s : registry.getRegisteredSubscriptions()) {
+            try {
+                cache.startSubscription(s);
+             } catch (TagNotFoundException ignore) {
+                 logger.warn("Cannot start subscription for user %s with tagid %s: %s", s.getSubscriberId(), s.getTagId(), ignore.getMessage()); 
+             }
+        }
+        
 
         /**
          * wait for all updates
@@ -269,9 +277,9 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         try {
             String text = textCreator.getTextForSourceDown(update);
             HashSet<Subscription> subscriptions = update.getSubscribers();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Got {} which are interested in this tag.", subscriptions.size());
-            }
+            
+            logger.debug("Got {} which are interested in this tag.", subscriptions.size());
+            
             for (Subscription s : subscriptions) {
                 notifyMail(registry.getSubscriber(s.getSubscriberId()), update.getLatestUpdate().getDataTagQuality()
                         .getDescription(), text);
@@ -430,7 +438,6 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                         update.getId(), quality.getInvalidQualityStates());
             }
         } 
-        
 
         if (update.getAllChildRules().size() == 0) {
             // R->M
