@@ -152,7 +152,7 @@
 
 <!-- process the XML element AlarmValue -->
 
-
+<!-- page : alarmviewer -->
 <xsl:template match="AlarmValue | alarmValue">
 	
 	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
