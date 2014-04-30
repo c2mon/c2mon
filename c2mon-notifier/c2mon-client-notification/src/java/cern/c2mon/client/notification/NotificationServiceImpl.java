@@ -25,13 +25,14 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.notification.jms.ClientRequest;
-import cern.c2mon.notification.jms.ClientResponse;
 import cern.c2mon.notification.jms.ClientRequest.Type;
+import cern.c2mon.notification.jms.ClientResponse;
 import cern.c2mon.notification.shared.RemoteServerException;
 import cern.c2mon.notification.shared.ServiceException;
 import cern.c2mon.notification.shared.Subscriber;
@@ -49,7 +50,7 @@ public class NotificationServiceImpl implements NotificationService {
     /**
      * our Logger
      */
-    private Logger logger = Logger.getLogger(NotificationServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(NotificationServiceImpl.class);
     
     private static String REQUEST_QUEUE = "";
     
@@ -130,9 +131,7 @@ public class NotificationServiceImpl implements NotificationService {
      * @throws RemoteServerException if an error occurred on the server side.
      */
     private ClientResponse getResponse(ClientRequest request) throws ServiceException, RemoteServerException {
-        if (logger.isTraceEnabled()) {
-            logger.trace("entering getResponse() for request " + request.getType());
-        }
+        logger.trace("entering getResponse() for request %s", request.getType());
         
         try {
             initJms();
@@ -163,28 +162,22 @@ public class NotificationServiceImpl implements NotificationService {
             producerSession = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             producer = producerSession.createProducer(null);
             
-            if (logger.isInfoEnabled()) {
-                logger.info(request.getId() + " Sending request and waiting on " + replyTo.toString() + " for reply");
-                if (logger.isTraceEnabled()) {
-                    logger.trace(request.getId() + " Message Content : " + toSendText);
-                }
-            }
+            logger.info("{} Sending request and waiting on {} ", request.getId(), replyTo.toString());
+            logger.trace("{} Message Content:\n{}", request.getId(), toSendText);
             
             producer.send(producerSession.createQueue(getRequestQueue()), toSend, DeliveryMode.PERSISTENT, 0, requestTimeout);
             
-            if (logger.isInfoEnabled()) {
-                logger.info(request.getId() + " Waiting " + requestTimeout + "msec for answer from remote server...");
-            }
+            logger.info("{} Waiting {}msec for answer from remote server...", request.getId(), requestTimeout);
             TextMessage fromServer = (TextMessage)myConsumer.receive(requestTimeout);
             
             if (fromServer == null) {
                 throw new ServiceException(request.getId() + " Timeout while trying to get answer from remote notification service!");
             }
-            logger.trace("Got message from server : " + fromServer.getText());
+            logger.trace("Got message from server: {}", fromServer.getText());
             
             response = gson.fromJson(fromServer.getText(), ClientResponse.class);
             
-            logger.trace("Transformed message from server to :\n" + response);
+            logger.trace("Transformed message from server to:\n{}", response);
             
         }catch(Exception ex) {
             // an error on OUR side. Need of course to publish this.
@@ -224,9 +217,7 @@ public class NotificationServiceImpl implements NotificationService {
    
     @Override
     public Subscriber getSubscriber(String userName) throws ServiceException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("entering getSubscriber() for User=" + userName);
-        }
+        logger.debug("entering getSubscriber() for User={}", userName);
         ClientRequest request = new ClientRequest(Type.GetSubscriber, userName);
         ClientResponse response = getResponse(request);
         Subscriber subscriber = null;
@@ -245,9 +236,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private void removeSubscription(Subscription subscription) throws UserNotFoundException, ServiceException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("entering removeSubscription() for User=" + subscription.getSubscriberId() + " and TagID=" + subscription.getTagId());
-        }
+        logger.debug("entering removeSubscription() for User={} and TagID={}", subscription.getSubscriberId(), subscription.getTagId());
         ClientRequest request = new ClientRequest(Type.RemoveSubscription, subscription);
         getResponse(request);
     }
@@ -259,13 +248,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Subscriber setSubscriber(Subscriber sub) throws ServiceException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("entering setSubscriber() for User=" + sub.getUserName());
-            
-            if (logger.isTraceEnabled()) {
-                logger.trace("Subscriber object: " + sub);
-            }
-        }
+        logger.debug("entering setSubscriber() for User={}", sub.getUserName());
+        logger.trace("Subscriber object: {}", sub);
         
         ClientRequest request = new ClientRequest(Type.UpdateSubscriber, sub);
         ClientResponse reponse = getResponse(request);
@@ -273,9 +257,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private Subscriber subscribe(Subscription subscription) throws UserNotFoundException, ServiceException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("entering subscribe() for User=" + subscription.getSubscriberId() + " and TagID=" + subscription.getTagId());
-        }
+        logger.debug("entering subscribe() for User={} andTagID={}", subscription.getSubscriberId(), subscription.getTagId());
         ClientRequest request = new ClientRequest(Type.AddSubscription, subscription);
         ClientResponse reponse = getResponse(request);
         return getSubscriberFromClientResponse(reponse);
