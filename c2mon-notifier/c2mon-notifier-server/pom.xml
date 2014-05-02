@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
    <parent>
-    <artifactId>dmn2-client-pom</artifactId>
-    <groupId>cern.dmn2.client</groupId>
-    <version>1.0.5</version>
+    <artifactId>c2mon-client-pom</artifactId>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <version>1.1.2</version>
    </parent>
 
 
@@ -28,6 +28,10 @@
 				<exclusion>
 					<artifactId>xml-apis</artifactId>
 					<groupId>xml-apis</groupId>
+				</exclusion>
+				<exclusion>
+				   <artifactId>activemq-all</artifactId>
+				   <groupId>org.apache.activemq</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -56,6 +60,14 @@
 		<dependency>
 			<groupId>cern.c2mon.notification</groupId>
 			<artifactId>c2mon-client-notification</artifactId>
+         <version>1.0.4</version>
+			<scope>test</scope>
+			<exclusions>
+			   <exclusion>
+			      <artifactId>activemq-all</artifactId>
+			      <groupId>org.apache.activemq</groupId>
+			   </exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.freemarker</groupId>
@@ -103,13 +115,7 @@
 		<dependency>
 			<groupId>cern.dmn2.shared</groupId>
 			<artifactId>dmn2-db-service</artifactId>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-		   <groupId>org.apache.activemq</groupId>
-		   <artifactId>activemq-all</artifactId>
-		   <version>5.9.0</version>
+			<version>1.0.4</version>
 		</dependency>
 		<dependency>
 		   <groupId>org.slf4j</groupId>
@@ -120,6 +126,22 @@
 		   <groupId>org.slf4j</groupId>
 		   <artifactId>slf4j-log4j12</artifactId>
 		   <version>1.7.5</version>
+		</dependency>
+		<dependency>
+		   <groupId>org.apache.activemq</groupId>
+		   <artifactId>activemq-client</artifactId>
+		   <version>5.9.1</version>
+		</dependency>
+		<dependency>
+		   <groupId>org.apache.activemq</groupId>
+		   <artifactId>activemq-broker</artifactId>
+		   <version>5.9.1</version>
+		   <scope>test</scope>
+		</dependency>
+		<dependency>
+		   <groupId>org.apache.activemq</groupId>
+		   <artifactId>activemq-spring</artifactId>
+		   <version>5.9.1</version>
 		</dependency>
 	</dependencies>
 	
