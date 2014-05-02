@@ -51,8 +51,8 @@ public class Tag {
     /**
      * 
      */
-    private boolean isSourceDown = false;
-    private boolean wasSourceDown = false;
+//    private boolean isSourceDown = false;
+//    private boolean wasSourceDown = false;
 
     // private int subscribers = 0;
 
@@ -185,8 +185,8 @@ public class Tag {
     /**
      * @return Returns the toBeNotified.
      */
-    public AtomicBoolean getToBeNotified() {
-        return toBeNotified;
+    public boolean getToBeNotified() {
+        return toBeNotified.get();
     }
 
     /**
@@ -277,7 +277,7 @@ public class Tag {
             if (update.getValue() != null) {
 
                 if (update.getValue() instanceof Integer) {
-                    newStatus = (Integer) update.getValue();
+                    newStatus = ((Integer)update.getValue()).intValue();
                 } else if (update.getValue() instanceof Double) {
                     newStatus = ((Double) update.getValue()).intValue();
                 } else {
@@ -305,11 +305,11 @@ public class Tag {
         previous = latest;
         latest = update;
 
-        if (update != null && !update.getDataTagQuality().isAccessible()) {
-            this.isSourceDown = true;
-        } else {
-            this.isSourceDown = false;
-        }
+//        if (!update.getDataTagQuality().isAccessible()) {
+//            this.isSourceDown = true;
+//        } else {
+//            this.isSourceDown = false;
+//        }
     }
 
     @SuppressWarnings("unchecked")
@@ -321,24 +321,24 @@ public class Tag {
         return latest;
     }
 
-    /**
-     * @return Returns the isSourceDown.
-     */
-    public boolean isSourceDown() {
-        return isSourceDown;
-    }
+//    /**
+//     * @return Returns the isSourceDown.
+//     */
+//    public boolean isSourceDown() {
+//        return isSourceDown;
+//    }
 
-    /**
-     * @param isSourceDown The isSourceDown to set.
-     */
-    public void setSourceDown(boolean isSourceDown) {
-        this.wasSourceDown = this.isSourceDown;
-        this.isSourceDown = isSourceDown;
-    }
-
-    public boolean wasSourceDown() {
-        return this.wasSourceDown;
-    }
+//    /**
+//     * @param isSourceDown The isSourceDown to set.
+//     */
+//    public void setSourceDown(boolean isSourceDown) {
+//        this.wasSourceDown = this.isSourceDown;
+//        this.isSourceDown = isSourceDown;
+//    }
+//
+//    public boolean wasSourceDown() {
+//        return this.wasSourceDown;
+//    }
 
     @Override
     public String toString() {
@@ -347,7 +347,7 @@ public class Tag {
         if (this.isRule()) {
             sb.append("Rule ID=").append(getId()).append(",Prev.State=").append(getPreviousStatus().toString()).append(
                     ",Status=").append(this.getLatestStatus().toString()).append(",NotifyRequired=").append(
-                    this.getToBeNotified().get());
+                    this.getToBeNotified());
 
             if (getLatestUpdate() != null) {
                 sb.append(",isValid=" + getLatestUpdate().isValid()).append(
@@ -361,7 +361,7 @@ public class Tag {
             }
             sb.append("}");
         } else {
-            sb.append("Metric ID=").append(getId()).append(",NotifyRequired=").append(this.getToBeNotified().get());
+            sb.append("Metric ID=").append(getId()).append(",NotifyRequired=").append(this.getToBeNotified());
             sb.append(",Value=");
             if (getLatestUpdate() != null) {
                 sb.append(",DTQDescription=" + getLatestUpdate().getDataTagQuality().getDescription()).append(
