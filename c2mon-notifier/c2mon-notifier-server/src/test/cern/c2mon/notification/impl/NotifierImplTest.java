@@ -34,6 +34,7 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleEvaluationException;
 import cern.c2mon.shared.rule.RuleExpression;
+import cern.c2mon.shared.rule.RuleExpression.RuleType;
 import cern.c2mon.shared.rule.RuleFormatException;
 import cern.c2mon.shared.rule.RuleValidationReport;
 import cern.dmn2.core.Status;
@@ -47,7 +48,7 @@ public class NotifierImplTest {
     /**
      * a factor to create values for example metrics.
      */
-    static Double DEFAULT_METRIC_VALUE_FACTOR = 1.0d;
+    static Double DEFAULT_METRIC_VALUE_FACTOR = Double.valueOf(1.0d);
     
 	SubscriptionRegistry reg = null;
 	IMocksControl mockControl = EasyMock.createControl();
@@ -102,7 +103,7 @@ public class NotifierImplTest {
 	     * @throws RuleFormatException in case of an error
 	     */
 	    public MyCache() throws RuleFormatException {
-	        resolveSubTags(1L);
+	        resolveSubTags(new Long(1L));
 	    }
 	    
 	    @Override
@@ -156,7 +157,7 @@ public class NotifierImplTest {
 	    
 	    @Override
 	    void unsubscribeFirstUpdateListener(DataTagUpdateListener initialReportTagListener) {
-	        
+	        //
 	    }
 	    
 	    @Override
@@ -178,11 +179,11 @@ public class NotifierImplTest {
 	         *      child rule 2 
              *         one metric 3
 	         */
-	        Tag rule1_0 = new Tag(1L, true);
-	        Tag rule1_2 = new Tag(2L, true);
-	        Tag metric1_1 = new Tag(3L, false);
-	        Tag rule1_3 = new Tag(10L, true);
-	        Tag metric1_2 = new Tag(11L, false);
+	        Tag rule1_0 = new Tag(new Long(1L), true);
+	        Tag rule1_2 = new Tag(new Long(2L), true);
+	        Tag metric1_1 = new Tag(new Long(3L), false);
+	        Tag rule1_3 = new Tag(new Long(10L), true);
+	        Tag metric1_2 = new Tag(new Long(11L), false);
 	        
 	        rule1_0.addChildTag(rule1_2);
 	        rule1_0.addChildTag(rule1_3);
@@ -204,9 +205,9 @@ public class NotifierImplTest {
 	         *      - metric 6 
 	         *   
 	         */
-	        Tag rule3 = new Tag(4L, true);
-	        Tag metric2 = new Tag(5L, false);
-	        Tag metric3 = new Tag(6L, false);
+	        Tag rule3 = new Tag(new Long(4L), true);
+	        Tag metric2 = new Tag(new Long(5L), false);
+	        Tag metric3 = new Tag(new Long(6L), false);
 	        
 	        rule3.addChildTag(metric2);
             rule3.addChildTag(metric3);
@@ -220,8 +221,8 @@ public class NotifierImplTest {
 	         * one (root-)rule 7
 	         *    one metric 8
 	         */
-	        Tag rule4 = new Tag(7L, true);
-	        Tag metric4 = new Tag(8L, false);
+	        Tag rule4 = new Tag(new Long(7L), true);
+	        Tag metric4 = new Tag(new Long(8L), false);
 	        rule4.addChildTag(metric4);
 	        overallList.put(rule4.getId(), rule4);
 	        overallList.put(metric4.getId(), metric4);
@@ -241,9 +242,9 @@ public class NotifierImplTest {
 	         *    - metric 2100
 	         *    - metric 2200   
 	         */
-	        Tag rule5 = new Tag(2000L, true);
-	        Tag rule5_1 = new Tag(200L, true);
-	        Tag rule5_1_1 = new Tag(20L, true);
+	        Tag rule5 = new Tag(new Long(2000L), true);
+	        Tag rule5_1 = new Tag(new Long(200L), true);
+	        Tag rule5_1_1 = new Tag(new Long(20L), true);
 	        
 	        Tag metric5_1 = new Tag(2100L, false);
 	        Tag metric5_2 = new Tag(2200L, false);
@@ -296,7 +297,7 @@ public class NotifierImplTest {
 	 * @throws IOException
 	 */
 	@Test
-	public void test() throws IOException {
+	public void testNotificationOnDisconnect() throws IOException {
 		NotifierImpl notifier = new NotifierImpl();
 		notifier.setSubscriptionRegistry(reg);
 	}
@@ -316,7 +317,7 @@ public class NotifierImplTest {
 	    }
 	    b.append("true[0]");
 	    
-      RuleExpression rExpression = new RuleExpression(b.toString()) {
+      RuleExpression rExpression = new RuleExpression(b.toString(), RuleType.Simple) {
             private static final long serialVersionUID = 7424951105237067129L;
 
             @Override
