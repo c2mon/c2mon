@@ -1,9 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?><ProcessConfiguration xmlns="http://timweb.cern.ch/schemas/tim-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://timweb.cern.ch/schemas/tim-daq/Configuration http://timweb/schemas/tim-daq/ProcessConfiguration.xsd"  process-id="4000" type="initialise">
-  <jms-user>P_JECTEST01</jms-user>
-  <jms-password>JECTEST01_P</jms-password>
-  <jms-qcf-jndi-name>jms/process/factories/QCF</jms-qcf-jndi-name>
-  <jms-queue-jndi-name>jms/process/destinations/queues/processmessage/P_JECTEST01</jms-queue-jndi-name>
-  <jms-listener-topic>tim.process.command.NOHOST.P_JECTEST01.NOPIK</jms-listener-topic>
+<?xml version="1.0" encoding="UTF-8" ?><ProcessConfiguration xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/Configuration http://timweb/schemas/c2mon-daq/ProcessConfiguration.xsd"  process-id="4000" type="initialise">
   <alive-tag-id>100123</alive-tag-id>
   <alive-interval>6000</alive-interval>
   <max-message-size>100</max-message-size>
