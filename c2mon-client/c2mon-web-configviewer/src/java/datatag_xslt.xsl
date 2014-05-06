@@ -3,43 +3,18 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <!-- link variables -->
-  <xsl:variable name="base_url">
-    ../
-  </xsl:variable>
-  <xsl:variable name="alarm_url">
-    alarmviewer/
-  </xsl:variable>
-  <xsl:variable name="command_url">
-    commandviewer/
-  </xsl:variable>
-  <xsl:variable name="datatag_url">
-    tagviewer/
-  </xsl:variable>
-  <xsl:variable name="history_url">
-    historyviewer/
-  </xsl:variable>
-  <xsl:variable name="trend_viewer_url">
-    trendviewer/
-  </xsl:variable>
-  <xsl:variable name="process_xml_url">
-    process/xml/
-  </xsl:variable>
-  <xsl:variable name="alarm_xml_url">
-    alarmviewer/xml/
-  </xsl:variable>
-  <xsl:variable name="tag_value_xml_url">
-    tagvalue/xml/
-  </xsl:variable>
-  <xsl:variable name="tag_config_xml_url">
-    tagconfig/xml/
-  </xsl:variable>
-
-  <xsl:variable name="help_alarm_url">
-    http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=
-  </xsl:variable>
-  <xsl:variable name="help_point_url">
-    https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=
-  </xsl:variable>
+  <xsl:variable name="base_url">../</xsl:variable>
+  <xsl:variable name="alarm_url">alarmviewer/</xsl:variable>
+  <xsl:variable name="command_url">commandviewer/</xsl:variable>
+  <xsl:variable name="datatag_url">tagviewer/</xsl:variable>
+  <xsl:variable name="history_url">historyviewer/</xsl:variable>
+  <xsl:variable name="trend_viewer_url">trendviewer/</xsl:variable>
+  <xsl:variable name="process_xml_url">process/xml/</xsl:variable>
+  <xsl:variable name="alarm_xml_url">alarmviewer/xml/</xsl:variable>
+  <xsl:variable name="tag_value_xml_url">tagvalue/xml/</xsl:variable>
+  <xsl:variable name="tag_config_xml_url">tagconfig/xml/</xsl:variable>
+  <xsl:variable name="help_alarm_url">http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=</xsl:variable>
+  <xsl:variable name="help_point_url">https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=</xsl:variable>
 
   <!-- leave the paragraphs untouched -->
   <xsl:template match="p">
@@ -57,7 +32,7 @@
       </h2>
     </div>
     <div class="links" style="margin-bottom:5%;">
-      <A style="display:inline;float:left;" href="../"
+      <A style="display:inline;float:left;" href="{$base_url}"
         class="large blue awesome xml_button">
         Home
       </A>
@@ -67,7 +42,7 @@
       <A href="{$base_url}{$history_url}{@id}" class="large blue awesome xml_button"
         target="_blank">History >>
       </A>
-      <A href="{$base_url}{$trend_viewer_url}{/*/@id}" class="large blue awesome xml_button"
+      <A href="{$base_url}{$trend_viewer_url}{@id}" class="large blue awesome xml_button"
         target="_blank">Trend >>
       </A>
       <A href="{$help_point_url}{@id}" class="large red awesome xml_button"
