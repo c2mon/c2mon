@@ -171,6 +171,8 @@ class EquipmentSenderInvalid {
         FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValue, newTagValueDesc, 
             newSDQuality, timestamp.getTime());
         
+        this.equipmentLogger.debug("sendInvalidTag - Filter Type: " + filterType);
+        
         // The new value will not be filtered out
         if(filterType == FilterType.NO_FILTERING) {
           // Send the value
@@ -184,7 +186,7 @@ class EquipmentSenderInvalid {
             msgBuf.append("\tthe tag [" + sourceDataTag.getId()
                 + "] has already been invalidated with quality code : " + newSDQuality.getQualityCode());
             msgBuf.append(" at " + sourceDataTag.getCurrentValue().getTimestamp());
-            msgBuf.append(" The DAQ has not received any values with different quality since than, Hence, the");
+            msgBuf.append(" The DAQ has not received any values with different quality since then, Hence, the");
             msgBuf.append(" invalidation procedure will be canceled this time");
             this.equipmentLogger.debug(msgBuf.toString());
           }

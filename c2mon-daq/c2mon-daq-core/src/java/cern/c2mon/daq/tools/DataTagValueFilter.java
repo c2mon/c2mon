@@ -36,41 +36,6 @@ public class DataTagValueFilter {
 	}
 
 	/**
-	 * Checks if the current tag has the same value as the new tag Value, including the value description. Note that a
-	 * value description of null and empty string are considered the same here.
-	 * <p>
-	 * Returns true if tagValue parameter is null.
-	 * 
-	 * @param tag The tag to check.
-	 * @param tagValue The tagValue to check; can be null
-	 * @param valueDescr The valueDescription to check; can be null
-	 * 
-	 * @return True if they have the same value else false.
-	 */
-	public boolean isSameValue(final SourceDataTag tag, final Object tagValue, final String valueDescr) {
-		if (this.equipmentLogger.isTraceEnabled())
-			this.equipmentLogger.trace(format("isSameValue - entering isSameValue(%d)..", tag.getId()));
-
-		boolean isSameValue = false;
-		if (isCurrentValueAvailable(tag)) {
-			String tagValueDesc = tag.getCurrentValue().getValueDescription();
-			if (tagValueDesc == null) {
-				tagValueDesc = "";
-			}
-			String newValueDesc = valueDescr;
-			if (newValueDesc == null) {
-				newValueDesc = "";
-			}
-			isSameValue = tag.getCurrentValue().isValid() && tag.getCurrentValue().getValue().equals(tagValue)
-					&& tagValueDesc.equalsIgnoreCase(newValueDesc);
-		}
-
-		if (equipmentLogger.isTraceEnabled())
-			equipmentLogger.trace(format("isSameValue - leaving isSameValue(%d). Result: %b", tag.getId(), isSameValue));
-		return isSameValue;
-	}
-
-	/**
 	 * This method is responsible for checking if the new value of the particular SourceDataTag should be sent to the
 	 * application server or not. The decision is taken based on the deadband specification of the considered tag and
 	 * assumes that the new update is valid (= quality OK).
@@ -193,7 +158,7 @@ public class DataTagValueFilter {
 	}
 	
 	/**
-     * Compares the value and quality information of the current {@link SourceDataTagValue} against the newly received 
+     * Compares the value, quality and time stamp information of the current {@link SourceDataTagValue} against the newly received 
      * quality information.
      * Avoid sending twice (one by one) 2 invalid tags with the same quality code and description
      * 
@@ -210,106 +175,148 @@ public class DataTagValueFilter {
      */
     public FilterType isCandidateForFiltering(final SourceDataTag currentTag, final Object newValue, final String newTagValueDesc,
         final SourceDataQuality newSDQuality, final long newSourceTimestamp) {
-      short newQualityCode = newSDQuality.getQualityCode(); 
-    
+      this.equipmentLogger.debug("isCandidateForFiltering - entering isCandidateForFiltering() for tag #" + currentTag.getId());
+      
       SourceDataTagValue currentSDValue = currentTag.getCurrentValue();
       
       if (currentSDValue != null) {
         // Check if the new update is older or equal than the current value
         if (isOlderUpdate(newSDQuality, currentSDValue.getQuality(), newSourceTimestamp, currentSDValue.getTimestamp().getTime())) {
-          // The value will be filtered out
-          return FilterType.OLD_UPDATE;
+          // Check if it is repeated value
+          FilterType result = isRepeatedValue(currentTag, newValue, newTagValueDesc, newSDQuality, newSourceTimestamp);
+          
+          if ((result == FilterType.REPEATED_INVALID) || (result == FilterType.REPEATED_VALUE)) {
+            // The value will be filtered out by result (REPEATED_INVALID, REPEATED_VALUE)
+            return result;
+          } else {
+            // The value will be filtered out by OLD_UPDATE
+            this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+                " - New timestamp is older than the current timestamp. Candidate for filtering");
+            return FilterType.OLD_UPDATE;
+          }
         }
         
-        if (currentSDValue.getValue() == null && newValue != null) {
-          // Got a new value which is initializing our SourceDataTag. Hence we do not want to filter it out!
-          this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-              " - Current Value null but we have a New value. Not candidate for filtering");
-
-          return FilterType.NO_FILTERING;
-        }        
-        else if (currentSDValue.getValue() != null && !currentSDValue.getValue().equals(newValue)) {  
-          // The two value are different, hence we do not want to filter it out ... unless the Value dead band filter said the opposite
-          if (isValueDeadbandFiltered(currentTag, newValue, newTagValueDesc, newSDQuality)) {
-            this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                " - New value update but within value deadband filter. Candidate for filtering");
-            
-            return FilterType.VALUE_DEADBAND;
-          }
-          
-          // The two values are different, so it is clear we do not want to filter it out!
-          this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-              " - Both Values are different. Not candidate for filtering");
-          
-          return FilterType.NO_FILTERING;
-        }
-        // The two values are both null or equal. Now we check for redundant Value Description information
-        else if (!currentSDValue.getValueDescription().equalsIgnoreCase(newTagValueDesc) 
-            && ((newTagValueDesc != null) || !currentSDValue.getValueDescription().isEmpty())) {
-          /* 
-           * Note 1: currentSDValue.getValueDescription() will never be null
-           * Note 2: if getValueDescription is empty and newTagValueDesc is null we get not equal but 
-           *         for us will be equal (no value) so we take care of this special case and continue the checks
-           */
-          
-          // The two value Descriptions are different
-          this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-              " - Both Values are equal but Value Descriptions are different. Not candidate for filtering");
-
-          return FilterType.NO_FILTERING;
-        }
-        // Current and new Values and Value Descriptions are both null or equal! Now we check for redundant quality information
-        else if (currentSDValue.getQuality() != null) {
-          // Check, if quality code did not change
-          if ((currentSDValue.getQuality().getQualityCode() == newQualityCode)) {
-            // Only checks description is Quality is no OK (Invalids)
-            if(newQualityCode != SourceDataQuality.OK) {
-              this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                  " - Both Value, Value Description and Quality codes are equal. Check Quality Descriptions to take a decision");
-              
-              // Check if quality description did not change. If it is not null we compare it with the new one
-              if (currentSDValue.getQuality().getDescription() == null) {
-                // If description is null we cannot compare so we check directly if both are null or not
-                if (newSDQuality.getDescription() == null) {
-                  // We filter out since both are the same and null
-                  this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                      " - Both Quality Descriptions are null. Candidate for filtering");
-
-                  return FilterType.REPEATED_INVALID;
-                }
-                else {
-                  this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                      " - Current Quality Description null but we have a New Quality Description. Not candidate for filtering");
-
-                  // Goes directly to the final return
-                }
-              } 
-              // Description is not null. We can compare it with the new description
-              else if (currentSDValue.getQuality().getDescription().equals(newSDQuality.getDescription())) {
-                // If we are here, it means we have received a redundant quality code and description ==> should be filtered out.
-                this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                    " - Both Value, Value Description, Quality and Quality Descriptions are equal. Candidate for filtering");
-
-                return FilterType.REPEATED_INVALID;
-              }
-            } else {
-              this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                  " - Both Value, Value Description and Quality codes (OK) are equal");
-              
-              return FilterType.REPEATED_VALUE;
-            }
-          }
-          // Different Quality Codes 
-          else {
-            this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-                " - Both Value and Value Description are equal but Quality Codes are different. Not candidate for filtering");
-          }
-        }
+        // Check if the value is
+        return isRepeatedValue(currentTag, newValue, newTagValueDesc, newSDQuality, newSourceTimestamp);
       } 
       // in case the SourceDataTag value has never been initialized we don't want to filter
       else {
         this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentTag.getId() + 
             " - Current Source Data Tag Value null but we have a New value. Not candidate for filtering");
+      }
+      
+      // We got a new quality information that we want to send to the server.
+      return FilterType.NO_FILTERING;
+    }
+    
+    /**
+     * IN addition to isCandidateForFiltering it compares the value and quality information of the current 
+     * {@link SourceDataTagValue} against the newly received quality information.
+     * Avoid sending twice (one by one) 2 invalid tags with the same quality code and description
+     * 
+     * 
+     * @param currentTag The current tag object of the {@link SourceDataTag} that shall be updated
+     * @param newValue The new update value that we want set to the tag 
+     * @param newTagValueDesc The new update value description
+     * @param newSDQuality The new quality info for the {@link SourceDataTag} that shall be updated
+     * @param newSourceTimestamp The new source timestamp
+     * 
+     * @return <code>FilterType</code>, if this the new quality is a candidate for being filtered out it will return the 
+     * reason if not it will return <code>FilterType.NO_FILTERING</code> 
+     */
+    private FilterType isRepeatedValue(final SourceDataTag currentTag, final Object newValue, final String newTagValueDesc,
+        final SourceDataQuality newSDQuality, final long newSourceTimestamp) {
+      short newQualityCode = newSDQuality.getQualityCode(); 
+      SourceDataTagValue currentSDValue = currentTag.getCurrentValue();
+      
+      if (currentSDValue.getValue() == null && newValue != null) {
+        // Got a new value which is initializing our SourceDataTag. Hence we do not want to filter it out!
+        this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+            " - Current Value null but we have a New value. Not candidate for filtering");
+
+        return FilterType.NO_FILTERING;
+      }        
+      else if (currentSDValue.getValue() != null && !currentSDValue.getValue().equals(newValue)) {  
+        // The two value are different, hence we do not want to filter it out ... unless the Value dead band filter said the opposite
+        if (isValueDeadbandFiltered(currentTag, newValue, newTagValueDesc, newSDQuality)) {
+          this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+              " - New value update but within value deadband filter. Candidate for filtering");
+          
+          return FilterType.VALUE_DEADBAND;
+        }
+        
+        // The two values are different, so it is clear we do not want to filter it out!
+        this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+            " - Both Values are different. Not candidate for filtering");
+        
+        return FilterType.NO_FILTERING;
+      }
+      // The two values are both null or equal. Now we check for redundant Value Description information
+      else if (!currentSDValue.getValueDescription().equalsIgnoreCase(newTagValueDesc) 
+          && ((newTagValueDesc != null) || !currentSDValue.getValueDescription().isEmpty())) {
+        /* 
+         * Note 1: currentSDValue.getValueDescription() will never be null
+         * Note 2: if getValueDescription is empty and newTagValueDesc is null we get not equal but 
+         *         for us will be equal (no value) so we take care of this special case and continue the checks
+         */
+
+        // The two value Descriptions are different
+        this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+            " - Both Values are equal but Value Descriptions are different. Not candidate for filtering");
+
+        return FilterType.NO_FILTERING;
+      }
+      // Current and new Values and Value Descriptions are both null or equal! Now we check for redundant quality information
+      else if (currentSDValue.getQuality() != null) {
+        // Check, if quality code did not change
+        if ((currentSDValue.getQuality().getQualityCode() == newQualityCode)) {
+          // Only checks description is Quality is no OK (Invalids)
+          if(newQualityCode != SourceDataQuality.OK) {
+            this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+                " - Both Value, Value Description and Quality codes are equal. Check Quality Descriptions to take a decision");
+
+            // Check if quality description did not change. If it is not null we compare it with the new one
+            if (currentSDValue.getQuality().getDescription() == null) {
+              // If description is null we cannot compare so we check directly if both are null or not
+              if (newSDQuality.getDescription() == null) {
+                // We filter out since both are the same and null
+                this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+                    " - Both Quality Descriptions are null. Candidate for filtering");
+
+                return FilterType.REPEATED_INVALID;
+              }
+              else {
+                this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+                    " - Current Quality Description null but we have a New Quality Description. Not candidate for filtering");
+
+                // Goes directly to the final return
+              }
+            } 
+            // Description is not null. We can compare it with the new description
+            else if (currentSDValue.getQuality().getDescription().equals(newSDQuality.getDescription())) {
+              // If we are here, it means we have received a redundant quality code and description ==> should be filtered out.
+              this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+                  " - Both Value, Value Description, Quality and Quality Descriptions are equal. Candidate for filtering");
+
+              return FilterType.REPEATED_INVALID;
+            } else {
+              this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+                  " - Current Quality Description and New Quality Description are different. Not candidate for filtering");
+
+              // Goes directly to the final return
+            }
+          } else {
+            this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+                " - Both Value, Value Description and Quality codes (OK) are equal");
+
+            return FilterType.REPEATED_VALUE;
+          }
+        }
+        // Different Quality Codes 
+        else {
+          this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
+              " - Both Value and Value Description are equal but Quality Codes are different. Not candidate for filtering");
+        }
       }
       
       // We got a new quality information that we want to send to the server.
@@ -377,27 +384,27 @@ public class DataTagValueFilter {
 	}
 	
 	/**
-	 * Checks if the new Timestamp is older than the current one and if so it checks the Quality code
-	 * to decide if the value has to be filtered out or not. 
-	 * 
-	 * Filter when:
-	 * - New TS <= Current TS + Current Good Quality 
-	 * - New TS <= Current TS + Current Bad Quality + New Bad Quality
-	 * 
-	 * No filter when:
-	 * - New TS <= Current TS + New Good Quality + Current Bad Quality
-	 * - New TS > Current TS
-	 * 
-	 * @param newSDQuality new Source Data Tag Quality
-	 * @param currentSDQuality current Source Data Tag Quality
-	 * @param newTimestamp new source Timestamp
-	 * @param currentTimestamp current source Timestamp
-	 * @return True if the New value has to be filter out. False if any other case.
-	 */
-	protected boolean isOlderUpdate(final SourceDataQuality newSDQuality, final SourceDataQuality currentSDQuality, 
-	    final long newTimestamp, final long currentTimestamp) {
-	  // if New TS is older or equal to the current TS we may have a filtering use case	  
-	  if (newTimestamp <= currentTimestamp) {
+   * Checks if the new Timestamp is older than the current one and if so it checks the Quality code
+   * to decide if the value has to be filtered out or not. 
+   * 
+   * Filter when:
+   * - New TS <= Current TS + Current Good Quality 
+   * - New TS <= Current TS + Current Bad Quality + New Bad Quality
+   * 
+   * No filter when:
+   * - New TS <= Current TS + New Good Quality + Current Bad Quality
+   * - New TS > Current TS
+   * 
+   * @param newSDQuality new Source Data Tag Quality
+   * @param currentSDQuality current Source Data Tag Quality
+   * @param newTimestamp new source Timestamp
+   * @param currentTimestamp current source Timestamp
+   * @return True if the New value has to be filter out. False if any other case.
+   */
+  protected boolean isOlderUpdate(final SourceDataQuality newSDQuality, final SourceDataQuality currentSDQuality, 
+      final long newTimestamp, final long currentTimestamp) {
+    // if New TS is older or equal to the current TS we may have a filtering use case   
+    if (newTimestamp <= currentTimestamp) {
       // New timestamp is older or equal than current TS. Check the Quality
       if (currentSDQuality.isValid()) {
         // The current value has Good Quality. Filter
@@ -412,9 +419,9 @@ public class DataTagValueFilter {
           return true;
         }
       }
-	  }
+    }
 
-	  // New TS is newer than current TS
-	  return false;
-	}
+    // New TS is newer than current TS
+    return false;
+  }
 }

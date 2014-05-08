@@ -224,6 +224,7 @@ class EquipmentSenderValid {
             qDesc.append("min: ").append(currentSourceDataTag.getMinValue()).append(" ");
           if (currentSourceDataTag.getMaxValue() != null)
             qDesc.append("max: ").append(currentSourceDataTag.getMaxValue());
+          qDesc.append(")");
 
           // Get the source data quality from the quality code and description
           SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.OUT_OF_BOUNDS, qDesc.toString());
@@ -240,7 +241,9 @@ class EquipmentSenderValid {
           FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(currentSourceDataTag, newTagValue, pValueDescr, 
                 newSDQuality, milisecTimestamp); 
           
-          // Check filters on (VALUE_DEADBAND, REPEATED_VALUE or none)
+          this.equipmentLogger.debug("sendTagFiltered - Filter Type: " + filterType);
+          
+          // Check filters on (OLD_UPDATE, VALUE_DEADBAND, REPEATED_VALUE or none)
           if (filterType != FilterType.NO_FILTERING) {
             // OLD_UPDATE filter on
             if ((filterType == FilterType.OLD_UPDATE)) {
