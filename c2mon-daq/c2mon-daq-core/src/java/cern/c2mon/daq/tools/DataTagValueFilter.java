@@ -384,44 +384,52 @@ public class DataTagValueFilter {
 	}
 	
 	/**
-   * Checks if the new Timestamp is older than the current one and if so it checks the Quality code
-   * to decide if the value has to be filtered out or not. 
-   * 
-   * Filter when:
-   * - New TS <= Current TS + Current Good Quality 
-   * - New TS <= Current TS + Current Bad Quality + New Bad Quality
-   * 
-   * No filter when:
-   * - New TS <= Current TS + New Good Quality + Current Bad Quality
-   * - New TS > Current TS
-   * 
-   * @param newSDQuality new Source Data Tag Quality
-   * @param currentSDQuality current Source Data Tag Quality
-   * @param newTimestamp new source Timestamp
-   * @param currentTimestamp current source Timestamp
-   * @return True if the New value has to be filter out. False if any other case.
-   */
-  protected boolean isOlderUpdate(final SourceDataQuality newSDQuality, final SourceDataQuality currentSDQuality, 
-      final long newTimestamp, final long currentTimestamp) {
-    // if New TS is older or equal to the current TS we may have a filtering use case   
-    if (newTimestamp <= currentTimestamp) {
+	 * Checks if the new Timestamp is older than the current one and if so it checks the Quality code
+	 * to decide if the value has to be filtered out or not. 
+	 * 
+	 * Filter when:
+	 * - New TS <= Current TS + Current has not DATA_UNAVAILABLE Quality 
+	 * - New TS <= Current TS + Current has DATA_UNAVAILABLE Quality + New Bad Quality
+	 * 
+	 * No filter when:
+	 * - New TS <= Current TS + Current has DATA_UNAVAILABLE Quality + New Good Quality
+	 * - New TS > Current TS
+	 * 
+	 * @param newSDQuality new Source Data Tag Quality
+	 * @param currentSDQuality current Source Data Tag Quality
+	 * @param newTimestamp new source Timestamp
+	 * @param currentTimestamp current source Timestamp
+	 * @return True if the New value has to be filter out. False if any other case.
+	 */
+	protected boolean isOlderUpdate(final SourceDataQuality newSDQuality, final SourceDataQuality currentSDQuality, 
+	    final long newTimestamp, final long currentTimestamp) {
+	  this.equipmentLogger.debug("isOlderUpdate - entering isOlderUpdate()");
+	  
+	  // if New TS is older or equal to the current TS we may have a filtering use case	  
+	  if (newTimestamp <= currentTimestamp) {
+	    this.equipmentLogger.trace("isOlderUpdate - New timestamp is older or equal than current TS (" + newTimestamp + ", " + currentTimestamp +")");
       // New timestamp is older or equal than current TS. Check the Quality
-      if (currentSDQuality.isValid()) {
-        // The current value has Good Quality. Filter
-        return true;
-      } else {
-        // New current value has Bad Quality. Check the new value Quality
+      if (currentSDQuality.getQualityCode() == SourceDataQuality.DATA_UNAVAILABLE) {
+        // Exceptional case for not applying this filter:
+        // If current tag was unavailable we allow sending tag value with good quality but old source time stamp 
         if (newSDQuality.isValid()) {
           // New value has Good Quality. Swapping to valid to invalid case. No filter
+          this.equipmentLogger.trace("isOlderUpdate - The current value has DATA_UNAVAILABLE Quality but new value has Good Quality. Not filter");
           return false;
         } else {
-          // New value has Bad Quality as well. Filter
+          // New value has Bad Quality. Filter
+          this.equipmentLogger.trace("isOlderUpdate - The current value has DATA_UNAVAILABLE Quality and new value has Bad Quality. Filter out ");
           return true;
         }
+      } else {
+        // The current value has any Quality but DATA_UNAVAILABLE. Filter
+        this.equipmentLogger.trace("isOlderUpdate - The current value quality is different to DATA_UNAVAILABLE. Filter out ");
+        return true;
       }
-    }
+	  }
 
-    // New TS is newer than current TS
-    return false;
-  }
+	  // New TS is newer than current TS
+	  this.equipmentLogger.trace("isOlderUpdate - New timestamp is newer than current TS. Not filter");
+	  return false;
+	}
 }
