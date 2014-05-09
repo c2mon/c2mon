@@ -47,8 +47,6 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.JsonSyntaxException;
-
 import cern.accsoft.commons.util.proc.ProcUtils;
 import cern.accsoft.commons.util.proc.ProcessInfo;
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
@@ -60,12 +58,14 @@ import cern.c2mon.client.jms.HeartbeatListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
+import cern.c2mon.shared.client.command.CommandExecuteRequest;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
-import cern.c2mon.shared.client.command.CommandExecuteRequest;
+
+import com.google.gson.JsonSyntaxException;
 
 /**
  * Implementation of the JmsProxy singleton bean. Also see the interface for
@@ -924,12 +924,12 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   }
 
   @Override
-  public synchronized void setAdminMessageTopic(final Destination adminMessageTopic) {
+  public void setAdminMessageTopic(final Destination adminMessageTopic) {
     if (this.adminMessageTopic != null) {
       throw new IllegalStateException("Cannot set the admin message topic more than one time");
     }
     this.adminMessageTopic = adminMessageTopic;
-    if (this.adminMessageTopic != null && this.connected) {
+    if (connected) {
       try {
         subscribeToAdminMessageTopic();
       } catch (JMSException e) {
