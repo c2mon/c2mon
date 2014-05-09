@@ -9,7 +9,7 @@
   
   <groupId>cern.c2mon.notification</groupId>
   <artifactId>c2mon-client-notification</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.5-SNAPSHOT</version>
   <dependencies>
   	<dependency>
   		<groupId>org.apache.activemq</groupId>
@@ -52,6 +52,10 @@
   	   <artifactId>slf4j-log4j12</artifactId>
   	</dependency>
   </dependencies>
+  
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-notifier/c2mon-client-notification</developerConnection>
+  </scm>
   
   
 </project>
