@@ -9,7 +9,7 @@
   
   <groupId>cern.c2mon.notification</groupId>
   <artifactId>c2mon-client-notification</artifactId>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.5</version>
   <dependencies>
   	<dependency>
   		<groupId>org.apache.activemq</groupId>
