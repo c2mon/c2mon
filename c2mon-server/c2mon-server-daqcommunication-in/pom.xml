@@ -9,7 +9,7 @@
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-daqcommunication-in</artifactId>
-  <version>1.3.1-SNAPSHOT</version>
+  <version>1.3.1</version>
   <name>c2mon-server-daqcommunication-in</name>
   <packaging>jar</packaging>
   <description>C2MON server module managing DAQ-initiated JMS communication to the server</description>
