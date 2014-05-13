@@ -144,7 +144,7 @@
 
    <!--  the main JMS connection factory  -->
    <bean id="logConnectionFactory"
-      class="org.springframework.jms.connection.SingleConnectionFactory">
+      class="org.springframework.jms.connection.CachingConnectionFactory">
       <property name="targetConnectionFactory">
          <bean class="org.apache.activemq.ActiveMQConnectionFactory">
             <constructor-arg index="0"
