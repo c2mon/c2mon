@@ -438,6 +438,7 @@
 	</ul>	 
 </xsl:template>
 <!-- process the XML element ProcessConfiguration -->
+<!-- DAQ page -->
 <xsl:template match="ProcessConfiguration">
 	
 	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
@@ -451,6 +452,19 @@
 			<script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
 			<script type="text/javascript" src="../js/bottom_panel.js"></script>
 			
+      <script type="text/javascript">
+          $(document).ready(function(){
+            function getProcessName(){
+              var url = window.location.pathname;
+              return url.substring(url.lastIndexOf("/") + 1, url.length);
+            }
+  
+            $("#process_name").append(getProcessName());
+            var urlForRawXmlView = document.getElementById('xml_butt');
+            urlForRawXmlView.href = urlForRawXmlView + getProcessName();
+          });
+        </script>
+      
 		</head>
 		<body>
 			
@@ -463,12 +477,12 @@
 				class="large blue awesome xml_button">		
 				<i class="icon-home"></i> Home
 				</A>
-				<A href="{$base_url}{$process_xml_url}{jms-user}/" 
-					class="large blue awesome xml_button" target="_blank">View as XML >>
+				<A href="{$base_url}{$process_xml_url}" 
+					id="xml_butt" class="large blue awesome xml_button" target="_blank">View as XML >>
 				</A>
 			</div>	
 			<br/><br/>
-			<p>Process: <xsl:value-of select="jms-user"/></p>
+			<p id="process_name">Process: </p>
 
 		<div class="column">
 			<table class="inline">
