@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-server</groupId>
     <artifactId>c2mon-server-pom</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.2</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-daqcommunication-in</artifactId>
@@ -88,15 +88,14 @@
             -Djms.update.consumers.max=1
             -Djms.update.consumers.initial=1
             -Djms.update.consumers.warmuptime=1
-            -Djms.process.updateQueueTrunk=test.tim.process.update
             -Djms.update.transacted=true
-            -Djms.process.requestQueue=test.tim.process.request
             -Djms.request.connections.max=1
             -Djms.request.consumers.initial=1
             -Djms.request.consumers.max=1
             -Djms.request.transacted=false
             -Djms.daq.out.connections=1
-            -Dc2mon.jms.process.listener.trunk=test.process.listener.trunk
+            -Dc2mon.jms.daq.queue.trunk=test.c2mon.process
+            
             -Dc2mon.jms.update.task.idle.limit=1
             -Dc2mon.jms.update.task.max.messages=1
             -Dc2mon.jms.update.executor.threads=5
