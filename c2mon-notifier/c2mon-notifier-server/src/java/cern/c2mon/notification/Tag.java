@@ -4,10 +4,11 @@
  */
 package cern.c2mon.notification;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,6 +170,26 @@ public class Tag {
             return true;
         }
     }
+    
+    public List<Tag> getChangedChildRules() {
+        ArrayList<Tag> result = new ArrayList<>();
+        for (Tag t : this.getAllChildRules()) {
+            if (t.hasStatusChanged() && t.getToBeNotified()) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+    
+    public List<Tag> getChangedChildMetrics() {
+        ArrayList<Tag> result = new ArrayList<>();
+        for (Tag t : this.getAllChildMetrics()) {
+            if (t.hasValueChanged() && t.getToBeNotified()) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
 
     /**
      * 
@@ -321,6 +342,11 @@ public class Tag {
         return latest;
     }
 
+    
+    public boolean hasStatusRecovered() {
+        return getPreviousStatus().worserThan(Status.OK) && getLatestStatus().equals(Status.OK);
+    }
+    
 //    /**
 //     * @return Returns the isSourceDown.
 //     */
