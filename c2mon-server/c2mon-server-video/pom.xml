@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-server</groupId>
     <artifactId>c2mon-server-pom</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.2</version>
   </parent>
   <groupId>cern.c2mon.c2mon-server</groupId>
   <artifactId>c2mon-server-video</artifactId>
@@ -149,9 +149,8 @@
             -Djms.update.consumers.initial=1
             -Djms.update.consumers.warmuptime=1
             -Dc2mon.jms.daqin.connections.max=1
-            -Djms.process.updateQueueTrunk=test.tim.process.update
             -Djms.update.transacted=true
-            -Djms.process.requestQueue=test.tim.process.request
+            -Dc2mon.jms.daq.queue.trunk=test.tim.process
             -Djms.request.connections.max=1
             -Djms.request.consumers.initial=1
             -Djms.request.consumers.max=1
