@@ -22,6 +22,7 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.notification.impl.TagCache;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -53,7 +54,7 @@ public class TextCreator {
      * the directory from where to read the templates.
      */
     private String directory = "templates";
-
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -120,10 +121,10 @@ public class TextCreator {
      * @throws IOException
      * @throws TemplateException
      */
-    public String getReportForTag(Tag update, List<Tag> interestingChildren) throws IOException, TemplateException {
+    public String getReportForTag(Tag update, List<Tag> interestingChildren, TagCache cache) throws IOException, TemplateException {
         StringBuilder bodyBuffer = new StringBuilder();
         bodyBuffer.append(getTextForRuleUpdate(update));
-        bodyBuffer.append(getFreeTextMapForChildren(interestingChildren));
+        bodyBuffer.append(getFreeTextMapForChildren(interestingChildren, cache));
         return bodyBuffer.toString();
     }
 
@@ -140,12 +141,12 @@ public class TextCreator {
         if (interestingTags.size() == 0) {
             subject.append(update.getLatestStatus()).append(" ").append(update.getLatestUpdate().getDescription());
         } else if ((interestingTags.size() == 1 && !interestingTags.get(0).isRule()) || interestingTags.get(0).getLatestUpdate().getDescription().length() > SUBJECT_TEXT_MAXLEN) {
-            subject.append("DMNNTFY [").append(update.getLatestStatus().toString().toUpperCase()).append("] : ")
-                    .append(interestingTags.get(0).getLatestUpdate().getDescription());
+            subject.append("DMNNTFY [").append(update.getLatestStatus().toString().toUpperCase()).append("]: ")
+                    .append(interestingTags.get(0).getLatestUpdate().getName());
         } else {
             Tag single = interestingTags.get(0);
-            subject.append("DMNNTFY [").append(single.getLatestStatus().toString().toUpperCase()).append("] : ")
-                    .append(single.getLatestUpdate().getDescription());
+            subject.append("DMNNTFY [").append(single.getLatestStatus().toString().toUpperCase()).append("]: ")
+                    .append(single.getLatestUpdate().getName());
         }
         logger.trace("Leaving getMailSubjectForStateChange()");
 
@@ -231,17 +232,14 @@ public class TextCreator {
             ruleInputTags.add(Long.toString(l));
         }
 
-        root.put("tagId", Long.toString(update.getId()));
-        root.put("tagStatus", update.getLatestStatus().toString());
-        root.put("tagName", cdtv.getName());
-        root.put("tagDescription", cdtv.getDescription());
-        root.put("tagRuleExpression", cdtv.getRuleExpression());
-        root.put("tagServerTimestamp", cdtv.getServerTimestamp());
-        root.put("tagUnit", cdtv.getUnit());
-        root.put("tagValueDescription", cdtv.getValueDescription());
+        root.put("ruleId", Long.toString(update.getId()));
+        root.put("ruleStatus", update.getLatestStatus().toString());
+        root.put("ruleName", cdtv.getName());
+        root.put("ruleDescription", cdtv.getDescription());
         root.put("ruleExpression", cdtv.getRuleExpression());
-        root.put("ruleExpressionInput", ruleInputTags);
-
+        root.put("ruleServerTimestamp", cdtv.getServerTimestamp());
+        root.put("tagValueDescription", cdtv.getValueDescription());
+ 
         StringWriter out = new StringWriter();
         try {
             Template temp = c.getTemplate("simpleUpdate.html");
@@ -259,7 +257,7 @@ public class TextCreator {
      * @throws IOException if there is a problem loading the template
      * @throws TemplateException in case there is a problem while setting the variables in the template.
      */
-    public String getFreeTextMapForChildren(List<Tag> list) throws IOException, TemplateException {
+    public String getFreeTextMapForChildren(List<Tag> list, TagCache tagCache) throws IOException, TemplateException {
 
         logger.trace("Entering getFreeTextMapForChildren()");
         List<HashMap<String, Object>> children = new ArrayList<HashMap<String, Object>>();
@@ -281,18 +279,49 @@ public class TextCreator {
         /*
          * put the relevant information into the list.
          */
+//        for (Tag tag : list) {
+//            ClientDataTagValue c = tag.getLatestUpdate();
+//            HashMap<String, Object> child = new HashMap<String, Object>();
+//            child.put("tagId", Long.toString(c.getId()));
+//            child.put("tagValue", c.getValue() == null ? "UNKNOWN" : c.getValue());
+//            child.put("tagName", c.getName() == null ? "UNKNOWN" : c.getName());
+//            child.put("tagDescription", c.getDescription() == null ? "UNKNOWN" : c.getDescription());
+//            child.put("tagServerTimestamp", c.getServerTimestamp() == null ? "UNKNOWN" : c.getServerTimestamp());
+//            child.put("tagUnit", c.getUnit() == null ? "UNKNOWN" : c.getUnit());
+//            child.put("tagValueDescription", c.getValueDescription() == null ? "UNKNOWN" : c.getValueDescription());
+//            child.put("tagQuality", c.getDataTagQuality().getDescription() == null ? null : c.getDataTagQuality()
+//                    .getDescription());
+//            children.add(child);
+//        }
+        
         for (Tag tag : list) {
             ClientDataTagValue c = tag.getLatestUpdate();
             HashMap<String, Object> child = new HashMap<String, Object>();
-            child.put("tagId", Long.toString(c.getId()));
-            child.put("tagValue", c.getValue() == null ? "UNKNOWN" : c.getValue());
-            child.put("tagName", c.getName() == null ? "UNKNOWN" : c.getName());
-            child.put("tagDescription", c.getDescription() == null ? "UNKNOWN" : c.getDescription());
-            child.put("tagServerTimestamp", c.getServerTimestamp() == null ? "UNKNOWN" : c.getServerTimestamp());
-            child.put("tagUnit", c.getUnit() == null ? "UNKNOWN" : c.getUnit());
-            child.put("tagValueDescription", c.getValueDescription() == null ? "UNKNOWN" : c.getValueDescription());
-            child.put("tagQuality", c.getDataTagQuality().getDescription() == null ? null : c.getDataTagQuality()
-                    .getDescription());
+            child.put("ruleId", Long.toString(c.getId()));
+            child.put("ruleStatus", tag.getLatestStatus().toString());
+            child.put("ruleName", c.getName() == null ? "UNKNOWN" : c.getName());
+            child.put("ruleDescription", c.getDescription() == null ? "UNKNOWN" : c.getDescription());
+            child.put("ruleServerTimestamp", c.getServerTimestamp() == null ? "UNKNOWN" : c.getServerTimestamp());
+            child.put("ruleValueDescription", c.getValueDescription() == null ? "UNKNOWN" : c.getValueDescription());
+            child.put("ruleQuality", c.getDataTagQuality());
+            
+            List<HashMap<String, Object>> datatags = new ArrayList<HashMap<String, Object>>();
+            if (c.getName().contains("PROC.MISSING")) {
+                HashMap<String, Object> cdatatag = new HashMap<String, Object>();
+                cdatatag.put("tagValue", c.getValueDescription());
+                datatags.add(cdatatag);
+            } else {
+                // datatags expected here:
+                for (Long datatagId : c.getRuleExpression().getInputTagIds()) {
+                    HashMap<String, Object> cdatatag = new HashMap<String, Object>();
+                    Tag datatag = tagCache.get(datatagId);
+                    cdatatag.put("tagValue", datatag.getLatestUpdate().getValue());
+                    cdatatag.put("tagDescription", datatag.getLatestUpdate().getDescription());
+                    cdatatag.put("tagValueDescription", datatag.getLatestUpdate().getValueDescription());
+                    datatags.add(cdatatag);
+                }
+            }
+            child.put("dataTags", datatags);
             children.add(child);
         }
 
@@ -339,6 +368,15 @@ public class TextCreator {
         out.flush();
 
         return out.toString();
+    }
+    
+    
+    public String getSmsTextForValueChange(Tag update) {
+        return "Value changed for " + update.getLatestUpdate().getName() + "to " + update.getLatestUpdate().getValue();
+    }
+    
+    public String getSmsTextForRuleChange(Tag update, List<Tag> interestingChildren) {
+        return null;
     }
 
     public String getTextForReminder(Tag t) throws IOException, TemplateException {
