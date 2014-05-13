@@ -467,9 +467,10 @@ public class TagCache implements DataTagUpdateListener {
         
         try {
             
-            logger.debug("TagID={} Update incoming: Name={}, isRule={}, value={}, valid={}, isAccessible={}, isExisting={}", 
+            logger.debug("TagID={} Update incoming: Name={}, isRule={}, value={}, valid={}, isAccessible={}, isExisting={}, equipIds={}, processIds={}", 
                     tagUpdate.getId(), tagUpdate.getName(), tagUpdate.isRuleResult(), tagUpdate.getValue(), 
-                    tagUpdate.getDataTagQuality().isValid(), tagUpdate.getDataTagQuality().isAccessible(), tagUpdate.getDataTagQuality().isExistingTag());
+                    tagUpdate.getDataTagQuality().isValid(), tagUpdate.getDataTagQuality().isAccessible(), 
+                    tagUpdate.getDataTagQuality().isExistingTag(), tagUpdate.getEquipmentIds(), tagUpdate.getProcessIds());
             
             checkUpdateOk(tagUpdate);
             Tag tag = cache.get(tagUpdate.getId());
@@ -582,7 +583,7 @@ public class TagCache implements DataTagUpdateListener {
                 if (s.getLastNotifiedStatus().equals(Status.UNKNOWN)) {
                     s.setLastNotifiedStatus(Status.OK);
                 }
-                logger.debug("Starting subscription {} User={}, TagID={}", s.getSubscriberId(), s.getTagId());
+                logger.debug("Starting subscription User={}, TagID={}", s.getSubscriberId(), s.getTagId());
             
                 Tag t = get(s.getTagId());
                 
@@ -610,7 +611,7 @@ public class TagCache implements DataTagUpdateListener {
             DataTagUpdateListener toCancelLater = startSubscriptionWithoutNotification(toSubscribeTo);
             
             for (Subscription s : list) {
-                notifier.sendReportOnRuleChange(get(s.getTagId()));
+                notifier.sendInitialReport(get(s.getTagId()));
             }
             
             logger.debug("Finished initial report subscription list.");
@@ -711,21 +712,27 @@ public class TagCache implements DataTagUpdateListener {
                 logger.info("The passed subscription User={}, Tag={} does not contain any resolved sub tags.", subscription.getSubscriberId(), subscription.getTagId());
             }
             
-            /*
-             * remove the tags from the cache
-             */
-            HashSet<Long> toRemove = new HashSet<Long>();
             Tag t = get(subscription.getTagId());
-            for (Tag ct : t.getChildTags()) {
-                ct.removeSubscription(subscription);
-                if (ct.getSubscribers().size() == 0) {
-                    toRemove.add(ct.getId());
-                }
-            }
+            HashSet<Long> toRemove = new HashSet<Long>();
+            if (t != null) {
             
-            t.removeSubscription(subscription);
-            if (t.getSubscribers().size() == 0) {
-                toRemove.add(t.getId());
+                /*
+                 * remove the tags from the cache
+                 */
+                
+                for (Tag ct : t.getChildTags()) {
+                    ct.removeSubscription(subscription);
+                    if (ct.getSubscribers().size() == 0) {
+                        toRemove.add(ct.getId());
+                    }
+                }
+            
+                t.removeSubscription(subscription);
+                if (t.getSubscribers().size() == 0) {
+                    toRemove.add(t.getId());
+                }
+            } else {
+                toRemove.add(subscription.getTagId());
             }
             
             /*
