@@ -18,9 +18,7 @@
 	  window.location.href = window.location.href + "?reloaded=true";
 	</script>
   <div id="container">
-  <div id="error">
-  
-  </div>
+  <div id="error"></div>
   
   <form action="<c:url value='j_spring_security_check' />" method="post" class="niceform">
   	<fieldset>
