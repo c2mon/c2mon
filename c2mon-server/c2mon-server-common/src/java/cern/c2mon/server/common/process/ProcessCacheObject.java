@@ -72,7 +72,9 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
      * Name of the temporary queue on which the process (daq) listens for server requests. Currently set after loading or in
      * facade creation.
      */
-    private String jmsDaqCommandQueue;
+    // TODO: to be change in next major revision
+//    private String jmsDaqCommandQueue;
+    private String jmsListenerTopic;
 
     /**
      * Host the DAQ process is running on.
@@ -287,7 +289,7 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
 
     @Override
     public String getJmsDaqCommandQueue() {
-        return this.jmsDaqCommandQueue;
+        return this.jmsListenerTopic;
     }
 
     /**
@@ -322,8 +324,8 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     }
 
     @Override
-    public void setJmsDaqCommandQueue(String jmsDaqCommandQueue) {
-        this.jmsDaqCommandQueue = jmsDaqCommandQueue;
+    public void setJmsDaqCommandQueue(String jmsListenerTopic) {
+        this.jmsListenerTopic = jmsListenerTopic;
     }
 
 }
