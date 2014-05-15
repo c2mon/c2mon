@@ -65,11 +65,11 @@ public class InfoMessageProcessor extends AbstractJECPFrameProcessor {
                 if (!(slaveAddress.equalsIgnoreCase("ERROR"))) {
                     if (infoFrame.GetDataStartNumber() == StdConstants.SLAVE_VALIDATE) {
                         getEquipmentLogger().debug("Revalidation - Slave LOST: " + slaveAddress);
-                        frameController.revalidateSlaveTags(slaveAddress);
+                        frameController.revalidateSlaveTags(slaveAddress, infoFrame.GetJECCurrTimeMilliseconds());
                     }
                     else if (infoFrame.GetDataStartNumber() == StdConstants.SLAVE_INVALIDATE) {
                         getEquipmentLogger().debug("Invalidation - Slave LOST: " + slaveAddress);
-                        frameController.invalidateSlaveTags(slaveAddress);
+                        frameController.invalidateSlaveTags(slaveAddress, infoFrame.GetJECCurrTimeMilliseconds());
                     } 
                     else {
                         getEquipmentLogger().debug("ERROR: Invalid VALIDATE/INVALIDATE INFO code in 'Data Start Number'");

@@ -124,8 +124,10 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      *            The position of the word to send.
      * @param bitPos
      *            The position of the bit to send.
+     * @param sourceTimestamp 
+     *            The timestamp when the request arrived.
      */
-    public abstract void revalidateTag(final int wordPos, final int bitPos);
+    public abstract void revalidateTag(final int wordPos, final int bitPos, final long sourceTimestamp);
 
     /**
      * Re-initializes all arrays in the processor. 
@@ -376,10 +378,11 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      * 
      * @param unavailableSlaves
      *            The unavailable.
+     * @param sourceTimestamp The timestamp when the request arrived.
      */
-    public void invalidateForUnavailableSlaves(final List<String> unavailableSlaves) {
+    public void invalidateForUnavailableSlaves(final List<String> unavailableSlaves, final long sourceTimestamp) {
         for (String unavailableSlave : unavailableSlaves) {
-            invalidateForUnavailableSlave(unavailableSlave);
+            invalidateForUnavailableSlave(unavailableSlave, sourceTimestamp);
         }
     }
 
@@ -388,14 +391,18 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      * 
      * @param unavailableSlave
      *            The slave which is unavailable.
+     * @param sourceTimestamp The timestamp when the request arrived.
      */
-    public synchronized void invalidateForUnavailableSlave(final String unavailableSlave) {
+    public synchronized void invalidateForUnavailableSlave(final String unavailableSlave, final long sourceTimestamp) {
         for (ISourceDataTag sourceDataTag : supervisedTags.values()) {
             PLCHardwareAddress plcHardwareAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
             String nativeAddress = plcHardwareAddress.getNativeAddress();
             if (!"INT999".equalsIgnoreCase(nativeAddress) && nativeAddress.startsWith(unavailableSlave)) {
                 getEquipmentLogger().debug("TAG: " + sourceDataTag.getId() + " comes from the DEAD UNIT: " + plcHardwareAddress.getNativeAddress());
-                equipmentMessageSender.sendInvalidTag(sourceDataTag, SourceDataQuality.DATA_UNAVAILABLE, JECMessageHandler.HIERARCHICAL_INVALIDATION_MESSAGE);
+                equipmentMessageSender.sendInvalidTag(sourceDataTag, 
+                                                      SourceDataQuality.DATA_UNAVAILABLE, 
+                                                      JECMessageHandler.HIERARCHICAL_INVALIDATION_MESSAGE, 
+                                                      new Timestamp(sourceTimestamp));
             }
         }
     }
@@ -404,15 +411,16 @@ public abstract class AbstractDataProcessor extends AbstractJECPFrameProcessor {
      * Revalidates all tags which belong to the provided slave address.
      * 
      * @param slaveAddress The slave address to send to.
+     * @param sourceTimestamp The timestamp when the request arrived.
      */
-    public synchronized void revalidateForUnavailableSlave(final String slaveAddress) {
+    public synchronized void revalidateForUnavailableSlave(final String slaveAddress, final long sourceTimestamp) {
         for (ISourceDataTag sourceDataTag : supervisedTags.values()) {
             PLCHardwareAddress plcTagAddress = (PLCHardwareAddress) sourceDataTag.getHardwareAddress();
             String natAddr = plcTagAddress.getNativeAddress();
             if (natAddr != null && natAddr.startsWith(slaveAddress)) {
                 final SourceDataTagValue currentValue = sourceDataTag.getCurrentValue();
                 if (currentValue != null && !currentValue.isValid()) {
-                    revalidateTag(plcTagAddress.getWordId(), plcTagAddress.getBitId());
+                    revalidateTag(plcTagAddress.getWordId(), plcTagAddress.getBitId(), sourceTimestamp);
                 }
             }
         }

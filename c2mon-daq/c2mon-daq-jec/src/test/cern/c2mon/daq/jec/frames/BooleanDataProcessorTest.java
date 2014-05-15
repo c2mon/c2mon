@@ -82,9 +82,9 @@ public class BooleanDataProcessorTest {
         expectLastCall().andReturn(true);
         
         replay(equipmentMessageSender);
-        booleanDataProcessor.revalidateTag(0, 5);
+        booleanDataProcessor.revalidateTag(0, 5, System.currentTimeMillis());
         sourceDataTag.getCurrentValue().setQuality(new SourceDataQuality(SourceDataQuality.DATA_UNAVAILABLE, JECMessageHandler.HIERARCHICAL_INVALIDATION_MESSAGE));
-        booleanDataProcessor.revalidateTag(0, 5);
+        booleanDataProcessor.revalidateTag(0, 5, System.currentTimeMillis());
         verify(equipmentMessageSender);
     }
 }

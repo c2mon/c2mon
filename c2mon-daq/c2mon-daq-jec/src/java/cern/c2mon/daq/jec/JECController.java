@@ -553,13 +553,14 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      * 
      * @param slaveAddress
      *            - Native address of the slave
+     * @param sourceTimestamp The timestamp when the request arrived.
      */
     @Override
-    public void invalidateSlaveTags(final String slaveAddress) {
-        booleanDataProcessor.invalidateForUnavailableSlave(slaveAddress);
-        booleanDataControlProcessor.invalidateForUnavailableSlave(slaveAddress);
-        analogDataProcessor.invalidateForUnavailableSlave(slaveAddress);
-        analogDataControlProcessor.invalidateForUnavailableSlave(slaveAddress);
+    public void invalidateSlaveTags(final String slaveAddress, final long sourceTimestamp) {
+        booleanDataProcessor.invalidateForUnavailableSlave(slaveAddress, sourceTimestamp);
+        booleanDataControlProcessor.invalidateForUnavailableSlave(slaveAddress, sourceTimestamp);
+        analogDataProcessor.invalidateForUnavailableSlave(slaveAddress, sourceTimestamp);
+        analogDataControlProcessor.invalidateForUnavailableSlave(slaveAddress, sourceTimestamp);
     }
 
     /**
@@ -570,13 +571,14 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      * 
      * @param slaveAddress
      *            - Slave address identifier
+     * @param sourceTimestamp The timestamp when the request arrived.
      */
     @Override
-    public void revalidateSlaveTags(final String slaveAddress) {
-        booleanDataProcessor.revalidateForUnavailableSlave(slaveAddress);
-        booleanDataControlProcessor.revalidateForUnavailableSlave(slaveAddress);
-        analogDataProcessor.revalidateForUnavailableSlave(slaveAddress);
-        analogDataControlProcessor.revalidateForUnavailableSlave(slaveAddress);
+    public void revalidateSlaveTags(final String slaveAddress, long sourceTimestamp) {
+        booleanDataProcessor.revalidateForUnavailableSlave(slaveAddress, sourceTimestamp);
+        booleanDataControlProcessor.revalidateForUnavailableSlave(slaveAddress, sourceTimestamp);
+        analogDataProcessor.revalidateForUnavailableSlave(slaveAddress, sourceTimestamp);
+        analogDataControlProcessor.revalidateForUnavailableSlave(slaveAddress, sourceTimestamp);
     }
 
     /**

@@ -129,14 +129,15 @@ public class BooleanDataProcessor<T extends BooleanJECAdressSpace> extends Abstr
      * the server.
      * @param wordPos The position of the word the tag belongs to.
      * @param bitPos the position of the bit the tag belongs to.
+     * @param sourceTimestamp The timestamp when the request arrived.
      */
     @Override
-    public void revalidateTag(final int wordPos, final int bitPos) {
+    public void revalidateTag(final int wordPos, final int bitPos, final long sourceTimestamp) {
         int word = JECBinaryHelper.getBooleanWord(wordPos, getCurrentValues());
         boolean value = ((word >> bitPos) & 1) == 1;
         ISourceDataTag sourceDataTag = getTag(wordPos, bitPos);
         if (sourceDataTag != null)
-            revalidate(value, sourceDataTag, System.currentTimeMillis());
+            revalidate(value, sourceDataTag, sourceTimestamp);
         else
             getEquipmentLogger().warn("revalidateTag() - Cannot send revalidation Source data tag for boolean word " + wordPos + " bit " + bitPos + ". Reason: tag unknown!");
     }

@@ -288,12 +288,13 @@ public class AnalogDataProcessor<T extends AnalogJECAddressSpace> extends Abstra
      * @param bitPosition The position of the bit to send.
      * analog values don't use that so it is ignored when searching for     * 
      * the tag.
+     * @param sourceTimestamp The timestamp when the request arrived.
      * @throws NullPointerException if no tag is associated with the word position
      */
     @Override
-    public void revalidateTag(final int wordPosition, final int bitPosition) {
+    public void revalidateTag(final int wordPosition, final int bitPosition, final long sourceTimestamp) {
         int word = getWord(wordPosition);
-        convertAndSend(word, getTag(wordPosition, -1), System.currentTimeMillis(), true);
+        convertAndSend(word, getTag(wordPosition, -1), sourceTimestamp, true);
     }
 
     /**

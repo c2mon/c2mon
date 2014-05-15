@@ -45,7 +45,7 @@ public class InfoMessageProcessorTest {
         writeJECString(frame, slaveName);
         
         // expected call
-        frameController.invalidateSlaveTags(slaveName);
+        frameController.invalidateSlaveTags(slaveName, frame.GetJECCurrTimeMilliseconds());
         
         replay(frameController);
         infoMessageProcessor.processJECPFrame(frame);
@@ -62,7 +62,7 @@ public class InfoMessageProcessorTest {
         writeJECString(frame, slaveName);
         
         // expected call
-        frameController.revalidateSlaveTags(slaveName);
+        frameController.revalidateSlaveTags(slaveName, frame.GetJECCurrTimeMilliseconds());
         
         replay(frameController);
         infoMessageProcessor.processJECPFrame(frame);

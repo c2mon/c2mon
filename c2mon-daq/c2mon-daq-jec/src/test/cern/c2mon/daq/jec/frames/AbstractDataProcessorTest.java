@@ -8,6 +8,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Timestamp;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,11 +111,12 @@ public class AbstractDataProcessorTest {
         sourceDataTag.setAddress(new DataTagAddress(hardwareAddress));
         
         expect(abstractDataProcessorMock.getJecAddressSpace()).andReturn(new BooleanJECAdressSpace());
-        equipmentMessageSender.sendInvalidTag(sourceDataTag, SourceDataQuality.DATA_UNAVAILABLE, JECMessageHandler.HIERARCHICAL_INVALIDATION_MESSAGE);
+        long sourceTimestamp = System.currentTimeMillis();
+        equipmentMessageSender.sendInvalidTag(sourceDataTag, SourceDataQuality.DATA_UNAVAILABLE, JECMessageHandler.HIERARCHICAL_INVALIDATION_MESSAGE, new Timestamp(sourceTimestamp));
         
         replay(abstractDataProcessorMock, equipmentMessageSender);
         abstractDataProcessorMock.addSourceDataTag(sourceDataTag);
-        abstractDataProcessorMock.invalidateForUnavailableSlave("TEST001");
+        abstractDataProcessorMock.invalidateForUnavailableSlave("TEST001", sourceTimestamp);
         verify(abstractDataProcessorMock, equipmentMessageSender);
     }
     
@@ -125,11 +128,12 @@ public class AbstractDataProcessorTest {
         sourceDataTag.update(true);
         sourceDataTag.invalidate(new SourceDataQuality(SourceDataQuality.DATA_UNAVAILABLE));
         expect(abstractDataProcessorMock.getJecAddressSpace()).andReturn(new BooleanJECAdressSpace());
-        abstractDataProcessorMock.revalidateTag(10, 5);
+        long sourceTimestamp = System.currentTimeMillis();
+        abstractDataProcessorMock.revalidateTag(10, 5, sourceTimestamp);
         
         replay(abstractDataProcessorMock, equipmentMessageSender);
         abstractDataProcessorMock.addSourceDataTag(sourceDataTag);
-        abstractDataProcessorMock.revalidateForUnavailableSlave("TEST001");
+        abstractDataProcessorMock.revalidateForUnavailableSlave("TEST001", sourceTimestamp);
         verify(abstractDataProcessorMock, equipmentMessageSender);
     }
 }

@@ -73,15 +73,17 @@ public interface IJECFrameController {
      * Invalidates all tags with this slave address.
      * 
      * @param slaveAddress The address to invalidate.
+     * @param sourceTimestamp The timestamp when the request arrived.
      */
-    void invalidateSlaveTags(final String slaveAddress);
+    void invalidateSlaveTags(final String slaveAddress, final long sourceTimestamp);
     
     /**
      * Validates all tags with this slave address.
      * 
      * @param slaveAddress The address to validate.
+     * @param sourceTimestamp The timestamp when the request arrived.
      */
-    void revalidateSlaveTags(final String slaveAddress);
+    void revalidateSlaveTags(final String slaveAddress, final long sourceTimestamp);
     
     /**
      * Returns the number of boolean data JEC frames.

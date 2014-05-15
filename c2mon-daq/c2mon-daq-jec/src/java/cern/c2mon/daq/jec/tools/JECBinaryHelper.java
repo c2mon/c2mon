@@ -19,7 +19,7 @@ package cern.c2mon.daq.jec.tools;
 
 /**
  * This class helps to access parts of a byte array supplied from the
- * PLCDricer. It also allows binary masking operations to encode the
+ * PLCDriver. It also allows binary masking operations to encode the
  * filtering type inside a value.
  * 
  * @author Andreas Lang
