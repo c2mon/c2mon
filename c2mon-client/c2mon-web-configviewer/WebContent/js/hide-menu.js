@@ -1,5 +1,6 @@
 $(document).ready(function(){
 	
+ 
   //If the div is empty that's mean there is no longer the data
 	if ($('#trend_view').is(':empty')){
 		$('#trend_view').append('<h3 style="margin-left:20%;">Records are only kept for the last 30 days</h3>');
@@ -34,13 +35,13 @@ $(document).ready(function(){
 	
 	// Hide and set the margin of the graph
 	function location(){	
-		if(getUrlVars()["MENU"]=="false" && getUrlVars()["TITLE"]=="false"){
+		if(TestUrlMenu() && TestUrlTitle()){
 			$(".page-header").hide();
 			$(".links").hide();
 			$(".dygraph-legend").css("margin-top","0%");
 		}	
 		// hide title
-		else if(getUrlVars()["TITLE"]=="false"){
+		else if(TestUrlTitle()){
 			$(".page-header").hide();
 			if(window.innerHeight<600)
 				$(".dygraph-legend").css("margin-top","-4%");
@@ -48,7 +49,7 @@ $(document).ready(function(){
 				$(".dygraph-legend").css("margin-top","-2%");
 			}
 		// hide buttons
-		else if(getUrlVars()["MENU"]=="false"){
+		else if(TestUrlMenu()){
 			$(".links").hide();
 			if(window.innerHeight<600)
 				$(".dygraph-legend").css("margin-top","-4%");
@@ -76,13 +77,37 @@ $(document).ready(function(){
 		if(h<400)
 			h=400;
 			
-		if(getUrlVars()["MENU"]=="false" && getUrlVars()["TITLE"]=="false"){
+		if(TestUrlMenu() && TestUrlTitle()){
 			trend.resize(w-130,h-80);
 		}
-		else if(getUrlVars()["MENU"]=="false" || getUrlVars()["TITLE"]=="false")
-			trend.resize(w-130,h-140);
+		else if(TestUrlMenu() || TestUrlTitle()){
+			trend.resize(w-130,h-140);}
 		else{
 			trend.resize(w-130,h-220);}
 	}
+	
+	function TestUrlMenu()
+	{
+	  if(typeof getUrlVars()["MENU"] == 'undefined')
+	    return false;
+	  else{
+  	  if(getUrlVars()["MENU"].toUpperCase()=="FALSE")
+  	    return true;
+  	  else
+  	    return false;
+	  }
+	}
+	
+	 function TestUrlTitle()
+	  {
+	    if(typeof getUrlVars()["TITLE"] == 'undefined')
+	      return false;
+	    else{ 
+	      if(getUrlVars()["TITLE"].toUpperCase()=="FALSE")
+	        return true;
+	      else
+	        return false;
+	    }
+	  }
 
 });
