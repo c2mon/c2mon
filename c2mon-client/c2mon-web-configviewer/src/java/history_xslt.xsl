@@ -55,6 +55,8 @@
           <link rel="stylesheet" type="text/css" href="../css/c2mon.css"></link>
           <link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
           <link rel="stylesheet" type="text/css" href="../css/buttons.css"></link>
+          <link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
+          <link rel="stylesheet" type="text/css" href="../css/bootstrap-responsive.css" />
           <script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
         </head>
 
