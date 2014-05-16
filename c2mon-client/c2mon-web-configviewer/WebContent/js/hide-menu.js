@@ -83,7 +83,7 @@ $(document).ready(function(){
 		else if(TestUrlMenu() || TestUrlTitle()){
 			trend.resize(w-130,h-140);}
 		else{
-			trend.resize(w-130,h-220);}
+			trend.resize(w-130,h-250);}
 	}
 	
 	function TestUrlMenu()
