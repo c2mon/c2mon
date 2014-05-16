@@ -48,10 +48,6 @@
       <artifactId>easymockclassextension</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.japc</groupId>
-      <artifactId>japc-ext-mockito</artifactId>
-    </dependency>
-    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
     </dependency>
