@@ -31,14 +31,22 @@
 
 		<!--  deployment descriptor -->		
 
-		<!--  log4j configuration -->
+		<!--  log4j configuration (standard output)-->
 		<file>
-			<source>${basedir}/conf/demo-log4j.xml</source>
+			<source>${basedir}/conf/demo-log4j-standardout.xml</source>
 			<outputDirectory>conf/</outputDirectory>
-			<destName>log4j.xml</destName>
+			<destName>log4j-standardout.xml</destName>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0700</fileMode>
 		</file>		
+		<!--  log4j configuration -->
+        <file>
+            <source>${basedir}/conf/demo-log4j.xml</source>
+            <outputDirectory>conf/</outputDirectory>
+            <destName>log4j.xml</destName>
+            <lineEnding>unix</lineEnding>
+            <fileMode>0700</fileMode>
+        </file> 
 		<file>
 			<source>${basedir}/conf/demo-modules.xml</source>
 			<outputDirectory>conf/</outputDirectory>
