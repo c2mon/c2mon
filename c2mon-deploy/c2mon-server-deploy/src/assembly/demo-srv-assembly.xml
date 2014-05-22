@@ -37,7 +37,7 @@
 			<outputDirectory>conf/</outputDirectory>
 			<destName>log4j-standardout.xml</destName>
 			<lineEnding>unix</lineEnding>
-			<fileMode>0700</fileMode>
+			<fileMode>0444</fileMode>
 		</file>		
 		<!--  log4j configuration -->
         <file>
@@ -45,7 +45,7 @@
             <outputDirectory>conf/</outputDirectory>
             <destName>log4j.xml</destName>
             <lineEnding>unix</lineEnding>
-            <fileMode>0700</fileMode>
+            <fileMode>0444</fileMode>
         </file> 
 		<file>
 			<source>${basedir}/conf/demo-modules.xml</source>
