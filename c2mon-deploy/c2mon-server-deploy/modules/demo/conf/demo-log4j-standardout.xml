@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<!-- default log4j configuration for JUnit tests -->
+<!-- default log4j configuration for sending info to the standard output -->
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
 <log4j:configuration debug="false"
