@@ -124,7 +124,9 @@ public class TextCreator {
     public String getReportForTag(Tag update, List<Tag> interestingChildren, TagCache cache) throws IOException, TemplateException {
         StringBuilder bodyBuffer = new StringBuilder();
         bodyBuffer.append(getTextForRuleUpdate(update));
-        bodyBuffer.append(getFreeTextMapForChildren(interestingChildren, cache));
+        if (interestingChildren.size() > 0) {
+            bodyBuffer.append(getFreeTextMapForChildren(interestingChildren, cache));
+        }
         return bodyBuffer.toString();
     }
 
