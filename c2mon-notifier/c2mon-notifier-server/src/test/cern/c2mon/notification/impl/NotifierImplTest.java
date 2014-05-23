@@ -539,7 +539,7 @@ public class NotifierImplTest {
         
         Mailer mailer = mockControl.createMock(Mailer.class);
         mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
-        EasyMock.expectLastCall().times(2);
+        EasyMock.expectLastCall().times(3);
         notifier.setMailer(mailer);
         EasyMock.replay(mailer);
         
@@ -558,10 +558,11 @@ public class NotifierImplTest {
         sendUpdateMetricTag(210L, 5.7D);
         notifier.checkCacheForChanges();
         
-        EasyMock.verify(mailer);
-        
         sendUpdateRuleTag(2000L, Status.OK.toInt());
         notifier.checkCacheForChanges();
+        
+        EasyMock.verify(mailer);
+
 	}
 	
 	
@@ -722,7 +723,7 @@ public class NotifierImplTest {
         
         Mailer mailer = mockControl.createMock(Mailer.class);
         mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
-        EasyMock.expectLastCall().times(3);
+        EasyMock.expectLastCall().times(4);
         notifier.setMailer(mailer);
         EasyMock.replay(mailer);
         
@@ -746,10 +747,12 @@ public class NotifierImplTest {
         assertTrue(s.getSubscription(toBeNotifiedFor.getId()).getLastStatusForResolvedSubTag(2L).equals(Status.OK));
         assertTrue(s.getSubscription(toBeNotifiedFor.getId()).getLastStatusForResolvedSubTag(10L).equals(Status.OK));
         assertTrue(s.getSubscription(toBeNotifiedFor.getId()).getLastNotifiedStatus().equals(Status.ERROR));
-        EasyMock.verify(mailer);
+        
         
         sendUpdateRuleTag(1L, Status.OK.toInt());
         notifier.checkCacheForChanges();
+        
+        EasyMock.verify(mailer);
 	}
 	
 	
@@ -804,7 +807,7 @@ public class NotifierImplTest {
 	    
 	    Mailer mailer = mockControl.createMock(Mailer.class);
         mailer.sendEmail(EasyMock.isA(String.class), EasyMock.isA(String.class), EasyMock.isA(String.class));
-        EasyMock.expectLastCall().times(2);
+        EasyMock.expectLastCall().times(3);
         notifier.setMailer(mailer);
         EasyMock.replay(mailer);
 	    
@@ -837,13 +840,15 @@ public class NotifierImplTest {
         inReg = reg.getSubscriber(s.getUserName()).getSubscription(toBeNotifiedFor.getId());
         assertTrue("Last Notification Time is not after " + t1,inReg.getLastNotification().after(t1));
         assertEquals(Status.UNREACHABLE, inReg.getLastNotifiedStatus());
-        EasyMock.verify(mailer);    
+        
 
         // we shouldn't get a notification as all child rules are OK again. 
         sendUpdateRuleTag(1, Status.OK.toInt());
         notifier.checkCacheForChanges();
         reg.getSubscriber(s.getUserName()).getSubscription(toBeNotifiedFor.getId());
         assertEquals(Status.OK, inReg.getLastNotifiedStatus());
+        
+        EasyMock.verify(mailer);    
          
 	}
 	
