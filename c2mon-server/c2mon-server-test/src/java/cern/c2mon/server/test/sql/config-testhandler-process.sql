@@ -76,7 +76,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'al
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'aliveInterval','60000');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'processId','25');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'description','Test MessageHandler');
-insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'handlerClass','cern.c2mon.driver.testhandler.TestMessageHandler');
+insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'handlerClass','cern.c2mon.daq.testhandler.TestMessageHandler');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'name','E_TEST_TESTHANDLER01');
 insert into timconfigval (seqid, elementfield, elementvalue) values (1000007,'commFaultTagId','1004');
 
