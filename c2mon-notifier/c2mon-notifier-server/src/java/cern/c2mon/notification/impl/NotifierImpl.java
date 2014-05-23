@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -496,7 +497,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
             for (Subscription s : update.getSubscribers()) {
                 logger.trace("{} Subscriber '{}' is interested in this update.", update.getId(), s.getSubscriberId());
                 try {
-                    // we add ourselfs, as we need to report on the metrics
+                    // we add ourself, as we need to report on the metrics
                     interestingChildRules.add(update);
                     
                     if (s.getTagId().longValue() != update.getId().longValue()) {
@@ -521,10 +522,59 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 }
             }
         } else {
+            logger.debug("{} has changed its state : {} -> {}. ", update.getId(), update.getPreviousStatus(), update.getLatestStatus());
             logger.debug("{} has child rules: R->R->M...", update.getId());
             logger.trace("{} children rules:", update.getAllChildRules());
+            
+            Set<Tag> allChildTags = update.getAllChildTagsRecursive();
+
+            boolean metricChanged = false;
+            for (Tag child : allChildTags) {
+                if (!child.isRule() && child.hasValueChanged()) {
+                    metricChanged = true;
+                }
+            }
+            
             // R->R->M
             for (Subscription s : update.getSubscribers()) {
+                
+                try {
+                    for (Tag child : allChildTags) {
+                        if (child.isRule() && !s.getLastStatusForResolvedSubTag(child.getId()).equals(child.getLatestStatus())) {
+                            // add to interesting list.
+                            logger.debug("{} Adding '{}' [{}] as interesting child.", update.getId(), child.getId(), child.getLatestStatus());
+                            interestingChildRules.add(child);
+                        } 
+                    }
+                    if (interestingChildRules.size() > 0 || metricChanged) {
+                        sendFullReportOn(update, s, interestingChildRules);
+                        s.setLastNotification(new Timestamp(System.currentTimeMillis()));
+                    
+                        for (Tag cR : interestingChildRules) {
+                            logger.debug("Setting status for resolved subtag '{}' to [{}] for Subscriber '{}'", 
+                                    update.getId(), cR.getId(), cR.getLatestStatus(), s.getSubscriberId()); 
+                            s.setLastStatusForResolvedTSubTag(cR.getId(), cR.getLatestStatus());
+                        }
+                        if (update.getId().longValue() != s.getTagId().longValue()) {
+                            // a sub rule update
+                            logger.debug("{} Setting status for resolved subtag '{}' to [{}] for Subscriber '{}'", 
+                                    update.getId(), update.getId(), update.getLatestStatus(), s.getSubscriberId());
+                            s.setLastStatusForResolvedTSubTag(update.getId(), update.getLatestStatus());
+                        } else {
+                            logger.debug("{} Setting last notified status to [{}] for Subscriber '{}'", 
+                                    update.getId(), update.getLatestStatus(), s.getSubscriberId());  
+                            s.setLastNotifiedStatus(update.getLatestStatus());
+                            
+                        }
+                    }
+                } catch (Exception ex) {
+                    logger.error(ex.getMessage(), ex);
+                }   
+                
+            }
+
+            
+            /*
                 if (s.getLastNotifiedStatus().equals(update.getLatestStatus())) {
                     logger.debug("{} received an update for it, but no status change. Checking children..", update.getId());
                     // no change for the update (why do we receive it ?) 
@@ -534,23 +584,25 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                             // add to interesting list.
                             interestingChildRules.add(cR);
                         } else {
-                            logger.debug("{} Childrule {} [{}] in Subscription {} was already notified ",
+                            logger.debug("{} Childrule '{}' [{}] in Subscription {} was already notified ",
                                     update.getId(), cR.getId(), 
                                     s.getLastStatusForResolvedSubTag(cR.getId()), s.getSubscriberId());
                         }
                     }
+                    
+                    
+                    
+                    
                 } else {
+                    // check if we have direct metrics assigned which should be visible in the message
                     boolean metricsChanged = false;
-                    for (Tag child : update.getAllChildTagsRecursive()) {
-                        if (child.getToBeNotified()) {
-                            // we received an update for this tag in the same iteration
-                            if (child.isRule() && child.hasStatusChanged()) {
-                                interestingChildRules.add(child);
-                            } else if (!child.isRule()){
-                                metricsChanged = true;
-                            }
+                    for (Tag child : update.getAllChildMetrics()) {
+                        if (child.getToBeNotified()){
+                            logger.trace("{} Metric '{}' was updated. Need to add parent .", update.getId(), child.getId(), child.getLatestStatus());
+                            metricsChanged = true;
                         }
                     }
+                    
                     if (metricsChanged) {
                         interestingChildRules.add(update);
                     }
@@ -562,13 +614,13 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                     if (interestingChildRules.size() > 0) {
                         sendFullReportOn(update, s, interestingChildRules);
                         for (Tag cR : interestingChildRules) {
-                            logger.debug("{} Setting status '{}' for resolved child {} for Subscriber '{}' ",
-                                    update.getId(),
-                                    cR.getLatestStatus(),
-                                    cR.getId(),
-                                    s.getSubscriberId()
-                                    );
                             if (cR.getId().longValue() != s.getTagId().longValue()) {
+                                logger.debug("{} Setting status '{}' for resolved child {} for Subscriber '{}' ",
+                                        update.getId(),
+                                        cR.getLatestStatus(),
+                                        cR.getId(),
+                                        s.getSubscriberId()
+                                        );
                                 s.setLastStatusForResolvedTSubTag(cR.getId(), cR.getLatestStatus());
                             }
                         }
@@ -579,8 +631,11 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);
                 }
+                
             } // END FOR
+            */
         }
+        
 
         logger.trace("Leaving sendReportOnRuleChange()");
     }
