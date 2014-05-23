@@ -27,21 +27,21 @@ table {
 <BODY>
 
 
-<h4>'${tagDescription}' has changed to status 
+<h4>'${ruleDescription}' has changed to status 
 <font 
-	<#if tagStatus == "ok">
+	<#if ruleStatus == "ok">
 		color="green"
-	<#elseif tagStatus == "warning">
+	<#elseif ruleStatus == "warning">
 		color="orange"
-	<#elseif tagStatus == "error">
+	<#elseif ruleStatus == "error">
 		color="red"
 	<#else>
 		color="blue"
 	</#if>
->${tagStatus}</font></h4>
+>${ruleStatus}</font></h4>
 
-<table border="0" cellpadding="0" cellspacing="2">
-	<tr><td>Web Link:</td><td></td><a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${tagId}">${tagName}</a></td></tr>
-	<tr><td>Server Time:</td><td>${tagServerTimestamp}</td></tr>
+<table border="0" cellpadding="0" cellspacing="1">
+	<tr><td width="100px">Web Link:</td><td></td><a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${ruleId}">${ruleName}</a></td></tr>
+	<tr><td width="100px">Server Time:</td><td>${ruleServerTimestamp}</td></tr>
 </table>
 

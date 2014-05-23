@@ -3,16 +3,35 @@
 
 
 <table border="0" cellspacing="0" cellpadding="2" border="1">
-	<#list children as ctag>
-		<tr><td colspan="2" bgcolor="#A2D6DE">&nbsp;</td></tr>
-		<tr><td>Description:</td><td>${ctag.tagDescription}</td></tr>
-		<tr><td>Value:</td><td>${ctag.tagValue} ${ctag.tagValueDescription}</td></tr>
-		<#if ctag.tagQuality?has_content>
-			<tr><td>Quality:</td><td>${ctag.tagQuality}</td></tr>
+	<#list children as rule>
+		<tr height="10px" ><td colspan="3" bgcolor="#A2D6DE">&nbsp;</td></tr>
+		
+		<tr><td>
+			<!--  Rule info for  -->
+			<font 
+		<#if rule.ruleStatus == "ok">
+			color="green"
+		<#elseif rule.ruleStatus == "warning">
+			color="orange"
+		<#elseif rule.ruleStatus == "error">
+			color="red"
+		<#else>
+			color="blue"
 		</#if>
-		<tr><td>Server Time:</td><td>${ctag.tagServerTimestamp}</td></tr>
-		<tr><td>Web Link</td><td><a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${ctag.tagId}">${ctag.tagName}</a></td></tr>
+	>${rule.ruleStatus}</font>
+			</td>
+			<td>
+				<a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${rule.ruleId}">${rule.ruleName}</a>
+			</td>
+			<td>
+			<!-- details on rule (the info from the datatags) -->
+				<table border="0" cellspacing="0" cellpadding="2">
+				<#list rule.dataTags as tag>
+					<tr><td>${tag.tagValue} </td></tr>
+				</#list>
+				</table> 
+			</td>
+		</tr>
 	</#list>
-	<tr><td colspan="2" bgcolor="#A2D6DE">&nbsp;</td></tr>
 </table>
 
