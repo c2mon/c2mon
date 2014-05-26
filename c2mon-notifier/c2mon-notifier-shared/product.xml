@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+   <product name="c2mon-notifier-shared" version="2.2.3" directory="c2mon/c2mon-notifier-shared">
+      <desc>
+         CMW Log Client
+      </desc>
+      <dependencies>
+         <dep product="slf4j-api" />
+         <dep product="slf4j-log4j12" local="true"/>
+         <dep product="dmn2-commons" />
+         <dep product="junit" local="true" /> 
+      </dependencies>
+
+      <deployment installLocation="/opt/cmw/log-client">
+         <directory name="conf" mask="550">
+            <file name="log4j.properties" mask="600" />
+         </directory>
+      </deployment>
+
+      <application name="logclient" title="CMW Log Client GUI">
+         <main-class name="cern.cmw.log.client.gui.ClientGuiExample" />
+         <property name="log4j.configuration" value="file:conf/log4j.properties" />
+      </application>
+   </product>
+</products>
