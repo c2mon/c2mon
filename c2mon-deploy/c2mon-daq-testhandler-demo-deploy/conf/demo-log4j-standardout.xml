@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- default log4j configuration for sending info to the standard output -->
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration debug="false"
+                     threshold="info"
+                     xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+
+  <renderer  renderedClass="cern.c2mon.shared.daq.datatag.SourceDataTagValue"
+             renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
+             
+  <renderer  renderedClass="cern.c2mon.server.common.rule.RuleTag"
+             renderingClass="cern.c2mon.server.common.rule.RuleTagRenderer" />
+             
+  <renderer  renderedClass="cern.c2mon.server.common.alarm.Alarm"
+             renderingClass="cern.c2mon.server.common.alarm.renderer.AlarmRenderer" />
+             
+<!--
+    Create a ConsoleAppender.
+    Log messages are written to the console
+  -->
+  <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%-d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c %x - %m%n"/>
+    </layout>
+  </appender>
+
+  <root>
+    <level value="info"/>
+    <appender-ref ref="ConsoleAppender" />
+  </root>
+
+</log4j:configuration>
