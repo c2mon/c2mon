@@ -57,7 +57,7 @@ public class BisJapcMessageHandler extends GenericJapcMessageHandler {
 
             ValueType valuesFieldType = valuesField.getValueType();
 
-            int index = getIndex(mapValue, NAMES_ARRAY_FIELD, addr.getIndexFieldName());
+            int index = getIndex(mapValue, NAMES_ARRAY_FIELD, addr.getDataFieldName());
             sendJAPCSValueFromArray(tag, valuesField, valuesFieldType, timeStamp, index);
 
         } catch (Exception e) {
