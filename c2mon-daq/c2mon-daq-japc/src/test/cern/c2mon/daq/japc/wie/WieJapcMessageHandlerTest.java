@@ -24,7 +24,7 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 public class WieJapcMessageHandlerTest extends AbstractGenericJapcMessageHandlerTst {
 
     /**
-     * This tests verifies the WieJapcMessageHandler's subscription mechanism. The generic handler by
+     * This tests verifies the BisJapcMessageHandler's subscription mechanism. The generic handler by
      * 
      * @throws Exception
      */

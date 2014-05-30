@@ -9,9 +9,8 @@
 	<!--
 		Create a ConsoleAppender. Log messages are written to the console
 	-->
-
-	<renderer renderedClass="cern.tim.shared.daq.datatag.SourceDataTagValue"
-		renderingClass="cern.tim.shared.daq.datatag.SourceDataTagValueRenderer" />
+  <renderer renderedClass="cern.c2mon.shared.daq.filter.FilteredDataTagValue"
+          renderingClass="cern.c2mon.shared.daq.filter.FilteredDataTagValueRenderer" />
 
 
 	<appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
