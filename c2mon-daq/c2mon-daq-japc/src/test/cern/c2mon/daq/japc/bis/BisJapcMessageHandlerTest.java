@@ -46,7 +46,7 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
 
         Parameter p1 = mockParameter("CIBX.400.LN4.RF/BoardRegisters");
 
-        String[] fields = { "namesArray", "valuesArray" };
+        String[] fields = { "registerNames", "registerValues" };
 
 
         // Array with names array
@@ -75,7 +75,7 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
         // set the new value
         p1.setValue(null, mpv(fields, values2));
 
-        Thread.sleep(1000);
+        Thread.sleep(1000);       
 
         verify(messageSender);
 
@@ -87,4 +87,61 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
         assertEquals(2, sdtv.getLastValue(54675L).getValue());
     }
 
+    
+    @Test
+    @UseConf("e_japc_bis1.xml")
+    public void subscription_Test2() throws Exception {
+
+        messageSender.sendCommfaultTag(107211, true);
+        expectLastCall().once();
+
+        SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
+
+        messageSender.addValue(EasyMock.capture(sdtv));
+
+        expectLastCall().times(1);
+
+        replay(messageSender);
+
+        // Create Mock parameters
+
+        Parameter p1 = mockParameter("CIBX.400.LN4.RF/BoardRegisters");
+
+        String[] fields = { "wrongFieldNames", "registerValues" };
+
+
+        // Array with names array
+
+        String[] fieldNames1 = { "FIELD1", "STATUS", "FIELD2"};
+        String[] fieldNames2 = { "FIELD1", "FIELD2", "STATUS"};
+        
+        float[] valueArray1 = { 0, 1, 2};
+        float[] valueArray2 = { 99, 0, 2};
+
+        Object[] values1 = { fieldNames1, valueArray1 };
+        Object[] values2 = { fieldNames2, valueArray2 };
+
+        setAnswer(p1, null, new DefaultParameterAnswer(mpv(fields, values1)));
+
+        japcHandler.connectToDataSource();
+
+        Thread.sleep(1200);
+
+        // set the new value
+
+        p1.setValue(null, mpv(fields, values1));
+
+        Thread.sleep(1000);
+
+        // set the new value
+        p1.setValue(null, mpv(fields, values2));
+
+        Thread.sleep(1000);       
+
+        verify(messageSender);
+        
+        assertEquals(SourceDataQuality.INCORRECT_NATIVE_ADDRESS, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
+        assertEquals("field: registerNames not found", sdtv.getFirstValue(54675L).getQuality().getDescription());      
+    }    
+    
 }

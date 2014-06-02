@@ -842,7 +842,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
         try {
             names = mpv.getStrings(parameterName);
         } catch (Exception ex) {
-            throw new ArrayIndexOutOfBoundsException("field not found");
+            throw new ArrayIndexOutOfBoundsException("field: "+parameterName +" not found");
         }
 
         if (names != null) {

@@ -15,7 +15,7 @@
 			<DataTagAddress>
 				<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.JAPCHardwareAddressImpl">
 					<protocol>mockito</protocol>
-					<service>mockito</service>
+					<service>mockito</service>		
 					<device-name>CIBX.400.LN4.RF</device-name>
 					<property-name>BoardRegisters</property-name>
 					<data-field-name>STATUS</data-field-name>
