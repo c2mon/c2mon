@@ -224,10 +224,10 @@ public class EquipmentMessageSenderTest {
         replay(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock, filterMessageSenderMock);
 
         // The first one has null currentSDValue and should not be filter
-        equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "");
+        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "", new Timestamp(System.currentTimeMillis() + 1L));
         // The second should go to filter module because the it has same currentSDvalue and newValue (null)
         // and same Quality
-        equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "");
+        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "", new Timestamp(System.currentTimeMillis() + 2L));
 
         verify(lowDynamicTimeDeadbandFilterActivatorMock, processMessageSenderMock);
     }
@@ -295,7 +295,7 @@ public class EquipmentMessageSenderTest {
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
         
         // The third one is invalid so it flush and cancel. It run the run() for the first time so the second value is sent to the server
-        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "");
+        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "", new Timestamp(System.currentTimeMillis() + 3L));
         Thread.sleep(300);
         assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
 
@@ -325,12 +325,12 @@ public class EquipmentMessageSenderTest {
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
         
         // The third one is invalid so it flush and cancel. It run the run() for the first time so the second value is sent to the server
-        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "");
+        this.equipmentMessageSender.sendInvalidTag(sdt1, SourceDataQuality.DATA_UNAVAILABLE, "", new Timestamp(System.currentTimeMillis() + 3L));
         Thread.sleep(200);
         assertEquals(SourceDataQuality.DATA_UNAVAILABLE, this.sdt1.getCurrentValue().getQuality().getQualityCode());
         
         // The forth one is also sent to the server since the value is different (flush and cancel again since the last one was invalid)
-        this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 3L);
+        this.equipmentMessageSender.sendTagFiltered(sdt1, true, System.currentTimeMillis() + 4L);
         Thread.sleep(200);
         assertEquals(true, this.sdt1.getCurrentValue().getValue());
         assertEquals(SourceDataQuality.OK, this.sdt1.getCurrentValue().getQuality().getQualityCode());

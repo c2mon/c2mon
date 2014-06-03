@@ -388,12 +388,12 @@ public class DataTagValueFilter {
 	 * to decide if the value has to be filtered out or not. 
 	 * 
 	 * Filter when:
-	 * - New TS <= Current TS + Current has not DATA_UNAVAILABLE Quality 
-	 * - New TS <= Current TS + Current has DATA_UNAVAILABLE Quality + New Bad Quality
+	 * - New TS < Current TS + Current has not DATA_UNAVAILABLE Quality 
+	 * - New TS < Current TS + Current has DATA_UNAVAILABLE Quality + New Bad Quality
 	 * 
 	 * No filter when:
-	 * - New TS <= Current TS + Current has DATA_UNAVAILABLE Quality + New Good Quality
-	 * - New TS > Current TS
+	 * - New TS < Current TS + Current has DATA_UNAVAILABLE Quality + New Good Quality
+	 * - New TS >= Current TS
 	 * 
 	 * @param newSDQuality new Source Data Tag Quality
 	 * @param currentSDQuality current Source Data Tag Quality
@@ -405,8 +405,8 @@ public class DataTagValueFilter {
 	    final long newTimestamp, final long currentTimestamp) {
 	  this.equipmentLogger.debug("isOlderUpdate - entering isOlderUpdate()");
 	  
-	  // if New TS is older or equal to the current TS we may have a filtering use case	  
-	  if (newTimestamp <= currentTimestamp) {
+	  // if New TS is older to the current TS we may have a filtering use case	  
+	  if (newTimestamp < currentTimestamp) {
 	    this.equipmentLogger.trace("isOlderUpdate - New timestamp is older or equal than current TS (" + newTimestamp + ", " + currentTimestamp +")");
       // New timestamp is older or equal than current TS. Check the Quality
       if (currentSDQuality.getQualityCode() == SourceDataQuality.DATA_UNAVAILABLE) {
@@ -429,7 +429,7 @@ public class DataTagValueFilter {
 	  }
 
 	  // New TS is newer than current TS
-	  this.equipmentLogger.trace("isOlderUpdate - New timestamp is newer than current TS. Not filter");
+	  this.equipmentLogger.trace("isOlderUpdate - New timestamp is newer or equal than current TS. Not filter");
 	  return false;
 	}
 }
