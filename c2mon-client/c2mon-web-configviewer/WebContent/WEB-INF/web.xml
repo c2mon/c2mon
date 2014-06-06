@@ -57,6 +57,6 @@
 	<error-page>
         <error-code>405</error-code>
         <location>/WEB-INF/views/loginNiceForm.jsp</location>
-    </error-page>
+  </error-page>
 
 </web-app>

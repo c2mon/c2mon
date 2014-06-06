@@ -12,15 +12,17 @@
 	<script type="text/javascript" src="../js/dygraph-combined.js"></script>
 	
 	<link rel="shortcut icon" href="../img/chart_icon.png">
-	
 	<link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
 	<link rel="stylesheet" type="text/css" href="../css/bootstrap-responsive.css" />
-
+  <link rel="stylesheet" type="text/css" href="../css/c2mon.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/buttons.css"/>
+  <link rel="stylesheet" type="text/css" href="../css/trend-view.css"/>
+  
 	<script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
   <script type="text/javascript" src="../js/bootstrap.js"></script>
-	<link rel="stylesheet" type="text/css" href="../css/c2mon.css"/>
-	<link rel="stylesheet" type="text/css" href="../css/buttons.css"/>
+
 	<script type="text/javascript" src="../js/hide-menu.js"></script>
+  <script type="text/javascript" src="../js/trend-view.js"></script>
 </head>
 
 <body >
@@ -37,30 +39,69 @@
     <div class="container-fluid">
       <div class="row-fluid" id="row-fluid">
 	  
-          <div class="page-header">
-			<h2 style="margin-left:50px;display:inline; text-align:center;">${view_title}</h2>
-			<div style="margin-left:50px;">
-				${view_description}
-			</div>
-          </div>
+        <div class="page-header">
+    			<h2 style="margin-left:50px;display:inline; text-align:center;">${view_title}</h2>
+    			<div style="margin-left:50px;">
+    				${view_description}
+    			</div>
+        </div>
 		  
-		<p style="margin-left:50px;width:90%; height:30px; min-width:550px; margin-bottom:5%;" class="links">
-			<A href="../historyviewer/${id}?${queryParameters}" 
+		<div style=" height:30px; min-width:670px; margin-bottom:20px;" class="links">
+			<A href="../historyviewer/${id}?${queryParameters}" style="display:inline; float:right;"
 				class="large blue awesome xml_button" target="_blank">Table >>
 			</A>	
 			<A href="../tagviewer/${id}" 
 				class="large blue awesome xml_button" target="_blank">View Tag >>
-			</A>
+			</A>     
 			<A href="https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=${id}" 
 				class="large red awesome xml_button" target="_blank">View Help Alarm >>
 			</A>
 			<A style="display:inline;float:left;" href="../" 
-			class="blue awesome xml_button">		
+			class="large blue awesome xml_button">		
 				 <i class="icon-home"></i> Home
-			</A>
-		</p>
+			</A>      
+      <A style="display:inline;float:left;" href="${url_help}" 
+        class="large blue awesome xml_button Help_page" target="_blank">Help >>
+      </A>   
+      <span style="display:inline;float:left;" class="large blue awesome xml_button navigation_popup" 
+          target="_blank">Info
+      </span> 
+      
+		</div>
 
-		<div style="width:100%; height:650px; ;" id="trend_view" ></div>
+    <div id="hide_links_show_menu" style="position: absolute; z-index: 999;">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    </div>
+    
+    <div class="Phone_Menu" style="position: absolute; z-index: 999; background-color: white;">
+      <p><A href="../" >Home </A></p>   
+      <p><A href="${url_help}" class="Help_page">Help >> </A></p> 
+      <p style="color:black;" class="navigation_popup">Info </p> 
+      <p><A href="../historyviewer/${id}?${queryParameters}" >Table >> </A></p>   
+      <p><A href="../tagviewer/${id}">View Tag >> </A></p>   
+      <p><A href="https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=${id}">View Help Alarm >> </A></p>
+    </div>
+    
+    <script type="text/javascript">
+      var url_help = '${url_help}';
+      if(url_help.trim().length<1)
+        $(".Help_page").hide();
+    </script>
+    
+    <div id="popup" style="position:absolute; background-color: #f8f8f8; z-index:999">
+    <h2 style="color:#000066;">Navigation</h2>
+    The chart is interactive:
+    <ul>
+        <li>Mouse over to highlight individual values.</li>
+        <li>Click and drag to zoom (horizontally or vertically).</li>
+        <li>Double-click will zoom back out.</li>
+        <li>Shift-drag will pan.</li>
+    </ul>
+    </div>
+		<div style="width:100%; height:650px; margin-top:50px; margin-left:-2%;" id="trend_view" ></div>
 		
 	</div>
     </div><!--/.fluid-container-->
@@ -175,7 +216,7 @@
            end_x_highlight = max_data_x;
          }
          highlight_period(start_x_highlight,end_x_highlight);
-         // get the end date of the invalid area 
+         // get the next invalid point 
          cpt++;
          nextDate = new Date(invalid[cpt]).getTime();
          

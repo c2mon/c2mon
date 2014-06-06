@@ -1,10 +1,32 @@
 
-#trend_view { 
-	
-	position: absolute; 
-	left: 200px; 
-	right: 10px; 
-	top: 100px; 
-	bottom: 10px; 
-	
+.Phone_Menu{
+  color:#FF0000;
+  }
+  
+
+.Phone_Menu a:link {
+COLOR: black;
+}
+.Phone_Menu a:visited {
+COLOR: black;
+}
+.Phone_Menu a:hover {
+COLOR: black;
+}
+.Phone_Menu a:active {
+COLOR: black;
+}
+
+.icon-bar {
+  display: block;
+  margin-top: 3px;
+  width: 18px;
+  height: 2px;
+  background-color: black;
+  -webkit-border-radius: 1px;
+     -moz-border-radius: 1px;
+          border-radius: 1px;
+  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+     -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+          box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
 }

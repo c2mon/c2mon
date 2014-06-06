@@ -65,6 +65,8 @@ public class TrendViewController {
 
   /** Instruction for the form page */
   public static final String INSTRUCTION = "Enter a Tag Id to create a Trend View.";
+  
+  public static final String URL_HELP = System.getProperty("c2mon.web.trend.viewer.help.url");
 
   /** How many records in history to ask for (default): 100 looks ok! */
   private static final int RECORDS_TO_ASK_FOR = 100;
@@ -95,6 +97,7 @@ public class TrendViewController {
     model.addAttribute("unit", tag.getUnit());
     model.addAttribute("id", tag.getId());
     model.addAttribute("fill_graph", true);
+    model.addAttribute("url_help", URL_HELP); 
     model.addAttribute("labels", new String[]{"Server Timestamp", 
         "[" + tag.getId() + "] " });
     
@@ -131,7 +134,7 @@ public class TrendViewController {
       model.addAttribute("CSV", historyService.getHistoryCSV(historyValues, isBooleanData));
       model.addAttribute("invalidPoints", invalidPoints);
       model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
-
+      model.addAttribute("url_help", URL_HELP); 
       model.addAttribute("records", lastRecords);
       model.addAttribute("view_title", tagValue.getName());
       model.addAttribute("view_description", "(Last " + lastRecords + " records)");
@@ -174,7 +177,7 @@ public class TrendViewController {
     model.addAttribute("CSV", historyCSV);
     model.addAttribute("invalidPoints", invalidPoints);
     model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
-
+    model.addAttribute("url_help", URL_HELP); 
     model.addAttribute("view_title", tagValue.getName());
     model.addAttribute("view_description", "(Last " + days + " days)");
     model.addAttribute("queryParameters", LAST_DAYS_PARAMETER + "=" + days);
@@ -211,7 +214,7 @@ public class TrendViewController {
     model.addAttribute("CSV", historyCSV);
     model.addAttribute("invalidPoints", invalidPoints);
     model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
-
+    model.addAttribute("url_help", URL_HELP); 
     model.addAttribute("records", records);
     model.addAttribute("view_title", tagValue.getName());
     model.addAttribute("view_description", "(Last " + records + " records)");
@@ -255,6 +258,7 @@ public class TrendViewController {
     model.addAttribute("CSV", historyCSV);
     model.addAttribute("invalidPoints", invalidPoints);
     model.addAttribute("is_boolean", ((Boolean) (isBooleanData)));
+    model.addAttribute("url_help", URL_HELP); 
     model.addAttribute("view_title", tagValue.getName());
     model.addAttribute("view_description", " (From " + start + " to " + end + ")");
     model.addAttribute(

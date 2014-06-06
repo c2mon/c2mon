@@ -23,6 +23,17 @@
 
   <!-- page : tag -->
   <xsl:template match="ClientDataTag">
+   <html>
+      <head>
+        <title>Configuration viewer</title>
+        <link rel="stylesheet" type="text/css" href="../css/c2mon.css"></link>
+        <link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
+        <link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
+
+        <script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
+        <script type="text/javascript" src="../js/bottom_panel.js"></script>
+      </head>
+      <body>
     <div class="page-header">
       <h2>
         <xsl:value-of select="tagName" />
@@ -34,7 +45,7 @@
     <div class="links" style="margin-bottom:5%;">
       <A style="display:inline;float:left;" href="{$base_url}"
         class="large blue awesome xml_button">
-        Home
+        <i class="icon-home"></i> Home
       </A>
       <A href="{$base_url}{$tag_value_xml_url}{@id}/" class="large blue awesome xml_button"
         target="_blank">View ClientDataTag XML >>
@@ -113,6 +124,8 @@
     </table>
     <xsl:apply-templates select="alarms" />
     <xsl:apply-templates select="tagQuality" />
+    </body>
+    </html>
   </xsl:template>
 
   <xsl:template match="tagQuality">
@@ -176,7 +189,6 @@
     the element ClientDataTag -->
   <!-- page : tag -->
   <xsl:template match="TagConfig">
-
     <p>
       <A href="{$base_url}{$tag_config_xml_url}{@id}/" class="large blue awesome xml_button"
         target="_blank">View TagConfig XML >>
@@ -254,7 +266,6 @@
         - no JAPC and DIP</td> <td><xsl:value-of select="publications"/></td> </tr> -->
 
     </table>
-
   </xsl:template>
 
   <!-- process the XML element AlarmValue -->
@@ -569,7 +580,6 @@
         <link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
         <link rel="stylesheet" type="text/css" href="../css/buttons.css"></link>
         <link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap-responsive.css" />
         
         <script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
         <script type="text/javascript" src="../js/bottom_panel.js"></script>

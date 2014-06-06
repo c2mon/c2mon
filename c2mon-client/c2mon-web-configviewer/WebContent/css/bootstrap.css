@@ -61,15 +61,7 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }
-a:focus {
-  outline: thin dotted #333;
-  outline: 5px auto -webkit-focus-ring-color;
-  outline-offset: -2px;
-}
-a:hover,
-a:active {
-  outline: 0;
-}
+
 sub,
 sup {
   position: relative;
@@ -132,21 +124,13 @@ textarea {
   vertical-align: top;
 }
 body {
-  margin: 0;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   line-height: 18px;
   color: #333333;
   background-color: #ffffff;
 }
-a {
-  color: #375e99;
-  text-decoration: none;
-}
-a:hover {
-  color: #233b61;
-  text-decoration: underline;
-}
+
 .row {
   margin-left: -20px;
   *zoom: 1;
@@ -355,7 +339,6 @@ p small {
   line-height: 27px;
 }
 h1,
-h2,
 h3,
 h4,
 h5,
@@ -367,7 +350,6 @@ h6 {
   text-rendering: optimizelegibility;
 }
 h1 small,
-h2 small,
 h3 small,
 h4 small,
 h5 small,
@@ -380,13 +362,6 @@ h1 {
   line-height: 36px;
 }
 h1 small {
-  font-size: 18px;
-}
-h2 {
-  font-size: 24px;
-  line-height: 36px;
-}
-h2 small {
   font-size: 18px;
 }
 h3 {
