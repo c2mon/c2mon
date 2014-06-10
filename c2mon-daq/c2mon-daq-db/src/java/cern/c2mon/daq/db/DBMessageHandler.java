@@ -535,6 +535,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * server ever since the daq was started
      * */
     private void showAmountOfProcessedAlerts() {
+      if (getEquipmentLogger().isTraceEnabled()) {
         int globalTotal = 0;
         StringBuilder msg = new StringBuilder("Processed alerts: [ ");
         for (Entry<Long, Integer> e : this.dbController.getAlertsSent().entrySet()) {
@@ -543,7 +544,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
             globalTotal += e.getValue();
         }
         msg.append(" ]");
-        getEquipmentLogger().info(msg);
+        getEquipmentLogger().trace(msg);
         msg = new StringBuilder("Processed invalid: [ ");
         for (Entry<Long, Integer> e : this.dbController.getInvalidSent().entrySet()) {
             if (e.getKey() > 0)
@@ -551,8 +552,9 @@ public class DBMessageHandler extends EquipmentMessageHandler {
             globalTotal += e.getValue();
         }
         msg.append(" ]");
-        getEquipmentLogger().info(msg);
-        getEquipmentLogger().info("Total sent: " + globalTotal);
+        getEquipmentLogger().trace(msg);
+        getEquipmentLogger().trace("Total sent: " + globalTotal);
+      }
     }
 
 }
