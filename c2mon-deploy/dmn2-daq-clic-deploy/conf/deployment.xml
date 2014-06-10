@@ -20,6 +20,7 @@
 				<java-vm-args>-Xms512m -Xmx512m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 			</startscript>
 
+
 			<!-- these inherit from the unnamed script (above) -->
 			<startscript name="DMN2-DAQ-CLIC_VMW">
 				<env name="PROCESS_NAME" value="P_CLIC_VMW" />
@@ -66,10 +67,41 @@
 		</application>
 
 		<application name="dmn2-daq-clic-dev">
-			<startscript>
+
+			<!-- these inherit from the unnamed script (above) -->
+			<startscript name="DMN2-DAQ-CLIC_VMW">
 				<!-- disable automatic CLIC agent reconfiguration on test system -->
 				<property name="dmn2.daq.clic.configuration_enabled" value="false" />
 			</startscript>
+			<startscript name="DMN2-DAQ-CLIC_VML">
+				<!-- disable automatic CLIC agent reconfiguration on test system -->
+				<property name="dmn2.daq.clic.configuration_enabled" value="false" />
+			</startscript>
+			<startscript name="DMN2-DAQ-CLIC_LHC">
+				<!-- disable automatic CLIC agent reconfiguration on test system -->
+				<property name="dmn2.daq.clic.configuration_enabled" value="false" />
+			</startscript>
+			<startscript name="DMN2-DAQ-CLIC_INJ">
+				<!-- disable automatic CLIC agent reconfiguration on test system -->
+				<property name="dmn2.daq.clic.configuration_enabled" value="false" />
+			</startscript>
+			<startscript name="DMN2-DAQ-CLIC_SPS">
+				<!-- disable automatic CLIC agent reconfiguration on test system -->
+				<property name="dmn2.daq.clic.configuration_enabled" value="false" />
+			</startscript>
+			<startscript name="DMN2-DAQ-CLIC_MISC">
+				<!-- disable automatic CLIC agent reconfiguration on test system -->
+				<property name="dmn2.daq.clic.configuration_enabled" value="false" />
+			</startscript>
+			<startscript name="DMN2-DAQ-CLIC_MISC_FEC">
+				<!-- disable automatic CLIC agent reconfiguration on test system -->
+				<property name="dmn2.daq.clic.configuration_enabled" value="false" />
+			</startscript>
+			<startscript name="DMN2-DAQ-CLIC_MISC_WS">
+				<!-- disable automatic CLIC agent reconfiguration on test system -->
+				<property name="dmn2.daq.clic.configuration_enabled" value="false" />
+			</startscript>
+
 			<deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-clic-dev">
 				<backupPolicy keepBackups="1">
 					<preserve type="dir" name="log" />
