@@ -48,7 +48,8 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
     public static final String ACTIVEMQ_URL = "tcp://localhost:9999";
     public static final String ACTIVEMQ_FAILOVER_URL = "failover:(" + ACTIVEMQ_URL
             + ")?jms.prefetchPolicy.all=100&startupMaxReconnectAttempts=2";
-
+    
+    
     @Override
     protected void beforeTest() throws Exception {
         System.setProperty(AgentClientConstants.DMN2_AGENTLIB_BROKER_PROPERTY, ACTIVEMQ_FAILOVER_URL);
@@ -141,7 +142,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
 
     @Test
     @UseConf("conf-clic-two-metrics.xml")
-    public void subscriptionWithClicReconfigurationTest1() throws Exception {
+    public void subscriptionWithClicReconfigurationTest1() throws Exception {                       
         messageSender.sendCommfaultTag(107211, true);
         expectLastCall().once();
 

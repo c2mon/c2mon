@@ -11,21 +11,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import cern.dmn2.agentlib.AgentClient;
-import cern.dmn2.agentlib.AgentCommunicationException;
-import cern.dmn2.agentlib.AgentContext;
-import cern.dmn2.agentlib.AgentListener;
-import cern.dmn2.agentlib.AgentMessage;
-import cern.dmn2.agentlib.CommandType;
-import cern.dmn2.agentlib.CommunicationListener;
-import cern.dmn2.agentlib.FieldDataType;
-import cern.dmn2.agentlib.MessageBody;
-import cern.dmn2.agentlib.MessageHeader;
-import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
@@ -36,6 +26,16 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.dmn2.agentlib.AgentClient;
+import cern.dmn2.agentlib.AgentCommunicationException;
+import cern.dmn2.agentlib.AgentContext;
+import cern.dmn2.agentlib.AgentListener;
+import cern.dmn2.agentlib.AgentMessage;
+import cern.dmn2.agentlib.CommandType;
+import cern.dmn2.agentlib.CommunicationListener;
+import cern.dmn2.agentlib.FieldDataType;
+import cern.dmn2.agentlib.MessageBody;
+import cern.dmn2.agentlib.MessageHeader;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
@@ -54,6 +54,10 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
     // size of the reconfiguration thread pool
     protected static int CLIC_RECONFIGURATION_THREADS_POOL_SIZE = Integer.parseInt(System.getProperty(
             "dmn2.daq.clic.configuration_threads", "4"));
+
+    // this flag determins if the CLIC reconfiguration algorithm is enabled or not.
+    protected static boolean CLIC_RECONFIGURATION_ALGORITHM_ENABLED = Boolean.parseBoolean(System.getProperty(
+            "dmn2.daq.clic.configuration_enabled", "true"));
 
     // reference to the static agent client instance, shared across all instances of the ClicMessageHandler
     private static AgentClient client;
@@ -92,11 +96,13 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
 
     public ClicMessageHandler() {
 
-        // start a predefined number of CLIC configuration threads
-        // NOTE: CLIC configuration threads are shared across all CLIC handlers
-        while (clicReconfigurationFutures.size() < CLIC_RECONFIGURATION_THREADS_POOL_SIZE) {
-            clicReconfigurationFutures.add(clicReconfigurationExecutor.submit(new ClicConfigurationTask()));
-        }// while
+        if (CLIC_RECONFIGURATION_ALGORITHM_ENABLED) {
+            // start a predefined number of CLIC configuration threads
+            // NOTE: CLIC configuration threads are shared across all CLIC handlers
+            while (clicReconfigurationFutures.size() < CLIC_RECONFIGURATION_THREADS_POOL_SIZE) {
+                clicReconfigurationFutures.add(clicReconfigurationExecutor.submit(new ClicConfigurationTask()));
+            }// while
+        }
 
     }
 
@@ -180,8 +186,10 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
                 getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
                         ex.getMessage());
 
-                // register this CLIC for reconfiguration
-                ClicConfigurationTask.registerForReconfiguration(ClicMessageHandler.this);
+                if (CLIC_RECONFIGURATION_ALGORITHM_ENABLED) {
+                    // register this CLIC for reconfiguration
+                    ClicConfigurationTask.registerForReconfiguration(ClicMessageHandler.this);
+                }
 
             } catch (Exception e) {
                 getEquipmentLogger().warn(
