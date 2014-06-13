@@ -27,8 +27,8 @@ DAQ_CONF_HOME=$DAQ_HOME/conf
 C2MON_PROPERTIES_FILE=$DAQ_CONF_HOME/c2mon.properties
 
 #log4j configuration file (uncomment log4j.xml for a rolling appender)
-LOG4J_CONF_FILE=$DAQ_HOME/conf/log4j.xml
-#LOG4J_CONF_FILE=$DAQ_HOME/conf/log4j-standardout.xml
+#LOG4J_CONF_FILE=$DAQ_HOME/conf/log4j.xml
+LOG4J_CONF_FILE=$DAQ_HOME/conf/log4j-standardout.xml
 
 # DAQ xml file
 ADDITIONAL_PARAMS="${ADDITIONAL_PARAMS} -c ${DAQ_CONF_HOME}/local/${PROCESS_NAME}.xml"
