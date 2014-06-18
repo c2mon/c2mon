@@ -2,10 +2,7 @@
 <products>
 	<product name="c2mon">
 
-		<!--
-			this application section is a parent configuration for both
-			c2mon-dmn2-prod and c2mon-dmn2-test
-		-->
+		<!-- this application section is a parent configuration for both c2mon-dmn2-prod and c2mon-dmn2-test -->
 		<application name="default">
 
 			<startscript name="DMN2-SRV">
@@ -15,10 +12,10 @@
 					</output>
 				</main-class>
 				<java-vm-args>-Xms4G -Xmx4G -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
-				
-				<!--  the following property defines if C2MON server caches shall be preloaded from database at start-up -->
+
+				<!-- the following property defines if C2MON server caches shall be preloaded from database at start-up -->
 				<property name="c2mon.server.cache.skippreloading" value="false" />
-				
+
 				<property name="server.process.name" value="DMN2-SRV" />
 				<property name="c2mon.process.name" value="DMN2-SRV" />
 				<property name="c2mon.home" value="$INSTALL_PATH" />
@@ -27,25 +24,31 @@
 				<property name="log4j.configuration" value="conf/log4j.xml" />
 				<property name="com.sun.management.jmxremote.port" value="9523" />
 				<property name="com.sun.management.jmxremote.password.file" value="conf/.jmxremote.passwd" />
-				<property name="com.sun.management.jmxremote.access.file" 	value="conf/.jmxremote.access" />
+				<property name="com.sun.management.jmxremote.access.file" value="conf/.jmxremote.access" />
 				<property name="com.sun.management.jmxremote.ssl" value="false" />
 				<property name="c2mon.home" value="$INSTALL_DIR" />
-				<property name="laser.hosts" value="laser-test" />
-				<property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
-                <property name="oracle.net.tns_admin" value="/etc" />
-                <property name="com.tc.productkey.path" value="conf/terracotta-license.key"/>
+				<property name="oracle.net.tns_admin" value="/etc" />
+				<property name="com.tc.productkey.path" value="conf/terracotta-license.key" />
+
+				<property name="laser.hosts" value="${LASER_HOSTS}" />
+				<property name="cmw.mom.brokerlist" value="${LASER_BROKERLIST}" />
+
 				<preExec>
 					<![CDATA[
-					      # ***************************************************************************
-					      #           NOTE:					         
-					      #           If the c2mon.server.cache.skippreloading flag is set to "true" the server 
-					      #           will not preload its caches from  the database, isitead it will refer to local 
-					      #           cache files, stored in: log/ehcache-diskstore  
-					      # ***************************************************************************
-					      
-					      # uncomment the two lines below  if you need to connect to the server process with the remote debugger 
-					      #REMOTE_DEBUGGER_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
-					      #JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUGGER_OPTS}"					      
+# ***************************************************************************
+#           NOTE:					         
+#           If the c2mon.server.cache.skippreloading flag is set to "true" the server 
+#           will not preload its caches from  the database, isitead it will refer to local 
+#           cache files, stored in: log/ehcache-diskstore  
+# ***************************************************************************
+				      
+# uncomment the two lines below  if you need to connect to the server process with the remote debugger 
+#REMOTE_DEBUGGER_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+#JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUGGER_OPTS}"				
+			      
+# source in additional file with environment variables
+. bin/setenv.sh
+					      	      
                     ]]>
 				</preExec>
 			</startscript>
@@ -62,37 +65,39 @@
 		<application name="dmn2-srv-pro" extends="default">
 			<deployment installLocation="/opt/dmn2/dmn2-srv-pro">
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/server"
-						mask="400" />
-					<file name=".jmxremote.access" sourceDir="~diamonop/c2mon/server"
-						mask="400" />
-					<file name="c2mon.properties" sourceDir="~diamonop/c2mon/server"
-						mask="400" />
+					<file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/server" mask="400" />
+					<file name=".jmxremote.access" sourceDir="~diamonop/c2mon/server" mask="400" />
+					<file name="c2mon.properties" sourceDir="~diamonop/c2mon/server" mask="400" />
 					<!-- copy over pro. server's log4j configuration -->
-					<file name="log4j.xml" sourceDir="~diamonop/c2mon/server"
-						mask="444" />
+					<file name="log4j.xml" sourceDir="~diamonop/c2mon/server" mask="444" />
+				</directory>
+
+				<directory name="bin">
+					<file name="setnv.sh" sourceDir="~diamonop/c2mon/server" mask="444" />
 				</directory>
 
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
 					<mail address="project-diamon-core@cern.ch" />
 				</notification>
-				
+
 			</deployment>
 		</application>
 
 		<application name="dmn2-srv-dev" extends="default">
 			<deployment installLocation="/opt/dmn2/dmn2-srv-dev">
 				<directory name="conf">
-					<file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/server"
-						mask="400" />
-					<file name=".jmxremote.access" sourceDir="~dmndev/c2mon/server"
-						mask="400" />
-					<file name="c2mon.properties" sourceDir="~dmndev/c2mon/server"
-						mask="400" />
+					<file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/server" mask="400" />
+					<file name=".jmxremote.access" sourceDir="~dmndev/c2mon/server" mask="400" />
+					<file name="c2mon.properties" sourceDir="~dmndev/c2mon/server" mask="400" />
 					<!-- copy over pro. server's log4j configuration -->
 					<file name="log4j.xml" sourceDir="~dmndev/c2mon/server" mask="444" />
 				</directory>
+
+				<directory name="bin">
+					<file name="setnv.sh" sourceDir="~dmndev/c2mon/server" mask="444" />
+				</directory>
+
 			</deployment>
 		</application>
 
