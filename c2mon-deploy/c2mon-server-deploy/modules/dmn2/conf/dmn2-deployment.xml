@@ -73,7 +73,7 @@
 				</directory>
 
 				<directory name="bin">
-					<file name="setnv.sh" sourceDir="~diamonop/c2mon/server" mask="444" />
+					<file name="setenv.sh" sourceDir="~diamonop/c2mon/server" mask="444" />
 				</directory>
 
 				<notification>
@@ -95,7 +95,7 @@
 				</directory>
 
 				<directory name="bin">
-					<file name="setnv.sh" sourceDir="~dmndev/c2mon/server" mask="444" />
+					<file name="setenv.sh" sourceDir="~dmndev/c2mon/server" mask="444" />
 				</directory>
 
 			</deployment>
