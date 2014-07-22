@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+   <product name="dmn2-daq-db">
+
+      <!--
+         this application section is a parent configuration for both
+         c2mon-dmn2-prod and c2mon-dmn2-test
+      -->
+      <application>
+         <deployment >
+            <directory name="log" />
+         </deployment>
+         <startscript name="DMN2-DAQ-DB">
+            <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
+               <arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName ${PROCESS_NAME} -noDeadband </arg>
+               <output>
+                  <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
+               </output>
+            </main-class>
+            <property name="c2mon.daq.equipment.alive.filteringtrue" value="true" />
+            <property name="c2mon.process.name" value="${PROCESS_NAME}" />
+            <property name="c2mon.log.dir" value="log" />
+            <property name="c2mon.daq.spring.context" value="file:conf/daq-core-service.xml" />
+            <java-vm-args>-Xms128m -Xmx128m -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+            
+            <env name="PROCESS_NAME" value="P_DB" />
+         </startscript>
+      </application>
+
+      <application name="dmn2-daq-db-pro">
+         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-db">
+            <directory name="conf">
+               <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
+               <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
+               <file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
+            </directory>
+            <notification>
+               <mail address="diamon-developers@cern.ch" />
+            </notification>
+         </deployment>
+      </application>
+
+      <application name="dmn2-daq-db-dev">
+         <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-db-dev">
+            <directory name="conf">
+               <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
+               <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
+               <file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
+            </directory>
+         </deployment>
+      </application>
+
+   </product>
+</products>
