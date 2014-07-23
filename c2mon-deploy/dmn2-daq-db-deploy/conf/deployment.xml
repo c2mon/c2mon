@@ -9,6 +9,7 @@
       <application>
          <deployment >
             <directory name="log" />
+            <directory name="local" />
          </deployment>
          <startscript name="DMN2-DAQ-DB">
             <main-class name="cern.c2mon.daq.common.startup.DaqStartup">
@@ -17,6 +18,7 @@
                   <file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
                </output>
             </main-class>
+            <property name="oracle.net.tns_admin" value="/etc" />
             <property name="c2mon.daq.equipment.alive.filteringtrue" value="true" />
             <property name="c2mon.process.name" value="${PROCESS_NAME}" />
             <property name="c2mon.log.dir" value="log" />
