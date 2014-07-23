@@ -137,8 +137,6 @@ else {
   print  "		<property name=\"app.name\" value=\"$appName\"/>\n";
 }
 
-# Defines the version number that is shown in the DMN2 Viewer about dialog
-print "		<property name=\"tim.version\" value=\"$viewerVersion\"/>\n";
 # JMS configuration parameters needed by C2MON client API
 print "		<property name=\"c2mon.client.conf.url\" value=\"$c2monClientPropertiesURL\"/>\n";
 
