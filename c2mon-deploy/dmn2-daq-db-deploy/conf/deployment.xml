@@ -33,6 +33,7 @@
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-db">
             <directory name="conf">
                <file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
+               <file name="db-daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
                <file name="log4j.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
                <file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
             </directory>
@@ -46,6 +47,7 @@
          <deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-db-dev">
             <directory name="conf">
                <file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
+               <file name="db-daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
                <file name="log4j.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
                <file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
             </directory>
