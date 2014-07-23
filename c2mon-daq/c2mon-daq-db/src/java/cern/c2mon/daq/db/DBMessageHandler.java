@@ -425,11 +425,14 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         }
         
         if (address.startsWith("dbUrl")) {
+            getEquipmentLogger().info("Trying to read database credentials directly from address...");
             parseDBAddress(address);
         } else if(address.startsWith("fileUrl")) {
             File config = new File(address.split("=")[1]);
             loadUrlFromFile(config);
         }
+        
+        getEquipmentLogger().info("Successfully loaded equipment address.");
     }
     
     /**
@@ -442,20 +445,21 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      */
     private void loadUrlFromFile(File configFile) throws EqIOException {
         Properties p = new Properties();
-        
+        getEquipmentLogger().info("Trying to read database credentials from file " + configFile + " ...");
         try {
             BufferedInputStream stream = new BufferedInputStream(new FileInputStream(configFile));
             p.load(stream);
         } catch (IOException e) {
-            throw new EqIOException(e);
+            throw new EqIOException("Failed to load from " + configFile + " : " + e.getMessage(), e);
         }
         
         String dbUrl = (String) p.get("dbUrl");
         if (dbUrl == null || dbUrl.length() == 0) {
             throw new EqIOException("Cannot find value for 'dbUrl' in properties file " + configFile);
         }
+        getEquipmentLogger().debug("Got file content. Now trying to parse db url .." + configFile + " ...");
+        parseDBAddress("dbUrl=" + dbUrl);
         
-        parseDBAddress(dbUrl);
     }
     
     /**
