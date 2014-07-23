@@ -1,5 +1,9 @@
 package cern.c2mon.daq.db;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -16,6 +21,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.UncategorizedSQLException;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.address.DBHardwareAddress;
@@ -395,12 +401,63 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      *             if parsing of the address is unsuccessful
      * */
     public void setDBDataSourceAddress() throws EqIOException {
-        parseDBAddress();
+        loadEqConfig();
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:cern/c2mon/daq/db/config/daq-db-config.xml");
         dbDaqDao = (IDbDaqDao) context.getBean("dbDaqDao");
         dbDaqDao.setDataSourceParams(dbAddress.get(DB_URL), dbAddress.get(DB_USERNAME), dbAddress.get(DB_PASSWORD));
     }
 
+    /**
+     * Loads the equipment address (the db url for our DB_DAQ table) depending on the location 
+     * defined in {@link IEquipmentConfiguration#getAddress()}.
+     * <ul>
+     * <li>dbUrl=...       : url taken directly from the configuration</li>
+     * <li>fileUrl=myconf  : url taken from a file "myconf" on the disk</li>
+     * </ul>
+     *  
+     * @throws EqIOException
+     */
+    private void loadEqConfig() throws EqIOException {
+        String address = super.getEquipmentConfiguration().getAddress();
+        
+        if (address == null || address.length() == 0) {
+            throw new EqIOException("No equipment address in config defined");
+        }
+        
+        if (address.startsWith("dbUrl")) {
+            parseDBAddress(address);
+        } else if(address.startsWith("fileUrl")) {
+            File config = new File(address.split("=")[1]);
+            loadUrlFromFile(config);
+        }
+    }
+    
+    /**
+     * Searches in the passed {@link Properties} file a property called dbUrl and uses 
+     * {@link #parseDBAddress(String)} to load the equipment config.
+     *  
+     * @see #loadEqConfig()
+     * @param configFile The properties file with the dbUrl instruction.
+     * @throws EqIOException in case the file or the "dbUrl=" property cannot be found. 
+     */
+    private void loadUrlFromFile(File configFile) throws EqIOException {
+        Properties p = new Properties();
+        
+        try {
+            BufferedInputStream stream = new BufferedInputStream(new FileInputStream(configFile));
+            p.load(stream);
+        } catch (IOException e) {
+            throw new EqIOException(e);
+        }
+        
+        String dbUrl = (String) p.get("dbUrl");
+        if (dbUrl == null || dbUrl.length() == 0) {
+            throw new EqIOException("Cannot find value for 'dbUrl' in properties file " + configFile);
+        }
+        
+        parseDBAddress(dbUrl);
+    }
+    
     /**
      * Parses the database address extracted from the equipment configuration
      * section of the XML. Checks for the existence of all expected properties
@@ -409,10 +466,11 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      *             if the address doesn't contain the required properties or
      *             contains unrecognized ones
      * */
-    private void parseDBAddress() throws EqIOException {
+    private void parseDBAddress(String address) throws EqIOException {
         this.dbAddress = new HashMap<String, String>();
         boolean keyFound;
-        String[] properties = super.getEquipmentConfiguration().getAddress().split(PROPERTY_SEPARATOR);
+        
+        String[] properties = address.split(PROPERTY_SEPARATOR);
         for (int i = 0; i < properties.length; i++) {
             int separatorIndex = properties[i].indexOf(VALUE_SEPARATOR);
             String key = properties[i].substring(0, separatorIndex);
