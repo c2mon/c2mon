@@ -44,7 +44,7 @@ public class RdaPublisherTest {
         try {
           DataEntry idEntry = value.get("id");
           long id = idEntry.extractLong();
-          if (value.get("id").extractLong() != 161027) {
+          if (id != 161027) {
             subscriptionTestOK = false;
             error = true;
           }
