@@ -517,16 +517,9 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
     
     @Override
     public final Object forceEvaluate(final Map<Long, Object> pInputParams)  {
-      
       try {
-        // Invalid Tags are replaced with their Values  
-        final Object result = tryToIgnoreInvalidTags(pInputParams);
-        if (isResultInvalid(result)) {
-          return null;
-        }
-        return result;
-        
-      } catch (final Exception e) {
+        return handleRuleWithNoInvalidTags(pInputParams);
+      } catch (Exception e) {
         return null;
       }
     }
@@ -571,61 +564,6 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
             e.printStackTrace();
         }
         System.out.println();
-    }
-
-    public static void main(String[] args) {
-
-        /*
-         * testExpression("-1.5"); testExpression("1.5"); testExpression("1."); testExpression(".5");
-         * testExpression("1"); testExpression("true"); testExpression("false"); testExpression("OK");
-         * testExpression("\"R!OK\" "); testExpression("(1)"); testExpression("(\"true\")");
-         * 
-         * testExpression("3+3"); testExpression("3-3"); testExpression("3/3"); testExpression("3/0");
-         * testExpression("3*3"); testExpression("3^2");
-         * 
-         * testExpression("true = false"); testExpression("true != false"); testExpression("3=3");
-         * testExpression("3!=3"); testExpression("\"OK\"!=\"NOK\""); testExpression("\"OK\"=\"NOK\"");
-         * testExpression("2<3"); testExpression("3<3"); testExpression("2<=3"); testExpression("3<=3");
-         * testExpression("4<=3"); testExpression("3>3"); testExpression("4>3"); testExpression("2>=3");
-         * testExpression("3>=3"); testExpression("4>=3");
-         * 
-         * testExpression("true<false"); testExpression("true<false"); testExpression("-(3)");
-         * testExpression("(3+3+3)");
-         * 
-         * try { SimpleRuleExpression exp = new SimpleRuleExpression("#1+3+#2"); System.out.println(exp.toString());
-         * Hashtable x = new Hashtable(); x.put(new Long(1), new Integer(5)); x.put(new Long(2), new Integer(5)); Object
-         * result = exp.evaluate(x); System.out.println("--> result type:  " + result.getClass().getName());
-         * System.out.println("--> result value: " + result.toString()); //System.out.println(exp.toString()); } catch
-         * (Exception e) { System.out.println("--> error: " + e.getMessage()); } System.exit(0);
-         */
-        /*
-         * testExpression(" -1.5"); testExpression(" -(1.5)"); testExpression("-3+3"); testExpression("-3-3");
-         * testExpression("-(3+3)"); /// testExpression("-(3+3+3)"); /// testExpression("-(-3-3+(-3))");
-         * testExpression("true"); testExpression("!true"); testExpression("!(!true))"); testExpression("!!true");
-         * 
-         * testExpression("2^2"); testExpression("2^-2"); testExpression("2^0.5"); testExpression("2^-0.5");
-         * testExpression("true|true"); testExpression("true|false"); testExpression("false|true");
-         * testExpression("false|false"); testExpression("false|3"); testExpression("3|3"); testExpression("3|true");
-         */
-
-        testExpression("(18000 > 17000)");
-        testExpression("(0.0 = 2)");
-        testExpression("(18000 > 17000) | (0=2)");
-        /*
-         * try {
-         * 
-         * Hashtable inputs = new Hashtable(); inputs.put(new Long(56447), new Float(18000)); inputs.put(new
-         * Long(56445), new Float(0)); inputs.put(new Long(56446), new Float(0)); inputs.put(new Long(56443), new
-         * Float(0)); inputs.put(new Long(56412), new Float(0)); inputs.put(new Long(56413), new Float(0));
-         * inputs.put(new Long(56438), new Float(-428)); inputs.put(new Long(56435), new Float(138)); inputs.put(new
-         * Long(56411), new Float(18010));
-         * 
-         * //inputs.put(new Long(48753), new Double(18600)); String expr = "(#56447 > 17000)"; SimpleRuleExpression exp
-         * = new SimpleRuleExpression(expr); Object val = exp.evaluate(inputs);
-         * System.out.println(exp.getInputTagIds()); System.out.println("Rule result type: " +
-         * val.getClass().getName()); System.out.println(val.toString());
-         * System.out.println(System.currentTimeMillis()); } catch (Exception e) { e.printStackTrace(); }
-         */
     }
 
     @Override
