@@ -14,7 +14,7 @@ sub smash {
   opendir DIR, $dir or return;
   my @contents =
     map "$dir/$_",
-    sort grep !/^\.\.?$/&&!/CVS/&&!/lib_.*/&&!/libs_.*/&&!/.*\.jar/&&!/.*\.css/&&!/.*\.svg/&&!/.*\.gif/&&!/.*\.GIF/&&!/.*\.jpg/&&!/.*\.JPG/,
+    sort grep !/^\.\.?$/&&!/CVS/&&!/lib_.*/&&!/libs_.*/&&!/.*\.jar/&&!/.*\.css/&&!/.*\.svg/&&!/.*\.png/&&!/.*\.gif/&&!/.*\.GIF/&&!/.*\.jpg/&&!/.*\.JPG/,
     readdir DIR;
   closedir DIR;
   foreach (@contents) {
