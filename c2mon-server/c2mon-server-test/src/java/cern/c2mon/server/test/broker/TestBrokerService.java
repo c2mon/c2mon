@@ -42,7 +42,7 @@ public class TestBrokerService {
     broker = new BrokerService();
     broker.setPersistent(false);
     broker.setUseShutdownHook(false);
-    broker.setUseJmx(false); 
+    broker.setUseJmx(true); 
     
     if (externalAccessUrl != null){
       TransportConnector connector =new TransportConnector();
