@@ -19,13 +19,29 @@
     <constructor-arg value="cern.c2mon.client.ext.device.cache.DeviceCache" />
   </bean>
 
-  <bean id="clientRequestHandler" class="org.easymock.EasyMock"
+  <bean id="requestHandler" class="org.easymock.classextension.EasyMock"
     factory-method="createMock">
-    <constructor-arg value="cern.c2mon.client.jms.RequestHandler" />
+    <constructor-arg
+      value="cern.c2mon.client.ext.device.request.DeviceRequestHandler" />
   </bean>
 
   <bean id="deviceManager" class="cern.c2mon.client.ext.device.DeviceManager">
     <constructor-arg value="deviceManager" />
+  </bean>
+
+  <!-- need these properties for tests -->
+  <bean
+    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="ignoreResourceNotFound" value="true" />
+    <property name="properties">
+      <props>
+        <prop key="c2mon.client.jms.url">c2mon.client.jms.url</prop>
+        <prop key="c2mon.client.request.size">500</prop>
+        <prop key="c2mon.client.request.threads.max">5</prop>
+        <prop key="c2mon.client.jms.request.queue">c2mon.client.request</prop>
+        <prop key="c2mon.client.jms.admin.queue">c2mon.client.admin</prop>
+      </props>
+    </property>
   </bean>
 
 </beans>

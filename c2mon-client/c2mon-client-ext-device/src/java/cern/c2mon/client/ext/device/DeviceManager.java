@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
-import cern.c2mon.client.jms.RequestHandler;
+import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 
 /**
  * This class implements the {@link C2monDeviceManager} interface and provides a
@@ -57,7 +57,7 @@ public class DeviceManager implements C2monDeviceManager {
   private final DeviceCache deviceCache;
 
   /** Provides methods for requesting information from the C2MON server */
-  private final RequestHandler clientRequestHandler;
+  private final DeviceRequestHandler requestHandler;
 
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service.
@@ -70,11 +70,11 @@ public class DeviceManager implements C2monDeviceManager {
    */
   @Autowired
   protected DeviceManager(final C2monTagManager pTagManager, final BasicCacheHandler pDataTagCache, final DeviceCache pDeviceCache,
-      final RequestHandler pRequestHandler) {
+      final DeviceRequestHandler pRequestHandler) {
     this.tagManager = pTagManager;
     this.dataTagCache = pDataTagCache;
     this.deviceCache = pDeviceCache;
-    this.clientRequestHandler = pRequestHandler;
+    this.requestHandler = pRequestHandler;
   }
 
   @Override
@@ -83,7 +83,7 @@ public class DeviceManager implements C2monDeviceManager {
 
     // Ask the server for all class names via RequestHandler
     try {
-      Collection<String> serverResponse = clientRequestHandler.getAllDeviceClassNames();
+      Collection<String> serverResponse = requestHandler.getAllDeviceClassNames();
       deviceClassNames.addAll(serverResponse);
     } catch (JMSException e) {
       LOG.error("getAllDeviceClassNames() - JMS connection lost -> Could not retrieve device class names from the C2MON server.", e);
