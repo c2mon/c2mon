@@ -43,6 +43,9 @@ public class TransferDeviceImpl implements TransferDevice {
   /** The device name */
   private final String name;
 
+  /** The device class ID */
+  private final Long deviceClassId;
+
   /** The device property mapping (property name : tag ID) */
   private Map<String, Long> propertyValues = new HashMap<>();
 
@@ -65,10 +68,12 @@ public class TransferDeviceImpl implements TransferDevice {
    *
    * @param pDeviceId the unique device ID
    * @param pDeviceName the name of the device
+   * @param pDeviceClassId the ID of the device class
    */
-  public TransferDeviceImpl(final Long pDeviceId, final String pDeviceName) {
+  public TransferDeviceImpl(final Long pDeviceId, final String pDeviceName, final Long pDeviceClassId) {
     this.id = pDeviceId;
     this.name = pDeviceName;
+    this.deviceClassId = pDeviceClassId;
   }
 
   @Override
@@ -79,6 +84,11 @@ public class TransferDeviceImpl implements TransferDevice {
   @Override
   public String getName() {
     return this.name;
+  }
+
+  @Override
+  public Long getDeviceClassId() {
+    return this.deviceClassId;
   }
 
   @Override

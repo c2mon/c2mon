@@ -36,6 +36,10 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.client.ext.device.util.DeviceTestUtils;
+import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
+import cern.c2mon.shared.client.device.TransferDevice;
+import cern.c2mon.shared.client.device.TransferDeviceImpl;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.rule.RuleFormatException;
 
@@ -68,9 +72,9 @@ public class DeviceManagerTest {
     // Reset the mock
     reset(requestHandlerMock);
 
-    List<String> deviceClassNamesReturnMap = new ArrayList<String>();
-    deviceClassNamesReturnMap.add("test_device_class_1");
-    deviceClassNamesReturnMap.add("test_device_class_2");
+    List<DeviceClassNameResponse> deviceClassNamesReturnMap = new ArrayList<DeviceClassNameResponse>();
+    deviceClassNamesReturnMap.add(new DeviceClassNameResponseImpl("test_device_class_1"));
+    deviceClassNamesReturnMap.add(new DeviceClassNameResponseImpl("test_device_class_2"));
 
     // Expect the device manager to query the server
     expect(requestHandlerMock.getAllDeviceClassNames()).andReturn(deviceClassNamesReturnMap).once();
@@ -80,38 +84,47 @@ public class DeviceManagerTest {
 
     List<String> deviceClassNames = deviceManager.getAllDeviceClassNames();
     Assert.assertNotNull(deviceClassNames);
-    Assert.assertTrue(deviceClassNames.get(0) == deviceClassNamesReturnMap.get(0));
-    Assert.assertTrue(deviceClassNames.get(1) == deviceClassNamesReturnMap.get(1));
+    Assert.assertTrue(deviceClassNames.get(0) == deviceClassNamesReturnMap.get(0).getDeviceClassName());
+    Assert.assertTrue(deviceClassNames.get(1) == deviceClassNamesReturnMap.get(1).getDeviceClassName());
 
     // Verify that everything happened as expected
     verify(requestHandlerMock);
   }
 
   @Test
-  public void testGetAllDevices() {
+  public void testGetAllDevices() throws JMSException {
     // Reset the mock
     EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    reset(requestHandlerMock);
 
-    List<Device> devicesReturnList = new ArrayList<Device>();
-    final DeviceImpl device1 = new DeviceImpl(1L, "test_device_1", 1L, "test_device_class", tagManagerMock);
-    final DeviceImpl device2 = new DeviceImpl(1L, "test_device_2", 1L, "test_device_class", tagManagerMock);
+    List<TransferDevice> devicesReturnList = new ArrayList<TransferDevice>();
+    final TransferDeviceImpl device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
+    final TransferDeviceImpl device2 = new TransferDeviceImpl(1000L, "test_device_2", 1L);
     devicesReturnList.add(device1);
     devicesReturnList.add(device2);
 
-    // Expect the device manager to retrieve the devices, first checking the
-    // cache
-    EasyMock.expect(deviceCacheMock.getAllDevices("test_device_class")).andReturn(devicesReturnList);
+    // Expect the device manager to check the cache
+    EasyMock.expect(deviceCacheMock.getAllDevices("test_device_class")).andReturn(new ArrayList<Device>());
+    // Expect the device manager to retrieve the devices
+    expect(requestHandlerMock.getAllDevices(EasyMock.<String> anyObject())).andReturn(devicesReturnList);
+    // Expect the device manager to add the devices to the cache
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall().times(2);
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    replay(requestHandlerMock);
 
     List<Device> devices = deviceManager.getAllDevices("test_device_class");
     Assert.assertNotNull(devices);
-    Assert.assertTrue(devices.contains(device1));
-    Assert.assertTrue(devices.contains(device2));
+
+    for (Device device : devices) {
+      Assert.assertTrue(device.getDeviceClassName().equals("test_device_class"));
+    }
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    verify(requestHandlerMock);
   }
 
   @Test

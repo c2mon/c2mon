@@ -8,12 +8,22 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 
 import org.junit.Test;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.command.CommandExecutionStatus;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandReportImpl;
+import cern.c2mon.shared.client.command.CommandTagHandleImpl;
+import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
+import cern.c2mon.shared.client.device.TransferDevice;
+import cern.c2mon.shared.client.device.TransferDeviceImpl;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
@@ -28,12 +38,6 @@ import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.c2mon.shared.client.command.CommandExecutionStatus;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandReportImpl;
-import cern.c2mon.shared.client.command.CommandTagHandleImpl;
-import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
@@ -41,25 +45,24 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStat
 import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 public class ClientRequestImplTest {
-  
+
   @Test
   public void testReports() {
-    
+
     final int currentProgress = 1;
     final String errorMessage = "Serious Error. Matthias had too much food";
-    
+
     ClientRequestResult progressReportResult = new ConfigurationReport(2, 1, 10, currentProgress, "In progress");
-    
+
     assertTrue(((ClientRequestReport) progressReportResult).isProgressReport());
     assertTrue(currentProgress == ((ClientRequestReport) progressReportResult).getCurrentProgressPart());
     assertFalse(((ClientRequestReport) progressReportResult).isErrorReport());
     assertFalse(((ClientRequestReport) progressReportResult).isResult());
-    
+
     ClientRequestResult errorReportResult = new ConfigurationReport(false, errorMessage);
-    
+
     assertTrue(((ClientRequestReport) errorReportResult).isErrorReport());
     assertTrue(errorMessage.equals(((ClientRequestReport) errorReportResult).getErrorMessage()));
     assertFalse(((ClientRequestReport) errorReportResult).isProgressReport());
@@ -110,24 +113,24 @@ public class ClientRequestImplTest {
     for (Long tagId : receivedTags) {
       assertFalse(tagRequest.addTagId(tagId));
     }
-  }  
-  
+  }
+
   @Test
   public void testActiveAlarmJsonMessageSerialization() {
-    
+
     ClientRequestImpl<AlarmValue> alarmsRequest =
       new ClientRequestImpl<AlarmValue>(
           ClientRequest.ResultType.TRANSFER_ALARM_LIST,
           ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
           10000
       );
-    
+
     String json = alarmsRequest.toJson();
     ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);
-    
+
     assertEquals(ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST, receivedRequest.getRequestType());
     assertEquals(ClientRequest.ResultType.TRANSFER_ALARM_LIST, receivedRequest.getResultType());
-  }  
+  }
 
   @Test
   public void testTagConfigurationJsonMessageSerialization() {
@@ -143,7 +146,7 @@ public class ClientRequestImplTest {
     for (Long tagId : receivedTags) {
       assertFalse(tagRequest.addTagId(tagId));
     }
-  }    
+  }
 
   @Test
   public void testConfigurationReportJsonMessageSerialization() {
@@ -159,7 +162,7 @@ public class ClientRequestImplTest {
     for (Long tagId : receivedTags) {
       assertFalse(tagRequest.addTagId(tagId));
     }
-  }      
+  }
 
   @Test
   public void testJsonResponseDeserialization() {
@@ -169,7 +172,7 @@ public class ClientRequestImplTest {
 
 
 
-    Float responseTagValue = Float.valueOf(2342.456546f); 
+    Float responseTagValue = Float.valueOf(2342.456546f);
     String serverResponse = mockTagValueResponse(tagRequest.toJson(), responseTagValue);
     Collection<TagUpdate> responseList = tagRequest.fromJsonResponse(serverResponse);
 
@@ -228,9 +231,9 @@ public class ClientRequestImplTest {
       assertTrue(originalConfigurationReport.getStatusDescription() .equals(receivedReport.getStatusDescription()));
 
       assertTrue(originalConfigurationReport.getUser() .equals(receivedReport.getUser()));
-      assertTrue(originalConfigurationReport.getElementReports() .equals(receivedReport.getElementReports()));    
+      assertTrue(originalConfigurationReport.getElementReports() .equals(receivedReport.getElementReports()));
     }
-  }  
+  }
 
   @Test
   public void testTagConfigurationJsonResponseDeserialization() {
@@ -264,9 +267,9 @@ public class ClientRequestImplTest {
 
       assertTrue(originalTagConfig.getMaxValue() .equals(receivedTagConfig.getMaxValue()));
       assertTrue(originalTagConfig.getMinValue() .equals(receivedTagConfig.getMinValue()));
-      assertTrue(originalTagConfig.getRuleExpression() .equals(receivedTagConfig.getRuleExpression()));   
+      assertTrue(originalTagConfig.getRuleExpression() .equals(receivedTagConfig.getRuleExpression()));
 
-      assertTrue(originalTagConfig.getTopicName() .equals(receivedTagConfig.getTopicName()));  
+      assertTrue(originalTagConfig.getTopicName() .equals(receivedTagConfig.getTopicName()));
       assertEquals(originalTagConfig.isLogged(), receivedTagConfig.isLogged());
       assertEquals(originalTagConfig.getProcessNames(), receivedTagConfig.getProcessNames());
     }
@@ -309,13 +312,13 @@ public class ClientRequestImplTest {
     executeCommandRequest.setObjectParameter(originalCommandTagHandle);
 
     String json = executeCommandRequest.toJson();
-    ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);    
+    ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);
     assertEquals(ClientRequest.RequestType.EXECUTE_COMMAND_REQUEST, receivedRequest.getRequestType());
 
 
     CommandTagHandleImpl h1 = (CommandTagHandleImpl)executeCommandRequest.getObjectParameter();
     CommandTagHandleImpl h2 = (CommandTagHandleImpl)receivedRequest.getObjectParameter();
-    assertEquals(h1.getId(), h2.getId());    
+    assertEquals(h1.getId(), h2.getId());
 
     CommandReport originalReport = createCommandReport(executeCommandRequest);
 
@@ -357,18 +360,18 @@ public class ClientRequestImplTest {
       new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
 
     String json = processNameRequest.toJson();
-    ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);    
+    ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);
     assertEquals(ClientRequest.RequestType.PROCESS_NAMES_REQUEST, receivedRequest.getRequestType());
 
-    String s = (String) receivedRequest.getRequestParameter();
-    assertEquals((String)processNameRequest.getRequestParameter(), (String)s);
+    String s = receivedRequest.getRequestParameter();
+    assertEquals(processNameRequest.getRequestParameter(), s);
 
     //fake response from server
     ProcessNameResponse processResponse = new ProcessNameResponseImpl("process name");
     Collection<ProcessNameResponse> responseList = new ArrayList<ProcessNameResponse>();
     responseList.add(processResponse);
 
-    Gson gson = TransferTagValueImpl.getGson();   
+    Gson gson = TransferTagValueImpl.getGson();
     String jsonResponse = gson.toJson(responseList);
 
     Collection<ProcessNameResponse> receivedResponse = processNameRequest.fromJsonResponse(jsonResponse);
@@ -381,18 +384,18 @@ public class ClientRequestImplTest {
       new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
     xmlRequest.setRequestParameter("request parameter");
     String json = xmlRequest.toJson();
-    ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);    
+    ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);
     assertEquals(ClientRequest.RequestType.DAQ_XML_REQUEST, receivedRequest.getRequestType());
 
-    String s = (String) receivedRequest.getRequestParameter();
-    assertEquals((String)xmlRequest.getRequestParameter(), (String)s);
+    String s = receivedRequest.getRequestParameter();
+    assertEquals(xmlRequest.getRequestParameter(), s);
 
     //fake response from server
     ProcessXmlResponse xmlResponse = new ProcessXmlResponseImpl();
     ((ProcessXmlResponseImpl) xmlResponse).setProcessXML("xml string");
     Collection<ProcessXmlResponse> responseList = new ArrayList<ProcessXmlResponse>();
     responseList.add(xmlResponse);
-    
+
     Gson gson = TransferTagValueImpl.getGson();
     String jsonResponse = gson.toJson(responseList);
 
@@ -401,6 +404,55 @@ public class ClientRequestImplTest {
     assertEquals("xml string", receivedResponse.iterator().next().getProcessXML());
   }
 
+  @Test
+  public void testDeviceClassNamesRequest() {
+    ClientRequestImpl<DeviceClassNameResponse> deviceClassNamesRequest = new ClientRequestImpl<>(DeviceClassNameResponse.class);
+    String json = deviceClassNamesRequest.toJson();
+    ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);
+    assertEquals(ClientRequest.RequestType.DEVICE_CLASS_NAMES_REQUEST, receivedRequest.getRequestType());
+
+    // Fake response from server
+    DeviceClassNameResponse className1 = new DeviceClassNameResponseImpl("test_device_class_name_1");
+    DeviceClassNameResponse className2 = new DeviceClassNameResponseImpl("test_device_class_name_2");
+    Collection<DeviceClassNameResponse> responseList = new ArrayList<>();
+    responseList.add(className1);
+    responseList.add(className2);
+
+    Gson gson = TransferTagValueImpl.getGson();
+    String jsonResponse = gson.toJson(responseList);
+
+    List<DeviceClassNameResponse> receivedResponse = (List<DeviceClassNameResponse>) deviceClassNamesRequest.fromJsonResponse(jsonResponse);
+    assertTrue(receivedResponse.size() == 2);
+
+    assertTrue(receivedResponse.get(0).getDeviceClassName().equals("test_device_class_name_1"));
+    assertTrue(receivedResponse.get(1).getDeviceClassName().equals("test_device_class_name_2"));
+  }
+
+  @Test
+  public void testDeviceRequest() {
+    ClientRequestImpl<TransferDevice> devicesRequest = new ClientRequestImpl<>(TransferDevice.class);
+    devicesRequest.setRequestParameter("test_device_class_name");
+    String json = devicesRequest.toJson();
+    ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);
+    assertEquals(ClientRequest.RequestType.DEVICE_REQUEST, receivedRequest.getRequestType());
+
+    // Fake response from server
+    TransferDevice device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
+    TransferDevice device2 = new TransferDeviceImpl(2000L, "test_device_2", 1L);
+    Collection<TransferDevice> responseList = new ArrayList<>();
+    responseList.add(device1);
+    responseList.add(device2);
+
+    Gson gson = TransferTagValueImpl.getGson();
+    String jsonResponse = gson.toJson(responseList);
+
+    List<TransferDevice> receivedResponse = (List<TransferDevice>) devicesRequest.fromJsonResponse(jsonResponse);
+    assertTrue(receivedResponse.size() == 2);
+
+    assertTrue(receivedResponse.get(0).getDeviceClassId().equals(1L));
+    assertTrue(receivedResponse.get(1).getDeviceClassId().equals(1L));
+
+  }
 
   private String mockSupervisionValueResponse(final String jsonSupervisionRequest, final int size) {
     ClientRequest tagRequest = ClientRequestImpl.fromJson(jsonSupervisionRequest);
@@ -424,7 +476,7 @@ public class ClientRequestImplTest {
   /**
    * @param jsonTagRequest The request as Json string
    * @param tagValue The value that shall be mocked as server response
-   * @return Json string which represents a list of <code>TransferTagValue</code> or 
+   * @return Json string which represents a list of <code>TransferTagValue</code> or
    *         <code>TransferTag</code> objects
    */
   @SuppressWarnings("unchecked")
@@ -451,7 +503,7 @@ public class ClientRequestImplTest {
 
     else if (tagRequest.getRequestType() == ClientRequest.RequestType.ALARM_REQUEST) {
       for (Long tagId : tagRequest.getTagIds()) {
-        switch (tagRequest.getResultType()) {    
+        switch (tagRequest.getResultType()) {
           case TRANSFER_ALARM_LIST:
             responseList.add(createAlarm(tagId));
             break;
@@ -463,7 +515,7 @@ public class ClientRequestImplTest {
 
     else if (tagRequest.getRequestType() == ClientRequest.RequestType.APPLY_CONFIGURATION_REQUEST) {
       for (Long tagId : tagRequest.getTagIds()) {
-        switch (tagRequest.getResultType()) {    
+        switch (tagRequest.getResultType()) {
           case TRANSFER_CONFIGURATION_REPORT:
             responseList.add(createConfigurationReport(tagId));
             break;
@@ -475,39 +527,39 @@ public class ClientRequestImplTest {
 
     else if (tagRequest.getRequestType() == ClientRequest.RequestType.TAG_CONFIGURATION_REQUEST) {
       for (Long tagId : tagRequest.getTagIds()) {
-        switch (tagRequest.getResultType()) {    
+        switch (tagRequest.getResultType()) {
           case TRANSFER_TAG_CONFIGURATION_LIST:
             responseList.add(createTagConfig(tagId));
-            break;   
+            break;
 
           default:
         }
       }
-    }    
+    }
 
     else if (tagRequest.getRequestType() == ClientRequest.RequestType.COMMAND_HANDLE_REQUEST) {
       for (Long tagId : tagRequest.getTagIds()) {
-        switch (tagRequest.getResultType()) {    
+        switch (tagRequest.getResultType()) {
           case TRANSFER_COMMAND_HANDLES_LIST:
             responseList.add(createCommandTagHandleImpl(tagId));
-            break;   
+            break;
 
           default:
         }
       }
-    }    
+    }
 
     else if (tagRequest.getRequestType() == ClientRequest.RequestType.EXECUTE_COMMAND_REQUEST) {
       for (Long tagId : tagRequest.getTagIds()) {
-        switch (tagRequest.getResultType()) {    
+        switch (tagRequest.getResultType()) {
           case TRANSFER_COMMAND_REPORT:
             responseList.add(createCommandReport(tagRequest));
-            break;   
+            break;
 
           default:
         }
       }
-    }    
+    }
 
     else {
       assertTrue("Unsupported request type", false);
@@ -567,7 +619,7 @@ public class ClientRequestImplTest {
 
     tagConfig.setAlarmIds(Arrays.asList(123L, 4324L, 4535L));
     tagConfig.setRuleIds(Arrays.asList(123L, 4324L, 4535L));
-    
+
     tagConfig.setLogged(Boolean.FALSE);
     ArrayList<String> processNames = new ArrayList<String>();
     processNames.add("Process1");
@@ -582,39 +634,39 @@ public class ClientRequestImplTest {
 
   private AlarmValueImpl createAlarm(final Long id) {
     return new AlarmValueImpl(
-        id, 
+        id,
         666,
         "test Fault Member",
         "test Fault Family",
         "test Info",
         123L,
-        new Timestamp(System.currentTimeMillis()), 
+        new Timestamp(System.currentTimeMillis()),
         true);
-  }  
+  }
 
   private TransferTagValueImpl createTagValue(final Long tagId, final Object tagValue) {
     return new TransferTagValueImpl(
-        tagId, 
+        tagId,
         tagValue,
         "test value desc",
         new DataTagQualityImpl(TagQualityStatus.PROCESS_DOWN, "Process Down"),
         TagMode.TEST,
         new Timestamp(System.currentTimeMillis()),
-        new Timestamp(System.currentTimeMillis()), 
-        new Timestamp(System.currentTimeMillis()), 
+        new Timestamp(System.currentTimeMillis()),
+        new Timestamp(System.currentTimeMillis()),
     "test description");
   }
 
   private TransferTagImpl createTag(final Long tagId, final Object tagValue) {
     return new TransferTagImpl(
-        tagId, 
-        tagValue, 
+        tagId,
+        tagValue,
         "test value desc",
         new DataTagQualityImpl(TagQualityStatus.PROCESS_DOWN, "Process Down"),
         TagMode.TEST,
-        new Timestamp(System.currentTimeMillis()), 
-        new Timestamp(System.currentTimeMillis()), 
-        new Timestamp(System.currentTimeMillis()), 
+        new Timestamp(System.currentTimeMillis()),
+        new Timestamp(System.currentTimeMillis()),
+        new Timestamp(System.currentTimeMillis()),
         "test description",
         "tag name",
     "tag:topic");

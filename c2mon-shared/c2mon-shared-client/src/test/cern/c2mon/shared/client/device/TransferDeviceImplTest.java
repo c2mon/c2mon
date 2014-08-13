@@ -13,17 +13,18 @@ public class TransferDeviceImplTest {
 
   @Test
   public void testBasicUsage() {
-    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name");
+    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L);
     String jsonString = dti.toJson();
 
     TransferDevice received = TransferDeviceImpl.fromJson(jsonString);
     Assert.assertTrue(received.getId().equals(dti.getId()));
     Assert.assertTrue(received.getName().equals(dti.getName()));
+    Assert.assertTrue(received.getDeviceClassId().equals(dti.getDeviceClassId()));
   }
 
   @Test
   public void testAddPropertyValues() {
-    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name");
+    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L);
     dti.addPropertyValue("test_property_name_1", 1000L);
     dti.addPropertyValue("test_property_name_2", 2000L);
     dti.addPropertyValues(new HashMap<String, Long>() {
@@ -45,7 +46,7 @@ public class TransferDeviceImplTest {
 
   @Test
   public void testAddCommandValues() {
-    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name");
+    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L);
     dti.addCommandValue("test_command_name_1", 1000L);
     dti.addCommandValue("test_command_name_2", 2000L);
     dti.addCommandValues(new HashMap<String, Long>() {

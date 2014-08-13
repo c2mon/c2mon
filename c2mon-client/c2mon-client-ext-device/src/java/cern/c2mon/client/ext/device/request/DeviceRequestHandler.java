@@ -21,8 +21,14 @@ import java.util.Collection;
 
 import javax.jms.JMSException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.impl.RequestHandlerImpl;
+import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.TransferDevice;
+import cern.c2mon.shared.client.request.ClientRequestImpl;
 
 /**
  * This class extends the core <code>RequestHandler</code> implementation,
@@ -31,11 +37,13 @@ import cern.c2mon.client.jms.impl.RequestHandlerImpl;
  *
  * @author Justin Lewis Salmon
  */
+@Service
 public class DeviceRequestHandler extends RequestHandlerImpl {
 
   /**
    * @param jmsProxy the JMS proxy bean
    */
+  @Autowired
   public DeviceRequestHandler(JmsProxy jmsProxy) {
     super(jmsProxy);
   }
@@ -46,8 +54,22 @@ public class DeviceRequestHandler extends RequestHandlerImpl {
    * @return a list of all device class names
    * @throws JMSException if JMS problem occurs or not connected at the moment
    */
-  public Collection<String> getAllDeviceClassNames() throws JMSException {
-    // TODO Auto-generated method stub
-    return null;
+  public Collection<DeviceClassNameResponse> getAllDeviceClassNames() throws JMSException {
+    ClientRequestImpl<DeviceClassNameResponse> namesRequest = new ClientRequestImpl<DeviceClassNameResponse>(DeviceClassNameResponse.class);
+    return jmsProxy.sendRequest(namesRequest, defaultRequestQueue, namesRequest.getTimeout());
   }
+
+  /**
+   * Requests all devices of a particular class.
+   *
+   * @param deviceClassName the name of the device class
+   * @return a list of all devices belonging to the specified class
+   * @throws JMSException if JMS problem occurs or not connected at the moment
+   */
+  public Collection<TransferDevice> getAllDevices(String deviceClassName) throws JMSException {
+    ClientRequestImpl<TransferDevice> devicesRequest = new ClientRequestImpl<TransferDevice>(TransferDevice.class);
+    devicesRequest.setRequestParameter(deviceClassName);
+    return jmsProxy.sendRequest(devicesRequest, defaultRequestQueue, devicesRequest.getTimeout());
+  }
+
 }

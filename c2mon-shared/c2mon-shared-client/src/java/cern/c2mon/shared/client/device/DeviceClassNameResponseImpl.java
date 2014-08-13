@@ -17,51 +17,32 @@
  ******************************************************************************/
 package cern.c2mon.shared.client.device;
 
-import java.util.Map;
-
-import cern.c2mon.shared.client.request.ClientRequestResult;
-
 /**
- * This interface defines the transport object that is transferred to the client
- * layer for initialising a given <code>Device</code> object and its
- * corresponding mapping between properties and data tag IDs.
- *
  * @author Justin Lewis Salmon
  */
-public interface TransferDevice extends ClientRequestResult {
+public class DeviceClassNameResponseImpl implements DeviceClassNameResponse {
+
+  /** The unique name of the device class */
+  public String deviceClassName;
 
   /**
-   * Retrieve the unique device ID.
+   * Default constructor.
    *
-   * @return the device ID
+   * @param deviceClassName the unique name of the device class
    */
-  public Long getId();
+  public DeviceClassNameResponseImpl(String deviceClassName) {
+    this.deviceClassName = deviceClassName;
+  }
+
+  @Override
+  public String getDeviceClassName() {
+    return deviceClassName;
+  }
 
   /**
-   * Retrieve the device name.
-   *
-   * @return the device name
+   * @param deviceClassName the device class name to set
    */
-  public String getName();
-
-  /**
-   * Retrieve the ID iof the device class.
-   *
-   * @return the device class ID
-   */
-  public Long getDeviceClassId();
-
-  /**
-   * Retrieve the property values (property name : tag ID mappings).
-   *
-   * @return the map of property values
-   */
-  public Map<String, Long> getPropertyValues();
-
-  /**
-   * Retrieve the command values (command name : tag ID mappings).
-   *
-   * @return the map of command values
-   */
-  public Map<String, Long> getCommandValues();
+  public void setDeviceClassName(String deviceClassName) {
+    this.deviceClassName = deviceClassName;
+  }
 }

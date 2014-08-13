@@ -33,6 +33,8 @@ import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
+import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.TransferDevice;
 
 /**
  * This class implements the {@link C2monDeviceManager} interface and provides a
@@ -83,8 +85,11 @@ public class DeviceManager implements C2monDeviceManager {
 
     // Ask the server for all class names via RequestHandler
     try {
-      Collection<String> serverResponse = requestHandler.getAllDeviceClassNames();
-      deviceClassNames.addAll(serverResponse);
+      Collection<DeviceClassNameResponse> serverResponse = requestHandler.getAllDeviceClassNames();
+
+      for (DeviceClassNameResponse className : serverResponse) {
+        deviceClassNames.add(className.getDeviceClassName());
+      }
     } catch (JMSException e) {
       LOG.error("getAllDeviceClassNames() - JMS connection lost -> Could not retrieve device class names from the C2MON server.", e);
     }
@@ -100,8 +105,23 @@ public class DeviceManager implements C2monDeviceManager {
     List<Device> devices = deviceCache.getAllDevices(deviceClassName);
     if (devices.isEmpty()) {
 
-      // TODO: Didn't find any devices of that class in the cache, so call the
+      // Didn't find any devices of that class in the cache, so call the
       // server
+      try {
+        Collection<TransferDevice> serverResponse = requestHandler.getAllDevices(deviceClassName);
+
+        for (TransferDevice device : serverResponse) {
+          devices.add(new DeviceImpl(device.getId(), device.getName(), device.getDeviceClassId(), deviceClassName, tagManager));
+        }
+      } catch (JMSException e) {
+        LOG.error("getAllDevices() - JMS connection lost -> Could not retrieve devices from the C2MON server.", e);
+      }
+    }
+
+    // Add the devices to the cache
+    // TODO: purge the device cache after a certain amount of time?
+    for (Device device : devices) {
+      deviceCache.add(device);
     }
 
     return devices;
@@ -119,20 +139,6 @@ public class DeviceManager implements C2monDeviceManager {
       // Use TagManager to subscribe to all properties of the device
       device.addDeviceUpdateListener(listener);
       tagManager.subscribeDataTags(dataTagIds, device);
-
-      // The properties should now be in the cache
-      // Map<Long, ClientDataTag> dataTags = dataTagCache.get(dataTagIds);
-      //
-      // Map<String, ClientDataTagValue> propertyValues = new HashMap<String,
-      // ClientDataTagValue>();
-      // for (ClientDataTagValue tag : dataTags.values()) {
-      // propertyValues.put(tag.getName(), tag);
-      // }
-      //
-      // device.setPropertyValues(propertyValues);
-
-      // Give the initial values to the device listener
-      // listener.onUpdate(device, null);
     }
   }
 

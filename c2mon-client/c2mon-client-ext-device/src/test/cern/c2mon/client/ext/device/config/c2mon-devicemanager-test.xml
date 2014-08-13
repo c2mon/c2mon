@@ -29,19 +29,8 @@
     <constructor-arg value="deviceManager" />
   </bean>
 
-  <!-- need these properties for tests -->
-  <bean
-    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-    <property name="ignoreResourceNotFound" value="true" />
-    <property name="properties">
-      <props>
-        <prop key="c2mon.client.jms.url">c2mon.client.jms.url</prop>
-        <prop key="c2mon.client.request.size">500</prop>
-        <prop key="c2mon.client.request.threads.max">5</prop>
-        <prop key="c2mon.client.jms.request.queue">c2mon.client.request</prop>
-        <prop key="c2mon.client.jms.admin.queue">c2mon.client.admin</prop>
-      </props>
-    </property>
-  </bean>
+  <!-- import jms properties -->
+  <import
+    resource="classpath:cern/c2mon/client/ext/device/config/jms-properties.xml" />
 
 </beans>

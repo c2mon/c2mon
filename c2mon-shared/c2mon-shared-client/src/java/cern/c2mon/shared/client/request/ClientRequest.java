@@ -3,7 +3,6 @@ package cern.c2mon.shared.client.request;
 import java.util.Collection;
 
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
-import cern.c2mon.shared.client.command.CommandTagHandle;
 
 /**
  * This interface describes the request message object
@@ -27,13 +26,13 @@ public interface ClientRequest {
    * @author Matthias Braeger
    */
   enum RequestType {
-    /** 
+    /**
      * Used to request a list of either <code>TransferTag</code>
      * or <code>TransferTagValue</code> objects.
      * @see ResultType
      */
     TAG_REQUEST,
-    /** 
+    /**
      * Used to request a list of <code>TagConfig</code>
      * objects.
      */
@@ -62,7 +61,7 @@ public interface ClientRequest {
     /**
      * Used to request a Configuration Report from the server.
      */
-    APPLY_CONFIGURATION_REQUEST,    
+    APPLY_CONFIGURATION_REQUEST,
     /**
      * Used to request the DAQ XML configuration from the server.
      * The request parameter needs setting to the DAQ name.
@@ -72,10 +71,18 @@ public interface ClientRequest {
     /**
      * Used to request a list of all the process names from the server.
      */
-    PROCESS_NAMES_REQUEST
+    PROCESS_NAMES_REQUEST,
+    /**
+     * Used to request a list of all device class names from the server.
+     */
+    DEVICE_CLASS_NAMES_REQUEST,
+    /**
+     * Used to request a list of devices from the server.
+     */
+    DEVICE_REQUEST
   };
-  
-  /** 
+
+  /**
    * Enumeration for specifying the expected result type of the response.
    * The two values correspond to the <code>TransferTag</code> and
    * <code>TransferTagValue</code> interfaces.
@@ -97,22 +104,26 @@ public interface ClientRequest {
     /** @see ... */
     TRANSFER_ACTIVE_ALARM_LIST,
     /** @see ... */
-    TRANSFER_COMMAND_HANDLES_LIST,   
+    TRANSFER_COMMAND_HANDLES_LIST,
     /** @see ... */
     TRANSFER_COMMAND_REPORT,
     /** @see ... */
-    TRANSFER_CONFIGURATION_REPORT,    
+    TRANSFER_CONFIGURATION_REPORT,
     /** A  is returned for these request.*/
     TRANSFER_DAQ_XML,
     /** A  is returned for these request.*/
-    TRANSFER_PROCESS_NAMES
+    TRANSFER_PROCESS_NAMES,
+    /** @see cern.c2mon.shared.client.device.DeviceClassNameResponse */
+    TRANSFER_DEVICE_CLASS_NAMES,
+    /** @see cern.c2mon.shared.client.device.TransferDevice */
+    TRANSFER_DEVICE_LIST,
   };
-  
+
   /**
    * Returns a list of tag Ids for which a client wants to
    * receive the <code>TransferTag</code> or <code>TransferTagValue</code>
    * objects.
-   * 
+   *
    * This is actually used to return Alarm, Configuration and Command Ids as well.
    * @return A list of tag ids
    */
@@ -124,7 +135,7 @@ public interface ClientRequest {
    * @see RequestType
    */
   RequestType getRequestType();
-  
+
   /**
    * @return The expected <code>ResultType</code> of the response message
    * @see ResultType
@@ -136,23 +147,23 @@ public interface ClientRequest {
    * @see RequestType
    */
   String getRequestParameter();
-  
+
   /**
    * Only supported by EXECUTE_COMMAND_REQUESTS so far.
    * @return the Object parameter (may be null for types that do not need this set).
    * In case of the EXECUTE_COMMAND_REQUEST this is a {@link CommandExecuteRequest}.
    */
   Object getObjectParameter();
-  
+
   /**
    * @return <code>true</code> if the response for this Request should
    * be sent as an Object false if the response should be sent in Json format.
    */
   boolean requiresObjectResponse();
-  
+
   /**
    * Every request has a different timeout depending.
-   * @return request timeout in Milliseconds. 
-   */  
+   * @return request timeout in Milliseconds.
+   */
   int getTimeout();
 }
