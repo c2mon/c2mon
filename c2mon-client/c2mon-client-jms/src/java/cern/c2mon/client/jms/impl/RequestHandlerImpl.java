@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2011 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
@@ -39,6 +39,10 @@ import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.command.CommandExecuteRequest;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandTagHandle;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
@@ -48,17 +52,13 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.c2mon.shared.client.command.CommandExecuteRequest;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandTagHandle;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
 
 /**
  * Implementation of the RequestHandler bean.
- * 
+ *
  * @see cern.c2mon.client.jms.RequestHandler
  * @author Mark Brightwell
- * 
+ *
  */
 @Service
 public class RequestHandlerImpl implements RequestHandler {
@@ -85,21 +85,21 @@ public class RequestHandlerImpl implements RequestHandler {
    * Thread idle timeout in executor (in seconds), including core threads.
    */
   private static final long KEEP_ALIVE_TIME = 60;
-  
+
   /**
    * Ref to JmsProxy bean.
    */
-  private JmsProxy jmsProxy;
+  protected JmsProxy jmsProxy;
 
   /**
    * Name of main client request queue.
    */
   @Value("${c2mon.client.jms.request.queue}")
-  private String defaultRequestQueue;
-  
+  protected String defaultRequestQueue;
+
   @Value("${c2mon.client.jms.admin.queue}")
   private String adminRequestQueue;
-  
+
   /**
    * Executor for submitting requests to the server.
    */
@@ -108,7 +108,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
   /**
    * Constructor.
-   * 
+   *
    * @param jmsProxy
    *          the proxy bean
    */
@@ -118,7 +118,7 @@ public class RequestHandlerImpl implements RequestHandler {
     this.jmsProxy = jmsProxy;
     executor.allowCoreThreadTimeOut(true);
   }
-  
+
 
   @Override
   public Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException {
@@ -141,21 +141,21 @@ public class RequestHandlerImpl implements RequestHandler {
     }
     return executeRequest(alarmIds, AlarmValue.class, null, defaultRequestQueue);
   }
-  
+
   @Override
   public Collection<AlarmValue> requestAllActiveAlarms() throws JMSException {
-    
+
     ClientRequestImpl<AlarmValue> activeAlarmsRequest = new ClientRequestImpl<AlarmValue>(
         ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST,
           ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
           60000); // == timeout
-    
-    Collection<AlarmValue> c = jmsProxy.sendRequest(activeAlarmsRequest, defaultRequestQueue, 
+
+    Collection<AlarmValue> c = jmsProxy.sendRequest(activeAlarmsRequest, defaultRequestQueue,
         activeAlarmsRequest.getTimeout());
-    
+
     return c;
   }
-  
+
   @Override
   public Collection<CommandTagHandle> requestCommandTagHandles(final Collection<Long> commandIds) {
     if (commandIds == null) {
@@ -163,13 +163,13 @@ public class RequestHandlerImpl implements RequestHandler {
     }
     return executeRequest(commandIds, CommandTagHandle.class, null, defaultRequestQueue);
   }
-  
+
   @Override
   public ConfigurationReport applyConfiguration(final Long configurationId) {
-    
+
     return applyConfiguration(configurationId, null);
   }
-  
+
   @Override
   public ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener) {
     ArrayList<Long> ids = new ArrayList<Long>();
@@ -189,7 +189,7 @@ public class RequestHandlerImpl implements RequestHandler {
     }
     final ConfigurationReport receivedReport = report.iterator().next();
     if (receivedReport != null)
-      LOGGER.trace("applyConfiguration(): Received Configuration report Report=" 
+      LOGGER.trace("applyConfiguration(): Received Configuration report Report="
           + receivedReport.toXML());
 
     return receivedReport;
@@ -214,7 +214,7 @@ public class RequestHandlerImpl implements RequestHandler {
   /**
    * Splits and executes a id-base request, splitting the collection into
    * smaller requests.
-   * 
+   *
    * @param <T>
    *          type of request result
    * @param ids
@@ -225,7 +225,7 @@ public class RequestHandlerImpl implements RequestHandler {
    */
   private <T extends ClientRequestResult> Collection<T> executeRequest(
       final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
-    
+
     LOGGER.debug("Initiating client request.");
     ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);
     Iterator<Long> it = ids.iterator();
@@ -256,13 +256,13 @@ public class RequestHandlerImpl implements RequestHandler {
     LOGGER.debug("Client request completed.");
     return finalCollection;
   }
-  
+
   /**
    * Setter method.
-   * 
+   *
    * @param requestQueue
    *          the requestQueue to set
-   */ 
+   */
   public void setRequestQueue(final String requestQueue) {
     this.defaultRequestQueue = requestQueue;
   }
@@ -279,43 +279,43 @@ public class RequestHandlerImpl implements RequestHandler {
       throw new RuntimeException(response.getErrorMessage());
     }
   }
-  
+
   @Override
   public Collection<ProcessNameResponse> getProcessNames() throws JMSException {
-    
+
     ClientRequestImpl<ProcessNameResponse> namesRequest = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
 
     return jmsProxy.sendRequest(namesRequest, defaultRequestQueue, namesRequest.getTimeout());
   }
-  
+
   @SuppressWarnings("unchecked")
   @Override
   public <T> CommandReport executeCommand(final CommandExecuteRequest<T> commandExecuteRequest) throws JMSException {
-    
+
     ClientRequestImpl clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
     clientRequest.setObjectParameter(commandExecuteRequest);
-    
+
     Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, commandExecuteRequest.getTimeout());
     CommandReport report = c.iterator().next();
-    
+
     return report;
   }
 
   /**
    * This task calls the JmsProxy with the passed request and returns the
    * requested collection.
-   * 
+   *
    * @author Mark Brightwell
-   * 
+   *
    */
   private class RequestValuesTask<T extends ClientRequestResult> implements Callable<Collection<T>> {
 
     /** The request. */
     private ClientRequestImpl<T> clientRequest;
-    
+
     /** Receives updates for the progress of the request. */
     private ClientRequestReportListener reportListener;
-    
+
     /** The queue to send the request to */
     private String requestQueue;
 
@@ -323,14 +323,14 @@ public class RequestHandlerImpl implements RequestHandler {
      * @param clientRequest The request.
      * @param reportListener Receives updates for the progress of the request.
      */
-    public RequestValuesTask(final ClientRequestImpl<T> clientRequest, 
-                             final ClientRequestReportListener reportListener, 
+    public RequestValuesTask(final ClientRequestImpl<T> clientRequest,
+                             final ClientRequestReportListener reportListener,
                              final String requestQueue) {
       this.clientRequest = clientRequest;
       this.reportListener = reportListener;
       this.requestQueue = requestQueue;
     }
-    
+
     /**
      * @param clientRequest The request.
      */
