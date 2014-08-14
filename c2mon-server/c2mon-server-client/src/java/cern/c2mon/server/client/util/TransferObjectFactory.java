@@ -4,23 +4,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
+import cern.c2mon.shared.client.device.TransferDevice;
+import cern.c2mon.shared.client.device.TransferDeviceImpl;
 import cern.c2mon.shared.client.tag.Publisher;
 import cern.c2mon.shared.client.tag.TagConfigImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 /**
- * Factory class for creating transfer objects for sending to the C2MON client layer  
+ * Factory class for creating transfer objects for sending to the C2MON client layer
  *
  * @author Matthias Braeger
  */
@@ -64,7 +69,7 @@ public abstract class TransferObjectFactory {
             transferTag.addProcessIds(tag.getProcessIds());
             if (tag instanceof RuleTag) {
               transferTag.setRuleExpression(((RuleTag) tag).getRuleExpression());
-            }            
+            }
         }
 
         return transferTag;
@@ -79,16 +84,16 @@ public abstract class TransferObjectFactory {
         Tag tag = tagWithAlarms.getTag();
         TransferTagValueImpl tagValue = null;
         if (tag != null) {
-            tagValue = 
+            tagValue =
                 new TransferTagValueImpl(
-                        tag.getId(), 
+                        tag.getId(),
                         tag.getValue(),
                         tag.getValueDescription(),
                         (DataTagQualityImpl) tag.getDataTagQuality(),
                         getTagMode(tag),
-                        tag.getTimestamp(), 
+                        tag.getTimestamp(),
                         tag instanceof DataTag ? ((DataTag) tag).getDaqTimestamp() : null,
-                        tag.getCacheTimestamp(), 
+                        tag.getCacheTimestamp(),
                         tag.getDescription());
 
             addAlarmValues(tagValue, tagWithAlarms.getAlarms());
@@ -96,7 +101,7 @@ public abstract class TransferObjectFactory {
         }
 
         return tagValue;
-    }  
+    }
 
     /**
      * Creates an <code>AlarmValueImpl</code> object for the given parameters
@@ -104,24 +109,24 @@ public abstract class TransferObjectFactory {
      * @return The resulting <code>AlarmValueImpl</code>
      */
     public static AlarmValueImpl createAlarmValue(final Alarm alarm) {
-        
-        AlarmValueImpl alarmValueImpl = null;       
-        
+
+        AlarmValueImpl alarmValueImpl = null;
+
         if (alarm != null) {
-            
-            alarmValueImpl = new AlarmValueImpl(alarm.getId(), 
-                    alarm.getFaultCode(), 
-                    alarm.getFaultMember(), 
-                    alarm.getFaultFamily(), 
-                    alarm.getInfo(), 
-                    alarm.getTagId(), 
-                    
-                    alarm.getTimestamp(), 
+
+            alarmValueImpl = new AlarmValueImpl(alarm.getId(),
+                    alarm.getFaultCode(),
+                    alarm.getFaultMember(),
+                    alarm.getFaultFamily(),
+                    alarm.getInfo(),
+                    alarm.getTagId(),
+
+                    alarm.getTimestamp(),
                     alarm.isActive());
         }
         return alarmValueImpl;
-    }    
-    
+    }
+
     /**
      * Creates an <code>AlarmValueImpl</code> object.
      * Also adds Tag Description information.
@@ -130,19 +135,19 @@ public abstract class TransferObjectFactory {
      * @return The resulting <code>AlarmValueImpl</code>
      */
     public static AlarmValueImpl createAlarmValue(Alarm alarm, Tag tag) {
-      
-      AlarmValueImpl alarmValueImpl = null;       
-      
+
+      AlarmValueImpl alarmValueImpl = null;
+
       if (alarm != null && tag != null) {
-          
-          alarmValueImpl = new AlarmValueImpl(alarm.getId(), 
-                  alarm.getFaultCode(), 
-                  alarm.getFaultMember(), 
-                  alarm.getFaultFamily(), 
-                  alarm.getInfo(), 
-                  alarm.getTagId(), 
+
+          alarmValueImpl = new AlarmValueImpl(alarm.getId(),
+                  alarm.getFaultCode(),
+                  alarm.getFaultMember(),
+                  alarm.getFaultFamily(),
+                  alarm.getInfo(),
+                  alarm.getTagId(),
                   tag.getDescription(),
-                  alarm.getTimestamp(), 
+                  alarm.getTimestamp(),
                   alarm.isActive());
       }
       return alarmValueImpl;
@@ -160,10 +165,10 @@ public abstract class TransferObjectFactory {
         TagConfigImpl tagConfig = null;
 
         if (tag != null) {
-            
+
             tagConfig = new TagConfigImpl(tag.getId());
             tagConfig.setAlarmIds(new ArrayList<Long>(tag.getAlarmIds()));
-            
+
             Boolean controlTag = Boolean.FALSE;
             if (tag instanceof ControlTag) {
                 controlTag = Boolean.TRUE;
@@ -174,13 +179,13 @@ public abstract class TransferObjectFactory {
                 DataTag dataTag = (DataTag) tag;
 
                 // check if min. value is defined, since it is not mandatory
-                if (dataTag.getMinValue() != null)        
+                if (dataTag.getMinValue() != null)
                     tagConfig.setMinValue(dataTag.getMinValue().toString());
 
                 // check if max. value is defined, since it is not mandatory
                 if (dataTag.getMaxValue() != null)
                     tagConfig.setMaxValue(dataTag.getMaxValue().toString());
-                
+
                 if (dataTag.getAddress() != null) {
 
                     tagConfig.setValueDeadbandType(dataTag.getAddress().getValueDeadbandType());
@@ -206,7 +211,7 @@ public abstract class TransferObjectFactory {
                 tagConfig.addPublication(Publisher.JAPC, tag.getJapcAddress());
             }
             if (tag.isLogged()) {
-                tagConfig.setLogged(Boolean.TRUE);                
+                tagConfig.setLogged(Boolean.TRUE);
             } else {
                 tagConfig.setLogged(Boolean.FALSE);
             }
@@ -251,7 +256,7 @@ public abstract class TransferObjectFactory {
         if (alarms != null) {
             List<AlarmValueImpl> alarmValues = new ArrayList<AlarmValueImpl>(alarms.size());
             for (Alarm alarm : alarms) {
-                AlarmValueImpl alarmValue = 
+                AlarmValueImpl alarmValue =
                     new AlarmValueImpl(
                             alarm.getId(),
                             alarm.getFaultCode(),
@@ -267,4 +272,27 @@ public abstract class TransferObjectFactory {
             tagValue.addAlarmValues(alarmValues);
         }
     }
+
+  /**
+   * Creates a <code>DeviceClassNameResponse</code> object for the given device class name.
+   *
+   * @param name the name of the device class
+   * @return the resulting <code>DeviceClassNameResponse</code> object
+   */
+  public static DeviceClassNameResponse createTransferDeviceName(String name) {
+    return new DeviceClassNameResponseImpl(name);
+  }
+
+  /**
+   * Creates a <code>TransferDevice</code> object for the given device.
+   *
+   * @param device the device object to be transferred
+   * @return the resulting <code>TransferDevice</code> object
+   */
+  public static TransferDevice createTransferDevice(Device device) {
+    TransferDeviceImpl transferDevice = new TransferDeviceImpl(device.getId(), device.getName(), device.getDeviceClassId());
+    transferDevice.addPropertyValues(device.getPropertyValues());
+    transferDevice.addCommandValues(device.getCommandValues());
+    return transferDevice;
+  }
 }

@@ -33,6 +33,11 @@
   		<value>cern.c2mon.server.command.CommandExecutionManager</value>
   	</constructor-arg>
   </bean>
+
+  <bean id="deviceCache" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.DeviceCache" />
+  </bean>
   
   <!-- start module -->
   <import resource="classpath:cern/c2mon/server/client/config/server-client.xml"/>

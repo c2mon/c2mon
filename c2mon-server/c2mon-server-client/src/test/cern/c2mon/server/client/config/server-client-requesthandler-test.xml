@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+  <bean id="tagLocationService" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.TagLocationService" />
+  </bean>
+
+  <bean id="tagFacadeGateway" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.TagFacadeGateway" />
+  </bean>
+
+  <bean id="supervisionFacade" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.supervision.SupervisionFacade" />
+  </bean>
+
+  <bean id="processXMLProvider" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.ProcessXMLProvider" />
+  </bean>
+
+  <bean id="alarmCache" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.AlarmCache" />
+  </bean>
+
+  <bean id="configurationLoader" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg
+      value="cern.c2mon.server.configuration.ConfigurationLoader" />
+  </bean>
+
+  <bean id="commandExecutionManager" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.command.CommandExecutionManager" />
+  </bean>
+
+  <bean id="processCache" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.ProcessCache" />
+  </bean>
+
+  <bean id="deviceCache" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.DeviceCache" />
+  </bean>
+
+  <bean id="clientRequestHandler" class="cern.c2mon.server.client.request.ClientRequestHandler">
+  </bean>
+
+</beans>

@@ -9,6 +9,11 @@ import org.apache.activemq.command.ActiveMQTextMessage;
 import org.junit.Test;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandTagHandle;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
@@ -17,9 +22,6 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandTagHandle;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
 
 public class ClientRequestMessageConverterTest {
 
@@ -110,7 +112,7 @@ public class ClientRequestMessageConverterTest {
     catch (JMSException e) {
       assertTrue(e.getMessage(), false);
     }
-  }  
+  }
 
   @Test
   public void testTagConfigMessageConversion() {
@@ -127,7 +129,7 @@ public class ClientRequestMessageConverterTest {
     catch (JMSException e) {
       assertTrue(e.getMessage(), false);
     }
-  }   
+  }
 
   @Test
   public void testConfigurationReportMessageConversion() {
@@ -144,8 +146,8 @@ public class ClientRequestMessageConverterTest {
     catch (JMSException e) {
       assertTrue(e.getMessage(), false);
     }
-  }   
-  
+  }
+
   @Test
   public void testCommandTagHandleMessageConversion() {
     JsonRequest<CommandTagHandle> request = new ClientRequestImpl<CommandTagHandle>(CommandTagHandle.class);
@@ -163,7 +165,7 @@ public class ClientRequestMessageConverterTest {
       assertTrue(e.getMessage(), false);
     }
   }
-  
+
   @Test
   public void testExecuteCommandMessageConversion() {
     JsonRequest<CommandReport> request = new ClientRequestImpl<CommandReport>(CommandReport.class);
@@ -180,10 +182,10 @@ public class ClientRequestMessageConverterTest {
       assertTrue(e.getMessage(), false);
     }
   }
-  
+
   @Test
   public void testProcessNamesMessageConversion() {
-    
+
     ClientRequestImpl<ProcessNameResponse> request = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
 
     TextMessage message = new ActiveMQTextMessage();
@@ -193,6 +195,40 @@ public class ClientRequestMessageConverterTest {
 
       assertTrue(receivedRequest.getRequestType() == ClientRequest.RequestType.PROCESS_NAMES_REQUEST);
       assertTrue(receivedRequest.getResultType() == ClientRequest.ResultType.TRANSFER_PROCESS_NAMES);
+    }
+    catch (JMSException e) {
+      assertTrue(e.getMessage(), false);
+    }
+  }
+
+  @Test
+  public void testDeviceClassNamesMessageConversion() {
+    ClientRequestImpl<DeviceClassNameResponse> request = new ClientRequestImpl<>(DeviceClassNameResponse.class);
+
+    TextMessage message = new ActiveMQTextMessage();
+    try {
+      message.setText(request.toJson());
+      ClientRequest receivedRequest = ClientRequestMessageConverter.fromMessage(message);
+
+      assertTrue(receivedRequest.getRequestType() == ClientRequest.RequestType.DEVICE_CLASS_NAMES_REQUEST);
+      assertTrue(receivedRequest.getResultType() == ClientRequest.ResultType.TRANSFER_DEVICE_CLASS_NAMES);
+    }
+    catch (JMSException e) {
+      assertTrue(e.getMessage(), false);
+    }
+  }
+
+  @Test
+  public void testDevicesMessageConversion() {
+    ClientRequestImpl<TransferDevice> request = new ClientRequestImpl<>(TransferDevice.class);
+
+    TextMessage message = new ActiveMQTextMessage();
+    try {
+      message.setText(request.toJson());
+      ClientRequest receivedRequest = ClientRequestMessageConverter.fromMessage(message);
+
+      assertTrue(receivedRequest.getRequestType() == ClientRequest.RequestType.DEVICE_REQUEST);
+      assertTrue(receivedRequest.getResultType() == ClientRequest.ResultType.TRANSFER_DEVICE_LIST);
     }
     catch (JMSException e) {
       assertTrue(e.getMessage(), false);

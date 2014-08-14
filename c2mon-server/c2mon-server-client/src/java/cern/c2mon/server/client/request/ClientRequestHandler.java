@@ -22,45 +22,46 @@ import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.client.util.TransferObjectFactory;
-import cern.c2mon.server.configuration.ConfigProgressMonitor;
-import cern.c2mon.server.configuration.ConfigurationLoader;
-import cern.c2mon.shared.client.process.ProcessNameResponse;
-import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
-import cern.c2mon.shared.client.process.ProcessXmlResponse;
-import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
-import cern.c2mon.shared.client.request.ClientRequest;
-import cern.c2mon.shared.client.request.ClientRequestReport;
-import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.command.CommandExecutionManager;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.common.thread.Event;
+import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.supervision.SupervisionFacade;
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
 import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.TransferDevice;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
+import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
+import cern.c2mon.shared.client.process.ProcessXmlResponse;
+import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
+import cern.c2mon.shared.client.request.ClientRequest;
+import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.util.json.GsonFactory;
 
 import com.google.gson.Gson;
 
 /**
  * Handles tag requests received on JMS from C2MON clients.
- * 
+ *
  * <p>
  * The request is processed and a list of <code>TranferTag</code> objects is
  * returned as serialized JSON string
- * 
+ *
  * <p>Handles requests on both client request and admin queues.
- * 
+ *
  * @author Matthias Braeger
  */
 @Service("clientRequestHandler")
@@ -90,6 +91,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   /** Reference to the Process cache that provides a list of all the process names */
   private final ProcessCache processCache;
 
+  /** Reference to the Device cache */
+  private final DeviceCache deviceCache;
+
   /**
    * Reference to the supervision facade service for handling the supervision
    * request
@@ -109,7 +113,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /**
    * Default Constructor
-   * 
+   *
    * @param pTagLocationService
    *          Reference to the tag location service singleton
    * @param pTagFacadeGateway
@@ -125,13 +129,15 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @param pCommandExecutionManager
    *          Reference to the CommandExecutionManager
    * @param pProcessCache
-   *          Reference to the ProcessCache          
+   *          Reference to the ProcessCache
+   * @param pDeviceCache
+   *          Reference to the DeviceCache
    */
   @Autowired
   public ClientRequestHandler(final TagLocationService pTagLocationService, final TagFacadeGateway pTagFacadeGateway,
       final SupervisionFacade pSupervisionFacade, final ProcessXMLProvider pProcessXMLProvider, final AlarmCache pAlarmCache,
       final ConfigurationLoader pConfigurationLoader, final CommandExecutionManager pCommandExecutionManager,
-      final ProcessCache pProcessCache) {
+      final ProcessCache pProcessCache, final DeviceCache pDeviceCache) {
     tagLocationService = pTagLocationService;
     tagFacadeGateway = pTagFacadeGateway;
     supervisionFacade = pSupervisionFacade;
@@ -140,6 +146,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     configurationLoader = pConfigurationLoader;
     commandExecutionManager = pCommandExecutionManager;
     processCache = pProcessCache;
+    deviceCache = pDeviceCache;
   }
 
   /**
@@ -147,7 +154,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * <code>ClientRequest</code> to the server. The server retrieves the request
    * Tag and associated alarms information from the cache and sends them back
    * through the reply topic
-   * 
+   *
    * @param message
    *          the JMS message which contains the Json <code>ClientRequest</code>
    * @param session
@@ -162,7 +169,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     if (LOG.isDebugEnabled()) {
       LOG.debug("onMessage() : Client request received.");
     }
-    try { 
+    try {
       Destination replyDestination = null;
       try {
         replyDestination = message.getJMSReplyTo();
@@ -172,11 +179,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       }
 
       ClientRequest clientRequest = ClientRequestMessageConverter.fromMessage(message);
-      Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest, session, replyDestination);  
+      Collection< ? extends ClientRequestResult> response = handleClientRequest(clientRequest, session, replyDestination);
 
       if (replyDestination != null) {
 
-        MessageProducer messageProducer = session.createProducer(replyDestination);    
+        MessageProducer messageProducer = session.createProducer(replyDestination);
         try {
           messageProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
           messageProducer.setTimeToLive(DEFAULT_REPLY_TTL);
@@ -198,22 +205,22 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
             LOG.debug("onMessage() : Responded to ClientRequest.");
           }
           messageProducer.send(replyMessage);
-        } finally {          
+        } finally {
           messageProducer.close();
-        }     
+        }
       } else {
         LOG.error("onMessage() : JMSReplyTo destination is null - cannot send reply.");
         throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
       }
     } catch (Exception e) {
       LOG.error("Exception caught while processing client request - unable to process it; request will time out", e);
-    }    
+    }
   }
-  
+
   /**
    * Inner method for handling requests. Therefore it has to get for all tag ids
    * mentioned in that request the tag and alarm referenses.
-   * 
+   *
    * @param clientRequest The request
    * @param session Used by the ReportHandler to send reports
    * @param replyDestination Used by the ReportHandler to send reports
@@ -247,7 +254,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
           LOG.debug("handleClientRequest() - Received an ALARM_REQUEST for " + clientRequest.getTagIds().size() + " alarms.");
         }
         return handleAlarmRequest(clientRequest);
-      case ACTIVE_ALARMS_REQUEST:  
+      case ACTIVE_ALARMS_REQUEST:
         if (LOG.isDebugEnabled()) {
           LOG.debug("handleClientRequest() - Received an ACTIVE_ALARMS_REQUEST.");
         }
@@ -277,6 +284,16 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
           LOG.debug("handleClientRequest() - Received a PROCESS_NAMES_REQUEST");
         }
         return handleProcessNamesRequest(clientRequest);
+      case DEVICE_CLASS_NAMES_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("handleClientRequest() - Received a DEVICE_CLASS_NAMES_REQUEST");
+        }
+        return handleDeviceClassNamesRequest(clientRequest);
+      case DEVICE_REQUEST:
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("handleClientRequest() - Received a DEVICE_REQUEST");
+        }
+        return handleDeviceRequest(clientRequest);
       default:
         LOG.error("handleClientRequest() - Client request not supported: " + clientRequest.getRequestType());
         return Collections.emptyList();
@@ -285,10 +302,10 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /**
    * Inner method which handles the process names request
-   * 
+   *
    * @param clientRequest A process name sent from the client
    * @return a Collection of all available process names
-   */ 
+   */
   private Collection< ? extends ClientRequestResult> handleProcessNamesRequest(final ClientRequest clientRequest) {
 
     Collection<ProcessNameResponse> names = new ArrayList<ProcessNameResponse>();
@@ -297,37 +314,37 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
     while (iterator.hasNext()) {
 
-      cern.c2mon.server.common.process.Process o = processCache.get((Long) iterator.next());
+      cern.c2mon.server.common.process.Process o = processCache.get(iterator.next());
       names.add(new ProcessNameResponseImpl(o.getName()));
     }
-    return names;    
+    return names;
   }
 
   /**
    * Inner method which handles the Daq Xml Requests
-   * 
+   *
    * @param daqXmlRequest The daq Xml Request sent from the client
    * @return a ProcessXmlResponse
-   */ 
+   */
   private Collection< ? extends ClientRequestResult> handleDaqXmlRequest(final ClientRequest daqXmlRequest) {
 
     Collection<ProcessXmlResponse> singleXML = new ArrayList<ProcessXmlResponse>(1);
     ProcessXmlResponseImpl processXmlResponse;
     try {
-      String xmlString = processXMLProvider.getProcessConfigXML((String) daqXmlRequest.getRequestParameter());
+      String xmlString = processXMLProvider.getProcessConfigXML(daqXmlRequest.getRequestParameter());
       processXmlResponse = new ProcessXmlResponseImpl();
       processXmlResponse.setProcessXML(xmlString);
     } catch (CacheElementNotFoundException cacheEx) {
       String errorMessage = "Requested process not found.";
       LOG.warn(errorMessage, cacheEx);
-      processXmlResponse = new ProcessXmlResponseImpl(false, errorMessage);     
+      processXmlResponse = new ProcessXmlResponseImpl(false, errorMessage);
     }
     singleXML.add(processXmlResponse);
     return singleXML;
   }
 
   /**
-   * Helper method. Casts to an int. 
+   * Helper method. Casts to an int.
    * Logs a warning if the cast is unsafe.
    * @param l long
    * @return int
@@ -342,11 +359,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /**
    * Inner method which handles the CommandTagHandle Requests
-   * 
+   *
    * @param commandRequest
    *          The command request sent from the client
    * @return a Collection of CommandTagHandles
-   */ 
+   */
   private Collection< ? extends ClientRequestResult> handleCommandHandleRequest(final ClientRequest commandRequest) {
 
     switch (commandRequest.getResultType()) {
@@ -361,7 +378,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /**
    * Inner method which handles the Configuration Requests
-   * 
+   *
    * @param configurationRequest
    *          The configuration request sent from the client
    * @return Configuration Report
@@ -389,13 +406,13 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
         default:
           LOG.error("handleConfigurationRequest() - Could not generate response message. Unknown enum ResultType " + configurationRequest.getResultType());
       }
-    } // end while   
+    } // end while
     return reports;
   }
 
   /**
    * Inner method which handles the Execute Command Request
-   * 
+   *
    * @param executeCommandRequest
    *          The command request send from the client
    * @return A command report
@@ -413,11 +430,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /**
    * Inner method which handles the Tag Configuration Requests
-   * 
+   *
    * @param tagConfigurationRequest
    *          The configuration request sent from the client
    * @return A tag configuration list
-   */  
+   */
   private Collection< ? extends ClientRequestResult> handleTagConfigurationRequest(final ClientRequest tagConfigurationRequest) {
 
     // !!! TagId field is also used for Configuration Ids
@@ -454,11 +471,11 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * Inner method which handles the active alarm request.
    * @param alarmRequest The alarm request sent from the client. It doesn't really contain any information
    * other than the fact that this is an Active Alarms request.
-   * 
+   *
    * @return Collection of all the active alarms
    */
   @SuppressWarnings("unchecked")
-  private Collection< ? extends ClientRequestResult> handleActiveAlarmRequest(final ClientRequest alarmRequest) {  
+  private Collection< ? extends ClientRequestResult> handleActiveAlarmRequest(final ClientRequest alarmRequest) {
 
     final Collection activeAlarms = new ArrayList();
     List<Long> alarmKeys = alarmCache.getKeys();
@@ -488,7 +505,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /**
    * Inner method which handles the alarm request.
-   * 
+   *
    * @param alarmRequest
    *          The alarm request sent from the client
    * @return Collection of alarms
@@ -535,7 +552,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
 
   /**
    * Inner method which handles the tag requests
-   * 
+   *
    * @param tagRequest
    *          The tag request sent from the client
    * @return Collection of
@@ -568,5 +585,40 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       LOG.debug("Finished processing Tag request (values only): returning " + transferTags.size() + " Tags");
     }
     return transferTags;
+  }
+
+  /**
+   * Inner method which handles the device class names request.
+   *
+   * @param deviceClassNamesRequest the request sent by the client
+   * @return a collection of all the device class names
+   */
+  private Collection< ? extends ClientRequestResult> handleDeviceClassNamesRequest(final ClientRequest deviceClassNamesRequest) {
+    Collection<DeviceClassNameResponse> classNames = new ArrayList<>();
+
+    Collection<String> names = deviceCache.getClassNames();
+    for (String name : names) {
+      classNames.add(TransferObjectFactory.createTransferDeviceName(name));
+    }
+
+    return classNames;
+  }
+
+  /**
+   * Inner method which handles the device request.
+   *
+   * @param deviceRequest the request sent by the client
+   * @return a collection of all devices of the requested class
+   */
+  private Collection< ? extends ClientRequestResult> handleDeviceRequest(final ClientRequest deviceRequest) {
+    Collection<TransferDevice> transferDevices = new ArrayList<>();
+    String deviceClassName = deviceRequest.getRequestParameter();
+
+    Collection<Device> devices = deviceCache.getDevices(deviceClassName);
+    for (Device device : devices) {
+      transferDevices.add(TransferObjectFactory.createTransferDevice(device));
+    }
+
+    return transferDevices;
   }
 }
