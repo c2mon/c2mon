@@ -17,6 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.server.common.device;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,7 +26,12 @@ import java.util.Map;
  *
  * @author Justin Lewis Salmon
  */
-public class DeviceCacheObject implements Device {
+public class DeviceCacheObject implements Device, Cloneable {
+
+  /**
+   * Serial version UID, since cloneable
+   */
+  private static final long serialVersionUID = -5756951683926328266L;
 
   /**
    * The unique ID of this device.
@@ -45,12 +51,12 @@ public class DeviceCacheObject implements Device {
   /**
    * The property mapping (property name : tag ID) of this device.
    */
-  private Map<String, Long> propertyValues;
+  private Map<String, Long> propertyValues = new HashMap<>();
 
   /**
    * The command mapping (command name : tag ID) of this device.
    */
-  private Map<String, Long> commandValues;
+  private Map<String, Long> commandValues = new HashMap<>();
 
   /**
    * Default constructor.
@@ -82,14 +88,17 @@ public class DeviceCacheObject implements Device {
 
   @Override
   public Map<String, Long> getPropertyValues() {
-    // TODO Auto-generated method stub
-    return null;
+    return propertyValues;
   }
 
   @Override
   public Map<String, Long> getCommandValues() {
+    return commandValues;
+  }
+
+  @Override
+  public DeviceCacheObject clone() {
     // TODO Auto-generated method stub
     return null;
   }
-
 }

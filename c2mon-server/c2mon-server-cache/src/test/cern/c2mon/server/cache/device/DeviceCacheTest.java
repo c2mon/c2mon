@@ -15,17 +15,11 @@
  *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.server.cache;
-
-import cern.c2mon.server.common.device.Device;
+package cern.c2mon.server.cache.device;
 
 /**
- * The module public interface that should be used to access the
- * <code>Device</code>s in the server cache.
- *
  * @author Justin Lewis Salmon
  */
-public interface DeviceCache extends C2monCache<Long, Device> {
+public class DeviceCacheTest {
 
-  String cacheInitializedKey = "c2mon.cache.device.initialized";
 }

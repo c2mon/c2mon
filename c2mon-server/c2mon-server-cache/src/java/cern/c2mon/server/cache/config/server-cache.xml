@@ -27,4 +27,6 @@
   <import resource="classpath:cern/c2mon/server/cache/config/server-cache-commfault.xml"/>
   <import resource="classpath:cern/c2mon/server/cache/config/server-cache-command.xml"/>
   <import resource="classpath:cern/c2mon/server/cache/config/server-cache-alarm.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-device.xml"/>
+  <import resource="classpath:cern/c2mon/server/cache/config/server-cache-deviceclass.xml"/>
 </beans>

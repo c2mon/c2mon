@@ -19,19 +19,22 @@ package cern.c2mon.server.common.device;
 
 import java.util.List;
 
+import cern.c2mon.shared.common.Cacheable;
+
 /**
  * This interface describes the methods provided by a DeviceClass object used in
  * the server Device cache.
  *
  * @author Justin Lewis Salmon
  */
-public interface DeviceClass {
+public interface DeviceClass extends Cacheable {
 
   /**
    * Retrieve the unique ID of this device class.
    *
    * @return the device class ID
    */
+  @Override
   public Long getId();
 
   /**

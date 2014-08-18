@@ -17,15 +17,25 @@
  ******************************************************************************/
 package cern.c2mon.server.cache;
 
-import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceClass;
 
 /**
  * The module public interface that should be used to access the
- * <code>Device</code>s in the server cache.
+ * <code>DeviceClass</code>es in the server cache.
  *
  * @author Justin Lewis Salmon
  */
-public interface DeviceCache extends C2monCache<Long, Device> {
+public interface DeviceClassCache extends C2monCache<Long, DeviceClass> {
 
-  String cacheInitializedKey = "c2mon.cache.device.initialized";
+  String cacheInitializedKey = "c2mon.cache.deviceclass.initialized";
+
+  /**
+   * Retrieve a particular <code>DeviceClass</code> instance from the cache by
+   * specifying its name.
+   *
+   * @param deviceClassName the name of the device class
+   * @return the <code>DeviceClass</code> instance with the specified name, or
+   *         null if no instance exists in the cache
+   */
+  public DeviceClass getDeviceClassByName(String deviceClassName);
 }

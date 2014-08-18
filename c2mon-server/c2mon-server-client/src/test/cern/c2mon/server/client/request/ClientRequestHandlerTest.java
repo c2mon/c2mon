@@ -1,7 +1,7 @@
 package cern.c2mon.server.client.request;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -20,7 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.DeviceCache;
+import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.test.broker.TestBrokerService;
@@ -41,7 +41,7 @@ public class ClientRequestHandlerTest {
 
   /** Mocked components */
   @Autowired
-  DeviceCache deviceCacheMock;
+  DeviceFacade deviceFacadeMock;
 
   @Value("${jms.client.request.queue}")
   private String requestQueue;
@@ -66,7 +66,7 @@ public class ClientRequestHandlerTest {
     // infrastructure
 
     // Reset the mock
-    EasyMock.reset(deviceCacheMock);
+    EasyMock.reset(deviceFacadeMock);
 
     Session session = testBrokerService.getConnectionFactory().createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
 
@@ -77,22 +77,22 @@ public class ClientRequestHandlerTest {
     ClientRequestImpl<DeviceClassNameResponse> request = new ClientRequestImpl<>(DeviceClassNameResponse.class);
     message.setText(request.toJson());
 
-    Collection<String> classNames = new ArrayList<>();
+    List<String> classNames = new ArrayList<>();
     classNames.add("test_device_class_name_1");
     classNames.add("test_device_class_name_2");
 
     // Expect the request handler to delegate and get class names from the
     // device cache
-    EasyMock.expect(deviceCacheMock.getClassNames()).andReturn(classNames);
+    EasyMock.expect(deviceFacadeMock.getDeviceClassNames()).andReturn(classNames);
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(deviceCacheMock);
+    EasyMock.replay(deviceFacadeMock);
 
     // Pass in a dummy message
     clientRequestHandler.onMessage(message, session);
 
     // Verify that everything happened as expected
-    EasyMock.verify(deviceCacheMock);
+    EasyMock.verify(deviceFacadeMock);
   }
 
   @Test
@@ -101,7 +101,7 @@ public class ClientRequestHandlerTest {
     // infrastructure
 
     // Reset the mock
-    EasyMock.reset(deviceCacheMock);
+    EasyMock.reset(deviceFacadeMock);
 
     Session session = testBrokerService.getConnectionFactory().createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
 
@@ -113,20 +113,24 @@ public class ClientRequestHandlerTest {
     request.setRequestParameter("test_device_class_name_1");
     message.setText(request.toJson());
 
-    Collection<Device> devices = new ArrayList<>();
-    devices.add(new DeviceCacheObject(1000L, "test_device_1", 1L));
-    devices.add(new DeviceCacheObject(2000L, "test_device_2", 1L));
+    Long deviceClassId = 1L;
+    List<Device> devices = new ArrayList<>();
+    Device device1 = new DeviceCacheObject(1000L, "test_device_1", deviceClassId);
+    Device device2 = new DeviceCacheObject(2000L, "test_device_2", deviceClassId);
+    devices.add(device1);
+    devices.add(device2);
 
-    EasyMock.expect(deviceCacheMock.getDevices("test_device_class_name_1")).andReturn(devices);
+    // Expect the request handler to look up the device class ID
+    EasyMock.expect(deviceFacadeMock.getDevices("test_device_class_name_1")).andReturn(devices);
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(deviceCacheMock);
+    EasyMock.replay(deviceFacadeMock);
 
     // Pass in a dummy message
     clientRequestHandler.onMessage(message, session);
 
     // Verify that everything happened as expected
-    EasyMock.verify(deviceCacheMock);
+    EasyMock.verify(deviceFacadeMock);
   }
 
 }

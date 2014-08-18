@@ -100,6 +100,27 @@
     <terracotta clustered="true" consistency="strong" />
   </cache>
 
+  <cache
+    name="deviceCache"
+    eternal="true"
+    maxElementsInMemory="2000"
+    maxEntriesInCache="4000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+
+  <cache
+    name="deviceClassCache"
+    eternal="true"
+    maxElementsInMemory="2000"
+    maxEntriesInCache="4000">
+    <persistence strategy="distributed" />
+    <searchable>
+      <searchAttribute name="name" expression="value.getName()"/>
+    </searchable>
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
+
   <!-- Caches used by core repository c2mon-server-supervision -->
   <cache
     name="processEventCache"
