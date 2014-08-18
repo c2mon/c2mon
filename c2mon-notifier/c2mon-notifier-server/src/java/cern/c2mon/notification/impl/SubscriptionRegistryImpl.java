@@ -22,8 +22,6 @@ import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.notification.shared.TagNotFoundException;
 import cern.c2mon.notification.shared.UserNotFoundException;
 import cern.dmn2.core.Status;
-import cern.dmn2.db.DiamonDbGateway;
-import cern.dmn2.db.PersonData;
 
 /**
  * @author felixehm
@@ -230,7 +228,11 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	     */
 	    Subscriber inReg = null;
 	    
-        inReg = getSubscriber(subscriber.getUserName());
+	    if (!users.containsKey(subscriber.getUserName())) {
+	        addSubscriber(subscriber);
+	    } 
+	    
+	    inReg = getSubscriber(subscriber.getUserName());
 	    inReg.setReportInterval(subscriber.getReportInterval());
 	    
 	    HashSet<Subscription> toStart = new HashSet<Subscription>();
@@ -409,22 +411,11 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
 	@Override
 	public Subscriber getSubscriber(String userName) throws UserNotFoundException {
 	    checkNull(userName);
+	    if (users.containsKey(userName)) {
+	        return users.get(userName);
+	    }
 	    
-		if (users.containsKey(userName)) {
-		    Subscriber s = users.get(userName);
-		    logger.trace("Found for key {}: ", userName, s);
-			return s;
-		} else {
-		    PersonData p = DiamonDbGateway.getDbService().getPersonData(userName.toUpperCase());
-		    if (p == null) {
-		        throw new UserNotFoundException("User " + userName + " is not registered.");
-		    } else {
-		        Subscriber s = new Subscriber(userName, p.getMail(), p.getMobile());
-		        logger.trace("Creating new Subscriber : {} ", s);
-		        users.put(s.getUserName(), s);
-		        return s;
-		    }
-		}
+	    throw new UserNotFoundException("Couldn't find user '" + userName + "'. Maybe he wasn't added yet ?");
 	}
 
 	
