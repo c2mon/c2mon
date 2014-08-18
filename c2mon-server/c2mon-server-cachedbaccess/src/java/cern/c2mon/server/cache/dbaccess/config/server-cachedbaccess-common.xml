@@ -85,4 +85,14 @@
     <property name="mapperInterface" value="cern.c2mon.server.cache.dbaccess.AlarmMapper"/>
   </bean>
   
+  <bean id="deviceMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    <property name="mapperInterface" value="cern.c2mon.server.cache.dbaccess.DeviceMapper"/>
+  </bean>
+  
+  <bean id="deviceClassMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+    <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    <property name="mapperInterface" value="cern.c2mon.server.cache.dbaccess.DeviceClassMapper"/>
+  </bean>
+  
 </beans>

@@ -15,6 +15,8 @@
     <typeAlias alias="LaserPublication" type="cern.c2mon.server.common.alarm.AlarmPublication" />
     <typeAlias alias="AlarmCondition" type="cern.c2mon.server.common.alarm.AlarmCondition" />        
     <typeAlias alias="Process" type="cern.c2mon.server.common.process.ProcessCacheObject" />
+<!--     <typeAlias alias="Device" type="cern.c2mon.server.common.device.DeviceCacheObject" />
+    <typeAlias alias="DeviceClass" type="cern.c2mon.server.common.device.DeviceClassCacheObject" /> -->
     <typeAlias alias="DataTagQuality" type="cern.c2mon.shared.common.datatag.DataTagQuality" />
     <typeAlias alias="RbacAuthorizationDetails" type="cern.c2mon.shared.client.command.RbacAuthorizationDetails" />      
   </typeAliases>
@@ -38,5 +40,7 @@
     <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/ruletag-sql.xml"/>  
     <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/commandtag-sql.xml"/>      
     <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/alarm-sql.xml"/>
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/device-sql.xml"/>
+    <mapper resource="cern/c2mon/server/cache/dbaccess/sqlmaps/deviceclass-sql.xml"/>
   </mappers>
 </configuration>

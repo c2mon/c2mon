@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cern.c2mon.server.cache.dbaccess.DeviceMapper">
+
+  <resultMap id="deviceResultMap"
+    type="cern.c2mon.server.common.device.DeviceCacheObject">
+
+    <constructor>
+      <idArg column="device_id" javaType="Long" />
+      <arg column="device_name" javaType="String" />
+    </constructor>
+<!--     <result property="description" column="process_description" />
+    <collection property="equipmentIds" ofType="Long"
+      javaType="ArrayList" resultMap="equipmentIdsResultMap" /> -->
+  </resultMap>
+
+  <!-- getAll needed for persistent caches -->
+  <select id="getAll" resultMap="deviceResultMap">
+    SELECT DEVID as device_id
+    FROM DEVICE
+  </select>
+
+  <!-- getItem needed for persistence caches -->
+  <select id="getItem" resultMap="deviceResultMap" parameterType="Long">
+    SELECT DEVID as device_id, DEVNAME as device_name
+    FROM DEVICE
+    WHERE DEVID = #{id}
+  </select>
+
+  <insert id="insertDevice" parameterType="cern.c2mon.server.common.device.DeviceCacheObject">
+    INSERT INTO DEVICE
+    (DEVID, DEVNAME)
+    VALUES (#{id}, #{name,jdbcType=VARCHAR})
+  </insert>
+
+  <select id="getMaxId" resultType="Long">
+    SELECT MAX(DEVID)
+    FROM DEVICE
+  </select>
+
+  <select id="getMinId" resultType="Long">
+    SELECT MIN(DEVID)
+    FROM DEVICE
+  </select>
+
+  <select id="isInDb" resultType="boolean" parameterType="Long">
+    SELECT
+    count(*)
+    FROM DEVICE
+    WHERE DEVID = #{id}
+  </select>
+
+</mapper>

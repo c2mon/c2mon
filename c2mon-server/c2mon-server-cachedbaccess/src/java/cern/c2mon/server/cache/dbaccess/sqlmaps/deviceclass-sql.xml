@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+  "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cern.c2mon.server.cache.dbaccess.DeviceClassMapper">
+
+<!--   <resultMap id="deviceClassResultMap" type="cern.c2mon.server.common.device.DeviceClassCacheObject">
+    <id property="id" column="device_id" />
+    <result property="name" column="device_name" />
+  </resultMap> -->
+
+<!--   <resultMap id="deviceClassResultMap"
+    type="cern.c2mon.server.common.device.DeviceClassCacheObject">
+
+    <constructor>
+      <idArg column="device_class_id" javaType="Long" />
+      <arg column="device_class_name" javaType="String" />
+      <arg column="device_description" javaType="String" />
+    </constructor>
+    <collection property="properties" ofType="String"
+      javaType="ArrayList" resultMap="deviceClassPropertiesResultMap" />
+    <collection property="commands" ofType="String" javaType="ArrayList"
+      resultMap="deviceClassCommandsResultMap" />
+    <collection property="deviceIds" ofType="String"
+      javaType="ArrayList" resultMap="deviceClassDeviceIdsResultMap" />
+  </resultMap> -->
+
+  <!-- getAll needed for persistent caches -->
+<!--   <select id="getAll" resultMap="deviceClassResultMap">
+    SELECT DEVCLASSID as
+    device_class_id
+    FROM DEVICE
+  </select> -->
+
+  <!-- getItem needed for persistence caches -->
+<!--   <select id="getItem" resultMap="deviceClassResultMap"
+    parameterType="Long">
+    SELECT DEVCLASSID as device_class_id, DEVCLASSNAME as
+    device_class_name
+    FROM DEVICECLASS
+    WHERE DEVCLASSID = #{id}
+  </select> -->
+
+<!--   <insert id="insertDevice"
+    parameterType="cern.c2mon.server.common.device.DeviceClassCacheObject">
+    INSERT INTO DEVICECLASS
+    (DEVCLASSID, DEVCLASSNAME)
+    VALUES (#{id}, #{name,jdbcType=VARCHAR})
+  </insert> -->
+
+  <select id="getMaxId" resultType="Long">
+    SELECT MAX(DEVCLASSID)
+    FROM
+    DEVICECLASS
+  </select>
+
+  <select id="getMinId" resultType="Long">
+    SELECT MIN(DEVCLASSID)
+    FROM
+    DEVICECLASS
+  </select>
+
+  <select id="isInDb" resultType="boolean" parameterType="Long">
+    SELECT
+    count(*)
+    FROM DEVICECLASS
+    WHERE DEVCLASSID = #{id}
+  </select>
+
+</mapper>
