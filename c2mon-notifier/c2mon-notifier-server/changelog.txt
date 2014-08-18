@@ -1,6 +1,13 @@
 C2MON Notifier Changelog:
 ---------------------------
 
+6/2014 Release 1.0.3
+===========================
+DMN-1603: Added support for eGroup subscriptions
+
+6/2014 Release 1.0.2
+===========================
+DMN-1603: Added support for eGroup subscriptions
 
 2/2013 Initial Release 1.0
 
