@@ -115,7 +115,7 @@
 		<dependency>
 			<groupId>cern.dmn2.shared</groupId>
 			<artifactId>dmn2-db-service</artifactId>
-			<version>1.0.4</version>
+			<version>1.0.19</version>
 		</dependency>
 		<dependency>
 		   <groupId>org.slf4j</groupId>
