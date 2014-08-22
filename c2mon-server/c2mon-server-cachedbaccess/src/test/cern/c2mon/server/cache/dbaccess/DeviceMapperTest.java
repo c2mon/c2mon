@@ -70,24 +70,24 @@ public class DeviceMapperTest {
      Map<String, Long> propertyValues = device1.getPropertyValues();
      Assert.assertNotNull(propertyValues);
      Assert.assertTrue(propertyValues.size() == 1);
-     Assert.assertTrue(propertyValues.get("TEST_PROPERTY_1") == 200000);
+     Assert.assertTrue(propertyValues.get("TEST_PROPERTY_1") == 210000);
 
      Map<String, Long> commandValues = device1.getCommandValues();
      Assert.assertNotNull(commandValues);
      Assert.assertTrue(commandValues.size() == 1);
-     Assert.assertTrue(commandValues.get("TEST_COMMAND_1") == 200000);
+     Assert.assertTrue(commandValues.get("TEST_COMMAND_1") == 210004);
 
      Device device2 = deviceMapper.getItem(301L);
      Assert.assertNotNull(device2);
      propertyValues = device2.getPropertyValues();
      Assert.assertNotNull(propertyValues);
      Assert.assertTrue(propertyValues.size() == 1);
-     Assert.assertTrue(propertyValues.get("TEST_PROPERTY_2") == 200001);
+     Assert.assertTrue(propertyValues.get("TEST_PROPERTY_2") == 210001);
 
      commandValues = device2.getCommandValues();
      Assert.assertNotNull(commandValues);
      Assert.assertTrue(commandValues.size() == 1);
-     Assert.assertTrue(commandValues.get("TEST_COMMAND_2") == 200001);
+     Assert.assertTrue(commandValues.get("TEST_COMMAND_2") == 210005);
   }
 
   @Test
