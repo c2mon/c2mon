@@ -20,6 +20,8 @@ package cern.c2mon.server.cache.loading;
 import cern.c2mon.server.common.device.Device;
 
 /**
+ * Device DAO interface.
+ *
  * @author Justin Lewis Salmon
  */
 public interface DeviceDAO extends BatchCacheLoaderDAO<Device> {

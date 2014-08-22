@@ -26,16 +26,18 @@ import cern.c2mon.server.cache.loading.common.AbstractBatchLoaderDAO;
 import cern.c2mon.server.common.device.Device;
 
 /**
+ * Device loader DAO implementation.
+ *
  * @author Justin Lewis Salmon
  */
 @Service("deviceDAO")
 public class DeviceDAOImpl extends AbstractBatchLoaderDAO<Device> implements DeviceDAO {
 
+  /**
+   * Reference to the MyBatis Device mapper.
+   */
   private DeviceMapper deviceMapper;
 
-  /**
-   * @param batchLoaderMapper
-   */
   @Autowired
   public DeviceDAOImpl(final DeviceMapper deviceMapper) {
     super(deviceMapper);
@@ -44,7 +46,6 @@ public class DeviceDAOImpl extends AbstractBatchLoaderDAO<Device> implements Dev
 
   @Override
   protected Device doPostDbLoading(Device item) {
-    // TODO Auto-generated method stub
-    return null;
+    return item;
   }
 }

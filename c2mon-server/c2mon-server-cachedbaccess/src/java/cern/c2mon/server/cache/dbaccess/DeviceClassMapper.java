@@ -18,10 +18,20 @@
 package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.server.common.device.DeviceClassCacheObject;
 
 /**
+ * MyBatis mapper for for accessing and updating {@link DeviceClassCacheObject}s in
+ * the cache database.
+ *
  * @author Justin Lewis Salmon
  */
 public interface DeviceClassMapper extends LoaderMapper<DeviceClass>, BatchLoaderMapper<DeviceClass> {
 
+  /**
+   * Insert a device class obejct from the cache into the db.
+   *
+   * @param deviceClass the device class cache object to insert
+   */
+  void insertDeviceClass(DeviceClassCacheObject deviceClass);
 }

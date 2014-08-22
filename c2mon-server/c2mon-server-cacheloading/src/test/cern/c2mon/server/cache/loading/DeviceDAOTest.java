@@ -17,12 +17,31 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.loading;
 
-import cern.c2mon.server.common.device.DeviceClass;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * DeviceClass DAO interface.
- *
  * @author Justin Lewis Salmon
  */
-public interface DeviceClassDAO extends BatchCacheLoaderDAO<DeviceClass> {
+@RunWith(SpringJUnit4ClassRunner.class)
+@DirtiesContext
+@ContextConfiguration({"classpath:cern/c2mon/server/cache/loading/config/server-cacheloading-device-test.xml"})
+public class DeviceDAOTest {
+
+  /** Component to test */
+  @Autowired
+  DeviceDAO deviceDAO;
+
+  @Test
+  public void testGetItem() {
+    Assert.assertNotNull(deviceDAO.getItem(300L));
+    Assert.assertNotNull(deviceDAO.getItem(301L));
+    Assert.assertTrue(deviceDAO.getItem(300L).getDeviceClassId() == 400);
+    Assert.assertTrue(deviceDAO.getItem(301L).getDeviceClassId() == 400);
+  }
 }

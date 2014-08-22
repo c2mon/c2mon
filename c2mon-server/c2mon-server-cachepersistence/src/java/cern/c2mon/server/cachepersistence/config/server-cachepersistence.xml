@@ -124,4 +124,36 @@
     <constructor-arg ref="subEquipmentPersistenceManager"/>
   </bean>
   
+  <bean id="devicePersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
+    <constructor-arg ref="deviceMapper"/>
+    <constructor-arg ref="deviceCache"/>
+  </bean>
+  
+  <bean name="devicePersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
+    <constructor-arg ref="devicePersistenceDAO"/>
+    <constructor-arg ref="deviceCache" />
+    <property name="timeoutPerBatch" value="${c2mon.persistence.timeout}"/>
+  </bean>
+
+  <bean id="devicePersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
+    <constructor-arg ref="deviceCache"/>
+    <constructor-arg ref="devicePersistenceManager"/>
+  </bean>
+  
+    <bean id="deviceClassPersistenceDAO" class="cern.c2mon.server.cachepersistence.impl.CachePersistenceDAOImpl">
+    <constructor-arg ref="deviceClassMapper"/>
+    <constructor-arg ref="deviceClassCache"/>
+  </bean>
+  
+  <bean name="deviceClassPersistenceManager" class="cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl">
+    <constructor-arg ref="deviceClassPersistenceDAO"/>
+    <constructor-arg ref="deviceClassCache" />
+    <property name="timeoutPerBatch" value="${c2mon.persistence.timeout}"/>
+  </bean>
+
+  <bean id="deviceClassPersistenceSynchroListener" class="cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener">
+    <constructor-arg ref="deviceClassCache"/>
+    <constructor-arg ref="deviceClassPersistenceManager"/>
+  </bean>
+  
 </beans>
