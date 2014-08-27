@@ -40,7 +40,9 @@
   <bean id="alarmConfigHandler" class="cern.c2mon.server.configuration.handler.impl.AlarmConfigHandlerImpl" autowire="constructor"/>
   <bean id="subEquipmentConfigHandler" class="cern.c2mon.server.configuration.handler.impl.SubEquipmentConfigHandlerImpl" autowire="constructor"/>
   <bean id="equipmentConfigHandler" class="cern.c2mon.server.configuration.handler.impl.EquipmentConfigHandlerImpl" autowire="constructor"/>
-  <bean id="ruleTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.RuleTagConfigHandlerImpl" autowire="constructor"/> 
+  <bean id="ruleTagConfigHandler" class="cern.c2mon.server.configuration.handler.impl.RuleTagConfigHandlerImpl" autowire="constructor"/>
+  <bean id="deviceClassConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DeviceClassConfigHandlerImpl" autowire="constructor"/>
+  <bean id="deviceConfigHandler" class="cern.c2mon.server.configuration.handler.impl.DeviceConfigHandlerImpl" autowire="constructor"/>
   
   <bean id="tagConfigGateway" class="cern.c2mon.server.configuration.handler.impl.TagConfigGateway" autowire="constructor"/> 
   
@@ -50,6 +52,8 @@
   <bean class="cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransactedImpl" autowire="constructor"/>
   <bean class="cern.c2mon.server.configuration.handler.transacted.EquipmentConfigTransactedImpl" autowire="constructor"/>
   <bean class="cern.c2mon.server.configuration.handler.transacted.SubEquipmentConfigTransactedImpl" autowire="constructor"/>
-  <bean class="cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransactedImpl" autowire="constructor"/>  
+  <bean class="cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransactedImpl" autowire="constructor"/>
+  <bean class="cern.c2mon.server.configuration.handler.transacted.DeviceClassConfigTransactedImpl" autowire="constructor"/>
+  <bean class="cern.c2mon.server.configuration.handler.transacted.DeviceConfigTransactedImpl" autowire="constructor"/>
 
 </beans>

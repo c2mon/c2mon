@@ -41,12 +41,12 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
   /**
    * The name of the device class.
    */
-  private final String name;
+  private String name;
 
   /**
    * The textual description of the device class.
    */
-  private final String description;
+  private String description;
 
   /**
    * The list of property names that belong to this device class.
@@ -76,6 +76,17 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
     this.description = description;
   }
 
+  /**
+   * Constructor used when creating a cache object during configuration.
+   *
+   * @param id the unique ID of the device class
+   */
+  public DeviceClassCacheObject(final Long id) {
+    this.id = id;
+    this.name = null;
+    this.description = null;
+  }
+
   @Override
   public Long getId() {
     return id;
@@ -101,10 +112,34 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
     return commands;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Object clone() {
-    // TODO Auto-generated method stub
-    return null;
+  public Object clone() throws CloneNotSupportedException {
+    DeviceClassCacheObject clone = (DeviceClassCacheObject) super.clone();
+
+    clone.properties = (List<String>) ((ArrayList<String>) properties).clone();
+    clone.commands = (List<String>) ((ArrayList<String>) commands).clone();
+    clone.deviceIds = (List<Long>) ((ArrayList<Long>) deviceIds).clone();
+
+    return clone;
+  }
+
+  /**
+   * Set the name of the device class.
+   *
+   * @param name the device class name to set
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  /**
+   * Set the description of the device class.
+   *
+   * @param description the device class description to set
+   */
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   /**

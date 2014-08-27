@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
-import cern.c2mon.server.cache.loading.common.AbstractBatchLoaderDAO;
+import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.device.DeviceClass;
 
 /**
@@ -31,7 +31,7 @@ import cern.c2mon.server.common.device.DeviceClass;
  * @author Justin Lewis Salmon
  */
 @Service("deviceClassDAO")
-public class DeviceClassDAOImpl extends AbstractBatchLoaderDAO<DeviceClass> implements DeviceClassDAO {
+public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> implements DeviceClassDAO {
 
   /**
    * Reference to the DeviceClass MyBatis loader.
@@ -40,7 +40,7 @@ public class DeviceClassDAOImpl extends AbstractBatchLoaderDAO<DeviceClass> impl
 
   @Autowired
   public DeviceClassDAOImpl(final DeviceClassMapper deviceClassMapper) {
-    super(deviceClassMapper);
+    super(2000, deviceClassMapper);
     this.deviceClassMapper = deviceClassMapper;
   }
 
@@ -52,5 +52,22 @@ public class DeviceClassDAOImpl extends AbstractBatchLoaderDAO<DeviceClass> impl
   @Override
   protected DeviceClass doPostDbLoading(DeviceClass item) {
     return item;
+  }
+
+  @Override
+  public void deleteItem(Long id) {
+    deviceClassMapper.deleteProperties(id);
+    deviceClassMapper.deleteCommands(id);
+    deviceClassMapper.deleteDeviceClass(id);
+  }
+
+  @Override
+  public void updateConfig(DeviceClass deviceClass) {
+    deviceClassMapper.updateDeviceClassConfig(deviceClass);
+  }
+
+  @Override
+  public void insert(DeviceClass deviceClass) {
+    deviceClassMapper.insertDeviceClass(deviceClass);
   }
 }

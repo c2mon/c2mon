@@ -15,27 +15,49 @@
  *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.server.cache;
+package cern.c2mon.server.common.device;
 
 import java.util.List;
 
-import cern.c2mon.server.cache.common.ConfigurableCacheFacade;
-import cern.c2mon.server.common.device.Device;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
 /**
- * This interface defines the methods provided for interacting with the
- * {@link Device} cache.
- *
  * @author Justin Lewis Salmon
  */
-public interface DeviceFacade extends ConfigurableCacheFacade<Device> {
+@Root(name = "Properties")
+public class PropertyList {
 
-  /**
-   * Retrieve a list of all devices currently in the cache that belong to a
-   * particular device class.
-   *
-   * @param deviceClassName the name of the desired device class
-   * @return the list of devices
-   */
-  List<Device> getDevices(String deviceClassName);
+  @ElementList(entry = "Property", inline = true)
+  private List<Property> properties;
+
+  public PropertyList(List<Property> properties) {
+    this.properties = properties;
+  }
+
+  public PropertyList() {
+    super();
+  }
+
+  public List<Property> getProperties() {
+    return properties;
+  }
+
+  public static class Property {
+
+    @Attribute
+    private String name;
+
+    @Attribute
+    private String description;
+
+    public String getName() {
+      return name;
+    }
+
+    public String getDescription() {
+      return description;
+    }
+  }
 }

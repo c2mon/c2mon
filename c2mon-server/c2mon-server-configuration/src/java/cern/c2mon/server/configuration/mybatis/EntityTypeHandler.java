@@ -32,6 +32,10 @@ public class EntityTypeHandler implements TypeHandler {
       entity = Entity.CONTROLTAG;
     } else if (entityString.equalsIgnoreCase("RuleTag")) {
       entity = Entity.RULETAG;
+    } else if (entityString.equalsIgnoreCase("DeviceClass")) {
+      entity = Entity.DEVICECLASS;
+    } else if (entityString.equalsIgnoreCase("Device")) {
+      entity = Entity.DEVICE;
     }
     if (entity == null) {
       throw new SQLException("Unrecognized ConfigConstants.Entity: " + entityString);

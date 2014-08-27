@@ -23,6 +23,7 @@ import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.DeviceClassFacade;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessXMLProvider;
@@ -98,6 +99,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   /** Reference to the Device facade */
   private final DeviceFacade deviceFacade;
 
+  /** Reference to the DeviceClass facade */
+  private final DeviceClassFacade deviceClassFacade;
+
   /**
    * Reference to the supervision facade service for handling the supervision
    * request
@@ -137,7 +141,8 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
                               final ConfigurationLoader pConfigurationLoader,
                               final CommandExecutionManager pCommandExecutionManager,
                               final ProcessCache pProcessCache,
-                              final DeviceFacade pDeviceFacade) {
+                              final DeviceFacade pDeviceFacade,
+                              final DeviceClassFacade pDeviceClassFacade) {
     tagLocationService = pTagLocationService;
     tagFacadeGateway = pTagFacadeGateway;
     supervisionFacade = pSupervisionFacade;
@@ -147,6 +152,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
     commandExecutionManager = pCommandExecutionManager;
     processCache = pProcessCache;
     deviceFacade = pDeviceFacade;
+    deviceClassFacade = pDeviceClassFacade;
   }
 
   /**
@@ -590,7 +596,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
   private Collection<? extends ClientRequestResult> handleDeviceClassNamesRequest(final ClientRequest deviceClassNamesRequest) {
     Collection<DeviceClassNameResponse> classNames = new ArrayList<>();
 
-    Collection<String> names = deviceFacade.getDeviceClassNames();
+    Collection<String> names = deviceClassFacade.getDeviceClassNames();
     for (String name : names) {
       classNames.add(TransferObjectFactory.createTransferDeviceName(name));
     }

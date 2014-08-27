@@ -24,5 +24,5 @@ import cern.c2mon.server.common.device.Device;
  *
  * @author Justin Lewis Salmon
  */
-public interface DeviceDAO extends BatchCacheLoaderDAO<Device> {
+public interface DeviceDAO extends CacheLoaderDAO<Device>, ConfigurableDAO<Device> {
 }

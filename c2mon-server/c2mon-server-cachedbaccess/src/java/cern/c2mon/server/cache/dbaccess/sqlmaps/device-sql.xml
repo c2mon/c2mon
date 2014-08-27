@@ -70,6 +70,13 @@
     (DEVID, DEVNAME, DEVCLASSID)
     VALUES (#{id}, #{name}, #{deviceClassId})
   </insert>
+  
+  <update id="updateDeviceConfig" parameterType="cern.c2mon.server.common.device.Device">
+    UPDATE DEVICE
+       SET DEVNAME = #{name},
+           DEVCLASSID = #{deviceClassId}
+     WHERE DEVID = #{id}
+  </update>
 
   <select id="getMaxId" resultType="Long">
     SELECT MAX(DEVID)
@@ -87,5 +94,17 @@
     FROM DEVICE
     WHERE DEVID = #{id}
   </select>
+
+  <delete id="deleteDevice" parameterType="Long">
+    DELETE FROM DEVICE WHERE DEVID = #{id}
+  </delete>
+
+  <delete id="deletePropertyValues" parameterType="Long">
+    DELETE FROM PROPERTYVALUE WHERE DEVID = #{id}
+  </delete>
+
+  <delete id="deleteCommandValues" parameterType="Long">
+    DELETE FROM COMMANDVALUE WHERE DEVID = #{id}
+  </delete>
 
 </mapper>

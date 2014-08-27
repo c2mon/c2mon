@@ -25,7 +25,7 @@ import cern.c2mon.server.common.device.DeviceClass;
  *
  * @author Justin Lewis Salmon
  */
-public interface DeviceClassCache extends C2monCache<Long, DeviceClass> {
+public interface DeviceClassCache extends C2monCacheWithListeners<Long, DeviceClass> {
 
   String cacheInitializedKey = "c2mon.cache.deviceclass.initialized";
 

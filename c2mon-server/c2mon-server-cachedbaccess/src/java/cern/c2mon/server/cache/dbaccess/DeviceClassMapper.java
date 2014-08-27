@@ -26,12 +26,40 @@ import cern.c2mon.server.common.device.DeviceClassCacheObject;
  *
  * @author Justin Lewis Salmon
  */
-public interface DeviceClassMapper extends LoaderMapper<DeviceClass>, BatchLoaderMapper<DeviceClass> {
+public interface DeviceClassMapper extends LoaderMapper<DeviceClass> {
 
   /**
-   * Insert a device class obejct from the cache into the db.
+   * Insert a device class object from the cache into the db.
    *
    * @param deviceClass the device class cache object to insert
    */
-  void insertDeviceClass(DeviceClassCacheObject deviceClass);
+  void insertDeviceClass(DeviceClass deviceClass);
+
+  /**
+   * Delete a device class object from the db.
+   *
+   * @param id the ID of the device class object to be deleted
+   */
+  void deleteDeviceClass(Long id);
+
+  /**
+   * Update a device object in the db.
+   *
+   * @param deviceClass the device class object to be updated
+   */
+  void updateDeviceClassConfig(DeviceClass deviceClass);
+
+  /**
+   * TODO put this in separate mapper?
+   *
+   * @param id
+   */
+  void deleteProperties(Long id);
+
+  /**
+   * TODO put this in separate mapper?
+   *
+   * @param id
+   */
+  void deleteCommands(Long id);
 }

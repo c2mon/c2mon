@@ -52,12 +52,12 @@ public class DeviceCacheObject implements Device, Cloneable {
   /**
    * The name of this device.
    */
-  private final String name;
+  private String name;
 
   /**
    * The unique ID of the class to which this device belongs.
    */
-  private final Long deviceClassId;
+  private Long deviceClassId;
 
   /**
    * The list of names of properties belonging to this device. This has a 1:1
@@ -94,6 +94,15 @@ public class DeviceCacheObject implements Device, Cloneable {
     this.id = id;
     this.name = name;
     this.deviceClassId = deviceClassId;
+  }
+
+  /**
+   * Constructor used when creating a cache object during configuration.
+   *
+   * @param id the unique ID of this device
+   */
+  public DeviceCacheObject(Long id) {
+    this.id = id;
   }
 
   @Override
@@ -147,10 +156,17 @@ public class DeviceCacheObject implements Device, Cloneable {
     return commandValues;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public DeviceCacheObject clone() {
-    // TODO Auto-generated method stub
-    return null;
+  public Object clone() throws CloneNotSupportedException {
+    DeviceCacheObject clone = (DeviceCacheObject) super.clone();
+
+    clone.propertyNames = (List<String>) ((ArrayList<String>) propertyNames).clone();
+    clone.propertyTagIds = (List<Long>) ((ArrayList<Long>) propertyTagIds).clone();
+    clone.commandNames = (List<String>) ((ArrayList<String>) commandNames).clone();
+    clone.commandTagIds = (List<Long>) ((ArrayList<Long>) commandTagIds).clone();
+
+    return clone;
   }
 
   /**
@@ -197,6 +213,7 @@ public class DeviceCacheObject implements Device, Cloneable {
 
   /**
    * Get the list of property tag IDs
+   *
    * @return the property tag IDs
    */
   public List<Long> getPropertyTagIds() {
@@ -246,5 +263,23 @@ public class DeviceCacheObject implements Device, Cloneable {
    */
   public void setCommandTagIds(List<Long> commandTagIds) {
     this.commandTagIds = commandTagIds;
+  }
+
+  /**
+   * Set the name of the device.
+   *
+   * @param name the device name to set
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  /**
+   * Set the ID of the class to which this device belongs.
+   *
+   * @param deviceClassId the device class ID to set
+   */
+  public void setDeviceClassId(Long deviceClassId) {
+    this.deviceClassId = deviceClassId;
   }
 }

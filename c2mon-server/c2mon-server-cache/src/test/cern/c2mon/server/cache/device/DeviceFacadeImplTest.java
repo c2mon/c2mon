@@ -19,6 +19,7 @@ package cern.c2mon.server.cache.device;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -31,11 +32,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
+import cern.c2mon.server.cache.DeviceClassFacade;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.shared.common.ConfigurationException;
 
 /**
  * @author Justin Lewis Salmon
@@ -46,6 +49,9 @@ import cern.c2mon.server.common.device.DeviceClassCacheObject;
 public class DeviceFacadeImplTest {
 
   /** Component to test */
+  @Autowired
+  DeviceClassFacade deviceClassFacade;
+
   @Autowired
   DeviceFacade deviceFacade;
 
@@ -80,7 +86,7 @@ public class DeviceFacadeImplTest {
     // Setup is finished, need to activate the mock
     EasyMock.replay(deviceCacheMock, deviceClassCacheMock);
 
-    List<String> classNames = deviceFacade.getDeviceClassNames();
+    List<String> classNames = deviceClassFacade.getDeviceClassNames();
     Assert.assertTrue(classNames.get(0).equals("test_device_class_name_1"));
     Assert.assertTrue(classNames.get(1).equals("test_device_class_name_2"));
 
@@ -121,5 +127,83 @@ public class DeviceFacadeImplTest {
 
     // Verify that everything happened as expected
     EasyMock.verify(deviceCacheMock, deviceClassCacheMock);
+  }
+
+  @Test
+  public void testCreateDeviceClassCacheObject() throws IllegalAccessException {
+    Properties properties = new Properties();
+    properties.put("name", "device_class_name");
+    properties.put("properties", "<Properties><Property name=\"TEST_PROPERTY_1\" description=\"Description of TEST_PROPERTY_1\" />"
+        + "<Property name=\"TEST_PROPERTY_2\" description=\"Description of TEST_PROPERTY_2\" /></Properties>");
+    properties.put("commands", "<Commands><Command name=\"TEST_COMMAND_1\" description=\"Description of TEST_COMMAND_1\" />"
+        + "<Command name=\"TEST_COMMAND_2\" description=\"Description of TEST_COMMAND_2\" /></Commands>");
+
+    DeviceClass deviceClass = deviceClassFacade.createCacheObject(10L, properties);
+    Assert.assertNotNull(deviceClass);
+    Assert.assertTrue(deviceClass.getId() == 10L);
+    Assert.assertTrue(deviceClass.getName() == properties.getProperty("name"));
+
+    Assert.assertTrue(deviceClass.getProperties().size() == 2);
+    Assert.assertTrue(deviceClass.getProperties().contains("TEST_PROPERTY_1"));
+    Assert.assertTrue(deviceClass.getProperties().contains("TEST_PROPERTY_2"));
+
+    Assert.assertTrue(deviceClass.getCommands().size() == 2);
+    Assert.assertTrue(deviceClass.getCommands().contains("TEST_COMMAND_1"));
+    Assert.assertTrue(deviceClass.getCommands().contains("TEST_COMMAND_2"));
+
+    // Test XML parser throws exception with invalid XML
+    properties.put("properties", "invalid XML string");
+    try {
+      deviceClassFacade.createCacheObject(10L, properties);
+      Assert.fail("createCacheObject() did not throw exception");
+    } catch (ConfigurationException e) {
+    }
+
+    properties.put("properties", "<Properties />");
+    properties.put("commands", "invalid XML string");
+    try {
+      deviceClassFacade.createCacheObject(10L, properties);
+      Assert.fail("createCacheObject() did not throw exception");
+    } catch (ConfigurationException e) {
+    }
+  }
+
+  @Test
+  public void testCreateDeviceCacheObject() throws IllegalAccessException {
+    Properties propertyValues = new Properties();
+    propertyValues.put("name", "device_name");
+    propertyValues.put("propertyValues", "<PropertyValues><PropertyValue name=\"TEST_PROPERTY_1\" tag-id=\"100430\" />"
+        + "<PropertyValue name=\"TEST_PROPERTY_2\" tag-id=\"100431\" /></PropertyValues>");
+    propertyValues.put("commandValues", "<CommandValues><CommandValue name=\"TEST_COMMAND_1\" command-tag-id=\"4287\" />"
+        + "<CommandValue name=\"TEST_COMMAND_2\" command-tag-id=\"4288\" /></CommandValues>");
+
+    Device device = deviceFacade.createCacheObject(10L, propertyValues);
+    Assert.assertNotNull(device);
+    Assert.assertTrue(device.getId() == 10L);
+    Assert.assertTrue(device.getName() == propertyValues.getProperty("name"));
+
+    Assert.assertTrue(device.getPropertyValues().size() == 2);
+    Assert.assertTrue(device.getPropertyValues().containsKey("TEST_PROPERTY_1"));
+    Assert.assertTrue(device.getPropertyValues().containsKey("TEST_PROPERTY_2"));
+
+    Assert.assertTrue(device.getCommandValues().size() == 2);
+    Assert.assertTrue(device.getCommandValues().containsKey("TEST_COMMAND_1"));
+    Assert.assertTrue(device.getCommandValues().containsKey("TEST_COMMAND_2"));
+
+    // Test XML parser throws exception with invalid XML
+    propertyValues.put("propertyValues", "invalid XML string");
+    try {
+      deviceFacade.createCacheObject(10L, propertyValues);
+      Assert.fail("createCacheObject() did not throw exception");
+    } catch (ConfigurationException e) {
+    }
+
+    propertyValues.put("propertyValues", "<PropertyValues />");
+    propertyValues.put("commandValues", "invalid XML string");
+    try {
+      deviceFacade.createCacheObject(10L, propertyValues);
+      Assert.fail("createCacheObject() did not throw exception");
+    } catch (ConfigurationException e) {
+    }
   }
 }

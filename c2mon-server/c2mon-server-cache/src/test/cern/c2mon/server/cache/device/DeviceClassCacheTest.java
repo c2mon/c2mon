@@ -30,41 +30,41 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.dbaccess.DeviceMapper;
-import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
+import cern.c2mon.server.common.device.DeviceClass;
 
 /**
- * Integration test of the DeviceCache implementation with the cache loading and
- * cache DB access modules.
+ * Integration test of the DeviceClassCache implementation with the cache
+ * loading and cache DB access modules.
  *
  * @author Justin Lewis Salmon
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration({ "classpath:cern/c2mon/server/cache/config/server-cache-device-test.xml" })
-public class DeviceCacheTest {
+@ContextConfiguration({ "classpath:cern/c2mon/server/cache/config/server-cache-deviceclass-test.xml" })
+public class DeviceClassCacheTest {
 
   @Autowired
-  private DeviceMapper deviceMapper;
+  private DeviceClassMapper deviceClassMapper;
 
   @Autowired
-  private DeviceCacheImpl deviceCache;
+  private DeviceClassCacheImpl deviceClassCache;
 
   @Test
   public void testCacheLoading() {
-    assertNotNull(deviceCache);
+    assertNotNull(deviceClassCache);
 
-    List<Device> deviceList = deviceMapper.getAll();
+    List<DeviceClass> deviceClassList = deviceClassMapper.getAll();
 
     // Test the cache is the same size as in DB
-    assertEquals(deviceList.size(), deviceCache.getCache().getKeys().size());
+    assertEquals(deviceClassList.size(), deviceClassCache.getCache().getKeys().size());
     // Compare all the objects from the cache and buffer
-    Iterator<Device> it = deviceList.iterator();
+    Iterator<DeviceClass> it = deviceClassList.iterator();
     while (it.hasNext()) {
-      Device currentDevice = it.next();
+      DeviceClass currentDeviceClass = it.next();
       // Equality of DataTagCacheObjects => currently only compares names
-      assertEquals(currentDevice.getName(), (deviceCache.getCopy(currentDevice.getId()).getName()));
+      assertEquals(currentDeviceClass.getName(), (deviceClassCache.getCopy(currentDeviceClass.getId()).getName()));
     }
   }
 }

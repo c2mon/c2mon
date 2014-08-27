@@ -80,5 +80,8 @@
 
   <bean id="deviceFacade" class="cern.c2mon.server.cache.device.DeviceFacadeImpl">
   </bean>
+  
+  <bean id="deviceClassFacade" class="cern.c2mon.server.cache.device.DeviceClassFacadeImpl">
+  </bean>
 
 </beans>

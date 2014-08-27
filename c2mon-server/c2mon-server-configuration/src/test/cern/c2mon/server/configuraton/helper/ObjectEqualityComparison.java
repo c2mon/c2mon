@@ -1,10 +1,12 @@
 package cern.c2mon.server.configuraton.helper;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.device.DeviceCacheObject;
+import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
@@ -23,21 +25,21 @@ public class ObjectEqualityComparison {
   public static void assertDataTagValueEquals(DataTagCacheObject expectedObject, DataTagCacheObject object) {
     assertDataTagConfigEquals(expectedObject, object);
     assertEquals(expectedObject.getSourceTimestamp(), object.getSourceTimestamp());
-    assertEquals(expectedObject.getDaqTimestamp(), object.getDaqTimestamp());  
+    assertEquals(expectedObject.getDaqTimestamp(), object.getDaqTimestamp());
   }
-  
+
   public static void assertDataTagConfigEquals(DataTagCacheObject expectedObject, DataTagCacheObject object) {
     assertTagConfigEquals(expectedObject, object);
     assertEquals(expectedObject.getEquipmentId(), object.getEquipmentId());
-    assertEquals(expectedObject.getProcessId(), object.getProcessId());    
+    assertEquals(expectedObject.getProcessId(), object.getProcessId());
     assertEquals(expectedObject.getMinValue(), object.getMinValue());
     assertEquals(expectedObject.getMaxValue(), object.getMaxValue());
     if (expectedObject.getAddress() != null) {
-      assertEquals(expectedObject.getAddress().toConfigXML(), object.getAddress().toConfigXML());  
+      assertEquals(expectedObject.getAddress().toConfigXML(), object.getAddress().toConfigXML());
     }
-        
+
   }
-  
+
   public static void assertTagConfigEquals(AbstractTagCacheObject expectedObject, AbstractTagCacheObject object) {
     assertEquals(expectedObject.getId(), object.getId());
     assertEquals(expectedObject.getName(), object.getName());
@@ -48,33 +50,33 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.isLogged(), object.isLogged());
     assertEquals(expectedObject.getUnit(), object.getUnit());
     assertEquals(expectedObject.getDipAddress(), object.getDipAddress());
-    assertEquals(expectedObject.getJapcAddress(), object.getJapcAddress());    
+    assertEquals(expectedObject.getJapcAddress(), object.getJapcAddress());
     assertEquals(expectedObject.isSimulated(), object.isSimulated());
     assertNotNull(object.getValueDictionary());
     //assertEquals(expectedObject.getValueDictionary().toXML(), object.getValueDictionary().toXML()); //compare XML of value dictionary
-    assertEquals(expectedObject.getDataTagQuality(), object.getDataTagQuality());  
+    assertEquals(expectedObject.getDataTagQuality(), object.getDataTagQuality());
     assertEquals(expectedObject.getRuleIdsString(), object.getRuleIdsString());
     assertEquals(expectedObject.getRuleIds(), object.getRuleIds());
     assertEquals(((Tag)expectedObject).getProcessIds(), ((Tag)object).getProcessIds());
     assertEquals(((Tag)expectedObject).getEquipmentIds(), ((Tag)object).getEquipmentIds());
   }
-  
+
   public static void assertTagValueEquals(AbstractTagCacheObject expectedObject, AbstractTagCacheObject object) {
     assertTagConfigEquals(expectedObject, object);
     assertEquals(expectedObject.getCacheTimestamp(), object.getCacheTimestamp());
     assertEquals(expectedObject.getValue(), object.getValue());
     assertEquals(expectedObject.getValueDescription(), object.getValueDescription());
   }
-  
+
   public static void assertCommandTagEquals(CommandTagCacheObject expectedObject, CommandTagCacheObject object) {
     assertEquals(expectedObject.getId(), object.getId());
     assertEquals(expectedObject.getName(), object.getName());
     assertEquals(expectedObject.getDescription(), object.getDescription());
     assertEquals(expectedObject.getMode(), object.getMode());
     assertEquals(expectedObject.getDataType(), object.getDataType());
-    assertEquals(expectedObject.getAuthorizationDetails().getRbacClass(), object.getAuthorizationDetails().getRbacClass());    
-    assertEquals(expectedObject.getAuthorizationDetails().getRbacDevice(), object.getAuthorizationDetails().getRbacDevice());    
-    assertEquals(expectedObject.getAuthorizationDetails().getRbacProperty(), object.getAuthorizationDetails().getRbacProperty());    
+    assertEquals(expectedObject.getAuthorizationDetails().getRbacClass(), object.getAuthorizationDetails().getRbacClass());
+    assertEquals(expectedObject.getAuthorizationDetails().getRbacDevice(), object.getAuthorizationDetails().getRbacDevice());
+    assertEquals(expectedObject.getAuthorizationDetails().getRbacProperty(), object.getAuthorizationDetails().getRbacProperty());
     assertEquals(expectedObject.getSourceRetries(), object.getSourceRetries());
     assertEquals(expectedObject.getSourceTimeout(), object.getSourceTimeout());
     assertEquals(expectedObject.getExecTimeout(), object.getExecTimeout());
@@ -85,23 +87,23 @@ public class ObjectEqualityComparison {
 
   public static void assertRuleTagConfigEquals(RuleTagCacheObject expectedObject, RuleTagCacheObject cacheObject) {
     assertTagConfigEquals(expectedObject, cacheObject);
-    assertEquals(expectedObject.getRuleText(), cacheObject.getRuleText());    
+    assertEquals(expectedObject.getRuleText(), cacheObject.getRuleText());
   }
-  
+
   public static void assertEquipmentEquals(EquipmentCacheObject expectedObject, EquipmentCacheObject actualObject) {
-    assertAbstractEquipmentEquals(expectedObject, actualObject);   
-    assertEquals(expectedObject.getProcessId(), actualObject.getProcessId());    
+    assertAbstractEquipmentEquals(expectedObject, actualObject);
+    assertEquals(expectedObject.getProcessId(), actualObject.getProcessId());
     assertEquals(expectedObject.getAddress(), actualObject.getAddress());
     assertEquals(expectedObject.getCommandTagIds(), actualObject.getCommandTagIds());
     assertEquals(expectedObject.getDataTagIds(), actualObject.getDataTagIds());
-    assertEquals(expectedObject.getSubEquipmentIds(), actualObject.getSubEquipmentIds());      
+    assertEquals(expectedObject.getSubEquipmentIds(), actualObject.getSubEquipmentIds());
   }
-  
+
   public static void assertSubEquipmentEquals(SubEquipmentCacheObject expectedObject, SubEquipmentCacheObject actualObject) {
-    assertAbstractEquipmentEquals(expectedObject, actualObject);   
+    assertAbstractEquipmentEquals(expectedObject, actualObject);
     assertEquals(expectedObject.getParentId(), actualObject.getParentId());
   }
-  
+
   public static void assertAbstractEquipmentEquals(AbstractEquipmentCacheObject expectedObject, AbstractEquipmentCacheObject actualObject) {
     assertEquals(expectedObject.getId(), actualObject.getId());
     assertEquals(expectedObject.getName(), actualObject.getName());
@@ -109,7 +111,7 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getHandlerClassName(), actualObject.getHandlerClassName());
     assertEquals(expectedObject.getAliveInterval(), actualObject.getAliveInterval());
     assertEquals(expectedObject.getStateTagId(), actualObject.getStateTagId());
-    assertEquals(expectedObject.getAliveTagId(), actualObject.getAliveTagId());    
+    assertEquals(expectedObject.getAliveTagId(), actualObject.getAliveTagId());
     assertEquals(expectedObject.getCommFaultTagId(), actualObject.getCommFaultTagId());
     assertEquals(expectedObject.getCommFaultTagValue(), actualObject.getCommFaultTagValue()); //constant at the moment
   }
@@ -126,14 +128,40 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getEquipmentIds(), cacheObject.getEquipmentIds());
     assertEquals(expectedObject.getJmsDaqCommandQueue(), cacheObject.getJmsDaqCommandQueue());
   }
-  
+
   public static void assertAlarmEquals(AlarmCacheObject expectedObject, AlarmCacheObject cacheObject) {
     assertEquals(expectedObject.getId(), cacheObject.getId());
     assertEquals(expectedObject.getFaultFamily(), cacheObject.getFaultFamily());
     assertEquals(expectedObject.getFaultMember(), cacheObject.getFaultMember());
     assertEquals(expectedObject.getFaultCode(), cacheObject.getFaultCode());
-    assertEquals(expectedObject.getCondition(), cacheObject.getCondition());    
-    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());    
+    assertEquals(expectedObject.getCondition(), cacheObject.getCondition());
+    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
   }
-  
+
+  public static void assertDeviceClassEquals(DeviceClassCacheObject expectedObject, DeviceClassCacheObject cacheObject) {
+    assertEquals(expectedObject.getId(), cacheObject.getId());
+    assertEquals(expectedObject.getName(), cacheObject.getName());
+    assertEquals(expectedObject.getDescription(), cacheObject.getDescription());
+    assertEquals(expectedObject.getProperties().size(), cacheObject.getProperties().size());
+    for (int i = 0; i < expectedObject.getProperties().size(); i++) {
+      assertEquals(expectedObject.getProperties().get(i), cacheObject.getProperties().get(i));
+    }
+    assertEquals(expectedObject.getCommands().size(), cacheObject.getCommands().size());
+    for (int i = 0; i < expectedObject.getCommands().size(); i++) {
+      assertEquals(expectedObject.getCommands().get(i), cacheObject.getCommands().get(i));
+    }
+  }
+
+  public static void assertDeviceEquals(DeviceCacheObject expectedObject, DeviceCacheObject cacheObject) {
+    assertEquals(expectedObject.getId(), cacheObject.getId());
+    assertEquals(expectedObject.getName(), cacheObject.getName());
+    assertEquals(expectedObject.getDeviceClassId(), cacheObject.getDeviceClassId());
+    assertEquals(expectedObject.getPropertyValues().size(), cacheObject.getPropertyValues().size());
+    for (String propertyName : expectedObject.getPropertyValues().keySet()) {
+      assertEquals(expectedObject.getPropertyValues().get(propertyName), cacheObject.getPropertyValues().get(propertyName));
+    }
+    for (String commandName: expectedObject.getCommandValues().keySet()) {
+      assertEquals(expectedObject.getCommandValues().get(commandName), cacheObject.getCommandValues().get(commandName));
+    }
+  }
 }

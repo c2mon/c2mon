@@ -20,22 +20,20 @@ package cern.c2mon.server.cache;
 import java.util.List;
 
 import cern.c2mon.server.cache.common.ConfigurableCacheFacade;
-import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceClass;
 
 /**
  * This interface defines the methods provided for interacting with the
- * {@link Device} cache.
+ * {@link DeviceClass} cache.
  *
  * @author Justin Lewis Salmon
  */
-public interface DeviceFacade extends ConfigurableCacheFacade<Device> {
+public interface DeviceClassFacade extends ConfigurableCacheFacade<DeviceClass> {
 
   /**
-   * Retrieve a list of all devices currently in the cache that belong to a
-   * particular device class.
+   * Retrieve a list of the names of all device classes currently in the cache.
    *
-   * @param deviceClassName the name of the desired device class
-   * @return the list of devices
+   * @return the list of device class names
    */
-  List<Device> getDevices(String deviceClassName);
+  List<String> getDeviceClassNames();
 }

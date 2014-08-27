@@ -15,12 +15,12 @@
     <constructor-arg ref="deviceClassDAO"/>
   </bean>
   
-   <bean id="deviceClassCacheLoader" class="cern.c2mon.server.cache.common.BatchCacheLoader">
+   <bean id="deviceClassCacheLoader" class="cern.c2mon.server.cache.common.SimpleC2monCacheLoader">
     <constructor-arg ref="deviceClassEhcache"/>
     <constructor-arg ref="deviceClassDAO"/>
-    <constructor-arg value="${cache.loader.batch.size}"/>
+<!--     <constructor-arg value="${cache.loader.batch.size}"/>
     <constructor-arg value="${cache.loader.threads.max}"/>
-    <constructor-arg value="${cache.loader.queue.size}"/>
+    <constructor-arg value="${cache.loader.queue.size}"/> -->
   </bean>
 
 </beans>

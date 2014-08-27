@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.server.cache.DeviceClassFacade;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
@@ -42,6 +43,9 @@ public class ClientRequestHandlerTest {
   /** Mocked components */
   @Autowired
   DeviceFacade deviceFacadeMock;
+
+  @Autowired
+  DeviceClassFacade deviceClassFacadeMock;
 
   @Value("${jms.client.request.queue}")
   private String requestQueue;
@@ -66,7 +70,7 @@ public class ClientRequestHandlerTest {
     // infrastructure
 
     // Reset the mock
-    EasyMock.reset(deviceFacadeMock);
+    EasyMock.reset(deviceFacadeMock, deviceClassFacadeMock);
 
     Session session = testBrokerService.getConnectionFactory().createConnection().createSession(false, Session.AUTO_ACKNOWLEDGE);
 
@@ -83,16 +87,16 @@ public class ClientRequestHandlerTest {
 
     // Expect the request handler to delegate and get class names from the
     // device cache
-    EasyMock.expect(deviceFacadeMock.getDeviceClassNames()).andReturn(classNames);
+    EasyMock.expect(deviceClassFacadeMock.getDeviceClassNames()).andReturn(classNames);
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(deviceFacadeMock);
+    EasyMock.replay(deviceFacadeMock, deviceClassFacadeMock);
 
     // Pass in a dummy message
     clientRequestHandler.onMessage(message, session);
 
     // Verify that everything happened as expected
-    EasyMock.verify(deviceFacadeMock);
+    EasyMock.verify(deviceFacadeMock, deviceClassFacadeMock);
   }
 
   @Test

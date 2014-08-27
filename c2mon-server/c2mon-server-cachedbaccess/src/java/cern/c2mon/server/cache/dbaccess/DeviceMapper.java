@@ -26,12 +26,40 @@ import cern.c2mon.server.common.device.DeviceCacheObject;
  *
  * @author Justin Lewis Salmon
  */
-public interface DeviceMapper extends LoaderMapper<Device>, BatchLoaderMapper<Device> {
+public interface DeviceMapper extends LoaderMapper<Device> {
 
   /**
    * Insert a device object from the cache into the db.
    *
    * @param device the device object to insert
    */
-  void insertDevice(DeviceCacheObject device);
+  void insertDevice(Device device);
+
+  /**
+   * Delete a device object from the db.
+   *
+   * @param id the ID of the Device object to be deleted
+   */
+  void deleteDevice(Long id);
+
+  /**
+   * Update a device object in the db.
+   *
+   * @param device the Device object to be updated
+   */
+  void updateDeviceConfig(Device device);
+
+  /**
+   * TODO
+   *
+   * @param id
+   */
+  void deletePropertyValues(Long id);
+
+  /**
+   * TODO
+   *
+   * @param id
+   */
+  void deleteCommandValues(Long id);
 }

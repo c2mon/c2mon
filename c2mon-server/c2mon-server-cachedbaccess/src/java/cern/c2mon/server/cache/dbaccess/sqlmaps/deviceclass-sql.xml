@@ -69,6 +69,13 @@
     VALUES (#{id}, #{name}, #{description,jdbcType=VARCHAR})
   </insert>
 
+  <update id="updateDeviceClassConfig" parameterType="cern.c2mon.server.common.device.DeviceClass">
+    UPDATE DEVICECLASS
+       SET DEVCLASSNAME = #{name},
+           DEVCLASSDESC = #{description,jdbcType=VARCHAR}
+     WHERE DEVCLASSID = #{id}
+  </update>
+
   <select id="getMaxId" resultType="Long">
     SELECT MAX(DEVCLASSID)
     FROM
@@ -87,5 +94,17 @@
     FROM DEVICECLASS
     WHERE DEVCLASSID = #{id}
   </select>
+
+  <delete id="deleteDeviceClass" parameterType="Long">
+    DELETE FROM DEVICECLASS WHERE DEVCLASSID = #{id}
+  </delete>
+
+  <delete id="deleteProperties" parameterType="Long">
+    DELETE FROM PROPERTY WHERE DEVCLASSID = #{id}
+  </delete>
+
+  <delete id="deleteCommands" parameterType="Long">
+    DELETE FROM COMMAND WHERE DEVCLASSID = #{id}
+  </delete>
 
 </mapper>
