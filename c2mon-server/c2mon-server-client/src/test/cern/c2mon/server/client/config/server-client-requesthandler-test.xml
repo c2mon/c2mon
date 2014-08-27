@@ -50,6 +50,11 @@
     <constructor-arg value="cern.c2mon.server.cache.DeviceFacade" />
   </bean>
 
+  <bean id="deviceClassFacade" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.server.cache.DeviceClassFacade" />
+  </bean>
+  
   <bean id="clientRequestHandler" class="cern.c2mon.server.client.request.ClientRequestHandler">
   </bean>
 
