@@ -32,13 +32,14 @@ import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.common.AbstractFacade;
+import cern.c2mon.server.common.device.CommandValue;
 import cern.c2mon.server.common.device.CommandValueList;
-import cern.c2mon.server.common.device.CommandValueList.CommandValue;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
+import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.common.device.PropertyValue;
 import cern.c2mon.server.common.device.PropertyValueList;
-import cern.c2mon.server.common.device.PropertyValueList.PropertyValue;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 
@@ -93,6 +94,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
   public Device createCacheObject(Long id, Properties properties) throws IllegalAccessException {
     DeviceCacheObject deviceCacheObject = new DeviceCacheObject(id);
     configureCacheObject(deviceCacheObject, properties);
+    validateConfig(deviceCacheObject);
     return deviceCacheObject;
   }
 
@@ -114,7 +116,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
         deviceCacheObject.setPropertyValues(propertyValues);
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            "Exception: Unable to create property value list from parameter \"propertyValues\": \n" + properties.getProperty("propertyValues"));
+            "Exception: Unable to create property value list from parameter \"propertyValues\": " + e + "\n" + properties.getProperty("propertyValues"));
       }
     }
 
@@ -124,7 +126,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
         deviceCacheObject.setCommandValues(commandValues);
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            "Exception: Unable to create command value list from parameter \"commands\": \n" + properties.getProperty("commands"));
+            "Exception: Unable to create command value list from parameter \"commands\":" + e + "\n" + properties.getProperty("commands"));
       }
     }
 
@@ -133,27 +135,45 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
 
   @Override
   protected void validateConfig(Device cacheObject) {
-    try {
-      deviceCache.acquireReadLockOnKey(cacheObject.getId());
 
-      if (cacheObject.getId() == null) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
-      }
-      if (cacheObject.getName() == null) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be null");
-      }
-      if (cacheObject.getName().length() == 0 ) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be empty");
-      }
-      if (cacheObject.getPropertyValues() == null) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"propertyValues\" cannot be null");
-      }
-      if (cacheObject.getCommandValues() == null) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"commandValues\" cannot be null");
-      }
+    if (cacheObject.getId() == null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
+    }
+    if (cacheObject.getName() == null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be null");
+    }
+    if (cacheObject.getName().length() == 0) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be empty");
+    }
+    if (cacheObject.getDeviceClassId() == null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"deviceClassId\" cannot be null");
+    }
+    if (cacheObject.getPropertyValues() == null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"propertyValues\" cannot be null");
+    }
+    if (cacheObject.getCommandValues() == null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"commandValues\" cannot be null");
+    }
 
-    } finally {
-      deviceCache.releaseReadLockOnKey(cacheObject.getId());
+    // Cross-check device class ID
+    DeviceClass deviceClass = deviceClassCache.get(cacheObject.getDeviceClassId());
+    if (deviceClass == null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"deviceClassId\" must refer to an existing DeviceClass");
+    }
+
+    // Cross-check properties and commands
+    for (String propertyName : cacheObject.getPropertyValues().keySet()) {
+      if (!deviceClass.getProperties().contains(propertyName)) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + propertyName
+            + "\" must refer to an existing DeviceClass property");
+      }
+    }
+
+    for (String commandName : cacheObject.getCommandValues().keySet()) {
+      if (!deviceClass.getCommands().contains(commandName)) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Command \"" + commandName
+            + "\" must refer to an existing DeviceClass command");
+      }
     }
   }
 

@@ -47,7 +47,7 @@ public class DeviceCacheObject implements Device, Cloneable {
   /**
    * The unique ID of this device.
    */
-  private final Long id;
+  private Long id;
 
   /**
    * The name of this device.
@@ -60,28 +60,14 @@ public class DeviceCacheObject implements Device, Cloneable {
   private Long deviceClassId;
 
   /**
-   * The list of names of properties belonging to this device. This has a 1:1
-   * mapping with the propertyTagIds field.
+   * TODO
    */
-  private List<String> propertyNames = new ArrayList<>();
+  private List<PropertyValue> propertyValues = new ArrayList<>();
 
   /**
-   * The list of IDs of the tags (property values) belonging to this device.
-   * This has a 1:1 mapping with the propertyNames field.
+   *
    */
-  private List<Long> propertyTagIds = new ArrayList<>();
-
-  /**
-   * The list of names of commands belonging to this device. This has a 1:1
-   * mapping with the commandTagIds field.
-   */
-  private List<String> commandNames = new ArrayList<>();
-
-  /**
-   * The list of IDs of the tags (command values) belonging to this device. This
-   * has a 1:1 mapping with the commandNames field.
-   */
-  private List<Long> commandTagIds = new ArrayList<>();
+  private List<CommandValue> commandValues = new ArrayList<>();
 
   /**
    * Default constructor.
@@ -101,8 +87,14 @@ public class DeviceCacheObject implements Device, Cloneable {
    *
    * @param id the unique ID of this device
    */
-  public DeviceCacheObject(Long id) {
+  public DeviceCacheObject(final Long id) {
     this.id = id;
+  }
+
+  /**
+   * TODO
+   */
+  public DeviceCacheObject() {
   }
 
   @Override
@@ -124,15 +116,8 @@ public class DeviceCacheObject implements Device, Cloneable {
   public Map<String, Long> getPropertyValues() {
     Map<String, Long> propertyValues = new HashMap<>();
 
-    // Potential bug alert: the propertyNames and propertyTagIds lists must be
-    // the same length. Although they should be, as both come directly from
-    // database columns marked as NOT NULL.
-    for (int i = 0; i < propertyNames.size(); i++) {
-      try {
-        propertyValues.put(propertyNames.get(i), propertyTagIds.get(i));
-      } catch (IndexOutOfBoundsException e) {
-        propertyValues.put(propertyNames.get(i), null);
-      }
+    for (PropertyValue propertyValue : this.propertyValues) {
+      propertyValues.put(propertyValue.getName(), propertyValue.getTagId());
     }
 
     return propertyValues;
@@ -142,15 +127,8 @@ public class DeviceCacheObject implements Device, Cloneable {
   public Map<String, Long> getCommandValues() {
     Map<String, Long> commandValues = new HashMap<>();
 
-    // Potential bug alert: the commandNames and commandTagIds lists must be the
-    // same length. Although they should be, as both come directly from
-    // database columns marked as NOT NULL.
-    for (int i = 0; i < commandNames.size(); i++) {
-      try {
-        commandValues.put(commandNames.get(i), commandTagIds.get(i));
-      } catch (IndexOutOfBoundsException e) {
-        commandValues.put(commandNames.get(i), null);
-      }
+    for (CommandValue commandValue : this.commandValues) {
+      commandValues.put(commandValue.getName(), commandValue.getTagId());
     }
 
     return commandValues;
@@ -161,10 +139,8 @@ public class DeviceCacheObject implements Device, Cloneable {
   public Object clone() throws CloneNotSupportedException {
     DeviceCacheObject clone = (DeviceCacheObject) super.clone();
 
-    clone.propertyNames = (List<String>) ((ArrayList<String>) propertyNames).clone();
-    clone.propertyTagIds = (List<Long>) ((ArrayList<Long>) propertyTagIds).clone();
-    clone.commandNames = (List<String>) ((ArrayList<String>) commandNames).clone();
-    clone.commandTagIds = (List<Long>) ((ArrayList<Long>) commandTagIds).clone();
+    clone.propertyValues = (List<PropertyValue>) ((ArrayList<PropertyValue>) propertyValues).clone();
+    clone.commandValues = (List<CommandValue>) ((ArrayList<CommandValue>) commandValues).clone();
 
     return clone;
   }
@@ -176,9 +152,24 @@ public class DeviceCacheObject implements Device, Cloneable {
    */
   public void setPropertyValues(Map<String, Long> propertyValues) {
     for (Entry<String, Long> e : propertyValues.entrySet()) {
-      propertyNames.add(e.getKey());
-      propertyTagIds.add(e.getValue());
+      this.propertyValues.add(new PropertyValue(e.getKey(), e.getValue()));
     }
+  }
+
+  /**
+   * TODO
+   *
+   * @param propertyValues
+   */
+  public void setPropertyValues(List<PropertyValue> propertyValues) {
+    this.propertyValues = propertyValues;
+  }
+
+  /**
+   * @param commandValueList
+   */
+  public void setCommandValues(List<CommandValue> commandValues) {
+    this.commandValues = commandValues;
   }
 
   /**
@@ -188,81 +179,17 @@ public class DeviceCacheObject implements Device, Cloneable {
    */
   public void setCommandValues(Map<String, Long> commandValues) {
     for (Entry<String, Long> e : commandValues.entrySet()) {
-      commandNames.add(e.getKey());
-      commandTagIds.add(e.getValue());
+      this.commandValues.add(new CommandValue(e.getKey(), e.getValue()));
     }
   }
 
   /**
-   * Get the list of property names.
+   * Set the unique ID of the device.
    *
-   * @return the property names
+   * @param id the id to set
    */
-  public List<String> getPropertyNames() {
-    return propertyNames;
-  }
-
-  /**
-   * Set the list of property names.
-   *
-   * @param propertyNames the property names to set
-   */
-  public void setPropertyNames(List<String> propertyNames) {
-    this.propertyNames = propertyNames;
-  }
-
-  /**
-   * Get the list of property tag IDs
-   *
-   * @return the property tag IDs
-   */
-  public List<Long> getPropertyTagIds() {
-    return propertyTagIds;
-  }
-
-  /**
-   * Set the list of property tag IDs.
-   *
-   * @param propertyTagIds the tag IDs to set
-   */
-  public void setPropertyTagIds(List<Long> propertyTagIds) {
-    this.propertyTagIds = propertyTagIds;
-  }
-
-  /**
-   * Get the list of command names
-   *
-   * @return the command names
-   */
-  public List<String> getCommandNames() {
-    return commandNames;
-  }
-
-  /**
-   * Set the list of command names.
-   *
-   * @param commandNames the command names to set
-   */
-  public void setCommandNames(List<String> commandNames) {
-    this.commandNames = commandNames;
-  }
-
-  /**
-   * Get the list of command tag IDs
-   *
-   * @return the command tag IDs
-   */
-  public List<Long> getCommandTagIds() {
-    return commandTagIds;
-  }
-
-  /**
-   * Set the list of command tag IDs.
-   *
-   * @param commandTagIds the command tag IDs to set
-   */
-  public void setCommandTagIds(List<Long> commandTagIds) {
-    this.commandTagIds = commandTagIds;
+  public void setId(Long id) {
+    this.id = id;
   }
 
   /**

@@ -18,6 +18,7 @@
 package cern.c2mon.server.cache.device;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -170,8 +171,28 @@ public class DeviceFacadeImplTest {
 
   @Test
   public void testCreateDeviceCacheObject() throws IllegalAccessException {
+    // Reset the mock
+    EasyMock.reset(deviceCacheMock, deviceClassCacheMock);
+
+    DeviceClassCacheObject deviceClass = new DeviceClassCacheObject(400L, "TEST_DEVICE_CLASS_1", "Description of TEST_DEVICE_CLASS_1");
+    deviceClass.setProperties(Arrays.asList("TEST_PROPERTY_1", "TEST_PROPERTY_2", "TEST_PROPERTY_3"));
+    deviceClass.setCommands(Arrays.asList("TEST_COMMAND_1", "TEST_COMMAND_2"));
+
+    // Expect the facade to get the DeviceClass for the device
+    EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass);
+
+    // Expect the facade to attempt get a non-existent DeviceClass
+    EasyMock.expect(deviceClassCacheMock.get(-1L)).andReturn(null);
+
+    // Expect the facade to get the DeviceClass for the device
+    EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass);
+
+    // Setup is finished, need to activate the mock
+    EasyMock.replay(deviceCacheMock, deviceClassCacheMock);
+
     Properties propertyValues = new Properties();
     propertyValues.put("name", "device_name");
+    propertyValues.put("classId", "400");
     propertyValues.put("propertyValues", "<PropertyValues><PropertyValue name=\"TEST_PROPERTY_1\" tag-id=\"100430\" />"
         + "<PropertyValue name=\"TEST_PROPERTY_2\" tag-id=\"100431\" /></PropertyValues>");
     propertyValues.put("commandValues", "<CommandValues><CommandValue name=\"TEST_COMMAND_1\" command-tag-id=\"4287\" />"
@@ -181,6 +202,7 @@ public class DeviceFacadeImplTest {
     Assert.assertNotNull(device);
     Assert.assertTrue(device.getId() == 10L);
     Assert.assertTrue(device.getName() == propertyValues.getProperty("name"));
+    Assert.assertTrue(device.getDeviceClassId() == 400L);
 
     Assert.assertTrue(device.getPropertyValues().size() == 2);
     Assert.assertTrue(device.getPropertyValues().containsKey("TEST_PROPERTY_1"));
@@ -197,13 +219,34 @@ public class DeviceFacadeImplTest {
       Assert.fail("createCacheObject() did not throw exception");
     } catch (ConfigurationException e) {
     }
+    propertyValues.put("propertyValues", "<PropertyValues><PropertyValue name=\"TEST_PROPERTY_1\" tag-id=\"100430\" /></PropertyValues>");
 
-    propertyValues.put("propertyValues", "<PropertyValues />");
     propertyValues.put("commandValues", "invalid XML string");
     try {
       deviceFacade.createCacheObject(10L, propertyValues);
       Assert.fail("createCacheObject() did not throw exception");
     } catch (ConfigurationException e) {
     }
+    propertyValues.put("commandValues", "<CommandValues><CommandValue name=\"TEST_COMMAND_1\" command-tag-id=\"4287\" /></CommandValues>");
+
+    // Test invalid device class ID
+    propertyValues.put("classId", "-1");
+    try {
+      deviceFacade.createCacheObject(10L, propertyValues);
+      Assert.fail("createCacheObject() did not throw exception");
+    } catch (ConfigurationException e) {
+    }
+    propertyValues.put("classId", "400");
+
+    // Test invalid property name
+    propertyValues.put("propertyValues", "<PropertyValues><PropertyValue name=\"NONEXISTENT_PROPERTY\" tag-id=\"1\" /></PropertyValues>");
+    try {
+      deviceFacade.createCacheObject(10L, propertyValues);
+      Assert.fail("createCacheObject() did not throw exception");
+    } catch (ConfigurationException e) {
+    }
+
+    // Verify that everything happened as expected
+    EasyMock.verify(deviceCacheMock, deviceClassCacheMock);
   }
 }

@@ -6,71 +6,73 @@
 <mapper namespace="cern.c2mon.server.cache.dbaccess.DeviceMapper">
 
   <resultMap id="deviceResultMap" type="cern.c2mon.server.common.device.DeviceCacheObject">
-    <constructor>
-      <idArg column="device_id" javaType="Long" />
-      <arg column="device_name" javaType="String" />
-      <arg column="device_class_id" javaType="Long" />
-    </constructor>
-    <collection property="propertyNames" ofType="String" javaType="java.util.ArrayList" resultMap="propertyNamesResult" />
-    <collection property="propertyTagIds" ofType="Long" javaType="java.util.ArrayList" resultMap="propertyTagIdsResult" />
-    <collection property="commandNames" ofType="String" javaType="java.util.ArrayList" resultMap="commandNamesResult" />
-    <collection property="commandTagIds" ofType="Long" javaType="java.util.ArrayList" resultMap="commandTagIdsResult" />
+    <id property="id" column="device_id"/>
+    <result property="name" column="device_name"/>
+    <result property="deviceClassId" column="device_class_id"/>
   </resultMap>
 
-  <resultMap id="propertyNamesResult" type="String">
-    <id column="property_name" />
+  <resultMap id="propertyValueResult" type="cern.c2mon.server.common.device.PropertyValue" >
+    <id property="name" column="name" javaType="String" />
+    <result property="tagId" column="tagId" javaType="Long" />
   </resultMap>
   
-    <resultMap id="propertyTagIdsResult" type="Long">
-    <id column="property_tagid" />
-  </resultMap>
-  
-  <resultMap id="commandNamesResult" type="String">
-    <id column="command_name" />
-  </resultMap>
-  
-    <resultMap id="commandTagIdsResult" type="Long">
-    <id column="command_tagid" />
+  <resultMap id="commandValueResult" type="cern.c2mon.server.common.device.CommandValue" >
+    <id property="name" column="name" javaType="String" />
+    <result property="tagId" column="tagId" javaType="Long" />
   </resultMap>
 
   <!-- getAll needed for persistent caches -->
   <select id="getAll" resultMap="deviceResultMap">
     SELECT DEVICE.DEVID as device_id,
            DEVICE.DEVNAME as device_name,
-           DEVICE.DEVCLASSID as device_class_id,
-           PROPERTYVALUE.PROPNAME as property_name,
+           DEVICE.DEVCLASSID as device_class_id
+<!--            PROPERTYVALUE.PROPNAME as property_name,
            PROPERTYVALUE.PROPVAL_TAGID as property_tagid,
            COMMANDVALUE.CMDNAME as command_name,
-           COMMANDVALUE.CMDVAL_TAGID as command_tagid
-      FROM DEVICE LEFT OUTER JOIN PROPERTYVALUE
+           COMMANDVALUE.CMDVAL_TAGID as command_tagid -->
+      FROM DEVICE 
+<!--            LEFT OUTER JOIN PROPERTYVALUE
         ON DEVICE.DEVID = PROPERTYVALUE.DEVID
            INNER JOIN COMMANDVALUE
-        ON DEVICE.DEVID = COMMANDVALUE.DEVID
+        ON DEVICE.DEVID = COMMANDVALUE.DEVID -->
   </select>
 
   <!-- getItem needed for persistence caches -->
   <select id="getItem" resultMap="deviceResultMap" parameterType="Long">
     SELECT DEVICE.DEVID as device_id,
            DEVICE.DEVNAME as device_name,
-           DEVICE.DEVCLASSID as device_class_id,
-           PROPERTYVALUE.PROPNAME as property_name,
+           DEVICE.DEVCLASSID as device_class_id
+           <!-- PROPERTYVALUE.PROPNAME as property_name,
            PROPERTYVALUE.PROPVAL_TAGID as property_tagid,
            COMMANDVALUE.CMDNAME as command_name,
-           COMMANDVALUE.CMDVAL_TAGID as command_tagid
-      FROM DEVICE LEFT OUTER JOIN PROPERTYVALUE
+           COMMANDVALUE.CMDVAL_TAGID as command_tagid -->
+      FROM DEVICE 
+           <!-- LEFT OUTER JOIN PROPERTYVALUE
         ON DEVICE.DEVID = PROPERTYVALUE.DEVID
            INNER JOIN COMMANDVALUE
-        ON DEVICE.DEVID = COMMANDVALUE.DEVID
+        ON DEVICE.DEVID = COMMANDVALUE.DEVID -->
      WHERE DEVICE.DEVID = #{id}
   </select>
+
+  <select id="getPropertyValuesForDevice" parameterType="Long" resultMap="propertyValueResult">
+    SELECT PROPNAME as name, PROPVAL_TAGID as tagId 
+      FROM PROPERTYVALUE 
+     WHERE PROPERTYVALUE.DEVID = #{id}
+  </select>
   
+  <select id="getCommandValuesForDevice" parameterType="Long" resultMap="commandValueResult">
+    SELECT CMDNAME as name, CMDVAL_TAGID as tagId 
+      FROM COMMANDVALUE 
+     WHERE COMMANDVALUE.DEVID = #{id}
+  </select>
+
   <insert id="insertDevice"
     parameterType="cern.c2mon.server.common.device.DeviceCacheObject">
     INSERT INTO DEVICE
     (DEVID, DEVNAME, DEVCLASSID)
     VALUES (#{id}, #{name}, #{deviceClassId})
   </insert>
-  
+
   <update id="updateDeviceConfig" parameterType="cern.c2mon.server.common.device.Device">
     UPDATE DEVICE
        SET DEVNAME = #{name},

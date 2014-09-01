@@ -17,31 +17,26 @@
  ******************************************************************************/
 package cern.c2mon.server.common.device;
 
-import java.util.List;
-
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Attribute;
 
 /**
  * TODO
  *
  * @author Justin Lewis Salmon
  */
-@Root(name = "PropertyValues")
-public class PropertyValueList {
+public class Property {
 
-  @ElementList(entry = "PropertyValue", inline = true)
-  private List<PropertyValue> propertyValues;
+  @Attribute
+  private String name;
 
-  public PropertyValueList(List<PropertyValue> propertyValues) {
-    this.propertyValues = propertyValues;
+  @Attribute
+  private String description;
+
+  public String getName() {
+    return name;
   }
 
-  public PropertyValueList() {
-    super();
-  }
-
-  public List<PropertyValue> getPropertyValues() {
-    return propertyValues;
+  public String getDescription() {
+    return description;
   }
 }

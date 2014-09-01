@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.session.SqlSession;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,8 +33,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import cern.c2mon.server.common.device.CommandValue;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
+import cern.c2mon.server.common.device.PropertyValue;
 import cern.c2mon.server.test.TestDataInserter;
 
 /**
@@ -48,6 +51,9 @@ public class DeviceMapperTest {
   /** Component to test */
   @Autowired
   private DeviceMapper deviceMapper;
+
+  @Autowired
+  private SqlSession sqlSession;
 
   @Autowired
   TestDataInserter testDataInserter;
@@ -65,29 +71,40 @@ public class DeviceMapperTest {
 
   @Test
   public void testGetItem() {
-     Device device1 = deviceMapper.getItem(300L);
-     Assert.assertNotNull(device1);
-     Map<String, Long> propertyValues = device1.getPropertyValues();
-     Assert.assertNotNull(propertyValues);
-     Assert.assertTrue(propertyValues.size() == 1);
-     Assert.assertTrue(propertyValues.get("TEST_PROPERTY_1") == 210000);
+    Device device1 = getDevice(300L);
+    Assert.assertNotNull(device1);
+    Map<String, Long> propertyValues = device1.getPropertyValues();
+    Assert.assertNotNull(propertyValues);
+    Assert.assertTrue(propertyValues.size() == 2);
+    Assert.assertTrue(propertyValues.get("TEST_PROPERTY_1") == 210000);
+    Assert.assertTrue(propertyValues.get("TEST_PROPERTY_5") == 210007);
 
-     Map<String, Long> commandValues = device1.getCommandValues();
-     Assert.assertNotNull(commandValues);
-     Assert.assertTrue(commandValues.size() == 1);
-     Assert.assertTrue(commandValues.get("TEST_COMMAND_1") == 210004);
+    Map<String, Long> commandValues = device1.getCommandValues();
+    Assert.assertNotNull(commandValues);
+    Assert.assertTrue(commandValues.size() == 1);
+    Assert.assertTrue(commandValues.get("TEST_COMMAND_1") == 210004);
 
-     Device device2 = deviceMapper.getItem(301L);
-     Assert.assertNotNull(device2);
-     propertyValues = device2.getPropertyValues();
-     Assert.assertNotNull(propertyValues);
-     Assert.assertTrue(propertyValues.size() == 1);
-     Assert.assertTrue(propertyValues.get("TEST_PROPERTY_2") == 210001);
+    Device device2 = getDevice(301L);
+    Assert.assertNotNull(device2);
+    propertyValues = device2.getPropertyValues();
+    Assert.assertNotNull(propertyValues);
+    Assert.assertTrue(propertyValues.size() == 1);
+    Assert.assertTrue(propertyValues.get("TEST_PROPERTY_2") == 210001);
 
-     commandValues = device2.getCommandValues();
-     Assert.assertNotNull(commandValues);
-     Assert.assertTrue(commandValues.size() == 1);
-     Assert.assertTrue(commandValues.get("TEST_COMMAND_2") == 210005);
+    commandValues = device2.getCommandValues();
+    Assert.assertNotNull(commandValues);
+    Assert.assertTrue(commandValues.size() == 1);
+    Assert.assertTrue(commandValues.get("TEST_COMMAND_2") == 210005);
+  }
+
+  public Device getDevice(Long id) {
+    // Normally the DAO handles this hacky property value access
+    DeviceCacheObject device = sqlSession.selectOne("cern.c2mon.server.cache.dbaccess.DeviceMapper.getItem", id);
+    List<PropertyValue> propertyValueList = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getPropertyValuesForDevice", id);
+    List<CommandValue> commandValueList = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getCommandValuesForDevice", id);
+    device.setPropertyValues(propertyValueList);
+    device.setCommandValues(commandValueList);
+    return device;
   }
 
   @Test

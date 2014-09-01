@@ -34,6 +34,10 @@
 	  <property name="configLocation" value="classpath:cern/c2mon/server/cache/dbaccess/sqlmaps/sql-map-config.xml"/>
 	  <property name="dataSource" ref="cacheDataSource"/>
 	</bean>
+  
+  <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+    <constructor-arg index="0" ref="sqlSessionFactory" />
+  </bean>
 	  
 	<bean id="dataTagMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
 	  <property name="sqlSessionFactory" ref="sqlSessionFactory"/>

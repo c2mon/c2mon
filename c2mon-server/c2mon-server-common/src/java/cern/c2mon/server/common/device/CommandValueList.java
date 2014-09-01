@@ -19,7 +19,6 @@ package cern.c2mon.server.common.device;
 
 import java.util.List;
 
-import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
@@ -42,22 +41,5 @@ public class CommandValueList {
 
   public List<CommandValue> getCommandValues() {
     return commandValues;
-  }
-
-  public static class CommandValue {
-
-    @Attribute
-    private String name;
-
-    @Attribute(name="command-tag-id")
-    private Long tagId;
-
-    public String getName() {
-      return name;
-    }
-
-    public Long getTagId() {
-      return tagId;
-    }
   }
 }

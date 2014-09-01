@@ -19,11 +19,12 @@ package cern.c2mon.server.common.device;
 
 import java.util.List;
 
-import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 /**
+ * TODO
+ *
  * @author Justin Lewis Salmon
  */
 @Root(name = "Properties")
@@ -42,22 +43,5 @@ public class PropertyList {
 
   public List<Property> getProperties() {
     return properties;
-  }
-
-  public static class Property {
-
-    @Attribute
-    private String name;
-
-    @Attribute
-    private String description;
-
-    public String getName() {
-      return name;
-    }
-
-    public String getDescription() {
-      return description;
-    }
   }
 }

@@ -33,8 +33,8 @@ import cern.c2mon.server.common.device.CommandList;
 import cern.c2mon.server.common.device.CommandList.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.common.device.Property;
 import cern.c2mon.server.common.device.PropertyList;
-import cern.c2mon.server.common.device.PropertyList.Property;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 
@@ -80,6 +80,7 @@ public class DeviceClassFacadeImpl extends AbstractFacade<DeviceClass> implement
   public DeviceClass createCacheObject(Long id, Properties properties) throws IllegalAccessException {
     DeviceClassCacheObject deviceClassCacheObject = new DeviceClassCacheObject(id);
     configureCacheObject(deviceClassCacheObject, properties);
+    validateConfig(deviceClassCacheObject);
     return deviceClassCacheObject;
   }
 
