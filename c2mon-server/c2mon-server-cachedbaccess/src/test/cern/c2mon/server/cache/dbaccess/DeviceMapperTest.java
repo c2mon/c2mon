@@ -99,7 +99,7 @@ public class DeviceMapperTest {
 
   public Device getDevice(Long id) {
     // Normally the DAO handles this hacky property value access
-    DeviceCacheObject device = sqlSession.selectOne("cern.c2mon.server.cache.dbaccess.DeviceMapper.getItem", id);
+    DeviceCacheObject device = (DeviceCacheObject) sqlSession.selectOne("cern.c2mon.server.cache.dbaccess.DeviceMapper.getItem", id);
     List<PropertyValue> propertyValueList = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getPropertyValuesForDevice", id);
     List<CommandValue> commandValueList = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getCommandValuesForDevice", id);
     device.setPropertyValues(propertyValueList);

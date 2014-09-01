@@ -61,7 +61,7 @@ public class DeviceDAOImpl extends AbstractDefaultLoaderDAO<Device> implements D
   @Override
   public Device getItem(Object id) {
     // TODO make MyBatis mapper to to this directly...
-    DeviceCacheObject device = sqlSession.selectOne("cern.c2mon.server.cache.dbaccess.DeviceMapper.getItem", id);
+    DeviceCacheObject device = (DeviceCacheObject) sqlSession.selectOne("cern.c2mon.server.cache.dbaccess.DeviceMapper.getItem", id);
     List<PropertyValue> propertyValues = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getPropertyValuesForDevice", id);
     List<CommandValue> commandValueList = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getCommandValuesForDevice", id);
     device.setPropertyValues(propertyValues);
