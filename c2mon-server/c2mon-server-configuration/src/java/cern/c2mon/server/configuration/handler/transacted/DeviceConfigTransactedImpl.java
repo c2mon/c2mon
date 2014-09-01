@@ -154,12 +154,12 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
     LOGGER.trace("Removing Device " + id);
 
     try {
+      deviceCache.acquireWriteLockOnKey(id);
       DeviceCacheObject device = (DeviceCacheObject) deviceCache.get(id);
 
       // TODO: Remove all property and command values of this class (does this
       // mean remove the DataTags?)
 
-      deviceCache.acquireWriteLockOnKey(id);
       try {
         deviceDAO.deleteItem(device.getId());
         return new ProcessChange();
@@ -168,17 +168,17 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
         LOGGER.error("Exception caught while removing a Device.", e);
         elementReport.setFailure("Unable to remove Device with id " + id);
         throw new UnexpectedRollbackException("Unable to remove Device " + id, e);
-
-      } finally {
-        if (deviceCache.isWriteLockedByCurrentThread(id)) {
-          deviceCache.releaseWriteLockOnKey(id);
-        }
       }
 
     } catch (CacheElementNotFoundException e) {
       LOGGER.warn("Attempting to remove a non-existent Device - no action taken.");
       elementReport.setWarning("Attempting to remove a non-existent Device");
       return new ProcessChange();
+
+    } finally {
+      if (deviceCache.isWriteLockedByCurrentThread(id)) {
+        deviceCache.releaseWriteLockOnKey(id);
+      }
     }
   }
 

@@ -168,6 +168,7 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
     LOGGER.trace("Removing DeviceClass " + id);
 
     try {
+      deviceClassCache.acquireWriteLockOnKey(id);
       DeviceClassCacheObject deviceClass = (DeviceClassCacheObject) deviceClassCache.get(id);
 
       // Remove all Devices dependent on this class (using DeviceConfigHandler)
@@ -182,10 +183,6 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
         }
       }
 
-      // TODO: Remove all properties and commands of this class (does this mean
-      // remove the DataTags?)
-
-      deviceClassCache.acquireWriteLockOnKey(id);
       try {
         deviceClassDAO.deleteItem(deviceClass.getId());
         return new ProcessChange();
@@ -194,17 +191,17 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
         LOGGER.error("Exception caught while removing a DeviceClass.", e);
         elementReport.setFailure("Unable to remove DeviceClass with id " + id);
         throw new UnexpectedRollbackException("Unable to remove DeviceClass " + id, e);
-
-      } finally {
-        if (deviceClassCache.isWriteLockedByCurrentThread(id)) {
-          deviceClassCache.releaseWriteLockOnKey(id);
-        }
       }
 
     } catch (CacheElementNotFoundException e) {
       LOGGER.warn("Attempting to remove a non-existent DeviceClass - no action taken.");
       elementReport.setWarning("Attempting to remove a non-existent DeviceClass");
       return new ProcessChange();
+
+    } finally {
+      if (deviceClassCache.isWriteLockedByCurrentThread(id)) {
+        deviceClassCache.releaseWriteLockOnKey(id);
+      }
     }
   }
 }
