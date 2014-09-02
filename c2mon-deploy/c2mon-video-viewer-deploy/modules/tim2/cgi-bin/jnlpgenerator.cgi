@@ -99,7 +99,12 @@ print "    <property name=\"c2mon.client.jms.video.request.queue\" value=\"$jmsV
 print "    <property name=\"log4j.configuration\" value=\"$log4jURL\"/>\n";
 
 if (param('configurl')) {
-	print "    <property name=\"tim.conf.url\" value=\"", param('configurl'), "\"/>", "\n";
+	my $confUrl = param('configurl');
+    print "    <property name=\"tim.conf.url\" value=\"", $confUrl, "\"/>", "\n";
+
+    if ($confUrl =~ /windows/) {
+      print "    <property name=\"jna.library.path\" value=\"C:\\Program Files\\VideoLAN\\VLC\"/>\n";
+    }
 }
 
 print "  </resources>
