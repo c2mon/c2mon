@@ -51,10 +51,15 @@ public class EntityTypeHandler implements TypeHandler {
   }
 
   @Override
+  public Object getResult(ResultSet arg0, int arg1) throws SQLException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public void setParameter(PreparedStatement arg0, int arg1, Object arg2,
       JdbcType arg3) throws SQLException {
     // TODO Auto-generated method stub
 
   }
-
 }

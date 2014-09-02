@@ -17,19 +17,24 @@
  ******************************************************************************/
 package cern.c2mon.server.common.device;
 
+import java.io.Serializable;
+
 import org.simpleframework.xml.Attribute;
 
 /**
- * TODO
+ * Simple XML mapper bean representing a device command value. Used when
+ * deserialising device command values during configuration.
  *
  * @author Justin Lewis Salmon
  */
-public class CommandValue {
+public class CommandValue implements Cloneable, Serializable {
+
+  private static final long serialVersionUID = 7331198531306903558L;
 
   @Attribute
   private String name;
 
-  @Attribute(name="command-tag-id")
+  @Attribute(name = "command-tag-id")
   private Long tagId;
 
   /**

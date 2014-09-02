@@ -27,32 +27,32 @@ import cern.c2mon.shared.common.Cacheable;
 @TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
 @Transactional
 public class AliveTimerMapperTest {
-  
+
   private static final Long TEST_ALIVE_ID = new Long(500000);
-  
+
   /**
    * Class to test.
    */
   @Autowired
   private AliveTimerMapper aliveTimerMapper;
-  
+
   /**
    * For creating test data.
    */
   @Autowired
   private TestDataHelper testDataHelper;
-  
+
   @Before
   public void insertTestData() {
     testDataHelper.createTestData();
     testDataHelper.insertTestDataIntoDB();
   }
-  
+
   @After
   public void cleanDataBase() {
-    testDataHelper.removeTestData(); 
+    testDataHelper.removeTestData();
   }
-  
+
   //need tests inserting process, equipment and check appear in retrieved view
   @Test
   public void testRetrieveProcessAlive() {
@@ -63,12 +63,12 @@ public class AliveTimerMapperTest {
     assertEquals("PROC", retrievedCacheObject.getAliveType());
     assertEquals(testDataHelper.getProcess().getId(), retrievedCacheObject.getRelatedId());
     assertEquals(testDataHelper.getProcess().getName(), retrievedCacheObject.getRelatedName());
-    assertEquals(testDataHelper.getProcess().getStateTagId(), retrievedCacheObject.getRelatedStateTagId());    
+    assertEquals(testDataHelper.getProcess().getStateTagId(), retrievedCacheObject.getRelatedStateTagId());
     assertTrue(retrievedCacheObject.getDependentAliveTimerIds().size() == 1); //2 dependent alive timers (eq and subeq)
     assertTrue(retrievedCacheObject.getDependentAliveTimerIds().contains(testDataHelper.getEquipment().getAliveTagId()));
     //assertTrue(retrievedCacheObject.getDependentAliveTimerIds().contains(testDataHelper.getSubEquipment().getAliveTagId())); only contains equipment alives!
   }
-  
+
   /**
    * So far, only tests retrieved list of values is not empty.
    */
@@ -77,13 +77,13 @@ public class AliveTimerMapperTest {
     List<AliveTimer> returnList = aliveTimerMapper.getAll();
     assertTrue(returnList.size() > 0);
   }
-  
+
   @Test
   public void testGetOne() {
-    Cacheable item = aliveTimerMapper.getItem(1221);  
+    Cacheable item = aliveTimerMapper.getItem(1221L);
     assertNotNull(item);
   }
-  
+
   private AliveTimerCacheObject createTestAliveTimerOld() {
     AliveTimerCacheObject aliveTimer = new AliveTimerCacheObject(TEST_ALIVE_ID);
 //    aliveTimer.setAliveTagId(TEST_ALIVE_ID);
@@ -94,16 +94,16 @@ public class AliveTimerMapperTest {
     aliveTimer.setRelatedStateTagId(Long.valueOf(400000));
     return aliveTimer;
   }
-  
+
   @Test
   public void testIsInDB() {
     assertTrue(aliveTimerMapper.isInDb(1224L));
   }
-  
+
   @Test
   public void testNotInDB() {
     assertFalse(aliveTimerMapper.isInDb(1263L));
   }
-  
-  
+
+
 }

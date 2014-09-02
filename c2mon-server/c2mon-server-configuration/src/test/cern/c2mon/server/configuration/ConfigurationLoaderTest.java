@@ -1144,7 +1144,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     cacheObject = (DeviceCacheObject) deviceCache.get(20L);
 
-    expectedPropertyValues.put("TEST_PROPERTY_3", 100432L);
+    expectedPropertyValues.put("TEST_PROPERTY_2", 999999L);
     expectedObject.setPropertyValues(expectedPropertyValues);
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
 

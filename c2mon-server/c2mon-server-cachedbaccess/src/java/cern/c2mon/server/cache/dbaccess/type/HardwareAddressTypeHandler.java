@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2010 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess.type;
@@ -32,8 +32,8 @@ import cern.c2mon.shared.common.datatag.address.impl.HardwareAddressImpl;
 
 /**
  * iBatis TypeHandler for HardwareAddress. Used in CommandTag
- * iBatis XML file. 
- * 
+ * iBatis XML file.
+ *
  * @author Mark Brightwell
  *
  */
@@ -50,7 +50,7 @@ public class HardwareAddressTypeHandler implements TypeHandler {
     else {
       hardwareAddress = null;
     }
-    return hardwareAddress; 
+    return hardwareAddress;
   }
 
   @Override
@@ -60,12 +60,17 @@ public class HardwareAddressTypeHandler implements TypeHandler {
   }
 
   @Override
+  public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public void setParameter(PreparedStatement ps, int parameterIndex, Object hardwareAddress, JdbcType jdbcType) throws SQLException {
     if (hardwareAddress != null) {
-      ps.setString(parameterIndex, ((HardwareAddress) hardwareAddress).toConfigXML());          
+      ps.setString(parameterIndex, ((HardwareAddress) hardwareAddress).toConfigXML());
     } else {
       ps.setString(parameterIndex, null);
     }
   }
-
 }

@@ -17,26 +17,26 @@
  ******************************************************************************/
 package cern.c2mon.server.common.device;
 
+import java.io.Serializable;
+
 import org.simpleframework.xml.Attribute;
 
 /**
- * TODO
+ * Simple XML mapper bean representing a device property value. Used when
+ * deserialising device property values during configuration.
  *
  * @author Justin Lewis Salmon
  */
-public class PropertyValue implements Cloneable {
+public class PropertyValue implements Cloneable, Serializable {
+
+  private static final long serialVersionUID = -3714996315363505073L;
 
   @Attribute
   private String name;
 
-  @Attribute(name="tag-id")
+  @Attribute(name = "tag-id")
   private Long tagId;
 
-  /**
-   *
-   * @param name
-   * @param tagId
-   */
   public PropertyValue(final String name, final Long tagId) {
     this.name = name;
     this.tagId = tagId;

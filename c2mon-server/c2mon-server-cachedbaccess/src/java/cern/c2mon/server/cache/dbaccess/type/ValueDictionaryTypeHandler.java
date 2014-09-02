@@ -11,20 +11,20 @@ import org.apache.ibatis.type.TypeHandler;
 import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
 
 public class ValueDictionaryTypeHandler implements TypeHandler {
-  
+
   @Override
   public Object getResult(ResultSet rs, String columnName) throws SQLException {
-    
+
     String tagValueDictionaryString;
     DataTagValueDictionary valueDictionary;
-    
+
     if ((tagValueDictionaryString = rs.getString(columnName)) != null) {
       valueDictionary = DataTagValueDictionary.fromXML(tagValueDictionaryString);
     }
     else {
       valueDictionary = null;
     }
-    return valueDictionary;   
+    return valueDictionary;
   }
 
   @Override
@@ -34,9 +34,15 @@ public class ValueDictionaryTypeHandler implements TypeHandler {
   }
 
   @Override
+  public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public void setParameter(PreparedStatement ps, int parameterIndex, Object valueDictionary, JdbcType arg3) throws SQLException {
     if (valueDictionary != null) {
-      ps.setString(parameterIndex, ((DataTagValueDictionary) valueDictionary).toXML());          
+      ps.setString(parameterIndex, ((DataTagValueDictionary) valueDictionary).toXML());
     } else {
       ps.setString(parameterIndex, null);
     }

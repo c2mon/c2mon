@@ -359,7 +359,7 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
   values (34, 'update device', 'update device 20', 'jusalmon', '?', sysdate);
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (34, 34, 'UPDATE', 'Device', '20');
-insert into timconfigval (seqid, elementfield, elementvalue) values (34, 'propertyValues', '<PropertyValues><PropertyValue name="TEST_PROPERTY_1" tag-id="100430" /><PropertyValue name="TEST_PROPERTY_2" tag-id="100431" /><PropertyValue name="TEST_PROPERTY_3" tag-id="100432" /></PropertyValues>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (34, 'propertyValues', '<PropertyValues><PropertyValue name="TEST_PROPERTY_1" tag-id="100430" /><PropertyValue name="TEST_PROPERTY_2" tag-id="999999" /></PropertyValues>');
 
 -- remove device - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)

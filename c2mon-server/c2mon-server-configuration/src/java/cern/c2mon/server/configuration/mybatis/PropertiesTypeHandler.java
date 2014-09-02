@@ -15,18 +15,18 @@ public class PropertiesTypeHandler implements TypeHandler {
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(PropertiesTypeHandler.class); 
-  
+  private static final Logger LOGGER = Logger.getLogger(PropertiesTypeHandler.class);
+
   @Override
   public Object getResult(ResultSet rs, String arg1) throws SQLException {
-    Properties returnProperties = new Properties();    
+    Properties returnProperties = new Properties();
     do {
       returnProperties.put(
         rs.getString("elementfield"),
         rs.getString("elementvalue")
       );
-    } while (rs.next());     
-    return returnProperties;    
+    } while (rs.next());
+    return returnProperties;
   }
 
   @Override
@@ -34,6 +34,12 @@ public class PropertiesTypeHandler implements TypeHandler {
     LOGGER.error("Running getResult(CallableStatement,...) method in PropertiesTypeHandler - this should not be happening, "
       + "so throwing a runtime exception");
     throw new RuntimeException("getResult(CallableStatement,...) method in PropertiesTypeHandler is not implemented!");
+  }
+
+  @Override
+  public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override

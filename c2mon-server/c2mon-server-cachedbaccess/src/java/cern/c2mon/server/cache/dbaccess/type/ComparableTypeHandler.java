@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
  * iBatis TypeHandler used to convert between Comparable Java objects (used for
  * Min and Max value). If the columns are empty, a null object is returned when
  * loading from the database.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -26,11 +26,11 @@ public class ComparableTypeHandler implements TypeHandler {
   /**
    * Private class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(ComparableTypeHandler.class); 
-  
+  private static final Logger LOGGER = Logger.getLogger(ComparableTypeHandler.class);
+
   @Override
-  public Object getResult(ResultSet rs, String columnName) throws SQLException {    
-    Object returnObject = null;    
+  public Object getResult(ResultSet rs, String columnName) throws SQLException {
+    Object returnObject = null;
     try {
       if (rs.getBlob(columnName) != null) {
         returnObject = new ObjectInputStream(rs.getBlob(columnName).getBinaryStream()).readObject();
@@ -43,7 +43,7 @@ public class ComparableTypeHandler implements TypeHandler {
       LOGGER.error("Unexpected exception caught when constructing a java.lang.Comparable from the database:", ex);
     }
     return returnObject;
-    
+
   }
 
   @Override
@@ -53,18 +53,22 @@ public class ComparableTypeHandler implements TypeHandler {
   }
 
   @Override
-  public void setParameter(PreparedStatement ps, int parameterIndex, Object parameter, JdbcType arg3) throws SQLException {          
+  public Object getResult(ResultSet rs, int columnIndex) throws SQLException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void setParameter(PreparedStatement ps, int parameterIndex, Object parameter, JdbcType arg3) throws SQLException {
     try {
       ByteArrayOutputStream outStream = new ByteArrayOutputStream();
       ObjectOutputStream objectOutStream = new ObjectOutputStream(outStream);
       objectOutStream.writeObject(parameter);
-      ps.setBytes(parameterIndex, outStream.toByteArray());      
+      ps.setBytes(parameterIndex, outStream.toByteArray());
     } catch (IOException ioEx) {
       LOGGER.error("IOException caught when setting a prepared statement parameter from a "
           + "java.lang.Comparable object (corresponds to Min or Max values)", ioEx);
     }
-        
-  }
 
- 
+  }
 }

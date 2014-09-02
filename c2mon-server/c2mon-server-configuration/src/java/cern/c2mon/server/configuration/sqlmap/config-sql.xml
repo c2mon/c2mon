@@ -51,7 +51,7 @@
        WHERE SEQID=#{sequenceId} 
     </update>
        
-    <update id="markAsApplied" parameterType="Long">
+    <update id="markAsApplied" parameterType="int">
       UPDATE TIMCONFIG
          SET STATUS = 'Y',
              APPLYDATE = SYSDATE                        
