@@ -157,9 +157,6 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
       deviceCache.acquireWriteLockOnKey(id);
       DeviceCacheObject device = (DeviceCacheObject) deviceCache.get(id);
 
-      // TODO: Remove all property and command values of this class (does this
-      // mean remove the DataTags?)
-
       try {
         deviceDAO.deleteItem(device.getId());
         return new ProcessChange();

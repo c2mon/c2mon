@@ -23,7 +23,8 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 /**
- * TODO
+ * Simple XML mapper bean representing a list of device propertiess. Used when
+ * deserialising device property values during configuration.
  *
  * @author Justin Lewis Salmon
  */

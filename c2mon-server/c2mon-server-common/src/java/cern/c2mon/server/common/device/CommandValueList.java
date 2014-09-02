@@ -23,6 +23,9 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 /**
+ * Simple XML mapper bean representing a list of device command values. Used
+ * when deserialising device command values during configuration.
+ *
  * @author Justin Lewis Salmon
  */
 @Root(name = "CommandValues")

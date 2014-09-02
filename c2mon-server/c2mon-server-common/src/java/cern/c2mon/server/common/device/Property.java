@@ -20,7 +20,8 @@ package cern.c2mon.server.common.device;
 import org.simpleframework.xml.Attribute;
 
 /**
- * TODO
+ * Simple XML mapper bean representing a device class property. Used when
+ * deserialising device class properties during configuration.
  *
  * @author Justin Lewis Salmon
  */

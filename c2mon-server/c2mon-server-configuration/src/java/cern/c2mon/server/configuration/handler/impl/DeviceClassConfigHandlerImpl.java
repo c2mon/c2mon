@@ -92,8 +92,6 @@ public class DeviceClassConfigHandlerImpl implements DeviceClassConfigHandler {
    * @see cern.c2mon.server.configuration.handler.DeviceClassConfigHandler#
    * removeDeviceClass()
    *
-   * TODO
-   *
    * A Device Class removal will always result in the following actions, in this
    * order:
    *

@@ -50,16 +50,16 @@ public interface DeviceMapper extends LoaderMapper<Device> {
   void updateDeviceConfig(Device device);
 
   /**
-   * TODO
+   * Delete all property values belonging to a device.
    *
-   * @param id
+   * @param id the ID of the device from which to delete property values
    */
   void deletePropertyValues(Long id);
 
   /**
-   * TODO
+   * Delete all command values belonging to a device.
    *
-   * @param id
+   * @param id the ID of the device from which to delete command values
    */
   void deleteCommandValues(Long id);
 }

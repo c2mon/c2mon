@@ -27,14 +27,6 @@ import java.util.Map.Entry;
  * This class implements the <code>Device</code> interface and resides in the
  * server Device cache.
  *
- * <p>
- * Note: the properties and commands are not stored directly as Maps due to a
- * limitation with MyBatis - it cannot load a map containing a key-value pair
- * based on 2 columns in an <association>/<collection> element. So the
- * keys/values are stored as separate lists and combined in the accessor
- * methods.
- * </p>
- *
  * @author Justin Lewis Salmon
  */
 public class DeviceCacheObject implements Device, Cloneable {
@@ -60,12 +52,12 @@ public class DeviceCacheObject implements Device, Cloneable {
   private Long deviceClassId;
 
   /**
-   * TODO
+   * The list of property values belonging to this device.
    */
   private List<PropertyValue> propertyValues = new ArrayList<>();
 
   /**
-   *
+   * The lsit of command values belonging to this device.
    */
   private List<CommandValue> commandValues = new ArrayList<>();
 
@@ -92,7 +84,7 @@ public class DeviceCacheObject implements Device, Cloneable {
   }
 
   /**
-   * TODO
+   * Empty constructor, needed for MyBatis.
    */
   public DeviceCacheObject() {
   }
@@ -157,16 +149,18 @@ public class DeviceCacheObject implements Device, Cloneable {
   }
 
   /**
-   * TODO
+   * Set the list of property values.
    *
-   * @param propertyValues
+   * @param propertyValues the property values to set
    */
   public void setPropertyValues(List<PropertyValue> propertyValues) {
     this.propertyValues = propertyValues;
   }
 
   /**
-   * @param commandValueList
+   * Set the list of command values.
+   *
+   * @param commandValueList the command values to set
    */
   public void setCommandValues(List<CommandValue> commandValues) {
     this.commandValues = commandValues;

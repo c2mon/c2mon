@@ -24,6 +24,9 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 /**
+ * Simple XML mapper bean representing a list of device class commands. Used
+ * when deserialising device class commands during configuration.
+ *
  * @author Justin Lewis Salmon
  */
 @Root(name = "Commands")
