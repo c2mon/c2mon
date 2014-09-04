@@ -14,11 +14,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.annotation.PostConstruct;
 import javax.jms.JMSException;
 
 import org.apache.log4j.Logger;
@@ -29,7 +28,6 @@ import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
 import cern.c2mon.client.core.listener.TagSubscriptionListener;
@@ -38,10 +36,10 @@ import cern.c2mon.client.jms.AlarmListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
@@ -51,7 +49,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
  * <p>
  * Please note that the <code>TagManager</code> is not in charge of registering the <code>ClientDataTags</code> to the
  * <code>JmsProxy</code> nor to the <code>SupervisionManager</code>. This is done directly by the cache.
- * 
+ *
  * @author Matthias Braeger
  */
 @Service
@@ -86,9 +84,12 @@ public class TagManager implements CoreTagManager {
   /** List of subscribed listeners */
   private final Set<TagSubscriptionListener> tagSubscriptionListeners = new HashSet<TagSubscriptionListener>();
 
+  /** List of subscribed data tag update listeners */
+  private final Set<DataTagUpdateListener> tagUpdateListeners = new HashSet<>();
+
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service
-   * 
+   *
    * @param pCache The cache instance which is managing all <code>ClientDataTag</code> objects
    * @param pRequestHandler Provides methods for requesting tag information from the C2MON server
    */
@@ -157,6 +158,8 @@ public class TagManager implements CoreTagManager {
     try {
       // add listener to tags and subscribe them to the live topics
       Set<Long> newTags = cache.addDataTagUpdateListener(tagIds, listener);
+      // Add listener to set
+      tagUpdateListeners.add(listener);
       // Inform listeners (e.g. HistoryManager) about new subscriptions
       fireOnNewTagSubscriptionsEvent(newTags);
     }
@@ -173,12 +176,14 @@ public class TagManager implements CoreTagManager {
   @Override
   public void unsubscribeAllDataTags(final DataTagUpdateListener listener) {
     Set<Long> unsubscribedTagIds = cache.unsubscribeAllDataTags(listener);
+    tagUpdateListeners.remove(listener);
     fireOnUnsubscribeEvent(unsubscribedTagIds);
   }
 
   @Override
   public void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
     Set<Long> unsubscribedTagIds = cache.unsubscribeDataTags(dataTagIds, listener);
+    tagUpdateListeners.remove(listener);
     fireOnUnsubscribeEvent(unsubscribedTagIds);
   }
 
@@ -238,7 +243,7 @@ public class TagManager implements CoreTagManager {
   /**
    * Fires an <code>onNewTagSubscriptions()</code> event to all registered <code>TagSubscriptionListener</code>
    * listeners.
-   * 
+   *
    * @param tagIds list of new subscribed tags
    */
   private void fireOnNewTagSubscriptionsEvent(final Set<Long> tagIds) {
@@ -257,7 +262,7 @@ public class TagManager implements CoreTagManager {
 
   /**
    * Fires an <code>onUnsubscribe()</code> event to all registered <code>TagSubscriptionListener</code> listeners.
-   * 
+   *
    * @param tagIds list of tags that have been removed from the cache
    */
   private void fireOnUnsubscribeEvent(final Set<Long> tagIds) {
@@ -416,8 +421,8 @@ public class TagManager implements CoreTagManager {
    */
   private void notifyAlarmListeners(final AlarmValue alarm) {
 
-    LOG.debug("onAlarmUpdate() -  there is:" + alarmListeners.size() 
-        + " listeners waiting to be notified!");  
+    LOG.debug("onAlarmUpdate() -  there is:" + alarmListeners.size()
+        + " listeners waiting to be notified!");
 
     for (AlarmListener listener : alarmListeners) {
 
@@ -430,12 +435,17 @@ public class TagManager implements CoreTagManager {
 
     alarmListenersLock.readLock().lock();
 
-    LOG.debug("onAlarmUpdate() -  received alarm update for alarmId:" + alarm.getId());  
+    LOG.debug("onAlarmUpdate() -  received alarm update for alarmId:" + alarm.getId());
     try {
       notifyAlarmListeners(alarm);
     }
     finally {
       alarmListenersLock.readLock().unlock();
     }
+  }
+
+  @Override
+  public boolean isSubscribed(DataTagUpdateListener listener) {
+    return tagUpdateListeners.contains(listener);
   }
 }
