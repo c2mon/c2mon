@@ -116,7 +116,7 @@
     maxEntriesInCache="4000">
     <persistence strategy="distributed" />
     <searchable>
-      <searchAttribute name="name" expression="value.getName()"/>
+      <searchAttribute name="deviceClassName" expression="value.getName()"/>
     </searchable>
     <terracotta clustered="true" consistency="strong" />
   </cache>

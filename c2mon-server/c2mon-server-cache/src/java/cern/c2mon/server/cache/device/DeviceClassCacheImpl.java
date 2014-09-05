@@ -21,6 +21,9 @@ import javax.annotation.PostConstruct;
 
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
+import net.sf.ehcache.search.Attribute;
+import net.sf.ehcache.search.Query;
+import net.sf.ehcache.search.Results;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.device.DeviceClass;
@@ -66,16 +70,7 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
   @PostConstruct
   public void init() {
     LOG.info("Initializing Device class cache...");
-
     commonInit();
-
-//    SearchAttribute sa = new SearchAttribute();
-//    sa.setExpression("value.getName()");
-//    sa.setName("deviceClassName");
-//    Searchable s = new Searchable();
-//    s.addSearchAttribute(sa);
-//    getCache().getCacheConfiguration().addSearchable(s);
-
     LOG.info("Device class cache initialization complete.");
   }
 
@@ -101,30 +96,22 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
       throw new IllegalArgumentException("Attempting to retrieve a DeviceClass from the cache with a NULL or empty name parameter.");
     }
 
-    for (Long deviceClassId : getKeys()) {
-      if (get(deviceClassId).getName().equals(deviceClassName)) {
-        deviceClass = getCopy(deviceClassId);
+    Results results = null;
+    try {
+      Attribute<String> className = getCache().getSearchAttribute("deviceClassName");
+      Query query = getCache().createQuery();
+      results = query.includeKeys().includeValues().addCriteria(className.eq(deviceClassName)).maxResults(1).execute();
+
+      if (results.size() == 0) {
+        throw new CacheElementNotFoundException("Failed to find a device class with name " + deviceClassName + " in the cache.");
+      }
+
+      deviceClass = (DeviceClass) results.all().get(0).getValue();
+    } finally {
+      if (results != null) {
+        results.discard();
       }
     }
-
-    // TODO: Make search by value attribute work...
-
-//    Results results = null;
-//    try {
-//      Attribute<Object> className = getCache().getSearchAttribute("deviceClassName");
-//      Query query = getCache().createQuery();
-//      results = query.includeKeys().addCriteria(className.eq(deviceClassName)).maxResults(1).execute();
-//
-//      if (results.size() == 0) {
-//        throw new CacheElementNotFoundException("Failed to find a device class with name " + deviceClassName + " in the cache.");
-//      }
-//
-//      deviceClass = (DeviceClass) results.all().get(0).getKey();
-//    } finally {
-//      if (results != null) {
-//        results.discard();
-//      }
-//    }
 
     return deviceClass;
   }
