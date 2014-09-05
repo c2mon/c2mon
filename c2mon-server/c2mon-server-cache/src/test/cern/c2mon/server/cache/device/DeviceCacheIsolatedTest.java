@@ -17,8 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.device;
 
-
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +26,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.DeviceClassCache;
-import cern.c2mon.server.common.device.DeviceClass;
-import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.cache.DeviceCache;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceCacheObject;
 
 /**
  * This test class does not do any proper cache loading, it simply loads in data
@@ -39,23 +40,31 @@ import cern.c2mon.server.common.device.DeviceClassCacheObject;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration({ "classpath:cern/c2mon/server/cache/config/server-cache-deviceclass-isolated-test.xml" })
-public class DeviceClassCacheIsolatedTest {
+@ContextConfiguration({ "classpath:cern/c2mon/server/cache/config/server-cache-device-isolated-test.xml" })
+public class DeviceCacheIsolatedTest {
 
   /** Component to test */
   @Autowired
-  DeviceClassCache deviceClassCache;
+  DeviceCache deviceCache;
+
+  Device device;
+
+  @Before
+  public void setUp() {
+    device = new DeviceCacheObject(1000L, "test_device_1", 1L);
+    deviceCache.put(device.getId(), device);
+  }
 
   @Test
-  public void testGetDeviceClassByName() {
-    DeviceClassCacheObject deviceClass1 = new DeviceClassCacheObject(1L, "test_device_class_name_1", "Test description");
-    DeviceClassCacheObject deviceClass2 = new DeviceClassCacheObject(2L, "test_device_class_name_2", "Test description");
-    DeviceClassCacheObject deviceClass3 = new DeviceClassCacheObject(3L, "test_device_class_name_3", "Test description");
-    deviceClassCache.put(deviceClass1.getId(), deviceClass1);
-    deviceClassCache.put(deviceClass2.getId(), deviceClass2);
-    deviceClassCache.put(deviceClass3.getId(), deviceClass3);
+  public void testGet() {
+    Device d = deviceCache.get(device.getId());
+    Assert.assertNotNull(d);
+    Assert.assertTrue(d.getId() == device.getId());
+  }
 
-    DeviceClass deviceClass = deviceClassCache.getDeviceClassByName("test_device_class_name_1");
-    Assert.assertTrue(deviceClass.getId().equals(deviceClass1.getId()));
+  @Test(expected=CacheElementNotFoundException.class)
+  public void testGetNull() {
+    Device d = deviceCache.get(2000L);
+    Assert.assertNull(d);
   }
 }
