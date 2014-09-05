@@ -286,6 +286,9 @@ public class DeviceImplTest {
     commandValues.add(new CommandValue("test_command_2", -2L));
     device.setCommandValues(commandValues);
 
+    Assert.assertTrue(device.getCommandValue("test_command_1").getId().equals(-1L));
+    Assert.assertTrue(device.getCommandValue("test_command_2").getId().equals(-2L));
+
     // Verify that everything happened as expected
     EasyMock.verify(commandManagerMock);
   }

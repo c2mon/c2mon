@@ -29,15 +29,14 @@ import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientCommandTag;
-import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientRuleTag;
-import cern.c2mon.client.ext.device.tag.ClientConstantValueTag;
+import cern.c2mon.client.ext.device.property.ClientPropertyValue;
+import cern.c2mon.client.ext.device.property.ClientPropertyValueFactory;
 import cern.c2mon.shared.client.device.CommandValue;
 import cern.c2mon.shared.client.device.PropertyValue;
-import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
@@ -84,7 +83,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
    * then all the device properties will exist in the map.
    * </p>
    */
-  private Map<String, ?> propertyValues = new HashMap<>();
+  private Map<String, ClientPropertyValue> propertyValues = new HashMap<>();
 
   /**
    * The map of command names -> command values.
@@ -145,17 +144,17 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
 
   @Override
   public ClientDataTagValue getPropertyValue(String propertyName) {
-    Object value = propertyValues.get(propertyName);
+    ClientPropertyValue value = propertyValues.get(propertyName);
 
     // If the internal map value is a Long, then we lazy load the data tag
-    if (value instanceof Long) {
-      Long tagId = (Long) value;
+    if (value.isDataTag() && !value.isSubscribed()) {
+      Long tagId = value.getTagId();
       return tagManager.getDataTag(tagId);
     }
 
     // If it is a rule tag, we evaluate the rule (if it isn't subscribed)
-    else if (value instanceof ClientRuleTag && !tagManager.isSubscribed((ClientRuleTag) value)) {
-      ClientRuleTag ruleTag = (ClientRuleTag) value;
+    else if (value.isRuleTag() && !tagManager.isSubscribed((DataTagUpdateListener) value.getClientPropertyValue())) {
+      ClientRuleTag ruleTag = (ClientRuleTag) value.getClientPropertyValue();
 
       // Get the data tag values from inside the rule
       Set<Long> tagIds = ruleTag.getRuleExpression().getInputTagIds();
@@ -169,7 +168,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
       return ruleTag;
 
     } else {
-      return (ClientDataTagValue) value;
+      return value.getClientPropertyValue();
     }
   }
 
@@ -186,17 +185,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
 
   @Override
   public ClientCommandTag<?> getCommandValue(String commandName) {
-    Object value = commandValues.get(commandName);
-
-    if (value instanceof Long) {
-
-      // If the internal map value is a Long, then we lazy load the command tag
-      Long tagId = (Long) value;
-      return commandManager.getCommandTag(tagId);
-
-    } else {
-      return (ClientCommandTag<?>) propertyValues.get(commandName);
-    }
+    return commandValues.get(commandName);
   }
 
   @Override
@@ -227,12 +216,9 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
   protected Set<Long> getPropertyValueIds() {
     Set<Long> propertyValueIds = new HashSet<>();
 
-    for (Object object : propertyValues.values()) {
-      if (object instanceof Long) {
-        propertyValueIds.add((Long) object);
-
-      } else if (object instanceof ClientDataTag) {
-        propertyValueIds.add(((ClientDataTag) object).getId());
+    for (ClientPropertyValue propertyValue : propertyValues.values()) {
+      if (propertyValue.isDataTag()) {
+        propertyValueIds.add(propertyValue.getTagId());
       }
     }
 
@@ -248,9 +234,9 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
   protected Set<ClientRuleTag> getRuleTags() {
     Set<ClientRuleTag> ruleTags = new HashSet<>();
 
-    for (Object object : this.propertyValues.values()) {
-      if (object instanceof ClientRuleTag) {
-        ruleTags.add((ClientRuleTag) object);
+    for (ClientPropertyValue propertyValue : propertyValues.values()) {
+      if (propertyValue.isRuleTag()) {
+        ruleTags.add((ClientRuleTag) propertyValue.getClientPropertyValue());
       }
     }
 
@@ -277,23 +263,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
   protected void setPropertyValues(List<PropertyValue> propertyValues) throws RuleFormatException, ClassNotFoundException {
 
     for (PropertyValue propertyValue : propertyValues) {
-
-      // If we have a tag ID, it takes priority.
-      if (propertyValue.getTagId() != null) {
-        ((Map<String, Long>) this.propertyValues).put(propertyValue.getName(), propertyValue.getTagId());
-      }
-
-      // If we have a client rule, that comes next in the hierarchy.
-      else if (propertyValue.getClientRule() != null) {
-        ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(propertyValue.getClientRule()), propertyValue.getResultType());
-        ((Map<String, ClientRuleTag>) this.propertyValues).put(propertyValue.getName(), ruleTag);
-      }
-
-      // If we have a constant value, it comes last in the hierarchy.
-      else if (propertyValue.getConstantValue() != null) {
-        ((Map<String, ClientConstantValueTag>) this.propertyValues).put(propertyValue.getName(), new ClientConstantValueTag(propertyValue.getConstantValue(),
-            propertyValue.getResultType()));
-      }
+      this.propertyValues.put(propertyValue.getName(), ClientPropertyValueFactory.createClientPropertyValue(propertyValue));
     }
   }
 
@@ -303,7 +273,9 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
    * @param propertyValues the property values to set
    */
   protected void setPropertyValues(Map<String, ClientDataTagValue> propertyValues) {
-    this.propertyValues = propertyValues;
+    for (Map.Entry<String, ClientDataTagValue> entry : propertyValues.entrySet()) {
+      this.propertyValues.put(entry.getKey(), new ClientPropertyValue(entry.getValue()));
+    }
   }
 
   /**
@@ -368,37 +340,31 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
     String propertyValueName = null;
 
     // Need to find the property name corresponding to this tag ID
-    for (Entry<String, ?> entry : propertyValues.entrySet()) {
-      Long tagId;
+    for (Entry<String, ClientPropertyValue> entry : propertyValues.entrySet()) {
+      ClientPropertyValue propertyValue = entry.getValue();
 
-      if (entry.getValue() instanceof Long) {
-        tagId = (Long) entry.getValue();
-
-      } else {
-        tagId = ((ClientDataTagValue) entry.getValue()).getId();
-      }
-
-      if (tagId.equals(tagUpdate.getId())) {
+      if (propertyValue.isDataTag() && propertyValue.getTagId().equals(tagUpdate.getId())) {
         propertyValueName = entry.getKey();
       }
     }
 
     // Update the property
     if (propertyValueName != null) {
-      ((Map<String, ClientDataTagValue>) propertyValues).put(propertyValueName, tagUpdate);
+      this.propertyValues.put(propertyValueName, new ClientPropertyValue(tagUpdate));
 
     } else {
       LOG.warn("onUpdate() called with unmapped tag ID");
     }
 
-    int numSparseEntries = 0;
-    for (Object object : propertyValues.values()) {
-      if (object instanceof Long)
-        numSparseEntries++;
+    int numUnsubscribedProperties = 0;
+    for (ClientPropertyValue propertyValue : propertyValues.values()) {
+      if (propertyValue.isDataTag() && !propertyValue.isSubscribed()) {
+        numUnsubscribedProperties++;
+      }
     }
 
     // Notify listeners only when all tag values are properly received
-    if (numSparseEntries == 0) {
+    if (numUnsubscribedProperties == 0) {
       for (DeviceUpdateListener listener : deviceUpdateListeners) {
         listener.onUpdate(this, tagUpdate.getName());
       }
