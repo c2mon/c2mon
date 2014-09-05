@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.ibatis.session.SqlSession;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,9 +53,6 @@ public class DeviceMapperTest {
   private DeviceMapper deviceMapper;
 
   @Autowired
-  private SqlSession sqlSession;
-
-  @Autowired
   TestDataInserter testDataInserter;
 
   @Before
@@ -72,7 +68,7 @@ public class DeviceMapperTest {
 
   @Test
   public void testGetItem() throws ClassNotFoundException {
-    Device device1 = getDevice(300L);
+    Device device1 = deviceMapper.getItem(300L); //getDevice(300L);
     Assert.assertNotNull(device1);
     List<PropertyValue> propertyValues = device1.getPropertyValues();
     Assert.assertNotNull(propertyValues);
@@ -87,7 +83,7 @@ public class DeviceMapperTest {
     Assert.assertTrue(commandValues.size() == 1);
     assertCommandValueEquals(new CommandValue("TEST_COMMAND_1", 210004L), commandValues.get(0));
 
-    Device device2 = getDevice(301L);
+    Device device2 = deviceMapper.getItem(301L); //getDevice(301L);
     Assert.assertNotNull(device2);
     propertyValues = device2.getPropertyValues();
     Assert.assertNotNull(propertyValues);
@@ -98,16 +94,6 @@ public class DeviceMapperTest {
     Assert.assertNotNull(commandValues);
     Assert.assertTrue(commandValues.size() == 1);
     assertCommandValueEquals(new CommandValue("TEST_COMMAND_2", 210005L), commandValues.get(0));
-  }
-
-  public Device getDevice(Long id) {
-    // Normally the DAO handles this hacky property value access
-    DeviceCacheObject device = (DeviceCacheObject) sqlSession.selectOne("cern.c2mon.server.cache.dbaccess.DeviceMapper.getItem", id);
-    List<PropertyValue> propertyValueList = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getPropertyValuesForDevice", id);
-    List<CommandValue> commandValueList = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getCommandValuesForDevice", id);
-    device.setPropertyValues(propertyValueList);
-    device.setCommandValues(commandValueList);
-    return device;
   }
 
   public void assertPropertyValueEquals(PropertyValue expectedObject, PropertyValue cacheObject) throws ClassNotFoundException {

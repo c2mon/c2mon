@@ -9,68 +9,56 @@
     <id property="id" column="device_id"/>
     <result property="name" column="device_name"/>
     <result property="deviceClassId" column="device_class_id"/>
-  </resultMap>
-
-  <resultMap id="propertyValueResult" type="cern.c2mon.shared.client.device.PropertyValue" >
-    <id property="name" column="name" javaType="String" />
-    <result property="tagId" column="tagId" javaType="Long" />
-    <result property="clientRule" column="clientRule" javaType="String" />
-    <result property="constantValue" column="constantValue" javaType="String" />
-    <result property="resultType" column="resultType" javaType="String" />
-  </resultMap>
-  
-  <resultMap id="commandValueResult" type="cern.c2mon.shared.client.device.CommandValue" >
-    <id property="name" column="name" javaType="String" />
-    <result property="tagId" column="tagId" javaType="Long" />
+    <collection property="propertyValues" ofType="cern.c2mon.shared.client.device.PropertyValue">
+      <id property="name" column="property_name"/>
+      <result property="tagId" column="property_tagid"/>
+      <result property="clientRule" column="client_rule"/>
+      <result property="constantValue" column="constant_value"/>
+      <result property="resultType" column="result_type"/>
+    </collection>
+    <collection property="commandValues" ofType="cern.c2mon.shared.client.device.CommandValue">
+      <id property="name" column="command_name"/>
+      <result property="tagId" column="command_tagid"/>
+    </collection>
   </resultMap>
 
   <!-- getAll needed for persistent caches -->
   <select id="getAll" resultMap="deviceResultMap">
     SELECT DEVICE.DEVID as device_id,
            DEVICE.DEVNAME as device_name,
-           DEVICE.DEVCLASSID as device_class_id
-<!--            PROPERTYVALUE.PROPNAME as property_name,
+           DEVICE.DEVCLASSID as device_class_id,
+           PROPERTYVALUE.PROPNAME as property_name,
            PROPERTYVALUE.PROPVAL_TAGID as property_tagid,
+           PROPERTYVALUE.PROPRULE as client_rule,
+           PROPERTYVALUE.PROPCONST as constant_value,
+           PROPERTYVALUE.PROPRESULTTYPE as result_type,
            COMMANDVALUE.CMDNAME as command_name,
-           COMMANDVALUE.CMDVAL_TAGID as command_tagid -->
+           COMMANDVALUE.CMDVAL_TAGID as command_tagid
       FROM DEVICE 
-<!--            LEFT OUTER JOIN PROPERTYVALUE
+           LEFT OUTER JOIN PROPERTYVALUE
         ON DEVICE.DEVID = PROPERTYVALUE.DEVID
            INNER JOIN COMMANDVALUE
-        ON DEVICE.DEVID = COMMANDVALUE.DEVID -->
+        ON DEVICE.DEVID = COMMANDVALUE.DEVID
   </select>
 
   <!-- getItem needed for persistence caches -->
   <select id="getItem" resultMap="deviceResultMap" parameterType="Long">
     SELECT DEVICE.DEVID as device_id,
            DEVICE.DEVNAME as device_name,
-           DEVICE.DEVCLASSID as device_class_id
-           <!-- PROPERTYVALUE.PROPNAME as property_name,
+           DEVICE.DEVCLASSID as device_class_id,
+           PROPERTYVALUE.PROPNAME as property_name,
            PROPERTYVALUE.PROPVAL_TAGID as property_tagid,
+           PROPERTYVALUE.PROPRULE as client_rule,
+           PROPERTYVALUE.PROPCONST as constant_value,
+           PROPERTYVALUE.PROPRESULTTYPE as result_type,
            COMMANDVALUE.CMDNAME as command_name,
-           COMMANDVALUE.CMDVAL_TAGID as command_tagid -->
+           COMMANDVALUE.CMDVAL_TAGID as command_tagid
       FROM DEVICE 
-           <!-- LEFT OUTER JOIN PROPERTYVALUE
+           LEFT OUTER JOIN PROPERTYVALUE
         ON DEVICE.DEVID = PROPERTYVALUE.DEVID
            INNER JOIN COMMANDVALUE
-        ON DEVICE.DEVID = COMMANDVALUE.DEVID -->
+        ON DEVICE.DEVID = COMMANDVALUE.DEVID
      WHERE DEVICE.DEVID = #{id}
-  </select>
-
-  <select id="getPropertyValuesForDevice" parameterType="Long" resultMap="propertyValueResult">
-    SELECT PROPNAME as name, 
-           PROPVAL_TAGID as tagId,
-           PROPRULE as clientRule,
-           PROPCONST as constantValue,
-           PROPRESULTTYPE as resultType
-      FROM PROPERTYVALUE 
-     WHERE PROPERTYVALUE.DEVID = #{id}
-  </select>
-  
-  <select id="getCommandValuesForDevice" parameterType="Long" resultMap="commandValueResult">
-    SELECT CMDNAME as name, CMDVAL_TAGID as tagId 
-      FROM COMMANDVALUE 
-     WHERE COMMANDVALUE.DEVID = #{id}
   </select>
 
   <insert id="insertDevice"
