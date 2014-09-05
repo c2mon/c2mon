@@ -16,10 +16,8 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -92,6 +90,8 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.PropertyValue;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -1069,8 +1069,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     DeviceClassCacheObject expectedObject = new DeviceClassCacheObject(10L, "TEST_DEVICE_CLASS_10", "Description of TEST_DEVICE_CLASS_10");
 
     List<String> expectedProperties = new ArrayList<>();
-    expectedProperties.add("TEST_PROPERTY_1");
-    expectedProperties.add("TEST_PROPERTY_2");
+    expectedProperties.add("cpuLoadInPercent");
+    expectedProperties.add("responsiblePerson");
+    expectedProperties.add("someCalculations");
 
     List<String> expectedCommands = new ArrayList<>();
     expectedCommands.add("TEST_COMMAND_1");
@@ -1081,13 +1082,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     ObjectEqualityComparison.assertDeviceClassEquals(expectedObject, cacheObject);
 
-    //update should succeed
+    // Update should succeed
     report = configurationLoader.applyConfiguration(31);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     cacheObject = (DeviceClassCacheObject) deviceClassCache.get(10L);
 
-    expectedProperties.add("TEST_PROPERTY_3");
+    expectedProperties.add("numCores");
     expectedObject.setProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceClassEquals(expectedObject, cacheObject);
 
@@ -1125,26 +1126,28 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     DeviceCacheObject cacheObject = (DeviceCacheObject) deviceCache.get(20L);
     DeviceCacheObject expectedObject = new DeviceCacheObject(20L, "TEST_DEVICE_20", 400L);
 
-    Map<String, Long> expectedPropertyValues= new HashMap<>();
-    expectedPropertyValues.put("TEST_PROPERTY_1", 100430L);
-    expectedPropertyValues.put("TEST_PROPERTY_2", 100431L);
+    List<PropertyValue> expectedPropertyValues= new ArrayList<>();
+    expectedPropertyValues.add(new PropertyValue("cpuLoadInPercent", 987654L, null, null, null));
+    expectedPropertyValues.add(new PropertyValue("responsiblePerson", null, null, "Mr. Administrator", null));
+    expectedPropertyValues.add(new PropertyValue("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
 
-    Map<String, Long> expectedCommandValues= new HashMap<>();
-    expectedCommandValues.put("TEST_COMMAND_1", 4287L);
-    expectedCommandValues.put("TEST_COMMAND_2", 4288L);
+
+    List<CommandValue> expectedCommandValues= new ArrayList<>();
+    expectedCommandValues.add(new CommandValue("TEST_COMMAND_1", 4287L));
+    expectedCommandValues.add(new CommandValue("TEST_COMMAND_2", 4288L));
 
     expectedObject.setPropertyValues(expectedPropertyValues);
     expectedObject.setCommandValues(expectedCommandValues);
 
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
 
-    //update should succeed
+    // Update should succeed
     report = configurationLoader.applyConfiguration(34);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     cacheObject = (DeviceCacheObject) deviceCache.get(20L);
 
-    expectedPropertyValues.put("TEST_PROPERTY_2", 999999L);
+    expectedPropertyValues.add(new PropertyValue("numCores", null, null, "4", "Integer"));
     expectedObject.setPropertyValues(expectedPropertyValues);
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
 

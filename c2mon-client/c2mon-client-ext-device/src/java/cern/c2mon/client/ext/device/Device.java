@@ -69,6 +69,14 @@ public interface Device {
   public Map<String, ClientDataTagValue> getPropertyValues();
 
   /**
+   * Retrieve a particular command of this device.
+   *
+   * @param commandName the name of the command to retrieve
+   * @return the {@link ClientCommandTag} corresponding to the requested command
+   */
+  public ClientCommandTag getCommandValue(String commandName);
+
+  /**
    * Return all commands of this device.
    *
    * @return the command values map

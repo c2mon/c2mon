@@ -30,14 +30,18 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
+import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.client.ext.device.util.DeviceTestUtils;
+import cern.c2mon.shared.client.device.CommandValue;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
+import cern.c2mon.shared.client.device.PropertyValue;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -57,6 +61,9 @@ public class DeviceManagerTest {
   /** Mocked components */
   @Autowired
   private C2monTagManager tagManagerMock;
+
+  @Autowired
+  private C2monCommandManager commandManagerMock;
 
   @Autowired
   private DeviceCache deviceCacheMock;
@@ -94,36 +101,47 @@ public class DeviceManagerTest {
   @Test
   public void testGetAllDevices() throws JMSException {
     // Reset the mock
-    EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     reset(requestHandlerMock);
 
     List<TransferDevice> devicesReturnList = new ArrayList<TransferDevice>();
     final TransferDeviceImpl device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
     final TransferDeviceImpl device2 = new TransferDeviceImpl(1000L, "test_device_2", 1L);
+    device1.addPropertyValue(new PropertyValue("TEST_PROPERTY_1", 100430L, null, null, null));
+    device2.addPropertyValue(new PropertyValue("TEST_PROPERTY_2", 100431L, null, null, null));
+    device1.addCommandValue(new CommandValue("TEST_COMMAND_1", 4287L));
+    device2.addCommandValue(new CommandValue("TEST_COMMAND_2", 4288L));
     devicesReturnList.add(device1);
     devicesReturnList.add(device2);
+
+    ClientCommandTagImpl cct1 = new ClientCommandTagImpl<>(-1L);
+    ClientCommandTagImpl cct2 = new ClientCommandTagImpl<>(-2L);
 
     // Expect the device manager to check the cache
     EasyMock.expect(deviceCacheMock.getAllDevices("test_device_class")).andReturn(new ArrayList<Device>());
     // Expect the device manager to retrieve the devices
     expect(requestHandlerMock.getAllDevices(EasyMock.<String> anyObject())).andReturn(devicesReturnList);
+    // Expect the device manager to get the command tags
+    EasyMock.expect(commandManagerMock.getCommandTag(EasyMock.<Long> anyObject())).andReturn(cct1);
+    EasyMock.expect(commandManagerMock.getCommandTag(EasyMock.<Long> anyObject())).andReturn(cct2);
     // Expect the device manager to add the devices to the cache
     deviceCacheMock.add(EasyMock.<Device> anyObject());
     EasyMock.expectLastCall().times(2);
 
     // Setup is finished, need to activate the mock
-    EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     replay(requestHandlerMock);
 
     List<Device> devices = deviceManager.getAllDevices("test_device_class");
     Assert.assertNotNull(devices);
+    Assert.assertTrue(devices.size() == 2);
 
     for (Device device : devices) {
       Assert.assertTrue(device.getDeviceClassName().equals("test_device_class"));
     }
 
     // Verify that everything happened as expected
-    EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     verify(requestHandlerMock);
   }
 
@@ -137,7 +155,7 @@ public class DeviceManagerTest {
     propertyValues.put("test_property_name_1", cdt1);
     propertyValues.put("test_property_name_2", cdt2);
 
-    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock);
+    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     device1.setPropertyValues(propertyValues);
 
     Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
@@ -179,13 +197,13 @@ public class DeviceManagerTest {
   }
 
   @Test
-  public void testSubscribeLazyDevice() {
+  public void testSubscribeLazyDevice() throws RuleFormatException, ClassNotFoundException {
 
-    Map<String, Long> sparsePropertyMap = new HashMap<String, Long>();
-    sparsePropertyMap.put("test_property_name_1", 100000L);
-    sparsePropertyMap.put("test_property_name_2", 200000L);
+    List<PropertyValue> sparsePropertyMap = new ArrayList<>();
+    sparsePropertyMap.add(new PropertyValue("test_property_name_1", 100000L, null, null, null));
+    sparsePropertyMap.add(new PropertyValue("test_property_name_2", 200000L, null, null, null));
 
-    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock);
+    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     device1.setPropertyValues(sparsePropertyMap);
 
     Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
@@ -239,7 +257,7 @@ public class DeviceManagerTest {
     propertyValues.put("test_property_name_1", cdt1);
     propertyValues.put("test_property_name_2", cdt2);
 
-    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock);
+    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     device1.setPropertyValues(propertyValues);
 
     Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
@@ -294,8 +312,8 @@ public class DeviceManagerTest {
     propertyValues1.put("test_property_name_1", cdt1);
     propertyValues2.put("test_property_name_2", cdt2);
 
-    final DeviceImpl device1 = new DeviceImpl(1L, "test_device_1", 1L, "test_device_class", tagManagerMock);
-    final DeviceImpl device2 = new DeviceImpl(2L, "test_device_2", 1L, "test_device_class", tagManagerMock);
+    final DeviceImpl device1 = new DeviceImpl(1L, "test_device_1", 1L, "test_device_class", tagManagerMock, commandManagerMock);
+    final DeviceImpl device2 = new DeviceImpl(2L, "test_device_2", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     device1.setPropertyValues(propertyValues1);
     device2.setPropertyValues(propertyValues2);
 

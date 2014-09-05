@@ -17,6 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.device;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +41,8 @@ import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.PropertyValue;
 import cern.c2mon.shared.common.ConfigurationException;
 
 /**
@@ -170,7 +174,7 @@ public class DeviceFacadeImplTest {
   }
 
   @Test
-  public void testCreateDeviceCacheObject() throws IllegalAccessException {
+  public void testCreateDeviceCacheObject() throws IllegalAccessException, ClassNotFoundException {
     // Reset the mock
     EasyMock.reset(deviceCacheMock, deviceClassCacheMock);
 
@@ -205,12 +209,12 @@ public class DeviceFacadeImplTest {
     Assert.assertTrue(device.getDeviceClassId() == 400L);
 
     Assert.assertTrue(device.getPropertyValues().size() == 2);
-    Assert.assertTrue(device.getPropertyValues().containsKey("TEST_PROPERTY_1"));
-    Assert.assertTrue(device.getPropertyValues().containsKey("TEST_PROPERTY_2"));
+    assertPropertyValueListContains(device.getPropertyValues(), new PropertyValue("TEST_PROPERTY_1", 100430L, null, null, null));
+    assertPropertyValueListContains(device.getPropertyValues(), new PropertyValue("TEST_PROPERTY_2", 100431L, null, null, null));
 
     Assert.assertTrue(device.getCommandValues().size() == 2);
-    Assert.assertTrue(device.getCommandValues().containsKey("TEST_COMMAND_1"));
-    Assert.assertTrue(device.getCommandValues().containsKey("TEST_COMMAND_2"));
+    assertCommandValueListContains(device.getCommandValues(), new CommandValue("TEST_COMMAND_1", 4287L));
+    assertCommandValueListContains(device.getCommandValues(), new CommandValue("TEST_COMMAND_2", 4288L));
 
     // Test XML parser throws exception with invalid XML
     propertyValues.put("propertyValues", "invalid XML string");
@@ -248,5 +252,34 @@ public class DeviceFacadeImplTest {
 
     // Verify that everything happened as expected
     EasyMock.verify(deviceCacheMock, deviceClassCacheMock);
+  }
+
+  public void assertPropertyValueEquals(PropertyValue expectedObject, PropertyValue cacheObject) throws ClassNotFoundException {
+    assertEquals(expectedObject.getName(), cacheObject.getName());
+    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
+    assertEquals(expectedObject.getClientRule(), cacheObject.getClientRule());
+    assertEquals(expectedObject.getConstantValue(), cacheObject.getConstantValue());
+    assertEquals(expectedObject.getResultType(), cacheObject.getResultType());
+  }
+
+  public void assertPropertyValueListContains(List<PropertyValue> propertyValues, PropertyValue expectedObject) throws ClassNotFoundException {
+    for (PropertyValue propertyValue : propertyValues) {
+      if (propertyValue.getName().equals(expectedObject.getName())) {
+        assertPropertyValueEquals(expectedObject, propertyValue);
+      }
+    }
+  }
+
+  public void assertCommandValueEquals(CommandValue expectedObject, CommandValue cacheObject) {
+    assertEquals(expectedObject.getName(), cacheObject.getName());
+    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
+  }
+
+  public void assertCommandValueListContains(List<CommandValue> commandValues, CommandValue expectedObject) {
+    for (CommandValue commandValue : commandValues) {
+      if (commandValue.getName().equals(expectedObject.getName())) {
+        assertCommandValueEquals(expectedObject, commandValue);
+      }
+    }
   }
 }

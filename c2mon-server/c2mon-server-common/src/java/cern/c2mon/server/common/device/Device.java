@@ -17,8 +17,10 @@
  ******************************************************************************/
 package cern.c2mon.server.common.device;
 
-import java.util.Map;
+import java.util.List;
 
+import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.PropertyValue;
 import cern.c2mon.shared.common.Cacheable;
 
 /**
@@ -52,17 +54,17 @@ public interface Device extends Cacheable {
   public Long getDeviceClassId();
 
   /**
-   * Retrieve the property values (property name : tag ID) of this device.
+   * Retrieve the property values of this device.
    *
-   * @return the map of property values
+   * @return the list of property values
    */
-  public Map<String, Long> getPropertyValues();
+  public List<PropertyValue> getPropertyValues();
 
   /**
-   * Retrieve the command values (command name : tag ID) of this device.
+   * Retrieve the command values of this device.
    *
-   * @return the map of command values
+   * @return the list of command values
    */
-  public Map<String, Long> getCommandValues();
+  public List<CommandValue> getCommandValues();
 
 }

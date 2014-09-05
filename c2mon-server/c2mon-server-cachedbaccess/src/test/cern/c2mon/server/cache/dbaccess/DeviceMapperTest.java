@@ -17,9 +17,10 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.junit.After;
@@ -33,11 +34,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.common.device.CommandValue;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
-import cern.c2mon.server.common.device.PropertyValue;
 import cern.c2mon.server.test.TestDataInserter;
+import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.PropertyValue;
 
 /**
  * @author Justin Lewis Salmon
@@ -70,31 +71,33 @@ public class DeviceMapperTest {
   }
 
   @Test
-  public void testGetItem() {
+  public void testGetItem() throws ClassNotFoundException {
     Device device1 = getDevice(300L);
     Assert.assertNotNull(device1);
-    Map<String, Long> propertyValues = device1.getPropertyValues();
+    List<PropertyValue> propertyValues = device1.getPropertyValues();
     Assert.assertNotNull(propertyValues);
-    Assert.assertTrue(propertyValues.size() == 2);
-    Assert.assertTrue(propertyValues.get("TEST_PROPERTY_1") == 210000);
-    Assert.assertTrue(propertyValues.get("TEST_PROPERTY_5") == 210007);
+    Assert.assertTrue(propertyValues.size() == 4);
+    assertPropertyValueListContains(propertyValues, new PropertyValue("cpuLoadInPercent", 210000L, null, null, null));
+    assertPropertyValueListContains(propertyValues, new PropertyValue("responsiblePerson", null, null, "Mr. Administrator", null));
+    assertPropertyValueListContains(propertyValues, new PropertyValue("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
+    assertPropertyValueListContains(propertyValues, new PropertyValue("numCores", null, null, "4", "Integer"));
 
-    Map<String, Long> commandValues = device1.getCommandValues();
+    List<CommandValue> commandValues = device1.getCommandValues();
     Assert.assertNotNull(commandValues);
     Assert.assertTrue(commandValues.size() == 1);
-    Assert.assertTrue(commandValues.get("TEST_COMMAND_1") == 210004);
+    assertCommandValueEquals(new CommandValue("TEST_COMMAND_1", 210004L), commandValues.get(0));
 
     Device device2 = getDevice(301L);
     Assert.assertNotNull(device2);
     propertyValues = device2.getPropertyValues();
     Assert.assertNotNull(propertyValues);
     Assert.assertTrue(propertyValues.size() == 1);
-    Assert.assertTrue(propertyValues.get("TEST_PROPERTY_2") == 210001);
+    assertPropertyValueListContains(propertyValues, new PropertyValue("TEST_PROPERTY_1", 210001L, null, null, null));
 
     commandValues = device2.getCommandValues();
     Assert.assertNotNull(commandValues);
     Assert.assertTrue(commandValues.size() == 1);
-    Assert.assertTrue(commandValues.get("TEST_COMMAND_2") == 210005);
+    assertCommandValueEquals(new CommandValue("TEST_COMMAND_2", 210005L), commandValues.get(0));
   }
 
   public Device getDevice(Long id) {
@@ -105,6 +108,27 @@ public class DeviceMapperTest {
     device.setPropertyValues(propertyValueList);
     device.setCommandValues(commandValueList);
     return device;
+  }
+
+  public void assertPropertyValueEquals(PropertyValue expectedObject, PropertyValue cacheObject) throws ClassNotFoundException {
+    assertEquals(expectedObject.getName(), cacheObject.getName());
+    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
+    assertEquals(expectedObject.getClientRule(), cacheObject.getClientRule());
+    assertEquals(expectedObject.getConstantValue(), cacheObject.getConstantValue());
+    assertEquals(expectedObject.getResultType(), cacheObject.getResultType());
+  }
+
+  public void assertPropertyValueListContains(List<PropertyValue> propertyValues, PropertyValue expectedObject) throws ClassNotFoundException {
+    for (PropertyValue propertyValue : propertyValues) {
+      if (propertyValue.getName().equals(expectedObject.getName())) {
+        assertPropertyValueEquals(expectedObject, propertyValue);
+      }
+    }
+  }
+
+  public void assertCommandValueEquals(CommandValue expectedObject, CommandValue cacheObject) {
+    assertEquals(expectedObject.getName(), cacheObject.getName());
+    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
   }
 
   @Test

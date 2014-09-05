@@ -17,8 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.shared.client.device;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import cern.c2mon.shared.util.json.GsonFactory;
 
@@ -46,11 +46,11 @@ public class TransferDeviceImpl implements TransferDevice {
   /** The device class ID */
   private final Long deviceClassId;
 
-  /** The device property mapping (property name : tag ID) */
-  private Map<String, Long> propertyValues = new HashMap<>();
+  /** The device property values */
+  private List<PropertyValue> propertyValues = new ArrayList<>();
 
-  /** The device command mapping (command name : tag ID) */
-  private Map<String, Long> commandValues = new HashMap<>();
+  /** The device command values */
+  private List<CommandValue> commandValues = new ArrayList<>();
 
   /**
    * @return The Gson parser singleton instance to serialise/deserialise Json
@@ -92,54 +92,49 @@ public class TransferDeviceImpl implements TransferDevice {
   }
 
   @Override
-  public Map<String, Long> getPropertyValues() {
+  public List<PropertyValue> getPropertyValues() {
     return this.propertyValues;
   }
 
   @Override
-  public Map<String, Long> getCommandValues() {
+  public List<CommandValue> getCommandValues() {
     return this.commandValues;
   }
 
   /**
-   * Add a property value (property name : tag ID mapping) to the transfer
-   * object.
+   * Add a property value to the transfer object.
    *
-   * @param propertyName the name of the property
-   * @param tagId the ID of the tag to which the property corresponds
+   * @param propertyValue the property value to add
    */
-  public void addPropertyValue(String propertyName, Long tagId) {
-    this.propertyValues.put(propertyName, tagId);
+  public void addPropertyValue(PropertyValue propertyValue) {
+    this.propertyValues.add(propertyValue);
   }
 
   /**
-   * Add several property values (property name : tag ID mappings) to the
-   * transfer object.
+   * Add several property values to the transfer object.
    *
-   * @param propertyValues the map of property values to add
+   * @param propertyValues the list of property values to add
    */
-  public void addPropertyValues(Map<String, Long> propertyValues) {
-    this.propertyValues.putAll(propertyValues);
+  public void addPropertyValues(List<PropertyValue> propertyValues) {
+    this.propertyValues.addAll(propertyValues);
   }
 
   /**
-   * Add a command value (command name : tag ID mapping) to the transfer object.
+   * Add a command value to the transfer object.
    *
-   * @param commandName the name of the command
-   * @param tagId the ID of the tag to which the command corresponds
+   * @param commandValue the command value to add
    */
-  public void addCommandValue(String commandName, Long tagId) {
-    this.commandValues.put(commandName, tagId);
+  public void addCommandValue(CommandValue commandValue) {
+    this.commandValues.add(commandValue);
   }
 
   /**
-   * Add several command values (command name : tag ID mappings) to the transfer
-   * object.
+   * Add several command values to the transfer object.
    *
-   * @param commandValues the map of command values to add
+   * @param commandValues the list of command values to add
    */
-  public void addCommandValues(Map<String, Long> commandValues) {
-    this.commandValues.putAll(commandValues);
+  public void addCommandValues(List<CommandValue> commandValues) {
+    this.commandValues.addAll(commandValues);
   }
 
   /**

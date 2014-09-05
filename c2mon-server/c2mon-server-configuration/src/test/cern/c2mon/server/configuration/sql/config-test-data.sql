@@ -325,15 +325,30 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
 insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'id', '10');
 insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'name', 'TEST_DEVICE_CLASS_10');
 insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'description', 'Description of TEST_DEVICE_CLASS_10');
-insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'properties', '<Properties><Property name="TEST_PROPERTY_1" description="Description of TEST_PROPERTY_1" /><Property name="TEST_PROPERTY_2" description="Description of TEST_PROPERTY_2" /></Properties>');
-insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'commands', '<Commands><Command name="TEST_COMMAND_1" description="Description of TEST_COMMAND_1" /><Command name="TEST_COMMAND_2" description="Description of TEST_COMMAND_2" /></Commands>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'properties', 
+'<Properties>
+    <Property name="cpuLoadInPercent" description="The current CPU load in percent" />
+    <Property name="responsiblePerson" description="The person responsible for this device" />
+    <Property name="someCalculations" description="Some super awesome calculations" />
+ </Properties>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'commands', 
+'<Commands>
+    <Command name="TEST_COMMAND_1" description="Description of TEST_COMMAND_1" />
+    <Command name="TEST_COMMAND_2" description="Description of TEST_COMMAND_2" />
+</Commands>');
 
 --update device class - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (31, 'update device class', 'update device class 10', 'jusalmon', '?', sysdate);
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (31, 31, 'UPDATE', 'DeviceClass', '10');
-insert into timconfigval (seqid, elementfield, elementvalue) values (31, 'properties', '<Properties><Property name="TEST_PROPERTY_1" description="Description of TEST_PROPERTY_1" /><Property name="TEST_PROPERTY_2" description="Description of TEST_PROPERTY_2" /><Property name="TEST_PROPERTY_3" description="Description of TEST_PROPERTY_3" /></Properties>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (31, 'properties', 
+'<Properties>
+    <Property name="cpuLoadInPercent" description="The current CPU load in percent" />
+    <Property name="responsiblePerson" description="The person responsible for this device" />
+    <Property name="someCalculations" description="Some super awesome calculations" />
+    <Property name="numCores" description="The number of CPU cores on this device" />
+</Properties>');
 
 -- remove device class - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
@@ -351,15 +366,30 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'id', '
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'classId', '400');
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'name', 'TEST_DEVICE_20');
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'description', 'Description of TEST_DEVICE_20');
-insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'propertyValues', '<PropertyValues><PropertyValue name="TEST_PROPERTY_1" tag-id="100430" /><PropertyValue name="TEST_PROPERTY_2" tag-id="100431" /></PropertyValues>');
-insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'commandValues', '<CommandValues><CommandValue name="TEST_COMMAND_1" command-tag-id="4287" /><CommandValue name="TEST_COMMAND_2" command-tag-id="4288" /></CommandValues>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'propertyValues', 
+'<PropertyValues>
+    <PropertyValue name="cpuLoadInPercent" tag-id="987654"/>
+    <PropertyValue name="responsiblePerson" constant-value="Mr. Administrator"/>
+    <PropertyValue name="someCalculations" client-rule="(#123 + #234) / 2" result-type="Float" />
+</PropertyValues>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'commandValues', 
+'<CommandValues>
+    <CommandValue name="TEST_COMMAND_1" command-tag-id="4287" />
+    <CommandValue name="TEST_COMMAND_2" command-tag-id="4288" />
+</CommandValues>');
 
 --update device - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (34, 'update device', 'update device 20', 'jusalmon', '?', sysdate);
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (34, 34, 'UPDATE', 'Device', '20');
-insert into timconfigval (seqid, elementfield, elementvalue) values (34, 'propertyValues', '<PropertyValues><PropertyValue name="TEST_PROPERTY_1" tag-id="100430" /><PropertyValue name="TEST_PROPERTY_2" tag-id="999999" /></PropertyValues>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (34, 'propertyValues', 
+'<PropertyValues>
+    <PropertyValue name="cpuLoadInPercent" tag-id="987654"/>
+    <PropertyValue name="responsiblePerson" constant-value="Mr. Administrator"/>
+    <PropertyValue name="someCalculations" client-rule="(#123 + #234) / 2" result-type="Float" />
+    <PropertyValue name="numCores" constant-value="4" result-type="Integer"/>
+</PropertyValues>');
 
 -- remove device - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)

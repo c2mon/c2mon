@@ -9,4 +9,9 @@
     <constructor-arg value="cern.c2mon.client.core.manager.CoreTagManager" />
   </bean>
 
+  <bean id="commandManager" class="org.easymock.EasyMock"
+    factory-method="createMock">
+    <constructor-arg value="cern.c2mon.client.core.C2monCommandManager" />
+  </bean>
+  
 </beans>

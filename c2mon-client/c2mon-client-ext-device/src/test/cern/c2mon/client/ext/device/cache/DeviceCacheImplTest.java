@@ -33,9 +33,9 @@ public class DeviceCacheImplTest {
 
   @BeforeClass
   public static void setUp() {
-    device1 = new DeviceImpl(1000L, "test_device", 1L, "test_device_class_1", null);
-    device2 = new DeviceImpl(2000L, "test_device", 1L, "test_device_class_1", null);
-    device3 = new DeviceImpl(3000L, "test_device", 1L, "test_device_class_2", null);
+    device1 = new DeviceImpl(1000L, "test_device", 1L, "test_device_class_1", null, null);
+    device2 = new DeviceImpl(2000L, "test_device", 1L, "test_device_class_1", null, null);
+    device3 = new DeviceImpl(3000L, "test_device", 1L, "test_device_class_2", null, null);
   }
 
   @Test

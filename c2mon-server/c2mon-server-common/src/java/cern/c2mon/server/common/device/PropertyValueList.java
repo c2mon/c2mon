@@ -22,6 +22,8 @@ import java.util.List;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
+import cern.c2mon.shared.client.device.PropertyValue;
+
 /**
  * Simple XML mapper bean representing a list of device propertiess. Used when
  * deserialising device property values during configuration.

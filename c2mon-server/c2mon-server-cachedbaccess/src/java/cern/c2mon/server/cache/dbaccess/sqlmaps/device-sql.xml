@@ -11,12 +11,15 @@
     <result property="deviceClassId" column="device_class_id"/>
   </resultMap>
 
-  <resultMap id="propertyValueResult" type="cern.c2mon.server.common.device.PropertyValue" >
+  <resultMap id="propertyValueResult" type="cern.c2mon.shared.client.device.PropertyValue" >
     <id property="name" column="name" javaType="String" />
     <result property="tagId" column="tagId" javaType="Long" />
+    <result property="clientRule" column="clientRule" javaType="String" />
+    <result property="constantValue" column="constantValue" javaType="String" />
+    <result property="resultType" column="resultType" javaType="String" />
   </resultMap>
   
-  <resultMap id="commandValueResult" type="cern.c2mon.server.common.device.CommandValue" >
+  <resultMap id="commandValueResult" type="cern.c2mon.shared.client.device.CommandValue" >
     <id property="name" column="name" javaType="String" />
     <result property="tagId" column="tagId" javaType="Long" />
   </resultMap>
@@ -55,7 +58,11 @@
   </select>
 
   <select id="getPropertyValuesForDevice" parameterType="Long" resultMap="propertyValueResult">
-    SELECT PROPNAME as name, PROPVAL_TAGID as tagId 
+    SELECT PROPNAME as name, 
+           PROPVAL_TAGID as tagId,
+           PROPRULE as clientRule,
+           PROPCONST as constantValue,
+           PROPRESULTTYPE as resultType
       FROM PROPERTYVALUE 
      WHERE PROPERTYVALUE.DEVID = #{id}
   </select>

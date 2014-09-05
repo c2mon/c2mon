@@ -22,6 +22,8 @@ import java.util.List;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
+import cern.c2mon.shared.client.device.CommandValue;
+
 /**
  * Simple XML mapper bean representing a list of device command values. Used
  * when deserialising device command values during configuration.

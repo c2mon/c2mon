@@ -29,12 +29,15 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
+import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.TransferDevice;
+import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
  * This class implements the {@link C2monDeviceManager} interface and provides a
@@ -51,6 +54,9 @@ public class DeviceManager implements C2monDeviceManager {
 
   /** Reference to the <code>TagManager</code> singleton */
   private final C2monTagManager tagManager;
+
+  /** Reference to the <code>TagManager</code> singleton */
+  private final C2monCommandManager commandManager;
 
   /** Reference to the <code>BasicCacheHandler</code> singleton */
   private final BasicCacheHandler dataTagCache;
@@ -71,12 +77,16 @@ public class DeviceManager implements C2monDeviceManager {
    *          C2MON server
    */
   @Autowired
-  protected DeviceManager(final C2monTagManager pTagManager, final BasicCacheHandler pDataTagCache, final DeviceCache pDeviceCache,
-      final DeviceRequestHandler pRequestHandler) {
+  protected DeviceManager(final C2monTagManager pTagManager,
+                          final BasicCacheHandler pDataTagCache,
+                          final DeviceCache pDeviceCache,
+                          final DeviceRequestHandler pRequestHandler,
+                          final C2monCommandManager pCommandManager) {
     this.tagManager = pTagManager;
     this.dataTagCache = pDataTagCache;
     this.deviceCache = pDeviceCache;
     this.requestHandler = pRequestHandler;
+    this.commandManager = pCommandManager;
   }
 
   @Override
@@ -110,8 +120,9 @@ public class DeviceManager implements C2monDeviceManager {
       try {
         Collection<TransferDevice> serverResponse = requestHandler.getAllDevices(deviceClassName);
 
-        for (TransferDevice device : serverResponse) {
-          devices.add(new DeviceImpl(device.getId(), device.getName(), device.getDeviceClassId(), deviceClassName, tagManager));
+        for (TransferDevice transferDevice : serverResponse) {
+          Device device = createClientDevice(transferDevice, deviceClassName);
+          devices.add(device);
         }
       } catch (JMSException e) {
         LOG.error("getAllDevices() - JMS connection lost -> Could not retrieve devices from the C2MON server.", e);
@@ -127,6 +138,38 @@ public class DeviceManager implements C2monDeviceManager {
     return devices;
   }
 
+  /**
+   * Create a client {@link Device} object from a {@link TransferDevice}.
+   *
+   * @param transferDevice the transfer device to create a client device for
+   * @param deviceClassName the name of the device class to which the device
+   *          belongs
+   *
+   * @return the newly created device
+   */
+  private Device createClientDevice(TransferDevice transferDevice, String deviceClassName) {
+    DeviceImpl device = new DeviceImpl(transferDevice.getId(), transferDevice.getName(), transferDevice.getDeviceClassId(), deviceClassName, tagManager,
+        commandManager);
+
+    try {
+      // Set the property values
+      device.setPropertyValues(transferDevice.getPropertyValues());
+
+    } catch (RuleFormatException e) {
+      LOG.error("getAllDevices() - Received property containing incorrect rule tag from the server. Please check device with id " + device.getId(), e);
+      throw new RuntimeException("Received property containing incorrect rule tag from the server for device id " + device.getId());
+
+    } catch (ClassNotFoundException e) {
+      LOG.error("getAllDevices() - Received property containing incorrect result type from the server. Please check device with id " + device.getId(), e);
+      throw new RuntimeException("Received property containing incorrect result type from the server for device id " + device.getId());
+    }
+
+    // Set the command values
+    device.setCommandValues(transferDevice.getCommandValues());
+
+    return device;
+  }
+
   @Override
   public void subscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
 
@@ -139,6 +182,12 @@ public class DeviceManager implements C2monDeviceManager {
       // Use TagManager to subscribe to all properties of the device
       device.addDeviceUpdateListener(listener);
       tagManager.subscribeDataTags(dataTagIds, device);
+
+      // If the device contains properties that are client rules, also subscribe
+      // to the tags contained within those rules
+      for (ClientRuleTag ruleTag : device.getRuleTags()) {
+        tagManager.subscribeDataTags(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
+      }
     }
   }
 

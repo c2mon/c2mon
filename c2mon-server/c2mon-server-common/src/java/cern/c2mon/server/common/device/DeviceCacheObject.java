@@ -18,10 +18,10 @@
 package cern.c2mon.server.common.device;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+
+import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.PropertyValue;
 
 /**
  * This class implements the <code>Device</code> interface and resides in the
@@ -105,24 +105,12 @@ public class DeviceCacheObject implements Device, Cloneable {
   }
 
   @Override
-  public Map<String, Long> getPropertyValues() {
-    Map<String, Long> propertyValues = new HashMap<>();
-
-    for (PropertyValue propertyValue : this.propertyValues) {
-      propertyValues.put(propertyValue.getName(), propertyValue.getTagId());
-    }
-
+  public List<PropertyValue> getPropertyValues() {
     return propertyValues;
   }
 
   @Override
-  public Map<String, Long> getCommandValues() {
-    Map<String, Long> commandValues = new HashMap<>();
-
-    for (CommandValue commandValue : this.commandValues) {
-      commandValues.put(commandValue.getName(), commandValue.getTagId());
-    }
-
+  public List<CommandValue> getCommandValues() {
     return commandValues;
   }
 
@@ -135,17 +123,6 @@ public class DeviceCacheObject implements Device, Cloneable {
     clone.commandValues = (List<CommandValue>) ((ArrayList<CommandValue>) commandValues).clone();
 
     return clone;
-  }
-
-  /**
-   * Set the map of property values.
-   *
-   * @param propertyValues the property values to set
-   */
-  public void setPropertyValues(Map<String, Long> propertyValues) {
-    for (Entry<String, Long> e : propertyValues.entrySet()) {
-      this.propertyValues.add(new PropertyValue(e.getKey(), e.getValue()));
-    }
   }
 
   /**
@@ -164,17 +141,6 @@ public class DeviceCacheObject implements Device, Cloneable {
    */
   public void setCommandValues(List<CommandValue> commandValues) {
     this.commandValues = commandValues;
-  }
-
-  /**
-   * Set the map of command values.
-   *
-   * @param commandValues the command values to set
-   */
-  public void setCommandValues(Map<String, Long> commandValues) {
-    for (Entry<String, Long> e : commandValues.entrySet()) {
-      this.commandValues.add(new CommandValue(e.getKey(), e.getValue()));
-    }
   }
 
   /**

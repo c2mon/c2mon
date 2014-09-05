@@ -2,6 +2,9 @@ package cern.c2mon.server.configuraton.helper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import org.junit.Assert;
+
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -14,9 +17,12 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.PropertyValue;
 
 /**
  * Junit helper class for comparing cache objects.
+ *
  * @author Mark Brightwell
  *
  */
@@ -53,12 +59,13 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getJapcAddress(), object.getJapcAddress());
     assertEquals(expectedObject.isSimulated(), object.isSimulated());
     assertNotNull(object.getValueDictionary());
-    //assertEquals(expectedObject.getValueDictionary().toXML(), object.getValueDictionary().toXML()); //compare XML of value dictionary
+    // assertEquals(expectedObject.getValueDictionary().toXML(),
+    // object.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(expectedObject.getDataTagQuality(), object.getDataTagQuality());
     assertEquals(expectedObject.getRuleIdsString(), object.getRuleIdsString());
     assertEquals(expectedObject.getRuleIds(), object.getRuleIds());
-    assertEquals(((Tag)expectedObject).getProcessIds(), ((Tag)object).getProcessIds());
-    assertEquals(((Tag)expectedObject).getEquipmentIds(), ((Tag)object).getEquipmentIds());
+    assertEquals(((Tag) expectedObject).getProcessIds(), ((Tag) object).getProcessIds());
+    assertEquals(((Tag) expectedObject).getEquipmentIds(), ((Tag) object).getEquipmentIds());
   }
 
   public static void assertTagValueEquals(AbstractTagCacheObject expectedObject, AbstractTagCacheObject object) {
@@ -113,7 +120,10 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getStateTagId(), actualObject.getStateTagId());
     assertEquals(expectedObject.getAliveTagId(), actualObject.getAliveTagId());
     assertEquals(expectedObject.getCommFaultTagId(), actualObject.getCommFaultTagId());
-    assertEquals(expectedObject.getCommFaultTagValue(), actualObject.getCommFaultTagValue()); //constant at the moment
+    assertEquals(expectedObject.getCommFaultTagValue(), actualObject.getCommFaultTagValue()); // constant
+                                                                                              // at
+                                                                                              // the
+                                                                                              // moment
   }
 
   public static void assertProcessEquals(ProcessCacheObject expectedObject, ProcessCacheObject cacheObject) {
@@ -157,11 +167,11 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getName(), cacheObject.getName());
     assertEquals(expectedObject.getDeviceClassId(), cacheObject.getDeviceClassId());
     assertEquals(expectedObject.getPropertyValues().size(), cacheObject.getPropertyValues().size());
-    for (String propertyName : expectedObject.getPropertyValues().keySet()) {
-      assertEquals(expectedObject.getPropertyValues().get(propertyName), cacheObject.getPropertyValues().get(propertyName));
+    for (PropertyValue propertyValue : expectedObject.getPropertyValues()) {
+      Assert.assertTrue(expectedObject.getPropertyValues().contains(propertyValue));
     }
-    for (String commandName: expectedObject.getCommandValues().keySet()) {
-      assertEquals(expectedObject.getCommandValues().get(commandName), cacheObject.getCommandValues().get(commandName));
+    for (CommandValue commandValue : expectedObject.getCommandValues()) {
+      Assert.assertTrue(expectedObject.getCommandValues().contains(commandValue));
     }
   }
 }

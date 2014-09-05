@@ -26,10 +26,10 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.dbaccess.DeviceMapper;
 import cern.c2mon.server.cache.loading.DeviceDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
-import cern.c2mon.server.common.device.CommandValue;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
-import cern.c2mon.server.common.device.PropertyValue;
+import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.PropertyValue;
 
 /**
  * Device loader DAO implementation.

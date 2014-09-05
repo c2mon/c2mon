@@ -68,9 +68,11 @@ public class DeviceClassMapperTest {
     Assert.assertNotNull(deviceClass1);
     List<String> properties = deviceClass1.getProperties();
     Assert.assertNotNull(properties);
-    Assert.assertTrue(properties.size() == 2);
-    Assert.assertTrue(properties.contains("TEST_PROPERTY_1"));
-    Assert.assertTrue(properties.contains("TEST_PROPERTY_2"));
+    Assert.assertTrue(properties.size() == 4);
+    Assert.assertTrue(properties.contains("cpuLoadInPercent"));
+    Assert.assertTrue(properties.contains("responsiblePerson"));
+    Assert.assertTrue(properties.contains("someCalculations"));
+    Assert.assertTrue(properties.contains("numCores"));
 
     List<String> commands = deviceClass1.getCommands();
     Assert.assertNotNull(commands);
@@ -88,7 +90,9 @@ public class DeviceClassMapperTest {
     Assert.assertNotNull(deviceClass2);
     properties = deviceClass2.getProperties();
     Assert.assertNotNull(properties);
-    Assert.assertTrue(properties.size() == 2);
+    Assert.assertTrue(properties.size() == 4);
+    Assert.assertTrue(properties.contains("TEST_PROPERTY_1"));
+    Assert.assertTrue(properties.contains("TEST_PROPERTY_2"));
     Assert.assertTrue(properties.contains("TEST_PROPERTY_3"));
     Assert.assertTrue(properties.contains("TEST_PROPERTY_4"));
 

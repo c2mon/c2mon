@@ -15,40 +15,66 @@
  *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.server.common.device;
+package cern.c2mon.shared.client.device;
 
 import java.io.Serializable;
 
 import org.simpleframework.xml.Attribute;
 
 /**
- * Simple XML mapper bean representing a device property value. Used when
- * deserialising device property values during configuration.
+ * Simple XML mapper bean representing a device command value. Used when
+ * deserialising device command values during configuration.
  *
  * @author Justin Lewis Salmon
  */
-public class PropertyValue implements Cloneable, Serializable {
+public class CommandValue implements Cloneable, Serializable {
 
-  private static final long serialVersionUID = -3714996315363505073L;
+  private static final long serialVersionUID = 7331198531306903558L;
 
+  /**
+   * The unique name of this command value.
+   */
   @Attribute
   private String name;
 
-  @Attribute(name = "tag-id")
+  /**
+   * The ID of the command tag to which this command value corresponds.
+   */
+  @Attribute(name = "command-tag-id")
   private Long tagId;
 
-  public PropertyValue(final String name, final Long tagId) {
+  /**
+   * Default constructor.
+   *
+   * @param name the unique name of this command value.
+   * @param tagId the ID of the command tag to which this command value
+   *          corresponds.
+   */
+  public CommandValue(String name, Long tagId) {
     this.name = name;
     this.tagId = tagId;
   }
 
-  public PropertyValue() {
+  /**
+   * Constructor not used (needed for SimpleXML).
+   */
+  public CommandValue() {
   }
 
+  /**
+   * Retrieve the name of this command value.
+   *
+   * @return the command value name
+   */
   public String getName() {
     return name;
   }
 
+  /**
+   * Retrieve the ID of the command tag to which this command value corresponds.
+   *
+   * @return the command tag ID
+   */
   public Long getTagId() {
     return tagId;
   }

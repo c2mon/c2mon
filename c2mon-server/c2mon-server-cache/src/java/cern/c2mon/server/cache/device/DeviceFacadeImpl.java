@@ -18,9 +18,7 @@
 package cern.c2mon.server.cache.device;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.simpleframework.xml.Serializer;
@@ -32,14 +30,14 @@ import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.common.AbstractFacade;
-import cern.c2mon.server.common.device.CommandValue;
 import cern.c2mon.server.common.device.CommandValueList;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import cern.c2mon.server.common.device.PropertyValue;
 import cern.c2mon.server.common.device.PropertyValueList;
+import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.PropertyValue;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 
@@ -112,7 +110,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
     // Parse property and command values from XML representation
     if (properties.getProperty("propertyValues") != null) {
       try {
-        Map<String, Long> propertyValues = parseXmlPropertyValues(properties.getProperty("propertyValues"));
+        List<PropertyValue> propertyValues = parseXmlPropertyValues(properties.getProperty("propertyValues"));
         deviceCacheObject.setPropertyValues(propertyValues);
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
@@ -122,7 +120,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
 
     if (properties.getProperty("commandValues") != null) {
       try {
-        Map<String, Long> commandValues = parseXmlCommandValues(properties.getProperty("commandValues"));
+        List<CommandValue> commandValues = parseXmlCommandValues(properties.getProperty("commandValues"));
         deviceCacheObject.setCommandValues(commandValues);
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
@@ -162,16 +160,29 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
     }
 
     // Cross-check properties and commands
-    for (String propertyName : cacheObject.getPropertyValues().keySet()) {
-      if (!deviceClass.getProperties().contains(propertyName)) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + propertyName
+    for (PropertyValue propertyValue : cacheObject.getPropertyValues()) {
+      if (!deviceClass.getProperties().contains(propertyValue.getName())) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + propertyValue.getName()
             + "\" must refer to an existing DeviceClass property");
+      }
+
+      // Sanity check on (tagId / clientRule / constantValue / resultType)
+      if (propertyValue.getTagId() == null && propertyValue.getClientRule() == null && propertyValue.getConstantValue() == null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + propertyValue.getName()
+            + "\" must specify at least one of (tagId, clientRule, constantValue)");
+      }
+
+      try {
+        propertyValue.getResultType();
+      } catch (ClassNotFoundException e) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + propertyValue.getName()
+            + "\" specifies invalid result type");
       }
     }
 
-    for (String commandName : cacheObject.getCommandValues().keySet()) {
-      if (!deviceClass.getCommands().contains(commandName)) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Command \"" + commandName
+    for (CommandValue commandValue : cacheObject.getCommandValues()) {
+      if (!deviceClass.getCommands().contains(commandValue.getName())) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Command \"" + commandValue.getName()
             + "\" must refer to an existing DeviceClass command");
       }
     }
@@ -179,23 +190,23 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
 
   /**
    * Parse the XML representation of the property values of a device (which
-   * comes from configuration) and return it as a map of (property names : tag
-   * IDs).
+   * comes from configuration) and return it as a list of {@link PropertyValue}
+   * objects.
    *
    * @param xmlString the XML representation string of the device property
    *          values
    *
-   * @return the map of (property names : tag IDs)
+   * @return the list of property values
    * @throws Exception if the XML could not be parsed
    */
-  private Map<String, Long> parseXmlPropertyValues(String xmlString) throws Exception {
-    Map<String, Long> propertyValues = new HashMap<>();
+  private List<PropertyValue> parseXmlPropertyValues(String xmlString) throws Exception {
+    List<PropertyValue> propertyValues = new ArrayList<>();
 
     Serializer serializer = new Persister();
     PropertyValueList propertyValueList = serializer.read(PropertyValueList.class, xmlString);
 
     for (PropertyValue propertyValue : propertyValueList.getPropertyValues()) {
-      propertyValues.put(propertyValue.getName(), propertyValue.getTagId());
+      propertyValues.add(propertyValue);
     }
 
     return propertyValues;
@@ -203,21 +214,22 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
 
   /**
    * Parse the XML representation of the command values of a device (which comes
-   * from configuration) and return it as a map of (command names : tag IDs).
+   * from configuration) and return it as a list of {@link CommandValue}
+   * objects.
    *
    * @param xmlString the XML representation string of the device command values
    *
-   * @return the map of (command names : tag IDs)
+   * @return the list of command values
    * @throws Exception if the XML could not be parsed
    */
-  private Map<String, Long> parseXmlCommandValues(String xmlString) throws Exception {
-    Map<String, Long> commandValues = new HashMap<>();
+  private List<CommandValue> parseXmlCommandValues(String xmlString) throws Exception {
+    List<CommandValue> commandValues = new ArrayList<>();
 
     Serializer serializer = new Persister();
     CommandValueList commandValueList = serializer.read(CommandValueList.class, xmlString);
 
     for (CommandValue commandValue : commandValueList.getCommandValues()) {
-      commandValues.put(commandValue.getName(), commandValue.getTagId());
+      commandValues.add(commandValue);
     }
 
     return commandValues;
