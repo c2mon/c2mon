@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -36,57 +37,64 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.client.request.ClientRequestReportHandler;
-import cern.c2mon.server.configuration.ConfigurationLoader;
-import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.server.command.CommandExecutionManager;
+import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.test.broker.TestBrokerService;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.TransferDevice;
+import cern.c2mon.shared.client.request.ClientRequestImpl;
 
 /**
  * Integration test of client module with server core.
- * 
+ *
  * @author Mark Brightwell
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:cern/c2mon/server/client/config/server-client-integration-test.xml" })
 public class ClientModuleIntegrationTest implements ApplicationContextAware {
-  
+
   @Value("${c2mon.jms.client.admin.queue}")
   private String adminQueue;
-  
+
+  @Value("${jms.client.request.queue}")
+  private String requestQueue;
+
   @Autowired
   private IMocksControl control;
-  
+
   @Autowired
   private ConfigurationLoader configurationLoader;
   @Autowired
   private CommandExecutionManager commandExecutionManager;
- 
+
   private ApplicationContext applicationContext;
-  
+
   private static TestBrokerService testBrokerService = new TestBrokerService();
-  
+
   @BeforeClass
   public static void startJmsBroker() throws Exception {
     testBrokerService.createAndStartBroker();
   }
-  
+
   @AfterClass
   public static void stopBroker() throws Exception {
     testBrokerService.stopBroker();
   }
-  
+
   @Before
   public void setUp() {
-    ((GenericApplicationContext) applicationContext).start();    
+    ((GenericApplicationContext) applicationContext).start();
   }
-  
+
   @After
   public void closeContext() {
     ((GenericApplicationContext) applicationContext).close();
   }
-  
+
   /**
    * Fakes the client request and checks the server response is correct.
    */
@@ -94,9 +102,9 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
   public void testConfigurationRequest() {
     control.reset();
     final ConfigurationReport fakedReport = new ConfigurationReport(10, "config", "user_name");
-    EasyMock.expect(configurationLoader.applyConfiguration(EasyMock.eq(10), 
+    EasyMock.expect(configurationLoader.applyConfiguration(EasyMock.eq(10),
                         EasyMock.isA(ClientRequestReportHandler.class))).andReturn(fakedReport);
-    
+
     control.replay();
     //send client request to admin queue
     JmsTemplate clientTemplate = new JmsTemplate(testBrokerService.getConnectionFactory());
@@ -119,7 +127,7 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
         String replyText = ((TextMessage) replyMessage).getText();
         System.out.println("reply: " + replyText);
         Collection<ConfigurationReport> reportList = request.fromJsonResponse(replyText);
-        assertNotNull(reportList);       
+        assertNotNull(reportList);
         assertEquals(1, reportList.size());
         ConfigurationReport report =  reportList.iterator().next();
         assertEquals(fakedReport.getId(), report.getId());
@@ -129,8 +137,112 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
         assertEquals(fakedReport.getStatusDescription(), report.getStatusDescription());
         return null;
       }
-    }, true);   
-    
+    }, true);
+
+    control.verify();
+  }
+
+  @Test
+  public void testHandleDeviceClassNamesRequest() {
+    // Reset the mock
+    control.reset();
+
+    // Setup is finished, need to activate the mock
+    control.replay();
+
+    JmsTemplate clientTemplate = new JmsTemplate(testBrokerService.getConnectionFactory());
+    clientTemplate.execute(new SessionCallback<Object>() {
+
+      @Override
+      public Object doInJms(final Session session) throws JMSException {
+        Destination replyDestination = session.createTemporaryQueue();
+        TextMessage message = new ActiveMQTextMessage();
+        message.setJMSReplyTo(replyDestination);
+
+        ClientRequestImpl<DeviceClassNameResponse> request = new ClientRequestImpl<>(DeviceClassNameResponse.class);
+        message.setText(request.toJson());
+
+        MessageProducer producer = session.createProducer(new ActiveMQQueue(requestQueue));
+        producer.send(message);
+        MessageConsumer consumer = session.createConsumer(replyDestination);
+        Message replyMessage = consumer.receive(1000);
+        assertNotNull(replyMessage);
+        assertTrue(replyMessage instanceof TextMessage);
+        String replyText = ((TextMessage) replyMessage).getText();
+        System.out.println("reply: " + replyText);
+
+        List<DeviceClassNameResponse> deviceClassNames = (List<DeviceClassNameResponse>) request.fromJsonResponse(replyText);
+        assertNotNull(deviceClassNames);
+        assertEquals(2, deviceClassNames.size());
+        assertTrue(deviceClassNames.get(1).getDeviceClassName().equals("TEST_DEVICE_CLASS_1"));
+        assertTrue(deviceClassNames.get(0).getDeviceClassName().equals("TEST_DEVICE_CLASS_2"));
+
+        return null;
+      }
+    }, true);
+
+    // Verify that everything happened as expected
+    control.verify();
+  }
+
+  @Test
+  public void testHandleDeviceRequest() throws JMSException {
+    // Reset the mock
+    control.reset();
+
+    // Setup is finished, need to activate the mock
+    control.replay();
+
+    JmsTemplate clientTemplate = new JmsTemplate(testBrokerService.getConnectionFactory());
+    clientTemplate.execute(new SessionCallback<Object>() {
+
+      @Override
+      public Object doInJms(final Session session) throws JMSException {
+        Destination replyDestination = session.createTemporaryQueue();
+        TextMessage message = new ActiveMQTextMessage();
+        message.setJMSReplyTo(replyDestination);
+
+        ClientRequestImpl<TransferDevice> request = new ClientRequestImpl<>(TransferDevice.class);
+        request.setRequestParameter("TEST_DEVICE_CLASS_1");
+        message.setText(request.toJson());
+
+        MessageProducer producer = session.createProducer(new ActiveMQQueue(requestQueue));
+        producer.send(message);
+        MessageConsumer consumer = session.createConsumer(replyDestination);
+        Message replyMessage = consumer.receive(5000);
+        assertNotNull(replyMessage);
+        assertTrue(replyMessage instanceof TextMessage);
+        String replyText = ((TextMessage) replyMessage).getText();
+        System.out.println("reply: " + replyText);
+
+        List<TransferDevice> devices = (List<TransferDevice>) request.fromJsonResponse(replyText);
+        assertNotNull(devices);
+        assertEquals(2, devices.size());
+
+        TransferDevice device1 = devices.get(0);
+        assertNotNull(device1);
+        assertEquals(device1.getId(), new Long(300));
+        assertEquals(device1.getName(), "TEST_DEVICE_1");
+        assertEquals(device1.getDeviceClassId(), new Long(400));
+
+        List<PropertyValue> propertyValues = device1.getPropertyValues();
+        assertNotNull(propertyValues);
+        assertEquals(propertyValues.size(), 4);
+        assertEquals(propertyValues.get(0).getName(), "cpuLoadInPercent");
+        assertEquals(propertyValues.get(1).getName(), "numCores");
+        assertEquals(propertyValues.get(2).getName(), "responsiblePerson");
+        assertEquals(propertyValues.get(3).getName(), "someCalculations");
+
+        List<CommandValue> commandValues = device1.getCommandValues();
+        assertNotNull(commandValues);
+        assertEquals(commandValues.size(), 1);
+        assertEquals(commandValues.get(0).getName(), "TEST_COMMAND_1");
+
+        return null;
+      }
+    }, true);
+
+    // Verify that everything happened as expected
     control.verify();
   }
 
@@ -138,5 +250,5 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
   public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
     this.applicationContext = applicationContext;
   }
-  
+
 }

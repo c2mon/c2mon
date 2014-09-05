@@ -17,9 +17,13 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.ibatis.session.SqlSession;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +42,8 @@ import cern.c2mon.shared.client.device.PropertyValue;
  */
 @Service("deviceDAO")
 public class DeviceDAOImpl extends AbstractDefaultLoaderDAO<Device> implements DeviceDAO {
+
+  private static Logger LOGGER = Logger.getLogger(DeviceDAOImpl.class);
 
   /**
    * Reference to the MyBatis Device mapper.
@@ -67,6 +73,31 @@ public class DeviceDAOImpl extends AbstractDefaultLoaderDAO<Device> implements D
     device.setPropertyValues(propertyValues);
     device.setCommandValues(commandValueList);
     return device;
+  }
+
+  @Override
+  public Map<Long, Device> getAllAsMap() {
+    List<Device> cacheableList = deviceMapper.getAll();
+    for (Device device : cacheableList) {
+      List<PropertyValue> propertyValues = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getPropertyValuesForDevice", device.getId());
+      List<CommandValue> commandValueList = sqlSession.selectList("cern.c2mon.server.cache.dbaccess.DeviceMapper.getCommandValuesForDevice", device.getId());
+
+      ((DeviceCacheObject) device).setPropertyValues(propertyValues);
+      ((DeviceCacheObject) device).setCommandValues(commandValueList);
+    }
+
+    ConcurrentHashMap<Long, Device> returnMap = new ConcurrentHashMap<>(2000);
+    Iterator<Device> it = cacheableList.iterator();
+    Device current;
+    while (it.hasNext()) {
+      current = it.next();
+      if (current != null) {
+        returnMap.put(current.getId(), doPostDbLoading(current));
+      } else {
+        LOGGER.warn("Null value retrieved from DB by Mapper " + deviceMapper.getClass().getSimpleName());
+      }
+    }
+    return returnMap;
   }
 
   @Override
