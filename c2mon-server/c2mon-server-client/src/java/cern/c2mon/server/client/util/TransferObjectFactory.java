@@ -65,7 +65,7 @@ public abstract class TransferObjectFactory {
             addAlarmValues(transferTag, tagWithAlarms.getAlarms());
             transferTag.setSimulated(tag.isSimulated());
             transferTag.setUnit(tag.getUnit());
-            transferTag.addEquimpmentIds(tag.getEquipmentIds());
+            transferTag.addEquipmentIds(tag.getEquipmentIds());
             transferTag.addProcessIds(tag.getProcessIds());
             if (tag instanceof RuleTag) {
               transferTag.setRuleExpression(((RuleTag) tag).getRuleExpression());

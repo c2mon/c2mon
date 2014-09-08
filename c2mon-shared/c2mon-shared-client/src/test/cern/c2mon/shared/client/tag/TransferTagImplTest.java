@@ -43,7 +43,7 @@ public class TransferTagImplTest {
         1234L, tagValue, valDesc, tagQuality, TagMode.TEST,
         sourceTimestamp, daqTimestamp, serverTimestamp, descr, tagName, topicName);
             
-    transferTag.addEquimpmentIds(Arrays.asList(234L, 4234L, 234L));
+    transferTag.addEquipmentIds(Arrays.asList(234L, 4234L, 234L));
     transferTag.addProcessIds(Arrays.asList(123L, 3214L, 123L));
     
     return transferTag;

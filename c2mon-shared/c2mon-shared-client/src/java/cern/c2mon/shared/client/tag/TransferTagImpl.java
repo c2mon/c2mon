@@ -112,7 +112,7 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    * Adds all equipment id's of that list as dependency to this tag
    * @param equipmentIds List of equipment id's
    */
-  public void addEquimpmentIds(final Collection<Long> equipmentIds) {
+  public void addEquipmentIds(final Collection<Long> equipmentIds) {
     for (Long equipmentId : equipmentIds) {
       addEquipmentId(equipmentId);
     }
