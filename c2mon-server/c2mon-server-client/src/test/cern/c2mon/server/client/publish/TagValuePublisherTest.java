@@ -45,8 +45,8 @@ import cern.c2mon.shared.util.jms.JmsSender;
 
 /**
  * Integration test of TagValuePublisher with broker.
- * Tests publication & re-publication works. 
- * 
+ * Tests publication & re-publication works.
+ *
  * @author Mark Brightwell, Ignacio Vilches
  *
  */
@@ -55,18 +55,18 @@ import cern.c2mon.shared.util.jms.JmsSender;
 public class TagValuePublisherTest {
 
   private static TestBrokerService testBrokerService = new TestBrokerService();
-  
+
   private IMocksControl control = EasyMock.createNiceControl();
-  
+
   /**
    * To test.
    */
   private TagValuePublisher tagValuePublisher;
-  
+
   /**
    * Mocks of other modules.
    */
-  private AlarmAggregator alarmAggregator;  
+  private AlarmAggregator alarmAggregator;
   private ConfigurationUpdate configurationUpdate;
   private TagFacadeGateway tagFacadeGateway;
   private TagLocationService tagLocationService;
@@ -76,22 +76,22 @@ public class TagValuePublisherTest {
    */
   @Autowired
   private JmsSender jmsSender;
-  
+
   /**
    * Used for holding update received in test with lock.
    */
   private TagValueUpdate update;
   private TagUpdate updateFromConfig;
   private Object updateLock = new Object();
-  
+
   @BeforeClass
   public static void startBroker() throws Exception {
     testBrokerService.createAndStartBroker();
   }
-  
+
   @Before
-  public void setUp() {    
-    this.alarmAggregator = control.createMock(AlarmAggregator.class);  
+  public void setUp() {
+    this.alarmAggregator = control.createMock(AlarmAggregator.class);
     this.configurationUpdate =  control.createMock(ConfigurationUpdate.class);
     this.tagFacadeGateway = this.control.createMock(TagFacadeGateway.class);
     this.tagLocationService = this.control.createMock(TagLocationService.class);
@@ -100,17 +100,17 @@ public class TagValuePublisherTest {
     this.tagValuePublisher.setRepublicationDelay(1000);
     this.tagValuePublisher.init();
   }
-  
+
   @After
   public void afterTest() {
     tagValuePublisher.shutdown();
   }
-  
+
   /**
    * Tests the value is indeed published to the broker and the update
    * is correctly transmitted to the broker.
-   * @throws JMSException 
-   * @throws InterruptedException 
+   * @throws JMSException
+   * @throws InterruptedException
    */
   @Test
   public void testPublication() throws JMSException, InterruptedException {
@@ -122,20 +122,20 @@ public class TagValuePublisherTest {
     List<Alarm> alarms = new ArrayList<Alarm>();
     alarms.add(CacheObjectCreation.createTestAlarm1()); //attached to this tag
     alarms.add(CacheObjectCreation.createTestAlarm3()); //attached to this tag
-    
+
     Thread listenerThread = startListenerThread(tag);
-    
-    this.control.replay();    
-    
+
+    this.control.replay();
+    Thread.sleep(500);
     this.tagValuePublisher.notifyOnUpdate(tag, alarms);
-    
+
     listenerThread.join(1000);
-    
+
     compareTagAndUpdate(tag, alarms, this.update);
-    
+
     this.control.verify();
   }
-  
+
   @Test
   public void testPublicationConfigUpdate() throws JMSException, InterruptedException {
     this.control.reset();
@@ -146,26 +146,26 @@ public class TagValuePublisherTest {
     List<Alarm> alarms = new ArrayList<Alarm>();
     alarms.add(CacheObjectCreation.createTestAlarm1()); //attached to this tag
     alarms.add(CacheObjectCreation.createTestAlarm3()); //attached to this tag
-    
+
     TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
     EasyMock.expect(this.tagFacadeGateway.getTagWithAlarms(tag.getId())).andReturn(tagWithAlarms);
-    
-    
+
+
     Thread listenerThread = startListenerThreadForTransferTag(tag);
-    
-    this.control.replay();    
-    
+
+    this.control.replay();
+    Thread.sleep(500);
     this.tagValuePublisher.notifyOnConfigurationUpdate(tag.getId());
-    
+
     listenerThread.join(1000);
-    
+
     compareTagAndUpdate(tag, alarms, this.updateFromConfig);
-    
+
     this.control.verify();
   }
-  
+
   /**
-   * 
+   *
    * @param tag
    * @param alarms
    * @param update
@@ -184,56 +184,56 @@ public class TagValuePublisherTest {
       assertEquals(tag.getDataTagQuality().getDescription(), update.getDataTagQuality().getDescription());
       assertEquals(TagMode.TEST, update.getMode()); //in DataTagCacheObject is old constant 2, which indicates mode test
     }
-  }  
-  
+  }
+
   /**
    * Listens for 1s for updates on the tag topic.
    */
   private Thread startListenerThread(final Tag tag) {
     // start listener in separate thread (to catch update to topic)
     Thread listenerThread = new Thread(new Runnable() {
-      
+
       @Override
       public void run() {
         try {
           JmsTemplate template = new JmsTemplate(testBrokerService.getConnectionFactory());
           template.setReceiveTimeout(1000);
-          Message message = template.receive(new ActiveMQTopic(tag.getTopic()));                   
           synchronized (updateLock) {
+            Message message = template.receive(new ActiveMQTopic(tag.getTopic()));
             update = TransferTagValueImpl.fromJson(((TextMessage) message).getText());
-          }                                  
-        } catch (Exception e) {  
-          synchronized (updateLock) {
-            update = null;         
           }
-        }       
+        } catch (Exception e) {
+          synchronized (updateLock) {
+            update = null;
+          }
+        }
       }
     });
     listenerThread.start();
     return listenerThread;
   }
-  
+
   /**
    * Listens for 1s for updates on the tag topic.
    */
   private Thread startListenerThreadForTransferTag(final Tag tag) {
     // start listener in separate thread (to catch update to topic)
     Thread listenerThread = new Thread(new Runnable() {
-      
+
       @Override
       public void run() {
         try {
           JmsTemplate template = new JmsTemplate(testBrokerService.getConnectionFactory());
-          template.setReceiveTimeout(1000);
-          Message message = template.receive(new ActiveMQTopic(tag.getTopic()));                   
+          template.setReceiveTimeout(5000);
           synchronized (updateLock) {
+            Message message = template.receive(new ActiveMQTopic(tag.getTopic()));
             updateFromConfig = TransferTagImpl.fromJson(((TextMessage) message).getText());
-          }                                  
-        } catch (Exception e) {     
-          synchronized (updateLock) {
-            updateFromConfig = null;  
           }
-        }       
+        } catch (Exception e) {
+          synchronized (updateLock) {
+            updateFromConfig = null;
+          }
+        }
       }
     });
     listenerThread.start();
@@ -244,7 +244,7 @@ public class TagValuePublisherTest {
    * Tests behaviour when publication fails when broker is down, and that re-publication occurs
    * when the broker is restarted. Uses 2 successive listener threads to check if publication occurred:
    * the first one fails (update is null), the second succeeds (after the broker is restarted).
-   * @throws Exception 
+   * @throws Exception
    */
   @Test
   public void testRepublication() throws Exception {
@@ -253,36 +253,36 @@ public class TagValuePublisherTest {
       this.update = null;
     }
     testBrokerService.stopBroker();
-    
+
     //try publication
     final DataTag tag = CacheObjectCreation.createTestDataTag3();
     List<Alarm> alarms = new ArrayList<Alarm>();
     Alarm alarm1 = CacheObjectCreation.createTestAlarm1();
-    Alarm alarm2 = CacheObjectCreation.createTestAlarm3(); 
+    Alarm alarm2 = CacheObjectCreation.createTestAlarm3();
     alarms.add(alarm1); //attached to this tag
     alarms.add(alarm2); //attached to this tag
-    
+
     Thread listenerThread = startListenerThread(tag); //will throw exception
-    
+
     this.control.replay();
     tagValuePublisher.notifyOnUpdate(tag, alarms);
     listenerThread.join(1000); //will fail after 100ms (failover timeout)
     synchronized (updateLock) {
       assertTrue(this.update == null); //update failed as broker stopped
     }
-   
-    Thread.sleep(1000); //allow another republication to fail (after 1s=republication delay)
+
+    Thread.sleep(2000); //allow another republication to fail (after 1s=republication delay)
                         //then start broker & listener before next republication attempt!
     testBrokerService.createAndStartBroker();  //connection to listener thread must have time to establish itself before republication
-    listenerThread = startListenerThread(tag); //new thread     
-    
+    listenerThread = startListenerThread(tag); //new thread
+
     listenerThread.join(1000);
-    
+
     compareTagAndUpdate(tag, alarms, this.update);
-    
-    this.control.verify();    
+
+    this.control.verify();
   }
-  
+
   @Test
   public void testRepublicationConfigUpdate() throws Exception {
     this.control.reset();
@@ -290,42 +290,42 @@ public class TagValuePublisherTest {
       this.updateFromConfig = null;
     }
     testBrokerService.stopBroker();
-    
+
     //try publication
     final DataTag tag = CacheObjectCreation.createTestDataTag3();
     List<Alarm> alarms = new ArrayList<Alarm>();
     Alarm alarm1 = CacheObjectCreation.createTestAlarm1();
-    Alarm alarm2 = CacheObjectCreation.createTestAlarm3(); 
+    Alarm alarm2 = CacheObjectCreation.createTestAlarm3();
     alarms.add(alarm1); //attached to this tag
     alarms.add(alarm2); //attached to this tag
-    
+
     TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
     EasyMock.expect(this.tagFacadeGateway.getTagWithAlarms(tag.getId())).andReturn(tagWithAlarms);
-    
+
     Thread listenerThread = startListenerThreadForTransferTag(tag); //will throw exception
-    
+
     this.control.replay();
     tagValuePublisher.notifyOnConfigurationUpdate(tag.getId());
     listenerThread.join(1000); //will fail after 100ms (failover timeout)
     synchronized (updateLock) {
       assertTrue(this.updateFromConfig == null); //update failed as broker stopped
     }
-   
+
     Thread.sleep(1000); //allow another republication to fail (after 1s=republication delay)
                         //then start broker & listener before next republication attempt!
     testBrokerService.createAndStartBroker();  //connection to listener thread must have time to establish itself before republication
-    listenerThread = startListenerThreadForTransferTag(tag); //new thread     
-    
+    listenerThread = startListenerThreadForTransferTag(tag); //new thread
+
     listenerThread.join(1000);
-    
+
     compareTagAndUpdate(tag, alarms, this.updateFromConfig);
-    
-    this.control.verify();    
+
+    this.control.verify();
   }
-  
+
   @AfterClass
   public static void stopBroker() throws Exception {
     testBrokerService.stopBroker();
   }
-  
+
 }
