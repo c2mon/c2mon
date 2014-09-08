@@ -474,7 +474,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
    * @param pListener Listener to be registered for updates
    * @return <code>true</code>, if the listener was not already registered
    */
-  public boolean addCientDataTagUpdateListener(final DataTagUpdateListener pListener) {
+  public boolean addClientDataTagUpdateListener(final DataTagUpdateListener pListener) {
     boolean retval = false;
     try {
       listenersLock.writeLock().lock();
@@ -506,7 +506,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
    * @return <code>true</code>, if the listener successfully removed from 
    *         the listeners list
    */
-  public boolean removeCientDataTagUpdateListener(final DataTagUpdateListener listener) {
+  public boolean removeClientDataTagUpdateListener(final DataTagUpdateListener listener) {
     boolean retval = false;
     try {
       listenersLock.writeLock().lock();
