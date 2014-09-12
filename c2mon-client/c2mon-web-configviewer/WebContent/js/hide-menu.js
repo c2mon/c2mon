@@ -70,7 +70,7 @@ $(document).ready(function(){
 	//Resize the graph and set a minimum size
 	function resizeGraph(){
 		var w=window.innerWidth;
-		var h=window.innerHeight;alert(h+" "+w);
+		var h=window.innerHeight;
 		document.getElementById("row-fluid").style.height = window.innerHeight;
 		if(!TestUrlMenu()){
 			if(w<770){
