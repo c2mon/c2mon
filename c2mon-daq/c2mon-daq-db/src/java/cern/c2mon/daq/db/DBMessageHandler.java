@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
@@ -22,6 +23,7 @@ import org.springframework.jdbc.UncategorizedSQLException;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.address.DBHardwareAddress;
@@ -47,7 +49,12 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
  * @author Aleksandra Wardzinska
  */
 public class DBMessageHandler extends EquipmentMessageHandler {
-
+    
+    /**
+     * The equipment logger of this class.
+     */
+    private EquipmentLogger equipmentLogger;
+    
     /**
      * Separator used between the property name and property value in the
      * equipment (DB) address
@@ -141,6 +148,8 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * */
     @Override
     public void connectToDataSource() throws EqIOException {
+        this.equipmentLogger = getEquipmentLogger(DBMessageHandler.class);
+        
         this.running = true;
         setDBDataSourceAddress();
 
@@ -152,15 +161,16 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         }
         
         // Controller
-        this.dbController = new DBController(this.dbDaqDao, getEquipmentLoggerFactory(), getEquipmentConfiguration(), getEquipmentMessageSender());
+        this.dbController = new DBController(this.dbDaqDao, getEquipmentLoggerFactory(), getEquipmentConfiguration(), 
+                getEquipmentMessageSender());
         
         // Data Tag Changer
-        DBDataTagChanger dataTagChanger = new DBDataTagChanger(this.dbController);
+        DBDataTagChanger dataTagChanger = new DBDataTagChanger(this.dbController, getEquipmentLogger(DBDataTagChanger.class));
         getEquipmentConfigurationHandler().setDataTagChanger(dataTagChanger);
         
         if (getEquipmentConfiguration().getSourceDataTags().isEmpty()) {
           String errorMsg = "No datatags found in the configuration xml";
-          getEquipmentLogger().error(errorMsg);
+          this.equipmentLogger.error(errorMsg);
           throw new EqIOException(errorMsg);
         }
 
@@ -175,14 +185,14 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                 String description =  de.getCause().getMessage().replaceAll("\n", "") + ". Manual DB intervention is required."
                     + " Please contact Admin Support.";
 
-                getEquipmentLogger().error("connectToDataSource - " + de.getCause().getMessage(), de);
+                this.equipmentLogger.error("connectToDataSource - " + de.getCause().getMessage(), de);
                 getEquipmentMessageSender().sendInvalidTag(dataTag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, description);
               } catch (DataAccessException dae) {
                 // Invalidate
                 String description =  dae.getCause().getMessage().replaceAll("\n", "") + ". Unexpected DB exception caught." 
                     + " Please contact Admin Support";
 
-                getEquipmentLogger().error("connectToDataSource - " + dae.getCause().getMessage().replaceAll("\n", ""), dae);
+                this.equipmentLogger.error("connectToDataSource - " + dae.getCause().getMessage().replaceAll("\n", ""), dae);
                 getEquipmentMessageSender().sendInvalidTag(dataTag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, description);
               }
             } else {
@@ -205,7 +215,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                                 try {
                                     alertsQueue.wait();
                                 } catch (InterruptedException e) {
-                                    getEquipmentLogger().warn("Wait on alertsQueue interrupted.", e);
+                                    equipmentLogger.warn("Wait on alertsQueue interrupted.", e);
                                 }
                             }
                             Alert a = alertsQueue.poll();
@@ -216,13 +226,13 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
-                        getEquipmentLogger().warn("Waiting for the connection to the database interrupted.", e);
+                        equipmentLogger.warn("Waiting for the connection to the database interrupted.", e);
                     }
                 }
             }
         });
         processor.start();
-        getEquipmentLogger().info("Processor thread started");
+        this.equipmentLogger.info("Processor thread started");
 
         // The connector thread is responsible for listening for new alerts and putting them to the queue.
         Thread connector = new Thread(new Runnable() {
@@ -238,25 +248,25 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                         while (connected) {
                             try {
                                 // System.out.println("Waiting for any...");
-                                synchronized (dbDaqDao) {
+//                                synchronized (dbDaqDao) {
                                     Alert a = dbDaqDao.waitForAnyAlert(Alert.MAX_TIMEOUT);
                                     // System.out.println("Got alert! " +
                                     // a.getName() + ", " + a.getValue());
                                     synchronized (alertsQueue) {
                                         alertsQueue.add(a);
                                         alertsQueue.notify();
-                                    }
+//                                    }
                                 }
                             } catch (AlertTimeOutException ex) {
-                                getEquipmentLogger().warn("Starting to wait again...", ex);
+                                equipmentLogger.warn("Starting to wait again...", ex);
                             }
                         }
                     } catch (UncategorizedSQLException e) {
                         setDisconnected();
-                        getEquipmentLogger().error("SQLException caught. Trying to reconnect to the db.", e);
+                        equipmentLogger.error("SQLException caught. Trying to reconnect to the db.", e);
                     } catch (Exception e) {
                         setDisconnected();
-                        getEquipmentLogger().error("Unexpected exception caught. Trying to reconnect to the db.", e);
+                        equipmentLogger.error("Unexpected exception caught. Trying to reconnect to the db.", e);
                     }
 
                     // Sleep for 5 seconds before trying again to
@@ -264,7 +274,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
-                        getEquipmentLogger().warn("Waiting for reestablishing the connection to the database interrupted.", e);
+                        equipmentLogger.warn("Waiting for reestablishing the connection to the database interrupted.", e);
                         e.printStackTrace();
                     }
                 }
@@ -272,7 +282,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
             }
         });
         connector.start();
-        getEquipmentLogger().info("Connector thread started");
+        this.equipmentLogger.info("Connector thread started");
    }
     
     /**
@@ -302,16 +312,16 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * Registers for all alerts for the monitored datatags.
      * */
     private void registerForAlerts() {
-        getEquipmentLogger().info("registerForAlerts - Registering for alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
-        synchronized (dbDaqDao) {
+        this.equipmentLogger.info("registerForAlerts - Registering for alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
+//        synchronized (dbDaqDao) {
             for (long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
               try {
                 this.dbController.registerForAlert(alertId);
               } catch (DataAccessException dae) {
-                getEquipmentLogger().error("registerForAlerts - " + dae.getCause().getMessage(), dae);
+                this.equipmentLogger.error("registerForAlerts - " + dae.getCause().getMessage(), dae);
               }
             }
-        }
+//        }
     }
     
     /**
@@ -329,7 +339,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
             @Override
             public void run() {
                 getEquipmentMessageSender().sendSupervisionAlive(System.currentTimeMillis());
-                getEquipmentLogger().info("Equipment alive sent to server.");
+                equipmentLogger.info("Equipment alive sent to server.");
             }
         };
         timer.schedule(task, 0, interval);
@@ -347,13 +357,13 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * connection to the database.
      * */
     private void unregisterAlerts() {
-        getEquipmentLogger().info("unregisterAlerts - Unregistering alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
+        this.equipmentLogger.info("unregisterAlerts - Unregistering alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
 //        synchronized (dbDaqDao) {
             for (Long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
               try {
                 this.dbController.unregisterFromAlert(alertId);
               } catch (DataAccessException dae) {
-                getEquipmentLogger().error("unregisterAlerts - " + dae.getCause().getMessage(), dae);
+                this.equipmentLogger.error("unregisterAlerts - " + dae.getCause().getMessage(), dae);
               }
             }
 //        }
@@ -371,10 +381,10 @@ public class DBMessageHandler extends EquipmentMessageHandler {
     private void processAlert(final Alert alert) {
         Long dataTagId = alert.getId();
         if (!getEquipmentConfiguration().getSourceDataTags().containsKey(dataTagId)) {
-            getEquipmentLogger().warn("An alert was received for a not monitored data tag.");
+            this.equipmentLogger.warn("An alert was received for a not monitored data tag.");
             return;
         }
-        getEquipmentLogger().info("Sending datatag: " + alert);
+        this.equipmentLogger.info("Sending datatag: " + alert);
         ISourceDataTag sdt = getEquipmentConfiguration().getSourceDataTags().get(dataTagId);
         if (alert.getQuality() == SourceDataQuality.UNKNOWN) {
             getEquipmentMessageSender().sendInvalidTag(sdt, alert.getQuality(), alert.getQualityDescription(),
@@ -384,7 +394,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         }
         Object sdtValue = TypeConverter.cast(alert.getDataTagValue(), sdt.getDataType());
         if (sdtValue == null) {
-            getEquipmentLogger().info("Conversion error! Got: " + alert.getDataTagValue() + ", expected:" + sdt.getDataType());
+            this.equipmentLogger.info("Conversion error! Got: " + alert.getDataTagValue() + ", expected:" + sdt.getDataType());
             getEquipmentMessageSender().sendInvalidTag(sdt, SourceDataQuality.CONVERSION_ERROR, "", new Timestamp(alert.getClientTimestamp().getTime()));
             increaseSentInvalidDataTags(dataTagId);
             return;
@@ -425,14 +435,14 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         }
         
         if (address.startsWith("dbUrl")) {
-            getEquipmentLogger().info("Trying to read database credentials directly from address...");
+            this.equipmentLogger.info("Trying to read database credentials directly from address...");
             parseDBAddress(address);
         } else if(address.startsWith("fileUrl")) {
             File config = new File(address.split("=")[1]);
             loadUrlFromFile(config);
         }
         
-        getEquipmentLogger().info("Successfully loaded equipment address.");
+        this.equipmentLogger.info("Successfully loaded equipment address.");
     }
     
     /**
@@ -445,7 +455,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      */
     private void loadUrlFromFile(File configFile) throws EqIOException {
         Properties p = new Properties();
-        getEquipmentLogger().info("Trying to read database credentials from file " + configFile + " ...");
+        this.equipmentLogger.info("Trying to read database credentials from file " + configFile + " ...");
         try {
             BufferedInputStream stream = new BufferedInputStream(new FileInputStream(configFile));
             p.load(stream);
@@ -457,7 +467,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         if (dbUrl == null || dbUrl.length() == 0) {
             throw new EqIOException("Cannot find value for 'dbUrl' in properties file " + configFile);
         }
-        getEquipmentLogger().debug("Got file content. Now trying to parse db url .." + configFile + " ...");
+        this.equipmentLogger.debug("Got file content. Now trying to parse db url .." + configFile + " ...");
         parseDBAddress("dbUrl=" + dbUrl);
         
     }
@@ -489,14 +499,14 @@ public class DBMessageHandler extends EquipmentMessageHandler {
             }
             if (!keyFound) {
                 String explanation = "The 'Address' field of the equipment configuration contains unrecognized key: " + key;
-                getEquipmentLogger().fatal(explanation);
+                this.equipmentLogger.fatal(explanation);
                 throw new EqIOException(explanation);
             }
         }
 
         if (!dbAddress.containsKey(DB_URL) || !dbAddress.containsKey(DB_USERNAME) || !dbAddress.containsKey(DB_PASSWORD)) {
             String errorMsq = "The 'Address' field does not contain the required parameters.";
-            getEquipmentLogger().fatal(errorMsq);
+            this.equipmentLogger.fatal(errorMsq);
             throw new EqIOException(errorMsq);
         }
     }
@@ -520,8 +530,8 @@ public class DBMessageHandler extends EquipmentMessageHandler {
     @Override
     public void refreshAllDataTags() {
         List<Long> dataTagIds = new ArrayList<Long>(getEquipmentConfiguration().getSourceDataTags().keySet());
-        getEquipmentLogger().info("Refreshing all data tags ");
-        synchronized (dbDaqDao) {
+        this.equipmentLogger.info("refreshAllDataTags - Refreshing all data tags ");
+//        synchronized (dbDaqDao) {
             List<Alert> alerts = dbDaqDao.getLastAlerts(dataTagIds);
             synchronized (alertsQueue) {
                 for (Alert a : alerts) {
@@ -529,7 +539,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                 }
                 alertsQueue.notify();
             }
-        }
+//        }
     }
 
     /**
@@ -538,11 +548,11 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * */
     @Override
     public void refreshDataTag(final long dataTagId) {
-        getEquipmentLogger().info("Refreshing data tag " + dataTagId);
-        synchronized (dbDaqDao) {
+        this.equipmentLogger.info("refreshDataTag - Refreshing data tag " + dataTagId);
+//        synchronized (dbDaqDao) {
             Alert alert = dbDaqDao.getLastAlertForDataTagId(dataTagId);
             processAlert(alert);
-        }
+//        }
     }
     
     /** Methods for loggging of the amount of sent datatags (valid and invalid) **/
@@ -597,7 +607,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * server ever since the daq was started
      * */
     private void showAmountOfProcessedAlerts() {
-      if (getEquipmentLogger().isTraceEnabled()) {
+      if (this.equipmentLogger.isTraceEnabled()) {
         int globalTotal = 0;
         StringBuilder msg = new StringBuilder("Processed alerts: [ ");
         for (Entry<Long, Integer> e : this.dbController.getAlertsSent().entrySet()) {
@@ -606,7 +616,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
             globalTotal += e.getValue();
         }
         msg.append(" ]");
-        getEquipmentLogger().trace(msg);
+        this.equipmentLogger.trace(msg);
         msg = new StringBuilder("Processed invalid: [ ");
         for (Entry<Long, Integer> e : this.dbController.getInvalidSent().entrySet()) {
             if (e.getKey() > 0)
@@ -614,8 +624,8 @@ public class DBMessageHandler extends EquipmentMessageHandler {
             globalTotal += e.getValue();
         }
         msg.append(" ]");
-        getEquipmentLogger().trace(msg);
-        getEquipmentLogger().trace("Total sent: " + globalTotal);
+        this.equipmentLogger.trace(msg);
+        this.equipmentLogger.trace("Total sent: " + globalTotal);
       }
     }
 

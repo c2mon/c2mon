@@ -34,8 +34,9 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * @param dataTagsIds     a list of data tags' ids for which the values should be retrieved
      * @return list of alerts that happened before the process started listening
      * */
+    @Override
     @SuppressWarnings("unchecked")
-    public List<Alert> getLastAlerts(final List<Long> dataTagsIds) {
+    public synchronized List<Alert> getLastAlerts(final List<Long> dataTagsIds) {
         List<Long> shortDataTagsIds;
         List<Alert> alerts = new ArrayList<Alert>();
         Map<String,Object> inputMap = new HashMap<String,Object>();
@@ -53,7 +54,8 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * @param dataTagId     data tag id for which the value should be retrieved
      * @return alert that happened before the process started listening
      * */
-    public Alert getLastAlertForDataTagId(final long dataTagId) {
+    @Override
+    public synchronized Alert getLastAlertForDataTagId(final long dataTagId) {
         return (Alert) (this.getSqlSession().selectOne("getLastAlertForDataTagById", dataTagId));
     }
 
@@ -61,8 +63,9 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * Get all the datatags' ids registered for the equipment (db account)
      * @return list of datatags ids known to the DB DAQ process
      * */
+    @Override
     @SuppressWarnings("unchecked")
-    public List<Long> getDataTags() {
+    public synchronized List<Long> getDataTags() {
         return (List<Long>) this.getSqlSession().selectList("getDataTags");
     }
     
@@ -76,7 +79,8 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * @param quality       quality of the datatag value
      * @param qualityDesc   description of the quality
      * */
-    public void insertNewDataTag(final long dataTagId, final String name, final String value, 
+    @Override
+    public synchronized void insertNewDataTag(final long dataTagId, final String name, final String value, 
                             final String type, final short quality, final String qualityDesc) {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("tag_id", dataTagId);
@@ -95,7 +99,8 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * Registers an interest in receiveing alerts identified by alertId
      * @param alertId   id of the alert 
      * */
-    public void registerForAlert(final String alertId) {
+    @Override
+    public synchronized void registerForAlert(final String alertId) {
         this.getSqlSession().update("register-for-alert", alertId);
     }
 
@@ -106,7 +111,8 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * @return received alert from the database 
      * @throws AlertTimeOutException if the wait was timed out
      * */
-    public Alert waitForAlert(final String alertId, final int timeout) throws AlertTimeOutException {
+    @Override
+    public synchronized Alert waitForAlert(final String alertId, final int timeout) throws AlertTimeOutException {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("name", alertId);
         params.put("timeout", timeout);
@@ -123,10 +129,12 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * @return alert received
      * @throws AlertTimeOutException if the wait was timed out 
      * */
-    public Alert waitForAnyAlert(final int timeout) throws AlertTimeOutException {
+    @Override
+    public synchronized Alert waitForAnyAlert(final int timeout) throws AlertTimeOutException {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("timeout", timeout);
         this.getSqlSession().update("wait-any-alert", params);
+  
         if ((Integer) params.get("status") == Alert.ALERT_OCCURRED) 
             return new Alert((String) params.get("name"), (String) params.get("message"));
         else
@@ -137,14 +145,16 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * Unregisters the process from receiving the alert
      * @param alertId name of the alert
      * */
-    public void unregisterFromAlert(final String alertId) {
+    @Override
+    public synchronized void unregisterFromAlert(final String alertId) {
         this.getSqlSession().update("unregister-one-alert", alertId);
     }
 
     /**
      * Unregisters from all alerts
      * */
-    public void unregisterFromAll() {
+    @Override
+    public synchronized void unregisterFromAll() {
         this.getSqlSession().update("unregister-all-alerts");
     }
 
@@ -154,7 +164,8 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * @param dbUsername    database username
      * @param dbPassword    database password 
      * */
-    public void setDataSourceParams(final String dbUrl, final String dbUsername, final String dbPassword) {
+    @Override
+    public synchronized void setDataSourceParams(final String dbUrl, final String dbUsername, final String dbPassword) {
         BasicDataSource ds =  (BasicDataSource) this.getSqlSession().getConfiguration().getEnvironment().getDataSource();
         ds.setUrl(dbUrl);
         ds.setUsername(dbUsername);
@@ -165,35 +176,36 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * Gets the dataSource
      * @return basicDataSource 
      * */
-    public BasicDataSource getCustomDataSource() {
+    @Override
+    public synchronized BasicDataSource getCustomDataSource() {
         BasicDataSource ds =  (BasicDataSource) this.getSqlSession().getConfiguration().getEnvironment().getDataSource();
         return ds;
     }
     
     @Override
-    public void updateDataTagItemName(final long dataTagId, final String itemName) {
+    public synchronized void updateDataTagItemName(final long dataTagId, final String itemName) {
         DBDAQConfigInfo dbDAQConfigInfo = new DBDAQConfigInfo(dataTagId, itemName, null);
         this.getSqlSession().update("updateDataTagItemName", dbDAQConfigInfo);
     }
     
     @Override
-    public String getItemName(final long dataTagId) {
+    public synchronized String getItemName(final long dataTagId) {
       return (String) (this.getSqlSession().selectOne("getItemNameForDataTagById", dataTagId));
     }
 
     @Override
-    public void updateDataTagDataType(long dataTagId, String dataType) {
+    public synchronized void updateDataTagDataType(long dataTagId, String dataType) {
       DBDAQConfigInfo dbDAQConfigInfo = new DBDAQConfigInfo(dataTagId, null, dataType);
       this.getSqlSession().update("updateDataTagDataType", dbDAQConfigInfo);
     }
 
     @Override
-    public String getDataType(long dataTagId) {
+    public synchronized String getDataType(long dataTagId) {
       return (String) (this.getSqlSession().selectOne("getDataTypeForDataTagById", dataTagId));
     }
 
     @Override
-    public DBDAQConfigInfo getItemNameAndDataType(long dataTagId) {
+    public synchronized DBDAQConfigInfo getItemNameAndDataType(long dataTagId) {
       return (DBDAQConfigInfo) (this.getSqlSession().selectOne("getItemNameAndDataTypeById", dataTagId));
     }
   

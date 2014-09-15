@@ -19,7 +19,12 @@
 package cern.c2mon.daq.db;
 
 import static java.lang.String.format;
+
+import org.apache.log4j.Logger;
+
+import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -38,56 +43,67 @@ public class DBDataTagChanger implements IDataTagChanger {
   private DBController dbController;
   
   /**
+   * The equipment logger of this class.
+   */
+  private EquipmentLogger equipmentLogger;
+  
+  /**
    * Creates a new DBDataTagChanger.
    *
    */
-  public DBDataTagChanger(DBController dbController) {
+  public DBDataTagChanger(DBController dbController, EquipmentLogger equipmentLogger) {
    this.dbController = dbController;
+   this.equipmentLogger = equipmentLogger;
   }
 
   @Override
   public void onAddDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
-    if (this.dbController.getEquipmentLogger().isDebugEnabled()) {
-      this.dbController.getEquipmentLogger().debug(format("entering onAddCommandTag(%d)..", sourceDataTag.getId()));
+    if (this.equipmentLogger.isDebugEnabled()) {
+      this.equipmentLogger.debug(format("entering onAddCommandTag(%d)..", sourceDataTag.getId()));
     }
 
     // Connect the Data Tag
+    this.equipmentLogger.trace("onAddDataTag - Connecting ...");
     changeReport.setState(this.dbController.connection(sourceDataTag, changeReport));
+    this.equipmentLogger.trace("onAddDataTag - Connected ...");
+    this.equipmentLogger.trace("onAddDataTag - Status " + changeReport.getState());
     if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
       changeReport.appendInfo("onAddDataTag - SourceDataTag added ...");
     } else {
       changeReport.appendInfo("onAddDataTag - SourceDataTag not added ...");
     }
 
-    if (this.dbController.getEquipmentLogger().isDebugEnabled()) {
-      this.dbController.getEquipmentLogger().debug(format("leaving onAddCommandTag(%d)", sourceDataTag.getId()));
-    }
-    
+    if (this.equipmentLogger.isDebugEnabled()) {
+      this.equipmentLogger.debug(format("leaving onAddCommandTag(%d)", sourceDataTag.getId()));
+    }   
   }
 
   @Override
-  public void onRemoveDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
-    if (this.dbController.getEquipmentLogger().isDebugEnabled()) {
-      this.dbController.getEquipmentLogger().debug(format("entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
+  public void onRemoveDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {   
+    if (this.equipmentLogger.isDebugEnabled()) {
+      this.equipmentLogger.debug(format("entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
     }
 
     // Disconnect the Data Tag
+    this.equipmentLogger.trace("onRemoveDataTag - Disconnecting ...");
     changeReport.setState(this.dbController.disconnection(sourceDataTag, changeReport));
+    this.equipmentLogger.trace("onRemoveDataTag - Disconnect ...");
+    this.equipmentLogger.trace("onRemoveDataTag - Status " + changeReport.getState());
     if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
       changeReport.appendInfo("onRemoveDataTag - SourceDataTag removed ...");
     } else {
       changeReport.appendInfo("onRemoveDataTag - SourceDataTag not removed ...");
     }
 
-    if (this.dbController.getEquipmentLogger().isDebugEnabled()) {
-      this.dbController.getEquipmentLogger().debug(format("leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
+    if (this.equipmentLogger.isDebugEnabled()) {
+      this.equipmentLogger.debug(format("leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
     }
   }
 
   @Override
   public void onUpdateDataTag(ISourceDataTag sourceDataTag, ISourceDataTag oldSourceDataTag, ChangeReport changeReport) {
-    if (this.dbController.getEquipmentLogger().isDebugEnabled()) {
-      this.dbController.getEquipmentLogger().debug(format("entering onUpdateDataTag(%d)..", sourceDataTag.getId()));
+    if (this.equipmentLogger.isDebugEnabled()) {
+      this.equipmentLogger.debug(format("entering onUpdateDataTag(%d)..", sourceDataTag.getId()));
     }
 
     // Disconnect old Data Tag 
@@ -106,8 +122,8 @@ public class DBDataTagChanger implements IDataTagChanger {
       changeReport.appendInfo("onUpdateDataTag - SourceDataTag not updated ...");
     }
 
-    if (this.dbController.getEquipmentLogger().isDebugEnabled()) {
-      this.dbController.getEquipmentLogger().debug(format("leaving onUpdateDataTag(%d)", sourceDataTag.getId()));
+    if (this.equipmentLogger.isDebugEnabled()) {
+      this.equipmentLogger.debug(format("leaving onUpdateDataTag(%d)", sourceDataTag.getId()));
     }
     
   }

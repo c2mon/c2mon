@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
@@ -91,19 +93,21 @@ public class DBController {
    */
   public CHANGE_STATE connection(ISourceDataTag sourceDataTag, ChangeReport changeReport, List<Long> registeredDataTags) {
     Long dataTagId = sourceDataTag.getId();
-    this.equipmentLogger.trace("connection - Connecting with Datatag: " + dataTagId);
+    getEquipmentLogger().trace("connection - Connecting with Datatag: " + dataTagId);
     
     this.alertsSent.put(dataTagId, 0);
     this.invalidSent.put(dataTagId, 0);
     
     // Inserting data data on the data base if it does not exist yet
     if (!registeredDataTags.contains(dataTagId)) {
+      getEquipmentLogger().trace("connection - Inserting Data Tag: " + dataTagId);
       insertMissingDataTag(dataTagId, changeReport); 
     }
     // It exists. Update the Data Tag Hardware Address Item Name and the Data Type on the data base if it is necessary
     else {
       ISourceDataTag sdt = getEquipmentConfiguration().getSourceDataTags().get(dataTagId); 
       // Take info from data base
+      getEquipmentLogger().trace("connection - : getItemNameAndDataType " + dataTagId);
       DBDAQConfigInfo dbDAQConfigInfo = this.dbDaqDao.getItemNameAndDataType(dataTagId);
       
       if ((dbDAQConfigInfo != null) && (sdt != null)) {
@@ -111,6 +115,7 @@ public class DBController {
         String newItemName = ((DBHardwareAddress) sdt.getHardwareAddress()).getDBItemName();
         String oldItemName = dbDAQConfigInfo.getDBItemName();
         if (!oldItemName.equals(newItemName)) {
+          getEquipmentLogger().trace("connection - : updateDataTagItemName (" + newItemName + ", " + oldItemName + ")");
           updateDataTagItemName(dataTagId, changeReport, newItemName, oldItemName);
         }
 
@@ -118,10 +123,13 @@ public class DBController {
         String newDataType = sdt.getDataType();
         String oldDataType = dbDAQConfigInfo.getDataType();
         if (!oldDataType.equals(newDataType)) {
+          getEquipmentLogger().trace("connection - : updateDataTagDataType (" + newDataType + ", " + oldDataType + ")");
           updateDataTagDataType(dataTagId, changeReport, newDataType, oldDataType);
         }
       }
     }
+    
+    getEquipmentLogger().trace("connection - Exiting: " + dataTagId);
     
     return CHANGE_STATE.SUCCESS;
   }
@@ -141,7 +149,7 @@ public class DBController {
     String name = ((DBHardwareAddress) sdt.getHardwareAddress()).getDBItemName();
     String type = sdt.getDataType();
     String value = "0";
-    this.equipmentLogger.info("insertMissingDataTag - Inserting missing datatag: " + dataTagId + " - " + name);
+    getEquipmentLogger().info("insertMissingDataTag - Inserting missing datatag: " + dataTagId + " - " + name);
     if (changeReport != null) {
       changeReport.appendInfo("insertMissingDataTag - Inserting missing datatag: " + dataTagId + " - " + name);
     }
@@ -157,10 +165,10 @@ public class DBController {
    * @param oldItemName The old Item Name read from the data base
    */
   private void updateDataTagItemName(Long dataTagId, ChangeReport changeReport, String newItemName, String oldItemName) {
-    this.equipmentLogger.info("updateDataTagItemName - Updating datatag Item Name: " + dataTagId + " - " + newItemName + "(new) - " 
+    getEquipmentLogger().info("updateDataTagItemName - Updating datatag Item Name: " + dataTagId + " - " + newItemName + "(new) - " 
         + oldItemName + "(old)");
     if (changeReport != null) {
-      this.equipmentLogger.info("updateDataTagItemName - Updating datatag Item Name: " + dataTagId + " - " + newItemName + "(new) - " 
+      getEquipmentLogger().info("updateDataTagItemName - Updating datatag Item Name: " + dataTagId + " - " + newItemName + "(new) - " 
           + oldItemName + "(old)");
     }
     this.dbDaqDao.updateDataTagItemName(dataTagId, newItemName);
@@ -175,10 +183,10 @@ public class DBController {
    * @param dolDataType The old Data Type read from the data base
    */
   private void updateDataTagDataType(Long dataTagId, ChangeReport changeReport, String newDataType, String oldDataType) {
-    this.equipmentLogger.info("updateDataTagDataType - Updating datatag Data Type: " + dataTagId + " - " + newDataType + "(new) - " 
+    getEquipmentLogger().info("updateDataTagDataType - Updating datatag Data Type: " + dataTagId + " - " + newDataType + "(new) - " 
         + oldDataType + "(old)");
     if (changeReport != null) {
-      this.equipmentLogger.info("updateDataTagDataType - Updating datatag Data Type: " + dataTagId + " - " + newDataType + "(new) - " 
+      getEquipmentLogger().info("updateDataTagDataType - Updating datatag Data Type: " + dataTagId + " - " + newDataType + "(new) - " 
           + oldDataType + "(old)");
     }
     this.dbDaqDao.updateDataTagDataType(dataTagId, newDataType);
@@ -194,16 +202,22 @@ public class DBController {
    */
   public CHANGE_STATE disconnection(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
     Long dataTagId = sourceDataTag.getId();
+    getEquipmentLogger().trace("disconnection - Disconnecting with Datatag: " + dataTagId);
     
+    getEquipmentLogger().trace("disconnection - Remove alerts");
     if (this.alertsSent.remove(dataTagId) == null) {
       if (changeReport != null) {
+          getEquipmentLogger().trace("disconnection - DataTag does not exist in Alers map: " + dataTagId);
         changeReport.appendError("disconnection - DataTag does not exist in Alers map: " + dataTagId);
       }
       
       return CHANGE_STATE.FAIL;
     }
+    
+    getEquipmentLogger().trace("disconnection - Remove invalids" + this.invalidSent.get(dataTagId));
     if (this.invalidSent.remove(dataTagId) == null) {
       if (changeReport != null) {
+          getEquipmentLogger().trace("disconnection - DataTag does not exist in Invalids map: " + dataTagId);
         changeReport.appendError("disconnection - DataTag does not exist in Invalids map: " + dataTagId);
       }
       
@@ -211,9 +225,13 @@ public class DBController {
     }
     
     // Unregister from alert
-    synchronized (this.dbDaqDao) {
+    getEquipmentLogger().trace("disconnection - Unregister from alert (waiting synchronized)");
+//    synchronized (this.dbDaqDao) {
+        getEquipmentLogger().trace("disconnection - Unregistering from alert");
       unregisterFromAlert(dataTagId);
-    }
+//    }
+    
+    getEquipmentLogger().trace("disconnection - Exiting: " + dataTagId);
     
     return CHANGE_STATE.SUCCESS;      
   }
@@ -225,7 +243,7 @@ public class DBController {
    * 
    */
   public void registerForAlert(long alertId) {
-    this.equipmentLogger.trace("registerForAlert - Registering for Alert: " + alertId);
+    getEquipmentLogger().trace("registerForAlert - Registering for Alert: " + alertId);
     this.dbDaqDao.registerForAlert(Long.toString(alertId));
   }
   
@@ -236,7 +254,7 @@ public class DBController {
    * @param alertId 
    */
   public void unregisterFromAlert(long alertId) {
-    this.equipmentLogger.trace("unregisterFromAlert - Unregistering from Alert: " + alertId);
+    getEquipmentLogger().trace("unregisterFromAlert - Unregistering from Alert: " + alertId);
     dbDaqDao.unregisterFromAlert(Long.toString(alertId));
   }
 
@@ -252,6 +270,13 @@ public class DBController {
    */
   public EquipmentLogger getEquipmentLogger() {
     return this.equipmentLogger;
+  }
+  
+  /**
+   * 
+   */
+  public void setEquipmentLogger(final EquipmentLogger equipmentLogger) {
+    this.equipmentLogger = equipmentLogger;
   }
 
   /**
