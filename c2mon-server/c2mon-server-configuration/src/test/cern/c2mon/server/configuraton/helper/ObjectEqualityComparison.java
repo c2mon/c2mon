@@ -17,8 +17,8 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.client.device.CommandValue;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 
 /**
  * Junit helper class for comparing cache objects.
@@ -166,12 +166,12 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getId(), cacheObject.getId());
     assertEquals(expectedObject.getName(), cacheObject.getName());
     assertEquals(expectedObject.getDeviceClassId(), cacheObject.getDeviceClassId());
-    assertEquals(expectedObject.getPropertyValues().size(), cacheObject.getPropertyValues().size());
-    for (PropertyValue propertyValue : expectedObject.getPropertyValues()) {
-      Assert.assertTrue(expectedObject.getPropertyValues().contains(propertyValue));
+    assertEquals(expectedObject.getDeviceProperties().size(), cacheObject.getDeviceProperties().size());
+    for (DeviceProperty property : expectedObject.getDeviceProperties()) {
+      Assert.assertTrue(expectedObject.getDeviceProperties().contains(property));
     }
-    for (CommandValue commandValue : expectedObject.getCommandValues()) {
-      Assert.assertTrue(expectedObject.getCommandValues().contains(commandValue));
+    for (DeviceCommand deviceCommand : expectedObject.getDeviceCommands()) {
+      Assert.assertTrue(expectedObject.getDeviceCommands().contains(deviceCommand));
     }
   }
 }

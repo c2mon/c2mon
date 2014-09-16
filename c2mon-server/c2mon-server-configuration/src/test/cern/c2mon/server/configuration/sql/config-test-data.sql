@@ -327,14 +327,24 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'name',
 insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'description', 'Description of TEST_DEVICE_CLASS_10');
 insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'properties', 
 '<Properties>
-    <Property name="cpuLoadInPercent" description="The current CPU load in percent" />
-    <Property name="responsiblePerson" description="The person responsible for this device" />
-    <Property name="someCalculations" description="Some super awesome calculations" />
- </Properties>');
+    <Property name="cpuLoadInPercent">
+        <description>The current CPU load in percent</description>
+    </Property>
+    <Property name="responsiblePerson">
+        <description>The person responsible for this device</description>
+    </Property>
+    <Property name="someCalculations">
+        <description>Some super awesome calculations</description>
+    </Property>
+</Properties>');
 insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'commands', 
 '<Commands>
-    <Command name="TEST_COMMAND_1" description="Description of TEST_COMMAND_1" />
-    <Command name="TEST_COMMAND_2" description="Description of TEST_COMMAND_2" />
+    <Command name="TEST_COMMAND_1">
+        <description>Description of TEST_COMMAND_1</description>
+    </Command>
+    <Command name="TEST_COMMAND_2">
+        <description>Description of TEST_COMMAND_2</description>
+    </Command>
 </Commands>');
 
 --update device class - should succeed
@@ -344,10 +354,18 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (31, 31, 'UPDATE', 'DeviceClass', '10');
 insert into timconfigval (seqid, elementfield, elementvalue) values (31, 'properties', 
 '<Properties>
-    <Property name="cpuLoadInPercent" description="The current CPU load in percent" />
-    <Property name="responsiblePerson" description="The person responsible for this device" />
-    <Property name="someCalculations" description="Some super awesome calculations" />
-    <Property name="numCores" description="The number of CPU cores on this device" />
+    <Property name="cpuLoadInPercent">
+        <description>The current CPU load in percent</description>
+    </Property>
+    <Property name="responsiblePerson">
+        <description>The person responsible for this device</description>
+    </Property>
+    <Property name="someCalculations">
+        <description>Some super awesome calculations</description>
+    </Property>
+    <Property name="numCores">
+        <description>The number of CPU cores on this device</description>
+    </Property>
 </Properties>');
 
 -- remove device class - should succeed
@@ -366,30 +384,51 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'id', '
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'classId', '400');
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'name', 'TEST_DEVICE_20');
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'description', 'Description of TEST_DEVICE_20');
-insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'propertyValues', 
-'<PropertyValues>
-    <PropertyValue name="cpuLoadInPercent" tag-id="987654"/>
-    <PropertyValue name="responsiblePerson" constant-value="Mr. Administrator"/>
-    <PropertyValue name="someCalculations" client-rule="(#123 + #234) / 2" result-type="Float" />
-</PropertyValues>');
-insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'commandValues', 
-'<CommandValues>
-    <CommandValue name="TEST_COMMAND_1" command-tag-id="4287" />
-    <CommandValue name="TEST_COMMAND_2" command-tag-id="4288" />
-</CommandValues>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'deviceProperties', 
+'<DeviceProperties>
+    <DeviceProperty name="cpuLoadInPercent">
+        <tag-id>123456</tag-id>
+    </DeviceProperty>
+    <DeviceProperty name="responsiblePerson">
+        <constant-value>Mr. Administrator</constant-value>
+    </DeviceProperty>
+    <DeviceProperty name="someCalculations">
+        <client-rule><![CDATA[(#123 + #23 4) / 2]]></client-rule>
+        <result-type>Float</result-type>
+    </DeviceProperty>
+</DeviceProperties>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'deviceCommands', 
+'<DeviceCommands>
+    <DeviceCommand name="TEST_COMMAND_1">
+        <command-tag-id>4287</command-tag-id>
+    </DeviceCommand>
+    <DeviceCommand name="TEST_COMMAND_2">
+        <command-tag-id>4288</command-tag-id>
+    </DeviceCommand>
+</DeviceCommands>');
 
 --update device - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (34, 'update device', 'update device 20', 'jusalmon', '?', sysdate);
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (34, 34, 'UPDATE', 'Device', '20');
-insert into timconfigval (seqid, elementfield, elementvalue) values (34, 'propertyValues', 
-'<PropertyValues>
-    <PropertyValue name="cpuLoadInPercent" tag-id="987654"/>
-    <PropertyValue name="responsiblePerson" constant-value="Mr. Administrator"/>
-    <PropertyValue name="someCalculations" client-rule="(#123 + #234) / 2" result-type="Float" />
-    <PropertyValue name="numCores" constant-value="4" result-type="Integer"/>
-</PropertyValues>');
+insert into timconfigval (seqid, elementfield, elementvalue) values (34, 'deviceProperties', 
+'<DeviceProperties>
+    <DeviceProperty name="cpuLoadInPercent">
+        <tag-id>123456</tag-id>
+    </DeviceProperty>
+    <DeviceProperty name="responsiblePerson">
+        <constant-value>Mr. Administrator</constant-value>
+    </DeviceProperty>
+    <DeviceProperty name="someCalculations">
+        <client-rule><![CDATA[(#123 + #23 4) / 2]]></client-rule>
+        <result-type>Float</result-type>
+    </DeviceProperty>
+    <DeviceProperty name="numCores">
+        <constant-value>4</constant-value>
+        <result-type>Integer</result-type>
+    </DeviceProperty>
+</DeviceProperties>');
 
 -- remove device - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)

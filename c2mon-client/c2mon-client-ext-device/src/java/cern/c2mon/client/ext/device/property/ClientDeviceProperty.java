@@ -29,7 +29,7 @@ import cern.c2mon.client.ext.device.tag.ClientConstantValueTag;
  *
  * @author Justin Lewis Salmon
  */
-public class ClientPropertyValue {
+public class ClientDeviceProperty {
 
   /**
    * The ID of the {@link ClientDataTag} (if applicable).
@@ -49,18 +49,18 @@ public class ClientPropertyValue {
    * @param tagId the ID of the {@link ClientDataTag} corresponding to this
    *          property
    */
-  public ClientPropertyValue(final Long tagId) {
+  public ClientDeviceProperty(final Long tagId) {
     this.tagId = tagId;
   }
 
   /**
-   * Constructor used to create an instance containing a property value that
+   * Constructor used to create an instance containing a device property that
    * will not be lazily loaded ({@link ClientRuleTag} or
    * {@link ClientConstantValueTag}).
    *
-   * @param clientDataTag the client property value to set
+   * @param clientDataTag the client device property to set
    */
-  public ClientPropertyValue(final ClientDataTagValue clientDataTag) {
+  public ClientDeviceProperty(final ClientDataTagValue clientDataTag) {
     this.clientDataTagValue = clientDataTag;
     if (isDataTag()) {
       this.tagId = clientDataTag.getId();
@@ -79,12 +79,12 @@ public class ClientPropertyValue {
   }
 
   /**
-   * Retrieve the property value. May be null if the property points to a
+   * Retrieve the device property. May be null if the property points to a
    * {@link ClientDataTag} and the actual tag has not yet been loaded.
    *
-   * @return the property value
+   * @return the device property value
    */
-  public ClientDataTagValue getClientPropertyValue() {
+  public ClientDataTagValue getProperty() {
     return clientDataTagValue;
   }
 

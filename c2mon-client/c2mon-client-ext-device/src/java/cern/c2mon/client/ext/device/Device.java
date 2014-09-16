@@ -59,14 +59,14 @@ public interface Device {
    * @return the {@link ClientDataTagValue} corresponding to the requested
    *         property
    */
-  public ClientDataTagValue getPropertyValue(String propertyName);
+  public ClientDataTagValue getProperty(String propertyName);
 
   /**
    * Retrieve all properties of this device.
    *
-   * @return the property values map
+   * @return the properties map
    */
-  public Map<String, ClientDataTagValue> getPropertyValues();
+  public Map<String, ClientDataTagValue> getProperties();
 
   /**
    * Retrieve a particular command of this device.
@@ -74,12 +74,12 @@ public interface Device {
    * @param commandName the name of the command to retrieve
    * @return the {@link ClientCommandTag} corresponding to the requested command
    */
-  public ClientCommandTag getCommandValue(String commandName);
+  public ClientCommandTag getCommand(String commandName);
 
   /**
    * Return all commands of this device.
    *
-   * @return the command values map
+   * @return the commands map
    */
-  public Map<String, ClientCommandTag> getCommandValues();
+  public Map<String, ClientCommandTag> getCommands();
 }

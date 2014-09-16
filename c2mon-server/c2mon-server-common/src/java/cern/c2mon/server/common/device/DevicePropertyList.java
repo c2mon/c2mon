@@ -22,29 +22,29 @@ import java.util.List;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceProperty;
 
 /**
- * Simple XML mapper bean representing a list of device propertiess. Used when
- * deserialising device property values during configuration.
+ * Simple XML mapper bean representing a list of device properties. Used when
+ * deserialising device properties during configuration.
  *
  * @author Justin Lewis Salmon
  */
-@Root(name = "PropertyValues")
-public class PropertyValueList {
+@Root(name = "DeviceProperties")
+public class DevicePropertyList {
 
-  @ElementList(entry = "PropertyValue", inline = true)
-  private List<PropertyValue> propertyValues;
+  @ElementList(entry = "DeviceProperty", inline = true)
+  private List<DeviceProperty> deviceProperties;
 
-  public PropertyValueList(List<PropertyValue> propertyValues) {
-    this.propertyValues = propertyValues;
+  public DevicePropertyList(List<DeviceProperty> deviceProperties) {
+    this.deviceProperties = deviceProperties;
   }
 
-  public PropertyValueList() {
+  public DevicePropertyList() {
     super();
   }
 
-  public List<PropertyValue> getPropertyValues() {
-    return propertyValues;
+  public List<DeviceProperty> getDeviceProperties() {
+    return deviceProperties;
   }
 }

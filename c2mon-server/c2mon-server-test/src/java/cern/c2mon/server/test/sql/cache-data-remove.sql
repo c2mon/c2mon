@@ -1,7 +1,7 @@
 delete from property;
-delete from propertyvalue;
+delete from deviceproperty;
 delete from command;
-delete from commandvalue;
+delete from devicecommand;
 delete from device;
 delete from deviceclass;
 delete from alarm;

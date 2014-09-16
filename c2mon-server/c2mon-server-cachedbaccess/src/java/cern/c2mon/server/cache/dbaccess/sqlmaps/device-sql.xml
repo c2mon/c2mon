@@ -9,14 +9,14 @@
     <id property="id" column="device_id"/>
     <result property="name" column="device_name"/>
     <result property="deviceClassId" column="device_class_id"/>
-    <collection property="propertyValues" ofType="cern.c2mon.shared.client.device.PropertyValue">
+    <collection property="deviceProperties" ofType="cern.c2mon.shared.client.device.DeviceProperty">
       <id property="name" column="property_name"/>
       <result property="tagId" column="property_tagid"/>
       <result property="clientRule" column="client_rule"/>
       <result property="constantValue" column="constant_value"/>
       <result property="resultType" column="result_type"/>
     </collection>
-    <collection property="commandValues" ofType="cern.c2mon.shared.client.device.CommandValue">
+    <collection property="deviceCommands" ofType="cern.c2mon.shared.client.device.DeviceCommand">
       <id property="name" column="command_name"/>
       <result property="tagId" column="command_tagid"/>
     </collection>
@@ -27,18 +27,18 @@
     SELECT DEVICE.DEVID as device_id,
            DEVICE.DEVNAME as device_name,
            DEVICE.DEVCLASSID as device_class_id,
-           PROPERTYVALUE.PROPNAME as property_name,
-           PROPERTYVALUE.PROPVAL_TAGID as property_tagid,
-           PROPERTYVALUE.PROPRULE as client_rule,
-           PROPERTYVALUE.PROPCONST as constant_value,
-           PROPERTYVALUE.PROPRESULTTYPE as result_type,
-           COMMANDVALUE.CMDNAME as command_name,
-           COMMANDVALUE.CMDVAL_TAGID as command_tagid
+           DEVICEPROPERTY.DVPNAME as property_name,
+           DEVICEPROPERTY.DVPTAGID as property_tagid,
+           DEVICEPROPERTY.DVPRULE as client_rule,
+           DEVICEPROPERTY.DVPCONST as constant_value,
+           DEVICEPROPERTY.DVPRESULTTYPE as result_type,
+           DEVICECOMMAND.DVCNAME as command_name,
+           DEVICECOMMAND.DVCTAGID as command_tagid
       FROM DEVICE 
-           LEFT OUTER JOIN PROPERTYVALUE
-        ON DEVICE.DEVID = PROPERTYVALUE.DEVID
-           INNER JOIN COMMANDVALUE
-        ON DEVICE.DEVID = COMMANDVALUE.DEVID
+           LEFT OUTER JOIN DEVICEPROPERTY
+        ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
+           INNER JOIN DEVICECOMMAND
+        ON DEVICE.DEVID = DEVICECOMMAND.DVCDEVID
   </select>
 
   <!-- getItem needed for persistence caches -->
@@ -46,18 +46,18 @@
     SELECT DEVICE.DEVID as device_id,
            DEVICE.DEVNAME as device_name,
            DEVICE.DEVCLASSID as device_class_id,
-           PROPERTYVALUE.PROPNAME as property_name,
-           PROPERTYVALUE.PROPVAL_TAGID as property_tagid,
-           PROPERTYVALUE.PROPRULE as client_rule,
-           PROPERTYVALUE.PROPCONST as constant_value,
-           PROPERTYVALUE.PROPRESULTTYPE as result_type,
-           COMMANDVALUE.CMDNAME as command_name,
-           COMMANDVALUE.CMDVAL_TAGID as command_tagid
+           DEVICEPROPERTY.DVPNAME as property_name,
+           DEVICEPROPERTY.DVPTAGID as property_tagid,
+           DEVICEPROPERTY.DVPRULE as client_rule,
+           DEVICEPROPERTY.DVPCONST as constant_value,
+           DEVICEPROPERTY.DVPRESULTTYPE as result_type,
+           DEVICECOMMAND.DVCNAME as command_name,
+           DEVICECOMMAND.DVCTAGID as command_tagid
       FROM DEVICE 
-           LEFT OUTER JOIN PROPERTYVALUE
-        ON DEVICE.DEVID = PROPERTYVALUE.DEVID
-           INNER JOIN COMMANDVALUE
-        ON DEVICE.DEVID = COMMANDVALUE.DEVID
+           LEFT OUTER JOIN DEVICEPROPERTY
+        ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
+           INNER JOIN DEVICECOMMAND
+        ON DEVICE.DEVID = DEVICECOMMAND.DVCDEVID
      WHERE DEVICE.DEVID = #{id}
   </select>
 
@@ -96,12 +96,12 @@
     DELETE FROM DEVICE WHERE DEVID = #{id}
   </delete>
 
-  <delete id="deletePropertyValues" parameterType="Long">
-    DELETE FROM PROPERTYVALUE WHERE DEVID = #{id}
+  <delete id="deleteDeviceProperties" parameterType="Long">
+    DELETE FROM DEVICEPROPERTY WHERE DVPDEVID = #{id}
   </delete>
 
-  <delete id="deleteCommandValues" parameterType="Long">
-    DELETE FROM COMMANDVALUE WHERE DEVID = #{id}
+  <delete id="deleteDeviceCommands" parameterType="Long">
+    DELETE FROM DEVICECOMMAND WHERE DVCDEVID = #{id}
   </delete>
 
 </mapper>

@@ -36,8 +36,8 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.test.TestDataInserter;
-import cern.c2mon.shared.client.device.CommandValue;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 
 /**
  * @author Justin Lewis Salmon
@@ -70,33 +70,33 @@ public class DeviceMapperTest {
   public void testGetItem() throws ClassNotFoundException {
     Device device1 = deviceMapper.getItem(300L); //getDevice(300L);
     Assert.assertNotNull(device1);
-    List<PropertyValue> propertyValues = device1.getPropertyValues();
-    Assert.assertNotNull(propertyValues);
-    Assert.assertTrue(propertyValues.size() == 4);
-    assertPropertyValueListContains(propertyValues, new PropertyValue("cpuLoadInPercent", 210000L, null, null, null));
-    assertPropertyValueListContains(propertyValues, new PropertyValue("responsiblePerson", null, null, "Mr. Administrator", null));
-    assertPropertyValueListContains(propertyValues, new PropertyValue("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
-    assertPropertyValueListContains(propertyValues, new PropertyValue("numCores", null, null, "4", "Integer"));
+    List<DeviceProperty> deviceProperties = device1.getDeviceProperties();
+    Assert.assertNotNull(deviceProperties);
+    Assert.assertTrue(deviceProperties.size() == 4);
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("cpuLoadInPercent", 210000L, null, null, null));
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("responsiblePerson", null, null, "Mr. Administrator", null));
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("numCores", null, null, "4", "Integer"));
 
-    List<CommandValue> commandValues = device1.getCommandValues();
-    Assert.assertNotNull(commandValues);
-    Assert.assertTrue(commandValues.size() == 1);
-    assertCommandValueEquals(new CommandValue("TEST_COMMAND_1", 210004L), commandValues.get(0));
+    List<DeviceCommand> deviceCommands = device1.getDeviceCommands();
+    Assert.assertNotNull(deviceCommands);
+    Assert.assertTrue(deviceCommands.size() == 1);
+    assertDeviceCommandEquals(new DeviceCommand("TEST_COMMAND_1", 210004L), deviceCommands.get(0));
 
     Device device2 = deviceMapper.getItem(301L); //getDevice(301L);
     Assert.assertNotNull(device2);
-    propertyValues = device2.getPropertyValues();
-    Assert.assertNotNull(propertyValues);
-    Assert.assertTrue(propertyValues.size() == 1);
-    assertPropertyValueListContains(propertyValues, new PropertyValue("TEST_PROPERTY_1", 210001L, null, null, null));
+    deviceProperties = device2.getDeviceProperties();
+    Assert.assertNotNull(deviceProperties);
+    Assert.assertTrue(deviceProperties.size() == 1);
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("TEST_PROPERTY_1", 210001L, null, null, null));
 
-    commandValues = device2.getCommandValues();
-    Assert.assertNotNull(commandValues);
-    Assert.assertTrue(commandValues.size() == 1);
-    assertCommandValueEquals(new CommandValue("TEST_COMMAND_2", 210005L), commandValues.get(0));
+    deviceCommands = device2.getDeviceCommands();
+    Assert.assertNotNull(deviceCommands);
+    Assert.assertTrue(deviceCommands.size() == 1);
+    assertDeviceCommandEquals(new DeviceCommand("TEST_COMMAND_2", 210005L), deviceCommands.get(0));
   }
 
-  public void assertPropertyValueEquals(PropertyValue expectedObject, PropertyValue cacheObject) throws ClassNotFoundException {
+  public void assertDevicePropertyEquals(DeviceProperty expectedObject, DeviceProperty cacheObject) throws ClassNotFoundException {
     assertEquals(expectedObject.getName(), cacheObject.getName());
     assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
     assertEquals(expectedObject.getClientRule(), cacheObject.getClientRule());
@@ -104,15 +104,15 @@ public class DeviceMapperTest {
     assertEquals(expectedObject.getResultType(), cacheObject.getResultType());
   }
 
-  public void assertPropertyValueListContains(List<PropertyValue> propertyValues, PropertyValue expectedObject) throws ClassNotFoundException {
-    for (PropertyValue propertyValue : propertyValues) {
-      if (propertyValue.getName().equals(expectedObject.getName())) {
-        assertPropertyValueEquals(expectedObject, propertyValue);
+  public void assertDevicePropertyListContains(List<DeviceProperty> deviceProperties, DeviceProperty expectedObject) throws ClassNotFoundException {
+    for (DeviceProperty deviceProperty : deviceProperties) {
+      if (deviceProperty.getName().equals(expectedObject.getName())) {
+        assertDevicePropertyEquals(expectedObject, deviceProperty);
       }
     }
   }
 
-  public void assertCommandValueEquals(CommandValue expectedObject, CommandValue cacheObject) {
+  public void assertDeviceCommandEquals(DeviceCommand expectedObject, DeviceCommand cacheObject) {
     assertEquals(expectedObject.getName(), cacheObject.getName());
     assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
   }

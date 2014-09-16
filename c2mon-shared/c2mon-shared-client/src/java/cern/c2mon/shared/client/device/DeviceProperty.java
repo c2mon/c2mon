@@ -20,14 +20,15 @@ package cern.c2mon.shared.client.device;
 import java.io.Serializable;
 
 import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
 
 /**
- * Simple XML mapper bean representing a device property value. Used when
- * deserialising device property values during configuration.
+ * Simple XML mapper bean representing a device property. Used when
+ * deserialising device properties during configuration.
  *
  * @author Justin Lewis Salmon
  */
-public class PropertyValue implements Cloneable, Serializable {
+public class DeviceProperty implements Cloneable, Serializable {
 
   /**
    * ID, since serializable.
@@ -35,7 +36,7 @@ public class PropertyValue implements Cloneable, Serializable {
   private static final long serialVersionUID = -3714996315363505073L;
 
   /**
-   * The unique name of the property value.
+   * The unique name of the property (matches name from parent device class).
    */
   @Attribute
   private String name;
@@ -43,40 +44,40 @@ public class PropertyValue implements Cloneable, Serializable {
   /**
    * The ID of the data tag that corresponds to this property.
    */
-  @Attribute(required = false, name = "tag-id")
+  @Element(required = false, name = "tag-id")
   private Long tagId;
 
   /**
    * The client rule string of this property.
    */
-  @Attribute(required = false, name = "client-rule")
+  @Element(required = false, name = "client-rule")
   private String clientRule;
 
   /**
    * The constant value of this property.
    */
-  @Attribute(required = false, name = "constant-value")
+  @Element(required = false, name = "constant-value")
   private String constantValue;
 
   /**
    * The result type of this property (for rules and constant values)
    */
-  @Attribute(required = false, name = "result-type")
+  @Element(required = false, name = "result-type")
   private String resultType = "String";
 
   /**
-   * Default constructor. A <code>PropertyValue</code> can be either a tag ID, a
-   * client rule, or a constant value. For client rules and constant values, it
-   * is possible to specify the type of the resulting value.
+   * Default constructor. A <code>DeviceProperty</code> can be either a tag ID,
+   * a client rule, or a constant value. For client rules and constant values,
+   * it is possible to specify the type of the resulting value.
    *
-   * @param name the unique name of this property value
+   * @param name the unique name of this property
    * @param tagId the ID of the data tag that corresponds to this property
    * @param clientRule the client rule string of this property
    * @param constantValue the constant value of this property
    * @param resultType the result type of this property (for rules and constant
    *          values). Defaults to {@link String}.
    */
-  public PropertyValue(final String name, final Long tagId, final String clientRule, final String constantValue, final String resultType) {
+  public DeviceProperty(final String name, final Long tagId, final String clientRule, final String constantValue, final String resultType) {
     this.name = name;
     this.tagId = tagId;
     this.clientRule = clientRule;
@@ -90,7 +91,7 @@ public class PropertyValue implements Cloneable, Serializable {
   /**
    * Constructor not used (needed for SimpleXML).
    */
-  public PropertyValue() {
+  public DeviceProperty() {
   }
 
   /**

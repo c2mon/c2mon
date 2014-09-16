@@ -19,52 +19,52 @@ package cern.c2mon.client.ext.device.property;
 
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.tag.ClientConstantValueTag;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
- * Factory class to create an appropriate {@link ClientPropertyValue} instance
- * from a {@link PropertyValue} received from the server.
+ * Factory class to create an appropriate {@link ClientDeviceProperty} instance
+ * from a {@link DeviceProperty} received from the server.
  *
  * @author Justin Lewis Salmon
  */
-public class ClientPropertyValueFactory {
+public class ClientDevicePropertyFactory {
 
   /**
-   * Factory method to create an appropriate {@link ClientPropertyValue}
+   * Factory method to create an appropriate {@link ClientDeviceProperty}
    * instance.
    *
-   * @param propertyValue the property value object received from the server
-   * @return the appropriate client property value
+   * @param deviceProperty the property object received from the server
+   * @return the appropriate client device property
    *
-   * @throws ClassNotFoundException if the {@link PropertyValue} contains an
+   * @throws ClassNotFoundException if the {@link DeviceProperty} contains an
    *           invalid result type field
-   * @throws RuleFormatException if the {@link PropertyValue} contains an
+   * @throws RuleFormatException if the {@link DeviceProperty} contains an
    *           invalid client rule field
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public static ClientPropertyValue createClientPropertyValue(PropertyValue propertyValue) throws ClassNotFoundException, RuleFormatException {
+  public static ClientDeviceProperty createClientDeviceProperty(DeviceProperty deviceProperty) throws ClassNotFoundException, RuleFormatException {
 
     // If we have a tag ID, it takes priority.
-    if (propertyValue.getTagId() != null) {
-      return new ClientPropertyValue(propertyValue.getTagId());
+    if (deviceProperty.getTagId() != null) {
+      return new ClientDeviceProperty(deviceProperty.getTagId());
     }
 
     // If we have a client rule, that comes next in the hierarchy.
-    else if (propertyValue.getClientRule() != null) {
-      ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(propertyValue.getClientRule()), propertyValue.getResultType());
-      return new ClientPropertyValue(ruleTag);
+    else if (deviceProperty.getClientRule() != null) {
+      ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getClientRule()), deviceProperty.getResultType());
+      return new ClientDeviceProperty(ruleTag);
     }
 
     // If we have a constant value, it comes last in the hierarchy.
-    else if (propertyValue.getConstantValue() != null) {
-      ClientConstantValueTag constantValueTag = new ClientConstantValueTag(propertyValue.getConstantValue(), propertyValue.getResultType());
-      return new ClientPropertyValue(constantValueTag);
+    else if (deviceProperty.getConstantValue() != null) {
+      ClientConstantValueTag constantValueTag = new ClientConstantValueTag(deviceProperty.getConstantValue(), deviceProperty.getResultType());
+      return new ClientDeviceProperty(constantValueTag);
     }
 
     else {
-      throw new RuntimeException("Property \"" + propertyValue.getName() + "\" must specify at least one of (tagId, clientRule, constantValue)");
+      throw new RuntimeException("Property \"" + deviceProperty.getName() + "\" must specify at least one of (tagId, clientRule, constantValue)");
     }
   }
 }

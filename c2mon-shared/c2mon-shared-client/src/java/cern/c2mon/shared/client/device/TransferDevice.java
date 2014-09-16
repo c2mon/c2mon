@@ -52,16 +52,16 @@ public interface TransferDevice extends ClientRequestResult {
   public Long getDeviceClassId();
 
   /**
-   * Retrieve the property values of this device.
+   * Retrieve the properties of this device.
    *
-   * @return the list of property values
+   * @return the list of device properties
    */
-  public List<PropertyValue> getPropertyValues();
+  public List<DeviceProperty> getDeviceProperties();
 
   /**
-   * Retrieve the command values of this device.
+   * Retrieve the commands of this device.
    *
-   * @return the list of command values
+   * @return the list of device commands
    */
-  public List<CommandValue> getCommandValues();
+  public List<DeviceCommand> getDeviceCommands();
 }

@@ -291,8 +291,8 @@ public abstract class TransferObjectFactory {
    */
   public static TransferDevice createTransferDevice(Device device) {
     TransferDeviceImpl transferDevice = new TransferDeviceImpl(device.getId(), device.getName(), device.getDeviceClassId());
-    transferDevice.addPropertyValues(device.getPropertyValues());
-    transferDevice.addCommandValues(device.getCommandValues());
+    transferDevice.addDeviceProperties(device.getDeviceProperties());
+    transferDevice.addDeviceCommands(device.getDeviceCommands());
     return transferDevice;
   }
 }

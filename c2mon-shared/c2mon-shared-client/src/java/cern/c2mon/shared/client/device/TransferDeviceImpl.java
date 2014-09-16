@@ -46,11 +46,11 @@ public class TransferDeviceImpl implements TransferDevice {
   /** The device class ID */
   private final Long deviceClassId;
 
-  /** The device property values */
-  private List<PropertyValue> propertyValues = new ArrayList<>();
+  /** The device properties */
+  private List<DeviceProperty> deviceProperties = new ArrayList<>();
 
-  /** The device command values */
-  private List<CommandValue> commandValues = new ArrayList<>();
+  /** The device commands */
+  private List<DeviceCommand> deviceCommands = new ArrayList<>();
 
   /**
    * @return The Gson parser singleton instance to serialise/deserialise Json
@@ -92,49 +92,49 @@ public class TransferDeviceImpl implements TransferDevice {
   }
 
   @Override
-  public List<PropertyValue> getPropertyValues() {
-    return this.propertyValues;
+  public List<DeviceProperty> getDeviceProperties() {
+    return this.deviceProperties;
   }
 
   @Override
-  public List<CommandValue> getCommandValues() {
-    return this.commandValues;
+  public List<DeviceCommand> getDeviceCommands() {
+    return this.deviceCommands;
   }
 
   /**
-   * Add a property value to the transfer object.
+   * Add a device property to the transfer object.
    *
-   * @param propertyValue the property value to add
+   * @param deviceProperty the property to add
    */
-  public void addPropertyValue(PropertyValue propertyValue) {
-    this.propertyValues.add(propertyValue);
+  public void addDeviceProperty(DeviceProperty deviceProperty) {
+    this.deviceProperties.add(deviceProperty);
   }
 
   /**
-   * Add several property values to the transfer object.
+   * Add several device properties to the transfer object.
    *
-   * @param propertyValues the list of property values to add
+   * @param deviceProperties the list of properties to add
    */
-  public void addPropertyValues(List<PropertyValue> propertyValues) {
-    this.propertyValues.addAll(propertyValues);
+  public void addDeviceProperties(List<DeviceProperty> deviceProperties) {
+    this.deviceProperties.addAll(deviceProperties);
   }
 
   /**
-   * Add a command value to the transfer object.
+   * Add a device command to the transfer object.
    *
-   * @param commandValue the command value to add
+   * @param deviceCommand the command to add
    */
-  public void addCommandValue(CommandValue commandValue) {
-    this.commandValues.add(commandValue);
+  public void addDeviceCommand(DeviceCommand deviceCommand) {
+    this.deviceCommands.add(deviceCommand);
   }
 
   /**
-   * Add several command values to the transfer object.
+   * Add several device commands to the transfer object.
    *
-   * @param commandValues the list of command values to add
+   * @param deviceCommands the list of commands to add
    */
-  public void addCommandValues(List<CommandValue> commandValues) {
-    this.commandValues.addAll(commandValues);
+  public void addDeviceCommands(List<DeviceCommand> deviceCommands) {
+    this.deviceCommands.addAll(deviceCommands);
   }
 
   /**

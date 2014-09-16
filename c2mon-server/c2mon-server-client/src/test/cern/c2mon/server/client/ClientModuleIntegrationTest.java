@@ -41,9 +41,9 @@ import cern.c2mon.server.command.CommandExecutionManager;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.test.broker.TestBrokerService;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 
@@ -225,18 +225,18 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
         assertEquals(device1.getName(), "TEST_DEVICE_1");
         assertEquals(device1.getDeviceClassId(), new Long(400));
 
-        List<PropertyValue> propertyValues = device1.getPropertyValues();
-        assertNotNull(propertyValues);
-        assertEquals(propertyValues.size(), 4);
-        assertEquals(propertyValues.get(0).getName(), "cpuLoadInPercent");
-        assertEquals(propertyValues.get(1).getName(), "numCores");
-        assertEquals(propertyValues.get(2).getName(), "responsiblePerson");
-        assertEquals(propertyValues.get(3).getName(), "someCalculations");
+        List<DeviceProperty> deviceProperties = device1.getDeviceProperties();
+        assertNotNull(deviceProperties);
+        assertEquals(deviceProperties.size(), 4);
+        assertEquals(deviceProperties.get(0).getName(), "cpuLoadInPercent");
+        assertEquals(deviceProperties.get(1).getName(), "numCores");
+        assertEquals(deviceProperties.get(2).getName(), "responsiblePerson");
+        assertEquals(deviceProperties.get(3).getName(), "someCalculations");
 
-        List<CommandValue> commandValues = device1.getCommandValues();
-        assertNotNull(commandValues);
-        assertEquals(commandValues.size(), 1);
-        assertEquals(commandValues.get(0).getName(), "TEST_COMMAND_1");
+        List<DeviceCommand> deviceCommands = device1.getDeviceCommands();
+        assertNotNull(deviceCommands);
+        assertEquals(deviceCommands.size(), 1);
+        assertEquals(deviceCommands.get(0).getName(), "TEST_COMMAND_1");
 
         return null;
       }

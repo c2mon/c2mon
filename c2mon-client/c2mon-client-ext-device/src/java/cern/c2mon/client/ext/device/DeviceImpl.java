@@ -33,16 +33,16 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientRuleTag;
-import cern.c2mon.client.ext.device.property.ClientPropertyValue;
-import cern.c2mon.client.ext.device.property.ClientPropertyValueFactory;
-import cern.c2mon.shared.client.device.CommandValue;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
+import cern.c2mon.client.ext.device.property.ClientDevicePropertyFactory;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
  * This class represents the <code>Device</code> aspect of the
  * class/device/property model. A Device is a concrete instance of a
- * <code>DeviceClass</code> and is composed of property values.
+ * <code>DeviceClass</code> and is composed of properties.
  *
  * @author Justin Lewis Salmon
  */
@@ -72,28 +72,28 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
   private final String deviceClassName;
 
   /**
-   * The map of property names -> property values.
+   * The map of property names -> properties.
    *
    * <p>
    * Note: when retrieving a device via
    * {@link DeviceManager#getAllDevices(String)}, this map does not contain the
-   * actual property values; they will be lazily loaded when you access a
-   * particular value. However, when you subscribe to a device via
+   * actual properties; they will be lazily loaded when you access a particular
+   * value. However, when you subscribe to a device via
    * {@link DeviceManager#subscribeDevices(java.util.Set, DeviceUpdateListener)}
    * then all the device properties will exist in the map.
    * </p>
    */
-  private Map<String, ClientPropertyValue> propertyValues = new HashMap<>();
+  private Map<String, ClientDeviceProperty> deviceProperties = new HashMap<>();
 
   /**
-   * The map of command names -> command values.
+   * The map of command names -> commands.
    *
    * <p>
    * Note: the behaviour of this map is equivalent to that of
-   * {@link DeviceImpl#propertyValues}.
+   * {@link DeviceImpl#deviceProperties}.
    * </p>
    */
-  private Map<String, ClientCommandTag> commandValues = new HashMap<>();
+  private Map<String, ClientCommandTag> deviceCommands = new HashMap<>();
 
   /**
    * The set of all listeners which are subscribed to this device
@@ -143,8 +143,8 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
   }
 
   @Override
-  public ClientDataTagValue getPropertyValue(String propertyName) {
-    ClientPropertyValue value = propertyValues.get(propertyName);
+  public ClientDataTagValue getProperty(String propertyName) {
+    ClientDeviceProperty value = deviceProperties.get(propertyName);
 
     // If the internal map value is a Long, then we lazy load the data tag
     if (value.isDataTag() && !value.isSubscribed()) {
@@ -153,8 +153,8 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
     }
 
     // If it is a rule tag, we evaluate the rule (if it isn't subscribed)
-    else if (value.isRuleTag() && !tagManager.isSubscribed((DataTagUpdateListener) value.getClientPropertyValue())) {
-      ClientRuleTag ruleTag = (ClientRuleTag) value.getClientPropertyValue();
+    else if (value.isRuleTag() && !tagManager.isSubscribed((DataTagUpdateListener) value.getProperty())) {
+      ClientRuleTag ruleTag = (ClientRuleTag) value.getProperty();
 
       // Get the data tag values from inside the rule
       Set<Long> tagIds = ruleTag.getRuleExpression().getInputTagIds();
@@ -168,35 +168,35 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
       return ruleTag;
 
     } else {
-      return value.getClientPropertyValue();
+      return value.getProperty();
     }
   }
 
   @Override
-  public Map<String, ClientDataTagValue> getPropertyValues() {
-    Map<String, ClientDataTagValue> propertyValues = new HashMap<>();
+  public Map<String, ClientDataTagValue> getProperties() {
+    Map<String, ClientDataTagValue> deviceProperties = new HashMap<>();
 
-    for (String propertyName : this.propertyValues.keySet()) {
-      propertyValues.put(propertyName, getPropertyValue(propertyName));
+    for (String propertyName : this.deviceProperties.keySet()) {
+      deviceProperties.put(propertyName, getProperty(propertyName));
     }
 
-    return propertyValues;
+    return deviceProperties;
   }
 
   @Override
-  public ClientCommandTag<?> getCommandValue(String commandName) {
-    return commandValues.get(commandName);
+  public ClientCommandTag<?> getCommand(String commandName) {
+    return deviceCommands.get(commandName);
   }
 
   @Override
-  public Map<String, ClientCommandTag> getCommandValues() {
-    Map<String, ClientCommandTag> commandValues = new HashMap<>();
+  public Map<String, ClientCommandTag> getCommands() {
+    Map<String, ClientCommandTag> deviceCommands = new HashMap<>();
 
-    for (String commandName : this.commandValues.keySet()) {
-      commandValues.put(commandName, getCommandValue(commandName));
+    for (String commandName : this.deviceCommands.keySet()) {
+      deviceCommands.put(commandName, getCommand(commandName));
     }
 
-    return commandValues;
+    return deviceCommands;
   }
 
   /**
@@ -209,20 +209,20 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
   }
 
   /**
-   * Retrieve the IDs of all properties of this device.
+   * Retrieve the IDs of all properties of this device that are data tags.
    *
-   * @return the property value IDs of this device
+   * @return the data tag property IDs of this device
    */
-  protected Set<Long> getPropertyValueIds() {
-    Set<Long> propertyValueIds = new HashSet<>();
+  protected Set<Long> getPropertyDataTagIds() {
+    Set<Long> propertyDataTagIds = new HashSet<>();
 
-    for (ClientPropertyValue propertyValue : propertyValues.values()) {
-      if (propertyValue.isDataTag()) {
-        propertyValueIds.add(propertyValue.getTagId());
+    for (ClientDeviceProperty deviceProperty : deviceProperties.values()) {
+      if (deviceProperty.isDataTag()) {
+        propertyDataTagIds.add(deviceProperty.getTagId());
       }
     }
 
-    return propertyValueIds;
+    return propertyDataTagIds;
   }
 
   /**
@@ -234,9 +234,9 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
   protected Set<ClientRuleTag> getRuleTags() {
     Set<ClientRuleTag> ruleTags = new HashSet<>();
 
-    for (ClientPropertyValue propertyValue : propertyValues.values()) {
-      if (propertyValue.isRuleTag()) {
-        ruleTags.add((ClientRuleTag) propertyValue.getClientPropertyValue());
+    for (ClientDeviceProperty deviceProperty : deviceProperties.values()) {
+      if (deviceProperty.isRuleTag()) {
+        ruleTags.add((ClientRuleTag) deviceProperty.getProperty());
       }
     }
 
@@ -247,7 +247,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
    * Manually set the properties of this device.
    *
    * <p>
-   * If the given property values contains client rules, the appropriate
+   * If any of the given properties are client rules, the appropriate
    * {@link ClientRuleTag} object will be created and the rule will be evaluated
    * here (fetching dependent {@link ClientDataTagValue}s if necessary).
    * However, the dependent data tags will not be subscribed to until the entire
@@ -255,38 +255,40 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
    * {@link DeviceManager#subscribeDevices(Set, DeviceUpdateListener)}.
    * </p>
    *
-   * @param propertyValues the property values to set
-   * @throws RuleFormatException
-   * @throws ClassNotFoundException
+   * @param deviceProperties the properties to set
+   *
+   * @throws RuleFormatException if a property is a client rule and is malformed
+   * @throws ClassNotFoundException if the result type of a property cannot be
+   *           found
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected void setPropertyValues(List<PropertyValue> propertyValues) throws RuleFormatException, ClassNotFoundException {
+  protected void setDeviceProperties(List<DeviceProperty> deviceProperties) throws RuleFormatException, ClassNotFoundException {
 
-    for (PropertyValue propertyValue : propertyValues) {
-      this.propertyValues.put(propertyValue.getName(), ClientPropertyValueFactory.createClientPropertyValue(propertyValue));
+    for (DeviceProperty deviceProperty : deviceProperties) {
+      this.deviceProperties.put(deviceProperty.getName(), ClientDevicePropertyFactory.createClientDeviceProperty(deviceProperty));
     }
   }
 
   /**
    * Manually set the properties of this device (for testing).
    *
-   * @param propertyValues the property values to set
+   * @param deviceProperties the properties to set
    */
-  protected void setPropertyValues(Map<String, ClientDataTagValue> propertyValues) {
-    for (Map.Entry<String, ClientDataTagValue> entry : propertyValues.entrySet()) {
-      this.propertyValues.put(entry.getKey(), new ClientPropertyValue(entry.getValue()));
+  protected void setDeviceProperties(Map<String, ClientDataTagValue> deviceProperties) {
+    for (Map.Entry<String, ClientDataTagValue> entry : deviceProperties.entrySet()) {
+      this.deviceProperties.put(entry.getKey(), new ClientDeviceProperty(entry.getValue()));
     }
   }
 
   /**
-   * Manually set the command values of this device.
+   * Manually set the commands of this device.
    *
-   * @param commandValues
+   * @param deviceCommands
    */
-  public void setCommandValues(List<CommandValue> commandValues) {
-    for (CommandValue commandValue : commandValues) {
+  public void setDeviceCommands(List<DeviceCommand> deviceCommands) {
+    for (DeviceCommand deviceCommand : deviceCommands) {
       // We don't need to lazy-load command tags, so just get them here
-      this.commandValues.put(commandValue.getName(), commandManager.getCommandTag(commandValue.getTagId()));
+      this.deviceCommands.put(deviceCommand.getName(), commandManager.getCommandTag(deviceCommand.getTagId()));
     }
   }
 
@@ -337,28 +339,28 @@ public class DeviceImpl implements Device, DataTagUpdateListener {
 
   @Override
   public final void onUpdate(ClientDataTagValue tagUpdate) {
-    String propertyValueName = null;
+    String propertyName = null;
 
     // Need to find the property name corresponding to this tag ID
-    for (Entry<String, ClientPropertyValue> entry : propertyValues.entrySet()) {
-      ClientPropertyValue propertyValue = entry.getValue();
+    for (Entry<String, ClientDeviceProperty> entry : deviceProperties.entrySet()) {
+      ClientDeviceProperty deviceProperty = entry.getValue();
 
-      if (propertyValue.isDataTag() && propertyValue.getTagId().equals(tagUpdate.getId())) {
-        propertyValueName = entry.getKey();
+      if (deviceProperty.isDataTag() && deviceProperty.getTagId().equals(tagUpdate.getId())) {
+        propertyName = entry.getKey();
       }
     }
 
     // Update the property
-    if (propertyValueName != null) {
-      this.propertyValues.put(propertyValueName, new ClientPropertyValue(tagUpdate));
+    if (propertyName != null) {
+      this.deviceProperties.put(propertyName, new ClientDeviceProperty(tagUpdate));
 
     } else {
       LOG.warn("onUpdate() called with unmapped tag ID");
     }
 
     int numUnsubscribedProperties = 0;
-    for (ClientPropertyValue propertyValue : propertyValues.values()) {
-      if (propertyValue.isDataTag() && !propertyValue.isSubscribed()) {
+    for (ClientDeviceProperty deviceProperty : deviceProperties.values()) {
+      if (deviceProperty.isDataTag() && !deviceProperty.isSubscribed()) {
         numUnsubscribedProperties++;
       }
     }

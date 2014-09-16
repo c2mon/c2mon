@@ -90,8 +90,8 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.device.CommandValue;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -1126,18 +1126,18 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     DeviceCacheObject cacheObject = (DeviceCacheObject) deviceCache.get(20L);
     DeviceCacheObject expectedObject = new DeviceCacheObject(20L, "TEST_DEVICE_20", 400L);
 
-    List<PropertyValue> expectedPropertyValues= new ArrayList<>();
-    expectedPropertyValues.add(new PropertyValue("cpuLoadInPercent", 987654L, null, null, null));
-    expectedPropertyValues.add(new PropertyValue("responsiblePerson", null, null, "Mr. Administrator", null));
-    expectedPropertyValues.add(new PropertyValue("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
+    List<DeviceProperty> expectedProperties= new ArrayList<>();
+    expectedProperties.add(new DeviceProperty("cpuLoadInPercent", 987654L, null, null, null));
+    expectedProperties.add(new DeviceProperty("responsiblePerson", null, null, "Mr. Administrator", null));
+    expectedProperties.add(new DeviceProperty("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
 
 
-    List<CommandValue> expectedCommandValues= new ArrayList<>();
-    expectedCommandValues.add(new CommandValue("TEST_COMMAND_1", 4287L));
-    expectedCommandValues.add(new CommandValue("TEST_COMMAND_2", 4288L));
+    List<DeviceCommand> expectedCommands= new ArrayList<>();
+    expectedCommands.add(new DeviceCommand("TEST_COMMAND_1", 4287L));
+    expectedCommands.add(new DeviceCommand("TEST_COMMAND_2", 4288L));
 
-    expectedObject.setPropertyValues(expectedPropertyValues);
-    expectedObject.setCommandValues(expectedCommandValues);
+    expectedObject.setDeviceProperties(expectedProperties);
+    expectedObject.setDeviceCommands(expectedCommands);
 
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
 
@@ -1147,8 +1147,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     cacheObject = (DeviceCacheObject) deviceCache.get(20L);
 
-    expectedPropertyValues.add(new PropertyValue("numCores", null, null, "4", "Integer"));
-    expectedObject.setPropertyValues(expectedPropertyValues);
+    expectedProperties.add(new DeviceProperty("numCores", null, null, "4", "Integer"));
+    expectedObject.setDeviceProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
 
     verify(mockManager);

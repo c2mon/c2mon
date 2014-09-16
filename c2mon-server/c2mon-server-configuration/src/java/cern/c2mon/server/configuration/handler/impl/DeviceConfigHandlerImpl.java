@@ -92,8 +92,8 @@ public class DeviceConfigHandlerImpl implements DeviceConfigHandler {
    * @see
    * cern.c2mon.server.configuration.handler.DeviceConfigHandler#removeDevice()
    *
-   * A Device removal will always result in the removal of all property and
-   * command values.
+   * A Device removal will always result in the removal of all device properties
+   * and commands.
    */
   @Override
   public ProcessChange removeDevice(Long id, ConfigurationElementReport elementReport) {

@@ -22,29 +22,29 @@ import java.util.List;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.DeviceCommand;
 
 /**
- * Simple XML mapper bean representing a list of device command values. Used
- * when deserialising device command values during configuration.
+ * Simple XML mapper bean representing a list of device commands. Used when
+ * deserialising device commands during configuration.
  *
  * @author Justin Lewis Salmon
  */
-@Root(name = "CommandValues")
-public class CommandValueList {
+@Root(name = "DeviceCommands")
+public class DeviceCommandList {
 
-  @ElementList(entry = "CommandValue", inline = true)
-  private List<CommandValue> commandValues;
+  @ElementList(entry = "DeviceCommand", inline = true)
+  private List<DeviceCommand> deviceCommands;
 
-  public CommandValueList(List<CommandValue> commandValues) {
-    this.commandValues = commandValues;
+  public DeviceCommandList(List<DeviceCommand> deviceCommand) {
+    this.deviceCommands = deviceCommand;
   }
 
-  public CommandValueList() {
+  public DeviceCommandList() {
     super();
   }
 
-  public List<CommandValue> getCommandValues() {
-    return commandValues;
+  public List<DeviceCommand> getDeviceCommands() {
+    return deviceCommands;
   }
 }

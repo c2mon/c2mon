@@ -44,7 +44,7 @@ public interface C2monDeviceManager {
    *
    * <p>
    * Note: retrieving devices using this method does not automatically subscribe
-   * to those devices. Accessing a property value of a particular device will
+   * to those devices. Accessing a property of a particular device will
    * fetch the value from the server only once. To receive updates about
    * property changes, use {@link #subscribeDevices(Set, DeviceUpdateListener)}.
    * </p>

@@ -28,8 +28,8 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.tag.ClientConstantValueTag;
 import cern.c2mon.client.ext.device.util.DeviceTestUtils;
-import cern.c2mon.shared.client.device.CommandValue;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.rule.RuleFormatException;
 import cern.c2mon.shared.rule.SimpleRuleExpression;
 
@@ -48,16 +48,16 @@ public class DeviceImplTest {
   private C2monCommandManager commandManagerMock;
 
   @Test
-  public void testLazyLoadPropertyValue() throws RuleFormatException, ClassNotFoundException {
+  public void testLazyLoadDeviceProperty() throws RuleFormatException, ClassNotFoundException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 
     DeviceImpl device = new DeviceImpl(1000L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
 
-    List<PropertyValue> propertyValues = new ArrayList<>();
-    propertyValues.add(new PropertyValue("test_property_1", 100000L, null, null, null));
+    List<DeviceProperty> deviceProperties = new ArrayList<>();
+    deviceProperties.add(new DeviceProperty("test_property_1", 100000L, null, null, null));
 
-    device.setPropertyValues(propertyValues);
+    device.setDeviceProperties(deviceProperties);
 
     // Expect the device to get a single data tag
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
@@ -66,7 +66,7 @@ public class DeviceImplTest {
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock);
 
-    ClientDataTagValue property = device.getPropertyValue("test_property_1");
+    ClientDataTagValue property = device.getProperty("test_property_1");
     Assert.assertTrue(property.getId() == cdt1.getId());
 
     // Verify that everything happened as expected
@@ -74,7 +74,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testGetPropertyValue() throws RuleFormatException {
+  public void testGetDeviceProperty() throws RuleFormatException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 
@@ -85,13 +85,13 @@ public class DeviceImplTest {
     ClientConstantValueTag ccv2 = new ClientConstantValueTag(4, Integer.class);
 
     // Make a map with real values
-    Map<String, ClientDataTagValue> propertyValues = new HashMap<String, ClientDataTagValue>();
-    propertyValues.put("cpuLoadInPercent", cdt1);
-    propertyValues.put("responsiblePerson", ccv1);
-    propertyValues.put("someCalculations", crt);
-    propertyValues.put("numCores", ccv2);
+    Map<String, ClientDataTagValue> deviceProperties = new HashMap<String, ClientDataTagValue>();
+    deviceProperties.put("cpuLoadInPercent", cdt1);
+    deviceProperties.put("responsiblePerson", ccv1);
+    deviceProperties.put("someCalculations", crt);
+    deviceProperties.put("numCores", ccv2);
 
-    device.setPropertyValues(propertyValues);
+    device.setDeviceProperties(deviceProperties);
 
     // Expect the device to check if the rule tag is subscribed, but make no
     // other calls
@@ -100,13 +100,13 @@ public class DeviceImplTest {
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock);
 
-    ClientDataTagValue property = device.getPropertyValue("cpuLoadInPercent");
+    ClientDataTagValue property = device.getProperty("cpuLoadInPercent");
     Assert.assertTrue(property.getId() == cdt1.getId());
-    property = device.getPropertyValue("responsiblePerson");
+    property = device.getProperty("responsiblePerson");
     Assert.assertTrue(property.getId() == ccv1.getId());
-    property = device.getPropertyValue("someCalculations");
+    property = device.getProperty("someCalculations");
     Assert.assertTrue(property.getId() == crt.getId());
-    property = device.getPropertyValue("numCores");
+    property = device.getProperty("numCores");
     Assert.assertTrue(property.getId() == ccv2.getId());
 
     // Verify that everything happened as expected
@@ -114,17 +114,17 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testLazyLoadPropertyValues() throws RuleFormatException, ClassNotFoundException {
+  public void testLazyLoadDeviceProperties() throws RuleFormatException, ClassNotFoundException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 
     DeviceImpl device = new DeviceImpl(1000L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
 
-    List<PropertyValue> propertyValues = new ArrayList<>();
-    propertyValues.add(new PropertyValue("cpuLoadInPercent", 100000L, null, null, null));
-    propertyValues.add(new PropertyValue("responsiblePerson", null, null, "Mr. Administrator", null));
-    propertyValues.add(new PropertyValue("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
-    propertyValues.add(new PropertyValue("numCores", null, null, "4", "Integer"));
+    List<DeviceProperty> deviceProperties = new ArrayList<>();
+    deviceProperties.add(new DeviceProperty("cpuLoadInPercent", 100000L, null, null, null));
+    deviceProperties.add(new DeviceProperty("responsiblePerson", null, null, "Mr. Administrator", null));
+    deviceProperties.add(new DeviceProperty("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
+    deviceProperties.add(new DeviceProperty("numCores", null, null, "4", "Integer"));
 
     ClientDataTagImpl cdt = new ClientDataTagImpl(100000L);
     ClientConstantValueTag ccv1 = new ClientConstantValueTag("Mr. Administrator", null);
@@ -149,9 +149,9 @@ public class DeviceImplTest {
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock);
 
-    device.setPropertyValues(propertyValues);
+    device.setDeviceProperties(deviceProperties);
 
-    Map<String, ClientDataTagValue> properties = device.getPropertyValues();
+    Map<String, ClientDataTagValue> properties = device.getProperties();
 
     Assert.assertTrue(properties.get("cpuLoadInPercent").getId().equals(cdt.getId()));
     Assert.assertTrue(properties.get("responsiblePerson").getId().equals(ccv1.getId()));
@@ -171,7 +171,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testGetPropertyValues() {
+  public void testGetDeviceProperties() {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 
@@ -181,19 +181,19 @@ public class DeviceImplTest {
     ClientDataTagImpl cdt3 = new ClientDataTagImpl(300000L);
 
     // Make a map with real values
-    Map<String, ClientDataTagValue> propertyValues = new HashMap<String, ClientDataTagValue>();
-    propertyValues.put("test_property_1", cdt1);
-    propertyValues.put("test_property_2", cdt2);
-    propertyValues.put("test_property_3", cdt3);
+    Map<String, ClientDataTagValue> deviceProperties = new HashMap<String, ClientDataTagValue>();
+    deviceProperties.put("test_property_1", cdt1);
+    deviceProperties.put("test_property_2", cdt2);
+    deviceProperties.put("test_property_3", cdt3);
 
-    device.setPropertyValues(propertyValues);
+    device.setDeviceProperties(deviceProperties);
 
     // Expect the device to never, ever call the server
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock);
 
-    Map<String, ClientDataTagValue> properties = device.getPropertyValues();
+    Map<String, ClientDataTagValue> properties = device.getProperties();
     Assert.assertTrue(properties.get("test_property_1").getId() == cdt1.getId());
     Assert.assertTrue(properties.get("test_property_2").getId() == cdt2.getId());
     Assert.assertTrue(properties.get("test_property_3").getId() == cdt3.getId());
@@ -209,13 +209,13 @@ public class DeviceImplTest {
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     cdt1.update(DeviceTestUtils.createValidTransferTag(cdt1.getId(), "test_tag_name", 1L));
 
-    Map<String, ClientDataTagValue> propertyValues = new HashMap<String, ClientDataTagValue>();
-    propertyValues.put("test_property_name", cdt1);
-    device.setPropertyValues(propertyValues);
+    Map<String, ClientDataTagValue> deviceProperties = new HashMap<String, ClientDataTagValue>();
+    deviceProperties.put("test_property_name", cdt1);
+    device.setDeviceProperties(deviceProperties);
 
     device.addDeviceUpdateListener(new DeviceUpdateListener() {
       @Override
-      public void onUpdate(Device device, String propertyValueName) {
+      public void onUpdate(Device device, String propertyName) {
         // do nothing
       }
     });
@@ -226,13 +226,13 @@ public class DeviceImplTest {
     device.onUpdate(cdt2);
 
     // Check that the device stored the new update properly
-    Assert.assertTrue(((Long) device.getPropertyValue("test_property_name").getValue()) == 2L);
+    Assert.assertTrue(((Long) device.getProperty("test_property_name").getValue()) == 2L);
   }
 
   @Test
   public void testRuleUpdate() throws RuleFormatException, ClassNotFoundException, InterruptedException {
     // Reset the mock
-    EasyMock.reset(commandManagerMock);
+    EasyMock.reset(tagManagerMock);
 
     final DeviceImpl device = new DeviceImpl(1000L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
 
@@ -252,11 +252,11 @@ public class DeviceImplTest {
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock);
 
-    final List<PropertyValue> propertyValues = new ArrayList<>();
-    propertyValues.add(new PropertyValue("test_property_rule_name", null, "(#234 + #345) / 2", null, "Float"));
-    device.setPropertyValues(propertyValues);
+    final List<DeviceProperty> deviceProperties = new ArrayList<>();
+    deviceProperties.add(new DeviceProperty("test_property_rule_name", null, "(#234 + #345) / 2", null, "Float"));
+    device.setDeviceProperties(deviceProperties);
 
-    ClientRuleTag rule = (ClientRuleTag) device.getPropertyValue("test_property_rule_name");
+    ClientRuleTag rule = (ClientRuleTag) device.getProperty("test_property_rule_name");
     Assert.assertNotNull(rule);
     Assert.assertTrue(rule.isValid());
     Assert.assertTrue((Float) rule.getValue() == 1F);
@@ -266,7 +266,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testGetCommandValue() {
+  public void testGetDeviceCommand() {
     // Reset the mock
     EasyMock.reset(commandManagerMock);
 
@@ -281,13 +281,13 @@ public class DeviceImplTest {
     // Setup is finished, need to activate the mock
     EasyMock.replay(commandManagerMock);
 
-    List<CommandValue> commandValues = new ArrayList<>();
-    commandValues.add(new CommandValue("test_command_1", -1L));
-    commandValues.add(new CommandValue("test_command_2", -2L));
-    device.setCommandValues(commandValues);
+    List<DeviceCommand> deviceCommands = new ArrayList<>();
+    deviceCommands.add(new DeviceCommand("test_command_1", -1L));
+    deviceCommands.add(new DeviceCommand("test_command_2", -2L));
+    device.setDeviceCommands(deviceCommands);
 
-    Assert.assertTrue(device.getCommandValue("test_command_1").getId().equals(-1L));
-    Assert.assertTrue(device.getCommandValue("test_command_2").getId().equals(-2L));
+    Assert.assertTrue(device.getCommand("test_command_1").getId().equals(-1L));
+    Assert.assertTrue(device.getCommand("test_command_2").getId().equals(-2L));
 
     // Verify that everything happened as expected
     EasyMock.verify(commandManagerMock);

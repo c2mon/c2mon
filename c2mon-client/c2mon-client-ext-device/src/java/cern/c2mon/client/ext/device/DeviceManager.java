@@ -152,8 +152,8 @@ public class DeviceManager implements C2monDeviceManager {
         commandManager);
 
     try {
-      // Set the property values
-      device.setPropertyValues(transferDevice.getPropertyValues());
+      // Set the properties
+      device.setDeviceProperties(transferDevice.getDeviceProperties());
 
     } catch (RuleFormatException e) {
       LOG.error("getAllDevices() - Received property containing incorrect rule tag from the server. Please check device with id " + device.getId(), e);
@@ -164,8 +164,8 @@ public class DeviceManager implements C2monDeviceManager {
       throw new RuntimeException("Received property containing incorrect result type from the server for device id " + device.getId());
     }
 
-    // Set the command values
-    device.setCommandValues(transferDevice.getCommandValues());
+    // Set the commands
+    device.setDeviceCommands(transferDevice.getDeviceCommands());
 
     return device;
   }
@@ -177,7 +177,7 @@ public class DeviceManager implements C2monDeviceManager {
       DeviceImpl device = (DeviceImpl) deviceInterface;
 
       // Here, just get the tag IDs to avoid calling the server
-      Set<Long> dataTagIds = device.getPropertyValueIds();
+      Set<Long> dataTagIds = device.getPropertyDataTagIds();
 
       // Use TagManager to subscribe to all properties of the device
       device.addDeviceUpdateListener(listener);
@@ -196,7 +196,7 @@ public class DeviceManager implements C2monDeviceManager {
 
     for (Device deviceInterface : devices) {
       DeviceImpl device = (DeviceImpl) deviceInterface;
-      Set<Long> dataTagIds = device.getPropertyValueIds();
+      Set<Long> dataTagIds = device.getPropertyDataTagIds();
 
       // Use TagManager to unsubscribe from all properties of the device
       tagManager.unsubscribeDataTags(dataTagIds, device);

@@ -15,10 +15,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.jms.JmsProxy;
-import cern.c2mon.shared.client.device.CommandValue;
+import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
 import cern.c2mon.shared.client.request.ClientRequestResult;
@@ -73,10 +73,10 @@ public class DeviceRequestHandlerTest {
     Collection<ClientRequestResult> mockResponse = new ArrayList<>();
     TransferDeviceImpl dti1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
     TransferDeviceImpl dti2 = new TransferDeviceImpl(2000L, "test_device_2", 1L);
-    dti1.addPropertyValue(new PropertyValue("TEST_PROPERTY_1", 1000L, null, null, null));
-    dti2.addPropertyValue(new PropertyValue("TEST_PROPERTY_2", 1001L, null, null, null));
-    dti1.addCommandValue(new CommandValue("TEST_COMMAND_1", 2000L));
-    dti2.addCommandValue(new CommandValue("TEST_COMMAND_2", 2001L));
+    dti1.addDeviceProperty(new DeviceProperty("TEST_PROPERTY_1", 1000L, null, null, null));
+    dti2.addDeviceProperty(new DeviceProperty("TEST_PROPERTY_2", 1001L, null, null, null));
+    dti1.addDeviceCommand(new DeviceCommand("TEST_COMMAND_1", 2000L));
+    dti2.addDeviceCommand(new DeviceCommand("TEST_COMMAND_2", 2001L));
     mockResponse.add(dti1);
     mockResponse.add(dti2);
 
@@ -93,9 +93,9 @@ public class DeviceRequestHandlerTest {
     Assert.assertTrue(devices.get(0).getDeviceClassId().equals(dti1.getDeviceClassId()));
     Assert.assertTrue(devices.get(1).getDeviceClassId().equals(dti2.getDeviceClassId()));
 
-    Assert.assertTrue(!devices.get(0).getPropertyValues().isEmpty());
-    Assert.assertTrue(devices.get(0).getPropertyValues().get(0).getName().equals("TEST_PROPERTY_1"));
-    Assert.assertTrue(devices.get(1).getPropertyValues().get(0).getName().equals("TEST_PROPERTY_2"));
+    Assert.assertTrue(!devices.get(0).getDeviceProperties().isEmpty());
+    Assert.assertTrue(devices.get(0).getDeviceProperties().get(0).getName().equals("TEST_PROPERTY_1"));
+    Assert.assertTrue(devices.get(1).getDeviceProperties().get(0).getName().equals("TEST_PROPERTY_2"));
 
     // Verify that everything happened as expected
     EasyMock.verify(jmsProxyMock);

@@ -20,37 +20,37 @@ package cern.c2mon.shared.client.device;
 import java.io.Serializable;
 
 import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
 
 /**
- * Simple XML mapper bean representing a device command value. Used when
- * deserialising device command values during configuration.
+ * Simple XML mapper bean representing a device command. Used when deserialising
+ * device commands during configuration.
  *
  * @author Justin Lewis Salmon
  */
-public class CommandValue implements Cloneable, Serializable {
+public class DeviceCommand implements Cloneable, Serializable {
 
   private static final long serialVersionUID = 7331198531306903558L;
 
   /**
-   * The unique name of this command value.
+   * The unique name of this command (matches name from parent device class).
    */
   @Attribute
   private String name;
 
   /**
-   * The ID of the command tag to which this command value corresponds.
+   * The ID of the command tag to which this command corresponds.
    */
-  @Attribute(name = "command-tag-id")
+  @Element(name = "command-tag-id")
   private Long tagId;
 
   /**
    * Default constructor.
    *
-   * @param name the unique name of this command value.
-   * @param tagId the ID of the command tag to which this command value
-   *          corresponds.
+   * @param name the unique name of this command.
+   * @param tagId the ID of the command tag to which this command corresponds.
    */
-  public CommandValue(String name, Long tagId) {
+  public DeviceCommand(String name, Long tagId) {
     this.name = name;
     this.tagId = tagId;
   }
@@ -58,20 +58,20 @@ public class CommandValue implements Cloneable, Serializable {
   /**
    * Constructor not used (needed for SimpleXML).
    */
-  public CommandValue() {
+  public DeviceCommand() {
   }
 
   /**
-   * Retrieve the name of this command value.
+   * Retrieve the name of this command.
    *
-   * @return the command value name
+   * @return the command name
    */
   public String getName() {
     return name;
   }
 
   /**
-   * Retrieve the ID of the command tag to which this command value corresponds.
+   * Retrieve the ID of the command tag to which this command corresponds.
    *
    * @return the command tag ID
    */

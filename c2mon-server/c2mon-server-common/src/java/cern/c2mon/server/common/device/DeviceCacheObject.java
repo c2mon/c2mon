@@ -20,8 +20,8 @@ package cern.c2mon.server.common.device;
 import java.util.ArrayList;
 import java.util.List;
 
-import cern.c2mon.shared.client.device.CommandValue;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 
 /**
  * This class implements the <code>Device</code> interface and resides in the
@@ -52,14 +52,14 @@ public class DeviceCacheObject implements Device, Cloneable {
   private Long deviceClassId;
 
   /**
-   * The list of property values belonging to this device.
+   * The list of properties belonging to this device.
    */
-  private List<PropertyValue> propertyValues = new ArrayList<>();
+  private List<DeviceProperty> deviceProperties = new ArrayList<>();
 
   /**
-   * The lsit of command values belonging to this device.
+   * The list of commands belonging to this device.
    */
-  private List<CommandValue> commandValues = new ArrayList<>();
+  private List<DeviceCommand> deviceCommands = new ArrayList<>();
 
   /**
    * Default constructor.
@@ -105,13 +105,13 @@ public class DeviceCacheObject implements Device, Cloneable {
   }
 
   @Override
-  public List<PropertyValue> getPropertyValues() {
-    return propertyValues;
+  public List<DeviceProperty> getDeviceProperties() {
+    return deviceProperties;
   }
 
   @Override
-  public List<CommandValue> getCommandValues() {
-    return commandValues;
+  public List<DeviceCommand> getDeviceCommands() {
+    return deviceCommands;
   }
 
   @SuppressWarnings("unchecked")
@@ -119,28 +119,28 @@ public class DeviceCacheObject implements Device, Cloneable {
   public Object clone() throws CloneNotSupportedException {
     DeviceCacheObject clone = (DeviceCacheObject) super.clone();
 
-    clone.propertyValues = (List<PropertyValue>) ((ArrayList<PropertyValue>) propertyValues).clone();
-    clone.commandValues = (List<CommandValue>) ((ArrayList<CommandValue>) commandValues).clone();
+    clone.deviceProperties = (List<DeviceProperty>) ((ArrayList<DeviceProperty>) deviceProperties).clone();
+    clone.deviceCommands = (List<DeviceCommand>) ((ArrayList<DeviceCommand>) deviceCommands).clone();
 
     return clone;
   }
 
   /**
-   * Set the list of property values.
+   * Set the list of device properties.
    *
-   * @param propertyValues the property values to set
+   * @param deviceProperties the properties to set
    */
-  public void setPropertyValues(List<PropertyValue> propertyValues) {
-    this.propertyValues = propertyValues;
+  public void setDeviceProperties(List<DeviceProperty> deviceProperties) {
+    this.deviceProperties = deviceProperties;
   }
 
   /**
-   * Set the list of command values.
+   * Set the list of device commands.
    *
-   * @param commandValueList the command values to set
+   * @param deviceCommands the commands to set
    */
-  public void setCommandValues(List<CommandValue> commandValues) {
-    this.commandValues = commandValues;
+  public void setDeviceCommands(List<DeviceCommand> deviceCommands) {
+    this.deviceCommands = deviceCommands;
   }
 
   /**

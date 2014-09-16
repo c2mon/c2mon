@@ -38,10 +38,10 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.client.ext.device.util.DeviceTestUtils;
-import cern.c2mon.shared.client.device.CommandValue;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -107,10 +107,10 @@ public class DeviceManagerTest {
     List<TransferDevice> devicesReturnList = new ArrayList<TransferDevice>();
     final TransferDeviceImpl device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
     final TransferDeviceImpl device2 = new TransferDeviceImpl(1000L, "test_device_2", 1L);
-    device1.addPropertyValue(new PropertyValue("TEST_PROPERTY_1", 100430L, null, null, null));
-    device2.addPropertyValue(new PropertyValue("TEST_PROPERTY_2", 100431L, null, null, null));
-    device1.addCommandValue(new CommandValue("TEST_COMMAND_1", 4287L));
-    device2.addCommandValue(new CommandValue("TEST_COMMAND_2", 4288L));
+    device1.addDeviceProperty(new DeviceProperty("TEST_PROPERTY_1", 100430L, null, null, null));
+    device2.addDeviceProperty(new DeviceProperty("TEST_PROPERTY_2", 100431L, null, null, null));
+    device1.addDeviceCommand(new DeviceCommand("TEST_COMMAND_1", 4287L));
+    device2.addDeviceCommand(new DeviceCommand("TEST_COMMAND_2", 4288L));
     devicesReturnList.add(device1);
     devicesReturnList.add(device2);
 
@@ -151,12 +151,12 @@ public class DeviceManagerTest {
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     ClientDataTagImpl cdt2 = new ClientDataTagImpl(200000L);
 
-    Map<String, ClientDataTagValue> propertyValues = new HashMap<String, ClientDataTagValue>();
-    propertyValues.put("test_property_name_1", cdt1);
-    propertyValues.put("test_property_name_2", cdt2);
+    Map<String, ClientDataTagValue> deviceProperties = new HashMap<String, ClientDataTagValue>();
+    deviceProperties.put("test_property_name_1", cdt1);
+    deviceProperties.put("test_property_name_2", cdt2);
 
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
-    device1.setPropertyValues(propertyValues);
+    device1.setDeviceProperties(deviceProperties);
 
     Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
 
@@ -186,7 +186,7 @@ public class DeviceManagerTest {
     Assert.assertNotNull(device);
     Assert.assertTrue(device.getId() == device1.getId());
 
-    Map<String, ClientDataTagValue> values = device.getPropertyValues();
+    Map<String, ClientDataTagValue> values = device.getProperties();
     Assert.assertTrue(values.get("test_property_name_1").getId().equals(100000L));
     Assert.assertTrue(values.get("test_property_name_2").getId().equals(200000L));
 
@@ -199,12 +199,12 @@ public class DeviceManagerTest {
   @Test
   public void testSubscribeLazyDevice() throws RuleFormatException, ClassNotFoundException {
 
-    List<PropertyValue> sparsePropertyMap = new ArrayList<>();
-    sparsePropertyMap.add(new PropertyValue("test_property_name_1", 100000L, null, null, null));
-    sparsePropertyMap.add(new PropertyValue("test_property_name_2", 200000L, null, null, null));
+    List<DeviceProperty> sparsePropertyMap = new ArrayList<>();
+    sparsePropertyMap.add(new DeviceProperty("test_property_name_1", 100000L, null, null, null));
+    sparsePropertyMap.add(new DeviceProperty("test_property_name_2", 200000L, null, null, null));
 
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
-    device1.setPropertyValues(sparsePropertyMap);
+    device1.setDeviceProperties(sparsePropertyMap);
 
     Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
 
@@ -235,7 +235,7 @@ public class DeviceManagerTest {
     Assert.assertNotNull(device);
     Assert.assertTrue(device.getId() == device1.getId());
 
-    Map<String, ClientDataTagValue> values = device.getPropertyValues();
+    Map<String, ClientDataTagValue> values = device.getProperties();
     Assert.assertTrue(values.get("test_property_name_1").getId().equals(100000L));
     Assert.assertTrue(values.get("test_property_name_2").getId().equals(200000L));
 
@@ -253,12 +253,12 @@ public class DeviceManagerTest {
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     ClientDataTagImpl cdt2 = new ClientDataTagImpl(200000L);
 
-    Map<String, ClientDataTagValue> propertyValues = new HashMap<String, ClientDataTagValue>();
-    propertyValues.put("test_property_name_1", cdt1);
-    propertyValues.put("test_property_name_2", cdt2);
+    Map<String, ClientDataTagValue> deviceProperties = new HashMap<String, ClientDataTagValue>();
+    deviceProperties.put("test_property_name_1", cdt1);
+    deviceProperties.put("test_property_name_2", cdt2);
 
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
-    device1.setPropertyValues(propertyValues);
+    device1.setDeviceProperties(deviceProperties);
 
     Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
 
@@ -307,15 +307,15 @@ public class DeviceManagerTest {
 
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     ClientDataTagImpl cdt2 = new ClientDataTagImpl(200000L);
-    Map<String, ClientDataTagValue> propertyValues1 = new HashMap<String, ClientDataTagValue>();
-    Map<String, ClientDataTagValue> propertyValues2 = new HashMap<String, ClientDataTagValue>();
-    propertyValues1.put("test_property_name_1", cdt1);
-    propertyValues2.put("test_property_name_2", cdt2);
+    Map<String, ClientDataTagValue> deviceProperties1 = new HashMap<String, ClientDataTagValue>();
+    Map<String, ClientDataTagValue> deviceProperties2 = new HashMap<String, ClientDataTagValue>();
+    deviceProperties1.put("test_property_name_1", cdt1);
+    deviceProperties2.put("test_property_name_2", cdt2);
 
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device_1", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     final DeviceImpl device2 = new DeviceImpl(2L, "test_device_2", 1L, "test_device_class", tagManagerMock, commandManagerMock);
-    device1.setPropertyValues(propertyValues1);
-    device2.setPropertyValues(propertyValues2);
+    device1.setDeviceProperties(deviceProperties1);
+    device2.setDeviceProperties(deviceProperties2);
 
     Set<Device> devices = new HashSet<Device>();
     devices.add(device1);
@@ -357,7 +357,7 @@ public class DeviceManagerTest {
     Device device;
 
     @Override
-    public void onUpdate(Device device, String propertyValueName) {
+    public void onUpdate(Device device, String propertyName) {
       this.device = device;
       latch.countDown();
     }

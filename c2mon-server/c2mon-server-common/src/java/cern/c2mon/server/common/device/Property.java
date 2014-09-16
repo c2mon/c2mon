@@ -18,6 +18,7 @@
 package cern.c2mon.server.common.device;
 
 import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
 
 /**
  * Simple XML mapper bean representing a device class property. Used when
@@ -30,7 +31,7 @@ public class Property {
   @Attribute
   private String name;
 
-  @Attribute
+  @Element
   private String description;
 
   public String getName() {

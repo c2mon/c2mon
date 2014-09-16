@@ -30,14 +30,14 @@ import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.common.AbstractFacade;
-import cern.c2mon.server.common.device.CommandValueList;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import cern.c2mon.server.common.device.PropertyValueList;
-import cern.c2mon.shared.client.device.CommandValue;
-import cern.c2mon.shared.client.device.PropertyValue;
+import cern.c2mon.server.common.device.DeviceCommandList;
+import cern.c2mon.server.common.device.DevicePropertyList;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 
@@ -107,24 +107,24 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
       deviceCacheObject.setDeviceClassId(Long.parseLong(properties.getProperty("classId")));
     }
 
-    // Parse property and command values from XML representation
-    if (properties.getProperty("propertyValues") != null) {
+    // Parse properties and commands from XML representation
+    if (properties.getProperty("deviceProperties") != null) {
       try {
-        List<PropertyValue> propertyValues = parseXmlPropertyValues(properties.getProperty("propertyValues"));
-        deviceCacheObject.setPropertyValues(propertyValues);
+        List<DeviceProperty> deviceProperties = parseDevicePropertiesXML(properties.getProperty("deviceProperties"));
+        deviceCacheObject.setDeviceProperties(deviceProperties);
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            "Exception: Unable to create property value list from parameter \"propertyValues\": " + e + "\n" + properties.getProperty("propertyValues"));
+            "Exception: Unable to create device property list from parameter \"deviceProperties\": " + e + "\n" + properties.getProperty("deviceProperties"));
       }
     }
 
-    if (properties.getProperty("commandValues") != null) {
+    if (properties.getProperty("deviceCommands") != null) {
       try {
-        List<CommandValue> commandValues = parseXmlCommandValues(properties.getProperty("commandValues"));
-        deviceCacheObject.setCommandValues(commandValues);
+        List<DeviceCommand> deviceCommands = parseDeviceCommandsXML(properties.getProperty("deviceCommands"));
+        deviceCacheObject.setDeviceCommands(deviceCommands);
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            "Exception: Unable to create command value list from parameter \"commands\":" + e + "\n" + properties.getProperty("commands"));
+            "Exception: Unable to create device command list from parameter \"deviceCommands\":" + e + "\n" + properties.getProperty("deviceCommands"));
       }
     }
 
@@ -146,11 +146,11 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
     if (cacheObject.getDeviceClassId() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"deviceClassId\" cannot be null");
     }
-    if (cacheObject.getPropertyValues() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"propertyValues\" cannot be null");
+    if (cacheObject.getDeviceProperties() == null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"deviceProperties\" cannot be null");
     }
-    if (cacheObject.getCommandValues() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"commandValues\" cannot be null");
+    if (cacheObject.getDeviceCommands() == null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"deviceCommands\" cannot be null");
     }
 
     // Cross-check device class ID
@@ -160,79 +160,77 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
     }
 
     // Cross-check properties and commands
-    for (PropertyValue propertyValue : cacheObject.getPropertyValues()) {
-      if (!deviceClass.getProperties().contains(propertyValue.getName())) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + propertyValue.getName()
-            + "\" must refer to an existing DeviceClass property");
+    for (DeviceProperty deviceProperty : cacheObject.getDeviceProperties()) {
+      if (!deviceClass.getProperties().contains(deviceProperty.getName())) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + deviceProperty.getName()
+            + "\" must refer to a property defined in parent device class");
       }
 
       // Sanity check on (tagId / clientRule / constantValue / resultType)
-      if (propertyValue.getTagId() == null && propertyValue.getClientRule() == null && propertyValue.getConstantValue() == null) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + propertyValue.getName()
+      if (deviceProperty.getTagId() == null && deviceProperty.getClientRule() == null && deviceProperty.getConstantValue() == null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + deviceProperty.getName()
             + "\" must specify at least one of (tagId, clientRule, constantValue)");
       }
 
       try {
-        propertyValue.getResultType();
+        deviceProperty.getResultType();
       } catch (ClassNotFoundException e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + propertyValue.getName()
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + deviceProperty.getName()
             + "\" specifies invalid result type");
       }
     }
 
-    for (CommandValue commandValue : cacheObject.getCommandValues()) {
-      if (!deviceClass.getCommands().contains(commandValue.getName())) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Command \"" + commandValue.getName()
-            + "\" must refer to an existing DeviceClass command");
+    for (DeviceCommand deviceCommand : cacheObject.getDeviceCommands()) {
+      if (!deviceClass.getCommands().contains(deviceCommand.getName())) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Command \"" + deviceCommand.getName()
+            + "\" must refer to a command defined in parent device class");
       }
     }
   }
 
   /**
-   * Parse the XML representation of the property values of a device (which
-   * comes from configuration) and return it as a list of {@link PropertyValue}
+   * Parse the XML representation of the properties of a device (which comes
+   * from configuration) and return it as a list of {@link DeviceProperty}
    * objects.
    *
-   * @param xmlString the XML representation string of the device property
-   *          values
+   * @param xmlString the XML representation string of the device properties
    *
-   * @return the list of property values
+   * @return the list of device properties
    * @throws Exception if the XML could not be parsed
    */
-  private List<PropertyValue> parseXmlPropertyValues(String xmlString) throws Exception {
-    List<PropertyValue> propertyValues = new ArrayList<>();
+  private List<DeviceProperty> parseDevicePropertiesXML(String xmlString) throws Exception {
+    List<DeviceProperty> deviceProperties = new ArrayList<>();
 
     Serializer serializer = new Persister();
-    PropertyValueList propertyValueList = serializer.read(PropertyValueList.class, xmlString);
+    DevicePropertyList devicePropertyList = serializer.read(DevicePropertyList.class, xmlString);
 
-    for (PropertyValue propertyValue : propertyValueList.getPropertyValues()) {
-      propertyValues.add(propertyValue);
+    for (DeviceProperty deviceProperty : devicePropertyList.getDeviceProperties()) {
+      deviceProperties.add(deviceProperty);
     }
 
-    return propertyValues;
+    return deviceProperties;
   }
 
   /**
-   * Parse the XML representation of the command values of a device (which comes
-   * from configuration) and return it as a list of {@link CommandValue}
-   * objects.
+   * Parse the XML representation of the commands of a device (which comes from
+   * configuration) and return it as a list of {@link DeviceCommand} objects.
    *
-   * @param xmlString the XML representation string of the device command values
+   * @param xmlString the XML representation string of the device commands
    *
-   * @return the list of command values
+   * @return the list of device commands
    * @throws Exception if the XML could not be parsed
    */
-  private List<CommandValue> parseXmlCommandValues(String xmlString) throws Exception {
-    List<CommandValue> commandValues = new ArrayList<>();
+  private List<DeviceCommand> parseDeviceCommandsXML(String xmlString) throws Exception {
+    List<DeviceCommand> deviceCommands = new ArrayList<>();
 
     Serializer serializer = new Persister();
-    CommandValueList commandValueList = serializer.read(CommandValueList.class, xmlString);
+    DeviceCommandList deviceCommandList = serializer.read(DeviceCommandList.class, xmlString);
 
-    for (CommandValue commandValue : commandValueList.getCommandValues()) {
-      commandValues.add(commandValue);
+    for (DeviceCommand deviceCommand : deviceCommandList.getDeviceCommands()) {
+      deviceCommands.add(deviceCommand);
     }
 
-    return commandValues;
+    return deviceCommands;
   }
 
 }
