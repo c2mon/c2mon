@@ -35,9 +35,6 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicLong;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.daq.jec.config.JECCommandTagChanger;
 import cern.c2mon.daq.jec.config.JECDataTagChanger;
 import cern.c2mon.daq.jec.config.JECEquipmentConfigurationChanger;
@@ -47,6 +44,9 @@ import cern.c2mon.daq.jec.plc.ConnectionData;
 import cern.c2mon.daq.jec.plc.JECIndexOutOfRangeException;
 import cern.c2mon.daq.jec.plc.JECPFrames;
 import cern.c2mon.daq.jec.plc.StdConstants;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The
@@ -232,8 +232,9 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
                                                                 plcConfiguration.getHandlerPeriod() * HANDLER_PERIOD_MULTIPLIER);        
         jecController = new JECController(plcFactory, connectionSamplerThread, jecCommandRunner, getEquipmentMessageSender(), getEquipmentLoggerFactory());
               
-        JECDataTagChanger dataTagChanger = new JECDataTagChanger(jecController, jecRestarter);
-        getEquipmentConfigurationHandler().setDataTagChanger(dataTagChanger);
+        //TODO: uncomment when reconfig is done at the level of the PLC
+//        JECDataTagChanger dataTagChanger = new JECDataTagChanger(jecController, jecRestarter, getEquipmentLogger(JECDataTagChanger.class));
+//        getEquipmentConfigurationHandler().setDataTagChanger(dataTagChanger);
         JECCommandTagChanger commandTagChanger = new JECCommandTagChanger(jecController, jecRestarter);
         getEquipmentConfigurationHandler().setCommandTagChanger(commandTagChanger);
         JECEquipmentConfigurationChanger equipmentConfigurationChanger = new JECEquipmentConfigurationChanger(jecRestarter);

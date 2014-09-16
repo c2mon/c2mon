@@ -17,8 +17,10 @@
  *****************************************************************************/
 package cern.c2mon.daq.jec.config;
 
+import static java.lang.String.format;
 import cern.c2mon.daq.common.conf.equipment.DataTagChangerHelper;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.jec.IJECRestarter;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
 import cern.c2mon.shared.daq.config.ChangeReport;
@@ -56,6 +58,11 @@ public class JECDataTagChanger implements IDataTagChanger {
      * object to restart the equipment handler.
      */
     private IJECRestarter jecRestarter;
+    
+    /**
+     * The equipment logger of this class.
+     */
+    private EquipmentLogger equipmentLogger;
 
     /**
      * Creates a new JECDataTagChanger.
@@ -65,9 +72,11 @@ public class JECDataTagChanger implements IDataTagChanger {
      * @param jecRestarter
      *            The jec restarter to use.
      */
-    public JECDataTagChanger(final IJECTagConfigurationController plcTagController, final IJECRestarter jecRestarter) {
+    public JECDataTagChanger(final IJECTagConfigurationController plcTagController, final IJECRestarter jecRestarter,
+            EquipmentLogger equipmentLogger) {
         this.plcTagController = plcTagController;
         this.jecRestarter = jecRestarter;
+        this.equipmentLogger = equipmentLogger;
     }
 
     /**
@@ -81,8 +90,21 @@ public class JECDataTagChanger implements IDataTagChanger {
      */
     @Override
     public void onAddDataTag(final ISourceDataTag sourceDataTag, final ChangeReport changeReport) {
+        if (getEquipmentLogger().isDebugEnabled()) {
+            getEquipmentLogger().debug(format("onAddDataTag - entering onAddCommandTag(%d)..", sourceDataTag.getId()));
+        }
+
         reconfigureTag(sourceDataTag, changeReport);
-        changeReport.setState(CHANGE_STATE.SUCCESS);
+//        changeReport.setState(reconfigureTag(sourceDataTag, changeReport));
+        if (changeReport.getState() == CHANGE_STATE.SUCCESS) {
+            changeReport.appendInfo("onAddDataTag - SourceDataTag added ...");
+        } else {
+            changeReport.appendInfo("onAddDataTag - SourceDataTag not added ...");
+        }
+
+        if (getEquipmentLogger().isDebugEnabled()) {
+            getEquipmentLogger().debug(format("onRemoveDataTag - leaving onUpdateDataTag(%d)", sourceDataTag.getId()));
+        }
     }
 
     /**
@@ -124,9 +146,17 @@ public class JECDataTagChanger implements IDataTagChanger {
      */
     @Override
     public void onRemoveDataTag(final ISourceDataTag sourceDataTag, final ChangeReport changeReport) {
+        if (getEquipmentLogger().isDebugEnabled()) {
+            getEquipmentLogger().debug(format("onRemoveDataTag - entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
+        }
+
         plcTagController.removeDataTag(sourceDataTag);
         changeReport.appendInfo("SourceDataTag removed in PLC configuration.");
         changeReport.setState(CHANGE_STATE.SUCCESS);
+
+        if (getEquipmentLogger().isDebugEnabled()) {
+            getEquipmentLogger().debug(format("onRemoveDataTag - leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
+        }
     }
 
     /**
@@ -141,6 +171,10 @@ public class JECDataTagChanger implements IDataTagChanger {
      */
     @Override
     public void onUpdateDataTag(final ISourceDataTag sourceDataTag, final ISourceDataTag oldSourceDataTag, final ChangeReport changeReport) {
+        if (getEquipmentLogger().isDebugEnabled()) {
+            getEquipmentLogger().debug(format("onRemoveDataTag - entering onUpdateDataTag(%d)..", sourceDataTag.getId()));
+        }
+
         if (DataTagChangerHelper.hasValueDeadbandTypeChanged(sourceDataTag, oldSourceDataTag) || DataTagChangerHelper.hasEquipmentValueDeadbandChanged(sourceDataTag, oldSourceDataTag)) {
             jecRestarter.triggerRestart();
             changeReport.appendInfo("Source Data Equipment. Reconnect and reconfigure PLC.");
@@ -157,6 +191,17 @@ public class JECDataTagChanger implements IDataTagChanger {
             }
         }
         changeReport.setState(CHANGE_STATE.SUCCESS);
+
+        if (getEquipmentLogger().isDebugEnabled()) {
+            getEquipmentLogger().debug(format("onRemoveDataTag - leaving onUpdateDataTag(%d)", sourceDataTag.getId()));
+        }
+    }
+    
+    /**
+     * @return the equipmentLogger
+     */
+    public EquipmentLogger getEquipmentLogger() {
+        return this.equipmentLogger;
     }
 
 }
