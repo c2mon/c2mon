@@ -235,10 +235,10 @@ public class JECMessageHandler extends EquipmentMessageHandler implements Runnab
         //TODO: uncomment when reconfig is done at the level of the PLC
 //        JECDataTagChanger dataTagChanger = new JECDataTagChanger(jecController, jecRestarter, getEquipmentLogger(JECDataTagChanger.class));
 //        getEquipmentConfigurationHandler().setDataTagChanger(dataTagChanger);
-        JECCommandTagChanger commandTagChanger = new JECCommandTagChanger(jecController, jecRestarter);
-        getEquipmentConfigurationHandler().setCommandTagChanger(commandTagChanger);
-        JECEquipmentConfigurationChanger equipmentConfigurationChanger = new JECEquipmentConfigurationChanger(jecRestarter);
-        getEquipmentConfigurationHandler().setEquipmentConfigurationChanger(equipmentConfigurationChanger);
+//        JECCommandTagChanger commandTagChanger = new JECCommandTagChanger(jecController, jecRestarter);
+//        getEquipmentConfigurationHandler().setCommandTagChanger(commandTagChanger);
+//        JECEquipmentConfigurationChanger equipmentConfigurationChanger = new JECEquipmentConfigurationChanger(jecRestarter);
+//        getEquipmentConfigurationHandler().setEquipmentConfigurationChanger(equipmentConfigurationChanger);
         sendFrame = plcFactory.getSendFrame(StdConstants.INIT_MSG);
         recvFrame = plcFactory.getRawRecvFrame();
 
