@@ -27,6 +27,7 @@ import cern.dip.DipException;
 import cern.dip.DipFactory;
 import cern.dip.DipSubscription;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
@@ -100,11 +101,9 @@ public class DIPController {
    * @param equipmentMessageSender
    * 
    */
-  public DIPController(DipFactory dipFactory, DipMessageHandlerDataListener handler, EquipmentLogger equipmentLogger, 
-      IEquipmentConfiguration equipmentConfiguration, IEquipmentMessageSender equipmentMessageSender) {
-    this.dipFactory = dipFactory;
-    this.handler = handler;
-    this.equipmentLogger = equipmentLogger;
+  public DIPController(EquipmentLoggerFactory equipmentLoggerFactory, IEquipmentConfiguration equipmentConfiguration, 
+          IEquipmentMessageSender equipmentMessageSender) {
+    this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
     this.equipmentConfiguration = equipmentConfiguration;
     this.equipmentMessageSender = equipmentMessageSender;
   }
@@ -117,14 +116,14 @@ public class DIPController {
    * 
    */
   public CHANGE_STATE connection(final ISourceDataTag sourceDataTag, final ChangeReport changeReport) {
-    this.equipmentLogger.debug("connection - Connecting " + sourceDataTag.getId());
+    getEquipmentLogger().debug("connection - Connecting " + sourceDataTag.getId());
     
     // Hardware Address
     DIPHardwareAddress sdtAddress = (DIPHardwareAddress) sourceDataTag.getHardwareAddress();
 
     // !!!! Put extra comments in case the item-name is empty !!!
     if (sdtAddress == null || sdtAddress.getItemName() == null) {
-      this.equipmentLogger.error("connection - corrupted configuration. SDT does not contain correct hardware address!!");
+      getEquipmentLogger().error("connection - corrupted configuration. SDT does not contain correct hardware address!!");
       this.equipmentMessageSender.sendInvalidTag(sourceDataTag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, 
           "No valid DIP address defined. Please check the configuration!");
       if (changeReport != null) {
@@ -145,7 +144,7 @@ public class DIPController {
       Vector<ISourceDataTag> v = this.subscribedDataTags.get(sdtAddress.getItemName());
       v.addElement(sourceDataTag);
       this.subscribedDataTags.put(sdtAddress.getItemName(), v);
-      this.equipmentLogger.debug("connection - adding tag for item : " + sdtAddress.getItemName() + " (" + sdtAddress.getFieldName() + ")");
+      getEquipmentLogger().debug("connection - adding tag for item : " + sdtAddress.getItemName() + " (" + sdtAddress.getFieldName() + ")");
       if (changeReport != null) {
         changeReport.appendInfo("connection - adding tag for item : " + sdtAddress.getItemName() + " (" + sdtAddress.getFieldName() + ")");
       }
@@ -156,9 +155,9 @@ public class DIPController {
       dipSubscr = this.dipFactory.createDipSubscription(sdtAddress.getItemName(), this.handler);
       this.dipSubscriptions.put(sdtAddress.getItemName(), dipSubscr);
 
-      this.equipmentLogger.debug("connection - Creating subscription for " + dipSubscr.getTopicName());
+      getEquipmentLogger().debug("connection - Creating subscription for " + dipSubscr.getTopicName());
     } catch (DipException ex) {
-      this.equipmentLogger.error("connection - A problem with creating subscription occured : " + ex.getMessage());
+      getEquipmentLogger().error("connection - A problem with creating subscription occured : " + ex.getMessage());
       if(changeReport != null) {
         changeReport.appendError("connection - A problem with creating subscription occured");
       }
@@ -175,7 +174,7 @@ public class DIPController {
       return CHANGE_STATE.FAIL;
     }
     
-    this.equipmentLogger.debug("connection - Leaving ...");
+    getEquipmentLogger().debug("connection - Leaving ...");
     if (changeReport != null) {
       changeReport.appendInfo("connection - DIP subscription succesfully created.");
     }
@@ -190,7 +189,7 @@ public class DIPController {
    * @param changeReport 
    */
   public CHANGE_STATE disconnection(final DipSubscription dipSubscription, final ChangeReport changeReport) {
-    this.equipmentLogger.debug("disconnection - Starting ...");
+    getEquipmentLogger().debug("disconnection - Starting ...");
     
     try {
       getEquipmentLogger().debug(new StringBuffer("disconnection - destroying subscription ").append(dipSubscription.getTopicName()));
@@ -209,7 +208,7 @@ public class DIPController {
       return CHANGE_STATE.FAIL;
     }
     
-    this.equipmentLogger.debug("disconnection - Leaving ...");
+    getEquipmentLogger().debug("disconnection - Leaving ...");
     if (changeReport != null) {
       changeReport.appendInfo("disconnection - DIP unsubscription succesfully done.");
     }
@@ -306,6 +305,14 @@ public class DIPController {
    */
   public void setDipFactory(final DipFactory dipFactory) {
     this.dipFactory = dipFactory;
+  }
+  
+  /**
+   * 
+   * @return dipFactory
+   */
+  public DipFactory getDipFactory() {
+    return this.dipFactory;
   }
   
   /**

@@ -20,6 +20,7 @@ package cern.c2mon.daq.dip;
 
 import static java.lang.String.format;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -38,19 +39,25 @@ public class DIPDataTagChanger implements IDataTagChanger {
   private DIPController dipController;
   
   /**
+   * The equipment logger of this class.
+   */
+  private EquipmentLogger equipmentLogger;
+  
+  /**
    * Creates a new DIPDataTagChanger.
    * 
    * @param dipController 
    *
    */
-  public DIPDataTagChanger(DIPController dipController) {
+  public DIPDataTagChanger(DIPController dipController, EquipmentLogger equipmentLogger) {
    this.dipController = dipController;
+   this.equipmentLogger = equipmentLogger;
   }
 
   @Override
   public void onAddDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
-    if (this.dipController.getEquipmentLogger().isDebugEnabled()) {
-      this.dipController.getEquipmentLogger().debug(format("onAddDataTag - entering onAddCommandTag(%d)..", sourceDataTag.getId()));
+    if (getEquipmentLogger().isDebugEnabled()) {
+      getEquipmentLogger().debug(format("onAddDataTag - entering onAddCommandTag(%d)..", sourceDataTag.getId()));
     }
 
     // Connect the Data Tag
@@ -61,15 +68,15 @@ public class DIPDataTagChanger implements IDataTagChanger {
       changeReport.appendInfo("onAddDataTag - SourceDataTag not added ...");
     }
 
-    if (this.dipController.getEquipmentLogger().isDebugEnabled()) {
-      this.dipController.getEquipmentLogger().debug(format("onAddDataTag - leaving onAddCommandTag(%d)", sourceDataTag.getId()));
+    if (getEquipmentLogger().isDebugEnabled()) {
+      getEquipmentLogger().debug(format("onAddDataTag - leaving onAddCommandTag(%d)", sourceDataTag.getId()));
     }
   }
 
   @Override
   public void onRemoveDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {  
-    if (this.dipController.getEquipmentLogger().isDebugEnabled()) {
-      this.dipController.getEquipmentLogger().debug(format("onRemoveDataTag - entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
+    if (getEquipmentLogger().isDebugEnabled()) {
+      getEquipmentLogger().debug(format("onRemoveDataTag - entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
     }
 
     // Connect the Data Tag
@@ -80,15 +87,15 @@ public class DIPDataTagChanger implements IDataTagChanger {
       changeReport.appendInfo("onRemoveDataTag - SourceDataTag not removed ...");
     }
 
-    if (this.dipController.getEquipmentLogger().isDebugEnabled()) {
-      this.dipController.getEquipmentLogger().debug(format("onRemoveDataTag - leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
+    if (getEquipmentLogger().isDebugEnabled()) {
+      getEquipmentLogger().debug(format("onRemoveDataTag - leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
     }
   }
 
   @Override
   public void onUpdateDataTag(ISourceDataTag sourceDataTag, ISourceDataTag oldSourceDataTag, ChangeReport changeReport) {
-    if (this.dipController.getEquipmentLogger().isDebugEnabled()) {
-      this.dipController.getEquipmentLogger().debug(format("onRemoveDataTag - entering onUpdateDataTag(%d)..", sourceDataTag.getId()));
+    if (getEquipmentLogger().isDebugEnabled()) {
+      getEquipmentLogger().debug(format("onRemoveDataTag - entering onUpdateDataTag(%d)..", sourceDataTag.getId()));
     }
     
     // Disconnect old Data Tag 
@@ -106,9 +113,16 @@ public class DIPDataTagChanger implements IDataTagChanger {
       changeReport.appendInfo("onUpdateDataTag - SourceDataTag not updated ...");
     }
 
-    if (this.dipController.getEquipmentLogger().isDebugEnabled()) {
-      this.dipController.getEquipmentLogger().debug(format("onRemoveDataTag - leaving onUpdateDataTag(%d)", sourceDataTag.getId()));
+    if (getEquipmentLogger().isDebugEnabled()) {
+      getEquipmentLogger().debug(format("onRemoveDataTag - leaving onUpdateDataTag(%d)", sourceDataTag.getId()));
     }
+  }
+  
+  /**
+   * @return the equipmentLogger
+   */
+  public EquipmentLogger getEquipmentLogger() {
+      return this.equipmentLogger;
   }
 
 }

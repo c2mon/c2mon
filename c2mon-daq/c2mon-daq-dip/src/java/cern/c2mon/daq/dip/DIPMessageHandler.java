@@ -23,12 +23,11 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
 
-import cern.dip.Dip;
-import cern.dip.DipFactory;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.dip.Dip;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The
@@ -37,9 +36,6 @@ import cern.c2mon.shared.daq.datatag.ISourceDataTag;
  * @author vilches
  */
 public class DIPMessageHandler extends EquipmentMessageHandler {
-
-  /** The DIP object */
-  private DipFactory dipFactory;
 
   /** The dip message handler object used for handling dip callbacks. */
   private DipMessageHandlerDataListener handler;
@@ -74,20 +70,21 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
     alivePublisher.start();
     
     // Controller
-    this.dipController = new DIPController(this.dipFactory, this.handler, getEquipmentLogger(), 
-        getEquipmentConfiguration(), getEquipmentMessageSender());
+    if (this.dipController == null) {
+        this.dipController = new DIPController(getEquipmentLoggerFactory(), getEquipmentConfiguration(), 
+                getEquipmentMessageSender());
+    }
 
-    if (this.dipFactory == null) {
+    if (this.dipController.getDipFactory() == null) {
       try {
         // Create a unique number
         long time = System.currentTimeMillis();
         // By using the create method with an unique number as
         // parameter, a different user application handler will be used
         // each time
-        this.dipFactory = Dip.create(getEquipmentConfiguration().getId() + "_" + Long.valueOf(time).toString());
-        this.handler = new DipMessageHandlerDataListener(this.dipController);
+        this.dipController.setDipFactory(Dip.create(getEquipmentConfiguration().getId() + "_" + Long.valueOf(time).toString()));
+        this.handler = new DipMessageHandlerDataListener(this.dipController, getEquipmentLogger(DipMessageHandlerDataListener.class));
         
-        this.dipController.setDipFactory(this.dipFactory);
         this.dipController.setHandler(this.handler);
       } catch (Exception ex) {
         getEquipmentLogger().error("connectToDataSource - The handler cound not initialise properly its connection", ex);
@@ -100,7 +97,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
     getEquipmentMessageSender().confirmEquipmentStateOK();
 
     // Add Data Tag Changer
-    DIPDataTagChanger dataTagChanger = new DIPDataTagChanger(this.dipController);
+    DIPDataTagChanger dataTagChanger = new DIPDataTagChanger(this.dipController, getEquipmentLogger(DIPDataTagChanger.class));
     getEquipmentConfigurationHandler().setDataTagChanger(dataTagChanger);
 
     // Connection
