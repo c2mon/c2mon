@@ -38,7 +38,7 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
 
         messageSender.addValue(EasyMock.capture(sdtv));
 
-        expectLastCall().times(3);
+        expectLastCall().times(2);
 
         replay(messageSender);
 
