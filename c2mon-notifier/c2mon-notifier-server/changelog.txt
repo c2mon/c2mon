@@ -1,6 +1,11 @@
 C2MON Notifier Changelog:
 ---------------------------
 
+9/2014 Release 1.0.4
+===========================
+DMN-1856: Notifier should state the names of the missing processes
+DMN-1599: Reformat message templates for notification service
+
 6/2014 Release 1.0.3
 ===========================
 DMN-1603: Added support for eGroup subscriptions
