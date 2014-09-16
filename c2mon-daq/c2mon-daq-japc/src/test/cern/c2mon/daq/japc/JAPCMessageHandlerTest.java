@@ -582,11 +582,11 @@ public class JAPCMessageHandlerTest extends GenericMessageHandlerTst {
     public void testConvertSourceTimestampToMs() {
         Calendar cal = Calendar.getInstance();
         cal.set(1970, 1, 15);
-        assertEquals(cal.getTimeInMillis() * 1000, JAPCMessageHandler.convertSourceTimestampToMs(cal.getTimeInMillis()));
+        assertEquals(cal.getTimeInMillis() * 1000, JAPCController.convertSourceTimestampToMs(cal.getTimeInMillis()));
 
         cal.set(2010, 8, 17);
 
-        assertEquals(cal.getTimeInMillis(), JAPCMessageHandler.convertSourceTimestampToMs(cal.getTimeInMillis()));
+        assertEquals(cal.getTimeInMillis(), JAPCController.convertSourceTimestampToMs(cal.getTimeInMillis()));
     }
 
     public void stopMockSupercycles() {
