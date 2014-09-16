@@ -398,7 +398,7 @@ public class EquipmentMessageSenderTest {
     @Test
     public void testSendInvalidTagFutureSourceTS() {
       // Add value to the SourceDatTag
-      this.sdt2.update(false);
+      this.sdt1.update(false);
 
       // One value is added
       this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
@@ -409,7 +409,7 @@ public class EquipmentMessageSenderTest {
 
       replay(this.processMessageSenderMock, this.filterMessageSenderMock);
 
-      SourceDataTagValue sourceDTValue = this.sdt2.getCurrentValue();
+      SourceDataTagValue sourceDTValue = this.sdt1.getCurrentValue();
       // Get the source data quality from the quality code and description
       SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.FUTURE_SOURCE_TIMESTAMP,
           sourceDTValue.getQuality().getDescription());
@@ -421,10 +421,10 @@ public class EquipmentMessageSenderTest {
       // - same Quality Description
       // 
       // Should not be filtered 
-      this.equipmentMessageSender.sendInvalidTag(this.sdt2, sourceDTValue.getValue(), sourceDTValue.getValueDescription(), 
+      this.equipmentMessageSender.sendInvalidTag(this.sdt1, sourceDTValue.getValue(), sourceDTValue.getValueDescription(), 
           newSDQuality, new Timestamp(System.currentTimeMillis() + 1L));
       
-      assertEquals(SourceDataQuality.FUTURE_SOURCE_TIMESTAMP, this.sdt2.getCurrentValue().getQuality().getQualityCode());
+      assertEquals(SourceDataQuality.FUTURE_SOURCE_TIMESTAMP, this.sdt1.getCurrentValue().getQuality().getQualityCode());
       
       // It has:
       // - same currentSDValue and new value (false)
@@ -433,7 +433,7 @@ public class EquipmentMessageSenderTest {
       // - same Quality Description
       // 
       //Should be filtered 
-      this.equipmentMessageSender.sendInvalidTag(this.sdt2, sourceDTValue.getValue(), sourceDTValue.getValueDescription(), 
+      this.equipmentMessageSender.sendInvalidTag(this.sdt1, sourceDTValue.getValue(), sourceDTValue.getValueDescription(), 
           newSDQuality, new Timestamp(System.currentTimeMillis() + 2L));
 
       verify(this.processMessageSenderMock, this.filterMessageSenderMock);

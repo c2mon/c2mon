@@ -239,7 +239,7 @@ class EquipmentSenderValid {
           // New quality needed for comparing
           SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.OK, "");
 
-          // Cast the value to the proper type before sending it
+          // Cast the value to the proper type before sending it (we know it has passed the isConvertible flter)
           Object newValueCasted = TypeConverter.cast(newTagValue.toString(), currentSourceDataTag.getDataType());
           
           // is Candidate for filtering?

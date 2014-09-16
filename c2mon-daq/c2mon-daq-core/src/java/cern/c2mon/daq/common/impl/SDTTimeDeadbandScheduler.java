@@ -199,14 +199,21 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             }
           }
           else {
-              // Cast the value to the proper type before sending it
-              Object newValueCasted = TypeConverter.cast(currentSDValue.getValue().toString(), this.lastSourceDataTag.getDataType());
-              
             // Check the current Source Data tag against the last one sent since
-            // they have never been compared        
-            filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, newValueCasted,
-                currentSDValue.getValueDescription(), currentSDValue.getQuality(), 
-                currentSDValue.getTimestamp().getTime());
+            // they have never been compared 
+
+            // Cast the value to the proper type before sending it 
+            if(currentSDValue.getValue() != null) {
+              Object newValueCasted = TypeConverter.cast(currentSDValue.getValue().toString(), this.lastSourceDataTag.getDataType());
+
+              filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, newValueCasted,
+                  currentSDValue.getValueDescription(), currentSDValue.getQuality(), 
+                  currentSDValue.getTimestamp().getTime());
+            } else {
+              filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, currentSDValue.getValue(),
+                  currentSDValue.getValueDescription(), currentSDValue.getQuality(), 
+                  currentSDValue.getTimestamp().getTime());
+            }
             
             if (LOGGER.isDebugEnabled()) {
               LOGGER.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : Filter type: " + filterType);

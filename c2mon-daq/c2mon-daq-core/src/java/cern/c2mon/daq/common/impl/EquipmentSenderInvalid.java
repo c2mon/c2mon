@@ -169,12 +169,21 @@ class EquipmentSenderInvalid {
 
       try {
           
-       // Cast the value to the proper type before sending it
-       Object newValueCasted = TypeConverter.cast(newValue.toString(), sourceDataTag.getDataType());
-          
         // We check first is the new value has to be filtered out or not
-        FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValueCasted, newTagValueDesc, 
-            newSDQuality, timestamp.getTime());
+        FilterType filterType;
+        
+        // Cast the value to the proper type before sending it 
+        // NOTE: if it comes from a isConvertible filter to be invalidate because it did not pass it the new value will be null
+        if(newValue != null) {
+          Object newValueCasted = TypeConverter.cast(newValue.toString(), sourceDataTag.getDataType());
+       
+          // We check first is the new value has to be filtered out or not
+          filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValueCasted, newTagValueDesc, 
+              newSDQuality, timestamp.getTime());
+        } else {
+          filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValue, newTagValueDesc, 
+              newSDQuality, timestamp.getTime());
+        }
         
         this.equipmentLogger.debug("sendInvalidTag - Filter Type: " + filterType);
         
