@@ -13,7 +13,6 @@ import org.junit.Test;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.notification.Tag;
 import cern.c2mon.notification.TextCreator;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
 import freemarker.template.TemplateException;
@@ -34,26 +33,45 @@ public class TextCreatorTest {
     }
     
     
-    public ClientDataTagValue getClientDataTagMock() throws RuleFormatException {
+    ClientDataTagValue getClientDataTagMock(Long id, Object val) throws RuleFormatException {
         
-        ClientDataTagValue value = mockControl.createMock(ClientDataTagValue.class);
+        ClientDataTagValue result = mockControl.createMock(ClientDataTagValue.class);
         
-        RuleExpression rule = RuleExpression.createExpression("#1>50 [1],#1>100 [2], [0]");
+        RuleExpression rule = RuleExpression.createExpression("#2>50 [1],#2>100 [2], [0]");
         
-        EasyMock.expect(value.getId()).andReturn(1L).atLeastOnce();
-        EasyMock.expect(value.getName()).andReturn("test-tag").atLeastOnce();
-        EasyMock.expect(value.getDescription()).andReturn("test-description").atLeastOnce();
-        EasyMock.expect(value.getValue()).andReturn(0).atLeastOnce();
-        EasyMock.expect(value.getUnit()).andReturn("integer").atLeastOnce();
-        EasyMock.expect(value.getRuleExpression()).andReturn(rule).anyTimes();
-        EasyMock.expect(value.getServerTimestamp()).andReturn(new Timestamp(0)).atLeastOnce();
-        EasyMock.expect(value.isRuleResult()).andReturn(false).atLeastOnce();
-        EasyMock.expect(value.getDataTagQuality()).andReturn(new DataTagQualityImpl()).atLeastOnce();
+        EasyMock.expect(result.getId()).andReturn(id).anyTimes();
+        EasyMock.expect(result.getName()).andReturn("DataTag #" + id).anyTimes();
+        EasyMock.expect(result.getDescription()).andReturn("test-description").anyTimes();
+        EasyMock.expect(result.getValue()).andReturn(val).anyTimes();
+        EasyMock.expect(result.getUnit()).andReturn("integer").anyTimes();
+        EasyMock.expect(result.getRuleExpression()).andReturn(rule).anyTimes();
+        EasyMock.expect(result.getServerTimestamp()).andReturn(new Timestamp(System.currentTimeMillis())).anyTimes();
+        EasyMock.expect(Boolean.valueOf(result.isRuleResult())).andReturn(Boolean.FALSE).anyTimes();
         
-        EasyMock.expect(value.getType()).andReturn((Class) Integer.class).atLeastOnce();
-        EasyMock.expect(value.getValueDescription()).andReturn("test-value-description").atLeastOnce();
-        EasyMock.replay(value);
-        return value;
+        
+        EasyMock.expect(result.getValueDescription()).andReturn("datatag value description").anyTimes();
+        
+        return result;
+    }
+    
+    ClientDataTagValue getRuleTagMock(Long id, int status, String ruleValueDescription) throws RuleFormatException {
+     
+        ClientDataTagValue result = mockControl.createMock(ClientDataTagValue.class);
+        EasyMock.expect(result.getId()).andReturn(id).anyTimes();
+        EasyMock.expect(result.getName()).andReturn("RuleTag #" + id).anyTimes();
+        EasyMock.expect(result.getDescription()).andReturn("a rule with single datatag").anyTimes();
+        EasyMock.expect(result.getValue()).andReturn(new Integer(status)).anyTimes();
+        EasyMock.expect(result.getUnit()).andReturn("integer").anyTimes();
+        EasyMock.expect(Boolean.valueOf(result.isRuleResult())).andReturn(Boolean.TRUE).anyTimes();
+        EasyMock.expect(result.getServerTimestamp()).andReturn(new Timestamp(System.currentTimeMillis())).anyTimes();
+        
+        RuleExpression rule = RuleExpression.createExpression("#2>50 [1],#2>100 [2], [0]");
+        EasyMock.expect(result.getRuleExpression()).andReturn(rule).anyTimes();
+        EasyMock.expect(result.getValueDescription()).andReturn(ruleValueDescription).anyTimes();
+        
+        
+        
+        return result;
     }
     
     public Collection<ClientDataTagValue> getClientDataTagChildren() {
@@ -78,17 +96,34 @@ public class TextCreatorTest {
     @Test
     public void testSimpleTagUpdate() throws IOException, TemplateException, RuleFormatException {
         TextCreator creator = new TextCreator();
-        ClientDataTagValue cdtv = getClientDataTagMock();
         
-        Tag t = new Tag (cdtv.getId(), true);
-        t.update(cdtv);
         
-        String text = creator.getTextForRuleUpdate(t);
+        ClientDataTagValue rule = getRuleTagMock(new Long(1), 2, "Additional info for failing rule");
+
+        ClientDataTagValue dataTag = getClientDataTagMock(new Long(2), new Long(4));
+        mockControl.replay();
+        
+        Tag t = new Tag (rule.getId(), true);
+        Tag child = new Tag(dataTag.getId(), false);
+        t.update(rule);
+        child.update(dataTag);
+        t.addChildTag(child);
+
+        MyCache c = new MyCache();
+        c.put(t);
+        c.put(child);
+        
+        String text = creator.getTextForRuleUpdate(t, c);
+        
         System.out.println(text);
         
     }
     
-    
+    private class MyCache extends TagCache {
+        public void put(Tag tag) {
+            super.cache.put(tag.getId(), tag);
+        }
+    }
     
     
     
