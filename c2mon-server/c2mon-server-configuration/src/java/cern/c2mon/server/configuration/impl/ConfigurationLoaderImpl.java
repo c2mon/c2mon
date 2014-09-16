@@ -194,7 +194,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       try {
         LOGGER.debug(configId + " Fetching configuration items from DB...");
         configElements = configurationDAO.getConfigElements(configId);
-        LOGGER.debug(configId + " Got " + configElements.size() + "elements from DB");
+        LOGGER.debug(configId + " Got " + configElements.size() + " elements from DB");
       } catch (Exception e) {
         String message = "Exception caught while loading the configuration for " + configId + " from the DB: " + e.getMessage();
         LOGGER.error(message, e);
@@ -273,9 +273,10 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                 LOGGER.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
                 ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
                 if (!processReport.getChangeReports().isEmpty()) {
-                  LOGGER.trace(configId + "Received " + processReport.getChangeReports().size() + " back from process.");
+                    
+                  LOGGER.trace(configId + " Received " + processReport.getChangeReports().size() + " back from process.");
                 } else {
-                  LOGGER.trace(configId + "Received 0 reports back from process");
+                  LOGGER.trace(configId + " Received 0 reports back from process");
                 }
                 for (ChangeReport changeReport : processReport.getChangeReports()) {
                   ConfigurationElementReport convertedReport =
