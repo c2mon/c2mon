@@ -329,7 +329,7 @@ public class ConfigurationController {
    * @return A report with information if the change was successful.
    */
   public ChangeReport onDataTagAdd(final DataTagAdd dataTagAddChange) {
-    LOGGER.debug("entering onDataTagAdd()");
+    LOGGER.debug("onDataTagAdd - entering onDataTagAdd()");
     if (LOGGER.isDebugEnabled())
       LOGGER.debug("changeId: " + dataTagAddChange.getChangeId());
 
@@ -350,16 +350,17 @@ public class ConfigurationController {
       changeReport.appendError(StackTraceHelper.getStackTrace(e));
       return changeReport;
     }
+    
     if (sourceDataTags.containsKey(dataTagId)) {
 
-      LOGGER.warn("cannot add data tag id: " + dataTagId + " to equipment id: "
+      LOGGER.warn("onDataTagAdd - cannot add data tag id: " + dataTagId + " to equipment id: "
           + dataTagAddChange.getEquipmentId() + " This equipment already has tag with that id");
 
       changeReport.appendError("DataTag " + dataTagId + " is already in equipment " + equipmentId);
     } else {
       sourceDataTags.put(dataTagId, sourceDataTag);
       changeReport.appendInfo("Core added data tag with id " + sourceDataTag.getId()
-          + " successfully to eqipment " + equipmentId);
+          + " successfully to equipment " + equipmentId);
       List<ICoreDataTagChanger> coreChangers = coreDataTagChangers.get(equipmentId);
       if (coreChangers != null) {
         for (ICoreDataTagChanger dataTagChanger : coreChangers) {
@@ -384,6 +385,7 @@ public class ConfigurationController {
         changeReport.setState(CHANGE_STATE.REBOOT);
       }
     }
+    LOGGER.debug("onDataTagAdd - exiting onDataTagAdd()");
     return changeReport;
   }
 
@@ -453,6 +455,8 @@ public class ConfigurationController {
    * @return A change report with success information.
    */
   public ChangeReport onDataTagRemove(final DataTagRemove dataTagRemoveChange) {
+    LOGGER.debug("Entering onDataTagRemove: ");
+    
     ChangeReport changeReport = new ChangeReport(dataTagRemoveChange);
     Long equipmentId = dataTagRemoveChange.getEquipmentId();
     Map<Long, SourceDataTag> sourceDataTags = getSourceDataTags(equipmentId);
@@ -460,11 +464,16 @@ public class ConfigurationController {
       changeReport.appendError("Equipment does not exist: " + equipmentId);
       return changeReport;
     }
+    
+    LOGGER.debug("onDataTagRemove - removing " + dataTagRemoveChange.getDataTagId());
     SourceDataTag sourceDataTag = sourceDataTags.remove(dataTagRemoveChange.getDataTagId());
     if (sourceDataTag != null) {
+      LOGGER.debug("onDataTagRemove - Core removed data tag with id " + dataTagRemoveChange.getDataTagId()
+                + " successfully from equipment " + equipmentId);
       changeReport.appendInfo("Core removed data tag with id " + dataTagRemoveChange.getDataTagId()
           + " successfully from equipment " + equipmentId);
       List<ICoreDataTagChanger> coreChangers = coreDataTagChangers.get(equipmentId);
+     
       if (coreChangers != null) {
         for (ICoreDataTagChanger dataTagChanger : coreChangers) {
           dataTagChanger.onRemoveDataTag(sourceDataTag, changeReport);
@@ -483,11 +492,16 @@ public class ConfigurationController {
         changeReport.setState(CHANGE_STATE.REBOOT);
       }
     } else {
+      LOGGER.debug("onDataTagRemove - The data tag with id " + dataTagRemoveChange.getDataTagId()
+          + " to remove was not found" + " in equipment with id " + equipmentId);
       // The data tag which should be removed was not found which means the same result as foudn and removed.
       changeReport.appendWarn("The data tag with id " + dataTagRemoveChange.getDataTagId()
           + " to remove was not found" + " in equipment with id " + equipmentId);
       changeReport.setState(CHANGE_STATE.SUCCESS);
     }
+    
+    LOGGER.debug("Exiting onDataTagRemove: ");
+    
     return changeReport;
   }
 

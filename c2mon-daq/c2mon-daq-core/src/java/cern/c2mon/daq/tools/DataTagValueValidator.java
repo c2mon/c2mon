@@ -98,6 +98,7 @@ public class DataTagValueValidator {
     public boolean isConvertible(final SourceDataTag tag, final Object tagValue) {
         this.equipmentLogger.trace("entering isConvertable()..");
         String value = tagValue.toString();
+        this.equipmentLogger.trace("isConvertible - Tag #" + tag.getId() + " Casting " + value + " to " + tag.getDataType());
         boolean isConvertable = TypeConverter.cast(value, tag.getDataType()) != null;
         this.equipmentLogger.trace("leaving isConvertable().. Result: " + isConvertable);
         return isConvertable;

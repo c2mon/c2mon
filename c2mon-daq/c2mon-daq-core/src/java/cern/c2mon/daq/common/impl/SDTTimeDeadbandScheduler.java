@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
+import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
@@ -198,9 +199,12 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             }
           }
           else {
+              // Cast the value to the proper type before sending it
+              Object newValueCasted = TypeConverter.cast(currentSDValue.getValue().toString(), this.lastSourceDataTag.getDataType());
+              
             // Check the current Source Data tag against the last one sent since
             // they have never been compared        
-            filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, currentSDValue.getValue(),
+            filterType = this.dataTagValueFilter.isCandidateForFiltering(this.lastSourceDataTag, newValueCasted,
                 currentSDValue.getValueDescription(), currentSDValue.getQuality(), 
                 currentSDValue.getTimestamp().getTime());
             

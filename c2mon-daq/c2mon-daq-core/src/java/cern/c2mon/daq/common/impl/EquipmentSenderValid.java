@@ -32,8 +32,10 @@ import cern.c2mon.daq.common.vcm.ValueChangeMonitorEvent;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.daq.tools.DataTagValueValidator;
 import cern.c2mon.daq.tools.EquipmentSenderHelper;
+import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.filter.FilteredDataTagValue.FilterType;
 
 /**
@@ -237,11 +239,14 @@ class EquipmentSenderValid {
           // New quality needed for comparing
           SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(SourceDataQuality.OK, "");
 
+          // Cast the value to the proper type before sending it
+          Object newValueCasted = TypeConverter.cast(newTagValue.toString(), currentSourceDataTag.getDataType());
+          
           // is Candidate for filtering?
-          FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(currentSourceDataTag, newTagValue, pValueDescr, 
+          FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(currentSourceDataTag, newValueCasted, pValueDescr, 
                 newSDQuality, milisecTimestamp); 
           
-          this.equipmentLogger.debug("sendTagFiltered - Filter Type: " + filterType);
+          this.equipmentLogger.debug("sendTagFiltered - tag #" + currentSourceDataTag.getId() + " with Filter Type " + filterType);
           
           // Check filters on (OLD_UPDATE, VALUE_DEADBAND, REPEATED_VALUE or none)
           if (filterType != FilterType.NO_FILTERING) {

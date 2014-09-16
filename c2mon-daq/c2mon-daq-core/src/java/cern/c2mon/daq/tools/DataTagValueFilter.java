@@ -246,8 +246,9 @@ public class DataTagValueFilter {
         }
         
         // The two values are different, so it is clear we do not want to filter it out!
-        this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() + 
-            " - Both Values are different. Not candidate for filtering");
+        this.equipmentLogger.trace("isCandidateForFiltering - Tag " + currentSDValue.getId() 
+            + " - Both Values are different (Current vs New) = (" + currentSDValue.getValue() + " vs " + newValue 
+            + "). Not candidate for filtering");          
         
         return FilterType.NO_FILTERING;
       }

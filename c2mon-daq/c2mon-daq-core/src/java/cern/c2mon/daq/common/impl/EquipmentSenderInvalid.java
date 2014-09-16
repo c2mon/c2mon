@@ -32,6 +32,7 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.daq.tools.EquipmentSenderHelper;
+import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
@@ -167,8 +168,12 @@ class EquipmentSenderInvalid {
       }
 
       try {
+          
+       // Cast the value to the proper type before sending it
+       Object newValueCasted = TypeConverter.cast(newValue.toString(), sourceDataTag.getDataType());
+          
         // We check first is the new value has to be filtered out or not
-        FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValue, newTagValueDesc, 
+        FilterType filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, newValueCasted, newTagValueDesc, 
             newSDQuality, timestamp.getTime());
         
         this.equipmentLogger.debug("sendInvalidTag - Filter Type: " + filterType);

@@ -230,6 +230,7 @@ public abstract class ProcessMessageReceiver {
                     } else if (change instanceof EquipmentUnitRemove) {
                         changeReport = kernel.onEquipmentUnitRemove((EquipmentUnitRemove) change);
                     } else {
+                        LOGGER.debug("onReconfigureProcess - applyChange");
                         changeReport = requestController.applyChange(change);
                     }
 
@@ -240,6 +241,7 @@ public abstract class ProcessMessageReceiver {
             RECONF_LOGGER.info(configurationReport);
             
             try {
+                LOGGER.debug("onReconfigureProcess - sendConfigurationReport");
                 sendConfigurationReport(configurationReport, destination, jmsSession);
             } catch (TransformerException e) {
                 LOGGER.error("Error while transforming configuration report to a text message.", e);

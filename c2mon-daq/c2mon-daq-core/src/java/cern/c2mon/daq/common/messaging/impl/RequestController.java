@@ -77,6 +77,7 @@ public class RequestController {
      * @return A report about the applied change and its success.
      */
     public ChangeReport applyChange(final Change change) {
+        LOGGER.debug("Entering applyChange: ");
         ChangeReport report;
         if (change instanceof DataTagAdd) {
             DataTagAdd addChange = (DataTagAdd) change;
@@ -124,6 +125,9 @@ public class RequestController {
             report.appendError("Change failed in DAQ core. " + change.getClass().getName()
                     + " is not supported by this version of the DAQ.");
         }
+        
+        LOGGER.debug("Leaving applyChange: ");
+        
         return report;
     }
 
