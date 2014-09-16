@@ -281,17 +281,19 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
             String text = textCreator.getTextForSourceDown(update);
             HashSet<Subscription> subscriptions = update.getSubscribers();
             
-            logger.debug("{} Sending TAG DOWN to {} Subscribers .", update.getId(), subscriptions.size());
-            
             for (Subscription s : subscriptions) {
-                Subscriber subscriber  = registry.getSubscriber(s.getSubscriberId());
-                notifyMail(subscriber, update.getLatestUpdate().getDataTagQuality()
-                        .getDescription(), text);
-                s.setLastNotification(new Timestamp(System.currentTimeMillis()));
-                s.setLastNotifiedStatus(Status.UNREACHABLE);
+                logger.debug("{} Sending TAG DOWN to Subscriber {} .", update.getId(), s.getSubscriberId());
                 
-                if (s.isSmsNotification()) {
-                    notifySms(subscriber, update.getLatestUpdate().getDataTagQuality().getDescription());
+                if (!s.getLastNotifiedStatus().equals(Status.UNREACHABLE)) {
+                    Subscriber subscriber  = registry.getSubscriber(s.getSubscriberId());
+                    notifyMail(subscriber, update.getLatestUpdate().getDataTagQuality()
+                            .getDescription(), text);
+                    s.setLastNotification(new Timestamp(System.currentTimeMillis()));
+                    s.setLastNotifiedStatus(Status.UNREACHABLE);
+                    
+                    if (s.isSmsNotification()) {
+                        notifySms(subscriber, update.getLatestUpdate().getDataTagQuality().getDescription());
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -334,7 +336,7 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
         
         HashMap<Long, Tag> list = update.getParents();
         boolean requiredtoSend = false;
-        if (update.getLatestUpdate().getName().contains("PROC.MISSING.LIMIT")) {
+        if (update.getLatestUpdate().getName().contains("PROC.MISSING")) {
             requiredtoSend = true;
             logger.debug("This notification is required to be send to all enabled recipients.");
         }
@@ -388,13 +390,20 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
     @Override
     public void sendInitialReport(Tag update) {
         logger.trace("Entering sendInitialReport()");
-
+        
+        List<Tag> noGood = getProblemChildRules(update);
+        logger.debug("{} Sending initial report with {} problematic children to {} subscribers ", update.getId(), noGood.size(), update.getSubscribers().size());
+        
         logger.debug("{} Sending initial report to {} Subscribers ", update.getId(), update.getSubscribers().size());
+        
+        if (checkSourceDownReport(update)) {
+            return;
+        }
         
         for (Subscription s : update.getSubscribers()) {
             try {
                 if (!s.getLastNotifiedStatus().equals(update.getLatestStatus())) {
-                    List<Tag> noGood = getProblemChildRules(update);
+                    
                     sendFullReportOn(update, s, noGood);
                     for (Tag t : noGood) {
                         s.setLastStatusForResolvedTSubTag(t.getId(), t.getLatestStatus());
@@ -430,7 +439,8 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
 
         String subject = textCreator.getMailSubjectForStateChange(update, interestingRuleTags);
         String text = textCreator.getReportForTag(update, interestingRuleTags, cache);
-        String smsText = textCreator.getSmsTextForRuleChange(update, interestingRuleTags);
+
+        //TODO String smsText = textCreator.getSmsTextForRuleChange(update, interestingRuleTags);
         
         if (sub.isEnabled() && sub.isInterestedInLevel(update.getLatestStatus())) {
             Subscriber user = registry.getSubscriber(sub.getSubscriberId());
@@ -449,33 +459,10 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
 
         logger.trace("{} Entering sendReportOnRuleChange()", update.getId());
 
-        DataTagQuality quality = update.getLatestUpdate().getDataTagQuality();
         
-        //
-        // quality check first
-        // Should we announce this anyhow ?
-        //
-        if (!quality.isValid()) {
-            if (quality.isInvalidStatusSet(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)
-              || quality.isInvalidStatusSet(TagQualityStatus.JMS_CONNECTION_DOWN)
-              || quality.isInvalidStatusSet(TagQualityStatus.PROCESS_DOWN)) {
-              logger.trace("{} Quality is {} . No announcement with these states: {}", 
-                      update.getId(), quality.getInvalidQualityStates());
-                return;
-            }
-            else if (
-                  quality.isInvalidStatusSet(TagQualityStatus.SUBEQUIPMENT_DOWN)
-               || quality.isInvalidStatusSet(TagQualityStatus.EQUIPMENT_DOWN)
-               || quality.isInvalidStatusSet(TagQualityStatus.INACCESSIBLE)) {
-                // tell user that the source is down
-                sendSourceAvailabilityReport(update);
-                return;
-            } else {
-                // tag is invalid, but we announce this reason to the user in the following ...
-                logger.trace("{} quality is {}. User notification required.", 
-                        update.getId(), quality.getInvalidQualityStates());
-            }
-        }  
+        if (checkSourceDownReport(update)) {
+            return;
+        }
         
         /**
          * Tag has recovered:
@@ -572,74 +559,43 @@ public class NotifierImpl implements Notifier, TagCacheUpdateListener {
                 }   
                 
             }
-
-            
-            /*
-                if (s.getLastNotifiedStatus().equals(update.getLatestStatus())) {
-                    logger.debug("{} received an update for it, but no status change. Checking children..", update.getId());
-                    // no change for the update (why do we receive it ?) 
-                    // lets check if something has changed on the children side.
-                    for (Tag cR : update.getAllChildRules()) {
-                        if (!s.getLastStatusForResolvedSubTag(cR.getId()).equals(cR.getLatestStatus())) {
-                            // add to interesting list.
-                            interestingChildRules.add(cR);
-                        } else {
-                            logger.debug("{} Childrule '{}' [{}] in Subscription {} was already notified ",
-                                    update.getId(), cR.getId(), 
-                                    s.getLastStatusForResolvedSubTag(cR.getId()), s.getSubscriberId());
-                        }
-                    }
-                    
-                    
-                    
-                    
-                } else {
-                    // check if we have direct metrics assigned which should be visible in the message
-                    boolean metricsChanged = false;
-                    for (Tag child : update.getAllChildMetrics()) {
-                        if (child.getToBeNotified()){
-                            logger.trace("{} Metric '{}' was updated. Need to add parent .", update.getId(), child.getId(), child.getLatestStatus());
-                            metricsChanged = true;
-                        }
-                    }
-                    
-                    if (metricsChanged) {
-                        interestingChildRules.add(update);
-                    }
-                    logger.debug("{} has changed its state. Found {} children which are interesting", update.getId(), interestingChildRules.size());
-                }
-
-                // now real sending
-                try {
-                    if (interestingChildRules.size() > 0) {
-                        sendFullReportOn(update, s, interestingChildRules);
-                        for (Tag cR : interestingChildRules) {
-                            if (cR.getId().longValue() != s.getTagId().longValue()) {
-                                logger.debug("{} Setting status '{}' for resolved child {} for Subscriber '{}' ",
-                                        update.getId(),
-                                        cR.getLatestStatus(),
-                                        cR.getId(),
-                                        s.getSubscriberId()
-                                        );
-                                s.setLastStatusForResolvedTSubTag(cR.getId(), cR.getLatestStatus());
-                            }
-                        }
-                    } 
-                    logger.debug("{} Setting status '{}' for Subscriber '{}' ", 
-                            update.getId(), update.getLatestStatus(), s.getSubscriberId());
-                    s.setLastNotifiedStatus(update.getLatestStatus());
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
-                
-            } // END FOR
-            */
         }
         
 
         logger.trace("Leaving sendReportOnRuleChange()");
     }
 
+    
+    boolean checkSourceDownReport(Tag update) {
+        DataTagQuality quality = update.getLatestUpdate().getDataTagQuality();
+        
+        //
+        // quality check first
+        // Should we announce this anyhow ?
+        //
+        if (!quality.isValid()) {
+            if (quality.isInvalidStatusSet(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)
+              || quality.isInvalidStatusSet(TagQualityStatus.JMS_CONNECTION_DOWN)
+              || quality.isInvalidStatusSet(TagQualityStatus.PROCESS_DOWN)) {
+              logger.trace("{} Quality is {} . No announcement with these states: {}", 
+                      update.getId(), quality.getInvalidQualityStates());
+                return true;
+            }
+            else if (
+                  quality.isInvalidStatusSet(TagQualityStatus.SUBEQUIPMENT_DOWN)
+               || quality.isInvalidStatusSet(TagQualityStatus.EQUIPMENT_DOWN)
+               || quality.isInvalidStatusSet(TagQualityStatus.INACCESSIBLE)) {
+                // tell user that the source is down
+                sendSourceAvailabilityReport(update);
+                return true;
+            } else {
+                // tag is invalid, but we announce this reason to the user in the following ...
+                logger.trace("{} quality is {}. User notification required.", 
+                        update.getId(), quality.getInvalidQualityStates());
+            }
+        }
+        return false;
+    }
     
     
     

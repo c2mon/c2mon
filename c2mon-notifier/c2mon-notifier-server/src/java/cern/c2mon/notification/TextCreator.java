@@ -13,7 +13,10 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,9 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.notification.impl.TagCache;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.rule.ConditionedRuleExpression;
+import cern.c2mon.shared.rule.IRuleCondition;
+import cern.dmn2.core.Status;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
@@ -49,7 +55,7 @@ public class TextCreator {
     /**
      * our FreeMarker Configuration.
      */
-    private Configuration c = null;
+    private Configuration config = null;
     /**
      * the directory from where to read the templates.
      */
@@ -107,9 +113,9 @@ public class TextCreator {
             logger.debug("Using {} for reading the templates", getTemplateDir());
         }
 
-        c = new Configuration();
-        c.setDirectoryForTemplateLoading(new File(directory));
-        c.setObjectWrapper(new DefaultObjectWrapper());
+        config = new Configuration();
+        config.setDirectoryForTemplateLoading(new File(directory));
+        config.setObjectWrapper(new DefaultObjectWrapper());
     }
 
     /**
@@ -123,7 +129,8 @@ public class TextCreator {
      */
     public String getReportForTag(Tag update, List<Tag> interestingChildren, TagCache cache) throws IOException, TemplateException {
         StringBuilder bodyBuffer = new StringBuilder();
-        bodyBuffer.append(getTextForRuleUpdate(update));
+        bodyBuffer.append(getTextForRuleUpdate(update, cache));
+        
         if (interestingChildren.size() > 0) {
             bodyBuffer.append(getFreeTextMapForChildren(interestingChildren, cache));
         }
@@ -140,11 +147,12 @@ public class TextCreator {
         logger.trace("TagID={} Building Mail subject..", update.getId());
 
         StringBuilder subject = new StringBuilder();
+        subject.append("DMNNTFY [").append(update.getLatestStatus().toString().toUpperCase()).append("]: ");
+        
         if (interestingTags.size() == 0) {
-            subject.append(update.getLatestStatus()).append(" ").append(update.getLatestUpdate().getDescription());
+            subject.append(update.getLatestUpdate().getDescription());
         } else if ((interestingTags.size() == 1 && !interestingTags.get(0).isRule()) || interestingTags.get(0).getLatestUpdate().getDescription().length() > SUBJECT_TEXT_MAXLEN) {
-            subject.append("DMNNTFY [").append(update.getLatestStatus().toString().toUpperCase()).append("]: ")
-                    .append(interestingTags.get(0).getLatestUpdate().getName());
+            subject.append(interestingTags.get(0).getLatestUpdate().getName());
         } else {
             Tag single = interestingTags.get(0);
             subject.append("DMNNTFY [").append(single.getLatestStatus().toString().toUpperCase()).append("]: ")
@@ -186,7 +194,7 @@ public class TextCreator {
 
         StringWriter out = new StringWriter();
         try {
-            Template temp = c.getTemplate("metricUpdate.html");
+            Template temp = config.getTemplate("metricUpdate.html");
             temp.process(root, out);
             out.flush();
         } catch (Exception ex) {
@@ -207,7 +215,7 @@ public class TextCreator {
     }
 
     /**
-     * Renders the text which contains information on the rule. There is information no the childs.
+     * Renders the text which contains information on the rule. There is no information on the childs (tags and rules).
      * 
      * @see #getFreeTextMapForChildren(List)
      * @param update the {@link ClientDataTagValue} from which the information should be retrieved.
@@ -215,7 +223,7 @@ public class TextCreator {
      * @throws IOException
      * @throws TemplateException
      */
-    public String getTextForRuleUpdate(Tag update) throws IOException, TemplateException {
+    public String getTextForRuleUpdate(Tag update, TagCache cache) throws IOException, TemplateException {
         logger.debug("Entering getTextForUpdate()");
 
         if (update == null) {
@@ -225,26 +233,40 @@ public class TextCreator {
         ClientDataTagValue cdtv = update.getLatestUpdate();
 
         // Create the root hash
-        HashMap<String, Object> root = new HashMap<String, Object>();
+        HashMap<String, Object> root = new HashMap<>();
 
         root.put("notificationType", update.getLatestStatus().toString());
 
-        ArrayList<String> ruleInputTags = new ArrayList<String>();
-        for (Long l : cdtv.getRuleExpression().getInputTagIds()) {
-            ruleInputTags.add(Long.toString(l));
+        List<HashMap<String, Object>> children = new ArrayList<HashMap<String, Object>>();
+        root.put("dataTags", children);
+        if (!update.hasChildRules()) {
+            for (Tag metric: update.getAllChildMetrics()) {
+                HashMap<String, Object> child = new HashMap<>();
+                if (metric.getLatestUpdate() != null) {
+                    child.put("tagValue", metric.getLatestUpdate().getValue());
+                    child.put("tagName", metric.getLatestUpdate().getName());
+                    child.put("tagValueDetails", metric.getLatestUpdate().getValueDescription());
+                } else {
+                    child.put("tagValue", "Not available");
+                    child.put("tagName", "Not available");
+                }
+                children.add(child);
+            }
+            if (update.getLatestStatus().worserThan(Status.OK)) {
+                root.put("ruleProblemDescription", getProblemDescription(update, cache));
+            }
         }
-
-        root.put("ruleId", Long.toString(update.getId()));
+        
+        root.put("ruleId", update.getId());
         root.put("ruleStatus", update.getLatestStatus().toString());
         root.put("ruleName", cdtv.getName());
         root.put("ruleDescription", cdtv.getDescription());
-        root.put("ruleExpression", cdtv.getRuleExpression());
+        root.put("ruleExpression", cdtv.getRuleExpression().getExpression());
         root.put("ruleServerTimestamp", cdtv.getServerTimestamp());
-        root.put("tagValueDescription", cdtv.getValueDescription());
  
         StringWriter out = new StringWriter();
         try {
-            Template temp = c.getTemplate("simpleUpdate.html");
+            Template temp = config.getTemplate("simpleUpdate.html");
             temp.process(root, out);
             out.flush();
         } catch (Exception ex) {
@@ -252,9 +274,9 @@ public class TextCreator {
         }
         return out.toString();
     }
-
+    
     /**
-     * @param list a list of {@link Tag} RULE objects.
+     * @param list a list of {@link Tag} RULE objects which have only metrics are children.
      * @return a string representation of the problematic metrics.
      * @throws IOException if there is a problem loading the template
      * @throws TemplateException in case there is a problem while setting the variables in the template.
@@ -307,10 +329,12 @@ public class TextCreator {
             child.put("ruleValueDescription", c.getValueDescription() == null ? "UNKNOWN" : c.getValueDescription());
             child.put("ruleQuality", c.getDataTagQuality());
             
+            child.put("ruleProblemDescription", getProblemDescription(tag, tagCache));
+            
             List<HashMap<String, Object>> datatags = new ArrayList<HashMap<String, Object>>();
             if (c.getName().contains("PROC.MISSING")) {
                 HashMap<String, Object> cdatatag = new HashMap<String, Object>();
-                cdatatag.put("tagValue", c.getValueDescription());
+                cdatatag.put("tagValue", tag.getAllChildMetrics().iterator().next().getLatestUpdate().getValueDescription());
                 datatags.add(cdatatag);
             } else {
                 // datatags expected here:
@@ -333,7 +357,7 @@ public class TextCreator {
         HashMap<String, Object> root = new HashMap<String, Object>();
         root.put("children", children);
 
-        Template temp = c.getTemplate("ruleChildren.html");
+        Template temp = config.getTemplate("ruleChildren.html");
         StringWriter out = new StringWriter();
         temp.process(root, out);
         out.flush();
@@ -364,7 +388,7 @@ public class TextCreator {
             root.put("tagServerTimestamp", cdtv.getServerTimestamp());
         }
 
-        Template temp = c.getTemplate("sourceDown.html");
+        Template temp = config.getTemplate("sourceDown.html");
         StringWriter out = new StringWriter();
         temp.process(root, out);
         out.flush();
@@ -372,6 +396,74 @@ public class TextCreator {
         return out.toString();
     }
     
+    public String getProblemDescription(Tag ruleTag, TagCache cache) {
+        
+        ClientDataTagValue cdtv = ruleTag.getLatestUpdate();
+        
+        ConditionedRuleExpression ruleExpression = (ConditionedRuleExpression) cdtv
+                .getRuleExpression();
+        
+        String ruleExpressionText = "";
+        
+        for (IRuleCondition ruleCondition : ruleExpression.getConditions()) {
+            // is this the currently applied condition?
+            if (String.valueOf(ruleCondition.getResultValue()).equals(String.valueOf(ruleTag.getValue()))) {
+                
+                ruleExpressionText = ruleCondition.getExpression().replaceAll("[\\(\\) ]", "");
+                if (ruleExpressionText.equals("true")) {
+                    ruleExpressionText = "default tag rule";
+                } else {
+                    // name and values of data-tags
+                    ruleExpressionText += " but is ";
+                    for (Long tagid : ruleCondition.getInputTagIds()) {
+                        
+                        Tag c2MonMetric = cache.get(tagid);
+                        ruleExpressionText = ruleExpressionText.replaceAll(
+                                "#" + String.valueOf(tagid), "'"
+                                        + c2MonMetric.getLatestUpdate().getName() + "' ");
+                        ruleExpressionText += c2MonMetric.getValue() + ";";
+                        ruleExpressionText = RuleExplainer.replace(ruleExpressionText);
+                    }
+                    ruleExpressionText += "";
+                }
+            } else if (ruleTag.getValue() == null && !"true".equals(ruleCondition.getExpression())) {
+                // handle rules without valid results (data tags are invalid)
+                ruleExpressionText = ruleCondition.getExpression()
+                        .replaceAll("[\\(\\)]", "");
+                ruleExpressionText += " has quality " + cdtv.getDataTagQuality().toString();
+                for (Long tagid : ruleCondition.getInputTagIds()) {
+                    Tag c2MonMetric = cache.get(tagid);
+                    ruleExpressionText = ruleExpressionText.replaceAll("#" + String.valueOf(tagid),
+                            "\"" + c2MonMetric.getName() + "\"");
+                }
+            } else {
+                // NOOP
+            }
+        }
+        return ruleExpressionText;
+    }
+    
+    private static class RuleExplainer {
+        static Map<String, String> tr = new HashMap<>();
+        static {
+            tr.put("<", "should be more or equal than ");
+            tr.put(">", "should be less or equal than ");
+            tr.put("<=", "should be more than ");
+            tr.put(">=", "should be less than ");
+            tr.put("!>", "should not be less than ");
+            tr.put("!<", "should not be more than ");
+            tr.put("!=", "should be ");
+            tr.put("&&", "and ");
+        }
+        static String replace(String toReplace) {
+            String result = toReplace;
+            for (Entry<String, String> s : tr.entrySet()) {
+                result = result.replace(s.getKey(),s.getValue());                
+            }
+            return result;
+        }
+        
+    }
     
     public String getSmsTextForValueChange(Tag update) {
         return "Value changed for " + update.getLatestUpdate().getName() + "to " + update.getLatestUpdate().getValue();

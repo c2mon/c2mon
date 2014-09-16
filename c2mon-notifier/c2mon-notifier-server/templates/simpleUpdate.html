@@ -26,8 +26,8 @@ table {
 </HTML>
 <BODY>
 
-
-<h4>'${ruleDescription}' has changed to status 
+<p>
+<a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${ruleId}">${ruleName}</a> has changed to status 
 <font 
 	<#if ruleStatus == "ok">
 		color="green"
@@ -38,10 +38,26 @@ table {
 	<#else>
 		color="blue"
 	</#if>
->${ruleStatus}</font></h4>
+> <b>${ruleStatus}</b></font>
+<#if ruleProblemDescription??>
+<p>
+<i>Triggering rule: ${ruleProblemDescription}</i>
+</p>
+</#if>
+<#if (dataTags?size > 0)>
 
-<table border="0" cellpadding="0" cellspacing="1">
-	<tr><td width="100px">Web Link:</td><td></td><a href="http://diamon-pro1:8080/c2mon-web-configviewer/tagviewer/${ruleId}">${ruleName}</a></td></tr>
-	<tr><td width="100px">Server Time:</td><td>${ruleServerTimestamp}</td></tr>
-</table>
+	<p>
+	<hr size="1"/>
+	<#list dataTags as metric>
+	<#if metric.tagValueDetails != "">
+		Details of "${metric.tagName}":<br/>
+		${metric.tagValueDetails}
+	</#if>
+	<hr size="1"/>
+	</#list>
+	</p>
+</#if>
+
+
+
 

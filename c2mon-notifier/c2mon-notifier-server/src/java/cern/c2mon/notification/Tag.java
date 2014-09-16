@@ -31,6 +31,10 @@ public class Tag {
 
     private final Long id;
 
+    private Object value;
+    
+    private final String name;
+    
     private ClientDataTagValue latest = null;
     private ClientDataTagValue previous = null;
 
@@ -57,11 +61,20 @@ public class Tag {
 
     // private int subscribers = 0;
 
+    public Tag(Long id, boolean isRule) {
+        this(id, "Tag #" + id, isRule);
+    }
+    
+    Tag(ClientDataTagValue from) {
+        this(from.getId(), from.getName(), from.isRuleResult());
+        update(from);
+    }
+    
     /**
      * @param id the tag id
      * @param isRule flag to set if this tag is a rule or not.
      */
-    public Tag(Long id, boolean isRule) {
+    public Tag(Long id, String name, boolean isRule) {
         this.id = id;
         this.isRule = isRule;
 
@@ -70,8 +83,25 @@ public class Tag {
             history[i] = Status.OK;
         }
         currentHistoryPtr = 0;
+        setValue(new Long(0));
+        this.name = name;
     }
 
+    /**
+     * @param i
+     */
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
     /**
      * thread-safe call to remove the passed subscription from this tag.
      * @param s the Subscription of the user.
@@ -325,7 +355,8 @@ public class Tag {
 
         previous = latest;
         latest = update;
-
+        value = update.getValue();
+        
 //        if (!update.getDataTagQuality().isAccessible()) {
 //            this.isSourceDown = true;
 //        } else {
@@ -403,6 +434,14 @@ public class Tag {
         return sb.toString();
     }
 
+    public int getNumberOfChildMetrics() {
+        return children.size();
+    }
+    
+    public boolean hasChildRules() {
+        return getAllChildRules().size() > 0;
+    }
+    
     /**
      * 
      * @param before the value before 

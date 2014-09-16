@@ -431,9 +431,8 @@ public class SubscriptionRegistryImpl implements SubscriptionRegistry {
         logger.trace("Entering removeSubscription(): User={}, TagaId= {}" , subscription.getSubscriberId(), subscription.getTagId());
 	    
 	    Subscriber subscriber = getSubscriber(subscription.getSubscriberId());
-	    subscription = subscriber.getSubscription(subscription.getTagId());
 	    
-		subscriber.removeSubscription(subscription.getTagId());
+    	subscriber.removeSubscription(subscription.getTagId());
 		updateTagIdList();
 		
 		/*

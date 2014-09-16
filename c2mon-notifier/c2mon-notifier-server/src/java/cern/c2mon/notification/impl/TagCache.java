@@ -7,9 +7,6 @@
  */
 package cern.c2mon.notification.impl;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.listener.HeartbeatListener;
 import cern.c2mon.client.core.manager.TagManager;
 import cern.c2mon.notification.Notifier;
 import cern.c2mon.notification.SubscriptionRegistry;
@@ -41,14 +37,10 @@ import cern.c2mon.notification.shared.ServiceException;
 import cern.c2mon.notification.shared.Subscriber;
 import cern.c2mon.notification.shared.Subscription;
 import cern.c2mon.notification.shared.TagNotFoundException;
-import cern.c2mon.shared.client.supervision.Heartbeat;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.dmn2.core.Status;
 import cern.dmn2.db.DiamonDbGateway;
 import cern.dmn2.db.EntityData.Type;
 import cern.dmn2.db.MetricData;
-
-import com.google.gson.Gson;
 
 
 /**
@@ -326,52 +318,6 @@ public class TagCache implements DataTagUpdateListener {
     }
     
 
-    /**
-     * writes the tag, status and hasChanged attributes from {@link #cache} to disk. 
-     */
-    public void writeToPersistence() {
-        ArrayList<SimpleTagInformation> toStore = new ArrayList<SimpleTagInformation>(cache.size());
-        logger.trace("entering writeToPersistence()");
-        long t1 = System.currentTimeMillis();
-        
-        
-        for (Entry<Long, Tag> e : cache.entrySet()) {
-            SimpleTagInformation si = new SimpleTagInformation();
-            si.tagID = e.getKey();
-            //si.status = e.getValue().getLatestStatusInt();
-            //si.previousState = e.getValue().getPreviousStatusInt();
-            si.history = e.getValue().getHistory();
-            si.isRule = e.getValue().isRule();
-            toStore.add(si);
-        }
-        Gson gson = new Gson();
-        FileWriter fr = null;
-        BufferedWriter output = null;
-        try {
-            fr = new FileWriter(localCacheFileName);
-            output = new BufferedWriter(fr);
-            output.write(gson.toJson(toStore));
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
-        } finally {
-            if (output != null) { try { output.close(); } catch (IOException e1) { e1.printStackTrace(); 
-            }
-            }
-            if (fr != null)     { try { fr.close(); } catch (IOException e1) { e1.printStackTrace(); 
-            }
-            }
-        }
-        logger.debug("Wrote tag cache within {}msec.", Long.valueOf(System.currentTimeMillis() - t1));
-    }
-    
-    
-    private class SimpleTagInformation {
-        private long tagID;
-        private boolean isRule = false;
-        private Status [] history = new Status [Tag.MAX_STATE_HISTORY_ENTRIES];
-    }
-    
-    
     public long getSize() {
         return cache.size();
     }
