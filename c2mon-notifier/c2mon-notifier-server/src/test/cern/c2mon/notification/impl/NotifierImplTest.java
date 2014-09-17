@@ -306,53 +306,16 @@ public class NotifierImplTest {
 		notifier.setSubscriptionRegistry(reg);
 	}
 	
-	/**
-	 * helper to create a RuleExpression quickly.
-	 * @param inRule the tags belonging to the rule.\
-	 * @return a RuleExpression object
-	 */
-	private RuleExpression getRuleExpression(final Long [] inRule) {
-	    /*
-         * tagid=1 has one sub-rule 2 
-         */
+	private RuleExpression get(final Long [] inRule) throws RuleFormatException {
 	    StringBuilder b = new StringBuilder();
+        
 	    for (Long l : inRule) {
-	        b.append("#" + l + " & ");
-	    }
-	    b.append("true[0]");
-	    
-      RuleExpression rExpression = new RuleExpression(b.toString(), RuleType.Simple) {
-            private static final long serialVersionUID = 7424951105237067129L;
-
-            @Override
-            public Set<Long> getInputTagIds() {
-                HashSet<Long> result = new HashSet<Long>();
-                for (Long l : inRule) {
-                    result.add(l);
-                }
-                return result;
-            }
-            
-            @Override
-            public Object evaluate(Map<Long, Object> arg0) throws RuleEvaluationException {
-                return null;
-            }
-
-            @Override
-            public RuleValidationReport validate(Map<Long, Object> pInputParams) {
-                return null;
-            }
-
-            @Override
-            public Object forceEvaluate(Map<Long, Object> pInputParams) {
-              // TODO Auto-generated method stub
-              return null;
-            }
-        };
-        return rExpression;
+            b.append("#" + l + ">20");
+        }
+        b.append("[0], true [1]");
+        
+	    return RuleExpression.createExpression(b.toString());
 	}
-	
-	
 	
 	/**
 	 * 
@@ -896,7 +859,7 @@ public class NotifierImplTest {
 	            inputTags.add(c.getId());
 	        }
 	        
-	        t.setRuleExpression(getRuleExpression(inputTags.toArray(new Long [] {})));
+	        t.setRuleExpression(get(inputTags.toArray(new Long [] {})));
 	        result.update(t);
 	        
 	    } else {
