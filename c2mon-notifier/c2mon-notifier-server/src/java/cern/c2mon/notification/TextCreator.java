@@ -29,6 +29,7 @@ import cern.c2mon.notification.impl.TagCache;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.rule.ConditionedRuleExpression;
 import cern.c2mon.shared.rule.IRuleCondition;
+import cern.c2mon.shared.rule.SimpleRuleExpression;
 import cern.dmn2.core.Status;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -399,7 +400,9 @@ public class TextCreator {
     public String getProblemDescription(Tag ruleTag, TagCache cache) {
         
         ClientDataTagValue cdtv = ruleTag.getLatestUpdate();
-        
+        if ( cdtv.getRuleExpression() instanceof SimpleRuleExpression) {
+            return "";
+        }
         ConditionedRuleExpression ruleExpression = (ConditionedRuleExpression) cdtv
                 .getRuleExpression();
         
@@ -420,7 +423,7 @@ public class TextCreator {
                         Tag c2MonMetric = cache.get(tagid);
                         ruleExpressionText = ruleExpressionText.replaceAll(
                                 "#" + String.valueOf(tagid), "'"
-                                        + c2MonMetric.getLatestUpdate().getName() + "' ");
+                                        + c2MonMetric.getLatestUpdate().getName() + "'");
                         ruleExpressionText += c2MonMetric.getValue() + ";";
                         ruleExpressionText = RuleExplainer.replace(ruleExpressionText);
                     }
