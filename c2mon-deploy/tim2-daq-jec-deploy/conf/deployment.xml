@@ -25,12 +25,12 @@
         <property name="java.security.egd" value="file://dev/urandom" />
         <preExec>
                     <![CDATA[
-                      [[ ${PROCESS_NAME} = "P_YZLASSGW01" ]] && JVM_MEM="-Xms512m -Xmx512m"
                       [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
                       [[ -z $LOG4J_CONF_FILE ]] && echo "LOG4J_CONF_FILE not set!" && exit 1
                       [[ -z $DAQ_CONF_HOME ]] && echo "DAQ_CONF_HOME not set!" && exit 1
                       [[ -z $DAQ_LOG_HOME ]] && echo "DAQ_LOG_HOME not set!" && exit 1
                       [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
+                      [[ ${PROCESS_NAME} = "P_YZLASSGW01" ]] && JVM_MEM="-Xms512m -Xmx512m"
                       [[ -z $ADDITIONAL_PARAMS ]] && echo "ADDITIONAL_PARAMS not set!" && exit 1
                      ]]>
         </preExec>
