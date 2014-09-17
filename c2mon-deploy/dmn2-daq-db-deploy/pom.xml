@@ -12,7 +12,7 @@
 	<groupId>cern.dmn2.dmn2-daq</groupId>
 	<artifactId>dmn2-daq-db-deploy</artifactId>
 	<name>DMN2 DB DAQ deployment module</name>
-	<version>1.2.6</version>
+	<version>1.2.7-SNAPSHOT</version>
 
 	<description>DMN2 DB DAQ assembling required modules and configuration files</description>
 
