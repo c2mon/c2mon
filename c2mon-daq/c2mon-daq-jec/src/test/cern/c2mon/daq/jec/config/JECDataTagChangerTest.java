@@ -2,10 +2,13 @@ package cern.c2mon.daq.jec.config;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import cern.c2mon.daq.common.DriverKernel;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.jec.IJECRestarter;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -25,16 +28,17 @@ public class JECDataTagChangerTest {
     
     @Before
     public void setUp() throws ConfigurationException {
-//        changeReport = new ChangeReport(1L);
-//        sourceDataTag = new SourceDataTag(1L, "asd", false);
-//        hwAddress = new PLCHardwareAddressImpl(1, 10, 5, 0, 10, 100, "asd", 1000);
-//        sourceDataTag.setAddress(new DataTagAddress(hwAddress));
-//        plcTagController = EasyMock.createMock(IJECTagConfigurationController.class);
-//        jecRestarter = EasyMock.createMock(IJECRestarter.class);
-//        jecDataTagChanger = new JECDataTagChanger(plcTagController, jecRestarter, );
+        changeReport = new ChangeReport(1L);
+        sourceDataTag = new SourceDataTag(1L, "asd", false);
+        hwAddress = new PLCHardwareAddressImpl(1, 10, 5, 0, 10, 100, "asd", 1000);
+        sourceDataTag.setAddress(new DataTagAddress(hwAddress));
+        plcTagController = EasyMock.createMock(IJECTagConfigurationController.class);
+        jecRestarter = EasyMock.createMock(IJECRestarter.class);
+        // TODO: to add a LOGGER inestead of null 
+        jecDataTagChanger = new JECDataTagChanger(plcTagController, jecRestarter, null);
     }
     
-//    @Test
+    @Test
     public void testOnUpdateDataTagNoChanges() throws ConfigurationException {
         SourceDataTag oldSourceDataTag = new SourceDataTag(2L, "asd2", false);
         HardwareAddress oldHwAddress = new PLCHardwareAddressImpl(1, 10, 5, 0, 10, 100, "asd", 1000);
@@ -48,7 +52,7 @@ public class JECDataTagChangerTest {
         assertEquals(ChangeReport.CHANGE_STATE.SUCCESS, changeReport.getState());
     }
     
-//    @Test
+    @Test
     public void testOnUpdateDataTagNoResartChanges() throws ConfigurationException {
         SourceDataTag oldSourceDataTag = new SourceDataTag(2L, "asd2", false);
         HardwareAddress oldHwAddress = new PLCHardwareAddressImpl(1, 9, 5, 0, 10, 100, "asd", 1000);
@@ -64,7 +68,7 @@ public class JECDataTagChangerTest {
         assertEquals(ChangeReport.CHANGE_STATE.SUCCESS, changeReport.getState());
     }
     
-//    @Test
+    @Test
     public void testOnUpdateDataTagRestartChanges() throws ConfigurationException {
         SourceDataTag oldSourceDataTag = new SourceDataTag(2L, "asd2", false);
         HardwareAddress oldHwAddress = new PLCHardwareAddressImpl(1, 9, 5, 0, 10, 100, "asd", 1000);
@@ -81,7 +85,7 @@ public class JECDataTagChangerTest {
         assertEquals(JECDataTagChanger.OUT_OF_RANGE_WARN_MESSAGE, changeReport.getWarnMessage());
     }
     
-//    @Test
+    @Test
     public void testOnAddDataTagNoResartChanges() {
         // in address range
         EasyMock.expect(plcTagController.isInAddressRange(hwAddress)).andReturn(true);
@@ -94,7 +98,7 @@ public class JECDataTagChangerTest {
         assertEquals(JECDataTagChanger.WITHIN_RANGE_INFO_MESSAGE, changeReport.getInfoMessage());
     }
     
-//    @Test
+    @Test
     public void testOnAddDataTagRestartChanges() {
         // not in address range
         EasyMock.expect(plcTagController.isInAddressRange(hwAddress)).andReturn(false);
@@ -106,7 +110,7 @@ public class JECDataTagChangerTest {
         assertEquals(ChangeReport.CHANGE_STATE.SUCCESS, changeReport.getState());
     }
     
-//    @Test
+    @Test
     public void onRemoveDataTag() {
         plcTagController.removeDataTag(sourceDataTag);
         

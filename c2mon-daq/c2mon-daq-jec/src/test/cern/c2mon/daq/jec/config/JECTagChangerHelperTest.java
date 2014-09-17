@@ -11,7 +11,7 @@ import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 
 public class JECTagChangerHelperTest {
     
-//    @Test
+    @Test
     public void testMightAffectPLCAddressSpace() throws ConfigurationException {
         PLCHardwareAddressImpl hardwareAddress = new PLCHardwareAddressImpl(PLCHardwareAddress.STRUCT_ANALOG, 0, 0, 0, 10, 100, null, 1000);
         PLCHardwareAddressImpl oldHardwareAddress = new PLCHardwareAddressImpl(PLCHardwareAddress.STRUCT_ANALOG, 0, 0, 0, 10, 100, null, 1000);;
