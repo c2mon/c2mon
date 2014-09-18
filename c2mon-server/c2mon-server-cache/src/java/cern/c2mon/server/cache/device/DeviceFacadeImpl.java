@@ -166,10 +166,11 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
             + "\" must refer to a property defined in parent device class");
       }
 
-      // Sanity check on (tagId / clientRule / constantValue / resultType)
-      if (deviceProperty.getTagId() == null && deviceProperty.getClientRule() == null && deviceProperty.getConstantValue() == null) {
+      // Sanity check on (tagId / clientRule / constantValue / resultType/ fields)
+      if (deviceProperty.getTagId() == null && deviceProperty.getClientRule() == null && deviceProperty.getConstantValue() == null
+          && deviceProperty.getFields() == null) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + deviceProperty.getName()
-            + "\" must specify at least one of (tagId, clientRule, constantValue)");
+            + "\" must specify at least one of (tagId, clientRule, constantValue, fields)");
       }
 
       try {

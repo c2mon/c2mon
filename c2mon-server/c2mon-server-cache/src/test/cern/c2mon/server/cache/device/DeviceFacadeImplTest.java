@@ -179,7 +179,7 @@ public class DeviceFacadeImplTest {
     EasyMock.reset(deviceCacheMock, deviceClassCacheMock);
 
     DeviceClassCacheObject deviceClass = new DeviceClassCacheObject(400L, "TEST_DEVICE_CLASS_1", "Description of TEST_DEVICE_CLASS_1");
-    deviceClass.setProperties(Arrays.asList("TEST_PROPERTY_1", "TEST_PROPERTY_2", "TEST_PROPERTY_3"));
+    deviceClass.setProperties(Arrays.asList("TEST_PROPERTY_1", "TEST_PROPERTY_2", "TEST_PROPERTY_WITH_FIELDS"));
     deviceClass.setCommands(Arrays.asList("TEST_COMMAND_1", "TEST_COMMAND_2"));
 
     // Expect the facade to get the DeviceClass for the device
@@ -201,6 +201,14 @@ public class DeviceFacadeImplTest {
         + "<DeviceProperties>"
         + "  <DeviceProperty name=\"TEST_PROPERTY_1\"><tag-id>100430</tag-id></DeviceProperty>"
         + "  <DeviceProperty name=\"TEST_PROPERTY_2\"><tag-id>100431</tag-id></DeviceProperty>"
+        + "  <DeviceProperty name=\"TEST_PROPERTY_WITH_FIELDS\">"
+        + "    <Fields>"
+        + "      <Field name=\"cpuLoadInPercent\"><tag-id>987654</tag-id></Field>"
+        + "      <Field name=\"responsiblePerson\"><constant-value>Mr. Administrator</constant-value></Field>"
+        + "      <Field name=\"someCalculations\"><client-rule><![CDATA[(#123 + #234) / 2]]></client-rule></Field>"
+        + "      <Field name=\"numCores\"><constant-value>4</constant-value><result-type>Integer</result-type></Field>"
+        + "    </Fields>"
+        + "  </DeviceProperty>"
         + "</DeviceProperties>");
     deviceProperties.put("deviceCommands", ""
         + "<DeviceCommands>"
@@ -214,7 +222,7 @@ public class DeviceFacadeImplTest {
     Assert.assertTrue(device.getName() == deviceProperties.getProperty("name"));
     Assert.assertTrue(device.getDeviceClassId() == 400L);
 
-    Assert.assertTrue(device.getDeviceProperties().size() == 2);
+    Assert.assertTrue(device.getDeviceProperties().size() == 3);
     assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty("TEST_PROPERTY_1", 100430L, null, null, null));
     assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty("TEST_PROPERTY_2", 100431L, null, null, null));
 

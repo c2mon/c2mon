@@ -72,7 +72,7 @@ public class DeviceProperty implements Cloneable, Serializable {
   /**
    * The list of nested fields of this property.
    */
-  @ElementList(required = false, entry = "Fields")
+  @ElementList(required = false, name = "Fields")
   private List<DeviceProperty> fields;
 
   /**
