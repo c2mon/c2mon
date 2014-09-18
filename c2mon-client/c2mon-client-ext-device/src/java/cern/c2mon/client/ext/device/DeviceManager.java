@@ -138,38 +138,6 @@ public class DeviceManager implements C2monDeviceManager {
     return devices;
   }
 
-  /**
-   * Create a client {@link Device} object from a {@link TransferDevice}.
-   *
-   * @param transferDevice the transfer device to create a client device for
-   * @param deviceClassName the name of the device class to which the device
-   *          belongs
-   *
-   * @return the newly created device
-   */
-  private Device createClientDevice(TransferDevice transferDevice, String deviceClassName) {
-    DeviceImpl device = new DeviceImpl(transferDevice.getId(), transferDevice.getName(), transferDevice.getDeviceClassId(), deviceClassName, tagManager,
-        commandManager);
-
-    try {
-      // Set the properties
-      device.setDeviceProperties(transferDevice.getDeviceProperties());
-
-    } catch (RuleFormatException e) {
-      LOG.error("getAllDevices() - Received property containing incorrect rule tag from the server. Please check device with id " + device.getId(), e);
-      throw new RuntimeException("Received property containing incorrect rule tag from the server for device id " + device.getId());
-
-    } catch (ClassNotFoundException e) {
-      LOG.error("getAllDevices() - Received property containing incorrect result type from the server. Please check device with id " + device.getId(), e);
-      throw new RuntimeException("Received property containing incorrect result type from the server for device id " + device.getId());
-    }
-
-    // Set the commands
-    device.setDeviceCommands(transferDevice.getDeviceCommands());
-
-    return device;
-  }
-
   @Override
   public void subscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
 
@@ -217,4 +185,35 @@ public class DeviceManager implements C2monDeviceManager {
     unsubscribeDevices(allDevices, listener);
   }
 
+  /**
+   * Create a client {@link Device} object from a {@link TransferDevice}.
+   *
+   * @param transferDevice the transfer device to create a client device for
+   * @param deviceClassName the name of the device class to which the device
+   *          belongs
+   *
+   * @return the newly created device
+   */
+  private Device createClientDevice(TransferDevice transferDevice, String deviceClassName) {
+    DeviceImpl device = new DeviceImpl(transferDevice.getId(), transferDevice.getName(), transferDevice.getDeviceClassId(), deviceClassName, tagManager,
+        commandManager);
+
+    try {
+      // Set the properties
+      device.setDeviceProperties(transferDevice.getDeviceProperties());
+
+    } catch (RuleFormatException e) {
+      LOG.error("getAllDevices() - Received property containing incorrect rule tag from the server. Please check device with id " + device.getId(), e);
+      throw new RuntimeException("Received property containing incorrect rule tag from the server for device id " + device.getId());
+
+    } catch (ClassNotFoundException e) {
+      LOG.error("getAllDevices() - Received property containing incorrect result type from the server. Please check device with id " + device.getId(), e);
+      throw new RuntimeException("Received property containing incorrect result type from the server for device id " + device.getId());
+    }
+
+    // Set the commands
+    device.setDeviceCommands(transferDevice.getDeviceCommands());
+
+    return device;
+  }
 }

@@ -9,6 +9,7 @@ import static org.easymock.classextension.EasyMock.reset;
 import static org.easymock.classextension.EasyMock.verify;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,9 @@ import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
+import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
+import cern.c2mon.client.ext.device.property.ClientDevicePropertyImpl;
+import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.client.ext.device.util.DeviceTestUtils;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
@@ -158,7 +162,7 @@ public class DeviceManagerTest {
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     device1.setDeviceProperties(deviceProperties);
 
-    Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
+    final Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
 
     // Expect the tag manager to subscribe to the tags
     EasyMock.expect(tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject())).andReturn(true).once();
@@ -177,9 +181,14 @@ public class DeviceManagerTest {
     }, listener);
 
     // Simulate the tag update calls
-    for (ClientDataTagValue tag : cacheReturnMap.values()) {
-      device1.onUpdate(tag);
-    }
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        for (ClientDataTagValue tag : cacheReturnMap.values()) {
+          device1.onUpdate(tag);
+        }
+      }
+    }).start();
 
     listener.await(5000L);
     Device device = listener.getDevice();
@@ -206,7 +215,7 @@ public class DeviceManagerTest {
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     device1.setDeviceProperties(sparsePropertyMap);
 
-    Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
+    final Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
 
     // Expect the device to not call getDataTags() but instead to
     // get the tags from the cache
@@ -226,18 +235,89 @@ public class DeviceManagerTest {
     }, listener);
 
     // Simulate the tag update calls
-    for (ClientDataTagValue tag : cacheReturnMap.values()) {
-      device1.onUpdate(tag);
-    }
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        for (ClientDataTagValue tag : cacheReturnMap.values()) {
+          device1.onUpdate(tag);
+        }
+      }
+    }).start();
 
     listener.await(5000L);
     Device device = listener.getDevice();
     Assert.assertNotNull(device);
     Assert.assertTrue(device.getId() == device1.getId());
 
+    // Check all properties are subscribed to at this point
+    Assert.assertTrue(areAllPropertiesAndFieldsSubscribed(device));
+
     Map<String, ClientDataTagValue> values = device.getProperties();
     Assert.assertTrue(values.get("test_property_name_1").getId().equals(100000L));
     Assert.assertTrue(values.get("test_property_name_2").getId().equals(200000L));
+
+    // Verify that everything happened as expected
+    EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    // Reset the mock
+    EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+  }
+
+  @Test
+  public void testSubscribeDeviceWithFields() throws RuleFormatException {
+
+    Map<String, ClientDeviceProperty> deviceFields = new HashMap<>();
+
+    for (int i = 0; i < 1000; i++) {
+      deviceFields.put("test_field_name_" + i, new ClientDevicePropertyImpl(new Long(i)));
+    }
+
+    HashMap<String, ClientDeviceProperty> deviceProperties = new HashMap<>();
+    deviceProperties.put("test_property_name", new ClientDevicePropertyImpl(deviceFields));
+
+    final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
+    device1.setDeviceProperties(deviceProperties);
+
+    final Map<Long, ClientDataTag> cacheReturnMap = new HashMap<Long, ClientDataTag>();
+
+    for (int i = 0; i < 1000; i++) {
+      ClientDataTagImpl cdt = new ClientDataTagImpl(new Long(i));
+      cdt.update(DeviceTestUtils.createValidTransferTag(new Long(i), "test_tag_name_" + i, "test_value_" + i));
+      cacheReturnMap.put(new Long(i), cdt);
+    }
+
+    // Expect the tag manager to subscribe to the tags
+    EasyMock.expect(tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject())).andReturn(true).once();
+
+    // Setup is finished, need to activate the mock
+    EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+
+    TestDeviceUpdateListener listener = new TestDeviceUpdateListener();
+    deviceManager.subscribeDevices(new HashSet<Device>(Arrays.asList(device1)), listener);
+
+    // Simulate the tag update calls
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        for (ClientDataTagValue tag : cacheReturnMap.values()) {
+          device1.onUpdate(tag);
+        }
+      }
+    }).start();
+
+    listener.await(5000L);
+    Device device = listener.getDevice();
+    Assert.assertNotNull(device);
+    Assert.assertTrue(device.getId() == device1.getId());
+
+    Assert.assertTrue(areAllPropertiesAndFieldsSubscribed(device));
+
+    Map<String, ClientDataTagValue> fields = device.getMappedProperty("test_property_name");
+    for (int i = 0; i < 1000; i++) {
+      ClientDataTagValue tag = fields.get("test_field_name_" + i);
+      Assert.assertTrue(tag.getId().equals(new Long(i)));
+      Assert.assertTrue(tag.getValue() != null);
+      Assert.assertTrue(tag.getValue().equals("test_value_" + i));
+    }
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock);
@@ -355,16 +435,21 @@ public class DeviceManagerTest {
 
     final CountDownLatch latch = new CountDownLatch(1);
     Device device;
+    PropertyInfo propertyInfo;
 
     @Override
-    public void onUpdate(Device device, String propertyName) {
+    public void onUpdate(Device device, PropertyInfo propertyInfo) {
       this.device = device;
+      this.propertyInfo = propertyInfo;
+
+      Assert.assertTrue(areAllPropertiesAndFieldsSubscribed(device));
+
       latch.countDown();
     }
 
     public void await(Long timeout) {
       try {
-        latch.await(5000, TimeUnit.MILLISECONDS);
+        latch.await(timeout, TimeUnit.MILLISECONDS);
         System.out.println("latch released");
       } catch (InterruptedException e) {
         e.printStackTrace();
@@ -394,5 +479,28 @@ public class DeviceManagerTest {
     cacheReturnMap.put(cdt1.getId(), cdt1);
     cacheReturnMap.put(cdt2.getId(), cdt2);
     return cacheReturnMap;
+  }
+
+  private boolean areAllPropertiesAndFieldsSubscribed(Device device) {
+    Map<String, ClientDeviceProperty> properties = ((DeviceImpl) device).getDeviceProperties();
+    for (ClientDeviceProperty property : properties.values()) {
+      if (property.isDataTag()) {
+        if (!property.isSubscribed()) {
+          return false;
+        }
+      }
+
+      if (property.isMappedProperty()) {
+        for (ClientDeviceProperty field : property.getFields().values()) {
+          if (field.isDataTag()) {
+            if (!field.isSubscribed()) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+
+    return true;
   }
 }

@@ -17,6 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.device;
 
+import cern.c2mon.client.ext.device.property.PropertyInfo;
+
 /**
  * Callback interface for a device. An update event is fired when a property on
  * a subscribed-to device changes.
@@ -28,19 +30,34 @@ package cern.c2mon.client.ext.device;
 public interface DeviceUpdateListener {
 
   /**
-   * When a particular property on a device changes, this method will be called
-   * with the name of the property that has changed.
+   * When a particular property on a device changes, this method will be called.
+   * A reference to the device itself will be given, along with a
+   * {@link PropertyInfo} object which will contain information about the
+   * property that has changed.
+   *
+   * <p>
+   * If the updated property is a simple property (i.e. an atomic value, not a
+   * mapped property) then the {@link PropertyInfo} object will contain the
+   * property name and have a null field name.
+   *
+   * If it is a mapped property (i.e. contains nested fields) then the field
+   * name will not be null; it will point to the field within the property that
+   * was updated.
+   * </p>
    *
    * <p>
    * Note: when you initially subscribe to a device, this method will be called
-   * with the device object containing all properties and with propertyName as
-   * null. Thereafter, a single property will change for any given listener
-   * invocation, i.e. the method will be invoked multiple times to reflect
-   * multiple property changes.
+   * once with the device object containing all properties and with
+   * <code>propertyInfo</code> as null. Thereafter, a single property will
+   * change for any given listener invocation, i.e. the method will be invoked
+   * multiple times to reflect multiple property changes.
    * </p>
    *
    * @param device the device in which a property has changed
-   * @param propertyName the name of the property that has changed
+   * @param propertyInfo the {@link PropertyInfo} object containing information
+   *          about the property/field that has changed
+   *
+   * @see PropertyInfo
    */
-  void onUpdate(Device device, String propertyName);
+  void onUpdate(Device device, PropertyInfo propertyInfo);
 }

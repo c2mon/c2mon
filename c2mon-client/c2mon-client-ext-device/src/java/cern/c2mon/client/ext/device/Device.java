@@ -21,6 +21,8 @@ import java.util.Map;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.ext.device.property.MappedPropertyException;
+import cern.c2mon.client.ext.device.property.PropertyInfo;
 
 /**
  * This interface describes the methods which are provided by a C2MON Device
@@ -53,20 +55,58 @@ public interface Device {
   public String getDeviceClassName();
 
   /**
-   * Retrieve a particular property of this device.
+   * Retrieve a particular property/field of this device.
    *
-   * @param propertyName the name of the property to retrieve
+   * <p>
+   * The given {@link PropertyInfo} object should contain the name of the
+   * property to be retrieved. In the case of the property being a mapped
+   * property (i.e. containing nested fields) then it should also contain the
+   * name of the field to be retrieved. You will then get the
+   * {@link ClientDataTagValue} corresponding to the field value, NOT the entire
+   * field map.
+   * </p>
+   *
+   * @param propertyInfo the info object containing the name of the
+   *          property/field to retrieve
    * @return the {@link ClientDataTagValue} corresponding to the requested
-   *         property
+   *         property/field, or null if the property/field was not found
+   *
+   * @throws MappedPropertyException if an attempt is made to retrieve a field
+   *           value from a non mapped property, or if a field name is not
+   *           specified for a mapped property
+   *
+   * @see PropertyInfo
    */
-  public ClientDataTagValue getProperty(String propertyName);
+  public ClientDataTagValue getProperty(PropertyInfo propertyInfo) throws MappedPropertyException;
 
   /**
-   * Retrieve all properties of this device.
+   * Retrieve all properties of this device, except mapped properties.
+   *
+   * <p>
+   * Note: this method will not return mapped properties.
+   * </p>
    *
    * @return the properties map
    */
   public Map<String, ClientDataTagValue> getProperties();
+
+  /**
+   * Check if the property is a mapped property, i.e. is a property containing
+   * nested fields.
+   *
+   * @param propertyName the name of the property to check
+   * @return true if the property is a mapped property, false otherwise
+   */
+  public boolean isMappedProperty(String propertyName);
+
+  /**
+   * Retrieve a mapped property from the device, i.e. one containing nested
+   * fields.
+   *
+   * @param propertyName
+   * @return
+   */
+  public Map<String, ClientDataTagValue> getMappedProperty(String propertyName);
 
   /**
    * Retrieve a particular command of this device.

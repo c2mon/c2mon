@@ -17,66 +17,29 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.device.property;
 
+import java.util.Map;
+
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.tag.ClientRuleTag;
-import cern.c2mon.client.ext.device.tag.ClientConstantValueTag;
 
 /**
  * Wrapper class to manage a client device property. A property can be either a
  * straightforward {@link ClientDataTag}, a {@link ClientRuleTag} or a
- * {@link ClientConstantValueTag}.
+ * {@link ClientConstantValue}.
  *
  * @author Justin Lewis Salmon
  */
-public class ClientDeviceProperty {
-
-  /**
-   * The ID of the {@link ClientDataTag} (if applicable).
-   */
-  private Long tagId;
-
-  /**
-   * The actual value (may be null if the property is a {@link ClientDataTag}
-   * and has not yet been lazily loaded).
-   */
-  private ClientDataTagValue clientDataTagValue;
-
-  /**
-   * Constructor used to create an instance containing only a tag ID, to be
-   * lazily loaded later.
-   *
-   * @param tagId the ID of the {@link ClientDataTag} corresponding to this
-   *          property
-   */
-  public ClientDeviceProperty(final Long tagId) {
-    this.tagId = tagId;
-  }
-
-  /**
-   * Constructor used to create an instance containing a device property that
-   * will not be lazily loaded ({@link ClientRuleTag} or
-   * {@link ClientConstantValueTag}).
-   *
-   * @param clientDataTag the client device property to set
-   */
-  public ClientDeviceProperty(final ClientDataTagValue clientDataTag) {
-    this.clientDataTagValue = clientDataTag;
-    if (isDataTag()) {
-      this.tagId = clientDataTag.getId();
-    }
-  }
+public interface ClientDeviceProperty {
 
   /**
    * Retrieve the ID of the {@link ClientDataTag} to which this property
    * corresponds. Not applicable for {@link ClientRuleTag}s or
-   * {@link ClientConstantValueTag}s.
+   * {@link ClientConstantValue}s.
    *
    * @return the tagId the ID of the corresponding tag
    */
-  public Long getTagId() {
-    return tagId;
-  }
+  public Long getTagId();
 
   /**
    * Retrieve the device property. May be null if the property points to a
@@ -84,27 +47,21 @@ public class ClientDeviceProperty {
    *
    * @return the device property value
    */
-  public ClientDataTagValue getProperty() {
-    return clientDataTagValue;
-  }
+  public ClientDataTagValue getDataTag();
 
   /**
    * Check if this property points to a {@link ClientDataTag}.
    *
    * @return true if this property is a data tag, false otherwise
    */
-  public boolean isDataTag() {
-    return clientDataTagValue instanceof ClientDataTag || tagId != null;
-  }
+  public boolean isDataTag();
 
   /**
    * Check if this property points to a {@link ClientRuleTag}.
    *
    * @return true if this property is a rule tag, false otherwise.
    */
-  public boolean isRuleTag() {
-    return clientDataTagValue instanceof ClientRuleTag;
-  }
+  public boolean isRuleTag();
 
   /**
    * Check if the data tag corresponding to this property has been subscribed to
@@ -112,7 +69,22 @@ public class ClientDeviceProperty {
    *
    * @return true if the property tag has been subscribed to, false otherwise
    */
-  public boolean isSubscribed() {
-    return isDataTag() && clientDataTagValue != null;
-  }
+  public boolean isSubscribed();
+
+  /**
+   * Check if the property is a mapped property, i.e. if it has nested fields.
+   *
+   * @return true if the property is a mapped property, false otherwise
+   */
+  public boolean isMappedProperty();
+
+  /**
+   * Retrieve the nested fields of this property.
+   *
+   * @return the property fields, or null if this property is not a mapped
+   *         property
+   *
+   * @see ClientDeviceProperty#isMappedProperty()
+   */
+  public Map<String, ClientDeviceProperty> getFields();
 }

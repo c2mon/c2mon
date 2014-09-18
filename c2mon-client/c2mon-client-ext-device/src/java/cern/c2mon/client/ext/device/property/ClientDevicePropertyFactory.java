@@ -17,8 +17,10 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.device.property;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import cern.c2mon.client.core.tag.ClientRuleTag;
-import cern.c2mon.client.ext.device.tag.ClientConstantValueTag;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
@@ -46,21 +48,33 @@ public class ClientDevicePropertyFactory {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static ClientDeviceProperty createClientDeviceProperty(DeviceProperty deviceProperty) throws ClassNotFoundException, RuleFormatException {
 
+    // If the property has nested fields, create them all here
+    if (deviceProperty.getFields() != null) {
+      Map<String, DeviceProperty> fields = deviceProperty.getFields();
+      Map<String, ClientDeviceProperty> clientFields = new HashMap<>();
+
+      for (DeviceProperty field : fields.values()) {
+        clientFields.put(field.getName(), createClientDeviceProperty(field));
+      }
+
+      return new ClientDevicePropertyImpl(clientFields);
+    }
+
     // If we have a tag ID, it takes priority.
     if (deviceProperty.getTagId() != null) {
-      return new ClientDeviceProperty(deviceProperty.getTagId());
+      return new ClientDevicePropertyImpl(deviceProperty.getTagId());
     }
 
     // If we have a client rule, that comes next in the hierarchy.
     else if (deviceProperty.getClientRule() != null) {
       ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getClientRule()), deviceProperty.getResultType());
-      return new ClientDeviceProperty(ruleTag);
+      return new ClientDevicePropertyImpl(ruleTag);
     }
 
     // If we have a constant value, it comes last in the hierarchy.
     else if (deviceProperty.getConstantValue() != null) {
-      ClientConstantValueTag constantValueTag = new ClientConstantValueTag(deviceProperty.getConstantValue(), deviceProperty.getResultType());
-      return new ClientDeviceProperty(constantValueTag);
+      ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getConstantValue(), deviceProperty.getResultType());
+      return new ClientDevicePropertyImpl(constantValueTag);
     }
 
     else {

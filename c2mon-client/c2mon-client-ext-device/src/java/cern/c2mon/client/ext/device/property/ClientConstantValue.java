@@ -15,7 +15,7 @@
  *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.ext.device.tag;
+package cern.c2mon.client.ext.device.property;
 
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -35,7 +35,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  *
  * @author Justin Lewis Salmon
  */
-public class ClientConstantValueTag<T> implements ClientDataTagValue {
+public class ClientConstantValue<T> implements ClientDataTagValue {
 
   /**
    * The ID of this tag.
@@ -58,9 +58,9 @@ public class ClientConstantValueTag<T> implements ClientDataTagValue {
    * @param value the constant value
    * @param resultType the type of the constant value
    */
-  public ClientConstantValueTag(final T value, final Class<T> resultType) {
+  public ClientConstantValue(final T value, final Class<T> resultType) {
     if (value == null) {
-      throw new NullPointerException("ClientConstantValueTag cannot be instantiated with null value argument");
+      throw new NullPointerException("ClientConstantValue cannot be instantiated with null value argument");
     }
 
     this.id = -1L;

@@ -18,9 +18,13 @@
 package cern.c2mon.shared.client.device;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
 
 /**
  * Simple XML mapper bean representing a device property. Used when
@@ -66,6 +70,12 @@ public class DeviceProperty implements Cloneable, Serializable {
   private String resultType = "String";
 
   /**
+   * The list of nested fields of this property.
+   */
+  @ElementList(required = false, entry = "Fields")
+  private List<DeviceProperty> fields;
+
+  /**
    * Default constructor. A <code>DeviceProperty</code> can be either a tag ID,
    * a client rule, or a constant value. For client rules and constant values,
    * it is possible to specify the type of the resulting value.
@@ -86,6 +96,11 @@ public class DeviceProperty implements Cloneable, Serializable {
     if (resultType != null) {
       this.resultType = resultType;
     }
+  }
+
+  public DeviceProperty(final String name, final List<DeviceProperty> fields) {
+    this.name = name;
+    this.fields = fields;
   }
 
   /**
@@ -128,6 +143,26 @@ public class DeviceProperty implements Cloneable, Serializable {
    */
   public String getConstantValue() {
     return constantValue;
+  }
+
+  /**
+   * Retrieve the raw fields of this property (if they exist). Used for testing
+   * only.
+   *
+   * @return the property fields if they exist, null otherwise
+   */
+  public Map<String, DeviceProperty> getFields() {
+    if (this.fields == null) {
+      return null;
+    }
+
+    Map<String, DeviceProperty> fields = new HashMap<>();
+
+    for (DeviceProperty field : this.fields) {
+      fields.put(field.getName(), field);
+    }
+
+    return fields;
   }
 
   /**
