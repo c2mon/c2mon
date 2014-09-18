@@ -46,14 +46,31 @@ public class ClusterCacheImpl extends DefaultCacheImpl<String, Serializable> imp
   public void init() {
     //lock cluster
     cache.acquireWriteLockOnKey(clusterInitializedKey);
+    //empty this cache in single server mode!
+    if (!skipCachePreloading && cacheMode.equalsIgnoreCase("single")) {
+      cache.removeAll();
+    }
     try {
-      // empty this cache in single server mode!
-      if (!skipCachePreloading && cacheMode.equalsIgnoreCase("single")) {
-        cache.removeAll();
-      }
-      
+      //if cluster cache is not initialized (i.e. distributed cache is not running), then set initial values
       if (cache.get(clusterInitializedKey) == null) {
+        //only run this once on clean cluster startup
         this.put(clusterInitializedKey, Boolean.TRUE);
+
+        //initialize cache loading flags
+        this.put(AlarmCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(DataTagCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(CommandTagCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(RuleTagCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(RuleTagPostLoaderProcessor.ruleCachePostProcessedKey, Boolean.FALSE);
+        this.put(ControlTagCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(ProcessCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(EquipmentCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(SubEquipmentCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(CommFaultTagCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(AliveTimerCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(DeviceClassCache.cacheInitializedKey, Boolean.FALSE);
+        this.put(DeviceCache.cacheInitializedKey, Boolean.FALSE);
+
       }
     } finally {
       cache.releaseWriteLockOnKey(clusterInitializedKey);
