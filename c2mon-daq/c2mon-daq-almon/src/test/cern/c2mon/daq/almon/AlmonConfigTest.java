@@ -6,7 +6,6 @@ package cern.c2mon.daq.almon;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import javax.annotation.Resource;
 
@@ -17,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import cern.c2mon.daq.almon.AlmonConfig;
 
 /**
  * @author wbuczak

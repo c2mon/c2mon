@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author wbuczak
  */
-@Component
+@Component("conf")
 @ManagedResource(objectName = "cern.c2mon.daq.almon:name=AlmonConfig", description = "configuration holder")
 public class AlmonConfig {
    

@@ -5,11 +5,14 @@
 package cern.c2mon.daq.almon;
 
 import static cern.c2mon.daq.almon.FesaJapcParameterHandler.CYCLE_NAME_FIELD;
+import static cern.c2mon.daq.almon.FesaJapcParameterHandler.FESA_PLS_LINE_USER_PROPERTY;
 import static cern.c2mon.daq.almon.FesaJapcParameterHandler.NAMES_ARRAY_FIELD;
 import static cern.c2mon.daq.almon.FesaJapcParameterHandler.PREFIXES_ARRAY_FIELD;
 import static cern.c2mon.daq.almon.FesaJapcParameterHandler.SUFFIXES_ARRAY_FIELD;
 import static cern.c2mon.daq.almon.FesaJapcParameterHandler.TIMESTAMPS_ARRAY_FIELD;
 import static cern.c2mon.daq.almon.JapcParameterHandler.ALARM_MON_FAULT_FAMILY;
+import static cern.c2mon.daq.almon.JapcParameterHandler.ASI_PREFIX_PROPERTY;
+import static cern.c2mon.daq.almon.JapcParameterHandler.ASI_SUFFIX_PROPERTY;
 import static cern.japc.ext.mockito.JapcMock.acqVal;
 import static cern.japc.ext.mockito.JapcMock.mockParameter;
 import static cern.japc.ext.mockito.JapcMock.mpv;
@@ -364,67 +367,68 @@ public class FesaJapcParameterHandlerTest {
          */
     }
 
-    // @Test(timeout = 10000)
+    @Test(timeout = 10000)
     @DirtiesContext
     public void testAlarmUpdate() throws Exception {
-        /*
-         * // create mock parameter Parameter p1 = mockParameter("PR.TFB-AMP/Alarm");
-         * 
-         * String[] fields = { NAMES_ARRAY_FIELD, TIMESTAMPS_ARRAY_FIELD, CYCLE_NAME_FIELD, PREFIXES_ARRAY_FIELD,
-         * SUFFIXES_ARRAY_FIELD };
-         * 
-         * String[] namesArray1 = { "DAMPERPS_100010", "DAMPERPS_100020" };
-         * 
-         * long[] timestampsArray1 = { 1389175345532888003L, 1389175345532987834L };
-         * 
-         * String[] prefixesArray = { "" }; String[] suffixesArray = { "" };
-         * 
-         * String[] suffixesArray2 = { "suffix1", "suffix2" };
-         * 
-         * Object[] values1 = { namesArray1, timestampsArray1, "user1", prefixesArray, suffixesArray }; Object[] values2
-         * = { namesArray1, timestampsArray1, "user1", prefixesArray, suffixesArray2 };
-         * 
-         * // register behavior - by default throw exception simulating the server is down, followed by an active alarm
-         * when(p1.getValue(null)).thenReturn(acqVal("PR.TFB-AMP/Alarm", mpv(fields, values1))).thenReturn(
-         * acqVal("PR.TFB-AMP/Alarm", mpv(fields, values2)));
-         * 
-         * FesaParameter fesaParameter = new FesaParameter("PR.TFB-AMP", "Alarm", "DAMPERPS_100010", "NONE",
-         * "ADTPSMODULE_210", "PR.TFB-AMP", 1000);
-         * 
-         * handler1 = new FesaJapcParameterHandler(fesaParameter, senderProxy, plsLineResolver);
-         * handler1.startMonitoring();
-         * 
-         * SuperCycle superCycle = newSuperCycle(new Cycle("", 200)); superCycle.start(); Thread.sleep(600);
-         * 
-         * AlarmTripplet alarmTripplet = new AlarmTripplet(ALARM_MON_FAULT_FAMILY, "PR.TFB-AMP", 2);
-         * 
-         * List<AlarmRecord> records = mockSender.getAlarmsSequence(alarmTripplet); assertEquals(0, records.size());
-         * 
-         * alarmTripplet = new AlarmTripplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
-         * 
-         * while (mockSender.getAlarmsSequence(alarmTripplet).size() < 2) { Thread.sleep(50); }
-         * 
-         * records = mockSender.getAlarmsSequence(alarmTripplet); assertEquals(2, records.size());
-         * 
-         * AlarmRecord r1 = records.get(0); AlarmRecord r2 = records.get(1);
-         * 
-         * // 1st - expect alarm activation assertEquals(AlarmState.ACTIVE, r1.getAlarmState());
-         * 
-         * // no prefixes nor suffixes in the first record assertNull(r1.getUserProperties().get(ASI_PREFIX_PROPERTY));
-         * assertNull(r1.getUserProperties().get(ASI_SUFFIX_PROPERTY)); assertEquals("1",
-         * r2.getUserProperties().get(FESA_PLS_LINE_USER_PROPERTY));
-         * 
-         * // 2nd - still the alarm should stay active - is should be just updated assertEquals(AlarmState.ACTIVE,
-         * r2.getAlarmState()); assertNull(r2.getUserProperties().get(ASI_PREFIX_PROPERTY));
-         * assertNotNull(r2.getUserProperties().get(ASI_SUFFIX_PROPERTY)); assertEquals("suffix1",
-         * r2.getUserProperties().get(ASI_SUFFIX_PROPERTY)); assertEquals("1",
-         * r2.getUserProperties().get(FESA_PLS_LINE_USER_PROPERTY));
-         */
+
+        // create mock parameter
+        Parameter p1 = mockParameter("PR.TFB-AMP/Alarm");
+
+        String[] fields = { NAMES_ARRAY_FIELD, TIMESTAMPS_ARRAY_FIELD, CYCLE_NAME_FIELD, PREFIXES_ARRAY_FIELD,
+                SUFFIXES_ARRAY_FIELD };
+
+        String[] namesArray1 = { "DAMPERPS_100010", "DAMPERPS_100020" };
+
+        long[] timestampsArray1 = { 1389175345532888003L, 1389175345532987834L };
+
+        String[] prefixesArray = { "" };
+        String[] suffixesArray = { "" };
+
+        String[] suffixesArray2 = { "suffix1", "suffix2" };
+
+        Object[] values1 = { namesArray1, timestampsArray1, "user1", prefixesArray, suffixesArray };
+        Object[] values2 = { namesArray1, timestampsArray1, "user1", prefixesArray, suffixesArray2 };
+
+        // register behavior - by default throw exception simulating the server is down, followed by an active alarm
+        when(p1.getValue(null)).thenReturn(acqVal("PR.TFB-AMP/Alarm", mpv(fields, values1))).thenReturn(
+                acqVal("PR.TFB-AMP/Alarm", mpv(fields, values2)));
+
+        AlarmTripplet alarmTripplet = new AlarmTripplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
+        AlmonHardwareAddress address1 = new AlmonHardwareAddressImpl(AlarmType.FESA, "PR.TFB-AMP", "Alarm",
+                "DAMPERPS_100010", alarmTripplet);
+
+        handler1 = new FesaJapcParameterHandler(sdt, address1, ems, senderProxy, plsLineResolver);
+        handler1.startMonitoring();
+
+        SuperCycle superCycle = newSuperCycle(new Cycle("", 200));
+        superCycle.start();
+        Thread.sleep(600);
+
+        while (mockSender.getAlarmsSequence(alarmTripplet).size() < 2) {
+            Thread.sleep(50);
+        }
+
+        List<AlarmRecord> records = mockSender.getAlarmsSequence(alarmTripplet);
+        assertEquals(2, records.size());
+
+        AlarmRecord r1 = records.get(0);
+        AlarmRecord r2 = records.get(1);
+
+        // 1st - expect alarm activation
+        assertEquals(AlarmState.ACTIVE, r1.getAlarmState());
+
+        // no prefixes nor suffixes in the first record
+        assertNull(r1.getUserProperties().get(ASI_PREFIX_PROPERTY));
+        assertNull(r1.getUserProperties().get(ASI_SUFFIX_PROPERTY));
+        assertEquals("1", r2.getUserProperties().get(FESA_PLS_LINE_USER_PROPERTY));
+
+        // 2nd - still the alarm should stay active - is should be just updated
+        assertEquals(AlarmState.ACTIVE, r2.getAlarmState());
+        assertNull(r2.getUserProperties().get(ASI_PREFIX_PROPERTY));
+        assertNotNull(r2.getUserProperties().get(ASI_SUFFIX_PROPERTY));
+        assertEquals("suffix1", r2.getUserProperties().get(ASI_SUFFIX_PROPERTY));
+        assertEquals("1", r2.getUserProperties().get(FESA_PLS_LINE_USER_PROPERTY));
+
     }
 
-    static AlmonHardwareAddress createTestAddress() {
-        AlmonHardwareAddress addr = null;
-
-        return addr;
-    }
 }

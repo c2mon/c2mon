@@ -20,6 +20,7 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -28,7 +29,7 @@ import cern.c2mon.shared.daq.datatag.ISourceDataTag;
  * The alarm monitor sender proxy keeps a list of alarm monitor senders which are called to forward alarms. The proxy
  * allows injecting more than one sender and thus forwarding alarms activations/terminations/updates to multiple
  * destinations. In practice on production system we use one LASER sender + one logging sender (which logs every alarm
- * activation/termination/update record into a dedicated log file). Operations have synchronized critical blocks
+ * activation/termination/update record into a dedicated LOG file). Operations have synchronized critical blocks
  * disallowing different threads to activate/terminate the same alarm tripplet concurrently. Proxy also caches active
  * alarms list. It will discard calls to underlying senders when attempting to activate a tripplet which is already
  * active. Similarly, it will not forward the call to terminate an alarm if it has already been terminated. In addition
@@ -52,7 +53,7 @@ public class AlarmMonitorSenderProxy implements AlmonSender {
 
     @Override
     public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
-            long userTimestamp, Properties userProperties) {
+            long userTimestamp, UserProperties userProperties) {
         Properties props = userProperties == null ? new Properties() : userProperties;
 
         boolean activate = false;
@@ -78,7 +79,7 @@ public class AlarmMonitorSenderProxy implements AlmonSender {
 
     @Override
     public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
-            long userTimestamp, Properties userProperties) {
+            long userTimestamp, UserProperties userProperties) {
         Properties props = userProperties == null ? new Properties() : userProperties;
 
         boolean update = false;

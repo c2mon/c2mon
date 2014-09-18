@@ -7,6 +7,7 @@ package cern.c2mon.daq.almon;
 import java.util.Properties;
 
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
+import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -17,7 +18,7 @@ import cern.japc.Type;
 import cern.japc.ValueType;
 
 /**
- * <code>JApcParameterHandler</code> specialization for GM
+ * The <code>FesaJapcParameterHandler</code> is a parameter handler implementation for GM alarms
  * 
  * @author wbuczak
  */
@@ -97,7 +98,7 @@ public class GmJapcParameterHandler extends JapcParameterHandler {
             // (ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet, long userTimestamp,
             // Properties userProperties);
 
-            this.amSender.activate(tag, ems, address.getAlarmTripplet(), timestamp, props);
+            this.amSender.activate(tag, ems, address.getAlarmTripplet(), timestamp, new UserProperties());
         }
     }
 

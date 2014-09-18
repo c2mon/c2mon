@@ -4,25 +4,24 @@
 
 package cern.c2mon.daq.almon.sender;
 
-import java.util.Properties;
-
 import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
- * This interface defines the operations all alarm senders must implement
+ * This interface defines the operations common to all alarm senders
  * 
  * @author wbuczak
  */
 public interface AlmonSender {
 
     void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet, long userTimestamp,
-            Properties userProperties);
+            UserProperties userProperties);
 
     void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet, long userTimestamp);
 
     void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet, long userTimestamp,
-            Properties userProperties);
+            UserProperties userProperties);
 
 }

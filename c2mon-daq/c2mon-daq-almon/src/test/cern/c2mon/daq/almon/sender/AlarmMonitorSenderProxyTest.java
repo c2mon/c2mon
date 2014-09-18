@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.impl.AlarmMonitorSenderProxy;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -107,7 +107,7 @@ public class AlarmMonitorSenderProxyTest {
         latch.await(4000, TimeUnit.MILLISECONDS);
 
         // sender should be called once only,
-        verify(mockSender, times(1)).activate(eq(sdt), eq(ems), eq(tripplet), anyInt(), (Properties) anyObject());
+        verify(mockSender, times(1)).activate(eq(sdt), eq(ems), eq(tripplet), anyInt(), (UserProperties) anyObject());
 
         // sender should be called once only,
         verify(mockSender, times(1)).terminate(eq(sdt), eq(ems), eq(tripplet), anyInt());
@@ -120,7 +120,7 @@ public class AlarmMonitorSenderProxyTest {
 
         final AlarmTripplet tripplet = new AlarmTripplet("fault-family1", "fault-member1", 1);
 
-        final Properties props = new Properties();
+        final UserProperties props = new UserProperties();
         props.put("userProperty1", "value1");
         props.put("userProperty2", "value2");
 
@@ -141,6 +141,6 @@ public class AlarmMonitorSenderProxyTest {
         latch.await(4000, TimeUnit.MILLISECONDS);
 
         // sender should be called once only,
-        verify(mockSender, times(1)).update(eq(sdt), eq(ems), eq(tripplet), anyInt(), (Properties) anyObject());
+        verify(mockSender, times(1)).update(eq(sdt), eq(ems), eq(tripplet), anyInt(), (UserProperties) anyObject());
     }
 }

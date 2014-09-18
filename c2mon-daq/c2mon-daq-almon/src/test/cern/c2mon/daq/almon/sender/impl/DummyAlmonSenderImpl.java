@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import cern.c2mon.daq.almon.AlarmRecord;
 import cern.c2mon.daq.almon.AlarmState;
 import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.TestAlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -44,12 +44,15 @@ public class DummyAlmonSenderImpl implements TestAlmonSender {
 
     @Override
     public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
-            long userTimestamp, Properties userProperties) {
+            long userTimestamp, UserProperties userProperties) {
         LOG.info("activating alarm: {}", alarmTripplet);
         if (!alarms.containsKey(alarmTripplet)) {
             alarms.put(alarmTripplet, new ArrayList<AlarmRecord>());
         }
         alarms.get(alarmTripplet).add(new AlarmRecord(AlarmState.ACTIVE, userTimestamp, userProperties));
+        if (ems != null) {
+            ems.sendTagFiltered(sdt, Boolean.TRUE, System.currentTimeMillis(), userProperties.toJson());
+        }
     }
 
     @Override
@@ -60,12 +63,14 @@ public class DummyAlmonSenderImpl implements TestAlmonSender {
             alarms.put(alarmTripplet, new ArrayList<AlarmRecord>());
         }
         alarms.get(alarmTripplet).add(new AlarmRecord(AlarmState.TERMINATED, userTimestamp));
-
+        if (ems != null) {
+            ems.sendTagFiltered(sdt, Boolean.FALSE, System.currentTimeMillis());
+        }
     }
 
     @Override
     public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
-            long userTimestamp, Properties userProperties) {
+            long userTimestamp, UserProperties userProperties) {
         LOG.info("updating alarm: {}", alarmTripplet);
         if (!alarms.containsKey(alarmTripplet)) {
             LOG.warn("trying to update alarm which is not active. skipping");
@@ -76,6 +81,9 @@ public class DummyAlmonSenderImpl implements TestAlmonSender {
         AlarmRecord lastRecord = records.get(records.size() - 1);
         if (lastRecord.getAlarmState().equals(AlarmState.ACTIVE)) {
             alarms.get(alarmTripplet).add(new AlarmRecord(AlarmState.ACTIVE, userTimestamp, userProperties));
+            if (ems != null) {
+                ems.sendTagFiltered(sdt, true, System.currentTimeMillis(), userProperties.toJson());
+            }
         } else {
             LOG.warn("trying to update alarm which is not active. skipping");
         }

@@ -13,6 +13,8 @@ import cern.c2mon.daq.almon.util.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
+ * This is the implementation of the <code>AlmonHardwareAddress</code>
+ * 
  * @author wbuczak
  */
 public class AlmonHardwareAddressImpl implements AlmonHardwareAddress {

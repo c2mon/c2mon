@@ -6,13 +6,10 @@ package cern.c2mon.daq.almon.plsline.impl;
 
 import static cern.japc.ext.tgm.TgmUtil.cycleName2LineNumber;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
-import cern.c2mon.daq.almon.AlmonConfig;
 import cern.c2mon.daq.almon.plsline.PlsLineResolver;
 
 /**
@@ -24,15 +21,8 @@ public class PlsLineResolverImpl implements PlsLineResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlsLineResolverImpl.class);
 
-    @Resource
-    AlmonConfig config;
-
+    @Value("#{conf.maxPlsLine}")
     private int maxPlsLine;
-
-    @PostConstruct
-    private void init() {
-        maxPlsLine = config.getMaxPlsLine();
-    }
 
     @Override
     public int resolve(String cycleName) {

@@ -7,6 +7,7 @@ package cern.c2mon.daq.almon;
 import java.util.Properties;
 
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
+import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.plsline.PlsLineResolver;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
@@ -17,7 +18,7 @@ import cern.japc.Type;
 import cern.japc.ValueConversionException;
 
 /**
- * <code>FesaJapcParameterHandler</code> specialization for FESA
+ * The <code>FesaJapcParameterHandler</code> is a parameter handler implementation for FESA
  * 
  * @author wbuczak
  */
@@ -101,7 +102,7 @@ public class FesaJapcParameterHandler extends JapcParameterHandler {
             if (field.equals(address.getField())) {
 
                 // fill in the user properties
-                Properties props = new Properties();
+                UserProperties props = new UserProperties();
 
                 if (prefixes != null && i < prefixes.length && prefixes[i].length() != 0)
                     props.setProperty(ASI_PREFIX_PROPERTY, prefixes[i]);

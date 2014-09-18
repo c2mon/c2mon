@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.Environment;
 
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
 import cern.c2mon.daq.almon.address.AlmonHardwareAddressFactory;
@@ -54,21 +55,24 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
      */
     private Thread initThread;
 
+    private AlmonConfig config;
     private AlmonSender almonSender;
 
-    private AlmonConfig config;
+    private static ClassPathXmlApplicationContext ctx;
 
     /**
      * default constructor
      */
     public AlmonMessageHandler() {
 
-        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
-                "classpath:resources/dmn-almon-config.xml");
-        ctx.getEnvironment().setDefaultProfiles("PRO");
-        ctx.refresh();
+        if (ctx == null) {
+            ctx = new ClassPathXmlApplicationContext("classpath:resources/dmn-almon-config.xml");
+            ctx.getEnvironment().setDefaultProfiles("PRO");
+            ctx.refresh();
+        }
 
         config = ctx.getBean(AlmonConfig.class);
+        almonSender = ctx.getBean("almonSenderProxy", AlmonSender.class);
 
         // create executor
         if (executor == null) {
@@ -80,6 +84,14 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
     @Override
     public void connectToDataSource() throws EqIOException {
         LOG = getEquipmentLogger();
+
+        if (LOG.isDebugEnabled()) {
+            Environment env = ctx.getBean(Environment.class);
+            StringBuilder bld = new StringBuilder();
+            for (String profile : env.getActiveProfiles())
+                bld.append(profile).append(" ");
+            LOG.debug("active spring profile(s) : " + bld.toString());
+        }
 
         LOG.debug("entering connectToDataSource()..");
 

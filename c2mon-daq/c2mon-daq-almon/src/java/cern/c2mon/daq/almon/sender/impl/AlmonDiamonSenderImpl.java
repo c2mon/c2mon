@@ -4,8 +4,6 @@
 
 package cern.c2mon.daq.almon.sender.impl;
 
-import java.util.Properties;
-
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
@@ -29,88 +27,38 @@ public class AlmonDiamonSenderImpl implements AlmonSender {
     @PostConstruct
     public void init() {
         LOG.info("Initializing alarms sender..");
-        /*
-         * try { manager = SourceManager.get();
-         * 
-         * SourceManagerConfiguration config = new SourceManagerConfiguration();
-         * 
-         * if (destinationRoot != null) { config.setDestRoot(destinationRoot); }
-         * 
-         * manager.init(config);
-         * 
-         * alarmSource = manager.createSource(conf.getAccelerator());
-         * 
-         * alarmSource.setBackupFreq(conf.getBackupPeriod()); alarmSource.setKeepAliveFreq(keepAliveFrequency);
-         * alarmSource.setLatency(latency); alarmSource.setQueueSize(queueSize);
-         * 
-         * alarmSource.start();
-         * 
-         * } catch (Exception e) { LOG.error("Alarms Source Manager initialization failed!", e); }
-         */
 
         LOG.info("alarm monitor sender's initialization done");
     }
 
     @Override
     public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
-            long userTimestamp, Properties userProperties) {
+            long userTimestamp, UserProperties userProperties) {
 
         try {
-            ems.sendTagFiltered(sdt, "true", System.currentTimeMillis(), new UserProperties(userProperties).toJson());
+            ems.sendTagFiltered(sdt, Boolean.TRUE, System.currentTimeMillis(), userProperties.toJson());
         } catch (Exception ex2) {
             LOG.error("exception caught when trying to send tag update", ex2);
         }
 
-        // AlarmHandle alarm = alarmSource.getHandle(alarmTripplet.getFaultFamily(), alarmTripplet.getFaultMember(),
-        // alarmTripplet.getFaultCode());
-        //
-        // if (userProperties != null) {
-        // for (Entry<Object, Object> e : userProperties.entrySet()) {
-        // try {
-        // alarm.getStatus().setProperty(e.getKey().toString(), userProperties.get(e.getKey()).toString());
-        // } catch (Exception e1) {
-        // LOG.warn("could not set user priperty: {} value: {} for alarm: {}", e.getKey().toString(),
-        // userProperties.get(e.getKey()).toString(), alarmTripplet.toString());
-        // }
-        // }
-        // }
-        //
-        // if (!alarmSource.activate(alarm)) {
-        // LOG.warn("activating alarm: {} failed", alarmTripplet.toString());
-        // }
     }
 
     @Override
     public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
-            long userTimestamp, Properties userProperties) {
-        // AlarmHandle alarm = alarmSource.getHandle(alarmTripplet.getFaultFamily(), alarmTripplet.getFaultMember(),
-        // alarmTripplet.getFaultCode());
-        //
-        // if (userProperties != null) {
-        // for (Entry<Object, Object> e : userProperties.entrySet()) {
-        // try {
-        // alarm.getStatus().setProperty(e.getKey().toString(), userProperties.get(e.getKey()).toString());
-        // } catch (Exception e1) {
-        // LOG.warn("could not set user priperty: {} value: {} for alarm: {}", e.getKey().toString(),
-        // userProperties.get(e.getKey()).toString(), alarmTripplet.toString());
-        // }
-        // }
-        // }
-        //
-        // if (!alarmSource.update(alarm)) {
-        // LOG.warn("updating alarm: {} failed", alarmTripplet.toString());
-        // }
+            long userTimestamp, UserProperties userProperties) {
+
+        // in fact we're just re-sending the same value (true) - only user properties may have changed..
+        this.activate(sdt, ems, alarmTripplet, userTimestamp, userProperties);
     }
 
     @Override
     public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
             long userTimestamp) {
-        // AlarmHandle alarm = alarmSource.getHandle(alarmTripplet.getFaultFamily(), alarmTripplet.getFaultMember(),
-        // alarmTripplet.getFaultCode());
-        //
-        // if (!alarmSource.terminate(alarm)) {
-        // LOG.warn("terminating alarm: {} failed", alarmTripplet.toString());
-        // }
+        try {
+            ems.sendTagFiltered(sdt, Boolean.FALSE, System.currentTimeMillis());
+        } catch (Exception ex2) {
+            LOG.error("exception caught when trying to send tag update", ex2);
+        }
     }
 
 }

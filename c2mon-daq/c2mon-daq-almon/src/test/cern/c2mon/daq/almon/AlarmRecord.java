@@ -4,23 +4,21 @@
 
 package cern.c2mon.daq.almon;
 
-import java.util.Properties;
-
-import cern.c2mon.daq.almon.AlarmState;
+import cern.c2mon.daq.almon.address.UserProperties;
 
 /**
  * @author wbuczak
  */
 public class AlarmRecord {
     private AlarmState alarmState;
-    private Properties userProperties;
+    private UserProperties userProperties;
     private long userTimestamp;
 
     public AlarmRecord(AlarmState alarmState, long userTimestamp) {
         this(alarmState, userTimestamp, null);
     }
 
-    public AlarmRecord(AlarmState alarmState, long userTimestamp, Properties userProperties) {
+    public AlarmRecord(AlarmState alarmState, long userTimestamp, UserProperties userProperties) {
         this.alarmState = alarmState;
         this.userProperties = userProperties;
         this.userTimestamp = userTimestamp;
@@ -30,7 +28,7 @@ public class AlarmRecord {
         return alarmState;
     }
 
-    public Properties getUserProperties() {
+    public UserProperties getUserProperties() {
         return userProperties;
     }
 

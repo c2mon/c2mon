@@ -3,29 +3,33 @@
  */
 package cern.c2mon.daq.almon;
 
+import static cern.japc.ext.mockito.JapcMock.mockParameter;
+import static cern.japc.ext.mockito.JapcMock.mpv;
+import static cern.japc.ext.mockito.JapcMock.resetJapcMock;
+import static cern.japc.ext.mockito.JapcMock.sel;
+import static cern.japc.ext.mockito.JapcMock.setAnswer;
+import static java.lang.System.setProperty;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
-import static cern.japc.ext.mockito.JapcMock.resetJapcMock;
-import static cern.japc.ext.mockito.JapcMatchers.anySelector;
-import static cern.japc.ext.mockito.JapcMock.acqVal;
-import static cern.japc.ext.mockito.JapcMock.mockParameter;
-import static cern.japc.ext.mockito.JapcMock.mpv;
-import static cern.japc.ext.mockito.JapcMock.setAnswer;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import cern.japc.ext.mockito.JapcMock;
-
+import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
+import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.japc.Parameter;
+import cern.japc.Selector;
+import cern.japc.ext.mockito.JapcMock;
 import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 
 /**
@@ -39,38 +43,39 @@ import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 @UseHandler(AlmonMessageHandler.class)
 public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
 
-    static Logger log = Logger.getLogger(AlmonMessageHandlerTest.class);
+    static Logger LOG = Logger.getLogger(AlmonMessageHandlerTest.class);
 
     static {
         // activate the TEST spring profile
-        System.setProperty("spring.profiles.active", "TEST");
+        setProperty("spring.profiles.active", "TEST");
     }
+
+    static final Selector GM_DEVICE_SELECTOR = sel(AlmonHardwareAddress.GM_JAPC_ALARM_SELECTOR);
 
     AlmonMessageHandler emh;
 
     @Override
     protected void beforeTest() throws Exception {
-        log.info("entering beforeTest()..");
+        LOG.info("entering beforeTest()..");
         emh = (AlmonMessageHandler) msgHandler;
-
         JapcMock.init();
         resetJapcMock();
-        
-        log.info("leaving beforeTest()");
+
+        LOG.info("leaving beforeTest()");
     }
 
     @Override
     protected void afterTest() throws Exception {
-        log.info("entering afterTest()..");
+        LOG.info("entering afterTest()..");
 
         emh.disconnectFromDataSource();
 
-        log.info("leaving afterTest()");
+        LOG.info("leaving afterTest()");
     }
 
     @Test
     @UseConf("conf-gm-one-metric.xml")
-    public void test1() throws Exception {
+    public void testGmAlarmActivation() throws Exception {
 
         messageSender.sendCommfaultTag(107211, true);
         expectLastCall().once();
@@ -80,31 +85,37 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
         messageSender.addValue(EasyMock.capture(sdtv));
         expectLastCall().times(1);
 
-        replay(messageSender);        
-                
+        replay(messageSender);
+
         // Create Mock parameters
         Parameter p1 = mockParameter("RFLNP/ALARM");
 
         String[] fields = { "value" };
         Object[] values1 = { 1 };
-        //Object[] values2 = { 0 };
 
-        setAnswer(p1, null, new DefaultParameterAnswer(mpv(fields, values1)));
+        setAnswer(p1, GM_DEVICE_SELECTOR, new DefaultParameterAnswer(mpv(fields, values1)));
+
+        Thread.sleep(500);
 
         emh.connectToDataSource();
 
         Thread.sleep(2500);
 
         // set the new value
-        p1.setValue(null, mpv(fields, values1));
+        p1.setValue(GM_DEVICE_SELECTOR, mpv(fields, values1));
 
-        
-        Thread.sleep(1500);
+        Thread.sleep(1000);
 
         verify(messageSender);
 
+        assertEquals(1, sdtv.getValues().size());
+
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
-        assertEquals(true, sdtv.getFirstValue(54675L).getValue());      
+        assertEquals(true, sdtv.getFirstValue(54675L).getValue());
+        assertNotNull(sdtv.getFirstValue(54675L).getValueDescription());
+        UserProperties uprops = UserProperties.fromJson(sdtv.getFirstValue(54675L).getValueDescription());
+        assertNotNull(uprops);
+        assertTrue(uprops.isEmpty());
     }
 
     // @Test

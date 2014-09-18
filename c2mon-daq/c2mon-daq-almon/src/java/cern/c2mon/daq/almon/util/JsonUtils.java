@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
- * Helper class providing JSON serialization/de-serialization utility methods
+ * Helper class providing JSON serialization & de-serialization utility methods
  * 
  * @author wbuczak
  */
