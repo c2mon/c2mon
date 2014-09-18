@@ -163,7 +163,8 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
     //lock cacheStatus while setting that this server will perform the preload
     getClusterCache().acquireWriteLockOnKey(getCacheInitializedKey());    
     try {      
-      if (!skipCachePreloading && !getClusterCache().getCopy(getCacheInitializedKey()).equals(Boolean.TRUE)) {
+      if (!skipCachePreloading 
+          && (!getClusterCache().hasKey(getCacheInitializedKey()) || getClusterCache().getCopy(getCacheInitializedKey()).equals(Boolean.FALSE))) {
         //record that the preload will be done by this server and set loading flag to TRUE
         loadCache = true;
         getClusterCache().put(getCacheInitializedKey(), Boolean.TRUE);        
