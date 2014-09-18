@@ -20,30 +20,30 @@ import cern.c2mon.server.common.rule.RuleTag;
 /**
  * Manages the multi threaded loading of the rule
  * parent ids at start up.
- *  
+ *
  * @author Mark Brightwell
  *
  */
 @Service
 public class RuleTagPostLoaderProcessor {
-  
+
   private static final Logger LOGGER = Logger.getLogger(RuleTagPostLoaderProcessor.class);
 
   private RuleTagFacade ruleTagFacade;
-  
+
   private RuleTagCache ruleTagCache;
-  
+
   private ClusterCache clusterCache;
-  
+
   /**
    * Thread pool settings.
    */
   private int threadPoolMax = 16;
   private int threadPoolMin = 4;
-  
+
   /** Cluster Cache key to avoid loading twice the parent rule ids at startup */
   public static final String ruleCachePostProcessedKey = "c2mon.cache.rule.ruleCachePostProcessed";
-    
+
   @Autowired
   public RuleTagPostLoaderProcessor(RuleTagFacade ruleTagFacade, RuleTagCache ruleTagCache, ClusterCache clusterCache) {
     super();
@@ -57,33 +57,36 @@ public class RuleTagPostLoaderProcessor {
    * if the distributed cache is being initialised.
    */
   @PostConstruct
-  public void loadRuleParentIds() {  
+  public void loadRuleParentIds() {
     LOGGER.trace("Entering loadRuleParentIds()...");
-    
+
     LOGGER.trace("Trying to get cache lock for " + RuleTagCache.cacheInitializedKey);
     clusterCache.acquireWriteLockOnKey(RuleTagCache.cacheInitializedKey);
     try {
-      Boolean isRuleCachePostProcessed = (Boolean) clusterCache.getCopy(ruleCachePostProcessedKey);
+      Boolean isRuleCachePostProcessed = Boolean.FALSE;
+      if (clusterCache.hasKey(ruleCachePostProcessedKey)) {
+        isRuleCachePostProcessed = (Boolean) clusterCache.getCopy(ruleCachePostProcessedKey);
+      }
       if (!isRuleCachePostProcessed.booleanValue()) {
         LOGGER.info("Setting parent ids for rules...");
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(threadPoolMin, threadPoolMax, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
         LoaderTask task = new LoaderTask();
         int counter = 0;
-        for (Long key : ruleTagCache.getKeys()) {      
+        for (Long key : ruleTagCache.getKeys()) {
           task.addKey(key);
           counter++;
-          if (counter == 500) {              
+          if (counter == 500) {
             threadPoolExecutor.execute(task);
-            task = new LoaderTask();        
-            counter = 0; 
-          }      
+            task = new LoaderTask();
+            counter = 0;
+          }
         }
         threadPoolExecutor.execute(task);
         threadPoolExecutor.shutdown();
         try {
           threadPoolExecutor.awaitTermination(1200, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-          LOGGER.warn("Exception caught while waiting for rule parent id loading threads to complete (waited longer then timeout?): ", e);      
+          LOGGER.warn("Exception caught while waiting for rule parent id loading threads to complete (waited longer then timeout?): ", e);
         }
         LOGGER.info("... rule parent ids set.");
         clusterCache.put(ruleCachePostProcessedKey, Boolean.TRUE);
@@ -93,19 +96,19 @@ public class RuleTagPostLoaderProcessor {
     } finally {
       clusterCache.releaseWriteLockOnKey(RuleTagCache.cacheInitializedKey);
       LOGGER.trace("Released cache lock .. for " + RuleTagCache.cacheInitializedKey);
-    }  
-    
+    }
+
     LOGGER.trace("Leaving loadRuleParentIds()");
   }
-  
+
   private class LoaderTask implements Runnable {
 
     private List<Long> keyList = new LinkedList<Long>();
-    
+
     public void addKey(Long key) {
       keyList.add(key);
     }
-    
+
     @Override
     public void run() {
       for (Long ruleKey : keyList) {
@@ -115,9 +118,9 @@ public class RuleTagPostLoaderProcessor {
           ruleTagFacade.setParentSupervisionIds(ruleTag);
           ruleTagCache.putQuiet(ruleTag);
         }
-      }      
+      }
     }
-    
+
   }
 
   /**
@@ -135,5 +138,5 @@ public class RuleTagPostLoaderProcessor {
   public void setThreadPoolMin(int threadPoolMin) {
     this.threadPoolMin = threadPoolMin;
   }
-  
+
 }
