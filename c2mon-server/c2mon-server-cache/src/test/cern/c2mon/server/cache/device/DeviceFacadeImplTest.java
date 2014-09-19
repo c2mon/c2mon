@@ -196,7 +196,7 @@ public class DeviceFacadeImplTest {
     EasyMock.expect(deviceClassCacheMock.get(-1L)).andReturn(null);
 
     // Expect the facade to get the DeviceClass for the device
-    EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass).times(2);
+    EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass).times(3);
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(deviceCacheMock, deviceClassCacheMock);
