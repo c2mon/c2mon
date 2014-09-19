@@ -1105,7 +1105,14 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     replay(mockManager);
 
-    ConfigurationReport report = configurationLoader.applyConfiguration(32);
+    ConfigurationReport report = configurationLoader.applyConfiguration(33);
+    System.out.println(report.toXML());
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+
+    deviceClass = deviceClassCache.get(400L);
+    assertTrue(((DeviceClassCacheObject) deviceClass).getDeviceIds().size() == 3);
+
+    report = configurationLoader.applyConfiguration(32);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(deviceClassCache.hasKey(400L));

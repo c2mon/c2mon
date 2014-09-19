@@ -64,8 +64,8 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
   }
 
   /**
-   * Run on bean initialization. Sets the Ehcache field to the appropriate cache and calls
-   * the preload routine if necessary.
+   * Run on bean initialization. Sets the Ehcache field to the appropriate cache
+   * and calls the preload routine if necessary.
    */
   @PostConstruct
   public void init() {
@@ -114,5 +114,13 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
     }
 
     return deviceClass;
+  }
+
+  @Override
+  public void updateDeviceIds(Long deviceClassId) {
+    // Remove/reload the item from the DB. This will cause the device IDS to be
+    // updated correctly
+    remove(deviceClassId);
+    loadFromDb(deviceClassId);
   }
 }

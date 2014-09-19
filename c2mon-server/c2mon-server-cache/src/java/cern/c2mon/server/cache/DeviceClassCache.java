@@ -38,4 +38,11 @@ public interface DeviceClassCache extends C2monCacheWithListeners<Long, DeviceCl
    *         null if no instance exists in the cache
    */
   public DeviceClass getDeviceClassByName(String deviceClassName);
+
+  /**
+   * Update the device IDs of a device class by reloading it from the database.
+   *
+   * @param deviceClassId the ID of the device class to update
+   */
+  public void updateDeviceIds(Long deviceClassId);
 }

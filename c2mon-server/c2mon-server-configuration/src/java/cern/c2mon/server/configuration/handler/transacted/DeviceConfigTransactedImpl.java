@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import cern.c2mon.server.cache.DeviceCache;
+import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.DeviceDAO;
@@ -66,17 +67,27 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
   private DeviceDAO deviceDAO;
 
   /**
+   * Reference to the DeviceClass cache.
+   */
+  private DeviceClassCache deviceClassCache;
+
+  /**
    * Default constructor.
    *
    * @param deviceCache reference to the Device cache.
    * @param deviceFacade reference to he Device facade bean.
    * @param deviceDAO reference to the Device DAO bean.
+   * @param deviceClassCache reference to the DeviceClass cache.
    */
   @Autowired
-  public DeviceConfigTransactedImpl(final DeviceCache deviceCache, final DeviceFacade deviceFacade, final DeviceDAO deviceDAO) {
+  public DeviceConfigTransactedImpl(final DeviceCache deviceCache,
+                                    final DeviceFacade deviceFacade,
+                                    final DeviceDAO deviceDAO,
+                                    final DeviceClassCache deviceClassCache) {
     this.deviceCache = deviceCache;
     this.deviceFacade = deviceFacade;
     this.deviceDAO = deviceDAO;
+    this.deviceClassCache = deviceClassCache;
   }
 
   @Override
@@ -108,6 +119,10 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
       // Insert the device into the cache
       try {
         deviceCache.putQuiet(device);
+
+        // Update the device class so that it knows about the new device
+        deviceClassCache.updateDeviceIds(device.getDeviceClassId());
+
         return new ProcessChange();
 
       } catch (Exception e) {
