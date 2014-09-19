@@ -220,7 +220,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                             }
                             Alert a = alertsQueue.poll();
                             //System.out.println("Taken from the queue");
-                            processAlert(a);
+                            dbController.processAlert(a);
                         }
                     }
                     try {
@@ -367,41 +367,6 @@ public class DBMessageHandler extends EquipmentMessageHandler {
               }
             }
 //        }
-    }
-    
-    /**
-     * Processes a single alert. Extracts the name of the alert (==id of the
-     * datatag), the value and timestamp, and sends them to TIM server. In case
-     * the quality of the datatag is low (SourceDataQuality.UNKNOWN) or the
-     * value failed the conversion to its datatype, the datatag is invalidated.
-     * 
-     * @param alert
-     *            alert to be sent to the server
-     * */
-    private void processAlert(final Alert alert) {
-        Long dataTagId = alert.getId();
-        if (!getEquipmentConfiguration().getSourceDataTags().containsKey(dataTagId)) {
-            this.equipmentLogger.warn("An alert was received for a not monitored data tag.");
-            return;
-        }
-        this.equipmentLogger.info("Sending datatag: " + alert);
-        ISourceDataTag sdt = getEquipmentConfiguration().getSourceDataTags().get(dataTagId);
-        if (alert.getQuality() == SourceDataQuality.UNKNOWN) {
-            getEquipmentMessageSender().sendInvalidTag(sdt, alert.getQuality(), alert.getQualityDescription(),
-                    new Timestamp(alert.getClientTimestamp().getTime()));
-            increaseSentInvalidDataTags(dataTagId);
-            return;
-        }
-        Object sdtValue = TypeConverter.cast(alert.getDataTagValue(), sdt.getDataType());
-        if (sdtValue == null) {
-            this.equipmentLogger.info("Conversion error! Got: " + alert.getDataTagValue() + ", expected:" + sdt.getDataType());
-            getEquipmentMessageSender().sendInvalidTag(sdt, SourceDataQuality.CONVERSION_ERROR, "", new Timestamp(alert.getClientTimestamp().getTime()));
-            increaseSentInvalidDataTags(dataTagId);
-            return;
-        } else {
-            getEquipmentMessageSender().sendTagFiltered(sdt, sdtValue, alert.getTimestamp().getTime());
-            increaseAllSentDataTags(dataTagId);
-        }
     }
 
     /**
@@ -551,38 +516,8 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         this.equipmentLogger.info("refreshDataTag - Refreshing data tag " + dataTagId);
 //        synchronized (dbDaqDao) {
             Alert alert = dbDaqDao.getLastAlertForDataTagId(dataTagId);
-            processAlert(alert);
+            this.dbController.processAlert(alert);
 //        }
-    }
-    
-    /** Methods for loggging of the amount of sent datatags (valid and invalid) **/
-    
-    /**
-     * Increases the counter of invalid data tag values sent for a given data
-     * tag and the counter of all values sent for this data tag.
-     * 
-     * @param dataTagId
-     *            id of a datatag
-     * */
-    private void increaseSentInvalidDataTags(final long dataTagId) {
-        synchronized (this.dbController.getInvalidSent()) {
-            int i = this.dbController.getInvalidSent().get(dataTagId);
-            this.dbController.getInvalidSent().put(dataTagId, ++i);
-        }
-        increaseAllSentDataTags(dataTagId);
-    }
-
-    /**
-     * Increases the counter of all values sent for a given data tag.
-     * 
-     * @param dataTagId
-     *            id of a datatag
-     * */
-    private void increaseAllSentDataTags(final long dataTagId) {
-        synchronized (this.dbController.getAlertsSent()) {
-            int i = this.dbController.getAlertsSent().get(dataTagId);
-            this.dbController.getAlertsSent().put(dataTagId, ++i);
-        }
     }
 
     /**

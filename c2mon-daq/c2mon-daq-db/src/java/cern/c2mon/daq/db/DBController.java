@@ -1,5 +1,6 @@
 package cern.c2mon.daq.db;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.shared.common.datatag.address.DBHardwareAddress;
+import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -75,9 +77,9 @@ public class DBController {
     }
     
     // Register for alert
-    synchronized (this.dbDaqDao) {
-      registerForAlert(sourceDataTag.getId());
-   }
+    registerForAlert(sourceDataTag.getId());
+    // Refresh DataTag
+    refreshDataTag(sourceDataTag.getId());
     
     return CHANGE_STATE.SUCCESS;
   }
@@ -256,6 +258,82 @@ public class DBController {
   public void unregisterFromAlert(long alertId) {
     getEquipmentLogger().trace("unregisterFromAlert - Unregistering from Alert: " + alertId);
     dbDaqDao.unregisterFromAlert(Long.toString(alertId));
+  }
+  
+  /**
+   * Processes a single alert. Extracts the name of the alert (==id of the
+   * datatag), the value and timestamp, and sends them to TIM server. In case
+   * the quality of the datatag is low (SourceDataQuality.UNKNOWN) or the
+   * value failed the conversion to its datatype, the datatag is invalidated.
+   * 
+   * @param alert
+   *            alert to be sent to the server
+   * */
+  protected void processAlert(final Alert alert) {
+      Long dataTagId = alert.getId();
+      if (!getEquipmentConfiguration().getSourceDataTags().containsKey(dataTagId)) {
+          this.equipmentLogger.warn("processAlert - An alert was received for a not monitored data tag.");
+          return;
+      }
+      this.equipmentLogger.info("processAlert - Sending datatag: " + alert);
+      ISourceDataTag sdt = getEquipmentConfiguration().getSourceDataTags().get(dataTagId);
+      if (alert.getQuality() == SourceDataQuality.UNKNOWN) {
+          getEquipmentMessageSender().sendInvalidTag(sdt, alert.getQuality(), alert.getQualityDescription(),
+                  new Timestamp(alert.getClientTimestamp().getTime()));
+          increaseSentInvalidDataTags(dataTagId);
+          return;
+      }
+      Object sdtValue = TypeConverter.cast(alert.getDataTagValue(), sdt.getDataType());
+      if (sdtValue == null) {
+          this.equipmentLogger.info("processAlert - Conversion error! Got: " + alert.getDataTagValue() + ", expected:" + sdt.getDataType());
+          getEquipmentMessageSender().sendInvalidTag(sdt, SourceDataQuality.CONVERSION_ERROR, "", new Timestamp(alert.getClientTimestamp().getTime()));
+          increaseSentInvalidDataTags(dataTagId);
+          return;
+      } else {
+          getEquipmentMessageSender().sendTagFiltered(sdt, sdtValue, alert.getTimestamp().getTime());
+          increaseAllSentDataTags(dataTagId);
+      }
+  }
+  
+  /**
+   * Gets the current value of the given dataTag from the database and sends it to the server.
+   * @param dataTagId the id of the data tag
+   * */
+  protected void refreshDataTag(final long dataTagId) {
+      this.equipmentLogger.info("refreshDataTag - Refreshing data tag " + dataTagId);
+
+      Alert alert = dbDaqDao.getLastAlertForDataTagId(dataTagId);
+      processAlert(alert);
+  }
+  
+  /** Methods for loggging of the amount of sent datatags (valid and invalid) **/
+  
+  /**
+   * Increases the counter of invalid data tag values sent for a given data
+   * tag and the counter of all values sent for this data tag.
+   * 
+   * @param dataTagId
+   *            id of a datatag
+   * */
+  private void increaseSentInvalidDataTags(final long dataTagId) {
+      synchronized (getInvalidSent()) {
+          int i = getInvalidSent().get(dataTagId);
+          getInvalidSent().put(dataTagId, ++i);
+      }
+      increaseAllSentDataTags(dataTagId);
+  }
+
+  /**
+   * Increases the counter of all values sent for a given data tag.
+   * 
+   * @param dataTagId
+   *            id of a datatag
+   * */
+  private void increaseAllSentDataTags(final long dataTagId) {
+      synchronized (getAlertsSent()) {
+          int i = getAlertsSent().get(dataTagId);
+          getAlertsSent().put(dataTagId, ++i);
+      }
   }
 
   /**
