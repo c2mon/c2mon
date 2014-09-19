@@ -17,6 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.server.common.device;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simpleframework.xml.Attribute;
@@ -33,8 +34,8 @@ import org.simpleframework.xml.Root;
 @Root(name = "Commands")
 public class CommandList {
 
-  @ElementList(entry = "Command", inline = true)
-  private List<Command> commands;
+  @ElementList(entry = "Command", inline = true, required = false)
+  private List<Command> commands = new ArrayList<>();
 
   public CommandList(List<Command> commands) {
     this.commands = commands;

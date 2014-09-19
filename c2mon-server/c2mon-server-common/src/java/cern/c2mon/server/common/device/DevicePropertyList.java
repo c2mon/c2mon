@@ -17,6 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.server.common.device;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simpleframework.xml.ElementList;
@@ -33,8 +34,8 @@ import cern.c2mon.shared.client.device.DeviceProperty;
 @Root(name = "DeviceProperties")
 public class DevicePropertyList {
 
-  @ElementList(entry = "DeviceProperty", inline = true)
-  private List<DeviceProperty> deviceProperties;
+  @ElementList(entry = "DeviceProperty", inline = true, required = false)
+  private List<DeviceProperty> deviceProperties = new ArrayList<>();
 
   public DevicePropertyList(List<DeviceProperty> deviceProperties) {
     this.deviceProperties = deviceProperties;

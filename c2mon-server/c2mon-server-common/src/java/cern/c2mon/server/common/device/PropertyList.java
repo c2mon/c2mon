@@ -17,6 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.server.common.device;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simpleframework.xml.ElementList;
@@ -31,8 +32,8 @@ import org.simpleframework.xml.Root;
 @Root(name = "Properties")
 public class PropertyList {
 
-  @ElementList(entry = "Property", inline = true)
-  private List<Property> properties;
+  @ElementList(entry = "Property", inline = true, required = false)
+  private List<Property> properties = new ArrayList<>();
 
   public PropertyList(List<Property> properties) {
     this.properties = properties;

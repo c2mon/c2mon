@@ -164,7 +164,14 @@ public class DeviceFacadeImplTest {
     } catch (ConfigurationException e) {
     }
 
+    // Test empty property list
     properties.put("properties", "<Properties />");
+    deviceClassFacade.createCacheObject(10L, properties);
+
+    // Test empty command list
+    properties.put("commands", "<Commands />");
+    deviceClassFacade.createCacheObject(10L, properties);
+
     properties.put("commands", "invalid XML string");
     try {
       deviceClassFacade.createCacheObject(10L, properties);
@@ -189,7 +196,7 @@ public class DeviceFacadeImplTest {
     EasyMock.expect(deviceClassCacheMock.get(-1L)).andReturn(null);
 
     // Expect the facade to get the DeviceClass for the device
-    EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass);
+    EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass).times(2);
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(deviceCacheMock, deviceClassCacheMock);
@@ -263,6 +270,14 @@ public class DeviceFacadeImplTest {
       Assert.fail("createCacheObject() did not throw exception");
     } catch (ConfigurationException e) {
     }
+
+    // Test empty property list
+    deviceProperties.put("deviceProperties", "<DeviceProperties />");
+    deviceFacade.createCacheObject(10L, deviceProperties);
+
+    // Test empty command list
+    deviceProperties.put("deviceCommands", "<DeviceCommands />");
+    deviceFacade.createCacheObject(10L, deviceProperties);
 
     // Verify that everything happened as expected
     EasyMock.verify(deviceCacheMock, deviceClassCacheMock);
