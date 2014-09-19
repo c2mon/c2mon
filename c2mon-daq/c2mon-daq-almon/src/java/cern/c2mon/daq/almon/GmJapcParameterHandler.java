@@ -81,8 +81,7 @@ public class GmJapcParameterHandler extends JapcParameterHandler {
 
             this.inFault = false;
             this.currentFault = GM_NO_ALARM;
-            this.amSender.terminate(tag, ems, address.getAlarmTripplet(), timestamp);
-            // this.activeAlarmTripplet = null;
+            this.amSender.terminate(tag, ems, address.getAlarmTripplet(), timestamp);        
         } // if inFault
 
         // if we arrive here we have to activate a new alarm (if it is related to the current tag)
@@ -91,13 +90,7 @@ public class GmJapcParameterHandler extends JapcParameterHandler {
 
             this.inFault = true;
             this.currentFault = fault;
-
-            // this.activeAlarmTripplet = new AlarmTripplet(address.getAlarmTripplet().getFaultFamily(),
-            // address
-            // .getAlarmTripplet().getFaultMember(), fault & FAULT_CODE_MASK);
-            // (ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet, long userTimestamp,
-            // Properties userProperties);
-
+            
             this.amSender.activate(tag, ems, address.getAlarmTripplet(), timestamp, new UserProperties());
         }
     }

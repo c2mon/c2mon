@@ -5,16 +5,13 @@
 package cern.c2mon.daq.almon;
 
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.daq.almon.address.AlarmTripplet;
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
-import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -61,37 +58,10 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
 
     protected boolean inFault = false;
 
-    // protected AlarmTripplet activeAlarmTripplet;
+    // the key: deviceName, value: problem description
+    protected static Map<String, String> deviceAccessFaults = new ConcurrentHashMap<>();
 
-    /**
-     * Encapsulates information about active device access fault
-     */
-    static class DeviceAccessFault {
-        private final AlarmTripplet devAccessFaultTripplet;
-
-        // properties may be updated
-        private UserProperties devAccessFaultProps;
-
-        public DeviceAccessFault(AlarmTripplet tripplet, UserProperties props) {
-            this.devAccessFaultTripplet = tripplet;
-            this.devAccessFaultProps = props;
-        }
-
-        public AlarmTripplet getDevAccessFaultTripplet() {
-            return devAccessFaultTripplet;
-        }
-
-        public void setDevAccessProps(UserProperties props) {
-            this.devAccessFaultProps = props;
-        }
-
-        public UserProperties getDevAccessFaultProps() {
-            return devAccessFaultProps;
-        }
-    }
-
-    protected static Map<String, DeviceAccessFault> deviceAccessFaults = new ConcurrentHashMap<String, DeviceAccessFault>();
-    protected static Map<String, AtomicInteger> parametersPerDevice = new ConcurrentHashMap<String, AtomicInteger>();
+    protected static Map<String, AtomicInteger> parametersPerDevice = new ConcurrentHashMap<>();
 
     protected JapcParameterHandler(ISourceDataTag tag, AlmonHardwareAddress hwAddress, IEquipmentMessageSender ems,
             AlmonSender amSender) {
@@ -148,7 +118,7 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
 
         // terminate the related alarm, if it was active
         if (inFault) {
-            // amSender.terminate(address.getAlarmTripplet(), System.currentTimeMillis());
+            this.amSender.terminate(tag, ems, address.getAlarmTripplet(), System.currentTimeMillis());
         }
 
         // terminate device access fault alarm if
@@ -174,52 +144,26 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
 
     @Override
     public void exceptionOccured(String parameterName, String description, ParameterException exception) {
-        // LOG.info("exception caught for parameter: {}  description: {}  ex-message: {}", parameterName, description,
-        // exception.getMessage());
-        LOG.debug("exception trace:", exception);
+        LOG.debug("ParameterException caught: {} ", exception.getMessage(), exception);
 
         if (exception instanceof SubscriptionRecoveredException) {
             LOG.debug("SubscriptionRecoveredException caught for parameter: {}", parameterName);
             return;
         }
 
+        String deviceName = address.getDevice();
         String reason = getErrorMessage(exception);
 
-        String deviceName = address.getDevice();
         synchronized (deviceName.intern()) {
-            // device access alarm not yet active
-            if (!deviceAccessFaults.containsKey(deviceName)) {
 
-                AlarmTripplet deviceAlarmTripplet = new AlarmTripplet(ALARM_MON_FAULT_FAMILY, deviceName,
-                        ALARM_MON_FAULT_IN_ERROR);
-
-                UserProperties props = new UserProperties();
-                props.setProperty(ASI_PREFIX_PROPERTY, reason);
-                props.setProperty(ALMON_FAULT_PROPERTY_TAG, exception.getMessage());
-                DeviceAccessFault fault = new DeviceAccessFault(deviceAlarmTripplet, props);
-
-                // send comfault tag, indicating the equipment is down
+            // device access alarm not yet active or active but the reason has changed
+            if (!deviceAccessFaults.containsKey(deviceName) || (!deviceAccessFaults.get(deviceName).equals(reason))) {
+                // send a note to the business layer, to confirm that the equipment is not properly configured,
+                // or connected
                 this.ems.confirmEquipmentStateIncorrect(reason);
-                deviceAccessFaults.put(deviceName, fault);
-            } else {
+                deviceAccessFaults.put(deviceName, reason);
+            }// if
 
-                DeviceAccessFault fault = deviceAccessFaults.get(deviceName);
-
-                UserProperties props = new UserProperties();
-                props.setProperty(ASI_PREFIX_PROPERTY, reason);
-                props.setProperty(ALMON_FAULT_PROPERTY_TAG, exception.getMessage());
-
-                // update already active alarm if the properties have changed
-                if (!props.equals(fault.getDevAccessFaultProps())) {
-                    AlarmTripplet tripplet = fault.getDevAccessFaultTripplet();
-                    // this.amSender.update(tag, System.currentTimeMillis(), props); // update(tripplet,
-                    // System.currentTimeMillis(), props);
-                    fault.setDevAccessProps(props);
-                } else {
-                    LOG.debug("Skipping repeated error for parameter: {}", parameterName);
-                }
-
-            }
         } // synchronized
     }
 
@@ -232,14 +176,13 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
         String deviceName = address.getDevice();
         synchronized (deviceName.intern()) {
             if (deviceAccessFaults.containsKey(deviceName)) {
-                AlarmTripplet deviceAlarmTripplet = deviceAccessFaults.get(deviceName).getDevAccessFaultTripplet();
 
-                //this.amSender.terminate(deviceAlarmTripplet, System.currentTimeMillis());
+                // send a note to the business layer, to confirm that the equipment is properly configured, connected to
+                // its source and running
                 ems.confirmEquipmentStateOK();
                 deviceAccessFaults.remove(deviceName);
             }
         }
-
     }
 
     protected static String getErrorMessage(ParameterException e) {

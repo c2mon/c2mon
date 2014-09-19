@@ -54,7 +54,7 @@ public class FesaJapcParameterHandler extends JapcParameterHandler {
     public void valueReceived(String parameterName, AcquiredParameterValue value) {
         LOG.debug("parameter: {} received value: {}", parameterName, value.getValue().getString());
 
-        // if access fault was activated - terminate it
+        // if device access fault was activated - terminate it
         super.terminateDeviceAccessFault();
 
         if (!(value.getValue().getType() == Type.MAP)) {
