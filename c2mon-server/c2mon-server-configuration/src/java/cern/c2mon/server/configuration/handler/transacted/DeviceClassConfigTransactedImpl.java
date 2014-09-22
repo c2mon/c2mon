@@ -107,11 +107,13 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
             + element.getEntityId());
       }
 
+      LOGGER.trace("Creating DeviceClass cache object " + element.getEntityId());
       // Create the cache object
       DeviceClass deviceClass = deviceClassFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
 
       // Insert the device class into the DB
       try {
+        LOGGER.trace("Inserting DeviceClass " + element.getEntityId() + " into DB");
         deviceClassDAO.insert(deviceClass);
 
       } catch (Exception e) {
@@ -121,6 +123,7 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
 
       // Insert the device class into the cache
       try {
+        LOGGER.trace("Inserting DeviceClass " + element.getEntityId() + " into cache");
         deviceClassCache.putQuiet(deviceClass);
         return new ProcessChange();
 

@@ -118,8 +118,8 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
 
   @Override
   public void updateDeviceIds(Long deviceClassId) {
-    // Remove/reload the item from the DB. This will cause the device IDS to be
-    // updated correctly
+    // Remove/reload the item from the DB. This will cause the device IDs to be
+    // updated correctly.
     remove(deviceClassId);
     loadFromDb(deviceClassId);
   }

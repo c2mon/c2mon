@@ -20,8 +20,6 @@ package cern.c2mon.server.common.device;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
@@ -47,22 +45,5 @@ public class CommandList {
 
   public List<Command> getCommands() {
     return commands;
-  }
-
-  public static class Command {
-
-    @Attribute
-    private String name;
-
-    @Element
-    private String description;
-
-    public String getName() {
-      return name;
-    }
-
-    public String getDescription() {
-      return description;
-    }
   }
 }

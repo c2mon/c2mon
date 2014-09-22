@@ -36,11 +36,12 @@
            PROPERTY.PROPNAME as property_name,
            COMMAND.CMDNAME as command_name,
            DEVICE.DEVID as device_id
-      FROM DEVICECLASS LEFT OUTER JOIN PROPERTY
+      FROM DEVICECLASS 
+           LEFT OUTER JOIN PROPERTY
         ON DEVICECLASS.DEVCLASSID = PROPERTY.PROPDEVCLASSID
-           INNER JOIN COMMAND
+           LEFT OUTER JOIN COMMAND
         ON DEVICECLASS.DEVCLASSID = COMMAND.CMDDEVCLASSID
-           INNER JOIN DEVICE
+           LEFT OUTER JOIN DEVICE
         ON DEVICECLASS.DEVCLASSID = DEVICE.DEVCLASSID
   </select>
 
@@ -53,20 +54,31 @@
            PROPERTY.PROPNAME as property_name,
            COMMAND.CMDNAME as command_name,
            DEVICE.DEVID as device_id
-      FROM DEVICECLASS LEFT OUTER JOIN PROPERTY
+      FROM DEVICECLASS 
+           LEFT OUTER JOIN PROPERTY
         ON DEVICECLASS.DEVCLASSID = PROPERTY.PROPDEVCLASSID
-           INNER JOIN COMMAND
+           LEFT OUTER JOIN COMMAND
         ON DEVICECLASS.DEVCLASSID = COMMAND.CMDDEVCLASSID
-           INNER JOIN DEVICE
+           LEFT OUTER JOIN DEVICE
         ON DEVICECLASS.DEVCLASSID = DEVICE.DEVCLASSID
      WHERE DEVICECLASS.DEVCLASSID = #{id}
   </select>
 
-  <insert id="insertDeviceClass"
+  <insert id="insertDeviceClass" 
     parameterType="cern.c2mon.server.common.device.DeviceClassCacheObject">
     INSERT INTO DEVICECLASS
     (DEVCLASSID, DEVCLASSNAME, DEVCLASSDESC)
     VALUES (#{id}, #{name}, #{description,jdbcType=VARCHAR})
+  </insert>
+  
+  <insert id="insertDeviceClassProperty">
+    INSERT INTO PROPERTY (PROPDEVCLASSID, PROPNAME)
+    VALUES (#{id}, #{property})
+  </insert>
+  
+  <insert id="insertDeviceClassCommand">
+    INSERT INTO COMMAND (CMDDEVCLASSID, CMDNAME)
+    VALUES (#{id}, #{command})
   </insert>
 
   <update id="updateDeviceClassConfig" parameterType="cern.c2mon.server.common.device.DeviceClass">

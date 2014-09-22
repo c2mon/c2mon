@@ -37,10 +37,12 @@ import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceClassFacade;
 import cern.c2mon.server.cache.DeviceFacade;
+import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.common.device.Property;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -186,8 +188,9 @@ public class DeviceFacadeImplTest {
     EasyMock.reset(deviceCacheMock, deviceClassCacheMock);
 
     DeviceClassCacheObject deviceClass = new DeviceClassCacheObject(400L, "TEST_DEVICE_CLASS_1", "Description of TEST_DEVICE_CLASS_1");
-    deviceClass.setProperties(Arrays.asList("TEST_PROPERTY_1", "TEST_PROPERTY_2", "TEST_PROPERTY_WITH_FIELDS"));
-    deviceClass.setCommands(Arrays.asList("TEST_COMMAND_1", "TEST_COMMAND_2"));
+    deviceClass.setProperties(Arrays.asList(new Property("TEST_PROPERTY_1", "Test property 1"), new Property("TEST_PROPERTY_2", "Test property 2"),
+        new Property("TEST_PROPERTY_WITH_FIELDS", "Test property with fields")));
+    deviceClass.setCommands(Arrays.asList(new Command("TEST_COMMAND_1", "Test command 1"), new Command("TEST_COMMAND_2", "Test command 1")));
 
     // Expect the facade to get the DeviceClass for the device
     EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass);
@@ -244,7 +247,8 @@ public class DeviceFacadeImplTest {
       Assert.fail("createCacheObject() did not throw exception");
     } catch (ConfigurationException e) {
     }
-    deviceProperties.put("deviceProperties", "<DeviceProperties><DeviceProperty name=\"TEST_PROPERTY_1\"><tag-id>100430</tag-id></DeviceProperty></DeviceProperties>");
+    deviceProperties.put("deviceProperties",
+        "<DeviceProperties><DeviceProperty name=\"TEST_PROPERTY_1\"><tag-id>100430</tag-id></DeviceProperty></DeviceProperties>");
 
     deviceProperties.put("deviceCommands", "invalid XML string");
     try {
@@ -252,7 +256,8 @@ public class DeviceFacadeImplTest {
       Assert.fail("createCacheObject() did not throw exception");
     } catch (ConfigurationException e) {
     }
-    deviceProperties.put("deviceCommands", "<DeviceCommands><DeviceCommand name=\"TEST_COMMAND_1\"><command-tag-id>4287</command-tag-id></DeviceCommand></DeviceCommands>");
+    deviceProperties.put("deviceCommands",
+        "<DeviceCommands><DeviceCommand name=\"TEST_COMMAND_1\"><command-tag-id>4287</command-tag-id></DeviceCommand></DeviceCommands>");
 
     // Test invalid device class ID
     deviceProperties.put("classId", "-1");

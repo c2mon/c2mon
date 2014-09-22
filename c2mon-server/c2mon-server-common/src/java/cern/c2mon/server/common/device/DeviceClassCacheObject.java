@@ -49,12 +49,12 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
   private String description;
 
   /**
-   * The list of property names that belong to this device class.
+   * The list of properties that belong to this device class.
    */
   private List<String> properties = new ArrayList<>();
 
   /**
-   * The list of command names that belong o this device class.
+   * The list of commands that belong o this device class.
    */
   private List<String> commands = new ArrayList<>();
 
@@ -167,8 +167,10 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
    *
    * @param properties the properties to set
    */
-  public void setProperties(List<String> properties) {
-    this.properties = properties;
+  public void setProperties(List<Property> properties) {
+    for (Property property : properties) {
+      this.properties.add(property.getName());
+    }
   }
 
   /**
@@ -176,7 +178,9 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
    *
    * @param commands the commands to set
    */
-  public void setCommands(List<String> commands) {
-    this.commands = commands;
+  public void setCommands(List<Command> commands) {
+    for (Command command : commands) {
+      this.commands.add(command.getName());
+    }
   }
 }

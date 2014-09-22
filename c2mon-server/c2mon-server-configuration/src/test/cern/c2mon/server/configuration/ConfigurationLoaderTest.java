@@ -69,10 +69,12 @@ import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.common.device.Property;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.Process;
@@ -1065,22 +1067,30 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
 
+    DeviceClassCacheObject expectedObject = (DeviceClassCacheObject) deviceClassMapper.getItem(10L);
+    assertNotNull(expectedObject);
+
     DeviceClassCacheObject cacheObject = (DeviceClassCacheObject) deviceClassCache.get(10L);
-    DeviceClassCacheObject expectedObject = new DeviceClassCacheObject(10L, "TEST_DEVICE_CLASS_10", "Description of TEST_DEVICE_CLASS_10");
+    expectedObject = new DeviceClassCacheObject(10L, "TEST_DEVICE_CLASS_10", "Description of TEST_DEVICE_CLASS_10");
 
-    List<String> expectedProperties = new ArrayList<>();
-    expectedProperties.add("cpuLoadInPercent");
-    expectedProperties.add("responsiblePerson");
-    expectedProperties.add("someCalculations");
+    List<Property> expectedProperties = new ArrayList<>();
+    expectedProperties.add(new Property("cpuLoadInPercent", "CPU load in percent"));
+    expectedProperties.add(new Property("responsiblePerson", "Responsible person"));
+    expectedProperties.add(new Property("someCalculations", "Some calculations"));
 
-    List<String> expectedCommands = new ArrayList<>();
-    expectedCommands.add("TEST_COMMAND_1");
-    expectedCommands.add("TEST_COMMAND_2");
+    List<Command> expectedCommands = new ArrayList<>();
+    expectedCommands.add(new Command("TEST_COMMAND_1", "Test command 1"));
+    expectedCommands.add(new Command("TEST_COMMAND_2", "Test command 2"));
 
     expectedObject.setProperties(expectedProperties);
     expectedObject.setCommands(expectedCommands);
 
     ObjectEqualityComparison.assertDeviceClassEquals(expectedObject, cacheObject);
+
+    // Assert that the object from the DB is also the same
+    DeviceClassCacheObject dbObject = (DeviceClassCacheObject) deviceClassMapper.getItem(10L);
+    assertNotNull(dbObject);
+    ObjectEqualityComparison.assertDeviceClassEquals(expectedObject, dbObject);
 
     // Update should succeed
     report = configurationLoader.applyConfiguration(31);
@@ -1088,7 +1098,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     cacheObject = (DeviceClassCacheObject) deviceClassCache.get(10L);
 
-    expectedProperties.add("numCores");
+    expectedProperties.add(new Property("numCores", "Number of cores"));
     expectedObject.setProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceClassEquals(expectedObject, cacheObject);
 

@@ -18,6 +18,7 @@
 package cern.c2mon.server.cache.dbaccess;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
@@ -31,8 +32,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.common.device.Property;
 import cern.c2mon.server.test.TestDataInserter;
 
 /**
@@ -119,8 +122,26 @@ public class DeviceClassMapperTest {
   @Test
   public void testInsertDeviceClass() {
     DeviceClassCacheObject deviceClass = new DeviceClassCacheObject(402L, "TEST_DEVICE_CLASS_3", "Description of TEST_DEVICE_CLASS_3");
+    deviceClass.setProperties(Arrays.asList(new Property("TEST_PROPERTY_1", "Test property 1"), new Property("TEST_PROPERTY_2", "Test property 2")));
+    deviceClass.setCommands(Arrays.asList(new Command("TEST_COMMAND_1", "Test command 1"), new Command("TEST_COMMAND_2", "Test command 1")));
+
     deviceClassMapper.insertDeviceClass(deviceClass);
-    Assert.assertTrue(deviceClassMapper.isInDb(deviceClass.getId()));
+    for (String property : ((DeviceClassCacheObject) deviceClass).getProperties()) {
+      deviceClassMapper.insertDeviceClassProperty(deviceClass.getId(), property);
+    }
+    for (String command : ((DeviceClassCacheObject) deviceClass).getCommands()) {
+      deviceClassMapper.insertDeviceClassCommand(deviceClass.getId(), command);
+    }
+
+    Assert.assertTrue(deviceClassMapper.isInDb(402L));
+    DeviceClassCacheObject fromDb = (DeviceClassCacheObject) deviceClassMapper.getItem(402L);
+    Assert.assertNotNull(fromDb);
+    List<String> properties = fromDb.getProperties();
+    Assert.assertNotNull(properties);
+    Assert.assertTrue(properties.size() == 2);
+    List<String> commands = fromDb.getCommands();
+    Assert.assertNotNull(commands);
+    Assert.assertTrue(commands.size() == 2);
   }
 
   @Test
@@ -132,5 +153,6 @@ public class DeviceClassMapperTest {
   @Test
   public void testIsNotInDb() {
     Assert.assertFalse(deviceClassMapper.isInDb(1L));
+    Assert.assertFalse(deviceClassMapper.isInDb(402L));
   }
 }

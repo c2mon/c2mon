@@ -23,14 +23,14 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 
 /**
- * Simple XML mapper bean representing a device class property. Used when
- * deserialising device class properties during configuration.
+ * Simple XML mapper bean representing a device class command. Used when
+ * deserialising device class commands during configuration.
  *
  * @author Justin Lewis Salmon
  */
-public class Property implements Serializable {
+public class Command implements Serializable {
 
-  private static final long serialVersionUID = 779255306056735769L;
+  private static final long serialVersionUID = -6943334662697273304L;
 
   @Attribute
   private String name;
@@ -38,12 +38,12 @@ public class Property implements Serializable {
   @Element
   private String description;
 
-  public Property(final String name, final String description) {
+  public Command(final String name, final String description) {
     this.name = name;
     this.description = description;
   }
 
-  public Property() {
+  public Command() {
   }
 
   public String getName() {

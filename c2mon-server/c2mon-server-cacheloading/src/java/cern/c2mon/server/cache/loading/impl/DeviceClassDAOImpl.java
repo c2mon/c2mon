@@ -24,6 +24,7 @@ import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.server.common.device.DeviceClassCacheObject;
 
 /**
  * DeviceClass loader DAO implementation.
@@ -69,5 +70,13 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
   @Override
   public void insert(DeviceClass deviceClass) {
     deviceClassMapper.insertDeviceClass(deviceClass);
+
+    for (String property : ((DeviceClassCacheObject) deviceClass).getProperties()) {
+      deviceClassMapper.insertDeviceClassProperty(deviceClass.getId(), property);
+    }
+
+    for (String command : ((DeviceClassCacheObject) deviceClass).getCommands()) {
+      deviceClassMapper.insertDeviceClassCommand(deviceClass.getId(), command);
+    }
   }
 }

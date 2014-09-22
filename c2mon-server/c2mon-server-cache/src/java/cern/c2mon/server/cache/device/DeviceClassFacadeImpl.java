@@ -29,8 +29,8 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceClassFacade;
 import cern.c2mon.server.cache.common.AbstractFacade;
+import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.CommandList;
-import cern.c2mon.server.common.device.CommandList.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.device.Property;
@@ -98,7 +98,7 @@ public class DeviceClassFacadeImpl extends AbstractFacade<DeviceClass> implement
     // Parse properties and commands from XML representation
     if (properties.getProperty("properties") != null) {
       try {
-        List<String> propertyNames = parseXmlProperties(properties.getProperty("properties"));
+        List<Property> propertyNames = parseXmlProperties(properties.getProperty("properties"));
         deviceClassCacheObject.setProperties(propertyNames);
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
@@ -108,7 +108,7 @@ public class DeviceClassFacadeImpl extends AbstractFacade<DeviceClass> implement
 
     if (properties.getProperty("commands") != null) {
       try {
-        List<String> commandNames = parseXmlCommands(properties.getProperty("commands"));
+        List<Command> commandNames = parseXmlCommands(properties.getProperty("commands"));
         deviceClassCacheObject.setCommands(commandNames);
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
@@ -147,22 +147,22 @@ public class DeviceClassFacadeImpl extends AbstractFacade<DeviceClass> implement
 
   /**
    * Parse the XML representation of the properties of a device class (which
-   * comes from configuration) and return it as a list of property names.
+   * comes from configuration) and return it as a list of properties.
    *
    * @param xmlString the XML representation string of the device class
    *          properties
    *
-   * @return the list of property names
+   * @return the list of properties
    * @throws Exception if the XML could not be parsed
    */
-  private List<String> parseXmlProperties(String xmlString) throws Exception {
-    List<String> properties = new ArrayList<>();
+  private List<Property> parseXmlProperties(String xmlString) throws Exception {
+    List<Property> properties = new ArrayList<>();
 
     Serializer serializer = new Persister();
     PropertyList propertyList = serializer.read(PropertyList.class, xmlString);
 
     for (Property property : propertyList.getProperties()) {
-      properties.add(property.getName());
+      properties.add(property);
     }
 
     return properties;
@@ -170,21 +170,21 @@ public class DeviceClassFacadeImpl extends AbstractFacade<DeviceClass> implement
 
   /**
    * Parse the XML representation of the commands of a device class (which comes
-   * from configuration) and return it as a list of command names.
+   * from configuration) and return it as a list of commands.
    *
    * @param xmlString the XML representation string of the device class commands
    *
-   * @return the list of command names
+   * @return the list of commands
    * @throws Exception if the XML could not be parsed
    */
-  private List<String> parseXmlCommands(String xmlString) throws Exception {
-    List<String> commands = new ArrayList<>();
+  private List<Command> parseXmlCommands(String xmlString) throws Exception {
+    List<Command> commands = new ArrayList<>();
 
     Serializer serializer = new Persister();
     CommandList commandList = serializer.read(CommandList.class, xmlString);
 
     for (Command command : commandList.getCommands()) {
-      commands.add(command.getName());
+      commands.add(command);
     }
 
     return commands;
