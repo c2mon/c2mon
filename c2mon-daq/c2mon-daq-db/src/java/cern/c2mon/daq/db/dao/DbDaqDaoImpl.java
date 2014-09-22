@@ -44,7 +44,8 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
             end = ((k + 1) * MAX_LIST_SIZE < dataTagsIds.size()) ? (k + 1) * MAX_LIST_SIZE : dataTagsIds.size();
             shortDataTagsIds = dataTagsIds.subList(k * MAX_LIST_SIZE, end);
             inputMap.put("ids", shortDataTagsIds); // just make sure that the key is not named "list" 
-            alerts.addAll( (List<Alert>) this.getSqlSession().selectList("getLastAlertsById", inputMap) );
+            List<Alert> datatagListAlerts = this.getSqlSession().selectList("getLastAlertsById", inputMap);
+            alerts.addAll(datatagListAlerts);
         }
         return alerts;
     }
@@ -66,7 +67,7 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
     @Override
     @SuppressWarnings("unchecked")
     public synchronized List<Long> getDataTags() {
-        return (List<Long>) this.getSqlSession().selectList("getDataTags");
+        return this.getSqlSession().selectList("getDataTags");
     }
     
     /**

@@ -49,12 +49,12 @@
 		<dependency>
     		<groupId>org.mybatis</groupId>
     		<artifactId>mybatis</artifactId>
-    		<version>3.0.5</version>
+    		<version>3.2.7</version>
   		</dependency>
   		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis-spring</artifactId>
-			<version>1.0.1</version>
+			<version>1.2.2</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

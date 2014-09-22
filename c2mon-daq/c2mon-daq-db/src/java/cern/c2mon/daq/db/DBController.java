@@ -1,6 +1,7 @@
 package cern.c2mon.daq.db;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +40,11 @@ public class DBController {
   /**
    * A counter indicating the amount of alerts sent to the server
    * */
-  private final Map<Long, Integer> alertsSent = new HashMap<Long, Integer>();
+  private final Map<Long, Integer> alertsSent = Collections.synchronizedMap(new HashMap<Long, Integer>());
   /**
    * A counter indicating the amount of invalid data tags sent to the server
    * */
-  private final Map<Long, Integer> invalidSent = new HashMap<Long, Integer>();
+  private final Map<Long, Integer> invalidSent = Collections.synchronizedMap(new HashMap<Long, Integer>());
   
   /**
    * An access object for registering/unregistering for alerts and receiving
@@ -316,10 +317,10 @@ public class DBController {
    *            id of a datatag
    * */
   private void increaseSentInvalidDataTags(final long dataTagId) {
-      synchronized (getInvalidSent()) {
+//      synchronized (getInvalidSent()) {
           int i = getInvalidSent().get(dataTagId);
           getInvalidSent().put(dataTagId, ++i);
-      }
+//      }
       increaseAllSentDataTags(dataTagId);
   }
 
@@ -330,10 +331,10 @@ public class DBController {
    *            id of a datatag
    * */
   private void increaseAllSentDataTags(final long dataTagId) {
-      synchronized (getAlertsSent()) {
+//      synchronized (getAlertsSent()) {
           int i = getAlertsSent().get(dataTagId);
           getAlertsSent().put(dataTagId, ++i);
-      }
+//      }
   }
 
   /**

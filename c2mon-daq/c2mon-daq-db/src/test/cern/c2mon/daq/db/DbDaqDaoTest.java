@@ -27,7 +27,7 @@ public class DbDaqDaoTest extends SqlSessionDaoSupport {
      * */
     @SuppressWarnings("unchecked")
     public List<String> getAllDataTagsNames() {
-        return (List<String>) this.getSqlSession().selectList("getAllDataTagsNames"); 
+        return this.getSqlSession().selectList("getAllDataTagsNames"); 
     }
     
     /**
@@ -36,7 +36,7 @@ public class DbDaqDaoTest extends SqlSessionDaoSupport {
      * */
     @SuppressWarnings("unchecked")
     public List<Long> getAllDataTagsIds() {
-        return (List<Long>) this.getSqlSession().selectList("getAllDataTagsIds");
+        return this.getSqlSession().selectList("getAllDataTagsIds");
     }
     
     /**
