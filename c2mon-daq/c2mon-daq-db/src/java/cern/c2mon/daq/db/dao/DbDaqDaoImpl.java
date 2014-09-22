@@ -36,7 +36,7 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * */
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized List<Alert> getLastAlerts(final List<Long> dataTagsIds) {
+    public List<Alert> getLastAlerts(final List<Long> dataTagsIds) {
         List<Long> shortDataTagsIds;
         List<Alert> alerts = new ArrayList<Alert>();
         Map<String,Object> inputMap = new HashMap<String,Object>();
@@ -56,7 +56,7 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * @return alert that happened before the process started listening
      * */
     @Override
-    public synchronized Alert getLastAlertForDataTagId(final long dataTagId) {
+    public Alert getLastAlertForDataTagId(final long dataTagId) {
         return (Alert) (this.getSqlSession().selectOne("getLastAlertForDataTagById", dataTagId));
     }
 
@@ -66,7 +66,7 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * */
     @Override
     @SuppressWarnings("unchecked")
-    public synchronized List<Long> getDataTags() {
+    public List<Long> getDataTags() {
         return this.getSqlSession().selectList("getDataTags");
     }
     
@@ -178,7 +178,7 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
      * @return basicDataSource 
      * */
     @Override
-    public synchronized BasicDataSource getCustomDataSource() {
+    public BasicDataSource getCustomDataSource() {
         BasicDataSource ds =  (BasicDataSource) this.getSqlSession().getConfiguration().getEnvironment().getDataSource();
         return ds;
     }
@@ -190,7 +190,7 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
     }
     
     @Override
-    public synchronized String getItemName(final long dataTagId) {
+    public String getItemName(final long dataTagId) {
       return (String) (this.getSqlSession().selectOne("getItemNameForDataTagById", dataTagId));
     }
 
@@ -201,12 +201,12 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
     }
 
     @Override
-    public synchronized String getDataType(long dataTagId) {
+    public String getDataType(long dataTagId) {
       return (String) (this.getSqlSession().selectOne("getDataTypeForDataTagById", dataTagId));
     }
 
     @Override
-    public synchronized DBDAQConfigInfo getItemNameAndDataType(long dataTagId) {
+    public DBDAQConfigInfo getItemNameAndDataType(long dataTagId) {
       return (DBDAQConfigInfo) (this.getSqlSession().selectOne("getItemNameAndDataTypeById", dataTagId));
     }
   
