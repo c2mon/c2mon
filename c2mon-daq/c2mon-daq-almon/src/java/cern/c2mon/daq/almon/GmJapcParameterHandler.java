@@ -4,8 +4,6 @@
 
 package cern.c2mon.daq.almon;
 
-import java.util.Properties;
-
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
@@ -72,8 +70,6 @@ public class GmJapcParameterHandler extends JapcParameterHandler {
         }
 
         long timestamp = System.currentTimeMillis();
-        // fill in the user properties (for now empty)
-        Properties props = new Properties();
 
         // If we are in fault, terminate the previous alarm
         if (this.inFault) {
@@ -81,7 +77,7 @@ public class GmJapcParameterHandler extends JapcParameterHandler {
 
             this.inFault = false;
             this.currentFault = GM_NO_ALARM;
-            this.amSender.terminate(tag, ems, address.getAlarmTripplet(), timestamp);        
+            this.amSender.terminate(tag, ems, address.getAlarmTripplet(), timestamp);
         } // if inFault
 
         // if we arrive here we have to activate a new alarm (if it is related to the current tag)
@@ -90,7 +86,7 @@ public class GmJapcParameterHandler extends JapcParameterHandler {
 
             this.inFault = true;
             this.currentFault = fault;
-            
+
             this.amSender.activate(tag, ems, address.getAlarmTripplet(), timestamp, new UserProperties());
         }
     }

@@ -5,6 +5,7 @@
 package cern.c2mon.daq.almon.address;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
@@ -32,6 +33,9 @@ public class UserPropertiesTest {
         assertEquals("value1", up2.get("x"));
         assertEquals("some string", up2.get("ASI_PREFIX"));
 
+        assertNull(UserProperties.fromJson(""));
+        up = UserProperties.fromJson("{}");
+        assertEquals(up, UserProperties.fromJson(up.toJson()));
     }
 
 }

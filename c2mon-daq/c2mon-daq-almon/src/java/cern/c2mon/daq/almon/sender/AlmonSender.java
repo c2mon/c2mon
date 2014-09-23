@@ -10,7 +10,7 @@ import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
- * This interface defines the operations common to all alarm senders
+ * This interface defines a set of operations common to all alarm senders
  * 
  * @author wbuczak
  */

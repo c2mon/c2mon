@@ -26,7 +26,7 @@ public class UserProperties extends Properties {
     }
 
     public static UserProperties fromJson(final String json) {
-        if (json == null) {
+        if (json == null || json.equals("")) {
             return null;
         }
 

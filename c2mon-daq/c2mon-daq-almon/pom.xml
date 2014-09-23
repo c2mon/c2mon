@@ -22,7 +22,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-daq</groupId>
-			<artifactId>c2mon-daq-core</artifactId>
+			<artifactId>c2mon-daq-core</artifactId>	
 		</dependency>
 		<dependency>
 			<groupId>cern.c2mon.c2mon-daq</groupId>

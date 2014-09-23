@@ -112,7 +112,6 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
 
     @Override
     public void run() {
-
         getEquipmentMessageSender().confirmEquipmentStateOK();
 
         for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
@@ -238,8 +237,6 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
 
             SimpleHardwareAddress saddr = (SimpleHardwareAddress) tag.getHardwareAddress();
 
-            // System.out.println(saddr.getAddress().trim());
-
             // wrap it around with almon hardware address
             AlmonHardwareAddress addr = AlmonHardwareAddressFactory.fromJson(saddr.getAddress().trim());
 
@@ -253,6 +250,7 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
                             .getAlarmTripplet().toString()));
 
                     parameterHandler = new GmJapcParameterHandler(tag, addr, getEquipmentMessageSender(), almonSender);
+
                 }
                 break;
 
@@ -291,14 +289,19 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
         if (LOG.isTraceEnabled())
             LOG.trace(format("entering unregisterTag(%d)", tag.getId()));
 
-        // if (!isTagPollerRegistered(tag.getId())) {
-        // throw new TagOperationException(format("tag: %d is not registered. You must register it first!",
-        // tag.getId()));
-        // }
-
         try {
 
-            // this.stopPingTask(tag.getId());
+            SimpleHardwareAddress saddr = (SimpleHardwareAddress) tag.getHardwareAddress();
+
+            // wrap it around with almon hardware address
+            AlmonHardwareAddress addr = AlmonHardwareAddressFactory.fromJson(saddr.getAddress().trim());
+
+            JapcParameterHandler parameterHandler = almonParameters.get(addr);
+
+            if (parameterHandler != null) {
+                parameterHandler.stopMonitoring();
+                almonParameters.remove(addr);
+            }
 
         } catch (Exception ex) {
             String err = format("Unable to unregister tag: %d. Problem description: %s", tag.getId(), ex.getMessage());
@@ -310,7 +313,6 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
             if (LOG.isTraceEnabled())
                 LOG.trace(format("leaving unregisterTag(%d)", tag.getId()));
         }
-
     }
 
     @Override

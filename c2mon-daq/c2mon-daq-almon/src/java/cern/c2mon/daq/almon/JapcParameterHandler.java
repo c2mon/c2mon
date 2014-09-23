@@ -113,33 +113,14 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
      * <code>AlmonMain</code> for details
      */
     public void stopMonitoring() {
-        shandle.stopMonitoring();
-        shandle = null;
 
         // terminate the related alarm, if it was active
         if (inFault) {
             this.amSender.terminate(tag, ems, address.getAlarmTripplet(), System.currentTimeMillis());
         }
 
-        // terminate device access fault alarm if
-        // it is active && there are no more parameters linked to that device.
-        // (i.e. if there are more than 1 parameters belonging to that device and the access fault is active it will NOT
-        // be terminated
-        String deviceName = address.getDevice();
-
-        synchronized (deviceName.intern()) {
-            if (parametersPerDevice.containsKey(deviceName)) {
-                if (parametersPerDevice.get(deviceName).get() > 0) {
-                    parametersPerDevice.get(deviceName).decrementAndGet();
-                }
-
-                if (parametersPerDevice.get(deviceName).get() == 0) {
-                    // terminate device access fault - if active
-                    terminateDeviceAccessFault();
-                }
-            }
-        }// synchronized
-
+        shandle.stopMonitoring();
+        shandle = null;
     }
 
     @Override
@@ -176,7 +157,6 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
         String deviceName = address.getDevice();
         synchronized (deviceName.intern()) {
             if (deviceAccessFaults.containsKey(deviceName)) {
-
                 // send a note to the business layer, to confirm that the equipment is properly configured, connected to
                 // its source and running
                 ems.confirmEquipmentStateOK();
