@@ -466,7 +466,9 @@ public class ConfigurationController {
     }
     
     LOGGER.debug("onDataTagRemove - removing " + dataTagRemoveChange.getDataTagId());
-    SourceDataTag sourceDataTag = sourceDataTags.remove(dataTagRemoveChange.getDataTagId());
+    
+    SourceDataTag sourceDataTag = sourceDataTags.get(dataTagRemoveChange.getDataTagId());
+    
     if (sourceDataTag != null) {
       LOGGER.debug("onDataTagRemove - Core removed data tag with id " + dataTagRemoveChange.getDataTagId()
                 + " successfully from equipment " + equipmentId);
@@ -491,6 +493,10 @@ public class ConfigurationController {
             + "to the implementation part. No data tag changer was found.");
         changeReport.setState(CHANGE_STATE.REBOOT);
       }
+      
+      // remove the tag from the core's map
+      sourceDataTags.remove(dataTagRemoveChange.getDataTagId());
+      
     } else {
       LOGGER.debug("onDataTagRemove - The data tag with id " + dataTagRemoveChange.getDataTagId()
           + " to remove was not found" + " in equipment with id " + equipmentId);
