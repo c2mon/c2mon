@@ -6,7 +6,8 @@
 		<application>
 			<startscript>
 				<main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-					<arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName ${PROCESS_NAME} -noDeadband</arg>
+					<arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName ${PROCESS_NAME}
+						-noDeadband</arg>
 					<output>
 						<file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
 					</output>
@@ -22,22 +23,49 @@
 
 			<deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-almon">
 				<directory name="conf">
-					<file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />
-					<file name="log4j.xml" sourceDir="~diamonop/c2mon/daq/almon-daq" mask="444" />
+					<file name="daq.properties" sourceDir="~diamonop/c2mon/daq" mask="400" />					
+					<file name="log4j.xml" source="logj4-almon.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
 					<file name="daq-core-service.xml" sourceDir="~diamonop/c2mon/daq" mask="444" />
 				</directory>
 				<notification>
 					<mail address="diamon-developers@cern.ch" />
 				</notification>
 			</deployment>
-			<startscript name="DMN2-DAQ-ALMON_LN3">
-				<env name="PROCESS_NAME" value="P_ALMON_LN3" />
+			<startscript name="DMN2-DAQ-ALMON-LHC">
+				<env name="PROCESS_NAME" value="P_ALMON_LHC" />
 			</startscript>
-			<startscript name="DMN2-DAQ-ALMON_SPS">
+			<startscript name="DMN2-DAQ-ALMON-CNGS">
+				<env name="PROCESS_NAME" value="P_ALMON_CNGS" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-SPS">
 				<env name="PROCESS_NAME" value="P_ALMON_SPS" />
 			</startscript>
-			<startscript name="DMN2-DAQ-ALMON_LHC">
-				<env name="PROCESS_NAME" value="P_ALMON_LHC" />
+			<startscript name="DMN2-DAQ-ALMON-NORTH">
+				<env name="PROCESS_NAME" value="P_ALMON_NORTH" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-SLG">
+				<env name="PROCESS_NAME" value="P_ALMON_SLG" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-PSB">
+				<env name="PROCESS_NAME" value="P_ALMON_PSB" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-CPS">
+				<env name="PROCESS_NAME" value="P_ALMON_CPS" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-LIN">
+				<env name="PROCESS_NAME" value="P_ALMON_LIN" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-LN3">
+				<env name="PROCESS_NAME" value="P_ALMON_LN3" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-ADE">
+				<env name="PROCESS_NAME" value="P_ALMON_ADE" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-CTF">
+				<env name="PROCESS_NAME" value="P_ALMON_CTF" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-LEI">
+				<env name="PROCESS_NAME" value="P_ALMON_LEI" />
 			</startscript>
 		</application>
 
@@ -45,18 +73,45 @@
 			<deployment installLocation="/opt/dmn2/dmn2-daq/dmn2-daq-almon-dev">
 				<directory name="conf">
 					<file name="daq.properties" sourceDir="~dmndev/c2mon/daq" mask="400" />
-					<file name="log4j.xml" sourceDir="~dmndev/c2mon/daq/almon-daq" mask="444" />
+					<file name="log4j.xml" source="logj4-almon.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
 					<file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
 				</directory>
 			</deployment>
+			<startscript name="DMN2-DAQ-ALMON-LHC">
+				<env name="PROCESS_NAME" value="P_ALMON_LHC" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-CNGS">
+				<env name="PROCESS_NAME" value="P_ALMON_CNGS" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-SPS">
+				<env name="PROCESS_NAME" value="P_ALMON_SPS" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-NORTH">
+				<env name="PROCESS_NAME" value="P_ALMON_NORTH" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-SLG">
+				<env name="PROCESS_NAME" value="P_ALMON_SLG" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-PSB">
+				<env name="PROCESS_NAME" value="P_ALMON_PSB" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-CPS">
+				<env name="PROCESS_NAME" value="P_ALMON_CPS" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-LIN">
+				<env name="PROCESS_NAME" value="P_ALMON_LIN" />
+			</startscript>
 			<startscript name="DMN2-DAQ-ALMON-LN3">
 				<env name="PROCESS_NAME" value="P_ALMON_LN3" />
 			</startscript>
-			<startscript name="DMN2-DAQ-ALMON_SPS">
-				<env name="PROCESS_NAME" value="P_ALMON_SPS" />
+			<startscript name="DMN2-DAQ-ALMON-ADE">
+				<env name="PROCESS_NAME" value="P_ALMON_ADE" />
 			</startscript>
-			<startscript name="DMN2-DAQ-ALMON_LHC">
-				<env name="PROCESS_NAME" value="P_ALMON_LHC" />
+			<startscript name="DMN2-DAQ-ALMON-CTF">
+				<env name="PROCESS_NAME" value="P_ALMON_CTF" />
+			</startscript>
+			<startscript name="DMN2-DAQ-ALMON-LEI">
+				<env name="PROCESS_NAME" value="P_ALMON_LEI" />
 			</startscript>
 		</application>
 
