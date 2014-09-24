@@ -47,6 +47,7 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
  * the access to dao object dbDaqDao (used for the refresh) also has to be synchronized. 
  * 
  * @author Aleksandra Wardzinska
+ * @author Nacho Vilches
  */
 public class DBMessageHandler extends EquipmentMessageHandler {
     
@@ -313,15 +314,13 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * */
     private void registerForAlerts() {
         this.equipmentLogger.info("registerForAlerts - Registering for alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
-//        synchronized (dbDaqDao) {
-            for (long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
-              try {
+        for (long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
+            try {
                 this.dbController.registerForAlert(alertId);
-              } catch (DataAccessException dae) {
+            } catch (DataAccessException dae) {
                 this.equipmentLogger.error("registerForAlerts - " + dae.getCause().getMessage(), dae);
-              }
             }
-//        }
+        }
     }
     
     /**
@@ -358,15 +357,13 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * */
     private void unregisterAlerts() {
         this.equipmentLogger.info("unregisterAlerts - Unregistering alerts (" + getEquipmentConfiguration().getSourceDataTags().size() + ")");
-//        synchronized (dbDaqDao) {
-            for (Long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
-              try {
+        for (Long alertId : getEquipmentConfiguration().getSourceDataTags().keySet()) {
+            try {
                 this.dbController.unregisterFromAlert(alertId);
-              } catch (DataAccessException dae) {
+            } catch (DataAccessException dae) {
                 this.equipmentLogger.error("unregisterAlerts - " + dae.getCause().getMessage(), dae);
-              }
             }
-//        }
+        }
     }
 
     /**
@@ -496,7 +493,6 @@ public class DBMessageHandler extends EquipmentMessageHandler {
     public void refreshAllDataTags() {
         List<Long> dataTagIds = new ArrayList<Long>(getEquipmentConfiguration().getSourceDataTags().keySet());
         this.equipmentLogger.info("refreshAllDataTags - Refreshing all data tags ");
-//        synchronized (dbDaqDao) {
             List<Alert> alerts = dbDaqDao.getLastAlerts(dataTagIds);
             synchronized (alertsQueue) {
                 for (Alert a : alerts) {
@@ -504,7 +500,6 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                 }
                 alertsQueue.notify();
             }
-//        }
     }
 
     /**
@@ -514,10 +509,8 @@ public class DBMessageHandler extends EquipmentMessageHandler {
     @Override
     public void refreshDataTag(final long dataTagId) {
         this.equipmentLogger.info("refreshDataTag - Refreshing data tag " + dataTagId);
-//        synchronized (dbDaqDao) {
             Alert alert = dbDaqDao.getLastAlertForDataTagId(dataTagId);
             this.dbController.processAlert(alert);
-//        }
     }
 
     /**

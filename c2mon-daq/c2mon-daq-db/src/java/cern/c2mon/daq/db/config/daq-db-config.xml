@@ -14,8 +14,7 @@
 	</bean>
 
 	<!-- data sources -->
-    <bean id="dbDaqDataSource" destroy-method="close"
-        class="org.apache.commons.dbcp.BasicDataSource">
+    <bean id="dbDaqDataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="oracle.jdbc.OracleDriver" />
 <!--        <property name="url" value="${timdb.url}" />-->
 <!--        <property name="username" value="${timdbdaq.login}" />-->
@@ -24,6 +23,8 @@
         <property name="testOnBorrow" value="false" />
         <property name="testWhileIdle" value="true" />
         <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <property name="initialSize" value="2"/>
+        <property name="maxActive" value="5"/>
     </bean>
 
 </beans>

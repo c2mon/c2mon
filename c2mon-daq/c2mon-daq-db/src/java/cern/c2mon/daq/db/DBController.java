@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
@@ -20,6 +18,13 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
+/**
+ * The DBController is used for helping the Message Handler when connecting/disconnecting from source or
+ * when doing dynamic reconfiguration of Data Tags
+ * 
+ * @author Nacho Vilches
+ * 
+ */
 public class DBController {
 
   /**
@@ -228,11 +233,8 @@ public class DBController {
     }
     
     // Unregister from alert
-    getEquipmentLogger().trace("disconnection - Unregister from alert (waiting synchronized)");
-//    synchronized (this.dbDaqDao) {
-        getEquipmentLogger().trace("disconnection - Unregistering from alert");
-      unregisterFromAlert(dataTagId);
-//    }
+    getEquipmentLogger().trace("disconnection - Unregistering from alert");
+    unregisterFromAlert(dataTagId);
     
     getEquipmentLogger().trace("disconnection - Exiting: " + dataTagId);
     
@@ -317,10 +319,8 @@ public class DBController {
    *            id of a datatag
    * */
   private void increaseSentInvalidDataTags(final long dataTagId) {
-//      synchronized (getInvalidSent()) {
-          int i = getInvalidSent().get(dataTagId);
-          getInvalidSent().put(dataTagId, ++i);
-//      }
+      int i = getInvalidSent().get(dataTagId);
+      getInvalidSent().put(dataTagId, ++i);
       increaseAllSentDataTags(dataTagId);
   }
 
@@ -331,10 +331,8 @@ public class DBController {
    *            id of a datatag
    * */
   private void increaseAllSentDataTags(final long dataTagId) {
-//      synchronized (getAlertsSent()) {
-          int i = getAlertsSent().get(dataTagId);
-          getAlertsSent().put(dataTagId, ++i);
-//      }
+      int i = getAlertsSent().get(dataTagId);
+      getAlertsSent().put(dataTagId, ++i);
   }
 
   /**
