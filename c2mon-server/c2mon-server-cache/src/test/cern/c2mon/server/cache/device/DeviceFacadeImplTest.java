@@ -114,7 +114,9 @@ public class DeviceFacadeImplTest {
     deviceIds.add(2000L);
     deviceClassReturn.setDeviceIds(deviceIds);
 
-    Device device1 = new DeviceCacheObject(1000L, "test_device_1", 1L);
+    DeviceCacheObject device1 = new DeviceCacheObject(1000L, "test_device_1", 1L);
+    device1.setDeviceProperties(new ArrayList<>(Arrays.asList(new DeviceProperty("test_property", 10L, null, null, null))));
+    device1.setDeviceCommands(new ArrayList<>(Arrays.asList(new DeviceCommand("test_command", 20L))));
     Device device2 = new DeviceCacheObject(2000L, "test_device_2", 1L);
 
     // Expect the facade to get the device class object

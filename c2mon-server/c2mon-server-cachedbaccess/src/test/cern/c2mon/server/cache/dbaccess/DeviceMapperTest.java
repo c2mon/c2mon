@@ -20,6 +20,8 @@ package cern.c2mon.server.cache.dbaccess;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
@@ -127,8 +129,33 @@ public class DeviceMapperTest {
   @Test
   public void testInsertDevice() {
     DeviceCacheObject device = new DeviceCacheObject(304L, "TEST_DEVICE_5", 400L);
+
+    DeviceProperty dvp1 = new DeviceProperty("test_property_5", 210005L, null, null, null);
+    DeviceProperty dvp2 = new DeviceProperty("test_property_6", null, null, "Mr. Administrator", null);
+    DeviceProperty dvp3 = new DeviceProperty("test_property_7", null, "(#123 + #234) / 2", null, "Float");
+    DeviceProperty dvp4 = new DeviceProperty("test_property_8", null, null, "4", "Integer");
+    device.setDeviceProperties(new ArrayList<>(Arrays.asList(dvp1, dvp2, dvp3, dvp4)));
+
+    DeviceCommand dvc1 = new DeviceCommand("test_command", 20L);
+    device.setDeviceCommands(new ArrayList<>(Arrays.asList(dvc1)));
+
     deviceMapper.insertDevice(device);
+    for (DeviceProperty property : ((DeviceCacheObject) device).getDeviceProperties()) {
+      deviceMapper.insertDeviceProperty(device.getId(), property);
+    }
+    for (DeviceCommand command : ((DeviceCacheObject) device).getDeviceCommands()) {
+      deviceMapper.insertDeviceCommand(device.getId(), command);
+    }
+
     Assert.assertTrue(deviceMapper.isInDb(device.getId()));
+    DeviceCacheObject fromDb = (DeviceCacheObject) deviceMapper.getItem(304L);
+    Assert.assertNotNull(fromDb);
+    List<DeviceProperty> properties = fromDb.getDeviceProperties();
+    Assert.assertNotNull(properties);
+    Assert.assertTrue(properties.size() == 4);
+    List<DeviceCommand> commands = fromDb.getDeviceCommands();
+    Assert.assertNotNull(commands);
+    Assert.assertTrue(commands.size() == 1);
   }
 
   @Test

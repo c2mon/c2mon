@@ -166,6 +166,15 @@ public class DeviceProperty implements Cloneable, Serializable {
   }
 
   /**
+   * Get the raw result type string of this property.
+   *
+   * @return the result type
+   */
+  public String getResultType() {
+    return resultType;
+  }
+
+  /**
    * Attempts to convert the string representation of the result type into a
    * class object of the corresponding type.
    *
@@ -173,7 +182,7 @@ public class DeviceProperty implements Cloneable, Serializable {
    * @throws ClassNotFoundException if the class cannot be created from the
    *           result type string
    */
-  public Class<?> getResultType() throws ClassNotFoundException {
+  public Class<?> getResultTypeClass() throws ClassNotFoundException {
     return Class.forName("java.lang." + resultType);
   }
 }

@@ -67,13 +67,13 @@ public class ClientDevicePropertyFactory {
 
     // If we have a client rule, that comes next in the hierarchy.
     else if (deviceProperty.getClientRule() != null) {
-      ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getClientRule()), deviceProperty.getResultType());
+      ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getClientRule()), deviceProperty.getResultTypeClass());
       return new ClientDevicePropertyImpl(ruleTag);
     }
 
     // If we have a constant value, it comes last in the hierarchy.
     else if (deviceProperty.getConstantValue() != null) {
-      ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getConstantValue(), deviceProperty.getResultType());
+      ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getConstantValue(), deviceProperty.getResultTypeClass());
       return new ClientDevicePropertyImpl(constantValueTag);
     }
 

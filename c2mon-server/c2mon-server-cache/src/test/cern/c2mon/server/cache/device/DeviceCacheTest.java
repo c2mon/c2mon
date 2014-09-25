@@ -32,6 +32,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.dbaccess.DeviceMapper;
 import cern.c2mon.server.common.device.Device;
+import cern.c2mon.shared.client.device.DeviceProperty;
 
 /**
  * Integration test of the DeviceCache implementation with the cache loading and
@@ -52,7 +53,7 @@ public class DeviceCacheTest {
   private DeviceCacheImpl deviceCache;
 
   @Test
-  public void testCacheLoading() {
+  public void testCacheLoading() throws ClassNotFoundException {
     assertNotNull(deviceCache);
 
     List<Device> deviceList = deviceMapper.getAll();
@@ -60,11 +61,38 @@ public class DeviceCacheTest {
     // Test the cache is the same size as in DB
     assertEquals(deviceList.size(), deviceCache.getCache().getKeys().size());
     // Compare all the objects from the cache and buffer
+    for (Device device : deviceList) {
+      Device fromCache = deviceCache.getCopy(device.getId());
+
+      assertEquals(device.getName(), fromCache.getName());
+
+      // Compare properties
+      for (DeviceProperty property : device.getDeviceProperties()) {
+        assertDevicePropertyListContains(fromCache.getDeviceProperties(), property);
+      }
+    }
+
     Iterator<Device> it = deviceList.iterator();
     while (it.hasNext()) {
       Device currentDevice = it.next();
       // Equality of DataTagCacheObjects => currently only compares names
       assertEquals(currentDevice.getName(), (deviceCache.getCopy(currentDevice.getId()).getName()));
+    }
+  }
+
+  public void assertDevicePropertyEquals(DeviceProperty expectedObject, DeviceProperty cacheObject) throws ClassNotFoundException {
+    assertEquals(expectedObject.getName(), cacheObject.getName());
+    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
+    assertEquals(expectedObject.getClientRule(), cacheObject.getClientRule());
+    assertEquals(expectedObject.getConstantValue(), cacheObject.getConstantValue());
+    assertEquals(expectedObject.getResultType(), cacheObject.getResultType());
+  }
+
+  public void assertDevicePropertyListContains(List<DeviceProperty> deviceProperties, DeviceProperty expectedObject) throws ClassNotFoundException {
+    for (DeviceProperty deviceProperty : deviceProperties) {
+      if (deviceProperty.getName().equals(expectedObject.getName())) {
+        assertDevicePropertyEquals(expectedObject, deviceProperty);
+      }
     }
   }
 }

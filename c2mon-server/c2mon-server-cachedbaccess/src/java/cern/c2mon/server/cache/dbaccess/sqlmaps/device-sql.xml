@@ -37,7 +37,7 @@
       FROM DEVICE 
            LEFT OUTER JOIN DEVICEPROPERTY
         ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
-           INNER JOIN DEVICECOMMAND
+           LEFT OUTER JOIN DEVICECOMMAND
         ON DEVICE.DEVID = DEVICECOMMAND.DVCDEVID
   </select>
 
@@ -56,7 +56,7 @@
       FROM DEVICE 
            LEFT OUTER JOIN DEVICEPROPERTY
         ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
-           INNER JOIN DEVICECOMMAND
+           LEFT OUTER JOIN DEVICECOMMAND
         ON DEVICE.DEVID = DEVICECOMMAND.DVCDEVID
      WHERE DEVICE.DEVID = #{id}
   </select>
@@ -66,6 +66,17 @@
     INSERT INTO DEVICE
     (DEVID, DEVNAME, DEVCLASSID)
     VALUES (#{id}, #{name}, #{deviceClassId})
+  </insert>
+  
+  <insert id="insertDeviceProperty">
+    INSERT INTO DEVICEPROPERTY (DVPDEVID, DVPNAME, DVPTAGID, DVPRULE, DVPCONST, DVPRESULTTYPE)
+    VALUES (#{id}, #{property.name}, #{property.tagId,jdbcType=INTEGER}, #{property.clientRule,jdbcType=VARCHAR},
+            #{property.constantValue,jdbcType=VARCHAR}, #{property.resultType})
+  </insert>
+  
+  <insert id="insertDeviceCommand">
+    INSERT INTO DEVICECOMMAND (DVCDEVID, DVCNAME, DVCTAGID)
+    VALUES (#{id}, #{command.name}, #{command.tagId})
   </insert>
 
   <update id="updateDeviceConfig" parameterType="cern.c2mon.server.common.device.Device">

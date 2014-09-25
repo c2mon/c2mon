@@ -174,7 +174,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
       }
 
       try {
-        deviceProperty.getResultType();
+        deviceProperty.getResultTypeClass();
       } catch (ClassNotFoundException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + deviceProperty.getName()
             + "\" specifies invalid result type");

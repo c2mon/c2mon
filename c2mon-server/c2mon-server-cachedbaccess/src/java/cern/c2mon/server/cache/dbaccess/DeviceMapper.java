@@ -17,8 +17,12 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
+import org.apache.ibatis.annotations.Param;
+
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 
 /**
  * MyBatis mapper for for accessing and updating {@link DeviceCacheObject}s in
@@ -34,6 +38,22 @@ public interface DeviceMapper extends LoaderMapper<Device> {
    * @param device the device object to insert
    */
   void insertDevice(Device device);
+
+  /**
+   * Insert a property of a device into the DB.
+   *
+   * @param id the ID of the device to which this property belongs
+   * @param property the property to insert
+   */
+  void insertDeviceProperty(@Param("id") Long id, @Param("property") DeviceProperty property);
+
+  /**
+   * Insert a command of a device into the DB.
+   *
+   * @param id the ID of the device to which this command belongs
+   * @param command the command to insert
+   */
+  void insertDeviceCommand(@Param("id") Long id, @Param("command") DeviceCommand command);
 
   /**
    * Delete a device object from the db.
