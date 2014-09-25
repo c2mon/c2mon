@@ -139,24 +139,47 @@ public class DeviceManager implements C2monDeviceManager {
   }
 
   @Override
-  public void subscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
+  public Device subscribeDevice(Device device, final DeviceUpdateListener listener) {
+    DeviceImpl deviceImpl = (DeviceImpl) device;
 
-    for (Device deviceInterface : devices) {
-      DeviceImpl device = (DeviceImpl) deviceInterface;
+    // Here, just get the tag IDs to avoid calling the server
+    Set<Long> dataTagIds = deviceImpl.getPropertyDataTagIds();
 
-      // Here, just get the tag IDs to avoid calling the server
-      Set<Long> dataTagIds = device.getPropertyDataTagIds();
+    // So we know how many tags to wait for
+    deviceImpl.initSubscriptionLatch(dataTagIds.size());
 
-      // Use TagManager to subscribe to all properties of the device
-      device.addDeviceUpdateListener(listener);
-      tagManager.subscribeDataTags(dataTagIds, device);
+    // Use TagManager to subscribe to all properties of the device
+    deviceImpl.addDeviceUpdateListener(listener);
+    tagManager.subscribeDataTags(dataTagIds, deviceImpl);
 
-      // If the device contains properties that are client rules, also subscribe
-      // to the tags contained within those rules
-      for (ClientRuleTag ruleTag : device.getRuleTags()) {
-        tagManager.subscribeDataTags(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
-      }
+    // If the device contains properties that are client rules, also subscribe
+    // to the tags contained within those rules
+    for (ClientRuleTag ruleTag : deviceImpl.getRuleTags()) {
+      tagManager.subscribeDataTags(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
     }
+
+    // Block and wait for all tags to be received
+    deviceImpl.awaitCompleteSubscription();
+    LOG.debug("Subscription completed");
+
+    try {
+      return deviceImpl.clone();
+
+    } catch (CloneNotSupportedException e) {
+      LOG.error("Unable to clone Device with id " + deviceImpl.getId(), e);
+      throw new UnsupportedOperationException("Unable to clone Device with id " + deviceImpl.getId(), e);
+    }
+  }
+
+  @Override
+  public List<Device> subscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
+    List<Device> deviceList = new ArrayList<>();
+
+    for (Device device : devices) {
+      deviceList.add(subscribeDevice(device, listener));
+    }
+
+    return deviceList;
   }
 
   @Override

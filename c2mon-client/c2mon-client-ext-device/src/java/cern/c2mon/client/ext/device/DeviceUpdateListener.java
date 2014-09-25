@@ -46,11 +46,9 @@ public interface DeviceUpdateListener {
    * </p>
    *
    * <p>
-   * Note: when you initially subscribe to a device, this method will be called
-   * once with the device object containing all properties and with
-   * <code>propertyInfo</code> as null. Thereafter, a single property will
-   * change for any given listener invocation, i.e. the method will be invoked
-   * multiple times to reflect multiple property changes.
+   * Note: only a single property will change for any given listener invocation,
+   * i.e. the method will be invoked multiple times to reflect multiple property
+   * changes.
    * </p>
    *
    * @param device the device in which a property has changed

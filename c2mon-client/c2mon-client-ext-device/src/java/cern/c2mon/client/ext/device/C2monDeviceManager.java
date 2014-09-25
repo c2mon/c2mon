@@ -44,9 +44,9 @@ public interface C2monDeviceManager {
    *
    * <p>
    * Note: retrieving devices using this method does not automatically subscribe
-   * to those devices. Accessing a property of a particular device will
-   * fetch the value from the server only once. To receive updates about
-   * property changes, use {@link #subscribeDevices(Set, DeviceUpdateListener)}.
+   * to those devices. Accessing a property of a particular device will fetch
+   * the value from the server only once. To receive updates about property
+   * changes, use {@link #subscribeDevices(Set, DeviceUpdateListener)}.
    * </p>
    *
    * @param deviceClassName the name of the class of devices to retrieve
@@ -55,24 +55,56 @@ public interface C2monDeviceManager {
   List<Device> getAllDevices(String deviceClassName);
 
   /**
+   * Subscribe to retrieve updates of property changes of a device.
+   *
+   * <p>
+   * Subscribing to a device means subscribing to all the properties of that
+   * device. When a particular property changes, the given
+   * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method will be
+   * called with the device itself and the name of the property that has
+   * changed.
+   *
+   * Note: only a single property will change for any given listener invocation.
+   * The listener will be invoked multiple times to reflect multiple property
+   * changes.
+   *
+   * This method will return a device containing the current property values.
+   * Note however that the given listener may be invoked if a property of the
+   * device changes before this method returns.
+   * </p>
+   *
+   * @param devices the device you want to subscribe to
+   * @param listener the callback listener that will be notified when a device
+   *          property changes
+   * @return the device containing its current property values
+   */
+  public Device subscribeDevice(Device device, final DeviceUpdateListener listener);
+
+  /**
    * Subscribe to retrieve updates of property changes of a set of devices.
    *
    * <p>
    * Subscribing to a device means subscribing to all the properties of that
    * device. When a particular property changes, the given
-   * {@link DeviceUpdateListener#onUpdate(Device, String)} method will be called
-   * with the device itself and the name of the property that has changed.
+   * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method will be
+   * called with the device itself and the name of the property that has
+   * changed.
    *
    * Note: only a single property will change for any given listener invocation.
    * The listener will be invoked multiple times to reflect multiple property
    * changes.
+   *
+   * This method will return a list of devices containing the current property
+   * values. Note however that the given listener may be invoked if a property
+   * of a device changes before this method returns.
    * </p>
    *
    * @param devices the set of devices you want to subscribe to
    * @param listener the callback listener that will be notified when a device
    *          property changes
+   * @return the list of devices containing their current property values
    */
-  void subscribeDevices(final Set<Device> devices, final DeviceUpdateListener listener);
+  List<Device> subscribeDevices(final Set<Device> devices, final DeviceUpdateListener listener);
 
   /**
    * Unsubscribe from a previously subscribed-to set of devices.
