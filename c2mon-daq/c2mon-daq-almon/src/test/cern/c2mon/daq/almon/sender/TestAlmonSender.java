@@ -7,8 +7,7 @@ package cern.c2mon.daq.almon.sender;
 import java.util.List;
 
 import cern.c2mon.daq.almon.AlarmRecord;
-import cern.c2mon.daq.almon.address.AlarmTripplet;
-import cern.c2mon.daq.almon.sender.AlmonSender;
+import cern.c2mon.daq.almon.address.AlarmTriplet;
 
 /**
  * The <code>TestAlmonSender</code> is used for test purposes only. It extends the <code>AlmonSender</code> interface
@@ -17,5 +16,5 @@ import cern.c2mon.daq.almon.sender.AlmonSender;
  * @author wbuczak
  */
 public interface TestAlmonSender extends AlmonSender {
-    List<AlarmRecord> getAlarmsSequence(AlarmTripplet alarmTripplet);
+    List<AlarmRecord> getAlarmsSequence(AlarmTriplet alarmTriplet);
 }

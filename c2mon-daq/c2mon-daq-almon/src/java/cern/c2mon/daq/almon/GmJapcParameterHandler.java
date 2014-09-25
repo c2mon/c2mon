@@ -34,7 +34,7 @@ public class GmJapcParameterHandler extends JapcParameterHandler {
 
     @Override
     public void valueReceived(String parameterName, AcquiredParameterValue value) {
-        LOG.debug("parameter: {} received update value: {}", parameterName, value.getValue().getString());
+        LOG.trace("parameter: {} received update value: {}", parameterName, value.getValue().getString());
 
         // if access fault was activated - terminate it
         super.terminateDeviceAccessFault();
@@ -77,17 +77,17 @@ public class GmJapcParameterHandler extends JapcParameterHandler {
 
             this.inFault = false;
             this.currentFault = GM_NO_ALARM;
-            this.amSender.terminate(tag, ems, address.getAlarmTripplet(), timestamp);
+            this.amSender.terminate(tag, ems, address.getAlarmTriplet(), timestamp);
         } // if inFault
 
         // if we arrive here we have to activate a new alarm (if it is related to the current tag)
-        if (fault != GM_NO_ALARM && (fault & FAULT_CODE_MASK) == address.getAlarmTripplet().getFaultCode()) {
+        if (fault != GM_NO_ALARM && (fault & FAULT_CODE_MASK) == address.getAlarmTriplet().getFaultCode()) {
             LOG.debug("parameter: {} received fault = true : activating", parameterName);
 
             this.inFault = true;
             this.currentFault = fault;
 
-            this.amSender.activate(tag, ems, address.getAlarmTripplet(), timestamp, new UserProperties());
+            this.amSender.activate(tag, ems, address.getAlarmTriplet(), timestamp, new UserProperties());
         }
     }
 

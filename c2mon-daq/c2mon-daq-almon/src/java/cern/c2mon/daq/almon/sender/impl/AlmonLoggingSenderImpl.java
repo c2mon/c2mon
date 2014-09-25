@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
@@ -41,24 +41,24 @@ public class AlmonLoggingSenderImpl implements AlmonSender {
     }
 
     @Override
-    public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
-        LOG.info("{} {} {} ACTIVATE {}", new Object[] { sdt.getId(), userTimestamp, alarmTripplet.toString(),
+        LOG.info("{} {} {} ACTIVATE {}", new Object[] { sdt.getId(), userTimestamp, alarmTriplet.toString(),
                 userPropsToString(userProperties) });
 
     }
 
     @Override
-    public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp) {
-        LOG.info("{} {} {} TERMINATE", new Object[] { sdt.getId(), userTimestamp, alarmTripplet.toString() });
+        LOG.info("{} {} {} TERMINATE", new Object[] { sdt.getId(), userTimestamp, alarmTriplet.toString() });
 
     }
 
     @Override
-    public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
-        LOG.info("{} {} {} UPDATE {}", new Object[] { sdt.getId(), userTimestamp, alarmTripplet.toString(),
+        LOG.info("{} {} {} UPDATE {}", new Object[] { sdt.getId(), userTimestamp, alarmTriplet.toString(),
                 userPropsToString(userProperties) });
 
     }

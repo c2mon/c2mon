@@ -12,6 +12,8 @@
 
 	<context:mbean-export registration="ignoreExisting" />
 
+	<context:property-placeholder ignore-resource-not-found="true" ignore-unresolvable="true" />
+
 	<bean id="logAlarmSender" class="cern.c2mon.daq.almon.sender.impl.AlmonLoggingSenderImpl" />
 
 	<beans profile="PRO">
@@ -39,7 +41,7 @@
 		<context:property-placeholder location="classpath:resources/test.properties"
 			ignore-resource-not-found="true" ignore-unresolvable="true" />
 
-<!-- 		<bean id="alarmsMonitorSender" class="cern.c2mon.daq.almon.sender.impl.AlmonDiamonSenderImpl" /> -->
+		<!-- <bean id="alarmsMonitorSender" class="cern.c2mon.daq.almon.sender.impl.AlmonDiamonSenderImpl" /> -->
 		<bean id="alarmsMonitorSender" class="cern.c2mon.daq.almon.sender.impl.DummyAlmonSenderImpl" />
 
 		<bean id="almonSenderProxy" class="cern.c2mon.daq.almon.sender.impl.AlarmMonitorSenderProxy">

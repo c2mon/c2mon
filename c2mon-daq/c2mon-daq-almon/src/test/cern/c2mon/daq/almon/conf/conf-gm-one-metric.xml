@@ -17,7 +17,7 @@
 						"device": "RFLNP",
 						"property": "ALARM",
 						"field": "value",
-						"alarmTripplet": {
+						"alarmTriplet": {
 						   "faultFamily": "ITM.CRFBU",
 						   "faultMember": "RFLNP",
 						   "faultCode": "1"

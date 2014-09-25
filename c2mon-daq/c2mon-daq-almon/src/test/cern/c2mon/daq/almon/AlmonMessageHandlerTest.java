@@ -104,7 +104,7 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(2);
+        expectLastCall().times(3);
 
         replay(messageSender);
 
@@ -133,12 +133,18 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
 
         verify(messageSender);
 
-        assertEquals(2, sdtv.getNumberOfCapturedValues(54675L));
+        assertEquals(3, sdtv.getNumberOfCapturedValues(54675L));
 
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
-        assertEquals(Boolean.TRUE, sdtv.getFirstValue(54675L).getValue());
-        assertNotNull(sdtv.getFirstValue(54675L).getValueDescription());
+        assertEquals(Boolean.FALSE, sdtv.getFirstValue(54675L).getValue());
+
         UserProperties uprops = UserProperties.fromJson(sdtv.getFirstValue(54675L).getValueDescription());
+        assertNull(uprops);
+
+        assertEquals(SourceDataQuality.OK, sdtv.getValueAt(1, 54675L).getQuality().getQualityCode());
+        assertEquals(Boolean.TRUE, sdtv.getValueAt(1, 54675L).getValue());
+        assertNotNull(sdtv.getValueAt(1, 54675L).getValueDescription());
+        uprops = UserProperties.fromJson(sdtv.getValueAt(1, 54675L).getValueDescription());
         assertNotNull(uprops);
         assertTrue(uprops.isEmpty());
 
@@ -166,7 +172,8 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(4);
+        expectLastCall().times(6); // 4+2 - the first one (for each tag) is the default value (false) initialized by the
+                                   // DAQ
 
         replay(messageSender);
 
@@ -196,7 +203,7 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
         str.append("    \"device\": \"RFLNP\",");
         str.append("    \"property\": \"ALARM\",");
         str.append("    \"field\": \"value\",");
-        str.append("    \"alarmTripplet\": {");
+        str.append("    \"alarmTriplet\": {");
         str.append("        \"faultFamily\": \"ITM.CRFBU\",");
         str.append("        \"faultMember\": \"RFLNP\",");
         str.append("        \"faultCode\": \"2\"");
@@ -248,18 +255,26 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
 
         SourceDataTagValue firstValue1 = sdtv.getFirstValue(54675L);
         SourceDataTagValue lastValue1 = sdtv.getLastValue(54675L);
+        SourceDataTagValue secondValue1 = sdtv.getValueAt(1, 54675L);
 
         SourceDataTagValue firstValue2 = sdtv.getFirstValue(54676L);
+        SourceDataTagValue secondValue2 = sdtv.getValueAt(1, 54676L);
         SourceDataTagValue lastValue2 = sdtv.getLastValue(54676L);
 
         assertEquals(SourceDataQuality.OK, firstValue1.getQuality().getQualityCode());
-        assertEquals(Boolean.TRUE, firstValue1.getValue());
+        assertEquals(Boolean.FALSE, firstValue1.getValue());
+
+        assertEquals(SourceDataQuality.OK, secondValue1.getQuality().getQualityCode());
+        assertEquals(Boolean.TRUE, secondValue1.getValue());
 
         assertEquals(SourceDataQuality.OK, lastValue1.getQuality().getQualityCode());
         assertEquals(Boolean.FALSE, lastValue1.getValue());
 
         assertEquals(SourceDataQuality.OK, firstValue2.getQuality().getQualityCode());
-        assertEquals(Boolean.TRUE, firstValue2.getValue());
+        assertEquals(Boolean.FALSE, firstValue2.getValue());
+
+        assertEquals(SourceDataQuality.OK, secondValue2.getQuality().getQualityCode());
+        assertEquals(Boolean.TRUE, secondValue2.getValue());
 
         assertEquals(SourceDataQuality.OK, lastValue2.getQuality().getQualityCode());
         assertEquals(Boolean.FALSE, lastValue2.getValue());
@@ -286,7 +301,7 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
         SourceDataTagValueCapture sdtv = new SourceDataTagValueCapture();
 
         messageSender.addValue(EasyMock.capture(sdtv));
-        expectLastCall().times(2);
+        expectLastCall().times(3);
 
         replay(messageSender);
 
@@ -319,13 +334,17 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
 
         verify(messageSender);
 
-        assertEquals(2, sdtv.getNumberOfCapturedValues(54675L));
+        assertEquals(3, sdtv.getNumberOfCapturedValues(54675L));
 
         SourceDataTagValue firstValue = sdtv.getFirstValue(54675L);
+        SourceDataTagValue secondValue = sdtv.getValueAt(1, 54675L);
         SourceDataTagValue lastValue = sdtv.getLastValue(54675L);
 
         assertEquals(SourceDataQuality.OK, firstValue.getQuality().getQualityCode());
-        assertEquals(Boolean.TRUE, firstValue.getValue());
+        assertEquals(Boolean.FALSE, firstValue.getValue());
+
+        assertEquals(SourceDataQuality.OK, secondValue.getQuality().getQualityCode());
+        assertEquals(Boolean.TRUE, secondValue.getValue());
 
         assertEquals(SourceDataQuality.OK, lastValue.getQuality().getQualityCode());
         assertEquals(Boolean.FALSE, lastValue.getValue());
@@ -381,6 +400,19 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
         superCycle.stop();
 
         verify(messageSender);
+
+        // make sure data tag was invalidated as expected
+        assertEquals(2, sdtv.getNumberOfCapturedValues(54675L));
+
+        SourceDataTagValue firstValue = sdtv.getFirstValue(54675L);
+        SourceDataTagValue secondValue = sdtv.getValueAt(1, 54675L);
+
+        assertEquals(SourceDataQuality.OK, firstValue.getQuality().getQualityCode());
+        assertEquals(Boolean.FALSE, firstValue.getValue());
+
+        assertEquals(SourceDataQuality.DATA_UNAVAILABLE, secondValue.getQuality().getQualityCode());
+        assertEquals("Server is down or unreachable", secondValue.getQuality().getDescription());
+
     }
 
 }

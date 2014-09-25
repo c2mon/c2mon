@@ -19,7 +19,7 @@ public interface AlmonHardwareAddress {
 
     String getField();
 
-    AlarmTripplet getAlarmTripplet();
+    AlarmTriplet getAlarmTriplet();
 
     boolean hasCycle();
 

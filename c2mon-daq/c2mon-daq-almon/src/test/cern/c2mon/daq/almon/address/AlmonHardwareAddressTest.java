@@ -12,10 +12,6 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import cern.c2mon.daq.almon.address.AlarmTripplet;
-import cern.c2mon.daq.almon.address.AlarmType;
-import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
-import cern.c2mon.daq.almon.address.AlmonHardwareAddressFactory;
 import cern.c2mon.daq.almon.address.impl.AlmonHardwareAddressImpl;
 
 /**
@@ -24,9 +20,9 @@ import cern.c2mon.daq.almon.address.impl.AlmonHardwareAddressImpl;
 public class AlmonHardwareAddressTest {
 
     @Test
-    public void testBasicAlarmTripplet() {
-        AlarmTripplet at = new AlarmTripplet("ITM.CRFBU", "RFLNP", 1);
-        AlarmTripplet at2 = new AlarmTripplet("ITM.CRFBU", "RFLNP", 1);
+    public void testBasicAlarmTriplet() {
+        AlarmTriplet at = new AlarmTriplet("ITM.CRFBU", "RFLNP", 1);
+        AlarmTriplet at2 = new AlarmTriplet("ITM.CRFBU", "RFLNP", 1);
 
         assertNotNull(at);
         assertEquals("ITM.CRFBU", at.getFaultFamily());
@@ -39,10 +35,10 @@ public class AlmonHardwareAddressTest {
     }
 
     @Test
-    public void testJsonAlarmTripplet() {
+    public void testJsonAlarmTriplet() {
         final String json = " { \"faultFamily\": \"ITM.CRFBU\",\"faultMember\":\"RFLNP\",\"faultCode\": \"1\"}";
 
-        AlarmTripplet at = AlarmTripplet.fromJson(json);
+        AlarmTriplet at = AlarmTriplet.fromJson(json);
 
         assertNotNull(at);
         assertEquals("ITM.CRFBU", at.getFaultFamily());
@@ -51,7 +47,7 @@ public class AlmonHardwareAddressTest {
 
         assertEquals("ITM.CRFBU:RFLNP:1", at.toString());
 
-        AlarmTripplet at2 = AlarmTripplet.fromJson(at.toJson());
+        AlarmTriplet at2 = AlarmTriplet.fromJson(at.toJson());
         assertNotSame(at, at2);
         assertEquals(at, at2);
 
@@ -62,7 +58,7 @@ public class AlmonHardwareAddressTest {
     @Test
     public void testBasicAlmonHardwareAddress() {
 
-        AlarmTripplet at = new AlarmTripplet("ITM.CRFBU", "RFLNP", 1);
+        AlarmTriplet at = new AlarmTriplet("ITM.CRFBU", "RFLNP", 1);
 
         AlmonHardwareAddress hw = new AlmonHardwareAddressImpl(AlarmType.GM, "RFLNP", "ALARM", "value", at);
         assertNotNull(hw);
@@ -70,14 +66,14 @@ public class AlmonHardwareAddressTest {
         assertEquals("RFLNP", hw.getDevice());
         assertEquals("ALARM", hw.getProperty());
         assertEquals("value", hw.getField());
-        assertEquals(at, hw.getAlarmTripplet());
+        assertEquals(at, hw.getAlarmTriplet());
     }
 
     @Test
     public void testJsonAlarmHardwareAddress() {
 
         final String json = " { \"device\": \"RFLNP\", \"property\": \"ALARM\", \"type\": \"GM\", \"field\": \"value\","
-                + "\"alarmTripplet\": { \"faultFamily\": \"ITM.CRFBU\",\"faultMember\":\"RFLNP\",\"faultCode\": \"1\"}}";
+                + "\"alarmTriplet\": { \"faultFamily\": \"ITM.CRFBU\",\"faultMember\":\"RFLNP\",\"faultCode\": \"1\"}}";
 
         AlmonHardwareAddressImpl.fromJson(json);
         AlmonHardwareAddressImpl.fromJson(json);

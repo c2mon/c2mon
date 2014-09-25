@@ -4,7 +4,7 @@
 
 package cern.c2mon.daq.almon.sender;
 
-import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
@@ -16,12 +16,12 @@ import cern.c2mon.shared.daq.datatag.ISourceDataTag;
  */
 public interface AlmonSender {
 
-    void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet, long userTimestamp,
+    void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet, long userTimestamp,
             UserProperties userProperties);
 
-    void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet, long userTimestamp);
+    void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet, long userTimestamp);
 
-    void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet, long userTimestamp,
+    void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet, long userTimestamp,
             UserProperties userProperties);
 
 }

@@ -11,7 +11,7 @@ import cern.c2mon.daq.almon.util.JsonUtils;
  * 
  * @author wbuczak
  */
-public class AlarmTripplet {
+public class AlarmTriplet {
 
     private String faultFamily;
     private String faultMember;
@@ -31,10 +31,10 @@ public class AlarmTripplet {
 
     // jackson needs it!
     @SuppressWarnings("unused")
-    private AlarmTripplet() {
+    private AlarmTriplet() {
     }
 
-    public AlarmTripplet(final String faultFamily, final String faultMember, final int faultCode) {
+    public AlarmTriplet(final String faultFamily, final String faultMember, final int faultCode) {
         this.faultFamily = faultFamily;
         this.faultMember = faultMember;
         this.faultCode = faultCode;
@@ -58,7 +58,7 @@ public class AlarmTripplet {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        AlarmTripplet other = (AlarmTripplet) obj;
+        AlarmTriplet other = (AlarmTriplet) obj;
         if (faultCode != other.faultCode)
             return false;
         if (faultFamily == null) {
@@ -83,19 +83,19 @@ public class AlarmTripplet {
         return JsonUtils.toJson(this);
     }
 
-    public static AlarmTripplet fromJson(final String json) {
+    public static AlarmTriplet fromJson(final String json) {
         if (json == null) {
             return null;
         }
 
-        return JsonUtils.fromJson(json, AlarmTripplet.class);
+        return JsonUtils.fromJson(json, AlarmTriplet.class);
     }
 
     /**
-     * @param tripplet
+     * @param triplet
      * @return
      */
-    public static AlarmTripplet fromString(String json) {
+    public static AlarmTriplet fromString(String json) {
         return fromJson(json);
     }
 }

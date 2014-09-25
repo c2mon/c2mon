@@ -42,13 +42,13 @@ public class JsonUtils {
         return null;
     }
 
-    public static String toJson(Object alarmTripplet) {
+    public static String toJson(Object alarmTriplet) {
         String result = null;
 
         StringWriter str = new StringWriter();
 
         try {
-            getObjectMapper().writeValue(str, alarmTripplet);
+            getObjectMapper().writeValue(str, alarmTriplet);
             result = str.toString();
         } catch (Exception ex) {
             LOG.error("deserialization from JSON failed", ex);

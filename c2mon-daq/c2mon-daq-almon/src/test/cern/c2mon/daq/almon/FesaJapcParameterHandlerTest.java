@@ -24,6 +24,7 @@ import static cern.japc.ext.mockito.JapcMock.setAnswer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -41,7 +42,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.AlarmType;
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
 import cern.c2mon.daq.almon.address.impl.AlmonHardwareAddressImpl;
@@ -94,6 +95,8 @@ public class FesaJapcParameterHandlerTest {
 
         sdt = Mockito.mock(ISourceDataTag.class);
         when(sdt.getId()).thenReturn(1000L);
+        
+        ems = mock(IEquipmentMessageSender.class);        
     }
 
     @After
@@ -148,13 +151,13 @@ public class FesaJapcParameterHandlerTest {
 
         setAnswer(p1, null, new DefaultParameterAnswer(mpv(fields, values1)));
 
-        AlarmTripplet alarmTripplet = new AlarmTripplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
+        AlarmTriplet alarmTriplet = new AlarmTriplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
         AlmonHardwareAddress address1 = new AlmonHardwareAddressImpl(AlarmType.FESA, "PR.TFB-AMP", "Alarm",
-                "DAMPERPS_100010", alarmTripplet);
+                "DAMPERPS_100010", alarmTriplet);
 
-        AlarmTripplet alarmTripplet2 = new AlarmTripplet("ADTPSMODULE_210", "PR.TFB-AMP", 3000);
+        AlarmTriplet alarmTriplet2 = new AlarmTriplet("ADTPSMODULE_210", "PR.TFB-AMP", 3000);
         AlmonHardwareAddress address2 = new AlmonHardwareAddressImpl(AlarmType.FESA, "PR.TFB-AMP", "Alarm",
-                "DAMPERPS_100020", alarmTripplet2);
+                "DAMPERPS_100020", alarmTriplet2);
 
         handler1 = new FesaJapcParameterHandler(sdt, address1, ems, senderProxy, plsLineResolver);
         handler1.startMonitoring();
@@ -166,11 +169,11 @@ public class FesaJapcParameterHandlerTest {
 
         p1.setValue(null, mpv(fields, values2));
 
-        while (mockSender.getAlarmsSequence(alarmTripplet).size() < 2) {
+        while (mockSender.getAlarmsSequence(alarmTriplet).size() < 2) {
             Thread.sleep(50);
         }
 
-        List<AlarmRecord> records = mockSender.getAlarmsSequence(alarmTripplet);
+        List<AlarmRecord> records = mockSender.getAlarmsSequence(alarmTriplet);
 
         assertEquals(2, records.size());
         AlarmRecord r1 = records.get(0);
@@ -186,11 +189,11 @@ public class FesaJapcParameterHandlerTest {
 
         assertEquals(AlarmState.TERMINATED, r2.getAlarmState());
 
-        while (mockSender.getAlarmsSequence(alarmTripplet2).size() < 1) {
+        while (mockSender.getAlarmsSequence(alarmTriplet2).size() < 1) {
             Thread.sleep(50);
         }
 
-        records = mockSender.getAlarmsSequence(alarmTripplet2);
+        records = mockSender.getAlarmsSequence(alarmTriplet2);
 
         assertEquals(1, records.size());
         r1 = records.get(0);
@@ -233,13 +236,13 @@ public class FesaJapcParameterHandlerTest {
         // FesaParameter fesaParameter2 = new FesaParameter("PR.TFB-AMP", "Alarm", "DAMPERPS_100020", "NONE",
         // "ADTPSMODULE_210", "PR.TFB-AMP", 2000);
 
-        AlarmTripplet alarmTripplet = new AlarmTripplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
+        AlarmTriplet alarmTriplet = new AlarmTriplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
         AlmonHardwareAddress address1 = new AlmonHardwareAddressImpl(AlarmType.FESA, "PR.TFB-AMP", "Alarm",
-                "DAMPERPS_100010", alarmTripplet);
+                "DAMPERPS_100010", alarmTriplet);
 
-        AlarmTripplet alarmTripplet2 = new AlarmTripplet("ADTPSMODULE_210", "PR.TFB-AMP", 2000);
+        AlarmTriplet alarmTriplet2 = new AlarmTriplet("ADTPSMODULE_210", "PR.TFB-AMP", 2000);
         AlmonHardwareAddress address2 = new AlmonHardwareAddressImpl(AlarmType.FESA, "PR.TFB-AMP", "Alarm",
-                "DAMPERPS_100020", alarmTripplet);
+                "DAMPERPS_100020", alarmTriplet);
 
         handler1 = new FesaJapcParameterHandler(sdt, address1, ems, senderProxy, plsLineResolver);
         handler2 = new FesaJapcParameterHandler(sdt, address2, ems, senderProxy, plsLineResolver);
@@ -249,26 +252,26 @@ public class FesaJapcParameterHandlerTest {
         SuperCycle superCycle = newSuperCycle(new Cycle("", 200));
         superCycle.start();
 
-        AlarmTripplet deviceAccessFaultTripplet = new AlarmTripplet(ALARM_MON_FAULT_FAMILY, "PR.TFB-AMP", 2);
+        AlarmTriplet deviceAccessFaultTriplet = new AlarmTriplet(ALARM_MON_FAULT_FAMILY, "PR.TFB-AMP", 2);
 
-        while (mockSender.getAlarmsSequence(deviceAccessFaultTripplet).size() < 2) {
+        while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 2) {
             Thread.sleep(50);
         }
 
-        List<AlarmRecord> records = mockSender.getAlarmsSequence(deviceAccessFaultTripplet);
+        List<AlarmRecord> records = mockSender.getAlarmsSequence(deviceAccessFaultTriplet);
         assertEquals(2, records.size());
         AlarmRecord r1 = records.get(0);
         AlarmRecord r2 = records.get(1);
         assertEquals(AlarmState.ACTIVE, r1.getAlarmState());
         assertEquals(AlarmState.TERMINATED, r2.getAlarmState());
 
-        // AlarmTripplet alarmTripplet = new AlarmTripplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
+        // AlarmTriplet alarmTriplet = new AlarmTriplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
 
-        while (mockSender.getAlarmsSequence(alarmTripplet).size() < 1) {
+        while (mockSender.getAlarmsSequence(alarmTriplet).size() < 1) {
             Thread.sleep(50);
         }
 
-        records = mockSender.getAlarmsSequence(alarmTripplet);
+        records = mockSender.getAlarmsSequence(alarmTriplet);
         assertEquals(1, records.size());
         r1 = records.get(0);
         assertEquals(AlarmState.ACTIVE, r1.getAlarmState());
@@ -317,11 +320,11 @@ public class FesaJapcParameterHandlerTest {
          * 
          * SuperCycle superCycle = newSuperCycle(new Cycle("", 200)); superCycle.start();
          * 
-         * AlarmTripplet deviceAccessFaultTripplet = new AlarmTripplet(ALARM_MON_FAULT_FAMILY, "PR.TFB-AMP", 2);
+         * AlarmTriplet deviceAccessFaultTriplet = new AlarmTriplet(ALARM_MON_FAULT_FAMILY, "PR.TFB-AMP", 2);
          * 
-         * while (mockSender.getAlarmsSequence(deviceAccessFaultTripplet).size() < 1) { Thread.sleep(50); }
+         * while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 1) { Thread.sleep(50); }
          * 
-         * List<AlarmRecord> records = mockSender.getAlarmsSequence(deviceAccessFaultTripplet); assertEquals(1,
+         * List<AlarmRecord> records = mockSender.getAlarmsSequence(deviceAccessFaultTriplet); assertEquals(1,
          * records.size()); AlarmRecord r1 = records.get(0); assertEquals(AlarmState.ACTIVE, r1.getAlarmState());
          * assertEquals(ERROR_SERVER_UNREACHABLE, r1.getUserProperties().get(ASI_PREFIX_PROPERTY));
          * assertEquals(EX_SERVER_DOWN, r1.getUserProperties().get(ALMON_FAULT_PROPERTY_TAG));
@@ -330,22 +333,22 @@ public class FesaJapcParameterHandlerTest {
          * handler2.stopMonitoring(); Thread.sleep(300); handler3.stopMonitoring(); Thread.sleep(300);
          * 
          * // still - just one activation record is expected records =
-         * mockSender.getAlarmsSequence(deviceAccessFaultTripplet); assertEquals(1, records.size());
+         * mockSender.getAlarmsSequence(deviceAccessFaultTriplet); assertEquals(1, records.size());
          * 
          * // stop monitoring of the remaining parameter handler4.stopMonitoring();
          * 
-         * while (mockSender.getAlarmsSequence(deviceAccessFaultTripplet).size() < 2) { Thread.sleep(50); }
+         * while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 2) { Thread.sleep(50); }
          * 
-         * records = mockSender.getAlarmsSequence(deviceAccessFaultTripplet); assertEquals(2, records.size());
+         * records = mockSender.getAlarmsSequence(deviceAccessFaultTriplet); assertEquals(2, records.size());
          * AlarmRecord r2 = records.get(1); assertEquals(AlarmState.TERMINATED, r2.getAlarmState());
          * 
          * // OK, again, subscribe just 1 parameter - back to the same device handler1 = new
          * FesaJapcParameterHandler(fesaParameter1, senderProxy, plsLineResolver); handler1.startMonitoring();
          * 
-         * while (mockSender.getAlarmsSequence(deviceAccessFaultTripplet).size() < 3) { Thread.sleep(50); }
+         * while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 3) { Thread.sleep(50); }
          * 
          * // we should have back activation of the device fault records =
-         * mockSender.getAlarmsSequence(deviceAccessFaultTripplet); assertEquals(3, records.size()); AlarmRecord r3 =
+         * mockSender.getAlarmsSequence(deviceAccessFaultTriplet); assertEquals(3, records.size()); AlarmRecord r3 =
          * records.get(2); assertEquals(AlarmState.ACTIVE, r3.getAlarmState()); assertEquals(ERROR_SERVER_UNREACHABLE,
          * r3.getUserProperties().get(ASI_PREFIX_PROPERTY)); assertEquals(EX_SERVER_DOWN,
          * r3.getUserProperties().get(ALMON_FAULT_PROPERTY_TAG));
@@ -353,7 +356,7 @@ public class FesaJapcParameterHandlerTest {
          * // change the exception thrown by the RDA server
          * doThrow(pe(EX_DEVICE_UNKNOWN)).when(p1).getValue(anySelector());
          * 
-         * // wait for alarm update while (mockSender.getAlarmsSequence(deviceAccessFaultTripplet).size() < 4) {
+         * // wait for alarm update while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 4) {
          * Thread.sleep(50); } assertEquals(4, records.size()); AlarmRecord r4 = records.get(3);
          * assertEquals(AlarmState.ACTIVE, r4.getAlarmState()); assertEquals(ERROR_UNKNOWN_DEVICE,
          * r4.getUserProperties().get(ASI_PREFIX_PROPERTY)); assertEquals(EX_DEVICE_UNKNOWN,
@@ -361,7 +364,7 @@ public class FesaJapcParameterHandlerTest {
          * 
          * // stop parameter's monitoring handler1.stopMonitoring();
          * 
-         * // wait for alarm termination while (mockSender.getAlarmsSequence(deviceAccessFaultTripplet).size() < 5) {
+         * // wait for alarm termination while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 5) {
          * Thread.sleep(50); } assertEquals(5, records.size()); AlarmRecord r5 = records.get(4);
          * assertEquals(AlarmState.TERMINATED, r5.getAlarmState());
          */
@@ -393,9 +396,9 @@ public class FesaJapcParameterHandlerTest {
         when(p1.getValue(null)).thenReturn(acqVal("PR.TFB-AMP/Alarm", mpv(fields, values1))).thenReturn(
                 acqVal("PR.TFB-AMP/Alarm", mpv(fields, values2)));
 
-        AlarmTripplet alarmTripplet = new AlarmTripplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
+        AlarmTriplet alarmTriplet = new AlarmTriplet("ADTPSMODULE_210", "PR.TFB-AMP", 1000);
         AlmonHardwareAddress address1 = new AlmonHardwareAddressImpl(AlarmType.FESA, "PR.TFB-AMP", "Alarm",
-                "DAMPERPS_100010", alarmTripplet);
+                "DAMPERPS_100010", alarmTriplet);
 
         handler1 = new FesaJapcParameterHandler(sdt, address1, ems, senderProxy, plsLineResolver);
         handler1.startMonitoring();
@@ -404,11 +407,11 @@ public class FesaJapcParameterHandlerTest {
         superCycle.start();
         Thread.sleep(600);
 
-        while (mockSender.getAlarmsSequence(alarmTripplet).size() < 2) {
+        while (mockSender.getAlarmsSequence(alarmTriplet).size() < 2) {
             Thread.sleep(50);
         }
 
-        List<AlarmRecord> records = mockSender.getAlarmsSequence(alarmTripplet);
+        List<AlarmRecord> records = mockSender.getAlarmsSequence(alarmTriplet);
         assertEquals(2, records.size());
 
         AlarmRecord r1 = records.get(0);
@@ -428,7 +431,7 @@ public class FesaJapcParameterHandlerTest {
         assertNotNull(r2.getUserProperties().get(ASI_SUFFIX_PROPERTY));
         assertEquals("suffix1", r2.getUserProperties().get(ASI_SUFFIX_PROPERTY));
         assertEquals("1", r2.getUserProperties().get(FESA_PLS_LINE_USER_PROPERTY));
-
+        
     }
 
 }

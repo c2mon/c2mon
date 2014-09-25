@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
-import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
@@ -32,7 +32,7 @@ public class AlmonDiamonSenderImpl implements AlmonSender {
     }
 
     @Override
-    public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
 
         try {
@@ -44,15 +44,15 @@ public class AlmonDiamonSenderImpl implements AlmonSender {
     }
 
     @Override
-    public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
 
         // in fact we're just re-sending the same value (true) - only user properties may have changed..
-        this.activate(sdt, ems, alarmTripplet, userTimestamp, userProperties);
+        this.activate(sdt, ems, alarmTriplet, userTimestamp, userProperties);
     }
 
     @Override
-    public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp) {
         try {
             ems.sendTagFiltered(sdt, Boolean.FALSE, System.currentTimeMillis());

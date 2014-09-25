@@ -5,7 +5,7 @@
 package cern.c2mon.daq.almon.address.impl;
 
 import static java.lang.String.format;
-import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.AlarmType;
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
 import cern.c2mon.daq.almon.util.JsonUtils;
@@ -26,19 +26,19 @@ public class AlmonHardwareAddressImpl implements AlmonHardwareAddress {
     }
 
     public AlmonHardwareAddressImpl(final AlarmType type, final String device, final String property,
-            final String field, final AlarmTripplet tripplet) {
+            final String field, final AlarmTriplet triplet) {
         this.type = type;
         this.device = device;
         this.property = property;
         this.field = field;
-        this.alarmTripplet = tripplet;
+        this.alarmTriplet = triplet;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((alarmTripplet == null) ? 0 : alarmTripplet.hashCode());
+        result = prime * result + ((alarmTriplet == null) ? 0 : alarmTriplet.hashCode());
         result = prime * result + ((device == null) ? 0 : device.hashCode());
         result = prime * result + ((field == null) ? 0 : field.hashCode());
         result = prime * result + ((property == null) ? 0 : property.hashCode());
@@ -55,10 +55,10 @@ public class AlmonHardwareAddressImpl implements AlmonHardwareAddress {
         if (getClass() != obj.getClass())
             return false;
         AlmonHardwareAddressImpl other = (AlmonHardwareAddressImpl) obj;
-        if (alarmTripplet == null) {
-            if (other.alarmTripplet != null)
+        if (alarmTriplet == null) {
+            if (other.alarmTriplet != null)
                 return false;
-        } else if (!alarmTripplet.equals(other.alarmTripplet))
+        } else if (!alarmTriplet.equals(other.alarmTriplet))
             return false;
         if (device == null) {
             if (other.device != null)
@@ -81,7 +81,7 @@ public class AlmonHardwareAddressImpl implements AlmonHardwareAddress {
     }
 
     private AlarmType type;
-    private AlarmTripplet alarmTripplet;
+    private AlarmTriplet alarmTriplet;
 
     private String device;
     private String property;
@@ -108,8 +108,8 @@ public class AlmonHardwareAddressImpl implements AlmonHardwareAddress {
     }
 
     @Override
-    public AlarmTripplet getAlarmTripplet() {
-        return alarmTripplet;
+    public AlarmTriplet getAlarmTriplet() {
+        return alarmTriplet;
     }
 
     @JsonIgnore

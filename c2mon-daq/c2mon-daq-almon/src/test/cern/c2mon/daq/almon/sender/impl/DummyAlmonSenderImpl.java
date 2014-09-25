@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.almon.AlarmRecord;
 import cern.c2mon.daq.almon.AlarmState;
-import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.TestAlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
@@ -31,56 +31,56 @@ public class DummyAlmonSenderImpl implements TestAlmonSender {
 
     private static final Logger LOG = LoggerFactory.getLogger(DummyAlmonSenderImpl.class);
 
-    private Map<AlarmTripplet, List<AlarmRecord>> alarms = new ConcurrentHashMap<AlarmTripplet, List<AlarmRecord>>();
+    private Map<AlarmTriplet, List<AlarmRecord>> alarms = new ConcurrentHashMap<AlarmTriplet, List<AlarmRecord>>();
 
     @Override
-    public synchronized List<AlarmRecord> getAlarmsSequence(AlarmTripplet alarmTripplet) {
-        if (alarms.get(alarmTripplet) != null)
-            return Collections.unmodifiableList(alarms.get(alarmTripplet));
+    public synchronized List<AlarmRecord> getAlarmsSequence(AlarmTriplet alarmTriplet) {
+        if (alarms.get(alarmTriplet) != null)
+            return Collections.unmodifiableList(alarms.get(alarmTriplet));
         else {
             return new ArrayList<AlarmRecord>();
         }
     }
 
     @Override
-    public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
-        LOG.info("activating alarm: {}", alarmTripplet);
-        if (!alarms.containsKey(alarmTripplet)) {
-            alarms.put(alarmTripplet, new ArrayList<AlarmRecord>());
+        LOG.info("activating alarm: {}", alarmTriplet);
+        if (!alarms.containsKey(alarmTriplet)) {
+            alarms.put(alarmTriplet, new ArrayList<AlarmRecord>());
         }
-        alarms.get(alarmTripplet).add(new AlarmRecord(AlarmState.ACTIVE, userTimestamp, userProperties));
+        alarms.get(alarmTriplet).add(new AlarmRecord(AlarmState.ACTIVE, userTimestamp, userProperties));
         if (ems != null) {
             ems.sendTagFiltered(sdt, Boolean.TRUE, System.currentTimeMillis(), userProperties.toJson());
         }
     }
 
     @Override
-    public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp) {
-        LOG.info("terminating alarm: {}", alarmTripplet);
-        if (!alarms.containsKey(alarmTripplet)) {
-            alarms.put(alarmTripplet, new ArrayList<AlarmRecord>());
+        LOG.info("terminating alarm: {}", alarmTriplet);
+        if (!alarms.containsKey(alarmTriplet)) {
+            alarms.put(alarmTriplet, new ArrayList<AlarmRecord>());
         }
-        alarms.get(alarmTripplet).add(new AlarmRecord(AlarmState.TERMINATED, userTimestamp));
-        if (ems != null) {
+        alarms.get(alarmTriplet).add(new AlarmRecord(AlarmState.TERMINATED, userTimestamp));
+        if (ems != null) {            
             ems.sendTagFiltered(sdt, Boolean.FALSE, System.currentTimeMillis());
         }
     }
 
     @Override
-    public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
-        LOG.info("updating alarm: {}", alarmTripplet);
-        if (!alarms.containsKey(alarmTripplet)) {
+        LOG.info("updating alarm: {}", alarmTriplet);
+        if (!alarms.containsKey(alarmTriplet)) {
             LOG.warn("trying to update alarm which is not active. skipping");
         }
 
-        List<AlarmRecord> records = alarms.get(alarmTripplet);
+        List<AlarmRecord> records = alarms.get(alarmTriplet);
 
         AlarmRecord lastRecord = records.get(records.size() - 1);
         if (lastRecord.getAlarmState().equals(AlarmState.ACTIVE)) {
-            alarms.get(alarmTripplet).add(new AlarmRecord(AlarmState.ACTIVE, userTimestamp, userProperties));
+            alarms.get(alarmTriplet).add(new AlarmRecord(AlarmState.ACTIVE, userTimestamp, userProperties));
             if (ems != null) {
                 ems.sendTagFiltered(sdt, true, System.currentTimeMillis(), userProperties.toJson());
             }

@@ -19,7 +19,7 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
-import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
@@ -30,8 +30,8 @@ import cern.c2mon.shared.daq.datatag.ISourceDataTag;
  * allows injecting more than one sender and thus forwarding alarms activations/terminations/updates to multiple
  * destinations. In practice on production system we use one LASER sender + one logging sender (which logs every alarm
  * activation/termination/update record into a dedicated LOG file). Operations have synchronized critical blocks
- * disallowing different threads to activate/terminate the same alarm tripplet concurrently. Proxy also caches active
- * alarms list. It will discard calls to underlying senders when attempting to activate a tripplet which is already
+ * disallowing different threads to activate/terminate the same alarm triplet concurrently. Proxy also caches active
+ * alarms list. It will discard calls to underlying senders when attempting to activate a triplet which is already
  * active. Similarly, it will not forward the call to terminate an alarm if it has already been terminated. In addition
  * the proxy sender exposes a set of monitoring JMX metrics.
  * 
@@ -44,7 +44,7 @@ public class AlarmMonitorSenderProxy implements AlmonSender {
 
     private List<AlmonSender> alarmSenders;
 
-    private Map<AlarmTripplet, Properties> activeAlarms = new HashMap<AlarmTripplet, Properties>();
+    private Map<AlarmTriplet, Properties> activeAlarms = new HashMap<AlarmTriplet, Properties>();
 
     @Resource(name = "alarmSenders")
     public void setAlarmSenders(List<AlmonSender> alarmSenders) {
@@ -52,22 +52,22 @@ public class AlarmMonitorSenderProxy implements AlmonSender {
     }
 
     @Override
-    public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
         Properties props = userProperties == null ? new Properties() : userProperties;
 
         boolean activate = false;
         synchronized (activeAlarms) {
-            if (!activeAlarms.containsKey(alarmTripplet)) {
+            if (!activeAlarms.containsKey(alarmTriplet)) {
                 activate = true;
-                activeAlarms.put(alarmTripplet, props);
+                activeAlarms.put(alarmTriplet, props);
             }
         }
 
         if (activate) {
             for (AlmonSender sender : alarmSenders) {
                 try {
-                    sender.activate(sdt, ems, alarmTripplet, userTimestamp, userProperties);
+                    sender.activate(sdt, ems, alarmTriplet, userTimestamp, userProperties);
                 } catch (Exception ex) {
                     LOG.error("exception caught while calling activate() on alarm sender: {}", sender.getClass()
                             .getName());
@@ -78,17 +78,17 @@ public class AlarmMonitorSenderProxy implements AlmonSender {
     }
 
     @Override
-    public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
         Properties props = userProperties == null ? new Properties() : userProperties;
 
         boolean update = false;
         synchronized (activeAlarms) {
-            if (activeAlarms.containsKey(alarmTripplet)) {
+            if (activeAlarms.containsKey(alarmTriplet)) {
                 // update only if alarm is currently active and properties have changed
-                if (!props.equals(activeAlarms.get(alarmTripplet))) {
+                if (!props.equals(activeAlarms.get(alarmTriplet))) {
                     update = true;
-                    activeAlarms.put(alarmTripplet, props);
+                    activeAlarms.put(alarmTriplet, props);
                 }
             }
         }
@@ -96,7 +96,7 @@ public class AlarmMonitorSenderProxy implements AlmonSender {
         if (update) {
             for (AlmonSender sender : alarmSenders) {
                 try {
-                    sender.update(sdt, ems, alarmTripplet, userTimestamp, userProperties);
+                    sender.update(sdt, ems, alarmTriplet, userTimestamp, userProperties);
                 } catch (Exception ex) {
                     LOG.error("exception caught while calling update() on alarm sender: {}", sender.getClass()
                             .getName());
@@ -107,27 +107,27 @@ public class AlarmMonitorSenderProxy implements AlmonSender {
     }
 
     @Override
-    public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTripplet alarmTripplet,
+    public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp) {
         boolean terminate = false;
         synchronized (activeAlarms) {
-            if (activeAlarms.containsKey(alarmTripplet)) {
+            if (activeAlarms.containsKey(alarmTriplet)) {
                 terminate = true;
-                activeAlarms.remove(alarmTripplet);
+                activeAlarms.remove(alarmTriplet);
             }
         }
 
         if (terminate) {
             for (AlmonSender sender : alarmSenders) {
                 try {
-                    sender.terminate(sdt, ems, alarmTripplet, userTimestamp);
+                    sender.terminate(sdt, ems, alarmTriplet, userTimestamp);
                 } catch (Exception ex) {
                     LOG.error("exception caught while calling terminate() on alarm sender: {}", sender.getClass()
                             .getName());
                     LOG.debug("exception trace", ex);
                 }
             }
-            activeAlarms.remove(alarmTripplet);
+            activeAlarms.remove(alarmTriplet);
         }// if
     }
 
@@ -142,10 +142,10 @@ public class AlarmMonitorSenderProxy implements AlmonSender {
     }
 
     @ManagedAttribute
-    public List<String> getActiveTripplets() {
-        Set<AlarmTripplet> activeTripplets = this.activeAlarms.keySet();
+    public List<String> getActiveTriplets() {
+        Set<AlarmTriplet> activeTriplets = this.activeAlarms.keySet();
         List<String> result = new ArrayList<String>();
-        for (AlarmTripplet t : activeTripplets) {
+        for (AlarmTriplet t : activeTriplets) {
             result.add(t.toString());
         }
 
@@ -153,8 +153,8 @@ public class AlarmMonitorSenderProxy implements AlmonSender {
     }
 
     @ManagedOperation
-    public Properties getUsersPropertiesOfActiveAlarm(String tripplet) {
-        return activeAlarms.get(AlarmTripplet.fromString(tripplet));
+    public Properties getUsersPropertiesOfActiveAlarm(String triplet) {
+        return activeAlarms.get(AlarmTriplet.fromString(triplet));
     }
 
 }

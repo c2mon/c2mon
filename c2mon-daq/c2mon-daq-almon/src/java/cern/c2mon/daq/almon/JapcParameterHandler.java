@@ -15,6 +15,7 @@ import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.japc.Parameter;
 import cern.japc.ParameterException;
 import cern.japc.ParameterValueListener;
@@ -69,7 +70,11 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
         this.address = hwAddress;
         this.ems = ems;
         this.amSender = amSender;
+        
+        // initialize tag
+        ems.sendTagFiltered(tag, Boolean.FALSE, System.currentTimeMillis());
     }
+        
 
     /**
      * The startMonitoring() must be called in order for the parameter to get subscribed
@@ -77,7 +82,10 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
     public void startMonitoring() {
         try {
 
-            String deviceName = address.getAlarmTripplet().getFaultMember();
+            // initialize the tag
+            this.amSender.terminate(tag, ems, address.getAlarmTriplet(), System.currentTimeMillis());
+            
+            String deviceName = address.getAlarmTriplet().getFaultMember();
 
             // increment
             synchronized (deviceName.intern()) {
@@ -95,7 +103,8 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
             if (address.hasCycle()) {
                 selector = ParameterValueFactory.newSelector(address.getCycle());
             }
-            shandle = p.createSubscription(selector, this);
+            shandle = p.createSubscription(selector, this);            
+            
             shandle.startMonitoring();
 
         } catch (ParameterException e) {
@@ -116,7 +125,7 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
 
         // terminate the related alarm, if it was active
         if (inFault) {
-            this.amSender.terminate(tag, ems, address.getAlarmTripplet(), System.currentTimeMillis());
+            this.amSender.terminate(tag, ems, address.getAlarmTriplet(), System.currentTimeMillis());
         }
 
         shandle.stopMonitoring();
@@ -141,11 +150,15 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
             if (!deviceAccessFaults.containsKey(deviceName) || (!deviceAccessFaults.get(deviceName).equals(reason))) {
                 // send a note to the business layer, to confirm that the equipment is not properly configured,
                 // or connected
+                LOG.trace("calling ems.confirmEquipmentStateIncorrect() with description: {}", reason);
                 this.ems.confirmEquipmentStateIncorrect(reason);
                 deviceAccessFaults.put(deviceName, reason);
             }// if
 
         } // synchronized
+
+        // invalidate tag        
+        this.ems.sendInvalidTag (this.tag, SourceDataQuality.DATA_UNAVAILABLE, reason);
     }
 
     /**

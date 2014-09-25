@@ -15,6 +15,7 @@ import org.springframework.core.env.Environment;
 
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
 import cern.c2mon.daq.almon.address.AlmonHardwareAddressFactory;
+import cern.c2mon.daq.almon.plsline.PlsLineResolver;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
@@ -57,6 +58,7 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
 
     private AlmonConfig config;
     private AlmonSender almonSender;
+    private PlsLineResolver plsLineResolver;
 
     private static ClassPathXmlApplicationContext ctx;
 
@@ -73,6 +75,7 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
 
         config = ctx.getBean(AlmonConfig.class);
         almonSender = ctx.getBean("almonSenderProxy", AlmonSender.class);
+        plsLineResolver = ctx.getBean(PlsLineResolver.class);
 
         // create executor
         if (executor == null) {
@@ -240,14 +243,16 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
             // wrap it around with almon hardware address
             AlmonHardwareAddress addr = AlmonHardwareAddressFactory.fromJson(saddr.getAddress().trim());
 
+            // initialize the tag
+
             JapcParameterHandler parameterHandler = null;
             switch (addr.getType()) {
             case GM:
                 // check if not yet subscribed to that parameter
-                if (!almonParameters.containsKey(addr.getAlarmTripplet())) {
+                if (!almonParameters.containsKey(addr.getAlarmTriplet())) {
 
-                    LOG.info(format("Registering GmParameter: tag id: %d, alarm-tripplet: %s", tag.getId(), addr
-                            .getAlarmTripplet().toString()));
+                    LOG.info(format("Registering GmParameter: tag id: %d, alarm-triplet: %s", tag.getId(), addr
+                            .getAlarmTriplet().toString()));
 
                     parameterHandler = new GmJapcParameterHandler(tag, addr, getEquipmentMessageSender(), almonSender);
 
@@ -256,12 +261,13 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
 
             case FESA:
                 // check if not yet subscribed to that parameter
-                if (!almonParameters.containsKey(addr.getAlarmTripplet())) {
+                if (!almonParameters.containsKey(addr.getAlarmTriplet())) {
 
-                    LOG.info(format("Registering FesaParameter: tag id: %d, alarm-tripplet: %s", tag.getId(), addr
-                            .getAlarmTripplet().toString()));
+                    LOG.info(format("Registering FesaParameter: tag id: %d, alarm-triplet: %s", tag.getId(), addr
+                            .getAlarmTriplet().toString()));
 
-                    parameterHandler = new GmJapcParameterHandler(tag, addr, getEquipmentMessageSender(), almonSender);
+                    parameterHandler = new FesaJapcParameterHandler(tag, addr, getEquipmentMessageSender(),
+                            almonSender, plsLineResolver);
                 }
 
                 break;

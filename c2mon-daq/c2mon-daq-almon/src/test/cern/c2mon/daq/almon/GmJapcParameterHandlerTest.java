@@ -14,6 +14,7 @@ import static cern.japc.ext.mockito.JapcMock.resetJapcMock;
 import static cern.japc.ext.mockito.JapcMock.sel;
 import static cern.japc.ext.mockito.JapcMock.setAnswer;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.daq.almon.address.AlarmTripplet;
+import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.AlarmType;
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
 import cern.c2mon.daq.almon.address.impl.AlmonHardwareAddressImpl;
@@ -78,6 +79,7 @@ public class GmJapcParameterHandlerTest {
         when(sdt.getId()).thenReturn(1000L);
 
         ems = Mockito.mock(IEquipmentMessageSender.class);
+        ems = mock(IEquipmentMessageSender.class);        
 
     }
 
@@ -95,9 +97,9 @@ public class GmJapcParameterHandlerTest {
 
         setAnswer(p1, SELECTOR1, new DefaultParameterAnswer(mpv(fields, value_0)));
 
-        AlarmTripplet alarmTripplet = new AlarmTripplet("CLASS1", "D1", 1);
+        AlarmTriplet alarmTriplet = new AlarmTriplet("CLASS1", "D1", 1);
 
-        AlmonHardwareAddress address = new AlmonHardwareAddressImpl(AlarmType.GM, "D1", "ALARM", "value", alarmTripplet);
+        AlmonHardwareAddress address = new AlmonHardwareAddressImpl(AlarmType.GM, "D1", "ALARM", "value", alarmTriplet);
 
         handler = new GmJapcParameterHandler(sdt, address, ems, senderProxy);
         handler.startMonitoring();
@@ -119,14 +121,14 @@ public class GmJapcParameterHandlerTest {
         p1.setValue(SELECTOR1, mpv(fields, value_1));
         Thread.sleep(200);
 
-        AlarmTripplet alarmTripplet2 = new AlarmTripplet("CLASS1", "D1", 2);
+        AlarmTriplet alarmTriplet2 = new AlarmTriplet("CLASS1", "D1", 2);
 
-        while (mockSender.getAlarmsSequence(alarmTripplet).size() < 2) {
+        while (mockSender.getAlarmsSequence(alarmTriplet).size() < 2) {
             Thread.sleep(50);
         }
 
-        List<AlarmRecord> alarmStates = mockSender.getAlarmsSequence(alarmTripplet);
-        List<AlarmRecord> alarmStates2 = mockSender.getAlarmsSequence(alarmTripplet2);
+        List<AlarmRecord> alarmStates = mockSender.getAlarmsSequence(alarmTriplet);
+        List<AlarmRecord> alarmStates2 = mockSender.getAlarmsSequence(alarmTriplet2);
 
         assertEquals(3, alarmStates.size());
         assertEquals(AlarmState.ACTIVE, alarmStates.get(0).getAlarmState());
@@ -148,9 +150,9 @@ public class GmJapcParameterHandlerTest {
         when(p1.getValue(SELECTOR1)).thenThrow(pe(ERROR_SERVER_DOWN)).thenReturn(acqVal("D1/P1", 1))
                 .thenReturn(acqVal("D1/P1", 0));
 
-        AlarmTripplet alarmTripplet2 = new AlarmTripplet("CLASS1", "D1", 1);
+        AlarmTriplet alarmTriplet2 = new AlarmTriplet("CLASS1", "D1", 1);
         AlmonHardwareAddress address = new AlmonHardwareAddressImpl(AlarmType.GM, "D1", "ALARM", "value",
-                alarmTripplet2);
+                alarmTriplet2);
 
         handler = new GmJapcParameterHandler(sdt, address, ems, senderProxy);
         handler.startMonitoring();
@@ -158,17 +160,17 @@ public class GmJapcParameterHandlerTest {
         SuperCycle superCycle = newSuperCycle(new Cycle(SELECTOR1.getId(), 200));
         superCycle.start();
 
-        AlarmTripplet alarmTripplet = new AlarmTripplet(ALARM_MON_FAULT_FAMILY, "D1", 2);
+        AlarmTriplet alarmTriplet = new AlarmTriplet(ALARM_MON_FAULT_FAMILY, "D1", 2);
 
-        while (mockSender.getAlarmsSequence(alarmTripplet).size() < 2) {
+        while (mockSender.getAlarmsSequence(alarmTriplet).size() < 2) {
             Thread.sleep(50);
         }
-        while (mockSender.getAlarmsSequence(alarmTripplet2).size() < 2) {
+        while (mockSender.getAlarmsSequence(alarmTriplet2).size() < 2) {
             Thread.sleep(50);
         }
 
-        List<AlarmRecord> alarmStates = mockSender.getAlarmsSequence(alarmTripplet);
-        List<AlarmRecord> alarmStates2 = mockSender.getAlarmsSequence(alarmTripplet2);
+        List<AlarmRecord> alarmStates = mockSender.getAlarmsSequence(alarmTriplet);
+        List<AlarmRecord> alarmStates2 = mockSender.getAlarmsSequence(alarmTriplet2);
 
         assertEquals(2, alarmStates.size());
         assertEquals(AlarmState.ACTIVE, alarmStates.get(0).getAlarmState());
@@ -192,9 +194,9 @@ public class GmJapcParameterHandlerTest {
                 .thenReturn(acqVal("D1/P1", 1), acqVal("D1/P1", 2)).thenThrow(pe(ERROR_SERVER_DOWN))
                 .thenReturn(acqVal("D1/P1", 1));
 
-        AlarmTripplet alarmTripplet2 = new AlarmTripplet("CLASS1", "D1", 1);
+        AlarmTriplet alarmTriplet2 = new AlarmTriplet("CLASS1", "D1", 1);
         AlmonHardwareAddress address = new AlmonHardwareAddressImpl(AlarmType.GM, "D1", "ALARM", "value",
-                alarmTripplet2);
+                alarmTriplet2);
 
         handler = new GmJapcParameterHandler(sdt, address, ems, senderProxy);
         handler.startMonitoring();
@@ -202,22 +204,22 @@ public class GmJapcParameterHandlerTest {
         SuperCycle superCycle = newSuperCycle(new Cycle(SELECTOR1.getId(), 200));
         superCycle.start();
 
-        AlarmTripplet alarmTripplet = new AlarmTripplet(ALARM_MON_FAULT_FAMILY, "D1", 2);
-        AlarmTripplet alarmTripplet3 = new AlarmTripplet("CLASS1", "D1", 2);
+        AlarmTriplet alarmTriplet = new AlarmTriplet(ALARM_MON_FAULT_FAMILY, "D1", 2);
+        AlarmTriplet alarmTriplet3 = new AlarmTriplet("CLASS1", "D1", 2);
 
-        while (mockSender.getAlarmsSequence(alarmTripplet).size() < 1) {
+        while (mockSender.getAlarmsSequence(alarmTriplet).size() < 1) {
             Thread.sleep(50);
         }
-        while (mockSender.getAlarmsSequence(alarmTripplet2).size() < 2) {
+        while (mockSender.getAlarmsSequence(alarmTriplet2).size() < 2) {
             Thread.sleep(50);
         }
-        while (mockSender.getAlarmsSequence(alarmTripplet3).size() < 1) {
+        while (mockSender.getAlarmsSequence(alarmTriplet3).size() < 1) {
             Thread.sleep(50);
         }
 
-        List<AlarmRecord> alarmStates = mockSender.getAlarmsSequence(alarmTripplet);
-        List<AlarmRecord> alarmStates2 = mockSender.getAlarmsSequence(alarmTripplet2);
-        List<AlarmRecord> alarmStates3 = mockSender.getAlarmsSequence(alarmTripplet3);
+        List<AlarmRecord> alarmStates = mockSender.getAlarmsSequence(alarmTriplet);
+        List<AlarmRecord> alarmStates2 = mockSender.getAlarmsSequence(alarmTriplet2);
+        List<AlarmRecord> alarmStates3 = mockSender.getAlarmsSequence(alarmTriplet3);
 
         assertEquals(1, alarmStates.size());
         assertEquals(AlarmState.ACTIVE, alarmStates.get(0).getAlarmState());

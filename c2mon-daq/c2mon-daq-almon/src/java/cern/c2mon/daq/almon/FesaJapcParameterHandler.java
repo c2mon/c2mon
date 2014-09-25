@@ -52,7 +52,7 @@ public class FesaJapcParameterHandler extends JapcParameterHandler {
      */
     @Override
     public void valueReceived(String parameterName, AcquiredParameterValue value) {
-        LOG.debug("parameter: {} received value: {}", parameterName, value.getValue().getString());
+        LOG.trace("parameter: {} received value: {}", parameterName, value.getValue().getString());
 
         // if device access fault was activated - terminate it
         super.terminateDeviceAccessFault();
@@ -118,15 +118,15 @@ public class FesaJapcParameterHandler extends JapcParameterHandler {
                 }
 
                 if (!inFault) {
-                    this.amSender.activate(tag, ems, address.getAlarmTripplet(), timestamps[i] / 1000000, props);
+                    this.amSender.activate(tag, ems, address.getAlarmTriplet(), timestamps[i] / 1000000, props);
                     this.inFault = true;
-                    // this.activeAlarmTripplet = address.getAlarmTripplet();
+                    // this.activeAlarmTriplet = address.getAlarmTriplet();
                     keepActive = true;
 
                 } else { // we are already in fault - check if update is needed
                     if (!userProperties.equals(props)) {
                         // activateAlarm = true;
-                        this.amSender.update(tag, ems, address.getAlarmTripplet(), timestamps[i] / 1000000, props);
+                        this.amSender.update(tag, ems, address.getAlarmTriplet(), timestamps[i] / 1000000, props);
                     }
 
                     keepActive = true;
@@ -142,9 +142,9 @@ public class FesaJapcParameterHandler extends JapcParameterHandler {
 
         // if we are in fault, and the field was not present
         if (inFault && !keepActive) {
-            this.amSender.terminate(tag, ems, address.getAlarmTripplet(), System.currentTimeMillis());
+            this.amSender.terminate(tag, ems, address.getAlarmTriplet(), System.currentTimeMillis());
             this.inFault = true;
-            // this.activeAlarmTripplet = null;
+            // this.activeAlarmTriplet = null;
         }
     }
 }
