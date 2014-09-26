@@ -15,12 +15,12 @@ import static cern.japc.ext.mockito.JapcMock.resetJapcMock;
 import static cern.japc.ext.mockito.JapcMock.sel;
 import static cern.japc.ext.mockito.JapcMock.spv;
 import static org.easymock.EasyMock.and;
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doThrow;
@@ -33,7 +33,12 @@ import org.junit.After;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import cern.c2mon.daq.japc.GenericJapcMessageHandler;
+import cern.c2mon.daq.common.conf.core.ConfigurationController;
+import cern.c2mon.daq.test.GenericMessageHandlerTst;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 import cern.japc.MapParameterValue;
 import cern.japc.Parameter;
 import cern.japc.ParameterException;
@@ -44,12 +49,6 @@ import cern.japc.SubscriptionHandle;
 import cern.japc.ext.mockito.JapcMock;
 import cern.japc.ext.mockito.SuperCycle;
 import cern.japc.factory.ParameterValueFactory;
-import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.test.GenericMessageHandlerTst;
-import cern.c2mon.daq.test.UseConf;
-import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
-import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This class implements a common parent class for JUnit testing framework for JAPC EquipmentMessageHandlers.
@@ -68,6 +67,10 @@ public abstract class AbstractGenericJapcMessageHandlerTst extends GenericMessag
         return 100;
     }
 
+    static {
+        JapcMock.init();
+    }
+
     // if set, JAPC mockito framework will be initialized
     static boolean initMockito = true;
 
@@ -76,7 +79,6 @@ public abstract class AbstractGenericJapcMessageHandlerTst extends GenericMessag
         japcHandler = (GenericJapcMessageHandler) msgHandler;
 
         if (initMockito) {
-            JapcMock.init();
             resetJapcMock();
         }
 
@@ -170,8 +172,9 @@ public abstract class AbstractGenericJapcMessageHandlerTst extends GenericMessag
     @Test()
     @UseConf("e_japc_test7.xml")
     public void commandExecutionTest1() throws Exception {
-        
-        if (!initMockito) return;
+
+        if (!initMockito)
+            return;
 
         Parameter p1 = mockParameter("D7/P7");
         Parameter p2 = mockParameter("D8/P8");
@@ -224,9 +227,10 @@ public abstract class AbstractGenericJapcMessageHandlerTst extends GenericMessag
 
     @Test
     public void testConvertSourceTimestampToMs() {
-        
-        if (!initMockito) return;
-        
+
+        if (!initMockito)
+            return;
+
         Calendar cal = Calendar.getInstance();
         cal.set(1970, 1, 15);
         assertEquals(cal.getTimeInMillis() * 1000,

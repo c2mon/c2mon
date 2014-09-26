@@ -14,6 +14,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.common.ICommandRunner;
+import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
+import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
+import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.japc.AcquiredParameterValue;
 import cern.japc.MapParameterValue;
 import cern.japc.Parameter;
@@ -30,21 +44,6 @@ import cern.japc.ValueHeader;
 import cern.japc.ValueType;
 import cern.japc.factory.ParameterFactory;
 import cern.japc.factory.ParameterValueFactory;
-import cern.japc.spi.ParameterUrl;
-import cern.japc.spi.ParameterUrlImpl;
-import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.common.ICommandRunner;
-import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
-import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
-import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.config.ChangeReport;
-import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
@@ -53,9 +52,6 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 public class GenericJapcMessageHandler extends EquipmentMessageHandler implements ICommandRunner, IDataTagChanger,
         ICommandTagChanger, Runnable {
 
-    public static final String DEFAULT_PROTOCOL = "rda";
-    public static final String DEFAULT_SERVICE = "rda";
-
     public static final String DEFAULT_TIMESTAMP_FIELD = "ts";
     public static final String DEFAULT_DETAILS_FIELD = "details";
 
@@ -63,9 +59,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
     protected static int MAX_RECONNECTION_TIME = 30 * 60; // in seconds
     protected static int RECONNECTION_TIME_STEP = 1 * 60; // 5 * 60; // in seconds;
 
-    // protected static int RECONNECTION_THREAD_POOL_SIZE = 16;
-
-    protected static int RECONNECTION_THREAD_POOL_SIZE = 100;
+    protected static int RECONNECTION_THREAD_POOL_SIZE = 32;
 
     /**
      * JAPC parameter factory instance.
@@ -250,9 +244,11 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
 
     /**
      * this method can be overridden by inheriting classes, if needed Default implementation is empty
+     * 
+     * @throws EqIOException
      */
     protected void beforeConnectToDataSource() throws EqIOException {
-
+        // no default implementation
     }
 
     @Override
@@ -334,12 +330,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
         try {
             JAPCHardwareAddress addr = (JAPCHardwareAddress) tag.getHardwareAddress();
 
-            // make sure protocol and service are correctly specified
-            String protocol = checkProtocol(addr.getProtocol());
-            String service = checkService(addr.getService());
-
-            Parameter parameter = this.parameterFactory.newParameter(new ParameterUrlImpl(protocol, service, addr
-                    .getDeviceName(), addr.getPropertyName(), null));
+            Parameter parameter = this.parameterFactory.newParameter(addr.getDeviceName(), addr.getPropertyName());
 
             Selector selector = getJapcSelector(tag);
 
@@ -407,22 +398,21 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
         }
     }
 
-    protected static String checkProtocol(final String protocol) {
-        if (protocol == null || protocol.length() == 0)
-            return DEFAULT_PROTOCOL;
-        else
-            return protocol;
-    }
-
-    protected static String checkService(final String service) {
-        if (service == null || service.length() == 0)
-            return DEFAULT_SERVICE;
-        else
-            return service;
-    }
+    // protected static String checkProtocol(final String protocol) {
+    // if (protocol == null || protocol.length() == 0)
+    // return DEFAULT_PROTOCOL;
+    // else
+    // return protocol;
+    // }
+    //
+    // protected static String checkService(final String service) {
+    // if (service == null || service.length() == 0)
+    // return DEFAULT_SERVICE;
+    // else
+    // return service;
+    // }
 
     @Override
-    @SuppressWarnings("unused")
     public void disconnectFromDataSource() throws EqIOException {
         getEquipmentLogger().debug("entering diconnectFromDataSource()..");
 
@@ -570,19 +560,19 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
 
         // do not convert - conversion is now done by the daq core!
         if (valueT == ValueType.BOOLEAN) {
-            value4send = sValue.getBoolean(); 
+            value4send = sValue.getBoolean();
         } else if (valueT == ValueType.BYTE) {
-            value4send = sValue.getByte(); 
+            value4send = sValue.getByte();
         } else if (valueT == ValueType.INT) {
-            value4send = sValue.getInt(); 
+            value4send = sValue.getInt();
         } else if (valueT == ValueType.LONG) {
-            value4send = sValue.getLong(); 
+            value4send = sValue.getLong();
         } else if (valueT == ValueType.FLOAT) {
-            value4send = sValue.getFloat(); 
+            value4send = sValue.getFloat();
         } else if (valueT == ValueType.DOUBLE) {
-            value4send = sValue.getDouble(); 
+            value4send = sValue.getDouble();
         } else if (valueT == ValueType.STRING) {
-            value4send = sValue.getString(); 
+            value4send = sValue.getString();
         }
 
         if (value4send != null) {
@@ -611,8 +601,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
         Object value4send = null;
 
         try {
-            
-            
+
             // we don't convert, it is now done by the DAQ core
             if (valueType == ValueType.BOOLEAN_ARRAY) {
                 value4send = simpleValue.getBoolean(index);
@@ -665,18 +654,14 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
         }
 
         JAPCHardwareAddress addr = (JAPCHardwareAddress) sct.getHardwareAddress();
-        ParameterUrl pUrl = null;
 
-        // make sure protocol and service are correctly specified
-        String protocol = checkProtocol(addr.getProtocol());
-        String service = checkService(addr.getService());
+        StringBuilder paramUrl = new StringBuilder();
+        paramUrl.append(addr.getDeviceName()).append("/").append(addr.getPropertyName());
 
         String dataField = addr.getDataFieldName();
-        if (dataField != null && dataField.length() == 0) {
-            dataField = null;
+        if (dataField != null && dataField.length() > 0) {
+            paramUrl.append("#").append(dataField);
         }
-
-        pUrl = new ParameterUrlImpl(protocol, service, addr.getDeviceName(), addr.getPropertyName(), dataField);
 
         Selector selector = null;
 
@@ -686,7 +671,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
 
             getEquipmentLogger().debug("executing SET command..");
             try {
-                Parameter parameter = ParameterFactory.newInstance().newParameter(pUrl);
+                Parameter parameter = ParameterFactory.newInstance().newParameter(paramUrl.toString());
 
                 // Create a selector for the parameter
                 if (addr.getCycleSelector() != null)
@@ -705,7 +690,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
 
             } catch (Exception e) {
                 throw new EqCommandTagException("command execution failed. could not set value: " + p0.getValue()
-                        + " for parameter: " + pUrl + " Error: " + e.getMessage());
+                        + " for parameter: " + paramUrl.toString() + " Error: " + e.getMessage());
             }
 
             break;
@@ -717,7 +702,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
 
                 if (getEquipmentLogger().isTraceEnabled())
                     getEquipmentLogger().debug("before ParameterFactory.newInstance().newParameter()");
-                Parameter parameter = ParameterFactory.newInstance().newParameter(pUrl);
+                Parameter parameter = ParameterFactory.newInstance().newParameter(paramUrl.toString());
                 if (getEquipmentLogger().isTraceEnabled())
                     getEquipmentLogger().debug("after ParameterFactory.newInstance().newParameter()");
 
@@ -794,7 +779,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
 
             } catch (Exception e) {
                 throw new EqCommandTagException("command execution failed. could not get value from from parameter: "
-                        + pUrl + " Error: " + e.getMessage());
+                        + paramUrl.toString() + " Error: " + e.getMessage());
             }
             break;
 
@@ -842,7 +827,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
         try {
             names = mpv.getStrings(parameterName);
         } catch (Exception ex) {
-            throw new ArrayIndexOutOfBoundsException("field: "+parameterName +" not found");
+            throw new ArrayIndexOutOfBoundsException("field: " + parameterName + " not found");
         }
 
         if (names != null) {

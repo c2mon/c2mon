@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -27,7 +28,9 @@ import cern.japc.Parameter;
 import cern.japc.ParameterValue;
 import cern.japc.Selector;
 import cern.japc.SimpleParameterValue;
+import cern.japc.ext.mockito.JapcMock;
 import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
+import cern.japc.factory.ParameterMetaFactoryConstants;
 import cern.japc.factory.ParameterValueFactory;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
@@ -53,7 +56,7 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
  */
 @UseHandler(GenericJapcMessageHandler.class)
 public class GenericJapcMessageHandlerTest extends AbstractGenericJapcMessageHandlerTst {
-
+           
     /**
      * This tests verifies the default GenericJapcMessageHandler's subscription mechanism. The generic handler by
      * default expects values to be organized in in triplets: [value,timestamp,description]
@@ -63,6 +66,8 @@ public class GenericJapcMessageHandlerTest extends AbstractGenericJapcMessageHan
     @Test
     @UseConf("e_japc_test-generic-handler1.xml")
     public void subscription_Test1() throws Exception {
+        
+        JapcMock.init();
 
         messageSender.sendCommfaultTag(107211, true);
         expectLastCall().once();
