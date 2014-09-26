@@ -424,6 +424,7 @@ public class DeviceManagerTest {
   public void testUnsubscribeAllDevices() {
     // Reset the mock
     EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    System.out.println("testUnsubscribeAllDevices");
 
     final ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     final ClientDataTagImpl cdt2 = new ClientDataTagImpl(200000L);
@@ -448,31 +449,20 @@ public class DeviceManagerTest {
         .andAnswer(new IAnswer<Boolean>() {
           @Override
           public Boolean answer() throws Throwable {
+            final Set<Long> tagIds = (Set<Long>) EasyMock.getCurrentArguments()[0];
             // Simulate the tag update calls
             new Thread(new Runnable() {
               @Override
               public void run() {
-                device1.onUpdate(cdt1);
+                if (tagIds.contains(cdt1.getId()))
+                  device1.onUpdate(cdt1);
+                else if (tagIds.contains(cdt2.getId()))
+                  device2.onUpdate(cdt2);
               }
             }).start();
             return true;
           }
-        }).once();
-
-    EasyMock.expect(tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject()))
-        .andAnswer(new IAnswer<Boolean>() {
-          @Override
-          public Boolean answer() throws Throwable {
-            // Simulate the tag update calls
-            new Thread(new Runnable() {
-              @Override
-              public void run() {
-                device2.onUpdate(cdt2);
-              }
-            }).start();
-            return true;
-          }
-        }).once();
+        }).times(2);
 
     // Expect the device manager to get the tags from the cache
     // EasyMock.expect(dataTagCacheMock.get(EasyMock.<Set<Long>>
@@ -491,6 +481,11 @@ public class DeviceManagerTest {
 
     TestDeviceUpdateListener listener = new TestDeviceUpdateListener();
     deviceManager.subscribeDevices(devices, listener);
+
+    // Update a property
+    device1.onUpdate(cacheReturnMap.get(100000L));
+    device2.onUpdate(cacheReturnMap.get(200000L));
+
     deviceManager.unsubscribeAllDevices(listener);
 
     Assert.assertFalse(device1.getDeviceUpdateListeners().contains(listener));

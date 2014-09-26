@@ -455,6 +455,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
    */
   protected void initSubscriptionLatch(int numDataTags) {
     subscriptionCompletionLatch = new CountDownLatch(numDataTags);
+    LOG.trace("Subscription latch init: " + subscriptionCompletionLatch.getCount());
   }
 
   /**
@@ -463,7 +464,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
   protected void awaitCompleteSubscription() {
     if (subscriptionCompletionLatch != null) {
       try {
-        LOG.debug("Waiting on subscription completion latch");
+        LOG.trace("Waiting on subscription completion latch");
         subscriptionCompletionLatch.await();
       } catch (InterruptedException e) {
         LOG.error("Unable to await complete subscription for device " + getName(), e);
@@ -474,8 +475,6 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
 
   @Override
   public final void onUpdate(ClientDataTagValue tagUpdate) {
-    LOG.debug("DeviceImpl.onUpdate() called");
-
     String propertyName = null;
     String fieldName = null;
 
@@ -508,7 +507,6 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
       } else {
         this.deviceProperties.put(propertyName, new ClientDevicePropertyImpl(tagUpdate));
       }
-
     } else {
       LOG.warn("onUpdate() called with unmapped tag ID");
     }
@@ -517,14 +515,14 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
 
       // If there are unsubscribed properties, count down the latch and return
       // without calling onUpdate()
-      LOG.debug("Counting down on subscription latch (" + subscriptionCompletionLatch.getCount() + " remaining)");
+      LOG.trace("Counting down on subscription latch (" + subscriptionCompletionLatch.getCount() + " remaining)");
       subscriptionCompletionLatch.countDown();
       return;
     }
 
     for (DeviceUpdateListener listener : deviceUpdateListeners) {
       try {
-        LOG.debug("Invoking DeviceUpdateListener");
+        LOG.trace("Invoking DeviceUpdateListener");
         listener.onUpdate(this.clone(), new PropertyInfo(propertyName));
 
       } catch (CloneNotSupportedException e) {
