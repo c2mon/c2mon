@@ -112,7 +112,7 @@ public interface C2monDeviceManager {
    * @param devices the set of devices you want to unsubscribe from.
    * @param listener the listener that was previously registered
    */
-  void unsubscribeDevices(final Set<Device> deviceIds, final DeviceUpdateListener listener);
+  void unsubscribeDevices(final Set<Device> devices, final DeviceUpdateListener listener);
 
   /**
    * Unsubscribe from all previously subscribed-to devices.
