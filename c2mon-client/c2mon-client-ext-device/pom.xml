@@ -50,6 +50,20 @@
   </dependencies>
   <developers />
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/DeviceIntegrationTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
   <!-- <scm> <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-ext-device</developerConnection> 
     </scm> -->
 </project>
