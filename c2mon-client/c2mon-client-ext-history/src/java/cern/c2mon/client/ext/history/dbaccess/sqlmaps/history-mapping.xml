@@ -111,7 +111,7 @@
         WHERE
             tagid = #{tagId}
             AND LOGDATE = TRUNC(SYS_EXTRACT_UTC(#{beforeTime}), 'DD') - 1
-        ORDER BY 8 DESC, 7 DESC, 6 DESC, 1 DESC
+        ORDER BY TAGSERVERTIME DESC, TAGDAQTIME DESC, TAGTIME DESC, LOGDATE DESC
     )
     WHERE rownum <![CDATA[ <= 1 ]]>
   </select>
