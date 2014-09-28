@@ -46,8 +46,8 @@ import cern.japc.factory.ParameterFactory;
 import cern.japc.factory.ParameterValueFactory;
 
 /**
- * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
- * EquipmentMessageHandler for TIM DAQ for JAPC protocol.
+ * This is a specialized subclass of the general C2MON EquipmentMessageHandler. The class implements a generic
+ * specialization for JAPC protocol.
  */
 public class GenericJapcMessageHandler extends EquipmentMessageHandler implements ICommandRunner, IDataTagChanger,
         ICommandTagChanger, Runnable {
@@ -76,7 +76,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
      */
     private Map<Long, ParameterValueListener> pvlistenersMap = new ConcurrentHashMap<Long, ParameterValueListener>();
 
-    private static volatile TagConnectionMonitor tagConnectionMonitor; // = new TagConnectionMonitor();
+    private static volatile TagConnectionMonitor tagConnectionMonitor;
 
     class JapcHandlerValueListener implements ParameterValueListener {
 
@@ -397,20 +397,6 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
                 getEquipmentLogger().trace(format("leaving unregisterTag(%d)", tag.getId()));
         }
     }
-
-    // protected static String checkProtocol(final String protocol) {
-    // if (protocol == null || protocol.length() == 0)
-    // return DEFAULT_PROTOCOL;
-    // else
-    // return protocol;
-    // }
-    //
-    // protected static String checkService(final String service) {
-    // if (service == null || service.length() == 0)
-    // return DEFAULT_SERVICE;
-    // else
-    // return service;
-    // }
 
     @Override
     public void disconnectFromDataSource() throws EqIOException {
