@@ -6,8 +6,8 @@
 		<application>
 			<startscript>
 				<main-class name="cern.c2mon.daq.common.startup.DaqStartup">
-					<arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -processName ${PROCESS_NAME}
-						-noDeadband
+					<arg>-c2monProperties conf/daq.properties -log4j conf/log4j.xml -daqConf conf/daq.conf -noDeadband -processName ${PROCESS_NAME}
+						
 					</arg>
 					<output>
 						<file name="${DAQ_LOG_HOME}/${PROCESS_NAME}.out.log" />
