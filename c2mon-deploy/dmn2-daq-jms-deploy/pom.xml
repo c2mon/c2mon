@@ -23,9 +23,9 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>cern.tim2.tim2-daq</groupId>
-			<artifactId>tim2-daq-jms</artifactId>
-			<version>[1.0.0,2.0.0)</version>
+			<groupId>cern.c2mon.c2mon-daq</groupId>
+			<artifactId>c2mon-daq-jms</artifactId>
+			<version>[1.0.0,3.0.0)</version>
 		</dependency>
 	</dependencies>
 
