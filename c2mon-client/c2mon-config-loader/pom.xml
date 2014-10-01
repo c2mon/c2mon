@@ -1,43 +1,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>cern.c2mon.c2mon-client</groupId>
-		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.1.2</version>
-	</parent>
+   <parent>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-pom</artifactId>
+      <version>1.1.2</version>
+   </parent>
 
-	<artifactId>c2mon-config-loader</artifactId>
-	<version>1.0.1</version>
-	<name>The C2MON configuration loader</name>
-	<description>The C2MON configuration loader is a process used for automatic application of the C2MON reconfigurations to the C2MON server</description>
+   <artifactId>c2mon-config-loader</artifactId>
+   <version>1.0.1</version>
+   <name>The C2MON configuration loader</name>
+   <description>The C2MON configuration loader is a process used for automatic application of the C2MON reconfigurations to the C2MON server</description>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-client/c2mon-config-loader</developerConnection>
-	</scm>
+   <scm>
+      <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-client/c2mon-config-loader</developerConnection>
+   </scm>
 
-	<dependencies>
+   <dependencies>
 
-		<!-- C2MON Client API dependencies -->
-		<dependency>
-			<groupId>cern.c2mon.c2mon-client</groupId>
-			<artifactId>c2mon-client-all</artifactId>
-		</dependency>
+      <!-- C2MON Client API dependencies -->
+      <dependency>
+         <groupId>cern.c2mon.c2mon-client</groupId>
+         <artifactId>c2mon-client-all</artifactId>
+      </dependency>
 
-		<!-- 3rd party dependencies -->
+      <!-- 3rd party dependencies -->
 
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<optional>true</optional>
-			<version>1.7.5</version>
-		</dependency>
+      <dependency>
+         <groupId>org.slf4j</groupId>
+         <artifactId>slf4j-log4j12</artifactId>
+         <optional>true</optional>
+         <version>1.7.5</version>
+      </dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -113,5 +109,10 @@
 		   <artifactId>ojdbc</artifactId>
 		   <version>11.2.0.3</version>
 		</dependency>
-	</dependencies>
+		<dependency>
+		   <groupId>org.slf4j</groupId>
+		   <artifactId>slf4j-api</artifactId>
+		   <version>1.7.5</version>
+		</dependency>
+   </dependencies>
 </project>
