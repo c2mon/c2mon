@@ -43,4 +43,13 @@
        <version>[2.0.3, 3.0.0)</version>
     </dependency>
   </dependencies>
+  <dependencyManagement>
+     <dependencies>
+        <dependency>
+           <groupId>cern.cmw</groupId>
+           <artifactId>cmw-util</artifactId>
+           <version>1.2.0</version>
+        </dependency>
+     </dependencies>
+  </dependencyManagement>
 </project>
