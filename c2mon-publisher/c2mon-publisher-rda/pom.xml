@@ -37,5 +37,10 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+    <dependency>
+       <groupId>cern.cmw</groupId>
+       <artifactId>cmw-directory-client</artifactId>
+       <version>[2.0.3, 3.0.0)</version>
+    </dependency>
   </dependencies>
 </project>
