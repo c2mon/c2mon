@@ -43,8 +43,6 @@
 #REMOTE_DEBUGGER_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
 #JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUGGER_OPTS}"				
 			      
-# source in additional file with environment variables
-. bin/setenv.sh
 					      	      
                     ]]>
 				</preExec>
