@@ -30,9 +30,6 @@
 				<property name="oracle.net.tns_admin" value="/etc" />
 				<property name="com.tc.productkey.path" value="conf/terracotta-license.key" />
 
-				<property name="laser.hosts" value="${LASER_HOSTS}" />
-				<property name="cmw.mom.brokerlist" value="${LASER_BROKERLIST}" />
-
 				<preExec>
 					<![CDATA[
 # ***************************************************************************
@@ -76,10 +73,6 @@
 					<file name="log4j.xml" sourceDir="~diamonop/c2mon/server" mask="444" />
 				</directory>
 
-				<directory name="bin">
-					<file name="setenv.sh" sourceDir="~diamonop/c2mon/server" mask="444" />
-				</directory>
-
 				<notification>
 					<!-- you can give more than one mail for deployment notification -->
 					<mail address="project-diamon-core@cern.ch" />
@@ -101,11 +94,6 @@
 					<!-- copy over pro. server's log4j configuration -->
 					<file name="log4j.xml" sourceDir="~dmndev/c2mon/server" mask="444" />
 				</directory>
-
-				<directory name="bin">
-					<file name="setenv.sh" sourceDir="~dmndev/c2mon/server" mask="444" />
-				</directory>
-
 			</deployment>
 		</application>
 
