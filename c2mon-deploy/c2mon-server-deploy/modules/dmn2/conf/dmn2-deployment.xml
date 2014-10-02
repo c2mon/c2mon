@@ -63,6 +63,10 @@
 		</application>
 
 		<application name="dmn2-srv-pro" extends="default">
+            <startscript name="DMN2-SRV">
+               <property name="laser.host" value="laser1,laser2" />
+               <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506" />
+            </startscript>
 			<deployment installLocation="/opt/dmn2/dmn2-srv-pro">
 				<directory name="conf">
 					<file name=".jmxremote.passwd" sourceDir="~diamonop/c2mon/server" mask="400" />
@@ -85,6 +89,10 @@
 		</application>
 
 		<application name="dmn2-srv-dev" extends="default">
+            <startscript name="DMN2-SRV">
+               <property name="laser.host" value="laser-test" />
+               <property name="cmw.mom.brokerlist" value="jms-laser-test:2506" />
+            </startscript>
 			<deployment installLocation="/opt/dmn2/dmn2-srv-dev">
 				<directory name="conf">
 					<file name=".jmxremote.passwd" sourceDir="~dmndev/c2mon/server" mask="400" />
