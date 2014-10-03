@@ -4,11 +4,11 @@ import javax.security.auth.login.LoginException;
 
 import cern.accsoft.security.rba.login.LoginPolicy;
 import cern.c2mon.daq.japc.GenericJapcMessageHandler;
-import cern.rba.util.relogin.RdaRbaLoginService;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.rba.util.relogin.RbaLoginService;
 
 /**
- * a dedicated JAPC DAQ for RDA. just befor initialization it sets up RBAC token
+ * a dedicated JAPC DAQ for RDA. just before initialization it sets up RBAC token
  */
 public class RdaJapcMessageHandler extends GenericJapcMessageHandler {
 
@@ -25,7 +25,7 @@ public class RdaJapcMessageHandler extends GenericJapcMessageHandler {
         if (!rbacInitilaized) {
             try {
 
-                RdaRbaLoginService service = new RdaRbaLoginService();
+                RbaLoginService service = new RbaLoginService();
                 service.setUser(user);
                 service.setPassword(pass);
                 service.setLoginPolicy(LoginPolicy.LOCATION);
@@ -40,17 +40,6 @@ public class RdaJapcMessageHandler extends GenericJapcMessageHandler {
             }
 
         }
-    }
-    
-    
-    public static final void main(String[] args) throws Exception {
-        RdaRbaLoginService service = new RdaRbaLoginService();
-        service.setUser(user);
-        service.setPassword(pass);
-        service.setLoginPolicy(LoginPolicy.EXPLICIT);
-        service.setApplicationName("JAPC-RDA-DAQ");
-        service.setAutoRefresh(true);
-        service.startAndLogin();        
     }
 
 }
