@@ -3,28 +3,28 @@
  */
 package cern.c2mon.daq.ping;
 
+import static cern.c2mon.daq.ping.Configuration.POLLING_INTERVAL;
 import static java.lang.String.format;
 
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import cern.c2mon.daq.common.logger.EquipmentLogger;
+
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
+import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.address.SimpleHardwareAddress;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-
-import static cern.c2mon.daq.ping.Configuration.POLLING_INTERVAL;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
@@ -48,7 +48,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     /**
      * handles for pollers NOTE: a shared (static) map is used across all instances of the PingMessageHandler
      */
-    private static Map<Long, ScheduledFuture<?>> scheduledFutures = new ConcurrentHashMap<Long, ScheduledFuture<?>>();
+    private static ConcurrentMap<Long, ScheduledFuture<?>> scheduledFutures = new ConcurrentHashMap<Long, ScheduledFuture<?>>();
 
     /**
      * reference to the initialization thread
@@ -72,8 +72,10 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
         if (logger.isTraceEnabled())
             logger.trace(format("entering startPingTask(%d,%s, %d)..", tag.getId(), target.getHostname(), pollingTime));
 
-        scheduledFutures.put(tag.getId(), executor.scheduleAtFixedRate(new PingTask(this, tag, target), new Random(
-                System.currentTimeMillis()).nextInt(2000), pollingTime * 1000, TimeUnit.MILLISECONDS));
+        synchronized (scheduledFutures) {
+            scheduledFutures.putIfAbsent(tag.getId(), executor.scheduleAtFixedRate(new PingTask(this, tag, target),
+                    new Random(System.currentTimeMillis()).nextInt(2000), pollingTime * 1000, TimeUnit.MILLISECONDS));
+        }
 
         logger.trace("leaving startPingTask()");
     }
@@ -87,20 +89,21 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
         if (logger.isTraceEnabled())
             logger.trace(format("entering stopPingTask(%d)..", tagId));
 
-        if (scheduledFutures.containsKey(tagId)) {
-            ScheduledFuture<?> sf = scheduledFutures.get(tagId);
-            if (sf != null) {
-                sf.cancel(true);
-            }
+        synchronized (scheduledFutures) {
+            if (scheduledFutures.containsKey(tagId)) {
+                ScheduledFuture<?> sf = scheduledFutures.get(tagId);
+                if (sf != null) {
+                    sf.cancel(true);
+                }
 
-            scheduledFutures.remove(tagId);
-        }// if
-
+                scheduledFutures.remove(tagId);
+            }// if
+        }
         logger.trace("leaving stopPingTask()");
     }
 
     @Override
-    public void connectToDataSource() throws EqIOException {
+    public synchronized void connectToDataSource() throws EqIOException {
         logger = getEquipmentLogger();
 
         logger.debug("entering connectToDataSource()..");
@@ -148,18 +151,18 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     }
 
     @Override
-    public void refreshAllDataTags() {
+    public synchronized void refreshAllDataTags() {
         // TODO Auto-generated method stub
     }
 
     @Override
-    public void refreshDataTag(@SuppressWarnings("unused") long dataTagId) {
+    public synchronized void refreshDataTag(@SuppressWarnings("unused") long dataTagId) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void onAddDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
+    public synchronized void onAddDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
         if (logger.isDebugEnabled())
             logger.debug(format("entering onAddDataTag(%d)..", sourceDataTag.getId()));
 
@@ -178,7 +181,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     }
 
     @Override
-    public void onRemoveDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
+    public synchronized void onRemoveDataTag(ISourceDataTag sourceDataTag, ChangeReport changeReport) {
         if (logger.isDebugEnabled())
             logger.debug(format("entering onRemoveDataTag(%d)..", sourceDataTag.getId()));
 
@@ -197,7 +200,8 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     }
 
     @Override
-    public void onUpdateDataTag(ISourceDataTag sourceDataTag, ISourceDataTag oldSourceDataTag, ChangeReport changeReport) {
+    public synchronized void onUpdateDataTag(ISourceDataTag sourceDataTag, ISourceDataTag oldSourceDataTag,
+            ChangeReport changeReport) {
         if (logger.isDebugEnabled())
             logger.debug(format("entering onUpdateDataTag(%d,%d)..", sourceDataTag.getId(), oldSourceDataTag.getId()));
 
@@ -228,14 +232,17 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
 
     boolean isTagPollerRegistered(final long tagId) {
         boolean result = true;
-        if (!scheduledFutures.containsKey(tagId)) {
-            result = false;
+
+        synchronized (scheduledFutures) {
+            if (!scheduledFutures.containsKey(tagId)) {
+                result = false;
+            }
         }
 
         return result;
     }
 
-    synchronized void registerTag(ISourceDataTag tag) throws TagOperationException {
+    void registerTag(ISourceDataTag tag) throws TagOperationException {
         if (logger.isTraceEnabled())
             logger.trace(format("entering registerTag(%d)", tag.getId()));
 
@@ -265,7 +272,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
 
     }
 
-    synchronized void unregisterTag(ISourceDataTag tag) throws TagOperationException {
+    void unregisterTag(ISourceDataTag tag) throws TagOperationException {
         if (logger.isTraceEnabled())
             logger.trace(format("entering unregisterTag(%d)", tag.getId()));
 
@@ -292,7 +299,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     }
 
     @Override
-    public void onUpdateEquipmentConfiguration(
+    public synchronized void onUpdateEquipmentConfiguration(
             @SuppressWarnings("unused") IEquipmentConfiguration equipmentConfiguration,
             @SuppressWarnings("unused") IEquipmentConfiguration oldEquipmentConfiguration, ChangeReport changeReport) {
 
