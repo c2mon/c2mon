@@ -328,7 +328,7 @@ public class ConfigurationController {
    * @param dataTagAddChange The data tag add change.
    * @return A report with information if the change was successful.
    */
-  public ChangeReport onDataTagAdd(final DataTagAdd dataTagAddChange) {
+  public synchronized ChangeReport onDataTagAdd(final DataTagAdd dataTagAddChange) {
     LOGGER.debug("onDataTagAdd - entering onDataTagAdd()");
     if (LOGGER.isDebugEnabled())
       LOGGER.debug("changeId: " + dataTagAddChange.getChangeId());
@@ -396,7 +396,7 @@ public class ConfigurationController {
    * @param commandTagAddChange The command tag add change.
    * @return A report with information if the change was successful.
    */
-  public ChangeReport onCommandTagAdd(final CommandTagAdd commandTagAddChange) {
+  public synchronized ChangeReport onCommandTagAdd(final CommandTagAdd commandTagAddChange) {
     LOGGER.debug("entering onCommandTagAdd()");
     if (LOGGER.isDebugEnabled())
       LOGGER.debug("changeId: " + commandTagAddChange.getChangeId());
@@ -454,7 +454,7 @@ public class ConfigurationController {
    * @param dataTagRemoveChange The change with all the data to remove the tag.
    * @return A change report with success information.
    */
-  public ChangeReport onDataTagRemove(final DataTagRemove dataTagRemoveChange) {
+  public synchronized ChangeReport onDataTagRemove(final DataTagRemove dataTagRemoveChange) {
     LOGGER.debug("Entering onDataTagRemove: ");
     
     ChangeReport changeReport = new ChangeReport(dataTagRemoveChange);
@@ -517,7 +517,7 @@ public class ConfigurationController {
    * @param dataTagUpdateChange The object with all necessary to update the tag.
    * @return A change report containing information about the success of the update.
    */
-  public ChangeReport onDataTagUpdate(final DataTagUpdate dataTagUpdateChange) {
+  public synchronized ChangeReport onDataTagUpdate(final DataTagUpdate dataTagUpdateChange) {
     ChangeReport changeReport = new ChangeReport(dataTagUpdateChange);
     long equipmentId = dataTagUpdateChange.getEquipmentId();
     long dataTagId = dataTagUpdateChange.getDataTagId();
@@ -571,7 +571,7 @@ public class ConfigurationController {
    * @param commandTagRemoveChange The change object with all the information to remove the command tag.
    * @return A report with information about success of the change.
    */
-  public ChangeReport onCommandTagRemove(final CommandTagRemove commandTagRemoveChange) {
+  public synchronized ChangeReport onCommandTagRemove(final CommandTagRemove commandTagRemoveChange) {
     ChangeReport changeReport = new ChangeReport(commandTagRemoveChange);
     Long equipmentId = commandTagRemoveChange.getEquipmentId();
     Map<Long, SourceCommandTag> sourceCommandTags = getSourceCommandTags(equipmentId);
@@ -613,7 +613,7 @@ public class ConfigurationController {
    * @param commandTagUpdateChange The object with all the information to update the tag.
    * @return A change report with information about the success of the update.
    */
-  public ChangeReport onCommandTagUpdate(final CommandTagUpdate commandTagUpdateChange) {
+  public synchronized ChangeReport onCommandTagUpdate(final CommandTagUpdate commandTagUpdateChange) {
     ChangeReport changeReport = new ChangeReport(commandTagUpdateChange);
     long equipmentId = commandTagUpdateChange.getEquipmentId();
     long commandTagId = commandTagUpdateChange.getCommandTagId();
@@ -667,7 +667,7 @@ public class ConfigurationController {
    * @param equipmentConfigurationUpdate The update with the changed values.
    * @return A change report with information about the success of the update.
    */
-  public ChangeReport onEquipmentConfigurationUpdate(final EquipmentConfigurationUpdate equipmentConfigurationUpdate) {
+  public synchronized ChangeReport onEquipmentConfigurationUpdate(final EquipmentConfigurationUpdate equipmentConfigurationUpdate) {
     long equipmentId = equipmentConfigurationUpdate.getEquipmentId();
     ChangeReport changeReport = new ChangeReport(equipmentConfigurationUpdate);
     try {
@@ -715,7 +715,7 @@ public class ConfigurationController {
    * @param processConfigurationUpdate The update with the changed values.
    * @return A change report with information about the success of the update.
    */
-  public ChangeReport onProcessConfigurationUpdate(final ProcessConfigurationUpdate processConfigurationUpdate) {
+  public synchronized ChangeReport onProcessConfigurationUpdate(final ProcessConfigurationUpdate processConfigurationUpdate) {
     ChangeReport changeReport = new ChangeReport(processConfigurationUpdate);
     long processId = processConfigurationUpdate.getProcessId();
     try {
