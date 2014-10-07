@@ -17,10 +17,10 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 /**
  * Tests for  {@link ClientDataTagImpl#isValidUpdate(TagValueUpdate)}
- * 
- * Covers all the cases described in the truth table of issue: 
+ *
+ * Covers all the cases described in the truth table of issue:
  * http://issues.cern.ch/browse/TIMS-826
- * 
+ *
  * @author ekoufaki
  */
 public class ClientDataTagImplIsValidUpdateTest {
@@ -37,7 +37,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
   @Test
   /**
-   * case1: 
+   * case1:
    * Update with newer server timestamp: always true
    */
   public void testCase1() {
@@ -96,7 +96,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
   @Test
   /**
-   * case2: 
+   * case2:
    * Update with older/null server timestamp: always false
    */
   public void testCase2() {
@@ -151,8 +151,8 @@ public class ClientDataTagImplIsValidUpdateTest {
 
   @Test
   /**
-   * case3: 
-   * Update with DAQ timestamp is preferred 
+   * case3:
+   * Update with DAQ timestamp is preferred
    * in case the previous update arrived with no DAQ Timestamp.
    */
   public void testCase3() {
@@ -186,7 +186,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
   @Test
   /**
-   * case4: 
+   * case4:
    * Update with NO DAQ timestamp
    *  when the previous update arrived WITH DAQ Timestamp, is ignored.
    */
@@ -220,7 +220,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
   @Test
   /**
-   * case5: 
+   * case5:
    * Same Server timestamp, newer DAQ timestamp.
    */
   public void testCase5() {
@@ -253,7 +253,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
   @Test
   /**
-   * case6: 
+   * case6:
    * Update with DAQ timestamp that is old..
    * Should not be accepted!
    */
@@ -313,7 +313,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
   @Test
   /**
-   * case8: 
+   * case8:
    */
   public void testCase8() {
 
@@ -412,7 +412,7 @@ public class ClientDataTagImplIsValidUpdateTest {
 
   @Test
   /**
-   * case11: 
+   * case11:
    */
   public void testCase11() {
 
@@ -688,6 +688,11 @@ public class ClientDataTagImplIsValidUpdateTest {
 
     @Override
     public Collection<Long> getEquipmentIds() {
+      return null;
+    }
+
+    @Override
+    public Collection<Long> getSubEquipmentIds() {
       return null;
     }
 

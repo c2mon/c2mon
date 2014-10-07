@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2010 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.server.common.tag;
@@ -21,8 +21,6 @@ package cern.c2mon.server.common.tag;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
@@ -184,6 +182,16 @@ public interface Tag extends RuleInputValue, Cacheable {
   Set<Long> getProcessIds();
   
   /**
+   * Returns the SubEquipments this Tag depends on (for rules
+   * this includes all "parent" equipments). If the Tag has no
+   * associated SubEquipment, the returned list will be empty.
+   * Should never return a null list.
+   * 
+   * @return list of SubEquipment ids; can be empty; never null
+   */
+  Set<Long> getSubEquipmentIds();
+  
+  /**
    * Returns the ids of the alarms set on this Tag.
    * Never returns null.
    * 
@@ -220,7 +228,5 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @param topic topic name
    */
   void setTopic(String topic);
-  
- 
-  
+
 }

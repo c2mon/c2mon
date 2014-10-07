@@ -13,6 +13,10 @@
    <bean id="equipmentFacade" class="org.easymock.EasyMock" factory-method="createMock">
       <constructor-arg value="cern.c2mon.server.cache.EquipmentFacade"/>
    </bean>
+   
+   <bean id="subEquipmentFacade" class="org.easymock.EasyMock" factory-method="createMock">
+      <constructor-arg value="cern.c2mon.server.cache.SubEquipmentFacade"/>
+   </bean>
   
    <bean id="cacheRegistrationService" class="cern.c2mon.server.cache.listener.CacheRegistrationServiceImpl" autowire="constructor"/>
    <bean id="dataTagFacade" class="cern.c2mon.server.cache.datatag.DataTagFacadeImpl" autowire="constructor"/>

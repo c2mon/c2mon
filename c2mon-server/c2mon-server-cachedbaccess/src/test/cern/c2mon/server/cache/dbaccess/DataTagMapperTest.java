@@ -25,7 +25,6 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -35,16 +34,16 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 @TransactionConfiguration(transactionManager="cacheTransactionManager", defaultRollback=true)
 @Transactional
 public class DataTagMapperTest {
-  
+
   @Autowired
-  private DataTagMapper dataTagMapper; 
-  
+  private DataTagMapper dataTagMapper;
+
   @Autowired
   private TestDataHelper testDataHelper;
-  
+
   private DataTagCacheObject dataTag;
-  
-  
+
+
 //  @BeforeClass
 //  public static void setUp() {
 //    //start Spring context
@@ -53,17 +52,17 @@ public class DataTagMapperTest {
 //    dataTagMapper = (DataTagMapper) applicationContext.getBean("dataTagMapper");
 //    testDataHelper = (TestDataHelper) applicationContext.getBean("testDataHelper");
 //  }
-  
+
   @Before
   public void setUp() {
     testDataHelper.removeTestData();
   }
-  
+
   @After
   public void cleanDb() {
     testDataHelper.removeTestData();
   }
-  
+
   @Test
   public void testAlarmCollectionCorrect() {
     testDataHelper.createTestData();
@@ -77,30 +76,30 @@ public class DataTagMapperTest {
     assertTrue(dataTagFromDB.getAlarmIds().contains(alarmId2));
     assertTrue(dataTagFromDB.getAlarmIds().contains(alarmId3));
   }
-  
+
   @Test
   public void testGetNumberItems() {
-    assertTrue(dataTagMapper.getNumberItems() > 5);   
+    assertTrue(dataTagMapper.getNumberItems() > 5);
   }
-  
+
   @Test
   public void testGetRowBatch() {
     DBBatch dbBatch = new DBBatch(200000L, 200002L);
     List<DataTag> datatags = dataTagMapper.getRowBatch(dbBatch);
     assertNotNull(datatags);
     assertTrue(datatags.size() == 3);
-    
+
     DBBatch dbBatch2 = new DBBatch(200002L, 200006L);
     List<DataTag> datatags2 = dataTagMapper.getRowBatch(dbBatch2);
     assertNotNull(datatags2);
-    assertTrue(datatags2.size() == 4); //since 200006 is not in DB 
+    assertTrue(datatags2.size() == 4); //since 200006 is not in DB
   }
-  
+
   @Test
   public void testGetAllDataTags() {
     dataTagMapper.getAll();
   }
-  
+
   @Test
   public void testGetDataTag() {
     //construct fake DataTagCacheObject, setting all fields
@@ -128,14 +127,15 @@ public class DataTagMapperTest {
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setRuleIdsString("1234");
     cacheObject.setProcessId(50L); //need test process also (P_JAPC01)
-    
-    
+
+
     //put in database
     dataTagMapper.testInsertDataTag(cacheObject);
-    
+    assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
+
     //retrieve from database
     DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150000));
-    
+
     assertEquals(cacheObject.getId(), retrievedObject.getId());
     assertEquals(cacheObject.getName(), retrievedObject.getName());
     assertEquals(cacheObject.getDescription(), retrievedObject.getDescription());
@@ -155,37 +155,53 @@ public class DataTagMapperTest {
     assertEquals(cacheObject.getMaxValue(), retrievedObject.getMaxValue());
     assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
-    assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());   
+    assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
     assertEquals(cacheObject.getRuleIdsString(), retrievedObject.getRuleIdsString());
-    
+
     dataTagMapper.deleteDataTag(cacheObject.getId());
+    assertFalse(dataTagMapper.isInDb(cacheObject.getId()));
+
+    // attach to a subequipment
+    cacheObject.setId(150001L);
+    cacheObject.setEquipmentId(null);
+    cacheObject.setSubEquipmentId(250L);
+
+    //put in database
+    dataTagMapper.testInsertDataTag(cacheObject);
+    assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
+
+    //retrieve from database
+    retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150001));
+    assertNotNull(retrievedObject);
+    assertEquals(null, retrievedObject.getEquipmentId());
+    assertEquals(cacheObject.getSubEquipmentId(), retrievedObject.getSubEquipmentId());
   }
-  
+
   @Test
   public void testUpdateDataTag() {
     //construct fake DataTagCacheObject
     DataTagCacheObject cacheObject = new DataTagCacheObject();
     cacheObject.setId(new Long(150000));  //must be non null in DB
-    cacheObject.setName("Junit_test_tag"); //non null    
+    cacheObject.setName("Junit_test_tag"); //non null
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
     cacheObject.setDataType("Boolean"); // non null
     cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
-    
+
     dataTagMapper.testInsertDataTag(cacheObject);
-     
+
     cacheObject.setValue(Boolean.TRUE);
     cacheObject.setValueDescription("test value description");
-    cacheObject.setSimulated(false); //null allowed    
+    cacheObject.setSimulated(false); //null allowed
     cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNDEFINED_VALUE,"undefined value"));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
 
     dataTagMapper.updateCacheable(cacheObject);
-    
+
     DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150000));
-    
+
     //updated values are changed
     assertEquals(cacheObject.getValue(), retrievedObject.getValue());
     assertEquals(cacheObject.getValueDescription(), retrievedObject.getValueDescription());
@@ -193,13 +209,13 @@ public class DataTagMapperTest {
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
-    
+
     //other values should be the same or ...
     assertEquals(cacheObject.getId(), retrievedObject.getId());
     assertEquals(cacheObject.getName(), retrievedObject.getName());
     assertEquals(cacheObject.getMode(), retrievedObject.getMode());
     assertEquals(cacheObject.getDataType(), retrievedObject.getDataType());
-    
+
     //... null/default
     assertNull(retrievedObject.getDescription());
     assertEquals(false, retrievedObject.isLogged()); //default boolean
@@ -210,21 +226,21 @@ public class DataTagMapperTest {
     assertNull(retrievedObject.getMaxValue());
     assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML());
     assertNull(retrievedObject.getAddress());
-    
+
     dataTagMapper.deleteDataTag(cacheObject.getId());
-        
+
   }
-  
+
   @Test
   public void testIsInDB() {
     assertTrue(dataTagMapper.isInDb(200000L));
   }
-  
+
   @Test
   public void testNotInDB() {
     assertFalse(dataTagMapper.isInDb(60010L));
   }
-  
+
   /**
    * Make sure the test DataTag is deleted after each method.
    */
@@ -232,5 +248,5 @@ public class DataTagMapperTest {
 //  public void deleteTestDataTag() {
 //    dataTagMapper.deleteDataTag(dataTag.getId());
 //  }
- 
+
 }

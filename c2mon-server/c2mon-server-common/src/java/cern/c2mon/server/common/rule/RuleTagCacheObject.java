@@ -26,7 +26,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
  * Cache object representing a rule in the server. Make sure to update the clone method if modifying the fields.
- * 
+ *
  * @author Mark Brightwell
  */
 public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTag, Cloneable {
@@ -54,13 +54,18 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     private Set<Long> parentEquipments = new HashSet<Long>();
 
     /**
+     * Reference to all the SubEquipments providing tags for this rule.
+     */
+    private Set<Long> parentSubEquipments = new HashSet<Long>();
+
+    /**
      * Reference to all the Processes providing tags for this rule.
      */
     private Set<Long> parentProcesses = new HashSet<Long>();
 
     /**
      * Constructor used to return a cache object when the object cannot be found in the cache.
-     * 
+     *
      * @param id id of the Tag
      * @param name name of the Tag
      * @param datatype the datatype of the Tag value
@@ -84,7 +89,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
 
     /**
      * Used for config loader.
-     * 
+     *
      * @param id
      */
     public RuleTagCacheObject(Long id) {
@@ -93,7 +98,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
 
     /**
      * Clone implementation.
-     * 
+     *
      * @throws CloneNotSupportedException
      */
     @Override
@@ -105,6 +110,12 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
                 ruleTagCacheObject.parentEquipments.add(eqId);
             }
         }
+        if (this.parentSubEquipments != null) {
+          ruleTagCacheObject.parentSubEquipments = new HashSet<Long>();
+          for (Long subEqId : this.parentSubEquipments) {
+              ruleTagCacheObject.parentSubEquipments.add(subEqId);
+          }
+      }
         if (this.parentProcesses != null) {
             ruleTagCacheObject.parentProcesses = new HashSet<Long>();
             for (Long procId : this.parentProcesses) {
@@ -117,7 +128,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
 //         ruleTagCacheObject.ruleExpression = (RuleExpression) this.ruleExpression.clone();
           ruleTagCacheObject.setRuleText(ruleText);
         }
-        
+
         return ruleTagCacheObject;
     }
 
@@ -148,13 +159,14 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
         return ruleCollection;
     }
 
+    @Override
     public final String getRuleText() {
         return this.ruleText;
     }
 
     /**
      * Also attempts to set the rule expression field (stays null if fails and logs an error).
-     * 
+     *
      * @param ruleText the ruleText to set
      */
     public void setRuleText(String ruleText) {
@@ -205,5 +217,14 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
             return sortedList.get(0);
         } else
             return 0L;
+    }
+
+    @Override
+    public void setSubEquipmentIds(Set<Long> parentSubEquipments) {
+        this.parentSubEquipments = parentSubEquipments;
+    }
+
+    public Set<Long> getSubEquipmentIds() {
+      return parentSubEquipments;
     }
 }

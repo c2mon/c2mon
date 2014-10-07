@@ -966,6 +966,71 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   @Test
   @DirtiesContext
+  public void testCreateSubEquipmentDataTag() {
+    replay(mockManager);
+
+    // First create the SubEquipment
+    ConfigurationReport report = configurationLoader.applyConfiguration(19);
+    System.out.println(report.toXML());
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+
+    //Now create the DataTag attached to the SubEquipment
+    report = configurationLoader.applyConfiguration(99);
+    System.out.println(report.toXML());
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+
+    SubEquipment subEquipment = subEquipmentCache.get(200L);
+    assertNotNull(subEquipment);
+    assertTrue(subEquipment.getDataTagIds().size() == 1);
+
+    DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(new Long(7000000));
+    assertTrue(cacheObject.getSubEquipmentId() == 200L);
+  }
+
+  @Test
+  @DirtiesContext
+  public void testRemoveSubEquipmentDataTag() {
+    testCreateSubEquipmentDataTag();
+    verify(mockManager);
+    reset(mockManager);
+
+    SubEquipment subEquipment = subEquipmentCache.get(200L);
+    assertNotNull(subEquipment);
+    assertTrue(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
+    assertTrue(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
+    assertTrue(controlTagCache.hasKey(subEquipment.getAliveTagId()));
+    assertTrue(controlTagCache.hasKey(subEquipment.getStateTagId()));
+    assertTrue(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
+    for (Long tagId : subEquipment.getDataTagIds()) {
+      assertTrue(dataTagCache.hasKey(tagId));
+    }
+
+    replay(mockManager);
+
+    ConfigurationReport report = configurationLoader.applyConfiguration(98);
+    System.out.println(report.toXML());
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertFalse(subEquipmentCache.hasKey(200L));
+    assertNull(equipmentMapper.getItem(200L));
+
+    assertFalse(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
+    assertFalse(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
+
+    assertFalse(controlTagCache.hasKey(subEquipment.getAliveTagId()));
+    assertNull(controlTagMapper.getItem(subEquipment.getAliveTagId()));
+    assertFalse(controlTagCache.hasKey(subEquipment.getStateTagId()));
+    assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
+    assertFalse(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
+    assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
+    for (Long tagId : subEquipment.getDataTagIds()) {
+      assertFalse(dataTagCache.hasKey(tagId));
+    }
+
+    verify(mockManager);
+  }
+
+  @Test
+  @DirtiesContext
   public void testRemoveSubEquipment() {
     SubEquipment subEquipment = subEquipmentCache.get(250L);
     assertNotNull(subEquipment);

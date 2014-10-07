@@ -138,6 +138,14 @@
     <persistence strategy="distributed" />
     <terracotta clustered="true" consistency="strong" />
   </cache>
+  <cache
+    name="subEquipmentEventCache"
+    eternal="true"
+    maxElementsInMemory="500"
+    maxEntriesInCache="1000">
+    <persistence strategy="distributed" />
+    <terracotta clustered="true" consistency="strong" />
+  </cache>
   <!-- ************************************* -->
 
 

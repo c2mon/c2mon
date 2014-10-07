@@ -7,28 +7,37 @@
     
     <resultMap id="subEquipmentResultMap" type="SubEquipment" extends="cern.c2mon.server.cache.dbaccess.EquipmentMapper.abstractEquipmentResultMap">            
       <result property="parentId" column="equipment_parentid" />
+      <collection property="dataTagIds" ofType="Long" javaType="java.util.LinkedList" resultMap="dataTagIdsResultMap"/>
     </resultMap>  
+    
+    <resultMap id="dataTagIdsResultMap" type="Long">
+      <id column="datatag_id"/>
+    </resultMap>
   
     <select id="getAll" resultMap="subEquipmentResultMap">
-      SELECT EQID as equipment_id, EQNAME as equipment_name, EQDESC as equipment_description,
-             EQHANDLERCLASS as equipment_handlerclass, EQSTATE_TAGID as equipment_statetagid,
-             EQALIVE_TAGID as equipment_alivetagid, EQALIVEINTERVAL as equipment_aliveinterval,
-             EQCOMMFAULT_TAGID as equipment_commfaulttagid, EQ_PARENT_ID as equipment_parentid, EQSTATE as equipment_state,
-             EQSTATUSTIME AS equipment_status_time, EQSTATUSDESC AS equipment_status_desc
-        FROM EQUIPMENT
-       WHERE EQ_PROCID IS NULL
+      SELECT E.EQID as equipment_id, E.EQNAME as equipment_name, E.EQDESC as equipment_description,
+             E.EQHANDLERCLASS as equipment_handlerclass, E.EQSTATE_TAGID as equipment_statetagid,
+             E.EQALIVE_TAGID as equipment_alivetagid, E.EQALIVEINTERVAL as equipment_aliveinterval,
+             E.EQCOMMFAULT_TAGID as equipment_commfaulttagid, E.EQ_PARENT_ID as equipment_parentid, E.EQSTATE as equipment_state,
+             E.EQSTATUSTIME AS equipment_status_time, E.EQSTATUSDESC AS equipment_status_desc, D.TAGID as datatag_id
+        FROM EQUIPMENT E
+        LEFT OUTER JOIN DATATAG D
+          ON (E.EQID = D.TAG_EQID AND D.TAGRULE IS NULL AND D.TAGCONTROLTAG = 0)
+       WHERE E.EQ_PROCID IS NULL
     </select>
     
     <!-- getItem needed for persistence caches -->
     <select id="getItem" resultMap="subEquipmentResultMap" parameterType="Long">
-      SELECT EQID as equipment_id, EQNAME as equipment_name, EQDESC as equipment_description,
-             EQHANDLERCLASS as equipment_handlerclass, EQSTATE_TAGID as equipment_statetagid,
-             EQALIVE_TAGID as equipment_alivetagid, EQALIVEINTERVAL as equipment_aliveinterval,
-             EQCOMMFAULT_TAGID as equipment_commfaulttagid, EQ_PARENT_ID as equipment_parentid, EQSTATE as equipment_state,
-             EQSTATUSTIME AS equipment_status_time, EQSTATUSDESC AS equipment_status_desc
-        FROM EQUIPMENT
-       WHERE EQ_PROCID IS NULL
-         AND EQID = #{id}
+      SELECT E.EQID as equipment_id, E.EQNAME as equipment_name, E.EQDESC as equipment_description,
+             E.EQHANDLERCLASS as equipment_handlerclass, E.EQSTATE_TAGID as equipment_statetagid,
+             E.EQALIVE_TAGID as equipment_alivetagid, E.EQALIVEINTERVAL as equipment_aliveinterval,
+             E.EQCOMMFAULT_TAGID as equipment_commfaulttagid, E.EQ_PARENT_ID as equipment_parentid, E.EQSTATE as equipment_state,
+             E.EQSTATUSTIME AS equipment_status_time, E.EQSTATUSDESC AS equipment_status_desc, D.TAGID as datatag_id
+        FROM EQUIPMENT E
+        LEFT OUTER JOIN DATATAG D
+          ON (E.EQID = D.TAG_EQID AND D.TAGRULE IS NULL AND D.TAGCONTROLTAG = 0)
+       WHERE E.EQ_PROCID IS NULL
+         AND E.EQID = #{id}
     </select>      
   
     <!--  Inserts a new row into the equipment database table -->
@@ -58,26 +67,30 @@
     
     <!-- Returns all the subEquipments attached to a given equipment -->
     <select id="selectSubEquipmentsByEquipment" parameterType="Long" resultMap="subEquipmentResultMap">
-      SELECT EQID as equipment_id, EQNAME as equipment_name, EQDESC as equipment_description,
-             EQHANDLERCLASS as equipment_handlerclass, EQSTATE_TAGID as equipment_statetagid,
-             EQALIVE_TAGID as equipment_alivetagid, EQALIVEINTERVAL as equipment_aliveinterval,
-             EQCOMMFAULT_TAGID as equipment_commfaulttagid, EQ_PARENT_ID as equipment_parentid,
-             EQSTATE as equipment_state, EQSTATUSTIME AS equipment_status_time, EQSTATUSDESC AS equipment_status_desc
-        FROM equipment
-       WHERE EQ_PARENT_ID=#{equipmentId} 
-         AND EQ_PROCID IS NULL  
+      SELECT E.EQID as equipment_id, E.EQNAME as equipment_name, E.EQDESC as equipment_description,
+             E.EQHANDLERCLASS as equipment_handlerclass, E.EQSTATE_TAGID as equipment_statetagid,
+             E.EQALIVE_TAGID as equipment_alivetagid, E.EQALIVEINTERVAL as equipment_aliveinterval,
+             E.EQCOMMFAULT_TAGID as equipment_commfaulttagid, E.EQ_PARENT_ID as equipment_parentid,
+             E.EQSTATE as equipment_state, E.EQSTATUSTIME AS equipment_status_time, E.EQSTATUSDESC AS equipment_status_desc, D.TAGID as datatag_id
+        FROM equipment E
+        LEFT OUTER JOIN DATATAG D
+          ON (E.EQID = D.TAG_EQID AND D.TAGRULE IS NULL AND D.TAGCONTROLTAG = 0)
+       WHERE E.EQ_PARENT_ID=#{equipmentId} 
+         AND E.EQ_PROCID IS NULL  
     </select>
     
     <!-- Returns a SubEquipmentBean representing an entry in the equipment database table selected by subEquipmentId -->
     <select id="selectSubEquipmentById" parameterType="Long" resultMap="subEquipmentResultMap">
-      SELECT EQID as equipment_id, EQNAME as equipment_name, EQDESC as equipment_description,
-             EQHANDLERCLASS as equipment_handlerclass, EQSTATE_TAGID as equipment_statetagid,
-             EQALIVE_TAGID as equipment_alivetagid, EQALIVEINTERVAL as equipment_aliveinterval,
-             EQCOMMFAULT_TAGID as equipment_commfaultagid, EQ_PARENT_ID as equipment_parentid,
-             EQSTATE as equipment_state, EQSTATUSTIME AS equipment_status_time, EQSTATUSDESC AS equipment_status_desc
-        FROM equipment 
-       WHERE EQID=#{id} 
-         AND EQ_PROCID IS NULL
+      SELECT E.EQID as equipment_id, E.EQNAME as equipment_name, E.EQDESC as equipment_description,
+             E.EQHANDLERCLASS as equipment_handlerclass, E.EQSTATE_TAGID as equipment_statetagid,
+             E.EQALIVE_TAGID as equipment_alivetagid, E.EQALIVEINTERVAL as equipment_aliveinterval,
+             E.EQCOMMFAULT_TAGID as equipment_commfaulttagid, E.EQ_PARENT_ID as equipment_parentid,
+             E.EQSTATE as equipment_state, E.EQSTATUSTIME AS equipment_status_time, E.EQSTATUSDESC AS equipment_status_desc, D.TAGID as datatag_id
+        FROM equipment E
+        LEFT OUTER JOIN DATATAG D
+          ON (E.EQID = D.TAG_EQID AND D.TAGRULE IS NULL AND D.TAGCONTROLTAG = 0)
+       WHERE E.EQID=#{id} 
+         AND E.EQ_PROCID IS NULL
     </select>  
   
     <!--  Removes an entry from the equipment database table -->

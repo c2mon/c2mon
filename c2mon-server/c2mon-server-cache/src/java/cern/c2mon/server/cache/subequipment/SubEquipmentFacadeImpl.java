@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2010 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,11 +13,12 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.server.cache.subequipment;
 
+import java.util.Collection;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -44,37 +45,37 @@ import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 
 /**
  * Implementation of the SubEquipmentFacade.
- * 
+ *
  * @author Mark Brightwell
  *
  */
 @Service
 public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment> implements SubEquipmentFacade {
-  
-  private static final Logger LOGGER = Logger.getLogger(SubEquipmentFacadeImpl.class); 
-  
+
+  private static final Logger LOGGER = Logger.getLogger(SubEquipmentFacadeImpl.class);
+
   /**
    * DAO, still necessary for code ported from TIM1.
    */
   private SubEquipmentDAO subEquipmentDAO;
-  
+
   /**
    * Equipment cache bean.
    */
   private EquipmentCache equipmentCache;
-  
+
   /**
    * Process cache bean.
    */
   private ProcessCache processCache;
-  
+
   /**
    * Autowired constructor.
    */
   @Autowired
-  public SubEquipmentFacadeImpl(final SubEquipmentDAO subEquipmentDAO, final SubEquipmentCache subEquipmentCache, 
+  public SubEquipmentFacadeImpl(final SubEquipmentDAO subEquipmentDAO, final SubEquipmentCache subEquipmentCache,
                                 final EquipmentCache equipmentCache, final AliveTimerFacade aliveTimerFacade,
-                                final AliveTimerCache aliveTimerCache, final CommFaultTagCache commFaultTagCache, 
+                                final AliveTimerCache aliveTimerCache, final CommFaultTagCache commFaultTagCache,
                                 final CommFaultTagFacade commFaultTagFacade, final ProcessCache processCache) {
     super(subEquipmentCache, aliveTimerFacade, aliveTimerCache, commFaultTagCache, commFaultTagFacade);
     this.subEquipmentDAO = subEquipmentDAO;
@@ -90,12 +91,13 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
     validateConfig(subEquipment);
     return subEquipment;
   }
-  
+
   /**
    * Sets the fields particular for SubEquipment from the properties object.
    * @param subEquipment sets the fields in this object
    * @param properties looks for relevant properties in this object
    */
+  @Override
   protected Change configureCacheObject(SubEquipment subEquipment, Properties properties) {
     SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipment;
     String tmpStr = null;
@@ -109,7 +111,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
     }
     return null;
   }
-  
+
   @Override
   public Long getEquipmentIdForSubEquipment(final Long subEquipmentId) {
     SubEquipment subEquipment = cache.get(subEquipmentId);
@@ -120,31 +122,32 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
       return equipmentId;
     }
   }
-  
+
   /**
    * Overridden as for SubEquipment rule out changing the parent equipment
    * associated it is associated to.
-   * @throws IllegalAccessException 
+   * @throws IllegalAccessException
    * @return empty EquipmentConfigurationUpdate because SubEquipments are not used
-   *          on the DAQ layer and no event is sent (return type necessary as in 
-   *          common interface). 
+   *          on the DAQ layer and no event is sent (return type necessary as in
+   *          common interface).
    */
   @Override
-  public EquipmentConfigurationUpdate updateConfig(final SubEquipment subEquipment, final Properties properties) throws IllegalAccessException { 
-    if ((properties.getProperty("parent_equip_id")) != null) {      
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Reconfiguration of " 
-          + "SubEquipment does not currently allow it to be reassigned to a different Equipment!");      
+  public EquipmentConfigurationUpdate updateConfig(final SubEquipment subEquipment, final Properties properties) throws IllegalAccessException {
+    if ((properties.getProperty("parent_equip_id")) != null) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Reconfiguration of "
+          + "SubEquipment does not currently allow it to be reassigned to a different Equipment!");
     }
-    super.updateConfig(subEquipment, properties); 
+    super.updateConfig(subEquipment, properties);
     return new EquipmentConfigurationUpdate();
   }
-  
+
   /**
    * Throws an exception if the validation fails.
-   * 
+   *
    * @param subEquipmentCacheObject the SubEquipment to validate
    * @throws ConfigurationException if the validation fails
    */
+  @Override
   protected void validateConfig(final SubEquipment subEquipment) {
     SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipment;
     super.validateConfig(subEquipmentCacheObject);
@@ -155,9 +158,9 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
 
   @Override
   public void addSubEquipmentToEquipment(Long id, Long parentId) {
-    equipmentCache.acquireWriteLockOnKey(parentId);   
+    equipmentCache.acquireWriteLockOnKey(parentId);
     try {
-      Equipment equipment = equipmentCache.get(parentId);     
+      Equipment equipment = equipmentCache.get(parentId);
       if (equipment.getSubEquipmentIds().contains(id)) {
         LOGGER.warn("Trying to add existing SubEquipment to an Equipment!");
       } else {
@@ -171,7 +174,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
 
   @Override
   public Long getProcessIdForAbstractEquipment(Long abstractEquipmentId) {
-    Equipment equipment = equipmentCache.get(getEquipmentIdForSubEquipment(abstractEquipmentId));        
+    Equipment equipment = equipmentCache.get(getEquipmentIdForSubEquipment(abstractEquipmentId));
     Long processId = equipment.getProcessId();
     if (processId == null) {
       throw new NullPointerException("Equipment " + equipment.getId() + "has no associated Process id - this should never happen!");
@@ -184,5 +187,34 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   protected SupervisionEntity getSupervisionEntity() {
     return SupervisionEntity.SUBEQUIPMENT;
   }
-  
+
+  @Override
+  public void addTagToSubEquipment(Long subEquipmentId, Long dataTagId) {
+    cache.acquireWriteLockOnKey(subEquipmentId);
+    try {
+      SubEquipment subEquipment = cache.get(subEquipmentId);
+      subEquipment.getDataTagIds().add(dataTagId);
+      cache.putQuiet(subEquipment);
+    } finally {
+      cache.releaseWriteLockOnKey(subEquipmentId);
+    }
+  }
+
+  @Override
+  public void removeTagFromSubEquipment(Long subEquipmentId, Long dataTagId) {
+    cache.acquireWriteLockOnKey(subEquipmentId);
+    try {
+      SubEquipment subEquipment = cache.get(subEquipmentId);
+      subEquipment.getDataTagIds().remove(dataTagId);
+      cache.putQuiet(subEquipment);
+    } finally {
+      cache.releaseWriteLockOnKey(subEquipmentId);
+    }
+  }
+
+  @Override
+  public Collection<Long> getDataTagIds(Long subEquipmentId) {
+    SubEquipment subEquipment = cache.getCopy(subEquipmentId);
+    return subEquipment.getDataTagIds();
+  }
 }

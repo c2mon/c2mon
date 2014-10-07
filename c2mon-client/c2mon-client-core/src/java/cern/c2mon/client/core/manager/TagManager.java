@@ -304,7 +304,7 @@ public class TagManager implements CoreTagManager {
           try {
             ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
             cdt.update(tagUpdate);
-            supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds());
+            supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
             try {
               resultList.add((ClientDataTagValue) cdt.clone());
             } catch (CloneNotSupportedException e) {

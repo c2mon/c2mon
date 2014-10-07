@@ -24,11 +24,20 @@
     <property name="cacheName" value="equipmentEventCache"/>
   </bean>
   
+    <bean id="subEquipmentEventEhcache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+    <property name="cacheManager" ref="cacheManager"/>
+    <property name="cacheName" value="subEquipmentEventCache"/>
+  </bean>
+  
   <bean id="processEventCache" class="cern.c2mon.server.cache.common.DefaultCacheImpl">
     <constructor-arg ref="processEventEhcache"/>
   </bean>
   
   <bean id="equipmentEventCache" class="cern.c2mon.server.cache.common.DefaultCacheImpl">
     <constructor-arg ref="equipmentEventEhcache"/>
+  </bean>
+  
+  <bean id="subEquipmentEventCache" class="cern.c2mon.server.cache.common.DefaultCacheImpl">
+    <constructor-arg ref="subEquipmentEventEhcache"/>
   </bean>
 </beans>

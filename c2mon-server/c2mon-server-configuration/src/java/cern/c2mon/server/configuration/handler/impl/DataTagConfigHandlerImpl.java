@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2011 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
@@ -29,6 +29,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
 
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.EquipmentFacade;
+import cern.c2mon.server.cache.SubEquipmentFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
@@ -40,58 +41,62 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * See interface documentation also.
- * 
+ *
  * <p>Currently all alarms and rules must be manually removed from any tag before it can be removed.
  * This also applied when removing an Equipment or Process: this will only succeed if all alarms
  * and rules have first been removed.
- * 
+ *
  * @author Mark Brightwell
  *
  */
 @Service
 public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
-  
+
   /**
    * Class logger.
    */
-  private static final Logger LOGGER = Logger.getLogger(DataTagConfigHandlerImpl.class);  
-  
+  private static final Logger LOGGER = Logger.getLogger(DataTagConfigHandlerImpl.class);
+
   /**
    * Bean with DB transactions on methods.
    */
   @Autowired
   private DataTagConfigTransacted dataTagConfigTransacted;
-  
+
   /**
    * Helper class for accessing the List of registered listeners
    * for configuration updates.
    */
   private ConfigurationUpdateImpl configurationUpdateImpl;
-  
+
   /**
    * Cache for final removal.
    */
   private DataTagCache dataTagCache;
-  
+
   private EquipmentFacade equipmentFacade;
+  private SubEquipmentFacade subEquipmentFacade;
 
   /**
    * Constructor.
    * @param dataTagCache cache
    * @param equipmentFacade
+   * @param subEquipmentFacade
    * @param configurationUpdateImpl
    */
   @Autowired
-  public DataTagConfigHandlerImpl(DataTagCache dataTagCache, EquipmentFacade equipmentFacade, ConfigurationUpdateImpl configurationUpdateImpl) {        
+  public DataTagConfigHandlerImpl(DataTagCache dataTagCache, EquipmentFacade equipmentFacade, SubEquipmentFacade subEquipmentFacade,
+      ConfigurationUpdateImpl configurationUpdateImpl) {
     this.dataTagCache = dataTagCache;
     this.equipmentFacade = equipmentFacade;
+    this.subEquipmentFacade = subEquipmentFacade;
     this.configurationUpdateImpl = configurationUpdateImpl;
   }
 
   @Override
   public ProcessChange createDataTag(ConfigurationElement element) throws IllegalAccessException {
     ProcessChange change = dataTagConfigTransacted.doCreateDataTag(element);
-    dataTagCache.lockAndNotifyListeners(element.getEntityId());    
+    dataTagCache.lockAndNotifyListeners(element.getEntityId());
     if (LOGGER.isTraceEnabled()) {
     	LOGGER.trace("createDataTag - Notifying Configuration update listeners");
     }
@@ -107,12 +112,20 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
       DataTag dataTag = dataTagCache.get(id);
       dataTagCache.remove(id); //only removed from cache if no exception is thrown
       //remove from Equipment list only once definitively removed from DB & cache (o.w. remove/recreate Process/Equipment cannot reach it)
-      equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
+      if (dataTag.getEquipmentId() != null) {
+        equipmentFacade.removeTagFromEquipment(dataTag.getEquipmentId(), dataTag.getId());
+      }
+
+      // TIMS-951: Allow attachment of DataTags to SubEquipments
+      else if (dataTag.getSubEquipmentId() != null) {
+        subEquipmentFacade.removeTagFromSubEquipment(dataTag.getSubEquipmentId(), dataTag.getId());
+      }
+
       return changes;
-    } catch (CacheElementNotFoundException e) {     
+    } catch (CacheElementNotFoundException e) {
       tagReport.setWarning(e.getMessage());
       return new ArrayList<ProcessChange>(); //no changes for DAQ layer
-    }    
+    }
   }
 
   @Override
@@ -150,5 +163,5 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   @Override
   public void removeRuleFromTag(Long tagId, Long ruleId) {
     dataTagConfigTransacted.removeRuleFromTag(tagId, ruleId);
-  }  
+  }
 }

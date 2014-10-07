@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2009 CERN This program is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the License,
@@ -12,7 +12,7 @@
  * copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.server.common.datatag;
@@ -31,21 +31,21 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 
 /**
- * Represents the data tag objects stored in the cache. These contain both the 
+ * Represents the data tag objects stored in the cache. These contain both the
  * configuration information and the current value. The persistence module keeps
  * a copy of the current cache value in the database. DataTag objects correspond
  * to values arriving from the DAQ layer.
- * 
+ *
  * <p>Queries to the cache are guaranteed to return a non-null object and throw an
  * exception if no object is found.
- * 
+ *
  * @author Mark Brightwell
  *
  */
 public class DataTagCacheObject extends AbstractTagCacheObject implements DataTag, Cacheable, Cloneable {
-   
-   /** 
-    * Log4j logger instance 
+
+   /**
+    * Log4j logger instance
     **/
    private static final Logger LOGGER = Logger.getLogger(DataTagCacheObject.class);
 
@@ -63,7 +63,7 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
    * invalid.
    */
   private Comparable minValue = null;
- 
+
   /**
    * Maximum value for range checks. If the system receives a tag value that is
    * less than the authorized minimum value, it will flag the new tag value as
@@ -81,28 +81,33 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
    * Timestamp set by the source for the current value (may be null).
    */
   private Timestamp sourceTimestamp;
-  
+
   /**
    * Timestamp set by the DAQ for the current value (may be null).
    * Is set when the value is updated or invalidated in the DAQ core map.
    */
   private Timestamp daqTimestamp;
-  
+
   /**
    * Reference to equipment the Datatag is attached to.
    */
   private Long equipmentId = null;
-  
+
+  /**
+   * Reference to sub equipment the DataTag is attached to.
+   */
+  private Long subEquipmentId = null;
+
   /**
    * Id of the Process this DataTag is attached to (loaded from DB also during cache loading).
    */
   private Long processId;
-  
+
   /**
    * Constructor used to return a cache object when the object cannot be found
    * in the cache. Sets the quality to UNINITIALISED with the message
    * "No value received for this data tag so far".
-   * 
+   *
    * The fields sets in this constructor (4 parameters + quality field) can be
    * assumed to always be non-null on objects circulating in the server. All other
    * fields may take on null values and appropriate checks should be made.
@@ -114,24 +119,24 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
     setMode(mode);
     setDataTagQuality(new DataTagQualityImpl());
   }
-  
+
   /**
-   * Default constructor 
+   * Default constructor
    */
   public DataTagCacheObject() {
       super();
   }
-  
-  
-  
+
+
+
   //for testing only so far
   public DataTagCacheObject(final Long id) {
     super(id);
   }
-  
+
   /**
    * Clone implementation.
-   * @throws CloneNotSupportedException 
+   * @throws CloneNotSupportedException
    */
   @Override
   public DataTagCacheObject clone() throws CloneNotSupportedException {
@@ -141,17 +146,17 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
     }
     if (sourceTimestamp != null) {
       dataTagCacheObject.sourceTimestamp = (Timestamp) this.sourceTimestamp.clone();
-    }    
-    return dataTagCacheObject; 
+    }
+    return dataTagCacheObject;
   }
-  
+
   /**
    * Constructor This constructor should only be used to create a "fake"
    * DataTagCacheObject representing a tag that does not exist within the TIM
    * system. When a client requests a value for a tag ID that doesn't exist,
    * such a fake object will be return. The DataTagQuality of this tag will
    * clearly indicate that the tag is non-existent.
-   * 
+   *
    * @param id
    *          identifier of the non-existing tag.
    */
@@ -186,7 +191,7 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
 //        new Timestamp(System.currentTimeMillis()));
 //  }
 
-  
+
   /**
    * TEMPORARY IMPLEMENTATION OF EQUALS (USED IN TESTING ONLY SO FAR)
    */
@@ -194,7 +199,7 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
 //  public boolean equals(Object object) {
 //    return ((DataTagCacheObject) object).getValue() == this.getValue();
 //  }
-  
+
   /**
    * @param serverTimestamp the serverTimestamp to set
    */
@@ -203,15 +208,16 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
       this.sourceTimestamp = serverTimestamp;
     } else {
       this.sourceTimestamp.setTime(serverTimestamp.getTime());
-    }    
+    }
   }
-  
+
+  @Override
   public final Long getEquipmentId() {
     return this.equipmentId;
   }
-  
+
   /**
-   * Set the equipment Id for this DataTag. 
+   * Set the equipment Id for this DataTag.
    * @param pEquipmentId
    */
   public final void setEquipmentId (final Long pEquipmentId) {
@@ -219,10 +225,23 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
   }
 
   @Override
+  public Long getSubEquipmentId() {
+    return this.subEquipmentId;
+  }
+
+  /**
+   * Set the sub equipment Id for this DataTag.
+   * @param pSubEquipmentId
+   */
+  public final void setSubEquipmentId(final Long pSubEquipmentId) {
+    this.subEquipmentId = pSubEquipmentId;
+  }
+
+  @Override
   public final Comparable getMinValue() {
     return this.minValue;
   }
-  
+
   @Override
   public final Comparable getMaxValue() {
     return this.maxValue;
@@ -235,8 +254,8 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
   @Override
   public final DataTagAddress getAddress() {
     return this.address;
-  }  
-  
+  }
+
   @Override
   public final Timestamp getTimestamp() {
     if (sourceTimestamp != null) {
@@ -247,13 +266,13 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
       return getCacheTimestamp();
     }
   }
-  
+
   @Override
   public final Timestamp getSourceTimestamp() {
     return this.sourceTimestamp;
   }
 
-    
+
 //  public final String toString() {
 //    StringBuffer str = new StringBuffer("<DataTag ");
 //
@@ -303,7 +322,7 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
       this.daqTimestamp = daqTimestamp;
     } else {
       this.daqTimestamp.setTime(daqTimestamp.getTime());
-    } 
+    }
   }
 
   /**
@@ -318,7 +337,7 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
    * @param processId the processId to set
    */
   public void setProcessId(Long processId) {
-    this.processId = processId;   
+    this.processId = processId;
   }
 
   @Override
@@ -326,7 +345,7 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
     Set<Long> returnSet = new HashSet<Long>();
     if (equipmentId != null) {
       returnSet.add(equipmentId);
-    }   
+    }
     return returnSet;
   }
 
@@ -335,8 +354,16 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
     Set<Long> returnSet = new HashSet<Long>();
     if (processId != null) {
       returnSet.add(processId);
-    }    
+    }
+    return returnSet;
+  }
+
+  @Override
+  public Set<Long> getSubEquipmentIds() {
+    Set<Long> returnSet = new HashSet<Long>();
+    if (subEquipmentId != null) {
+      returnSet.add(subEquipmentId);
+    }
     return returnSet;
   }
 }
-  

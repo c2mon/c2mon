@@ -19,8 +19,8 @@ import cern.c2mon.shared.rule.RuleExpression;
  * @author Matthias Braeger
  */
 public final class TransferTagImpl extends TransferTagValueImpl implements TagUpdate {
-  
-  /** 
+
+  /**
    * Containing all process id's which are relevant to compute the
    * final quality status on the C2MON client layer. By definition there
    * is just one id defined. Only rules might have dependencies
@@ -28,8 +28,8 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    */
   @Size(min = 1)
   private final Collection<Long> processIds = new HashSet<Long>();
-  
-  /** 
+
+  /**
    * Containing all equipment id's which are relevant to compute the
    * final quality status on the C2MON client layer. By definition there
    * is just one id defined. Only rules might have dependencies
@@ -37,22 +37,31 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    */
   @Size(min = 1)
   private final Collection<Long> equipmentIds = new HashSet<Long>();
-  
+
   /**
-   * String representation of the JMS destination where 
+   * Containing all sub equipment id's which are relevant to compute the
+   * final quality status on the C2MON client layer. By definition there
+   * is just one id defined. Only rules might have dependencies
+   * to multiple equipments.
+   */
+  @Size(min = 0)
+  private final Collection<Long> subEquipmentIds = new HashSet<Long>();
+
+  /**
+   * String representation of the JMS destination where
    * <code>TransferTagValue</code> is published on change.
    */
   @NotNull
   private final String topicName;
-  
+
   /** The unique name of the tag */
   @NotNull
   private final String tagName;
-  
+
   /** Unit of the tag */
   private String unit = null;
-  
-  /** In case of a rule tag this field should not be null */ 
+
+  /** In case of a rule tag this field should not be null */
   private String ruleExpressionStr = null;
 
   /**
@@ -62,10 +71,10 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   private TransferTagImpl() {
     this(null, null, null, null, null, null, null, null, null, null, null);
   }
-  
+
   /**
    * Default Constructor
-   * 
+   *
    * @param pTagId The unique tag id
    * @param pTagValue The current value of the tag
    * @param pTagValueDescription The description of the current value
@@ -94,7 +103,7 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
     tagName = pTagName;
     topicName = pTopicName;
   }
-  
+
   /**
    * Adds the equipment id as dependency to this tag
    * @param equipmentId The equipment id
@@ -104,10 +113,10 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
     if (equipmentId != null && equipmentId > 0) {
       return equipmentIds.add(equipmentId);
     }
-    
+
     return false;
   }
-  
+
   /**
    * Adds all equipment id's of that list as dependency to this tag
    * @param equipmentIds List of equipment id's
@@ -117,7 +126,7 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
       addEquipmentId(equipmentId);
     }
   }
-  
+
   /**
    * @return A copy of the list of equipment id's
    */
@@ -125,7 +134,38 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   public Collection<Long> getEquipmentIds() {
     return new ArrayList<Long>(equipmentIds);
   }
-  
+
+  /**
+   * Adds the sub equipment id as dependency to this tag
+   * @param subEquipmentId The sub equipment id
+   * @return <code>true</code>, if the sub equipment id was added, else <code>false</code>
+   */
+  public boolean addSubEquipmentId(final Long subEquipmentId) {
+    if (subEquipmentId != null && subEquipmentId > 0) {
+      return subEquipmentIds.add(subEquipmentId);
+    }
+
+    return false;
+  }
+
+  /**
+   * Adds all sub equipment id's of that list as dependency to this tag
+   * @param subEquipmentIds List of sub equipment id's
+   */
+  public void addSubEquipmentIds(final Collection<Long> subEquipmentIds) {
+    for (Long subEquipmentId : subEquipmentIds) {
+      addSubEquipmentId(subEquipmentId);
+    }
+  }
+
+  /**
+   * @return A copy of the list of sub equipment id's
+   */
+  @Override
+  public Collection<Long> getSubEquipmentIds() {
+    return new ArrayList<Long>(subEquipmentIds);
+  }
+
   /**
    * Adds the process id as dependency to this tag
    * @param processId The process id
@@ -135,10 +175,10 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
     if (processId != null && processId > 0) {
       return processIds.add(processId);
     }
-    
+
     return false;
   }
-  
+
   /**
    * Adds all process id's of that list as dependency to this tag
    * @param processIds List of process id's
@@ -156,9 +196,9 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   public Collection<Long> getProcessIds() {
     return new ArrayList<Long>(processIds);
   }
-  
+
   /**
-   * @return A <code>String</code> representation of the JMS destination where the DataTag 
+   * @return A <code>String</code> representation of the JMS destination where the DataTag
    *         is published on change.
    */
   @Override
@@ -178,7 +218,7 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   public void setRuleExpression(final RuleExpression ruleExpression) {
     ruleExpressionStr = ruleExpression.getExpression();
   }
-  
+
   @Override
   public String getRuleExpression() {
     return ruleExpressionStr;
@@ -195,7 +235,7 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   public String getUnit() {
     return unit;
   }
-  
+
   /**
    * Deserialized the JSON string into a <code>TransferTag</code> object instance
    * @param json A JSON string representation of a <code>TransferTagImpl</code> class

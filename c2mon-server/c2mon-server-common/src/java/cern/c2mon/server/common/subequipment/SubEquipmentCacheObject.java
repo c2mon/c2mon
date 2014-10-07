@@ -1,5 +1,8 @@
 package cern.c2mon.server.common.subequipment;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
@@ -11,7 +14,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEnti
  * the server side. It extends the abstract class MonitoringEquipmentCacheObject. Notice that the handlerClassName
  * attribute will normally contain a dash, since this field does not make sense for a SubEquipment, but it is mandatory
  * for the database.
- * 
+ *
  * @author mruizgar
  */
 public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implements SubEquipment, Cacheable, Cloneable {
@@ -21,6 +24,11 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
      * The id of the subequipment's parent, to the equipment it is attached
      */
     private Long parentId;
+
+    /**
+     * Collection of ids for all the datatags attached to this sub equipment.
+     */
+    private LinkedList<Long> dataTagIds = new LinkedList<Long>();
 
     /**
      * Public default constructor (needed by iBatis).
@@ -46,13 +54,14 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
     /**
      * Clones the SubEquipment object.
      */
+    @Override
     public SubEquipmentCacheObject clone() {
         return (SubEquipmentCacheObject) super.clone();
     }
 
     /**
      * Creates a new SubEquipmentCacheObject containing the information provided within the parameters
-     * 
+     *
      * @param pId Identifier of the subequipment
      * @param pName Name of the subequipment
      * @param pDescription Description of the subequipment
@@ -91,4 +100,17 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
         return SupervisionEntity.SUBEQUIPMENT;
     }
 
+    /**
+     * Set the data tag IDs attached to this sub equipment.
+     *
+     * @param dataTagIds the tag IDs to add
+     */
+    public void setDataTagIds(Collection<Long> dataTagIds) {
+      this.dataTagIds = (LinkedList<Long>) dataTagIds;
+    }
+
+    @Override
+    public Collection<Long> getDataTagIds() {
+      return dataTagIds;
+    }
 }

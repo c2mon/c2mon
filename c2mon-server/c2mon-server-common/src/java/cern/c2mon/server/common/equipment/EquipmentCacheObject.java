@@ -17,7 +17,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEnti
 
 /**
  * Equipment cache object implementation.
- * 
+ *
  * @author Mark Brightwell
  */
 public class EquipmentCacheObject extends AbstractEquipmentCacheObject implements Equipment, Cloneable {
@@ -41,8 +41,7 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
     private LinkedList<Long> subEquipmentIds = new LinkedList<Long>();
 
     /**
-     * Collection of ids for all the datatags attached to this equipment (not control tags?) (recall subequipments have
-     * no datatags attached to them).
+     * Collection of ids for all the datatags attached to this equipment (not control tags?).
      */
     private LinkedList<Long> dataTagIds = new LinkedList<Long>();
 
@@ -54,16 +53,17 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
     /**
      * Clone method that can be used by the server core and other modules to obtain their own copy of the equipment
      * cache object.
-     * 
+     *
      * @return a clone of the equipment
      */
+    @Override
     @SuppressWarnings("unchecked")
     public EquipmentCacheObject clone() {
         EquipmentCacheObject equipmentCacheObject = (EquipmentCacheObject) super.clone();
         equipmentCacheObject.commandTagIds = (LinkedList<Long>) this.commandTagIds.clone();
         equipmentCacheObject.dataTagIds = (LinkedList<Long>) this.dataTagIds.clone();
         equipmentCacheObject.subEquipmentIds = (LinkedList<Long>) this.subEquipmentIds.clone();
-        
+
         return equipmentCacheObject;
     }
 
@@ -75,7 +75,7 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
 
     /**
      * Constructor (used in reconfiguration module).
-     * 
+     *
      * @param id the equipment id
      */
     public EquipmentCacheObject(final Long id) {
@@ -87,7 +87,7 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
      * circulating in the server.
      * <p>
      * Is used to construct fake cache objects (functionality not implemented so far)
-     * 
+     *
      * @param id
      * @param name
      * @param handlerClass
@@ -114,7 +114,7 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
 
     /**
      * Get the identifier of the DAQ process to which the equipment is attached.
-     * 
+     *
      * @return the identifier of the DAQ process to which the equipment is attached
      */
     @Override
@@ -164,7 +164,7 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
 
     /**
      * Setter methods
-     * 
+     *
      * @param commandTagIds the commandTagIds to set
      */
     public void setCommandTagIds(final Collection<Long> commandTagIds) {

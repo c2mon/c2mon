@@ -33,22 +33,22 @@ public class SubEquipmentMapperTest {
    */
   @Autowired
   private SubEquipmentMapper subEquipmentMapper;
-  
+
   @Autowired
   private EquipmentMapper equipmentMapper;
-  
+
   @Autowired
   private TestDataHelper testDataHelper;
-  
+
   private SubEquipmentCacheObject subEquipmentCacheObject;
-  
+
   @Before
   public void loadTestData() {
     testDataHelper.createTestData();
     testDataHelper.insertTestDataIntoDB();
     subEquipmentCacheObject = testDataHelper.getSubEquipment();
   }
-  
+
   /**
    * Tests the result set is none empty.
    */
@@ -57,7 +57,7 @@ public class SubEquipmentMapperTest {
     List<SubEquipment> returnList = subEquipmentMapper.getAll();
     assertTrue(returnList.size() > 0);
   }
-  
+
   @Test
   public void testRetrieve() {
 //    EquipmentCacheObject equipmentCacheObject = EquipmentMapperTest.createTestEquipment();
@@ -66,26 +66,27 @@ public class SubEquipmentMapperTest {
 //    subEquipmentMapper.insertSubEquipment(subEquipmentCacheObject);
     SubEquipmentCacheObject retrievedObject = (SubEquipmentCacheObject) subEquipmentMapper.getItem(subEquipmentCacheObject.getId());
     assertEquals(subEquipmentCacheObject.getId(), retrievedObject.getId());
-    assertEquals(subEquipmentCacheObject.getName(), retrievedObject.getName());    
+    assertEquals(subEquipmentCacheObject.getName(), retrievedObject.getName());
     assertEquals(subEquipmentCacheObject.getAliveInterval(), retrievedObject.getAliveInterval());
     assertEquals(subEquipmentCacheObject.getAliveTagId(), retrievedObject.getAliveTagId());
-    assertEquals(subEquipmentCacheObject.getCommFaultTagId(), retrievedObject.getCommFaultTagId());    
+    assertEquals(subEquipmentCacheObject.getCommFaultTagId(), retrievedObject.getCommFaultTagId());
     assertEquals(subEquipmentCacheObject.getStateTagId(), retrievedObject.getStateTagId());
     assertEquals(subEquipmentCacheObject.getHandlerClassName(), retrievedObject.getHandlerClassName());
-    assertEquals(subEquipmentCacheObject.getDescription(), retrievedObject.getDescription()); 
+    assertEquals(subEquipmentCacheObject.getDescription(), retrievedObject.getDescription());
     assertEquals(subEquipmentCacheObject.getParentId(), retrievedObject.getParentId());
     assertEquals(subEquipmentCacheObject.getStatusDescription(), retrievedObject.getStatusDescription());
     assertEquals(subEquipmentCacheObject.getStatusTime(), retrievedObject.getStatusTime());
     assertEquals(subEquipmentCacheObject.getSupervisionStatus(), retrievedObject.getSupervisionStatus());
+    assertEquals(subEquipmentCacheObject.getDataTagIds(), retrievedObject.getDataTagIds());
   }
-  
-  
+
+
   @Test
   public void testSelectSubEquipmentsByEquipment() {
     List<SubEquipment> subEquipmentList = subEquipmentMapper.selectSubEquipmentsByEquipment(subEquipmentCacheObject.getParentId());
     assertEquals(2, subEquipmentList.size());
   }
-  
+
   @Test
   public void testUpdateConfig() {
     assertEquals(new Long(5000300), subEquipmentCacheObject.getAliveTagId());
@@ -96,9 +97,9 @@ public class SubEquipmentMapperTest {
     SubEquipment updatedEquipment = subEquipmentMapper.getItem(subEquipmentCacheObject.getId());
     assertEquals(new Long(1251), updatedEquipment.getAliveTagId());
     assertEquals(new Long(1252), updatedEquipment.getCommFaultTagId());
-    assertEquals(new Long(1250), updatedEquipment.getStateTagId());      
+    assertEquals(new Long(1250), updatedEquipment.getStateTagId());
   }
-  
+
   /**
    * Tests the cache persistence method.
    */
@@ -106,31 +107,31 @@ public class SubEquipmentMapperTest {
   @DirtiesContext
   public void testUpdate() {
     assertFalse(subEquipmentCacheObject.getSupervisionStatus().equals(SupervisionStatus.RUNNING));
-    subEquipmentCacheObject.setSupervisionStatus(SupervisionStatus.RUNNING); 
+    subEquipmentCacheObject.setSupervisionStatus(SupervisionStatus.RUNNING);
     Timestamp ts = new Timestamp(System.currentTimeMillis() + 1000);
     subEquipmentCacheObject.setStatusDescription("New status description.");
     subEquipmentCacheObject.setStatusTime(ts);
     subEquipmentMapper.updateCacheable(subEquipmentCacheObject);
-    
+
     SubEquipmentCacheObject retrievedEquipment = (SubEquipmentCacheObject) subEquipmentMapper.getItem(subEquipmentCacheObject.getId());
     assertEquals(SupervisionStatus.RUNNING, retrievedEquipment.getSupervisionStatus());
     assertEquals(ts, retrievedEquipment.getStatusTime());
     assertEquals("New status description.", retrievedEquipment.getStatusDescription());
   }
-  
+
   @Test
   public void testIsInDB() {
     assertTrue(subEquipmentMapper.isInDb(250L));
   }
-  
+
   @Test
   public void testNotInDB() {
     assertFalse(subEquipmentMapper.isInDb(150L));
   }
-    
+
   @After
   public void cleanDatabase() {
     testDataHelper.removeTestData();
   }
-  
+
 }

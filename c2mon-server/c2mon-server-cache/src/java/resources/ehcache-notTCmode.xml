@@ -170,6 +170,15 @@
       transactionalMode="off"           
       memoryStoreEvictionPolicy="LFU"
     />
+    
+    <cache 
+      name="subEquipmentEventCache" 
+      eternal="true" 
+      maxElementsInMemory="50000"
+      statistics="true"  
+      transactionalMode="off"           
+      memoryStoreEvictionPolicy="LFU"
+    />
 <!-- ************************************* -->
 				
 <!--		overflowToDisk="false" 	-->

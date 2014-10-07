@@ -278,6 +278,40 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (20,'parent_equip_id','151');
 
+
+--create DataTag attached to SubEquipment
+insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
+  values (99,'create subequipment datatag', 'description', 'jusalmon', '?', sysdate);
+
+insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
+  values (99,99,'CREATE','DataTag','7000000');
+
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'name','subeq_test_datatag');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'description','test description subequipment datatag');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'dataType','Float');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'mode','2');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'isLogged','false');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'unit','config unit m/sec');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'valueDictionary','20=value_description');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'dipAddress','testConfigDIPaddress');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'japcAddress','testConfigJAPCaddress');
+--attach to subequipment from above
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'subEquipmentId','200');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'minValue','12.2');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'maxValue','23.3');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'address',
+        '<DataTagAddress>
+          <HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+           <opc-item-name>CW_TEMP_IN_COND5</opc-item-name>         
+          </HardwareAddress>        
+        </DataTagAddress>');
+
+--remove subequipment - should succeed
+insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
+  values (98,'remove subequipment w/datatag', 'remove subequipment 200', 'jusalmon', '?', sysdate);     
+insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
+  values (98,98,'REMOVE','SubEquipment','200');
+
 --remove subequipment - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (21,'remove subequipment', 'remove subequipment 250', 'mbrightw', '?', sysdate);     

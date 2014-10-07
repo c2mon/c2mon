@@ -54,7 +54,8 @@
                                                                   extends="abstractTagResultMap">                   
       <result property="sourceTimestamp" column="TAGTIMESTAMP" jdbcType="TIMESTAMP"/>
       <result property="daqTimestamp" column="DAQTIMESTAMP" jdbcType="TIMESTAMP"/>
-      <result property="equipmentId" column="TAG_EQID" jdbcType="NUMERIC"/>
+      <result property="equipmentId" column="EQUIPMENT_ID" jdbcType="NUMERIC"/>
+      <result property="subEquipmentId" column="SUBEQUIPMENT_ID" jdbcType="NUMERIC"/>
       <result property="processId" column="PROCID" jdbcType="NUMERIC"/>
       <result property="minValue" column="TAGMINVAL" javaType="java.lang.Comparable" jdbcType="BLOB"/>
       <result property="maxValue" column="TAGMAXVAL" javaType="java.lang.Comparable" jdbcType="BLOB"/>
@@ -73,16 +74,21 @@
     <!-- fill in with adapted SQL for datatags only -->
      SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
             TAGVALUE, TAGVALUEDESC, TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP,
-            TAGQUALITYDESC, TAG_EQID,
+            TAGQUALITYDESC,
+            TAG_EQID,
+            E1.EQID as EQUIPMENT_ID,
+            E2.EQID as SUBEQUIPMENT_ID,
             TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
             TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
      FROM DATATAG LEFT OUTER JOIN ALARM 
             ON ALARM_TAGID = TAGID
-          INNER JOIN EQUIPMENT
-            ON EQID = TAG_EQID
-          INNER JOIN PROCESS
-            ON PROCID = EQ_PROCID  
+          LEFT OUTER JOIN EQUIPMENT E1
+            ON E1.EQID = TAG_EQID AND E1.EQ_PARENT_ID IS NULL
+          LEFT OUTER JOIN EQUIPMENT E2
+            ON E2.EQID = TAG_EQID AND E2.EQ_PARENT_ID IS NOT NULL
+          LEFT OUTER JOIN PROCESS
+            ON PROCID = E1.EQ_PROCID
      WHERE TAGCONTROLTAG=0 
        AND TAGRULE IS NULL
     </select>
@@ -91,16 +97,21 @@
     <!-- fill in with adapted SQL for datatags only -->     
      SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
             TAGVALUE, TAGVALUEDESC, TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP,
-            TAGQUALITYDESC, TAG_EQID,
+            TAGQUALITYDESC,
+            TAG_EQID,
+            E1.EQID as EQUIPMENT_ID,
+            E2.EQID as SUBEQUIPMENT_ID,
             TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
             TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
             TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
      FROM DATATAG LEFT OUTER JOIN ALARM 
             ON ALARM_TAGID = TAGID
-          INNER JOIN EQUIPMENT
-            ON EQID = TAG_EQID
-          INNER JOIN PROCESS
-            ON PROCID = EQ_PROCID  
+          LEFT OUTER JOIN EQUIPMENT E1
+            ON E1.EQID = TAG_EQID AND E1.EQ_PARENT_ID IS NULL
+          LEFT OUTER JOIN EQUIPMENT E2
+            ON E2.EQID = TAG_EQID AND E2.EQ_PARENT_ID IS NOT NULL
+          LEFT OUTER JOIN PROCESS
+            ON PROCID = E1.EQ_PROCID
      WHERE TAGCONTROLTAG=0 
        AND TAGRULE IS NULL
        AND TAGID <![CDATA[ >= ]]> #{firstId}
@@ -108,21 +119,26 @@
     </select>
     
     <select id="getItem" resultMap="dataTagResultMap" parameterType="Long">
-		      SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
-		            TAGVALUE, TAGVALUEDESC, TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP,
-		            TAGQUALITYDESC, TAG_EQID,
-		            TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
-		            TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
-		            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
-		     FROM DATATAG LEFT OUTER JOIN ALARM 
-		            ON ALARM_TAGID = TAGID
-		          INNER JOIN EQUIPMENT
-		            ON EQID = TAG_EQID
-		          INNER JOIN PROCESS
-		            ON PROCID = EQ_PROCID  
-		     WHERE TAGCONTROLTAG=0 
-		       AND TAGRULE IS NULL      
-           AND TAGID=#{id}
+      SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
+            TAGVALUE, TAGVALUEDESC, TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP,
+            TAGQUALITYDESC,
+            TAG_EQID,
+            E1.EQID as EQUIPMENT_ID,
+            E2.EQID as SUBEQUIPMENT_ID,
+            TAGMINVAL, TAGMAXVAL, TAGUNIT, TAGSIMULATED, TAGLOGGED, 
+            TAGVALUEDICTIONARY, TAGADDRESS, TAGDIPADDRESS,
+            TAGJAPCADDRESS, TAGRULEIDS, ALARMID, PROCID
+     FROM DATATAG LEFT OUTER JOIN ALARM 
+            ON ALARM_TAGID = TAGID
+          LEFT OUTER JOIN EQUIPMENT E1
+            ON E1.EQID = TAG_EQID AND E1.EQ_PARENT_ID IS NULL
+          LEFT OUTER JOIN EQUIPMENT E2
+            ON E2.EQID = TAG_EQID AND E2.EQ_PARENT_ID IS NOT NULL
+          LEFT OUTER JOIN PROCESS
+            ON PROCID = E1.EQ_PROCID
+     WHERE TAGCONTROLTAG=0
+       AND TAGRULE IS NULL
+       AND TAGID=#{id}
     </select>
     
     <update id="updateCacheable" parameterType="cern.c2mon.server.common.datatag.DataTagCacheObject">
@@ -171,7 +187,15 @@
       VALUES (#{id},#{name},SUBSTR(#{description, jdbcType=VARCHAR}, 1, 100),#{mode},#{dataType},
               #{value,javaType=java.lang.Object,jdbcType=BLOB},SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
               #{sourceTimestamp, jdbcType=TIMESTAMP},#{daqTimestamp,jdbcType=TIMESTAMP},#{cacheTimestamp,jdbcType=TIMESTAMP},
-              SUBSTR(#{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR}, 1, 1000),#{equipmentId,jdbcType=NUMERIC},
+              SUBSTR(#{dataTagQuality,javaType=DataTagQuality,jdbcType=VARCHAR}, 1, 1000),
+              
+              <if test="equipmentId != null">
+                #{equipmentId,jdbcType=NUMERIC},
+              </if>
+              <if test="subEquipmentId != null">
+                #{subEquipmentId,jdbcType=NUMERIC},
+              </if>
+              
               #{minValue,javaType=java.lang.Comparable,jdbcType=BLOB},#{maxValue,javaType=java.lang.Comparable,jdbcType=BLOB},
               #{unit,jdbcType=VARCHAR},#{simulated,jdbcType=NUMERIC},#{logged,jdbcType=NUMERIC},
               #{valueDictionary,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},

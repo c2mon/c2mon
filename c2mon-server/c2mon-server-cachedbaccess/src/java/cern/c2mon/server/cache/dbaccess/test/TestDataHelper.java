@@ -24,7 +24,7 @@ import cern.c2mon.server.test.CacheObjectCreation;
 /**
  * Bean to be inserted into test classes for inserting the test data.
  * Instantiated in test xml.
- * 
+ *
  * @author mbrightw
  * @deprecated old helper class for inserting test data into DB; use instead TestDataInserter
  * @see cern.c2mon.server.test.TestDataInserter TestDataInserter
@@ -32,12 +32,12 @@ import cern.c2mon.server.test.CacheObjectCreation;
  */
 @Deprecated
 public class TestDataHelper {
-     
+
   //Mappers for inserting the data.
   @Autowired
   private DataTagMapper dataTagMapper;
   @Autowired
-  private ControlTagMapper controlTagMapper;  
+  private ControlTagMapper controlTagMapper;
   @Autowired
   private RuleTagMapper ruleTagMapper;
   @Autowired
@@ -50,7 +50,7 @@ public class TestDataHelper {
   private CommandTagMapper commandTagMapper;
   @Autowired
   private AlarmMapper alarmMapper;
-  
+
   //fields for test data
   private ControlTagCacheObject processAliveTag;
   private ProcessCacheObject process;
@@ -61,60 +61,66 @@ public class TestDataHelper {
   private ControlTagCacheObject subEquipmentAliveTag;
   private DataTagCacheObject dataTag;
   private DataTagCacheObject dataTag2;
+  private DataTagCacheObject dataTag3;
   private RuleTagCacheObject ruleTag;
   private CommandTagCacheObject commandTag;
   private AlarmCacheObject alarm1;
   private AlarmCacheObject alarm2;
   private AlarmCacheObject alarm3;
-  
+
   public void createTestData() {
-    processAliveTag = CacheObjectCreation.createTestProcessAlive();    
-    equipmentAliveTag = CacheObjectCreation.createTestEquipmentAlive();    
-    subEquipmentAliveTag = CacheObjectCreation.createTestSubEquipmentAlive();    
-    ruleTag = CacheObjectCreation.createTestRuleTag();    
-    process = CacheObjectCreation.createTestProcess1();    
-    equipment = CacheObjectCreation.createTestEquipment();  
+    processAliveTag = CacheObjectCreation.createTestProcessAlive();
+    equipmentAliveTag = CacheObjectCreation.createTestEquipmentAlive();
+    subEquipmentAliveTag = CacheObjectCreation.createTestSubEquipmentAlive();
+    ruleTag = CacheObjectCreation.createTestRuleTag();
+    process = CacheObjectCreation.createTestProcess1();
+    equipment = CacheObjectCreation.createTestEquipment();
     commandTag = CacheObjectCreation.createTestCommandTag();
     alarm1 = CacheObjectCreation.createTestAlarm1();
     alarm2 = CacheObjectCreation.createTestAlarm2();
     alarm3 = CacheObjectCreation.createTestAlarm3();
-    
+
     //add equipment to list in process
-    process.getEquipmentIds().add(equipment.getId());    
-    
-    subEquipment = CacheObjectCreation.createTestSubEquipment();  
+    process.getEquipmentIds().add(equipment.getId());
+
+    subEquipment = CacheObjectCreation.createTestSubEquipment();
     subEquipment2 = CacheObjectCreation.createTestSubEquipment2();
-    
+
     //add subequipment to list in equipment
-    equipment.getSubEquipmentIds().add(subEquipment.getId());    
+    equipment.getSubEquipmentIds().add(subEquipment.getId());
 
     dataTag = CacheObjectCreation.createTestDataTag();
     dataTag2 = CacheObjectCreation.createTestDataTag2();
+    dataTag3 = CacheObjectCreation.createTestDataTag3();
+    dataTag3.setEquipmentId(null);
+    dataTag3.setSubEquipmentId(subEquipment.getId());
+    subEquipment.getDataTagIds().add(dataTag3.getId());
 
-    //add rule to both datatags (only set from string when loaded from DB 
+    //add rule to both datatags (only set from string when loaded from DB
     // - notice the string is not coherently here, but is not used)
     dataTag.addRuleId(ruleTag.getId());
     dataTag2.addRuleId(ruleTag.getId());
-    
+
     //add datatag to list of tags of the equipment
     equipment.getDataTagIds().add(dataTag.getId());
-    
+
     alarm1.setDataTagId(dataTag.getId());
     alarm2.setDataTagId(dataTag.getId());
-    alarm3.setDataTagId(dataTag.getId());        
+    alarm3.setDataTagId(dataTag.getId());
   }
-  
-  public void insertTestDataIntoDB() {    
+
+  public void insertTestDataIntoDB() {
     controlTagMapper.insertControlTag(processAliveTag);
     controlTagMapper.insertControlTag(equipmentAliveTag);
     controlTagMapper.insertControlTag(subEquipmentAliveTag);
     ruleTagMapper.insertRuleTag(ruleTag);
     processMapper.insertProcess(process);
-    equipmentMapper.insertEquipment(equipment);  
-    subEquipmentMapper.insertSubEquipment(subEquipment); 
-    subEquipmentMapper.insertSubEquipment(subEquipment2);             
+    equipmentMapper.insertEquipment(equipment);
+    subEquipmentMapper.insertSubEquipment(subEquipment);
+    subEquipmentMapper.insertSubEquipment(subEquipment2);
     dataTagMapper.testInsertDataTag(dataTag);
     dataTagMapper.testInsertDataTag(dataTag2);
+    dataTagMapper.testInsertDataTag(dataTag3);
     commandTagMapper.insertCommandTag(commandTag);
     alarmMapper.insertAlarm(alarm1);
     alarmMapper.insertAlarm(alarm2);
@@ -123,15 +129,16 @@ public class TestDataHelper {
 
   /**
    * Removes all the test data from the database.
-   * Should always run whatever the status of the 
+   * Should always run whatever the status of the
    * DB if a test case fails (or hangs!).
    */
   public void removeTestData() {
-    createTestData(); //makes sure all ids are non-null, so method can be run to clean DB    
+    createTestData(); //makes sure all ids are non-null, so method can be run to clean DB
     alarmMapper.deleteAlarm(alarm2.getId());
     alarmMapper.deleteAlarm(alarm1.getId());
     alarmMapper.deleteAlarm(alarm3.getId());
-    dataTagMapper.deleteDataTag(dataTag2.getId());    
+    dataTagMapper.deleteDataTag(dataTag3.getId());
+    dataTagMapper.deleteDataTag(dataTag2.getId());
     if (dataTag != null) {
       dataTagMapper.deleteDataTag(dataTag.getId());
     }
@@ -162,7 +169,7 @@ public class TestDataHelper {
     if (processAliveTag != null) {
       controlTagMapper.deleteControlTag(processAliveTag.getId());
     }
-    
+
   }
 
   /**
@@ -229,6 +236,14 @@ public class TestDataHelper {
   }
 
   /**
+   * @return the dataTag3
+   */
+  public DataTagCacheObject getDataTag3() {
+    return dataTag3;
+  }
+
+
+  /**
    * Getter method
    * @return the CommandTag
    */
@@ -249,7 +264,7 @@ public class TestDataHelper {
   public AlarmCacheObject getAlarm2() {
     return alarm2;
   }
-  
+
   /**
    * @return the alarm3
    */
@@ -263,5 +278,5 @@ public class TestDataHelper {
   public SubEquipmentCacheObject getSubEquipment2() {
     return subEquipment2;
   }
-  
+
 }

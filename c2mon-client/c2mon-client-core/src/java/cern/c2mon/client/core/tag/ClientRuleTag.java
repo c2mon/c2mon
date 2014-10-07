@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2004 - 2011 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.client.core.tag;
@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
-import org.simpleframework.xml.Attribute;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -42,9 +41,9 @@ import cern.c2mon.shared.rule.RuleExpression;
 
 /**
  * This class represents a client rule object which subscribes itself to the
- * data tags used within the rule expression. Every time it receives an 
+ * data tags used within the rule expression. Every time it receives an
  * update message it recomputes the rule result and the overall quality.<br>
- * 
+ *
  * You can register a <code>ClientDataTagValueUpdateListener</code> to get
  * noticed when the value of or quality of this client rule changed.
  *
@@ -53,47 +52,47 @@ import cern.c2mon.shared.rule.RuleExpression;
 public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagValue {
   /** Log4j Logger for this class */
   private static final Logger LOG = Logger.getLogger(ClientRuleTag.class);
-  
+
   /** The rule expression of the client rule */
   private final RuleExpression rule;
-  
+
   /** The result type of the rule */
   private final Class<T> resultType;
-  
+
   /** Indicates when the client rule was evaluated for the last time */
   private Timestamp timestamp = null;
-  
+
   /** The quality of the client rule which is computed from all input tags */
-  private DataTagQuality ruleQuality = new DataTagQualityImpl(); 
+  private DataTagQuality ruleQuality = new DataTagQualityImpl();
 
   /** The rule result */
   private T ruleResult = null;
 
   /** Identifier for a ClientRuleTag */
   private Long id;
-  
+
   /** List of unique update listeners */
   private final List<DataTagUpdateListener> listeners = new ArrayList<DataTagUpdateListener>();;
-  
+
   /** The actual list of rule input values, that was received by onUpdate() method */
   private final Map<Long, ClientDataTagValue> ruleInputValues = new Hashtable<Long, ClientDataTagValue>();
-  
+
   /** Thread synchronization lock for the rule input Values map */
   private final ReentrantReadWriteLock ruleMapLock = new ReentrantReadWriteLock();
-  
+
   /** Thread synchronization lock for listeners list */
   private final ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
-  
+
   /** The name of the this rule tag */
   private String name = "UNKNOWN";
-  
+
   /** The computed rule mode */
   private TagMode ruleMode = TagMode.OPERATIONAL;
-  
+
   /** Default error message in case the Rule expression cannot be evaluated. */
   private final static String RULE_ERROR_MESSAGE = "Errors occurred while evaluating the Rule Expression.";
-  
-  /** 
+
+  /**
    * If on of the tags that is used to compute the rule is simulated, then
    * the <code>ClientRuleTag</code> itself is marked as simulated.
    */
@@ -104,33 +103,33 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
 
   /** The value description */
   private String valueDescription = "";
-  
+
   /** Empty collection */
   private static final Collection<Long> EMPTY_LONG_LIST = new ArrayList<Long>();
-  
-  /** 
+
+  /**
    * In case the rule expression could not be evaluated, an error message describing the problem.
-   * Null otherwise. 
+   * Null otherwise.
    */
   private String ruleError;
-  
-  /** 
+
+  /**
    * Empty alarm collection instance that is returned, if another class
    * wants to know whether there are alarms registered for this
    * <code>ClientDataTagValue</code> instance. By definition a client rule cannot
-   * have any related alarms. 
+   * have any related alarms.
    */
   private static final Collection<AlarmValue> EMPTY_ALARM_LIST = new ArrayList<AlarmValue>();
-  
+
   /**
    * Default Constructor<br>
    * Do not forget to unsubscribe from the input tags once you not need anymore
    * this <code>ClientRuleTag</code> instance.
-   * @param pRule The client rule expression 
+   * @param pRule The client rule expression
    * @param pResultType The result type of the rule expression
    * @see ClientRuleTag#unsubscribe()
    */
-  public ClientRuleTag(final RuleExpression pRule, Class<T> pResultType) { 
+  public ClientRuleTag(final RuleExpression pRule, Class<T> pResultType) {
     if (pRule == null || pResultType == null) {
       throw new NullPointerException("The arguments cannot be null");
     }
@@ -138,7 +137,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
     this.resultType = pResultType;
     this.id = new Long(-1);
   }
-  
+
   /**
    * Forces an evaluation of the ClientRuleTag and informs then all registered
    * listeners.
@@ -147,10 +146,10 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
     computeRuleResult();
     fireUpdateReceivedEvent();
   }
-  
+
   /**
    * @return Rule id: used to be -1 as a convention for all the ClientRuleTags.
-   * Default is still -1, but can now be any minus (-) value, 
+   * Default is still -1, but can now be any minus (-) value,
    * to differentiate between RuleTags.
    */
   @Override
@@ -160,23 +159,23 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
 
   /**
    * Use this method to set Id for the ClientRuleTag.
-   * 
+   *
    * Rule id used to be -1 as a convention for all the ClientRuleTags.
-   * 
-   * Default is still -1, but can now be any minus (-) value, 
+   *
+   * Default is still -1, but can now be any minus (-) value,
    * to differentiate between RuleTags.
-   * 
+   *
    * Client Rule Tag id's can only be a minus value.
    * Positive values are ignored.
    */
   public void setId(final Long id)  {
-    
+
     if (id >= 0) {
       return;
     }
     this.id = id;
   }
-  
+
   /**
    * @return the timestamp
    */
@@ -187,18 +186,18 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
     }
     return timestamp;
   }
-  
+
   /**
    * Check whether this DataTag is the result of a rule. Rules are internal TIM
    * tags as opposed to regular DataTags which are acquired from an external
    * source.
-   * @return true if the DataTag is the result of a rule. 
+   * @return true if the DataTag is the result of a rule.
    */
   @Override
   public boolean isRuleResult() {
     return true;
   }
-  
+
   /**
    * Returns DataTagQuality object of the client rule
    * @return the DataTagQuality object for this client rule.
@@ -207,7 +206,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public DataTagQuality getDataTagQuality() {
     return this.ruleQuality;
   }
-  
+
   /**
    * Get the RuleExpression associated with this class.
    * @return the RuleExpression associated with this class
@@ -216,7 +215,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public RuleExpression getRuleExpression() {
     return rule;
   }
-  
+
   /**
    * Returns the rule result. Value should be casted to the correct type
    * The tag type is available with the getType() method
@@ -227,7 +226,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public T getValue() {
     return ruleResult;
   }
-  
+
   /**
    * Returns the type of the tagValue attribute
    * @see #getValue
@@ -236,8 +235,8 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   @Override
   public final Class< T > getType() {
     return resultType;
-  } 
-  
+  }
+
   @Override
   public TypeNumeric getTypeNumeric() {
     Class< ? > type = getType();
@@ -249,10 +248,10 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
         }
       }
     }
-    
+
     return TypeNumeric.TYPE_UNKNOWN;
   }
-  
+
   /**
    * Evaluates the rule and the quality of the rule and sets a new timestamp
    */
@@ -296,7 +295,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
             this.ruleResult = rule.evaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           catch (RuleEvaluationException e) {
-            LOG.debug("computeRule() - \"" + rule.getExpression() 
+            LOG.debug("computeRule() - \"" + rule.getExpression()
                 + "\" is Invalid.", e);
 
             ruleError = null;
@@ -306,9 +305,9 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
           catch (Exception e) {
             this.ruleQuality.setInvalidStatus(TagQualityStatus.UNKNOWN_REASON, RULE_ERROR_MESSAGE);
             ruleError = e.getMessage();
-            LOG.debug("computeRule() - \"" + rule.getExpression() 
+            LOG.debug("computeRule() - \"" + rule.getExpression()
                 + "\" could not be evaluated.", e);
-            
+
             this.ruleResult = rule.forceEvaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
           }
           // Update the time stamp of the ClientRuleTag
@@ -320,26 +319,26 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
       }
     }
   }
-  
+
   /**
    * In case a ClientRule tag is Invalid, the invalidity can be a result of multiple
    * invalid Datatags that belong to the Client rule.
-   * 
+   *
    * @return an overall Datatag quality from all the Tags belonging to this rule
-   * 
+   *
    * IMPORTANT! ->
    * This should only be called if we know that the Rule is Invalid.
-   * 
+   *
    * This is because a rule can be VALID, even though it contains INVALID tags. In such a case
    * calling this method will give the wrong result..
-   * 
+   *
    * @see https://issues.cern.ch/browse/TIMS-833
    */
   private DataTagQuality getInvalidTagQuality() {
 
     DataTagQuality invalidRuleQuality = new DataTagQualityImpl();
     invalidRuleQuality.validate();
-    
+
     for (ClientDataTagValue inputValue : ruleInputValues.values()) {
       // Check, if value tag is valid or not
       if (!inputValue.isValid()) {
@@ -352,8 +351,8 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
     }
     return invalidRuleQuality;
   }
-  
-  
+
+
   /**
    * @return In case the rule expression could not be evaluated, the error message.
    * Returns null if the rule was evaluated without problems.
@@ -361,7 +360,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public String getRuleError() {
     return ruleError;
   }
-  
+
   /**
    * Sets the client rule tag name.
    * @param pName The name of the client rule tag
@@ -369,7 +368,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public void setName(final String pName) {
     this.name = pName;
   }
-  
+
   /**
    * Returns the rule tag name or <code>UNKNOWN</code>,
    * if not set explicitly.
@@ -380,7 +379,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public String getName() {
     return this.name;
   }
-  
+
   /**
    * Sets the client rule tag description
    * @param pDescription The description of the client rule
@@ -388,16 +387,16 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public void setDescription(final String pDescription) {
     this.description = pDescription;
   }
-  
+
   @Override
   public String getDescription() {
     if (this.description == null || this.description.equalsIgnoreCase("")) {
-      return "Client rule tag"; 
+      return "Client rule tag";
     }
-    
+
     return "Client rule tag: " + this.description;
   }
-  
+
   /**
    * Sets the value Description
    * @param pValueDescription the value description
@@ -405,7 +404,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public void setValueDescription(final String pValueDescription) {
     this.valueDescription = pValueDescription;
   }
-  
+
   @Override
   public String getValueDescription() {
     if (this.valueDescription == null || this.valueDescription.equalsIgnoreCase("")) {
@@ -433,7 +432,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
       listenersLock.writeLock().unlock();
     }
   }
-  
+
   @Override
   public void onUpdate(final ClientDataTagValue cdt) {
     ruleMapLock.writeLock().lock();
@@ -445,7 +444,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
     }
     forceUpdate();
   }
-  
+
   @Override
   public int hashCode() {
     return this.rule.hashCode();
@@ -463,10 +462,10 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
         return true;
       }
     }
-    
+
     return false;
   }
-  
+
   /**
    * Registers a <code>ClientDataTagValueUpdateListener</code> instance as
    * listener that will be informed when this <code>ClientRuleTag</code> gets
@@ -487,7 +486,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
           break;
         }
       }
-      
+
       if (!isRegistered) {
         retval = listeners.add(pListener);
       }
@@ -497,13 +496,13 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
     }
     return retval;
   }
-  
+
   /**
    * Removes a <code>ClientDataTagValueUpdateListener</code> instance from
    * listener that will be informed when this <code>ClientRuleTag</code> gets
    * updated.
    * @param listener Listener to be removed
-   * @return <code>true</code>, if the listener successfully removed from 
+   * @return <code>true</code>, if the listener successfully removed from
    *         the listeners list
    */
   public boolean removeClientDataTagUpdateListener(final DataTagUpdateListener listener) {
@@ -517,7 +516,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
     }
     return retval;
   }
-  
+
   /**
    * Private method to inform listeners about an update of this client rule
    */
@@ -544,6 +543,11 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   }
 
   @Override
+  public Collection<Long> getSubEquipmentIds() {
+    return EMPTY_LONG_LIST;
+  }
+
+  @Override
   public TagMode getMode() {
     return ruleMode;
   }
@@ -556,10 +560,10 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
   public Collection<Long> getProcessIds() {
     return EMPTY_LONG_LIST;
   }
-  
+
   /**
    * @return By definition the <code>ClientRuleTag</code> will always return
-   *         <code>null</code> as DAQ timestamp. 
+   *         <code>null</code> as DAQ timestamp.
    */
   @Override
   public Timestamp getDaqTimestamp() {
@@ -568,7 +572,7 @@ public class ClientRuleTag<T> implements DataTagUpdateListener, ClientDataTagVal
 
   /**
    * @return By definition the <code>ClientRuleTag</code> will always return
-   *         <code>null</code> as server timestamp. 
+   *         <code>null</code> as server timestamp.
    */
   @Override
   public Timestamp getServerTimestamp() {

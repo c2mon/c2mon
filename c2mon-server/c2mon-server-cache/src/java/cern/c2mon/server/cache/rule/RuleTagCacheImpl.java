@@ -26,7 +26,7 @@ import cern.c2mon.server.common.rule.RuleTag;
 
 /**
  * Implementation of the Rule cache.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -38,27 +38,27 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
    * Class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(RuleTagCacheImpl.class);
-  
+
   /**
    * DataTagCache for rule parent id loading.
    */
   private final DataTagCache dataTagCache;
 
   @Autowired
-  public RuleTagCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache, 
+  public RuleTagCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                           @Qualifier("ruleTagEhcache") final Ehcache ehcache,
-                          @Qualifier("ruleTagEhcacheLoader") final CacheLoader cacheLoader, 
+                          @Qualifier("ruleTagEhcacheLoader") final CacheLoader cacheLoader,
                           @Qualifier("ruleTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
                           @Qualifier("ruleTagLoaderDAO") final SimpleCacheLoaderDAO<RuleTag> cacheLoaderDAO,
-                          @Qualifier("dataTagCache") final DataTagCache dataTagCache) {    
+                          @Qualifier("dataTagCache") final DataTagCache dataTagCache) {
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO);
     this.dataTagCache = dataTagCache;
   }
 
   @PostConstruct
-  public void init() {    
+  public void init() {
     LOGGER.info("Initializing RuleTag cache...");
-    commonInit(); 
+    commonInit();
     LOGGER.info("... RuleTag cache initialization complete.");
   }
 
@@ -73,7 +73,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
   protected C2monCacheName getCacheName() {
     return C2monCacheName.RULETAG;
   }
-  
+
   @Override
   protected String getCacheInitializedKey() {
     return cacheInitializedKey;
@@ -81,9 +81,9 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
 
   /**
    * Sets the parent process and equipment fields for RuleTags.
-   * Please notice that the caller method should first make a write lock 
+   * Please notice that the caller method should first make a write lock
    * on the RuleTag reference.
-   * 
+   *
    * @param ruleTag the RuleTag for which the fields should be set
    */
   @Override
@@ -92,17 +92,21 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
     //sets for this ruleTag
     HashSet<Long> processIds = new HashSet<Long>();
     HashSet<Long> equipmentIds = new HashSet<Long>();
+    HashSet<Long> subEquipmentIds = new HashSet<Long>();
     int cnt = 0;
-    
-    LOGGER.trace(ruleTag.getId() + " Has "+ ruleTag.getRuleInputTagIds().size() + " input rule tags"); 
+
+    LOGGER.trace(ruleTag.getId() + " Has "+ ruleTag.getRuleInputTagIds().size() + " input rule tags");
     for (Long tagKey : ruleTag.getRuleInputTagIds()) {
-        
+
       cnt++;
       LOGGER.trace(ruleTag.getId() + " Trying to find rule input tag No#" + cnt + " with id=" + tagKey + " in caches.. ");
       if (dataTagCache.hasKey(tagKey)) {
         DataTag dataTag = dataTagCache.getCopy(tagKey);
         processIds.add(dataTag.getProcessId());
         equipmentIds.add(dataTag.getEquipmentId());
+        if (dataTag.getSubEquipmentId() != null) {
+          subEquipmentIds.add(dataTag.getSubEquipmentId());
+        }
       } else {
           this.acquireWriteLockOnKey(tagKey);
           try {
@@ -111,9 +115,10 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
               if (childRuleTag.getProcessIds().isEmpty()) {
                 setParentSupervisionIds(childRuleTag);
                 this.putQuiet(childRuleTag);
-              }          
+              }
               processIds.addAll(childRuleTag.getProcessIds());
-              equipmentIds.addAll(childRuleTag.getEquipmentIds());                
+              equipmentIds.addAll(childRuleTag.getEquipmentIds());
+              subEquipmentIds.addAll(childRuleTag.getSubEquipmentIds());
           } catch(CacheElementNotFoundException cenfe) {
               throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
                       + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)", cenfe);
@@ -121,12 +126,14 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
             this.releaseWriteLockOnKey(tagKey);
           }
       }
-            
+
     }
-    LOGGER.debug("setParentSupervisionIds() - Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds);
+    LOGGER.debug("setParentSupervisionIds() - Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds
+        + "; subequipmnet ids: " + subEquipmentIds);
     ruleTag.setProcessIds(processIds);
     ruleTag.setEquipmentIds(equipmentIds);
-  } 
-  
+    ruleTag.setSubEquipmentIds(subEquipmentIds);
+  }
+
 
 }
