@@ -30,7 +30,7 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
  * EquipmentMessageHandler which is responsible for determining accessibility of a computer.
  */
-public class PingMessageHandler extends EquipmentMessageHandler implements Runnable, IDataTagChanger,
+public class PingMessageHandler extends EquipmentMessageHandler implements IDataTagChanger,
         IEquipmentConfigurationChanger {
 
     /*
@@ -68,14 +68,12 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     /**
      * @param pollingTime
      */
-    void startPingTask(final ISourceDataTag tag, final Target target, final int pollingTime) {
+    synchronized void startPingTask(final ISourceDataTag tag, final Target target, final int pollingTime) {
         if (logger.isTraceEnabled())
             logger.trace(format("entering startPingTask(%d,%s, %d)..", tag.getId(), target.getHostname(), pollingTime));
 
-        synchronized (scheduledFutures) {
-            scheduledFutures.putIfAbsent(tag.getId(), executor.scheduleAtFixedRate(new PingTask(this, tag, target),
-                    new Random(System.currentTimeMillis()).nextInt(2000), pollingTime * 1000, TimeUnit.MILLISECONDS));
-        }
+        scheduledFutures.putIfAbsent(tag.getId(), executor.scheduleAtFixedRate(new PingTask(this, tag, target),
+                new Random(System.currentTimeMillis()).nextInt(2000), pollingTime * 1000, TimeUnit.MILLISECONDS));
 
         logger.trace("leaving startPingTask()");
     }
@@ -85,20 +83,16 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
      * 
      * @param tagId
      */
-    void stopPingTask(final Long tagId) {
+    synchronized void stopPingTask(final Long tagId) {
         if (logger.isTraceEnabled())
             logger.trace(format("entering stopPingTask(%d)..", tagId));
 
-        synchronized (scheduledFutures) {
-            if (scheduledFutures.containsKey(tagId)) {
-                ScheduledFuture<?> sf = scheduledFutures.get(tagId);
-                if (sf != null) {
-                    sf.cancel(true);
-                }
-
-                scheduledFutures.remove(tagId);
-            }// if
+        ScheduledFuture<?> sf = scheduledFutures.get(tagId);
+        if (sf != null) {
+            sf.cancel(true);
+            scheduledFutures.remove(tagId);
         }
+
         logger.trace("leaving stopPingTask()");
     }
 
@@ -114,28 +108,20 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
         // set equipment configuration changer
         getEquipmentConfigurationHandler().setEquipmentConfigurationChanger(this);
 
-        // create initialization thread
-        initThread = new Thread(this);
-
-        // start the initialization thread
-        initThread.start();
-
-        logger.debug("leaving connectToDataSource()");
-    }
-
-    @Override
-    public void run() {
-
         getEquipmentMessageSender().confirmEquipmentStateOK();
 
+        // submit initialization task for execution
         for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
             try {
                 registerTag(tag);
             } catch (TagOperationException e) {
-                // nothing to be done here - tag is invalidated inside the registerTag() method
-                // problem is also logged inside the method
+                // nothing to be done here - if TagOperation is caught, the tag will be invalidated from inside the
+                // registerTag() method
+                // The problem is also logged inside the method.
             }
-        }
+        }// for
+
+        logger.debug("leaving connectToDataSource()");
     }
 
     @Override
@@ -144,23 +130,21 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
 
         // synchronized, because when the handler is removed we need to assure all tags are unregistered
         // at once - this operation must be atomic
-        synchronized (scheduledFutures) {
-            // stop all ping tasks for that handler
-            for (ISourceDataTag sdt : getEquipmentConfiguration().getSourceDataTags().values()) {
-                this.stopPingTask(sdt.getId());
-            }
+        // stop all ping tasks for that handler
+        for (ISourceDataTag sdt : getEquipmentConfiguration().getSourceDataTags().values()) {
+            this.stopPingTask(sdt.getId());
         }
 
         logger.debug("leaving diconnectFromDataSource()");
     }
 
     @Override
-    public synchronized void refreshAllDataTags() {
+    public void refreshAllDataTags() {
         // not implemented
     }
 
     @Override
-    public synchronized void refreshDataTag(long dataTagId) {
+    public void refreshDataTag(long dataTagId) {
         // not implemented
     }
 
@@ -234,18 +218,10 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     }
 
     boolean isTagPollerRegistered(final long tagId) {
-        boolean result = false;
-
-        synchronized (scheduledFutures) {
-            if (scheduledFutures.containsKey(tagId)) {
-                result = true;
-            }
-        }
-
-        return result;
+        return scheduledFutures.containsKey(tagId);
     }
 
-    void registerTag(ISourceDataTag tag) throws TagOperationException {
+    synchronized void registerTag(ISourceDataTag tag) throws TagOperationException {
         if (logger.isTraceEnabled())
             logger.trace(format("entering registerTag(%d)", tag.getId()));
 
@@ -277,7 +253,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
 
     }
 
-    void unregisterTag(ISourceDataTag tag) throws TagOperationException {
+    synchronized void unregisterTag(ISourceDataTag tag) throws TagOperationException {
         if (logger.isTraceEnabled())
             logger.trace(format("entering unregisterTag(%d)", tag.getId()));
 
