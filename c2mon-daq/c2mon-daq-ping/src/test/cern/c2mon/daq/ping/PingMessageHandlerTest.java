@@ -232,21 +232,18 @@ public class PingMessageHandlerTest extends GenericMessageHandlerTst {
                 try {
 
                     EVENT e = eventsQueue.take();
-                    System.out.println(e);
-
-                    newTag.getId();
 
                     switch (e) {
                     case REGISTER:
 
-                        // no need of synchronization of the list - there's only 1 thread operating on it
+                        // no need of synchronized list as there's only 1 thread operating on it
                         reports1.add(configurationController.onDataTagAdd(new DataTagAdd(1L, equipmentConfiguration
                                 .getId(), newTag)));
                         break;
 
                     case UNREGISTER:
 
-                        // no need of synchronization of the list - there's only 1 thread operating on it
+                        // no need of synchronized list as there's only 1 thread operating on it
                         reports2.add(configurationController.onDataTagRemove(new DataTagRemove(1L, newTag.getId(),
                                 equipmentConfiguration.getId())));
                         break;
@@ -264,7 +261,7 @@ public class PingMessageHandlerTest extends GenericMessageHandlerTst {
             pool.submit(new Job());
         }
 
-        pool.awaitTermination(4000, TimeUnit.MILLISECONDS);
+        pool.awaitTermination(3000, TimeUnit.MILLISECONDS);
         pool.shutdown();
 
         verify(messageSender);

@@ -131,9 +131,9 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
         for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
             try {
                 registerTag(tag);
-            } catch (TagOperationException ex) {
-                getEquipmentLogger().error(ex.getMessage());
-                getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.DATA_UNAVAILABLE, ex.getMessage());
+            } catch (TagOperationException e) {
+                // nothing to be done here - tag is invalidated inside the registerTag() method
+                // problem is also logged inside the method
             }
         }
     }
@@ -142,24 +142,26 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     public synchronized void disconnectFromDataSource() throws EqIOException {
         logger.debug("entering diconnectFromDataSource()..");
 
+        // synchronized, because when the handler is removed we need to assure all tags are unregistered
+        // at once - this operation must be atomic
         synchronized (scheduledFutures) {
             // stop all ping tasks for that handler
             for (ISourceDataTag sdt : getEquipmentConfiguration().getSourceDataTags().values()) {
                 this.stopPingTask(sdt.getId());
             }
         }
+
         logger.debug("leaving diconnectFromDataSource()");
     }
 
     @Override
     public synchronized void refreshAllDataTags() {
-        // TODO Auto-generated method stub
+        // not implemented
     }
 
     @Override
-    public synchronized void refreshDataTag(@SuppressWarnings("unused") long dataTagId) {
-        // TODO Auto-generated method stub
-
+    public synchronized void refreshDataTag(long dataTagId) {
+        // not implemented
     }
 
     @Override
@@ -263,7 +265,9 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
 
         } catch (Exception ex) {
             String err = format("Unable to register tag: %d. Problem description: %s", tag.getId(), ex.getMessage());
+            logger.warn(err);
             getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, err);
+            throw new TagOperationException(err);
         }
 
         finally {
@@ -300,9 +304,8 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     }
 
     @Override
-    public synchronized void onUpdateEquipmentConfiguration(
-            @SuppressWarnings("unused") IEquipmentConfiguration equipmentConfiguration,
-            @SuppressWarnings("unused") IEquipmentConfiguration oldEquipmentConfiguration, ChangeReport changeReport) {
+    public synchronized void onUpdateEquipmentConfiguration(IEquipmentConfiguration equipmentConfiguration,
+            IEquipmentConfiguration oldEquipmentConfiguration, ChangeReport changeReport) {
 
         logger.debug("entering onUpdateEquipmentConfiguration()..");
 
