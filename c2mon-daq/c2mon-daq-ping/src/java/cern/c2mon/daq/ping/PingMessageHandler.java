@@ -51,11 +51,6 @@ public class PingMessageHandler extends EquipmentMessageHandler implements IData
     private static ConcurrentMap<Long, ScheduledFuture<?>> scheduledFutures = new ConcurrentHashMap<Long, ScheduledFuture<?>>();
 
     /**
-     * reference to the initialization thread
-     */
-    private Thread initThread;
-
-    /**
      * default constructor
      */
     public PingMessageHandler() {
