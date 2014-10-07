@@ -142,11 +142,12 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     public synchronized void disconnectFromDataSource() throws EqIOException {
         logger.debug("entering diconnectFromDataSource()..");
 
-        // stop all ping tasks for that handler
-        for (ISourceDataTag sdt : getEquipmentConfiguration().getSourceDataTags().values()) {
-            this.stopPingTask(sdt.getId());
+        synchronized (scheduledFutures) {
+            // stop all ping tasks for that handler
+            for (ISourceDataTag sdt : getEquipmentConfiguration().getSourceDataTags().values()) {
+                this.stopPingTask(sdt.getId());
+            }
         }
-
         logger.debug("leaving diconnectFromDataSource()");
     }
 
@@ -231,11 +232,11 @@ public class PingMessageHandler extends EquipmentMessageHandler implements Runna
     }
 
     boolean isTagPollerRegistered(final long tagId) {
-        boolean result = true;
+        boolean result = false;
 
         synchronized (scheduledFutures) {
-            if (!scheduledFutures.containsKey(tagId)) {
-                result = false;
+            if (scheduledFutures.containsKey(tagId)) {
+                result = true;
             }
         }
 
