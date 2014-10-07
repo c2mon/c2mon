@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2004 - 2011 CERN This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.client.ext.history.tag;
@@ -30,9 +30,11 @@ import org.apache.log4j.Logger;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
+import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.ext.history.common.tag.HistoryTag;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagConfiguration;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagExpressionException;
+import cern.c2mon.client.ext.history.common.tag.HistoryTagManager;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagParameter;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagRecord;
 import cern.c2mon.client.ext.history.common.tag.HistoryTagResultType;
@@ -48,64 +50,64 @@ import cern.c2mon.shared.rule.RuleExpression;
  * <br/>
  * After a history tag is created it must be subscribed for data tag updates,
  * and for history data.
- * 
+ *
  * @see HistoryTagManager#subscribe(HistoryTagImpl)
  * @see C2monTagManager#subscribeDataTags(java.util.Set, DataTagUpdateListener)
- * 
+ *
  * @author vdeila
  */
 public class HistoryTagImpl implements HistoryTag {
 
   /** Log4j Logger for this class */
   private static final Logger LOG = Logger.getLogger(HistoryTagImpl.class);
-  
+
   /** The data which is shown to the user. */
   private ArrayList<HistoryTagRecord> data = null;
-  
+
   /** Lock for {@link #data} */
   private final ReentrantReadWriteLock dataLock = new ReentrantReadWriteLock();
-  
+
   /** The current value. <code>null</code> if it needs to be recalculated */
   private Object value;
-  
+
   /** The list of update listeners */
   private List<DataTagUpdateListener> dataTagUpdateListeners;
 
   /** The quality of the history tag */
   private DataTagQuality dataTagQuality;
-  
+
   /** The history mode */
   private TagMode historyMode = TagMode.OPERATIONAL;
-  
+
   /** The tag name */
   private String name = "UNKNOWN";
-  
+
   /** Indicates when the history data was updated for the last time */
   private Timestamp timestamp;
-  
+
   /** The history tag configuration for this history tag */
   private final HistoryTagConfiguration configuration;
-  
+
   /** The expression that defines what data to show to the user */
   private final String expression;
-  
+
   /** The class that extracts the data that is returned through {@link #getValue()} */
   private final HistoryTagRecordConverter dataConverter;
 
   /** The last time the value were calculated (using {@link System#currentTimeMillis()}) */
   private long lastCalculatedTime = 0;
-  
+
   /** Lock for {@link #value} and {@link #lastCalculatedTime} */
   private final ReentrantReadWriteLock valueLock = new ReentrantReadWriteLock();
-  
+
   /**
    * The history tag must be subscribed for data tag updates, and for history
    * data.
-   * 
+   *
    * @see HistoryTagManager#subscribe(HistoryTagImpl)
    * @see C2monTagManager#subscribeDataTags(java.util.Set,
    *      DataTagUpdateListener)
-   * 
+   *
    * @param expression
    *          an expression created with the
    *          {@link HistoryTagConfiguration#createExpression()}
@@ -113,11 +115,11 @@ public class HistoryTagImpl implements HistoryTag {
   public HistoryTagImpl(final String expression) {
     this(createHistoryTagConfiguration(expression), expression, true);
   }
-  
+
   /**
    * The history tag must be subscribed for data tag updates, and for history
    * data.
-   * 
+   *
    * @see HistoryTagManager#subscribe(HistoryTagImpl)
    * @see C2monTagManager#subscribeDataTags(java.util.Set,
    *      DataTagUpdateListener)
@@ -129,7 +131,7 @@ public class HistoryTagImpl implements HistoryTag {
   public HistoryTagImpl(final String expression, final boolean allowNullValues) {
     this(createHistoryTagConfiguration(expression), expression, allowNullValues);
   }
-  
+
   /**
    * @param historyTagConfiguration
    *          the configuration to use for the history tag
@@ -148,7 +150,7 @@ public class HistoryTagImpl implements HistoryTag {
    */
   public HistoryTagImpl(final HistoryTagConfiguration historyTagConfiguration, final String expression
        , final boolean allowNullValues) {
-    
+
     this.dataTagUpdateListeners = new ArrayList<DataTagUpdateListener>();
     this.data = null;
     this.value = null;
@@ -156,7 +158,7 @@ public class HistoryTagImpl implements HistoryTag {
     this.dataTagQuality = new DataTagQualityImpl();
     this.dataTagQuality.validate();
     this.dataConverter = new HistoryTagRecordConverter(this, allowNullValues);
-    
+
     if (expression == null && historyTagConfiguration != null) {
       String generatedExpression;
       try {
@@ -170,14 +172,14 @@ public class HistoryTagImpl implements HistoryTag {
     else {
       this.expression = expression;
     }
-    
+
     // Check that the configuration is valid
-    if (historyTagConfiguration != null 
+    if (historyTagConfiguration != null
         && historyTagConfiguration.validate()) {
-      
-      // The data is set to invalid, as it is not yet loaded. 
+
+      // The data is set to invalid, as it is not yet loaded.
       this.dataTagQuality.addInvalidStatus(QUALITY_STATUS_LOADING, "Loading data");
-      
+
       this.configuration = historyTagConfiguration;
     }
     else {
@@ -186,8 +188,8 @@ public class HistoryTagImpl implements HistoryTag {
       this.dataTagQuality.addInvalidStatus(QUALITY_STATUS_EXPRESSION_ERROR, "The expression is invalid");
     }
   }
-  
-  
+
+
   /**
    * @param expression
    *          the expression to create a configuration from
@@ -204,7 +206,7 @@ public class HistoryTagImpl implements HistoryTag {
     }
     return null;
   }
-  
+
   @Override
   public void onCancelled(final HistoryTagConfiguration filter) {
     // Loading the data from history failed or was canceled. Invalidating the tag.
@@ -216,7 +218,7 @@ public class HistoryTagImpl implements HistoryTag {
     try {
       this.data = null;
       this.timestamp = new Timestamp(System.currentTimeMillis());
-      
+
       this.valueLock.writeLock().lock();
       try {
         this.value = null;
@@ -233,16 +235,16 @@ public class HistoryTagImpl implements HistoryTag {
 
   @Override
   public void onLoaded(final HistoryTagConfiguration filter, final Collection<HistoryTagRecord> data) {
-    // The data was succsessfully loaded from the database 
+    // The data was succsessfully loaded from the database
     synchronized (this.dataTagQuality) {
       this.dataTagQuality.validate();
     }
-    
+
     this.dataLock.writeLock().lock();
     try {
       this.data = new ArrayList<HistoryTagRecord>(data);
       this.timestamp = new Timestamp(System.currentTimeMillis());
-      
+
       this.valueLock.writeLock().lock();
       try {
         this.value = null;
@@ -256,7 +258,7 @@ public class HistoryTagImpl implements HistoryTag {
     }
     fireDataTagUpdateListeners();
   }
-  
+
   @Override
   public void onUpdate(final ClientDataTagValue tagUpdate) {
     // When a new tag update comes from the c2mon server.
@@ -278,7 +280,7 @@ public class HistoryTagImpl implements HistoryTag {
           }
         }
         this.timestamp = new Timestamp(System.currentTimeMillis());
-        
+
         this.valueLock.writeLock().lock();
         try {
           value = null;
@@ -293,10 +295,11 @@ public class HistoryTagImpl implements HistoryTag {
     }
     fireDataTagUpdateListeners();
   }
-  
+
   /**
    * @return the tag ids that is used by the history tag.
    */
+  @Override
   public Collection<Long> getTagIds() {
     if (this.configuration != null) {
       return Arrays.asList(this.configuration.getTagId());
@@ -305,7 +308,7 @@ public class HistoryTagImpl implements HistoryTag {
       return Collections.emptyList();
     }
   }
-  
+
   @Override
   public Collection<HistoryTagRecord> getCurrentData(final HistoryTagConfiguration configuration) {
     this.dataLock.readLock().lock();
@@ -321,7 +324,7 @@ public class HistoryTagImpl implements HistoryTag {
       this.dataLock.readLock().unlock();
     }
   }
-  
+
   @Override
   public Object getValue() {
     Object result;
@@ -337,11 +340,11 @@ public class HistoryTagImpl implements HistoryTag {
     }
     return result;
   }
-  
+
   /**
    * Recalculates the value based on {@link #configuration} and the
    * {@link #data} using {@link HistoryTagRecordConverter#convert(Collection)}
-   * 
+   *
    * @return the updates {@link #value}
    */
   private Object recalculateValue() {
@@ -349,7 +352,7 @@ public class HistoryTagImpl implements HistoryTag {
       // The time of when the calculation started
       final long dataTime = System.currentTimeMillis();
       final Object newValue = this.dataConverter.convert();
-      
+
       this.valueLock.writeLock().lock();
       try {
         if (this.lastCalculatedTime < dataTime) {
@@ -360,19 +363,19 @@ public class HistoryTagImpl implements HistoryTag {
       finally {
         this.valueLock.writeLock().unlock();
       }
-      
+
       return newValue;
     }
     else {
       return null;
     }
   }
-  
+
   @Override
   public DataTagQuality getDataTagQuality() {
     return dataTagQuality;
   }
-  
+
   @Override
   public Long getId() {
     return -1L;
@@ -395,6 +398,11 @@ public class HistoryTagImpl implements HistoryTag {
 
   @Override
   public Collection<Long> getEquipmentIds() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public Collection<Long> getSubEquipmentIds() {
     return Collections.emptyList();
   }
 
@@ -422,7 +430,7 @@ public class HistoryTagImpl implements HistoryTag {
   public Timestamp getServerTimestamp() {
     return null;
   }
-  
+
   @Override
   public Timestamp getDaqTimestamp() {
     return null;
@@ -485,8 +493,8 @@ public class HistoryTagImpl implements HistoryTag {
   public boolean isValid() {
     return this.dataTagQuality.isValid();
   }
-  
-  /** 
+
+  /**
    * @param listener the listener to add
    */
   @Override
@@ -494,7 +502,7 @@ public class HistoryTagImpl implements HistoryTag {
     dataTagUpdateListeners.add(listener);
     listener.onUpdate(this);
   }
-  
+
   /**
    * @param listener the listener to remove
    */
@@ -502,21 +510,21 @@ public class HistoryTagImpl implements HistoryTag {
   public synchronized void removeDataTagUpdateListener(final DataTagUpdateListener listener) {
     dataTagUpdateListeners.remove(listener);
   }
-  
+
   /**
    * @return a copy of the list of listeners
    */
   public synchronized Collection<DataTagUpdateListener> getDataTagUpdateListeners() {
    return new ArrayList<DataTagUpdateListener>(this.dataTagUpdateListeners);
   }
-  
+
   /**
    * Removes all listeners.
    */
   public synchronized void removeDataTagUpdateListeners() {
     this.dataTagUpdateListeners.clear();
   }
-  
+
   /**
    * Fires the {@link DataTagUpdateListener#onUpdate(ClientDataTagValue)} on all the listeners
    */

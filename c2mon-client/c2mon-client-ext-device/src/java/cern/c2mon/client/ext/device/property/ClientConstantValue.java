@@ -129,6 +129,11 @@ public class ClientConstantValue<T> implements ClientDataTagValue {
   }
 
   @Override
+  public Collection<Long> getSubEquipmentIds() {
+    return null;
+  }
+
+  @Override
   public Collection<Long> getProcessIds() {
     return null;
   }
