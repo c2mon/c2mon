@@ -80,6 +80,12 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     private final Hashtable<Long, Boolean> subEqCommFaultValues = new Hashtable<Long, Boolean>();
 
     /**
+     * A collection of aliveTagId -> aliveTagInterval pairs, corresponding each pair to one of the subequipments
+     * attached to this equipment
+     */
+    private final Hashtable<Long, Long> subEqAliveValues = new Hashtable<>();
+
+    /**
      * The source data tags of this equipment configuration.
      */
     private final Map<Long, SourceDataTag> sourceDataTags = new ConcurrentHashMap<Long, SourceDataTag>();
@@ -97,7 +103,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method encodes the equipment configuration object into XML
-     * 
+     *
      * @return String Not yet implemented.
      */
     public String encode2XML() {
@@ -106,7 +112,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method sets the Equipment identifier
-     * 
+     *
      * @param id Equipment id
      */
     public void setId(final long id) {
@@ -115,16 +121,17 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method gets the Equipment identifier
-     * 
+     *
      * @return long
      */
+    @Override
     public long getId() {
         return id;
     }
 
     /**
      * This method sets the Equipment's CommFaultTag identifier
-     * 
+     *
      * @param id CommFaultTag id
      */
     public void setCommFaultTagId(final long id) {
@@ -133,7 +140,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * Sets the id of the alive tag.
-     * 
+     *
      * @param id The new id of the alive tag.
      */
     public void setAliveTagId(final long id) {
@@ -142,7 +149,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * Returns the id of the alive tag.
-     * 
+     *
      * @return The id of the alive tag.
      */
     @Override
@@ -152,7 +159,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * Sets the alive tag interval of this equipment.
-     * 
+     *
      * @param interval The new alive tag interval.
      */
     public void setAliveTagInterval(final long interval) {
@@ -161,7 +168,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * Returns the alive tag interval.
-     * 
+     *
      * @return The alive tag interval of this equipment.
      */
     @Override
@@ -171,7 +178,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method sets the Equipment's CommFaultTag identifier
-     * 
+     *
      * @return The communication fault tag id.
      */
     public long getCommFaultTagId() {
@@ -180,7 +187,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method sets the Equipment unit's name
-     * 
+     *
      * @param name Equipment Unit's name
      */
     public void setName(final String name) {
@@ -189,16 +196,17 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method gets the Equipment Unit's name.
-     * 
+     *
      * @return The name of this equipment unit.
      */
+    @Override
     public String getName() {
         return name;
     }
 
     /**
      * This method sets the Equipment unit's supervising handler class name
-     * 
+     *
      * @param className the supervising handler class name
      */
     public void setHandlerClassName(final String className) {
@@ -207,7 +215,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method gets the Equipment unit's name
-     * 
+     *
      * @return The class name of the handler implementation.
      */
     public String getHandlerClassName() {
@@ -216,7 +224,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method sets the Equipment unit's CommFaultTag value
-     * 
+     *
      * @param value new CommFaultTag value
      */
     public void setCommFaultTagValue(final boolean value) {
@@ -225,7 +233,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method gets the Equipment unit's CommFaultTag value
-     * 
+     *
      * @return The value to send if there was an communication fault.
      */
     public Boolean getCommFaultTagValue() {
@@ -234,7 +242,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method sets the Equipment unit's address
-     * 
+     *
      * @deprecated this method is kept for backward compatibility reasons. For new development please use method
      *             {@link #setEquipmentAddress(String)}
      * @param addr equipment's address
@@ -250,11 +258,12 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * This method sets the Equipment unit's address
-     * 
+     *
      * @deprecated this method is kept for backward compatibility reasons. For new development please use method
      *             {@link #getEquipmentAddress()}
      * @return The address of this equipment. (key value pairs separated with ';')
      */
+    @Override
     @Deprecated
     public String getAddress() {
         return equipmentAddress;
@@ -266,20 +275,22 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * Checks if this equipment configuration contains the source data tag with the provided id.
-     * 
+     *
      * @param tagID The tag id to check.
      * @return True if the source data tag is part of this equipment unit else false.
      */
+    @Override
     public boolean hasSourceDataTag(final Long tagID) {
         return sourceDataTags.get(tagID) != null;
     }
 
     /**
      * Checks if this equipment configuration contains the command tag with the provided id.
-     * 
+     *
      * @param tagID The tag id to check.
      * @return True if the command tag is part of this equipment unit else false.
      */
+    @Override
     public boolean hasSourceCommandTag(final Long tagID) {
         return sourceCommandTags.get(tagID) != null;
     }
@@ -287,18 +298,31 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     /**
      * Returns the live map of sub equipment commFault keys and values. All changes will (add/remove...) be made to the
      * real map. It is never null.
-     * 
+     *
      * @return The live map of sub equipment commFault keys and values.
      */
+    @Override
     public Hashtable<Long, Boolean> getSubEqCommFaultValues() {
         return subEqCommFaultValues;
     }
 
     /**
+     * Returns the live map of sub equipment alive tag keys and values. All changes will (add/remove...) be made to the
+     * real map. It is never null.
+     *
+     * @return The live map of sub equipment alive tag keys and values.
+     */
+    @Override
+    public Hashtable<Long, Long> getSubEqAliveValues() {
+        return subEqAliveValues;
+    }
+
+    /**
      * Returns a copy of the map of data tags. Adding tags to this map will not affect the rest of the application.
-     * 
+     *
      * @return SourceCommandTag map (dataTagId -> SourceCommandTag)
      */
+    @Override
     public Map<Long, ISourceDataTag> getSourceDataTags() {
         return new HashMap<Long, ISourceDataTag>(sourceDataTags);
     }
@@ -306,7 +330,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     /**
      * Returns the live map of equipment unit data tags keys and values. All changes will (add/remove...) be made to the
      * real map. It is never null.
-     * 
+     *
      * @return The live map of sub equipment commFault keys and values.
      */
     public Map<Long, SourceDataTag> getDataTags() {
@@ -315,9 +339,10 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * Returns a copy of the map of command tags. Adding tags to this map will not affect the rest of the application.
-     * 
+     *
      * @return SourceCommandTag map (commandTagId -> SourceCommandTag)
      */
+    @Override
     public Map<Long, ISourceCommandTag> getSourceCommandTags() {
         return new HashMap<Long, ISourceCommandTag>(sourceCommandTags);
     }
@@ -325,7 +350,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     /**
      * Returns the live map of equipment command tags keys and values. All changes will (add/remove/clear...) be made to
      * the real map. It is never null.
-     * 
+     *
      * @return The live map of sub equipment commFault keys and values.
      */
     public Map<Long, SourceCommandTag> getCommandTags() {
@@ -334,20 +359,22 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * Gets the SourceDataTag with the specified id.
-     * 
+     *
      * @param dataTagId The id of the data tag to look for.
      * @return The searched data tag or null if there is no data tag for the id.
      */
+    @Override
     public ISourceDataTag getSourceDataTag(final Long dataTagId) {
         return getSourceDataTags().get(dataTagId);
     }
 
     /**
      * Gets the SourceCommandTag with the specified id.
-     * 
+     *
      * @param commandTagId The id of the command tag to look for.
      * @return The searched data tag or null if there is no command tag for the id.
      */
+    @Override
     public ISourceCommandTag getSourceCommandTag(final Long commandTagId) {
         return getSourceCommandTags().get(commandTagId);
     }
@@ -355,7 +382,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     /**
      * Clones the equipment configuration. Be careful The contained maps will NOT be cloned. So if you try to access for
      * example the contained data tags the references to them will still be the same.
-     * 
+     *
      * @return The clone of the equipment configuration.
      */
     @Override

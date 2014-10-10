@@ -13,10 +13,11 @@ package cern.c2mon.daq.common;
 import java.sql.Timestamp;
 
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * Interface for equipment message senders.
- * 
+ *
  * @author Andreas Lang
  */
 public interface IEquipmentMessageSender {
@@ -30,14 +31,14 @@ public interface IEquipmentMessageSender {
     /**
      * This method should be invoked each time you want to propagate the supervision alive coming from the supervised
      * equipment.
-     * 
+     *
      * @param milisecTimestamp the timestamp (in milliseconds)
      */
     void sendSupervisionAlive(final long milisecTimestamp);
 
     /**
      * Tries to send a new value to the server.
-     * 
+     *
      * @param currentTag The tag to which the value belongs.
      * @param milisecTimestamp The timestamp of the tag.
      * @param tagValue The tag value to send.
@@ -48,7 +49,7 @@ public interface IEquipmentMessageSender {
 
     /**
      * Tries to send a new value to the server.
-     * 
+     *
      * @param currentTag The tag to which the value belongs.
      * @param milisecTimestamp The timestamp of the tag.
      * @param tagValue The tag value to send.
@@ -61,7 +62,7 @@ public interface IEquipmentMessageSender {
 
     /**
      * Tries to send a new value to the server.
-     * 
+     *
      * @param currentTag The tag to which the value belongs.
      * @param milisecTimestamp The timestamp of the tag.
      * @param tagValue The tag value to send.
@@ -75,7 +76,7 @@ public interface IEquipmentMessageSender {
 
     /**
      * This method sends an invalid SourceDataTagValue to the server.
-     * 
+     *
      * @param sourceDataTag SourceDataTag object
      * @param pQualityCode the SourceDataTag's quality see {@link SourceDataQuality} class for details
      * @param pDescription the quality description (optional)
@@ -84,7 +85,7 @@ public interface IEquipmentMessageSender {
 
     /**
      * This method sends an invalid SourceDataTagValue to the server.
-     * 
+     *
      * @param sourceDataTag SourceDataTag object
      * @param pQualityCode the SourceDataTag's quality see {@link SourceDataQuality} class for details
      * @param pDescription the quality description (optional)
@@ -102,10 +103,27 @@ public interface IEquipmentMessageSender {
     /**
      * Sends a note to the business layer, to confirm that the equipment is not properly configured, or connected to its
      * data source
-     * 
+     *
      * @param pDescription additional description
      */
     void confirmEquipmentStateIncorrect(final String pDescription);
+
+    /**
+     * Sends a note to the business layer, to confirm that a subequipment is not properly configured, or connected to its
+     * data source
+     *
+     * @param commFaultTagId the ID of the subequipment commfault tag
+     */
+    void confirmSubEquipmentStateIncorrect(Long commFaultTagId);
+
+    /**
+     * Sends a note to the business layer, to confirm that a subequipment is not properly configured, or connected to its
+     * data source
+     *
+     * @param commFaultTagId the ID of the subequipment commfault tag
+     * @param pDescription additional description
+     */
+    void confirmSubEquipmentStateIncorrect(Long commFaultTagId, final String pDescription);
 
     /**
      * Sends a note to the business layer, to confirm that the equipment is properly configured, connected to its source
@@ -116,10 +134,27 @@ public interface IEquipmentMessageSender {
     /**
      * Sends a note to the business layer, to confirm that the equipment is properly configured, connected to its source
      * and running
-     * 
+     *
      * @param pDescription additional description
      */
     void confirmEquipmentStateOK(final String pDescription);
+
+    /**
+     * Sends a note to the business layer, to confirm that a subequipment is properly configured, connected to its source
+     * and running
+     *
+     * @param commFaultTagId the ID of the subequipment commfault tag
+     */
+    void confirmSubEquipmentStateOK(Long commFaultTagId);
+
+    /**
+     * Sends a note to the business layer, to confirm that a subequipment is properly configured, connected to its source
+     * and running
+     *
+     * @param commFaultTagId the ID of the subequipment commfault tag
+     * @param pDescription additional description
+     */
+    void confirmSubEquipmentStateOK(Long commFaultTagId, final String pDescription);
 
     /**
      * Sends all through timedeadband delayed values immediately

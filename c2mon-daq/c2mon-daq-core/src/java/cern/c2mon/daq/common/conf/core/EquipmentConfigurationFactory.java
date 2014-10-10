@@ -1,8 +1,8 @@
 /*
  * $Id $
- * 
+ *
  * $Date$ $Revision$ $Author$
- * 
+ *
  * Copyright CERN ${year}, All Rights Reserved.
  */
 package cern.c2mon.daq.common.conf.core;
@@ -25,14 +25,14 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
 public class EquipmentConfigurationFactory extends XMLTagValueExtractor implements ConfigurationXMLConstants {
 
     private static EquipmentConfigurationFactory theInstance;
-    
-    
+
+
     SimpleXMLParser parser;
 
     private EquipmentConfigurationFactory() {
-        
+
     }
-    
+
     public static final EquipmentConfigurationFactory getInstance() {
         if (theInstance == null)
             theInstance = new EquipmentConfigurationFactory();
@@ -44,26 +44,26 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
     public void setParser(SimpleXMLParser parser) {
         this.parser = parser;
     }
-    
+
     /**
      * The logger.
      */
     private static final Logger LOGGER = Logger.getLogger(EquipmentConfigurationFactory.class);
 
-    
+
     /**
      * Creates the equipment configuration from the matching subelement in the DOM tree.
-     * 
+     *
      * @param equipmentUnit A EquipmentUnit element from the DOM tree.
      * @return An equipment configuration object.
      */
-    public EquipmentConfiguration createEquipmentConfiguration(final String equipmentUnitXml) throws Exception {       
+    public EquipmentConfiguration createEquipmentConfiguration(final String equipmentUnitXml) throws Exception {
         return this.createEquipmentConfiguration(parser.parse(equipmentUnitXml).getDocumentElement());
     }
-    
+
     /**
      * Creates the equipment configuration from the matching subelement in the DOM tree.
-     * 
+     *
      * @param equipmentUnit A EquipmentUnit element from the DOM tree.
      * @return An equipment configuration object.
      */
@@ -116,14 +116,14 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
         processSubEquipmentUnits(equipmentUnit, equipmentConfiguration);
         processDataTags(equipmentUnit, equipmentConfiguration);
         processCommandTags(equipmentUnit, equipmentConfiguration);
-        
+
         return equipmentConfiguration;
     }
 
     /**
      * Processes all subequipment units of the provided equipment unit and adds their commFault IDs and values to the
      * configuration object.
-     * 
+     *
      * @param equipmentUnit The equipment unit element to go through.
      * @param equipmentConfiguration The configuration object to fill.
      */
@@ -144,6 +144,11 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
                 String commFaultValue = getTagValue(subEquipmentConf, COMMFAULT_TAG_VALUE_ELEMENT);
                 equipmentConfiguration.getSubEqCommFaultValues().put(Long.parseLong(commFaultId),
                         Boolean.parseBoolean(commFaultValue));
+
+                // Also read alive tags for SubEquipments
+                String aliveTagId = getTagValue(subEquipmentConf, ALIVE_TAG_ID_ELEMENT);
+                String aliveTagInterval = getTagValue(subEquipmentConf, ALIVE_INTERVAL_ELEMENT);
+                equipmentConfiguration.getSubEqAliveValues().put(Long.parseLong(aliveTagId), Long.parseLong(aliveTagInterval));
             }
         }
     }
@@ -151,7 +156,7 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
     /**
      * Processes all data tags of this equipment configuration DOM element and adds them to the equipment configuration
      * object.
-     * 
+     *
      * @param equipmentUnit The DOM element with the data.
      * @param equipmentConfiguration The equipment configuration object.
      */
@@ -178,20 +183,20 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
                             + " is not configured as control tag! Please correct this in the configuration.");
                 }
             }
-            equipmentConfiguration.getDataTags().put(sourceDataTag.getId(), sourceDataTag);                       
-            
+            equipmentConfiguration.getDataTags().put(sourceDataTag.getId(), sourceDataTag);
+
             // register tag in the ValueChangeMonitorEngine if needed
             if (sourceDataTag.hasValueCheckMonitor()) {
                 ValueChangeMonitor vcm = sourceDataTag.getValueCheckMonitor();
                 ValueChangeMonitorEngine.getInstance().register(equipmentConfiguration.getId(),sourceDataTag, vcm);
             }
-                        
+
         } // for
     }
 
     /**
      * Processes all command tags in this equipment configuration DOM element and adds them to the configuration object.
-     * 
+     *
      * @param equipmentUnit A equipment unit DOM element.
      * @param equipmentConfiguration The equipment configuration object.
      */

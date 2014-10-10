@@ -1,10 +1,10 @@
 /******************************************************************************
  * This file is part of the CERN Control and Monitoring (C2MON) platform.
- * 
+ *
  * See http://cern.ch/c2mon
- * 
+ *
  * Copyright (C) 2005-2013 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -14,7 +14,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: C2MON team, c2mon-support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
@@ -46,16 +46,16 @@ import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * EquipmentMessageSender to control all filtering and sending.
- * 
+ *
  * @author vilches
  */
 public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMessageSender, IDynamicTimeDeadbandFilterer {
-    
+
     /**
      * The logger for this class.
      */
     private EquipmentLogger equipmentLogger;
-    
+
     /**
      * The filter message sender. All tags a filter rule matched are added to this.
      */
@@ -82,32 +82,32 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
      * The equipment configuration of this sender.
      */
     private EquipmentConfiguration equipmentConfiguration;
-    
+
     /**
      * Valid Sender helper class
      */
     private EquipmentSenderValid equipmentSenderValid;
-    
+
     /**
      * Invalid Sender helper class
      */
     private EquipmentSenderInvalid equipmentSenderInvalid;
-    
+
     /**
      * The equipment sender helper with many common and useful methods shared by sending classes
      */
     private EquipmentSenderHelper equipmentSenderHelper = new EquipmentSenderHelper();
-    
+
     /**
      * The Equipment Alive sender helper class
      */
     private EquipmentAliveSender equipmentAliveSender;
-    
+
     /**
      * Time deadband helper class
      */
     private EquipmentTimeDeadband equipmentTimeDeadband;
-    
+
     /**
      * The class with the message sender to send filtered tag values
      */
@@ -115,7 +115,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
 
     /**
      * Creates a new EquipmentMessageSender.
-     * 
+     *
      * @param filterMessageSender The filter message sender to send filtered tag values.
      * @param processMessageSender The process message sender to send tags to the server.
      * @param medDynamicTimeDeadbandFilterActivator The dynamic time deadband activator for medium priorities.
@@ -134,36 +134,36 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
         this.medDynamicTimeDeadbandFilterActivator = medDynamicTimeDeadbandFilterActivator;
         this.lowDynamicTimeDeadbandFilterActivator = lowDynamicTimeDeadbandFilterActivator;
     }
-    
+
     /**
      * Init
-     * 
+     *
      * @param equipmentConfiguration
      * @param equipmentLoggerFactory
      */
     public void init(final EquipmentConfiguration equipmentConfiguration, final EquipmentLoggerFactory equipmentLoggerFactory) {
-    	// Configuration 
+    	// Configuration
     	setEquipmentConfiguration(equipmentConfiguration);
     	// Logger
     	setEquipmentLoggerFactory(equipmentLoggerFactory);
-    	
+
     	// Filter module
     	this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSender, equipmentLoggerFactory);
 
     	// Time Deadband
-    	this.equipmentTimeDeadband = new EquipmentTimeDeadband(this, this.processMessageSender, this.equipmentSenderFilterModule, 
+    	this.equipmentTimeDeadband = new EquipmentTimeDeadband(this, this.processMessageSender, this.equipmentSenderFilterModule,
     	    equipmentLoggerFactory);
 
     	// Invalid Sender
-    	this.equipmentSenderInvalid = new EquipmentSenderInvalid(this.equipmentSenderFilterModule, this.processMessageSender, 
+    	this.equipmentSenderInvalid = new EquipmentSenderInvalid(this.equipmentSenderFilterModule, this.processMessageSender,
     	    this.equipmentTimeDeadband, this, equipmentLoggerFactory);
-    	
+
     	// Valid Sender
-    	this.equipmentSenderValid = new EquipmentSenderValid(this.equipmentSenderFilterModule, this.processMessageSender, 
+    	this.equipmentSenderValid = new EquipmentSenderValid(this.equipmentSenderFilterModule, this.processMessageSender,
     	    this.equipmentSenderInvalid, this.equipmentTimeDeadband, this, equipmentLoggerFactory);
-    	
+
     	// Alive Sender
-    	this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId(), 
+    	this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId(),
     	        equipmentLoggerFactory);
     	this.equipmentAliveSender.init(this.equipmentConfiguration.getAliveTagInterval(), this.equipmentConfiguration.getName());
     }
@@ -180,20 +180,20 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     /**
      * This method should be invoked each time you want to propagate the supervision alive coming from the supervised
      * equipment.
-     * 
+     *
      * @param milisecTimestamp the timestamp (in milliseconds)
      */
     @Override
     public void sendSupervisionAlive(final long milisecTimestamp) {
         Long supAliveTagId = Long.valueOf(this.equipmentConfiguration.getAliveTagId());
         SourceDataTag supAliveTag = getTag(supAliveTagId);
-        
+
         this.equipmentAliveSender.sendEquipmentAlive(supAliveTag, milisecTimestamp);
     }
 
     /**
      * Tries to send a new value to the server.
-     * 
+     *
      * @param currentTag The tag to which the value belongs.
      * @param milisecTimestamp The timestamp of the tag.
      * @param tagValue The tag value to send.
@@ -207,7 +207,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
 
     /**
      * Tries to send a new value to the server.
-     * 
+     *
      * @param currentTag The tag to which the value belongs.
      * @param tagValue The tag value to send.
      * @param milisecTimestamp The timestamp of the tag.
@@ -223,7 +223,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
 
     /**
      * Tries to send a new value to the server.
-     * 
+     *
      * @param currentTag The tag to which the value belongs.
      * @param milisecTimestamp The timestamp of the tag.
      * @param tagValue The tag value to send.
@@ -246,18 +246,18 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     		successfulSent = this.equipmentAliveSender.sendEquipmentAlive(tag, milisecTimestamp);
     	} else {
     		successfulSent = this.equipmentSenderValid.sendTagFiltered(tag, tagValue, milisecTimestamp, pValueDescr,
-    				sentByValueCheckMonitor);		
+    				sentByValueCheckMonitor);
     	}
 
     	this.equipmentLogger.trace("sendTagFiltered - leaving sendTagFiltered()");
-    	
+
     	return successfulSent;
     }
-    
+
     /**
      * This method sends an invalid SourceDataTagValue to the server. Source and DAQ timestamps are set to the current
      * DAQ system time.
-     * 
+     *
      * @param sourceDataTag SourceDataTag object
      * @param pQualityCode the SourceDataTag's quality see {@link SourceDataQuality} class for details
      * @param pDescription the quality description (optional)
@@ -269,7 +269,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
 
     /**
      * This method sends an invalid SourceDataTagValue to the server, without changing its origin value.
-     * 
+     *
      * @param sourceDataTag SourceDataTag object
      * @param pQualityCode the SourceDataTag's quality see {@link SourceDataQuality} class for details
      * @param qualityDescription the quality description (optional)
@@ -277,26 +277,26 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
      *            timestamp will be set to the current DAQ system time
      */
     @Override
-    public void sendInvalidTag(final ISourceDataTag sourceDataTag, final short qualityCode, final String qualityDescription, 
+    public void sendInvalidTag(final ISourceDataTag sourceDataTag, final short qualityCode, final String qualityDescription,
         final Timestamp pTimestamp) {
-    	
-    	// Get the source data quality from the quality code     
-    	SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(qualityCode, qualityDescription);         
 
-    	// The sendInvalidTag function with the value argument will take are of it     
-    	if (sourceDataTag.getCurrentValue() != null) {       
-    		sendInvalidTag(sourceDataTag, sourceDataTag.getCurrentValue().getValue(), 
-    				sourceDataTag.getCurrentValue().getValueDescription(), newSDQuality, pTimestamp);     
-    	} else {       
-    		sendInvalidTag(sourceDataTag, null, "", newSDQuality, pTimestamp);     
+    	// Get the source data quality from the quality code
+    	SourceDataQuality newSDQuality = this.equipmentSenderHelper.createTagQualityObject(qualityCode, qualityDescription);
+
+    	// The sendInvalidTag function with the value argument will take are of it
+    	if (sourceDataTag.getCurrentValue() != null) {
+    		sendInvalidTag(sourceDataTag, sourceDataTag.getCurrentValue().getValue(),
+    				sourceDataTag.getCurrentValue().getValueDescription(), newSDQuality, pTimestamp);
+    	} else {
+    		sendInvalidTag(sourceDataTag, null, "", newSDQuality, pTimestamp);
     	}
     }
 
     /**
      * This method sends both an invalid and updated SourceDataTagValue to the server.
-     * 
+     *
      * @param sourceDataTag SourceDataTag object
-     * @param newValue The new update value that we want set to the tag 
+     * @param newValue The new update value that we want set to the tag
      * @param newTagValueDesc The new value description
      * @param newSDQuality the new SourceDataTag see {@link SourceDataQuality}
      * @param pTimestamp time when the SourceDataTag's value has become invalid; if null the source timestamp and DAQ
@@ -311,7 +311,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
 
       long tagID = sourceDataTag.getId();
       SourceDataTag tag = getTag(tagID);
-  
+
       if (newSDQuality == null || newSDQuality.isValid()) {
     	  // this means we have a valid quality code 0 (OK)
     	  this.equipmentLogger.warn("sendInvalidTag - method called with 0(OK) quality code for tag " + sourceDataTag.getId()
@@ -323,26 +323,26 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
         }
         this.equipmentSenderInvalid.sendInvalidTag(tag, newValue, newTagValueDesc, newSDQuality, pTimestamp);
       }
-      
+
       this.equipmentLogger.debug("sendInvalidTag - leaving sendInvalidTag()");
     }
 
     /**
      * TimeDeadband policy:
-     * 
+     *
      * Static TimeDeadband  Dynamic TimeDeadband  Filter applied
      * -------------------  --------------------  --------------
      *        Yes                   Yes             Static
      *        yes                   No              Static
      *        No                    Yes             Dynamic
      *        No                    No              None
-     *        
-     * 
-     * Static TimeDeadband has more priority than the Dynamic one. So if the Static TimeDeadband for the 
-     * current Tag is disable and the DAQ has the Dynamic TimeDeadband enabled then the Tag will be 
+     *
+     *
+     * Static TimeDeadband has more priority than the Dynamic one. So if the Static TimeDeadband for the
+     * current Tag is disable and the DAQ has the Dynamic TimeDeadband enabled then the Tag will be
      * recorded for dynamic time deadband filtering
      * depending on the tag priority (only LOW and MEDIUM are used).
-     * 
+     *
      * @param tag The tag to be recorded.
      */
     @Override
@@ -362,10 +362,10 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
             }
         }
     }
-    
+
     /**
      * Checks if Dynamic Timedeadband can be appliyed or not
-     * 
+     *
      * @param tag The tag to be recorded.
      * @return True if the Dynamic Timedeadband can be apply or false if not
      */
@@ -387,7 +387,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     /**
      * Sends a note to the business layer, to confirm that the equipment is not properly configured, or connected to its
      * data source
-     * 
+     *
      * @param pDescription additional description
      */
     @Override
@@ -404,10 +404,21 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
             }
         }
     }
-    
+
+    @Override
+    public void confirmSubEquipmentStateIncorrect(Long commFaultTagId) {
+      confirmSubEquipmentStateIncorrect(commFaultTagId, null);
+    }
+
+    @Override
+    public void confirmSubEquipmentStateIncorrect(Long commFaultTagId, String description) {
+      sendCommfaultTag(commFaultTagId, this.equipmentConfiguration.getSubEqCommFaultValues().get(commFaultTagId),
+          description);
+    }
+
     /**
      * Sends the CommfaultTag message.
-     * 
+     *
      * @param tagID The CommfaultTag id.
      * @param value The CommFaultTag value to send.
      * @param description The description of the CommfaultTag
@@ -437,7 +448,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     /**
      * Sends a note to the business layer, to confirm that the equipment is properly configured, connected to its source
      * and running
-     * 
+     *
      * @param pDescription additional description
      */
     @Override
@@ -455,9 +466,20 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
         }
     }
 
+    @Override
+    public void confirmSubEquipmentStateOK(Long commFaultTagId) {
+      confirmSubEquipmentStateOK(commFaultTagId, null);
+    }
+
+    @Override
+    public void confirmSubEquipmentStateOK(Long commFaultTagId, String description) {
+      sendCommfaultTag(commFaultTagId, !this.equipmentConfiguration.getSubEqCommFaultValues().get(commFaultTagId),
+          description);
+    }
+
     /**
      * Sets the equipment configuration
-     * 
+     *
      * @param equipmentConfiguration The equipment configuration.
      */
     private void setEquipmentConfiguration(final EquipmentConfiguration equipmentConfiguration) {
@@ -495,35 +517,35 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     @Override
     public void sendDelayedTimeDeadbandValues() {
         this.equipmentLogger.debug("sendDelayedTimeDeadbandValues - Sending all time deadband delayed values to the server");
-        
+
         this.equipmentSenderValid.sendDelayedTimeDeadbandValues();
     }
-    
+
     /**
      * Gets a source data tag with the provided id.
-     * 
+     *
      * @param tagID The id of the tag to get.
      * @return The SourceDataTag with this id.
      */
     private SourceDataTag getTag(final long tagID) {
         return (SourceDataTag)this.equipmentConfiguration.getSourceDataTag(tagID);
     }
-    
+
     /**
-     * 
+     *
      * @return equipmentSenderValid
      */
     protected EquipmentSenderValid getEquipmentSenderValid() {
     	return this.equipmentSenderValid;
     }
-    
+
     /**
      * Reconfiguration functions Add/Remove/Update
      */
-    
+
     /**
      * Adds a data tag to this sender.
-     * 
+     *
      * @param sourceDataTag The data tag to add.
      * @param changeReport The change report to fill with the results of the change.
      */
@@ -548,7 +570,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
 
     /**
      * Removes a data tag from this sender.
-     * 
+     *
      * @param sourceDataTag The data tag to remove.
      * @param changeReport The change report to fill with the results of the change.
      */
@@ -561,7 +583,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
 
     /**
      * Updates a data tag of this sender.
-     * 
+     *
      * @param sourceDataTag The data tag to update.
      * @param oldSourceDataTag The old source data tag to identify if necessary for changes.
      * @param changeReport The change report to fill with the results.
@@ -575,4 +597,5 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
             onAddDataTag(sourceDataTag, changeReport);
         }
     }
+
 }
