@@ -296,7 +296,7 @@ public class SupervisionManager implements CoreSupervisionManager, SupervisionLi
       }
 
       for (Long subEquipmentId : subEquipmentIds) {
-        if (!subEquipmentSupervisionListeners.containsKey(subEquipmentIds)) {
+        if (!subEquipmentSupervisionListeners.containsKey(subEquipmentId)) {
           subEquipmentSupervisionListeners.put(subEquipmentId, new HashSet<SupervisionListener>());
         }
         Set<SupervisionListener> listeners = subEquipmentSupervisionListeners.get(subEquipmentId);
