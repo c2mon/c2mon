@@ -145,10 +145,12 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
                 equipmentConfiguration.getSubEqCommFaultValues().put(Long.parseLong(commFaultId),
                         Boolean.parseBoolean(commFaultValue));
 
-                // Also read alive tags for SubEquipments
+              // Also read alive tags for SubEquipments
+              if (subEquipmentConf.getElementsByTagName(ALIVE_TAG_ID_ELEMENT).getLength() > 0) {
                 String aliveTagId = getTagValue(subEquipmentConf, ALIVE_TAG_ID_ELEMENT);
                 String aliveTagInterval = getTagValue(subEquipmentConf, ALIVE_INTERVAL_ELEMENT);
                 equipmentConfiguration.getSubEqAliveValues().put(Long.parseLong(aliveTagId), Long.parseLong(aliveTagInterval));
+              }
             }
         }
     }
