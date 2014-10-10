@@ -683,7 +683,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         // update sub equipment map
         Map<Long, SupervisionEvent> updatedSubEquipmentMap = new HashMap<Long, SupervisionEvent>();
         for (Long subEquipmentId : tagUpdate.getSubEquipmentIds()) {
-          updatedEquipmentMap.put(subEquipmentId, subEquipmentSupervisionStatus.get(subEquipmentId));
+          updatedSubEquipmentMap.put(subEquipmentId, subEquipmentSupervisionStatus.get(subEquipmentId));
         }
         subEquipmentSupervisionStatus = updatedSubEquipmentMap;
 
@@ -1078,6 +1078,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     try {
       boolean validUpdate = false;
       validUpdate |= equipmentSupervisionStatus.containsKey(supervisionEvent.getEntityId());
+      validUpdate |= subEquipmentSupervisionStatus.containsKey(supervisionEvent.getEntityId());
       validUpdate |= processSupervisionStatus.containsKey(supervisionEvent.getEntityId());
 
       if (validUpdate) {
