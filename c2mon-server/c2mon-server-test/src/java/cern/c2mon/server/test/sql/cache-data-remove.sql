@@ -1,3 +1,5 @@
+delete from field;
+delete from propertyfield;
 delete from property;
 delete from deviceproperty;
 delete from command;
