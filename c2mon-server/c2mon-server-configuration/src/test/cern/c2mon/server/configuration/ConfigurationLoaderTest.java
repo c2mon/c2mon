@@ -108,22 +108,25 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 
 /**
- * Component/integration tests of the configuration module (integrates
- * the cache modules, but mocks the daqcommunication-out module).
+ * Component/integration tests of the configuration module (integrates the cache
+ * modules, but mocks the daqcommunication-out module).
  *
- * <p>These tests assume the test data is present before the test is run.
- * The data is removed and inserted after every test, ready to run the next
- * one. If a test is interrupted, will need to run twice to correct this.
+ * <p>
+ * These tests assume the test data is present before the test is run. The data
+ * is removed and inserted after every test, ready to run the next one. If a
+ * test is interrupted, will need to run twice to correct this.
  *
- * <p>(Notice the data must be in the DB *before* the context is loaded!)
+ * <p>
+ * (Notice the data must be in the DB *before* the context is loaded!)
  *
  * @author Mark Brightwell
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext
-@ContextConfiguration({"classpath:cern/c2mon/server/configuration/config/server-configuration-loader-test.xml" })
-//@TransactionConfiguration(transactionManager = "cacheTransactionManager", defaultRollback = true)
+@ContextConfiguration({ "classpath:cern/c2mon/server/configuration/config/server-configuration-loader-test.xml" })
+// @TransactionConfiguration(transactionManager = "cacheTransactionManager",
+// defaultRollback = true)
 public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   /**
@@ -225,18 +228,18 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   private String jmsDaqQueueTrunk;
 
   /**
-   * Clears DB of failed previous tests and resets the
-   * mock before each test.
+   * Clears DB of failed previous tests and resets the mock before each test.
+   *
    * @throws IOException
    */
   @Before
   public void beforeTest() throws IOException {
     ((AbstractApplicationContext) context).start();
 
-    //make sure Process is "running" (o.w. nothing is sent to DAQ)
+    // make sure Process is "running" (o.w. nothing is sent to DAQ)
     processFacade.start(50L, "hostname", new Timestamp(System.currentTimeMillis()));
 
-    //reset mock
+    // reset mock
     reset(mockManager);
   }
 
@@ -247,42 +250,52 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   }
 
   @Test
-  @DirtiesContext //TODO why?
+  @DirtiesContext
+  // TODO why?
   public void testCreateUpdateRemoveControlTag() {
-    //create
+    // create
     ConfigurationReport report = configurationLoader.applyConfiguration(2);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
-    assertTrue(report.getProcessesToReboot().isEmpty()); //empty because no process/equipment points to this control tag
+    assertTrue(report.getProcessesToReboot().isEmpty()); // empty because no
+                                                         // process/equipment
+                                                         // points to this
+                                                         // control tag
 
     ControlTagCacheObject cacheObject = (ControlTagCacheObject) controlTagCache.get(500L);
 
-    //corresponds to data inserted using SQL file
+    // corresponds to data inserted using SQL file
     ControlTagCacheObject expectedObject = new ControlTagCacheObject();
-    expectedObject.setId(new Long(500));  //must be non null in DB
-    expectedObject.setName("Process status"); //non null
-    expectedObject.setMode(DataTagConstants.MODE_TEST); //non null
+    expectedObject.setId(new Long(500)); // must be non null in DB
+    expectedObject.setName("Process status"); // non null
+    expectedObject.setMode(DataTagConstants.MODE_TEST); // non null
     expectedObject.setDataType("Integer"); // non null
     expectedObject.setDescription("test");
     expectedObject.setMinValue(new Integer(12));
     expectedObject.setMaxValue(new Integer(22));
     expectedObject.setTopic(controlTagPublicationTopic);
-    expectedObject.setLogged(false); //null allowed
+    expectedObject.setLogged(false); // null allowed
 
     expectedObject.setDataTagQuality(new DataTagQualityImpl());
 
-    ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject); //object correctly loaded to cache
+    ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject); // object
+                                                                                     // correctly
+                                                                                     // loaded
+                                                                                     // to
+                                                                                     // cache
 
-    //test update of control tag
+    // test update of control tag
     report = configurationLoader.applyConfiguration(6);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
-    //ControlTagCacheObject updatedCacheObject = (ControlTagCacheObject) controlTagCache.get(500L);
+    // ControlTagCacheObject updatedCacheObject = (ControlTagCacheObject)
+    // controlTagCache.get(500L);
     expectedObject.setDescription("modified description");
-    expectedObject.setMinValue(null); //check can reset min & max to null using update
+    expectedObject.setMinValue(null); // check can reset min & max to null using
+                                      // update
     expectedObject.setMaxValue(null);
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
 
@@ -291,25 +304,30 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Test
   @DirtiesContext
   public void testRemoveControlTag() {
-    //check as expected before test
+    // check as expected before test
     assertTrue(controlTagCache.hasKey(1250L));
     assertNotNull(controlTagMapper.getItem(1250L));
 
-    //run test
+    // run test
     ConfigurationReport report = configurationLoader.applyConfiguration(8);
 
-    //check outcome
+    // check outcome
     System.out.println(report.toXML());
     assertEquals(Status.OK, report.getStatus());
-    assertTrue(report.getProcessesToReboot().isEmpty()); //empty because no process/equipment points to this control tag
+    assertTrue(report.getProcessesToReboot().isEmpty()); // empty because no
+                                                         // process/equipment
+                                                         // points to this
+                                                         // control tag
     assertFalse(controlTagCache.hasKey(1250L));
     assertNull(controlTagMapper.getItem(1250L));
   }
 
   @Test
   @DirtiesContext
-  public void testCreateAndUpdateCommandTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
-    //the mocked ProcessCommmunicationManager can return an empty report (expect 3 calls)
+  public void testCreateAndUpdateCommandTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
+    // the mocked ProcessCommmunicationManager can return an empty report
+    // (expect 3 calls)
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
@@ -321,7 +339,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     CommandTagCacheObject cacheObject = (CommandTagCacheObject) commandTagCache.get(10000L);
 
     CommandTagCacheObject expectedObject = new CommandTagCacheObject(10000L, "Test CommandTag", "test description", "String", DataTagConstants.MODE_TEST);
-    //expectedObject.setAuthorizedHostsPattern("*");
+    // expectedObject.setAuthorizedHostsPattern("*");
     expectedObject.setEquipmentId(150L);
     expectedObject.setClientTimeout(30000);
     expectedObject.setExecTimeout(6000);
@@ -332,10 +350,14 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     details.setRbacDevice("RBAC device");
     details.setRbacProperty("RBAC property");
     expectedObject.setAuthorizationDetails(details);
-    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));
+    expectedObject
+        .setHardwareAddress(HardwareAddressFactory
+            .getInstance()
+            .fromConfigXML(
+                "<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObject);
 
-    //test update
+    // test update
     report = configurationLoader.applyConfiguration(5);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -345,23 +367,28 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setName("Test CommandTag Updated");
     expectedObject.getAuthorizationDetails().setRbacClass("new RBAC class");
     expectedObject.getAuthorizationDetails().setRbacDevice("new RBAC device");
-    expectedObject.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML("<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>"));
+    expectedObject
+        .setHardwareAddress(HardwareAddressFactory
+            .getInstance()
+            .fromConfigXML(
+                "<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>"));
     ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObjectUpdated);
   }
 
   @Test
   @DirtiesContext
-  public void testRemoveCommand() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
-    //check as expected
+  public void testRemoveCommand() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
+    // check as expected
     assertTrue(commandTagCache.hasKey(11000L));
     assertNotNull(commandTagMapper.getItem(11000L));
     EasyMock.expect(mockManager.sendConfiguration(EasyMock.isA(Long.class), EasyMock.isA(List.class))).andReturn(new ConfigurationChangeEventReport());
 
-    //rung test
+    // rung test
     replay(mockManager);
     ConfigurationReport report = configurationLoader.applyConfiguration(9);
 
-    //check successful
+    // check successful
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(commandTagCache.hasKey(11000L));
     assertNull(commandTagMapper.getItem(11000L));
@@ -370,8 +397,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   @Test
   @DirtiesContext
-  public void testCreateAndUpdateDataTag() throws ConfigurationException, InterruptedException, ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
-    //the mocked ProcessCommmunicationManager can return an empty report (expect 3 calls for create, update and remove)
+  public void testCreateAndUpdateDataTag() throws ConfigurationException, InterruptedException, ParserConfigurationException, IllegalAccessException,
+      InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+    // the mocked ProcessCommmunicationManager can return an empty report
+    // (expect 3 calls for create, update and remove)
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
@@ -385,41 +414,46 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(new Long(5000000));
 
-    //corresponds to data inserted using SQL file
+    // corresponds to data inserted using SQL file
     DataTagCacheObject expectedObject = new DataTagCacheObject();
-    expectedObject.setId(new Long(5000000));  //must be non null in DB
-    expectedObject.setName("Config_test_datatag"); //non null
+    expectedObject.setId(new Long(5000000)); // must be non null in DB
+    expectedObject.setName("Config_test_datatag"); // non null
     expectedObject.setDescription("test description config datatag");
-    expectedObject.setMode(DataTagConstants.MODE_TEST); //non null
+    expectedObject.setMode(DataTagConstants.MODE_TEST); // non null
     expectedObject.setDataType("Float"); // non null
     expectedObject.setTopic(tagPublicationTrunk + "." + 50L);
-    expectedObject.setLogged(false); //null allowed
+    expectedObject.setLogged(false); // null allowed
     expectedObject.setUnit("config unit m/sec");
     expectedObject.setDipAddress("testConfigDIPaddress");
     expectedObject.setJapcAddress("testConfigJAPCaddress");
-    //expectedObject.setValue(Boolean.TRUE);
-    //expectedObject.setValueDescription("test config value description");
-    expectedObject.setSimulated(false); //null allowed
-    expectedObject.setEquipmentId(new Long(150)); //need test equipment inserted
+    // expectedObject.setValue(Boolean.TRUE);
+    // expectedObject.setValueDescription("test config value description");
+    expectedObject.setSimulated(false); // null allowed
+    expectedObject.setEquipmentId(new Long(150)); // need test equipment
+                                                  // inserted
     expectedObject.setProcessId(50L);
     expectedObject.setMinValue(new Float(12.2));
     expectedObject.setMaxValue(new Float(23.3));
     expectedObject.setValueDictionary(new DataTagValueDictionary());
     expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND3")));
     expectedObject.setDataTagQuality(new DataTagQualityImpl());
-    //expectedObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis())); //should be set to creation time, so not null
-    //expectedObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
-    //expectedObject.setRuleIdsString("1234,3456"); //NO: never loaded at reconfiguration of datatag, but only when a new rule is added
+    // expectedObject.setCacheTimestamp(new
+    // Timestamp(System.currentTimeMillis())); //should be set to creation time,
+    // so not null
+    // expectedObject.setSourceTimestamp(new
+    // Timestamp(System.currentTimeMillis()));
+    // expectedObject.setRuleIdsString("1234,3456"); //NO: never loaded at
+    // reconfiguration of datatag, but only when a new rule is added
 
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
 
     equipmentCache.acquireWriteLockOnKey(cacheObject.getEquipmentId());
     Equipment equipment = equipmentCache.get(cacheObject.getEquipmentId());
-    //check equipment now has datatag in list
+    // check equipment now has datatag in list
     assertTrue(equipmentCache.get(cacheObject.getEquipmentId()).getDataTagIds().contains(5000000L));
     equipmentCache.releaseWriteLockOnKey(cacheObject.getEquipmentId());
 
-    //test update of this datatag
+    // test update of this datatag
     report = configurationLoader.applyConfiguration(4);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -428,7 +462,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     DataTagCacheObject updatedCacheObject = (DataTagCacheObject) dataTagCache.get(5000000L);
 
     expectedObject.setJapcAddress("testConfigJAPCaddress2");
-    expectedObject.setDipAddress(null); //checks can be set to null also
+    expectedObject.setDipAddress(null); // checks can be set to null also
     expectedObject.setMaxValue(new Float(26));
     expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND4")));
 
@@ -443,8 +477,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   @Test
   @DirtiesContext
-  public void testRemoveDataTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
-    //check data as expected
+  public void testRemoveDataTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
+    // check data as expected
     Long tagId = 200001L;
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(200001L);
     assertNotNull(cacheObject);
@@ -453,17 +488,17 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     EasyMock.expect(mockManager.sendConfiguration(EasyMock.isA(Long.class), EasyMock.isA(List.class))).andReturn(new ConfigurationChangeEventReport());
 
     replay(mockManager);
-    //run test
+    // run test
     ConfigurationReport report = configurationLoader.applyConfiguration(7);
 
-    //check successful
+    // check successful
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertFalse(dataTagCache.hasKey(tagId));
     assertNull(dataTagMapper.getItem(tagId));
-    //tag id is no longer in equipment
+    // tag id is no longer in equipment
     assertFalse(equipmentCache.get(cacheObject.getEquipmentId()).getDataTagIds().contains(tagId));
 
     verify(mockManager);
@@ -471,6 +506,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   /**
    * No communication should take place with the DAQs during rule configuration.
+   *
    * @throws InterruptedException
    * @throws NoSimpleValueParseException
    * @throws NoSuchFieldException
@@ -481,12 +517,14 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   @Test
   @DirtiesContext
-  public void testCreateUpdateRemoveRuleTag() throws InterruptedException, ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
-    //the mocked ProcessCommmunicationManager will be called once when creating the datatag to base the rule on
+  public void testCreateUpdateRemoveRuleTag() throws InterruptedException, ParserConfigurationException, IllegalAccessException, InstantiationException,
+      TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+    // the mocked ProcessCommmunicationManager will be called once when creating
+    // the datatag to base the rule on
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
 
-    //insert datatag to base rule on
+    // insert datatag to base rule on
     configurationLoader.applyConfiguration(1);
     ConfigurationReport report = configurationLoader.applyConfiguration(10);
     System.out.println(report.toXML());
@@ -494,11 +532,11 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     RuleTagCacheObject cacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
 
     RuleTagCacheObject expectedObject = new RuleTagCacheObject(50100L);
-    expectedObject.setName("test ruletag"); //non null
+    expectedObject.setName("test ruletag"); // non null
     expectedObject.setDescription("test ruletag description");
-    expectedObject.setMode(DataTagConstants.MODE_MAINTENANCE); //non null
+    expectedObject.setMode(DataTagConstants.MODE_MAINTENANCE); // non null
     expectedObject.setDataType("Float"); // non null
-    expectedObject.setLogged(true); //null allowed
+    expectedObject.setLogged(true); // null allowed
     expectedObject.setUnit("config unit m/sec");
     expectedObject.setDipAddress("testConfigDIPaddress");
     expectedObject.setJapcAddress("testConfigJAPCaddress");
@@ -513,7 +551,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, cacheObject);
 
-    //update ruletag
+    // update ruletag
     expectedObject.setJapcAddress("newTestConfigJAPCaddress");
     expectedObject.setRuleText("(2 > 1)[1],true[0]");
     expectedObject.setProcessIds(Collections.EMPTY_SET);
@@ -521,7 +559,8 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.getDataTagQuality().validate();
     expectedObject.setTopic(tagPublicationTrunk + "." + 0L);
     report = configurationLoader.applyConfiguration(11);
-    Thread.sleep(1000); //sleep 1s to allow for rule evaluation on separate thread
+    Thread.sleep(1000); // sleep 1s to allow for rule evaluation on separate
+                        // thread
     System.out.println(report.toXML());
     RuleTagCacheObject updatedCacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
     ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, updatedCacheObject);
@@ -531,18 +570,19 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   @Test
   @DirtiesContext
-  public void testRemoveRuleTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+  public void testRemoveRuleTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
 
     replay(mockManager);
 
-    //remove ruletag
+    // remove ruletag
     ConfigurationReport report = configurationLoader.applyConfiguration(12);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(ruleTagCache.hasKey(60007L));
     assertNull(ruleTagMapper.getItem(60007L));
 
-    //dependent rules removed, e.g.
+    // dependent rules removed, e.g.
     assertFalse(ruleTagCache.hasKey(60009L));
     assertNull(ruleTagMapper.getItem(60009L));
 
@@ -554,9 +594,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   @DirtiesContext
   @Test
-  public void testRuleRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+  public void testRuleRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
     Long tagId = 200001L;
-    Long ruleId1 = 60000L; //two of the rules that should be removed
+    Long ruleId1 = 60000L; // two of the rules that should be removed
     Long ruleId2 = 59999L;
     assertTrue(ruleTagCache.hasKey(ruleId1));
     assertNotNull(ruleTagMapper.getItem(ruleId1));
@@ -565,12 +606,12 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertTrue(dataTagCache.hasKey(tagId));
     assertNotNull(dataTagMapper.getItem(tagId));
 
-    //for tag removal
+    // for tag removal
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
 
     replay(mockManager);
 
-    //test removal of tag 20004L removes the rule also
+    // test removal of tag 20004L removes the rule also
     configurationLoader.applyConfiguration(7);
 
     assertFalse(ruleTagCache.hasKey(ruleId1));
@@ -585,6 +626,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   /**
    * Tests that a tag removal does indeed remove an associated alarm.
+   *
    * @throws NoSimpleValueParseException
    * @throws NoSuchFieldException
    * @throws TransformerException
@@ -594,10 +636,11 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   @Test
   @DirtiesContext
-  public void testAlarmRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+  public void testAlarmRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
     replay(mockManager);
 
-    //test removal of (rule)tag 60000 removes the alarm also
+    // test removal of (rule)tag 60000 removes the alarm also
     configurationLoader.applyConfiguration(27);
     assertFalse(alarmCache.hasKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
@@ -608,6 +651,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   /**
    * Test the creation, update and removal of equipment.
+   *
    * @throws NoSimpleValueParseException
    * @throws NoSuchFieldException
    * @throws TransformerException
@@ -617,9 +661,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   @Test
   @DirtiesContext
-  public void testCreateUpdateEquipment() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
-    //called once when updating the equipment;
-    //mock returns a list with the correct number of SUCCESS ChangeReports
+  public void testCreateUpdateEquipment() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
+    // called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
 
       @Override
@@ -633,14 +678,15 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
         }
         return report;
       }
-    }).times(2); //twice: once for create, another for update
+    }).times(2); // twice: once for create, another for update
 
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(13);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(Status.OK, report.getStatus()); //ok as DAQ handles Equipment creation
+    assertEquals(Status.OK, report.getStatus()); // ok as DAQ handles Equipment
+                                                 // creation
     assertFalse(report.getProcessesToReboot().contains("P_TESTHANDLER03"));
 
     EquipmentCacheObject cacheObject = (EquipmentCacheObject) equipmentCache.get(110L);
@@ -655,21 +701,23 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     ObjectEqualityComparison.assertEquipmentEquals(expectedObject, cacheObject);
 
-    //also check that the process, commfault and alive cache were updated
+    // also check that the process, commfault and alive cache were updated
     Process process = processCache.get(expectedObject.getProcessId());
-    //check process is running
+    // check process is running
     ((ProcessCacheObject) process).setRequiresReboot(false);
     assertFalse(process.getRequiresReboot());
     assertTrue(process.getEquipmentIds().contains(expectedObject.getId()));
-    //the alivetimer and commfault have overriden those already in the cache (check reference to the equipment has changed)
+    // the alivetimer and commfault have overriden those already in the cache
+    // (check reference to the equipment has changed)
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
 
-    //update (creates controltag and updates equipment) - should succeed
+    // update (creates controltag and updates equipment) - should succeed
     report = configurationLoader.applyConfiguration(25);
     System.out.println(report.toXML());
-    //expect 2 top elements (control and equipment, with control first)
-    //  equipment report should have 1 sub-reports from DAQ (control tag has no address)
+    // expect 2 top elements (control and equipment, with control first)
+    // equipment report should have 1 sub-reports from DAQ (control tag has no
+    // address)
     List<ConfigurationElementReport> topList = report.getElementReports();
     assertEquals(2, topList.size());
     assertEquals(topList.get(0).getEntity(), Entity.CONTROLTAG);
@@ -677,12 +725,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertEquals(0, topList.get(0).getSubreports().size());
     assertEquals(1, topList.get(1).getSubreports().size());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    //should contain both a controltag update and equipment update
-    //  (note the DAQ response is generated automatically by the mock)
+    // should contain both a controltag update and equipment update
+    // (note the DAQ response is generated automatically by the mock)
     assertTrue(report.toXML().contains("CONTROLTAG"));
     assertTrue(report.toXML().contains("EQUIPMENT"));
 
-    //checks restart status is correctly set (DAQ call is mocked as success for equipment update)
+    // checks restart status is correctly set (DAQ call is mocked as success for
+    // equipment update)
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
 
@@ -693,9 +742,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     ObjectEqualityComparison.assertEquipmentEquals(expectedObject, cacheObject);
 
-    //check alive timer reference is updated in DB
+    // check alive timer reference is updated in DB
     assertEquals(new Long(1251L), equipmentMapper.getItem(110L).getAliveTagId());
-    //also expect alivetimercache to have element 501:
+    // also expect alivetimercache to have element 501:
     assertNotNull(aliveTimerCache.get(1251L));
 
     verify(mockManager);
@@ -703,6 +752,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   /**
    * Test equipment and control tags are removed correctly.
+   *
    * @throws NoSimpleValueParseException
    * @throws NoSuchFieldException
    * @throws TransformerException
@@ -712,8 +762,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   @Test
   @DirtiesContext
-  public void testRemoveEquipement() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
-    //check as expected
+  public void testRemoveEquipement() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
+    // check as expected
     Equipment equipment = equipmentCache.get(150L);
     assertNotNull(equipment);
     assertNotNull(equipmentMapper.getItem(150L));
@@ -736,16 +787,17 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     });
 
     replay(mockManager);
-    //remove equipment
-    //remove completes successfully; both Equipment and ControlTags are removed
+    // remove equipment
+    // remove completes successfully; both Equipment and ControlTags are removed
     ConfigurationReport report = configurationLoader.applyConfiguration(15);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(Status.OK, report.getStatus()); //DAQ deals with Equipment removal
+    assertEquals(Status.OK, report.getStatus()); // DAQ deals with Equipment
+                                                 // removal
     assertFalse(report.getProcessesToReboot().contains("P_TESTHANDLER03"));
     assertFalse(equipmentCache.hasKey(150L));
     assertNull(equipmentMapper.getItem(150L));
-    //commfault and alive should no longer be in cache
+    // commfault and alive should no longer be in cache
     assertFalse(aliveTimerCache.hasKey(equipment.getAliveTagId()));
     assertFalse(commFaultTagCache.hasKey(equipment.getCommFaultTagId()));
     verify(mockManager);
@@ -753,8 +805,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   @Test
   @DirtiesContext
-  public void testCreateUpdateRemoveProcess() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
-    //currently no configuration required on DAQ layer for Process configuration options
+  public void testCreateUpdateRemoveProcess() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
+    // currently no configuration required on DAQ layer for Process
+    // configuration options
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(16);
@@ -774,10 +828,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     // Current host and PIK will be null
     expectedObject.setJmsDaqCommandQueue(this.jmsDaqQueueTrunk + ".command.null." + expectedObject.getName() + ".null");
 
-
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
 
-    //update
+    // update
     report = configurationLoader.applyConfiguration(17);
     System.out.println(report.toXML());
 
@@ -792,13 +845,13 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   /**
    * Tests the removal of a process succeeds, with dependent rules and alarms.
-   * Relies on permanent test data in test account and must be rolled back.
-   * No changes should be sent to the DAQ layer.
+   * Relies on permanent test data in test account and must be rolled back. No
+   * changes should be sent to the DAQ layer.
    */
   @Test
   @DirtiesContext
   public void testRemoveProcess() {
-    //stop DAQ else remove not allowed
+    // stop DAQ else remove not allowed
     processFacade.stop(50L, new Timestamp(System.currentTimeMillis()));
 
     replay(mockManager);
@@ -807,36 +860,36 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     verify(mockManager);
-    //check process, tag, rules and alarms are gone
+    // check process, tag, rules and alarms are gone
     assertFalse(processCache.hasKey(50L));
     assertNull(processMapper.getItem(50L));
     assertFalse(equipmentCache.hasKey(150L));
     assertNull(equipmentMapper.getItem(150L));
-    //check couple of rules
+    // check couple of rules
     assertFalse(ruleTagCache.hasKey(60010L));
     assertNull(ruleTagMapper.getItem(60010L));
     assertFalse(ruleTagCache.hasKey(60002L));
     assertNull(ruleTagMapper.getItem(60002L));
-    //tags
+    // tags
     assertFalse(dataTagCache.hasKey(200002L));
     assertNull(dataTagMapper.getItem(200002L));
     assertFalse(dataTagCache.hasKey(200003L));
     assertNull(dataTagMapper.getItem(200003L));
-    //control tags
+    // control tags
     assertFalse(controlTagCache.hasKey(1220L));
     assertNull(controlTagMapper.getItem(1220L));
     assertFalse(controlTagCache.hasKey(1221L));
     assertNull(controlTagMapper.getItem(1221L));
-    //equipment control tags
+    // equipment control tags
     assertFalse(controlTagCache.hasKey(1222L));
     assertNull(controlTagMapper.getItem(1222L));
     assertFalse(controlTagCache.hasKey(1223L));
     assertNull(controlTagMapper.getItem(1223L));
-    //equipment commfault
+    // equipment commfault
     assertFalse(commFaultTagCache.hasKey(1223L));
-    //process alive
+    // process alive
     assertFalse(aliveTimerCache.hasKey(1221L));
-    //alarms
+    // alarms
     assertFalse(alarmCache.hasKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(alarmCache.hasKey(350001L));
@@ -844,11 +897,11 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     verify(mockManager);
   }
 
-
   /**
    * Tests the removal of a process succeeds, with dependent rules and alarms.
-   * Relies on permanent test data in test account and must be rolled back.
-   * No changes should be sent to the DAQ layer.
+   * Relies on permanent test data in test account and must be rolled back. No
+   * changes should be sent to the DAQ layer.
+   *
    * @throws NoSimpleValueParseException
    * @throws NoSuchFieldException
    * @throws TransformerException
@@ -858,9 +911,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
    */
   @Test
   @DirtiesContext
-  public void testRemoveEquipmentDependentObjects() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+  public void testRemoveEquipmentDependentObjects() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
 
-    //expect equipment remove message to DAQ
+    // expect equipment remove message to DAQ
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
 
       @Override
@@ -880,30 +934,30 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     ConfigurationReport report = configurationLoader.applyConfiguration(29);
     verify(mockManager);
-    //check equipment, tag, rules and alarms are gone
+    // check equipment, tag, rules and alarms are gone
     assertFalse(equipmentCache.hasKey(150L));
     assertNull(equipmentMapper.getItem(150L));
-    //check couple of rules
+    // check couple of rules
     assertFalse(ruleTagCache.hasKey(60005L));
     assertNull(ruleTagMapper.getItem(60005L));
     assertFalse(ruleTagCache.hasKey(60004L));
     assertNull(ruleTagMapper.getItem(60004L));
-    //tags
+    // tags
     assertFalse(dataTagCache.hasKey(200001L));
     assertNull(dataTagMapper.getItem(200001L));
     assertFalse(dataTagCache.hasKey(200004L));
     assertNull(dataTagMapper.getItem(200004L));
-    //control tags
+    // control tags
     assertFalse(controlTagCache.hasKey(1222L));
     assertNull(controlTagMapper.getItem(1222L));
     assertFalse(controlTagCache.hasKey(1223L));
     assertNull(controlTagMapper.getItem(1223L));
     assertFalse(controlTagCache.hasKey(1224L));
     assertNull(controlTagMapper.getItem(1224L));
-    //alivetimer & commfault
+    // alivetimer & commfault
     assertFalse(aliveTimerCache.hasKey(1224L));
     assertFalse(commFaultTagCache.hasKey(1223L));
-    //alarms
+    // alarms
     assertFalse(alarmCache.hasKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(alarmCache.hasKey(350001L));
@@ -918,7 +972,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @DirtiesContext
   @Test
   public void testCreateUpdateSubEquipment() {
-    //update unsuccessful so no message sent to DAQ
+    // update unsuccessful so no message sent to DAQ
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(19);
@@ -938,20 +992,20 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     ObjectEqualityComparison.assertSubEquipmentEquals(expectedObject, cacheObject);
 
-    //check DB update was successful
+    // check DB update was successful
     SubEquipmentCacheObject dbObject = (SubEquipmentCacheObject) subEquipmentMapper.getItem(200L);
     ObjectEqualityComparison.assertSubEquipmentEquals(expectedObject, dbObject);
 
-    //also check that the equipment, commfault and alive cache were updated
+    // also check that the equipment, commfault and alive cache were updated
     Equipment equipment = equipmentCache.get(expectedObject.getParentId());
     assertTrue(equipment.getSubEquipmentIds().contains(expectedObject.getId()));
-    //the alivetimer and commfault caches should reflect the changes
+    // the alivetimer and commfault caches should reflect the changes
     assertNotNull(aliveTimerCache.get(expectedObject.getAliveTagId()));
     assertEquals(expectedObject.getId(), aliveTimerCache.get(cacheObject.getAliveTagId()).getRelatedId());
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
 
-    //update should fail as try to change parent id
+    // update should fail as try to change parent id
     boolean failed = false;
     try {
       report = configurationLoader.applyConfiguration(20);
@@ -966,52 +1020,57 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
   @Test
   @DirtiesContext
-  public void testCreateSubEquipmentDataTag() {
+  public void testCreateSubEquipmentDataTag() throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParserConfigurationException,
+      TransformerException, NoSimpleValueParseException {
+
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
 
-    // First create the SubEquipment
-    ConfigurationReport report = configurationLoader.applyConfiguration(19);
+    // Create another DataTag attached to the SubEquipment (two already exist in
+    // permanent test data)
+    ConfigurationReport report = configurationLoader.applyConfiguration(99);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
 
-    //Now create the DataTag attached to the SubEquipment
-    report = configurationLoader.applyConfiguration(99);
-    System.out.println(report.toXML());
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-
-    SubEquipment subEquipment = subEquipmentCache.get(200L);
+    SubEquipment subEquipment = subEquipmentCache.get(250L);
     assertNotNull(subEquipment);
-    assertTrue(subEquipment.getDataTagIds().size() == 1);
+    assertTrue(subEquipment.getDataTagIds().size() == 3);
 
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(new Long(7000000));
-    assertTrue(cacheObject.getSubEquipmentId() == 200L);
+    assertTrue(cacheObject.getSubEquipmentId() == 250L);
   }
 
   @Test
   @DirtiesContext
-  public void testRemoveSubEquipmentDataTag() {
-    testCreateSubEquipmentDataTag();
-    verify(mockManager);
-    reset(mockManager);
+  public void testRemoveSubEquipmentDataTag() throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParserConfigurationException,
+      TransformerException, NoSimpleValueParseException {
 
-    SubEquipment subEquipment = subEquipmentCache.get(200L);
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(mockManager);
+
+    // Create another DataTag attached to the SubEquipment (two already exist in
+    // permanent test data)
+    ConfigurationReport report = configurationLoader.applyConfiguration(99);
+    System.out.println(report.toXML());
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+
+    SubEquipment subEquipment = subEquipmentCache.get(250L);
     assertNotNull(subEquipment);
     assertTrue(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
     assertTrue(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
     assertTrue(controlTagCache.hasKey(subEquipment.getAliveTagId()));
     assertTrue(controlTagCache.hasKey(subEquipment.getStateTagId()));
     assertTrue(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
+    assertTrue(subEquipment.getDataTagIds().size() == 3);
     for (Long tagId : subEquipment.getDataTagIds()) {
       assertTrue(dataTagCache.hasKey(tagId));
     }
 
-    replay(mockManager);
-
-    ConfigurationReport report = configurationLoader.applyConfiguration(98);
+    report = configurationLoader.applyConfiguration(21);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertFalse(subEquipmentCache.hasKey(200L));
-    assertNull(equipmentMapper.getItem(200L));
+    assertFalse(subEquipmentCache.hasKey(250L));
+    assertNull(equipmentMapper.getItem(250L));
 
     assertFalse(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
     assertFalse(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
@@ -1032,7 +1091,12 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Test
   @DirtiesContext
   public void testRemoveSubEquipment() {
-    SubEquipment subEquipment = subEquipmentCache.get(250L);
+    // Create the subequipment
+    ConfigurationReport report = configurationLoader.applyConfiguration(19);
+    System.out.println(report.toXML());
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+
+    SubEquipment subEquipment = subEquipmentCache.get(200L);
     assertNotNull(subEquipment);
     assertTrue(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
     assertTrue(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
@@ -1042,11 +1106,11 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     replay(mockManager);
 
-    ConfigurationReport report = configurationLoader.applyConfiguration(21);
+    report = configurationLoader.applyConfiguration(98);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertFalse(subEquipmentCache.hasKey(250L));
-    assertNull(equipmentMapper.getItem(250L));
+    assertFalse(subEquipmentCache.hasKey(200L));
+    assertNull(equipmentMapper.getItem(200L));
 
     assertFalse(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
     assertFalse(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
@@ -1057,6 +1121,11 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
     assertFalse(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
+
+    Equipment parentEquipment = equipmentCache.get(150L);
+    for (Long id : parentEquipment.getSubEquipmentIds()) {
+      assertTrue(id != subEquipment.getId());
+    }
 
     verify(mockManager);
   }
@@ -1079,15 +1148,17 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject.setFaultFamily("fault family");
     expectedObject.setFaultMember("fault member");
     expectedObject.setFaultCode(223);
-    expectedObject.setCondition(AlarmCondition.fromConfigXML("<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\"><alarm-value type=\"Boolean\">true</alarm-value></AlarmCondition>"));
+    expectedObject
+        .setCondition(AlarmCondition
+            .fromConfigXML("<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\"><alarm-value type=\"Boolean\">true</alarm-value></AlarmCondition>"));
 
     ObjectEqualityComparison.assertAlarmEquals(expectedObject, cacheObject);
 
-    //also check that the Tag was updated
+    // also check that the Tag was updated
     Tag tag = tagLocationService.get(expectedObject.getTagId());
     assertTrue(tag.getAlarmIds().contains(expectedObject.getId()));
 
-    //update should succeed
+    // update should succeed
     report = configurationLoader.applyConfiguration(23);
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1208,13 +1279,12 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     DeviceCacheObject cacheObject = (DeviceCacheObject) deviceCache.get(20L);
     DeviceCacheObject expectedObject = new DeviceCacheObject(20L, "TEST_DEVICE_20", 400L);
 
-    List<DeviceProperty> expectedProperties= new ArrayList<>();
+    List<DeviceProperty> expectedProperties = new ArrayList<>();
     expectedProperties.add(new DeviceProperty("cpuLoadInPercent", 987654L, null, null, null));
     expectedProperties.add(new DeviceProperty("responsiblePerson", null, null, "Mr. Administrator", null));
     expectedProperties.add(new DeviceProperty("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
 
-
-    List<DeviceCommand> expectedCommands= new ArrayList<>();
+    List<DeviceCommand> expectedCommands = new ArrayList<>();
     expectedCommands.add(new DeviceCommand("TEST_COMMAND_1", 4287L));
     expectedCommands.add(new DeviceCommand("TEST_COMMAND_2", 4288L));
 

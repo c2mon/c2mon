@@ -107,6 +107,10 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
         subEquipmentFacade.removeAliveTimer(subEquipmentId);
         subEquipmentFacade.removeCommFault(subEquipmentId);
         subEquipmentCache.remove(subEquipmentId);
+
+        // Remove the SubEquipment from the parent Equipment
+        subEquipmentFacade.removeSubEquipmentFromEquipment(subEquipment.getParentId(), subEquipmentId);
+
         return change;
       } catch (RuntimeException e) {
         subEquipmentReport.setFailure("Exception caught while removing Sub-equipment " + subEquipmentId);

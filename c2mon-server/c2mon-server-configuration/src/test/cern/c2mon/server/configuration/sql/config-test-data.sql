@@ -278,8 +278,14 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   
 insert into timconfigval (seqid, elementfield, elementvalue) values (20,'parent_equip_id','151');
 
+--remove subequipment - should succeed
+insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
+  values (98,'remove subequipment w/datatag', 'remove subequipment 200', 'jusalmon', '?', sysdate);     
+insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
+  values (98,98,'REMOVE','SubEquipment','200');
+  
 
---create DataTag attached to SubEquipment
+--create DataTag attached to SubEquipment (from permanent test data)
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
   values (99,'create subequipment datatag', 'description', 'jusalmon', '?', sysdate);
 
@@ -296,7 +302,7 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (99,'valueDi
 insert into timconfigval (seqid, elementfield, elementvalue) values (99,'dipAddress','testConfigDIPaddress');
 insert into timconfigval (seqid, elementfield, elementvalue) values (99,'japcAddress','testConfigJAPCaddress');
 --attach to subequipment from above
-insert into timconfigval (seqid, elementfield, elementvalue) values (99,'subEquipmentId','200');
+insert into timconfigval (seqid, elementfield, elementvalue) values (99,'subEquipmentId','250');
 insert into timconfigval (seqid, elementfield, elementvalue) values (99,'minValue','12.2');
 insert into timconfigval (seqid, elementfield, elementvalue) values (99,'maxValue','23.3');
 insert into timconfigval (seqid, elementfield, elementvalue) values (99,'address',
@@ -305,12 +311,6 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (99,'address
            <opc-item-name>CW_TEMP_IN_COND5</opc-item-name>         
           </HardwareAddress>        
         </DataTagAddress>');
-
---remove subequipment - should succeed
-insert into timconfig (configid, configname, configdesc, author, configstate, createdate)
-  values (98,'remove subequipment w/datatag', 'remove subequipment 200', 'jusalmon', '?', sysdate);     
-insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
-  values (98,98,'REMOVE','SubEquipment','200');
 
 --remove subequipment - should succeed
 insert into timconfig (configid, configname, configdesc, author, configstate, createdate)

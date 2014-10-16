@@ -217,4 +217,16 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
     SubEquipment subEquipment = cache.getCopy(subEquipmentId);
     return subEquipment.getDataTagIds();
   }
+
+  @Override
+  public void removeSubEquipmentFromEquipment(Long equipmentId, Long subEquipmentId) {
+    cache.acquireWriteLockOnKey(equipmentId);
+    try {
+      Equipment equipment = equipmentCache.get(equipmentId);
+      equipment.getSubEquipmentIds().remove(subEquipmentId);
+      equipmentCache.putQuiet(equipment);
+    } finally {
+      cache.releaseWriteLockOnKey(equipmentId);
+    }
+  }
 }

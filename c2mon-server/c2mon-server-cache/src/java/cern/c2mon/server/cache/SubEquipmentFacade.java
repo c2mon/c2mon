@@ -76,4 +76,12 @@ public interface SubEquipmentFacade extends CommonEquipmentFacade<SubEquipment> 
    * @return the ids in a collection
    */
   Collection<Long> getDataTagIds(Long subEquipmentId);
+
+  /**
+   * Removes the SubEquipment from the list of SubEquipments of the Equipment.
+   *
+   * @param equipmentId the ID of the equipment
+   * @param subEquipmentId the ID of the SubEquipment to remove
+   */
+  void removeSubEquipmentFromEquipment(Long equipmentId, Long subEquipmentId);
 }
