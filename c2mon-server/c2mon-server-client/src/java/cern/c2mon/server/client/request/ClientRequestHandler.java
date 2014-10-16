@@ -340,7 +340,7 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       processXmlResponse = new ProcessXmlResponseImpl();
       processXmlResponse.setProcessXML(xmlString);
     } catch (CacheElementNotFoundException cacheEx) {
-      String errorMessage = "Requested process not found.";
+      String errorMessage = "Error while getting Process configruation:" + cacheEx.getMessage();
       LOG.warn(errorMessage, cacheEx);
       processXmlResponse = new ProcessXmlResponseImpl(false, errorMessage);
     }
