@@ -1,24 +1,42 @@
-package cern.c2mon.daq.opcua;
+/******************************************************************************
+ * This file is part of the Technical Infrastructure Monitoring (TIM) project.
+ * See http://ts-project-tim.web.cern.ch
+ * 
+ * Copyright (C) 2005 - 2014 CERN This program is free software; you can
+ * redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version. This program is distributed
+ * in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received
+ * a copy of the GNU General Public License along with this program; if not,
+ * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ * 
+ * Author: TIM team, tim.support@cern.ch
+ *****************************************************************************/
+
+package cern.c2mon.daq.opcua.connection.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 
-import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
-import cern.c2mon.daq.opcua.connection.common.IOPCEndpointFactory;
-import cern.c2mon.daq.opcua.connection.common.IOPCEndpointListener;
+import org.apache.log4j.Logger;
+
+import cern.c2mon.daq.common.IEquipmentMessageSender;
+import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
+import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
+import cern.c2mon.daq.opcua.EndpointEquipmentLogListener;
+import cern.c2mon.daq.opcua.EndpointTypesUnknownException;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint.STATE;
 import cern.c2mon.daq.opcua.connection.common.impl.AliveWriter;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.daq.opcua.connection.common.impl.StatusChecker;
-import cern.c2mon.daq.common.logger.EquipmentLogger;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
-import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
 import cern.c2mon.shared.daq.command.ISourceCommandTag;
@@ -29,54 +47,56 @@ import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
- * The endpoint controller is responsible for the handling of a single endpoint.
- * It initializes the connection, registers and unregisters data and command
- * tags and fires commands.
+ * AbstractEndpointController abstract class (no implementation of this class)
  * 
- * @author Andreas Lang
- * 
+ * @author vilches
  */
-public class EndpointController implements IOPCEndpointListener, ICommandTagChanger, IDataTagChanger {
+public abstract class AbstractEndpointController implements IOPCEndpointListener, ICommandTagChanger, IDataTagChanger {
+    /**
+     * Private class logger.
+     */
+    private static final Logger logger = Logger.getLogger(AbstractEndpointController.class);
+    
     /**
      * Properties for the opc endpoint.
      */
-    private final List<OPCUAAddress> opcAddresses;
+    protected List<? extends AbstractOPCUAAddress> opcAddresses = null;
 
     /**
      * The OPCAddress of the current endpoint.
      */
-    private OPCUAAddress currentAddress;
+    protected AbstractOPCUAAddress currentAddress;
 
     /**
      * Factory to create OPCEndpoints.
      */
-    private final IOPCEndpointFactory opcEndpointFactory;
+    protected IOPCEndpointFactory opcEndpointFactory = null;
 
     /**
      * The currently controlled endpoint.
      */
-    private IOPCEndpoint endpoint;
+    protected IOPCEndpoint endpoint;
 
     /**
      * The EquipmentMessageSender to send updates to.
      */
-    private IEquipmentMessageSender sender;
+    protected IEquipmentMessageSender sender;
 
     /**
      * The equipment specific logger factory.
      */
-    private final EquipmentLoggerFactory factory;
+    protected EquipmentLoggerFactory factory = null;
 
     /**
      * The equipment specific logger.
      */
-    private final EquipmentLogger logger;
+//    private final EquipmentLogger logger;
 
     /**
      * Event listener and logger for OPC endpoints to the C2MON equipment
      * logger.
      */
-    private final EndpointEquipmentLogListener logListener;
+    protected EndpointEquipmentLogListener logListener = null;
 
     /**
      * Thread used to reconnect to the endpoint if an exception occurred.
@@ -91,59 +111,15 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     /**
      * The equipment configuration for his controller.
      */
-    private IEquipmentConfiguration equipmentConfiguration;
+    protected IEquipmentConfiguration equipmentConfiguration;
     
     private Timer statusCheckTimer;
-
-    /**
-     * Creates a new EndpointController
-     * 
-     * @param endPointFactory
-     *            The endpoint factory to create OPC endpoints.
-     * @param sender
-     *            The equipment message sender to send updates to.
-     * @param factory
-     *            Factory to crate equipmen bound loggers.
-     * @param opcAddresses
-     *            The addresses for the endpoints.
-     * @param equipmentConfiguration
-     *            The equipment configuration for this controller.
-     */
-    public EndpointController(final IOPCEndpointFactory endPointFactory,
-            final IEquipmentMessageSender sender,
-            final EquipmentLoggerFactory factory,
-            final List<OPCUAAddress> opcAddresses,
-            final IEquipmentConfiguration equipmentConfiguration) {
-        this.opcEndpointFactory = endPointFactory;
-        this.sender = sender;
-        this.factory = factory;
-        this.logger = factory.getEquipmentLogger(getClass());
-        logListener = new EndpointEquipmentLogListener(factory);
-        this.opcAddresses = opcAddresses;
-        this.equipmentConfiguration = equipmentConfiguration;
-    }
 
     /**
      * Starts this controllers endpoint. After this method is called the
      * controller will receive updates.
      */
-    public synchronized void startEndpoint() {
-        try {
-            createEndpoint();
-            endpoint.registerEndpointListener(logListener);
-            endpoint.registerEndpointListener(this);
-            endpoint.addDataTags(equipmentConfiguration.getSourceDataTags().values());
-            endpoint.addCommandTags(equipmentConfiguration.getSourceCommandTags().values());
-            sender.confirmEquipmentStateOK("Connected to " + currentAddress.getUri().getHost());
-            startAliveTimer();
-            setUpStatusChecker();
-            endpoint.setStateOperational();
-        } catch (OPCCommunicationException e) {
-            logger.error(
-                    "Endpoint creation failed. Controller will try again. ", e);
-            triggerEndpointRestart(e.getMessage());
-        }
-    }
+    public abstract void startEndpoint();
 
     /**
      * Sets up and schedules a regular status check.
@@ -185,7 +161,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     /**
      * 
      */
-    protected void stopStatusChecker() {
+    public void stopStatusChecker() {
         if (statusCheckTimer != null) {
             logger.info("Stopping OPCStatusChecker...");
             statusCheckTimer.cancel();
@@ -224,19 +200,19 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     /**
      * Makes sure there is a created and initialized endpoint.
      */
-    private void createEndpoint() {
-        if (endpoint == null || endpoint.getState() == STATE.NOT_INITIALIZED) {
-            OPCUAAddress address = getNextOPCAddress();
+    protected void createEndpoint() {
+        if (this.endpoint == null || this.endpoint.getState() == STATE.NOT_INITIALIZED) {
+            AbstractOPCUAAddress address = getNextOPCAddress();
             logger.info("Trying to create endpoint '" + address.getUriString() + "'");
-            endpoint = opcEndpointFactory.createEndpoint(address.getProtocol());
-            if (endpoint == null && opcAddresses.size() > 1) {
+            this.endpoint = this.opcEndpointFactory.createEndpoint(address.getProtocol());
+            if (this.endpoint == null && opcAddresses.size() > 1) {
                 logger.warn("Endpoint creation for '" + address.getUriString() + "' failed. Trying alternative address.");
                 // try alternative address
                 address = getNextOPCAddress();
-                endpoint = opcEndpointFactory.createEndpoint(address.getProtocol());
+                this.endpoint = this.opcEndpointFactory.createEndpoint(address.getProtocol());
             }
-            if (endpoint != null) {
-                endpoint.initialize(address);
+            if (this.endpoint != null) {
+                this.endpoint.initialize(address);
                 logger.info("Endpoint '" + address.getUriString() + "' created and initialized");
             } else {
                 // There was no type matching an implemented endpoint
@@ -263,26 +239,26 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      * 
      * @return The next available OPCAddress.
      */
-    private synchronized OPCUAAddress getNextOPCAddress() {
-        if (currentAddress == null) {
-            currentAddress = opcAddresses.get(0);
-        } else if (opcAddresses.size() > 1) {
-            if (opcAddresses.get(0).equals(currentAddress)) {
-                currentAddress = opcAddresses.get(1);
+    protected synchronized AbstractOPCUAAddress getNextOPCAddress() {
+        if (this.currentAddress == null) {
+            this.currentAddress = this.opcAddresses.get(0);
+        } else if (this.opcAddresses.size() > 1) {
+            if (this.opcAddresses.get(0).equals(this.currentAddress)) {
+                this.currentAddress = this.opcAddresses.get(1);
             } else {
-                currentAddress = opcAddresses.get(0);
+                this.currentAddress = this.opcAddresses.get(0);
             }
         }
-        return currentAddress;
+        return this.currentAddress;
     }
     
     /**
-     * Returns the current OPC Address.
+     * Returns the current OPCUA Address
      * 
-     * @return The OPCAddress used at the moment.
+     * @return The OPCUAAddress used at the moment.
      */
-    private synchronized OPCUAAddress getCurrentOPCAddress() {
-    	return currentAddress;
+    protected synchronized AbstractOPCUAAddress getCurrentOPCAddress() {
+        return this.currentAddress;
     }
 
     /**
@@ -297,8 +273,9 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      *            The changed value.
      */
     @Override
-    public void onNewTagValue(final ISourceDataTag dataTag, 
-            final long timestamp, final Object tagValue) {
+    public void onNewTagValue(final ISourceDataTag dataTag, final long timestamp, final Object tagValue) {
+        logger.debug("onNewTagValue - New Tag value received for Tag#" + dataTag.getId());
+        
         Object convertedValue;
         if (tagValue == null)
             convertedValue = tagValue;
@@ -308,8 +285,9 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         else
             convertedValue = TIMDriverSimpleTypeConverter.convert(
                     dataTag, tagValue.toString());
-        sender.sendTagFiltered(dataTag, convertedValue, timestamp);
-        logger.debug("Tag value sent.");
+        this.sender.sendTagFiltered(dataTag, convertedValue, timestamp);
+        
+        logger.debug("onNewTagValue - Tag value " + convertedValue + " sent for Tag#" + dataTag.getId());
     }
 
     /**
@@ -318,7 +296,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     public synchronized void refresh() {
         requiresEndpoint();
         logger.info("Refreshing values of all data tags.");
-        endpoint.refreshDataTags(equipmentConfiguration.getSourceDataTags().values());
+        this.endpoint.refreshDataTags(this.equipmentConfiguration.getSourceDataTags().values());
     }
 
     /**
@@ -332,7 +310,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         Collection<ISourceDataTag> tags = new ArrayList<ISourceDataTag>(1);
         tags.add(sourceDataTag);
         logger.info("Refreshing value of data tag with id '" + sourceDataTag.getId() + "'.");
-        endpoint.refreshDataTags(tags);
+        this.endpoint.refreshDataTags(tags);
     }
 
     /**
@@ -348,7 +326,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         String decription = "Tag invalid: " + cause.getClass().getSimpleName() + ": " 
             + cause.getMessage();
         logger.debug(decription);
-        sender.sendInvalidTag(dataTag, (short) SourceDataQuality.DATA_UNAVAILABLE, cause.getMessage());
+        this.sender.sendInvalidTag(dataTag, (short) SourceDataQuality.DATA_UNAVAILABLE, cause.getMessage());
     }
 
     /**
@@ -368,14 +346,14 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      * Triggers the restart of this endpoint.
      * @param reason The reason of the restart, if any applicable.
      */
-    private synchronized void triggerEndpointRestart(final String reason) {      
-        if (reconnectThread == null || !reconnectThread.isAlive()) {
-            reconnectThread = new Thread() {
+    protected synchronized void triggerEndpointRestart(final String reason) {      
+        if (this.reconnectThread == null || !this.reconnectThread.isAlive()) {
+            this.reconnectThread = new Thread() {
                 @Override
                 public void run() {
                     do {
                         try {
-                          EndpointController.this.stop();
+                            AbstractEndpointController.this.stop();
                         }
                         catch (Exception ex) {
                           logger.warn("Error stopping endpoint subscription", ex);
@@ -407,7 +385,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
                     logger.info("Exiting OPC Endpoint restart procedure");
                 }
             };
-            reconnectThread.start();
+            this.reconnectThread.start();
         }
     }
 
@@ -421,7 +399,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      */
     public void runCommand(final ISourceCommandTag commandTag, final SourceCommandTagValue sourceCommandTagValue) {
         requiresEndpoint();
-        endpoint.executeCommand((OPCHardwareAddress) commandTag.getHardwareAddress(), sourceCommandTagValue);
+        this.endpoint.executeCommand((OPCHardwareAddress) commandTag.getHardwareAddress(), sourceCommandTagValue);
     }
 
     /**
@@ -436,7 +414,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     public void onAddCommandTag(final ISourceCommandTag sourceCommandTag, final ChangeReport changeReport) {
         logger.info("Adding command tag " + sourceCommandTag.getId());
         requiresEndpoint();
-        endpoint.addCommandTag(sourceCommandTag);
+        this.endpoint.addCommandTag(sourceCommandTag);
         changeReport.appendInfo("CommandTag added.");
         changeReport.setState(CHANGE_STATE.SUCCESS);
         logger.info("Added command tag " + sourceCommandTag.getId());
@@ -454,7 +432,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     public void onRemoveCommandTag(final ISourceCommandTag sourceCommandTag, final ChangeReport changeReport) {
         logger.info("Removing command tag " + sourceCommandTag.getId());
         requiresEndpoint();
-        endpoint.removeCommandTag(sourceCommandTag);
+        this.endpoint.removeCommandTag(sourceCommandTag);
         changeReport.appendInfo("CommandTag removed.");
         changeReport.setState(CHANGE_STATE.SUCCESS);
         logger.info("Removed command tag " + sourceCommandTag.getId());
@@ -476,8 +454,8 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         logger.info("Updating command tag " + sourceCommandTag.getId());
         requiresEndpoint();
         if (!sourceCommandTag.getHardwareAddress().equals(oldSourceCommandTag.getHardwareAddress())) {
-            endpoint.removeCommandTag(oldSourceCommandTag);
-            endpoint.addCommandTag(sourceCommandTag);
+            this.endpoint.removeCommandTag(oldSourceCommandTag);
+            this.endpoint.addCommandTag(sourceCommandTag);
             changeReport.appendInfo("CommandTag updated.");
         } else {
             changeReport.appendInfo("No changes for OPC necessary.");
@@ -498,7 +476,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     public void onAddDataTag(final ISourceDataTag sourceDataTag, final ChangeReport changeReport) {
         logger.info("Adding data tag " + sourceDataTag.getId());
         requiresEndpoint();
-        endpoint.addDataTag(sourceDataTag);
+        this.endpoint.addDataTag(sourceDataTag);
         refresh(sourceDataTag);
         changeReport.appendInfo("DataTag added.");
         changeReport.setState(CHANGE_STATE.SUCCESS);
@@ -517,7 +495,7 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
     public void onRemoveDataTag(final ISourceDataTag sourceDataTag, final ChangeReport changeReport) {
         logger.info("Removing data tag " + sourceDataTag.getId());
         requiresEndpoint();
-        endpoint.removeDataTag(sourceDataTag);
+        this.endpoint.removeDataTag(sourceDataTag);
         changeReport.appendInfo("DataTag removed.");
         changeReport.setState(CHANGE_STATE.SUCCESS);
         logger.info("Removed data tag " + sourceDataTag.getId());
@@ -538,8 +516,8 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
         logger.info("Updating data tag " + sourceDataTag.getId());
         requiresEndpoint();
         if (!sourceDataTag.getHardwareAddress().equals(oldSourceDataTag.getHardwareAddress())) {
-            endpoint.removeDataTag(oldSourceDataTag);
-            endpoint.addDataTag(sourceDataTag);
+            this.endpoint.removeDataTag(oldSourceDataTag);
+            this.endpoint.addDataTag(sourceDataTag);
             changeReport.appendInfo("Data tag updated.");
         } else {
             changeReport.appendInfo("No changes for OPC necessary.");
@@ -552,9 +530,16 @@ public class EndpointController implements IOPCEndpointListener, ICommandTagChan
      * Checks if there is an endpoint created. If not an exception is thrown.
      */
     private void requiresEndpoint() {
-        if (endpoint == null || endpoint.getState() == STATE.NOT_INITIALIZED)
+        if (this.endpoint == null || this.endpoint.getState() == STATE.NOT_INITIALIZED)
             throw new OPCCriticalException(
                     "No Endpoint was created or Endpoint was not initialized/started.");
     }
-
+    
+    /**
+     * 
+     * @return the writer
+     */
+    public AliveWriter getWriter() {
+        return writer;
+    }
 }
