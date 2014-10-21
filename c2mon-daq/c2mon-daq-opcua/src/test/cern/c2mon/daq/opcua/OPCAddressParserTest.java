@@ -1,32 +1,31 @@
 package cern.c2mon.daq.opcua;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Properties;
 
 import org.junit.Test;
 
-import cern.c2mon.daq.opcua.OPCUAAddress;
-import cern.c2mon.daq.opcua.OPCAUAddressException;
-import cern.c2mon.daq.opcua.OPCAUAddressParser;
-
-import static cern.c2mon.daq.opcua.OPCAUAddressParser.*;
-import static org.junit.Assert.*;
+import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddress;
+import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddressParser;
+import static cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddressParser.*;
 
 public class OPCAddressParserTest {
     
-    private OPCAUAddressParser parser = new OPCAUAddressParser();
+    private OPCUADefaultAddressParser parser = new OPCUADefaultAddressParser();
     
     @Test
     public void testParseAddressSingleCorrect() throws URISyntaxException {
         String addressString = URI_KEY + "=dcom://testhost:1234/testpath;"
             + USER_KEY + "=user@domain;" + PASSWORD_KEY + "=password;"
             + SERVER_TIMEOUT_KEY + "=314;" + SERVER_RETRY_TIMEOUT_KEY + "=1337";
-        List<OPCUAAddress> addresses =
-            parser.parseAddressString(addressString);
+        List<OPCUADefaultAddress> addresses =
+            parser.createOPCAddressFromAddressString(addressString);
         assertEquals(1, addresses.size());
-        OPCUAAddress address = addresses.get(0);
+        OPCUADefaultAddress address = addresses.get(0);
         assertEquals("dcom", address.getProtocol());
         assertEquals("domain", address.getDomain());
         assertEquals("password", address.getPassword());
@@ -45,10 +44,10 @@ public class OPCAddressParserTest {
             + PASSWORD_KEY + "=password, password2;"
             + SERVER_TIMEOUT_KEY + "=314;" + SERVER_RETRY_TIMEOUT_KEY + "=1337;"
             + ALIVE_WRITER_KEY + "=false";
-        List<OPCUAAddress> addresses =
-            parser.parseAddressString(addressString);
+        List<OPCUADefaultAddress> addresses =
+            parser.createOPCAddressFromAddressString(addressString);
         assertEquals(2, addresses.size());
-        OPCUAAddress address = addresses.get(0);
+        OPCUADefaultAddress address = addresses.get(0);
         assertEquals("dcom", address.getProtocol());
         assertEquals("domain", address.getDomain());
         assertEquals("password", address.getPassword());
@@ -77,6 +76,6 @@ public class OPCAddressParserTest {
             + "http://testhost2:1234/testpath2;" + USER_KEY + "=user@domain,user2;"
             + PASSWORD_KEY + "=password, password2;"
             + SERVER_TIMEOUT_KEY + "=314;" + SERVER_RETRY_TIMEOUT_KEY + "=1337";
-        parser.parseAddressString(addressString);
+        parser.createOPCAddressFromAddressString(addressString);
     }
 }

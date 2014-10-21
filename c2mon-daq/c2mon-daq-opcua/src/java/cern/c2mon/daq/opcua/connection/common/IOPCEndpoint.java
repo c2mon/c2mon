@@ -2,7 +2,6 @@ package cern.c2mon.daq.opcua.connection.common;
 
 import java.util.Collection;
 
-import cern.c2mon.daq.opcua.OPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
@@ -82,7 +81,7 @@ public interface IOPCEndpoint {
      * 
      * @param address The properties specific to this endpoint.
      */
-    void initialize(OPCUAAddress address);
+    void initialize(AbstractOPCUAAddress address);
     
     /**
      * Adds a data tag to this endpoint.

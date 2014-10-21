@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.axis2.jaxws.server.EndpointController;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -29,10 +30,13 @@ import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint.STATE;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpointFactory;
+import cern.c2mon.daq.opcua.connection.common.impl.EndpointControllerDefault;
+import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddress;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import cern.c2mon.shared.daq.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
@@ -41,7 +45,6 @@ import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 
 public class EndpointControllerTest {
     
@@ -53,9 +56,9 @@ public class EndpointControllerTest {
     
     private IEquipmentConfiguration conf = EasyMock.createMock(IEquipmentConfiguration.class);
 
-    private OPCUAAddress opcAddress;
+    private OPCUADefaultAddress opcAddress;
 
-    private EndpointController controller;
+    private EndpointControllerDefault controller;
 
     private Map<Long, ISourceDataTag> sourceDataTags;
 
@@ -63,20 +66,20 @@ public class EndpointControllerTest {
     
     private volatile Throwable error;
 
-    private ArrayList<OPCUAAddress> addresses;
+    private ArrayList<OPCUADefaultAddress> addresses;
     
     @Before
     public void setUp() throws URISyntaxException {
-        opcAddress = new OPCUAAddress.Builder(
+        opcAddress = new OPCUADefaultAddress.DefaultBuilder(
                 "test://somhost/somepath", 1000, 1000)
                 .build();
-        addresses = new ArrayList<OPCUAAddress>();
+        addresses = new ArrayList<OPCUADefaultAddress>();
         addresses.add(opcAddress);
         sourceDataTags =
             new HashMap<Long, ISourceDataTag>();
         sourceCommandTags =
             new HashMap<Long, ISourceCommandTag>();
-        controller = new EndpointController(
+        controller = new EndpointControllerDefault(
                 factory, sender, new EquipmentLoggerFactory("asd", 1L, "asd", "asd", false, false),
                 addresses, conf);
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
@@ -183,7 +186,7 @@ public class EndpointControllerTest {
     @Test
     public void testFirstEndpointInvalid() throws URISyntaxException {
         addresses.add(
-                new OPCUAAddress.Builder(
+                new OPCUADefaultAddress.DefaultBuilder(
                         "http://host/somepath", 100, 1000).build());
         expect(conf.getSourceDataTags()).andReturn(sourceDataTags).anyTimes();
         expect(conf.getSourceCommandTags()).andReturn(sourceCommandTags).anyTimes();
@@ -290,7 +293,7 @@ public class EndpointControllerTest {
         
         replay(conf);
         controller.startAliveTimer();
-        assertNotNull(controller.writer);
+        assertNotNull(controller.getWriter());
         controller.stopAliveTimer();
         verify(conf);
     }

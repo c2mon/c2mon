@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.daq.opcua.OPCUAAddress;
+import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
 import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
@@ -326,7 +326,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * @param address The address to use to initialize the endpoint.
      */
     @Override
-    public synchronized void initialize(final OPCUAAddress address) {
+    public synchronized void initialize(final AbstractOPCUAAddress address) {
         if (currentState == STATE.INITIALIZED) { 
             reset();
         }
@@ -471,7 +471,7 @@ public abstract class OPCEndpoint<ID extends ItemDefinition< ? > >
      * 
      * @param address The properties specific to this endpoint.
      */
-    protected abstract void onInit(OPCUAAddress address);
+    protected abstract void onInit(AbstractOPCUAAddress address);
     
     /**
      * Stops the endpoint and clears all configuration states.

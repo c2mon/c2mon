@@ -13,7 +13,7 @@ import org.opcfoundation.xmlda.ItemValue;
 import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
 import org.opcfoundation.xmlda.SubscribePolledRefreshReplyItemList;
 
-import cern.c2mon.daq.opcua.OPCUAAddress;
+import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 
@@ -44,7 +44,7 @@ public class SoapLongPoll {
     /**
      * The Saddress to poll.
      */
-    private OPCUAAddress address;
+    private AbstractOPCUAAddress address;
 
     /**
      * An executor service which serves as ThreadPool.
@@ -94,7 +94,7 @@ public class SoapLongPoll {
      * @param waitTime The maximum time the server will wait after the hold time
      * to return a request. Even if there are no updates.
      */
-    public SoapLongPoll(final OPCUAAddress address,
+    public SoapLongPoll(final AbstractOPCUAAddress address,
             final String serverSubscriptionHandle, final int holdTime, 
             final int waitTime) {
         this.address = address;

@@ -1,6 +1,9 @@
 package cern.c2mon.daq.opcua.connection.soap;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URISyntaxException;
@@ -8,21 +11,18 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.llom.OMElementImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.opcfoundation.xmlda.ItemValue;
 import org.opcfoundation.xmlda.SubscribePolledRefreshReplyItemList;
 
-import cern.c2mon.daq.opcua.OPCUAAddress;
-import cern.c2mon.daq.opcua.connection.soap.ISoapLongPollListener;
-import cern.c2mon.daq.opcua.connection.soap.SoapLongPoll;
+import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddress;
 
 public class SoapLongPollTest {
     
 
-    private OPCUAAddress address;
+    private OPCUADefaultAddress address;
 
     private SoapLongPoll poll;
     
@@ -36,7 +36,7 @@ public class SoapLongPollTest {
                 exception = e;
             }
         });
-        address = new OPCUAAddress.Builder(
+        address = new OPCUADefaultAddress.DefaultBuilder(
                 "http://host/path", 100, 1000)
                 .build();
         poll = new SoapLongPoll(

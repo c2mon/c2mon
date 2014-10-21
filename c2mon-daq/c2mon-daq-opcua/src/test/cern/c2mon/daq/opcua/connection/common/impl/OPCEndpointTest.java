@@ -1,5 +1,15 @@
 package cern.c2mon.daq.opcua.connection.common.impl;
 
+import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,28 +18,21 @@ import org.easymock.Capture;
 import org.easymock.classextension.ConstructorArgs;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
-import cern.c2mon.daq.opcua.OPCUAAddress;
+import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
 import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpointListener;
-import cern.c2mon.daq.opcua.connection.common.impl.ItemDefinition;
-import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
-import cern.c2mon.daq.opcua.connection.common.impl.OPCEndpoint;
-import cern.c2mon.daq.opcua.connection.common.impl.SubscriptionGroup;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.OPCCommandHardwareAddress.COMMAND_TYPE;
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import cern.c2mon.shared.daq.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
-import static org.easymock.classextension.EasyMock.*;
 
 public class OPCEndpointTest {
 
@@ -41,7 +44,7 @@ public class OPCEndpointTest {
 
     private OPCEndpoint<ItemDefinition<String>> endpoint;
 
-    private OPCUAAddress address;
+    private OPCUADefaultAddress address;
         
     @Before
     public void setUp() throws SecurityException, NoSuchMethodException, URISyntaxException {
@@ -50,7 +53,7 @@ public class OPCEndpointTest {
                         OPCEndpoint.class.getConstructor(
                                 IItemDefinitionFactory.class,
                                 IGroupProvider.class), factory, provider),
-                OPCEndpoint.class.getDeclaredMethod("onInit", OPCUAAddress.class),
+                OPCEndpoint.class.getDeclaredMethod("onInit", AbstractOPCUAAddress.class),
                 OPCEndpoint.class.getDeclaredMethod("onSubscribe", Collection.class),
                 OPCEndpoint.class.getDeclaredMethod(
                         "onWrite", ItemDefinition.class, Object.class),
@@ -59,7 +62,7 @@ public class OPCEndpointTest {
                 OPCEndpoint.class.getDeclaredMethod("onRefresh", Collection.class));
         
         address =
-            new OPCUAAddress.Builder("http://host/path", 100, 1000)
+            new OPCUADefaultAddress.DefaultBuilder("http://host/path", 100, 1000)
                 .build();
         endpoint.initialize(address);
         reset(endpoint);

@@ -1,29 +1,16 @@
 package cern.c2mon.daq.opcua.connection.soap;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.createMock;
 
 import java.net.URISyntaxException;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Properties;
 
-import org.easymock.Capture;
 import org.junit.Test;
 import org.opcfoundation.xmlda.OPCXML_DataAccess;
-import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
-import org.opcfoundation.xmlda.Subscribe;
-import org.opcfoundation.xmlda.SubscribeResponse;
 
-import cern.c2mon.daq.opcua.OPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
 import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
-import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
-import cern.c2mon.daq.opcua.connection.common.impl.SubscriptionGroup;
-import cern.c2mon.daq.opcua.connection.soap.DASoapEndpoint;
-import cern.c2mon.daq.opcua.connection.soap.DASoapItemDefintion;
+import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddress;
 
 public class DASoapEndpointTest {
     
@@ -65,7 +52,7 @@ public class DASoapEndpointTest {
     
     @Test(expected=OPCCriticalException.class)
     public void testMalformedURL() throws URISyntaxException {
-        OPCUAAddress address = new OPCUAAddress.Builder(
+        OPCUADefaultAddress address = new OPCUADefaultAddress.DefaultBuilder(
                 "dcom://asd/asd", 100, 1000)
                 .build();
         endpoint.initialize(address);

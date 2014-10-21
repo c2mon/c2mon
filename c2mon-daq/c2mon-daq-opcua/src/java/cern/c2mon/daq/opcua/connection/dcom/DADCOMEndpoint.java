@@ -12,7 +12,13 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.daq.opcua.OPCUAAddress;
+import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddress;
+import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
+import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
+import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
+import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
+import cern.c2mon.daq.opcua.connection.common.impl.OPCEndpoint;
+import cern.c2mon.daq.opcua.connection.common.impl.SubscriptionGroup;
 import cern.c2mon.daq.opcua.jintegraInterface.DIOPCGroupEventAdapter;
 import cern.c2mon.daq.opcua.jintegraInterface.DIOPCGroupEventDataChangeEvent;
 import cern.c2mon.daq.opcua.jintegraInterface.IOPCAutoServer;
@@ -24,12 +30,6 @@ import cern.c2mon.daq.opcua.jintegraInterface.OPCItem;
 import cern.c2mon.daq.opcua.jintegraInterface.OPCItems;
 import cern.c2mon.daq.opcua.jintegraInterface.OPCServer;
 import cern.c2mon.daq.opcua.jintegraInterface.OPCServerState;
-import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
-import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
-import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
-import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
-import cern.c2mon.daq.opcua.connection.common.impl.OPCEndpoint;
-import cern.c2mon.daq.opcua.connection.common.impl.SubscriptionGroup;
 
 import com.linar.jintegra.AuthInfo;
 import com.linar.jintegra.AutomationException;
@@ -117,7 +117,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      *            The address of this endpoint.
      */
     @Override
-    protected synchronized void onInit(final OPCUAAddress opcAddress) {
+    protected synchronized void onInit(final AbstractOPCUAAddress opcAddress) {
         URI uri = opcAddress.getUri();
         String domain = opcAddress.getDomain();
         String user = opcAddress.getUser();

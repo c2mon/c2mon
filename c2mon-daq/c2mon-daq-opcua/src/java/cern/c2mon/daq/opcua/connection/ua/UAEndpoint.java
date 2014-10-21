@@ -30,29 +30,29 @@ import org.opcfoundation.ua.core.TimestampsToReturn;
 import org.opcfoundation.ua.transport.security.Cert;
 import org.opcfoundation.ua.transport.security.SecurityMode;
 
-import com.prosysopc.ua.ApplicationIdentity;
-import com.prosysopc.ua.CertificateValidationListener;
-import com.prosysopc.ua.MonitoredItemBase;
-import com.prosysopc.ua.PkiFileBasedCertificateValidator;
-import com.prosysopc.ua.SecureIdentityException;
-import com.prosysopc.ua.ServiceException;
-import com.prosysopc.ua.StatusException;
-import com.prosysopc.ua.SubscriptionBase;
-import com.prosysopc.ua.UserIdentity;
-import com.prosysopc.ua.PkiFileBasedCertificateValidator.CertificateCheck;
-import com.prosysopc.ua.PkiFileBasedCertificateValidator.ValidationResult;
-import com.prosysopc.ua.client.MonitoredItem;
-import com.prosysopc.ua.client.ServerConnectionException;
-import com.prosysopc.ua.client.Subscription;
-import com.prosysopc.ua.client.UaClient;
-
-import cern.c2mon.daq.opcua.OPCUAAddress;
+import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
 import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCEndpoint;
 import cern.c2mon.daq.opcua.connection.common.impl.SubscriptionGroup;
+
+import com.prosysopc.ua.ApplicationIdentity;
+import com.prosysopc.ua.CertificateValidationListener;
+import com.prosysopc.ua.MonitoredItemBase;
+import com.prosysopc.ua.PkiFileBasedCertificateValidator;
+import com.prosysopc.ua.PkiFileBasedCertificateValidator.CertificateCheck;
+import com.prosysopc.ua.PkiFileBasedCertificateValidator.ValidationResult;
+import com.prosysopc.ua.SecureIdentityException;
+import com.prosysopc.ua.ServiceException;
+import com.prosysopc.ua.StatusException;
+import com.prosysopc.ua.SubscriptionBase;
+import com.prosysopc.ua.UserIdentity;
+import com.prosysopc.ua.client.MonitoredItem;
+import com.prosysopc.ua.client.ServerConnectionException;
+import com.prosysopc.ua.client.Subscription;
+import com.prosysopc.ua.client.UaClient;
 
 /**
  * The OPCUA endpoint to connect to OPC UA servers.
@@ -130,7 +130,7 @@ public class UAEndpoint extends OPCEndpoint<UAItemDefintion>
      * @param opcAddress The address for this OPC UA endpoint.
      */
     @Override
-    protected void onInit(final OPCUAAddress opcAddress) {
+    protected void onInit(final AbstractOPCUAAddress opcAddress) {
         String uri = opcAddress.getUriString();
         String userName = opcAddress.getUser();
         String password = opcAddress.getPassword();

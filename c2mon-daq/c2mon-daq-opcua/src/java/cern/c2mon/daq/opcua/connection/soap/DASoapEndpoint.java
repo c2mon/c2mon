@@ -14,7 +14,6 @@ import org.opcfoundation.xmlda.GetStatus;
 import org.opcfoundation.xmlda.GetStatusResponse;
 import org.opcfoundation.xmlda.ItemValue;
 import org.opcfoundation.xmlda.OPCError;
-import org.opcfoundation.xmlda.OPCXML_DataAccess;
 import org.opcfoundation.xmlda.OPCXML_DataAccessStub;
 import org.opcfoundation.xmlda.Read;
 import org.opcfoundation.xmlda.ReadRequestItemList;
@@ -24,7 +23,7 @@ import org.opcfoundation.xmlda.SubscribeRequestItem;
 import org.opcfoundation.xmlda.SubscribeResponse;
 import org.opcfoundation.xmlda.WriteResponse;
 
-import cern.c2mon.daq.opcua.OPCUAAddress;
+import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAAddress;
 import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
 import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
@@ -71,7 +70,7 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
     /**
      * The OPC address of this endpoint.
      */
-    private OPCUAAddress address;
+    private AbstractOPCUAAddress address;
     
     /**
      * Collection of Soap long polls.
@@ -103,7 +102,7 @@ public class DASoapEndpoint extends OPCEndpoint<DASoapItemDefintion> {
      * @param opcAddress The address for this endpoint.
      */
     @Override
-    protected synchronized void onInit(final OPCUAAddress opcAddress) {
+    protected synchronized void onInit(final AbstractOPCUAAddress opcAddress) {
         this.address = opcAddress;
         final String domain = opcAddress.getDomain();
         final String user = opcAddress.getUser();
