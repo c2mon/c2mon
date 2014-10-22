@@ -31,6 +31,9 @@
 					<mail address="diamon-developers@cern.ch" />
 				</notification>
 			</deployment>
+			<startscript name="DMN2-DAQ-RDA_SMP">
+				<env name="PROCESS_NAME" value="P_RDA_SMP" />
+			</startscript>			
 			<startscript name="DMN2-DAQ-RDA_BIS">
 				<env name="PROCESS_NAME" value="P_RDA_BIS" />
 			</startscript>
@@ -50,6 +53,9 @@
 					<file name="daq-core-service.xml" sourceDir="~dmndev/c2mon/daq" mask="444" />
 				</directory>
 			</deployment>
+			<startscript name="DMN2-DAQ-RDA_SMP">
+				<env name="PROCESS_NAME" value="P_RDA_SMP" />
+			</startscript>						
 			<startscript name="DMN2-DAQ-RDA_BIS">
 				<env name="PROCESS_NAME" value="P_RDA_BIS" />
 			</startscript>
