@@ -49,7 +49,7 @@ public class EndpointControllerSiemens extends AbstractEndpointController {
     /**
      * fake Data Tag ID use for reading the Redundant Server State 
      */
-    public static final Long FAKE_DATATAG_ID = 1L;
+    public static final Long REDUNDANT_SERVER_STATE_TAG_ID = 0L;
     
     /**
      * Redundant Server State types enum
@@ -146,10 +146,7 @@ public class EndpointControllerSiemens extends AbstractEndpointController {
      */
     private SourceDataTag createDataTagForRedServerState() {
         // Data Tag to read redundant server state name
-        SourceDataTag sourceDataTag = new SourceDataTag(
-                FAKE_DATATAG_ID, 
-                "CA.MEY." + ((OPCUASiemensAddress)getCurrentOPCAddress()).getUri().getHost() + ":RED_SERVER_STATE", 
-                false);
+        SourceDataTag sourceDataTag = new SourceDataTag(REDUNDANT_SERVER_STATE_TAG_ID, "REDUNDANT_SERVER_STATE", false);
         
         // DataTag Address
         DataTagAddress dataTagAddress = new DataTagAddress();
@@ -170,7 +167,7 @@ public class EndpointControllerSiemens extends AbstractEndpointController {
     @Override
     public void onNewTagValue(final ISourceDataTag dataTag, final long timestamp, final Object tagValue) {
         // If the Data Tag ID belongs to the redundant server state
-        if(dataTag.getId() == FAKE_DATATAG_ID) {      
+        if(dataTag.getId() == REDUNDANT_SERVER_STATE_TAG_ID) {      
             int value = Integer.valueOf(tagValue.toString());
             
             // If the Server went to Stand by or error restart connections
