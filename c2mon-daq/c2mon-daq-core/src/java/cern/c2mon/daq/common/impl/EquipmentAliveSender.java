@@ -127,8 +127,12 @@ class EquipmentAliveSender {
                     "Equipment alive tag value has been overwritten by the DAQ Core with the source timestamp",
                     new Timestamp(milisecTimestamp));
         } else {
-            supAliveValue = new SourceDataTagValue(this.aliveTagId, "eqalive", true, milisecTimestamp, null, milisecTimestamp,
-                    DataTagConstants.PRIORITY_HIGH, false, null, DataTagConstants.TTL_FOREVER);
+          int ttl = DataTagConstants.TTL_FOREVER;
+          if (aliveTagInterval <= Integer.MAX_VALUE) {
+            ttl = aliveTagInterval.intValue();
+          }
+          supAliveValue = new SourceDataTagValue(this.aliveTagId, "eqalive", true, milisecTimestamp, null, milisecTimestamp,
+                                                 DataTagConstants.PRIORITY_HIGH, false, null, ttl);
         }
 
         this.equipmentLogger.debug("sendSupervisionAlive() - Sending equipment alive message with timestamp " + milisecTimestamp);
