@@ -1294,10 +1294,10 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedProperties.add(new DeviceProperty("responsiblePerson", null, null, "Mr. Administrator", null));
     expectedProperties.add(new DeviceProperty("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
 
-    List<DeviceProperty> expectedFields = new ArrayList<>();
-    expectedFields.add(new DeviceProperty(1L, "field1", "987654", "tagId", null));
-    expectedFields.add(new DeviceProperty(2L, "field2", "(#123 + #234) / 2", "clientRule", null));
-    expectedProperties.add(new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields));
+//    List<DeviceProperty> expectedFields = new ArrayList<>();
+//    expectedFields.add(new DeviceProperty(1L, "field1", "987654", "tagId", null));
+//    expectedFields.add(new DeviceProperty(2L, "field2", "(#123 + #234) / 2", "clientRule", null));
+//    expectedProperties.add(new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields));
 
     List<DeviceCommand> expectedCommands = new ArrayList<>();
     expectedCommands.add(new DeviceCommand("TEST_COMMAND_1", 4287L));
