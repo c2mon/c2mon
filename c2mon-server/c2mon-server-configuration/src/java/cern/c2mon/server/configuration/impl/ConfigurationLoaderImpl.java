@@ -455,7 +455,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         case ALARM : alarmConfigHandler.removeAlarm(element.getEntityId(), elementReport); break;
         case PROCESS : daqConfigEvents.add(processConfigHandler.removeProcess(element.getEntityId(), elementReport)); break;
         case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.removeEquipment(element.getEntityId(), elementReport)); break;
-        case SUBEQUIPMENT : subEquipmentConfigHandler.removeSubEquipment(element.getEntityId(), elementReport); break;
+        case SUBEQUIPMENT : daqConfigEvents.addAll(subEquipmentConfigHandler.removeSubEquipment(element.getEntityId(), elementReport)); break;
         case DEVICECLASS : deviceClassConfigHandler.removeDeviceClass(element.getEntityId(), elementReport); break;
         case DEVICE : deviceConfigHandler.removeDevice(element.getEntityId(), elementReport); break;
         default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());

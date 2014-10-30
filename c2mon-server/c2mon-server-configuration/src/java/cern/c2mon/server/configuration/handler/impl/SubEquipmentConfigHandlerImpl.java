@@ -43,6 +43,7 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.config.DataTagRemove;
 
 /**
  * See interface documentation.
@@ -91,17 +92,18 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
    * @param subEquipmentReport to which subreports may be added
    */
   @Override
-  public ProcessChange removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
+  public List<ProcessChange> removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
     LOGGER.debug("Removing SubEquipment " + subEquipmentId);
     subEquipmentCache.acquireWriteLockOnKey(subEquipmentId);
     try {
       SubEquipment subEquipment = subEquipmentCache.get(subEquipmentId);
 
       // TIMS-951: Allow attachment of DataTags to SubEquipments
-      removeSubEquipmentTags(subEquipment, subEquipmentReport);
+      List<ProcessChange> changes = removeSubEquipmentTags(subEquipment, subEquipmentReport);
 
       try {
-        ProcessChange change = subEquipmentConfigTransacted.doRemoveSubEquipment(subEquipment, subEquipmentReport);
+        changes.addAll(subEquipmentConfigTransacted.doRemoveSubEquipment(subEquipment, subEquipmentReport));
+
         subEquipmentCache.releaseWriteLockOnKey(subEquipmentId);
         removeEquipmentControlTags(subEquipment, subEquipmentReport); //must be after removal of subequipment from DB
         subEquipmentFacade.removeAliveTimer(subEquipmentId);
@@ -111,7 +113,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
         // Remove the SubEquipment from the parent Equipment
         subEquipmentFacade.removeSubEquipmentFromEquipment(subEquipment.getParentId(), subEquipmentId);
 
-        return change;
+        return changes;
       } catch (RuntimeException e) {
         subEquipmentReport.setFailure("Exception caught while removing Sub-equipment " + subEquipmentId);
         throw new UnexpectedRollbackException("Exception caught while removing Sub-equipment", e);
@@ -119,7 +121,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
     } catch (CacheElementNotFoundException e) {
       LOGGER.debug("SubEquipment not found in cache - unable to remove it.", e);
       subEquipmentReport.setWarning("SubEquipment not found in cache so cannot be removed.");
-      return new ProcessChange();
+      return new ArrayList<ProcessChange>();
     } finally {
       if (subEquipmentCache.isWriteLockedByCurrentThread(subEquipmentId)) {
         subEquipmentCache.releaseWriteLockOnKey(subEquipmentId);
@@ -152,12 +154,21 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
    * @param equipment for which the tags should be removed
    * @throws RuntimeException if fail to remove tag
    */
-  private void removeSubEquipmentTags(SubEquipment subEquipment, ConfigurationElementReport subEquipmentReport) {
+  private List<ProcessChange> removeSubEquipmentTags(SubEquipment subEquipment, ConfigurationElementReport subEquipmentReport) {
+    List<ProcessChange> processChanges = new ArrayList<>();
+
     for (Long dataTagId : new ArrayList<Long>(subEquipment.getDataTagIds())) {
       // copy as list is modified by removeDataTag
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       subEquipmentReport.addSubReport(tagReport);
+
+      // Add removal events for the DataTags attached to this SubEquipment
+      DataTagRemove dataTagRemove = new DataTagRemove(0L, dataTagId, subEquipment.getParentId());
+      processChanges.add(new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(subEquipment.getId()), dataTagRemove));
+
       dataTagConfigHandler.removeDataTag(dataTagId, tagReport);
     }
+
+    return processChanges;
   }
 }
