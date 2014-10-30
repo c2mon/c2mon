@@ -269,7 +269,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    * @param subEquipmentCacheObject the SubEquipment we want the config XML for
    * @return XML as a String
    */
-  private String getSubEquipmentConfigXML(final SubEquipmentCacheObject subEquipmentCacheObject) {
+  public String getSubEquipmentConfigXML(final SubEquipmentCacheObject subEquipmentCacheObject) {
     if (LOGGER.isDebugEnabled()) {
       LOGGER.debug("getConfigXML() - Creating the configuration for the subequipment with id: " + subEquipmentCacheObject.getId());
     }
