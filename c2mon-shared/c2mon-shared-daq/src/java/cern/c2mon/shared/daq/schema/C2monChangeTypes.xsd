@@ -195,4 +195,19 @@
       <xs:attribute name="equipment-id" use="required" type="xs:long"/>
     </xs:complexType>
 
+    <!-- The sub equipment unit add type -->
+    <xs:complexType name="subEquipmentUnitAdd">
+      <xs:all>
+        <xs:element minOccurs="1" maxOccurs="1" name="sub-equipment-unit-xml" type="xs:string"/>
+      </xs:all>
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+      <xs:attribute name="sub-equipment-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
+    <!-- The sub equipment unit remove type -->
+    <xs:complexType name="subEquipmentUnitRemove">
+      <xs:attribute name="change-id" use="required" type="xs:long"/>
+      <xs:attribute name="sub-equipment-id" use="required" type="xs:long"/>
+    </xs:complexType>
+
 </xs:schema>

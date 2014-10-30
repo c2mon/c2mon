@@ -12,11 +12,11 @@
 	  <alive-interval>120000</alive-interval>
 	  <address>interval=100;eventProb=0.8;inRangeProb=1.0;outDeadBandProb=0.0;outDeadBandProb=0.0;switchProb=0.5;startIn=0.01;aliveInterval=30000</address>
 	  <SubEquipmentUnits>
-	  	<SubEquipmentUnit>
+	  	<SubEquipmentUnit id="1" name="subeq1">
 		  	<commfault-tag-id>1</commfault-tag-id>
 		  	<commfault-tag-value>true</commfault-tag-value>
 	  	</SubEquipmentUnit>
-	  	<SubEquipmentUnit>
+	  	<SubEquipmentUnit id="2" name="subeq2">
 		  	<commfault-tag-id>2</commfault-tag-id>
 		  	<commfault-tag-value>false</commfault-tag-value>
 	  	</SubEquipmentUnit>

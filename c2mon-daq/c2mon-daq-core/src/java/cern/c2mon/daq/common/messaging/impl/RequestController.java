@@ -35,6 +35,8 @@ import cern.c2mon.shared.daq.config.DataTagRemove;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
+import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
+import cern.c2mon.shared.daq.config.SubEquipmentUnitRemove;
 import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
@@ -42,7 +44,7 @@ import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 
 /**
  * The RequestController is to direct request to the core to the right place in the core.
- * 
+ *
  * @author Andreas Lang
  */
 public class RequestController {
@@ -62,7 +64,7 @@ public class RequestController {
     /**
      * Creates a new message controller which uses the provided configuration controller to perform configuration
      * changes triggered by messages.
-     * 
+     *
      * @param configurationController The configuration controller to apply confiuration changes to.
      */
     @Autowired
@@ -72,7 +74,7 @@ public class RequestController {
 
     /**
      * Applies a change to the configuration.
-     * 
+     *
      * @param change The change to apply.
      * @return A report about the applied change and its success.
      */
@@ -114,26 +116,30 @@ public class RequestController {
 
         // NOTE: adding and removing EquipmentUnit(s) at runtime is handled directly by DriverKernel
         // see: ProcessMessageReceiver.onReconfigureProcess()
-            
+
         //} else if (change instanceof EquipmentUnitAdd) {
         //    report = configurationController.onEquipmentUnitAdd((EquipmentUnitAdd) change);
         //} else if (change instanceof EquipmentUnitRemove) {
         //    report = configurationController.onEquipmentUnitRemove((EquipmentUnitRemove) change);
-            
+
+        } else if (change instanceof SubEquipmentUnitAdd) {
+          report = configurationController.onSubEquipmentUnitAdd((SubEquipmentUnitAdd) change);
+        } else if (change instanceof SubEquipmentUnitRemove) {
+          report = configurationController.onSubEquipmentUnitRemove((SubEquipmentUnitRemove) change);
         } else {
             report = new ChangeReport(change);
             report.appendError("Change failed in DAQ core. " + change.getClass().getName()
                     + " is not supported by this version of the DAQ.");
         }
-        
+
         LOGGER.debug("Leaving applyChange: ");
-        
+
         return report;
     }
 
     /**
      * Executes the command specified in SourceCommandTagValue.
-     * 
+     *
      * @param sourceCommandTagValue The value which specifies which command should be run.
      * @return A report about the comand execution.
      */
@@ -170,7 +176,7 @@ public class RequestController {
     /**
      * Calls the implementation to execute the command. It will retry and timeout like specified with the provided
      * values.
-     * 
+     *
      * @param sourceCommandTagValue The source command value which specifies he command.
      * @param commandRunner The command runner to use.
      * @param sourceRetries The number of retries if the command times out.
@@ -209,7 +215,7 @@ public class RequestController {
 
     /**
      * Handles a SourceDataTagValueUpdateRequest.
-     * 
+     *
      * @param sourceDataTagValueRequest The request to handle.
      * @return A SourceDataTagValueResponse which contains the result of the request. The return value is never null.
      */
@@ -270,7 +276,7 @@ public class RequestController {
 
     /**
      * Creates a list of data tag updates.
-     * 
+     *
      * @param equipmentConfiguration The equipment configuration which should be used to get the data tags.
      * @return List of updates for the provided equipment.
      */
@@ -285,19 +291,19 @@ public class RequestController {
 
     /**
      * Creates a data tag value update for the provided data tag.
-     * 
+     *
      * @param sourceDataTag The source data tag to use.
      * @return The update of the data tag value.
      */
     private DataTagValueUpdate getDataTagUpdate(final ISourceDataTag sourceDataTag) {
         Long processId = configurationController.getProcessConfiguration().getProcessID();
         Long processPIK = this.configurationController.getProcessConfiguration().getprocessPIK();
-        
+
         RunOptions runOptions = this.configurationController.getRunOptions();
         // We add the PIK to our communication process
         DataTagValueUpdate dataTagValueUpdate;
         dataTagValueUpdate = new DataTagValueUpdate(processId, processPIK);
-        
+
         if (sourceDataTag.getCurrentValue() != null)
             dataTagValueUpdate.addValue(sourceDataTag.getCurrentValue().clone());
         return dataTagValueUpdate;
@@ -305,7 +311,7 @@ public class RequestController {
 
     /**
      * Puts a command runner to this controller.
-     * 
+     *
      * @param equipmentId The id of the equipment the runner belongs to.
      * @param commandRunner The command runner object.
      */

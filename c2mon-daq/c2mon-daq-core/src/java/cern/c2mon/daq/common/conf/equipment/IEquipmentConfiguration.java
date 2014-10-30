@@ -17,9 +17,9 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
-import java.util.Hashtable;
 import java.util.Map;
 
+import cern.c2mon.daq.common.conf.core.SubEquipmentConfiguration;
 import cern.c2mon.shared.daq.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
@@ -84,22 +84,20 @@ public interface IEquipmentConfiguration {
      */
     boolean hasSourceCommandTag(final Long tagID);
 
-    // TODO Are these necessary for the implementation?
     /**
-     * Returns the live map of sub equipment commFault keys and values.
-     * All changes will (add/remove...) be made to the real
-     * map. It is never null.
-     * @return The live map of sub equipment commFault keys and values.
+     * Retrieve all SubEquipment configurations.
+     * 
+     * @return the map of SubEquipment configuration
      */
-    Hashtable<Long, Boolean> getSubEqCommFaultValues();
+    Map<Long, SubEquipmentConfiguration> getSubEquipmentConfigurations();
 
     /**
-     * Returns the live map of sub equipment alive tag keys and values.
-     * All changes will (add/remove...) be made to the real
-     * map. It is never null.
-     * @return The live map of sub equipment alive tag keys and values.
+     * Retrieve a single SubEquipment configuration.
+     * 
+     * @param subEquipmentId the id of the SubEquipment configuration
+     * @return the SubEquipment configuration
      */
-    Hashtable<Long, Long> getSubEqAliveValues();
+    SubEquipmentConfiguration getSubEquipmentConfiguration(Long subEquipmentId);
 
     /**
      * Returns a copy of the map of data tags. Adding tags to this

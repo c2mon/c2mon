@@ -2,7 +2,7 @@ package cern.c2mon.shared.daq.config;
 
 /**
  * Constants for the field names of configuration change objects.
- * 
+ *
  * @author Andreas Lang
  *
  */
@@ -43,6 +43,10 @@ public interface ConfigurationJavaConstants {
      * The equipment ID field.
      */
     String EQUIPMENT_ID_FIELD = "equipmentId";
+    /**
+     * The sub equipment ID field.
+     */
+    String SUB_EQUIPMENT_ID_FIELD = "subEquipmentId";
     /**
      * The process id field
      */

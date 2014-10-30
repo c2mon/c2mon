@@ -11,7 +11,6 @@
 package cern.c2mon.daq.common.conf.core;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -74,16 +73,9 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     private String name;
 
     /**
-     * A collection of commFaultTagId -> commFaultTagValue pairs, corresponding each pair to one of the subequipments
-     * attached to this equipment
+     * The map of SubEquipment configurations.
      */
-    private final Hashtable<Long, Boolean> subEqCommFaultValues = new Hashtable<Long, Boolean>();
-
-    /**
-     * A collection of aliveTagId -> aliveTagInterval pairs, corresponding each pair to one of the subequipments
-     * attached to this equipment
-     */
-    private final Hashtable<Long, Long> subEqAliveValues = new Hashtable<>();
+    private final Map<Long, SubEquipmentConfiguration> subEquipmentConfigurations = new HashMap<>();
 
     /**
      * The source data tags of this equipment configuration.
@@ -296,25 +288,28 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     }
 
     /**
-     * Returns the live map of sub equipment commFault keys and values. All changes will (add/remove...) be made to the
-     * real map. It is never null.
+     * Retrieve all SubEquipment configurations.
      *
-     * @return The live map of sub equipment commFault keys and values.
+     * @return the map of SubEquipment configurations
      */
     @Override
-    public Hashtable<Long, Boolean> getSubEqCommFaultValues() {
-        return subEqCommFaultValues;
+    public Map<Long, SubEquipmentConfiguration> getSubEquipmentConfigurations() {
+      return this.subEquipmentConfigurations;
     }
 
     /**
-     * Returns the live map of sub equipment alive tag keys and values. All changes will (add/remove...) be made to the
-     * real map. It is never null.
-     *
-     * @return The live map of sub equipment alive tag keys and values.
+     * Retrieve a single SubEquipment configuration.
+     * 
+     * @param subEquipmentId the id of the SubEquipment configuration
+     * @return the of SubEquipment configuration
      */
     @Override
-    public Hashtable<Long, Long> getSubEqAliveValues() {
-        return subEqAliveValues;
+    public SubEquipmentConfiguration getSubEquipmentConfiguration(Long subEquipmentId) {
+      return this.subEquipmentConfigurations.get(subEquipmentId);
+    }
+
+    public void addSubEquipmentConfiguration(SubEquipmentConfiguration subEquipmentConfiguration) {
+      this.subEquipmentConfigurations.put(subEquipmentConfiguration.getId(), subEquipmentConfiguration);
     }
 
     /**

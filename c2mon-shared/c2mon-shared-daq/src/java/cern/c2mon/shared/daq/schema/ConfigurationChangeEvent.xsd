@@ -18,6 +18,8 @@
           <xs:element name="CommandTagRemove" type="commandTagRemove" />
           <xs:element name="EquipmentUnitAdd" type="equipmentUnitAdd" />
           <xs:element name="EquipmentUnitRemove" type="equipmentUnitRemove" />
+          <xs:element name="SubEquipmentUnitAdd" type="subEquipmentUnitAdd" />
+          <xs:element name="SubEquipmentUnitRemove" type="subEquipmentUnitRemove" />
         </xs:choice>
       </xs:complexType>
     </xs:element>

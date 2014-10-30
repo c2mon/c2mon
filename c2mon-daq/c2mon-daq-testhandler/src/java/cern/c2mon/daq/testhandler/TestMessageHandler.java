@@ -29,6 +29,7 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
+import cern.c2mon.daq.common.conf.core.SubEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.jmx.JmxRegistrationMXBean;
@@ -207,16 +208,16 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
     }
 
     // create alive messages for sub equipments
-    for (Long aliveTagId : getEquipmentConfiguration().getSubEqAliveValues().keySet()) {
-      equipmentAliveTimer.scheduleSubEquipmentAliveTimer(aliveTagId, aliveInterval);
+    for (SubEquipmentConfiguration subEquipmentConfiguration : getEquipmentConfiguration().getSubEquipmentConfigurations().values()) {
+      equipmentAliveTimer.scheduleSubEquipmentAliveTimer(subEquipmentConfiguration.getAliveTagId(), aliveInterval);
     }
 
     // send commfault tag for equipment
     getEquipmentMessageSender().confirmEquipmentStateOK("Test Equipment is OK");
 
     // send commfault tags for subequipments
-    for (Long commFaultTagId : getEquipmentConfiguration().getSubEqCommFaultValues().keySet()) {
-      getEquipmentMessageSender().confirmSubEquipmentStateOK(commFaultTagId, "Test SubEquipment is OK");
+    for (SubEquipmentConfiguration subEquipmentConfiguration : getEquipmentConfiguration().getSubEquipmentConfigurations().values()) {
+      getEquipmentMessageSender().confirmSubEquipmentStateOK(subEquipmentConfiguration.getCommFaultTagId(), "Test SubEquipment is OK");
     }
 
     timer = new Timer("SendTimer");
@@ -304,13 +305,19 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
 
   @Override
   public void activateEquipmentAliveTag() {
-    equipmentAliveTimer.terminateEquipmentAliveTimer();
+    try {
+      equipmentAliveTimer.terminateEquipmentAliveTimer();
+    } catch (IllegalStateException e) {
+    }
     equipmentAliveTimer.scheduleEquipmentAliveTimer(Integer.parseInt((String) configurationParams.get("aliveInterval")));
   }
 
   @Override
   public void activateSubEquipmentAliveTag(int aliveTagId) {
-    equipmentAliveTimer.terminateSubEquipmentAliveTimer(new Long(aliveTagId));
+    try {
+      equipmentAliveTimer.terminateSubEquipmentAliveTimer(new Long(aliveTagId));
+    } catch (IllegalStateException e) {
+    }
     equipmentAliveTimer.scheduleSubEquipmentAliveTimer(new Long(aliveTagId), Integer.parseInt((String) configurationParams.get("aliveInterval")));
   }
 
