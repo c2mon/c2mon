@@ -59,7 +59,7 @@ public class EndpointControllerSiemens extends AbstractEndpointController {
       MASTER("Master Server", 1), 
       STANDBY("Standby Server", 2), 
       ERROR_REDUNDANCE("Redundancy error", 3),
-      NO_REDUNDANCE("No redundancy", 4);
+      NO_REDUNDANCY("No redundancy", 4);
       
       // Server State status description
       private String description;
@@ -119,26 +119,12 @@ public class EndpointControllerSiemens extends AbstractEndpointController {
         this.equipmentConfiguration = equipmentConfiguration;
     }
     
-   
     @Override
-    public synchronized void startEndpoint() {        
-        try {
-            createEndpoint();
-            this.endpoint.registerEndpointListener(this.logListener);
-            this.endpoint.registerEndpointListener(this);
-            
-            this.endpoint.addDataTags(this.equipmentConfiguration.getSourceDataTags().values());
-            this.endpoint.addDataTag(createDataTagForRedServerState());
-            
-            this.endpoint.addCommandTags(this.equipmentConfiguration.getSourceCommandTags().values());
-            this.sender.confirmEquipmentStateOK("Connected to " + currentAddress.getUri().getHost());
-            startAliveTimer();
-            setUpStatusChecker();
-            this.endpoint.setStateOperational();
-        } catch (OPCCommunicationException e) {
-            logger.error("Siemens Endpoint creation failed. Controller will try again. ", e);
-            triggerEndpointRestart("Problems connecting to " + currentAddress.getUri().getHost() + ": " + e.getMessage());
-        }
+    protected void addTagsToEndpoint() {
+        // Add Data and Command Tags
+        super.addTagsToEndpoint();
+        // Add DataTag for reading Redundant Server State
+        this.endpoint.addDataTag(createDataTagForRedServerState());
     }
     
     /**
@@ -146,7 +132,10 @@ public class EndpointControllerSiemens extends AbstractEndpointController {
      */
     private SourceDataTag createDataTagForRedServerState() {
         // Data Tag to read redundant server state name
-        SourceDataTag sourceDataTag = new SourceDataTag(REDUNDANT_SERVER_STATE_TAG_ID, "REDUNDANT_SERVER_STATE", false);
+        SourceDataTag sourceDataTag = new SourceDataTag(
+                REDUNDANT_SERVER_STATE_TAG_ID, 
+                "REDUNDANT_SERVER_STATE_TAG", 
+                false);
         
         // DataTag Address
         DataTagAddress dataTagAddress = new DataTagAddress();
@@ -170,22 +159,29 @@ public class EndpointControllerSiemens extends AbstractEndpointController {
         if(dataTag.getId() == REDUNDANT_SERVER_STATE_TAG_ID) {      
             int value = Integer.valueOf(tagValue.toString());
             
-            // If the Server went to Stand by or error restart connections
+            // If the Server went to Stand by or Error restart connections
             if (value == ServerStateType.STANDBY.getValue()) {
-                logger.debug("onNewTagValue - New Redundant Server State Tag value received: " + ServerStateType.STANDBY.getDescription());
-                triggerEndpointRestart("New Redundant Server State value received: " + ServerStateType.STANDBY.getDescription());
+                logger.debug("onNewTagValue - Server " + currentAddress.getUri().getHost() + " redundant state: " 
+                        + ServerStateType.STANDBY.getDescription() + ". Reconnection in progress");                    
+                triggerEndpointRestart("Server " + currentAddress.getUri().getHost() + " redundant state: " 
+                        + ServerStateType.STANDBY.getDescription() + ". Reconnection in progress");
             } else  if (value == ServerStateType.ERROR_REDUNDANCE.getValue()) {
-                logger.debug("onNewTagValue - New Redundant Server State Tag value received: " + ServerStateType.ERROR_REDUNDANCE.getDescription());
-                triggerEndpointRestart("New Redundant Server State value received: " + ServerStateType.ERROR_REDUNDANCE.getDescription());
-            } else  if (value == ServerStateType.NO_REDUNDANCE.getValue()) {
-                logger.debug("onNewTagValue - New Redundant Server State Tag value received: " + ServerStateType.NO_REDUNDANCE.getDescription());
-                triggerEndpointRestart("New Redundant Server State value received: " + ServerStateType.NO_REDUNDANCE.getDescription());
+                logger.debug("onNewTagValue - Server " + currentAddress.getUri().getHost() + " redundant state: " 
+                        + ServerStateType.ERROR_REDUNDANCE.getDescription() + ". Reconnection in progress");                    
+                triggerEndpointRestart("Server " + currentAddress.getUri().getHost() + " redundant state: " 
+                        + ServerStateType.ERROR_REDUNDANCE.getDescription() + ". Reconnection in progress");
+            } else  if (value == ServerStateType.NO_REDUNDANCY.getValue()) {
+                // No redundancy Received so do nothing
+                logger.debug("onNewTagValue - Server " + currentAddress.getUri().getHost() + " redundant state: " 
+                        + ServerStateType.NO_REDUNDANCY.getDescription());              
             } else  if (value == ServerStateType.INIT.getValue()) {
                 // Initialization Received so do nothing
-                logger.debug("onNewTagValue - New Redundant Server State Tag value received: " + ServerStateType.INIT.getDescription());
+                logger.debug("onNewTagValue - Server " + currentAddress.getUri().getHost() + " redundant state: " 
+                        + ServerStateType.INIT.getDescription());              
             } else {
                 // Master Received so do nothing
-                logger.debug("onNewTagValue - New Redundant Server State Tag value received: " + ServerStateType.MASTER.getDescription());
+                logger.debug("onNewTagValue - Server " + currentAddress.getUri().getHost() + " redundant state: " 
+                        + ServerStateType.MASTER.getDescription());              
             }
             
         } else {

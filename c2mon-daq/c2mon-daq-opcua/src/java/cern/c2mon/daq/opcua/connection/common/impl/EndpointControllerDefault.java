@@ -66,22 +66,4 @@ public class EndpointControllerDefault extends AbstractEndpointController {
         this.opcAddresses = opcAddresses;
         this.equipmentConfiguration = equipmentConfiguration;
     }
-    
-    @Override
-    public synchronized void startEndpoint() {
-        try {
-            createEndpoint();
-            this.endpoint.registerEndpointListener(this.logListener);
-            this.endpoint.registerEndpointListener(this);
-            this.endpoint.addDataTags(this.equipmentConfiguration.getSourceDataTags().values());
-            this.endpoint.addCommandTags(this.equipmentConfiguration.getSourceCommandTags().values());
-            this.sender.confirmEquipmentStateOK("Connected to " + currentAddress.getUri().getHost());
-            startAliveTimer();
-            setUpStatusChecker();
-            this.endpoint.setStateOperational();
-        } catch (OPCCommunicationException e) {
-            logger.error("Endpoint creation failed. Controller will try again. ", e);
-            triggerEndpointRestart("Problems connecting to " + currentAddress.getUri().getHost() + ": " + e.getMessage());
-        }
-    }
 }

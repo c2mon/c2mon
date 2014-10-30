@@ -65,8 +65,11 @@ public class OPCUASiemensMessageHandler extends AbstractOPCUAMessageHandler {
             this.controller = new EndpointControllerSiemens(endpointFactory, getEquipmentMessageSender(), getEquipmentLoggerFactory(),
                     opcuaSiemensAddresses, config);
             getEquipmentLogger().debug("connectToDataSource - starting endpoint");
-            controller.startEndpoint();
-            getEquipmentLogger().debug("connectToDataSource - endpoint started");
+            if (!this.controller.startEndpoint()) {
+                getEquipmentLogger().debug("connectToDataSource - endpoint NOT started");
+            } else {
+                getEquipmentLogger().debug("connectToDataSource - endpoint started");
+            }
         } catch (OPCAUAddressException e) {
             throw new EqIOException(
                     "OPCUA Siemens address configuration string is invalid.", e);
@@ -78,8 +81,8 @@ public class OPCUASiemensMessageHandler extends AbstractOPCUAMessageHandler {
             throw new EqIOException("Siemens Endpoint creation failed.", e);
         }
         getEquipmentCommandHandler().setCommandRunner(this);
-        getEquipmentConfigurationHandler().setCommandTagChanger(controller);
-        getEquipmentConfigurationHandler().setDataTagChanger(controller);
+        getEquipmentConfigurationHandler().setCommandTagChanger(this.controller);
+        getEquipmentConfigurationHandler().setDataTagChanger(this.controller);
         getEquipmentConfigurationHandler().setEquipmentConfigurationChanger(this);
     }
 

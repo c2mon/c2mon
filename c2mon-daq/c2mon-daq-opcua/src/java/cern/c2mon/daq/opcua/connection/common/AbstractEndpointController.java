@@ -99,11 +99,6 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     protected EndpointEquipmentLogListener logListener = null;
 
     /**
-     * Thread used to reconnect to the endpoint if an exception occurred.
-     */
-    private Thread reconnectThread;
-
-    /**
      * The alive writer to write to the OPC.
      */
     protected AliveWriter writer;
@@ -114,12 +109,84 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     protected IEquipmentConfiguration equipmentConfiguration;
     
     private Timer statusCheckTimer;
+    
+    /**
+     * Reason why the connection cannot be done
+     */
+    private String noConnectionReason;
 
     /**
-     * Starts this controllers endpoint. After this method is called the
+     * Starts this controllers endpoint for the first time. After this method is called the
      * controller will receive updates.
+     * 
+     * @return True if the connection was successful or false in any other case
      */
-    public abstract void startEndpoint();
+    public synchronized boolean startEndpoint() {      
+        try {
+            startProcedure();
+        } catch (OPCCommunicationException e) {
+            logger.error("Siemens Endpoint creation failed. Controller will try again. ", e);
+            // Restart Endpoint
+            triggerEndpointRestart("Problems connecting to " + currentAddress.getUri().getHost() + ": " + e.getMessage());
+            
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Restart the controller endpoint if the first attempt fails
+     * 
+     * @return True if the reconnection was successful or false in any other case
+     */
+    public synchronized boolean restartEndpoint() {
+        try {
+            startProcedure();
+        } catch (OPCCommunicationException e) {
+            logger.error("Siemens Endpoint creation failed. Controller will try again. ", e);
+            // Reason
+            this.noConnectionReason = "Problems connecting to " + currentAddress.getUri().getHost() + ": " + e.getMessage();
+            
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Procedure common to all starts (start and restart)
+     */
+    protected synchronized void startProcedure() throws OPCCommunicationException {
+        // Create Endpoint
+        createEndpoint();
+        
+        // Register Listeners
+        this.endpoint.registerEndpointListener(this.logListener);
+        this.endpoint.registerEndpointListener(this);
+        
+        // Add Tags to endpoint
+        addTagsToEndpoint();
+        
+        // Send info message to Comm_fault tag
+        this.sender.confirmEquipmentStateOK("Connected to " + currentAddress.getUri().getHost());
+        
+        startAliveTimer();
+        setUpStatusChecker();
+        
+        // Change endpoint status to operational
+        this.endpoint.setStateOperational();
+    }
+    
+    /**
+     * Add Data and Command tags to the the endpoint
+     */
+    protected void addTagsToEndpoint() {
+        // Datatags
+        this.endpoint.addDataTags(this.equipmentConfiguration.getSourceDataTags().values());
+        // CommandTags
+        this.endpoint.addCommandTags(this.equipmentConfiguration.getSourceCommandTags().values());
+    }
 
     /**
      * Sets up and schedules a regular status check.
@@ -203,20 +270,20 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
     protected void createEndpoint() {
         if (this.endpoint == null || this.endpoint.getState() == STATE.NOT_INITIALIZED) {
             AbstractOPCUAAddress address = getNextOPCAddress();
-            logger.info("Trying to create endpoint '" + address.getUriString() + "'");
+            logger.info("createEndpoint - Trying to create endpoint '" + address.getUriString() + "'");
             this.endpoint = this.opcEndpointFactory.createEndpoint(address.getProtocol());
             if (this.endpoint == null && opcAddresses.size() > 1) {
-                logger.warn("Endpoint creation for '" + address.getUriString() + "' failed. Trying alternative address.");
+                logger.warn("createEndpoint - Endpoint creation for '" + address.getUriString() + "' failed. Trying alternative address.");
                 // try alternative address
                 address = getNextOPCAddress();
                 this.endpoint = this.opcEndpointFactory.createEndpoint(address.getProtocol());
             }
             if (this.endpoint != null) {
                 this.endpoint.initialize(address);
-                logger.info("Endpoint '" + address.getUriString() + "' created and initialized");
+                logger.info("createEndpoint - Endpoint '" + address.getUriString() + "' created and initialized");
             } else {
                 // There was no type matching an implemented endpoint
-                logger.error("Endpoint creation for '" + address.getUriString() + "' failed. Stop Startup.");
+                logger.error("createEndpoint - Endpoint creation for '" + address.getUriString() + "' failed. Stop Startup.");
                 throw new EndpointTypesUnknownException();
             }
         }
@@ -294,8 +361,8 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
      * Refreshes the values of all added data tags.
      */
     public synchronized void refresh() {
+        logger.info("refresh - Refreshing values of all data tags.");
         requiresEndpoint();
-        logger.info("Refreshing values of all data tags.");
         this.endpoint.refreshDataTags(this.equipmentConfiguration.getSourceDataTags().values());
     }
 
@@ -342,52 +409,57 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
         triggerEndpointRestart(cause.getMessage());
     }
 
+    
     /**
      * Triggers the restart of this endpoint.
      * @param reason The reason of the restart, if any applicable.
      */
     protected synchronized void triggerEndpointRestart(final String reason) {      
-        if (this.reconnectThread == null || !this.reconnectThread.isAlive()) {
-            this.reconnectThread = new Thread() {
-                @Override
-                public void run() {
-                    do {
-                        try {
-                            AbstractEndpointController.this.stop();
-                        }
-                        catch (Exception ex) {
-                          logger.warn("Error stopping endpoint subscription", ex);
-                        }
-                        finally {
-                          if (reason == null || reason.equalsIgnoreCase("")) {
-                            sender.confirmEquipmentStateIncorrect();
-                          }
-                          else {
-                            sender.confirmEquipmentStateIncorrect(reason);
-                          }
-                        }
-                        
-                        try {
-                            logger.debug("Sleeping for " 
-                                + getCurrentOPCAddress().getServerRetryTimeout() 
-                                + " ms ...");
-                            Thread.sleep(getCurrentOPCAddress().getServerRetryTimeout());
-                        } catch (InterruptedException e) {
-                            logger.error("Subscription restart interrupted!", e);
-                        }
-                        try {
-                            startEndpoint();
-                            refresh();
-                        } catch (Exception e) {
-                            logger.error("Error restarting subscription", e);
-                        }
-                    } while (endpoint.getState() != STATE.OPERATIONAL);
-                    logger.info("Exiting OPC Endpoint restart procedure");
+        this.noConnectionReason = reason;
+        
+        // Do while the endpoint state changes to OPERATOINAL
+        do {
+            // Stop endpoint and send message to COMM_FAULT tag
+            try {
+                AbstractEndpointController.this.stop();
+            }
+            catch (Exception ex) {
+                logger.warn("triggerEndpointRestart - Error stopping endpoint subscription for " + 
+                        getCurrentOPCAddress().getUri().getHost(), ex);
+            }
+            finally {
+                if (this.noConnectionReason == null || this.noConnectionReason.equalsIgnoreCase("")) {
+                    sender.confirmEquipmentStateIncorrect();
                 }
-            };
-            this.reconnectThread.start();
-        }
+                else {
+                    sender.confirmEquipmentStateIncorrect(this.noConnectionReason);
+                }
+            }
+
+            // Sleep before retrying
+            try {
+                logger.debug("triggerEndpointRestart - Server " + getCurrentOPCAddress().getUri().getHost() 
+                        + " - Sleeping for " + getCurrentOPCAddress().getServerRetryTimeout() + " ms ...");
+                Thread.sleep(getCurrentOPCAddress().getServerRetryTimeout());
+            } catch (InterruptedException e) {
+                logger.error("Subscription restart interrupted for " + getCurrentOPCAddress().getUri().getHost(), e);
+            }
+            
+            // Retry
+            try {
+                if (!restartEndpoint()) {
+                    logger.error("Error restarting Endpoint for " + getCurrentOPCAddress().getUri().getHost());
+                } else {
+                    refresh();
+                }
+            } catch (Exception e) {
+                logger.error("Error restarting subscription for " + getCurrentOPCAddress().getUri().getHost(), e);
+            }
+        } while (endpoint.getState() != STATE.OPERATIONAL);
+        logger.info("triggerEndpointRestart - Exiting OPC Endpoint restart procedure for " + getCurrentOPCAddress().getUri().getHost());
     }
+            
+  
 
     /**
      * Runs a command on the current endpoint.

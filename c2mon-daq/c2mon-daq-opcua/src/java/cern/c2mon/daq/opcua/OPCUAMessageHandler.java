@@ -47,8 +47,11 @@ public class OPCUAMessageHandler extends AbstractOPCUAMessageHandler {
                     getEquipmentLoggerFactory(),
                     opcuaDefaultAddresses, config);
             getEquipmentLogger().debug("connectToDataSource - starting endpoint");
-            controller.startEndpoint();
-            getEquipmentLogger().debug("connectToDataSource - endpoint started");
+            if (!controller.startEndpoint()) {
+                getEquipmentLogger().debug("connectToDataSource - endpoint NOT started");
+            } else {
+                getEquipmentLogger().debug("connectToDataSource - endpoint started");
+            }
         } catch (OPCAUAddressException e) {
             throw new EqIOException(
                     "OPC address configuration string is invalid.", e);
