@@ -17,7 +17,6 @@
 
 <script type="text/javascript">
 
-
 /**
  * Sets the default value of the progress bar to 0
  */
@@ -26,6 +25,15 @@ $(function(){
 	// Reset the Progressbar
 	$("#progressbar").progressbar({
 		value: 0
+	});
+	
+	// Triggers a click on the submit button when the enter key is pressed 
+  // inside the config id input field.
+	$("#config_id_input").keyup(function(event){
+	  if(event.keyCode == 13){
+	      event.preventDefault();
+	      $("#submitButton").click();
+	  }
 	});
 });
 
@@ -145,7 +153,7 @@ function getProgressDescription() {
 	<input id="config_id_input" type="text" name="id" value="${formTagValue}" size="10" /> 
 </form:form>
 
-<input name="submitButton" type="button" value="Submit" onclick="startProcess()">
+<input id="submitButton" name="submitButton" type="button" value="Submit" onclick="startProcess()">
 
 
 <div class="ui-widget">
