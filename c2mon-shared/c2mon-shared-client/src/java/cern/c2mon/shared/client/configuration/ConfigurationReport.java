@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2011 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration;
@@ -27,16 +27,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import cern.c2mon.shared.client.request.ClientRequestReport;
-import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.c2mon.shared.client.request.ClientRequestErrorReport.RequestExecutionStatus;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
+import cern.c2mon.shared.client.request.ClientRequestReport;
 
 /**
  * Top level report for a single C2MON (re-)configuration. Contains
- * a list of {@link ConfigurationElementReport}s, one for each 
+ * a list of {@link ConfigurationElementReport}s, one for each
  * {@link ConfigurationElement} linked to this configuration.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -91,7 +89,7 @@ public class ConfigurationReport extends ClientRequestReport {
   public ConfigurationReport() {
     super();
   }
-  
+
   /**
    * Constructor.
    * @param pTotalOperations How many operations to expect for this progress report.
@@ -115,8 +113,8 @@ public class ConfigurationReport extends ClientRequestReport {
   /**
    * Constructor. Needs specifying whether the request executed successfully or not.
    * @param pExecutedSuccessfully True if the client request was executed successfully,
-   * false otherwise. 
-   * @param pErrorMessage Describes the error that occured in the server side. 
+   * false otherwise.
+   * @param pErrorMessage Describes the error that occured in the server side.
    * In case the execution was successfull, the error message can be left null.
    * @see RequestExecutionStatus
    */
@@ -220,7 +218,7 @@ public class ConfigurationReport extends ClientRequestReport {
    * Adjusts the top-level status of the report according
    * to the passed status. If the passed status is more severe
    * than the current one, the top-level status will be overwritten
-   * (e.g. failure overrides restart). 
+   * (e.g. failure overrides restart).
    * @param status
    */
   public void addStatus(final ConfigConstants.Status pStatus) {
@@ -280,7 +278,7 @@ public class ConfigurationReport extends ClientRequestReport {
       this.statusDescription = "Configuration failed: see detailed report below.";
     } else if (this.status != Status.FAILURE && pReport.requiresReboot()) {
       this.status = Status.RESTART;
-      this.statusDescription = "Some DAQs need restarting for the configuration to take full effect: see details below.";      
+      this.statusDescription = "Some DAQs need restarting for the configuration to take full effect: see details below.";
     }
   }
 
@@ -312,6 +310,9 @@ public class ConfigurationReport extends ClientRequestReport {
   public String toXML() {
     if (isResult()) {
       StringBuffer str = new StringBuffer(1000);
+      str.append("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
+      str.append("<?xml-stylesheet href=\"generic_tag.xsl\" type=\"text/xsl\" ?>\n");
+
       str.append("<ConfigurationReport>\n");
 
       str.append("<id>");
@@ -353,7 +354,7 @@ public class ConfigurationReport extends ClientRequestReport {
       return str.toString();
     } else {
       throw new UnsupportedOperationException("No XML report can be generated: this message is an intermediate response!");
-    }    
+    }
   }
 
   /**
