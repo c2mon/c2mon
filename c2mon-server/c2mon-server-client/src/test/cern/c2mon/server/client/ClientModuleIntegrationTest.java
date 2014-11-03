@@ -40,9 +40,10 @@ import cern.c2mon.server.client.request.ClientRequestReportHandler;
 import cern.c2mon.server.command.CommandExecutionManager;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.test.broker.TestBrokerService;
+import cern.c2mon.server.test.device.ObjectComparison;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
@@ -54,7 +55,7 @@ import cern.c2mon.shared.client.request.ClientRequestImpl;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:cern/c2mon/server/client/config/server-client-integration-test.xml" })
+@ContextConfiguration({ "classpath:cern/c2mon/server/client/config/server-client-integration-test.xml" })
 public class ClientModuleIntegrationTest implements ApplicationContextAware {
 
   @Value("${c2mon.jms.client.admin.queue}")
@@ -102,11 +103,10 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
   public void testConfigurationRequest() {
     control.reset();
     final ConfigurationReport fakedReport = new ConfigurationReport(10, "config", "user_name");
-    EasyMock.expect(configurationLoader.applyConfiguration(EasyMock.eq(10),
-                        EasyMock.isA(ClientRequestReportHandler.class))).andReturn(fakedReport);
+    EasyMock.expect(configurationLoader.applyConfiguration(EasyMock.eq(10), EasyMock.isA(ClientRequestReportHandler.class))).andReturn(fakedReport);
 
     control.replay();
-    //send client request to admin queue
+    // send client request to admin queue
     JmsTemplate clientTemplate = new JmsTemplate(testBrokerService.getConnectionFactory());
     clientTemplate.execute(new SessionCallback<Object>() {
 
@@ -129,7 +129,7 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
         Collection<ConfigurationReport> reportList = request.fromJsonResponse(replyText);
         assertNotNull(reportList);
         assertEquals(1, reportList.size());
-        ConfigurationReport report =  reportList.iterator().next();
+        ConfigurationReport report = reportList.iterator().next();
         assertEquals(fakedReport.getId(), report.getId());
         assertEquals(fakedReport.getName(), report.getName());
         assertEquals(fakedReport.getUser(), report.getUser());
@@ -228,10 +228,17 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
         List<DeviceProperty> deviceProperties = device1.getDeviceProperties();
         assertNotNull(deviceProperties);
         assertEquals(deviceProperties.size(), 4);
-        assertEquals(deviceProperties.get(0).getName(), "cpuLoadInPercent");
-        assertEquals(deviceProperties.get(1).getName(), "numCores");
-        assertEquals(deviceProperties.get(2).getName(), "responsiblePerson");
-        assertEquals(deviceProperties.get(3).getName(), "someCalculations");
+
+        try {
+          ObjectComparison.assertDevicePropertyListContains(deviceProperties, new DeviceProperty(1L, "cpuLoadInPercent", "987654", "tagId", "String"));
+          ObjectComparison.assertDevicePropertyListContains(deviceProperties, new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue",
+              "String"));
+          ObjectComparison.assertDevicePropertyListContains(deviceProperties, new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule",
+              "Float"));
+          ObjectComparison.assertDevicePropertyListContains(deviceProperties, new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
+        } catch (ClassNotFoundException e) {
+          e.printStackTrace();
+        }
 
         List<DeviceCommand> deviceCommands = device1.getDeviceCommands();
         assertNotNull(deviceCommands);
