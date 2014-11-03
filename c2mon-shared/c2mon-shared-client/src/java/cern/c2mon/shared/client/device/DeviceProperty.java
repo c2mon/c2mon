@@ -18,6 +18,7 @@
 package cern.c2mon.shared.client.device;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,28 +41,28 @@ public class DeviceProperty implements Cloneable, Serializable {
   private static final long serialVersionUID = -3714996315363505073L;
 
   /**
+   * The unique ID of the property (matches ID from parent device class property).
+   */
+  @Attribute
+  private Long id;
+
+  /**
    * The unique name of the property (matches name from parent device class).
    */
   @Attribute
   private String name;
 
   /**
-   * The ID of the data tag that corresponds to this property.
+   * The actual value of this property.
    */
-  @Element(required = false, name = "tag-id")
-  private Long tagId;
+  @Element(required = false, name = "value")
+  private String value;
 
   /**
-   * The client rule string of this property.
+   * The category of this property (e.g. "tagId", "clientRule", "constantValue").
    */
-  @Element(required = false, name = "client-rule")
-  private String clientRule;
-
-  /**
-   * The constant value of this property.
-   */
-  @Element(required = false, name = "constant-value")
-  private String constantValue;
+  @Element(required = false, name = "category")
+  private String category;
 
   /**
    * The result type of this property (for rules and constant values)
@@ -72,34 +73,45 @@ public class DeviceProperty implements Cloneable, Serializable {
   /**
    * The list of nested fields of this property.
    */
-  @ElementList(required = false, name = "Fields")
-  private List<DeviceProperty> fields;
+  @ElementList(required = false, name = "PropertyFields")
+  private List<DeviceProperty> fields = new ArrayList<>();
 
   /**
-   * Default constructor. A <code>DeviceProperty</code> can be either a tag ID,
-   * a client rule, or a constant value. For client rules and constant values,
-   * it is possible to specify the type of the resulting value.
+   * Default constructor. A <code>DeviceProperty</code> can be a tag ID, a
+   * client rule, a constant value, or something else. For client rules and
+   * constant values, it is possible to specify the type of the resulting value.
    *
+   * @param id the unique ID of the property
    * @param name the unique name of this property
-   * @param tagId the ID of the data tag that corresponds to this property
-   * @param clientRule the client rule string of this property
-   * @param constantValue the constant value of this property
+   * @param value the actual value of this property
+   * @param category the category of this property (e.g. "tagId", "clientRule",
+   *          "constantValue")
    * @param resultType the result type of this property (for rules and constant
    *          values). Defaults to {@link String}.
    */
-  public DeviceProperty(final String name, final Long tagId, final String clientRule, final String constantValue, final String resultType) {
+  public DeviceProperty(final Long id, final String name, final String value, final String category, final String resultType) {
+    this.id = id;
     this.name = name;
-    this.tagId = tagId;
-    this.clientRule = clientRule;
-    this.constantValue = constantValue;
+    this.value = value;
+    this.category = category;
 
     if (resultType != null) {
       this.resultType = resultType;
     }
   }
 
-  public DeviceProperty(final String name, final List<DeviceProperty> fields) {
+  /**
+   * Constructor that creates a mapped property.
+   *
+   * @param id the unique ID of the property
+   * @param name name the unique name of this property
+   * @param category category the category of this property (should be "mappedProperty")
+   * @param fields the nested property fields
+   */
+  public DeviceProperty(final Long id, final String name, final String category, final List<DeviceProperty> fields) {
+    this.id = id;
     this.name = name;
+    this.category = category;
     this.fields = fields;
   }
 
@@ -107,6 +119,15 @@ public class DeviceProperty implements Cloneable, Serializable {
    * Constructor not used (needed for SimpleXML).
    */
   public DeviceProperty() {
+  }
+
+  /**
+   * Get the unique ID of the property.
+   *
+   * @return the id of the property
+   */
+  public Long getId() {
+    return id;
   }
 
   /**
@@ -119,35 +140,25 @@ public class DeviceProperty implements Cloneable, Serializable {
   }
 
   /**
-   * Get the ID of the data tag corresponding to this property.
-   *
-   * @return the data tag ID
-   */
-  public Long getTagId() {
-    return tagId;
-  }
-
-  /**
-   * Get the client rule string of this property.
+   * Get the value of this property.
    *
    * @return the client rule string
    */
-  public String getClientRule() {
-    return clientRule;
+  public String getValue() {
+    return value;
   }
 
   /**
-   * Get the constant value of this property.
+   * Get the category of this property.
    *
    * @return the constant value
    */
-  public String getConstantValue() {
-    return constantValue;
+  public String getCategory() {
+    return category;
   }
 
   /**
-   * Retrieve the raw fields of this property (if they exist). Used for testing
-   * only.
+   * Retrieve the raw fields of this property (if they exist).
    *
    * @return the property fields if they exist, null otherwise
    */
@@ -163,6 +174,15 @@ public class DeviceProperty implements Cloneable, Serializable {
     }
 
     return fields;
+  }
+
+  /**
+   * Set a field of this property.
+   *
+   * @param field the field to set
+   */
+  public void setFields(DeviceProperty field) {
+    this.fields.add(field);
   }
 
   /**
