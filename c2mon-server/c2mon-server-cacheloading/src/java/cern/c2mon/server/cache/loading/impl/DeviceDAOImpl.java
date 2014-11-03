@@ -57,6 +57,7 @@ public class DeviceDAOImpl extends AbstractDefaultLoaderDAO<Device> implements D
 
   @Override
   public void deleteItem(Long id) {
+    deviceMapper.deletePropertyFields(id);
     deviceMapper.deleteDeviceProperties(id);
     deviceMapper.deleteDeviceCommands(id);
     deviceMapper.deleteDevice(id);

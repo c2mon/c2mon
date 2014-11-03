@@ -17,7 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import static org.junit.Assert.assertEquals;
+import static cern.c2mon.server.test.device.ObjectComparison.assertDeviceCommandEquals;
+import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropertyListContains;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +56,9 @@ public class DeviceMapperTest {
   private DeviceMapper deviceMapper;
 
   @Autowired
+  private DeviceClassMapper deviceClassMapper;
+
+  @Autowired
   TestDataInserter testDataInserter;
 
   @Before
@@ -70,53 +74,42 @@ public class DeviceMapperTest {
 
   @Test
   public void testGetItem() throws ClassNotFoundException {
-    Device device1 = deviceMapper.getItem(300L); //getDevice(300L);
+    Device device1 = deviceMapper.getItem(300L); // getDevice(300L);
     Assert.assertNotNull(device1);
     List<DeviceProperty> deviceProperties = device1.getDeviceProperties();
     Assert.assertNotNull(deviceProperties);
     Assert.assertTrue(deviceProperties.size() == 4);
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("cpuLoadInPercent", 210000L, null, null, null));
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("responsiblePerson", null, null, "Mr. Administrator", null));
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("numCores", null, null, "4", "Integer"));
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(1L, "cpuLoadInPercent", "210000", "tagId", null));
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
 
     List<DeviceCommand> deviceCommands = device1.getDeviceCommands();
     Assert.assertNotNull(deviceCommands);
     Assert.assertTrue(deviceCommands.size() == 1);
-    assertDeviceCommandEquals(new DeviceCommand("TEST_COMMAND_1", 210004L), deviceCommands.get(0));
+    assertDeviceCommandEquals(new DeviceCommand(1L, "TEST_COMMAND_1", "210004", "commandTagId", null), deviceCommands.get(0));
 
-    Device device2 = deviceMapper.getItem(301L); //getDevice(301L);
+    Device device2 = deviceMapper.getItem(301L); // getDevice(301L);
     Assert.assertNotNull(device2);
     deviceProperties = device2.getDeviceProperties();
     Assert.assertNotNull(deviceProperties);
-    Assert.assertTrue(deviceProperties.size() == 1);
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty("TEST_PROPERTY_1", 210001L, null, null, null));
+    Assert.assertTrue(deviceProperties.size() == 2);
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(5L, "TEST_PROPERTY_1", "210001", "tagId", null));
+    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", null, "mappedProperty", null));
+
+    List<DeviceProperty> expectedFields = new ArrayList<>();
+    expectedFields.add(new DeviceProperty(1L, "FIELD_CPULOAD", "210008", "tagId", null));
+    expectedFields.add(new DeviceProperty(2L, "FIELD_RESPONSIBLE_PERSON", "Mr. Administrator", "constantValue", null));
+    expectedFields.add(new DeviceProperty(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", "clientRule", "Float"));
+    expectedFields.add(new DeviceProperty(4L, "FIELD_NUM_CORES", "2", "constantValue", "Integer"));
+
+    DeviceProperty expectedMappedProperty = new DeviceProperty(9L, "mappedProperty", "TEST_PROPERTY_WITH_FIELDS", expectedFields);
+    assertDevicePropertyListContains(deviceProperties, expectedMappedProperty);
 
     deviceCommands = device2.getDeviceCommands();
     Assert.assertNotNull(deviceCommands);
     Assert.assertTrue(deviceCommands.size() == 1);
-    assertDeviceCommandEquals(new DeviceCommand("TEST_COMMAND_2", 210005L), deviceCommands.get(0));
-  }
-
-  public void assertDevicePropertyEquals(DeviceProperty expectedObject, DeviceProperty cacheObject) throws ClassNotFoundException {
-    assertEquals(expectedObject.getName(), cacheObject.getName());
-    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
-    assertEquals(expectedObject.getClientRule(), cacheObject.getClientRule());
-    assertEquals(expectedObject.getConstantValue(), cacheObject.getConstantValue());
-    assertEquals(expectedObject.getResultType(), cacheObject.getResultType());
-  }
-
-  public void assertDevicePropertyListContains(List<DeviceProperty> deviceProperties, DeviceProperty expectedObject) throws ClassNotFoundException {
-    for (DeviceProperty deviceProperty : deviceProperties) {
-      if (deviceProperty.getName().equals(expectedObject.getName())) {
-        assertDevicePropertyEquals(expectedObject, deviceProperty);
-      }
-    }
-  }
-
-  public void assertDeviceCommandEquals(DeviceCommand expectedObject, DeviceCommand cacheObject) {
-    assertEquals(expectedObject.getName(), cacheObject.getName());
-    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
+    assertDeviceCommandEquals(new DeviceCommand(2L, "TEST_COMMAND_2", "210005", "commandTagId", null), deviceCommands.get(0));
   }
 
   @Test
@@ -127,16 +120,25 @@ public class DeviceMapperTest {
   }
 
   @Test
-  public void testInsertDevice() {
+  public void testInsertDevice() throws ClassNotFoundException {
     DeviceCacheObject device = new DeviceCacheObject(304L, "TEST_DEVICE_5", 400L);
 
-    DeviceProperty dvp1 = new DeviceProperty("test_property_5", 210005L, null, null, null);
-    DeviceProperty dvp2 = new DeviceProperty("test_property_6", null, null, "Mr. Administrator", null);
-    DeviceProperty dvp3 = new DeviceProperty("test_property_7", null, "(#123 + #234) / 2", null, "Float");
-    DeviceProperty dvp4 = new DeviceProperty("test_property_8", null, null, "4", "Integer");
-    device.setDeviceProperties(new ArrayList<>(Arrays.asList(dvp1, dvp2, dvp3, dvp4)));
+    DeviceProperty dvp1 = new DeviceProperty(1L, "cpuLoadInPercent", "210005", "tagId", null);
+    DeviceProperty dvp2 = new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null);
+    DeviceProperty dvp3 = new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float");
+    DeviceProperty dvp4 = new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer");
 
-    DeviceCommand dvc1 = new DeviceCommand("test_command", 20L);
+    List<DeviceProperty> fields = new ArrayList<>();
+    fields.add(new DeviceProperty(1L, "FIELD_CPULOAD", "210008", "tagId", null));
+    fields.add(new DeviceProperty(2L, "FIELD_RESPONSIBLE_PERSON", "Mr. Administrator", "constantValue", null));
+    fields.add(new DeviceProperty(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", "clientRule", "Float"));
+    fields.add(new DeviceProperty(4L, "FIELD_NUM_CORES", "2", "constantValue", "Integer"));
+    DeviceProperty dvp5 = new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", fields);
+    List<DeviceProperty> properties = new ArrayList<>(Arrays.asList(dvp1, dvp2, dvp3, dvp4, dvp5));
+
+    device.setDeviceProperties(properties);
+
+    DeviceCommand dvc1 = new DeviceCommand(1L, "TEST_COMMAND_1", "20", "commandTagId", null);
     device.setDeviceCommands(new ArrayList<>(Arrays.asList(dvc1)));
 
     deviceMapper.insertDevice(device);
@@ -150,9 +152,14 @@ public class DeviceMapperTest {
     Assert.assertTrue(deviceMapper.isInDb(device.getId()));
     DeviceCacheObject fromDb = (DeviceCacheObject) deviceMapper.getItem(304L);
     Assert.assertNotNull(fromDb);
-    List<DeviceProperty> properties = fromDb.getDeviceProperties();
-    Assert.assertNotNull(properties);
-    Assert.assertTrue(properties.size() == 4);
+    List<DeviceProperty> propertiesFromDb = fromDb.getDeviceProperties();
+    Assert.assertNotNull(propertiesFromDb);
+    Assert.assertTrue(propertiesFromDb.size() == 5);
+
+    for (DeviceProperty property : properties) {
+      assertDevicePropertyListContains(propertiesFromDb, property);
+    }
+
     List<DeviceCommand> commands = fromDb.getDeviceCommands();
     Assert.assertNotNull(commands);
     Assert.assertTrue(commands.size() == 1);

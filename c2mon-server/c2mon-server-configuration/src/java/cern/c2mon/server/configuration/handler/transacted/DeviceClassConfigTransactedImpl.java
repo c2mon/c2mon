@@ -187,7 +187,7 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
       }
 
       try {
-        deviceClassDAO.deleteItem(deviceClass.getId());
+        deviceClassDAO.deleteItem(deviceClass);
         return new ProcessChange();
 
       } catch (Exception e) {

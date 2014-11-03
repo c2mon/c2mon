@@ -160,23 +160,84 @@ public class DataTagMapperTest {
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
     assertEquals(cacheObject.getRuleIdsString(), retrievedObject.getRuleIdsString());
 
-    dataTagMapper.deleteDataTag(cacheObject.getId());
-    assertFalse(dataTagMapper.isInDb(cacheObject.getId()));
+//    dataTagMapper.deleteDataTag(cacheObject.getId());
+//    assertFalse(dataTagMapper.isInDb(cacheObject.getId()));
+//
+//    // attach to a subequipment
+//    cacheObject.setId(150001L);
+//    cacheObject.setEquipmentId(null);
+//    cacheObject.setSubEquipmentId(250L);
+//
+//    //put in database
+//    dataTagMapper.testInsertDataTag(cacheObject);
+//    assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
+//
+//    //retrieve from database
+//    retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150001));
+//    assertNotNull(retrievedObject);
+//    assertEquals(null, retrievedObject.getEquipmentId());
+//    assertEquals(cacheObject.getSubEquipmentId(), retrievedObject.getSubEquipmentId());
+  }
 
-    // attach to a subequipment
-    cacheObject.setId(150001L);
-    cacheObject.setEquipmentId(null);
-    cacheObject.setSubEquipmentId(250L);
+  @Test
+  public void testGetDataTagAttachedToSubEquipment() {
+    //construct fake DataTagCacheObject, setting all fields
+    DataTagCacheObject cacheObject = new DataTagCacheObject();
+    cacheObject.setId(new Long(150001));  //must be non null in DB
+    cacheObject.setName("Junit_test_tag"); //non null
+    cacheObject.setDescription("test description");
+    cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
+    cacheObject.setDataType("Boolean"); // non null
+    cacheObject.setTopic("c2mon.tag." + 50);
+    cacheObject.setLogged(false); //null allowed
+    cacheObject.setUnit("test unit m/sec");
+    cacheObject.setDipAddress("testDIPaddress");
+    cacheObject.setJapcAddress("testJAPCaddress");
+    cacheObject.setValue(Boolean.TRUE);
+    cacheObject.setValueDescription("test value description");
+    cacheObject.setSimulated(false); //null allowed
+    cacheObject.setSubEquipmentId(new Long(250)); //need test equipment inserted - use EquipmentMapperTest
+    cacheObject.setMinValue(new Float(23.3));
+    cacheObject.setMaxValue(new Float(12.2));
+    cacheObject.setValueDictionary(new DataTagValueDictionary());
+    cacheObject.setAddress(new DataTagAddress());
+    cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.EQUIPMENT_DOWN));
+    cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setRuleIdsString("1234");
+//    cacheObject.setProcessId(50L); //need test process also (P_JAPC01)
 
     //put in database
     dataTagMapper.testInsertDataTag(cacheObject);
     assertTrue(dataTagMapper.isInDb(cacheObject.getId()));
 
     //retrieve from database
-    retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150001));
-    assertNotNull(retrievedObject);
-    assertEquals(null, retrievedObject.getEquipmentId());
+    DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150001));
+
+    assertEquals(cacheObject.getId(), retrievedObject.getId());
+    assertEquals(cacheObject.getName(), retrievedObject.getName());
+    assertEquals(cacheObject.getDescription(), retrievedObject.getDescription());
+    assertEquals(cacheObject.getMode(), retrievedObject.getMode());
+    assertEquals(cacheObject.getDataType(), retrievedObject.getDataType());
+    assertEquals("c2mon.tag.default.publication", retrievedObject.getTopic()); //at loading, should be set to default
+    assertEquals(cacheObject.isLogged(), retrievedObject.isLogged());
+    assertEquals(cacheObject.getUnit(), retrievedObject.getUnit());
+    assertEquals(cacheObject.getDipAddress(), retrievedObject.getDipAddress());
+    assertEquals(cacheObject.getJapcAddress(), retrievedObject.getJapcAddress());
+    assertEquals(cacheObject.getValue(), retrievedObject.getValue());
+    assertEquals(cacheObject.getValueDescription(), retrievedObject.getValueDescription());
+    assertEquals(cacheObject.isSimulated(), retrievedObject.isSimulated());
+    assertEquals(cacheObject.getEquipmentId(), retrievedObject.getEquipmentId());
     assertEquals(cacheObject.getSubEquipmentId(), retrievedObject.getSubEquipmentId());
+    assertEquals(cacheObject.getProcessId(), retrievedObject.getProcessId());
+    assertEquals(cacheObject.getMinValue(), retrievedObject.getMinValue());
+    assertEquals(cacheObject.getMaxValue(), retrievedObject.getMaxValue());
+    assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
+    assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
+    assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());
+    assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
+    assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
+    assertEquals(cacheObject.getRuleIdsString(), retrievedObject.getRuleIdsString());
   }
 
   @Test

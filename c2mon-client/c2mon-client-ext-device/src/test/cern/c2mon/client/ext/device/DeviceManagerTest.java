@@ -112,10 +112,10 @@ public class DeviceManagerTest {
     List<TransferDevice> devicesReturnList = new ArrayList<TransferDevice>();
     final TransferDeviceImpl device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
     final TransferDeviceImpl device2 = new TransferDeviceImpl(1000L, "test_device_2", 1L);
-    device1.addDeviceProperty(new DeviceProperty("TEST_PROPERTY_1", 100430L, null, null, null));
-    device2.addDeviceProperty(new DeviceProperty("TEST_PROPERTY_2", 100431L, null, null, null));
-    device1.addDeviceCommand(new DeviceCommand("TEST_COMMAND_1", 4287L));
-    device2.addDeviceCommand(new DeviceCommand("TEST_COMMAND_2", 4288L));
+    device1.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
+    device2.addDeviceProperty(new DeviceProperty(2L, "TEST_PROPERTY_2", "100431", "tagId", null));
+    device1.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
+    device2.addDeviceCommand(new DeviceCommand(2L, "TEST_COMMAND_2", "4288", "commandTagId", null));
     devicesReturnList.add(device1);
     devicesReturnList.add(device2);
 
@@ -221,8 +221,8 @@ public class DeviceManagerTest {
   public void testSubscribeLazyDevice() throws RuleFormatException, ClassNotFoundException {
 
     List<DeviceProperty> sparsePropertyMap = new ArrayList<>();
-    sparsePropertyMap.add(new DeviceProperty("test_property_name_1", 100000L, null, null, null));
-    sparsePropertyMap.add(new DeviceProperty("test_property_name_2", 200000L, null, null, null));
+    sparsePropertyMap.add(new DeviceProperty(1L, "test_property_name_1", "100000", "tagId", null));
+    sparsePropertyMap.add(new DeviceProperty(2L, "test_property_name_2", "200000", "tagId", null));
 
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     device1.setDeviceProperties(sparsePropertyMap);

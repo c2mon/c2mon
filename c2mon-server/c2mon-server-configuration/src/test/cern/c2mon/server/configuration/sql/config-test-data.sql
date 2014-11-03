@@ -361,22 +361,30 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'name',
 insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'description', 'Description of TEST_DEVICE_CLASS_10');
 insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'properties', 
 '<Properties>
-    <Property name="cpuLoadInPercent">
+    <Property name="cpuLoadInPercent" id="10">
         <description>The current CPU load in percent</description>
     </Property>
-    <Property name="responsiblePerson">
+    <Property name="responsiblePerson" id="11">
         <description>The person responsible for this device</description>
     </Property>
-    <Property name="someCalculations">
+    <Property name="someCalculations" id="12">
         <description>Some super awesome calculations</description>
+    </Property>
+    <Property name="TEST_PROPERTY_WITH_FIELDS" id="13">
+        <description>A property containing fields</description>
+        <Fields>
+            <Field name="field1" id="10"></Field>
+            <Field name="field2" id="11"></Field>
+            <Field name="field3" id="12"></Field>
+        </Fields>
     </Property>
 </Properties>');
 insert into timconfigval (seqid, elementfield, elementvalue) values (30, 'commands', 
 '<Commands>
-    <Command name="TEST_COMMAND_1">
+    <Command name="TEST_COMMAND_1" id="10">
         <description>Description of TEST_COMMAND_1</description>
     </Command>
-    <Command name="TEST_COMMAND_2">
+    <Command name="TEST_COMMAND_2" id="11">
         <description>Description of TEST_COMMAND_2</description>
     </Command>
 </Commands>');
@@ -388,16 +396,25 @@ insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (31, 31, 'UPDATE', 'DeviceClass', '10');
 insert into timconfigval (seqid, elementfield, elementvalue) values (31, 'properties', 
 '<Properties>
-    <Property name="cpuLoadInPercent">
+    <Property name="cpuLoadInPercent" id="10">
         <description>The current CPU load in percent</description>
     </Property>
-    <Property name="responsiblePerson">
+    <Property name="responsiblePerson" id="11">
         <description>The person responsible for this device</description>
     </Property>
-    <Property name="someCalculations">
+    <Property name="someCalculations" id="12">
         <description>Some super awesome calculations</description>
     </Property>
-    <Property name="numCores">
+    <Property name="TEST_PROPERTY_WITH_FIELDS" id="13">
+        <description>A property containing fields</description>
+        <Fields>
+            <Field name="field1" id="10"></Field>
+            <Field name="field2" id="11"></Field>
+            <Field name="field3" id="12"></Field>
+        </Fields>
+    </Property>
+
+    <Property name="numCores" id="14">
         <description>The number of CPU cores on this device</description>
     </Property>
 </Properties>');
@@ -419,25 +436,47 @@ insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'classI
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'name', 'TEST_DEVICE_20');
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'description', 'Description of TEST_DEVICE_20');
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'deviceProperties', 
-'<DeviceProperties>
-    <DeviceProperty name="cpuLoadInPercent">
-        <tag-id>123456</tag-id>
-    </DeviceProperty>
-    <DeviceProperty name="responsiblePerson">
-        <constant-value>Mr. Administrator</constant-value>
-    </DeviceProperty>
-    <DeviceProperty name="someCalculations">
-        <client-rule><![CDATA[(#123 + #23 4) / 2]]></client-rule>
+'<DeviceProperties> 
+  <DeviceProperty name="cpuLoadInPercent" id="1">
+    <value>987654</value>
+    <category>tagId</category> 
+  </DeviceProperty> 
+
+  <DeviceProperty name="responsiblePerson" id="2">
+     <value>Mr. Administrator</value>
+     <category>constantValue</category> 
+  </DeviceProperty> 
+
+  <DeviceProperty name="someCalculations" id="3">
+    <value>(#123 + #234) / 2</value>
+    <category>clientRule</category> 
+    <result-type>Float</result-type>
+  </DeviceProperty> 
+
+  <DeviceProperty name="TEST_PROPERTY_WITH_FIELDS" id="9">
+    <category>mappedProperty</category>
+    <PropertyFields>
+      <PropertyField name="field1" id="1">
+        <value>987654</value>
+        <category>tagId</category> 
+      </PropertyField>
+      <PropertyField name="field2" id="2">
+        <value>(#123 + #234) / 2</value>
+        <category>clientRule</category> 
         <result-type>Float</result-type>
-    </DeviceProperty>
-</DeviceProperties>');
+      </PropertyField>
+    </PropertyFields>
+  </DeviceProperty> 
+</DeviceProperties> ');
 insert into timconfigval (seqid, elementfield, elementvalue) values (33, 'deviceCommands', 
 '<DeviceCommands>
-    <DeviceCommand name="TEST_COMMAND_1">
-        <command-tag-id>4287</command-tag-id>
+    <DeviceCommand name="TEST_COMMAND_1" id="1">
+        <value>4287</value>
+        <category>commandTagId</category>
     </DeviceCommand>
-    <DeviceCommand name="TEST_COMMAND_2">
-        <command-tag-id>4288</command-tag-id>
+    <DeviceCommand name="TEST_COMMAND_2" id="2">
+        <value>4288</value>
+        <category>commandTagId</category>
     </DeviceCommand>
 </DeviceCommands>');
 
@@ -447,21 +486,43 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (34, 34, 'UPDATE', 'Device', '20');
 insert into timconfigval (seqid, elementfield, elementvalue) values (34, 'deviceProperties', 
-'<DeviceProperties>
-    <DeviceProperty name="cpuLoadInPercent">
-        <tag-id>123456</tag-id>
-    </DeviceProperty>
-    <DeviceProperty name="responsiblePerson">
-        <constant-value>Mr. Administrator</constant-value>
-    </DeviceProperty>
-    <DeviceProperty name="someCalculations">
-        <client-rule><![CDATA[(#123 + #23 4) / 2]]></client-rule>
+'<DeviceProperties> 
+  <DeviceProperty name="cpuLoadInPercent" id="1">
+    <value>987654</value>
+    <category>tagId</category> 
+  </DeviceProperty> 
+
+  <DeviceProperty name="responsiblePerson" id="2">
+     <value>Mr. Administrator</value>
+     <category>constantValue</category> 
+  </DeviceProperty> 
+
+  <DeviceProperty name="someCalculations" id="3">
+    <value>(#123 + #234) / 2</value>
+    <category>clientRule</category> 
+    <result-type>Float</result-type>
+  </DeviceProperty> 
+
+  <DeviceProperty name="TEST_PROPERTY_WITH_FIELDS" id="9">
+    <category>mappedProperty</category>
+    <PropertyFields>
+      <PropertyField name="field1" id="1">
+        <value>987654</value>
+        <category>tagId</category> 
+      </PropertyField>
+      <PropertyField name="field2" id="2">
+        <value>(#123 + #234) / 2</value>
+        <category>clientRule</category> 
         <result-type>Float</result-type>
-    </DeviceProperty>
-    <DeviceProperty name="numCores">
-        <constant-value>4</constant-value>
-        <result-type>Integer</result-type>
-    </DeviceProperty>
+      </PropertyField>
+    </PropertyFields>
+  </DeviceProperty> 
+
+  <DeviceProperty name="numCores" id="4">
+    <value>4</value>
+    <category>constantValue</category> 
+    <result-type>Integer</result-type>
+  </DeviceProperty>
 </DeviceProperties>');
 
 -- remove device - should succeed

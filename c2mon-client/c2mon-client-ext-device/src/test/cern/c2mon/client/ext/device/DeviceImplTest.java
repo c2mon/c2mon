@@ -59,7 +59,7 @@ public class DeviceImplTest {
     DeviceImpl device = getTestDevice();
 
     List<DeviceProperty> deviceProperties = new ArrayList<>();
-    deviceProperties.add(new DeviceProperty("test_property_1", 100000L, null, null, null));
+    deviceProperties.add(new DeviceProperty(1L, "test_property_1", "100000", "tagId", null));
 
     device.setDeviceProperties(deviceProperties);
 
@@ -132,30 +132,41 @@ public class DeviceImplTest {
     DeviceImpl device = getTestDevice();
 
     List<DeviceProperty> deviceProperties = new ArrayList<>();
-    deviceProperties.add(new DeviceProperty("cpuLoadInPercent", 100000L, null, null, null));
-    deviceProperties.add(new DeviceProperty("responsiblePerson", null, null, "Mr. Administrator", null));
-    deviceProperties.add(new DeviceProperty("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
-    deviceProperties.add(new DeviceProperty("numCores", null, null, "4", "Integer"));
+    deviceProperties.add(new DeviceProperty(1L, "cpuLoadInPercent", "10000", "tagId", null));
+    deviceProperties.add(new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
+    deviceProperties.add(new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
+    deviceProperties.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
 
-    ClientDataTagImpl cdt = new ClientDataTagImpl(100000L);
+    List<DeviceProperty> fields = new ArrayList<>();
+    fields.add(new DeviceProperty(1L, "cpuLoadInPercent2", "10001", "tagId", null));
+    fields.add(new DeviceProperty(2L, "responsiblePerson2", "Mr. Administrator", "constantValue", null));
+    fields.add(new DeviceProperty(3L, "someCalculations2", "(#123 + #234) / 2", "clientRule", "Float"));
+    fields.add(new DeviceProperty(4L, "numCores2", "4", "constantValue", "Integer"));
+
+    DeviceProperty propertyWithFields = new DeviceProperty(5L, "acquisition", "mappedProperty", fields);
+    deviceProperties.add(propertyWithFields);
+
+    ClientDataTagImpl cdt1 = new ClientDataTagImpl(10000L);
+    ClientDataTagImpl cdt2 = new ClientDataTagImpl(10001L);
     ClientConstantValue ccv1 = new ClientConstantValue("Mr. Administrator", null);
     ClientRuleTag crt = new ClientRuleTag(new SimpleRuleExpression("(#123 + #234) / 2"), Float.class);
     ClientConstantValue ccv2 = new ClientConstantValue(4, Integer.class);
 
     List<ClientDataTagValue> ruleResultTags = new ArrayList<>();
-    ClientDataTagImpl cdt1 = new ClientDataTagImpl(123L);
-    ClientDataTagImpl cdt2 = new ClientDataTagImpl(234L);
-    cdt1.update(DeviceTestUtils.createValidTransferTag(123L, "test_tag_1", 1F));
-    cdt2.update(DeviceTestUtils.createValidTransferTag(234L, "test_tag_2", 2F));
-    ruleResultTags.add(cdt1);
-    ruleResultTags.add(cdt2);
+    ClientDataTagImpl rrt1 = new ClientDataTagImpl(123L);
+    ClientDataTagImpl rrt2 = new ClientDataTagImpl(234L);
+    rrt1.update(DeviceTestUtils.createValidTransferTag(123L, "test_tag_1", 1F));
+    rrt2.update(DeviceTestUtils.createValidTransferTag(234L, "test_tag_2", 2F));
+    ruleResultTags.add(rrt1);
+    ruleResultTags.add(rrt2);
 
-    // Expect the device to get one data tag
-    EasyMock.expect(tagManagerMock.getDataTag(EasyMock.<Long> anyObject())).andReturn(cdt).once();
-    // Expect the device to check if the rule tag is subscribed
-    EasyMock.expect(tagManagerMock.isSubscribed(EasyMock.<DataTagUpdateListener> anyObject())).andReturn(false);
-    // Expect the device to get the tags inside the rule tag
-    EasyMock.expect(tagManagerMock.getDataTags(EasyMock.<List<Long>> anyObject())).andReturn(ruleResultTags).once();
+    // Expect the device to get two data tags (one property, one field)
+    EasyMock.expect(tagManagerMock.getDataTag(10000L)).andReturn(cdt1);
+    EasyMock.expect(tagManagerMock.getDataTag(10001L)).andReturn(cdt2);
+    // Expect the device to check if the rule tags are subscribed
+    EasyMock.expect(tagManagerMock.isSubscribed(EasyMock.<DataTagUpdateListener> anyObject())).andReturn(false).times(2);
+    // Expect the device to get the tags inside the rule tags
+    EasyMock.expect(tagManagerMock.getDataTags(EasyMock.<List<Long>> anyObject())).andReturn(ruleResultTags).times(2);
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock);
@@ -164,7 +175,7 @@ public class DeviceImplTest {
 
     Map<String, ClientDataTagValue> properties = device.getProperties();
 
-    Assert.assertTrue(properties.get("cpuLoadInPercent").getId().equals(cdt.getId()));
+    Assert.assertTrue(properties.get("cpuLoadInPercent").getId().equals(cdt1.getId()));
     Assert.assertTrue(properties.get("responsiblePerson").getId().equals(ccv1.getId()));
     Assert.assertTrue(properties.get("responsiblePerson").getType() == String.class);
     Assert.assertTrue(properties.get("responsiblePerson").getValue().equals(ccv1.getValue()));
@@ -175,6 +186,20 @@ public class DeviceImplTest {
     Assert.assertTrue(properties.get("numCores").getId().equals(ccv2.getId()));
     Assert.assertTrue(properties.get("numCores").getType().equals(ccv2.getType()));
     Assert.assertTrue(properties.get("numCores").getValue().equals(ccv2.getValue()));
+    Assert.assertTrue(properties.get("acquisition") == null);
+
+    Map<String, ClientDataTagValue> acquisition = device.getMappedProperty("acquisition");
+    Assert.assertTrue(acquisition.get("cpuLoadInPercent2").getId().equals(cdt2.getId()));
+    Assert.assertTrue(acquisition.get("responsiblePerson2").getId().equals(ccv1.getId()));
+    Assert.assertTrue(acquisition.get("responsiblePerson2").getType() == String.class);
+    Assert.assertTrue(acquisition.get("responsiblePerson2").getValue().equals(ccv1.getValue()));
+    Assert.assertTrue(acquisition.get("someCalculations2").getId().equals(crt.getId()));
+    Assert.assertTrue(acquisition.get("someCalculations2").getRuleExpression().getExpression().equals(crt.getRuleExpression().getExpression()));
+    Assert.assertTrue(acquisition.get("someCalculations2").getType().equals(crt.getType()));
+    Assert.assertTrue(acquisition.get("someCalculations2").getValue().equals(1.5F));
+    Assert.assertTrue(acquisition.get("numCores2").getId().equals(ccv2.getId()));
+    Assert.assertTrue(acquisition.get("numCores2").getType().equals(ccv2.getType()));
+    Assert.assertTrue(acquisition.get("numCores2").getValue().equals(ccv2.getValue()));
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock);
@@ -263,7 +288,7 @@ public class DeviceImplTest {
     EasyMock.replay(tagManagerMock);
 
     final List<DeviceProperty> deviceProperties = new ArrayList<>();
-    deviceProperties.add(new DeviceProperty("test_property_rule_name", null, "(#234 + #345) / 2", null, "Float"));
+    deviceProperties.add(new DeviceProperty(1L, "test_property_rule_name", "(#234 + #345) / 2", "clientRule", "Float"));
     device.setDeviceProperties(deviceProperties);
 
     ClientRuleTag rule = (ClientRuleTag) device.getProperty(new PropertyInfo("test_property_rule_name"));
@@ -292,8 +317,8 @@ public class DeviceImplTest {
     EasyMock.replay(commandManagerMock);
 
     List<DeviceCommand> deviceCommands = new ArrayList<>();
-    deviceCommands.add(new DeviceCommand("test_command_1", -1L));
-    deviceCommands.add(new DeviceCommand("test_command_2", -2L));
+    deviceCommands.add(new DeviceCommand(1L, "test_command_1", "-1", "commandTagId", null));
+    deviceCommands.add(new DeviceCommand(2L, "test_command_2", "-2", "commandTagId", null));
     device.setDeviceCommands(deviceCommands);
 
     Assert.assertTrue(device.getCommand("test_command_1").getId().equals(-1L));
@@ -377,10 +402,10 @@ public class DeviceImplTest {
     DeviceImpl device = getTestDevice();
 
     List<DeviceProperty> deviceFields = new ArrayList<>();
-    deviceFields.add(new DeviceProperty("cpuLoadInPercent", 100000L, null, null, null));
-    deviceFields.add(new DeviceProperty("responsiblePerson", null, null, "Mr. Administrator", null));
-    deviceFields.add(new DeviceProperty("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
-    deviceFields.add(new DeviceProperty("numCores", null, null, "4", "Integer"));
+    deviceFields.add(new DeviceProperty(1L, "cpuLoadInPercent", "10000", "tagId", null));
+    deviceFields.add(new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
+    deviceFields.add(new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
+    deviceFields.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
 
     ClientDataTagImpl cdt = new ClientDataTagImpl(100000L);
     ClientConstantValue ccv1 = new ClientConstantValue("Mr. Administrator", null);
@@ -406,7 +431,7 @@ public class DeviceImplTest {
     EasyMock.replay(tagManagerMock);
 
     List<DeviceProperty> deviceProperties = new ArrayList<>();
-    deviceProperties.add(new DeviceProperty("acquisition", deviceFields));
+    deviceProperties.add(new DeviceProperty(5L, "acquisition", "mappedProperty", deviceFields));
     device.setDeviceProperties(deviceProperties);
 
     Map<String, ClientDataTagValue> properties = device.getMappedProperty("acquisition");

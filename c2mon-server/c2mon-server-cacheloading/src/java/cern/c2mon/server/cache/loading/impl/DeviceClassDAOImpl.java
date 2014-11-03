@@ -23,8 +23,10 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
+import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.common.device.Property;
 
 /**
  * DeviceClass loader DAO implementation.
@@ -56,10 +58,14 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
   }
 
   @Override
-  public void deleteItem(Long id) {
-    deviceClassMapper.deleteProperties(id);
-    deviceClassMapper.deleteCommands(id);
-    deviceClassMapper.deleteDeviceClass(id);
+  public void deleteItem(DeviceClass deviceClass) {
+    for (Long propertyId : deviceClass.getPropertyIds()) {
+      deviceClassMapper.deleteFields(propertyId);
+    }
+
+    deviceClassMapper.deleteProperties(deviceClass.getId());
+    deviceClassMapper.deleteCommands(deviceClass.getId());
+    deviceClassMapper.deleteDeviceClass(deviceClass.getId());
   }
 
   @Override
@@ -71,12 +77,22 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
   public void insert(DeviceClass deviceClass) {
     deviceClassMapper.insertDeviceClass(deviceClass);
 
-    for (String property : ((DeviceClassCacheObject) deviceClass).getProperties()) {
+    for (Property property : ((DeviceClassCacheObject) deviceClass).getProperties()) {
       deviceClassMapper.insertDeviceClassProperty(deviceClass.getId(), property);
+
+      if (property.getFields() != null) {
+        for (Property field : property.getFields()) {
+          deviceClassMapper.insertDeviceClassField(property.getId(), field);
+        }
+      }
     }
 
-    for (String command : ((DeviceClassCacheObject) deviceClass).getCommands()) {
+    for (Command command : ((DeviceClassCacheObject) deviceClass).getCommands()) {
       deviceClassMapper.insertDeviceClassCommand(deviceClass.getId(), command);
     }
+  }
+
+  @Override
+  public void deleteItem(Long id) {
   }
 }

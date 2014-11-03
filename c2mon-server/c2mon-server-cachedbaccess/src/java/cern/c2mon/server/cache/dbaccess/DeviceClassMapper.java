@@ -19,8 +19,10 @@ package cern.c2mon.server.cache.dbaccess;
 
 import org.apache.ibatis.annotations.Param;
 
+import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.common.device.Property;
 
 /**
  * MyBatis mapper for for accessing and updating {@link DeviceClassCacheObject}s
@@ -43,7 +45,7 @@ public interface DeviceClassMapper extends LoaderMapper<DeviceClass> {
    * @param id the ID of the device class to which this property belongs
    * @param property the property to insert
    */
-  void insertDeviceClassProperty(@Param("id") Long id, @Param("property") String property);
+  void insertDeviceClassProperty(@Param("id") Long id, @Param("property") Property property);
 
   /**
    * Insert a command of a device class into the DB.
@@ -51,7 +53,15 @@ public interface DeviceClassMapper extends LoaderMapper<DeviceClass> {
    * @param id the ID of the device class to which this command belongs
    * @param command the command to insert
    */
-  void insertDeviceClassCommand(@Param("id") Long id, @Param("command") String command);
+  void insertDeviceClassCommand(@Param("id") Long id, @Param("command") Command command);
+
+  /**
+   * Insert a field of a property into the DB.
+   *
+   * @param id the ID of the property to which this field belongs
+   * @param field the field to insert
+   */
+  void insertDeviceClassField(@Param("id") Long id, @Param("field") Property field);
 
   /**
    * Delete a device class object from the db.
@@ -73,6 +83,13 @@ public interface DeviceClassMapper extends LoaderMapper<DeviceClass> {
    * @param id the ID of the device class from which to delete properties
    */
   void deleteProperties(Long id);
+
+  /**
+   * Delete all fields belonging to a particular device class.
+   *
+   * @param id the ID of the device class from which to delete fields
+   */
+  void deleteFields(Long id);
 
   /**
    * Delete all commands belonging to a particular device class.

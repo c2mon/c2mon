@@ -159,32 +159,58 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"deviceClassId\" must refer to an existing DeviceClass");
     }
 
-    // Cross-check properties and commands
+    // Cross-check properties
     for (DeviceProperty deviceProperty : cacheObject.getDeviceProperties()) {
-      if (!deviceClass.getProperties().contains(deviceProperty.getName())) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + deviceProperty.getName()
-            + "\" must refer to a property defined in parent device class");
+      if (!deviceClass.getPropertyNames().contains(deviceProperty.getName())) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "DeviceProperty \"" + deviceProperty.getName()
+            + "\" (id: " + deviceProperty.getId() + ") must refer to a property defined in parent class");
       }
 
-      // Sanity check on (tagId / clientRule / constantValue / resultType/ fields)
-      if (deviceProperty.getTagId() == null && deviceProperty.getClientRule() == null && deviceProperty.getConstantValue() == null
-          && deviceProperty.getFields() == null) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + deviceProperty.getName()
-            + "\" must specify at least one of (tagId, clientRule, constantValue, fields)");
+      if (!deviceClass.getPropertyIds().contains(deviceProperty.getId())) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "DeviceProperty \"" + deviceProperty.getName()
+            + "\" specifies incorrect ID (does not match corresponding parent class property)");
+      }
+
+      // Cross-check fields
+      if (deviceProperty.getFields() != null) {
+        for (DeviceProperty field : deviceProperty.getFields().values()) {
+
+          if (!deviceClass.getFieldNames(deviceProperty.getName()).contains(field.getName())) {
+            throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "PropertyField \"" + field.getName()
+                + "\" (id: " + field.getId() + ") must refer to a field defined in parent class property");
+          }
+
+          if (!deviceClass.getFieldIds(deviceProperty.getName()).contains(field.getId())) {
+            throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "PropertyField \"" + field.getName()
+                + "\" specifies incorrect ID (does not match corresponding parent property)");
+          }
+        }
+      }
+
+      // Sanity check on category
+      if (deviceProperty.getCategory() == null && deviceProperty.getFields() == null) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "DeviceProperty \"" + deviceProperty.getName()
+            + "\" must specify a value category");
       }
 
       try {
         deviceProperty.getResultTypeClass();
       } catch (ClassNotFoundException e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Property \"" + deviceProperty.getName()
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "DeviceProperty \"" + deviceProperty.getName()
             + "\" specifies invalid result type");
       }
     }
 
+    // Cross-check commands
     for (DeviceCommand deviceCommand : cacheObject.getDeviceCommands()) {
-      if (!deviceClass.getCommands().contains(deviceCommand.getName())) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Command \"" + deviceCommand.getName()
+      if (!deviceClass.getCommandNames().contains(deviceCommand.getName())) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "DeviceCommand \"" + deviceCommand.getName()
             + "\" must refer to a command defined in parent device class");
+      }
+
+      if (!deviceClass.getCommandIds().contains(deviceCommand.getId())) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "DeviceCommand \"" + deviceCommand.getName()
+            + "\" specifies incorrect ID (does not match corresponding parent class command)");
       }
     }
   }

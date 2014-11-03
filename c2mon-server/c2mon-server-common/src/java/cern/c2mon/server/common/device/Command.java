@@ -33,12 +33,16 @@ public class Command implements Serializable {
   private static final long serialVersionUID = -6943334662697273304L;
 
   @Attribute
+  private Long id;
+
+  @Attribute
   private String name;
 
-  @Element
+  @Element(required = false)
   private String description;
 
-  public Command(final String name, final String description) {
+  public Command(final Long id, final String name, final String description) {
+    this.id = id;
     this.name = name;
     this.description = description;
   }
@@ -52,5 +56,13 @@ public class Command implements Serializable {
 
   public String getDescription() {
     return description;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 }

@@ -17,6 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.device;
 
+import static cern.c2mon.server.test.device.ObjectComparison.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -77,22 +78,6 @@ public class DeviceCacheTest {
       Device currentDevice = it.next();
       // Equality of DataTagCacheObjects => currently only compares names
       assertEquals(currentDevice.getName(), (deviceCache.getCopy(currentDevice.getId()).getName()));
-    }
-  }
-
-  public void assertDevicePropertyEquals(DeviceProperty expectedObject, DeviceProperty cacheObject) throws ClassNotFoundException {
-    assertEquals(expectedObject.getName(), cacheObject.getName());
-    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
-    assertEquals(expectedObject.getClientRule(), cacheObject.getClientRule());
-    assertEquals(expectedObject.getConstantValue(), cacheObject.getConstantValue());
-    assertEquals(expectedObject.getResultType(), cacheObject.getResultType());
-  }
-
-  public void assertDevicePropertyListContains(List<DeviceProperty> deviceProperties, DeviceProperty expectedObject) throws ClassNotFoundException {
-    for (DeviceProperty deviceProperty : deviceProperties) {
-      if (deviceProperty.getName().equals(expectedObject.getName())) {
-        assertDevicePropertyEquals(expectedObject, deviceProperty);
-      }
     }
   }
 }

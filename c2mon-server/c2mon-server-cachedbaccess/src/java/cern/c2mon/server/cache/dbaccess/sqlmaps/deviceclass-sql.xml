@@ -11,19 +11,28 @@
       <arg column="device_class_name" javaType="String" />
       <arg column="device_class_description" javaType="String" />
     </constructor>
-    <collection property="properties" ofType="String" javaType="java.util.ArrayList" resultMap="propertyResultMap" />
-    <collection property="commands" ofType="String" javaType="java.util.ArrayList" resultMap="commandResultMap" />
+    <collection property="properties" ofType="cern.c2mon.server.common.device.Property" javaType="java.util.ArrayList" resultMap="propertyResultMap" />
+    <collection property="commands" ofType="cern.c2mon.server.common.device.Command" javaType="java.util.ArrayList" resultMap="commandResultMap" />
     <collection property="deviceIds" ofType="Long" javaType="java.util.ArrayList" resultMap="deviceIdsResultMap" />
   </resultMap>
 
-  <resultMap id="propertyResultMap" type="String">
-    <id column="property_name" />
+  <resultMap id="propertyResultMap" type="cern.c2mon.server.common.device.Property">
+    <id column="property_id" property="id" />
+    <result column="property_name" property="name" />
+    <result column="property_description" property="description" />
+
+    <collection property="fields" ofType="cern.c2mon.server.common.device.Property" javaType="java.util.ArrayList">
+      <id column="field_id" property="id" />
+      <result column="field_name" property="name" />
+    </collection>
   </resultMap>
 
-  <resultMap id="commandResultMap" type="String">
-    <id column="command_name" />
+  <resultMap id="commandResultMap" type="cern.c2mon.server.common.device.Command">
+    <id column="command_id" property="id" />
+    <result column="command_name" property="name" />
+    <result column="command_description" property="description" />
   </resultMap>
-  
+
   <resultMap id="deviceIdsResultMap" type="Long">
     <id column="device_id" />
   </resultMap>
@@ -33,12 +42,20 @@
         SELECT DEVICECLASS.DEVCLASSID as device_class_id, 
            DEVICECLASS.DEVCLASSNAME as device_class_name, 
            DEVICECLASS.DEVCLASSDESC as device_class_description,
+           PROPERTY.PROPID as property_id,
            PROPERTY.PROPNAME as property_name,
+           PROPERTY.PROPDESC as property_description,
+           FIELD.FIELDID as field_id,
+           FIELD.FIELDNAME as field_name,
+           COMMAND.CMDID as command_id,
            COMMAND.CMDNAME as command_name,
+           COMMAND.CMDDESC as command_description,
            DEVICE.DEVID as device_id
       FROM DEVICECLASS 
            LEFT OUTER JOIN PROPERTY
         ON DEVICECLASS.DEVCLASSID = PROPERTY.PROPDEVCLASSID
+           LEFT OUTER JOIN FIELD
+        ON PROPERTY.PROPID = FIELD.FIELDPROPID
            LEFT OUTER JOIN COMMAND
         ON DEVICECLASS.DEVCLASSID = COMMAND.CMDDEVCLASSID
            LEFT OUTER JOIN DEVICE
@@ -51,12 +68,20 @@
     SELECT DEVICECLASS.DEVCLASSID as device_class_id, 
            DEVICECLASS.DEVCLASSNAME as device_class_name, 
            DEVICECLASS.DEVCLASSDESC as device_class_description,
+           PROPERTY.PROPID as property_id,
            PROPERTY.PROPNAME as property_name,
+           PROPERTY.PROPDESC as property_description,
+           FIELD.FIELDID as field_id,
+           FIELD.FIELDNAME as field_name,
+           COMMAND.CMDID as command_id,
            COMMAND.CMDNAME as command_name,
+           COMMAND.CMDDESC as command_description,
            DEVICE.DEVID as device_id
       FROM DEVICECLASS 
            LEFT OUTER JOIN PROPERTY
         ON DEVICECLASS.DEVCLASSID = PROPERTY.PROPDEVCLASSID
+           LEFT OUTER JOIN FIELD
+        ON PROPERTY.PROPID = FIELD.FIELDPROPID
            LEFT OUTER JOIN COMMAND
         ON DEVICECLASS.DEVCLASSID = COMMAND.CMDDEVCLASSID
            LEFT OUTER JOIN DEVICE
@@ -70,15 +95,20 @@
     (DEVCLASSID, DEVCLASSNAME, DEVCLASSDESC)
     VALUES (#{id}, #{name}, #{description,jdbcType=VARCHAR})
   </insert>
-  
+
   <insert id="insertDeviceClassProperty">
-    INSERT INTO PROPERTY (PROPDEVCLASSID, PROPNAME)
-    VALUES (#{id}, #{property})
+    INSERT INTO PROPERTY (PROPID, PROPNAME, PROPDESC, PROPDEVCLASSID)
+    VALUES (#{property.id}, #{property.name}, #{property.description}, #{id})
   </insert>
-  
+
+  <insert id="insertDeviceClassField">
+    INSERT INTO FIELD (FIELDID, FIELDNAME, FIELDPROPID)
+    VALUES (#{field.id}, #{field.name}, #{id})
+  </insert>
+
   <insert id="insertDeviceClassCommand">
-    INSERT INTO COMMAND (CMDDEVCLASSID, CMDNAME)
-    VALUES (#{id}, #{command})
+    INSERT INTO COMMAND (CMDID, CMDNAME, CMDDESC, CMDDEVCLASSID)
+    VALUES (#{command.id}, #{command.name}, #{command.description}, #{id})
   </insert>
 
   <update id="updateDeviceClassConfig" parameterType="cern.c2mon.server.common.device.DeviceClass">
@@ -113,6 +143,10 @@
 
   <delete id="deleteProperties" parameterType="Long">
     DELETE FROM PROPERTY WHERE PROPDEVCLASSID = #{id}
+  </delete>
+
+  <delete id="deleteFields" parameterType="Long">
+    DELETE FROM FIELD WHERE FIELDPROPID = #{id}
   </delete>
 
   <delete id="deleteCommands" parameterType="Long">

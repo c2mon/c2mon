@@ -48,6 +48,15 @@ public interface DeviceMapper extends LoaderMapper<Device> {
   void insertDeviceProperty(@Param("id") Long id, @Param("property") DeviceProperty property);
 
   /**
+   * Insert a field of a property into the DB.
+   *
+   * @param propertyId the ID of the property to which this field belongs
+   * @param deviceId the ID of the device to which this field belongs
+   * @param field the field to insert
+   */
+  void insertPropertyField(@Param("propertyId") Long propertyId, @Param("deviceId") Long deviceId, @Param("field") DeviceProperty field);
+
+  /**
    * Insert a command of a device into the DB.
    *
    * @param id the ID of the device to which this command belongs
@@ -82,4 +91,11 @@ public interface DeviceMapper extends LoaderMapper<Device> {
    * @param id the ID of the device from which to delete commands
    */
   void deleteDeviceCommands(Long id);
+
+  /**
+   * Delete all fields belonging to a device.
+   *
+   * @param id the ID of the device from which to delete commands
+   */
+  void deletePropertyFields(Long id);
 }

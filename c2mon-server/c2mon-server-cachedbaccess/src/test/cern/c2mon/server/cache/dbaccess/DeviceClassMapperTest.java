@@ -16,8 +16,11 @@
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
+import static cern.c2mon.server.test.device.ObjectComparison.assertCommandListContains;
+import static cern.c2mon.server.test.device.ObjectComparison.assertPropertyListContains;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,22 +69,30 @@ public class DeviceClassMapperTest {
   }
 
   @Test
-  public void testGetItem() {
+  public void testGetItem() throws ClassNotFoundException {
     DeviceClassCacheObject deviceClass1 = (DeviceClassCacheObject) deviceClassMapper.getItem(400L);
     Assert.assertNotNull(deviceClass1);
-    List<String> properties = deviceClass1.getProperties();
+    List<Property> properties = deviceClass1.getProperties();
     Assert.assertNotNull(properties);
-    Assert.assertTrue(properties.size() == 4);
-    Assert.assertTrue(properties.contains("cpuLoadInPercent"));
-    Assert.assertTrue(properties.contains("responsiblePerson"));
-    Assert.assertTrue(properties.contains("someCalculations"));
-    Assert.assertTrue(properties.contains("numCores"));
+    Assert.assertTrue(properties.size() == 5);
+    assertPropertyListContains(properties, new Property(1L, "cpuLoadInPercent", "The current CPU load in percent"));
+    assertPropertyListContains(properties, new Property(2L, "responsiblePerson", "The person responsible for this device"));
+    assertPropertyListContains(properties, new Property(3L, "someCalculations", "Some super awesome calculations"));
+    assertPropertyListContains(properties, new Property(4L, "numCores", "The number of CPU cores on this device"));
 
-    List<String> commands = deviceClass1.getCommands();
+    List<Property> fields = new ArrayList<>();
+    fields.add(new Property(1L, "FIELD_CPULOAD", null));
+    fields.add(new Property(2L, "FIELD_RESPONSIBLE_PERSON", null));
+    fields.add(new Property(3L, "FIELD_SOME_CALCULATIONS", null));
+    fields.add(new Property(4L, "FIELD_NUM_CORES", null));
+
+    assertPropertyListContains(properties, new Property(9L, "TEST_PROPERTY_WITH_FIELDS", "Description of TEST_PROPERTY_WITH_FIELDS", fields));
+
+    List<Command> commands = deviceClass1.getCommands();
     Assert.assertNotNull(commands);
     Assert.assertTrue(commands.size() == 2);
-    Assert.assertTrue(commands.contains("TEST_COMMAND_1"));
-    Assert.assertTrue(commands.contains("TEST_COMMAND_2"));
+    assertCommandListContains(commands, new Command(1L, "TEST_COMMAND_1", "Description of TEST_COMMAND_1"));
+    assertCommandListContains(commands, new Command(2L, "TEST_COMMAND_2", "Description of TEST_COMMAND_2"));
 
     List<Long> deviceIds = deviceClass1.getDeviceIds();
     Assert.assertNotNull(deviceIds);
@@ -94,16 +105,16 @@ public class DeviceClassMapperTest {
     properties = deviceClass2.getProperties();
     Assert.assertNotNull(properties);
     Assert.assertTrue(properties.size() == 4);
-    Assert.assertTrue(properties.contains("TEST_PROPERTY_1"));
-    Assert.assertTrue(properties.contains("TEST_PROPERTY_2"));
-    Assert.assertTrue(properties.contains("TEST_PROPERTY_3"));
-    Assert.assertTrue(properties.contains("TEST_PROPERTY_4"));
+    assertPropertyListContains(properties, new Property(5L, "TEST_PROPERTY_1", "Description of TEST_PROPERTY_1"));
+    assertPropertyListContains(properties, new Property(6L, "TEST_PROPERTY_2", "Description of TEST_PROPERTY_2"));
+    assertPropertyListContains(properties, new Property(7L, "TEST_PROPERTY_3", "Description of TEST_PROPERTY_3"));
+    assertPropertyListContains(properties, new Property(8L, "TEST_PROPERTY_4", "Description of TEST_PROPERTY_4"));
 
     commands = deviceClass2.getCommands();
     Assert.assertNotNull(commands);
     Assert.assertTrue(commands.size() == 2);
-    Assert.assertTrue(commands.contains("TEST_COMMAND_3"));
-    Assert.assertTrue(commands.contains("TEST_COMMAND_4"));
+    assertCommandListContains(commands, new Command(3L, "TEST_COMMAND_3", "Description of TEST_COMMAND_3"));
+    assertCommandListContains(commands, new Command(4L, "TEST_COMMAND_4", "Description of TEST_COMMAND_4"));
 
     deviceIds = deviceClass2.getDeviceIds();
     Assert.assertNotNull(deviceIds);
@@ -117,31 +128,66 @@ public class DeviceClassMapperTest {
     List<DeviceClass> deviceClasses = deviceClassMapper.getAll();
     Assert.assertNotNull(deviceClasses);
     Assert.assertTrue(deviceClasses.size() == 2);
+
+    for (DeviceClass deviceClass : deviceClasses) {
+      Assert.assertFalse(deviceClass.getProperties().size() == 0);
+    }
   }
 
   @Test
-  public void testInsertDeviceClass() {
+  public void testInsertDeviceClass() throws ClassNotFoundException {
     DeviceClassCacheObject deviceClass = new DeviceClassCacheObject(402L, "TEST_DEVICE_CLASS_3", "Description of TEST_DEVICE_CLASS_3");
-    deviceClass.setProperties(Arrays.asList(new Property("TEST_PROPERTY_1", "Test property 1"), new Property("TEST_PROPERTY_2", "Test property 2")));
-    deviceClass.setCommands(Arrays.asList(new Command("TEST_COMMAND_1", "Test command 1"), new Command("TEST_COMMAND_2", "Test command 1")));
+
+    List<Property> properties = new ArrayList<>();
+
+    properties.add(new Property(10L, "TEST_PROPERTY_1", "Test property 1"));
+    properties.add(new Property(11L, "TEST_PROPERTY_2", "Test property 2"));
+
+    List<Property> fields = new ArrayList<>();
+    fields.add(new Property(12L, "TEST_FIELD_1", null));
+    fields.add(new Property(13L, "TEST_FIELD_2", null));
+
+    properties.add(new Property(14L, "TEST_PROPERTY_WITH_FIELDS", "Test property with fields", fields));
+
+    deviceClass.setProperties(properties);
+
+    deviceClass.setCommands(Arrays.asList(new Command(10L, "TEST_COMMAND_1", "Test command 1"), new Command(11L, "TEST_COMMAND_2", "Test command 2")));
 
     deviceClassMapper.insertDeviceClass(deviceClass);
-    for (String property : ((DeviceClassCacheObject) deviceClass).getProperties()) {
+    for (Property property : ((DeviceClassCacheObject) deviceClass).getProperties()) {
       deviceClassMapper.insertDeviceClassProperty(deviceClass.getId(), property);
+
+      if (property.getFields() != null) {
+        for (Property field : property.getFields()) {
+          deviceClassMapper.insertDeviceClassField(property.getId(), field);
+        }
+      }
     }
-    for (String command : ((DeviceClassCacheObject) deviceClass).getCommands()) {
+    for (Command command : ((DeviceClassCacheObject) deviceClass).getCommands()) {
       deviceClassMapper.insertDeviceClassCommand(deviceClass.getId(), command);
     }
 
     Assert.assertTrue(deviceClassMapper.isInDb(402L));
     DeviceClassCacheObject fromDb = (DeviceClassCacheObject) deviceClassMapper.getItem(402L);
     Assert.assertNotNull(fromDb);
-    List<String> properties = fromDb.getProperties();
-    Assert.assertNotNull(properties);
-    Assert.assertTrue(properties.size() == 2);
-    List<String> commands = fromDb.getCommands();
+    List<Property> retrievedProperties = fromDb.getProperties();
+    Assert.assertNotNull(retrievedProperties);
+    Assert.assertTrue(retrievedProperties.size() == 3);
+
+    assertPropertyListContains(retrievedProperties, new Property(10L, "TEST_PROPERTY_1", "Test property 1"));
+    assertPropertyListContains(retrievedProperties, new Property(11L, "TEST_PROPERTY_2", "Test property 2"));
+    assertPropertyListContains(retrievedProperties, new Property(14L, "TEST_PROPERTY_WITH_FIELDS", "Test property with fields", fields));
+
+    List<Property> retrievedFields = retrievedProperties.get(0).getFields();
+    assertPropertyListContains(retrievedFields, new Property(12L, "TEST_FIELD_1", null));
+    assertPropertyListContains(retrievedFields, new Property(13L, "TEST_FIELD_2", null));
+
+    List<Command> commands = fromDb.getCommands();
     Assert.assertNotNull(commands);
     Assert.assertTrue(commands.size() == 2);
+
+    assertCommandListContains(commands, new Command(10L, "TEST_COMMAND_1", "Test command 1"));
+    assertCommandListContains(commands, new Command(11L, "TEST_COMMAND_2", "Test command 2"));
   }
 
   @Test

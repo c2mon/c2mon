@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
-import cern.c2mon.shared.common.Cacheable;
-import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
@@ -36,28 +34,28 @@ public class ControlTagMapperTest {
    * The class to test.
    */
   @Autowired
-  private ControlTagMapper controlTagMapper;    
-  
+  private ControlTagMapper controlTagMapper;
+
   @After
   public void deleteTestTag() {
     controlTagMapper.deleteControlTag(new Long(1001));
   }
-  
+
   @Test
   public void testGetAllControlTags() {
     assertNotNull(controlTagMapper);
     List<ControlTag> allList = controlTagMapper.getAll();
     assertNotSame(0, allList.size());
   }
-  
+
   @Test
   public void testInsertControlTagAndGetItem() {
-    ControlTagCacheObject cacheObject = (ControlTagCacheObject) CacheObjectCreation.createTestControlTag(); 
+    ControlTagCacheObject cacheObject = (ControlTagCacheObject) CacheObjectCreation.createTestControlTag();
     controlTagMapper.insertControlTag(cacheObject); //insert into DB
     ControlTagCacheObject retrievedObject = (ControlTagCacheObject) controlTagMapper.getItem(cacheObject.getId()); //retrieve from DB
-    
+
     assertNotNull(retrievedObject);
-    
+
     //check the persistence was correct
     assertEquals(cacheObject.getId(), retrievedObject.getId());
     assertEquals(cacheObject.getName(), retrievedObject.getName());
@@ -77,46 +75,46 @@ public class ControlTagMapperTest {
     assertEquals(cacheObject.getMaxValue(), retrievedObject.getMaxValue());
     assertEquals(cacheObject.getValueDictionary().toXML(), retrievedObject.getValueDictionary().toXML()); //compare XML of value dictionary
     assertEquals(cacheObject.getAddress(), retrievedObject.getAddress());
-    assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());//quality compare code and string    
+    assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());//quality compare code and string
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
     assertEquals(cacheObject.getRuleIdsString(), retrievedObject.getRuleIdsString());
-    
+
   }
-  
+
   @Test
   public void testUpdateControlTag() {
     ControlTagCacheObject cacheObject = CacheObjectCreation.createTestControlTag();
     controlTagMapper.insertControlTag(cacheObject);
-    
-    cacheObject.setValue(new Long(2000));    
+
+    cacheObject.setValue(new Long(2000));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setValueDescription("new control value");
     cacheObject.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.PROCESS_DOWN, "Process down."));
     cacheObject.setSimulated(false);
-    
+
     controlTagMapper.updateCacheable(cacheObject);
-    
+
     ControlTagCacheObject retrievedObject = (ControlTagCacheObject) controlTagMapper.getItem(cacheObject.getId());
-    
+
     assertEquals(cacheObject.getValue(), retrievedObject.getValue());
-    assertEquals(cacheObject.getValueDescription(), retrievedObject.getValueDescription());    
+    assertEquals(cacheObject.getValueDescription(), retrievedObject.getValueDescription());
     assertEquals(cacheObject.getDataTagQuality(), retrievedObject.getDataTagQuality());//quality compare code and string
     assertEquals(cacheObject.getTimestamp(), retrievedObject.getTimestamp());
     assertEquals(cacheObject.getSourceTimestamp(), retrievedObject.getSourceTimestamp());
     assertEquals(cacheObject.isSimulated(), retrievedObject.isSimulated());
-    
+
   }
-  
+
   @Test
   public void testIsInDB() {
     assertTrue(controlTagMapper.isInDb(1230L));
   }
-  
+
   @Test
   public void testNotInDB() {
     assertFalse(controlTagMapper.isInDb(200004L));
   }
-  
+
 }

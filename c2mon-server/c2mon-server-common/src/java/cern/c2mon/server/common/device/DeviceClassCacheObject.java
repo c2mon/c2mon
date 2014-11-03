@@ -51,12 +51,12 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
   /**
    * The list of properties that belong to this device class.
    */
-  private List<String> properties = new ArrayList<>();
+  private List<Property> properties = new ArrayList<>();
 
   /**
    * The list of commands that belong o this device class.
    */
-  private List<String> commands = new ArrayList<>();
+  private List<Command> commands = new ArrayList<>();
 
   /**
    * List of IDs of devices that are instances of this class.
@@ -103,12 +103,12 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
   }
 
   @Override
-  public List<String> getProperties() {
+  public List<Property> getProperties() {
     return properties;
   }
 
   @Override
-  public List<String> getCommands() {
+  public List<Command> getCommands() {
     return commands;
   }
 
@@ -117,8 +117,8 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
   public Object clone() throws CloneNotSupportedException {
     DeviceClassCacheObject clone = (DeviceClassCacheObject) super.clone();
 
-    clone.properties = (List<String>) ((ArrayList<String>) properties).clone();
-    clone.commands = (List<String>) ((ArrayList<String>) commands).clone();
+    clone.properties = (List<Property>) ((ArrayList<Property>) properties).clone();
+    clone.commands = (List<Command>) ((ArrayList<Command>) commands).clone();
     clone.deviceIds = (List<Long>) ((ArrayList<Long>) deviceIds).clone();
 
     return clone;
@@ -163,24 +163,126 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
   }
 
   /**
-   * Set the list of property names that belong to this device.
+   * Set the list of properties that belong to this device.
    *
    * @param properties the properties to set
    */
   public void setProperties(List<Property> properties) {
-    for (Property property : properties) {
-      this.properties.add(property.getName());
-    }
+    this.properties = properties;
   }
 
   /**
-   * Set the list of command names that belong to this device.
+   * Set the list of commands that belong to this device.
    *
    * @param commands the commands to set
    */
   public void setCommands(List<Command> commands) {
-    for (Command command : commands) {
-      this.commands.add(command.getName());
+    this.commands = commands;
+  }
+
+  @Override
+  public List<Long> getPropertyIds() {
+    List<Long> propertyIds = new ArrayList<>();
+
+    for (Property property : properties) {
+      if (property.getId() != null) {
+        propertyIds.add(property.getId());
+      }
     }
+
+    return propertyIds;
+  }
+
+  @Override
+  public List<Long> getCommandIds() {
+    List<Long> commandIds = new ArrayList<>();
+
+    for (Command command : commands) {
+      if (command.getId() != null) {
+        commandIds.add(command.getId());
+      }
+    }
+
+    return commandIds;
+  }
+
+  @Override
+  public List<String> getPropertyNames() {
+    List<String> propertyNames = new ArrayList<>();
+
+    for (Property property : properties) {
+      propertyNames.add(property.getName());
+    }
+
+    return propertyNames;
+  }
+
+  @Override
+  public List<String> getCommandNames() {
+    List<String> commandNames = new ArrayList<>();
+
+    for (Command command : commands) {
+      commandNames.add(command.getName());
+    }
+
+    return commandNames;
+  }
+
+  @Override
+  public Long getPropertyId(String name) {
+    for (Property property : properties) {
+      if (property.getName().equals(name)) {
+        return property.getId();
+      }
+    }
+
+    return null;
+  }
+
+  @Override
+  public Long getCommandId(String name) {
+    for (Command command : commands) {
+      if (command.getName().equals(name)) {
+        return command.getId();
+      }
+    }
+
+    return null;
+  }
+
+  @Override
+  public List<String> getFieldNames(String propertyName) {
+    List<String> fieldNames = new ArrayList<>();
+
+    for (Property property : properties) {
+      if (property.getName().equals(propertyName)) {
+        if (property.getFields() != null) {
+          for (Property field : property.getFields()) {
+            fieldNames.add(field.getName());
+          }
+          break;
+        }
+      }
+    }
+
+    return fieldNames;
+  }
+
+  @Override
+  public List<Long> getFieldIds(String propertyName) {
+    List<Long> fieldIds = new ArrayList<>();
+
+    for (Property property : properties) {
+      if (property.getName().equals(propertyName)) {
+        if (property.getFields() != null) {
+          for (Property field : property.getFields()) {
+            fieldIds.add(field.getId());
+          }
+          break;
+        }
+      }
+    }
+
+    return fieldIds;
   }
 }

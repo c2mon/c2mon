@@ -1,7 +1,9 @@
-delete from property;
+delete from propertyfield;
+delete from field;
 delete from deviceproperty;
-delete from command;
+delete from property;
 delete from devicecommand;
+delete from command;
 delete from device;
 delete from deviceclass;
 delete from alarm;

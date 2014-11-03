@@ -395,7 +395,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
   public void setDeviceCommands(List<DeviceCommand> deviceCommands) {
     for (DeviceCommand deviceCommand : deviceCommands) {
       // We don't need to lazy-load command tags, so just get them here
-      this.deviceCommands.put(deviceCommand.getName(), commandManager.getCommandTag(deviceCommand.getTagId()));
+      this.deviceCommands.put(deviceCommand.getName(), commandManager.getCommandTag(Long.valueOf(deviceCommand.getValue())));
     }
   }
 

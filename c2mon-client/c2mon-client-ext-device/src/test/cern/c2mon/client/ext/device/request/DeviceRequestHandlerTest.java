@@ -15,9 +15,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.jms.JmsProxy;
-import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
+import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
@@ -73,10 +73,10 @@ public class DeviceRequestHandlerTest {
     Collection<ClientRequestResult> mockResponse = new ArrayList<>();
     TransferDeviceImpl dti1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
     TransferDeviceImpl dti2 = new TransferDeviceImpl(2000L, "test_device_2", 1L);
-    dti1.addDeviceProperty(new DeviceProperty("TEST_PROPERTY_1", 1000L, null, null, null));
-    dti2.addDeviceProperty(new DeviceProperty("TEST_PROPERTY_2", 1001L, null, null, null));
-    dti1.addDeviceCommand(new DeviceCommand("TEST_COMMAND_1", 2000L));
-    dti2.addDeviceCommand(new DeviceCommand("TEST_COMMAND_2", 2001L));
+    dti1.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
+    dti2.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_2", "100430", "tagId", null));
+    dti1.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
+    dti2.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
     mockResponse.add(dti1);
     mockResponse.add(dti2);
 

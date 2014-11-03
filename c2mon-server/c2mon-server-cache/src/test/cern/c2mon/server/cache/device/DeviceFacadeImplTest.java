@@ -16,8 +16,10 @@
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.server.cache.device;
-
-import static org.junit.Assert.assertEquals;
+import static cern.c2mon.server.test.device.ObjectComparison.assertCommandListContains;
+import static cern.c2mon.server.test.device.ObjectComparison.assertDeviceCommandListContains;
+import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropertyListContains;
+import static cern.c2mon.server.test.device.ObjectComparison.assertPropertyListContains;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,8 +117,8 @@ public class DeviceFacadeImplTest {
     deviceClassReturn.setDeviceIds(deviceIds);
 
     DeviceCacheObject device1 = new DeviceCacheObject(1000L, "test_device_1", 1L);
-    device1.setDeviceProperties(new ArrayList<>(Arrays.asList(new DeviceProperty("test_property", 10L, null, null, null))));
-    device1.setDeviceCommands(new ArrayList<>(Arrays.asList(new DeviceCommand("test_command", 20L))));
+    device1.setDeviceProperties(new ArrayList<>(Arrays.asList(new DeviceProperty(10L, "test_property", "10", "tagId", null))));
+    device1.setDeviceCommands(new ArrayList<>(Arrays.asList(new DeviceCommand(10L, "test_command", "20", "commandTagId", null))));
     Device device2 = new DeviceCacheObject(2000L, "test_device_2", 1L);
 
     // Expect the facade to get the device class object
@@ -139,13 +141,24 @@ public class DeviceFacadeImplTest {
   }
 
   @Test
-  public void testCreateDeviceClassCacheObject() throws IllegalAccessException {
+  public void testCreateDeviceClassCacheObject() throws IllegalAccessException, ClassNotFoundException {
+    // Reset the mock
+    EasyMock.reset(deviceCacheMock, deviceClassCacheMock);
+    // Expect the locks to be used
+    deviceClassCacheMock.acquireReadLockOnKey(EasyMock.anyLong());
+    EasyMock.expectLastCall().atLeastOnce();
+    // Expect the locks to be used
+    deviceClassCacheMock.releaseReadLockOnKey(EasyMock.anyLong());
+    EasyMock.expectLastCall().atLeastOnce();
+
     Properties properties = new Properties();
     properties.put("name", "device_class_name");
-    properties.put("properties", "<Properties><Property name=\"TEST_PROPERTY_1\"><description>Description of TEST_PROPERTY_1</description></Property>"
-        + "<Property name=\"TEST_PROPERTY_2\"><description>Description of TEST_PROPERTY_2</description></Property></Properties>");
-    properties.put("commands", "<Commands><Command name=\"TEST_COMMAND_1\"><description>Description of TEST_COMMAND_1</description></Command>"
-        + "<Command name=\"TEST_COMMAND_2\"><description>Description of TEST_COMMAND_2</description></Command></Commands>");
+    properties.put("properties", "<Properties><Property name=\"TEST_PROPERTY_1\" id=\"1\"><description>Description of TEST_PROPERTY_1</description></Property>"
+        + "<Property name=\"TEST_PROPERTY_2\" id=\"2\"><description>Description of TEST_PROPERTY_2</description></Property></Properties>");
+    properties.put("commands", "<Commands><Command name=\"TEST_COMMAND_1\" id=\"1\"><description>Description of TEST_COMMAND_1</description></Command>"
+        + "<Command name=\"TEST_COMMAND_2\" id=\"2\"><description>Description of TEST_COMMAND_2</description></Command></Commands>");
+
+    EasyMock.replay(deviceCacheMock, deviceClassCacheMock);
 
     DeviceClass deviceClass = deviceClassFacade.createCacheObject(10L, properties);
     Assert.assertNotNull(deviceClass);
@@ -153,12 +166,13 @@ public class DeviceFacadeImplTest {
     Assert.assertTrue(deviceClass.getName() == properties.getProperty("name"));
 
     Assert.assertTrue(deviceClass.getProperties().size() == 2);
-    Assert.assertTrue(deviceClass.getProperties().contains("TEST_PROPERTY_1"));
-    Assert.assertTrue(deviceClass.getProperties().contains("TEST_PROPERTY_2"));
+
+    assertPropertyListContains(deviceClass.getProperties(), new Property(1L, "TEST_PROPERTY_1", "Description of TEST_PROPERTY_1"));
+    assertPropertyListContains(deviceClass.getProperties(), new Property(2L, "TEST_PROPERTY_2", "Description of TEST_PROPERTY_2"));
 
     Assert.assertTrue(deviceClass.getCommands().size() == 2);
-    Assert.assertTrue(deviceClass.getCommands().contains("TEST_COMMAND_1"));
-    Assert.assertTrue(deviceClass.getCommands().contains("TEST_COMMAND_2"));
+    assertCommandListContains(deviceClass.getCommands(), new Command(1L, "TEST_COMMAND_1", "Description of TEST_COMMAND_1"));
+    assertCommandListContains(deviceClass.getCommands(), new Command(2L, "TEST_COMMAND_2", "Description of TEST_COMMAND_2"));
 
     // Test XML parser throws exception with invalid XML
     properties.put("properties", "invalid XML string");
@@ -190,9 +204,17 @@ public class DeviceFacadeImplTest {
     EasyMock.reset(deviceCacheMock, deviceClassCacheMock);
 
     DeviceClassCacheObject deviceClass = new DeviceClassCacheObject(400L, "TEST_DEVICE_CLASS_1", "Description of TEST_DEVICE_CLASS_1");
-    deviceClass.setProperties(Arrays.asList(new Property("TEST_PROPERTY_1", "Test property 1"), new Property("TEST_PROPERTY_2", "Test property 2"),
-        new Property("TEST_PROPERTY_WITH_FIELDS", "Test property with fields")));
-    deviceClass.setCommands(Arrays.asList(new Command("TEST_COMMAND_1", "Test command 1"), new Command("TEST_COMMAND_2", "Test command 1")));
+    List<Property> classProperties = new ArrayList<>();
+    classProperties.addAll(Arrays.asList(new Property(1L, "TEST_PROPERTY_1", "Test property 1"), new Property(2L, "TEST_PROPERTY_2", "Test property 2")));
+
+    List<Property> fields = new ArrayList<>();
+    fields.addAll(Arrays.asList(new Property(1L, "field1", null), new Property(2L, "field2", null), new Property(3L, "field3", null), new Property(4L,
+        "field4", null)));
+    Property propertyWithFields = new Property(3L, "TEST_PROPERTY_WITH_FIELDS", "Test property with fields", fields);
+    classProperties.add(propertyWithFields);
+
+    deviceClass.setProperties(classProperties);
+    deviceClass.setCommands(Arrays.asList(new Command(1L, "TEST_COMMAND_1", "Test command 1"), new Command(2L, "TEST_COMMAND_2", "Test command 1")));
 
     // Expect the facade to get the DeviceClass for the device
     EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass);
@@ -201,7 +223,7 @@ public class DeviceFacadeImplTest {
     EasyMock.expect(deviceClassCacheMock.get(-1L)).andReturn(null);
 
     // Expect the facade to get the DeviceClass for the device
-    EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass).times(3);
+    EasyMock.expect(deviceClassCacheMock.get(400L)).andReturn(deviceClass).times(2);
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(deviceCacheMock, deviceClassCacheMock);
@@ -211,21 +233,29 @@ public class DeviceFacadeImplTest {
     deviceProperties.put("classId", "400");
     deviceProperties.put("deviceProperties", ""
         + "<DeviceProperties>"
-        + "  <DeviceProperty name=\"TEST_PROPERTY_1\"><tag-id>100430</tag-id></DeviceProperty>"
-        + "  <DeviceProperty name=\"TEST_PROPERTY_2\"><tag-id>100431</tag-id></DeviceProperty>"
-        + "  <DeviceProperty name=\"TEST_PROPERTY_WITH_FIELDS\">"
-        + "    <Fields>"
-        + "      <Field name=\"cpuLoadInPercent\"><tag-id>987654</tag-id></Field>"
-        + "      <Field name=\"responsiblePerson\"><constant-value>Mr. Administrator</constant-value></Field>"
-        + "      <Field name=\"someCalculations\"><client-rule><![CDATA[(#123 + #234) / 2]]></client-rule></Field>"
-        + "      <Field name=\"numCores\"><constant-value>4</constant-value><result-type>Integer</result-type></Field>"
-        + "    </Fields>"
+        + "  <DeviceProperty name=\"TEST_PROPERTY_1\" id=\"1\">"
+        + "    <value>100430</value>"
+        + "    <category>tagId</category>"
+        + "  </DeviceProperty>"
+        + "  <DeviceProperty name=\"TEST_PROPERTY_2\" id=\"2\">"
+        + "    <value>100431</value>"
+        + "    <category>tagId</category>"
+        + "  </DeviceProperty>"
+        + "  <DeviceProperty name=\"TEST_PROPERTY_WITH_FIELDS\" id=\"3\">"
+        + "    <category>mappedProperty</category>"
+        + "    <PropertyFields>"
+        + "      <PropertyField name=\"field1\" id=\"1\"><value>987654</value><category>tagId</category></PropertyField>"
+        + "      <PropertyField name=\"field2\" id=\"2\"><value>Mr. Administrator</value><category>constantValue</category></PropertyField>"
+        + "      <PropertyField name=\"field3\" id=\"3\"><value><![CDATA[(#123 + #234) / 2]]></value><category>clientRule</category>"
+        + "         <result-type>Float</result-type></PropertyField>"
+        + "      <PropertyField name=\"field4\" id=\"4\"><value>4</value><category>constantValue</category><result-type>Integer</result-type></PropertyField>"
+        + "    </PropertyFields>"
         + "  </DeviceProperty>"
         + "</DeviceProperties>");
     deviceProperties.put("deviceCommands", ""
         + "<DeviceCommands>"
-        + "  <DeviceCommand name=\"TEST_COMMAND_1\"><command-tag-id>4287</command-tag-id></DeviceCommand>"
-        + "  <DeviceCommand name=\"TEST_COMMAND_2\"><command-tag-id>4288</command-tag-id></DeviceCommand>"
+        + "  <DeviceCommand name=\"TEST_COMMAND_1\" id=\"1\"><value>4287</value><category>commandTagId</category></DeviceCommand>"
+        + "  <DeviceCommand name=\"TEST_COMMAND_2\" id=\"2\"><value>4288</value><category>commandTagId</category></DeviceCommand>"
         + "</DeviceCommands>");
 
     Device device = deviceFacade.createCacheObject(10L, deviceProperties);
@@ -235,12 +265,19 @@ public class DeviceFacadeImplTest {
     Assert.assertTrue(device.getDeviceClassId() == 400L);
 
     Assert.assertTrue(device.getDeviceProperties().size() == 3);
-    assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty("TEST_PROPERTY_1", 100430L, null, null, null));
-    assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty("TEST_PROPERTY_2", 100431L, null, null, null));
+    assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
+    assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty(2L, "TEST_PROPERTY_2", "100431", "tagId", null));
+
+    List<DeviceProperty> expectedFields = new ArrayList<>();
+    expectedFields.add(new DeviceProperty(1L, "field1", "987654", "tagId", "String"));
+    expectedFields.add(new DeviceProperty(2L, "field2", "Mr. Administrator", "constantValue", "String"));
+    expectedFields.add(new DeviceProperty(3L, "field3", "(#123 + #234) / 2", "clientRule", "Float"));
+    expectedFields.add(new DeviceProperty(4L, "field4", "4", "constantValue", "Integer"));
+    assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty(3L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields));
 
     Assert.assertTrue(device.getDeviceCommands().size() == 2);
-    assertDeviceCommandListContains(device.getDeviceCommands(), new DeviceCommand("TEST_COMMAND_1", 4287L));
-    assertDeviceCommandListContains(device.getDeviceCommands(), new DeviceCommand("TEST_COMMAND_2", 4288L));
+    assertDeviceCommandListContains(device.getDeviceCommands(), new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
+    assertDeviceCommandListContains(device.getDeviceCommands(), new DeviceCommand(2L, "TEST_COMMAND_2", "4288", "commandTagId", null));
 
     // Test XML parser throws exception with invalid XML
     deviceProperties.put("deviceProperties", "invalid XML string");
@@ -250,7 +287,7 @@ public class DeviceFacadeImplTest {
     } catch (ConfigurationException e) {
     }
     deviceProperties.put("deviceProperties",
-        "<DeviceProperties><DeviceProperty name=\"TEST_PROPERTY_1\"><tag-id>100430</tag-id></DeviceProperty></DeviceProperties>");
+        "<DeviceProperties><DeviceProperty name=\"TEST_PROPERTY_1\" id=\"1\"><value>100430</value><category>tagId</category></DeviceProperty></DeviceProperties>");
 
     deviceProperties.put("deviceCommands", "invalid XML string");
     try {
@@ -259,7 +296,7 @@ public class DeviceFacadeImplTest {
     } catch (ConfigurationException e) {
     }
     deviceProperties.put("deviceCommands",
-        "<DeviceCommands><DeviceCommand name=\"TEST_COMMAND_1\"><command-tag-id>4287</command-tag-id></DeviceCommand></DeviceCommands>");
+        "<DeviceCommands><DeviceCommand name=\"TEST_COMMAND_1\" id=\"1\"><value>4287</value><category>commandTagId</category></DeviceCommand></DeviceCommands>");
 
     // Test invalid device class ID
     deviceProperties.put("classId", "-1");
@@ -271,7 +308,8 @@ public class DeviceFacadeImplTest {
     deviceProperties.put("classId", "400");
 
     // Test invalid property name
-    deviceProperties.put("deviceProperties", "<DeviceProperties><DeviceProperty name=\"NONEXISTENT\"><tag-id>1</tag-id></DeviceProperty></DeviceProperties>");
+    deviceProperties.put("deviceProperties", "<DeviceProperties><DeviceProperty name=\"NONEXISTENT\"> id=\"-1\""
+        + "<value>1</value><category>tagId</category></DeviceProperty></DeviceProperties>");
     try {
       deviceFacade.createCacheObject(10L, deviceProperties);
       Assert.fail("createCacheObject() did not throw exception");
@@ -288,34 +326,5 @@ public class DeviceFacadeImplTest {
 
     // Verify that everything happened as expected
     EasyMock.verify(deviceCacheMock, deviceClassCacheMock);
-  }
-
-  public void assertDevicePropertyEquals(DeviceProperty expectedObject, DeviceProperty cacheObject) throws ClassNotFoundException {
-    assertEquals(expectedObject.getName(), cacheObject.getName());
-    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
-    assertEquals(expectedObject.getClientRule(), cacheObject.getClientRule());
-    assertEquals(expectedObject.getConstantValue(), cacheObject.getConstantValue());
-    assertEquals(expectedObject.getResultType(), cacheObject.getResultType());
-  }
-
-  public void assertDevicePropertyListContains(List<DeviceProperty> deviceProperties, DeviceProperty expectedObject) throws ClassNotFoundException {
-    for (DeviceProperty deviceProperty : deviceProperties) {
-      if (deviceProperty.getName().equals(expectedObject.getName())) {
-        assertDevicePropertyEquals(expectedObject, deviceProperty);
-      }
-    }
-  }
-
-  public void assertDeviceCommandEquals(DeviceCommand expectedObject, DeviceCommand cacheObject) {
-    assertEquals(expectedObject.getName(), cacheObject.getName());
-    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
-  }
-
-  public void assertDeviceCommandListContains(List<DeviceCommand> deviceCommands, DeviceCommand expectedObject) {
-    for (DeviceCommand deviceCommand : deviceCommands) {
-      if (deviceCommand.getName().equals(expectedObject.getName())) {
-        assertDeviceCommandEquals(expectedObject, deviceCommand);
-      }
-    }
   }
 }

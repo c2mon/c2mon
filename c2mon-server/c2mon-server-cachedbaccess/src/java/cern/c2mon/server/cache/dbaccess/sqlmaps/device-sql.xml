@@ -9,16 +9,29 @@
     <id property="id" column="device_id"/>
     <result property="name" column="device_name"/>
     <result property="deviceClassId" column="device_class_id"/>
+
     <collection property="deviceProperties" ofType="cern.c2mon.shared.client.device.DeviceProperty">
-      <id property="name" column="property_name"/>
-      <result property="tagId" column="property_tagid"/>
-      <result property="clientRule" column="client_rule"/>
-      <result property="constantValue" column="constant_value"/>
-      <result property="resultType" column="result_type"/>
+      <id property="id" column="property_id"/>
+      <result property="name" column="property_name"/>
+      <result property="value" column="property_value"/>
+      <result property="category" column="property_category"/>
+      <result property="resultType" column="property_result_type"/>
+
+      <collection property="fields" ofType="cern.c2mon.shared.client.device.DeviceProperty">
+        <id property="id" column="field_id"/>
+        <result property="name" column="field_name"/>
+        <result property="value" column="field_value"/>
+        <result property="category" column="field_category"/>
+        <result property="resultType" column="field_result_type"/>
+      </collection>
     </collection>
+
     <collection property="deviceCommands" ofType="cern.c2mon.shared.client.device.DeviceCommand">
-      <id property="name" column="command_name"/>
-      <result property="tagId" column="command_tagid"/>
+      <id property="id" column="command_id"/>
+      <result property="name" column="command_name"/>
+      <result property="value" column="command_value"/>
+      <result property="category" column="command_category"/>
+      <result property="resultType" column="command_result_type"/>
     </collection>
   </resultMap>
 
@@ -27,16 +40,26 @@
     SELECT DEVICE.DEVID as device_id,
            DEVICE.DEVNAME as device_name,
            DEVICE.DEVCLASSID as device_class_id,
+           DEVICEPROPERTY.DVPPROPID as property_id,
            DEVICEPROPERTY.DVPNAME as property_name,
-           DEVICEPROPERTY.DVPTAGID as property_tagid,
-           DEVICEPROPERTY.DVPRULE as client_rule,
-           DEVICEPROPERTY.DVPCONST as constant_value,
-           DEVICEPROPERTY.DVPRESULTTYPE as result_type,
+           DEVICEPROPERTY.DVPVALUE as property_value,
+           DEVICEPROPERTY.DVPCATEGORY as property_category,
+           DEVICEPROPERTY.DVPRESULTTYPE as property_result_type,
+           PROPERTYFIELD.PRFFIELDID as field_id,
+           PROPERTYFIELD.PRFFIELDNAME as field_name,
+           PROPERTYFIELD.PRFVALUE as field_value,
+           PROPERTYFIELD.PRFCATEGORY as field_category,
+           PROPERTYFIELD.PRFRESULTTYPE as field_result_type,
+           DEVICECOMMAND.DVCCMDID as command_id,
            DEVICECOMMAND.DVCNAME as command_name,
-           DEVICECOMMAND.DVCTAGID as command_tagid
+           DEVICECOMMAND.DVCVALUE as command_value,
+           DEVICECOMMAND.DVCCATEGORY as command_category,
+           DEVICECOMMAND.DVCRESULTTYPE as command_result_type
       FROM DEVICE 
            LEFT OUTER JOIN DEVICEPROPERTY
         ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
+           LEFT OUTER JOIN PROPERTYFIELD
+        ON DEVICE.DEVID = PROPERTYFIELD.PRFDEVID
            LEFT OUTER JOIN DEVICECOMMAND
         ON DEVICE.DEVID = DEVICECOMMAND.DVCDEVID
   </select>
@@ -46,16 +69,26 @@
     SELECT DEVICE.DEVID as device_id,
            DEVICE.DEVNAME as device_name,
            DEVICE.DEVCLASSID as device_class_id,
+           DEVICEPROPERTY.DVPPROPID as property_id,
            DEVICEPROPERTY.DVPNAME as property_name,
-           DEVICEPROPERTY.DVPTAGID as property_tagid,
-           DEVICEPROPERTY.DVPRULE as client_rule,
-           DEVICEPROPERTY.DVPCONST as constant_value,
-           DEVICEPROPERTY.DVPRESULTTYPE as result_type,
+           DEVICEPROPERTY.DVPVALUE as property_value,
+           DEVICEPROPERTY.DVPCATEGORY as property_category,
+           DEVICEPROPERTY.DVPRESULTTYPE as property_result_type,
+           PROPERTYFIELD.PRFFIELDID as field_id,
+           PROPERTYFIELD.PRFFIELDNAME as field_name,
+           PROPERTYFIELD.PRFVALUE as field_value,
+           PROPERTYFIELD.PRFCATEGORY as field_category,
+           PROPERTYFIELD.PRFRESULTTYPE as field_result_type,
+           DEVICECOMMAND.DVCCMDID as command_id,
            DEVICECOMMAND.DVCNAME as command_name,
-           DEVICECOMMAND.DVCTAGID as command_tagid
+           DEVICECOMMAND.DVCVALUE as command_value,
+           DEVICECOMMAND.DVCCATEGORY as command_category,
+           DEVICECOMMAND.DVCRESULTTYPE as command_result_type
       FROM DEVICE 
            LEFT OUTER JOIN DEVICEPROPERTY
         ON DEVICE.DEVID = DEVICEPROPERTY.DVPDEVID
+           LEFT OUTER JOIN PROPERTYFIELD
+        ON DEVICE.DEVID = PROPERTYFIELD.PRFDEVID
            LEFT OUTER JOIN DEVICECOMMAND
         ON DEVICE.DEVID = DEVICECOMMAND.DVCDEVID
      WHERE DEVICE.DEVID = #{id}
@@ -67,16 +100,23 @@
     (DEVID, DEVNAME, DEVCLASSID)
     VALUES (#{id}, #{name}, #{deviceClassId})
   </insert>
-  
+
   <insert id="insertDeviceProperty">
-    INSERT INTO DEVICEPROPERTY (DVPDEVID, DVPNAME, DVPTAGID, DVPRULE, DVPCONST, DVPRESULTTYPE)
-    VALUES (#{id}, #{property.name}, #{property.tagId,jdbcType=INTEGER}, #{property.clientRule,jdbcType=VARCHAR},
-            #{property.constantValue,jdbcType=VARCHAR}, #{property.resultType})
+    INSERT INTO DEVICEPROPERTY (DVPPROPID, DVPNAME, DVPVALUE, DVPCATEGORY, DVPRESULTTYPE, DVPDEVID)
+    VALUES (#{property.id}, #{property.name}, #{property.value,jdbcType=VARCHAR}, #{property.category},
+            #{property.resultType}, #{id})
   </insert>
-  
+
+  <insert id="insertPropertyField">
+    INSERT INTO PROPERTYFIELD (PRFFIELDID, PRFFIELDNAME, PRFVALUE, PRFCATEGORY, PRFRESULTTYPE, PRFPROPID, PRFDEVID)
+    VALUES (#{field.id}, #{field.name}, #{field.value,jdbcType=VARCHAR}, #{field.category,jdbcType=VARCHAR},
+            #{field.resultType}, #{propertyId}, #{deviceId})
+  </insert>
+
   <insert id="insertDeviceCommand">
-    INSERT INTO DEVICECOMMAND (DVCDEVID, DVCNAME, DVCTAGID)
-    VALUES (#{id}, #{command.name}, #{command.tagId})
+    INSERT INTO DEVICECOMMAND (DVCCMDID, DVCNAME, DVCVALUE, DVCCATEGORY, DVCRESULTTYPE, DVCDEVID)
+    VALUES (#{command.id}, #{command.name}, #{command.value}, #{command.category}, #{command.resultType}, 
+            #{id})
   </insert>
 
   <update id="updateDeviceConfig" parameterType="cern.c2mon.server.common.device.Device">
@@ -109,6 +149,10 @@
 
   <delete id="deleteDeviceProperties" parameterType="Long">
     DELETE FROM DEVICEPROPERTY WHERE DVPDEVID = #{id}
+  </delete>
+
+  <delete id="deletePropertyFields" parameterType="Long">
+    DELETE FROM PROPERTYFIELD WHERE PRFDEVID = #{id}
   </delete>
 
   <delete id="deleteDeviceCommands" parameterType="Long">

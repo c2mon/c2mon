@@ -49,7 +49,7 @@ public class ClientDevicePropertyFactory {
   public static ClientDeviceProperty createClientDeviceProperty(DeviceProperty deviceProperty) throws ClassNotFoundException, RuleFormatException {
 
     // If the property has nested fields, create them all here
-    if (deviceProperty.getFields() != null) {
+    if (deviceProperty.getFields() != null && !deviceProperty.getFields().isEmpty()) {
       Map<String, DeviceProperty> fields = deviceProperty.getFields();
       Map<String, ClientDeviceProperty> clientFields = new HashMap<>();
 
@@ -61,19 +61,19 @@ public class ClientDevicePropertyFactory {
     }
 
     // If we have a tag ID, it takes priority.
-    if (deviceProperty.getTagId() != null) {
-      return new ClientDevicePropertyImpl(deviceProperty.getTagId());
+    if (deviceProperty.getCategory().equals("tagId")) {
+      return new ClientDevicePropertyImpl(Long.parseLong(deviceProperty.getValue()));
     }
 
     // If we have a client rule, that comes next in the hierarchy.
-    else if (deviceProperty.getClientRule() != null) {
-      ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getClientRule()), deviceProperty.getResultTypeClass());
+    else if (deviceProperty.getCategory().equals("clientRule")) {
+      ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getValue()), deviceProperty.getResultTypeClass());
       return new ClientDevicePropertyImpl(ruleTag);
     }
 
     // If we have a constant value, it comes last in the hierarchy.
-    else if (deviceProperty.getConstantValue() != null) {
-      ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getConstantValue(), deviceProperty.getResultTypeClass());
+    else if (deviceProperty.getCategory().equals("constantValue")) {
+      ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getValue(), deviceProperty.getResultTypeClass());
       return new ClientDevicePropertyImpl(constantValueTag);
     }
 

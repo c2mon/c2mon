@@ -1201,9 +1201,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     context = arg0;
   }
 
-//  @Test
+  @Test
   @DirtiesContext
-  public void testCreateUpdateDeviceClass() {
+  public void testCreateUpdateDeviceClass() throws ClassNotFoundException {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(30);
@@ -1217,13 +1217,19 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     expectedObject = new DeviceClassCacheObject(10L, "TEST_DEVICE_CLASS_10", "Description of TEST_DEVICE_CLASS_10");
 
     List<Property> expectedProperties = new ArrayList<>();
-    expectedProperties.add(new Property("cpuLoadInPercent", "CPU load in percent"));
-    expectedProperties.add(new Property("responsiblePerson", "Responsible person"));
-    expectedProperties.add(new Property("someCalculations", "Some calculations"));
+    expectedProperties.add(new Property(10L, "cpuLoadInPercent", "The current CPU load in percent"));
+    expectedProperties.add(new Property(11L, "responsiblePerson", "The person responsible for this device"));
+    expectedProperties.add(new Property(12L, "someCalculations", "Some super awesome calculations"));
+
+    List<Property> expectedFields = new ArrayList<>();
+    expectedFields.add(new Property(10L, "field1", null));
+    expectedFields.add(new Property(11L, "field2", null));
+
+    expectedProperties.add(new Property(13L, "TEST_PROPERTY_WITH_FIELDS", "A property containing fields", expectedFields));
 
     List<Command> expectedCommands = new ArrayList<>();
-    expectedCommands.add(new Command("TEST_COMMAND_1", "Test command 1"));
-    expectedCommands.add(new Command("TEST_COMMAND_2", "Test command 2"));
+    expectedCommands.add(new Command(10L, "TEST_COMMAND_1", "Description of TEST_COMMAND_1"));
+    expectedCommands.add(new Command(11L, "TEST_COMMAND_2", "Description of TEST_COMMAND_2"));
 
     expectedObject.setProperties(expectedProperties);
     expectedObject.setCommands(expectedCommands);
@@ -1241,7 +1247,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     cacheObject = (DeviceClassCacheObject) deviceClassCache.get(10L);
 
-    expectedProperties.add(new Property("numCores", "Number of cores"));
+    expectedProperties.add(new Property(14L, "numCores", "The number of CPU cores on this device"));
     expectedObject.setProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceClassEquals(expectedObject, cacheObject);
 
@@ -1272,14 +1278,15 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     System.out.println(report.toXML());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(deviceClassCache.hasKey(400L));
-    assertNull(deviceClassMapper.getItem(400L));
+    DeviceClass cacheObject = deviceClassMapper.getItem(400L);
+    assertNull(cacheObject);
 
     verify(mockManager);
   }
 
   @Test
   @DirtiesContext
-  public void testCreateUpdateDevice() {
+  public void testCreateUpdateDevice() throws ClassNotFoundException {
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(33);
@@ -1290,18 +1297,18 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     DeviceCacheObject expectedObject = new DeviceCacheObject(20L, "TEST_DEVICE_20", 400L);
 
     List<DeviceProperty> expectedProperties = new ArrayList<>();
-    expectedProperties.add(new DeviceProperty("cpuLoadInPercent", 987654L, null, null, null));
-    expectedProperties.add(new DeviceProperty("responsiblePerson", null, null, "Mr. Administrator", null));
-    expectedProperties.add(new DeviceProperty("someCalculations", null, "(#123 + #234) / 2", null, "Float"));
+    expectedProperties.add(new DeviceProperty(1L, "cpuLoadInPercent", "987654", "tagId", null));
+    expectedProperties.add(new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
+    expectedProperties.add(new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
 
-//    List<DeviceProperty> expectedFields = new ArrayList<>();
-//    expectedFields.add(new DeviceProperty(1L, "field1", "987654", "tagId", null));
-//    expectedFields.add(new DeviceProperty(2L, "field2", "(#123 + #234) / 2", "clientRule", null));
-//    expectedProperties.add(new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields));
+    List<DeviceProperty> expectedFields = new ArrayList<>();
+    expectedFields.add(new DeviceProperty(1L, "field1", "987654", "tagId", null));
+    expectedFields.add(new DeviceProperty(2L, "field2", "(#123 + #234) / 2", "clientRule", null));
+    expectedProperties.add(new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields));
 
     List<DeviceCommand> expectedCommands = new ArrayList<>();
-    expectedCommands.add(new DeviceCommand("TEST_COMMAND_1", 4287L));
-    expectedCommands.add(new DeviceCommand("TEST_COMMAND_2", 4288L));
+    expectedCommands.add(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
+    expectedCommands.add(new DeviceCommand(2L, "TEST_COMMAND_2", "4288", "commandTagId", null));
 
     expectedObject.setDeviceProperties(expectedProperties);
     expectedObject.setDeviceCommands(expectedCommands);
@@ -1314,7 +1321,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     cacheObject = (DeviceCacheObject) deviceCache.get(20L);
 
-    expectedProperties.add(new DeviceProperty("numCores", null, null, "4", "Integer"));
+    expectedProperties.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
     expectedObject.setDeviceProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
 

@@ -2,14 +2,13 @@ package cern.c2mon.server.configuraton.helper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import org.junit.Assert;
-
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.common.device.Property;
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
@@ -17,6 +16,7 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.test.device.ObjectComparison;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 
@@ -148,30 +148,32 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
   }
 
-  public static void assertDeviceClassEquals(DeviceClassCacheObject expectedObject, DeviceClassCacheObject cacheObject) {
+  public static void assertDeviceClassEquals(DeviceClassCacheObject expectedObject, DeviceClassCacheObject cacheObject) throws ClassNotFoundException {
     assertEquals(expectedObject.getId(), cacheObject.getId());
     assertEquals(expectedObject.getName(), cacheObject.getName());
     assertEquals(expectedObject.getDescription(), cacheObject.getDescription());
     assertEquals(expectedObject.getProperties().size(), cacheObject.getProperties().size());
-    for (int i = 0; i < expectedObject.getProperties().size(); i++) {
-      assertEquals(expectedObject.getProperties().get(i), cacheObject.getProperties().get(i));
+
+    for (Property property : expectedObject.getProperties()) {
+      ObjectComparison.assertPropertyListContains(cacheObject.getProperties(), property);
     }
+
     assertEquals(expectedObject.getCommands().size(), cacheObject.getCommands().size());
-    for (int i = 0; i < expectedObject.getCommands().size(); i++) {
-      assertEquals(expectedObject.getCommands().get(i), cacheObject.getCommands().get(i));
+    for (Command command : expectedObject.getCommands()) {
+      ObjectComparison.assertCommandListContains(cacheObject.getCommands(), command);
     }
   }
 
-  public static void assertDeviceEquals(DeviceCacheObject expectedObject, DeviceCacheObject cacheObject) {
+  public static void assertDeviceEquals(DeviceCacheObject expectedObject, DeviceCacheObject cacheObject) throws ClassNotFoundException {
     assertEquals(expectedObject.getId(), cacheObject.getId());
     assertEquals(expectedObject.getName(), cacheObject.getName());
     assertEquals(expectedObject.getDeviceClassId(), cacheObject.getDeviceClassId());
     assertEquals(expectedObject.getDeviceProperties().size(), cacheObject.getDeviceProperties().size());
     for (DeviceProperty property : expectedObject.getDeviceProperties()) {
-      Assert.assertTrue(expectedObject.getDeviceProperties().contains(property));
+      ObjectComparison.assertDevicePropertyListContains(cacheObject.getDeviceProperties(), property);
     }
     for (DeviceCommand deviceCommand : expectedObject.getDeviceCommands()) {
-      Assert.assertTrue(expectedObject.getDeviceCommands().contains(deviceCommand));
+      ObjectComparison.assertDeviceCommandListContains(cacheObject.getDeviceCommands(), deviceCommand);
     }
   }
 }

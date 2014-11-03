@@ -25,4 +25,11 @@ import cern.c2mon.server.common.device.DeviceClass;
  * @author Justin Lewis Salmon
  */
 public interface DeviceClassDAO extends CacheLoaderDAO<DeviceClass>, ConfigurableDAO<DeviceClass> {
+
+  /**
+   * Remove a device class.
+   *
+   * @param deviceClass the device class to remove
+   */
+  void deleteItem(DeviceClass deviceClass);
 }
