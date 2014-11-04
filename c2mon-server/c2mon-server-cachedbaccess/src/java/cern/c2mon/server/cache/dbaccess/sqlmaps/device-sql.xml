@@ -103,13 +103,13 @@
 
   <insert id="insertDeviceProperty">
     INSERT INTO DEVICEPROPERTY (DVPPROPID, DVPNAME, DVPVALUE, DVPCATEGORY, DVPRESULTTYPE, DVPDEVID)
-    VALUES (#{property.id}, #{property.name}, #{property.value,jdbcType=VARCHAR}, #{property.category},
+    VALUES (#{property.id}, #{property.name}, #{property.value,jdbcType=VARCHAR}, #{property.category,jdbcType=VARCHAR},
             #{property.resultType}, #{id})
   </insert>
 
   <insert id="insertPropertyField">
     INSERT INTO PROPERTYFIELD (PRFFIELDID, PRFFIELDNAME, PRFVALUE, PRFCATEGORY, PRFRESULTTYPE, PRFPROPID, PRFDEVID)
-    VALUES (#{field.id}, #{field.name}, #{field.value,jdbcType=VARCHAR}, #{field.category,jdbcType=VARCHAR},
+    VALUES (#{field.id}, #{field.name}, #{field.value,jdbcType=VARCHAR}, #{field.category},
             #{field.resultType}, #{propertyId}, #{deviceId})
   </insert>
 
