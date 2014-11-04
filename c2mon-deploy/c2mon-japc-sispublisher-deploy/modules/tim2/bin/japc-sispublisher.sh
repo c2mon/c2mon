@@ -38,7 +38,7 @@ export PROCESS_NAME=japc-sispublisher
 PROCESS_COMMAND=$1
 
 # The script which is actually calling the JAPC publisher
-STARTUP_SCRIPT=${APP_HOME}/bin/JAPC-PUBLISHER-STARTUP.jvm
+STARTUP_SCRIPT=${APP_HOME}/bin/TIM-PUBLISHER-SIS.jvm
 
 TIME=`date +"%F %T.%3N"`
 

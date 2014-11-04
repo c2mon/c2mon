@@ -15,7 +15,7 @@
           <mail address="tim-admin@cern.ch" />
         </notification>
       </deployment>
-      <startscript name="japc-publisher-startup">
+      <startscript name="tim-publisher-sis">
         <main-class name="cern.c2mon.japc.publisher.JAPCPublisherKernel">
           <arg>-log4j ${INSTALL_DIR}/conf/log4j.xml -dataTags ${INSTALL_DIR}/conf/publisher.tid</arg>
         </main-class>
