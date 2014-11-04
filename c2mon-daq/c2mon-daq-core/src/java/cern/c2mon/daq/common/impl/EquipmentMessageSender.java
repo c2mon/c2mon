@@ -171,26 +171,36 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   }
 
   /**
-   * This method should be invoked each time you want to propagate the
-   * supervision alive coming from the supervised equipment.
+   * Check whether the given tag id corresponds to the alive tag of the
+   * equipment, or any sub equipments.
+   *
+   * @param tagId the id of the tag to check
+   * @return true if the tag id corresponds to an alive tag, false otherwise
    */
-  @Override
-  public void sendSupervisionAlive() {
-    sendSupervisionAlive(System.currentTimeMillis());
+  boolean isAliveTag(Long tagId) {
+    if (equipmentConfiguration.getAliveTagId() == tagId) {
+      return true;
+    }
+
+    for (SubEquipmentConfiguration subEquipmentConfiguration : equipmentConfiguration.getSubEquipmentConfigurations().values()) {
+      if (subEquipmentConfiguration.getAliveTagId() != null && subEquipmentConfiguration.getAliveTagId().equals(tagId)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
    * This method should be invoked each time you want to propagate the
    * supervision alive coming from the supervised equipment.
-   *
-   * @param milisecTimestamp the timestamp (in milliseconds)
    */
   @Override
-  public void sendSupervisionAlive(final long milisecTimestamp) {
+  public void sendSupervisionAlive() {
     Long supAliveTagId = Long.valueOf(this.equipmentConfiguration.getAliveTagId());
     SourceDataTag supAliveTag = getTag(supAliveTagId);
 
-    this.equipmentAliveSender.sendEquipmentAlive(supAliveTag, milisecTimestamp);
+    this.equipmentAliveSender.sendEquipmentAlive(supAliveTag);
   }
 
   /**
@@ -226,28 +236,28 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * Tries to send a new value to the server.
    *
    * @param currentTag The tag to which the value belongs.
-   * @param milisecTimestamp The timestamp of the tag.
+   * @param sourceTimestamp The source timestamp of the tag in milliseconds.
    * @param tagValue The tag value to send.
    * @param pValueDescr A description belonging to the value.
    * @return True if the tag has been send successfully to the server. False if
    *         the tag has been invalidated or filtered out.
    */
   @Override
-  public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp, String pValueDescr,
+  public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long sourceTimestamp, String pValueDescr,
       boolean sentByValueCheckMonitor) {
 
     this.equipmentLogger.trace("sendTagFiltered - entering sendTagFiltered()");
 
-    boolean successfulSent = false;
+    boolean successfulSent = true;
     long tagID = currentTag.getId();
     SourceDataTag tag = getTag(tagID);
 
     // If we received an update of equipment alive tag, we send immediately a
     // message to the server
-    if (this.equipmentConfiguration.getAliveTagId() == tagID) {
-      successfulSent = this.equipmentAliveSender.sendEquipmentAlive(tag, milisecTimestamp);
+    if (isAliveTag(tagID)) {
+      successfulSent = this.equipmentAliveSender.sendEquipmentAlive(tag, tagValue, sourceTimestamp, pValueDescr);
     } else {
-      successfulSent = this.equipmentSenderValid.sendTagFiltered(tag, tagValue, milisecTimestamp, pValueDescr, sentByValueCheckMonitor);
+      successfulSent = this.equipmentSenderValid.sendTagFiltered(tag, tagValue, sourceTimestamp, pValueDescr, sentByValueCheckMonitor);
     }
 
     this.equipmentLogger.trace("sendTagFiltered - leaving sendTagFiltered()");

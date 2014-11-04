@@ -22,143 +22,135 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
  */
 public interface IEquipmentMessageSender {
 
-    /**
-     * This method should be invoked each time you want to propagate the supervision alive coming from the supervised
-     * equipment.
-     */
-    void sendSupervisionAlive();
+  /**
+   * This method should be invoked each time you want to propagate the
+   * supervision alive coming from the supervised equipment.
+   */
+  void sendSupervisionAlive();
 
-    /**
-     * This method should be invoked each time you want to propagate the supervision alive coming from the supervised
-     * equipment.
-     *
-     * @param milisecTimestamp the timestamp (in milliseconds)
-     */
-    void sendSupervisionAlive(final long milisecTimestamp);
+  /**
+   * Tries to send a new value to the server.
+   *
+   * @param currentTag The tag to which the value belongs.
+   * @param sourceTimestamp The source timestamp of the tag in milliseconds.
+   * @param tagValue The tag value to send.
+   * @return True if the tag has been send successfully to the server. False if
+   *         the tag has been invalidated or filtered out.
+   */
+  boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long sourceTimestamp);
 
-    /**
-     * Tries to send a new value to the server.
-     *
-     * @param currentTag The tag to which the value belongs.
-     * @param milisecTimestamp The timestamp of the tag.
-     * @param tagValue The tag value to send.
-     * @return True if the tag has been send successfully to the server.
-     * False if the tag has been invalidated or filtered out.
-     */
-    boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp);
+  /**
+   * Tries to send a new value to the server.
+   *
+   * @param currentTag The tag to which the value belongs.
+   * @param sourceTimestamp The source timestamp of the tag in milliseconds.
+   * @param tagValue The tag value to send.
+   * @param pValueDescr A description belonging to the value.
+   * @return True if the tag has been send successfully to the server. False if
+   *         the tag has been invalidated or filtered out.
+   */
+  boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long sourceTimestamp, final String pValueDescr);
 
-    /**
-     * Tries to send a new value to the server.
-     *
-     * @param currentTag The tag to which the value belongs.
-     * @param milisecTimestamp The timestamp of the tag.
-     * @param tagValue The tag value to send.
-     * @param pValueDescr A description belonging to the value.
-     * @return True if the tag has been send successfully to the server.
-     * False if the tag has been invalidated or filtered out.
-     */
-    boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp,
-            final String pValueDescr);
+  /**
+   * Tries to send a new value to the server.
+   *
+   * @param currentTag The tag to which the value belongs.
+   * @param sourceTimestamp The source timestamp of the tag in milliseconds.
+   * @param tagValue The tag value to send.
+   * @param pValueDescr A description belonging to the value.
+   * @param sentByValueCheckMonitor
+   * @return True if the tag has been send successfully to the server. False if
+   *         the tag has been invalidated or filtered out.
+   */
+  boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long sourceTimestamp, final String pValueDescr,
+      boolean sentByValueCheckMonitor);
 
-    /**
-     * Tries to send a new value to the server.
-     *
-     * @param currentTag The tag to which the value belongs.
-     * @param milisecTimestamp The timestamp of the tag.
-     * @param tagValue The tag value to send.
-     * @param pValueDescr A description belonging to the value.
-     * @param sentByValueCheckMonitor
-     * @return True if the tag has been send successfully to the server.
-     * False if the tag has been invalidated or filtered out.
-     */
-    boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp,
-            final String pValueDescr, boolean sentByValueCheckMonitor);
+  /**
+   * This method sends an invalid SourceDataTagValue to the server.
+   *
+   * @param sourceDataTag SourceDataTag object
+   * @param pQualityCode the SourceDataTag's quality see
+   *          {@link SourceDataQuality} class for details
+   * @param pDescription the quality description (optional)
+   */
+  void sendInvalidTag(final ISourceDataTag sourceDataTag, final short pQualityCode, final String pDescription);
 
-    /**
-     * This method sends an invalid SourceDataTagValue to the server.
-     *
-     * @param sourceDataTag SourceDataTag object
-     * @param pQualityCode the SourceDataTag's quality see {@link SourceDataQuality} class for details
-     * @param pDescription the quality description (optional)
-     */
-    void sendInvalidTag(final ISourceDataTag sourceDataTag, final short pQualityCode, final String pDescription);
+  /**
+   * This method sends an invalid SourceDataTagValue to the server.
+   *
+   * @param sourceDataTag SourceDataTag object
+   * @param pQualityCode the SourceDataTag's quality see
+   *          {@link SourceDataQuality} class for details
+   * @param pDescription the quality description (optional)
+   * @param sourceTimestamp time when the SourceDataTag's value has become invalid
+   */
+  void sendInvalidTag(final ISourceDataTag sourceDataTag, final short pQualityCode, final String pDescription, final Timestamp sourceTimestamp);
 
-    /**
-     * This method sends an invalid SourceDataTagValue to the server.
-     *
-     * @param sourceDataTag SourceDataTag object
-     * @param pQualityCode the SourceDataTag's quality see {@link SourceDataQuality} class for details
-     * @param pDescription the quality description (optional)
-     * @param pTimestamp time when the SourceDataTag's value has become invalid
-     */
-    void sendInvalidTag(final ISourceDataTag sourceDataTag, final short pQualityCode, final String pDescription,
-            final Timestamp pTimestamp);
+  /**
+   * Sends a note to the business layer, to confirm that the equipment is not
+   * properly configured, or connected to its data source
+   */
+  void confirmEquipmentStateIncorrect();
 
-    /**
-     * Sends a note to the business layer, to confirm that the equipment is not properly configured, or connected to its
-     * data source
-     */
-    void confirmEquipmentStateIncorrect();
+  /**
+   * Sends a note to the business layer, to confirm that the equipment is not
+   * properly configured, or connected to its data source
+   *
+   * @param pDescription additional description
+   */
+  void confirmEquipmentStateIncorrect(final String pDescription);
 
-    /**
-     * Sends a note to the business layer, to confirm that the equipment is not properly configured, or connected to its
-     * data source
-     *
-     * @param pDescription additional description
-     */
-    void confirmEquipmentStateIncorrect(final String pDescription);
+  /**
+   * Sends a note to the business layer, to confirm that a subequipment is not
+   * properly configured, or connected to its data source
+   *
+   * @param commFaultTagId the ID of the subequipment commfault tag
+   */
+  void confirmSubEquipmentStateIncorrect(Long commFaultTagId);
 
-    /**
-     * Sends a note to the business layer, to confirm that a subequipment is not properly configured, or connected to its
-     * data source
-     *
-     * @param commFaultTagId the ID of the subequipment commfault tag
-     */
-    void confirmSubEquipmentStateIncorrect(Long commFaultTagId);
+  /**
+   * Sends a note to the business layer, to confirm that a subequipment is not
+   * properly configured, or connected to its data source
+   *
+   * @param commFaultTagId the ID of the subequipment commfault tag
+   * @param pDescription additional description
+   */
+  void confirmSubEquipmentStateIncorrect(Long commFaultTagId, final String pDescription);
 
-    /**
-     * Sends a note to the business layer, to confirm that a subequipment is not properly configured, or connected to its
-     * data source
-     *
-     * @param commFaultTagId the ID of the subequipment commfault tag
-     * @param pDescription additional description
-     */
-    void confirmSubEquipmentStateIncorrect(Long commFaultTagId, final String pDescription);
+  /**
+   * Sends a note to the business layer, to confirm that the equipment is
+   * properly configured, connected to its source and running
+   */
+  void confirmEquipmentStateOK();
 
-    /**
-     * Sends a note to the business layer, to confirm that the equipment is properly configured, connected to its source
-     * and running
-     */
-    void confirmEquipmentStateOK();
+  /**
+   * Sends a note to the business layer, to confirm that the equipment is
+   * properly configured, connected to its source and running
+   *
+   * @param pDescription additional description
+   */
+  void confirmEquipmentStateOK(final String pDescription);
 
-    /**
-     * Sends a note to the business layer, to confirm that the equipment is properly configured, connected to its source
-     * and running
-     *
-     * @param pDescription additional description
-     */
-    void confirmEquipmentStateOK(final String pDescription);
+  /**
+   * Sends a note to the business layer, to confirm that a subequipment is
+   * properly configured, connected to its source and running
+   *
+   * @param commFaultTagId the ID of the subequipment commfault tag
+   */
+  void confirmSubEquipmentStateOK(Long commFaultTagId);
 
-    /**
-     * Sends a note to the business layer, to confirm that a subequipment is properly configured, connected to its source
-     * and running
-     *
-     * @param commFaultTagId the ID of the subequipment commfault tag
-     */
-    void confirmSubEquipmentStateOK(Long commFaultTagId);
+  /**
+   * Sends a note to the business layer, to confirm that a subequipment is
+   * properly configured, connected to its source and running
+   *
+   * @param commFaultTagId the ID of the subequipment commfault tag
+   * @param pDescription additional description
+   */
+  void confirmSubEquipmentStateOK(Long commFaultTagId, final String pDescription);
 
-    /**
-     * Sends a note to the business layer, to confirm that a subequipment is properly configured, connected to its source
-     * and running
-     *
-     * @param commFaultTagId the ID of the subequipment commfault tag
-     * @param pDescription additional description
-     */
-    void confirmSubEquipmentStateOK(Long commFaultTagId, final String pDescription);
-
-    /**
-     * Sends all through timedeadband delayed values immediately
-     */
-    void sendDelayedTimeDeadbandValues();
+  /**
+   * Sends all through timedeadband delayed values immediately
+   */
+  void sendDelayedTimeDeadbandValues();
 
 }

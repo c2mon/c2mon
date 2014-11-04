@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -15,7 +14,6 @@ import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
@@ -27,7 +25,6 @@ import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.shared.common.datatag.address.DBHardwareAddress;
-import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
@@ -38,24 +35,24 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
  * address of the DB account to which it should register for alerts. The
  * incoming alerts contain updates on monitored datatag values. They are
  * propagated to the TIM server.
- * 
+ *
  * <p>Synchronization is used. The main thread starts two other threads: the connector and the processor.
  * They synchronize on the alertsQueue and they use the connected flag to monitor the status of the db connection.
  * The connector listens for the alerts and puts them in the queue, the processor polls them from the queue and sends
  * to the server. The connector refreshes also the values of the datatags every time the connection is lost and established again.
- * The refreshDataTags is also called by the main thread in daq core right after the connectToDataSource, and so 
- * the access to dao object dbDaqDao (used for the refresh) also has to be synchronized. 
- * 
+ * The refreshDataTags is also called by the main thread in daq core right after the connectToDataSource, and so
+ * the access to dao object dbDaqDao (used for the refresh) also has to be synchronized.
+ *
  * @author Aleksandra Wardzinska
  * @author Nacho Vilches
  */
 public class DBMessageHandler extends EquipmentMessageHandler {
-    
+
     /**
      * The equipment logger of this class.
      */
     private EquipmentLogger equipmentLogger;
-    
+
     /**
      * Separator used between the property name and property value in the
      * equipment (DB) address
@@ -104,7 +101,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * them
      * */
     private IDbDaqDao dbDaqDao;
-    
+
     /**
      * Flag indicating if the DAQ process is connected to the database
      * */
@@ -113,7 +110,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
      * Flag indicating if the DAQ process is running
      * */
     private volatile boolean running = false;
-    
+
     /**
      * DB controller
      */
@@ -121,7 +118,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
 
     /**
      * Setter for dbDaqDao object
-     * 
+     *
      * @param dbDaqDao
      *            access object for registering/unregistering for alerts
      * */
@@ -131,7 +128,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
 
     /**
      * Getter for dbDaqDao object
-     * 
+     *
      * @return dbDaqDao object
      * */
     public IDbDaqDao getDbDaqDao() {
@@ -140,35 +137,35 @@ public class DBMessageHandler extends EquipmentMessageHandler {
 
     /**
      * Connects to the data source. Prepares and validates data needed to establish the connection.
-     * Inserts the missing datatags in the datatag table on the equipment db account. 
+     * Inserts the missing datatags in the datatag table on the equipment db account.
      * Starts the connector thread which takes care of the connection with the db, refreshing of the values
-     * of the datatags and receiving of alerts and the processor thread which sends the alerts to the server. 
-     * 
+     * of the datatags and receiving of alerts and the processor thread which sends the alerts to the server.
+     *
      * @throws EqIOException
      *             if unsupported equipment type
      * */
     @Override
     public void connectToDataSource() throws EqIOException {
         this.equipmentLogger = getEquipmentLogger(DBMessageHandler.class);
-        
+
         this.running = true;
         setDBDataSourceAddress();
 
         if (alertsQueue == null) {
-            alertsQueue = new LinkedList<Alert>(); 
+            alertsQueue = new LinkedList<Alert>();
         }
         else {
             alertsQueue.clear();
         }
-        
+
         // Controller
-        this.dbController = new DBController(this.dbDaqDao, getEquipmentLoggerFactory(), getEquipmentConfiguration(), 
+        this.dbController = new DBController(this.dbDaqDao, getEquipmentLoggerFactory(), getEquipmentConfiguration(),
                 getEquipmentMessageSender());
-        
+
         // Data Tag Changer
         DBDataTagChanger dataTagChanger = new DBDataTagChanger(this.dbController, getEquipmentLogger(DBDataTagChanger.class));
         getEquipmentConfigurationHandler().setDataTagChanger(dataTagChanger);
-        
+
         if (getEquipmentConfiguration().getSourceDataTags().isEmpty()) {
           String errorMsg = "No datatags found in the configuration xml";
           this.equipmentLogger.error(errorMsg);
@@ -190,7 +187,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                 getEquipmentMessageSender().sendInvalidTag(dataTag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, description);
               } catch (DataAccessException dae) {
                 // Invalidate
-                String description =  dae.getCause().getMessage().replaceAll("\n", "") + ". Unexpected DB exception caught." 
+                String description =  dae.getCause().getMessage().replaceAll("\n", "") + ". Unexpected DB exception caught."
                     + " Please contact Admin Support";
 
                 this.equipmentLogger.error("connectToDataSource - " + dae.getCause().getMessage().replaceAll("\n", ""), dae);
@@ -201,7 +198,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
                 throw new EqIOException(errorMsg);
             }
         }
-        
+
         // The processor thread is responsible for removing the alerts from the queue and sending them to the server.
         Thread processor = new Thread(new Runnable() {
             @Override
@@ -285,7 +282,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         connector.start();
         this.equipmentLogger.info("Connector thread started");
    }
-    
+
     /**
      * Sets the connected flag to true. Resets the counters for the amount of sent datatags.
      * Initiates the equipment alive and confirms the state to the server.
@@ -299,7 +296,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
       initAlive();
       getEquipmentMessageSender().confirmEquipmentStateOK("setConnected - Connected to the database");
     }
-    
+
     /**
      * Sets the connected flag to false. Stops sending the alive tag and confirms the incorrect state to the server.
      * */
@@ -308,7 +305,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         cancelAlive();
         getEquipmentMessageSender().confirmEquipmentStateIncorrect("setDisconnected - The connection to the database is closed.");
     }
-    
+
     /**
      * Registers for all alerts for the monitored datatags.
      * */
@@ -322,7 +319,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
             }
         }
     }
-    
+
     /**
      * Initiates sending of equipment alive tag.
      * */
@@ -337,7 +334,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                getEquipmentMessageSender().sendSupervisionAlive(System.currentTimeMillis());
+                getEquipmentMessageSender().sendSupervisionAlive();
                 equipmentLogger.info("Equipment alive sent to server.");
             }
         };
@@ -368,7 +365,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
 
     /**
      * Sets the dbAddress property of the DBMessageHandler.
-     * 
+     *
      * @throws EqIOException
      *             if parsing of the address is unsuccessful
      * */
@@ -380,22 +377,22 @@ public class DBMessageHandler extends EquipmentMessageHandler {
     }
 
     /**
-     * Loads the equipment address (the db url for our DB_DAQ table) depending on the location 
+     * Loads the equipment address (the db url for our DB_DAQ table) depending on the location
      * defined in {@link IEquipmentConfiguration#getAddress()}.
      * <ul>
      * <li>dbUrl=...       : url taken directly from the configuration</li>
      * <li>fileUrl=myconf  : url taken from a file "myconf" on the disk</li>
      * </ul>
-     *  
+     *
      * @throws EqIOException
      */
     private void loadEqConfig() throws EqIOException {
         String address = super.getEquipmentConfiguration().getAddress();
-        
+
         if (address == null || address.length() == 0) {
             throw new EqIOException("No equipment address in config defined");
         }
-        
+
         if (address.startsWith("dbUrl")) {
             this.equipmentLogger.info("Trying to read database credentials directly from address...");
             parseDBAddress(address);
@@ -403,17 +400,17 @@ public class DBMessageHandler extends EquipmentMessageHandler {
             File config = new File(address.split("=")[1]);
             loadUrlFromFile(config);
         }
-        
+
         this.equipmentLogger.info("Successfully loaded equipment address.");
     }
-    
+
     /**
-     * Searches in the passed {@link Properties} file a property called dbUrl and uses 
+     * Searches in the passed {@link Properties} file a property called dbUrl and uses
      * {@link #parseDBAddress(String)} to load the equipment config.
-     *  
+     *
      * @see #loadEqConfig()
      * @param configFile The properties file with the dbUrl instruction.
-     * @throws EqIOException in case the file or the "dbUrl=" property cannot be found. 
+     * @throws EqIOException in case the file or the "dbUrl=" property cannot be found.
      */
     private void loadUrlFromFile(File configFile) throws EqIOException {
         Properties p = new Properties();
@@ -424,20 +421,20 @@ public class DBMessageHandler extends EquipmentMessageHandler {
         } catch (IOException e) {
             throw new EqIOException("Failed to load from " + configFile + " : " + e.getMessage(), e);
         }
-        
+
         String dbUrl = (String) p.get("dbUrl");
         if (dbUrl == null || dbUrl.length() == 0) {
             throw new EqIOException("Cannot find value for 'dbUrl' in properties file " + configFile);
         }
         this.equipmentLogger.debug("Got file content. Now trying to parse db url .." + configFile + " ...");
         parseDBAddress("dbUrl=" + dbUrl);
-        
+
     }
-    
+
     /**
      * Parses the database address extracted from the equipment configuration
      * section of the XML. Checks for the existence of all expected properties
-     * 
+     *
      * @throws EqIOException
      *             if the address doesn't contain the required properties or
      *             contains unrecognized ones
@@ -445,7 +442,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
     private void parseDBAddress(String address) throws EqIOException {
         this.dbAddress = new HashMap<String, String>();
         boolean keyFound;
-        
+
         String[] properties = address.split(PROPERTY_SEPARATOR);
         for (int i = 0; i < properties.length; i++) {
             int separatorIndex = properties[i].indexOf(VALUE_SEPARATOR);
@@ -479,7 +476,7 @@ public class DBMessageHandler extends EquipmentMessageHandler {
     @Override
     public void disconnectFromDataSource() {
         if (this.running && this.connected) {
-          
+
             unregisterAlerts();
             setDisconnected();
         }
