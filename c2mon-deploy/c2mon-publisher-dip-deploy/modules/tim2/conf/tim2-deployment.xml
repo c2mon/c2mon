@@ -15,7 +15,7 @@
           <preserve type="file" name="conf/DIPPub02.tid" />
         </backupPolicy>
       </deployment>
-      <startscript name="dip-publisher-startup">
+      <startscript name="tim-publisher-dip">
         <preExec>
           <![CDATA[
 [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
