@@ -45,7 +45,7 @@
 
     <application name="tim-publisher-dip-prod" extends="default">
 
-      <startscript name="dip-publisher-startup">
+      <startscript name="tim-publisher-dip">
         <!-- Setting DIP environment variables  -->
         <env name="DIPNS" value="dipns1,dipns2" />
         <env name="DIM_DNS_NODE" value="dipns1,dipns2" />
@@ -67,7 +67,7 @@
 
     <application name="tim-publisher-dip-test" extends="default">
     
-      <startscript name="dip-publisher-startup">
+      <startscript name="tim-publisher-dip">
         <!-- Setting DIP environment variables to test DIM DNS -->
         <env name="DIPNS" value="tim2" />
         <env name="DIM_DNS_NODE" value="tim2" />
