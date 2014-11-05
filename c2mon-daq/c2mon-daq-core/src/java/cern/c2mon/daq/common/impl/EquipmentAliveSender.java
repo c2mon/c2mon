@@ -214,6 +214,7 @@ class EquipmentAliveSender {
 
     // Make sure expired alive tags get discarded from the broker
     aliveTagValue.setTimeToLive(ttl);
+    aliveTagValue.setPriority(DataTagConstants.PRIORITY_HIGH);
     this.processMessageSender.addValue(aliveTagValue);
   }
 }

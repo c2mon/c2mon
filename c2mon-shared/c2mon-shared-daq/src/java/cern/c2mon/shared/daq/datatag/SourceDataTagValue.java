@@ -284,6 +284,13 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   }
 
   /**
+   * @param priority the priority to set
+   */
+  public void setPriority(int priority) {
+    this.priority = priority;
+  }
+
+  /**
    * Get the time-to-live in milliseconds to be used for transmitting
    * this object to the server. If the message hasn't been received
    * by the server within the specified time-to-live, the message may
