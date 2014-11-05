@@ -15,7 +15,7 @@
           <preserve type="file" name="conf/DIPPub02.tid" />
         </backupPolicy>
       </deployment>
-      <startscript name="tim-publisher-dip">
+      <startscript>
         <preExec>
           <![CDATA[
 [[ -z $PROCESS_NAME ]] && echo "PROCESS_NAME not set!" && exit 1
@@ -28,7 +28,11 @@
         <!-- VM arguments -->
         <initial-heap-size>256m</initial-heap-size>
         <max-heap-size>256m</max-heap-size>
-        <main-class name="cern.c2mon.publisher.core.PublisherKernel" />
+        <main-class name="cern.c2mon.publisher.core.PublisherKernel">
+          <output>
+            <logrotate fileSize="10M" files="2" name="${INSTALL_DIR}/log/${PROCESS_NAME}.out.log"/>
+          </output>
+        </main-class>
         
         <!-- JVM environment variables -->
         <property name="c2mon.publisher.dip.server.name" value="${PROCESS_NAME}" />
@@ -45,7 +49,16 @@
 
     <application name="tim-publisher-dip-prod" extends="default">
 
-      <startscript name="tim-publisher-dip">
+      <startscript name="tim-publisher-dip01">
+        <env name="PROCESS_NAME" value="DIPPub01" />
+        <!-- Setting DIP environment variables  -->
+        <env name="DIPNS" value="dipns1,dipns2" />
+        <env name="DIM_DNS_NODE" value="dipns1,dipns2" />
+        <env name="DIM_DNS_PORT" value="2506" />
+      </startscript>
+      
+      <startscript name="tim-publisher-dip02">
+        <env name="PROCESS_NAME" value="DIPPub02" />
         <!-- Setting DIP environment variables  -->
         <env name="DIPNS" value="dipns1,dipns2" />
         <env name="DIM_DNS_NODE" value="dipns1,dipns2" />
@@ -67,7 +80,16 @@
 
     <application name="tim-publisher-dip-test" extends="default">
     
-      <startscript name="tim-publisher-dip">
+      <startscript name="tim-publisher-dip01">
+        <env name="PROCESS_NAME" value="DIPPub01" />
+        <!-- Setting DIP environment variables to test DIM DNS -->
+        <env name="DIPNS" value="tim2" />
+        <env name="DIM_DNS_NODE" value="tim2" />
+        <env name="DIM_DNS_PORT" value="2506" />
+      </startscript>
+      
+      <startscript name="tim-publisher-dip02">
+        <env name="PROCESS_NAME" value="DIPPub02" />
         <!-- Setting DIP environment variables to test DIM DNS -->
         <env name="DIPNS" value="tim2" />
         <env name="DIM_DNS_NODE" value="tim2" />

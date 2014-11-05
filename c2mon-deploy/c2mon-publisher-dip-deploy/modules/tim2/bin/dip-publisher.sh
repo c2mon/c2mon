@@ -42,8 +42,11 @@ PROCESS_COMMAND=$1
 #name of the DIP publisher passed as second argument
 export PROCESS_NAME=$2
 
-# The script which is actually calling the RDA publisher
-STARTUP_SCRIPT=${APP_HOME}/bin/TIM-PUBLISHER-DIP.jvm
+# The script which is actually calling the DIP publisher
+STARTUP_SCRIPT=TIM-PUBLISHER-DIP01.jvm
+if [ PROCESS_NAME == "DIPPub02" ] ; then
+  STARTUP_SCRIPT=TIM-PUBLISHER-DIP02.jvm
+fi
 
 TIME=`date +"%F %T.%3N"`
 
@@ -147,7 +150,7 @@ PROCESS_start() {
 #--------------------------------------------------------------------
 really_start() {
   echo -n "Starting $PROCESS_NAME process on host ${PROCESS_HOST} ..."
-  ${STARTUP_SCRIPT} > ${APP_HOME}/log/${PROCESS_NAME}.out.log 2>&1 &
+  ${APP_HOME}/bin/${STARTUP_SCRIPT} &
 
   pid="$!"
   sleep 5
