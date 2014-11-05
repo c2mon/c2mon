@@ -207,6 +207,13 @@ class EquipmentAliveSender {
    * @param aliveTagValue the alive tag value to be sent.
    */
   private void doSendEquipmentAlive(final SourceDataTagValue aliveTagValue) {
+    int ttl = aliveTagValue.getTimeToLive();
+    if (aliveTagInterval <= Integer.MAX_VALUE) {
+      ttl = aliveTagInterval.intValue();
+    }
+
+    // Make sure expired alive tags get discarded from the broker
+    aliveTagValue.setTimeToLive(ttl);
     this.processMessageSender.addValue(aliveTagValue);
   }
 }

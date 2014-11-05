@@ -2,11 +2,9 @@ package cern.c2mon.shared.daq.datatag;
 
 
 import java.io.Serializable;
-
 import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -16,18 +14,18 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 
 
 /**
- * Objects of the SourceDataTagValue class represent the current value of a 
+ * Objects of the SourceDataTagValue class represent the current value of a
  * SourceDataTag. They are created within the TIM DAQ process whenever a SourceDataTag
  * is updated, usually by a call to the SourceDataTag's update() and invalidate() methods.
- * 
- * Subsequently, an XML representation of the SourceDataTagValue object is sent  
+ *
+ * Subsequently, an XML representation of the SourceDataTagValue object is sent
  * to the application server as an XML message. The application
  * server decodes the contents using the fromXML method and propagates the
  * value update to the server representation of the DataTag.
  *
- * A new SourceDataTagValue object is created for each value update. This is 
+ * A new SourceDataTagValue object is created for each value update. This is
  * why the class contains no setXXX() method for any of its fields.
- * 
+ *
  * Please note that the toXML()/fromXML methods of this class disregard any fields
  * that need not be transmitted to the application server. The fields guaranteedDelivery,
  * priority and timeToLive are only needed as message parameters and are therefore not
@@ -35,14 +33,14 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
  * method mayno be equal to the original object (equals() may return false).
  *
  * @author Jan Stowisek
- * @version $Revision: 1.14 $ ($Date: 2008/11/27 10:22:36 $ - $State: Exp $) 
+ * @version $Revision: 1.14 $ ($Date: 2008/11/27 10:22:36 $ - $State: Exp $)
  */
 public final class SourceDataTagValue implements Cloneable, Serializable {
   // ----------------------------------------------------------------------------
   // PRIVATE STATIC MEMBERS
   // ----------------------------------------------------------------------------
   public static final String XML_ROOT_ELEMENT = "DataTag";
-  
+
   /**
    * Log4j Logger for the DataTagValueUpdate class.
    */
@@ -78,14 +76,14 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   /** Source timestamp of the current value */
   protected Timestamp timestamp;
 
-  /** 
+  /**
    * Timestamp set locally when the value was last updated
-   * (the DAQ server system time at the time the update was performed). 
+   * (the DAQ server system time at the time the update was performed).
    */
   protected Timestamp daqTimestamp;
-  
+
   /** Priority with which the tag value has to be sent to the server:
-   * either DataTagAddress.PRIORITY_HIGH or DataTagAddress.PRIORITY_LOW 
+   * either DataTagAddress.PRIORITY_HIGH or DataTagAddress.PRIORITY_LOW
    */
   protected int priority;
 
@@ -100,38 +98,38 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
    * the value is discarded.
    */
   protected int timeToLive;
-  
+
   /**
    * Flag indicating whether the value is the result of a simulation.
    */
   protected boolean simulated;
-  
+
   // ----------------------------------------------------------------------------
   // CONSTRUCTORS
   // ----------------------------------------------------------------------------
-  
+
   /**
    * Constructor. The DAQ timestamp is set at object creation.
    */
   public SourceDataTagValue(
-		  final Long pId, 
-		  final String pName, 
+		  final Long pId,
+		  final String pName,
 		  final boolean pControlTag
   ) {
     this(
-    		pId, 
-    		pName, 
-    		pControlTag, 
-    		null, // value 
+    		pId,
+    		pName,
+    		pControlTag,
+    		null, // value
     		null, // quality
-    		null, // timestamp    	
+    		null, // timestamp
     		DataTagAddress.PRIORITY_LOW,
             false, // no guaranteed delivery
             null,  // no value description
             DataTagAddress.TTL_FOREVER
      );
   }
-  
+
   /**
    * Constructor. The DAQ timestamp is set at object creation.
    * @param pId
@@ -146,27 +144,27 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
    * @param pTimeToLive
    */
   public SourceDataTagValue(
-    final Long pId, final String pName, final boolean pControlTag, 
+    final Long pId, final String pName, final boolean pControlTag,
     final Object pValue, final SourceDataQuality pQuality, final long pTimestamp,
     final int pPriority, final boolean pGuaranteedDelivery, final String pDescription, final int pTimeToLive
   ) {
     this(
-    		pId, 
-    		pName, 
-    		pControlTag, 
-    		pValue, 
-    		pQuality, 
-    		new Timestamp(pTimestamp),    		
-            pPriority, 
-            pGuaranteedDelivery, 
-            pDescription, 
+    		pId,
+    		pName,
+    		pControlTag,
+    		pValue,
+    		pQuality,
+    		new Timestamp(pTimestamp),
+            pPriority,
+            pGuaranteedDelivery,
+            pDescription,
             pTimeToLive
     );
   }
 
   /**
    * Constructor. The DAQ timestamp is set at object creation.
-   * 
+   *
    * @param pId
    * @param pName
    * @param pControlTag
@@ -179,7 +177,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
    * @param pTimeToLive
    */
   public SourceDataTagValue(
-    final Long pId, final String pName, final boolean pControlTag, 
+    final Long pId, final String pName, final boolean pControlTag,
     final Object pValue, final SourceDataQuality pQuality, final Timestamp pTimestamp,
     final int pPriority, final boolean pGuaranteedDelivery, final String pDescription, final int pTimeToLive
   ) {
@@ -189,7 +187,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
     this.value = pValue;
     this.setValueDescription(pDescription);
     this.quality = pQuality;
-    this.timestamp = pTimestamp;   
+    this.timestamp = pTimestamp;
     this.priority = pPriority;
     this.guaranteedDelivery = pGuaranteedDelivery;
     this.timeToLive = pTimeToLive;
@@ -200,21 +198,21 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   /**
    * Copy constructor.
    * Create a deep copy of the SourceDataTagValue object passed
-   * as a parameter. Notice the DAQ timestamp is also copied: depending 
+   * as a parameter. Notice the DAQ timestamp is also copied: depending
    * on the context it may make more sense to reset it using the setter method.
    * @param pOld original to be copied.
    */
   public SourceDataTagValue(final SourceDataTagValue pOld) {
         this(
-                pOld.id, 
-                pOld.name, 
-                pOld.controlTag, 
-                pOld.value, 
-                pOld.quality == null ? null : new SourceDataQuality(pOld.quality), 
+                pOld.id,
+                pOld.name,
+                pOld.controlTag,
+                pOld.value,
+                pOld.quality == null ? null : new SourceDataQuality(pOld.quality),
                 pOld.timestamp,
-                pOld.priority, 
+                pOld.priority,
                 pOld.guaranteedDelivery,
-                pOld.valueDescription, 
+                pOld.valueDescription,
                 pOld.timeToLive
              );
         // also set simulated flag, which is not part of any constructor
@@ -226,7 +224,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   // ----------------------------------------------------------------------------
   // READ-ONLY MEMBER ACCESSORS and UTILITY METHODS
   // ----------------------------------------------------------------------------
-  
+
   /**
    * Get the DataTag's unique numeric identifier.
    */
@@ -256,20 +254,20 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   public boolean isGuaranteedDelivery() {
     return this.guaranteedDelivery;
   }
-  
+
   /**
    * Check whether the value represented by this object is the
    * result of a simulated.
-   * @return true if the value represented by this object is the 
+   * @return true if the value represented by this object is the
    * result of a simulation.
    */
   public boolean isSimulated() {
 	return this.simulated;
   }
-  
+
   /**
    * Indicate whether the value represented by this object is the
-   * result of a simulation. 
+   * result of a simulation.
    * @param pSimulated true if the value represented by this object is
    * the result of a simulation.
    */
@@ -297,6 +295,13 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   }
 
   /**
+   * @param timeToLive the timeToLive to set
+   */
+  public void setTimeToLive(int timeToLive) {
+    this.timeToLive = timeToLive;
+  }
+
+  /**
    * Get the DataTag's current value.
    */
   public Object getValue() {
@@ -312,13 +317,13 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   }
 
   /**
-   * Get the data type of the DataTag's current value as 
+   * Get the data type of the DataTag's current value as
    * a string. This method will return null if the tag's
    * current value is null.
    */
   public String getDataType() {
     if (this.value != null) {
-      
+
       return this.value.getClass().getName().substring(10);
     } else {
       return null;
@@ -332,10 +337,10 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
     // if description is not defined, store empty string instead of null
     if (pDescription == null)
       this.valueDescription = "";
-    else 
+    else
       this.valueDescription = pDescription;
   }
-  
+
   /**
    * Get the optional free-text description for the tag's current
    * value.
@@ -351,7 +356,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
    * will be returned.
    */
   public SourceDataQuality getQuality() {
-    return 
+    return
       this.quality != null ? this.quality : new SourceDataQuality(SourceDataQuality.OK);
   }
 
@@ -365,7 +370,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   /**
    * Check whether the DataTag's current value is valid.
    * A value is considered valid if the associated SourceDataQuality
-   * object is valid OR if no SourceDataQuality object is associated 
+   * object is valid OR if no SourceDataQuality object is associated
    * with the value.
    */
   public boolean isValid() {
@@ -386,29 +391,29 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   public void setTimestamp(Timestamp newTimestamp) {
     this.timestamp = newTimestamp;
   }
-  
+
   /**
    * @param daqTimestamp the daqTimestamp to set
    */
   public void setDaqTimestamp(Timestamp daqTimestamp) {
     this.daqTimestamp = daqTimestamp;
   }
-  
+
   /**
    * @return the daqTimestamp
    */
   public Timestamp getDaqTimestamp() {
     return daqTimestamp;
   }
-  
+
 
   // ----------------------------------------------------------------------------
-  // METHODS FOR XML-IFICATION and DE-XML-IFICATION 
+  // METHODS FOR XML-IFICATION and DE-XML-IFICATION
   // ----------------------------------------------------------------------------
 
   /**
    * Create an XML string from the data contained in this object.
-   * As this method is only used by the driver to send DataTagValueUpdate 
+   * As this method is only used by the driver to send DataTagValueUpdate
    * messages to the application server, the generated XML will never contain
    * any information about priority, guaranteedDelivery and timeToLive
    * @return an XML representation of the SourceDataTagValue object.
@@ -446,7 +451,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
       str.append(value.toString());
       str.append("</value>\n");
     }
-  
+
     if (valueDescription != null && !valueDescription.equals("")) {
       str.append("<value-description><![CDATA[");
       str.append(valueDescription);
@@ -462,17 +467,17 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
     str.append("<timestamp>");
     str.append(timestamp.getTime());
     str.append("</timestamp>\n");
-    
+
     if (daqTimestamp != null) {
       str.append("<daq-timestamp>");
       str.append(daqTimestamp.getTime());
       str.append("</daq-timestamp>\n");
     }
-    
+
     if (simulated) {
     	str.append("<simulated>true</simulated>\n");
     }
-    
+
     /* Close <DataTag> tag */
     str.append("</");
     str.append(XML_ROOT_ELEMENT);
@@ -486,7 +491,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
    * Create a SourceDataTagValue object from a DOM element.
    * As this method is only used on the application server, to received tag
    * value updates sent by a driver, this method will initialise the fields
-   * priority, guaranteedDelivery and timeToLive. 
+   * priority, guaranteedDelivery and timeToLive.
    *
    * @param domElement DOM element
    * SourceDataTagValue object
@@ -496,8 +501,8 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
   private static final String XML_ATTRIBUTE_ID = "id";
   private static final String XML_ATTRIBUTE_NAME = "name";
   private static final String XML_ATTRIBUTE_CONTROLTAG = "control";
-  
-  
+
+
   /**
    * Create a SourceDataTagValue from its XML representation.
    * It is ESSENTIAL to know that the following fields are NOT initialised from the XML:
@@ -508,8 +513,8 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
    * </UL>
    * @return
    */
-  
-  public static SourceDataTagValue fromXML(Element domElement) { 
+
+  public static SourceDataTagValue fromXML(Element domElement) {
 
     /* We assume that the root element really is <DataTag> as this method is
      * only called from DataTagValueUpdate.fromXML if a <DataTag> element is found.
@@ -518,14 +523,14 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
     String name;
     boolean control;
     SourceDataTagValue result = null;
- 
+
     /* Try to extract the datatag id from the XML content */
     try {
       id = Long.valueOf(domElement.getAttribute(XML_ATTRIBUTE_ID));
     } catch (NumberFormatException nfe) {
       LOG.error("Cannot extract valid id attribute from <DataTag> element.");
       throw nfe;
-    }    
+    }
 
     /* Only proceed if the id has been extracted successfully */
     if (id != null) {
@@ -535,14 +540,14 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
       } else {
         throw new RuntimeException("Control tag attribute not set in SourceDataTagValue XML - unable to decode it.");
       }
-     
+
       result = new SourceDataTagValue(id, name, control);
 
       NodeList fields = domElement.getChildNodes();
       String fieldName;
       String fieldValueString;
       Node fieldNode;
-      
+
       int fieldsCount = fields.getLength();
 
       for (int i = 0; i != fieldsCount; i++) {
@@ -550,10 +555,10 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
         if (fieldNode.getNodeType() == Node.ELEMENT_NODE) {
           fieldName = fieldNode.getNodeName();
           if (fieldNode.getFirstChild() != null) {
-            fieldValueString = fieldNode.getFirstChild().getNodeValue();         
+            fieldValueString = fieldNode.getFirstChild().getNodeValue();
             if (fieldName.equals("value")) {
               String dataType = fieldNode.getAttributes().item(0).getNodeValue();
-            
+
               if (dataType.equals("Integer")) {
                 result.value = Integer.valueOf(fieldValueString);
               } else if (dataType.equals("Float")) {
@@ -568,7 +573,7 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
                 result.value = fieldValueString;
               }
             }
-            else if (fieldName.equals("value-description")) 
+            else if (fieldName.equals("value-description"))
             {
               result.valueDescription = fieldNode.getFirstChild().getNodeValue();
             }
@@ -608,14 +613,15 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
 
   /**
    * Create a clone of this SourceDataTagValue object.
-   * @throws CloneNotSupportedException 
+   * @throws CloneNotSupportedException
    */
+  @Override
   public SourceDataTagValue clone() {
-    
+
     SourceDataTagValue clone = null;
     try {
       clone = (SourceDataTagValue) super.clone();
-      
+
       if (this.daqTimestamp != null) {
         clone.daqTimestamp = (Timestamp) this.daqTimestamp.clone();
       }
@@ -631,21 +637,22 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
     catch (CloneNotSupportedException e) {
       throw new RuntimeException("Catched CloneNotSupportedException when trying to create a clone from SourceDataTagValue! Please check the code", e);
     }
-    
+
     return clone;
   }
 
   public void log() {
     if (TAG_LOG.isInfoEnabled()) {
       TAG_LOG.info(this);
-    }    
+    }
   }
-  
+
+  @Override
   public boolean equals(final Object pObj) {
 	boolean result = pObj != null && pObj instanceof SourceDataTagValue;
 	if (result) {
 	  SourceDataTagValue copy = (SourceDataTagValue)pObj;
-	  result = 
+	  result =
 		  this.controlTag == copy.controlTag &&
 		  this.guaranteedDelivery == copy.guaranteedDelivery &&
 		  this.simulated == copy.simulated &&
@@ -673,12 +680,12 @@ public final class SourceDataTagValue implements Cloneable, Serializable {
       result = result && this.daqTimestamp.equals(copy.daqTimestamp);
     }
 	  }
-		  
-		  
-		  
-		
+
+
+
+
 	}
 	return result;
   }
-  
+
 }
