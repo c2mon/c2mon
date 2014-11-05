@@ -150,7 +150,7 @@ PROCESS_start() {
 #--------------------------------------------------------------------
 really_start() {
   echo -n "Starting $PROCESS_NAME process on host ${PROCESS_HOST} ..."
-  ${APP_HOME}/bin/${STARTUP_SCRIPT} &
+  ${APP_HOME}/bin/${STARTUP_SCRIPT} > ${APP_HOME}/log/${PROCESS_NAME}.out.log 2>&1 &
 
   pid="$!"
   sleep 5
