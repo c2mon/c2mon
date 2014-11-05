@@ -44,7 +44,7 @@ export PROCESS_NAME=$2
 
 # The script which is actually calling the DIP publisher
 STARTUP_SCRIPT=TIM-PUBLISHER-DIP01.jvm
-if [ PROCESS_NAME == "DIPPub02" ] ; then
+if [ ${PROCESS_NAME} == "DIPPub02" ] ; then
   STARTUP_SCRIPT=TIM-PUBLISHER-DIP02.jvm
 fi
 
