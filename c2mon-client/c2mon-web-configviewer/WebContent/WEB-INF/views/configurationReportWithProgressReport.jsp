@@ -6,20 +6,27 @@
 <head>
 <title>Configuration viewer</title>
 <link rel="stylesheet" type="text/css" href="<c:url value="../css/form.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="../css/c2mon.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="../css/bootstrap.css"/>" />
+<%-- <link rel="stylesheet" type="text/css" href="<c:url value="../css/c2mon.css"/>" /> --%>
+<link rel="stylesheet" type="text/css" href="<c:url value="../css/bootstrap/bootstrap.css"/>" />
 <link rel="stylesheet" type="text/css" href="<c:url value="../css/web-config-viewer.css"/>" />
+
+<style type="text/css">
+body {
+  padding-top: 50px;
+  padding-bottom: 40px;
+}
+
+.sidebar-nav {
+  padding: 9px 0;
+}
+</style>
 
 <link type="text/css" href="../css/ui-lightness/jquery-ui.css" rel="stylesheet" />
 <script type="text/javascript" src="../js/jquery.js"></script>
 <script type="text/javascript" src="../js/jquery-spinner.js"></script>
 <script type="text/javascript" src="../js/jquery-ui.js"></script>
 
-
 <script type="text/javascript">
-  /**
-   * Sets the default value of the progress bar to 0
-   */
   $(function() {
 
     // Reset the Progressbar
@@ -27,13 +34,10 @@
       value : 0
     });
 
-    // Triggers a click on the submit button when the enter key is pressed 
-    // inside the config id input field.
-    $("#config_id_input").keyup(function(event) {
-      if (event.keyCode == 13) {
-        event.preventDefault();
-        $("#submitButton").click();
-      }
+    $('#configLoaderForm').submit(function(event) {
+      // prevent default browser behaviour
+      event.preventDefault();
+      startProcess();
     });
   });
 
@@ -42,7 +46,7 @@
    */
   function startProcess() {
 
-    var submittedNumber = parseInt(document.theOnlyFormInThisPage.id.value);
+    var submittedNumber = parseInt(document.configLoaderForm.id.value);
     if (isNaN(submittedNumber)) {
       return;
     }
@@ -51,13 +55,13 @@
     getProgress(); // polls the server and updates the progress bar
     getProgressDescription(); // polls the server and updates the description info
 
-    $("p").text("Starting...");
+    $("#status").text("Starting...");
 
-    document.theOnlyFormInThisPage.id.readOnly = true;
+    document.configLoaderForm.id.readOnly = true;
     document.getElementsByName("submitButton")[0].disabled = true;
 
     var $this = $("#progressbar");
-    $this.spinner();
+    $("#status").spinner();
   }
 
   /**
@@ -67,7 +71,7 @@
   function progressFinished() {
 
     window.location = "../configloader/progress/finalReport/"
-        + document.theOnlyFormInThisPage.id.value;
+        + document.configLoaderForm.id.value;
   }
 
   /**
@@ -83,7 +87,7 @@
       type : "POST",
       url : "../configloader/progress/start",
       data : {
-        configurationId : parseInt(document.theOnlyFormInThisPage.id.value)
+        configurationId : parseInt(document.configLoaderForm.id.value)
       },
       async : true,
       complete : progressFinished
@@ -100,7 +104,7 @@
       type : "POST",
       url : "../configloader/progress/getProgress",
       data : {
-        configurationId : document.theOnlyFormInThisPage.id.value
+        configurationId : document.configLoaderForm.id.value
       },
       async : true,
       success : function(data) {
@@ -128,7 +132,7 @@
           type : "POST",
           url : "../configloader/progress/getProgressDescription",
           data : {
-            configurationId : document.theOnlyFormInThisPage.id.value
+            configurationId : document.configLoaderForm.id.value
           },
           async : true,
           success : function(data) {
@@ -137,7 +141,7 @@
             if (description == null) {
               description = "No response has been received yet from the server. Please wait..";
             }
-            $("p").text(description);
+            $("#status").text(description);
 
           },
           dataType : "json",
@@ -149,46 +153,60 @@
 </head>
 
 <body>
-  <div class="breadcrumb">
-    <A style="color: blue;" href="../" class="large blue awesome xml_button"> Home </A>
-  </div>
 
-  <h1>${title}</h1>
+  <div class="container">
+    <div class="row">
 
-  <c:url var="submitUrl" value="${formSubmitUrl}" />
+      <ul class="breadcrumb">
+        <li><a href="../">Home</a> <span class="divider"></span></li>
+        <li>${title}</li>
+      </ul>
 
-  <form:form action="${submitUrl}" method="post" name="theOnlyFormInThisPage">
-    <div class="input-group form-horizontal">
-      <input id="config_id_input" type="text" name="id" value="${formTagValue}" size="10" placeholder="Config ID"/>
-      <input id="submitButton" class="btn" name="submitButton" type="button" value="Submit" onclick="startProcess()">
+      <div class="jumbotron">
+        <h1>${title}</h1>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>${instruction}</strong>
+      </div>
+
+      <c:url var="submitUrl" value="${formSubmitUrl}" />
+
+      <form:form id="configLoaderForm" name="configLoaderForm" class="well form-inline" action="${submitUrl}" method="post">
+
+        <div class="input-group">
+          <div class="input-group-addon">Config ID</div>
+          <input class="form-control" id="config_id_input" style="display: inline" type="text" name="id" value="${formTagValue}" />
+        </div>
+
+        <input id="submitButton" class="btn btn-large btn-primary" name="submitButton" type="submit" value="Submit">
+
+        <div style="margin-left: 40px; display: inline;">
+          <span id="status"></span>
+        </div>
+
+        <div id="progressbar" style="margin-top: 20px;"></div>
+      </form:form>
+
+
+      <div style="margin-top: 50px;">
+
+        <c:if test="${not empty reports}">
+          <table class="inline" align="center">
+            <tr>
+              <th>Previously Applied Configurations</th>
+            </tr>
+            <c:forEach var="report" items="${reports}">
+              <tr>
+                <td align="center"><a href="../configloader/progress/finalReport/${report.key}"> ${report.key}</a> (<a
+                    href="../configloader/progress/finalReport/xml/${report.key}" target="_blank">XML</a>)</td>
+              </tr>
+            </c:forEach>
+          </table>
+        </c:if>
+
+      </div>
     </div>
-  </form:form>
-
-  <div class="ui-widget">
-    <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
-      <p>
-        <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span> <strong>No configuration is running at the moment.</strong>
-      </p>
-    </div>
-  </div>
-  <div id="progressbar"></div>
-
-  <div style="margin-top: 50px;">
-
-    <c:if test="${not empty reports}">
-      <table class="inline" align="center">
-        <tr>
-          <th>Previously Applied Configurations</th>
-        </tr>
-        <c:forEach var="report" items="${reports}">
-          <tr>
-            <td align="center"><a href="../configloader/progress/finalReport/${report.key}"> ${report.key}</a> (<a
-              href="../configloader/progress/finalReport/xml/${report.key}" target="_blank">XML</a>)</td>
-          </tr>
-        </c:forEach>
-      </table>
-    </c:if>
-
   </div>
 
   <br />
