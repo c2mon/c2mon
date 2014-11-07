@@ -1,7 +1,7 @@
 /*Defaults Styling*/
 body {font:12px/17px Arial, Helvetica, sans-serif; color:#333; background:#ccc; padding:40px 20px 20px 20px;}
 fieldset {background:#f2f2e6; padding:10px; border:1px solid #fff; border-color:#fff #666661 #666661 #fff; margin-bottom:36px; width:600px;}
-input, textarea, select {font:12px/12px Arial, Helvetica, sans-serif; padding:0;}
+/* input, textarea, select {font:12px/12px Arial, Helvetica, sans-serif; padding:0;} */
 fieldset.action {background:#9da2a6; border-color:#e5e5e5 #797c80 #797c80 #e5e5e5; margin-top:-20px;}
 legend {background:#bfbf30; color:#fff; font:17px/21px Calibri, Arial, Helvetica, sans-serif; padding:0 10px; margin:-26px 0 0 -11px; font-weight:bold; border:1px solid #fff; border-color:#e5e5c3 #505014 #505014 #e5e5c3;}
 label {font-size:11px; font-weight:bold; color:#666;}

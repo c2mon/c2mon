@@ -1,42 +1,99 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page session="false" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page session="false"%>
 <html>
-	<head>
-		<title>Please Login</title>
+<head>
+<title>Please Login</title>
 <meta http-equiv="X-UA-Compatible" content="IE=9" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/form.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/c2mon.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/web-config-viewer.css"/>" />
+<%-- <link rel="stylesheet" type="text/css" href="<c:url value="/css/form.css"/>" />
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/c2mon.css"/>" /> --%>
+<link rel="stylesheet" type="text/css" href="<c:url value="/css/bootstrap/bootstrap.min.css"/>" />
+<%-- <link rel="stylesheet" type="text/css" href="<c:url value="/css/web-config-viewer.css"/>" /> --%>
 <script type="text/javascript" src="<c:url value="/js/jquery-1.7.min.js" />"></script>
 <script type="text/javascript" src="<c:url value="/js/login-error.js" />"> ></script>
 
-  </head>
-	
-	<body>
-	<script>
-	if(window.location.href.indexOf('?reloaded') === -1) 
-	  window.location.href = window.location.href + "?reloaded=true";
-	</script>
+<style type="text/css">
+
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #eee;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+
+.form-signin .form-signin-heading, .form-signin .checkbox {
+  margin-bottom: 10px;
+}
+
+.form-signin .checkbox {
+  font-weight: normal;
+}
+
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+
+.form-signin input[type="text"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+#username {
+  margin-bottom: 0px;
+}
+</style>
+
+</head>
+
+<body>
+  <script>
+  if(window.location.href.indexOf('?reloaded') === -1) 
+    window.location.href = window.location.href + "?reloaded=true";
+  </script>
   <div id="container">
-  <div id="error"></div>
-  
-  <form action="<c:url value='j_spring_security_check' />" method="post" class="niceform">
-  	<fieldset>
-      	<legend>Please Login</legend>
-          <dl>
-          	<dt><label for="j_username">Username:</label></dt>
-              <dd><input type="text" name="j_username" id="j_username" size="32" maxlength="128" /></dd>
-          </dl>
-          <dl>
-          	<dt><label for="password">Password:</label></dt>
-              <dd><input type="password" name="j_password" id="j_password" size="32" maxlength="32" /></dd>
-          </dl>
-      </fieldset>
-      <fieldset class="action">
-      	<input type="submit" name="submit" id="submit" value="Submit" />
-      </fieldset>
-  </form>
+    <div id="error"></div>
+
+    <div class="container">
+
+      <form class="form-signin" role="form" action="<c:url value='j_spring_security_check' />" method="post">
+        <h2 class="form-signin-heading">Please sign in</h2>
+
+        <div id="username" class="form-group has-feedback">
+          <label id="error-feedback" class="control-label" style="display: none;" for="j_username">Invalid username or password</label>
+          <input type="text" class="form-control" placeholder="Email address" name="j_username" id="j_username" size="32" maxlength="128" required autofocus>
+        </div>
+
+        <div id="password" class="form-group">
+          <input type="password" class="form-control" placeholder="Password" name="j_password" id="j_password" size="32" maxlength="32" required>
+        </div>
+
+        <button class="btn btn-large btn-primary btn-block" type="submit" name="submit" id="submit">Sign in</button>
+
+      </form>
+
+    </div>
   </div>
 
-	</body>
+</body>
 </html>
