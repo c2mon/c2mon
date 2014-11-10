@@ -58,10 +58,6 @@ body {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-
-#username {
-  margin-bottom: 0px;
-}
 </style>
 
 </head>
@@ -81,10 +77,10 @@ body {
 
         <div id="username" class="form-group has-feedback">
           <label id="error-feedback" class="control-label" style="display: none;" for="j_username">Invalid username or password</label>
-          <input type="text" class="form-control" placeholder="Email address" name="j_username" id="j_username" size="32" maxlength="128" required autofocus>
+          <input type="text" class="form-control" placeholder="Username" name="j_username" id="j_username" size="32" maxlength="128" required autofocus>
         </div>
 
-        <div id="password" class="form-group">
+        <div id="password" class="form-group has-feedback">
           <input type="password" class="form-control" placeholder="Password" name="j_password" id="j_password" size="32" maxlength="32" required>
         </div>
 

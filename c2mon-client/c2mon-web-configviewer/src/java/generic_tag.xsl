@@ -3,30 +3,14 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <!--  link variables  -->
-  <xsl:variable name="base_url">
-    ../../..
-  </xsl:variable>
-  <xsl:variable name="alarm_url">
-    alarmviewer/
-  </xsl:variable>
-  <xsl:variable name="command_url">
-    commandviewer/
-  </xsl:variable>
-  <xsl:variable name="datatag_url">
-    tagviewer/
-  </xsl:variable>
-  <xsl:variable name="process_xml_url">
-    process/xml/
-  </xsl:variable>
-  <xsl:variable name="alarm_xml_url">
-    alarmviewer/xml/
-  </xsl:variable>
-  <xsl:variable name="command_xml_url">
-    commandviewer/xml/
-  </xsl:variable>
-  <xsl:variable name="report_xml_url">
-    configloader/progress/finalReport/xml/
-  </xsl:variable>
+  <xsl:variable name="base_url">../</xsl:variable>
+  <xsl:variable name="alarm_url">alarmviewer/</xsl:variable>
+  <xsl:variable name="command_url">commandviewer/</xsl:variable>
+  <xsl:variable name="datatag_url">tagviewer/</xsl:variable>
+  <xsl:variable name="process_xml_url">process/xml/</xsl:variable>
+  <xsl:variable name="alarm_xml_url">alarmviewer/xml/</xsl:variable>
+  <xsl:variable name="command_xml_url">commandviewer/xml/</xsl:variable>
+  <xsl:variable name="report_xml_url">configloader/progress/finalReport/xml/</xsl:variable>
   
   <xsl:variable name="help_alarm_url">http://oraweb.cern.ch/pls/timw3/helpalarm.AlarmForm?p_alarmid=</xsl:variable>
   
@@ -159,13 +143,13 @@
   <html>
     <head>
       <title>Configuration viewer</title>
-      <link rel="stylesheet" type="text/css" href="../../../css/bootstrap/bootstrap.css" />
-      <link rel="stylesheet" type="text/css" href="../../../css/c2mon.css"></link>
-      <link rel="stylesheet" type="text/css" href="../../../css/web-config-viewer.css"></link>
-      <link rel="stylesheet" type="text/css" href="../../../css/buttons.css"></link>
+      <link rel="stylesheet" type="text/css" href="../css/bootstrap/bootstrap.css" />
+      <link rel="stylesheet" type="text/css" href="../css/c2mon.css"></link>
+      <link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
+      <link rel="stylesheet" type="text/css" href="../css/buttons.css"></link>
       
-      <script type="text/javascript" src="../../../js/jquery/jquery.js"></script>
-      <script type="text/javascript" src="../../../js/bottom_panel.js"></script>
+      <script type="text/javascript" src="../js/jquery/jquery.js"></script>
+      <script type="text/javascript" src="../js/bottom_panel.js"></script>
     </head>
     <body>
       
@@ -247,13 +231,13 @@
   <html>
     <head>
       <title>Configuration viewer</title>
-      <link rel="stylesheet" type="text/css" href="../../../css/bootstrap/bootstrap.css" />
-      <link rel="stylesheet" type="text/css" href="../../../css/c2mon.css"></link>
-      <link rel="stylesheet" type="text/css" href="../../../css/web-config-viewer.css"></link>
-      <link rel="stylesheet" type="text/css" href="../../../css/buttons.css"></link>
+      <link rel="stylesheet" type="text/css" href="../css/bootstrap/bootstrap.css" />
+      <link rel="stylesheet" type="text/css" href="../css/c2mon.css"></link>
+      <link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
+      <link rel="stylesheet" type="text/css" href="../css/buttons.css"></link>
       
-      <script type="text/javascript" src="../../../js/jquery/jquery.js"></script>
-      <script type="text/javascript" src="../../../js/bottom_panel.js"></script>
+      <script type="text/javascript" src="../js/jquery/jquery.js"></script>
+      <script type="text/javascript" src="../js/bottom_panel.js"></script>
     </head>
     <body>
       
@@ -451,13 +435,13 @@
   <html>
     <head>
       <title>Configuration viewer</title>
-      <link rel="stylesheet" type="text/css" href="../../../css/bootstrap/bootstrap.css" />
-      <link rel="stylesheet" type="text/css" href="../../../css/c2mon.css"></link>
-      <link rel="stylesheet" type="text/css" href="../../../css/web-config-viewer.css"></link>
-      <link rel="stylesheet" type="text/css" href="../../../css/buttons.css"></link>
+      <link rel="stylesheet" type="text/css" href="../css/bootstrap/bootstrap.css" />
+      <link rel="stylesheet" type="text/css" href="../css/c2mon.css"></link>
+      <link rel="stylesheet" type="text/css" href="../css/web-config-viewer.css"></link>
+      <link rel="stylesheet" type="text/css" href="../css/buttons.css"></link>
 
-      <script type="text/javascript" src="../../../js/jquery/jquery.js"></script>
-      <script type="text/javascript" src="../../../js/bottom_panel.js"></script>
+      <script type="text/javascript" src="../js/jquery/jquery.js"></script>
+      <script type="text/javascript" src="../js/bottom_panel.js"></script>
       
       <script type="text/javascript">
           $(document).ready(function(){
