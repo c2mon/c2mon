@@ -64,6 +64,7 @@
     </plugins>
   </build>
   
-  <!-- <scm> <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-ext-device</developerConnection> 
-    </scm> -->
+  <scm> 
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-client/c2mon-client-ext-device</developerConnection> 
+  </scm>
 </project>
