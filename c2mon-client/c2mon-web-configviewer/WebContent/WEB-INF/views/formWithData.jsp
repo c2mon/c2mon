@@ -25,6 +25,11 @@ body {
       <ul class="breadcrumb">
         <li><a href="../">Home</a> <span class="divider"></span></li>
         <li>${title}</li>
+
+        <span class="pull-right">
+          <a href="../j_spring_security_logout">Logout&nbsp;</a>
+          <span class="glyphicon glyphicon-log-out"></span>
+        </span>
       </ul>
 
       <div class="jumbotron">

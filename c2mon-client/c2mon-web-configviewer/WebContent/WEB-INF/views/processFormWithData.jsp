@@ -27,7 +27,13 @@ body {
       <ul class="breadcrumb">
         <li><a href="../">Home</a> <span class="divider"></span></li>
         <li>${title}</li>
+
+        <span class="pull-right">
+          <a href="../j_spring_security_logout">Logout&nbsp;</a>
+          <span class="glyphicon glyphicon-log-out"></span>
+        </span>
       </ul>
+
 
       <div class="jumbotron">
         <h1>${title}</h1>
@@ -45,7 +51,6 @@ body {
         <input class="btn btn-large btn-primary" type="submit" value="Submit">
       </form>
 
-      <a href="../j_spring_security_logout">Logout</a>
     </div>
     <!--/row-->
 
