@@ -1,9 +1,5 @@
 <config>
   <view>
-    <property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/GTPM/SPS/VueGeneraleSPS.xml" />
-    <property name="external" type="java.lang.Boolean" value="false" />
-  </view>
-  <view>
     <property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/Eau_SPS/EAU_SPS.idbd" />
     <property name="external" type="java.lang.Boolean" value="false" />
   </view>

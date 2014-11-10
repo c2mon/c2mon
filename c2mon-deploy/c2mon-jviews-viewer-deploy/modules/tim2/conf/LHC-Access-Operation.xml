@@ -1,6 +1,6 @@
 <config>
   <view>
-    <property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/LHC_Access/LHC_Ventilation_Doors.ivl" />
+    <property name="url" type="java.lang.String" value="http://timweb.cern.ch/Views/Production/LHC_Access/VENTILATION_DOORS_TS_View.idbd" />
     <property name="external" type="java.lang.Boolean" value="false" />
   </view>
 
