@@ -314,7 +314,7 @@
     <body>
       
       <p class="tagName"> 
-        <A href="{$base_url}{$report_xml_url}{id}/" 
+        <A href="../../{$base_url}{$report_xml_url}{id}/" 
           class="large blue awesome xml_button" target="_blank">View Configuration Report XML >>
         </A>    
       </p>

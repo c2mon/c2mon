@@ -127,27 +127,26 @@ body {
    */
   function getProgressDescription() {
 
-    $
-        .ajax({
-          type : "POST",
-          url : "../configloader/progress/getProgressDescription",
-          data : {
-            configurationId : document.configLoaderForm.id.value
-          },
-          async : true,
-          success : function(data) {
+    $.ajax({
+      type : "POST",
+      url : "../configloader/progress/getProgressDescription",
+      data : {
+        configurationId : document.configLoaderForm.id.value
+      },
+      async : true,
+      success : function(data) {
 
-            var description = data;
-            if (description == null) {
-              description = "No response has been received yet from the server. Please wait..";
-            }
-            $("#status").text(description);
+        var description = data;
+        if (description == null) {
+          description = "No response has been received yet from the server. Please wait..";
+        }
+        $("#status").text(description);
 
-          },
-          dataType : "json",
-          complete : getProgressDescription,
-          timeout : 50
-        });
+      },
+      dataType : "json",
+      complete : getProgressDescription,
+      timeout : 50
+    });
   }
 </script>
 </head>
