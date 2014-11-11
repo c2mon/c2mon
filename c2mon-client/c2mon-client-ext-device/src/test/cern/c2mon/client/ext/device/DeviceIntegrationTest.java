@@ -17,9 +17,9 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.device;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -65,6 +65,12 @@ public class DeviceIntegrationTest {
           log.info("\t" + property.getKey() + ": " + property.getValue().getName());
         }
 
+        Map<String, ClientDataTagValue> fields = device.getMappedProperty("PH");
+        log.info("Found the following fields for mapped property PH:");
+        for (Map.Entry<String, ClientDataTagValue> field : fields.entrySet()) {
+          log.info("\t" + field.getKey() + ": " + field.getValue().getName());
+        }
+
         log.info("Subscribing to device " + device.getName() + "...");
         Device subscribedDevice = manager.subscribeDevice(device, listener);
 
@@ -72,11 +78,17 @@ public class DeviceIntegrationTest {
         for (Map.Entry<String, ClientDataTagValue> property : subscribedDevice.getProperties().entrySet()) {
           log.info("\t" + property.getKey() + ": " + property.getValue().getName() + " (" + property.getValue().getValue() + ")");
         }
+
+        fields = device.getMappedProperty("PH");
+        log.info("Found the following fields for mapped property PH:");
+        for (Map.Entry<String, ClientDataTagValue> field : fields.entrySet()) {
+          log.info("\t" + field.getKey() + ": " + field.getValue().getName());
+        }
       }
 
       log.info("Unsubscribing and re-subscribing to all devices");
-      manager.unsubscribeDevices((Set<Device>) devices, listener);
-      manager.subscribeDevices((Set<Device>) devices, listener);
+      manager.unsubscribeDevices(new HashSet<Device>(devices), listener);
+      manager.subscribeDevices(new HashSet<Device>(devices), listener);
     }
   }
 
@@ -85,7 +97,6 @@ public class DeviceIntegrationTest {
     public void onUpdate(Device device, PropertyInfo propertyInfo) {
       log.info("onUpdate(): device=" + device.getName() + " property=" + propertyInfo.getPropertyName() + " value="
           + device.getProperty(propertyInfo).getValue());
-
     }
   };
 }

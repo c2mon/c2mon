@@ -288,7 +288,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
 
       if (deviceProperty.isMappedProperty()) {
         for (ClientDeviceProperty field : deviceProperty.getFields().values()) {
-          if (field.isDataTag() && !field.isSubscribed()) {
+          if (field.isDataTag()) {
             propertyDataTagIds.add(field.getTagId());
           }
         }
@@ -523,7 +523,8 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
     for (DeviceUpdateListener listener : deviceUpdateListeners) {
       try {
         LOG.trace("Invoking DeviceUpdateListener");
-        listener.onUpdate(this.clone(), new PropertyInfo(propertyName));
+        PropertyInfo propertyInfo = fieldName == null ? new PropertyInfo(propertyName) : new PropertyInfo(propertyName, fieldName);
+        listener.onUpdate(this.clone(), propertyInfo);
 
       } catch (CloneNotSupportedException e) {
         LOG.error("Unable to clone Device with id " + getId(), e);
