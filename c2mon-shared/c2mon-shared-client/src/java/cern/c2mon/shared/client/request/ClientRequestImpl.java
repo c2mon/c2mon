@@ -130,7 +130,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
     else if (clazz == ConfigurationReport.class) {
       resultType = ResultType.TRANSFER_CONFIGURATION_REPORT;
       requestType = RequestType.APPLY_CONFIGURATION_REQUEST;
-      requestTimeout = 120000;
+      requestTimeout = 300000;
     }
     else if (clazz == SupervisionEvent.class) {
       resultType = ResultType.SUPERVISION_EVENT_LIST;
