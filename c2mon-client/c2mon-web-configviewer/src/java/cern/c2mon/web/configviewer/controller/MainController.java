@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Handles requests for the application home page.
- * 
- * This is a super simple html page 
+ *
+ * This is a super simple html page
  * (we also add the username of the user to show a personalised message once he is logged in).
  */
 @Controller
@@ -19,7 +19,7 @@ public class MainController {
 
   /**
    * This is the application home page.
-   * 
+   *
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * @param request Used to get the username
    * @return name of a jsp page which will be displayed
@@ -35,5 +35,17 @@ public class MainController {
 
     model.addAttribute("username", username);
     return "home";
+  }
+
+  /**
+   *
+   * @param model
+   * @return
+   */
+  @RequestMapping("error/404")
+  public String error404(final Model model) {
+    model.addAttribute("errorMessage", "");
+    model.addAttribute("title", "");
+    return "error/404";
   }
 }
