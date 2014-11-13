@@ -155,16 +155,14 @@ public class ConfigLoaderController {
     try {
       response.setContentType("text/html; charset=UTF-8");
       response.getWriter().println(service.getStoredConfigurationReportHtml(id));
-    } catch (TransformerException e) {
-      response.setStatus(400);
-      response.getWriter().println(e.getMessage());
-      logger.error(e.getMessage());
+
     } catch (TagIdException e) {
       return ("redirect:" + "/configloader/errorform/" + id);
-    } catch (CannotProceedException e) {
+
+    } catch (Exception e) {
       response.setStatus(400);
-      response.getWriter().println(e.getMessage());
-      logger.error(e.getMessage());
+      response.getWriter().println("Upsss" + e.getMessage());
+      logger.error("viewFinalReport() - Error occured whilst trying show final report.", e);
     }
     return null;
   }
