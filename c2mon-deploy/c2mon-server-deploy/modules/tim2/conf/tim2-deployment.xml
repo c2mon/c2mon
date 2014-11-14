@@ -14,11 +14,11 @@
                         <file name="log/out.log"/>
                     </output>
                 </main-class>
-                <java-vm-args>
-                    -Xms2G -Xmx2G -XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100
-                </java-vm-args>
+                <initial-heap-size>2G</initial-heap-size>
+                <max-heap-size>2G</max-heap-size>
+                <java-vm-args>-XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 
-                <property name="c2mon.home" value="${INSTALL_PATH}"/>
+                <property name="c2mon.home" value="${INSTALL_DIR}"/>
                 <property name="c2mon.log.dir" value="log"/>
                 <property name="log4j.configuration" value="conf/log4j.xml"/>
                 <property name="c2mon.properties.location" value="conf/c2mon.properties"/>
@@ -40,6 +40,9 @@
 
                 <preExec>
                     <![CDATA[
+# adding C2MON recovery option
+[[ -z $C2MON_RECOVERY_ARG ]] && JVM_OTHER_OPTS="${JVM_OTHER_OPTS} -Dc2mon.recovery=true"
+
 # uncomment the two lines below  if you need to connect to the server process with the remote debugger
 #REMOTE_DEBUGGER_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
 #JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUGGER_OPTS}"
@@ -59,7 +62,6 @@
 
         <application name="c2mon-tim2-pro1" extends="default">
             <startscript name="C2MON-TIM-PRO">
-                <property name="server.process.name" value="C2MON-TIM-PRO1"/>
                 <property name="c2mon.process.name" value="C2MON-TIM-PRO1"/>
                 <!-- Configuration for LASER module -->
                 <property name="laser.hosts" value="laser-test"/>
@@ -77,10 +79,6 @@
                     <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro1"
                           mask="400"/>
                 </directory>
-                <directory name="bin">
-                    <file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro1.sh"
-                          mask="700"/>
-                </directory>
                 <notification>
                     <!-- you can give more than one mail for deployment notification -->
                     <mail address="tim-admin@cern.ch"/>
@@ -90,7 +88,6 @@
 
         <application name="c2mon-tim2-pro2" extends="default">
             <startscript name="C2MON-TIM-PRO">
-                <property name="server.process.name" value="C2MON-TIM-PRO2"/>
                 <property name="c2mon.process.name" value="C2MON-TIM-PRO2"/>
                 <!-- Configuration for LASER module -->
                 <property name="laser.hosts" value="laser-test"/>
@@ -107,17 +104,16 @@
                     <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro2"
                           mask="400"/>
                 </directory>
-                <directory name="bin">
-                    <file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro2.sh"
-                          mask="700"/>
-                </directory>
+                <notification>
+                    <!-- you can give more than one mail for deployment notification -->
+                    <mail address="tim-admin@cern.ch"/>
+                </notification>
             </deployment>
         </application>
 
 
         <application name="c2mon-tim2-test1" extends="default">
             <startscript name="C2MON-TIM-TEST">
-                <property name="server.process.name" value="C2MON-TIM-TEST1"/>
                 <property name="c2mon.process.name" value="C2MON-TIM-TEST1"/>
                 <!-- Configuration for LASER module -->
                 <property name="laser.hosts" value="laser-test"/>
@@ -137,16 +133,11 @@
                     <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
                           mask="400"/>
                 </directory>
-                <directory name="bin">
-                    <file name="setenv.sh" source="/user/timtest/rep/c2mon/server/setenv-test1.sh"
-                          mask="700"/>
-                </directory>
             </deployment>
         </application>
 
         <application name="c2mon-tim2-test2" extends="default">
             <startscript name="C2MON-TIM-TEST">
-                <property name="server.process.name" value="C2MON-TIM-TEST2"/>
                 <property name="c2mon.process.name" value="C2MON-TIM-TEST2"/>
                 <!-- Configuration for LASER module -->
                 <property name="laser.hosts" value="laser-test"/>
@@ -164,10 +155,6 @@
                           mask="400"/>
                     <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
                           mask="400"/>
-                </directory>
-                <directory name="bin">
-                    <file name="setenv.sh" source="/user/timtest/rep/c2mon/server/setenv-test2.sh"
-                          mask="700"/>
                 </directory>
             </deployment>
         </application>

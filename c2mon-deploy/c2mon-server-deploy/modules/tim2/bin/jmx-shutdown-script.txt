@@ -1,1 +1,0 @@
-run prepareForShutdown -b cern.c2mon:name=lifeCycleController 

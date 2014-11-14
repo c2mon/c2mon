@@ -20,7 +20,7 @@
 
 	<files>
 	
-		<!-- copy sthe starting script -->
+		<!-- copy the starting script -->
 		<file>
 			<source>${basedir}/bin/tim2-c2mon.sh</source>
 			<outputDirectory>bin/</outputDirectory>
@@ -96,13 +96,6 @@
 			<outputDirectory>conf/</outputDirectory>
 			<lineEnding>unix</lineEnding>
 			<fileMode>0444</fileMode>
-		</file>
-		<!-- copy the jmx shutdown script -->
-		<file>
-			<source>${basedir}/bin/jmx-shutdown-script.txt</source>
-			<outputDirectory>bin/</outputDirectory>
-			<lineEnding>unix</lineEnding>
-			<fileMode>0755</fileMode>
 		</file>
 	
 		<!-- copy the version file -->
