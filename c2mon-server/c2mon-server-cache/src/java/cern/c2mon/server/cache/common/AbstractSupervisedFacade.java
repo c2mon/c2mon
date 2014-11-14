@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2011 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.server.cache.common;
@@ -22,13 +22,13 @@ import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
 import cern.c2mon.server.cache.SupervisedFacade;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
@@ -36,7 +36,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStat
  * Implementation of SupervisedFacade, with the intention
  * this should be used as basis for Process, Equipment
  * and SubEquipment Facade implementations.
- * 
+ *
  * @author Mark Brightwell
  *
  * @param <T>
@@ -47,60 +47,60 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
    * Class logger.
    */
   private static final Logger LOGGER = Logger.getLogger(AbstractSupervisedFacade.class);
-  
+
   /**
    * Reference to the cache.
    */
   private C2monCacheWithListeners<Long, T> c2monCache;
-  
+
   /**
    * Alive timers
    */
   private AliveTimerCache aliveTimerCache;
-  
+
   /**
    * For accessing alive timers.
    */
   private AliveTimerFacade aliveTimerFacade;
-  
+
   /**
    * Constructor.
    * @param c2monCache the cache this facade pertains to
    * @param aliveTimerCache cache with alive timers
    * @param aliveTimerFacade the alive timer facade
    */
-  public AbstractSupervisedFacade(final C2monCacheWithListeners<Long, T> c2monCache, final AliveTimerCache aliveTimerCache, 
+  public AbstractSupervisedFacade(final C2monCacheWithListeners<Long, T> c2monCache, final AliveTimerCache aliveTimerCache,
                                                 final AliveTimerFacade aliveTimerFacade) {
     super();
     this.c2monCache = c2monCache;
     this.aliveTimerCache = aliveTimerCache;
     this.aliveTimerFacade = aliveTimerFacade;
   }
-  
+
   /**
    * Must return the corresponding supervision entity for this facade object.
    * @return a Supervision Entity constant
    */
   protected abstract SupervisionEntity getSupervisionEntity();
-  
+
   /**
    * Sets the status of the Supervised object to STARTUP,
    * with associated message.
-   * 
+   *
    * <p>Starts the alive timer if not already running.
-   * 
+   *
    * @param supervised supervised object
    * @param timestamp time of the start
    */
-  protected final void start(final T supervised, final Timestamp timestamp) {    
+  protected final void start(final T supervised, final Timestamp timestamp) {
     if (supervised.getAliveTagId() != null) {
       aliveTimerFacade.start(supervised.getAliveTagId());
-    }      
-    supervised.setSupervisionStatus(SupervisionStatus.STARTUP);      
+    }
+    supervised.setSupervisionStatus(SupervisionStatus.STARTUP);
     supervised.setStatusDescription(supervised.getSupervisionEntity() + " " + supervised.getName() + " was started");
-    supervised.setStatusTime(new Timestamp(System.currentTimeMillis()));              
+    supervised.setStatusTime(new Timestamp(System.currentTimeMillis()));
   }
-  
+
   @Override
   public void start(final Long id, final Timestamp timestamp) {
     c2monCache.acquireWriteLockOnKey(id);
@@ -112,16 +112,16 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
       c2monCache.releaseWriteLockOnKey(id);
     }
   }
-  
-  protected void stop(final T supervised, final Timestamp timestamp) {    
+
+  protected void stop(final T supervised, final Timestamp timestamp) {
     if (supervised.getAliveTagId() != null) {
       aliveTimerFacade.stop(supervised.getAliveTagId());
-    }      
+    }
     supervised.setSupervisionStatus(SupervisionStatus.DOWN);
     supervised.setStatusTime(timestamp);
-    supervised.setStatusDescription(supervised.getSupervisionEntity() + " " + supervised.getName() + " was stopped");            
+    supervised.setStatusDescription(supervised.getSupervisionEntity() + " " + supervised.getName() + " was stopped");
   }
-  
+
   @Override
   public void stop(final Long id, final Timestamp timestamp) {
     c2monCache.acquireWriteLockOnKey(id);
@@ -134,16 +134,16 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
     }
   }
 
-  private void resume(final T supervised, final Timestamp timestamp, final String message) {      
+  private void resume(final T supervised, final Timestamp timestamp, final String message) {
     supervised.setSupervisionStatus(SupervisionStatus.RUNNING);
     supervised.setStatusTime(timestamp);
     supervised.setStatusDescription(message);
   }
-  
+
   @Override
-  public void resume(final Long id, final Timestamp timestamp, final String message) {      
+  public void resume(final Long id, final Timestamp timestamp, final String message) {
     c2monCache.acquireWriteLockOnKey(id);
-    try {      
+    try {
       T supervised = c2monCache.get(id);
       if (!supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {
         resume(supervised, timestamp, message);
@@ -153,13 +153,13 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
       c2monCache.releaseWriteLockOnKey(id);
     }
   }
-  
+
   private void suspend(final T supervised, final Timestamp timestamp, final String message) {
     supervised.setSupervisionStatus(SupervisionStatus.DOWN);
     supervised.setStatusDescription(message);
-    supervised.setStatusTime(timestamp);       
+    supervised.setStatusTime(timestamp);
   }
-  
+
   @Override
   public final void suspend(final Long id, final Timestamp timestamp, final String message) {
     c2monCache.acquireWriteLockOnKey(id);
@@ -173,40 +173,41 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
       c2monCache.releaseWriteLockOnKey(id);
     }
   }
-  
+
   @Override
   public boolean isRunning(final T supervised) {
     c2monCache.acquireReadLockOnKey(supervised.getId());
-    try {      
-      return supervised.getSupervisionStatus() != null 
-            && (supervised.getSupervisionStatus().equals(SupervisionStatus.STARTUP) 
-            || supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING));
+    try {
+      return supervised.getSupervisionStatus() != null
+            && (supervised.getSupervisionStatus().equals(SupervisionStatus.STARTUP)
+            || supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)
+            || supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING_LOCAL));
     } finally {
       c2monCache.releaseReadLockOnKey(supervised.getId());
     }
   }
-  
+
   @Override
   public boolean isRunning(final Long id) {
     c2monCache.acquireReadLockOnKey(id);
-    try {  
+    try {
       return isRunning(c2monCache.get(id));
     } finally {
       c2monCache.releaseReadLockOnKey(id);
     }
   }
-  
+
   @Override
   public boolean isUncertain(final T supervised) {
     c2monCache.acquireReadLockOnKey(supervised.getId());
-    try {    
-      return supervised.getSupervisionStatus() != null 
+    try {
+      return supervised.getSupervisionStatus() != null
             && supervised.getSupervisionStatus().equals(SupervisionStatus.UNCERTAIN);
     } finally {
       c2monCache.releaseReadLockOnKey(supervised.getId());
     }
   }
-  
+
   @Override
   public SupervisionEvent getSupervisionStatus(final Long id) {
     c2monCache.acquireReadLockOnKey(id);
@@ -214,7 +215,7 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
       T supervised = c2monCache.get(id);
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace("Getting supervision status: " + getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus());
-      } 
+      }
       Timestamp supervisionTime;
       String supervisionMessage;
       if (supervised.getStatusTime() != null) {
@@ -227,13 +228,13 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
       } else {
         supervisionMessage = getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
       }
-      return new SupervisionEventImpl(getSupervisionEntity(), id, supervised.getSupervisionStatus(), 
+      return new SupervisionEventImpl(getSupervisionEntity(), id, supervised.getSupervisionStatus(),
                                                                     supervisionTime, supervisionMessage);
     } finally {
       c2monCache.releaseReadLockOnKey(id);
     }
   }
-  
+
   @Override
   public void refreshAndnotifyCurrentSupervisionStatus(final Long id) {
     c2monCache.acquireWriteLockOnKey(id);
@@ -246,33 +247,33 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
       c2monCache.releaseWriteLockOnKey(id);
     }
   }
-  
+
   @Override
-  public void removeAliveTimer(final Long supervisedId) {   
+  public void removeAliveTimer(final Long supervisedId) {
     T supervised = c2monCache.get(supervisedId);
-    Long aliveId = supervised.getAliveTagId(); 
-    if (aliveId != null) {      
+    Long aliveId = supervised.getAliveTagId();
+    if (aliveId != null) {
       aliveTimerFacade.stop(aliveId);
       aliveTimerCache.remove(aliveId);
-    }        
+    }
   }
-  
+
   @Override
   public void removeAliveDirectly(final Long aliveId) {
-    if (aliveId != null) {      
+    if (aliveId != null) {
       aliveTimerFacade.stop(aliveId);
       aliveTimerCache.remove(aliveId);
     } else {
       throw new NullPointerException("Called method with null alive id");
     }
   }
-  
+
   @Override
   public void loadAndStartAliveTag(final Long supervisedId) {
     T supervised = c2monCache.get(supervisedId);
     Long aliveId = supervised.getAliveTagId();
     aliveTimerCache.loadFromDb(aliveId);
-    if (aliveId != null) {            
+    if (aliveId != null) {
       aliveTimerFacade.start(aliveId);
     }
   }

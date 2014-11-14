@@ -221,7 +221,8 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   public void notifySupervisionEvent(final SupervisionEvent event) {
     SupervisionStatus status = event.getStatus();
     Long entityId = event.getEntityId();
-    if (status.equals(SupervisionStatus.RUNNING) || status.equals(SupervisionStatus.DOWN) || status.equals(SupervisionStatus.STOPPED)) {
+    if (status.equals(SupervisionStatus.RUNNING) || status.equals(SupervisionStatus.DOWN) || status.equals(SupervisionStatus.STOPPED)
+        || status.equals(SupervisionStatus.RUNNING_LOCAL)) {
 
       //lock for if-else logic only
       clusterCache.acquireWriteLockOnKey(EVENT_LOCK);
