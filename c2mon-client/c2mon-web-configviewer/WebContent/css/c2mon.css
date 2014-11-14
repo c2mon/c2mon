@@ -15,18 +15,18 @@ table {
   padding: 0;
   margin: 0;
   margin-bottom: 20px;
-  width: 100%
+  width: 100%;
 }
 
-table {
-    /* ... */
+/* table {
+    ...
     width: 100%;
 }
 @media all and (min-width: 1000px) {
    table {
      width: 1000px;
    }
-}
+} */
 
 p {
   padding: 0;

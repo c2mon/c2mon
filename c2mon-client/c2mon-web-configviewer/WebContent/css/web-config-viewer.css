@@ -29,7 +29,7 @@ table td.bold:hover  { background: #A2B5CD;  } */
 
 .bold {
   font-weight: bold;
-  width: 150px;
+  /* width: 150px; */
 }
 
 .align_center {

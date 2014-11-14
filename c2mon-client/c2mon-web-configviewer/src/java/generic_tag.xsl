@@ -304,23 +304,27 @@
     <head>
       <title>Configuration viewer</title>
       <link rel="stylesheet" type="text/css" href="../../../css/bootstrap/bootstrap.css" />
-      <link rel="stylesheet" type="text/css" href="../../../css/c2mon.css"></link>
-      <link rel="stylesheet" type="text/css" href="../../../css/web-config-viewer.css"></link>
-      <link rel="stylesheet" type="text/css" href="../../../css/buttons.css"></link>
+<!--       <link rel="stylesheet" type="text/css" href="../../../css/c2mon.css"></link> -->
+<!--       <link rel="stylesheet" type="text/css" href="../../../css/web-config-viewer.css"></link>
+      <link rel="stylesheet" type="text/css" href="../../../css/buttons.css"></link> -->
 
       <script type="text/javascript" src="../../../js/jquery/jquery.js"></script>
+      <script type="text/javascript" src="../../../js/bootstrap/bootstrap.js"></script>
       <script type="text/javascript" src="../../../js/bottom_panel.js"></script>
     </head>
     <body>
       
+      <div class="container">
+      <div class="row">
+      
       <p class="tagName"> 
-        <A href="../../{$base_url}{$report_xml_url}{id}/" 
-          class="large blue awesome xml_button" target="_blank">View Configuration Report XML >>
-        </A>    
+        <a href="../../{$base_url}{$report_xml_url}{id}/"  style="margin-top: 20px;"
+          class="btn btn-default btn-large pull-right" target="_blank">View Configuration Report XML >>
+        </a>    
       </p>
       <p>
         <h2>Overview</h2>
-        <table class="inline" border="1">
+        <table class="table table-striped table-bordered">
           <tr>
             <th class="bold">Identifier</th>
             <td><xsl:value-of select="id" /></td>
@@ -341,19 +345,19 @@
             <th class="bold">Status</th>
             <xsl:choose>
               <xsl:when test="status='OK'">
-                <td bgcolor="green"><xsl:value-of select="status" /></td>
+                <td class="success"><xsl:value-of select="status" /></td>
               </xsl:when>  
               <xsl:when test="status='WARNING' or status='RESTART'">
-                <td bgcolor="yellow"><xsl:value-of select="status" /></td>
-              </xsl:when>  
+                <td class="warning"><xsl:value-of select="status" /></td>
+              </xsl:when>
               <xsl:otherwise>
-                <td bgcolor="red"><xsl:value-of select="status" /></td>
+                <td class="danger"><xsl:value-of select="status" /></td>
               </xsl:otherwise>
             </xsl:choose>
           </tr>
           <tr>
             <th class="highlight bold">Message</th>
-            <td><pre><xsl:value-of select="status-description" /></pre></td>
+            <td><xsl:value-of select="status-description" /></td>
           </tr>
           <tr>
             <th class="highlight bold">DAQs to reboot</th>
@@ -363,6 +367,8 @@
       </p>
       <xsl:apply-templates select="ConfigurationElementReports"/>
       
+      </div>
+      </div>
     </body>
   </html>
 </xsl:template>
@@ -372,14 +378,17 @@
   <hr/>
   <p>
     <h2>Detailed Report</h2>
-    <table class="inline" border="1">
+    <table class="table table-striped table-bordered">
+    <thead>
       <tr>
-        <th class="bold">Action</th>
-        <th class="bold">Entity</th>
-        <th class="bold">Id</th>
-        <th class="bold">Status</th>
-        <th class="bold">Report</th>
+        <th class="col-md-1">Action</th>
+        <th class="col-md-1">Entity</th>
+        <th class="col-md-1">Id</th>
+        <th class="col-md-1">Status</th>
+        <th >Report</th>
       </tr>
+    </thead>
+    <tbody>
       <xsl:for-each select="ConfigurationElementReport">
         <tr>
           <td><xsl:value-of select="action" /></td>
@@ -387,28 +396,38 @@
           <td><xsl:value-of select="id" /></td>
           <xsl:choose>
             <xsl:when test="status='OK'">
-              <td bgcolor="green"><xsl:value-of select="status" /></td>
+              <td class="success"><xsl:value-of select="status" /></td>
             </xsl:when>  
-            <xsl:when test="status='WARNING'">
-              <td bgcolor="yellow"><xsl:value-of select="status" /></td>
+            <xsl:when test="status='WARNING' or status='RESTART'">
+              <td class="warning"><xsl:value-of select="status" /></td>
             </xsl:when>  
             <xsl:otherwise>
-              <td bgcolor="red"><xsl:value-of select="status" /></td>
+              <td class="danger"><xsl:value-of select="status" /></td>
             </xsl:otherwise>
           </xsl:choose>
 
           <td>
-            <pre><xsl:value-of select="status-message" /></pre>
-            <xsl:apply-templates select="sub-reports"/>
+            <button type="button" class="btn" data-toggle="collapse" data-target="#collapseme-{action}-{id}">
+              Click to expand
+            </button>
+            
+            <div id="collapseme-{action}-{id}" class="collapse out">
+            <xsl:value-of select="status-message" />
+            
+            <ul class="list-unstyled">
+              <xsl:apply-templates select="sub-reports"/>
+            </ul>
+            </div>
           </td>
         </tr>
       </xsl:for-each>
+      </tbody>
     </table>
   </p>
 </xsl:template>
 
 <xsl:template match="sub-reports">
-  <ul>   
+
     <xsl:for-each select="ConfigurationElementReport">
       <li>
         <xsl:value-of select="action" /> -  
@@ -417,15 +436,13 @@
         <xsl:value-of select="status"/> - 
         
         <xsl:if test="status-message!=''">
-          <pre>
-            <xsl:value-of select="status-message"/>
-          </pre>
-        </xsl:if>  
+          <xsl:value-of select="status-message"/>
+        </xsl:if>
         
       </li>
       <xsl:apply-templates select="sub-reports"/>
     </xsl:for-each>
-  </ul>   
+
 </xsl:template>
 <!-- process the XML element ProcessConfiguration -->
 <!-- DAQ page -->

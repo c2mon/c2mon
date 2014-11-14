@@ -161,7 +161,7 @@ public class ConfigLoaderController {
 
     } catch (Exception e) {
       response.setStatus(400);
-      response.getWriter().println("Upsss" + e.getMessage());
+      response.getWriter().println(e.getMessage());
       logger.error("viewFinalReport() - Error occured whilst trying show final report.", e);
     }
     return null;
