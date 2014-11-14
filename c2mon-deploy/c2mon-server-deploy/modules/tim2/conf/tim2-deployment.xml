@@ -1,215 +1,176 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-	<product name="c2mon">
+    <product name="c2mon">
 
-		<!--
-			this application section is a parent configuration for both
-			c2mon-tim2-prod and c2mon-tim2-test
-		-->
-		<application name="default">
+        <!--
+            this application section is a parent configuration for both
+            c2mon-tim2-prod and c2mon-tim2-test
+        -->
+        <application name="default">
 
-			<startscript name="C2MON-SERVER-DMN2">
-				<main-class name="cern.c2mon.server.lifecycle.ServerStartup">
-					<output>
-						<file name="log/out.log" />
-					</output>
-				</main-class>
-				<java-vm-args>-Xms2048m -Xmx2048m -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
-				<property name="server.process.name" value="C2MON-SERVER-TIM2" />
-				<property name="c2mon.home" value="$C2MON_HOME" />
-				<property name="c2mon.log.dir" value="log" />
-				<property name="c2mon.properties.location" value="conf/c2mon.properties" />
-				<property name="log4j.configuration" value="conf/log4j.xml" />
-				<property name="com.sun.management.jmxremote.port" value="9523" />
-				<property name="com.sun.management.jmxremote.password.file"
-					value="conf/.jmxremote.passwd" />
-				<property name="com.sun.management.jmxremote.access.file"
-					value="conf/.jmxremote.access" />
-				<property name="com.sun.management.jmxremote.ssl" value="false" />
-				<!--  LASER TEST ENVIRONMENT -->
-				<property name="laser.hosts" value="laser-test" />
-				<property name="cmw.mom.brokerlist" value="jms-diamon-test:2506" />
-                <property name="oracle.net.tns_admin" value="/etc" />
-				<preExec>
-					<![CDATA[
-		
+            <startscript>
+                <main-class name="cern.c2mon.server.lifecycle.ServerStartup">
+                    <output>
+                        <file name="log/out.log"/>
+                    </output>
+                </main-class>
+                <java-vm-args>
+                    -Xms2G -Xmx2G -XX:NewRatio=3 -XX:+PrintGCDetails -XX:+UseParallelGC -XX:MaxGCPauseMillis=100
+                </java-vm-args>
+
+                <property name="c2mon.home" value="${INSTALL_PATH}"/>
+                <property name="c2mon.log.dir" value="log"/>
+                <property name="log4j.configuration" value="conf/log4j.xml"/>
+                <property name="c2mon.properties.location" value="conf/c2mon.properties"/>
+                <property name="com.sun.management.jmxremote.port" value="9623"/>
+                <property name="com.sun.management.jmxremote.password.file" value="conf/jmxremote.passwd"/>
+                <property name="com.sun.management.jmxremote.access.file" value="conf/jmxremote.access"/>
+                <property name="com.sun.management.jmxremote.ssl" value="false"/>
+                <property name="oracle.net.tns_admin" value="/etc"/>
+
+                <!-- Terracotta license key-->
+                <property name="com.tc.productkey.path" value="conf/terracotta-license.key"/>
+
+                <!-- Cluster Java arguments -->
+                <property name="cern.c2mon.cache.mode" value="multi"/>
+                <property name="com.tc.l1.cachemanager.percentageToEvict" value="10"/>
+                <property name="com.tc.l1.cachemanager.threshold" value="70"/>
+                <property name="com.tc.l1.cachemanager.monitorOldGenOnly" value="false"/>
+
+
+                <preExec>
+                    <![CDATA[
+# uncomment the two lines below  if you need to connect to the server process with the remote debugger
+#REMOTE_DEBUGGER_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+#JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUGGER_OPTS}"
+
                     ]]>
-				</preExec>
-			</startscript>
+                </preExec>
+            </startscript>
 
-			<deployment installLocation="/opt/c2mon-tim2/">
-				<backupPolicy keepBackups="2">
-					<preserve type="dir" name="log" />
-					<preserve type="dir" name="tmp" />
-				</backupPolicy>				
+            <deployment installLocation="/opt/c2mon-tim2/">
+                <backupPolicy keepBackups="2">
+                    <preserve type="dir" name="log"/>
+                    <preserve type="dir" name="tmp"/>
+                </backupPolicy>
 
-			</deployment>
-		</application>
+            </deployment>
+        </application>
 
-		<application name="c2mon-tim2-pro1" extends="default">
-			<deployment installLocation="/opt/c2mon-pro1">
-				<directory name="conf">
-					<file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
-						mask="400" />
-					<file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
-						mask="400" />
-					<file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro1"
-						mask="400" />
-				</directory>
-				<directory name="bin">
-					<file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro1.sh"
-						mask="700" />
-				</directory>
-        <notification>
-          <!-- you can give more than one mail for deployment notification -->
-          <mail address="tim-admin@cern.ch" />
-        </notification>
-			</deployment>
-		</application>
+        <application name="c2mon-tim2-pro1" extends="default">
+            <startscript name="C2MON-TIM-PRO">
+                <property name="server.process.name" value="C2MON-TIM-PRO1"/>
+                <property name="c2mon.process.name" value="C2MON-TIM-PRO1"/>
+                <!-- Configuration for LASER module -->
+                <property name="laser.hosts" value="laser-test"/>
+                <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506"/>
+                <!-- Terracotta configuration -->
+                <property name="terracotta.config.location" value="tim-cache-pro1:9510,tim-cache-pro2:9511"/>
+            </startscript>
 
-    <application name="c2mon-tim2-pro2" extends="default">
-      <deployment installLocation="/opt/c2mon-pro2">
-        <directory name="conf">
-          <file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
-            mask="400" />
-          <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
-            mask="400" />
-          <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro2"
-            mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro2.sh"
-            mask="700" />
-        </directory>
-      </deployment>
-    </application>
-    
-    <application name="c2mon-tim2-pro3" extends="default">
-      <deployment installLocation="/opt/c2mon-pro3">
-        <directory name="conf">
-          <file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
-            mask="400" />
-          <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
-            mask="400" />
-          <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro1"
-            mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro3.sh"
-            mask="700" />
-        </directory>
-      </deployment>
-    </application>
-    
-    <application name="c2mon-tim2-pro4" extends="default">
-      <deployment installLocation="/opt/c2mon-pro4">
-        <directory name="conf">
-          <file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
-            mask="400" />
-          <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
-            mask="400" />
-          <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro2"
-            mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro4.sh"
-            mask="700" />
-        </directory>
-      </deployment>
-    </application>
-    
-		<application name="c2mon-tim2-test1" extends="default">
-			<deployment installLocation="/opt/c2mon-test1">
-				<directory name="conf">
-					<file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
-						mask="400" />
-					<file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
-						mask="400" />
-					<file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test1"
-						mask="400" />
-          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-				</directory>
-				<directory name="bin">
-					<file name="setenv.sh" source="/user/timtest/rep/c2mon/server/setenv-test1.sh"
-						mask="700" />
-				</directory>
-			</deployment>
-		</application>
-    
-    <application name="c2mon-tim2-test2" extends="default">
-      <deployment installLocation="/opt/c2mon-test2">
-        <directory name="conf">
-          <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-          <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test2"
-            mask="400" />
-          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="setenv.sh" source="/user/timtest/rep/c2mon/server/setenv-test2.sh"
-            mask="700" />
-        </directory>
-      </deployment>
-    </application>
-    
-    <application name="c2mon-tim2-test3" extends="default">
-      <deployment installLocation="/opt/c2mon-test3">
-        <directory name="conf">
-          <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-          <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test1"
-            mask="400" />
-          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="setenv.sh" source="/user/timtest/rep/c2mon/server/setenv-test3.sh"
-            mask="700" />
-        </directory>
-      </deployment>
-    </application>
-    
-    <application name="c2mon-tim2-test4" extends="default">
-      <deployment installLocation="/opt/c2mon-test4">
-        <directory name="conf">
-          <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-          <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-          <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test2"
-            mask="400" />
-          <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
-            mask="400" />
-        </directory>
-        <directory name="bin">
-          <file name="setenv.sh" source="/user/timtest/rep/c2mon/server/setenv-test4.sh"
-            mask="700" />
-        </directory>
-      </deployment>
-    </application>
+            <deployment installLocation="/opt/c2mon-pro1">
+                <directory name="conf">
+                    <file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
+                          mask="400"/>
+                    <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
+                          mask="400"/>
+                    <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro1"
+                          mask="400"/>
+                </directory>
+                <directory name="bin">
+                    <file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro1.sh"
+                          mask="700"/>
+                </directory>
+                <notification>
+                    <!-- you can give more than one mail for deployment notification -->
+                    <mail address="tim-admin@cern.ch"/>
+                </notification>
+            </deployment>
+        </application>
 
-		<application name="c2mon-tim2-dev" extends="default">
-			<deployment installLocation="/opt/c2mon-dev">
-				<directory name="conf">
-					<file name="jmxremote.passwd" sourceDir="/user/timtest/dev/rep/c2mon/server"
-						mask="400" />
-					<file name="jmxremote.access" sourceDir="/user/timtest/dev/rep/c2mon/server"
-						mask="400" />
-					<file name="c2mon.properties" sourceDir="/user/timtest/dev/rep/c2mon/server"
-						mask="400" />           
-				</directory>
-				<directory name="bin">
-					<file name="setenv.sh" sourceDir="/user/timtest/dev/rep/c2mon/server"
-						mask="700" />
-				</directory>
-			</deployment>
-		</application>
+        <application name="c2mon-tim2-pro2" extends="default">
+            <startscript name="C2MON-TIM-PRO">
+                <property name="server.process.name" value="C2MON-TIM-PRO2"/>
+                <property name="c2mon.process.name" value="C2MON-TIM-PRO2"/>
+                <!-- Configuration for LASER module -->
+                <property name="laser.hosts" value="laser-test"/>
+                <property name="cmw.mom.brokerlist" value="sljas2:2506,sljas3:2506"/>
+                <!-- Terracotta configuration -->
+                <property name="terracotta.config.location" value="tim-cache-pro1:9510,tim-cache-pro2:9511"/>
+            </startscript>
+            <deployment installLocation="/opt/c2mon-pro2">
+                <directory name="conf">
+                    <file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
+                          mask="400"/>
+                    <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
+                          mask="400"/>
+                    <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro2"
+                          mask="400"/>
+                </directory>
+                <directory name="bin">
+                    <file name="setenv.sh" source="/user/timoper/rep/c2mon/server/setenv-pro2.sh"
+                          mask="700"/>
+                </directory>
+            </deployment>
+        </application>
 
-	</product>
+
+        <application name="c2mon-tim2-test1" extends="default">
+            <startscript name="C2MON-TIM-TEST">
+                <property name="server.process.name" value="C2MON-TIM-TEST1"/>
+                <property name="c2mon.process.name" value="C2MON-TIM-TEST1"/>
+                <!-- Configuration for LASER module -->
+                <property name="laser.hosts" value="laser-test"/>
+                <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506"/>
+                <!-- Terracotta configuration -->
+                <property name="terracotta.config.location" value="tim-cache-test1:9510,tim-cache-test2:9511"/>
+            </startscript>
+
+            <deployment installLocation="/opt/c2mon-test1">
+                <directory name="conf">
+                    <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
+                          mask="400"/>
+                    <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
+                          mask="400"/>
+                    <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test1"
+                          mask="400"/>
+                    <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
+                          mask="400"/>
+                </directory>
+                <directory name="bin">
+                    <file name="setenv.sh" source="/user/timtest/rep/c2mon/server/setenv-test1.sh"
+                          mask="700"/>
+                </directory>
+            </deployment>
+        </application>
+
+        <application name="c2mon-tim2-test2" extends="default">
+            <startscript name="C2MON-TIM-TEST">
+                <property name="server.process.name" value="C2MON-TIM-TEST2"/>
+                <property name="c2mon.process.name" value="C2MON-TIM-TEST2"/>
+                <!-- Configuration for LASER module -->
+                <property name="laser.hosts" value="laser-test"/>
+                <property name="cmw.mom.brokerlist" value="jms-diamon-test:2506"/>
+                <!-- Terracotta configuration -->
+                <property name="terracotta.config.location" value="tim-cache-test1:9510,tim-cache-test2:9511"/>
+            </startscript>
+            <deployment installLocation="/opt/c2mon-test2">
+                <directory name="conf">
+                    <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
+                          mask="400"/>
+                    <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
+                          mask="400"/>
+                    <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test2"
+                          mask="400"/>
+                    <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
+                          mask="400"/>
+                </directory>
+                <directory name="bin">
+                    <file name="setenv.sh" source="/user/timtest/rep/c2mon/server/setenv-test2.sh"
+                          mask="700"/>
+                </directory>
+            </deployment>
+        </application>
+
+    </product>
 </products>
