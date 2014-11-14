@@ -39,9 +39,9 @@ fi
 
 # Checking for start script
 if [ -f $C2MON_HOME/bin/C2MON-TIM-PRO.jvm ] ; then
-    C2MON_START_CMD = $C2MON_HOME/bin/C2MON-TIM-PRO.jvm
+    C2MON_START_CMD=$C2MON_HOME/bin/C2MON-TIM-PRO.jvm
 elif [ -f $C2MON_HOME/bin/C2MON-TIM-TEST.jvm ] ; then
-    C2MON_START_CMD = $C2MON_HOME/bin/C2MON-TIM-TEST.jvm
+    C2MON_START_CMD=$C2MON_HOME/bin/C2MON-TIM-TEST.jvm
 else
     echo -n "[ERROR] No C2MON start script found in $C2MON_HOME/bin!"
     exit 1
