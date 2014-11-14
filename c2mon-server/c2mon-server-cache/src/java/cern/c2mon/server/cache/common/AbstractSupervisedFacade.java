@@ -26,6 +26,8 @@ import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
 import cern.c2mon.server.cache.SupervisedFacade;
+import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
@@ -136,6 +138,14 @@ public abstract class AbstractSupervisedFacade<T extends Supervised> extends Abs
 
   private void resume(final T supervised, final Timestamp timestamp, final String message) {
     supervised.setSupervisionStatus(SupervisionStatus.RUNNING);
+
+    if (supervised instanceof ProcessCacheObject) {
+      ProcessCacheObject process = (ProcessCacheObject) supervised;
+      if (process.getLocalConfig() != null && process.getLocalConfig().equals(LocalConfig.Y)) {
+        supervised.setSupervisionStatus(SupervisionStatus.RUNNING_LOCAL);
+      }
+    }
+
     supervised.setStatusTime(timestamp);
     supervised.setStatusDescription(message);
   }

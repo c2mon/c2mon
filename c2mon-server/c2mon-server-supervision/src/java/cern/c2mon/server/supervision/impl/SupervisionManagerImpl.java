@@ -783,11 +783,12 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     try {
       ControlTag stateTag = controlTagCache.get(stateTagId);
 
-      if (stateTag.getValue() == null || !stateTag.isValid()) {
+      if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
 
         // If the process is running under a local configuration, set the status
         // tag to RUNNING_LOCAL
         if (process.getLocalConfig() != null && process.getLocalConfig().equals(LocalConfig.Y)) {
+          LOGGER.debug("onProcessUp(): Process is running on a local configuration, setting status to RUNNING_LOCAL");
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING_LOCAL.toString(), pMessage, pTimestamp);
 
         } else if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString())) {

@@ -70,6 +70,9 @@ public class SupervisionAppenderImpl implements SupervisionAppender {
       case RUNNING:
         message = "DAQ process " + event.getEntityId() + " has recovered.";
         break;
+      case RUNNING_LOCAL:
+        message = "DAQ process " + event.getEntityId() + " has recovered and is running on a local configuration.";
+        break;
       default:
         LOGGER.error("Unexpected supervision status: " + event.getEntity());
         break;
