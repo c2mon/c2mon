@@ -42,6 +42,11 @@ public class DBDAQConfigInfo {
    */
   private transient String dataType;
   
+  /**
+   * Tag Data Value
+   */
+  private transient String datatagValue; 
+  
   public DBDAQConfigInfo(){}
     
   
@@ -50,6 +55,11 @@ public class DBDAQConfigInfo {
     this.dbItemName = dbItemName;
     this.dataType = dataType;
   }
+  
+  public DBDAQConfigInfo(Long tagId, String datatagValue){
+	    this.tagId = tagId;
+	    this.datatagValue = datatagValue;
+	  }
   
   /**
    * 
@@ -98,5 +108,24 @@ public class DBDAQConfigInfo {
     return dataType;
   }
 
+
+  /**
+   * 
+   * @return the Data Tag Value
+   */
+  public final String getDatatagValue() {
+	  return datatagValue;
+  }
+
+
+  /**
+   * 
+   * @param datatagValue
+   */
+  public final void setDatatagValue(String datatagValue) {
+	  this.datatagValue = datatagValue;
+  }
+
+  
 }
 

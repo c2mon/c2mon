@@ -60,6 +60,13 @@ public interface IDbDaqDao {
             final String type, final short quality, final String qualityDesc);
     
     /**
+     * Deletes a Data Tag from the data base 
+     * 
+     * @param dataTagId
+     */
+    void deleteDataTag(final long dataTagId);
+    
+    /**
      * Registers an update of the datatag  Hardware address item name for the equipment (db account). 
      * When there is a configuration that changes the item name of the data tag Hardware address (normally done using Modesti) 
      * we need to store the new name on the data base.
@@ -76,6 +83,14 @@ public interface IDbDaqDao {
      * @param dataType      New data type for the data tag
      * */
     void updateDataTagDataType(final long dataTagId, final String dataType);
+    
+    /**
+     * Registers an update for the Data Tag Value
+     * 
+     * @param dataTagId
+     * @param datatagValue New Data Tag value
+     */
+    void updateDataTagValue(final long dataTagId, final String datatagValue);
     
     /**
      * Retrieves from the data base the Data Tag hardware address Item name

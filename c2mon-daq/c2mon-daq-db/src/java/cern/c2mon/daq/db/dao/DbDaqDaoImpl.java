@@ -19,7 +19,7 @@ import cern.c2mon.daq.db.DBDAQConfigInfo;
  * methods for registering, unregistering and listening for database alerts sent
  * via dbms_alert package.
  * 
- * @author Aleksandra Wardzinska
+ * @author Aleksandra Wardzinska, Nacho Vilches
  * */
 public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
 
@@ -95,6 +95,12 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
         this.getSqlSession().insert("insertDataTag", params);
         
     }
+    
+    @Override
+	public void deleteDataTag(final long dataTagId) {
+		this.getSqlSession().delete("deleteDataTag", dataTagId);
+		
+	}
     
     /**
      * Registers an interest in receiveing alerts identified by alertId
@@ -209,6 +215,11 @@ public class DbDaqDaoImpl extends SqlSessionDaoSupport implements IDbDaqDao {
     public DBDAQConfigInfo getItemNameAndDataType(long dataTagId) {
       return (DBDAQConfigInfo) (this.getSqlSession().selectOne("getItemNameAndDataTypeById", dataTagId));
     }
-  
+
+	@Override
+	public void updateDataTagValue(long dataTagId, String datatagValue) {
+		DBDAQConfigInfo dbDAQConfigInfo = new DBDAQConfigInfo(dataTagId, datatagValue);
+	    this.getSqlSession().update("updateDataTagValue", dbDAQConfigInfo);	
+	}
     
 }

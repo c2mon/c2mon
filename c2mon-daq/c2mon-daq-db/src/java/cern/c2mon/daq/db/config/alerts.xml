@@ -60,6 +60,10 @@
 								DBD_QUALITY_DESCRIPTION, DBD_CRE_DAT) 
 						VALUES (?,?,?,?,?,?,?,?)	
 		</insert> 
+		
+		<delete id="deleteDataTag" parameterType="java.lang.Long">
+			DELETE FROM DB_DAQ WHERE DBD_TAG_ID=#{dataTagId}	
+		</delete> 
 	
 		<parameterMap id="wait-any-alert-map" type="java.util.Map">
 			<parameter property="name" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT"/>
@@ -128,5 +132,11 @@
             FROM DB_DAQ 
            WHERE DBD_TAG_ID = #{tagId}  
         </select>
+        
+         <update id="updateDataTagValue" parameterType="cern.c2mon.daq.db.DBDAQConfigInfo">
+            UPDATE DB_DAQ
+                SET DBD_VALUE = #{datatagValue,javaType=java.lang.String,jdbcType=VARCHAR}
+            WHERE DBD_TAG_ID=#{tagId} 
+        </update>
             
 </mapper>
