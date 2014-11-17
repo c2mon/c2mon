@@ -19,6 +19,19 @@ body {
 .sidebar-nav {
   padding: 9px 0;
 }
+
+.ui-progressbar .ui-progressbar-value {
+  margin: 0 !important;
+}
+
+#progressbar > .ui-progressbar-value {
+   background: #337ab7;
+}
+
+#progressbar > .ui-widget-header {
+   border: #337ab7;
+}
+
 </style>
 
 <link type="text/css" href="../css/ui-lightness/jquery-ui.css" rel="stylesheet" />

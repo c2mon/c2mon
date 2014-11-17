@@ -312,9 +312,9 @@
       <script type="text/javascript" src="../../../js/bootstrap/bootstrap.js"></script>
       <script type="text/javascript" src="../../../js/bottom_panel.js"></script>
     </head>
-    <body>
+    <body style="overflow-y: scroll;">
       
-      <div class="container">
+      <div class="container-fluid" style="padding-left:150px; padding-right:150px;">
       <div class="row">
       
       <p class="tagName"> 
@@ -407,17 +407,22 @@
           </xsl:choose>
 
           <td>
-            <button type="button" class="btn" data-toggle="collapse" data-target="#collapseme-{action}-{id}">
+          
+            <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#collapseme-{action}-{id}">
               Click to expand
             </button>
             
             <div id="collapseme-{action}-{id}" class="collapse out">
-            <xsl:value-of select="status-message" />
-            
-            <ul class="list-unstyled">
-              <xsl:apply-templates select="sub-reports"/>
-            </ul>
+              <xsl:if test="status-message!='' ">
+                <div style="white-space: pre-wrap;">
+                  <xsl:value-of select="status-message" />
+                </div>
+              </xsl:if>
+              <ul class="list-unstyled">
+                <xsl:apply-templates select="sub-reports"/>
+              </ul>
             </div>
+
           </td>
         </tr>
       </xsl:for-each>
@@ -429,7 +434,7 @@
 <xsl:template match="sub-reports">
 
     <xsl:for-each select="ConfigurationElementReport">
-      <li>
+      <li style="white-space: pre-wrap;">
         <xsl:value-of select="action" /> -  
         <xsl:value-of select="entity" /> - 
         <xsl:value-of select="id" /> -  
@@ -438,7 +443,6 @@
         <xsl:if test="status-message!=''">
           <xsl:value-of select="status-message"/>
         </xsl:if>
-        
       </li>
       <xsl:apply-templates select="sub-reports"/>
     </xsl:for-each>
