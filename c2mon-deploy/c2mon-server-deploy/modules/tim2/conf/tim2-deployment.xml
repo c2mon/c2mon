@@ -22,10 +22,6 @@
                 <property name="c2mon.log.dir" value="log"/>
                 <property name="log4j.configuration" value="conf/log4j.xml"/>
                 <property name="c2mon.properties.location" value="conf/c2mon.properties"/>
-                <property name="com.sun.management.jmxremote.port" value="9623"/>
-                <property name="com.sun.management.jmxremote.password.file" value="conf/jmxremote.passwd"/>
-                <property name="com.sun.management.jmxremote.access.file" value="conf/jmxremote.access"/>
-                <property name="com.sun.management.jmxremote.ssl" value="false"/>
                 <property name="oracle.net.tns_admin" value="/etc"/>
 
                 <!-- Terracotta license key-->
@@ -73,10 +69,6 @@ fi
 
             <deployment installLocation="/opt/c2mon-pro1">
                 <directory name="conf">
-                    <file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
-                          mask="400"/>
-                    <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
-                          mask="400"/>
                     <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro1"
                           mask="400"/>
                 </directory>
@@ -98,10 +90,6 @@ fi
             </startscript>
             <deployment installLocation="/opt/c2mon-pro2">
                 <directory name="conf">
-                    <file name="jmxremote.passwd" sourceDir="/user/timoper/rep/c2mon/server"
-                          mask="400"/>
-                    <file name="jmxremote.access" sourceDir="/user/timoper/rep/c2mon/server"
-                          mask="400"/>
                     <file name="c2mon.properties" source="/user/timoper/rep/c2mon/server/c2mon.properties.pro2"
                           mask="400"/>
                 </directory>
@@ -125,10 +113,6 @@ fi
 
             <deployment installLocation="/opt/c2mon-test1">
                 <directory name="conf">
-                    <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
-                          mask="400"/>
-                    <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
-                          mask="400"/>
                     <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test1"
                           mask="400"/>
                     <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
@@ -148,10 +132,6 @@ fi
             </startscript>
             <deployment installLocation="/opt/c2mon-test2">
                 <directory name="conf">
-                    <file name="jmxremote.passwd" sourceDir="/user/timtest/rep/c2mon/server"
-                          mask="400"/>
-                    <file name="jmxremote.access" sourceDir="/user/timtest/rep/c2mon/server"
-                          mask="400"/>
                     <file name="c2mon.properties" source="/user/timtest/rep/c2mon/server/c2mon.properties.test2"
                           mask="400"/>
                     <file name="log4j.xml" sourceDir="/user/timtest/rep/c2mon/server"
