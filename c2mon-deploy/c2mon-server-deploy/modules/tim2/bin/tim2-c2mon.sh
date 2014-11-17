@@ -33,8 +33,12 @@ C2MON_PIDFILE=$HOST_TMP_DIR/c2mon.pid
 # start/stop commands #
 #######################
 
-if [ "$1" == "recover" ]; then
-    export C2MON_RECOVERY_ARG="-Dc2mon.recovery=true"
+if [ "$1" == "recover" ] ; then
+    export C2MON_RECOVERY_ENABLED="TRUE"
+fi
+
+if [ "$2" == "-d" ] || [ "$2" == "--debug" ] ; then
+    export REMOTE_DEBUG_ENABLED="TRUE"
 fi
 
 # Checking for start script
@@ -241,11 +245,15 @@ status() {
 	
      *)
 	echo
-	echo $"Usage: $0 {start|stop|recover|status}"
-	echo $"start - Starts C2MON server on this machine, if it is not running."
+	echo $"Usage: $0 {start|stop|recover|status} [-d|--debug]"
+	echo
+	echo $"start   - Starts C2MON server on this machine, if it is not running."
 	echo $"recover - Same as start command, but with extra functionality for recovering after a server crash."
-	echo $"status - Checks the status (running/stopped) of the C2MON server."
-	echo $"stop - Stops the C2MON server on this host, if it is running. If a gentle shutdown fails, the process is killed after 30 seconds."
+	echo $"status  - Checks the status (running/stopped) of the C2MON server."
+	echo $"stop    - Stops the C2MON server on this host, if it is running. If a gentle shutdown fails, the process is killed after 20 seconds."
+	echo
+	echo $"-d, --debug"
+	echo $"         Allows attaching a remote debugger to the C2MON Java process. Works only in combination with \"start\" or \"recover\"."
 	exit 1
     esac
 

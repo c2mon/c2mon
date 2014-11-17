@@ -40,13 +40,14 @@
 
                 <preExec>
                     <![CDATA[
-# adding C2MON recovery option
-[[ -z $C2MON_RECOVERY_ARG ]] && JVM_OTHER_OPTS="${JVM_OTHER_OPTS} -Dc2mon.recovery=true"
+# if $REMOTE_DEBUG_ENABLED variable is set, we allow connecting to the server process with the remote debugger
+if [ -n "${REMOTE_DEBUG_ENABLED+set}" ] ; then
+    REMOTE_DEBUGGER_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
+    JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUGGER_OPTS}"
+fi
 
-# uncomment the two lines below  if you need to connect to the server process with the remote debugger
-#REMOTE_DEBUGGER_OPTS="-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=1044"
-#JVM_OTHER_OPTS="${JVM_OTHER_OPTS} ${REMOTE_DEBUGGER_OPTS}"
-
+# if $C2MON_RECOVERY_ENABLED is set, we add C2MON recovery option
+[[ -n "${C2MON_RECOVERY_ENABLED+set}" ]] && JVM_OTHER_OPTS="${JVM_OTHER_OPTS} -Dc2mon.recovery=true"
                     ]]>
                 </preExec>
             </startscript>
