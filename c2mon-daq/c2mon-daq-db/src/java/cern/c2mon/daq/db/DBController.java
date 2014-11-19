@@ -170,8 +170,8 @@ public class DBController {
       TimerTask task = new TimerTask() {
           @Override
           public void run() {
-              equipmentLogger.info("confTimerTask - Reconfigurong Task in progress");
-//              System.out.println("confTimerTask - Reconfigurong Task in progress");
+              equipmentLogger.info("confTimerTask - Reconfiguring Task in progress");
+//              System.out.println("confTimerTask - Reconfiguring Task in progress");
               
               // Send alert for reconfiguration for awaking the Listener Thread
               dbDaqDao.updateDataTagValue(RECONFIGURATION_TAG_ID, "0");
@@ -204,15 +204,6 @@ public class DBController {
 			  this.alertsSent.put(dataTagId, 0);
 			  this.invalidSent.put(dataTagId, 0);
 			  
-			  // If it is the Reconfiguration Data Tag and we don't have it yet we add it
-			  if(dataTagId == RECONFIGURATION_TAG_ID) {
-				  if (!registeredDataTags.contains(dataTagId)) {
-					  insertReconfigurationDataTag();
-				  }
-				  
-				  return CHANGE_STATE.SUCCESS;
-			  }
-
 			  // Inserting data data on the data base if it does not exist yet
 			  if (!registeredDataTags.contains(dataTagId)) {
 				  getEquipmentLogger().trace("connection - Inserting Data Tag: " + dataTagId);		  
@@ -300,6 +291,8 @@ public class DBController {
   public void insertReconfigurationDataTag() {
 	    getEquipmentLogger().info("insertReconfigurationDataTag - Inserting reconfiguration datatag: " + RECONFIGURATION_TAG_ID + " - " + RECONFIGURATION_TAG_ITEM_NAME);
 	    this.dbDaqDao.insertNewDataTag(RECONFIGURATION_TAG_ID, RECONFIGURATION_TAG_ITEM_NAME, "0", "Boolean", SourceDataQuality.OK, null);
+	    
+	    
 	  }
   
   /**
@@ -542,7 +535,7 @@ public class DBController {
                     			// If there is a reconfiguration we subscribe again to all alerts (old+new)
                     			setDisconnected();
                                 unregisterAlerts();
-                                equipmentLogger.trace("startAlertListener - Reconfiguration has been done. Registering again ...");
+                                equipmentLogger.info("startAlertListener - Reconfiguration has been done. Registering again ...");
 //                            	System.out.println("startAlertListener - Reconfiguration has been done. Registering again ...");
                             } else {
                             	// If is a normal alert we send to the queue for processing

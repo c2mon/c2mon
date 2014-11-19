@@ -16,6 +16,7 @@ import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
@@ -136,6 +137,13 @@ public class DBMessageHandler extends EquipmentMessageHandler {
 
         // parse HardwareAddress of each registered dataTag
         List<Long> registeredDataTags = this.dbDaqDao.getDataTags();
+        
+        // If the Reconfiguration Data Tag is not present we add it 
+        if (!registeredDataTags.contains(DBController.RECONFIGURATION_TAG_ID)) {
+        	this.dbController.insertReconfigurationDataTag();
+        }
+		 
+        // Connect to the rest of Data Tags
         for (ISourceDataTag dataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
         	this.dbController.connection(dataTag, null, registeredDataTags);
         }
