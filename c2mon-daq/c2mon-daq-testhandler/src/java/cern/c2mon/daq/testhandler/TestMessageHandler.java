@@ -324,18 +324,18 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
   @Override
   public void sendEquipmentCommFaultTag(boolean value) {
     if (value == false) {
-      getEquipmentMessageSender().confirmEquipmentStateOK("Test Equipment is OK");
-    } else {
       getEquipmentMessageSender().confirmEquipmentStateIncorrect("Test Equipment is having some problems...");
+    } else {
+      getEquipmentMessageSender().confirmEquipmentStateOK("Test Equipment is OK");
     }
   }
 
   @Override
   public void sendSubEquipmentCommFaultTag(int commFaultTagId, boolean value) {
     if (value == false) {
-      getEquipmentMessageSender().confirmSubEquipmentStateOK(new Long(commFaultTagId), "Test SubEquipment is OK");
-    } else {
       getEquipmentMessageSender().confirmSubEquipmentStateIncorrect(new Long(commFaultTagId), "Test SubEquipment is having some problems...");
+    } else {
+      getEquipmentMessageSender().confirmSubEquipmentStateOK(new Long(commFaultTagId), "Test SubEquipment is OK");
     }
   }
 
