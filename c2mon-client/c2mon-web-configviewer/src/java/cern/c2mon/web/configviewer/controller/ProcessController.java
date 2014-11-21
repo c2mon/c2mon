@@ -21,13 +21,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import cern.c2mon.web.configviewer.service.ProcessService;
 import cern.c2mon.web.configviewer.service.TagIdException;
+import cern.c2mon.web.configviewer.util.FormUtility;
 
 
 /**
  * A controller for the daq process viewer.
  * */
 @Controller
-public class ProcessControler {
+public class ProcessController {
 
   /** A REST-style URL */
   public static final String PROCESS_URL = "/process/";
@@ -53,7 +54,7 @@ public class ProcessControler {
   /**
    * ProcessControler logger
    * */
-  private static Logger logger = Logger.getLogger(ProcessControler.class);
+  private static Logger logger = Logger.getLogger(ProcessController.class);
 
   /**
    * Displays configuration of a process with the given process name
@@ -65,7 +66,9 @@ public class ProcessControler {
     logger.info(PROCESS_URL + processName);
     try {
       response.setContentType("text/html; charset=UTF-8");
+      response.getWriter().println(FormUtility.getHeader("../"));
       response.getWriter().println(service.generateHtmlResponse(processName));
+      response.getWriter().println(FormUtility.getFooter());
     } catch (TransformerException e) {
       response.getWriter().println(e.getMessage());
       logger.error(e.getMessage());
@@ -74,7 +77,7 @@ public class ProcessControler {
 
   /**
    * @return Displays configuration of a process with the given id together with a form
-   * 
+   *
    * @param id the process name
    * */
   @RequestMapping(value = PROCESS_FORM_URL + "/{id}", method = { RequestMethod.GET })
@@ -85,9 +88,9 @@ public class ProcessControler {
   }
 
   /**
-   * @return  
+   * @return
    * Displays configuration of a process with the given process name in RAW XML format
-   * 
+   *
    * @param id process name
    * */
   @RequestMapping(value = PROCESS_XML_URL + "/{id}", method = { RequestMethod.GET })
@@ -96,21 +99,21 @@ public class ProcessControler {
     model.addAllAttributes(getProcessModel(id));
     return "raw_xml_views/processXml";
   }
-  
+
 
 
   /**
    * @return
    * Displays an input form.
-   * 
+   *
    * If a POST was made, redirects to the PROCESS_URL.
-   * 
+   *
    * @param id process name
    * */
   @RequestMapping(value = PROCESS_FORM_URL, method = { RequestMethod.GET, RequestMethod.POST })
   public String viewProcessFormPost(
       @RequestParam(value = "id", required = false) final String id, final Model model) {
-    
+
     logger.info("/process/form " + id);
     if (id == null) {
       model.addAllAttributes(
@@ -131,7 +134,7 @@ public class ProcessControler {
    * @param instruction description of the user action displayed on the jsp page
    * @param formSubmitUrl url to which the form should be submitted
    * @param formTagValue previous value of a tag (datatag, alarm, command) entered in the form, that should be displayed in the form
-   * @return a map of values ready to be used in the MVC model 
+   * @return a map of values ready to be used in the MVC model
    * */
   public Map<String, Object> getProcessFormModel(final String title, final String instruction
       , final String formSubmitUrl, final String formTagValue, final String tagDataUrl) {

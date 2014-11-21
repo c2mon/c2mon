@@ -1,6 +1,5 @@
 package cern.c2mon.web.configviewer.util;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +14,7 @@ public final class FormUtility {
    * @param instruction description of the user action displayed on the jsp page
    * @param formSubmitUrl url to which the form should be submitted
    * @param formTagValue previous value of a tag (datatag, alarm, command) entered in the form, that should be displayed in the form
-   * @return a map of values ready to be used in the MVC model 
+   * @return a map of values ready to be used in the MVC model
    * */
   public static Map<String, String> getFormModel(final String title, final String instruction, final String formSubmitUrl, final String formTagValue, final String tagDataUrl) {
     Map<String, String> model = new HashMap<String, String>();
@@ -27,28 +26,30 @@ public final class FormUtility {
     return model;
   }
 
-  public static String getHeader() {
-    
+  public static String getHeader(String basePath) {
+
     String header = "" +
     "<!DOCTYPE html>"
     +  "<html>"
     + "<head>"
     +  " <title>Configuration viewer</title>"
-    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/c2mon.css\"></link>"
-    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/web-config-viewer.css\"></link>"
-    + "<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/buttons.css\"></link>"
-    +  " <script type=\"text/javascript\" src=\"../js/jquery-1.7.min.js\"></script>"
-    +  " <script type=\"text/javascript\" src=\"../js/bottom_panel.js\"></script>"
+//    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/c2mon.css\"></link>"
+//    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/web-config-viewer.css\"></link>"
+    + "  <link rel=\"stylesheet\" type=\"text/css\" href=\"" + basePath + "/css/bootstrap/bootstrap.css\"></link>"
+    +  " <script type=\"text/javascript\" src=\"" + basePath + "/js/jquery/jquery.js\"></script>"
+    +  " <script type=\"text/javascript\" src=\"" + basePath + "/js/bootstrap/bootstrap.js\"></script>"
+    +  " <script type=\"text/javascript\" src=\"" + basePath + "/js/bottom_panel.js\"></script>"
     + "</head>"
-    + "<body>";
-    
+    + "<body>"
+    + "<div class=\"container-fluid\" style=\"padding-left:150px; padding-right:150px;\">";
+
     return header;
   }
-  
+
   public static String getFooter() {
-    
-    String footer = "" + "</body>" + "</html>";
-    
+
+    String footer = "</div>" + "</body>" + "</html>";
+
     return footer;
   }
 

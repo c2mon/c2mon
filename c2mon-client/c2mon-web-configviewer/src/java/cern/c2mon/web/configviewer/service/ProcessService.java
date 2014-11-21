@@ -23,18 +23,12 @@ public class ProcessService {
    * ProcessService logger
    * */
   private static Logger logger = Logger.getLogger(ProcessService.class);
-  
+
   /** the path to the xslt document */
-  private static final String XSLT_PATH = "/generic_tag.xsl";
-  
-  /**
-   * Performs xslt transformations. 
-   * */
-  @Autowired
-  private XsltTransformUtility xsltTransformer;
+  private static final String XSLT_PATH = "../xslt/process.xsl";
 
   /**
-   * Gateway to ConfigLoaderService 
+   * Gateway to ConfigLoaderService
    * */
   @Autowired
   private ServiceGateway gateway;
@@ -77,17 +71,17 @@ public class ProcessService {
       names.add(p.getProcessName());
     }
     return names;
-  }    
+  }
 
-  
+
   public String generateHtmlResponse(final String processName) throws TransformerException {
 
     String xml = getXml(processName);
-    
+
     String html = null;
 
     try {
-      html = xsltTransformer.performXsltTransformation(xml, true);
+      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH, true);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation.");
       throw new TransformerException("Error while performing xslt transformation.");
@@ -105,14 +99,14 @@ public class ProcessService {
   private String getXml(final String processName) {
 
     String xml = gateway.getTagManager().getProcessXml(processName);
-    
-    if (xml != null) 
+
+    if (xml != null)
       // @see http://issues/browse/TIMS-782
       xml = XsltTransformUtility.removeXmlHeader(xml);
 
-    logger.debug("getXml fetch for process " + processName + ": " 
+    logger.debug("getXml fetch for process " + processName + ": "
         + (xml == null ? "NULL" : "SUCCESS"));
-    
+
     return xml;
   }
 }

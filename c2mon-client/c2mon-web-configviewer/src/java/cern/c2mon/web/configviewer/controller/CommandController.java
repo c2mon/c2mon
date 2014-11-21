@@ -20,7 +20,7 @@ import cern.c2mon.web.configviewer.util.FormUtility;
 
 
 /**
- * A controller for the command viewer 
+ * A controller for the command viewer
  * */
 @Controller
 public class CommandController {
@@ -29,12 +29,12 @@ public class CommandController {
    * A REST-style URL to commandviewer, combined with command id displays command information
    * */
   public static final String COMMAND_URL = "/commandviewer/";
-  
+
   /**
    * URL to commandviewer, that displays command information in RAW XML
    */
   public static final String COMMAND_XML_URL = "/commandviewer/xml";
-  
+
   /**
    * A URL to the commandviewer with input form
    * */
@@ -68,12 +68,12 @@ public class CommandController {
   public String viewCommand(final Model model) {
     logger.info("/commandviewer/");
     return ("redirect:" + "/commandviewer/form");
-  }    
-  
+  }
+
   /**
    * @return
    * Displays command information in RAW XML about a tag with the given id.
-   * 
+   *
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */
@@ -91,7 +91,7 @@ public class CommandController {
   /**
    * @return
    * Displays command information for a given command id.
-   * 
+   *
    * @param id command id
    * @param response we write the html result to that HttpServletResponse response
    * */
@@ -100,7 +100,9 @@ public class CommandController {
     logger.info("/commandviewer/{id} " + id);
     try {
       response.setContentType("text/html; charset=UTF-8");
+      response.getWriter().println(FormUtility.getHeader("../"));
       response.getWriter().println(service.generateHtmlResponse(id));
+      response.getWriter().println(FormUtility.getFooter());
     } catch (TransformerException e) {
       response.getWriter().println(e.getMessage());
       logger.error(e.getMessage());
@@ -113,16 +115,16 @@ public class CommandController {
   /**
    * @return
    * In case of an error this form is shown.
-   * It displays the error and you can also make a new query. 
+   * It displays the error and you can also make a new query.
    * New queries are redirected to COMMAND_URL + id
-   * 
+   *
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */
   @RequestMapping(value = "/commandviewer/errorform/{id}")
   public String viewCommandErrorForm(@PathVariable(value = "id") final String errorId,
       @RequestParam(value = "id", required = false) final String id, final Model model) {
-    
+
     logger.info("/commandviewer/errorform " + id);
 
     if (id == null)
@@ -135,9 +137,9 @@ public class CommandController {
   }
 
   /**
-   * @return 
+   * @return
    * Displays a form where an command id can be entered.
-   * 
+   *
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */
@@ -151,9 +153,9 @@ public class CommandController {
 
   /**
    * @return name of a jsp page which will be displayed
-   * Displays an input form for a command id, and if a POST was made with a command id, 
+   * Displays an input form for a command id, and if a POST was made with a command id,
    * redirects to COMMAND_URL + id.
-   * 
+   *
    * @param id command id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */

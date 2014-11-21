@@ -37,24 +37,24 @@ public class HistoryService {
    * HistoryService logger
    * */
   private static Logger logger = Logger.getLogger(HistoryService.class);
-  
+
   /** Date format used in our trend views */
   private static final String CHART_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
 
   /** the path to the xslt document */
-  private static final String XSLT_PATH = "/history_xslt.xsl";
-  
+  private static final String XSLT_PATH = "../xslt/history.xsl";
+
   /** App base url */
   private static final String BASE_URL = "../";
-  
+
   /** Date format used in History Queries */
   private static final String DATE_FORMAT = "dd/MM/yyyy-HH:mm";
 
   /** Used to retrieve Historical Data */
   private HistoryProvider historyProvider;
-  
+
   public HistoryService() throws HistoryProviderException {
-    
+
     try {
       historyProvider = C2monHistoryGateway.getHistoryManager().
           getHistoryProviderFactory().createHistoryProvider();
@@ -67,19 +67,19 @@ public class HistoryService {
   }
 
   /**
-   * @return XML representation of Tag's History 
-   * 
+   * @return XML representation of Tag's History
+   *
    * @param dataTagId id of the datatag
    * @param numberOfRecords number of records to look back in the history
-   * 
+   *
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
-   * 
+   *
    * @throws Exception if tag was not found or a non-numeric id was requested
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
-  public final String getHistoryXml(final String dataTagId, final int numberOfRecords) 
+  public final String getHistoryXml(final String dataTagId, final int numberOfRecords)
       throws HistoryProviderException, LoadingParameterException  {
 
     final List<HistoryTagValueUpdate> historyValues = requestHistoryData(dataTagId, numberOfRecords);
@@ -87,21 +87,21 @@ public class HistoryService {
     final String trendURL = "?" + TrendViewController.MAX_RECORDS_PARAMETER + "=" + numberOfRecords;
     return toXml(historyValues, dataTagId, description, trendURL);
   }
-  
+
 
   /**
-   * @return XML representation of Tag's History 
-   * 
+   * @return XML representation of Tag's History
+   *
    * @param dataTagId id of the datatag
    * @param numberOfDays number of days to go back in History
-   * 
+   *
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
    * @throws Exception if tag was not found or a non-numeric id was requested
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
-  public final String getHistoryXmlForLastDays(final String dataTagId, final int numberOfDays) 
+  public final String getHistoryXmlForLastDays(final String dataTagId, final int numberOfDays)
       throws HistoryProviderException, LoadingParameterException  {
 
     final List<HistoryTagValueUpdate> historyValues = requestHistoryDataForLastDays(dataTagId,
@@ -110,25 +110,25 @@ public class HistoryService {
     final String trendURL = "?" + TrendViewController.LAST_DAYS_PARAMETER + "=" + numberOfDays;
     return toXml(historyValues, dataTagId, description, trendURL);
   }
-  
+
 
   /**
-   * @return XML representation of Tag's History 
-   * 
+   * @return XML representation of Tag's History
+   *
    * @param dataTagId id of the datatag
-   * 
-   * @param startTime 
+   *
+   * @param startTime
    * @param endTime StartTime -> EndTime = Period of History to return
-   * 
+   *
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
    * @throws Exception if tag was not found or a non-numeric id was requested
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
-  public final String getHistoryXml(final String dataTagId, 
+  public final String getHistoryXml(final String dataTagId,
       final Timestamp startTime,
-      final Timestamp endTime) 
+      final Timestamp endTime)
       throws HistoryProviderException, LoadingParameterException  {
 
     final List<HistoryTagValueUpdate> historyValues = requestHistoryData(dataTagId, startTime, endTime);
@@ -138,22 +138,22 @@ public class HistoryService {
         + "&amp;" + TrendViewController.END_DATE_PARAMETER + "=" + endTime;
     return toXml(historyValues, dataTagId, description, trendURL);
   }
-  
+
 
   /**
-   * @return XML representation of Tag's History 
-   * 
+   * @return XML representation of Tag's History
+   *
    * Same as {@link #getHistoryXml(String, Timestamp, Timestamp)}
    * but startTime and endTime are given as strings (should follow {@link #DATE_FORMAT})
-   * 
+   *
    * */
-  public final String getHistoryXml(final String dataTagId, 
+  public final String getHistoryXml(final String dataTagId,
       final String startTime,
-      final String endTime) 
+      final String endTime)
       throws HistoryProviderException, LoadingParameterException, ParseException  {
 
-    final List<HistoryTagValueUpdate> historyValues = 
-        requestHistoryData(dataTagId, 
+    final List<HistoryTagValueUpdate> historyValues =
+        requestHistoryData(dataTagId,
             stringToTimestamp(startTime),
             stringToTimestamp(endTime));
 
@@ -162,11 +162,11 @@ public class HistoryService {
         + "&amp;" + TrendViewController.END_DATE_PARAMETER + "=" + endTime;
     return toXml(historyValues, dataTagId, description, trendURL);
   }
-  
+
 
   /**
-   * @return CSV representation of Tag's History 
-   * 
+   * @return CSV representation of Tag's History
+   *
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
@@ -175,20 +175,20 @@ public class HistoryService {
 
     return toCSV(historyValues, isBooleanData);
   }
-  
+
   /**
-   * @return CSV representation of Tag's History 
-   * 
+   * @return CSV representation of Tag's History
+   *
    * @param dataTagId id of the datatag
    * @param numberOfRecords number of records to look back in the history
-   * 
+   *
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
    * @throws Exception if tag was not found or a non-numeric id was requested
    *  ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
-  public final String getHistoryCSV(final String dataTagId, final int numberOfRecords) 
+  public final String getHistoryCSV(final String dataTagId, final int numberOfRecords)
       throws HistoryProviderException, LoadingParameterException  {
 
     final List<HistoryTagValueUpdate> historyValues = requestHistoryData(dataTagId, numberOfRecords);
@@ -200,13 +200,13 @@ public class HistoryService {
    * Used to make a request for HistoryData.
    * @param dataTagId The tag id whose history we are looking for
    * @param numberOfRecords number of records to retrieve from history
-   * 
+   *
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
    * @return history as a List of HistoryTagValueUpdates
    */
   public final List<HistoryTagValueUpdate> requestHistoryData(final String dataTagId,
-      final int numberOfRecords) 
+      final int numberOfRecords)
       throws HistoryProviderException, LoadingParameterException {
 
     // other values that can be used //
@@ -243,18 +243,18 @@ public class HistoryService {
     }
     return historyValues;
   }
-  
+
   /**
    * Used to make a request for HistoryData.
    * @param dataTagId The tag id whose history we are looking for
-   * 
+   *
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
    * @return history as a List of HistoryTagValueUpdates
    */
   public final List<HistoryTagValueUpdate> requestHistoryData(final String dataTagId
       , final Timestamp startTime
-      , final Timestamp endTime) 
+      , final Timestamp endTime)
       throws HistoryProviderException, LoadingParameterException {
 
     final long id = Long.parseLong(dataTagId);
@@ -286,16 +286,16 @@ public class HistoryService {
 
   /**
    * Used to make a request for HistoryData.
-   * 
+   *
    * @param dataTagId The tag id whose history we are looking for
    * @param numberOfDays number of days to go back in History
-   * 
+   *
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
    * @return history as a List of HistoryTagValueUpdates
    */
-  public final List<HistoryTagValueUpdate> requestHistoryDataForLastDays(final String dataTagId, 
-      final int numberOfDays) 
+  public final List<HistoryTagValueUpdate> requestHistoryDataForLastDays(final String dataTagId,
+      final int numberOfDays)
       throws HistoryProviderException, LoadingParameterException {
 
     final long id = Long.parseLong(dataTagId);
@@ -323,20 +323,20 @@ public class HistoryService {
     }
     return historyValues;
   }
-  
+
   /**
    * @return History values of the specified TagId in XML format.
-   * 
+   *
    * @param id The TagId whose history we are XML-ing
-   * 
+   *
    * @param historyDescription Description for the history values
    * (for example: Last 100 records)
-   * 
+   *
    * @param trendURL a trend view showing the same historyValues
    */
   public final String toXml(final List<HistoryTagValueUpdate> historyValues, final String id
       , final String historyDescription, final String trendURL) {
-    
+
     // example: <history id="15685" historyDescription="Last 100 records" >
     StringBuffer historyXml = new StringBuffer();
     historyXml.append("<history");
@@ -351,7 +351,7 @@ public class HistoryService {
     historyXml.append("</history>");
     return historyXml.toString();
   }
-  
+
   /**
    * @return True if the list of history values represent Boolean Data, false otherwise.
    * This is useful when creating a Trend View, so that the data is represented in the best way.
@@ -367,24 +367,24 @@ public class HistoryService {
     }
     return false;
   }
-  
+
   /**
    * @return History values of the specified TagId in CSV format.
-   * 
+   *
    * @see http://dygraphs.com/data.html#csv
    */
   public final String toCSV(final List<HistoryTagValueUpdate> historyValues, final boolean isBooleanData) {
-    
+
     StringBuffer historyCSV = new StringBuffer();
     final int size = historyValues.size();
     for (int i = 0; i < size; i++) {
-      
+
       final HistoryTagValueUpdate h = historyValues.get(i);
       HistoryTagValueUpdateImpl q = (HistoryTagValueUpdateImpl) h;
       double value;
-      
+
       historyCSV.append("\"");
-      
+
       try {
         if (isBooleanData) {
           value = getChartCompatibleBooleanValue(q.getValue());
@@ -394,13 +394,13 @@ public class HistoryService {
       } catch (final Exception e) {
         value = 0;
       }
-      
+
       historyCSV.append(
           formatToDygraphCompatibleDate(q.getServerTimestamp())
           + ", " + value);
-      
+
       historyCSV.append("\\n\"");
-      
+
       if (i != size - 1) {
         historyCSV.append(" + ");
       }
@@ -408,59 +408,59 @@ public class HistoryService {
     }
     return historyCSV.toString();
   }
-  
-  
+
+
   /**
    * @return A Date formated to be compatible with the Dygraph chart library.
    * @see http://dygraphs.com/data.html#csv
-   * 
+   *
    * For example: 2009/07/12 12:34:56
-   * 
+   *
    */
   private static String formatToDygraphCompatibleDate(final Timestamp timestamp) {
 
     // 2009/07/12 12:34:56
-    SimpleDateFormat dateFormat = new SimpleDateFormat(CHART_DATE_FORMAT); 
+    SimpleDateFormat dateFormat = new SimpleDateFormat(CHART_DATE_FORMAT);
     dateFormat.setLenient(false);
     String outputDate = null;
-    outputDate = dateFormat.format(timestamp); 
+    outputDate = dateFormat.format(timestamp);
     return outputDate;
   }
-  
+
   /**
    * @return Scans the specified list of history points and returns a list
    * of the invalid ones.
-   * 
+   *
    * @param historyValues A list of history points.
    */
   public Collection<InvalidPoint> getInvalidPoints(final List<HistoryTagValueUpdate> historyValues) {
-    
+
     final Collection<InvalidPoint> invalidPoints = new ArrayList<InvalidPoint>();
-    
+
     final Iterator<HistoryTagValueUpdate> i = historyValues.iterator();
-    
+
     while (i.hasNext()) {
       final HistoryTagValueUpdate h = i.next();
       if (!h.getDataTagQuality().isValid()) {
-        
+
         final String time = formatToDygraphCompatibleDate(h.getServerTimestamp());
         final String invalidationReason = h.getDataTagQuality().getDescription();
-        
+
         invalidPoints.add(new InvalidPoint(time, invalidationReason));
       }
     }
     return invalidPoints;
   }
-  
+
 
   /**
-   * @return Boolean values should be replaced with 0 or 1 
+   * @return Boolean values should be replaced with 0 or 1
    * to be represented in the chart.
-   * 
+   *
    * @param booleanValue The boolean value (as String).
    */
   private double getChartCompatibleBooleanValue(final Object booleanValue) {
-    
+
     if (booleanValue.toString().equals("true")) {
       return 1;
     }
@@ -468,18 +468,18 @@ public class HistoryService {
       return 0;
     }
   }
-  
-  
+
+
   /**
    * @return history in html format
-   * 
+   *
    * @param xml History in xml format
-   * 
+   *
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
    */
-  public final String generateHtmlResponse(final String xml) 
-    throws TagIdException, TransformerException, 
+  public final String generateHtmlResponse(final String xml)
+    throws TagIdException, TransformerException,
       HistoryProviderException, LoadingParameterException {
 
     String html = null;
@@ -491,8 +491,8 @@ public class HistoryService {
       throw new TransformerException("Error while performing xslt transformation.");
     }
     return html;
-  }  
-  
+  }
+
   /**
    * Used to make a request for HistoryData.
    * @param dataTagId The tag id whose history we are looking for
@@ -501,8 +501,8 @@ public class HistoryService {
    * @throws HistoryProviderException in case a HistoryProvider cannot be created
    * @throws LoadingParameterException in case of an invalid configurations
    */
-  public final String generateHtmlResponse(final String dataTagId, final int numberOfRecords) 
-    throws TagIdException, TransformerException, 
+  public final String generateHtmlResponse(final String dataTagId, final int numberOfRecords)
+    throws TagIdException, TransformerException,
       HistoryProviderException, LoadingParameterException {
 
     final String xml = getHistoryXml(dataTagId, numberOfRecords);
@@ -516,18 +516,18 @@ public class HistoryService {
       throw new TransformerException("Error while performing xslt transformation.");
     }
     return html;
-  }  
+  }
 
   /**
    * @return Converts a string to Timestamp
-   * 
+   *
    * @param dateString
    * should represent a Date in the following format: {@link TrendViewController#DATE_FORMAT}
-   * 
+   *
    * @throws ParseException in case of wrong Date Format
    */
   public static Timestamp stringToTimestamp(final String dateString) throws ParseException {
-    
+
     DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
     dateFormat.setLenient(false);
     java.util.Date date = dateFormat.parse(dateString);

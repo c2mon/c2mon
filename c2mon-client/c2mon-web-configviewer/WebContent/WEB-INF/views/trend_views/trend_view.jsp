@@ -12,14 +12,11 @@
 <script type="text/javascript" src="../js/dygraph-combined.js"></script>
 
 <link rel="shortcut icon" href="../img/chart_icon.png">
-<link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
-<link rel="stylesheet" type="text/css" href="../css/bootstrap-responsive.css" />
-<link rel="stylesheet" type="text/css" href="../css/c2mon.css" />
-<link rel="stylesheet" type="text/css" href="../css/buttons.css" />
+<link rel="stylesheet" type="text/css" href="../css/bootstrap/bootstrap.css" />
 <link rel="stylesheet" type="text/css" href="../css/trend-view.css" />
 
-<script type="text/javascript" src="../js/jquery-1.7.min.js"></script>
-<script type="text/javascript" src="../js/bootstrap.js"></script>
+<script type="text/javascript" src="../js/jquery/jquery.js"></script>
+<script type="text/javascript" src="../js/bootstrap/bootstrap.js"></script>
 
 <script type="text/javascript" src="../js/hide-menu.js"></script>
 <script type="text/javascript" src="../js/trend-view.js"></script>

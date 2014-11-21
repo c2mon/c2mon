@@ -1,8 +1,6 @@
 package cern.c2mon.web.configviewer.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerException;
@@ -21,7 +19,7 @@ import cern.c2mon.web.configviewer.service.TagIdException;
 import cern.c2mon.web.configviewer.util.FormUtility;
 
 /**
- * A controller for the alarm viewer 
+ * A controller for the alarm viewer
  **/
 @Controller
 public class AlarmController {
@@ -75,11 +73,11 @@ public class AlarmController {
   public String viewAlarm(final Model model) {
     logger.info("/alarmviewer/");
     return ("redirect:" + "/alarmviewer/form");
-  }    
+  }
 
   /**
    * @return Displays alarm information in RAW XML about a tag with the given id.
-   * 
+   *
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */
@@ -95,9 +93,9 @@ public class AlarmController {
   }
 
   /**
-   * @return 
+   * @return
    * Displays alarm information for a given alarm id.
-   * 
+   *
    * @param id alarm id
    * @param response we write the html result to that HttpServletResponse response
    * */
@@ -107,7 +105,9 @@ public class AlarmController {
 
     try {
       response.setContentType("text/html; charset=UTF-8");
+      response.getWriter().println(FormUtility.getHeader("../"));
       response.getWriter().println(service.generateHtmlResponse(id));
+      response.getWriter().println(FormUtility.getFooter());
       return null;
     } catch (TransformerException e) {
       response.getWriter().println(e.getMessage());
@@ -121,7 +121,7 @@ public class AlarmController {
   /**
    * @return
    * Displays a form where an alarm id can be entered.
-   * 
+   *
    * @param id alarm id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */
@@ -135,16 +135,16 @@ public class AlarmController {
   /**
    * @return In case of an error this form is shown.
    * It displays the error and you can also make a new query.
-   * 
+   *
    * New queries are simply redirected to ALARM_URL + id
-   * 
+   *
    * @param id tag id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */
   @RequestMapping(value = "/alarmviewer/errorform/{id}")
   public String viewAlarmErrorForm(@PathVariable(value = "id") final String errorId,
       @RequestParam(value = "id", required = false) final String id, final Model model) {
-    
+
     logger.info("/alarmviewer/errorform " + id);
 
     if (id == null)
@@ -158,9 +158,9 @@ public class AlarmController {
 
   /**
    * @return
-   * Displays an input form for an alarm id, 
+   * Displays an input form for an alarm id,
    * and if a POST was made with an alarm id, it is simply redirected to ALARM_URL + id
-   * 
+   *
    * @param id alarm id
    * @param model Spring MVC Model instance to be filled in before jsp processes it
    * */

@@ -125,7 +125,9 @@ public class ConfigLoaderController {
 
     try {
       response.setContentType("text/html; charset=UTF-8");
+      response.getWriter().println(FormUtility.getHeader("../../.."));
       response.getWriter().println(service.generateHtmlResponse(id));
+      response.getWriter().println(FormUtility.getFooter());
     } catch (TransformerException e) {
       response.setStatus(400);
       response.getWriter().println(e.getMessage());
@@ -154,7 +156,9 @@ public class ConfigLoaderController {
 
     try {
       response.setContentType("text/html; charset=UTF-8");
+      response.getWriter().println(FormUtility.getHeader("../../.."));
       response.getWriter().println(service.getStoredConfigurationReportHtml(id));
+      response.getWriter().println(FormUtility.getFooter());
 
     } catch (TagIdException e) {
       return ("redirect:" + "/configloader/errorform/" + id);

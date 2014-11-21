@@ -34,12 +34,6 @@ public class ConfigLoaderService {
   private ServiceGateway gateway;
 
   /**
-   * Performs xslt transformations.
-   * */
-  @Autowired
-  private XsltTransformUtility xsltTransformer;
-
-  /**
    * Stores the ProgressReports.
    **/
   private HashMap<String, ReportHandler> progressReports = new HashMap<String, ReportHandler>();
@@ -50,7 +44,7 @@ public class ConfigLoaderService {
   private HashMap<String, ConfigurationReport> finalReports = new HashMap<String, ConfigurationReport>();
 
   /** the path to the xslt document */
-  private static final String XSLT_PATH = "/generic_tag.xsl";
+  private static final String XSLT_PATH = "../xslt/config_report.xsl";
 
   /**
    * Gets the XML representation of the ConfigurationReport
@@ -102,7 +96,7 @@ public class ConfigLoaderService {
     String html = null;
 
     try {
-      html = xsltTransformer.performXsltTransformation(xml);
+      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation." + e.getMessage());
       throw new TransformerException("Error while performing xslt transformation." + e.getMessage());

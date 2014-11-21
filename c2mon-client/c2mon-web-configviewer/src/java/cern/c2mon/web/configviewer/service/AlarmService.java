@@ -27,29 +27,23 @@ public class AlarmService {
   private static Logger logger = Logger.getLogger(AlarmService.class);
 
   /** the path to the xslt document */
-  private static final String XSLT_PATH = "/generic_tag.xsl";
+  private static final String XSLT_PATH = "../xslt/alarm.xsl";
 
   /**
-   * Gateway to C2monService 
+   * Gateway to C2monService
    * */
   @Autowired
   private ServiceGateway gateway;
-  
-  /**
-   * Performs xslt transformations. 
-   * */
-  @Autowired
-  private XsltTransformUtility xsltTransformer;
 
   /**
    * Gets the XML representation of the current value and configuration of an alarm
    * @param alarmId id of the alarm
-   * @return XML representation of alarm value and configuration 
+   * @return XML representation of alarm value and configuration
    * @throws TagIdException if alarm was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
   public String getAlarmTagXml(final String alarmId) throws TagIdException {
-    try { 
+    try {
       AlarmValueImpl alarm = (AlarmValueImpl) getAlarmValue(Long.parseLong(alarmId));
       if (alarm != null)
         return alarm.getXml();
@@ -60,12 +54,12 @@ public class AlarmService {
     }
   }
 
-  public String generateHtmlResponse(final String alarmId) 
+  public String generateHtmlResponse(final String alarmId)
     throws TagIdException, TransformerException {
 
     String xml = null;
 
-    try { 
+    try {
       AlarmValueImpl alarm = (AlarmValueImpl) getAlarmValue(Long.parseLong(alarmId));
       if (alarm != null)
         xml = alarm.getXml();
@@ -78,7 +72,7 @@ public class AlarmService {
     String html = null;
 
     try {
-      html = xsltTransformer.performXsltTransformation(xml);
+      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation.");
       throw new TransformerException("Error while performing xslt transformation.");
@@ -96,12 +90,12 @@ public class AlarmService {
     AlarmValue av = null;
     List<Long> alarmIds = new ArrayList<Long>();
     alarmIds.add(alarmId);
-    Collection<AlarmValue> alarms = gateway.getTagManager().getAlarms(alarmIds); 
+    Collection<AlarmValue> alarms = gateway.getTagManager().getAlarms(alarmIds);
     //tagManager.getAlarms(alarmIds);
     Iterator<AlarmValue> it = alarms.iterator();
     if (it.hasNext()) {
       av = it.next();
-    } 
+    }
     logger.debug("Alarm fetch for alarm " + alarmId + ": " + (av == null ? "NULL" : "SUCCESS"));
     return av;
   }

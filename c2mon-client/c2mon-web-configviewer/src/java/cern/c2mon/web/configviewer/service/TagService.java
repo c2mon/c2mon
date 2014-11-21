@@ -31,16 +31,16 @@ public class TagService {
    * TagService logger
    * */
   private static Logger logger = Logger.getLogger(TagService.class);
-  
+
   /** the path to the xslt document */
-  private static final String XSLT_PATH = "/datatag_xslt.xsl";
+  private static final String XSLT_PATH = "../xslt/datatag.xsl";
 
   /**
-   * Gateway to C2monService 
+   * Gateway to C2monService
    * */
   @Autowired
   private ServiceGateway gateway;
-  
+
   public boolean subscribeTag(final long tagId, DataTagUpdateListener listener) {
     Set<Long> set = new HashSet<Long>(1);
     set.add(tagId);
@@ -50,7 +50,7 @@ public class TagService {
   /**
    * Gets the XML representation of the current value of datatag
    * @param dataTagId id of the datatag
-   * @return XML datatag value representation 
+   * @return XML datatag value representation
    * @throws TagIdException if the datatag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
@@ -69,7 +69,7 @@ public class TagService {
   /**
    * Gets the XML representation of the datatag configuration
    * @param tagId id of the datatag
-   * @return XML datatag config representation 
+   * @return XML datatag config representation
    * @throws TagIdException if the datatag was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
@@ -85,7 +85,7 @@ public class TagService {
       throw new TagIdException("Invalid datatag id");
     }
   }
-  
+
   public String generateDataTagConfigHtmlResponse(final String tagId) throws TransformerException, TagIdException {
 
     String html = null;
@@ -100,7 +100,7 @@ public class TagService {
 
     return html;
   }
-  
+
   public String generateDataTagValueHtmlResponse(final String tagId) throws TransformerException, TagIdException {
 
     String html = null;
@@ -119,7 +119,7 @@ public class TagService {
   /**
    * Retrieves a tagConfig object from the service gateway tagManager
    * @param tagId id of the datatag
-   * @return tag configuration 
+   * @return tag configuration
    * */
   private TagConfig getTagConfig(final long tagId) {
     TagConfig tc = null;
@@ -137,17 +137,17 @@ public class TagService {
   /**
    * Retrieves a tagValue object from the service gateway tagManager
    * @param dataTagId id of the datatag
-   * @return tag value 
+   * @return tag value
    * */
   public ClientDataTagValue getDataTagValue(final long dataTagId) {
     ClientDataTagValue dt = null;
     List<Long> tagIds = new ArrayList<Long>();
     tagIds.add(dataTagId);
-    Collection<ClientDataTagValue> dataTags = gateway.getTagManager().getDataTags(tagIds); 
+    Collection<ClientDataTagValue> dataTags = gateway.getTagManager().getDataTags(tagIds);
     Iterator<ClientDataTagValue> it = dataTags.iterator();
     if (it.hasNext()) {
       dt = it.next();
-    } 
+    }
     logger.debug("Datatag value fetch for tag " + dataTagId + ": " + (dt == null ? "NULL" : "SUCCESS"));
     return dt;
   }

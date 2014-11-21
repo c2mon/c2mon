@@ -22,31 +22,25 @@ public class CommandService {
   private static Logger logger = Logger.getLogger(CommandService.class);
 
   /** the path to the xslt document */
-  private static final String XSLT_PATH = "/generic_tag.xsl";
+  private static final String XSLT_PATH = "../xslt/commandtag.xsl";
 
   /**
-   * Gateway to C2monService 
+   * Gateway to C2monService
    * */
   @Autowired
   private ServiceGateway gateway;
-  
-  /**
-   * Performs xslt transformations. 
-   * */
-  @Autowired
-  private XsltTransformUtility xsltTransformer;
 
   /**
    * Gets the XML representation of the configuration of a command
    * @param commandId id of the command
-   * @return XML representation of command configuration 
+   * @return XML representation of command configuration
    * @throws TagIdException if command was not found or a non-numeric id was requested ({@link TagIdException}), or any other exception
    * thrown by the underlying service gateway.
    * */
   public String getCommandTagXml(final String commandId) throws TagIdException {
     try {
       ClientCommandTagImpl command = (ClientCommandTagImpl) getCommandTag(Long.parseLong(commandId));
-      if (command.isExistingCommand()) 
+      if (command.isExistingCommand())
         return command.getXml();
       else
         throw new TagIdException("No command found");
@@ -55,14 +49,14 @@ public class CommandService {
     }
   }
 
-  public String generateHtmlResponse(final String commandId) 
+  public String generateHtmlResponse(final String commandId)
     throws TagIdException, TransformerException {
 
     String xml = null;
 
     try {
       ClientCommandTagImpl command = (ClientCommandTagImpl) getCommandTag(Long.parseLong(commandId));
-      if (command.isExistingCommand()) 
+      if (command.isExistingCommand())
         xml = command.getXml();
       else
         throw new TagIdException("No command found");
@@ -73,7 +67,7 @@ public class CommandService {
     String html = null;
 
     try {
-      html = xsltTransformer.performXsltTransformation(xml);
+      html = XsltTransformUtility.performXsltTransformation(xml, XSLT_PATH);
     } catch (TransformerException e) {
       logger.error("Error while performing xslt transformation.");
       throw new TransformerException("Error while performing xslt transformation.");
@@ -88,7 +82,7 @@ public class CommandService {
    * @return command tag
    * */
   private ClientCommandTag<Object> getCommandTag(final long commandId) {
-    ClientCommandTag<Object> ct = gateway.getCommandManager().getCommandTag(commandId); 
+    ClientCommandTag<Object> ct = gateway.getCommandManager().getCommandTag(commandId);
     logger.debug("Command fetch for command " + commandId + ": " + (ct == null ? "NULL" : "SUCCESS"));
     return ct;
   }
