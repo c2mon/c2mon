@@ -420,7 +420,7 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   @Override
   public void confirmSubEquipmentStateIncorrect(Long commFaultTagId, String description) {
     for (SubEquipmentConfiguration subEquipmentConfiguration : equipmentConfiguration.getSubEquipmentConfigurations().values()) {
-      if (subEquipmentConfiguration.getCommFaultTagId() == commFaultTagId) {
+      if (subEquipmentConfiguration.getCommFaultTagId().equals(commFaultTagId)) {
         sendCommfaultTag(commFaultTagId, subEquipmentConfiguration.getCommFaultTagValue(), description);
       }
     }
@@ -481,8 +481,8 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   @Override
   public void confirmSubEquipmentStateOK(Long commFaultTagId, String description) {
     for (SubEquipmentConfiguration subEquipmentConfiguration : equipmentConfiguration.getSubEquipmentConfigurations().values()) {
-      if (subEquipmentConfiguration.getCommFaultTagId() == commFaultTagId) {
-        sendCommfaultTag(commFaultTagId, subEquipmentConfiguration.getCommFaultTagValue(), description);
+      if (subEquipmentConfiguration.getCommFaultTagId().equals(commFaultTagId)) {
+        sendCommfaultTag(commFaultTagId, !subEquipmentConfiguration.getCommFaultTagValue(), description);
       }
     }
   }
