@@ -53,8 +53,6 @@ public class EquipmentAliveTimer extends Timer {
   public EquipmentAliveTimer(final EquipmentMessageHandler pEquipmentMessageHandler) {
     logger = Logger.getLogger(EquipmentAliveTimer.class);
     this.equipmentMessageHandler = pEquipmentMessageHandler;
-    // start the timer as a 'daemon'
-    equipmentAliveTimer = new Timer("EquipmentAliveTimer");
   }
 
   /**
@@ -63,6 +61,7 @@ public class EquipmentAliveTimer extends Timer {
    * @param interval the time between ticks (in milliseconds)
    */
   public final void scheduleEquipmentAliveTimer(final long interval) {
+    equipmentAliveTimer = new Timer("EquipmentAliveTimer");
     equipmentAliveTimer.schedule(new SendAliveTask(), INITIAL_DELAY, interval);
   }
 
@@ -83,9 +82,9 @@ public class EquipmentAliveTimer extends Timer {
    * This method is used for timer's termination
    */
   public final void terminateEquipmentAliveTimer() {
-    for (Timer timer : subEquipmentAliveTimers.values()) {
-      timer.cancel();
-    }
+//    for (Timer timer : subEquipmentAliveTimers.values()) {
+//      timer.cancel();
+//    }
     equipmentAliveTimer.cancel();
   }
 
