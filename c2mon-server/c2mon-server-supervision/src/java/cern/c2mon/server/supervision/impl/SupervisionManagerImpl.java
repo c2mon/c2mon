@@ -477,10 +477,26 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         } else {
           if (aliveTimer.isEquipmentAliveType()) {
             Long equipmentId = aliveTimer.getRelatedId();
-            onEquipmentDown(equipmentId, new Timestamp(System.currentTimeMillis()), msg.toString());
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            onEquipmentDown(equipmentId, timestamp, msg.toString());
+
+            // Manually set the CommFaultTag (TIMS-972)
+            setCommFaultTag(equipmentCache.get(equipmentId).getCommFaultTagId(), false, msg.toString(), timestamp);
+
+            // Bring down all SubEquipments
+            for (Long subEquipmentId : equipmentCache.get(equipmentId).getSubEquipmentIds()) {
+              String message = "Alive timer for parent Equipment expired: " + msg.toString();
+              onSubEquipmentDown(subEquipmentId, timestamp, message);
+              setCommFaultTag(subEquipmentCache.get(subEquipmentId).getCommFaultTagId(), false, message, timestamp);
+            }
+
           } else {
             Long subEquipmentId = aliveTimer.getRelatedId();
-            onSubEquipmentDown(subEquipmentId, new Timestamp(System.currentTimeMillis()), msg.toString());
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            onSubEquipmentDown(subEquipmentId, timestamp, msg.toString());
+
+            // Manually set the CommFaultTag (TIMS-972)
+            setCommFaultTag(subEquipmentCache.get(subEquipmentId).getCommFaultTagId(), false, msg.toString(), timestamp);
           }
         }
       } catch (CacheElementNotFoundException cacheEx) {
@@ -490,6 +506,24 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       } catch (IllegalArgumentException argEx) {
         LOGGER.error("IllegalArgument exception caught on Aliver Timer expiration", argEx);
       }
+    }
+  }
+
+  /**
+   * Manually set the value of a CommFaultTag. Used to update a CommFaultTag
+   * when an AliveTimer expires, in order to keep the two tags consistent with
+   * each other.
+   *
+   * @param commFaultTagId the ID of the tag to set
+   * @param value the value of the tag
+   * @param message the value description to set for the tag
+   */
+  private void setCommFaultTag(final Long commFaultTagId, final boolean value, final String message, final Timestamp timestamp) {
+    try {
+      controlTagFacade.updateAndValidate(commFaultTagId, value, message, timestamp);
+
+    } catch (CacheElementNotFoundException e) {
+      LOGGER.error("Could not locate CommFaultTag (id: " + commFaultTagId + ") in cache");
     }
   }
 
@@ -522,10 +556,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     } else {
       try {
         controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.DOWN.toString(), message, timestamp);
-        //invalidate all control tags of the equipment and associated sub-equipment (except equipment state)
-        //setAbstractEquipmentControlQuality(equipment, message, timestamp, false, true, true, DataTagQuality.EQUIPMENT_DOWN + DataTagQuality.INACCESSIBLE, 0);
-        //setEquipmentSubEquipmentControlQuality(equipment, message, timestamp, true, true, true, DataTagQuality.EQUIPMENT_DOWN + DataTagQuality.INACCESSIBLE, 0);
-        //invalidateEquipment(equipment, message, timestamp, false, process);
+
       } catch (CacheElementNotFoundException cacheEx) {
         LOGGER.error("Could not locate state tag (Id is " + stateTagId + ") in cache for equipment " + equipmentCopy.getId());
       }
@@ -554,10 +585,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     } else {
       try {
         controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.DOWN.toString(), message, timestamp);
-        //invalidate all control tags of the equipment and associated sub-equipment (except equipment state)
-        //setAbstractEquipmentControlQuality(equipment, message, timestamp, false, true, true, DataTagQuality.EQUIPMENT_DOWN + DataTagQuality.INACCESSIBLE, 0);
-        //setEquipmentSubEquipmentControlQuality(equipment, message, timestamp, true, true, true, DataTagQuality.EQUIPMENT_DOWN + DataTagQuality.INACCESSIBLE, 0);
-        //invalidateEquipment(equipment, message, timestamp, false, process);
+
       } catch (CacheElementNotFoundException cacheEx) {
         LOGGER.error("Could not locate state tag (Id is " + stateTagId + ") in cache for subequipment " + subEquipmentCopy.getId());
       }
@@ -714,7 +742,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             StringBuffer str = new StringBuffer("Communication fault tag indicates that subequipment ");
             str.append(commFaultTagCopy.getEquipmentName());
             str.append(" is down.");
-            valueDescription = str.toString();
+
             if (!valueDescription.equalsIgnoreCase("")) {
               str.append(" Reason: " + valueDescription);
             }
@@ -838,6 +866,9 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
+
+        setCommFaultTag(equipmentCache.get(pId).getCommFaultTagId(), true, pMessage, pTimestamp);
+
       } catch (CacheElementNotFoundException controlCacheEx) {
         LOGGER.error("Unable to locate equipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
       } finally {
@@ -888,6 +919,9 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         if (stateTag.getValue() == null  || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
+
+        setCommFaultTag(subEquipmentCache.get(pId).getCommFaultTagId(), true, pMessage, pTimestamp);
+
       } catch (CacheElementNotFoundException controlCacheEx) {
         LOGGER.error("Unable to locate subequipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
       } finally {
