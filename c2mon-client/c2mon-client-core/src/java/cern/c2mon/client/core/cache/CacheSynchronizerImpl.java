@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 
 import javax.annotation.PostConstruct;
@@ -150,7 +152,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
     supervisionManager.refreshSupervisionStatus();
     synchronized (refreshLiveCacheSyncLock) {
       synchronizeCache(tagIds);
-    } // end synchronized block
+    }
   }
 
 
@@ -165,7 +167,6 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
           historyCacheUpdateList.add(tagId);
         }
       }
-      synchronizeCache(tagIds);
     }
   }
 
@@ -225,35 +226,6 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   }
 
   /**
-   * This inner method gets called whenever a live tag is added to the cache
-   * or when a refresh is triggered. it handles the the live tag registration
-   * to the <code>JmsProxy</code> and the <code>SupervisionManager</code>.
-   * @param liveTag The live tag
-   * @return <code>true</code>, if the tag had to be registered to the jms proxy.
-   *         In case he was already registered the method will return <code>false</code>.
-   * @throws JMSException In case of problems while registering the the tag for live updates.
-   */
-  private boolean handleLiveTagRegistration(final ClientDataTagImpl liveTag) throws JMSException {
-    final DataTagQuality tagQuality = liveTag.getDataTagQuality();
-
-    if (tagQuality.isExistingTag()) {
-      supervisionManager.addSupervisionListener(liveTag, liveTag.getProcessIds(), liveTag.getEquipmentIds(), liveTag.getSubEquipmentIds());
-      if (!jmsProxy.isRegisteredListener(liveTag)) {
-        jmsProxy.registerUpdateListener(liveTag, liveTag);
-        return true;
-      }
-    }
-    else {
-      supervisionManager.removeSupervisionListener(liveTag);
-      if (jmsProxy.isRegisteredListener(liveTag)) {
-        jmsProxy.unregisterUpdateListener(liveTag);
-      }
-    }
-
-    return false;
-  }
-
-  /**
    * Inner method which synchronizes the live cache with the C2MON server
    * @param pTagIds Set of tag id's that shall be refreshed. If the parameter
    *        is <code>null</code>, the entire cache is updated.
@@ -264,31 +236,26 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
     try {
       if (!liveCache.isEmpty()) {
         final Set<Long> unsynchronizedTagIds;
+
         if (pTagIds == null || jmsConnectionDown || heartbeatExpired) {
           // Refresh entire cache
           unsynchronizedTagIds = new HashSet<Long>(liveCache.keySet());
-        }
-        else {
+        } else {
           unsynchronizedTagIds = new HashSet<Long>(pTagIds);
         }
+
         LOG.info("synchronizeCache() - Synchronizing " + unsynchronizedTagIds.size() + " live cache entries with the server.");
 
-
-        // Map that keeps a reference to all newly registered tags which values have
-        // to be synchronized with a second server call.
-        Map<Long, ClientDataTag> newKnownTags = new Hashtable<Long, ClientDataTag>();
-        Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(unsynchronizedTagIds);
+        // Get and update the initial tags
+        final Collection<TagUpdate> tagUpdates = clientRequestHandler.requestTags(unsynchronizedTagIds);
         for (TagUpdate tagUpdate : tagUpdates) {
           try {
             ClientDataTagImpl liveTag = liveCache.get(tagUpdate.getId());
             liveTag.update(tagUpdate);
-            if (handleLiveTagRegistration(liveTag)) {
-              newKnownTags.put(liveTag.getId(), liveTag);
-            }
+
             // remove it from the list
             unsynchronizedTagIds.remove(tagUpdate.getId());
-          }
-          catch (RuleFormatException e) {
+          } catch (RuleFormatException e) {
             LOG.error("synchronizeCache() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
             throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
           }
@@ -302,8 +269,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
             if (jmsProxy.isRegisteredListener(liveTag)) {
               try {
                 jmsProxy.unregisterUpdateListener(liveTag);
-              }
-              catch (Exception e) {
+              } catch (Exception e) {
                 LOG.warn("synchronizeCache() - Could not unregister tag " + tagId + " from JmsProxy. Reason: " + e.getMessage());
               }
             }
@@ -314,18 +280,113 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
             liveCache.put(tagId, unkownTag);
           }
         }
-
-        synchronizeCacheValues(newKnownTags);
       }
 
-      // Checks, if there are tags which needs to be synchronized with the history cache.
-      synchronizeHistoryCache();
       // Reset JMS and Heartbeat problem flags
       jmsConnectionDown = false;
       heartbeatExpired = false;
-    }
-    catch (Exception e) {
+
+    } catch (Exception e) {
       throw new CacheSynchronizationException("Could not refresh tags in the live cache.", e);
+    }
+  }
+
+  /**
+   * Subscribes to the tag value update topic and requests the values once again,
+   * in a separate thread.
+   *
+   * @param tagIds the set of tag IDs to be subscribed to
+   */
+  @Override
+  public void subscribeTags(Set<Long> tagIds) {
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+    executorService.execute(new AsyncTagSubscriptionTask(tagIds));
+  }
+
+  /**
+   * This inner class is responsible for asynchronously subscribing to the JMS
+   * proxy and synchronising the values for a set of tags.
+   *
+   * @author Justin Lewis Salmon
+   */
+  class AsyncTagSubscriptionTask implements Runnable {
+
+    /**
+     * The set of tag IDs to be subscribed to.
+     */
+    final Set<Long> tagIds;
+
+    /**
+     * Constructor.
+     *
+     * @param tagIds set of tag IDs to be subscribed to.
+     */
+    public AsyncTagSubscriptionTask(Set<Long> tagIds) {
+      this.tagIds = tagIds;
+    }
+
+    @Override
+    public void run() {
+      LOG.info("Subscribing to and synchronizing values for " + tagIds.size() + " tags");
+
+      // Keep a reference to all newly registered tags whose values have to be
+      // synchronised with a second server call.
+      Map<Long, ClientDataTag> newKnownTags = new Hashtable<Long, ClientDataTag>();
+      try {
+        LOG.info("Subscribing to tag value update topic");
+
+        for (Long tagId : tagIds) {
+          ClientDataTagImpl liveTag = liveCache.get(tagId);
+
+          // Subscribe to the value update topic of the tag
+          if (handleLiveTagRegistration(liveTag)) {
+            newKnownTags.put(liveTag.getId(), liveTag);
+          }
+        }
+
+        // Perform once again a tag request in order to assure that no
+        // update has been missed whilst subscribing to the topic
+        LOG.info("Synchronizing cache values after update topic registration");
+        synchronizeCacheValues(newKnownTags);
+
+        // Checks, if there are tags which needs to be synchronized with
+        // the history cache.
+        synchronizeHistoryCache();
+
+      } catch (JMSException e) {
+        throw new CacheSynchronizationException("Could not refresh tags in the live cache.", e);
+      }
+    }
+
+    /**
+     * This inner method gets called whenever a live tag is added to the cache
+     * or when a refresh is triggered. it handles the the live tag registration
+     * to the <code>JmsProxy</code> and the <code>SupervisionManager</code>.
+     *
+     * @param liveTag The live tag
+     * @return <code>true</code>, if the tag had to be registered to the jms
+     *         proxy. In case he was already registered the method will return
+     *         <code>false</code>.
+     * @throws JMSException in case of problems while registering the the tag
+     *           for live updates.
+     */
+    private boolean handleLiveTagRegistration(final ClientDataTagImpl liveTag) throws JMSException {
+      final DataTagQuality tagQuality = liveTag.getDataTagQuality();
+
+      if (tagQuality.isExistingTag()) {
+        supervisionManager.addSupervisionListener(liveTag, liveTag.getProcessIds(), liveTag.getEquipmentIds(), liveTag.getSubEquipmentIds());
+        if (!jmsProxy.isRegisteredListener(liveTag)) {
+          jmsProxy.registerUpdateListener(liveTag, liveTag);
+          return true;
+        }
+      } else {
+        supervisionManager.removeSupervisionListener(liveTag);
+        if (jmsProxy.isRegisteredListener(liveTag)) {
+          jmsProxy.unregisterUpdateListener(liveTag);
+        }
+      }
+
+      return false;
     }
   }
 
@@ -344,7 +405,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         if (newTag.getServerTimestamp() == null || newTag.getServerTimestamp().before(tagValueUpdate.getServerTimestamp())) {
           newTag.update(tagValueUpdate);
         }
-      } // end for loop
+      }
     }
   }
 

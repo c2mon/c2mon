@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2004 - 2011 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 package cern.c2mon.client.core.cache;
@@ -39,12 +39,8 @@ interface CacheSynchronizer {
    * {@link ClientDataTagCache#addDataTagUpdateListener(Set, DataTagUpdateListener)}
    * method to create new tags in the cache.
    * This method is called before adding the {@link DataTagUpdateListener} references
-   * to the <code>ClientDataTag</code>. 
-   * <p>
-   * Please note that this method handles also the subscription of the
-   * <code>ClientDataTag</code> to the <code>JmsProxy</code> and
-   * <code>SupervisionManager</code>.
-   * 
+   * to the <code>ClientDataTag</code>.
+   *
    * @param tagIds The ids of the <code>ClientDataTag</code> objects that shall be
    *                      added to the cache.
    * @see ClientDataTagCache#addDataTagUpdateListener(Set, DataTagUpdateListener)
@@ -52,20 +48,27 @@ interface CacheSynchronizer {
    *         the C2MON server during the tag creation.
    */
   void createTags(final Set<Long> tagIds) throws CacheSynchronizationException;
-  
-  
-  /** 
+
+  /**
+   * This method handles the subscription of the <code>ClientDataTag</code> to
+   * the <code>JmsProxy</code> and <code>SupervisionManager</code>.
+   *
+   * @param tagIds The ids of the <code>ClientDataTag</code> objects that shall
+   *          be subscribed to.
+   */
+  void subscribeTags(final Set<Long> tagIds);
+
+  /**
    * Removes all <code>ClientDataTag</code> references
    * with the given id from the cache. At the same time it unsubscribes the
    * live tags from the <code>JmsProxy</code> where they were formerly
    * registered as <code>ServerUpdateListener</code> by the <code>TagManager</code>.
-   * 
+   *
    * @param tagIds list of <code>ClientDataTag</code> id's
    * @throws NullPointerException When the parameter is <code>null</code>
    */
   void removeTags(Set<Long> tagIds);
 
-  
   /**
    * Synchronizes the live cache with the C2MON server. At the same time the
    * supervision status cache is also refreshed.
