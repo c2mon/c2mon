@@ -40,6 +40,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  *  -Dc2mon.home                  - home directory of the server (used for conf & log location ...)         REQUIRED
  *  -Dc2mon.properties.location   - location of the c2mon.properties file                                   OPTIONAL
  *                                  (optional - default is .c2mon.properties in the user home directory)  
+ *  -DtestMode                    - starts the Server in test mode. Accept all incoming updates no matter   OPTIONAL
+ *                                  the PIK and allows normal startup of test DAQs ignoring production 
+ *                                  DAQs updates (true/false)
  *  
  *  The c2mon.home directory must have a "conf" subdirectory containing the following files:
  *    c2mon-modules.xml           - list of modules the server should run
@@ -47,7 +50,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  *    
  *  !You will also need to include the correct SQL driver dependency in the your final project! (server deploy module)
  *  
- * @author Mark Brightwell
+ * @author Mark Brightwell, Nacho Vilches
  *
  */
 public final class ServerStartup {
@@ -90,6 +93,11 @@ public final class ServerStartup {
       System.setProperty("c2mon.properties.location", System.getProperty("user.home") + "/.c2mon.properties");
     }
     logger.info("Using c2mon.properties file at: " + System.getProperty("c2mon.properties.location"));
+    
+    // Test Mode
+    if ((System.getProperty("testMode")) != null && (System.getProperty("testMode").equals("true"))) {
+      logger.info("The Server is starting in TEST mode");
+    }
     
     //by default run in single-server mode
     List<String> cacheModeModules;
