@@ -197,7 +197,14 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     processCache.acquireWriteLockOnKey(processId);
     try {
       process = processCache.get(processId);
-      start(process, pHostName, pStartupTime);
+      
+      if (isTestMode()) {
+        // If the TEST Mode is on
+        startLocal(process, pHostName, pStartupTime);
+      } else {
+        // If the TEST Mode is off
+        start(process, pHostName, pStartupTime);
+      }
       processCache.put(processId, process);
     } finally {
       processCache.releaseWriteLockOnKey(processId);
@@ -234,6 +241,37 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
           + processCacheObject.getName() + "." + newPIK.toString());
       super.start(processCacheObject, pStartupTime);
     }
+  }
+  
+  /**
+   * Records the start up time of the process and the host it is running on,
+   * (and sets it's status to STARTUP - may remove this in the future as duplicate
+   * of state tag of the DAQ)
+   * 
+   * <p>Also starts the alive timer.
+   * 
+   * <p>Please note, that in case of a cache reference to the process it is up to the calling
+   * method to acquire a write lock. In case of a copy it is the calling method that has
+   * to take care of committing the changes made to the process object back to the cache. 
+   * 
+   * <p>This function does not check if the process is Running and use to be called by the TEST mode
+   * since it will force the DAQ to start
+   * 
+   * @param process the Process that is starting
+   * @param hostName the hostname of the Process
+   * @param startupTime the start up time
+   */
+  private void startLocal(final Process process, final String pHostName, final Timestamp pStartupTime) {
+    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
+    final Long newPIK = createProcessPIK();
+    processCacheObject.setCurrentHost(pHostName);
+    processCacheObject.setStartupTime(pStartupTime);
+    processCacheObject.setRequiresReboot(Boolean.FALSE);
+    processCacheObject.setProcessPIK(newPIK);
+    processCacheObject.setLocalConfig(LocalConfig.Y);
+    processCacheObject.setJmsDaqCommandQueue(jmsDaqQueueTrunk + ".command." + processCacheObject.getCurrentHost() + "." 
+        + processCacheObject.getName() + "." + newPIK.toString());
+    super.start(processCacheObject, pStartupTime);
   }
 
   @Override
@@ -419,5 +457,14 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     } finally {
       processCache.releaseWriteLockOnKey(processId);
     }
+  }
+  
+  /**
+   * Checks if the TEST mode is on
+   * 
+   * @return True if the TEST mode is on and False in any other case
+   */
+  private boolean isTestMode() {
+    return ((System.getProperty("testMode")) != null && (System.getProperty("testMode").equals("true")));
   }
 }
