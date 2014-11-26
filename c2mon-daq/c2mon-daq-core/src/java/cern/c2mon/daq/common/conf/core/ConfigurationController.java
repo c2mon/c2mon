@@ -228,12 +228,12 @@ public class ConfigurationController {
 
     boolean localConfiguration = false;
     if (getCommandParamsHandler().hasParam(CONFIGURATION_PARAM)) {
-      LOGGER.trace("loadProcessConfiguration - Taking Configuration from file");
+      LOGGER.info("loadProcessConfiguration - Taking Configuration from file");
       localConfiguration = true;
       String fileSystemLocation = getCommandParamsHandler().getParamValue(CONFIGURATION_PARAM);
       xmlConfiguration = this.processConfigurationLoader.fromFiletoDOC(fileSystemLocation);
     } else {
-      LOGGER.trace("loadProcessConfiguration - Taking Configuration from remote server");
+      LOGGER.info("loadProcessConfiguration - Taking Configuration from remote server");
       processConfigurationResponse = this.processConfigurationLoader.getProcessConfiguration();
 
       // If Process Configuration is REJECTED we exit
