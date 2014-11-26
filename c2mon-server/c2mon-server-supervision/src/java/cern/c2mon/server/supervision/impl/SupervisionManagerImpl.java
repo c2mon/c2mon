@@ -421,6 +421,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
       // Only If PIK is the same we have in cache we change Y(LOCAL_CONFIG) by N(SERVER_CONFIG) for the current process
       if(processConfigurationRequest.getProcessPIK().equals(processCopy.getProcessPIK())) {
+        LOGGER.info("onProcessConfiguration - SERVER_CONFIG");
         this.processFacade.setLocalConfig(processId, LocalConfig.N);
       }
 
@@ -999,26 +1000,54 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       processCache.acquireWriteLockOnKey(processId);
       try {
         Process process = processCache.get(processId);
-        try {
-          // If process is already currently running no connection is permitted
-          if (this.processFacade.isRunning(processId)) {
-            // Reject Connection
-            processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
-            LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : "
-                + processConnectionRequest.getProcessName());
-          } else {
-            LOGGER.info("Connection request for DAQ " + process.getName() + " authorized.");
+        try {     
+          // If process is already currently running
+          if (this.processFacade.isRunning(processId)) { 
+            // And TEST mode is on
+            if (isTestMode()) {
+              LOGGER.info("onProcessConnection - TEST mode" + process.getProcessPIK());
+              // If the DAQ has not being locally initialised connection is permitted
+              if (process.getProcessPIK() == null) {
+                LOGGER.info("onProcessConnection - TEST mode - Connection request for DAQ " + process.getName() + " authorized.");
+                
+                // Start Up the process
+                this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.", 
+                    processConnectionRequest.getProcessStartupTime());
+                process = this.processFacade.start(processId, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
 
+                // PIK
+                processConnectionResponse.setprocessPIK(process.getProcessPIK());
+                
+                LOGGER.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName());
+              // If the DAQ has being locally initialised no connection is permitted
+              } else {
+                // Reject Connection
+                processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
+                LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : " 
+                    + processConnectionRequest.getProcessName());
+              }
+            // If process is already currently running and TEST mode is off no connection is permitted
+            } else {
+              // Reject Connection
+              processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
+              LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : " 
+                  + processConnectionRequest.getProcessName());
+            }
+          // If process is not currently running the connection is permitted
+          } else {
+            LOGGER.info("onProcessConnection - Connection request for DAQ " + process.getName() + " authorized.");
+  
             // Start Up the process
-            this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.",
+            this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.", 
                 processConnectionRequest.getProcessStartupTime());
             process = this.processFacade.start(processId, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
-
+  
             // PIK
             processConnectionResponse.setprocessPIK(process.getProcessPIK());
 
             LOGGER.info("onProcessConnection - Returning PIKResponse to DAQ " + process.getName());
           }
+
         } catch (CacheElementNotFoundException cacheEx) {
           LOGGER.error("State tag " + process.getStateTagId() + " or the alive tag for process " + process.getId() +
               "could not be found in the cache.");
@@ -1036,5 +1065,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     }
 
     return this.xmlConverter.toXml(processConnectionResponse);
+  }
+  
+  /**
+   * Checks if the TEST mode is on
+   * 
+   * @return True if the TEST mode is on and False in any other case
+   */
+  private boolean isTestMode() {
+    return ((System.getProperty("testMode")) != null && (System.getProperty("testMode").equals("true")));
   }
 }
