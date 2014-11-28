@@ -180,7 +180,7 @@ public class HistoryController {
       logger.error(e.getMessage());
       return ("redirect:" + "/historyviewer/errorform/" + id);
     }
-    return "raw_xml_views/rawXml";
+    return "raw/xml";
   }
 
   /**
@@ -226,6 +226,6 @@ public class HistoryController {
     } else if (records != null) {
       return ("redirect:" + HISTORY_URL + id + "?" + MAX_RECORDS_PARAMETER + "=" + records);
     }
-    return "trend_views/trend_view_form";
+    return "trend/trendViewForm";
   }
 }

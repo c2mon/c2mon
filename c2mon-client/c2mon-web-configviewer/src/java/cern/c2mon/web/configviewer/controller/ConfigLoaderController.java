@@ -107,7 +107,7 @@ public class ConfigLoaderController {
     } catch (NotFoundException e) {
       return ("redirect:" + "/configloader/errorform/" + id);
     }
-    return "raw_xml_views/rawXml";
+    return "raw/xml";
   }
 
   /**
@@ -191,7 +191,7 @@ public class ConfigLoaderController {
     }
 
     model.addAttribute("err", errorId);
-    return "notFoundErrorFormWithData";
+    return "genericErrorForm";
   }
 
   /**
@@ -206,7 +206,7 @@ public class ConfigLoaderController {
     logger.debug("/configloader/form/{id} " + id);
     model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, id, CONFIG_LOADER_URL + id));
 
-    return "formWithData";
+    return "genericForm";
   }
 
   /**
@@ -226,7 +226,7 @@ public class ConfigLoaderController {
       model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, null, null));
     else
       return ("redirect:" + CONFIG_LOADER_URL + id);
-    return "formWithData";
+    return "genericForm";
   }
 
   /**
@@ -243,7 +243,7 @@ public class ConfigLoaderController {
 
     model.addAllAttributes(FormUtility.getFormModel(CONFIG_LOADER_FORM_TITLE, CONFIG_LOADER_FORM_INSTR, CONFIG_LOADER_FORM_URL, "", CONFIG_LOADER_URL));
     model.addAttribute("reports", service.getFinalReports());
-    return "configurationReportWithProgressReport";
+    return "loadConfigForm";
   }
 
   /**

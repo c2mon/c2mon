@@ -5,10 +5,7 @@
 <html>
 <head>
 <title>Configuration viewer</title>
-<link rel="stylesheet" type="text/css" href="<c:url value="../css/form.css"/>" />
-<%-- <link rel="stylesheet" type="text/css" href="<c:url value="../css/c2mon.css"/>" /> --%>
 <link rel="stylesheet" type="text/css" href="<c:url value="../css/bootstrap/bootstrap.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="../css/web-config-viewer.css"/>" />
 
 <style type="text/css">
 body {
@@ -16,36 +13,22 @@ body {
   padding-bottom: 40px;
 }
 
-.sidebar-nav {
-  padding: 9px 0;
+.progress {
+  margin-top: 20px;
+  height: 30px;
+  margin-bottom: 0px;
 }
-
-.ui-progressbar .ui-progressbar-value {
-  margin: 0 !important;
-}
-
-#progressbar > .ui-progressbar-value {
-   background: #337ab7;
-}
-
-#progressbar > .ui-widget-header {
-   border: #337ab7;
-}
-
 </style>
 
-<link type="text/css" href="../css/ui-lightness/jquery-ui.css" rel="stylesheet" />
-<script type="text/javascript" src="../js/jquery.js"></script>
-<script type="text/javascript" src="../js/jquery-spinner.js"></script>
-<script type="text/javascript" src="../js/jquery-ui.js"></script>
+<script type="text/javascript" src="../js/jquery/jquery.js"></script>
+<script type="text/javascript" src="../js/jquery/jquery-spinner.js"></script>
+<script type="text/javascript" src="../js/bootstrap/bootstrap.js"></script>
 
 <script type="text/javascript">
   $(function() {
 
     // Reset the Progressbar
-    $("#progressbar").progressbar({
-      value : 0
-    });
+    $("#progressbar").css('width', '0%');
 
     $('#configLoaderForm').submit(function(event) {
       // prevent default browser behaviour
@@ -122,10 +105,8 @@ body {
       async : true,
       success : function(data) {
 
-        //Update progressbar
-        $("#progressbar").progressbar({
-          value : data
-        });
+        // Update progressbar
+        $("#progressbar").css('width', data + '%');
 
       },
       dataType : "json",
@@ -140,26 +121,27 @@ body {
    */
   function getProgressDescription() {
 
-    $.ajax({
-      type : "POST",
-      url : "../configloader/progress/getProgressDescription",
-      data : {
-        configurationId : document.configLoaderForm.id.value
-      },
-      async : true,
-      success : function(data) {
+    $
+        .ajax({
+          type : "POST",
+          url : "../configloader/progress/getProgressDescription",
+          data : {
+            configurationId : document.configLoaderForm.id.value
+          },
+          async : true,
+          success : function(data) {
 
-        var description = data;
-        if (description == null) {
-          description = "No response has been received yet from the server. Please wait..";
-        }
-        $("#status").text(description);
+            var description = data;
+            if (description == null) {
+              description = "No response has been received yet from the server. Please wait..";
+            }
+            $("#status").text(description);
 
-      },
-      dataType : "json",
-      complete : getProgressDescription,
-      timeout : 50
-    });
+          },
+          dataType : "json",
+          complete : getProgressDescription,
+          timeout : 50
+        });
   }
 </script>
 </head>
@@ -204,7 +186,9 @@ body {
           <span id="status"></span>
         </div>
 
-        <div id="progressbar" style="margin-top: 20px;"></div>
+        <div class="progress">
+          <div id="progressbar" class="progress-bar" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
       </form:form>
 
 
@@ -218,7 +202,7 @@ body {
             <c:forEach var="report" items="${reports}">
               <tr>
                 <td align="center"><a href="../configloader/progress/finalReport/${report.key}"> ${report.key}</a> (<a
-                    href="../configloader/progress/finalReport/xml/${report.key}" target="_blank">XML</a>)</td>
+                  href="../configloader/progress/finalReport/xml/${report.key}" target="_blank">XML</a>)</td>
               </tr>
             </c:forEach>
           </table>

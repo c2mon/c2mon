@@ -141,50 +141,44 @@
   <!-- process the XML element invalidQualityStates - entry -->
   <xsl:template match="invalidQualityStates">
     <xsl:if test="entry!=''">
-      <p>
-      </p>
-      <table class="inline">
 
+    <div class="row">
+      <table class="table table-striped table-bordered">
+        <thead>
         <th colspan="4">Reason for tag invalidation</th>
-
+        </thead>
+        
+        <tbody>
         <xsl:for-each select="entry">
           <tr>
-            <td class="highlight bold">Quality Status</td>
-            <td width="25%">
+            <th>Quality Status</th>
+            <td>
               <xsl:value-of select="tagQualityStatus" />
             </td>
-            <td class="highlight bold">Description</td>
-            <td width="25%">
+          <tr>
+          </tr>
+            <th>Description</th>
+            <td>
               <xsl:value-of select="string" />
             </td>
           </tr>
 
           <xsl:for-each
             select="*[not(local-name() = 'tagQualityStatus' or local-name() = 'string')]">
-
-            <xsl:if test="position() mod 2 = 1">
-              <xsl:text disable-output-escaping='yes'>&lt;TR></xsl:text>
-              <td class="highlight bold">
+            <tr>
+              <th>
                 <xsl:value-of select="local-name()" />
-              </td>
-              <td width="25%">
+              </th>
+              <td>
                 <xsl:value-of select="." />
               </td>
-            </xsl:if>
-
-            <xsl:if test="position() mod 2 = 0">
-              <td class="highlight bold">
-                <xsl:value-of select="local-name()" />
-              </td>
-              <td width="25%">
-                <xsl:value-of select="." />
-              </td>
-              <xsl:text disable-output-escaping='yes'>&lt;/TR></xsl:text>
-            </xsl:if>
-
+            </tr>
           </xsl:for-each>
+
         </xsl:for-each>
+        </tbody>
       </table>
+      </div>
     </xsl:if>
 
   </xsl:template>
@@ -275,7 +269,9 @@
           <tr>
             <th>Hardware Address</th>
             <td>
+              <pre>
               <xsl:value-of select="hardwareAddress" />
+              </pre>
             </td>
           </tr>
 

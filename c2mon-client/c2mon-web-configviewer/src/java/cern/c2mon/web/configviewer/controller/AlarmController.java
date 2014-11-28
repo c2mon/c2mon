@@ -89,7 +89,7 @@ public class AlarmController {
     } catch (TagIdException e) {
       return ("redirect:" + "/alarmviewer/errorform/" + id);
     }
-    return "raw_xml_views/rawXml";
+    return "raw/xml";
   }
 
   /**
@@ -129,7 +129,7 @@ public class AlarmController {
   public String viewAlarmWithForm(@PathVariable final String id, final Model model) {
     logger.info("/alarmviewer/form/{id} " + id);
     model.addAllAttributes(FormUtility.getFormModel(ALARM_FORM_TITLE, ALARM_FORM_INSTR, ALARM_FORM_URL, id, ALARM_URL + id));
-    return "formWithData";
+    return "genericForm";
   }
 
   /**
@@ -153,7 +153,7 @@ public class AlarmController {
       return ("redirect:" + ALARM_URL + id);
 
     model.addAttribute("err", errorId);
-    return "notFoundErrorFormWithData";
+    return "genericErrorForm";
   }
 
   /**
@@ -172,6 +172,6 @@ public class AlarmController {
     else
       return ("redirect:" + ALARM_URL + id);
 
-    return "formWithData";
+    return "genericForm";
   }
 }

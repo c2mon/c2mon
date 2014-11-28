@@ -33,12 +33,10 @@ public final class FormUtility {
     +  "<html>"
     + "<head>"
     +  " <title>Configuration viewer</title>"
-//    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/c2mon.css\"></link>"
-//    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/web-config-viewer.css\"></link>"
     + "  <link rel=\"stylesheet\" type=\"text/css\" href=\"" + basePath + "/css/bootstrap/bootstrap.css\"></link>"
+    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"" + basePath + "/css/common.css\"></link>"
     +  " <script type=\"text/javascript\" src=\"" + basePath + "/js/jquery/jquery.js\"></script>"
     +  " <script type=\"text/javascript\" src=\"" + basePath + "/js/bootstrap/bootstrap.js\"></script>"
-    +  " <script type=\"text/javascript\" src=\"" + basePath + "/js/bottom_panel.js\"></script>"
     + "</head>"
     + "<body>"
     + "<div class=\"container-fluid\" style=\"padding-left:150px; padding-right:150px;\">";

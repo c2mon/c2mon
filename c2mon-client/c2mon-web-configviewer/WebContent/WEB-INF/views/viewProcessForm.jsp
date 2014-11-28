@@ -11,10 +11,6 @@ body {
   padding-top: 50px;
   padding-bottom: 40px;
 }
-
-.sidebar-nav {
-  padding: 9px 0;
-}
 </style>
 
 </head>

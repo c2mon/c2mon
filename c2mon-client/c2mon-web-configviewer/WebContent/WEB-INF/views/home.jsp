@@ -12,8 +12,6 @@
 
 <!-- Le styles -->
 <link rel="stylesheet" type="text/css" href="<c:url value="css/bootstrap/bootstrap.css"/>" />
-<%-- <link rel="stylesheet" type="text/css" href="<c:url value="css/buttons.css"/>" /> --%>
-<%-- <link rel="stylesheet" type="text/css" href="<c:url value="css/bootstrap-responsive.css"/>" /> --%>
 
 <style type="text/css">
 body {

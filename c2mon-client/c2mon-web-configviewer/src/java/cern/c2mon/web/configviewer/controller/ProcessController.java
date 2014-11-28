@@ -84,7 +84,7 @@ public class ProcessController {
   public String viewProcessWithForm(@PathVariable final String id,  final Model model) {
     logger.info("/process/form/{id} " + id);
     model.addAllAttributes(getProcessFormModel(PROCESS_FORM_TITLE, PROCESS_FORM_INSTR, PROCESS_FORM_URL, id, PROCESS_URL + id));
-    return "processFormWithData";
+    return "viewProcessForm";
   }
 
   /**
@@ -97,7 +97,7 @@ public class ProcessController {
   public String viewXml(@PathVariable final String id,  final Model model) {
     logger.info("/process/xml/{id} " + id);
     model.addAllAttributes(getProcessModel(id));
-    return "raw_xml_views/processXml";
+    return "raw/process";
   }
 
 
@@ -123,7 +123,7 @@ public class ProcessController {
       return ("redirect:" + PROCESS_URL + id);
     }
 
-    return "processFormWithData";
+    return "viewProcessForm";
   }
 
   /**

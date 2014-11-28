@@ -179,7 +179,7 @@ body {
 
   <script src="../js/jquery/jquery.js"></script>
   <script src="../js/bootstrap/bootstrap.js"></script>
-  <script src="../js/bootstrap-datepicker.js"></script>
+  <script src="../js/bootstrap/bootstrap-datepicker.js"></script>
 
   <script type="text/javascript">
       $('#tabs a:first').tab('show'); // Marks the first tab as selected in the interface 

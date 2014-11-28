@@ -124,7 +124,7 @@ public class DataTagController {
     } catch (TagIdException e) {
       return ("redirect:" + "/" + TAGVIEWER_PAGE_NAME + "/errorform/" + id);
     }
-    return "raw_xml_views/rawXml";
+    return "raw/xml";
   }
 
   /**
@@ -144,7 +144,7 @@ public class DataTagController {
     } catch (TagIdException e) {
       return ("redirect:" + "/" + TAGVIEWER_PAGE_NAME + "/errorform/" + id);
     }
-    return "raw_xml_views/rawXml";
+    return "raw/xml";
   }
 
   /**
@@ -170,7 +170,7 @@ public class DataTagController {
     }
 
     model.addAttribute("err", errorId);
-    return "notFoundErrorFormWithData";
+    return "genericErrorForm";
   }
 
   /**
@@ -183,7 +183,7 @@ public class DataTagController {
   public String viewTagWithForm(@PathVariable final String id, final Model model) {
     logger.info("/" + TAGVIEWER_PAGE_NAME + "/form/{id} " + id);
     model.addAllAttributes(FormUtility.getFormModel(TAG_FORM_TITLE, TAG_FORM_INSTR, TAG_FORM_URL, id, TAG_URL + id));
-    return "formWithData";
+    return "genericForm";
   }
 
   /**
@@ -202,6 +202,6 @@ public class DataTagController {
        return ("redirect:" + TAG_URL + TAGVIEWER_PAGE_NAME + "/" + id);
      }
 
-    return "formWithData";
+    return "genericForm";
   }
 }

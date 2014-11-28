@@ -85,7 +85,7 @@ public class CommandController {
     } catch (TagIdException e) {
       return ("redirect:" + "/commandviewer/errorform/" + id);
     }
-    return "raw_xml_views/rawXml";
+    return "raw/xml";
   }
 
   /**
@@ -133,7 +133,7 @@ public class CommandController {
       return ("redirect:" + COMMAND_URL + id);
 
     model.addAttribute("err", errorId);
-    return "notFoundErrorFormWithData";
+    return "genericErrorForm";
   }
 
   /**
@@ -148,7 +148,7 @@ public class CommandController {
     logger.info("/commandviewer/form/{id} " + id);
     model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR,
         COMMAND_FORM_URL, id, COMMAND_URL + id));
-    return "formWithData";
+    return "genericForm";
   }
 
   /**
@@ -166,6 +166,6 @@ public class CommandController {
       model.addAllAttributes(FormUtility.getFormModel(COMMAND_FORM_TITLE, COMMAND_FORM_INSTR, COMMAND_FORM_URL, null, null));
     else
       return ("redirect:" + COMMAND_URL + id);
-    return "formWithData";
+    return "genericForm";
   }
 }

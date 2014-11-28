@@ -4,12 +4,11 @@
 <head>
 <title>Please Login</title>
 <meta http-equiv="X-UA-Compatible" content="IE=9" />
-<%-- <link rel="stylesheet" type="text/css" href="<c:url value="/css/form.css"/>" />
-<link rel="stylesheet" type="text/css" href="<c:url value="/css/c2mon.css"/>" /> --%>
+
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/bootstrap/bootstrap.css"/>" />
-<%-- <link rel="stylesheet" type="text/css" href="<c:url value="/css/web-config-viewer.css"/>" /> --%>
-<script type="text/javascript" src="<c:url value="/js/jquery-1.7.min.js" />"></script>
-<script type="text/javascript" src="<c:url value="/js/login-error.js" />"> ></script>
+
+<script type="text/javascript" src="<c:url value="/js/jquery/jquery.js" />"></script>
+<script type="text/javascript" src="<c:url value="/js/login-error.js" />"></script>
 
 <style type="text/css">
 
