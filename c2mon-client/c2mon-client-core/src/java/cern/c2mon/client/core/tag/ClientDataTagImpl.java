@@ -449,9 +449,10 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
 
   /**
-   * Adds a <code>DataTagUpdateListener</code> to the ClientDataTag. Any change
-   * to the ClientDataTag value or quality attributes will trigger an update
-   * event to all <code>DataTagUpdateListener</code> objects registered.
+   * Adds a <code>DataTagUpdateListener</code> to the ClientDataTag and
+   * generates an initial update event for that listener. Any change to the
+   * ClientDataTag value or quality attributes will trigger an update event to
+   * all <code>DataTagUpdateListener</code> objects registered.
    *
    * @param pListener the DataTagUpdateListener comments
    * @see #removeUpdateListener(DataTagUpdateListener)
@@ -461,6 +462,13 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       LOG.debug("addUpdateListener() called.");
     }
     listeners.add(pListener);
+
+    try {
+      pListener.onUpdate(this.clone());
+    } catch (CloneNotSupportedException cloneException) {
+      LOG.fatal("addUpdateListener() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
+      throw new RuntimeException(cloneException);
+    }
   }
 
   /**

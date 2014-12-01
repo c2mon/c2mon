@@ -166,6 +166,8 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         if (controller.isHistoryModeEnabled()) {
           historyCacheUpdateList.add(tagId);
         }
+
+        supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
       }
     }
   }
@@ -374,7 +376,6 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
       final DataTagQuality tagQuality = liveTag.getDataTagQuality();
 
       if (tagQuality.isExistingTag()) {
-        supervisionManager.addSupervisionListener(liveTag, liveTag.getProcessIds(), liveTag.getEquipmentIds(), liveTag.getSubEquipmentIds());
         if (!jmsProxy.isRegisteredListener(liveTag)) {
           jmsProxy.registerUpdateListener(liveTag, liveTag);
           return true;

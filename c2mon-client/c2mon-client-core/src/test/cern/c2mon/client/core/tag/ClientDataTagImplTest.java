@@ -9,6 +9,7 @@ import static junit.framework.Assert.assertTrue;
 
 import java.sql.Timestamp;
 
+import org.easymock.EasyMock;
 import org.junit.Test;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
@@ -155,21 +156,21 @@ public class ClientDataTagImplTest {
     cdt.onUpdate(createValidTransferTag(1234L, new Object()));
   }
 
-//  @Test
-//  public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException {
-//    //test setup
-//    ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
-//    cdt.onUpdate(createValidTransferTag(1234L));
-//    DataTagUpdateListener mockUpdateListener = EasyMock.createMock(DataTagUpdateListener.class);
-//    mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(cdt)), EasyMock.eq(cdt)));
-//
-//    //run test
-//    EasyMock.replay(mockUpdateListener);
-//    cdt.addUpdateListener(mockUpdateListener);
-//
-//    //check test success
-//    EasyMock.verify(mockUpdateListener);
-//  }
+  @Test
+  public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException {
+    //test setup
+    ClientDataTagImpl cdt = new ClientDataTagImpl(1234L);
+    cdt.onUpdate(createValidTransferTag(1234L));
+    DataTagUpdateListener mockUpdateListener = EasyMock.createMock(DataTagUpdateListener.class);
+    mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(cdt)), EasyMock.eq(cdt)));
+
+    //run test
+    EasyMock.replay(mockUpdateListener);
+    cdt.addUpdateListener(mockUpdateListener);
+
+    //check test success
+    EasyMock.verify(mockUpdateListener);
+  }
 
   @Test
   public void testUpdateListener() {

@@ -100,6 +100,8 @@ public class TagManagerTest {
     // Wait for onUpdate() to be called for all tags
     latch2.await();
 
+    Thread.sleep(1000);
+
     // check test success
     EasyMock.verify(requestHandlerMock, jmsProxyMock);
   }
