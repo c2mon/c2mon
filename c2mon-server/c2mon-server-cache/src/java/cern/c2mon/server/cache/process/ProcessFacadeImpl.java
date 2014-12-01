@@ -201,9 +201,13 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       if (isTestMode()) {
         // If the TEST Mode is on
         startLocal(process, pHostName, pStartupTime);
+        LOGGER.trace("start - TEST Mode - Process " + process.getName() 
+            + ", PIK " + process.getProcessPIK());
       } else {
         // If the TEST Mode is off
         start(process, pHostName, pStartupTime);
+        LOGGER.trace("start - Process " + process.getName() 
+            + ", PIK " + process.getProcessPIK());
       }
       processCache.put(processId, process);
     } finally {
