@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import javax.jms.JMSException;
 
-import junit.framework.Assert;
-
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +39,13 @@ public class TagManagerTest {
    */
   @Autowired
   private C2monTagManager tagManager;
-  
+
   @Autowired
   private RequestHandler requestHandlerMock;
-  
+
   @Autowired
   private JmsProxy jmsProxyMock;
-  
+
   @Test
   public void testSubscribeDataTags() throws Exception {
     // Test setup
@@ -53,30 +53,57 @@ public class TagManagerTest {
     for (long i = 1; i <= 1000; i++) {
       tagIds1.add(i);
     }
-    DataTagUpdateListener listener1 = EasyMock.createMock(DataTagUpdateListener.class);
+
+    // Use a CountDownLatch as an update listener to allow the subscription
+    // thread to finish
+    final CountDownLatch latch1 = new CountDownLatch(tagIds1.size());
+    DataTagUpdateListener listener1 = new DataTagUpdateListener() {
+      @Override
+      public void onUpdate(ClientDataTagValue tagUpdate) {
+        System.out.println("1: counting down " + latch1.getCount());
+        latch1.countDown();
+      }
+    };
     prepareSubscribeDataTagsMock(tagIds1, listener1);
+
     // listener 2
     Set<Long> tagIds2 = new HashSet<Long>();
     for (long i = 1001; i <= 2000; i++) {
       tagIds2.add(i);
     }
-    DataTagUpdateListener listener2 = EasyMock.createMock(DataTagUpdateListener.class);
-    prepareSubscribeDataTagsMock(tagIds2, listener2);
-    
+
+    // Use another latch for the second listener
+    final CountDownLatch latch2 = new CountDownLatch(tagIds2.size());
+    DataTagUpdateListener listener2 = new DataTagUpdateListener() {
+      @Override
+      public void onUpdate(ClientDataTagValue tagUpdate) {
+        System.out.println("2: counting down " + latch2.getCount());
+        latch2.countDown();
+      }
+    };
+    prepareSubscribeDataTagsMock(tagIds2, listener1);
+
     // run test
-    EasyMock.replay(requestHandlerMock, jmsProxyMock, listener1, listener2);
+    EasyMock.replay(requestHandlerMock, jmsProxyMock);
     Assert.assertTrue(tagManager.subscribeDataTags(tagIds1, listener1));
     Collection<ClientDataTagValue> cdtValues = tagManager.getAllSubscribedDataTags(listener1);
     Assert.assertEquals(tagIds1.size(), cdtValues.size());
+
+    // Wait for onUpdate() to be called for all tags
+    latch1.await();
+
     // second call for second listener
     Assert.assertTrue(tagManager.subscribeDataTags(tagIds2, listener2));
     cdtValues = tagManager.getAllSubscribedDataTags(listener2);
     Assert.assertEquals(tagIds2.size(), cdtValues.size());
-   
+
+    // Wait for onUpdate() to be called for all tags
+    latch2.await();
+
     // check test success
-    EasyMock.verify(requestHandlerMock, jmsProxyMock, listener1, listener2);
+    EasyMock.verify(requestHandlerMock, jmsProxyMock);
   }
-  
+
   @Test
   public void testUnsubscribeDataTags() throws JMSException {
     // Test setup
@@ -85,7 +112,7 @@ public class TagManagerTest {
       tagIds1.add(i);
     }
     DataTagUpdateListener listener1 = EasyMock.createMock(DataTagUpdateListener.class);
-    
+
     // run test
     Assert.assertTrue(tagManager.subscribeDataTags(tagIds1, listener1));
     Collection<ClientDataTagValue> cdtValues = tagManager.getAllSubscribedDataTags(listener1);
@@ -95,11 +122,11 @@ public class TagManagerTest {
     cdtValues = tagManager.getAllSubscribedDataTags(listener1);
     Assert.assertEquals(0, cdtValues.size());
   }
-  
-  
+
+
   /**
    * Prepares all EasyMock calls for doing a <code>tagManager.subscribeDataTags()</code> call
-   * @param tagIds list of tag ids to subscribe to 
+   * @param tagIds list of tag ids to subscribe to
    * @param listener the listener to be subscribed
    * @throws JMSException
    */
@@ -108,28 +135,31 @@ public class TagManagerTest {
     for (Long tagId : tagIds) {
       serverUpdates.add(createValidTransferTag(tagId));
     }
-    Collection<TagValueUpdate> serverUpdateValues = new ArrayList<TagValueUpdate>(serverUpdates);
-    
-    
+
+    Collection<TagValueUpdate> serverUpdateValues = new ArrayList<>();
+    for (Long tagId : tagIds) {
+      serverUpdateValues.add(createValidTransferTag(tagId));
+    }
+
+
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
-    for (Long tagId : tagIds) { 
+    for (Long tagId : tagIds) {
       ClientDataTagImpl cdt = new ClientDataTagImpl(tagId);
-      listener.onUpdate(cdt);
       EasyMock.expect(jmsProxyMock.isRegisteredListener(cdt)).andReturn(false);
       jmsProxyMock.registerUpdateListener(cdt, cdt);
     }
     EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(serverUpdateValues);
   }
-  
-  
+
+
   private TagUpdate createValidTransferTag(final Long tagId) {
     return createValidTransferTag(tagId, Float.valueOf(1.234f));
   }
-  
+
   private TagUpdate createValidTransferTag(final Long tagId, Object value) {
-    DataTagQuality tagQuality = new DataTagQualityImpl();    
+    DataTagQuality tagQuality = new DataTagQualityImpl();
     tagQuality.validate();
-    TagUpdate tagUpdate = 
+    TagUpdate tagUpdate =
       new TransferTagImpl(
           tagId,
           null,
@@ -142,7 +172,7 @@ public class TagManagerTest {
           "Test description",
           "My.data.tag.name",
           "My.jms.topic");
-    
+
     return tagUpdate;
   }
 }

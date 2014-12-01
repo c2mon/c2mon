@@ -97,9 +97,10 @@ public class ClientDataTagCacheImplTest {
     assertEquals(0, cachedTags.size());
     cache.addDataTagUpdateListener(tagIds, listener);
 
-
     cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
+
+    Thread.sleep(500);
 
     // check test success
     EasyMock.verify(jmsProxyMock, requestHandlerMock);
@@ -124,7 +125,6 @@ public class ClientDataTagCacheImplTest {
     DataTagUpdateListener listener1 = EasyMock.createMock(DataTagUpdateListener.class);
     DataTagUpdateListener listener2 = EasyMock.createMock(DataTagUpdateListener.class);
 
-
     // run test
     EasyMock.replay(jmsProxyMock, requestHandlerMock);
     cache.addDataTagUpdateListener(tagIds, listener1);
@@ -138,6 +138,8 @@ public class ClientDataTagCacheImplTest {
     cache.unsubscribeAllDataTags(listener1);
     cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(0, cachedTags.size());
+
+    Thread.sleep(2000);
 
     // check test success
     EasyMock.verify(jmsProxyMock, requestHandlerMock);
@@ -157,6 +159,8 @@ public class ClientDataTagCacheImplTest {
     }
     EasyMock.expect(requestHandlerMock.requestTags(tagIds)).andReturn(serverUpdates);
     EasyMock.expect(requestHandlerMock.requestTagValues(tagIds)).andReturn(new ArrayList<TagValueUpdate>(serverUpdates));
+    supervisionManagerMock.refreshSupervisionStatus();
+    EasyMock.expectLastCall();
     DataTagUpdateListener listener = EasyMock.createMock(DataTagUpdateListener.class);
 
     // run test
@@ -165,6 +169,8 @@ public class ClientDataTagCacheImplTest {
     assertTrue(cache.containsTag(1L));
     assertTrue(cache.containsTag(2L));
     assertFalse(cache.containsTag(23423L));
+
+    Thread.sleep(500);
 
     // check test success
     EasyMock.verify(jmsProxyMock, supervisionManagerMock, requestHandlerMock);
@@ -199,8 +205,11 @@ public class ClientDataTagCacheImplTest {
     Collection<ClientDataTag> cachedTags = cache.getAllSubscribedDataTags();
     assertEquals(2, cachedTags.size());
 
+    Thread.sleep(500);
+
     // check test success
     EasyMock.verify(jmsProxyMock, requestHandlerMock);
+    cache.setHistoryMode(false);
   }
 
 

@@ -391,8 +391,9 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   }
 
   /**
-   * Inner method that updates a second time in case an update was send before
+   * Inner method that updates a second time in case an update was sent before
    * the ClientDataTag was subscribed to the topic.
+   *
    * @param newTags Map of uninitialized tags from the cache
    * @throws JMSException In case of a JMS problem
    */

@@ -64,12 +64,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   /** The cache controller manages the cache references */
   private final CacheController controller;
 
-  /** The cache Synchronizer*/
+  /** The cache Synchronizer */
   private final CacheSynchronizer cacheSynchronizer;
 
   /**
-   * <code>Map</code> reference containing all subscribed data tags which
-   * are updated via the <code>JmsProxy</code>
+   * <code>Map</code> reference containing all subscribed data tags which are
+   * updated via the <code>JmsProxy</code>
    */
   private Map<Long, ClientDataTagImpl> liveCache = null;
 
@@ -80,15 +80,17 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   private WriteLock cacheWriteLock = null;
 
   /**
-   * Default Constructor used by Spring to wire in the references to other Services.
+   * Default Constructor used by Spring to wire in the references to other
+   * Services.
    *
-   * @param pCacheController Provides acces to the different cache instances and to the thread locks.
-   * @param pCacheSynchronizer Handles the cache synchronization with the C2MON server
+   * @param pCacheController Provides acces to the different cache instances and
+   *          to the thread locks.
+   * @param pCacheSynchronizer Handles the cache synchronization with the C2MON
+   *          server
    *
    */
   @Autowired
-  protected ClientDataTagCacheImpl(final CacheController pCacheController,
-                                   final CacheSynchronizer pCacheSynchronizer) {
+  protected ClientDataTagCacheImpl(final CacheController pCacheController, final CacheSynchronizer pCacheSynchronizer) {
     this.controller = pCacheController;
     this.cacheSynchronizer = pCacheSynchronizer;
   }
@@ -110,8 +112,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     cacheReadLock.lock();
     try {
       cdt = controller.getActiveCache().get(tagId);
+    } finally {
+      cacheReadLock.unlock();
     }
-    finally { cacheReadLock.unlock(); }
 
     return cdt;
   }
@@ -127,8 +130,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           list.add(cdt);
         }
       }
+    } finally {
+      cacheReadLock.unlock();
     }
-    finally { cacheReadLock.unlock(); }
 
     return list;
   }
@@ -144,8 +148,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           list.add(cdt);
         }
       }
+    } finally {
+      cacheReadLock.unlock();
     }
-    finally { cacheReadLock.unlock(); }
 
     return list;
   }
@@ -161,8 +166,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           list.add(cdt);
         }
       }
+    } finally {
+      cacheReadLock.unlock();
     }
-    finally { cacheReadLock.unlock(); }
 
     return list;
   }
@@ -178,8 +184,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           list.add(cdt.getId());
         }
       }
+    } finally {
+      cacheReadLock.unlock();
     }
-    finally { cacheReadLock.unlock(); }
 
     return list;
   }
@@ -195,12 +202,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           list.add(cdt);
         }
       }
+    } finally {
+      cacheReadLock.unlock();
     }
-    finally { cacheReadLock.unlock(); }
 
     return list;
   }
-
 
   @Override
   public void refresh() throws CacheSynchronizationException {
@@ -211,7 +218,6 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   public void refresh(final Set<Long> tagIds) throws CacheSynchronizationException {
     cacheSynchronizer.refresh(tagIds);
   }
-
 
   @Override
   public Set<Long> unsubscribeAllDataTags(final DataTagUpdateListener listener) {
@@ -229,8 +235,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
       // Remove from cache
       cacheSynchronizer.removeTags(tagsToRemove);
+    } finally {
+      cacheWriteLock.unlock();
     }
-    finally { cacheWriteLock.unlock(); }
 
     return tagsToRemove;
   }
@@ -253,8 +260,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
       // Remove from cache
       cacheSynchronizer.removeTags(tagsToRemove);
+    } finally {
+      cacheWriteLock.unlock();
     }
-    finally { cacheWriteLock.unlock(); }
 
     return tagsToRemove;
   }
@@ -267,8 +275,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
       for (Long tagId : tagIds) {
         resultMap.put(tagId, controller.getActiveCache().get(tagId));
       }
+    } finally {
+      cacheReadLock.unlock();
     }
-    finally { cacheReadLock.unlock(); }
 
     return resultMap;
   }
@@ -309,21 +318,25 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           }
         }
 
-        // Create the uninitialised tags
-        cacheSynchronizer.createTags(newTagIds);
+        if (newTagIds.size() > 0) {
+          // Create the uninitialised tags
+          cacheSynchronizer.createTags(newTagIds);
 
-        // Update the tags with their initial values from the server
-        cacheSynchronizer.refresh(newTagIds);
+          // Update the tags with their initial values from the server
+          cacheSynchronizer.refresh(newTagIds);
 
-        // Add the update listeners
-        for (Long tagId : newTagIds) {
-          cdt = controller.getActiveCache().get(tagId);
-          cdt.addUpdateListener(listener);
+          // Add the update listeners
+          for (Long tagId : newTagIds) {
+            cdt = controller.getActiveCache().get(tagId);
+            if (cdt != null) {
+              cdt.addUpdateListener(listener);
+            }
+          }
+
+          // Asynchronously subscribe to the topics and get the latest values
+          // again
+          cacheSynchronizer.subscribeTags(newTagIds);
         }
-
-        // Asynchronously subscribe to the topics and get the latest values
-        // again
-        cacheSynchronizer.subscribeTags(newTagIds);
 
       } finally {
         cacheWriteLock.unlock();
