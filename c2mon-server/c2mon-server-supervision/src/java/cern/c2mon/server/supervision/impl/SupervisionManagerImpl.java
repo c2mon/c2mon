@@ -1005,7 +1005,6 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           if (this.processFacade.isRunning(processId)) { 
             // And TEST mode is on
             if (isTestMode()) {
-              LOGGER.info("onProcessConnection - TEST mode" + process.getProcessPIK());
               // If the DAQ has not being locally initialised connection is permitted
               if (process.getProcessPIK() == null) {
                 LOGGER.info("onProcessConnection - TEST mode - Connection request for DAQ " + process.getName() + " authorized.");
@@ -1018,7 +1017,8 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                 // PIK
                 processConnectionResponse.setprocessPIK(process.getProcessPIK());
                 
-                LOGGER.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName());
+                LOGGER.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName() 
+                    + ", PIK " + process.getProcessPIK());
               // If the DAQ has being locally initialised no connection is permitted
               } else {
                 // Reject Connection
