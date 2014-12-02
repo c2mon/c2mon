@@ -125,7 +125,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
         try {
             startProcedure();
         } catch (OPCCommunicationException e) {
-            logger.error("Siemens Endpoint creation failed. Controller will try again. ", e);
+            logger.error("Endpoint creation failed. Controller will try again. ", e);
             // Restart Endpoint
             triggerEndpointRestart("Problems connecting to " + currentAddress.getUri().getHost() + ": " + e.getMessage());
             
@@ -144,7 +144,7 @@ public abstract class AbstractEndpointController implements IOPCEndpointListener
         try {
             startProcedure();
         } catch (OPCCommunicationException e) {
-            logger.error("Siemens Endpoint creation failed. Controller will try again. ", e);
+            logger.error("Endpoint creation failed. Controller will try again. ", e);
             // Reason
             this.noConnectionReason = "Problems connecting to " + currentAddress.getUri().getHost() + ": " + e.getMessage();
             
