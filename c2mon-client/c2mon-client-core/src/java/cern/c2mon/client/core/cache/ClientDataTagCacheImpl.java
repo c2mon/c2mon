@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 
 /**
@@ -67,6 +68,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   /** The cache Synchronizer */
   private final CacheSynchronizer cacheSynchronizer;
 
+  /** Reference to the supervision manager singleton */
+  private final CoreSupervisionManager supervisionManager;
+
   /**
    * <code>Map</code> reference containing all subscribed data tags which are
    * updated via the <code>JmsProxy</code>
@@ -83,16 +87,20 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
    * Default Constructor used by Spring to wire in the references to other
    * Services.
    *
-   * @param pCacheController Provides acces to the different cache instances and
-   *          to the thread locks.
+   * @param pCacheController Provides access to the different cache instances
+   *          and to the thread locks.
    * @param pCacheSynchronizer Handles the cache synchronization with the C2MON
    *          server
-   *
+   * @param pSupervisionManager Handles registration of supervision listeners on
+   *          data tags
    */
   @Autowired
-  protected ClientDataTagCacheImpl(final CacheController pCacheController, final CacheSynchronizer pCacheSynchronizer) {
+  protected ClientDataTagCacheImpl(final CacheController pCacheController,
+                                   final CacheSynchronizer pCacheSynchronizer,
+                                   final CoreSupervisionManager pSupervisionManager) {
     this.controller = pCacheController;
     this.cacheSynchronizer = pCacheSynchronizer;
+    this.supervisionManager = pSupervisionManager;
   }
 
   /**
@@ -304,7 +312,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public Set<Long> addDataTagUpdateListener(final Set<Long> tagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException {
-    Set<Long> newTagIds = new HashSet<Long>();
+    final Set<Long> newTagIds = new HashSet<Long>();
     synchronized (getHistoryModeSyncLock()) {
       cacheWriteLock.lock();
       try {
@@ -325,11 +333,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           // Update the tags with their initial values from the server
           cacheSynchronizer.refresh(newTagIds);
 
-          // Add the update listeners
+          // Add the update listeners and supervision listeners
           for (Long tagId : newTagIds) {
             cdt = controller.getActiveCache().get(tagId);
             if (cdt != null) {
               cdt.addUpdateListener(listener);
+              supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
             }
           }
 

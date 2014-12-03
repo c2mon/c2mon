@@ -166,8 +166,6 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         if (controller.isHistoryModeEnabled()) {
           historyCacheUpdateList.add(tagId);
         }
-
-        supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
       }
     }
   }
