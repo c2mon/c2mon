@@ -337,8 +337,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           for (Long tagId : newTagIds) {
             cdt = controller.getActiveCache().get(tagId);
             if (cdt != null) {
-              cdt.addUpdateListener(listener);
               supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
+              cdt.addUpdateListener(listener);
             }
           }
 
