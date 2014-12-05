@@ -28,18 +28,20 @@ public final class FormUtility {
 
   public static String getHeader(String basePath) {
 
-    String header = "" +
-    "<!DOCTYPE html>"
-    +  "<html>"
+    String header = "<!DOCTYPE html>"
+    + "<html lang=\"en\">"
     + "<head>"
-    +  " <title>Configuration viewer</title>"
+    + "<meta charset=\"utf-8\">"
+    + "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">"
+    + "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    + "  <title>Configuration viewer</title>"
     + "  <link rel=\"stylesheet\" type=\"text/css\" href=\"" + basePath + "/css/bootstrap/bootstrap.css\"></link>"
-    +  " <link rel=\"stylesheet\" type=\"text/css\" href=\"" + basePath + "/css/common.css\"></link>"
-    +  " <script type=\"text/javascript\" src=\"" + basePath + "/js/jquery/jquery.js\"></script>"
-    +  " <script type=\"text/javascript\" src=\"" + basePath + "/js/bootstrap/bootstrap.js\"></script>"
+    + "  <link rel=\"stylesheet\" type=\"text/css\" href=\"" + basePath + "/css/common.css\"></link>"
+    + "  <script type=\"text/javascript\" src=\"" + basePath + "/js/jquery/jquery.js\"></script>"
+    + "  <script type=\"text/javascript\" src=\"" + basePath + "/js/bootstrap/bootstrap.js\"></script>"
     + "</head>"
     + "<body>"
-    + "<div class=\"container-fluid\" style=\"padding-left:150px; padding-right:150px;\">";
+    + "<div class=\"container-fluid\">";
 
     return header;
   }

@@ -32,6 +32,7 @@
   border-bottom-right-radius: 0px;
   -webkit-border-bottom-right-radius: 0px;
   -moz-border-bottom-right-radius: 0px;
+  background-color: rgb(247, 247, 247);
 }
 
 #chart-container {

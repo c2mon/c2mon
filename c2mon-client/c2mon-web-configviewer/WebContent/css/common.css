@@ -1,0 +1,10 @@
+/* Add some outer padding to all fluid containers */
+.container-fluid {
+  padding-left: 150px;
+  padding-right: 150px;
+}
+
+/* Alter the colour of bootstrap's table stripes */
+.table-striped>tbody>tr:nth-child(2n+1) {
+  background-color: rgb(247, 247, 247);
+}
