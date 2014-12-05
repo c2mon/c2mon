@@ -81,18 +81,16 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
    */
   @PostConstruct
   public void init() {
-    listenerContainer = cacheRegistrationService.registerToAllTags(this, 2);
+    listenerContainer = cacheRegistrationService.registerToAllTags(this, 1);
   }
 
   @Override
   public void notifyElementUpdated(Tag tag) {
     try {
-      LOGGER.trace(tag.getId() + " Entering notifyElementUpdated()");
       evaluateRules(tag);
     } catch (Exception e) {
       LOGGER.error(tag.getId() + " Error caught when evaluating rules (these are " + tag.getRuleIds() + ")", e);
     }
-    LOGGER.debug(tag.getId() + " Finished processing.");
   }
 
   /**
@@ -114,6 +112,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     // For each rule id related to the tag
     if (tag.getRuleIds().size() > 0) {
         LOGGER.trace(tag.getId() + " Triggering re-evaluation for " + tag.getRuleIds().size() + " rules : " + tag.getRuleIds());
+
         while (rulesIterator.hasNext()) {
            evaluateRule(rulesIterator.next());
         }
@@ -142,19 +141,14 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     if (ruleTagCache.isWriteLockedByCurrentThread(pRuleId)) {
         LOGGER.info(pRuleId + " Attention: I already have a write lock on rule " + pRuleId);
     }
-    LOGGER.trace(pRuleId + " Trying to acquire WRITE lock...");
+
     ruleTagCache.acquireWriteLockOnKey(pRuleId);
-    LOGGER.debug(pRuleId + " Got WRITE lock");
 
     try {
-      LOGGER.trace(pRuleId + " Trying to get rule tag object from cache...");
       RuleTag rule = ruleTagCache.get(pRuleId);
-      LOGGER.debug(pRuleId + " Got rule tag object from cache ");
 
       if (rule.getRuleExpression() != null) {
         final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
-
-        LOGGER.trace(pRuleId + " RuleInputTags: " + ruleInputTagIds);
 
         // Retrieve all input tags for the rule
         final Map<Long, Object> tags = new Hashtable<Long, Object>(ruleInputTagIds.size());
@@ -167,9 +161,8 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
             // We don't use a read lock here, because a tag change would anyway
             // result in another rule evaluation
             // look for tag in datatag, rule and control caches
-            LOGGER.trace(pRuleId + " Trying to get object for input tag '" + inputTagId + "' from cache...");
             tag = tagLocationService.get(inputTagId);
-            LOGGER.debug(pRuleId + " Got object for input tag '" + inputTagId + "' object from cache");
+
             // put reference to cache object in map
             tags.put(inputTagId, tag);
           }
@@ -209,7 +202,6 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
       ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
     } finally {
       ruleTagCache.releaseWriteLockOnKey(pRuleId);
-      LOGGER.debug(pRuleId + " Released WRITE lock");
     }
   }
 
@@ -218,9 +210,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
    */
   @Override
   public void confirmStatus(Tag tag) {
-    LOGGER.trace(tag.getId() + " Entering confirmStatus()");
     notifyElementUpdated(tag);
-    LOGGER.trace(tag.getId() + " Leaving confirmStatus()");
   }
 
   @Override
