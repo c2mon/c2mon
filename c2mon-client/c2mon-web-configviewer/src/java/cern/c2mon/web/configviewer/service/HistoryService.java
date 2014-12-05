@@ -39,7 +39,7 @@ public class HistoryService {
   private static Logger logger = Logger.getLogger(HistoryService.class);
 
   /** Date format used in our trend views */
-  private static final String CHART_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
+  private static final String CHART_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
 
   /** the path to the xslt document */
   private static final String XSLT_PATH = "../xslt/history.xsl";
