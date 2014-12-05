@@ -16,7 +16,7 @@
 
 <script type="text/javascript" src="../js/jquery/jquery.js"></script>
 <script type="text/javascript" src="../js/bootstrap/bootstrap.js"></script>
-<script src="http://code.highcharts.com/highcharts.js"></script>
+<script type="text/javascript" src="../js/highcharts.js"></script>
 <script type="text/javascript" src="../js/trend-view.js"></script>
 
 
