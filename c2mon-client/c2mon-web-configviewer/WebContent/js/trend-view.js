@@ -88,7 +88,7 @@ TrendView.prototype.init = function() {
   // browser window is resized
   $(window).resize(function() {
     this.resizeChart();
-  });
+  }.bind(this));
 
   // Initialises the "Help" popover
   $(function() {
