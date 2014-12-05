@@ -39,7 +39,7 @@ public class HistoryService {
   private static Logger logger = Logger.getLogger(HistoryService.class);
 
   /** Date format used in our trend views */
-  private static final String CHART_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+  private static final String CHART_DATE_FORMAT = "yyyy/MM/dd HH:mm:ss.SSS";
 
   /** the path to the xslt document */
   private static final String XSLT_PATH = "../xslt/history.xsl";
@@ -397,7 +397,9 @@ public class HistoryService {
 
       historyCSV.append(
           formatToDygraphCompatibleDate(q.getServerTimestamp())
-          + ", " + value);
+          + "," + value + "," + q.getValueDescription());
+
+      historyCSV.append("," + q.getDataTagQuality().getDescription());
 
       historyCSV.append("\\n\"");
 

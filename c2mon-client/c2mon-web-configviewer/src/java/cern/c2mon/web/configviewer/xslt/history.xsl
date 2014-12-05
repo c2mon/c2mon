@@ -52,7 +52,7 @@
     tr.invalid
     {
     color : #000000;
-    background : #66FFFF;
+    background : #D9EDF7 !important;
     }
     
     table {

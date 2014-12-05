@@ -5,316 +5,174 @@
 <%@page import="java.util.List"%>
 
 <!DOCTYPE html>
+<html>
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9; IE=EmulateIE10">
 <!--[if IE]><script src="../js/excanvas.js"></script><![endif]-->
 <title>TrendViewer</title>
-<script type="text/javascript" src="../js/dygraph-combined.js"></script>
 
 <link rel="shortcut icon" href="../img/chart_icon.png">
 <link rel="stylesheet" type="text/css" href="../css/bootstrap/bootstrap.css" />
-<link rel="stylesheet" type="text/css" href="../css/trend-view.css" />
 
 <script type="text/javascript" src="../js/jquery/jquery.js"></script>
 <script type="text/javascript" src="../js/bootstrap/bootstrap.js"></script>
-
-<script type="text/javascript" src="../js/hide-menu.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
 <script type="text/javascript" src="../js/trend-view.js"></script>
+
+
+<style type="text/css">
+#chart-toolbar {
+  margin-bottom: 0;
+  border-bottom-left-radius: 0px;
+  -webkit-border-bottom-left-radius: 0px;
+  -moz-border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  -webkit-border-bottom-right-radius: 0px;
+  -moz-border-bottom-right-radius: 0px;
+}
+
+#chart-container {
+  border-top-left-radius: 0px;
+  -webkit-border-top-left-radius: 0px;
+  -moz-border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  -webkit-border-top-right-radius: 0px;
+  -moz-border-top-right-radius: 0px;
+  border-top: 0px;
+  background-color: #fff;
+  padding-bottom: 0;
+  padding-left: 0;
+}
+
+.btn-danger {
+  margin-left: 8px;
+}
+</style>
+
 </head>
 
 <body>
-
-
-  <style media="screen" type="text/css">
-.invalidPoint {
-  background-color: #66ffff;
-}
-
-.Phone_Menu{
- color:#FF0000;
- }
- 
- 
-.Phone_Menu a:link {
-COLOR: black;
-}
-.Phone_Menu a:visited {
-COLOR: black;
-}
-.Phone_Menu a:hover {
-COLOR: black;
-}
-.Phone_Menu a:active {
-COLOR: black;
-}
- 
-.icon-bar {
- display: block;
- margin-top: 3px;
- width: 18px;
- height: 2px;
- background-color: black;
- -webkit-border-radius: 1px;
-    -moz-border-radius: 1px;
-         border-radius: 1px;
- -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
-    -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
-         box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
-}
-
-</style>
-
-
-  <div class="container-fluid">
-    <div class="row-fluid" id="row-fluid">
-
+  <div class="container-fluid" style="padding-left: 150px; padding-right: 150px;">
+    <div id="page-title" class="row">
       <div class="page-header">
-        <h2 style="margin-left: 50px; display: inline; text-align: center;">${view_title}</h2>
-        <div style="margin-left: 50px;">${view_description}</div>
+        <h2>${view_title}</h2>
+        <div>${view_description}</div>
       </div>
+    </div>
 
-      <div style="height: 30px; min-width: 670px; margin-bottom: 20px;" class="links">
-        <A href="../historyviewer/${id}?${queryParameters}" style="display: inline; float: right;" class="large blue awesome xml_button" target="_blank">Table
-          >> </A>
-        <A href="../tagviewer/${id}" class="large blue awesome xml_button" target="_blank">View Tag >> </A>
-        <A href="https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=${id}" class="large red awesome xml_button" target="_blank">View Help Alarm
-          >> </A>
-        <A style="display: inline; float: left;" href="../" class="large blue awesome xml_button">
-          <i class="icon-home"></i> Home
-        </A>
-        <A style="display: inline; float: left;" href="${url_help}" class="large blue awesome xml_button Help_page" target="_blank">Help >> </A>
-        <span style="display: inline; float: left;" class="large blue awesome xml_button navigation_popup" target="_blank">Info </span>
+    <div id="page-body" class="row">
 
+      <nav id="chart-toolbar" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <!-- Brand and toggle get grouped for better mobile display -->
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">
+              C<sup>2</sup>MON Trend Viewer
+            </a>
+          </div>
+
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li>
+                <a href="../">
+                  <i class="glyphicon glyphicon-home"></i>
+                  &nbsp;Home
+                </a>
+              </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+              <li>
+                <div class="btn-group" data-toggle="buttons">
+                  <button id="reset-zoom" class="btn btn-default navbar-btn">
+                    <i class="glyphicon glyphicon-zoom-out"></i>
+                    &nbsp;Reset Zoom
+                  </button>
+                  <label id="toggle-invalid" class="btn btn-default navbar-btn">
+                    <input type="checkbox" autocomplete="off">
+                    Toggle Invalid
+                  </label>
+                </div>
+              </li>
+
+              <li>
+                <a data-toggle="popover" data-placement="bottom" data-container="body" title="Usage instructions">
+                  <i class="glyphicon glyphicon-question-sign"></i>
+                  &nbsp;Help
+                </a>
+
+                <div id="popover-help" style="display: none;">
+                  Drag out a rectangle in the chart with your mouse to zoom into that area. Click the 'Reset Zoom' button or double click the chart to zoom out
+                  again.
+                  <br />
+                  <br />
+                  You can also hold down the Shift key and click to pan inside the chart.
+                  <br />
+                  <br />
+                  Invalid tag indicators can be shown/hidden with the 'Toggle Invalid' button.
+                </div>
+              </li>
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                  <i class="glyphicon glyphicon-cog"></i>
+                  Tools
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                  <li>
+                    <a href="../historyviewer/${id}?${queryParameters}">View as Table &raquo;</a>
+                  </li>
+                  <li>
+                    <a href="../tagviewer/${id}">View Tag &raquo;</a>
+                  </li>
+                  <li class="divider"></li>
+                  <li>
+                    <form action="https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=${id}">
+                      <input type="submit" class="btn btn-danger navbar-btn" value="View Help Alarm &raquo;">
+                    </form>
+
+                  </li>
+                </ul>
+              </li>
+
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <div id="chart-container" class="well">
+        <div id="chart" style="margin: 0 auto;"></div>
       </div>
-
-      <div id="hide_links_show_menu" style="position: absolute; z-index: 999;">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </div>
-
-      <div class="Phone_Menu" style="position: absolute; z-index: 999; background-color: white;">
-        <p>
-          <A href="../">Home </A>
-        </p>
-        <p>
-          <A href="${url_help}" class="Help_page">Help >> </A>
-        </p>
-        <p style="color: black;" class="navigation_popup">Info</p>
-        <p>
-          <A href="../historyviewer/${id}?${queryParameters}">Table >> </A>
-        </p>
-        <p>
-          <A href="../tagviewer/${id}">View Tag >> </A>
-        </p>
-        <p>
-          <A href="https://oraweb.cern.ch/pls/timw3/helpalarm.AlarmList?p_pointid1=${id}">View Help Alarm >> </A>
-        </p>
-      </div>
-
-      <script type="text/javascript">
-      var url_help = '${url_help}';
-      if(url_help.trim().length<1)
-        $(".Help_page").hide();
-    </script>
-
-      <div id="popup" style="position: absolute; background-color: #f8f8f8; z-index: 999">
-        <h2 style="color: #000066;">Navigation</h2>
-        The chart is interactive:
-        <ul>
-          <li>Mouse over to highlight individual values.</li>
-          <li>Click and drag to zoom (horizontally or vertically).</li>
-          <li>Double-click will zoom back out.</li>
-          <li>Shift-drag will pan.</li>
-        </ul>
-      </div>
-      <div style="width: 100%; height: 650px; margin-top: 50px; margin-left: -2%;" id="trend_view"></div>
-
     </div>
   </div>
-  <!--/.fluid-container-->
 
 
-  <script type="text/javascript">      
-    var invalid;
-    
-    var texte = ${CSV};
-    //table with all dates
-    var array = texte.split("\n");
-    //Table without ',number' at the end
-    var datefinal = new Array();
-    
-    /**
-     * Table with the content of ${invalidPoint.time}
-     */
-    function populateArray() {  
-      names = new Array();
-      <c:forEach items="${invalidPoints}" var="invalidPoint" varStatus="status">  
-      names[${status.index}] = "${invalidPoint.time}";  
-      </c:forEach>  
-      return names;  
-    } 
-     
-
-    
-    
-    
-    //Remove the unnecessary character
-    for (var i=0;i<array.length;i++) {  
-      datefinal[i] = array[i].substr(0,19);
-    }
-      
-    // Table with all invalid point
-    invalid = populateArray();
-    
-    var trend = new Dygraph(
-
-    // containing div
-    document.getElementById("trend_view"),
-
-    // CSV or path to a CSV file.
-    ${CSV}
-    
-    ,{
-     // title: "History chart for: ${id}",
-     legend: 'always',
-     stepPlot: ${is_boolean},
-     fillGraph: ${fill_graph},
-     colors: ['#2e8b57'],
-     ylabel: '${ylabel}',
-       <c:if test="${is_boolean}"> 
-         valueRange: [-1, 2],  
-       </c:if>
-     labels: [ 
-         <c:set var="totalLabels" value="${fn:length(labels)}" />
-        <c:forEach items="${labels}" var="label" varStatus="labelCounter">
-          "<c:out value="${label}"/>"
-          <c:if test="${ totalLabels !=  labelCounter.count }">
-            ,
-          </c:if>
-        </c:forEach>
-     ],
-     xAxisLabelWidth: 70,
-    
-     underlayCallback: function(canvas, area, trend) {
-       var cpt = 0;
-       //Color of the area
-       canvas.fillStyle = "rgba(102, 255, 255, 10.0)"
-       
-         /**
-          * To draw the invalid area
-          */
-         function highlight_period(x_start, x_end) {
-           var canvas_left_x = trend.toDomXCoord(x_start);
-           var canvas_right_x = trend.toDomXCoord(x_end);
-           var canvas_width = canvas_right_x - canvas_left_x;
-           canvas.fillRect(canvas_left_x, area.y, canvas_width, area.h);
-         }
-       
-       // 1st value of the graph
-       var min_data_x = trend.getValue(0,0);
-       var max_data_x = trend.getValue(trend.numRows()-1,0);
-
-       // get the first invalid date and convert the string to a date
-       var d = new Date(invalid[cpt]);
-       // Convert this date to timestamp
-       var w = d.getTime();
-
-       while (w < max_data_x) {
-         // Save the index of the invalid date who is located in the all date table
-         var savecpt;
-         var start_x_highlight = w;
-         
-        //i search the invalid date in the all date table, the next one is the end 
-         for (var j=0;j<datefinal.length;j++)
-         {  
-           end = new Date(datefinal[j]).getTime();
-           if(start_x_highlight == end)
-             {
-              savecpt = j + 1; 
-             }        
-         }
-
-         var end_x_highlight = new Date(datefinal[savecpt]).getTime();
-         // make sure we don't try to plot outside the graph
-         if (start_x_highlight < min_data_x) {
-           start_x_highlight = min_data_x;
-         }
-         if (end_x_highlight > max_data_x) {
-           end_x_highlight = max_data_x;
-         }
-         highlight_period(start_x_highlight,end_x_highlight);
-         // get the next invalid point 
-         cpt++;
-         nextDate = new Date(invalid[cpt]).getTime();
-         
-         w = nextDate;
-         //alert(w);
-       }
-       
-     },
-     axes: {
-         x: {
-           axisLabelFormatter: function(d) {
-            var month=new Array();
-            month[00]="Jan";
-            month[01]="Feb";
-            month[02]="Mar";
-            month[03]="Apr";
-            month[04]="May";
-            month[05]="Jun";
-            month[06]="Jul";
-            month[07]="Aug";
-            month[08]="Sep";
-            month[09]="Oct";
-            month[10]="Nov";
-            month[11]="Dec";
-            /* d.getMonth() return number and not Jan, Feb
-            *  uncomment d.getFullYear() if you want the year
-            */
-               return d.getDate()+"-"
-               + month[(d.getMonth())]/*+"-"
-               + Dygraph.zeropad(d.getFullYear())*/+"\n"
-               + Dygraph.zeropad(d.getHours()) + ":"
-               + Dygraph.zeropad(d.getMinutes());
-           }
+  <script type="text/javascript">
   
-         }}
-    }
-  );
-    
-   // Display the invalid notification (blue square)
-   trend.ready(function(g) {
-    g.setAnnotations( [
-    
-   <c:set var="totalInvalidPoints" value="${fn:length(invalidPoints)}" />
-   <c:forEach items="${invalidPoints}" var="invalidPoint" varStatus="invalidPointCounter">
-    {
-      series:
-         <c:set var="totalLabels" value="${fn:length(labels)}" />
-        <c:forEach items="${labels}" var="label" varStatus="labelCounter">
-          <c:if test="${ totalLabels ==  labelCounter.count }">
-            "<c:out value="${label}"/>",
-          </c:if>
-        </c:forEach>
-      x: "<c:out value="${invalidPoint.time}"/>",
-      shortText: "?",
-      text: "<c:out value="${invalidPoint.invalidationReason}"/>",
-      cssClass: 'invalidPoint'
-    }
-      <c:if test="${ totalInvalidPoints !=  invalidPointCounter.count }">
-        ,
-      </c:if>
+  /**
+   * Called when the document is ready to be safely manipulated.
+   */
+  $(document).ready(function() {
+    var data = ${CSV};
+
+    // Parse the invalid points into an array
+    // TODO: merge this into main CSV file via 'valid' column
+    var invalid = new Array();
+    <c:forEach items="${invalidPoints}" var="invalidPoint" varStatus="status">  
+      invalid[${status.index}] = ["${invalidPoint.time}", "${invalidPoint.invalidationReason}"];
     </c:forEach>
-    ] );
+    
+    // Create and show the chart
+    var trendView = new TrendView(${id}, ${CSV}, invalid, "Date", "${ylabel}");
   });
-  
-
-
-</script>
-
-
-
+  </script>
 </body>
 </html>
