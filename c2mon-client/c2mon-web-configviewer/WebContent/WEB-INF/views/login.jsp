@@ -1,9 +1,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page session="false"%>
-<html>
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Please Login</title>
-<meta http-equiv="X-UA-Compatible" content="IE=9" />
 
 <link rel="stylesheet" type="text/css" href="<c:url value="/css/bootstrap/bootstrap.css"/>" />
 

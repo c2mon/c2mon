@@ -5,10 +5,13 @@
 <%@page import="java.util.List"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7; IE=EmulateIE9; IE=EmulateIE10">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <!--[if IE]><script src="../js/excanvas.js"></script><![endif]-->
+
 <title>TrendViewer</title>
 
 <link rel="shortcut icon" href="../img/chart_icon.png">
