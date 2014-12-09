@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +51,9 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
 
   private final CacheRegistrationService cacheRegistrationService;
 
+  @Value("${c2mon.server.rule.evaluation.threads}")
+  protected int numEvaluationThreads = 1;
+
   /**
    * Listener container lifecycle hook.
    */
@@ -81,7 +85,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
    */
   @PostConstruct
   public void init() {
-    listenerContainer = cacheRegistrationService.registerToAllTags(this, 1);
+    listenerContainer = cacheRegistrationService.registerToAllTags(this, numEvaluationThreads);
   }
 
   @Override

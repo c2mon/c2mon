@@ -103,7 +103,10 @@
             
             <!-- LASER module -->
             <!-- number of threads used when creating a LASER backup -->
-            <prop key="c2mon.server.laser.backup.threads">10</prop>                     
+            <prop key="c2mon.server.laser.backup.threads">10</prop>
+            
+            <!-- number of rule evaluation threads to be used -->
+            <prop key="c2mon.server.rule.evaluation.threads">1</prop>
                      
         </props>  
      </property>  
