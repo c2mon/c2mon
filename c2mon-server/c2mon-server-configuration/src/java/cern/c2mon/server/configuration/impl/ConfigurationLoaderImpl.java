@@ -164,203 +164,213 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
     LOGGER.info(configId + " Applying configuration ");
     ConfigurationReport report = null;
-    clusterCache.acquireWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
-    try {
 
-      String configName = configurationDAO.getConfigName(configId);
-      if (configName == null) {
-        LOGGER.warn(configId + " Unable to locate configuration - cannot be applied.");
-        return new ConfigurationReport(
-            configId,
-            "UNKNOWN",
-            "", //TODO set user name through RBAC once available
-            Status.FAILURE,
-            "Configuration with id <" + configId + "> not found. Please try again with a valid configuration id"
-          );
-      }
-
-      //map of element reports that need a DAQ child report adding
-      Map<Long, ConfigurationElementReport> daqReportPlaceholder = new HashMap<Long, ConfigurationElementReport>();
-      //map of elements themselves elt_seq_id -> element
-      Map<Long, ConfigurationElement> elementPlaceholder = new HashMap<Long, ConfigurationElement>();
-      //map of lists, where each list needs sending to a particular DAQ (processId -> List of events)
-      Map<Long, List<Change>> processLists = new HashMap<Long, List<Change>>();
-
-      report = new ConfigurationReport(configId,
-          configName,
-          "");
-
-      List<ConfigurationElement> configElements;
+    // Try to acquire the configuration lock.
+    if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, 10L)) {
       try {
-        LOGGER.debug(configId + " Fetching configuration items from DB...");
-        configElements = configurationDAO.getConfigElements(configId);
-        LOGGER.debug(configId + " Got " + configElements.size() + " elements from DB");
-      } catch (Exception e) {
-        String message = "Exception caught while loading the configuration for " + configId + " from the DB: " + e.getMessage();
-        LOGGER.error(message, e);
-        throw new RuntimeException(message, e);
-      }
 
-      AtomicInteger progressCounter = new AtomicInteger(1);
-      if (configProgressMonitor != null){
-        configProgressMonitor.serverTotalParts(configElements.size());
-      }
-      for (ConfigurationElement element : configElements) {
-        if (!cancelRequested) {
-          //initialize success report
-          ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
-              element.getEntity(),
-              element.getEntityId());
-          report.addElementReport(elementReport);
-          List<ProcessChange> processChanges = null;
-          try {
-            processChanges = applyConfigElement(element, elementReport);  //never returns null
-
-            for (ProcessChange processChange : processChanges) {
-
-              Long processId = processChange.getProcessId();
-              if (processChange.processActionRequired()) {
-
-                if (!processLists.containsKey(processId)) {
-                  processLists.put(processId, new ArrayList<Change>());
-                }
-                processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface
-                daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
-                elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
-                element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
-              } else if (processChange.requiresReboot()) {
-                if (LOGGER.isDebugEnabled()) {
-                  LOGGER.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
-                }
-                element.setDaqStatus(Status.RESTART);
-                report.addStatus(Status.RESTART);
-                report.addProcessToReboot(processCache.get(processId).getName());
-                element.setStatus(Status.RESTART);
-                processFacade.requiresReboot(processId, Boolean.TRUE);
-              }
-            }
-          } catch (Exception ex) {
-            String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, Entity id) = ("
-              + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
-            LOGGER.error(errMessage, ex);
-            elementReport.setFailure("Exception caught while applying the configuration change.", ex);
-            element.setStatus(Status.FAILURE);
-            report.addStatus(Status.FAILURE);
-            report.setStatusDescription("Failure: see details below.");
-          }
-          if (configProgressMonitor != null){
-            configProgressMonitor.onServerProgress(progressCounter.getAndIncrement());
-          }
-        } else {
-          LOGGER.info(configId + " Interrupting configuration due to cancel request.");
+        String configName = configurationDAO.getConfigName(configId);
+        if (configName == null) {
+          LOGGER.warn(configId + " Unable to locate configuration - cannot be applied.");
+          return new ConfigurationReport(
+              configId,
+              "UNKNOWN",
+              "", //TODO set user name through RBAC once available
+              Status.FAILURE,
+              "Configuration with id <" + configId + "> not found. Please try again with a valid configuration id"
+            );
         }
-      }
 
-      //send events to Process if enabled, convert the responses and introduce them into the existing report; else set all DAQs to restart
-      if (daqConfigEnabled) {
+        //map of element reports that need a DAQ child report adding
+        Map<Long, ConfigurationElementReport> daqReportPlaceholder = new HashMap<Long, ConfigurationElementReport>();
+        //map of elements themselves elt_seq_id -> element
+        Map<Long, ConfigurationElement> elementPlaceholder = new HashMap<Long, ConfigurationElement>();
+        //map of lists, where each list needs sending to a particular DAQ (processId -> List of events)
+        Map<Long, List<Change>> processLists = new HashMap<Long, List<Change>>();
+
+        report = new ConfigurationReport(configId,
+            configName,
+            "");
+
+        List<ConfigurationElement> configElements;
+        try {
+          LOGGER.debug(configId + " Fetching configuration items from DB...");
+          configElements = configurationDAO.getConfigElements(configId);
+          LOGGER.debug(configId + " Got " + configElements.size() + " elements from DB");
+        } catch (Exception e) {
+          String message = "Exception caught while loading the configuration for " + configId + " from the DB: " + e.getMessage();
+          LOGGER.error(message, e);
+          throw new RuntimeException(message, e);
+        }
+
+        AtomicInteger progressCounter = new AtomicInteger(1);
         if (configProgressMonitor != null){
-          configProgressMonitor.daqTotalParts(processLists.size());
+          configProgressMonitor.serverTotalParts(configElements.size());
         }
+        for (ConfigurationElement element : configElements) {
+          if (!cancelRequested) {
+            //initialize success report
+            ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
+                element.getEntity(),
+                element.getEntityId());
+            report.addElementReport(elementReport);
+            List<ProcessChange> processChanges = null;
+            try {
+              processChanges = applyConfigElement(element, elementReport);  //never returns null
 
-        LOGGER.info(configId + " Reconfiguring " + processLists.keySet().size()+ " processes ...");
+              for (ProcessChange processChange : processChanges) {
 
-        AtomicInteger daqProgressCounter = new AtomicInteger(1);
-        for (Long processId : processLists.keySet()) {
-          if (!cancelRequested){
-            List<Change> processChangeEvents = processLists.get(processId);
-            if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
-              try {
-                LOGGER.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
-                ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
-                if (!processReport.getChangeReports().isEmpty()) {
-                    
-                  LOGGER.trace(configId + " Received " + processReport.getChangeReports().size() + " back from process.");
-                } else {
-                  LOGGER.trace(configId + " Received 0 reports back from process");
-                }
-                for (ChangeReport changeReport : processReport.getChangeReports()) {
-                  ConfigurationElementReport convertedReport =
-                    ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
-                  daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);
-                  //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
-                  if (changeReport.isReboot()) {
-                    report.addProcessToReboot(processCache.get(processId).getName());
-                    elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
-                    //TODO set flag & tag to indicate that process restart is needed
-                  } else if (changeReport.isFail()) {
-                    LOGGER.debug(configId + " changeRequest failed at process " + processCache.get(processId).getName());
-                    report.addStatus(Status.FAILURE);
-                    report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
-                    elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
-                  } else { //success, override default failure
-                    if (elementPlaceholder.get(changeReport.getChangeId()).getDaqStatus().equals(Status.RESTART)) {
-                      elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.OK);
-                    }
+                Long processId = processChange.getProcessId();
+                if (processChange.processActionRequired()) {
+
+                  if (!processLists.containsKey(processId)) {
+                    processLists.put(processId, new ArrayList<Change>());
                   }
+                  processLists.get(processId).add((Change) processChange.getChangeEvent());   //cast to implementation needed as DomFactory uses this - TODO change to interface
+                  daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
+                  elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
+                  element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
+                } else if (processChange.requiresReboot()) {
+                  if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
+                  }
+                  element.setDaqStatus(Status.RESTART);
+                  report.addStatus(Status.RESTART);
+                  report.addProcessToReboot(processCache.get(processId).getName());
+                  element.setStatus(Status.RESTART);
+                  processFacade.requiresReboot(processId, Boolean.TRUE);
                 }
-              } catch (Exception e) {
-                String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration to Process (possible timeout)" + processCache.get(processId).getName();
-                LOGGER.error(errorMessage, e);
-                processFacade.requiresReboot(processId, true);
-                report.addProcessToReboot(processCache.get(processId).getName());
-                report.addStatus(Status.FAILURE);
-                report.setStatusDescription(errorMessage);
               }
-            } else {
-              processFacade.requiresReboot(processId, true);
-              report.addProcessToReboot(processCache.get(processId).getName());
-              report.addStatus(Status.RESTART);
+            } catch (Exception ex) {
+              String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, Entity id) = ("
+                + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
+              LOGGER.error(errMessage, ex);
+              elementReport.setFailure("Exception caught while applying the configuration change.", ex);
+              element.setStatus(Status.FAILURE);
+              report.addStatus(Status.FAILURE);
+              report.setStatusDescription("Failure: see details below.");
             }
-            if (configProgressMonitor != null) {
-              configProgressMonitor.onDaqProgress(daqProgressCounter.getAndIncrement());
+            if (configProgressMonitor != null){
+              configProgressMonitor.onServerProgress(progressCounter.getAndIncrement());
             }
           } else {
-            LOGGER.info("Interrupting configuration " + configId + " due to cancel request.");
+            LOGGER.info(configId + " Interrupting configuration due to cancel request.");
           }
         }
-      } else {
-        LOGGER.debug("DAQ runtime reconfiguration not enabled - setting required restart flags");
-        if (!processLists.isEmpty()){
-          report.addStatus(Status.RESTART);
+
+        //send events to Process if enabled, convert the responses and introduce them into the existing report; else set all DAQs to restart
+        if (daqConfigEnabled) {
+          if (configProgressMonitor != null){
+            configProgressMonitor.daqTotalParts(processLists.size());
+          }
+
+          LOGGER.info(configId + " Reconfiguring " + processLists.keySet().size()+ " processes ...");
+
+          AtomicInteger daqProgressCounter = new AtomicInteger(1);
           for (Long processId : processLists.keySet()) {
-            processFacade.requiresReboot(processId, true);
-            report.addProcessToReboot(processCache.get(processId).getName());
+            if (!cancelRequested){
+              List<Change> processChangeEvents = processLists.get(processId);
+              if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
+                try {
+                  LOGGER.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
+                  ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
+                  if (!processReport.getChangeReports().isEmpty()) {
+
+                    LOGGER.trace(configId + " Received " + processReport.getChangeReports().size() + " back from process.");
+                  } else {
+                    LOGGER.trace(configId + " Received 0 reports back from process");
+                  }
+                  for (ChangeReport changeReport : processReport.getChangeReports()) {
+                    ConfigurationElementReport convertedReport =
+                      ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
+                    daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);
+                    //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
+                    if (changeReport.isReboot()) {
+                      report.addProcessToReboot(processCache.get(processId).getName());
+                      elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.RESTART);
+                      //TODO set flag & tag to indicate that process restart is needed
+                    } else if (changeReport.isFail()) {
+                      LOGGER.debug(configId + " changeRequest failed at process " + processCache.get(processId).getName());
+                      report.addStatus(Status.FAILURE);
+                      report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
+                      elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.FAILURE);
+                    } else { //success, override default failure
+                      if (elementPlaceholder.get(changeReport.getChangeId()).getDaqStatus().equals(Status.RESTART)) {
+                        elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(Status.OK);
+                      }
+                    }
+                  }
+                } catch (Exception e) {
+                  String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration to Process (possible timeout)" + processCache.get(processId).getName();
+                  LOGGER.error(errorMessage, e);
+                  processFacade.requiresReboot(processId, true);
+                  report.addProcessToReboot(processCache.get(processId).getName());
+                  report.addStatus(Status.FAILURE);
+                  report.setStatusDescription(errorMessage);
+                }
+              } else {
+                processFacade.requiresReboot(processId, true);
+                report.addProcessToReboot(processCache.get(processId).getName());
+                report.addStatus(Status.RESTART);
+              }
+              if (configProgressMonitor != null) {
+                configProgressMonitor.onDaqProgress(daqProgressCounter.getAndIncrement());
+              }
+            } else {
+              LOGGER.info("Interrupting configuration " + configId + " due to cancel request.");
+            }
+          }
+        } else {
+          LOGGER.debug("DAQ runtime reconfiguration not enabled - setting required restart flags");
+          if (!processLists.isEmpty()){
+            report.addStatus(Status.RESTART);
+            for (Long processId : processLists.keySet()) {
+              processFacade.requiresReboot(processId, true);
+              report.addProcessToReboot(processCache.get(processId).getName());
+            }
           }
         }
-      }
 
-      //LOGGER.info(configId + " Saving configuration ")
-      //save Configuration element status information in the DB tables
-      for (ConfigurationElement element : configElements) {
-        configurationDAO.saveStatusInfo(element);
-      }
-      //mark the Configuration as applied in the DB table, with timestamp set
-      configurationDAO.markAsApplied(configId);
-      LOGGER.info("Finished applying configuraton " + configId);
-      return report;
+        //LOGGER.info(configId + " Saving configuration ")
+        //save Configuration element status information in the DB tables
+        for (ConfigurationElement element : configElements) {
+          configurationDAO.saveStatusInfo(element);
+        }
+        //mark the Configuration as applied in the DB table, with timestamp set
+        configurationDAO.markAsApplied(configId);
+        LOGGER.info("Finished applying configuraton " + configId);
+        return report;
 
-    } catch (Exception ex) {
-      LOGGER.error("Exception caught while applying configuration " + configId, ex);
-      if (report == null) {
-        String userName = null;
-        report = new ConfigurationReport(
-            configId,
-            "UNKNOWN",
-            "",
-            Status.FAILURE,
-            "Exception caught when applying configuration with id <" + configId + ">."
-          );
-        report.setExceptionTrace(ex);
-      } else {
-        report.addStatus(Status.FAILURE);
-        report.setExceptionTrace(ex);
+      } catch (Exception ex) {
+        LOGGER.error("Exception caught while applying configuration " + configId, ex);
+        if (report == null) {
+          String userName = null;
+          report = new ConfigurationReport(
+              configId,
+              "UNKNOWN",
+              "",
+              Status.FAILURE,
+              "Exception caught when applying configuration with id <" + configId + ">."
+            );
+          report.setExceptionTrace(ex);
+        } else {
+          report.addStatus(Status.FAILURE);
+          report.setExceptionTrace(ex);
+        }
+        throw new ConfigurationException(report, ex);
+      } finally {
+        clusterCache.releaseWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
+        if (report != null) {
+          archiveReport(configId, report.toXML());
+        }
       }
-      throw new ConfigurationException(report, ex);
-    } finally {
-      clusterCache.releaseWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
-      if (report != null) {
-        archiveReport(configId, report.toXML());
-      }
+    }
+
+    // If we couldn't acquire the configuration lock, reject the request.
+    else {
+      LOGGER.warn(configId + " Unable to apply configuration - another configuration is already running.");
+      return new ConfigurationReport(configId, null, null, Status.FAILURE,
+          "Your configuration request has been rejected since another configuration is still running. Please try again later.");
     }
   }
 

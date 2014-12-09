@@ -1346,4 +1346,43 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
 
     verify(mockManager);
   }
+
+  @Test
+  public void testConcurrentConfigRequestRejected() throws InterruptedException, IllegalAccessException, InstantiationException, NoSuchFieldException,
+      ParserConfigurationException, TransformerException, NoSimpleValueParseException {
+
+    final ConfigurationReport report1;
+    final ConfigurationReport report2;
+
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+
+    replay(mockManager);
+
+    ConcurrentConfigRequestor ccr = new ConcurrentConfigRequestor();
+    Thread t = new Thread(ccr);
+
+    // Start two configs concurrently
+    t.start();
+    report1 = configurationLoader.applyConfiguration(1);
+    t.join();
+
+    System.out.println(report1.toXML());
+    assertFalse(report1.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+
+    report2 = ccr.report;
+    System.out.println(report2.toXML());
+    assertTrue(report2.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertTrue(report2.toXML().contains("rejected since another configuration is still running"));
+
+    verify(mockManager);
+  }
+
+  class ConcurrentConfigRequestor implements Runnable {
+    ConfigurationReport report;
+
+    @Override
+    public void run() {
+      report = configurationLoader.applyConfiguration(2);
+    }
+  }
 }
