@@ -166,7 +166,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     ConfigurationReport report = null;
 
     // Try to acquire the configuration lock.
-    if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, 10L)) {
+    if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, 1L)) {
       try {
 
         String configName = configurationDAO.getConfigName(configId);
