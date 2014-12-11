@@ -45,8 +45,7 @@ function TrendView(id, csv, invalidPoints, xlabel, ylabel) {
  * appropriate.
  */
 TrendView.prototype.init = function() {
-  console.log('init() called');
-
+  
   // Register a click handler for the reset zoom button
   $('#reset-zoom').prop('disabled', true);
   $('#reset-zoom').click(function() {
