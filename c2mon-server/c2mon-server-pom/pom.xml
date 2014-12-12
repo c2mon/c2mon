@@ -116,6 +116,11 @@
         <artifactId>spring-context-support</artifactId>
         <version>${org.springframework.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
 
       <!-- c2mon shared libraries -->
       <dependency>
@@ -407,6 +412,14 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <!-- Disable doclint (which comes with Java 8) as it is very strict with javadoc and causes build failures. -->
+          <additionalparam>-Xdoclint:none</additionalparam>
+        </configuration>
       </plugin>
     </plugins>
   </build>
