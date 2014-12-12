@@ -1,8 +1,8 @@
 package cern.c2mon.server.shorttermlog.structure;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import org.apache.ibatis.migration.commands.NewCommand;
 import org.junit.Test;
 
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -10,7 +10,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 /**
  * Unit test of DataTagShortTermLogConverter.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -20,7 +20,7 @@ public class ConverterTest {
    * Class to test.
    */
   private DataTagShortTermLogConverter converter = new DataTagShortTermLogConverter();
-  
+
   /**
    * Tests the quality code is correctly generated.
    */
@@ -35,7 +35,7 @@ public class ConverterTest {
     TagShortTermLog logTag = (TagShortTermLog) loggable;
     assertEquals(11, logTag.getTagQualityCode());
   }
-  
+
   /**
    * Tests conversion for some other fields.
    */
@@ -44,7 +44,7 @@ public class ConverterTest {
     DataTagCacheObject tag = new DataTagCacheObject(10L);
     tag.setValueDescription("value desc");
     TagShortTermLog logTag = (TagShortTermLog) converter.convertToLogged(tag);
-    assertEquals("value desc",logTag.getTagValueDesc());    
+    assertEquals("value desc",logTag.getTagValueDesc());
   }
-  
+
 }
