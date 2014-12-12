@@ -25,31 +25,29 @@
         <div class="page-header">
           <h2>DataTag: 
             <xsl:value-of select="tagName" /> (<xsl:value-of select="@id" />)
-            
-            <span>
-              <div class="pull-right">
-                <a href="{$base_url}" class="btn btn-default btn-large">
-                  Home
-                  <span class="glyphicon glyphicon-home"></span>
-                </a>
-                <a href="{$base_url}{$tag_value_xml_url}{@id}/" class="btn btn-default btn-large">View XML >></a>
-                <a href="{$base_url}{$history_url}{@id}" class="btn btn-default btn-large">History >> 
-                </a>
-                <a href="{$base_url}{$trend_viewer_url}{@id}" class="btn btn-default btn-large">Trend >> 
-                </a>
-                <a href="{$help_point_url}{@id}" class="btn btn-default btn-large btn-danger">View Help Alarm >> 
-                </a>
-              </div>
-            </span>
           </h2>
         </div>
       </div>
 
       <div class="row">
+        <a href="{$base_url}" class="btn btn-default btn-large">
+          Home
+          <span class="glyphicon glyphicon-home"></span>
+        </a>
+          
+        <p class="pull-right btn-toolbar">
+          <a href="{$base_url}{$tag_value_xml_url}{@id}/" class="btn btn-default btn-large">View as XML &#0187;</a>
+          <a href="{$base_url}{$history_url}{@id}" class="btn btn-default btn-large">View History &#0187; 
+          </a>
+          <a href="{$base_url}{$trend_viewer_url}{@id}" class="btn btn-default btn-large">View Trend &#0187; 
+          </a>
+          <a href="{$help_point_url}{@id}" class="btn btn-default btn-large btn-danger">View Help Alarm &#0187; 
+          </a>
+        </p>
+      </div>
+      
+      <div class="row">
         <table class="table table-striped table-bordered">
-        <thead>
-          <th colspan="2">ClientDataTag</th>
-          </thead>
           <tbody>
           <tr>
             <th>Tag ID</th>
@@ -194,7 +192,7 @@
             DataTag Configuration
             <span>
               <div class="pull-right">
-                <a href="{$base_url}{$tag_config_xml_url}{@id}/" class="btn btn-large btn-default">View TagConfig XML >>
+                <a href="{$base_url}{$tag_config_xml_url}{@id}/" class="btn btn-large btn-default">View as XML &#0187;
                 </a>
               </div>
             </span>
@@ -204,11 +202,7 @@
     
       <div class="row">
         <table class="table table-striped table-bordered">
-          <thead>
-            <th colspan="2">Tag Configuration</th>
-          </thead>
           <tbody>
-          
           <tr>
             <th>Value Deadband</th>
             <td><xsl:value-of select="valueDeadband" /></td>

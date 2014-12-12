@@ -9,13 +9,13 @@
   
     <style>th {width:25%;}</style>
   
-    <p class="tagName">
+    <h2 class="tagName">
       Equipment: 
       <a name="{@name}">
         <xsl:value-of select="@name" />
       </a>
       : (<xsl:value-of select="@id" />)
-    </p>
+    </h2>
     
     <div class="row">
       <table class="table table-striped table-bordered">
@@ -57,14 +57,14 @@
   </xsl:template>
 
   <xsl:template match="SubEquipmentUnit">
-    <p class="tagName">
+    <h3 class="tagName">
       <a name="{@name}">
         <xsl:value-of select="@name" />
       </a>
       : (
       <xsl:value-of select="@id" />
       )
-    </p>
+    </h3>
     <div class="row">
       <table class="table table-striped table-bordered">
         <th colspan="2">SubEquipmentUnit</th>
@@ -101,7 +101,7 @@
   </xsl:template>
 
   <xsl:template match="CommandTag">
-    <p class="tagName">
+    <h4 class="tagName">
       <a href="{$base_url}{$command_url}{@id}/">
         <xsl:value-of select="@name" />
         :(
@@ -109,7 +109,7 @@
         )
       </a>
       &#160;
-    </p>
+    </h4>
     <p>
       This CommandTag belongs to Equipment
       <a href="#{../../@name}">
@@ -155,7 +155,7 @@
   </xsl:template>
 
   <xsl:template match="DataTag">
-    <p class="tagName">
+    <h4 class="tagName">
       <a href="{$base_url}{$datatag_url}{@id}">
         <xsl:value-of select="@name" />
         :(
@@ -163,7 +163,7 @@
         )
       </a>
       &#160;
-    </p>
+    </h4>
     <p>
       This DataTag belongs to Equipment
       <a href="#{../../@name}">

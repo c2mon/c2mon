@@ -22,13 +22,13 @@
         Alarm: 
         <xsl:value-of select="faultFamily"/>:<xsl:value-of select="faultMemeber"/>:<xsl:value-of select="faultCode"/>
         
-        <span class="pull-right" style="margin-bottom: 15px;">
+        <span class="pull-right btn-toolbar" style="margin-bottom: 15px;">
           <a href="{$base_url}{$alarm_xml_url}{@id}/" 
-            class="btn btn-default btn-large" target="_blank">View Alarm XML >>
+            class="btn btn-default btn-large" target="_blank">View as XML &#0187;
           </a>  
           
           <a href="{$help_alarm_url}{@id}" 
-            class="btn btn-danger btn-large" target="_blank">View Help Alarm >>
+            class="btn btn-danger btn-large" target="_blank">View Help Alarm &#0187;
           </a>
         </span>
       </h2>
@@ -37,9 +37,6 @@
 
     <div class="row">
     <table class="table table-striped table-bordered">
-      <thead>
-        <th colspan="2">Alarm Value</th>
-      </thead>
       <tbody>
         <tr>
           <th>Alarm ID</th>

@@ -46,12 +46,12 @@
           DAQ Process:
           <span id="process_name"></span>
   
-          <span class="pull-right">
+          <span class="pull-right btn-toolbar">
             <a href="../" class="btn btn-large btn-default">
-              <span class="glyphicon glyphicon-home"></span>
               Home
+              <span class="glyphicon glyphicon-home"></span>
             </a>
-            <a href="{$base_url}{$process_xml_url}" id="xml_butt" class="btn btn-large btn-default">View as XML >>
+            <a href="{$base_url}{$process_xml_url}" id="xml_butt" class="btn btn-large btn-default">View as XML &#0187;
             </a>
           </span>
         </h2>
