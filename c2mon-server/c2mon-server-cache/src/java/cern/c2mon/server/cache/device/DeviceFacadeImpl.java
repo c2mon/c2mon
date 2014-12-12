@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.common.AbstractFacade;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClass;
@@ -49,6 +51,11 @@ import cern.c2mon.shared.daq.config.Change;
  */
 @Service
 public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFacade {
+
+  /**
+   * Static class logger.
+   */
+  private static final Logger LOG = Logger.getLogger(DeviceCacheImpl.class);
 
   /**
    * Reference to the <code>Device</code> cache
@@ -76,11 +83,19 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
   @Override
   public List<Device> getDevices(String deviceClassName) {
     List<Device> devices = new ArrayList<>();
+    DeviceClassCacheObject deviceClass = null;
 
-    // Search the name attribute of the class cache
-    DeviceClassCacheObject deviceClass = (DeviceClassCacheObject) deviceClassCache.getDeviceClassByName(deviceClassName);
+    try {
+      // Search the name attribute of the class cache
+      deviceClass = (DeviceClassCacheObject) deviceClassCache.getDeviceClassByName(deviceClassName);
+
+    } catch (CacheElementNotFoundException e) {
+      // If we didn't find a class with the given name, return an empty list.
+      LOG.warn("Error getting device class ny name", e);
+      return devices;
+    }
+
     List<Long> deviceIds = deviceClass.getDeviceIds();
-
     for (Long deviceId : deviceIds) {
       devices.add(deviceCache.getCopy(deviceId));
     }

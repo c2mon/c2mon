@@ -32,6 +32,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 
@@ -85,5 +86,14 @@ public class DeviceClassCacheTest {
     Assert.assertTrue(deviceClass.getId().equals(deviceClass2.getId()));
     deviceClass = deviceClassCache.getDeviceClassByName("test_device_class_name_3");
     Assert.assertTrue(deviceClass.getId().equals(deviceClass3.getId()));
+
+    // Test getting an unknown device class
+    try {
+      deviceClass = deviceClassCache.getDeviceClassByName("unknown_device_class");
+      Assert.fail("getDeviceClassByName() did not throw exception");
+    } catch (CacheElementNotFoundException e) {
+    }
   }
+
+
 }
