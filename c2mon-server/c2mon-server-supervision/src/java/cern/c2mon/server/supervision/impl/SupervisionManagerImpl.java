@@ -861,6 +861,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       Equipment equipmentCopy = equipmentCache.getCopy(pId);
       //set state tag if necessary
       Long stateTagId = equipmentCopy.getStateTagId();
+      Long commFaultId = equipmentCopy.getCommFaultTagId();
       controlTagCache.acquireWriteLockOnKey(stateTagId);
       try {
         ControlTag stateTag = controlTagCache.get(stateTagId);
@@ -868,7 +869,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
 
-        setCommFaultTag(equipmentCache.get(pId).getCommFaultTagId(), true, pMessage, pTimestamp);
+        setCommFaultTag(commFaultId, true, pMessage, pTimestamp);
 
       } catch (CacheElementNotFoundException controlCacheEx) {
         LOGGER.error("Unable to locate equipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
@@ -921,7 +922,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
 
-        setCommFaultTag(subEquipmentCache.get(pId).getCommFaultTagId(), true, pMessage, pTimestamp);
+        setCommFaultTag(subEquipmentCopy.getCommFaultTagId(), true, pMessage, pTimestamp);
 
       } catch (CacheElementNotFoundException controlCacheEx) {
         LOGGER.error("Unable to locate subequipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
