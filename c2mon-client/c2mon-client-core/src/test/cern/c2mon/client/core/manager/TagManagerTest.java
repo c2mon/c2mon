@@ -60,7 +60,6 @@ public class TagManagerTest {
     DataTagUpdateListener listener1 = new DataTagUpdateListener() {
       @Override
       public void onUpdate(ClientDataTagValue tagUpdate) {
-        System.out.println("1: counting down " + latch1.getCount());
         latch1.countDown();
       }
     };
@@ -77,7 +76,6 @@ public class TagManagerTest {
     DataTagUpdateListener listener2 = new DataTagUpdateListener() {
       @Override
       public void onUpdate(ClientDataTagValue tagUpdate) {
-        System.out.println("2: counting down " + latch2.getCount());
         latch2.countDown();
       }
     };
