@@ -482,13 +482,16 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             onEquipmentDown(equipmentId, timestamp, msg.toString());
 
             // Manually set the CommFaultTag (TIMS-972)
-            setCommFaultTag(equipmentCache.get(equipmentId).getCommFaultTagId(), false, msg.toString(), timestamp);
+            ControlTag commFaultTag = controlTagCache.getCopy(equipmentCache.getCopy(equipmentId).getCommFaultTagId());
+            setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
 
             // Bring down all SubEquipments
             for (Long subEquipmentId : equipmentCache.get(equipmentId).getSubEquipmentIds()) {
               String message = "Alive timer for parent Equipment expired: " + msg.toString();
               onSubEquipmentDown(subEquipmentId, timestamp, message);
-              setCommFaultTag(subEquipmentCache.get(subEquipmentId).getCommFaultTagId(), false, message, timestamp);
+
+              commFaultTag = controlTagCache.getCopy(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId());
+              setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
             }
 
           } else {
@@ -497,7 +500,8 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             onSubEquipmentDown(subEquipmentId, timestamp, msg.toString());
 
             // Manually set the CommFaultTag (TIMS-972)
-            setCommFaultTag(subEquipmentCache.get(subEquipmentId).getCommFaultTagId(), false, msg.toString(), timestamp);
+            ControlTag commFaultTag = controlTagCache.getCopy(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId());
+            setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
           }
         }
       } catch (CacheElementNotFoundException cacheEx) {
@@ -869,7 +873,8 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
 
-        setCommFaultTag(commFaultId, true, pMessage, pTimestamp);
+        ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
+        setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
 
       } catch (CacheElementNotFoundException controlCacheEx) {
         LOGGER.error("Unable to locate equipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
@@ -915,6 +920,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       subEquipmentFacade.resume(pId, pTimestamp, pMessage);
       SubEquipment subEquipmentCopy = subEquipmentCache.getCopy(pId);
       Long stateTagId = subEquipmentCopy.getStateTagId();
+      Long commFaultId = subEquipmentCopy.getCommFaultTagId();
       controlTagCache.acquireWriteLockOnKey(stateTagId);
       try {
         ControlTag stateTag = controlTagCache.get(stateTagId);
@@ -922,7 +928,8 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
 
-        setCommFaultTag(subEquipmentCopy.getCommFaultTagId(), true, pMessage, pTimestamp);
+        ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
+        setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
 
       } catch (CacheElementNotFoundException controlCacheEx) {
         LOGGER.error("Unable to locate subequipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
@@ -1001,48 +1008,48 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       processCache.acquireWriteLockOnKey(processId);
       try {
         Process process = processCache.get(processId);
-        try {     
+        try {
           // If process is already currently running
-          if (this.processFacade.isRunning(processId)) { 
+          if (this.processFacade.isRunning(processId)) {
             // And TEST mode is on
             if (isTestMode()) {
               // If the DAQ has not being locally initialised connection is permitted
               if (process.getProcessPIK() == null) {
                 LOGGER.info("onProcessConnection - TEST mode - Connection request for DAQ " + process.getName() + " authorized.");
-                
+
                 // Start Up the process
-                this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.", 
+                this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.",
                     processConnectionRequest.getProcessStartupTime());
                 process = this.processFacade.start(processId, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
 
                 // PIK
                 processConnectionResponse.setprocessPIK(process.getProcessPIK());
-                
-                LOGGER.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName() 
+
+                LOGGER.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName()
                     + ", PIK " + process.getProcessPIK());
               // If the DAQ has being locally initialised no connection is permitted
               } else {
                 // Reject Connection
                 processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
-                LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : " 
+                LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : "
                     + processConnectionRequest.getProcessName());
               }
             // If process is already currently running and TEST mode is off no connection is permitted
             } else {
               // Reject Connection
               processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
-              LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : " 
+              LOGGER.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : "
                   + processConnectionRequest.getProcessName());
             }
           // If process is not currently running the connection is permitted
           } else {
             LOGGER.info("onProcessConnection - Connection request for DAQ " + process.getName() + " authorized.");
-  
+
             // Start Up the process
-            this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.", 
+            this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.",
                 processConnectionRequest.getProcessStartupTime());
             process = this.processFacade.start(processId, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
-  
+
             // PIK
             processConnectionResponse.setprocessPIK(process.getProcessPIK());
 
@@ -1067,10 +1074,10 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
     return this.xmlConverter.toXml(processConnectionResponse);
   }
-  
+
   /**
    * Checks if the TEST mode is on
-   * 
+   *
    * @return True if the TEST mode is on and False in any other case
    */
   private boolean isTestMode() {
