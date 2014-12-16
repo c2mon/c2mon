@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2004 - 2011 CERN This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.client.ext.history.dbaccess;
@@ -21,25 +21,24 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 
-import cern.c2mon.client.ext.history.dbaccess.HistoryMapper;
-
 /**
  * Used for testing purposes
- * 
+ *
  * @author vdeila
  *
  */
 public class FakeSqlSession implements SqlSession {
 
   public FakeSqlSession() {
-    
+
   }
-  
+
   @SuppressWarnings("unchecked")
   @Override
   public <T> T getMapper(Class<T> type) {
@@ -47,28 +46,28 @@ public class FakeSqlSession implements SqlSession {
       final HistoryMapper mapper = new FakeHistoryMapperImpl();
       return (T) mapper;
     }
-    
+
     throw new RuntimeException("Mapper \"" + type.getName() + "\" is not supported");
   }
-  
+
   @Override
   public void clearCache() {
-    
+
   }
 
   @Override
   public void close() {
-    
+
   }
 
   @Override
   public void commit() {
-    
+
   }
 
   @Override
   public void commit(boolean force) {
-    
+
   }
 
   @Override
@@ -90,7 +89,7 @@ public class FakeSqlSession implements SqlSession {
   public Connection getConnection() {
     throw new RuntimeException("This method is not supported");
   }
-  
+
   @Override
   public int insert(String statement) {
     throw new RuntimeException("This method is not supported");
@@ -174,6 +173,11 @@ public class FakeSqlSession implements SqlSession {
 
   @Override
   public int update(String statement, Object parameter) {
+    throw new RuntimeException("This method is not supported");
+  }
+
+  @Override
+  public List<BatchResult> flushStatements() {
     throw new RuntimeException("This method is not supported");
   }
 

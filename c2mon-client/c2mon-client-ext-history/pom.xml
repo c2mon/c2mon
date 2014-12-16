@@ -58,7 +58,7 @@
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis-spring</artifactId>
       <!-- be carefull with this: mybatis-spring > 1.0.1 requires: mybatis version > 3.0.5 more info here -> http://www.mybatis.org/spring/ -->
-      <version>1.0.1</version>
+      <version>1.2.2</version>
     </dependency>
 
     <!-- test dependencies -->
