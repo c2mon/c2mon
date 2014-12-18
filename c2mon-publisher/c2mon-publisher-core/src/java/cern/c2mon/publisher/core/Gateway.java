@@ -102,7 +102,8 @@ public class Gateway implements DataTagUpdateListener {
             tagConfigs.put(tagConfig.getId(), tagConfig);
           }
           // Subscribe to the tags
-          tagSubscriptionSuccessful = tagManager.subscribeDataTags(newTagIds, this);
+          tagManager.subscribeDataTags(newTagIds, this);
+          tagSubscriptionSuccessful = true;
         }
         catch (Exception ex) {
           LOG.error("Error occured while trying to subscribe to the list of data tags.", ex);
