@@ -697,11 +697,11 @@ public class HistoryLoader {
     final List<SupervisionEventId> supervisionEventIds = new ArrayList<SupervisionEventId>();
     final List<TagValueUpdateId> tagValueUpdateIds = new ArrayList<TagValueUpdateId>();
     for (final HistoryUpdateId historyUpdateId : historyUpdateIds) {
-      if (historyUpdateId.isTagValueUpdateId()) {
-        tagValueUpdateIds.add(historyUpdateId.getTagValueUpdateId());
+      if (historyUpdateId.isTagValueUpdateIdType()) {
+        tagValueUpdateIds.add(historyUpdateId.toTagValueUpdateId());
       }
-      else if (historyUpdateId.isSupervisionEventId()) {
-        supervisionEventIds.add(historyUpdateId.getSupervisionEventId());
+      else if (historyUpdateId.isSupervisionEventIdType()) {
+        supervisionEventIds.add(historyUpdateId.toSupervisionEventId());
       }
       else {
         LOG.error(String.format("The HistoryUpdateId type \"%s\" is not supported.", historyUpdateId.getClass().getName()));
@@ -1141,11 +1141,11 @@ public class HistoryLoader {
         // Skips days that doesn't need to be loaded
         long totalSkippedTime = 0;
         for (final HistoryUpdateId historyUpdateId : historyStore.getRegisteredDataIds()) {
-          if (historyUpdateId.isTagValueUpdateId() && historyStore.isTagInitialized(historyUpdateId)) {
+          if (historyUpdateId.isTagValueUpdateIdType() && historyStore.isTagInitialized(historyUpdateId)) {
             // Don't load the tag if it is not accepted
             final Timestamp tagIsLoadedUntil = historyStore.getTagHaveRecordsUntilTime(historyUpdateId);
             
-            final Timespan skipTimespan = dailySnapshotFilter.getTimespan(historyUpdateId.getTagValueUpdateId().getTagId(), tagIsLoadedUntil);
+            final Timespan skipTimespan = dailySnapshotFilter.getTimespan(historyUpdateId.toTagValueUpdateId().getTagId(), tagIsLoadedUntil);
             
             if (skipTimespan != null) {
               historyStore.addHistoryValues(
@@ -1194,7 +1194,7 @@ public class HistoryLoader {
           
           // Finds the tags to load
           for (final HistoryUpdateId historyUpdateId : historyStore.getRegisteredDataIds()) {
-            if (historyUpdateId.isTagValueUpdateId() && historyStore.isTagInitialized(historyUpdateId)) {
+            if (historyUpdateId.isTagValueUpdateIdType() && historyStore.isTagInitialized(historyUpdateId)) {
               // Don't load the tag if it is not accepted
               final Timestamp tagIsLoadedUntil = historyStore.getTagHaveRecordsUntilTime(historyUpdateId);
               
@@ -1203,13 +1203,13 @@ public class HistoryLoader {
               }
               
               if (tagIsLoadedUntil.equals(loadedUntilTime)) {
-                tagsWithOldestTime.add(historyUpdateId.getTagValueUpdateId().getTagId());
+                tagsWithOldestTime.add(historyUpdateId.toTagValueUpdateId().getTagId());
               }
             }
-            else if (historyUpdateId.isSupervisionEventId()) {
+            else if (historyUpdateId.isSupervisionEventIdType()) {
               final Timestamp tagIsLoadedUntil = historyStore.getTagHaveRecordsUntilTime(historyUpdateId);
               if (tagIsLoadedUntil == null || tagIsLoadedUntil.compareTo(historyStore.getEnd()) < 0) {
-                supervisionIds.add(historyUpdateId.getSupervisionEventId());
+                supervisionIds.add(historyUpdateId.toSupervisionEventId());
               }
             }
           }

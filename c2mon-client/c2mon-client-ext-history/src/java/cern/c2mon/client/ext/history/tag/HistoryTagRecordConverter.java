@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2004 - 2011 CERN This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.client.ext.history.tag;
@@ -42,7 +42,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
  * This class provides functions to convert a collection of
  * {@link HistoryTagRecord}s into what the configuration of the
  * {@link HistoryTag} provided.
- * 
+ *
  * @author vdeila
  */
 final class HistoryTagRecordConverter {
@@ -52,13 +52,13 @@ final class HistoryTagRecordConverter {
 
   /** The history tag that this convertion is for */
   private final HistoryTag historyTag;
-  
+
   /** the data to convert */
   private Collection<HistoryTagRecord> data = null;
-  
+
   /** Whether Null values are allowed as a result, or should be removed */
   private boolean allowNullValues;
-  
+
   /**
    * @param historyTag the history tag to convert the data of
    * @param allowNullValues Whether Null values are allowed as a result, or should be removed.
@@ -86,16 +86,16 @@ final class HistoryTagRecordConverter {
       this.data = null;
     }
   }
-  
+
   /**
    * @param resultType the result type to return
-   * @return the converted result based on the {@link #historyTag}  
+   * @return the converted result based on the {@link #historyTag}
    * @throws RuntimeException
    *           if the configuration specified is not supported
    */
   private Object convertToResultType(final HistoryTagResultType resultType) throws RuntimeException {
     Object result = null;
-    
+
     switch (resultType) {
     case Conditional:
       final DataTagQuality quality = historyTag.getDataTagQuality();
@@ -115,7 +115,7 @@ final class HistoryTagRecordConverter {
     case Values:
       result = getYValues(data, allowNullValues).toArray();
       break;
-    case XMax: 
+    case XMax:
       result = findValue(getXValues(data, allowNullValues), true, resultType.getResultClass());
       break;
     case XMin:
@@ -131,16 +131,16 @@ final class HistoryTagRecordConverter {
       LOG.error(String.format("The %s '%s' is not supported", HistoryTagResultType.class.getSimpleName(), resultType.toString()));
       throw new RuntimeException("Invalid type, see the log for details");
     }
-    
+
     // Converts the data to be of the correct array type
     result = TypeConverter.cast(result, resultType.getResultClass());
-    
+
     return result;
   }
-  
+
   /**
    * Changes the data based on the <code>changeExpression</code>
-   * 
+   *
    * @param data the data to change
    * @param changeExpression the expression that defines how the data should be changed.
    * @return the changed data
@@ -149,13 +149,13 @@ final class HistoryTagRecordConverter {
     if (changeExpression == null) {
       return data;
     }
-    
+
     Object result;
-    
+
     if (data != null && data.getClass().isArray()) {
       final int arrayLength = Array.getLength(data);
       final Object[] array = new Object[arrayLength];
-      
+
       for (int i = 0; i < arrayLength; i++) {
         Array.set(array, i, changeResult(Array.get(data, i), changeExpression));
       }
@@ -193,10 +193,10 @@ final class HistoryTagRecordConverter {
         throw new RuntimeException(errorMessage, e);
       }
     }
-    
+
     return result;
   }
-  
+
   /** Function available from the jep expressions */
   private class ChangeFunction extends PostfixMathCommand {
     /** The result type */
@@ -217,7 +217,7 @@ final class HistoryTagRecordConverter {
       stack.push(convertToResultType(this.resultType));
     }
   }
-  
+
   /** Function for formatting a Timestamp */
   private static class DateFormatFunction extends PostfixMathCommand {
     public DateFormatFunction() {
@@ -241,11 +241,11 @@ final class HistoryTagRecordConverter {
       catch (Exception e) {
         throw new ParseException("The first argument must be a Timestamp!");
       }
-      
+
       stack.push(new SimpleDateFormat(newFormat).format(date));
     }
   }
-  
+
   /** Function for concatting two values */
   private static class ConcatFunction extends PostfixMathCommand {
     public ConcatFunction() {
@@ -255,10 +255,10 @@ final class HistoryTagRecordConverter {
     @Override
     public void run(final Stack stack) throws ParseException {
       checkStack(stack);
-      
+
       Object value2 = stack.pop();
       Object value1 = stack.pop();
-      
+
       if (value1 == null) {
         value1 = "null";
       }
@@ -266,11 +266,11 @@ final class HistoryTagRecordConverter {
         value2 = "null";
       }
       final String result = value1.toString().concat(value2.toString());
-      
+
       stack.push(result);
     }
   }
-  
+
   /**
    * @param <T> the return type, must be comparable
    * @param data the data to find the maximum or minimum of
@@ -297,7 +297,7 @@ final class HistoryTagRecordConverter {
           e);
     }
   }
-  
+
   /**
    * @param <T> the return type, must be comparable
    * @param data the data to find the maximum or minimum of
@@ -326,11 +326,11 @@ final class HistoryTagRecordConverter {
     }
     return result;
   }
-  
+
   /**
    * @param records
    *          the records to get the x data from.
-   * @param allowNullValues Whether Null values are allowed as a result, or should be removed.         
+   * @param allowNullValues Whether Null values are allowed as a result, or should be removed.
    * @return all the x values of the records. That is all the
    *         {@link HistoryTagRecord#getTimestamp()}s.
    */
@@ -345,11 +345,11 @@ final class HistoryTagRecordConverter {
     }
     return result;
   }
-  
+
   /**
    * @param records
    *          the records to get the y data from.
-   * @param allowNullValues Whether Null values are allowed as a result, or should be removed.   
+   * @param allowNullValues Whether Null values are allowed as a result, or should be removed.
    * @return all the y values of the records. That is all the
    *         {@link HistoryTagRecord#getValue()}s.
    */

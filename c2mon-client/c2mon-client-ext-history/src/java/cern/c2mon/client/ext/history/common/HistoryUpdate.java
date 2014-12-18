@@ -35,7 +35,7 @@ public interface HistoryUpdate {
    * 
    * @return the id of the update
    */
-  HistoryUpdateId getDataId();
+  HistoryUpdateId getUpdateId();
 
   /**
    * 

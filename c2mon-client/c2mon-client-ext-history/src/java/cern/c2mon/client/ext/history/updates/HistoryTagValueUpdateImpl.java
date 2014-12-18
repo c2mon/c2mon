@@ -47,8 +47,8 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 @Root(name="HistoryTag")
 public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
 
-  /** the id */
-  private final TagValueUpdateId id;
+  /** the updateId */
+  private final TagValueUpdateId updateId;
 
   /** the DataTagQuality object for this data tag. */
   @Element(required = false)
@@ -135,7 +135,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
       final Timestamp sourceTimestamp, final Timestamp daqTimestamp,
       final Timestamp serverTimestamp, final Timestamp logTimestamp,
       final String description, final AlarmValue[] alarms, final TagMode mode) {
-    this.id = new TagValueUpdateId(tagId);
+    this.updateId = new TagValueUpdateId(tagId);
     this.dataTagQuality = dataTagQuality;
     this.value = value;
     this.sourceTimestamp = sourceTimestamp;
@@ -221,7 +221,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
 
   @Override
   public Long getId() {
-    return this.id.getTagId();
+    return this.updateId.getTagId();
   }
 
   @Override
@@ -306,8 +306,8 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
   }
 
   @Override
-  public HistoryUpdateId getDataId() {
-    return this.id;
+  public HistoryUpdateId getUpdateId() {
+    return this.updateId;
   }
 
   @Override
@@ -319,7 +319,7 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
     result = prime * result + ((dataTagQuality == null) ? 0 : dataTagQuality.hashCode());
     result = prime * result + ((dataType == null) ? 0 : dataType.hashCode());
     result = prime * result + ((description == null) ? 0 : description.hashCode());
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((updateId == null) ? 0 : updateId.hashCode());
     result = prime * result + (isSimulated ? 1231 : 1237);
     result = prime * result + ((mode == null) ? 0 : mode.hashCode());
     result = prime * result + ((serverTimestamp == null) ? 0 : serverTimestamp.hashCode());
@@ -367,11 +367,11 @@ public class HistoryTagValueUpdateImpl implements HistoryTagValueUpdate {
     } 
     else if (!description.equals(other.description))
       return false;
-    if (id == null) {
-      if (other.id != null)
+    if (updateId == null) {
+      if (other.updateId != null)
         return false;
     } 
-    else if (!id.equals(other.id))
+    else if (!updateId.equals(other.updateId))
       return false;
     if (isSimulated != other.isSimulated)
       return false;

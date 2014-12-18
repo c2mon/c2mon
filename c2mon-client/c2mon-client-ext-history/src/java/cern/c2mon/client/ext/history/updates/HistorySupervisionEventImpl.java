@@ -142,7 +142,7 @@ public class HistorySupervisionEventImpl implements HistorySupervisionEvent {
   }
 
   @Override
-  public SupervisionEventId getDataId() {
+  public SupervisionEventId getUpdateId() {
     return this.id;
   }
 

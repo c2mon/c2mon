@@ -34,7 +34,7 @@ public abstract class HistoryUpdateId {
    * 
    * @return <code>true</code> if this is a {@link TagValueUpdateId}
    */
-  public boolean isTagValueUpdateId() {
+  public boolean isTagValueUpdateIdType() {
     return (this instanceof TagValueUpdateId);
   }
 
@@ -43,7 +43,7 @@ public abstract class HistoryUpdateId {
    * @return the {@link TagValueUpdateId}, or <code>null</code> if this is not a
    *         {@link TagValueUpdateId}
    */
-  public TagValueUpdateId getTagValueUpdateId() {
+  public TagValueUpdateId toTagValueUpdateId() {
     if (this instanceof TagValueUpdateId) {
       return (TagValueUpdateId) this;
     }
@@ -56,7 +56,7 @@ public abstract class HistoryUpdateId {
    * 
    * @return <code>true</code> if this is a {@link SupervisionEventId}
    */
-  public boolean isSupervisionEventId() {
+  public boolean isSupervisionEventIdType() {
     return (this instanceof SupervisionEventId);
   }
 
@@ -65,7 +65,7 @@ public abstract class HistoryUpdateId {
    * @return the {@link SupervisionEventId}, or <code>null</code> if this is not
    *         a {@link SupervisionEventId}
    */
-  public SupervisionEventId getSupervisionEventId() {
+  public SupervisionEventId toSupervisionEventId() {
     if (this instanceof SupervisionEventId) {
       return (SupervisionEventId) this;
     }

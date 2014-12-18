@@ -806,8 +806,8 @@ public class HistoryStore {
   public Collection<TagValueUpdateId> getRegisteredTagValueUpdateIds() {
     final List<TagValueUpdateId> result = new ArrayList<TagValueUpdateId>();
     for (HistoryUpdateId id : getRegisteredDataIds()) {
-      if (id.isTagValueUpdateId()) {
-        result.add(id.getTagValueUpdateId());
+      if (id.isTagValueUpdateIdType()) {
+        result.add(id.toTagValueUpdateId());
       }
     }
     return result;

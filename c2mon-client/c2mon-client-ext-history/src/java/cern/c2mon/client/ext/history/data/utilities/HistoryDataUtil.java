@@ -56,15 +56,15 @@ public final class HistoryDataUtil {
         continue;
       }
       
-      HistoryGroup history = dataTagHistoryMap.get(historyUpdate.getDataId());
+      HistoryGroup history = dataTagHistoryMap.get(historyUpdate.getUpdateId());
       if (history == null) {
-        history = new HistoryGroup(historyUpdate.getDataId());
-        dataTagHistoryMap.put(historyUpdate.getDataId(), history);
+        history = new HistoryGroup(historyUpdate.getUpdateId());
+        dataTagHistoryMap.put(historyUpdate.getUpdateId(), history);
       }
       if (historyUpdate instanceof TagValueUpdate) {
         history.add(new HistoryTagValueUpdateImpl((TagValueUpdate) historyUpdate));
       }
-      else if (historyUpdate instanceof SupervisionEvent && historyUpdate.getDataId().isSupervisionEventId()) {
+      else if (historyUpdate instanceof SupervisionEvent && historyUpdate.getUpdateId().isSupervisionEventIdType()) {
         final SupervisionEvent event = (SupervisionEvent) historyUpdate;
         final boolean initialValue;
         if (event instanceof HistorySupervisionEvent) {
@@ -76,7 +76,7 @@ public final class HistoryDataUtil {
         }
         
         final HistorySupervisionEventImpl historySupervisionEvent = new HistorySupervisionEventImpl(
-            historyUpdate.getDataId().getSupervisionEventId(), event.getStatus(), event.getEventTime(), event.getMessage());
+            historyUpdate.getUpdateId().toSupervisionEventId(), event.getStatus(), event.getEventTime(), event.getMessage());
         historySupervisionEvent.setInitialValue(initialValue);
         history.add(historySupervisionEvent);
       }

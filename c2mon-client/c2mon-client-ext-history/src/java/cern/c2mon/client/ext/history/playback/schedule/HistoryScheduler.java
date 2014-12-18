@@ -279,10 +279,10 @@ public class HistoryScheduler {
   static class HistoryUpdateIdSorter implements Comparator<HistoryUpdateId> {
     @Override
     public int compare(final HistoryUpdateId o1, final HistoryUpdateId o2) {
-      if (!o1.isSupervisionEventId() && o2.isSupervisionEventId()) {
+      if (!o1.isSupervisionEventIdType() && o2.isSupervisionEventIdType()) {
         return -1;
       }
-      if (o1.isSupervisionEventId() && !o2.isSupervisionEventId()) {
+      if (o1.isSupervisionEventIdType() && !o2.isSupervisionEventIdType()) {
         return 1;
       }
       return 0;

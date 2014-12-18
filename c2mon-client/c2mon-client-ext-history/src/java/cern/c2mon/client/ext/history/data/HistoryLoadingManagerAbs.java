@@ -284,7 +284,7 @@ abstract class HistoryLoadingManagerAbs implements HistoryLoadingManager {
         }
       }
       else {
-        LOG.error(String.format("Does not support HistoryUpdate of type \"%s\" (Id: %s)", historyUpdate.getClass().getName(), historyUpdate.getDataId().toString()));
+        LOG.error(String.format("Does not support HistoryUpdate of type \"%s\" (Id: %s)", historyUpdate.getClass().getName(), historyUpdate.getUpdateId().toString()));
       }
     }
     return result;
