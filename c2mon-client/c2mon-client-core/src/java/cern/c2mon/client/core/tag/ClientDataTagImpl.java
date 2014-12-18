@@ -454,20 +454,24 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * ClientDataTag value or quality attributes will trigger an update event to
    * all <code>DataTagUpdateListener</code> objects registered.
    *
-   * @param pListener the DataTagUpdateListener comments
+   * @param listener the DataTagUpdateListener that will receive value updates message for this tag
+   * @param sendInitialValuesToListener if set to <code>true</code>, the listener will receive the
+   *                                    current value of the tag.
    * @see #removeUpdateListener(DataTagUpdateListener)
    */
-  public void addUpdateListener(final DataTagUpdateListener pListener) {
+  public void addUpdateListener(final DataTagUpdateListener listener, final boolean sendInitialValuesToListener) {
     if (LOG.isDebugEnabled()) {
       LOG.debug("addUpdateListener() called.");
     }
-    listeners.add(pListener);
+    listeners.add(listener);
 
-    try {
-      pListener.onUpdate(this.clone());
-    } catch (CloneNotSupportedException cloneException) {
-      LOG.fatal("addUpdateListener() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
-      throw new RuntimeException(cloneException);
+    if (sendInitialValuesToListener) {
+      try {
+        listener.onUpdate(this.clone());
+      } catch (CloneNotSupportedException cloneException) {
+        LOG.fatal("addUpdateListener() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
+        throw new RuntimeException(cloneException);
+      }
     }
   }
 
@@ -477,12 +481,14 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * Any change to the ClientDataTag value or quality attributes will trigger
    * an update event to all <code>DataTagUpdateListener</code> objects
    * registered.
-   * @param pListenerList the DataTagUpdateListener comments
+   * @param listeners the DataTagUpdateListeners that will receive value updates message for this tag
+   * @param sendInitialValuesToListener if set to <code>true</code>, the listener will receive the
+   *                                    current value of the tag.
    * @see #removeUpdateListener(DataTagUpdateListener)
    */
-  public void addUpdateListeners(final Collection<DataTagUpdateListener> pListenerList) {
-    for (DataTagUpdateListener listener : pListenerList) {
-      addUpdateListener(listener);
+  public void addUpdateListeners(final Collection<DataTagUpdateListener> listeners, final boolean sendInitialValuesToListener) {
+    for (DataTagUpdateListener listener : listeners) {
+      addUpdateListener(listener, sendInitialValuesToListener);
     }
   }
 

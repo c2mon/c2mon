@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
@@ -75,14 +76,8 @@ public class TagManager implements CoreTagManager {
   /** Lock for accessing the <code>listeners</code> variable */
   private ReentrantReadWriteLock alarmListenersLock = new ReentrantReadWriteLock();
 
-  /** Lock for accessing the <code>listeners</code> variable */
-  private ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
-
   /** List of subscribed alarm listeners */
   private final Set<AlarmListener> alarmListeners = new HashSet<AlarmListener>();
-
-  /** List of subscribed listeners */
-  private final Set<TagSubscriptionListener> tagSubscriptionListeners = new HashSet<TagSubscriptionListener>();
 
   /** List of subscribed data tag update listeners */
   private final Set<DataTagUpdateListener> tagUpdateListeners = new HashSet<>();
@@ -134,69 +129,120 @@ public class TagManager implements CoreTagManager {
   public void refreshDataTags(final Collection<Long> tagIds) {
     cache.refresh(new HashSet<Long>(tagIds));
   }
+  
+  @Override
+  public void subscribeDataTag(final Long dataTagId, final DataTagUpdateListener listener) throws CacheSynchronizationException {
+    if (dataTagId == null) {
+      String error = "Called with null parameter (id collection).";
+      LOG.warn("subscribeDataTag() : " + error);
+      throw new IllegalArgumentException(error);
+    }
+    
+    Set<Long> id = new HashSet<>(1);
+    id.add(dataTagId);
+    subscribeDataTags(id, listener);
+  }
+  
+  @Override
+  public void subscribeDataTags(final Set<Long> tagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException {
+    doTagSubscription(tagIds, listener);
+  }
+  
+  @Override
+  public void subscribeDataTag(final Long dataTagId, final DataTagListener listener) throws CacheSynchronizationException {
+    if (dataTagId == null) {
+      String error = "Called with null parameter (id collection).";
+      LOG.warn("subscribeDataTagUpdate() : " + error);
+      throw new IllegalArgumentException(error);
+    }
+    
+    Set<Long> id = new HashSet<>(1);
+    id.add(dataTagId);
+    subscribeDataTags(id, listener);
+  }
 
   /**
    * Determine from its request all new tag id's which are not yet available in the cache. Those ones are then created
    * with a request to the C2MON server and afterwards registered for the listener.
    */
   @Override
-  public synchronized boolean subscribeDataTags(final Set<Long> tagIds, final DataTagUpdateListener listener) {
+  public void subscribeDataTags(final Set<Long> tagIds, final DataTagListener listener) {
+    doTagSubscription(tagIds, listener);
+  }
+  
+  /**
+   * Inner method that handles the tag subscription.
+   * @param tagIds List of tag ids
+   * @param listener The listener to be added to the <code>ClientDataTag</code> references
+   * @param sendInitialValuesToListener if set to <code>true</code>, the listener will receive the
+   *                                    current value of the tag.
+   * @return The initial values of the subscribed tags.
+   */
+  private synchronized <T extends DataTagUpdateListener> void doTagSubscription(final Set<Long> tagIds, final T listener) {
     if (tagIds == null) {
-      LOG.warn("subscribeDataTags() : called with null parameter (id collection). Ignoring request.");
-      return false;
+      String error = "Called with null parameter (id collection). Ignoring request.";
+      LOG.warn("doTagSubscription() : " + error);
+      throw new IllegalArgumentException(error);
     }
 
     if (listener == null) {
-      LOG.warn("subscribeDataTags() : called with null parameter (DataTagUpdateListener). Ignoring request.");
-      return false;
+      String error = "Called with null parameter (DataTagUpdateListener). Ignoring request.";
+      LOG.warn("doTagSubscription() : " + error);
+      throw new IllegalArgumentException(error);
     }
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug(new StringBuilder("subscribeDataTags() : called for ").append(tagIds.size()).append(" tags."));
+      LOG.debug(new StringBuilder("doTagSubscription() : called for ").append(tagIds.size()).append(" tags."));
     }
 
     try {
       // add listener to tags and subscribe them to the live topics
-      Set<Long> newTags = cache.addDataTagUpdateListener(tagIds, listener);
+      cache.addDataTagUpdateListener(tagIds, listener);
       // Add listener to set
       tagUpdateListeners.add(listener);
-      // Inform listeners (e.g. HistoryManager) about new subscriptions
-      fireOnNewTagSubscriptionsEvent(newTags);
     }
     catch (CacheSynchronizationException cse) {
       // Rollback the subscription
-      LOG.error("subscribeDataTags() : Cache error occured while subscribing to data tags ==> Rolling back subscription.");
+      LOG.error("doTagSubscription() : Cache error occured while subscribing to data tags ==> Rolling back subscription.", cse);
       cache.unsubscribeDataTags(tagIds, listener);
       throw cse;
     }
-
-    return true;
+  }
+  
+  @Override
+  public void unsubscribeDataTag(Long dataTagId, DataTagUpdateListener listener) {
+    if (dataTagId == null) {
+      String error = "Called with null parameter (id collection).";
+      LOG.warn("unsubscribeDataTag() : " + error);
+      throw new IllegalArgumentException(error);
+    }
+    
+    Set<Long> id = new HashSet<>(1);
+    id.add(dataTagId);
+    unsubscribeDataTags(id, listener);
   }
 
   @Override
   public void unsubscribeAllDataTags(final DataTagUpdateListener listener) {
-    Set<Long> unsubscribedTagIds = cache.unsubscribeAllDataTags(listener);
+    cache.unsubscribeAllDataTags(listener);
     tagUpdateListeners.remove(listener);
-    fireOnUnsubscribeEvent(unsubscribedTagIds);
   }
 
   @Override
   public void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
-    Set<Long> unsubscribedTagIds = cache.unsubscribeDataTags(dataTagIds, listener);
+    cache.unsubscribeDataTags(dataTagIds, listener);
     tagUpdateListeners.remove(listener);
-    fireOnUnsubscribeEvent(unsubscribedTagIds);
   }
 
   @Override
   public void addAlarmListener(final AlarmListener listener) throws JMSException {
-
     alarmListenersLock.writeLock().lock();
 
-    if (alarmListeners.size() == 0) {
-      jmsProxy.registerAlarmListener(this);
-    }
-
     try {
+      if (alarmListeners.size() == 0) {
+        jmsProxy.registerAlarmListener(this);
+      }
+      
       LOG.debug(new StringBuilder("addAlarmListener() : adding alarm listener " + listener.getClass()));
       alarmListeners.add(listener);
     } finally {
@@ -222,60 +268,15 @@ public class TagManager implements CoreTagManager {
 
   @Override
   public void addTagSubscriptionListener(final TagSubscriptionListener listener) {
-    listenersLock.writeLock().lock();
-    try {
-      tagSubscriptionListeners.add(listener);
-    } finally {
-      listenersLock.writeLock().unlock();
-    }
+    cache.addTagSubscriptionListener(listener);
   }
 
   @Override
   public void removeTagSubscriptionListener(final TagSubscriptionListener listener) {
-    listenersLock.writeLock().lock();
-    try {
-      tagSubscriptionListeners.remove(listener);
-    } finally {
-      listenersLock.writeLock().unlock();
-    }
+    cache.removeTagSubscriptionListener(listener);
   }
 
-  /**
-   * Fires an <code>onNewTagSubscriptions()</code> event to all registered <code>TagSubscriptionListener</code>
-   * listeners.
-   *
-   * @param tagIds list of new subscribed tags
-   */
-  private void fireOnNewTagSubscriptionsEvent(final Set<Long> tagIds) {
-    if (!tagIds.isEmpty()) {
-      listenersLock.readLock().lock();
-      try {
-        Set<Long> copyList = new HashSet<Long>(tagIds);
-        for (TagSubscriptionListener listener : tagSubscriptionListeners) {
-          listener.onNewTagSubscriptions(copyList);
-        }
-      } finally {
-        listenersLock.readLock().unlock();
-      }
-    }
-  }
-
-  /**
-   * Fires an <code>onUnsubscribe()</code> event to all registered <code>TagSubscriptionListener</code> listeners.
-   *
-   * @param tagIds list of tags that have been removed from the cache
-   */
-  private void fireOnUnsubscribeEvent(final Set<Long> tagIds) {
-    listenersLock.readLock().lock();
-    try {
-      Set<Long> copyList = new HashSet<Long>(tagIds);
-      for (TagSubscriptionListener listener : tagSubscriptionListeners) {
-        listener.onUnsubscribe(copyList);
-      }
-    } finally {
-      listenersLock.readLock().unlock();
-    }
-  }
+  
 
   @Override
   public Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds) {
@@ -432,11 +433,10 @@ public class TagManager implements CoreTagManager {
 
   @Override
   public void onAlarmUpdate(final AlarmValue alarm) {
-
     alarmListenersLock.readLock().lock();
 
-    LOG.debug("onAlarmUpdate() -  received alarm update for alarmId:" + alarm.getId());
     try {
+      LOG.debug("onAlarmUpdate() -  received alarm update for alarmId:" + alarm.getId());
       notifyAlarmListeners(alarm);
     }
     finally {

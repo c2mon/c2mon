@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
@@ -32,8 +33,11 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.manager.CoreSupervisionManager;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 
@@ -70,6 +74,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   /** Reference to the supervision manager singleton */
   private final CoreSupervisionManager supervisionManager;
+  
+  /** Lock for accessing the <code>listeners</code> variable */
+  private ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
+  
+  /** List of subscribed listeners */
+  private final Set<TagSubscriptionListener> tagSubscriptionListeners = new HashSet<TagSubscriptionListener>();
 
   /**
    * <code>Map</code> reference containing all subscribed data tags which are
@@ -228,7 +238,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Set<Long> unsubscribeAllDataTags(final DataTagUpdateListener listener) {
+  public void unsubscribeAllDataTags(final DataTagUpdateListener listener) {
     Set<Long> tagsToRemove = new HashSet<Long>();
     cacheWriteLock.lock();
     try {
@@ -246,12 +256,12 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     } finally {
       cacheWriteLock.unlock();
     }
-
-    return tagsToRemove;
+    
+    fireOnUnsubscribeEvent(tagsToRemove);
   }
 
   @Override
-  public Set<Long> unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
+  public void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) {
     Set<Long> tagsToRemove = new HashSet<Long>();
     cacheWriteLock.lock();
     try {
@@ -271,8 +281,8 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
     } finally {
       cacheWriteLock.unlock();
     }
-
-    return tagsToRemove;
+    
+    fireOnUnsubscribeEvent(tagsToRemove);
   }
 
   @Override
@@ -311,8 +321,13 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
-  public Set<Long> addDataTagUpdateListener(final Set<Long> tagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException {
+  public <T extends DataTagUpdateListener> void addDataTagUpdateListener(final Set<Long> tagIds, final T listener) throws CacheSynchronizationException {
+    doAddDataTagUpdateListener(tagIds, listener, !(listener instanceof DataTagListener));
+  }
+  
+  private void doAddDataTagUpdateListener(final Set<Long> tagIds, final DataTagUpdateListener listener, final boolean sendInitialValuesToListener) throws CacheSynchronizationException {
     final Set<Long> newTagIds = new HashSet<Long>();
+    final Collection<ClientDataTagValue> initialValues = new ArrayList<>(tagIds.size());
     synchronized (getHistoryModeSyncLock()) {
       cacheWriteLock.lock();
       try {
@@ -320,7 +335,13 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
         for (Long tagId : tagIds) {
           if (liveCache.containsKey(tagId)) {
             cdt = controller.getActiveCache().get(tagId);
-            cdt.addUpdateListener(listener);
+            try {
+              initialValues.add(cdt.clone());
+            }
+            catch (CloneNotSupportedException e) {
+              throw new RuntimeException("ClientDataTagImpl object could not be cloned for tag " + tagId + ": " + cdt.toString());
+            }
+            cdt.addUpdateListener(listener, sendInitialValuesToListener);
           } else {
             newTagIds.add(tagId);
           }
@@ -330,16 +351,28 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           // Create the uninitialised tags
           cacheSynchronizer.createTags(newTagIds);
 
-          // Update the tags with their initial values from the server
-          cacheSynchronizer.refresh(newTagIds);
-
           // Add the update listeners and supervision listeners
           for (Long tagId : newTagIds) {
             cdt = controller.getActiveCache().get(tagId);
             if (cdt != null) {
               supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
-              cdt.addUpdateListener(listener);
+              try {
+                initialValues.add(cdt.clone());
+              }
+              catch (CloneNotSupportedException e) {
+                throw new RuntimeException("ClientDataTagImpl object could not be cloned for tag " + tagId + ": " + cdt.toString());
+              }
+              cdt.addUpdateListener(listener, sendInitialValuesToListener);
             }
+          }
+          
+          // Before subscribing to the update topics we send the initial values,
+          // if the listener is of type DataTagListener
+          if (!sendInitialValuesToListener && listener instanceof DataTagListener) {
+            if (LOG.isDebugEnabled()) {
+              LOG.debug("doAddDataTagUpdateListener() - Sending initial values to DataTagListener");
+            }
+            ((DataTagListener) listener).onInitialValues(initialValues);
           }
 
           // Asynchronously subscribe to the topics and get the latest values
@@ -347,16 +380,75 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
           cacheSynchronizer.subscribeTags(newTagIds);
         }
 
-      } finally {
+      } 
+      finally {
         cacheWriteLock.unlock();
       }
     }
 
-    return newTagIds;
+    // Inform listeners (e.g. HistoryManager) about new subscriptions
+    fireOnNewTagSubscriptionsEvent(newTagIds);
   }
 
   @Override
   public int getCacheSize() {
     return liveCache.size();
+  }
+  
+  @Override
+  public void addTagSubscriptionListener(final TagSubscriptionListener listener) {
+    listenersLock.writeLock().lock();
+    try {
+      tagSubscriptionListeners.add(listener);
+    } finally {
+      listenersLock.writeLock().unlock();
+    }
+  }
+
+  @Override
+  public void removeTagSubscriptionListener(final TagSubscriptionListener listener) {
+    listenersLock.writeLock().lock();
+    try {
+      tagSubscriptionListeners.remove(listener);
+    } finally {
+      listenersLock.writeLock().unlock();
+    }
+  }
+  
+  /**
+   * Fires an <code>onNewTagSubscriptions()</code> event to all registered <code>TagSubscriptionListener</code>
+   * listeners.
+   *
+   * @param tagIds list of new subscribed tags
+   */
+  private void fireOnNewTagSubscriptionsEvent(final Set<Long> tagIds) {
+    if (!tagIds.isEmpty()) {
+      listenersLock.readLock().lock();
+      try {
+        Set<Long> copyList = new HashSet<Long>(tagIds);
+        for (TagSubscriptionListener listener : tagSubscriptionListeners) {
+          listener.onNewTagSubscriptions(copyList);
+        }
+      } finally {
+        listenersLock.readLock().unlock();
+      }
+    }
+  }
+
+  /**
+   * Fires an <code>onUnsubscribe()</code> event to all registered <code>TagSubscriptionListener</code> listeners.
+   *
+   * @param tagIds list of tags that have been removed from the cache
+   */
+  private void fireOnUnsubscribeEvent(final Set<Long> tagIds) {
+    listenersLock.readLock().lock();
+    try {
+      Set<Long> copyList = new HashSet<Long>(tagIds);
+      for (TagSubscriptionListener listener : tagSubscriptionListeners) {
+        listener.onUnsubscribe(copyList);
+      }
+    } finally {
+      listenersLock.readLock().unlock();
+    }
   }
 }

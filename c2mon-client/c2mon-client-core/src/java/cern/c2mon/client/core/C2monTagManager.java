@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.jms.JMSException;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.cache.CacheSynchronizationException;
@@ -46,7 +47,8 @@ import cern.c2mon.shared.client.tag.TagConfig;
 public interface C2monTagManager {
 
   /**
-   * Use this method for registering a listener and to receive updates for specific data tags.
+   * Use this method for registering a listener and to receive the current (initial) values and updates
+   * for the list of specified data tags.<p>
    * The C2MON client API will handle for you in the background the initialization of the data
    * tags with the C2MON server, if this was not already done before. <p>
    * You will be informed about new updates via the <code>onUpdate(ClientDataTagValue)</code>
@@ -54,13 +56,75 @@ public interface C2monTagManager {
    *
    * @param dataTagIds A collection of data tag IDs
    * @param listener the listener which shall be registered
-   * @return <code>true</code>, if the registration was succesfull, otherwhise <code>false</code>
-   * @throws CacheSynchronizationException In case a communicatin problem with the C2MON server
+   * @return A collection with initial values for all tags to which the listener got subscribed.
+   *         Please note, that also the listener is receiving the initial values.
+   * @throws CacheSynchronizationException In case a communication problem with the C2MON server
    *         occurs while subscribing to the tags. In that case the {@link TagManager} will
    *         rollback the subscription.
+   * @see #subscribeDataTags(Set, DataTagListener)
+   * @see C2monSupervisionManager#isServerConnectionWorking()
+   */
+  void subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException;
+  
+  /**
+   * Registers a listener to receive the current (initial) value and updates for one specific data tag.<p>
+   * The C2MON client API will handle for you in the background the initialization of the data
+   * tags with the C2MON server, if this was not already done before. <p>
+   * You will be informed about new updates via the <code>onUpdate(ClientDataTagValue)</code>
+   * method.
+   *
+   * @param dataTagId The unique identifier of the data tag you want to subscribe to
+   * @param listener the listener which shall be registered
+   * @return The initial value of the subscribed tag. Please note, that also the listener is
+   *         receiving the initial value!
+   * @throws CacheSynchronizationException In case a communication problem with the C2MON server
+   *         occurs while subscribing to the tag. In that case the {@link TagManager} will
+   *         rollback the subscription.
+   * @see #subscribeDataTag(Long, DataTagListener)
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
-  boolean subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException;
+  void subscribeDataTag(final Long dataTagId, final DataTagUpdateListener listener) throws CacheSynchronizationException;
+  
+  /**
+   * Registers a listener to receive updates for specific data tags. 
+   * The method will return the initial values of the subscribed tags to {@link DataTagListener#onInitialValues(Collection)}.
+   * <b>Please note</b> that the {@link DataTagListener#onUpdate(ClientDataTagValue)} method will then not
+   * receive the initial values.<p>
+   * The C2MON client API will handle for you in the background the initialization of the data
+   * tags with the C2MON server, if this was not already done before. <p>
+   * You will be informed about new updates via the <code>onUpdate(ClientDataTagValue)</code>
+   * method.
+   *
+   * @param dataTagIds A collection of data tag IDs
+   * @param listener the listener which shall be registered
+   * @throws CacheSynchronizationException In case a communication problem with the C2MON server
+   *         occurs while subscribing to the tags. In that case the {@link TagManager} will
+   *         rollback the subscription.
+   * @see #subscribeDataTags(Set, DataTagUpdateListener)
+   * @see C2monSupervisionManager#isServerConnectionWorking()
+   */
+  void subscribeDataTags(final Set<Long> dataTagIds, final DataTagListener listener) throws CacheSynchronizationException;
+  
+  /**
+   * Registers a listener to receive updates for a specific data tag. 
+   * The method will return the initial value of the subscribed tag to {@link DataTagListener#onInitialValues(Collection)}. <b>Please note</b> 
+   * that the {@link DataTagListener#onUpdate(ClientDataTagValue)} method will then not receive the initial value.<p>
+   * The C2MON client API will handle for you in the background the initialization of the data
+   * tags with the C2MON server, if this was not already done before. <p>
+   * You will be informed about new updates via the <code>onUpdate(ClientDataTagValue)</code>
+   * method.
+   *
+   * @param dataTagId The unique identifier of the data tag you want to subscribe to
+   * @param listener the listener which shall be registered
+   * @return The initial value of the subscribed tag. Please note, that the listener is not
+   *         receiving the initial value!
+   * @throws CacheSynchronizationException In case a communication problem with the C2MON server
+   *         occurs while subscribing to the tag. In that case the {@link TagManager} will
+   *         rollback the subscription.
+   * @see #subscribeDataTag(Long, DataTagUpdateListener)
+   * @see C2monSupervisionManager#isServerConnectionWorking()
+   */
+  void subscribeDataTag(final Long dataTagId, final DataTagListener listener) throws CacheSynchronizationException;
 
   /**
    * Use this method for unregistering a listener from receiving updates for specific data tags.
@@ -69,6 +133,14 @@ public interface C2monTagManager {
    * @param listener the listener which shall be registered
    */
   void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
+  
+  /**
+   * Unregisters a listener from receiving updates for specific data tag.
+   *
+   * @param dataTagId The unique identifier of the data tag from which we want to unsubscribe
+   * @param listener the listener which shall be registered
+   */
+  void unsubscribeDataTag(final Long dataTagId, final DataTagUpdateListener listener);
 
 
   /**

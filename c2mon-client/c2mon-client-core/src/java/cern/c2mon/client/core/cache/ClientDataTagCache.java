@@ -20,6 +20,7 @@ package cern.c2mon.client.core.cache;
 import java.util.Set;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.core.listener.TagSubscriptionListener;
 import cern.c2mon.client.core.manager.TagManager;
 
 /**
@@ -42,14 +43,13 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    * <b>Please note, that this method is synchronizing on the history lock.</b>
    * @param tagIds List of tag ids
    * @param listener The listener to be added to the <code>ClientDataTag</code> references
-   * @return Set of id's from all tags which have been added to the cache. 
    * @throws NullPointerException If one of the parameter is <code>null</code> or if one of 
    *                              the tags is not present in the cache
    * @throws CacheSynchronizationException In case of communication problems with the C2MON
    *         server during the refresh process.
    * @see #getHistoryModeSyncLock();
    */
-  Set<Long> addDataTagUpdateListener(Set<Long> tagIds, DataTagUpdateListener listener) throws CacheSynchronizationException;
+  <T extends DataTagUpdateListener> void addDataTagUpdateListener(Set<Long> tagIds, T listener) throws CacheSynchronizationException;
   
   /**
    * This method synchronizes subscribed data tags with the server.
@@ -76,22 +76,18 @@ public interface ClientDataTagCache extends BasicCacheHandler {
   /**
    * Unsubscribes the given listener from all cache objects. 
    * @param listener The listener which shall be unsubscribed.
-   * @return List of id's from those tags which have no <code>DataTagUpdateListener</code>
-   *         anymore subscribed.
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Set<Long> unsubscribeAllDataTags(DataTagUpdateListener listener);
+  void unsubscribeAllDataTags(DataTagUpdateListener listener);
   
   /**
    * Unsubscribes the given listener from all tags specified by the
    * list of tag ids.
    * @param dataTagIds list of tag ids 
    * @param listener The listener which shall be unsubscribed.
-   * @return List of id's from those tags which have no <code>DataTagUpdateListener</code>
-   *         anymore subscribed.
    * @throws NullPointerException When the parameter is <code>null</code>
    */
-  Set<Long> unsubscribeDataTags(Set<Long> dataTagIds, DataTagUpdateListener listener);
+  void unsubscribeDataTags(Set<Long> dataTagIds, DataTagUpdateListener listener);
   
   /**
    * Returns the cache size.
@@ -99,4 +95,18 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    * tags contained in the cache).
    */
   int getCacheSize();
+  
+  /**
+   * Registers a <code>TagSubscriptionListener</code>. 
+   * @param listener The listener to be registered
+   * @throws NullPointerException In case that the parameter is <code>null</code>.
+   */
+  void addTagSubscriptionListener(TagSubscriptionListener listener);
+  
+  /**
+   * Unregisters a <code>TagSubscriptionListener</code>. 
+   * @param listener The listener to be unregistered
+   * @throws NullPointerException In case that the parameter is <code>null</code>.
+   */
+  void removeTagSubscriptionListener(TagSubscriptionListener listener);
 }

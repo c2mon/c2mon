@@ -28,6 +28,7 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
  * You can register a <code>DataTagUpdateListener</code> with a 
  * <code>ClientDataTag</code> so as to be notified of these property changes.
  * @see ClientDataTag
+ * @see DataTagListener
  * @author Matthias Braeger
  */
 public interface DataTagUpdateListener {
@@ -35,7 +36,9 @@ public interface DataTagUpdateListener {
   /**
    * This method gets called when the value or quality property of a
    * <code>ClientDataTag</code> has changed. It receives then a <b>copy</b>
-   * of the updated object in the C2MON client cache.
+   * of the updated object in the C2MON client cache.<p>
+   * Please note that this method will also receive initial tag values, if you
+   * did not subscribe with the {@link DataTagListener} interface.
    * 
    * @param tagUpdate A copy of the <code>ClientDataTagValue</code> object with the 
    *                  updated properties
