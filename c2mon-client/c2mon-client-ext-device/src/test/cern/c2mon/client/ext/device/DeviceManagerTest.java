@@ -166,7 +166,8 @@ public class DeviceManagerTest {
     final Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
 
     // Expect the tag manager to subscribe to the tags
-    EasyMock.expect(tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject()))
+    tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject());
+    EasyMock.expectLastCall()
         .andAnswer(new IAnswer<Boolean>() {
           @Override
           public Boolean answer() throws Throwable {
@@ -234,7 +235,8 @@ public class DeviceManagerTest {
     // EasyMock.expect(dataTagCacheMock.get(EasyMock.<Set<Long>>
     // anyObject())).andReturn(cacheReturnMap).once();
     // Expect the tag manager to subscribe to the tags
-    EasyMock.expect(tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject()))
+    tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject());
+        EasyMock.expectLastCall()
         .andAnswer(new IAnswer<Boolean>() {
           @Override
           public Boolean answer() throws Throwable {
@@ -302,7 +304,8 @@ public class DeviceManagerTest {
     }
 
     // Expect the tag manager to subscribe to the tags
-    EasyMock.expect(tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject()))
+    tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject());
+    EasyMock.expectLastCall()
         .andAnswer(new IAnswer<Boolean>() {
           @Override
           public Boolean answer() throws Throwable {
@@ -367,7 +370,8 @@ public class DeviceManagerTest {
     Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
 
     // Expect the tag manager to subscribe to the tags
-    EasyMock.expect(tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject()))
+    tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject());
+    EasyMock.expectLastCall()
         .andAnswer(new IAnswer<Boolean>() {
           @Override
           public Boolean answer() throws Throwable {
@@ -445,7 +449,8 @@ public class DeviceManagerTest {
     Map<Long, ClientDataTag> cacheReturnMap = getCacheReturnMap();
 
     // Expect the tag manager to subscribe to the tags
-    EasyMock.expect(tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject()))
+    tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagUpdateListener> anyObject());
+    EasyMock.expectLastCall()
         .andAnswer(new IAnswer<Boolean>() {
           @Override
           public Boolean answer() throws Throwable {
