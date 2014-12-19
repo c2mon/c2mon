@@ -386,8 +386,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public void validate(final TagQualityStatus statusToRemove) {
     updateTagLock.writeLock().lock();
     try {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("validate() - Removing " + statusToRemove + " quality status from tag " + this.id);
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("validate() - Removing " + statusToRemove + " quality status from tag " + this.id);
       }
       if (tagQuality.isInvalidStatusSet(statusToRemove)) {
         // remove the quality status
@@ -411,8 +411,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
   public void invalidate(final TagQualityStatus status, final String description) {
     updateTagLock.writeLock().lock();
     try {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("invalidate() - Invalidating tag " + this.id + " with quality status " + status);
+      if (LOG.isTraceEnabled()) {
+        LOG.trace("invalidate() - Invalidating tag " + this.id + " with quality status " + status);
       }
       // Invalidate the object.
       tagQuality.addInvalidStatus(status, description);
@@ -460,8 +460,8 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @see #removeUpdateListener(DataTagUpdateListener)
    */
   public void addUpdateListener(final DataTagUpdateListener listener, final boolean sendInitialValuesToListener) {
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("addUpdateListener() called.");
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("addUpdateListener() called.");
     }
     listeners.add(listener);
 
