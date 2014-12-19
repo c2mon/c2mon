@@ -1,0 +1,175 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-pom</artifactId>
+    <version>1.1.3</version>
+  </parent>
+
+  <groupId>cern.c2mon.c2mon-web</groupId>
+  <artifactId>c2mon-web-restapi</artifactId>
+  <version>1.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <name>c2mon-web-restapi</name>
+  <description>C2MON REST API</description>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <version>1.9.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-jaxrs</artifactId>
+      <version>1.9.4</version>
+    </dependency>
+
+    <!-- C2MON dependency -->
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-all</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-client</groupId>
+      <artifactId>c2mon-client-ext-history</artifactId>
+    </dependency>
+
+    <!-- SPRING library dependencies -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${org.springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${org.springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>${org.springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+      <version>${org.springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-taglibs</artifactId>
+      <version>${org.springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>${org.springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>${org.springframework.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-aop</artifactId>
+      <version>${org.springframework.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- 3rd party library dependencies -->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>4.1.0.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
+      <version>1.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>6.0.35</version>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
+
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-client/c2mon-web-restapi</developerConnection>
+  </scm>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>
+            <!-- needed for the C2MON Client API -->
+            -Dc2mon.client.conf.url=http://timweb/test/conf/c2mon-client.properties
+          </argLine>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>${basedir}/src</directory>
+            </resource>
+          </webResources>
+          <warSourceDirectory>src</warSourceDirectory>
+          <warSourceExcludes>src/WEB-INF/lib/*.jar</warSourceExcludes>
+          <webXml>src\WEB-INF\web.xml</webXml>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
