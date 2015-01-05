@@ -68,23 +68,27 @@
         <xsl:value-of select="/*/@id" />
         )
         <xsl:value-of select="/*/@historyDescription" />
-
-        <div class="pull-right">
-          <a href="../" class="btn btn-large btn-default">
-            <span class="glyphicon glyphicon-home"></span>
-            Home
-          </a>
-          <a href="{$base_url}{$history_xml_url}{/*/@id}{$trend_parameter}" class="btn btn-large btn-default">History XML >>
-          </a>
-          <a href="{$trend_base_url}{/*/@id}{$trend_parameter}" class="btn btn-large btn-default"> Trend >>
-          </a>
-          <a href="{$base_url}{$datatag_url}{/*/@id}" class="btn btn-large btn-default">View Tag>>
-          </a>
-          <a href="{$help_point_url}{/*/@id}" class="btn btn-large btn-danger">View Help Alarm >>
-          </a>
-        </div>
       </h2>
     </div>
+  </div>
+
+  <div class="row">
+  
+    <a href="../" class="btn btn-default btn-large">
+      Home
+      <span class="glyphicon glyphicon-home"></span>
+    </a>
+        
+    <p class="pull-right btn-toolbar">
+      <a href="{$base_url}{$history_xml_url}{/*/@id}{$trend_parameter}" class="btn btn-large btn-default">View as XML &#0187;
+      </a>
+      <a href="{$trend_base_url}{/*/@id}{$trend_parameter}" class="btn btn-large btn-default"> View Trend &#0187;
+      </a>
+      <a href="{$base_url}{$datatag_url}{/*/@id}" class="btn btn-large btn-default">View Tag &#0187;
+      </a>
+      <a href="{$help_point_url}{/*/@id}" class="btn btn-large btn-danger">View Help Alarm &#0187;
+      </a>
+    </p>
   </div>
 
   <div class="row">

@@ -160,12 +160,12 @@
         <configuration>
           <webResources>
             <resource>
-              <directory>${basedir}/WebContent</directory>
+              <directory>${basedir}/src</directory>
             </resource>
           </webResources>
-          <warSourceDirectory>WebContent</warSourceDirectory>
-          <warSourceExcludes>WebContent/WEB-INF/lib/*.jar</warSourceExcludes>
-          <webXml>WebContent\WEB-INF\web.xml</webXml>
+          <warSourceDirectory>src</warSourceDirectory>
+          <warSourceExcludes>src/WEB-INF/lib/*.jar</warSourceExcludes>
+          <webXml>src\WEB-INF\web.xml</webXml>
         </configuration>
       </plugin>
 

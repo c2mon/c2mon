@@ -8,3 +8,8 @@
 .table-striped>tbody>tr:nth-child(2n+1) {
   background-color: rgb(247, 247, 247);
 }
+
+/* Stop IE cutting of the tails of letters in text boxes */
+input[type="text"], input[type="email"], input[type="password"], {
+  line-height: 1; 
+}

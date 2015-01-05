@@ -76,9 +76,9 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">
+            <span class="navbar-brand">
               C<sup>2</sup>MON Trend Viewer
-            </a>
+            </span>
           </div>
 
           <!-- Collect the nav links, forms, and other content for toggling -->
