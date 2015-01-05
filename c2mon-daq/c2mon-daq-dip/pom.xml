@@ -28,7 +28,7 @@
   </repositories>
 
   <properties>
-    <dip.version>5.5.0</dip.version>
+    <dip.version>5.5.2</dip.version>
     <dip.native.libs.dir.rel>dip-${dip.version}/lib64</dip.native.libs.dir.rel>
     <dip.native.libs.dir.abs>${project.build.directory}/lib_so/${dip.native.libs.dir.rel}</dip.native.libs.dir.abs>
   </properties>
