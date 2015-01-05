@@ -28,13 +28,16 @@ import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 
 /**
+ * This class extends the default Jackson {@link ObjectMapper} in order to allow
+ * custom serialisation of resources.
+ *
  * @author Justin Lewis Salmon
  */
 @Component
 public class CustomObjectMapper extends ObjectMapper {
 
   /**
-   *
+   * Constructor.
    */
   public CustomObjectMapper() {
     super();

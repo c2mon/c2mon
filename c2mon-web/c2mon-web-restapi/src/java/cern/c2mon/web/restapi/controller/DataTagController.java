@@ -14,6 +14,7 @@ import cern.c2mon.web.restapi.exception.UnknownResourceException;
 import cern.c2mon.web.restapi.service.DataTagService;
 
 /**
+ * Controller entry point for data tag API requests.
  *
  * @author Justin Lewis Salmon
  */
@@ -21,21 +22,30 @@ import cern.c2mon.web.restapi.service.DataTagService;
 public class DataTagController {
 
   /**
-   *
+   * The URL mapping to be used for retrieving data tags.
    */
   private static final String DATATAG_VALUE_MAPPING = "/datatags/{id}";
 
   /**
-   *
+   * Reference to the data tag service bean.
    */
   @Autowired
   private DataTagService service;
 
   /**
+   * Spring MVC request mapping entry point for requests to the URL defined by
+   * DATATAG_VALUE_MAPPING.
    *
-   * @param id
-   * @return
-   * @throws UnknownResourceException
+   * <p>
+   * Note: only GET requests are allowed to this URL.
+   * </p>
+   *
+   * @param id the path variable representing the ID of the data tag to be
+   *          retrieved
+   * @return the {@link ClientDataTagValue} object itself, which will be
+   *         automatically serialised by Spring
+   *
+   * @throws UnknownResourceException if no data tag was found with the given ID
    */
   @RequestMapping(value = DATATAG_VALUE_MAPPING, method = GET, produces = { API_V1 })
   @ResponseBody

@@ -24,19 +24,26 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import cern.c2mon.client.ext.history.common.HistoryProvider;
 import cern.c2mon.client.ext.history.common.exception.HistoryProviderException;
 import cern.c2mon.client.ext.history.common.exception.LoadingParameterException;
 
 /**
+ * This class handles all exceptions thrown by request handler methods and
+ * converts them to proper JSON error responses.
+ *
  * @author Justin Lewis Salmon
  */
 @ControllerAdvice
 public class RestExceptionHandler {
 
   /**
+   * Default exception handler that will be called if no more specific exception
+   * matches.
    *
-   * @param e
-   * @return
+   * @param e the {@link Exception} that was thrown
+   * @return an {@link ErrorResponse} object that will be automatically
+   *         serialised by Spring
    */
   @ExceptionHandler(Exception.class)
   @ResponseBody
@@ -46,9 +53,13 @@ public class RestExceptionHandler {
   }
 
   /**
+   * Exception handler for {@link TypeMismatchException}, which occurs for
+   * example when a client passes a string instead of an integer as a URL
+   * parameter.
    *
-   * @param e
-   * @return
+   * @param e the {@link TypeMismatchException} that was thrown
+   * @return an {@link ErrorResponse} object that will be automatically
+   *         serialised by Spring
    */
   @ExceptionHandler(TypeMismatchException.class)
   @ResponseBody
@@ -58,9 +69,12 @@ public class RestExceptionHandler {
   }
 
   /**
+   * Exception handler for {@link UnknownResourceException} which occurs when a
+   * client requests a resource that does not exist.
    *
-   * @param e
-   * @return
+   * @param e the {@link UnknownResourceException} that was thrown
+   * @return an {@link ErrorResponse} object that will be automatically
+   *         serialised by Spring
    */
   @ExceptionHandler(UnknownResourceException.class)
   @ResponseBody
@@ -70,9 +84,12 @@ public class RestExceptionHandler {
   }
 
   /**
+   * Exception handler for {@link HistoryProviderException} which occurs when
+   * there is a problem accessing the {@link HistoryProvider}.
    *
-   * @param e
-   * @return
+   * @param e the {@link HistoryProviderException} that was thrown
+   * @return an {@link ErrorResponse} object that will be automatically
+   *         serialised by Spring
    */
   @ExceptionHandler(HistoryProviderException.class)
   @ResponseBody
@@ -82,9 +99,12 @@ public class RestExceptionHandler {
   }
 
   /**
+   * Exception handler for {@link LoadingParameterException} which occurs when
+   * there is a problem retrieving history for a resource.
    *
-   * @param e
-   * @return
+   * @param e the {@link LoadingParameterException} that was thrown
+   * @return an {@link ErrorResponse} object that will be automatically
+   *         serialised by Spring
    */
   @ExceptionHandler(LoadingParameterException.class)
   @ResponseBody

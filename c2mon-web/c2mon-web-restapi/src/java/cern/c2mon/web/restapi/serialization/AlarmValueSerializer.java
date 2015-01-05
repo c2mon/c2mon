@@ -27,12 +27,14 @@ import org.codehaus.jackson.map.ser.std.SerializerBase;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 
 /**
+ * Custom serialisation class for {@link AlarmValueImpl} objects.
+ *
  * @author Justin Lewis Salmon
  */
 class AlarmValueSerializer extends SerializerBase<AlarmValueImpl> {
 
   /**
-   *
+   * Constructor.
    */
   public AlarmValueSerializer() {
     super(AlarmValueImpl.class);

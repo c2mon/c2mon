@@ -27,12 +27,14 @@ import org.codehaus.jackson.map.ser.std.SerializerBase;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 
 /**
+ * Custom serialisation class for {@link ClientDataTagImpl} objects.
+ *
  * @author Justin Lewis Salmon
  */
 public class ClientDataTagSerializer extends SerializerBase<ClientDataTagImpl> {
 
   /**
-   *
+   * Constructor.
    */
   public ClientDataTagSerializer() {
     super(ClientDataTagImpl.class);

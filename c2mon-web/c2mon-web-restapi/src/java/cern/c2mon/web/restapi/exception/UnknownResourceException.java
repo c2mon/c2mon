@@ -18,6 +18,9 @@
 package cern.c2mon.web.restapi.exception;
 
 /**
+ * Custom exception that is thrown when a client requests a resource that does
+ * not exist.
+ *
  * @author Justin Lewis Salmon
  */
 public class UnknownResourceException extends Exception {
@@ -25,9 +28,9 @@ public class UnknownResourceException extends Exception {
   private static final long serialVersionUID = -808381842161544109L;
 
   /**
-   * TODO
+   * Constructor.
    *
-   * @param message
+   * @param message the message describing the error
    */
   public UnknownResourceException(final String message) {
     super(message);

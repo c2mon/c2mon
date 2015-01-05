@@ -27,21 +27,27 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.web.restapi.exception.UnknownResourceException;
 
 /**
+ * Service bean for accessing {@link AlarmValue} objects from the C2MON server.
+ *
  * @author Justin Lewis Salmon
  */
 @Service
 public class AlarmService {
 
   /**
-   *
+   * Reference to the service gateway bean.
    */
   @Autowired
   private ServiceGateway gateway;
 
   /**
-   * @param id
-   * @return
-   * @throws UnknownResourceException
+   * Retrieve a {@link AlarmValue} object.
+   *
+   * @param id the ID of the {@link AlarmValue} to retrieve
+   * @return the {@link AlarmValue} object
+   *
+   * @throws UnknownResourceException if no alarm could be found with the given
+   *           ID
    */
   public AlarmValue getAlarmValue(Long id) throws UnknownResourceException {
     List<AlarmValue> list = (List<AlarmValue>) gateway.getTagManager().getAlarms(Arrays.asList(id));

@@ -41,6 +41,9 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.web.restapi.exception.UnknownResourceException;
 
 /**
+ * Service bean for accessing historical data for supported resources from the
+ * C2MON server.
+ *
  * @author Justin Lewis Salmon
  */
 @Service
@@ -49,18 +52,21 @@ public class HistoryService {
   private static Logger logger = LoggerFactory.getLogger(HistoryService.class);
 
   /**
-   *
+   * Reference to the history provider.
    */
   private HistoryProvider historyProvider;
 
   /**
-   *
+   * Reference to the service gateway bean.
    */
   @Autowired
   private ServiceGateway gateway;
 
   /**
-   * @throws HistoryProviderException
+   * Constructor.
+   *
+   * @throws HistoryProviderException if an error occurred while retrieving the
+   *           {@link HistoryProvider}.
    */
   public HistoryService() throws HistoryProviderException {
     try {
@@ -73,12 +79,18 @@ public class HistoryService {
   }
 
   /**
-   * @param id
-   * @param type
-   * @param records
-   * @return
-   * @throws LoadingParameterException
-   * @throws UnknownResourceException
+   * Retrieve a specific number of records of historical data for a specific
+   * resource.
+   *
+   * @param id the ID of the resource
+   * @param type the type of the resource (datatags, alarms, etc.)
+   * @param records the number of records to retrieve
+   *
+   * @return the list containing the specified number (or less) of historical
+   *         records
+   *
+   * @throws LoadingParameterException if an error occurs retrieving the history
+   * @throws UnknownResourceException if no resource was found with the given ID
    */
   public List<HistoryTagValueUpdate> getHistory(Long id, String type, int records) throws LoadingParameterException, UnknownResourceException {
     checkTagExistence(id, type);
@@ -90,11 +102,17 @@ public class HistoryService {
   }
 
   /**
-   * @param id
-   * @param days
-   * @return
-   * @throws LoadingParameterException
-   * @throws UnknownResourceException
+   * Retrieve all historical records for a specific number of days for a
+   * specific resource.
+   *
+   * @param id the ID of the resource
+   * @param type the type of the resource (datatags, alarms, etc.)
+   * @param days the number of days to retrieve
+   *
+   * @return a list of {@link HistoryTagValueUpdate} objects
+   *
+   * @throws LoadingParameterException if an error occurs retrieving the history
+   * @throws UnknownResourceException if no resource was found with the given ID
    */
   public List<HistoryTagValueUpdate> getHistory(Long id, String type, String days) throws LoadingParameterException, UnknownResourceException {
     checkTagExistence(id, type);
@@ -106,12 +124,18 @@ public class HistoryService {
   }
 
   /**
-   * @param id
-   * @param from
-   * @param to
-   * @return
-   * @throws LoadingParameterException
-   * @throws UnknownResourceException
+   * Retrieve all historical records of a resource between two dates for a
+   * specific resource.
+   *
+   * @param id the ID of the resource
+   * @param type the type of the resource (datatags, alarms, etc.)
+   * @param from the start date
+   * @param to the end date
+   *
+   * @return a list of {@link HistoryTagValueUpdate} objects
+   *
+   * @throws LoadingParameterException if an error occurs retrieving the history
+   * @throws UnknownResourceException if no resource was found with the given ID
    */
   public List<HistoryTagValueUpdate> getHistory(Long id, String type, Date from, Date to) throws LoadingParameterException, UnknownResourceException {
     checkTagExistence(id, type);
@@ -124,11 +148,15 @@ public class HistoryService {
   }
 
   /**
+   * Retrieve historical data from the {@link HistoryProvider}.
    *
-   * @param id
-   * @param configuration
-   * @return
-   * @throws LoadingParameterException
+   * @param id the ID of the resource to retrieve history for
+   * @param configuration the configuration parameter object used to specify
+   *          what to load
+   *
+   * @return a list of {@link HistoryTagValueUpdate} objects
+   *
+   * @throws LoadingParameterException if an error occurs retrieving the history
    */
   private List<HistoryTagValueUpdate> getHistory(Long id, HistoryLoadingConfiguration configuration) throws LoadingParameterException {
     final HistoryLoadingManager loadingManager = C2monHistoryGateway.getHistoryManager().createHistoryLoadingManager(historyProvider, Arrays.asList(id));
@@ -146,10 +174,12 @@ public class HistoryService {
   }
 
   /**
+   * Check that a particular tag of a given type exists.
    *
-   * @param id
-   * @param type
-   * @throws UnknownResourceException
+   * @param id the ID of the tag
+   * @param type the type of the tag
+   *
+   * @throws UnknownResourceException if no tag was found with the given ID
    */
   private void checkTagExistence(final Long id, final String type) throws UnknownResourceException {
 
@@ -169,7 +199,8 @@ public class HistoryService {
       }
     }
 
-    // This code should never be reached, as Spring handles the resource type within the controller
+    // This code should never be reached, as Spring handles the resource type
+    // within the controller
     else {
       throw new UnknownResourceException("Unknown resource type " + type);
     }

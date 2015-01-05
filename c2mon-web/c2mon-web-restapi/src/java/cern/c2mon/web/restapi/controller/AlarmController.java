@@ -31,31 +31,42 @@ import cern.c2mon.web.restapi.exception.UnknownResourceException;
 import cern.c2mon.web.restapi.service.AlarmService;
 
 /**
+ * Controller entry point for alarm API requests.
+ *
  * @author Justin Lewis Salmon
  */
 @Controller
 public class AlarmController {
 
   /**
-  *
-  */
- private static final String ALARM_VALUE_MAPPING = "/alarms/{id}";
+   * The URL mapping to be used for retrieving alarms.
+   */
+  private static final String ALARM_VALUE_MAPPING = "/alarms/{id}";
 
- /**
-  *
-  */
- @Autowired
- private AlarmService service;
+  /**
+   * Reference to the alarm service bean.
+   */
+  @Autowired
+  private AlarmService service;
 
- /**
-  *
-  * @param id
-  * @return
-  * @throws UnknownResourceException
-  */
- @RequestMapping(value = ALARM_VALUE_MAPPING, method = GET, produces = { API_V1 })
- @ResponseBody
- public AlarmValue getAlarmValue(@PathVariable final Long id) throws UnknownResourceException {
-   return service.getAlarmValue(id);
- }
+  /**
+   * Spring MVC request mapping entry point for requests to the URL defined by
+   * ALARM_VALUE_MAPPING.
+   *
+   * <p>
+   * Note: only GET requests are allowed to this URL.
+   * </p>
+   *
+   * @param id the path variable representing the ID of the alarm to be
+   *          retrieved
+   * @return the {@link AlarmValue} object itself, which will be automatically
+   *         serialised by Spring
+   *
+   * @throws UnknownResourceException if no alarm was found with the given ID
+   */
+  @RequestMapping(value = ALARM_VALUE_MAPPING, method = GET, produces = { API_V1 })
+  @ResponseBody
+  public AlarmValue getAlarmValue(@PathVariable final Long id) throws UnknownResourceException {
+    return service.getAlarmValue(id);
+  }
 }

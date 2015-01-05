@@ -24,21 +24,28 @@ import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.web.restapi.exception.UnknownResourceException;
 
 /**
+ * Service bean for accessing {@link ClientCommandTag} objects from the C2MON
+ * server.
+ *
  * @author Justin Lewis Salmon
  */
 @Service
 public class CommandService {
 
   /**
-   *
+   * Reference to the service gateway bean.
    */
   @Autowired
   private ServiceGateway gateway;
 
   /**
-   * @param id
-   * @return
-   * @throws UnknownResourceException
+   * Retrieve a {@link ClientCommandTag} object.
+   *
+   * @param id the ID of the {@link ClientCommandTag} to retrieve
+   * @return the {@link ClientCommandTag} object
+   *
+   * @throws UnknownResourceException if no command could be found with the
+   *           given ID
    */
   public ClientCommandTag<?> getCommand(Long id) throws UnknownResourceException {
     ClientCommandTag<Object> command = gateway.getCommandManager().getCommandTag(id);

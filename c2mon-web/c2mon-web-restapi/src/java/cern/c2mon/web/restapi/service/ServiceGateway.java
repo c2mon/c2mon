@@ -13,77 +13,68 @@ import cern.c2mon.client.ext.history.C2monHistoryGateway;
 import cern.c2mon.client.ext.history.C2monHistoryManager;
 
 /**
- * Service gateway wrapper for C2monServiceGateway
- * */
+ * Service wrapper bean around {@link C2monServiceGateway} for accessing C2MON
+ * manager singleton beans.
+ *
+ * @author Justin Lewis Salmon
+ */
 @Service
 public class ServiceGateway {
 
-  /**
-   * ServiceGateway logger
-   * */
   private static Logger logger = LoggerFactory.getLogger(ServiceGateway.class);
 
   /**
-   * Tag manager
-   * */
+   * Reference to the {@link C2monTagManager} instance.
+   */
   private C2monTagManager tagManager;
 
   /**
-   * Command manager
-   * */
+   * Reference to the {@link C2monCommandManager} instance.
+   */
   private C2monCommandManager commandManager;
 
   /**
-   * Command manager
-   * */
+   * Reference to the {@link C2monHistoryManager} instance.
+   */
   private C2monHistoryManager historyManager;
 
   /**
-   * Initializes the tagManager and commandManager
-   * */
+   * Called by Spring when the service has been created. Starts the C2MON client
+   * and initialises references to the manager beans.
+   */
   @PostConstruct
   public void init() {
-    startC2monServiceGateway();
-    tagManager = C2monServiceGateway.getTagManager();
-    logger.info("TagManager instance started: " + (tagManager == null ? "NULL" : "OK"));
-    commandManager = C2monServiceGateway.getCommandManager();
-    logger.info("CommandManager instance started: " + (commandManager == null ? "NULL" : "OK"));
-    historyManager = C2monHistoryGateway.getHistoryManager();
-    logger.info("HistoryManager instance started: " + (historyManager == null ? "NULL" : "OK"));
-  }
-
-  /**
-   * Starts the C2monServiceGateway. No need to sleep!
-   *
-   **/
-  private void startC2monServiceGateway() {
-    logger.info("Starting C2MON Service Gateway...");
+    logger.info("Starting C2MON service gateway...");
     C2monServiceGateway.startC2monClientSynchronous();
+
+    tagManager = C2monServiceGateway.getTagManager();
+    commandManager = C2monServiceGateway.getCommandManager();
+    historyManager = C2monHistoryGateway.getHistoryManager();
   }
 
   /**
-   * Getter for tagManager
+   * Retrieve the {@link C2monTagManager} instance.
    *
-   * @return tag manager instance
-   * */
+   * @return the reference to the {@link C2monTagManager}
+   */
   public C2monTagManager getTagManager() {
-    return this.tagManager;
+    return tagManager;
   }
 
   /**
-   * Getter for commandManager
+   * Retrieve the {@link C2monCommandManager} instance.
    *
-   * @return command manager instance
-   * */
+   * @return the reference to the {@link C2monCommandManager}
+   */
   public C2monCommandManager getCommandManager() {
-    return this.commandManager;
+    return commandManager;
   }
 
   /**
-   * Getter for HistoryManager
+   * Retrieve the {@link C2monHistoryManager} instance.
    *
-   * @return History Manager instance
-   * */
+   * @return the reference to the {@link C2monHistoryManager}
+   */
   public C2monHistoryManager getHistoryManager() {
     return historyManager;
   }

@@ -27,12 +27,14 @@ import org.codehaus.jackson.map.ser.std.SerializerBase;
 import cern.c2mon.client.ext.history.updates.HistoryTagValueUpdateImpl;
 
 /**
+ * Custom serialisation class for {@link HistoryTagValueUpdateImpl} objects.
+ *
  * @author Justin Lewis Salmon
  */
 public class HistoryTagValueUpdateSerializer extends SerializerBase<HistoryTagValueUpdateImpl> {
 
   /**
-   *
+   * Constructor.
    */
   public HistoryTagValueUpdateSerializer() {
     super(HistoryTagValueUpdateImpl.class);
@@ -51,7 +53,8 @@ public class HistoryTagValueUpdateSerializer extends SerializerBase<HistoryTagVa
     generator.writeStartObject();
     generator.writeNumberField("id", value.getId());
 
-    // This will be an empty string, as the tag description is not stored in the STL
+    // This will be an empty string, as the tag description is not stored in the
+    // STL
     generator.writeStringField("description", value.getDescription());
     generator.writeObjectField("value", value.getValue());
     generator.writeStringField("valueDescription", value.getValueDescription());

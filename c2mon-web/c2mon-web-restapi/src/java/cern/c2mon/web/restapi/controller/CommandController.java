@@ -31,30 +31,42 @@ import cern.c2mon.web.restapi.exception.UnknownResourceException;
 import cern.c2mon.web.restapi.service.CommandService;
 
 /**
+ * Controller entry point for command API requests.
+ *
  * @author Justin Lewis Salmon
  */
 @Controller
 public class CommandController {
+
   /**
-  *
-  */
- private static final String COMMAND_VALUE_MAPPING = "/commands/{id}";
+   * The URL mapping to be used for retrieving commands.
+   */
+  private static final String COMMAND_VALUE_MAPPING = "/commands/{id}";
 
- /**
-  *
-  */
- @Autowired
- private CommandService service;
+  /**
+   * Reference to the command service bean.
+   */
+  @Autowired
+  private CommandService service;
 
- /**
-  *
-  * @param id
-  * @return
-  * @throws UnknownResourceException
-  */
- @RequestMapping(value = COMMAND_VALUE_MAPPING, method = GET, produces = { API_V1 })
- @ResponseBody
- public ClientCommandTag<?> getCommand(@PathVariable final Long id) throws UnknownResourceException {
-   return service.getCommand(id);
- }
+  /**
+   * Spring MVC request mapping entry point for requests to the URL defined by
+   * COMMAND_VALUE_MAPPING.
+   *
+   * <p>
+   * Note: only GET requests are allowed to this URL.
+   * </p>
+   *
+   * @param id the path variable representing the ID of the command to be
+   *          retrieved
+   * @return the {@link ClientCommandTag} object itself, which will be
+   *         automatically serialised by Spring
+   *
+   * @throws UnknownResourceException if no command was found with the given ID
+   */
+  @RequestMapping(value = COMMAND_VALUE_MAPPING, method = GET, produces = { API_V1 })
+  @ResponseBody
+  public ClientCommandTag<?> getCommand(@PathVariable final Long id) throws UnknownResourceException {
+    return service.getCommand(id);
+  }
 }

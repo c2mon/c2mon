@@ -18,12 +18,20 @@
 package cern.c2mon.web.restapi.version;
 
 /**
+ * Simple bean used to keep track of progressive versions of the C2MON REST API.
+ *
+ * The version numbers are used in conjunction with the Spring MVC request
+ * mappings to determine which response to send to the client. By the exchange
+ * of HTTP "Content-Type" and "Accepts" headers, the client can request a
+ * specific API version and the server can respond with the corresponding
+ * version. A version number is a plain integer with no decimal part.
+ *
  * @author Justin Lewis Salmon
  */
 public class ApiVersion {
 
   /**
-   *
+   * HTTP header string for version 1.
    */
-  public static final String API_V1 = "application/vnd.c2mon.web.rest.api-v1+json";
+  public static final String API_V1 = "application/vnd.c2mon.web.restapi-v1+json";
 }

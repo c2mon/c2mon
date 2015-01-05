@@ -20,34 +20,39 @@ package cern.c2mon.web.restapi.exception;
 import org.springframework.http.HttpStatus;
 
 /**
+ * This class is used to hold a HTTP status and an error message which will be
+ * serialised and returned to clients when errors occur during API requests.
  *
  * @author Justin Lewis Salmon
  */
 class ErrorResponse {
 
   /**
-   *
+   * The HTTP error status code (404, 500, etc.)
    */
   int status;
 
   /**
-   *
+   * The message describing the reason for the error.
    */
   String message;
 
   /**
+   * Constructor.
    *
-   * @param status
-   * @param t
+   * @param status the {@link HttpStatus} of the error
+   * @param throwable the exception that was thrown
    */
-  public ErrorResponse(final HttpStatus status, final Throwable t) {
+  public ErrorResponse(final HttpStatus status, final Throwable throwable) {
     this.status = status.value();
-    this.message = t.getMessage();
+    this.message = throwable.getMessage();
   }
 
   /**
-   * @param badRequest
-   * @param string
+   * Constructor.
+   *
+   * @param status the {@link HttpStatus} of the error
+   * @param message the message describing the reason for the error
    */
   public ErrorResponse(HttpStatus status, String message) {
     this.status = status.value();
@@ -55,13 +60,17 @@ class ErrorResponse {
   }
 
   /**
-   * @return the status
+   * Retrieve the HTTP status code.
+   *
+   * @return the status code
    */
   public int getStatus() {
     return status;
   }
 
   /**
+   * Retrieve the error message string.
+   *
    * @return the message
    */
   public String getMessage() {

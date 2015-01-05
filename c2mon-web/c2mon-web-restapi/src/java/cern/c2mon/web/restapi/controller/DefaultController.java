@@ -25,17 +25,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import cern.c2mon.web.restapi.exception.UnknownResourceException;
 
 /**
+ * Default controller entry point for all API requests that do not map to any
+ * other controller.
+ *
  * @author Justin Lewis Salmon
  */
 @Controller
 public class DefaultController {
 
   /**
-   *
+   * When a request is made to an unmapped URL, simply throw an
+   * UnknownResourceException, which will be handled by Spring and converted
+   * into a proper JSON error response.
    */
   @RequestMapping("/**")
   public void unmappedRequest(HttpServletRequest request) throws UnknownResourceException {
-      String uri = request.getRequestURI();
-      throw new UnknownResourceException("There is no resource for path " + uri);
+    String uri = request.getRequestURI();
+    throw new UnknownResourceException("There is no resource for path " + uri);
   }
 }

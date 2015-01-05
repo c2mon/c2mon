@@ -27,21 +27,28 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.web.restapi.exception.UnknownResourceException;
 
 /**
+ * Service bean for accessing {@link ClientDataTagValue} objects from the C2MON
+ * server.
+ *
  * @author Justin Lewis Salmon
  */
 @Service
 public class DataTagService {
 
   /**
-   *
+   * Reference to the service gateway bean.
    */
   @Autowired
   private ServiceGateway gateway;
 
   /**
-   * @param id
-   * @return
-   * @throws UnknownResourceException
+   * Retrieve a {@link ClientDataTagValue} object.
+   *
+   * @param id the ID of the {@link ClientDataTagValue} to retrieve
+   * @return the {@link ClientDataTagValue} object
+   *
+   * @throws UnknownResourceException if no datatag could be found with the
+   *           given ID
    */
   public ClientDataTagValue getDataTagValue(Long id) throws UnknownResourceException {
     List<ClientDataTagValue> list = (List<ClientDataTagValue>) gateway.getTagManager().getDataTags(Arrays.asList(id));
