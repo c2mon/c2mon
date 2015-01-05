@@ -25,7 +25,6 @@
         <max-heap-size>256m</max-heap-size>
         <property name="c2mon.process.name" value="$PROCESS_NAME" />
         <property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
-        <property name="java.security.egd" value="file://dev/urandom" />
         <property name="java.library.path" value="$INSTALL_DIR/lib_so" />
         <preExec>
                     <![CDATA[

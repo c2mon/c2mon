@@ -24,7 +24,6 @@
         <property name="c2mon.log.dir" value="$DAQ_LOG_HOME" />
         <property name="cmw.mom.brokerlist" value="laser1:2506,laser2:2506" />
         <property name="laser.hosts" value="${LASER_HOSTS}" />
-        <property name="java.security.egd" value="file://dev/urandom" />
         <preExec>
                     <![CDATA[
                       [[ -z $C2MON_PROPERTIES_FILE ]] && echo "C2MON_PROPERTIES_FILE not set!" && exit 1
