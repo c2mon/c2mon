@@ -37,9 +37,9 @@ import com.linar.jintegra.AutomationException;
 /**
  * The DADCOMEndpoint represents an endpoint to connect via DCOM to a classic
  * OPC server.
- * 
+ *
  * @author Andreas Lang
- * 
+ *
  */
 public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
@@ -47,7 +47,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      * Timeout of the DCOM connection.
      */
     private static final String TIMEOUT = "10000";
-    
+
     /**
      * The cancel ID for async refreshes
      */
@@ -78,17 +78,17 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
      * The authentication info of this endpoint.
      */
     private AuthInfo authInfo;
-    
+
     /**
      * Thread pool for incomming data.
      */
     private ExecutorService executorService;
-    
+
     /**
      * Calendar to correct GMT time given by OPC server to local time
      */
     private final GregorianCalendar gregorianCalendar = new GregorianCalendar();
-    
+
     /**
      * logger of this class.
      */
@@ -96,14 +96,14 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Creates a new DADCOMEndpoint.
-     * 
+     *
      * @param itemDefinitionFactory
      *            The factory to create item defintions from data tags.
      * @param groupProvider
      *            The strategy how items should be grouped to subscriptions.
      */
     public DADCOMEndpoint(
-            final IItemDefinitionFactory<DADCOMItemDefintion> itemDefinitionFactory, 
+            final IItemDefinitionFactory<DADCOMItemDefintion> itemDefinitionFactory,
             final IGroupProvider<DADCOMItemDefintion> groupProvider) {
         super(itemDefinitionFactory, groupProvider);
         System.setProperty("JINTEGRA_OUTGOING_CONNECTION_TIMEOUT", TIMEOUT);
@@ -112,7 +112,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Initializes the endpoint with the properties for the connection.
-     * 
+     *
      * @param opcAddress
      *            The address of this endpoint.
      */
@@ -135,15 +135,15 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Sets up the OPC server connection.
-     * 
+     *
      * @param uri
      *            The URI of the OPC server.
      * @throws IOException
      *             Thrown if there is a connection error.
      */
     private void setUpConnection(final URI uri) throws IOException {
-        logger.debug("Establishing NTdomain: " + authInfo.getCallerDomain() + ", NTuser: " + authInfo.getCallerUser() + ", NTpassword: ********");
-        AuthInfo.setDefault(authInfo);
+        logger.debug("Establishing NTdomain: " + AuthInfo.getCallerDomain() + ", NTuser: " + AuthInfo.getCallerUser() + ", NTpassword: ********");
+        AuthInfo.setThreadDefault(authInfo);
         String host = uri.getHost();
         String opcServer = uri.getPath().replaceFirst("/", "");
         server = new OPCServer(host);
@@ -167,7 +167,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Subscribes to the items in the subscription groups.
-     * 
+     *
      * @param subscriptionGroups
      *            The groups to subscribe to.
      */
@@ -192,14 +192,14 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     /**
      * Processes a subscription group which means subscribes for it and
      * adds a listener.
-     * 
+     *
      * @param subscritionGroup The group to subscribe to.
      * @return The OPCGroup which is used for the subscription.
      * @throws IOException The connection may have IOExceptions.
      * @throws AutomationException Server side automation errors can be thrown.
      */
     private IOPCGroup processGroup(
-            final SubscriptionGroup<DADCOMItemDefintion> subscritionGroup) 
+            final SubscriptionGroup<DADCOMItemDefintion> subscritionGroup)
             throws IOException, AutomationException {
         IOPCGroup group = subscribe(subscritionGroup);
         group.addDIOPCGroupEventListener(new DIOPCGroupEventAdapter() {
@@ -209,7 +209,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             public void dataChange(final DIOPCGroupEventDataChangeEvent theEvent) throws IOException {
                 notifyListeners(theEvent);
             }
-            
+
         });
         group.setIsSubscribed(true);
         try {
@@ -223,7 +223,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Subscribes to all the items in the provided SubscriptionGroup.
-     * 
+     *
      * @param subscritionGroup
      *            The SubscriptionGroup with the items to connect to.
      * @return The created group.
@@ -263,7 +263,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Returns a new unique group name.
-     * 
+     *
      * @return The new group name.
      */
     private String getNewGroupName() {
@@ -274,7 +274,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Notifies all listeners about the updates in the event.
-     * 
+     *
      * @param theEvent
      *            The event with the updates.
      */
@@ -301,24 +301,24 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
             }
         });
     }
-    
+
     /**
-     * Returns the adjusted OPC timestamp to the time zone 
+     * Returns the adjusted OPC timestamp to the time zone
      * of the DAQ server.
-     * 
+     *
      * @param opcTimestamp The GMT timestamp received from the OPC
      * @return The adjusted timestamp in milliseconds.
      */
     private synchronized long getAdjustedTimestamp(long opcTimestamp) {
       gregorianCalendar.setTimeInMillis(opcTimestamp);
-      int timezoneAdjustment = 
+      int timezoneAdjustment =
         gregorianCalendar.get(GregorianCalendar.ZONE_OFFSET) + gregorianCalendar.get(GregorianCalendar.DST_OFFSET);
       return opcTimestamp + (long) timezoneAdjustment;
     }
 
     /**
      * True for a good quality.
-     * 
+     *
      * @param quality The quality to check.
      * @return True if the quality is good else false.
      */
@@ -332,7 +332,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
 //    /**
 //     * Refreshes the values of a collection of item definitions.
-//     * 
+//     *
 //     * @param itemDefintions
 //     *            The item definitions to refresh.
 //     */
@@ -369,20 +369,20 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 //            }
 //        }
 //        logger.debug("Finished refresh");
-//    }    
-    
+//    }
+
     /**
      * Refreshes the values of a collection of item definitions.
      * TODO: This method needs to be rewritten since it does not work
      *       most of the time, especially after an OPC reboot!
-     * 
+     *
      * @param itemDefintions
      *            The item definitions to refresh.
      */
     @Override
     protected synchronized void onRefresh(
             final Collection<DADCOMItemDefintion> itemDefintions) {
-      
+
       logger.debug("onRefresh() - Method call is disabled for DCOM. An async refresh is triggered at initialization by processGroup() method");
 
 //        AuthInfo.setThreadDefault(authInfo);
@@ -409,7 +409,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 //        }
 //        for (OPCGroup group : opcGroups) {
 //          try {
-//            logger.debug("onRefresh() - trigger async refresh for group " + group.getName()); 
+//            logger.debug("onRefresh() - trigger async refresh for group " + group.getName());
 //            group.asyncRefresh((short) OPCDataSource.OPCDevice, 666, CANCEL_ID);
 //          } catch (AutomationException e) {
 //              throw OPCDCOMFactory.createWrappedAutomationException(e);
@@ -422,7 +422,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Calling a method is not supported by a DADCOMEndpoint.
-     * 
+     *
      * @param itemDefintion
      *            ignored.
      * @param value
@@ -437,7 +437,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Writes a value to the OPC server.
-     * 
+     *
      * @param itemDefintion
      *            Defines where to write.
      * @param value
@@ -466,7 +466,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Returns the command group of this endpoint.
-     * 
+     *
      * @return The new OPCGroup.
      * @throws IOException
      *             Throws an IOException if the DCOM connection fails.
@@ -495,7 +495,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
         catch (Exception ex) {
             logger.error("Exception disconnecting from OPC server: " + ex);
         }
-        
+
         try {
             opcCommandGroup = null;
             executorService.shutdown();
@@ -510,7 +510,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Called when a subsription is removed.
-     * 
+     *
      * @param subscriptionGroup The subscription to remove.
      * @param removedDefinition The removed subscription.
      */
@@ -538,7 +538,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
 
     /**
      * Subscribes for a subscription group.
-     * 
+     *
      * @param subscriptionGroup The subscription group to subscribe.
      */
     @Override
@@ -557,7 +557,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     /**
      * Checks the status of the enpoint. It will throw an exception if something
      * is wrong.
-     * 
+     *
      * @throws OPCCommunicationException Thrown if the connection is not
      * reachable but might be back later on.
      * @throws OPCCriticalException Thrown if the connection is not
@@ -591,7 +591,7 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
               default:
                 state = "OPC state unknown";
             }
-            
+
             if (stateId != OPCServerState.OPCRunning) {
               // not fine throw exception
               throw new OPCCommunicationException("OPC server state wrong: " + state);
