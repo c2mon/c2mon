@@ -144,7 +144,7 @@
 
                 <div id="collapseme-{action}-{id}" class="collapse out">
                   <xsl:if test="status-message!='' ">
-                    <div style="white-space: pre-wrap;">
+                    <div>
                       <xsl:value-of select="status-message" />
                     </div>
                   </xsl:if>
@@ -164,18 +164,16 @@
   <xsl:template match="sub-reports">
 
     <xsl:for-each select="ConfigurationElementReport">
-      <li style="white-space: pre-wrap;">
-        <xsl:value-of select="action" />
-        -
-        <xsl:value-of select="entity" />
-        -
-        <xsl:value-of select="id" />
-        -
+      <li>
+        <xsl:value-of select="action" /> -
+        <xsl:value-of select="entity" /> -
+        <xsl:value-of select="id" /> -
         <xsl:value-of select="status" />
-        -
-
+        
         <xsl:if test="status-message!=''">
-          <xsl:value-of select="status-message" />
+          <p>
+            <xsl:value-of select="status-message" />
+          </p>
         </xsl:if>
       </li>
       <xsl:apply-templates select="sub-reports" />
