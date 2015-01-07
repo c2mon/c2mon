@@ -872,15 +872,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
-
-        ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
-        setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
-
       } catch (CacheElementNotFoundException controlCacheEx) {
         LOGGER.error("Unable to locate equipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
       } finally {
         controlTagCache.releaseWriteLockOnKey(stateTagId);
       }
+
+      ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
+      setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
     } catch (CacheElementNotFoundException equipmentCacheEx) {
       LOGGER.error("Unable to locate equipment in cache (id is " + pId + ") - not taking any invalidation action.", equipmentCacheEx);
     }
@@ -927,15 +926,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         if (stateTag.getValue() == null  || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
-
-        ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
-        setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
-
       } catch (CacheElementNotFoundException controlCacheEx) {
         LOGGER.error("Unable to locate subequipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
       } finally {
         controlTagCache.releaseWriteLockOnKey(stateTagId);
       }
+
+      ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
+      setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
     } catch (CacheElementNotFoundException subEquipmentCacheEx) {
       LOGGER.error("Unable to locate subequipment in cache (id is " + pId + ")", subEquipmentCacheEx);
     }
