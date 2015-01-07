@@ -307,6 +307,12 @@ public class DriverKernel implements ApplicationContextAware {
     FilterConnectorThread filterConnectorThread = new FilterConnectorThread(filterMessageSender);
     filterConnectorThread.start();
 
+    // Start "ticking" of the ProcessMessageSender's AliveTimer. As soon as the
+    // first AliveTag arrives to TIM server, the DAQ will be considered as
+    // operational.
+    LOGGER.debug("configure - Starting DAQ alive timer.");
+    processMessageSender.startAliveTimer();
+
     EquipmentMessageHandler equnit = null;
     ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
     boolean dynamicTimeDeadbandEnabled = !configurationController.getCommandParamsHandler().hasParam("-noDeadband");
@@ -359,14 +365,6 @@ public class DriverKernel implements ApplicationContextAware {
     // LOGGER.info("Number of supervised equipment units : " +
     // eqLookupTable.size());
     LOGGER.info("configure - Number of equipment units configured properly : " + eqUnitsConnectedProperly);
-
-    // start "ticking" of the ProcessMessageSender's AliveTimer
-    // as soon as the first AliveTag arives to TIM server, the daq will
-    // be
-    // considered as operational
-    LOGGER.debug("configure - Starting DAQ alive timer.");
-    processMessageSender.startAliveTimer();
-
     LOGGER.info("configure - DAQ initialized and running.");
   }
 
