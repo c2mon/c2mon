@@ -76,7 +76,8 @@ public class JAPCGateway  implements DataTagUpdateListener, HeartbeatListener {
     if (tagIds != null) {    
       while (!tagSubscriptionSuccessful) {
         try {
-          tagSubscriptionSuccessful = tagManager.subscribeDataTags(tagIds, this);
+          tagManager.subscribeDataTags(tagIds, this);
+          tagSubscriptionSuccessful = true;
         }
         catch (Exception ex) {
           LOG.error("error occured while trying to subscribe to the list of data tags.", ex);
