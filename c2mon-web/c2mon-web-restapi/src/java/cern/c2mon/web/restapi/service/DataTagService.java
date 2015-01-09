@@ -20,10 +20,14 @@ package cern.c2mon.web.restapi.service;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.web.restapi.cache.ClientDataTagCache;
 import cern.c2mon.web.restapi.exception.UnknownResourceException;
 
 /**
@@ -33,13 +37,21 @@ import cern.c2mon.web.restapi.exception.UnknownResourceException;
  * @author Justin Lewis Salmon
  */
 @Service
-public class DataTagService {
+public class DataTagService implements DataTagUpdateListener {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DataTagService.class);
 
   /**
    * Reference to the service gateway bean.
    */
   @Autowired
   private ServiceGateway gateway;
+
+  /**
+   * Reference to the data tag cache.
+   */
+  @Autowired
+  private ClientDataTagCache cache;
 
   /**
    * Retrieve a {@link ClientDataTagValue} object.
@@ -51,12 +63,31 @@ public class DataTagService {
    *           given ID
    */
   public ClientDataTagValue getDataTagValue(Long id) throws UnknownResourceException {
-    List<ClientDataTagValue> list = (List<ClientDataTagValue>) gateway.getTagManager().getDataTags(Arrays.asList(id));
+    ClientDataTagValue tag;
 
+    // Try to get the tag from the cache
+    if (cache.contains(id)) {
+      return cache.get(id);
+    }
+
+    // Otherwise, try to get the tag from the server
+    List<ClientDataTagValue> list = (List<ClientDataTagValue>) gateway.getTagManager().getDataTags(Arrays.asList(id));
     if (list.isEmpty()) {
       throw new UnknownResourceException("No datatag with id " + id + " was found.");
     } else {
-      return list.get(0);
+      tag = list.get(0);
     }
+
+    // Subscribe to the tag and add it to the cache
+    gateway.getTagManager().subscribeDataTag(id, this);
+    cache.add(tag);
+
+    return tag;
+  }
+
+  @Override
+  public void onUpdate(ClientDataTagValue tagUpdate) {
+    // Update the tag in the cache
+    cache.add(tagUpdate);
   }
 }
