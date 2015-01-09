@@ -35,10 +35,10 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientRuleTag;
+import cern.c2mon.client.ext.device.exception.MappedPropertyException;
 import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
 import cern.c2mon.client.ext.device.property.ClientDevicePropertyFactory;
 import cern.c2mon.client.ext.device.property.ClientDevicePropertyImpl;
-import cern.c2mon.client.ext.device.property.MappedPropertyException;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
@@ -154,7 +154,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
   }
 
   @Override
-  public ClientDataTagValue getProperty(PropertyInfo propertyInfo) {
+  public ClientDataTagValue getProperty(PropertyInfo propertyInfo) throws MappedPropertyException {
     ClientDeviceProperty property = deviceProperties.get(propertyInfo.getPropertyName());
 
     // If we didn't find the property, just return null
@@ -214,7 +214,10 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
 
       // Don't return mapped properties here
       if (!isMappedProperty(propertyName)) {
-        deviceProperties.put(propertyName, getProperty(info));
+        try {
+          deviceProperties.put(propertyName, getProperty(info));
+        } catch (MappedPropertyException e) {
+        }
       }
     }
 
@@ -228,7 +231,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
   }
 
   @Override
-  public HashMap<String, ClientDataTagValue> getMappedProperty(String propertyName) {
+  public HashMap<String, ClientDataTagValue> getMappedProperty(String propertyName) throws MappedPropertyException {
     ClientDeviceProperty property = deviceProperties.get(propertyName);
 
     if (property == null) {

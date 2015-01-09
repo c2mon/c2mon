@@ -21,7 +21,7 @@ import java.util.Map;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.ext.device.property.MappedPropertyException;
+import cern.c2mon.client.ext.device.exception.MappedPropertyException;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 
 /**
@@ -103,10 +103,13 @@ public interface Device {
    * Retrieve a mapped property from the device, i.e. one containing nested
    * fields.
    *
-   * @param propertyName
-   * @return
+   * @param propertyName the name of the mapped property to retrieve
+   * @return the map of fields
+   *
+   * @throws MappedPropertyException if the requested property is not a mapped
+   *           property
    */
-  public Map<String, ClientDataTagValue> getMappedProperty(String propertyName);
+  public Map<String, ClientDataTagValue> getMappedProperty(String propertyName) throws MappedPropertyException;
 
   /**
    * Retrieve a particular command of this device.

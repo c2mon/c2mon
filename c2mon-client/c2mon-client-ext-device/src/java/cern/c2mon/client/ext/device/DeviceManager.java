@@ -34,6 +34,7 @@ import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
+import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.TransferDevice;
@@ -169,6 +170,24 @@ public class DeviceManager implements C2monDeviceManager {
       LOG.error("Unable to clone Device with id " + deviceImpl.getId(), e);
       throw new UnsupportedOperationException("Unable to clone Device with id " + deviceImpl.getId(), e);
     }
+  }
+
+  @Override
+  public Device subscribeDevice(String className, String deviceName, DeviceUpdateListener listener) throws DeviceNotFoundException {
+    Device device = null;
+    List<Device> devices = getAllDevices(className);
+
+    for (Device dev : devices) {
+      if (dev.getName().equals(deviceName)) {
+        device = subscribeDevice(dev, listener);
+      }
+    }
+
+    if (device == null) {
+      throw new DeviceNotFoundException("No devices found of class " + className);
+    }
+
+    return device;
   }
 
   @Override

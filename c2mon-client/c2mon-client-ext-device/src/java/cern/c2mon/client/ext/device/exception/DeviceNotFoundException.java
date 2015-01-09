@@ -2,7 +2,7 @@
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
  *
- * Copyright (C) 2004 - 2014 CERN. This program is free software; you can
+ * Copyright (C) 2004 - 2015 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version. This program is distributed
@@ -15,19 +15,21 @@
  *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.ext.device.property;
+package cern.c2mon.client.ext.device.exception;
+
+import cern.c2mon.client.ext.device.Device;
 
 /**
- * This class represents an exception thrown when an error occurs accessing
- * mapped properties (i.e. fields) within devices.
+ * This class represents an exception thrown when a client requests a
+ * {@link Device} that does not exist.
  *
  * @author Justin Lewis Salmon
  */
-public class MappedPropertyException extends RuntimeException {
+public class DeviceNotFoundException extends Exception {
 
-  private static final long serialVersionUID = 97720075824887949L;
+  private static final long serialVersionUID = 5716954272685824112L;
 
-  public MappedPropertyException(String message) {
+  public DeviceNotFoundException(String message) {
     super(message);
   }
 }

@@ -21,6 +21,8 @@ package cern.c2mon.client.ext.device;
 import java.util.List;
 import java.util.Set;
 
+import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
+
 /**
  * This interface describes the methods which are provided by the C2MON device
  * manager singleton. The device manager handles communication with the C2MON
@@ -79,6 +81,35 @@ public interface C2monDeviceManager {
    * @return the device containing its current property values
    */
   public Device subscribeDevice(Device device, final DeviceUpdateListener listener);
+
+  /**
+   * Subscribe to retrieve updates of property changes of a device.
+   *
+   * <p>
+   * Subscribing to a device means subscribing to all the properties of that
+   * device. When a particular property changes, the given
+   * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method will be
+   * called with the device itself and the name of the property that has
+   * changed.
+   *
+   * Note: only a single property will change for any given listener invocation.
+   * The listener will be invoked multiple times to reflect multiple property
+   * changes.
+   *
+   * This method will return a device containing the current property values.
+   * Note however that the given listener may be invoked if a property of the
+   * device changes before this method returns.
+   * </p>
+   *
+   * @param className the class name of the device you want to subscribe to
+   * @param deviceName the name of the device you want to subscribe to
+   * @param listener the callback listener that will be notified when a device
+   *          property changes
+   * @return the device containing its current property values
+   *
+   * @throws DeviceNotFoundException if no device of the given class was found
+   */
+  public Device subscribeDevice(String className, String deviceName, final DeviceUpdateListener listener) throws DeviceNotFoundException;
 
   /**
    * Subscribe to retrieve updates of property changes of a set of devices.

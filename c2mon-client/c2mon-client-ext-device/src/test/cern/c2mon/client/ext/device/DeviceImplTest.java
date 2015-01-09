@@ -26,10 +26,10 @@ import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientRuleTag;
+import cern.c2mon.client.ext.device.exception.MappedPropertyException;
 import cern.c2mon.client.ext.device.property.ClientConstantValue;
 import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
 import cern.c2mon.client.ext.device.property.ClientDevicePropertyImpl;
-import cern.c2mon.client.ext.device.property.MappedPropertyException;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.client.ext.device.util.DeviceTestUtils;
 import cern.c2mon.shared.client.device.DeviceCommand;
@@ -52,7 +52,7 @@ public class DeviceImplTest {
   private C2monCommandManager commandManagerMock;
 
   @Test
-  public void testLazyLoadDeviceProperty() throws RuleFormatException, ClassNotFoundException {
+  public void testLazyLoadDeviceProperty() throws RuleFormatException, ClassNotFoundException, MappedPropertyException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 
@@ -78,7 +78,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testGetDeviceProperty() throws RuleFormatException {
+  public void testGetDeviceProperty() throws RuleFormatException, MappedPropertyException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 
@@ -125,7 +125,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testLazyLoadDeviceProperties() throws RuleFormatException, ClassNotFoundException {
+  public void testLazyLoadDeviceProperties() throws RuleFormatException, ClassNotFoundException, MappedPropertyException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 
@@ -238,7 +238,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testPropertyUpdate() throws RuleFormatException {
+  public void testPropertyUpdate() throws RuleFormatException, MappedPropertyException {
 
     DeviceImpl device = getTestDevice();
     ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
@@ -265,7 +265,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testRuleUpdate() throws RuleFormatException, ClassNotFoundException, InterruptedException {
+  public void testRuleUpdate() throws RuleFormatException, ClassNotFoundException, InterruptedException, MappedPropertyException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 
@@ -329,14 +329,14 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testGetNonexistentProperty() {
+  public void testGetNonexistentProperty() throws MappedPropertyException {
     DeviceImpl device = getTestDevice();
     ClientDataTagValue value = device.getProperty(new PropertyInfo("nonexistent"));
     Assert.assertNull(value);
   }
 
   @Test
-  public void testGetDevicePropertyField() throws RuleFormatException {
+  public void testGetDevicePropertyField() throws RuleFormatException, MappedPropertyException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 
@@ -395,7 +395,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testLazyLoadDevicePropertyFields() throws RuleFormatException, ClassNotFoundException {
+  public void testLazyLoadDevicePropertyFields() throws RuleFormatException, ClassNotFoundException, MappedPropertyException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
 

@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.ext.device.exception.MappedPropertyException;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 
 /**
@@ -39,7 +40,7 @@ public class DeviceIntegrationTest {
 
   static Logger log = Logger.getLogger(DeviceIntegrationTest.class);
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws MappedPropertyException {
     C2monDeviceManager manager = C2monDeviceGateway.getDeviceManager();
 
     List<String> deviceClassNames = manager.getAllDeviceClassNames();
@@ -95,8 +96,11 @@ public class DeviceIntegrationTest {
   static DeviceUpdateListener listener = new DeviceUpdateListener() {
     @Override
     public void onUpdate(Device device, PropertyInfo propertyInfo) {
-      log.info("onUpdate(): device=" + device.getName() + " property=" + propertyInfo.getPropertyName() + " value="
-          + device.getProperty(propertyInfo).getValue());
+      try {
+        log.info("onUpdate(): device=" + device.getName() + " property=" + propertyInfo.getPropertyName() + " value="
+            + device.getProperty(propertyInfo).getValue());
+      } catch (MappedPropertyException e) {
+      }
     }
   };
 }
