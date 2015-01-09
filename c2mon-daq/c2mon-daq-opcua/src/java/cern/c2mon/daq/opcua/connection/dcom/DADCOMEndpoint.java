@@ -224,30 +224,35 @@ public class DADCOMEndpoint extends OPCEndpoint<DADCOMItemDefintion> {
     /**
      * Subscribes to all the items in the provided SubscriptionGroup.
      *
-     * @param subscritionGroup
+     * @param subscriptionGroup
      *            The SubscriptionGroup with the items to connect to.
      * @return The created group.
      * @throws IOException
      *             Throws an IOException if the subscription to the server fails
      *             due to an I/O error.
      */
-    private IOPCGroup subscribe(final SubscriptionGroup<DADCOMItemDefintion> subscritionGroup) throws IOException {
+    private IOPCGroup subscribe(final SubscriptionGroup<DADCOMItemDefintion> subscriptionGroup) throws IOException {
         IOPCGroups opcGroups = server.getOPCGroups();
-        int updateRate = subscritionGroup.getTimeDeadband();
-        float valueDeadband = subscritionGroup.getValueDeadband();
+        int updateRate = subscriptionGroup.getTimeDeadband();
+        float valueDeadband = subscriptionGroup.getValueDeadband();
         IOPCGroup group = OPCDCOMFactory.createOPCGroup(opcGroups, getNewGroupName(), updateRate, valueDeadband);
         OPCItems items = group.getOPCItems();
-        for (DADCOMItemDefintion defintion : subscritionGroup.getUnsubscribedDefinitions()) {
-            long itemDefinitionId = defintion.getId();
+        for (DADCOMItemDefintion definition : subscriptionGroup.getUnsubscribedDefinitions()) {
+            long itemDefinitionId = definition.getId();
             int clientHandle = Long.valueOf(itemDefinitionId).intValue();
-            String itemAddress = defintion.getAddress();
+            String itemAddress = definition.getAddress();
+
+            // Mark this item as subscribed, in order to prevent re-creating it
+            // unnecessarily (see TIMD-140)
+            definition.setSubscribed(true);
+
             try {
                 OPCItem item = OPCDCOMFactory.createOPCItem(items, clientHandle, itemAddress);
                 itemHandleOpcItems.put(clientHandle, item);
-                if (defintion.hasRedundantAddress()) {
+                if (definition.hasRedundantAddress()) {
                     // use just the negative value makes it easy to map back
                     int redundantClientHandle = -clientHandle;
-                    String redundantItemAddress = defintion.getRedundantAddress();
+                    String redundantItemAddress = definition.getRedundantAddress();
                     item = OPCDCOMFactory.createOPCItem(items, redundantClientHandle, redundantItemAddress);
                     itemHandleOpcItems.put(redundantClientHandle, item);
                 }
