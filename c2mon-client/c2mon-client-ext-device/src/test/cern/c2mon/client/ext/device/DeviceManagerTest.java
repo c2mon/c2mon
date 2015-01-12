@@ -40,6 +40,7 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
 import cern.c2mon.client.ext.device.exception.MappedPropertyException;
+import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
 import cern.c2mon.client.ext.device.property.ClientDevicePropertyImpl;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
@@ -286,11 +287,11 @@ public class DeviceManagerTest {
     Map<String, ClientDeviceProperty> deviceFields = new HashMap<>();
 
     for (int i = 0; i < 1000; i++) {
-      deviceFields.put("test_field_name_" + i, new ClientDevicePropertyImpl(new Long(i)));
+      deviceFields.put("test_field_name_" + i, new ClientDevicePropertyImpl(new Long(i), Category.TAG_ID));
     }
 
     HashMap<String, ClientDeviceProperty> deviceProperties = new HashMap<>();
-    deviceProperties.put("test_property_name", new ClientDevicePropertyImpl(deviceFields));
+    deviceProperties.put("test_property_name", new ClientDevicePropertyImpl(deviceFields, Category.MAPPED_PROPERTY));
 
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     device1.setDeviceProperties(deviceProperties);

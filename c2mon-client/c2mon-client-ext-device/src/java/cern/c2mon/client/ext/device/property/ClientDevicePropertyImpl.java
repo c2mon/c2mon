@@ -42,6 +42,11 @@ public class ClientDevicePropertyImpl implements ClientDeviceProperty {
   private ClientDataTagValue value;
 
   /**
+   * The category of this property, e.g. tag id, constant, etc.
+   */
+  private Category category;
+
+  /**
    * The map of nested property fields (if applicable).
    */
   private Map<String, ClientDeviceProperty> fields;
@@ -52,9 +57,11 @@ public class ClientDevicePropertyImpl implements ClientDeviceProperty {
    *
    * @param tagId the ID of the {@link ClientDataTag} corresponding to this
    *          property
+   * @param category the category of this property
    */
-  public ClientDevicePropertyImpl(final Long tagId) {
+  public ClientDevicePropertyImpl(final Long tagId, final Category category) {
     this.tagId = tagId;
+    this.category = category;
   }
 
   /**
@@ -63,9 +70,11 @@ public class ClientDevicePropertyImpl implements ClientDeviceProperty {
    * {@link ClientConstantValue}).
    *
    * @param clientDataTag the client device property to set
+   * @param category the category of this property
    */
-  public ClientDevicePropertyImpl(final ClientDataTagValue clientDataTag) {
+  public ClientDevicePropertyImpl(final ClientDataTagValue clientDataTag, final Category category) {
     this.value = clientDataTag;
+    this.category = category;
     if (isDataTag()) {
       this.tagId = clientDataTag.getId();
     }
@@ -75,9 +84,11 @@ public class ClientDevicePropertyImpl implements ClientDeviceProperty {
    * Constructor used to create an instance containing nested property fields.
    *
    * @param fields the property fields to set
+   * @param category the category of this property
    */
-  public ClientDevicePropertyImpl(Map<String, ClientDeviceProperty> fields) {
+  public ClientDevicePropertyImpl(Map<String, ClientDeviceProperty> fields, final Category category) {
     this.fields = fields;
+    this.category = category;
   }
 
   @Override
@@ -88,6 +99,11 @@ public class ClientDevicePropertyImpl implements ClientDeviceProperty {
   @Override
   public ClientDataTagValue getDataTag() {
     return value;
+  }
+
+  @Override
+  public Category getCategory() {
+    return category;
   }
 
   @Override

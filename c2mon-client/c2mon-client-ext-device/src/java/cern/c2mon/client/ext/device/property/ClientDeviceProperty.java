@@ -50,6 +50,14 @@ public interface ClientDeviceProperty {
   public ClientDataTagValue getDataTag();
 
   /**
+   * Retrieve the category of this property (tag id, constant value, etc.) as
+   * defined in {@link Category}.
+   *
+   * @return the category of this property
+   */
+  public Category getCategory();
+
+  /**
    * Check if this property points to a {@link ClientDataTag}.
    *
    * @return true if this property is a data tag, false otherwise

@@ -27,6 +27,7 @@ import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.exception.MappedPropertyException;
+import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.ClientConstantValue;
 import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
 import cern.c2mon.client.ext.device.property.ClientDevicePropertyImpl;
@@ -347,13 +348,13 @@ public class DeviceImplTest {
     ClientConstantValue ccv2 = new ClientConstantValue(4, Integer.class);
 
     Map<String, ClientDeviceProperty> fields = new HashMap<>();
-    fields.put("cpuLoadInPercent", new ClientDevicePropertyImpl(cdt1));
-    fields.put("responsiblePerson", new ClientDevicePropertyImpl(ccv1));
-    fields.put("someCalculations", new ClientDevicePropertyImpl(crt));
-    fields.put("numCores", new ClientDevicePropertyImpl(ccv2));
+    fields.put("cpuLoadInPercent", new ClientDevicePropertyImpl(cdt1, Category.TAG_ID));
+    fields.put("responsiblePerson", new ClientDevicePropertyImpl(ccv1, Category.CONSTANT_VALUE));
+    fields.put("someCalculations", new ClientDevicePropertyImpl(crt, Category.CLIENT_RULE));
+    fields.put("numCores", new ClientDevicePropertyImpl(ccv2, Category.CONSTANT_VALUE));
 
     HashMap<String, ClientDeviceProperty> properties = new HashMap<>();
-    properties.put("acquisition", new ClientDevicePropertyImpl(fields));
+    properties.put("acquisition", new ClientDevicePropertyImpl(fields, Category.MAPPED_PROPERTY));
 
     device.setDeviceProperties(properties);
 
@@ -454,5 +455,34 @@ public class DeviceImplTest {
 
   private DeviceImpl getTestDevice() {
     return new DeviceImpl(1000L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
+  }
+
+  @Test
+  public void testGetCategoriesForProperties() throws ClassNotFoundException, RuleFormatException, MappedPropertyException {
+    DeviceImpl device = getTestDevice();
+
+    List<DeviceProperty> deviceProperties = new ArrayList<>();
+    deviceProperties.add(new DeviceProperty(1L, "cpuLoadInPercent", "10000", "tagId", null));
+    deviceProperties.add(new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
+    deviceProperties.add(new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
+    deviceProperties.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
+
+    List<DeviceProperty> fields = new ArrayList<>();
+    fields.add(new DeviceProperty(1L, "cpuLoadInPercent2", "10001", "tagId", null));
+    DeviceProperty propertyWithFields = new DeviceProperty(5L, "acquisition", "mappedProperty", fields);
+    deviceProperties.add(propertyWithFields);
+
+    device.setDeviceProperties(deviceProperties);
+
+    Assert.assertTrue(device.getCategoryForProperty(new PropertyInfo("cpuLoadInPercent")).equals(Category.TAG_ID));
+    Assert.assertTrue(device.getCategoryForProperty(new PropertyInfo("responsiblePerson")).equals(Category.CONSTANT_VALUE));
+    Assert.assertTrue(device.getCategoryForProperty(new PropertyInfo("someCalculations")).equals(Category.CLIENT_RULE));
+    Assert.assertTrue(device.getCategoryForProperty(new PropertyInfo("numCores")).equals(Category.CONSTANT_VALUE));
+    Assert.assertTrue(device.getCategoryForProperty(new PropertyInfo("acquisition")).equals(Category.MAPPED_PROPERTY));
+
+    Assert.assertTrue(device.getCategoryForProperty(new PropertyInfo("acquisition", "cpuLoadInPercent2")).equals(Category.TAG_ID));
+
+    // Test getting an unknown property
+    Assert.assertNull(device.getCategoryForProperty(new PropertyInfo("nonexistent")));
   }
 }

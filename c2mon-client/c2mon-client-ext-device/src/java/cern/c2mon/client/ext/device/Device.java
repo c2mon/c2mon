@@ -22,6 +22,7 @@ import java.util.Map;
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.ext.device.exception.MappedPropertyException;
+import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 
 /**
@@ -110,6 +111,23 @@ public interface Device {
    *           property
    */
   public Map<String, ClientDataTagValue> getMappedProperty(String propertyName) throws MappedPropertyException;
+
+  /**
+   * Retrieve the category of a given property/field, as defined in
+   * {@link Category}.
+   *
+   * @param propertyInfo the object specifying the property/field you wish to
+   *          determine the category of
+   * @return the category of the property/field, or null if the property was not
+   *         found
+   *
+   * @throws MappedPropertyException if an attempt is made to retrieve a field
+   *           value from a non mapped property, or if a field name is not
+   *           specified for a mapped property
+   *
+   * @see Category
+   */
+  public Category getCategoryForProperty(PropertyInfo propertyInfo) throws MappedPropertyException;
 
   /**
    * Retrieve a particular command of this device.
