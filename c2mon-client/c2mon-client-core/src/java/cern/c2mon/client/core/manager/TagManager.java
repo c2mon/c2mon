@@ -190,6 +190,12 @@ public class TagManager implements CoreTagManager {
       LOG.warn("doTagSubscription() : " + error);
       throw new IllegalArgumentException(error);
     }
+    
+    if (tagIds.isEmpty()) {
+      String info = "Called with empty tag id list. Ignoring request.";
+      LOG.info("doTagSubscription() : " + info);
+      return;
+    }
 
     if (LOG.isDebugEnabled()) {
       LOG.debug(new StringBuilder("doTagSubscription() : called for ").append(tagIds.size()).append(" tags."));
