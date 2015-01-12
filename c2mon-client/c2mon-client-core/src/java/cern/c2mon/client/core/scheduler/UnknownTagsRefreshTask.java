@@ -42,26 +42,17 @@ class UnknownTagsRefreshTask {
   /**
    * The cache instance which is managing all <code>ClientDataTag</code> objects
    */
-  private final ClientDataTagCache cache;
+  @Autowired
+  private ClientDataTagCache cache;
   
   /** Logger instance */
   private static Logger LOG = Logger.getLogger(UnknownTagsRefreshTask.class);
-  
-  /**
-   * Default Constructor
-   * @param cache
-   * @param requestHandler
-   */
-  @Autowired
-  public UnknownTagsRefreshTask(final ClientDataTagCache cache) {
-    this.cache = cache;
-  }
-  
+   
   /**
    * This method is called every 5 minutes in order to refresh all Tags which are
    * currently marked as unknown.
    */
-  @Scheduled(fixedRate=300000, fixedDelay=300000)
+  @Scheduled(fixedRate=300000, initialDelay=300000)
   public void refreshAllUnknownTags() {
     if (LOG.isTraceEnabled()) {
       LOG.trace("refreshAllUnknownTags() - Start refreshing all unknown tags ... ");
