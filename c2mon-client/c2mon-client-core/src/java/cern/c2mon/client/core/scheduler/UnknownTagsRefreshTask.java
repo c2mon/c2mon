@@ -22,9 +22,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.core.cache.ClientDataTagCache;
@@ -35,18 +35,27 @@ import cern.c2mon.client.core.cache.ClientDataTagCache;
  *
  * @author Matthias Braeger
  */
-@Configuration
+@Component
 @EnableScheduling
 class UnknownTagsRefreshTask {
   
   /**
    * The cache instance which is managing all <code>ClientDataTag</code> objects
    */
-  @Autowired
-  private ClientDataTagCache cache;
+  private final ClientDataTagCache cache;
   
   /** Logger instance */
-  private static Logger LOG = Logger.getLogger(UnknownTagsRefreshTask.class);
+  private static final Logger LOG = Logger.getLogger(UnknownTagsRefreshTask.class);
+  
+  
+  /**
+   * Default Constructor
+   * @param cache The cache instance which is managing all <code>ClientDataTag</code> objects
+   */
+  @Autowired
+  public UnknownTagsRefreshTask(final ClientDataTagCache cache) {
+    this.cache = cache;
+  }
    
   /**
    * This method is called every 5 minutes in order to refresh all Tags which are
