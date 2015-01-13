@@ -77,22 +77,7 @@ public class DeviceIntegrationTest {
         }
 
         log.info("Subscribing to device " + device.getName() + "...");
-        Device subscribedDevice = manager.subscribeDevice(device, listener);
-
-        log.info("Subscribed and got the following properties for device " + subscribedDevice.getName() + ":");
-        for (ClientDeviceProperty property : subscribedDevice.getProperties()) {
-          if (property.getCategory() == Category.MAPPED_PROPERTY) {
-            log.info("\t" + property.getName() + ": (mapped property)");
-
-            log.info("\tSubscribed and got the following fields for mapped property " + property.getName() + ":");
-            for (ClientDeviceProperty field : property.getFields()) {
-              log.info("\t\t" + field.getName() + ": " + field.getDataTag().getName() + " (" + field.getDataTag().getValue() + ")");
-            }
-
-          } else {
-            log.info("\t" + property.getName() + ": " + property.getDataTag().getName() + " (" + property.getDataTag().getValue() + ")");
-          }
-        }
+        manager.subscribeDevice(device, listener);
       }
 
       log.info("Unsubscribing and re-subscribing to all devices");
@@ -102,6 +87,24 @@ public class DeviceIntegrationTest {
   }
 
   static DeviceUpdateListener listener = new DeviceUpdateListener() {
+    @Override
+    public void onInitialUpdate(Device device) {
+      log.info("Subscribed and got the following properties for device " + device.getName() + ":");
+      for (ClientDeviceProperty property : device.getProperties()) {
+        if (property.getCategory() == Category.MAPPED_PROPERTY) {
+          log.info("\t" + property.getName() + ": (mapped property)");
+
+          log.info("\tSubscribed and got the following fields for mapped property " + property.getName() + ":");
+          for (ClientDeviceProperty field : property.getFields()) {
+            log.info("\t\t" + field.getName() + ": " + field.getDataTag().getName() + " (" + field.getDataTag().getValue() + ")");
+          }
+
+        } else {
+          log.info("\t" + property.getName() + ": " + property.getDataTag().getName() + " (" + property.getDataTag().getValue() + ")");
+        }
+      }
+    }
+
     @Override
     public void onUpdate(Device device, PropertyInfo propertyInfo) {
       log.info("onUpdate(): device=" + device.getName() + " property=" + propertyInfo.getPropertyName() + " value="

@@ -18,17 +18,17 @@
 package cern.c2mon.client.ext.device;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.listener.DataTagUpdateListener;
+import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
@@ -49,7 +49,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
  *
  * @author Justin Lewis Salmon
  */
-public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
+public class DeviceImpl implements Device, DataTagListener, Cloneable {
 
   /** Log4j logger for this class */
   private static final Logger LOG = Logger.getLogger(DeviceImpl.class);
@@ -112,12 +112,6 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
    * Reference to the <code>CommandManager</code> singleton
    */
   private C2monCommandManager commandManager;
-
-  /**
-   * Countdown latch used to keep track of the number of data tags waiting to be
-   * subscribed-to
-   */
-  private CountDownLatch subscriptionCompletionLatch = new CountDownLatch(0);
 
   /**
    * Default constructor.
@@ -275,23 +269,6 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
   }
 
   /**
-   * Manually set the properties of this device.
-   *
-   * @param deviceProperties the properties to set
-   */
-  protected void setDeviceProperties(ArrayList<ClientDataTagValue> deviceProperties) {
-    Map<String, ClientDeviceProperty> newDeviceProperties = new HashMap<>();
-
-    for (Map.Entry<String, ClientDeviceProperty> property : this.deviceProperties.entrySet()) {
-      for (ClientDataTagValue dataTag : deviceProperties) {
-        if (dataTag.getId().equals(property.getValue().getTagId())) {
-          newDeviceProperties.put(property.getKey(), ClientDevicePropertyFactory.createClientDeviceProperty(property.getValue().getName(), dataTag));
-        }
-      }
-    }
-  }
-
-  /**
    * Manually set the properties of this device (for testing).
    *
    * @param deviceProperties the properties to set
@@ -378,36 +355,40 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
   }
 
   /**
-   * Initialise the tag subscription latch. This will cause any listeners not to
-   * be called until numDataTags data tags have been received from the server.
-   * This is used to wait for all tags to arrive in order to return a fully
-   * populated device when a client calls
-   * {@link DeviceManager#subscribeDevice(Device, DeviceUpdateListener)}.
+   * Update the property that corresponds to the given
+   * {@link ClientDataTagValue}.
    *
-   * @param numDataTags the number of data tags to wait for
+   * @param tag the updated {@link ClientDataTagValue}
+   * @param info a {@link PropertyInfo} object describing the property/field
+   *          that was updated
    */
-  protected void initSubscriptionLatch(int numDataTags) {
-    subscriptionCompletionLatch = new CountDownLatch(numDataTags);
-    LOG.trace("Subscription latch init: " + subscriptionCompletionLatch.getCount());
+  private PropertyInfo updateProperty(ClientDataTagValue tag) {
+    PropertyInfo info = getPropertyInfoForTag(tag);
+
+    if (info.getPropertyName() != null) {
+      if (info.getFieldName() != null) {
+        ClientDevicePropertyImpl property = (ClientDevicePropertyImpl) this.deviceProperties.get(info.getPropertyName());
+        property.addField(info.getFieldName(), ClientDevicePropertyFactory.createClientDeviceProperty(info.getFieldName(), tag));
+
+      } else {
+        this.deviceProperties.put(info.getPropertyName(), ClientDevicePropertyFactory.createClientDeviceProperty(info.getPropertyName(), tag));
+      }
+    } else {
+      LOG.warn("updateProperty() called with unmapped tag ID");
+    }
+
+    return info;
   }
 
   /**
-   * Block and wait for all tags that were subscribed-to to be received.
+   * Search the list of properties of this device to find the one that
+   * corresponds to the given {@link ClientDataTagValue}.
+   *
+   * @param tag the updated {@link ClientDataTagValue}
+   * @return info a {@link PropertyInfo} object describing the property/field
+   *         that was updated
    */
-  protected void awaitCompleteSubscription() {
-    if (subscriptionCompletionLatch != null) {
-      try {
-        LOG.trace("Waiting on subscription completion latch");
-        subscriptionCompletionLatch.await();
-      } catch (InterruptedException e) {
-        LOG.error("Unable to await complete subscription for device " + getName(), e);
-        throw new UnsupportedOperationException("Unable to await complete subscription for device " + getName(), e);
-      }
-    }
-  }
-
-  @Override
-  public final void onUpdate(ClientDataTagValue tagUpdate) {
+  private PropertyInfo getPropertyInfoForTag(ClientDataTagValue tag) {
     String propertyName = null;
     String fieldName = null;
 
@@ -415,7 +396,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
     for (Entry<String, ClientDeviceProperty> propertyEntry : deviceProperties.entrySet()) {
       ClientDevicePropertyImpl deviceProperty = (ClientDevicePropertyImpl) propertyEntry.getValue();
 
-      if (deviceProperty.isDataTag() && deviceProperty.getTagId().equals(tagUpdate.getId())) {
+      if (deviceProperty.isDataTag() && deviceProperty.getTagId().equals(tag.getId())) {
         propertyName = propertyEntry.getKey();
 
       } else if (deviceProperty.isMappedProperty()) {
@@ -423,7 +404,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
         for (ClientDeviceProperty field : deviceProperty.getFields()) {
           ClientDevicePropertyImpl fieldImpl = (ClientDevicePropertyImpl) field;
 
-          if (fieldImpl.isDataTag() && fieldImpl.getTagId().equals(tagUpdate.getId())) {
+          if (fieldImpl.isDataTag() && fieldImpl.getTagId().equals(tag.getId())) {
             propertyName = propertyEntry.getKey();
             fieldName = fieldImpl.getName();
           }
@@ -431,33 +412,38 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
       }
     }
 
+    return fieldName == null ? new PropertyInfo(propertyName) : new PropertyInfo(propertyName, fieldName);
+  }
+
+  @Override
+  public void onInitialValues(Collection<ClientDataTagValue> initialValues) {
     // Update the property
-    if (propertyName != null) {
+    for (ClientDataTagValue tag : initialValues) {
+      updateProperty(tag);
+    }
 
-      if (fieldName != null) {
-        ClientDevicePropertyImpl property = (ClientDevicePropertyImpl) this.deviceProperties.get(propertyName);
-        property.addField(fieldName, ClientDevicePropertyFactory.createClientDeviceProperty(fieldName, tagUpdate));
+    // Invoke the listeners
+    for (DeviceUpdateListener listener : deviceUpdateListeners) {
+      try {
+        LOG.trace("Invoking DeviceUpdateListener.onInitialValues()");
+        listener.onInitialUpdate(this.clone());
 
-      } else {
-        this.deviceProperties.put(propertyName, ClientDevicePropertyFactory.createClientDeviceProperty(propertyName, tagUpdate));
+      } catch (CloneNotSupportedException e) {
+        LOG.error("Unable to clone Device with id " + getId(), e);
+        throw new UnsupportedOperationException("Unable to clone Device with id " + getId(), e);
       }
-    } else {
-      LOG.warn("onUpdate() called with unmapped tag ID");
     }
+  }
 
-    if (subscriptionCompletionLatch.getCount() > 0) {
+  @Override
+  public final void onUpdate(ClientDataTagValue tagUpdate) {
+    // Update the property
+    PropertyInfo propertyInfo = updateProperty(tagUpdate);
 
-      // If there are unsubscribed properties, count down the latch and return
-      // without calling onUpdate()
-      LOG.trace("Counting down on subscription latch (" + subscriptionCompletionLatch.getCount() + " remaining)");
-      subscriptionCompletionLatch.countDown();
-      return;
-    }
-
+    // Invoke the listeners
     for (DeviceUpdateListener listener : deviceUpdateListeners) {
       try {
         LOG.trace("Invoking DeviceUpdateListener");
-        PropertyInfo propertyInfo = fieldName == null ? new PropertyInfo(propertyName) : new PropertyInfo(propertyName, fieldName);
         listener.onUpdate(this.clone(), propertyInfo);
 
       } catch (CloneNotSupportedException e) {

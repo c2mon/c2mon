@@ -58,4 +58,21 @@ public interface DeviceUpdateListener {
    * @see PropertyInfo
    */
   void onUpdate(Device device, PropertyInfo propertyInfo);
+
+  /**
+   * This method is only called once before the listener gets subscribed to the
+   * device properties, in order to provide the initial values.
+   *
+   * <p>
+   * Please note, that this method has to return in order to not block the
+   * listener subscription. Only after it returns will the
+   * {@link #onUpdate(Device, PropertyInfo)} be called.
+   * </p>
+   *
+   * @param device the device containing the initial values of the tags to which
+   *          the listener subscribed to.
+   *
+   * @param device
+   */
+  void onInitialUpdate(Device device);
 }

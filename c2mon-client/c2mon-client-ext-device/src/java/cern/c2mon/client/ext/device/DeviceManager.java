@@ -140,14 +140,11 @@ public class DeviceManager implements C2monDeviceManager {
   }
 
   @Override
-  public Device subscribeDevice(Device device, final DeviceUpdateListener listener) {
+  public void subscribeDevice(Device device, final DeviceUpdateListener listener) {
     DeviceImpl deviceImpl = (DeviceImpl) device;
 
     // Here, just get the tag IDs to avoid calling the server
     Set<Long> dataTagIds = deviceImpl.getPropertyDataTagIds();
-
-    // So we know how many tags to wait for
-    deviceImpl.initSubscriptionLatch(dataTagIds.size());
 
     // Use TagManager to subscribe to all properties of the device
     deviceImpl.addDeviceUpdateListener(listener);
@@ -159,65 +156,51 @@ public class DeviceManager implements C2monDeviceManager {
       tagManager.subscribeDataTags(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
     }
 
-    // Block and wait for all tags to be received
-    deviceImpl.awaitCompleteSubscription();
-    LOG.debug("Subscription completed");
-
-    try {
-      return deviceImpl.clone();
-
-    } catch (CloneNotSupportedException e) {
-      LOG.error("Unable to clone Device with id " + deviceImpl.getId(), e);
-      throw new UnsupportedOperationException("Unable to clone Device with id " + deviceImpl.getId(), e);
-    }
   }
 
   @Override
-  public Device subscribeDevice(String className, String deviceName, DeviceUpdateListener listener) throws DeviceNotFoundException {
-    Device device = null;
+  public void subscribeDevice(String className, String deviceName, DeviceUpdateListener listener) throws DeviceNotFoundException {
     List<Device> devices = getAllDevices(className);
 
-    for (Device dev : devices) {
-      if (dev.getName().equals(deviceName)) {
-        device = subscribeDevice(dev, listener);
+    for (Device device : devices) {
+      if (device.getName().equals(deviceName)) {
+        subscribeDevice(device, listener);
+        return;
       }
     }
 
-    if (device == null) {
-      throw new DeviceNotFoundException("No devices found of class " + className);
-    }
-
-    return device;
+    // If we didn't find the device, throw the exception
+    throw new DeviceNotFoundException("No devices found of class " + className);
   }
 
   @Override
-  public List<Device> subscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
-    List<Device> deviceList = new ArrayList<>();
-
+  public void subscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
     for (Device device : devices) {
-      deviceList.add(subscribeDevice(device, listener));
+      subscribeDevice(device, listener);
     }
+  }
 
-    return deviceList;
+  @Override
+  public void unsubscribeDevice(Device device, DeviceUpdateListener listener) {
+    DeviceImpl deviceImpl = (DeviceImpl) device;
+    Set<Long> dataTagIds = deviceImpl.getPropertyDataTagIds();
+
+    // Use TagManager to unsubscribe from all properties of the device
+    tagManager.unsubscribeDataTags(dataTagIds, deviceImpl);
+
+    // Remove the listener
+    deviceImpl.removeDeviceUpdateListener(listener);
+
+    // Remove the device from the cache if nobody is listening for updates
+    if (!deviceImpl.hasUpdateListeners()) {
+      deviceCache.remove(device);
+    }
   }
 
   @Override
   public void unsubscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
-
-    for (Device deviceInterface : devices) {
-      DeviceImpl device = (DeviceImpl) deviceInterface;
-      Set<Long> dataTagIds = device.getPropertyDataTagIds();
-
-      // Use TagManager to unsubscribe from all properties of the device
-      tagManager.unsubscribeDataTags(dataTagIds, device);
-
-      // Remove the listener
-      device.removeDeviceUpdateListener(listener);
-
-      // Remove the device from the cache if nobody is listening for updates
-      if (!device.hasUpdateListeners()) {
-        deviceCache.remove(device);
-      }
+    for (Device device : devices) {
+      unsubscribeDevice(device, listener);
     }
   }
 

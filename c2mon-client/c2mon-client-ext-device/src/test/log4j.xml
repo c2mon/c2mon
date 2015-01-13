@@ -3,8 +3,8 @@
 <!-- default log4j configuration for JUnit tests -->
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 
-<log4j:configuration debug="false"
-                     threshold="debug"
+<log4j:configuration debug="true"
+                     threshold="all"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
 <!--
