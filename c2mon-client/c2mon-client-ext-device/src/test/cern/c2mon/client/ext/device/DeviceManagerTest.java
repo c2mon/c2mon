@@ -39,7 +39,6 @@ import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
-import cern.c2mon.client.ext.device.exception.MappedPropertyException;
 import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
 import cern.c2mon.client.ext.device.property.ClientDevicePropertyImpl;
@@ -210,9 +209,8 @@ public class DeviceManagerTest {
     Assert.assertNotNull(device);
     Assert.assertTrue(device.getId() == device1.getId());
 
-    Map<String, ClientDataTagValue> values = device.getProperties();
-    Assert.assertTrue(values.get("test_property_name_1").getId().equals(100000L));
-    Assert.assertTrue(values.get("test_property_name_2").getId().equals(200000L));
+    Assert.assertTrue(device.getProperty("test_property_name_1").getDataTag().getId().equals(100000L));
+    Assert.assertTrue(device.getProperty("test_property_name_2").getDataTag().getId().equals(200000L));
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock);
@@ -271,9 +269,8 @@ public class DeviceManagerTest {
     // Check all properties are subscribed to at this point
     Assert.assertTrue(areAllPropertiesAndFieldsSubscribed(device));
 
-    Map<String, ClientDataTagValue> values = device.getProperties();
-    Assert.assertTrue(values.get("test_property_name_1").getId().equals(100000L));
-    Assert.assertTrue(values.get("test_property_name_2").getId().equals(200000L));
+    Assert.assertTrue(device.getProperty("test_property_name_1").getDataTag().getId().equals(100000L));
+    Assert.assertTrue(device.getProperty("test_property_name_2").getDataTag().getId().equals(200000L));
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock);
@@ -282,19 +279,20 @@ public class DeviceManagerTest {
   }
 
   @Test
-  public void testSubscribeDeviceWithFields() throws RuleFormatException, MappedPropertyException {
+  public void testSubscribeDeviceWithFields() throws RuleFormatException {
 
     Map<String, ClientDeviceProperty> deviceFields = new HashMap<>();
 
     for (int i = 0; i < 1000; i++) {
-      deviceFields.put("test_field_name_" + i, new ClientDevicePropertyImpl(new Long(i), Category.TAG_ID));
+      deviceFields.put("test_field_name_" + i, new ClientDevicePropertyImpl("test_field_name_" + i, Category.TAG_ID, new Long(i)));
     }
 
     HashMap<String, ClientDeviceProperty> deviceProperties = new HashMap<>();
-    deviceProperties.put("test_property_name", new ClientDevicePropertyImpl(deviceFields, Category.MAPPED_PROPERTY));
+    deviceProperties.put("test_property_name", new ClientDevicePropertyImpl("test_property_name", Category.MAPPED_PROPERTY, deviceFields));
 
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
     device1.setDeviceProperties(deviceProperties);
+    device1.setTagManager(tagManagerMock);
 
     final Map<Long, ClientDataTag> cacheReturnMap = new HashMap<Long, ClientDataTag>();
 
@@ -338,9 +336,10 @@ public class DeviceManagerTest {
 
     Assert.assertTrue(areAllPropertiesAndFieldsSubscribed(device));
 
-    Map<String, ClientDataTagValue> fields = device.getMappedProperty("test_property_name");
+    ClientDeviceProperty propertyWithFields = device.getProperty("test_property_name");
+    Assert.assertTrue(propertyWithFields.getCategory().equals(Category.MAPPED_PROPERTY));
     for (int i = 0; i < 1000; i++) {
-      ClientDataTagValue tag = fields.get("test_field_name_" + i);
+      ClientDataTagValue tag = propertyWithFields.getField("test_field_name_" + i).getDataTag();
       Assert.assertTrue(tag.getId().equals(new Long(i)));
       Assert.assertTrue(tag.getValue() != null);
       Assert.assertTrue(tag.getValue().equals("test_value_" + i));
@@ -415,8 +414,7 @@ public class DeviceManagerTest {
     Assert.assertNotNull(device2);
     Assert.assertTrue(device2.getId() == device.getId());
 
-    Map<String, ClientDataTagValue> values = device2.getProperties();
-    Assert.assertTrue(values.get("TEST_PROPERTY_1").getId().equals(100430L));
+    Assert.assertTrue(device.getProperty("TEST_PROPERTY_1").getDataTag().getId().equals(100430L));
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
@@ -649,16 +647,16 @@ public class DeviceManagerTest {
   private boolean areAllPropertiesAndFieldsSubscribed(Device device) {
     Map<String, ClientDeviceProperty> properties = ((DeviceImpl) device).getDeviceProperties();
     for (ClientDeviceProperty property : properties.values()) {
-      if (property.isDataTag()) {
-        if (!property.isSubscribed()) {
+      if (((ClientDevicePropertyImpl) property).isDataTag()) {
+        if (!((ClientDevicePropertyImpl) property).isValueLoaded()) {
           return false;
         }
       }
 
-      if (property.isMappedProperty()) {
-        for (ClientDeviceProperty field : property.getFields().values()) {
-          if (field.isDataTag()) {
-            if (!field.isSubscribed()) {
+      if (((ClientDevicePropertyImpl) property).isMappedProperty()) {
+        for (ClientDeviceProperty field : property.getFields()) {
+          if (((ClientDevicePropertyImpl) field).isDataTag()) {
+            if (!((ClientDevicePropertyImpl) field).isValueLoaded()) {
               return false;
             }
           }

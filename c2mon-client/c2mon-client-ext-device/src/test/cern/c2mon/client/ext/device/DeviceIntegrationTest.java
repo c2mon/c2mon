@@ -19,12 +19,11 @@ package cern.c2mon.client.ext.device;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.ext.device.exception.MappedPropertyException;
+import cern.c2mon.client.ext.device.property.Category;
+import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 
 /**
@@ -40,7 +39,7 @@ public class DeviceIntegrationTest {
 
   static Logger log = Logger.getLogger(DeviceIntegrationTest.class);
 
-  public static void main(String[] args) throws MappedPropertyException {
+  public static void main(String[] args) {
     C2monDeviceManager manager = C2monDeviceGateway.getDeviceManager();
 
     List<String> deviceClassNames = manager.getAllDeviceClassNames();
@@ -59,31 +58,40 @@ public class DeviceIntegrationTest {
       }
 
       for (Device device : devices) {
-        Map<String, ClientDataTagValue> properties = device.getProperties();
+        List<ClientDeviceProperty> properties = device.getProperties();
 
         log.info("Found the following properties for device " + device.getName() + ":");
-        for (Map.Entry<String, ClientDataTagValue> property : properties.entrySet()) {
-          log.info("\t" + property.getKey() + ": " + property.getValue().getName());
-        }
+        for (ClientDeviceProperty property : properties) {
 
-        Map<String, ClientDataTagValue> fields = device.getMappedProperty("PH");
-        log.info("Found the following fields for mapped property PH:");
-        for (Map.Entry<String, ClientDataTagValue> field : fields.entrySet()) {
-          log.info("\t" + field.getKey() + ": " + field.getValue().getName());
+          if (property.getCategory() == Category.MAPPED_PROPERTY) {
+            log.info("\t" + property.getName() + ": (mapped property)");
+
+            log.info("\tFound the following fields for mapped property " + property.getName() + ":");
+            for (ClientDeviceProperty field : property.getFields()) {
+              log.info("\t\t" + field.getName() + ": " + field.getDataTag().getName());
+            }
+
+          } else {
+            log.info("\t" + property.getName() + ": " + property.getDataTag().getName());
+          }
         }
 
         log.info("Subscribing to device " + device.getName() + "...");
         Device subscribedDevice = manager.subscribeDevice(device, listener);
 
         log.info("Subscribed and got the following properties for device " + subscribedDevice.getName() + ":");
-        for (Map.Entry<String, ClientDataTagValue> property : subscribedDevice.getProperties().entrySet()) {
-          log.info("\t" + property.getKey() + ": " + property.getValue().getName() + " (" + property.getValue().getValue() + ")");
-        }
+        for (ClientDeviceProperty property : subscribedDevice.getProperties()) {
+          if (property.getCategory() == Category.MAPPED_PROPERTY) {
+            log.info("\t" + property.getName() + ": (mapped property)");
 
-        fields = device.getMappedProperty("PH");
-        log.info("Found the following fields for mapped property PH:");
-        for (Map.Entry<String, ClientDataTagValue> field : fields.entrySet()) {
-          log.info("\t" + field.getKey() + ": " + field.getValue().getName());
+            log.info("\tSubscribed and got the following fields for mapped property " + property.getName() + ":");
+            for (ClientDeviceProperty field : property.getFields()) {
+              log.info("\t\t" + field.getName() + ": " + field.getDataTag().getName() + " (" + field.getDataTag().getValue() + ")");
+            }
+
+          } else {
+            log.info("\t" + property.getName() + ": " + property.getDataTag().getName() + " (" + property.getDataTag().getValue() + ")");
+          }
         }
       }
 
@@ -96,11 +104,8 @@ public class DeviceIntegrationTest {
   static DeviceUpdateListener listener = new DeviceUpdateListener() {
     @Override
     public void onUpdate(Device device, PropertyInfo propertyInfo) {
-      try {
-        log.info("onUpdate(): device=" + device.getName() + " property=" + propertyInfo.getPropertyName() + " value="
-            + device.getProperty(propertyInfo).getValue());
-      } catch (MappedPropertyException e) {
-      }
+      log.info("onUpdate(): device=" + device.getName() + " property=" + propertyInfo.getPropertyName() + " value="
+          + device.getProperty(propertyInfo.getPropertyName()).getDataTag().getValue());
     }
   };
 }

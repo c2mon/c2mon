@@ -155,7 +155,7 @@ public class DeviceManager implements C2monDeviceManager {
 
     // If the device contains properties that are client rules, also subscribe
     // to the tags contained within those rules
-    for (ClientRuleTag ruleTag : deviceImpl.getRuleTags()) {
+    for (ClientRuleTag<?> ruleTag : deviceImpl.getRuleTags()) {
       tagManager.subscribeDataTags(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
     }
 

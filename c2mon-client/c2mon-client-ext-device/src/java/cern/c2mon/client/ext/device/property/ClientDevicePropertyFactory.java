@@ -36,7 +36,7 @@ public class ClientDevicePropertyFactory {
 
   /**
    * Factory method to create an appropriate {@link ClientDeviceProperty}
-   * instance from a {@link DeviceProperty}.
+   * instance from a {@link DeviceProperty}, based on its category.
    *
    * @param deviceProperty the property object received from the server
    * @return the appropriate client device property
@@ -50,7 +50,8 @@ public class ClientDevicePropertyFactory {
   public static ClientDeviceProperty createClientDeviceProperty(DeviceProperty deviceProperty) throws ClassNotFoundException, RuleFormatException {
 
     // If the property has nested fields, create them all here
-    if (deviceProperty.getFields() != null && !deviceProperty.getFields().isEmpty()) {
+    if ((deviceProperty.getCategory() == null && !deviceProperty.getFields().isEmpty())
+        || deviceProperty.getCategory().equals(Category.MAPPED_PROPERTY.getCategory())) {
       Map<String, DeviceProperty> fields = deviceProperty.getFields();
       Map<String, ClientDeviceProperty> clientFields = new HashMap<>();
 
@@ -58,24 +59,24 @@ public class ClientDevicePropertyFactory {
         clientFields.put(field.getName(), createClientDeviceProperty(field));
       }
 
-      return new ClientDevicePropertyImpl(clientFields, Category.MAPPED_PROPERTY);
+      return new ClientDevicePropertyImpl(deviceProperty.getName(), Category.MAPPED_PROPERTY, clientFields);
     }
 
     // If we have a tag ID, it takes priority.
     if (deviceProperty.getCategory().equals(Category.TAG_ID.getCategory())) {
-      return new ClientDevicePropertyImpl(Long.parseLong(deviceProperty.getValue()), Category.TAG_ID);
+      return new ClientDevicePropertyImpl(deviceProperty.getName(), Category.TAG_ID, Long.parseLong(deviceProperty.getValue()));
     }
 
     // If we have a client rule, that comes next in the hierarchy.
     else if (deviceProperty.getCategory().equals(Category.CLIENT_RULE.getCategory())) {
       ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getValue()), deviceProperty.getResultTypeClass());
-      return new ClientDevicePropertyImpl(ruleTag, Category.CLIENT_RULE);
+      return new ClientDevicePropertyImpl(deviceProperty.getName(), Category.CLIENT_RULE, ruleTag);
     }
 
     // If we have a constant value, it comes last in the hierarchy.
     else if (deviceProperty.getCategory().equals(Category.CONSTANT_VALUE.getCategory())) {
       ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getValue(), deviceProperty.getResultTypeClass());
-      return new ClientDevicePropertyImpl(constantValueTag, Category.CONSTANT_VALUE);
+      return new ClientDevicePropertyImpl(deviceProperty.getName(), Category.CONSTANT_VALUE, constantValueTag);
     }
 
     else {
@@ -85,12 +86,23 @@ public class ClientDevicePropertyFactory {
 
   /**
    * Factory method to create an appropriate {@link ClientDeviceProperty}
-   * instance from a {@link ClientDataTagValue}.
+   * instance from a {@link ClientDataTagValue}, based on its type.
    *
+   * @param name the name of the property
    * @param dataTag the data tag
    * @return the appropriate client device property
    */
-  public static ClientDeviceProperty createClientDeviceProperty(ClientDataTagValue dataTag) {
-    return new ClientDevicePropertyImpl(dataTag, Category.TAG_ID);
+  public static ClientDeviceProperty createClientDeviceProperty(String name, ClientDataTagValue dataTag) {
+    Category category;
+
+    if (dataTag instanceof ClientRuleTag<?>) {
+      category = Category.CLIENT_RULE;
+    } else if (dataTag instanceof ClientConstantValue<?>) {
+      category = Category.CONSTANT_VALUE;
+    } else {
+      category = Category.TAG_ID;
+    }
+
+    return new ClientDevicePropertyImpl(name, category, dataTag);
   }
 }

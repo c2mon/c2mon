@@ -17,13 +17,12 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.device;
 
+import java.util.List;
 import java.util.Map;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.ext.device.exception.MappedPropertyException;
-import cern.c2mon.client.ext.device.property.Category;
-import cern.c2mon.client.ext.device.property.PropertyInfo;
+import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
 
 /**
  * This interface describes the methods which are provided by a C2MON Device
@@ -56,91 +55,75 @@ public interface Device {
   public String getDeviceClassName();
 
   /**
-   * Retrieve a particular property/field of this device.
+   * Retrieve a particular property of this device.
    *
    * <p>
-   * The given {@link PropertyInfo} object should contain the name of the
-   * property to be retrieved. In the case of the property being a mapped
-   * property (i.e. containing nested fields) then it should also contain the
-   * name of the field to be retrieved. You will then get the
-   * {@link ClientDataTagValue} corresponding to the field value, NOT the entire
-   * field map.
+   * Properties can take a number of different forms. They can be data tags,
+   * client rules, constant values, or they can contain a list of sub-properties
+   * known as fields. The {@link ClientDeviceProperty#getCategory()} method
+   * exists to help you determine the property type.
    * </p>
-   *
-   * @param propertyInfo the info object containing the name of the
-   *          property/field to retrieve
-   * @return the {@link ClientDataTagValue} corresponding to the requested
-   *         property/field, or null if the property/field was not found
-   *
-   * @throws MappedPropertyException if an attempt is made to retrieve a field
-   *           value from a non mapped property, or if a field name is not
-   *           specified for a mapped property
-   *
-   * @see PropertyInfo
-   */
-  public ClientDataTagValue getProperty(PropertyInfo propertyInfo) throws MappedPropertyException;
-
-  /**
-   * Retrieve all properties of this device, except mapped properties.
    *
    * <p>
-   * Note: this method will not return mapped properties.
+   * In the case of data tags/rules/constant values, the
+   * {@link ClientDeviceProperty#getDataTag()} method will return you a
+   * {@link ClientDataTagValue} object. The field accessor methods (
+   * {@link ClientDeviceProperty#getField(String)} and
+   * {@link ClientDeviceProperty#getFields()}) will return null and empty list,
+   * respectively.
    * </p>
    *
-   * @return the properties map
+   * <p>
+   * In the case of a property containing fields,
+   * {@link ClientDeviceProperty#getDataTag()} will return null, and the field
+   * accessor methods will become active. Note that the fields themselves are
+   * also instances of {@link ClientDeviceProperty} and can be treated in the
+   * same way as regular properties.
+   * </p>
+   *
+   * @param propertyName the name of the property you wish to retrieve
+   *
+   * @return the {@link ClientDeviceProperty} instance, or null if the property
+   *         was not found
+   *
+   * @see ClientDeviceProperty
    */
-  public Map<String, ClientDataTagValue> getProperties();
+  public ClientDeviceProperty getProperty(String propertyName);
 
   /**
-   * Check if the property is a mapped property, i.e. is a property containing
-   * nested fields.
+   * Retrieve all properties of this device.
    *
-   * @param propertyName the name of the property to check
-   * @return true if the property is a mapped property, false otherwise
+   * @return the list of {@link ClientDeviceProperty} instances, or an empty
+   *         list if the device contains no properties
+   *
+   * @see ClientDeviceProperty
    */
-  public boolean isMappedProperty(String propertyName);
+  public List<ClientDeviceProperty> getProperties();
 
   /**
-   * Retrieve a mapped property from the device, i.e. one containing nested
-   * fields.
+   * Retrieve the names of all properties of this device.
    *
-   * @param propertyName the name of the mapped property to retrieve
-   * @return the map of fields
-   *
-   * @throws MappedPropertyException if the requested property is not a mapped
-   *           property
+   * @return the list of device property names, or an empty list if the device
+   *         contains no properties
    */
-  public Map<String, ClientDataTagValue> getMappedProperty(String propertyName) throws MappedPropertyException;
-
-  /**
-   * Retrieve the category of a given property/field, as defined in
-   * {@link Category}.
-   *
-   * @param propertyInfo the object specifying the property/field you wish to
-   *          determine the category of
-   * @return the category of the property/field, or null if the property was not
-   *         found
-   *
-   * @throws MappedPropertyException if an attempt is made to retrieve a field
-   *           value from a non mapped property, or if a field name is not
-   *           specified for a mapped property
-   *
-   * @see Category
-   */
-  public Category getCategoryForProperty(PropertyInfo propertyInfo) throws MappedPropertyException;
+  public List<String> getPropertyNames();
 
   /**
    * Retrieve a particular command of this device.
    *
    * @param commandName the name of the command to retrieve
    * @return the {@link ClientCommandTag} corresponding to the requested command
+   *
+   * @see ClientCommandTag
    */
   public ClientCommandTag getCommand(String commandName);
 
   /**
    * Return all commands of this device.
    *
-   * @return the commands map
+   * @return the map of command names -> {@link ClientCommandTag} instances
+   *
+   * @see ClientCommandTag
    */
   public Map<String, ClientCommandTag> getCommands();
 }

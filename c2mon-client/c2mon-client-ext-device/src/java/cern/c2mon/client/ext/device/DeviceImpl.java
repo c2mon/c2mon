@@ -18,7 +18,6 @@
 package cern.c2mon.client.ext.device;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,10 +34,9 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientRuleTag;
-import cern.c2mon.client.ext.device.exception.MappedPropertyException;
-import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
 import cern.c2mon.client.ext.device.property.ClientDevicePropertyFactory;
+import cern.c2mon.client.ext.device.property.ClientDevicePropertyImpl;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
@@ -154,122 +152,32 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
   }
 
   @Override
-  public ClientDataTagValue getProperty(PropertyInfo propertyInfo) throws MappedPropertyException {
-    ClientDeviceProperty property = getDeviceProperty(propertyInfo);
-
-    if (property == null) {
-      return null;
-    }
-
-    // If the internal map value is a Long, then we lazy load the data tag
-    if (property.isDataTag() && !property.isSubscribed()) {
-      Long tagId = property.getTagId();
-      return tagManager.getDataTag(tagId);
-    }
-
-    // If it is a rule tag, we evaluate the rule (if it isn't subscribed)
-    else if (property.isRuleTag() && !tagManager.isSubscribed((DataTagUpdateListener) property.getDataTag())) {
-      ClientRuleTag ruleTag = (ClientRuleTag) property.getDataTag();
-
-      // Get the data tag values from inside the rule
-      Set<Long> tagIds = ruleTag.getRuleExpression().getInputTagIds();
-      Collection<ClientDataTagValue> dataTagValues = tagManager.getDataTags(tagIds);
-
-      // Update the rule tag
-      for (ClientDataTagValue tagValue : dataTagValues) {
-        ruleTag.onUpdate(tagValue);
-      }
-
-      return ruleTag;
-
-    } else {
-      return property.getDataTag();
-    }
-  }
-
-  /**
-   * Retrieve the internal {@link ClientDeviceProperty} representation of a
-   * property.
-   *
-   * @param propertyInfo the object specifying the property to retrieve
-   * @return the property, or null if none was found
-   *
-   * @throws MappedPropertyException if an attempt is made to retrieve a field
-   *           value from a non mapped property, or if a field name is not
-   *           specified for a mapped property
-   */
-  private ClientDeviceProperty getDeviceProperty(PropertyInfo propertyInfo) throws MappedPropertyException {
-    ClientDeviceProperty property = deviceProperties.get(propertyInfo.getPropertyName());
+  public ClientDeviceProperty getProperty(String propertyName) {
+    ClientDevicePropertyImpl property = (ClientDevicePropertyImpl) deviceProperties.get(propertyName);
 
     // If we didn't find the property, just return null
     if (property == null) {
-      LOG.warn("Property " + propertyInfo.getPropertyName() + " does not exist in device.");
+      LOG.warn("Property " + propertyName + " does not exist in device.");
       return null;
-    }
-
-    // If a field name was specified, check that the property has fields
-    if (propertyInfo.getFieldName() != null) {
-      if (property.isMappedProperty()) {
-
-        // Re-assign the property to the field itself
-        property = property.getFields().get(propertyInfo.getFieldName());
-
-      } else {
-        throw new MappedPropertyException("Attempting to retrieve field value from non-mapped property");
-      }
-
-    } else {
-      if (property.isMappedProperty()) {
-        throw new MappedPropertyException("Field name not specified for mapped property");
-      }
     }
 
     return property;
   }
 
   @Override
-  public Map<String, ClientDataTagValue> getProperties() {
-    Map<String, ClientDataTagValue> deviceProperties = new HashMap<>();
+  public List<ClientDeviceProperty> getProperties() {
+    List<ClientDeviceProperty> properties = new ArrayList<>();
 
-    for (String propertyName : this.deviceProperties.keySet()) {
-      PropertyInfo info = new PropertyInfo(propertyName);
-
-      // Don't return mapped properties here
-      if (!isMappedProperty(propertyName)) {
-        try {
-          deviceProperties.put(propertyName, getProperty(info));
-        } catch (MappedPropertyException e) {
-        }
-      }
+    for (ClientDeviceProperty property : deviceProperties.values()) {
+      properties.add(getProperty(property.getName()));
     }
 
-    return deviceProperties;
+    return properties;
   }
 
   @Override
-  public boolean isMappedProperty(String propertyName) {
-    ClientDeviceProperty property = deviceProperties.get(propertyName);
-    return property != null && property.isMappedProperty();
-  }
-
-  @Override
-  public HashMap<String, ClientDataTagValue> getMappedProperty(String propertyName) throws MappedPropertyException {
-    ClientDeviceProperty property = deviceProperties.get(propertyName);
-
-    if (property == null) {
-      return null;
-    }
-
-    if (!property.isMappedProperty()) {
-      throw new MappedPropertyException("Attempting to retrieve non-mapped property");
-    }
-
-    HashMap<String, ClientDataTagValue> fields = new HashMap<>();
-    for (Entry<String, ClientDeviceProperty> entry : property.getFields().entrySet()) {
-      fields.put(entry.getKey(), getProperty(new PropertyInfo(propertyName, entry.getKey())));
-    }
-
-    return (HashMap<String, ClientDataTagValue>) fields.clone();
+  public List<String> getPropertyNames() {
+    return new ArrayList<String>(deviceProperties.keySet());
   }
 
   @Override
@@ -307,16 +215,14 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
     Set<Long> propertyDataTagIds = new HashSet<>();
 
     for (ClientDeviceProperty deviceProperty : deviceProperties.values()) {
-      if (deviceProperty.isDataTag()) {
-        propertyDataTagIds.add(deviceProperty.getTagId());
+      ClientDevicePropertyImpl propertyImpl = (ClientDevicePropertyImpl) deviceProperty;
+
+      if (propertyImpl.isDataTag()) {
+        propertyDataTagIds.add(propertyImpl.getTagId());
       }
 
-      if (deviceProperty.isMappedProperty()) {
-        for (ClientDeviceProperty field : deviceProperty.getFields().values()) {
-          if (field.isDataTag()) {
-            propertyDataTagIds.add(field.getTagId());
-          }
-        }
+      if (propertyImpl.isMappedProperty()) {
+        propertyDataTagIds.addAll(propertyImpl.getFieldDataTagIds());
       }
     }
 
@@ -333,7 +239,9 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
     Set<ClientRuleTag> ruleTags = new HashSet<>();
 
     for (ClientDeviceProperty deviceProperty : deviceProperties.values()) {
-      if (deviceProperty.isRuleTag()) {
+      ClientDevicePropertyImpl propertyImpl = (ClientDevicePropertyImpl) deviceProperty;
+
+      if (propertyImpl.isRuleTag()) {
         ruleTags.add((ClientRuleTag) deviceProperty.getDataTag());
       }
     }
@@ -377,7 +285,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
     for (Map.Entry<String, ClientDeviceProperty> property : this.deviceProperties.entrySet()) {
       for (ClientDataTagValue dataTag : deviceProperties) {
         if (dataTag.getId().equals(property.getValue().getTagId())) {
-          newDeviceProperties.put(property.getKey(), ClientDevicePropertyFactory.createClientDeviceProperty(dataTag));
+          newDeviceProperties.put(property.getKey(), ClientDevicePropertyFactory.createClientDeviceProperty(property.getValue().getName(), dataTag));
         }
       }
     }
@@ -390,7 +298,7 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
    */
   protected void setDeviceProperties(Map<String, ClientDataTagValue> deviceProperties) {
     for (Map.Entry<String, ClientDataTagValue> entry : deviceProperties.entrySet()) {
-      this.deviceProperties.put(entry.getKey(), ClientDevicePropertyFactory.createClientDeviceProperty(entry.getValue()));
+      this.deviceProperties.put(entry.getKey(), ClientDevicePropertyFactory.createClientDeviceProperty(entry.getKey(), entry.getValue()));
     }
   }
 
@@ -505,19 +413,19 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
 
     // Need to find the property name corresponding to this tag ID
     for (Entry<String, ClientDeviceProperty> propertyEntry : deviceProperties.entrySet()) {
-      ClientDeviceProperty deviceProperty = propertyEntry.getValue();
+      ClientDevicePropertyImpl deviceProperty = (ClientDevicePropertyImpl) propertyEntry.getValue();
 
       if (deviceProperty.isDataTag() && deviceProperty.getTagId().equals(tagUpdate.getId())) {
         propertyName = propertyEntry.getKey();
 
       } else if (deviceProperty.isMappedProperty()) {
-        // Check if the update is on a property field
-        for (Entry<String, ClientDeviceProperty> fieldEntry : deviceProperty.getFields().entrySet()) {
-          ClientDeviceProperty deviceField = fieldEntry.getValue();
+        // Check if the update is on a field
+        for (ClientDeviceProperty field : deviceProperty.getFields()) {
+          ClientDevicePropertyImpl fieldImpl = (ClientDevicePropertyImpl) field;
 
-          if (deviceField.isDataTag() && deviceField.getTagId().equals(tagUpdate.getId())) {
+          if (fieldImpl.isDataTag() && fieldImpl.getTagId().equals(tagUpdate.getId())) {
             propertyName = propertyEntry.getKey();
-            fieldName = fieldEntry.getKey();
+            fieldName = fieldImpl.getName();
           }
         }
       }
@@ -527,10 +435,11 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
     if (propertyName != null) {
 
       if (fieldName != null) {
-        this.deviceProperties.get(propertyName).getFields().put(fieldName, ClientDevicePropertyFactory.createClientDeviceProperty(tagUpdate));
+        ClientDevicePropertyImpl property = (ClientDevicePropertyImpl) this.deviceProperties.get(propertyName);
+        property.addField(fieldName, ClientDevicePropertyFactory.createClientDeviceProperty(fieldName, tagUpdate));
 
       } else {
-        this.deviceProperties.put(propertyName, ClientDevicePropertyFactory.createClientDeviceProperty(tagUpdate));
+        this.deviceProperties.put(propertyName, ClientDevicePropertyFactory.createClientDeviceProperty(propertyName, tagUpdate));
       }
     } else {
       LOG.warn("onUpdate() called with unmapped tag ID");
@@ -568,19 +477,16 @@ public class DeviceImpl implements Device, DataTagUpdateListener, Cloneable {
     return clone;
   }
 
-  @Override
-  public Category getCategoryForProperty(PropertyInfo propertyInfo) throws MappedPropertyException {
-    if (isMappedProperty(propertyInfo.getPropertyName()) && propertyInfo.getFieldName() == null) {
-      return Category.MAPPED_PROPERTY;
+  /**
+   * Manually set the reference to the {@link C2monTagManager} inside the device
+   * and also inside all device properties. Used for testing purposes.
+   *
+   * @param tagManager the tag manager to use
+   */
+  public void setTagManager(C2monTagManager tagManager) {
+    this.tagManager = tagManager;
+    for (ClientDeviceProperty property : deviceProperties.values()) {
+      ((ClientDevicePropertyImpl) property).setTagManager(tagManager);
     }
-
-    ClientDeviceProperty property = getDeviceProperty(propertyInfo);
-
-    if (property == null) {
-      LOG.warn("Property " + propertyInfo.getPropertyName() + " does not exist in device.");
-      return null;
-    }
-
-    return property.getCategory();
   }
 }
