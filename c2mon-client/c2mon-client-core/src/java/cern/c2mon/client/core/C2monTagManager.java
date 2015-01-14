@@ -87,7 +87,7 @@ public interface C2monTagManager {
   
   /**
    * Registers a listener to receive updates for specific data tags. 
-   * The method will return the initial values of the subscribed tags to {@link DataTagListener#onInitialValues(Collection)}.
+   * The method will return the initial values of the subscribed tags to {@link DataTagListener#onInitialUpdate(Collection)}.
    * <b>Please note</b> that the {@link DataTagListener#onUpdate(ClientDataTagValue)} method will then not
    * receive the initial values.<p>
    * The C2MON client API will handle for you in the background the initialization of the data
@@ -107,7 +107,7 @@ public interface C2monTagManager {
   
   /**
    * Registers a listener to receive updates for a specific data tag. 
-   * The method will return the initial value of the subscribed tag to {@link DataTagListener#onInitialValues(Collection)}. <b>Please note</b> 
+   * The method will return the initial value of the subscribed tag to {@link DataTagListener#onInitialUpdate(Collection)}. <b>Please note</b> 
    * that the {@link DataTagListener#onUpdate(ClientDataTagValue)} method will then not receive the initial value.<p>
    * The C2MON client API will handle for you in the background the initialization of the data
    * tags with the C2MON server, if this was not already done before. <p>

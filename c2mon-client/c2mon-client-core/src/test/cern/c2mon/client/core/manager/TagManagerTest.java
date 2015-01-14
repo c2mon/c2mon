@@ -128,7 +128,7 @@ public class TagManagerTest {
       }
 
       @Override
-      public void onInitialValues(Collection<ClientDataTagValue> initialValues) {
+      public void onInitialUpdate(Collection<ClientDataTagValue> initialValues) {
         Assert.assertEquals(tagIds1.size(), initialValues.size());
         Assert.assertEquals(tagIds1.size(), latch1.getCount());
         check.add(Boolean.TRUE);
@@ -150,7 +150,7 @@ public class TagManagerTest {
       }
 
       @Override
-      public void onInitialValues(Collection<ClientDataTagValue> initialValues) {
+      public void onInitialUpdate(Collection<ClientDataTagValue> initialValues) {
         Assert.assertEquals(tagIds2.size(), initialValues.size());
         Assert.assertEquals(tagIds2.size(), latch2.getCount());
         check.add(Boolean.TRUE);
@@ -208,7 +208,7 @@ public class TagManagerTest {
         Assert.assertTrue("The Listener should never be called", false);
       }
       @Override
-      public void onInitialValues(Collection<ClientDataTagValue> initialValues) {
+      public void onInitialUpdate(Collection<ClientDataTagValue> initialValues) {
         Assert.assertEquals(1, initialValues.size());
         for (ClientDataTagValue cdtValue : initialValues) {
           Assert.assertFalse(cdtValue.getDataTagQuality().isExistingTag());

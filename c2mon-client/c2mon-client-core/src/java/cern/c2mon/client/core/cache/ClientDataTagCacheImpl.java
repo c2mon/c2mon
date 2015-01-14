@@ -372,7 +372,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
             if (LOG.isDebugEnabled()) {
               LOG.debug("doAddDataTagUpdateListener() - Sending initial values to DataTagListener");
             }
-            ((DataTagListener) listener).onInitialValues(initialValues);
+            ((DataTagListener) listener).onInitialUpdate(initialValues);
           }
 
           // Asynchronously subscribe to the topics and get the latest values

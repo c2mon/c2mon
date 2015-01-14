@@ -25,7 +25,7 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
  * This interface extends the {@link DataTagUpdateListener} and can be used to
  * subscribe to tags via the C2monTagManager. Different to the {@link DataTagUpdateListener}
  * interface, the initial tag values are not passed to the {@link #onUpdate(ClientDataTagValue)}
- * method. Instead, the {@link #onInitialValues(Collection)} method gets called.
+ * method. Instead, the {@link #onInitialUpdate(Collection)} method gets called.
  * This allows a better differentiation between inital values and updates. However,
  * it is also possible to just subscribe with the {@link DataTagUpdateListener} interface,
  * in case this distinction is not needed.
@@ -44,5 +44,5 @@ public interface DataTagListener extends DataTagUpdateListener {
    * @param initialValues The initial values of the tags to which the 
    *        listener got subscribed to.
    */
-  void onInitialValues(Collection<ClientDataTagValue> initialValues);
+  void onInitialUpdate(Collection<ClientDataTagValue> initialValues);
 }
