@@ -22,7 +22,7 @@ import java.util.Map;
 
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
+import cern.c2mon.client.ext.device.property.Property;
 
 /**
  * This interface describes the methods which are provided by a C2MON Device
@@ -60,45 +60,43 @@ public interface Device {
    * <p>
    * Properties can take a number of different forms. They can be data tags,
    * client rules, constant values, or they can contain a list of sub-properties
-   * known as fields. The {@link ClientDeviceProperty#getCategory()} method
-   * exists to help you determine the property type.
+   * known as fields. The {@link Property#getCategory()} method exists to help
+   * you determine the property type.
    * </p>
    *
    * <p>
    * In the case of data tags/rules/constant values, the
-   * {@link ClientDeviceProperty#getDataTag()} method will return you a
+   * {@link Property#getTag()} method will return you a
    * {@link ClientDataTagValue} object. The field accessor methods (
-   * {@link ClientDeviceProperty#getField(String)} and
-   * {@link ClientDeviceProperty#getFields()}) will return null and empty list,
-   * respectively.
+   * {@link Property#getField(String)} and {@link Property#getFields()}) will
+   * return null and empty list, respectively.
    * </p>
    *
    * <p>
-   * In the case of a property containing fields,
-   * {@link ClientDeviceProperty#getDataTag()} will return null, and the field
-   * accessor methods will become active. Note that the fields themselves are
-   * also instances of {@link ClientDeviceProperty} and can be treated in the
-   * same way as regular properties.
+   * In the case of a property containing fields, {@link Property#getTag()}
+   * will return null, and the field accessor methods will become active. Note
+   * that the fields themselves are also instances of {@link Property} and can
+   * be treated in the same way as regular properties.
    * </p>
    *
    * @param propertyName the name of the property you wish to retrieve
    *
-   * @return the {@link ClientDeviceProperty} instance, or null if the property
-   *         was not found
+   * @return the {@link Property} instance, or null if the property was not
+   *         found
    *
-   * @see ClientDeviceProperty
+   * @see Property
    */
-  public ClientDeviceProperty getProperty(String propertyName);
+  public Property getProperty(String propertyName);
 
   /**
    * Retrieve all properties of this device.
    *
-   * @return the list of {@link ClientDeviceProperty} instances, or an empty
-   *         list if the device contains no properties
+   * @return the list of {@link Property} instances, or an empty list if the
+   *         device contains no properties
    *
-   * @see ClientDeviceProperty
+   * @see Property
    */
-  public List<ClientDeviceProperty> getProperties();
+  public List<Property> getProperties();
 
   /**
    * Retrieve the names of all properties of this device.

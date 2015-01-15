@@ -27,16 +27,16 @@ import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
- * Factory class to create an appropriate {@link ClientDeviceProperty} instance
- * from a {@link DeviceProperty} received from the server.
+ * Factory class to create appropriate {@link Property} and {@link Field}
+ * instances from {@link DeviceProperty} instances received from the server.
  *
  * @author Justin Lewis Salmon
  */
-public class ClientDevicePropertyFactory {
+public class PropertyFactory {
 
   /**
-   * Factory method to create an appropriate {@link ClientDeviceProperty}
-   * instance from a {@link DeviceProperty}, based on its category.
+   * Factory method to create an appropriate {@link Property} instance from a
+   * {@link DeviceProperty}, based on its category.
    *
    * @param deviceProperty the property object received from the server
    * @return the appropriate client device property
@@ -47,36 +47,36 @@ public class ClientDevicePropertyFactory {
    *           invalid client rule field
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public static ClientDeviceProperty createClientDeviceProperty(DeviceProperty deviceProperty) throws ClassNotFoundException, RuleFormatException {
+  public static Property createProperty(DeviceProperty deviceProperty) throws ClassNotFoundException, RuleFormatException {
 
     // If the property has nested fields, create them all here
     if ((deviceProperty.getCategory() == null && !deviceProperty.getFields().isEmpty())
         || deviceProperty.getCategory().equals(Category.MAPPED_PROPERTY.getCategory())) {
       Map<String, DeviceProperty> fields = deviceProperty.getFields();
-      Map<String, ClientDeviceProperty> clientFields = new HashMap<>();
+      Map<String, Field> clientFields = new HashMap<>();
 
       for (DeviceProperty field : fields.values()) {
-        clientFields.put(field.getName(), createClientDeviceProperty(field));
+        clientFields.put(field.getName(), createField(createProperty(field)));
       }
 
-      return new ClientDevicePropertyImpl(deviceProperty.getName(), Category.MAPPED_PROPERTY, clientFields);
+      return new PropertyImpl(deviceProperty.getName(), Category.MAPPED_PROPERTY, clientFields);
     }
 
     // If we have a tag ID, it takes priority.
     if (deviceProperty.getCategory().equals(Category.TAG_ID.getCategory())) {
-      return new ClientDevicePropertyImpl(deviceProperty.getName(), Category.TAG_ID, Long.parseLong(deviceProperty.getValue()));
+      return new PropertyImpl(deviceProperty.getName(), Category.TAG_ID, Long.parseLong(deviceProperty.getValue()));
     }
 
     // If we have a client rule, that comes next in the hierarchy.
     else if (deviceProperty.getCategory().equals(Category.CLIENT_RULE.getCategory())) {
       ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getValue()), deviceProperty.getResultTypeClass());
-      return new ClientDevicePropertyImpl(deviceProperty.getName(), Category.CLIENT_RULE, ruleTag);
+      return new PropertyImpl(deviceProperty.getName(), Category.CLIENT_RULE, ruleTag);
     }
 
     // If we have a constant value, it comes last in the hierarchy.
     else if (deviceProperty.getCategory().equals(Category.CONSTANT_VALUE.getCategory())) {
       ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getValue(), deviceProperty.getResultTypeClass());
-      return new ClientDevicePropertyImpl(deviceProperty.getName(), Category.CONSTANT_VALUE, constantValueTag);
+      return new PropertyImpl(deviceProperty.getName(), Category.CONSTANT_VALUE, constantValueTag);
     }
 
     else {
@@ -85,24 +85,51 @@ public class ClientDevicePropertyFactory {
   }
 
   /**
-   * Factory method to create an appropriate {@link ClientDeviceProperty}
-   * instance from a {@link ClientDataTagValue}, based on its type.
+   * Factory method to create an appropriate {@link Property} instance from a
+   * {@link ClientDataTagValue}, based on its type.
    *
    * @param name the name of the property
-   * @param dataTag the data tag
+   * @param tag the data tag
    * @return the appropriate client device property
    */
-  public static ClientDeviceProperty createClientDeviceProperty(String name, ClientDataTagValue dataTag) {
+  public static Property createProperty(String name, ClientDataTagValue tag) {
     Category category;
 
-    if (dataTag instanceof ClientRuleTag<?>) {
+    if (tag instanceof ClientRuleTag<?>) {
       category = Category.CLIENT_RULE;
-    } else if (dataTag instanceof ClientConstantValue<?>) {
+    } else if (tag instanceof ClientConstantValue<?>) {
       category = Category.CONSTANT_VALUE;
     } else {
       category = Category.TAG_ID;
     }
 
-    return new ClientDevicePropertyImpl(name, category, dataTag);
+    return new PropertyImpl(name, category, tag);
+  }
+
+  /**
+   * Factory method to create an appropriate {@link Field} instance from a
+   * {@link ClientDataTagValue}, based on its type.
+   *
+   * @param name the name of the field
+   * @param tag the data tag
+   * @return the newly created {@link Field} instance
+   */
+  public static Field createField(String name, ClientDataTagValue tag) {
+    Property property = createProperty(name, tag);
+    return new FieldImpl(property.getName(), property.getCategory(), ((BasePropertyImpl) property).getValue());
+  }
+
+  /**
+   * Private internal method to convert a {@link Property} into a {@link Field}.
+   *
+   * @param property the property to convert
+   * @return the newly converted {@link Field} instance
+   */
+  private static Field createField(Property property) {
+    if (property.getCategory().equals(Category.TAG_ID)) {
+      return new FieldImpl(property.getName(), property.getCategory(), property.getTagId());
+    } else {
+      return new FieldImpl(property.getName(), property.getCategory(), ((BasePropertyImpl) property).getValue());
+    }
   }
 }

@@ -18,7 +18,6 @@
 package cern.c2mon.client.ext.device;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,15 +27,16 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.tag.ClientCommandTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientRuleTag;
-import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
-import cern.c2mon.client.ext.device.property.ClientDevicePropertyFactory;
-import cern.c2mon.client.ext.device.property.ClientDevicePropertyImpl;
+import cern.c2mon.client.ext.device.property.Field;
+import cern.c2mon.client.ext.device.property.FieldImpl;
+import cern.c2mon.client.ext.device.property.Property;
+import cern.c2mon.client.ext.device.property.PropertyFactory;
+import cern.c2mon.client.ext.device.property.PropertyImpl;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
@@ -49,7 +49,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
  *
  * @author Justin Lewis Salmon
  */
-public class DeviceImpl implements Device, DataTagListener, Cloneable {
+public class DeviceImpl implements Device, Cloneable {
 
   /** Log4j logger for this class */
   private static final Logger LOG = Logger.getLogger(DeviceImpl.class);
@@ -86,7 +86,7 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
    * then all the device properties will exist in the map.
    * </p>
    */
-  private Map<String, ClientDeviceProperty> deviceProperties = new HashMap<>();
+  private Map<String, Property> deviceProperties = new HashMap<>();
 
   /**
    * The map of command names -> commands.
@@ -97,11 +97,6 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
    * </p>
    */
   private Map<String, ClientCommandTag> deviceCommands = new HashMap<>();
-
-  /**
-   * The set of all listeners which are subscribed to this device
-   */
-  private Set<DeviceUpdateListener> deviceUpdateListeners = new HashSet<DeviceUpdateListener>();
 
   /**
    * Reference to the <code>TagManager</code> singleton
@@ -146,8 +141,8 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
   }
 
   @Override
-  public ClientDeviceProperty getProperty(String propertyName) {
-    ClientDevicePropertyImpl property = (ClientDevicePropertyImpl) deviceProperties.get(propertyName);
+  public Property getProperty(String propertyName) {
+    PropertyImpl property = (PropertyImpl) deviceProperties.get(propertyName);
 
     // If we didn't find the property, just return null
     if (property == null) {
@@ -159,10 +154,10 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
   }
 
   @Override
-  public List<ClientDeviceProperty> getProperties() {
-    List<ClientDeviceProperty> properties = new ArrayList<>();
+  public List<Property> getProperties() {
+    List<Property> properties = new ArrayList<>();
 
-    for (ClientDeviceProperty property : deviceProperties.values()) {
+    for (Property property : deviceProperties.values()) {
       properties.add(getProperty(property.getName()));
     }
 
@@ -208,8 +203,8 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
   protected Set<Long> getPropertyDataTagIds() {
     Set<Long> propertyDataTagIds = new HashSet<>();
 
-    for (ClientDeviceProperty deviceProperty : deviceProperties.values()) {
-      ClientDevicePropertyImpl propertyImpl = (ClientDevicePropertyImpl) deviceProperty;
+    for (Property deviceProperty : deviceProperties.values()) {
+      PropertyImpl propertyImpl = (PropertyImpl) deviceProperty;
 
       if (propertyImpl.isDataTag()) {
         propertyDataTagIds.add(propertyImpl.getTagId());
@@ -232,11 +227,11 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
   protected Set<ClientRuleTag> getRuleTags() {
     Set<ClientRuleTag> ruleTags = new HashSet<>();
 
-    for (ClientDeviceProperty deviceProperty : deviceProperties.values()) {
-      ClientDevicePropertyImpl propertyImpl = (ClientDevicePropertyImpl) deviceProperty;
+    for (Property deviceProperty : deviceProperties.values()) {
+      PropertyImpl propertyImpl = (PropertyImpl) deviceProperty;
 
       if (propertyImpl.isRuleTag()) {
-        ruleTags.add((ClientRuleTag) deviceProperty.getDataTag());
+        ruleTags.add((ClientRuleTag) deviceProperty.getTag());
       }
     }
 
@@ -264,7 +259,7 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void setDeviceProperties(List<DeviceProperty> deviceProperties) throws RuleFormatException, ClassNotFoundException {
     for (DeviceProperty deviceProperty : deviceProperties) {
-      this.deviceProperties.put(deviceProperty.getName(), ClientDevicePropertyFactory.createClientDeviceProperty(deviceProperty));
+      this.deviceProperties.put(deviceProperty.getName(), PropertyFactory.createProperty(deviceProperty));
     }
   }
 
@@ -275,7 +270,7 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
    */
   protected void setDeviceProperties(Map<String, ClientDataTagValue> deviceProperties) {
     for (Map.Entry<String, ClientDataTagValue> entry : deviceProperties.entrySet()) {
-      this.deviceProperties.put(entry.getKey(), ClientDevicePropertyFactory.createClientDeviceProperty(entry.getKey(), entry.getValue()));
+      this.deviceProperties.put(entry.getKey(), PropertyFactory.createProperty(entry.getKey(), entry.getValue()));
     }
   }
 
@@ -284,7 +279,7 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
    *
    * @param deviceProperties the properties to set
    */
-  protected void setDeviceProperties(HashMap<String, ClientDeviceProperty> deviceProperties) {
+  protected void setDeviceProperties(HashMap<String, Property> deviceProperties) {
     this.deviceProperties = deviceProperties;
   }
 
@@ -293,7 +288,7 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
    *
    * @return the map of raw device properties
    */
-  protected Map<String, ClientDeviceProperty> getDeviceProperties() {
+  protected Map<String, Property> getDeviceProperties() {
     return deviceProperties;
   }
 
@@ -310,51 +305,6 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
   }
 
   /**
-   * Register a {@link DeviceUpdateListener} that will be notified when a
-   * property of this device changes.
-   *
-   * @param listener the listener to add
-   */
-  protected void addDeviceUpdateListener(DeviceUpdateListener listener) {
-    deviceUpdateListeners.add(listener);
-  }
-
-  /**
-   * Remove a {@link DeviceUpdateListener} that was previously registered to
-   * receive updates about this device.
-   *
-   * @param listener the listener to remove
-   */
-  protected void removeDeviceUpdateListener(DeviceUpdateListener listener) {
-    if (deviceUpdateListeners.contains(listener)) {
-      deviceUpdateListeners.remove(listener);
-    } else {
-      LOG.debug("Trying to unregister a listener that is not registered: ignoring");
-    }
-  }
-
-  /**
-   * Retrieve all {@link DeviceUpdateListener}s currently registered with this
-   * device.
-   *
-   * @return the set of DeviceUpdateListeners
-   */
-  protected Set<DeviceUpdateListener> getDeviceUpdateListeners() {
-    return deviceUpdateListeners;
-  }
-
-  /**
-   * Determine whether this device has any registered
-   * {@link DeviceUpdateListener}s.
-   *
-   * @return true if this device has any registered update listeners, false
-   *         otherwise
-   */
-  protected boolean hasUpdateListeners() {
-    return deviceUpdateListeners.size() > 0;
-  }
-
-  /**
    * Update the property that corresponds to the given
    * {@link ClientDataTagValue}.
    *
@@ -362,16 +312,16 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
    * @param info a {@link PropertyInfo} object describing the property/field
    *          that was updated
    */
-  private PropertyInfo updateProperty(ClientDataTagValue tag) {
+  protected PropertyInfo updateProperty(ClientDataTagValue tag) {
     PropertyInfo info = getPropertyInfoForTag(tag);
 
     if (info.getPropertyName() != null) {
       if (info.getFieldName() != null) {
-        ClientDevicePropertyImpl property = (ClientDevicePropertyImpl) this.deviceProperties.get(info.getPropertyName());
-        property.addField(info.getFieldName(), ClientDevicePropertyFactory.createClientDeviceProperty(info.getFieldName(), tag));
+        PropertyImpl property = (PropertyImpl) this.deviceProperties.get(info.getPropertyName());
+        property.addField(info.getFieldName(), (Field) PropertyFactory.createField(info.getFieldName(), tag));
 
       } else {
-        this.deviceProperties.put(info.getPropertyName(), ClientDevicePropertyFactory.createClientDeviceProperty(info.getPropertyName(), tag));
+        this.deviceProperties.put(info.getPropertyName(), PropertyFactory.createProperty(info.getPropertyName(), tag));
       }
     } else {
       LOG.warn("updateProperty() called with unmapped tag ID");
@@ -393,16 +343,16 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
     String fieldName = null;
 
     // Need to find the property name corresponding to this tag ID
-    for (Entry<String, ClientDeviceProperty> propertyEntry : deviceProperties.entrySet()) {
-      ClientDevicePropertyImpl deviceProperty = (ClientDevicePropertyImpl) propertyEntry.getValue();
+    for (Entry<String, Property> propertyEntry : deviceProperties.entrySet()) {
+      PropertyImpl deviceProperty = (PropertyImpl) propertyEntry.getValue();
 
       if (deviceProperty.isDataTag() && deviceProperty.getTagId().equals(tag.getId())) {
         propertyName = propertyEntry.getKey();
 
       } else if (deviceProperty.isMappedProperty()) {
         // Check if the update is on a field
-        for (ClientDeviceProperty field : deviceProperty.getFields()) {
-          ClientDevicePropertyImpl fieldImpl = (ClientDevicePropertyImpl) field;
+        for (Field field : deviceProperty.getFields()) {
+          FieldImpl fieldImpl = (FieldImpl) field;
 
           if (fieldImpl.isDataTag() && fieldImpl.getTagId().equals(tag.getId())) {
             propertyName = propertyEntry.getKey();
@@ -416,48 +366,10 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
   }
 
   @Override
-  public void onInitialValues(Collection<ClientDataTagValue> initialValues) {
-    // Update the property
-    for (ClientDataTagValue tag : initialValues) {
-      updateProperty(tag);
-    }
-
-    // Invoke the listeners
-    for (DeviceUpdateListener listener : deviceUpdateListeners) {
-      try {
-        LOG.trace("Invoking DeviceUpdateListener.onInitialValues()");
-        listener.onInitialUpdate(this.clone());
-
-      } catch (CloneNotSupportedException e) {
-        LOG.error("Unable to clone Device with id " + getId(), e);
-        throw new UnsupportedOperationException("Unable to clone Device with id " + getId(), e);
-      }
-    }
-  }
-
-  @Override
-  public final void onUpdate(ClientDataTagValue tagUpdate) {
-    // Update the property
-    PropertyInfo propertyInfo = updateProperty(tagUpdate);
-
-    // Invoke the listeners
-    for (DeviceUpdateListener listener : deviceUpdateListeners) {
-      try {
-        LOG.trace("Invoking DeviceUpdateListener");
-        listener.onUpdate(this.clone(), propertyInfo);
-
-      } catch (CloneNotSupportedException e) {
-        LOG.error("Unable to clone Device with id " + getId(), e);
-        throw new UnsupportedOperationException("Unable to clone Device with id " + getId(), e);
-      }
-    }
-  }
-
-  @Override
   protected Device clone() throws CloneNotSupportedException {
     DeviceImpl clone = (DeviceImpl) super.clone();
 
-    clone.deviceProperties = (Map<String, ClientDeviceProperty>) ((HashMap<String, ClientDeviceProperty>) deviceProperties).clone();
+    clone.deviceProperties = (Map<String, Property>) ((HashMap<String, Property>) deviceProperties).clone();
     clone.deviceCommands = (Map<String, ClientCommandTag>) ((HashMap<String, ClientCommandTag>) deviceCommands).clone();
 
     return clone;
@@ -471,8 +383,8 @@ public class DeviceImpl implements Device, DataTagListener, Cloneable {
    */
   public void setTagManager(C2monTagManager tagManager) {
     this.tagManager = tagManager;
-    for (ClientDeviceProperty property : deviceProperties.values()) {
-      ((ClientDevicePropertyImpl) property).setTagManager(tagManager);
+    for (Property property : deviceProperties.values()) {
+      ((PropertyImpl) property).setTagManager(tagManager);
     }
   }
 }

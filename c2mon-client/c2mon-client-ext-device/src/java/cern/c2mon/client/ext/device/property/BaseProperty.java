@@ -2,7 +2,7 @@
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
  *
- * Copyright (C) 2004 - 2014 CERN. This program is free software; you can
+ * Copyright (C) 2004 - 2015 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version. This program is distributed
@@ -17,21 +17,17 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.device.property;
 
-import java.util.List;
-
 import cern.c2mon.client.common.tag.ClientDataTag;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 
 /**
- * This class represents the <code>Property</code> aspect of the
- * class/device/property model. A property can be either a {@link ClientDataTag}
- * , a {@link ClientRuleTag}, a {@link ClientConstantValue} , or it can contain
- * a list of fields (i.e. sub-properties).
+ * This interface defines the common methods that all properties (properties and
+ * fields) must implement.
  *
  * @author Justin Lewis Salmon
  */
-public interface ClientDeviceProperty {
+public interface BaseProperty {
 
   /**
    * Retrieve the name of this property. A property name is unique within its
@@ -39,7 +35,7 @@ public interface ClientDeviceProperty {
    *
    * @return the name of the property
    */
-  public String getName();
+  String getName();
 
   /**
    * Retrieve the category of this property (tag id, constant value, etc.) as
@@ -47,7 +43,7 @@ public interface ClientDeviceProperty {
    *
    * @return the category of this property
    */
-  public Category getCategory();
+  Category getCategory();
 
   /**
    * Retrieve the ID of the {@link ClientDataTag} to which this property
@@ -57,44 +53,29 @@ public interface ClientDeviceProperty {
    * @return the tagId the ID of the corresponding tag or null if the property
    *         does not correspond to a {@link ClientDataTagValue}
    */
-  public Long getTagId();
+  Long getTagId();
 
   /**
-   * Retrieve the device property. May be null if the property points to a
-   * {@link ClientDataTag} and the actual tag has not yet been loaded.
+   * Retrieve the device property.
+   *
+   * <p>
+   * In the case of data tags/rules/constant values, this method will return you
+   * a {@link ClientDataTagValue} object. The field accessor methods (
+   * {@link #getField(String)} and {@link #getFields()}) will return null and
+   * empty list, respectively.
+   * </p>
+   *
+   * <p>
+   * In the case of a property containing fields, this method will return null,
+   * and the field accessor methods will become active. Note that the fields
+   * themselves are also instances of {@link Property} and can be treated in the
+   * same way as regular properties.
+   * </p>
    *
    * @return the device property value or null if the property does not
    *         correspond to a {@link ClientDataTagValue}
-   */
-  public ClientDataTagValue getDataTag();
-
-  /**
-   * Retrieve a field from this property.
    *
-   * <p>
-   * Note that fields are themselves simply instances of
-   * {@link ClientDeviceProperty} and can be treated in the same way as regular
-   * properties.
-   * </p>
-   *
-   * @param fieldName the name of the field you wish to retrieve
-   * @return the {@link ClientDeviceProperty} instance, or null if the field was
-   *         not found in the property or the property does not contain fields
+   * @see #getField(String)
    */
-  public ClientDeviceProperty getField(String fieldName);
-
-  /**
-   * Retrieve all fields of this property.
-   *
-   * @return the list of {@link ClientDeviceProperty} instances, or an empty
-   *         list if this property does not contain fields
-   */
-  public List<ClientDeviceProperty> getFields();
-
-  /**
-   * Retrieve the names of all fields of this property.
-   *
-   * @return the list of field names
-   */
-  public List<String> getFieldNames();
+  ClientDataTagValue getTag();
 }

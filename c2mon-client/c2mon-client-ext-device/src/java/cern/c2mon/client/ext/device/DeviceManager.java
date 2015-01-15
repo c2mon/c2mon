@@ -18,9 +18,12 @@
 package cern.c2mon.client.ext.device;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jms.JMSException;
@@ -29,12 +32,15 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.common.listener.DataTagListener;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
+import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.TransferDevice;
@@ -48,7 +54,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
  * @author Justin Lewis Salmon
  */
 @Service
-public class DeviceManager implements C2monDeviceManager {
+public class DeviceManager implements C2monDeviceManager, DataTagListener {
 
   /** Log4j logger for this class */
   private static final Logger LOG = Logger.getLogger(DeviceManager.class);
@@ -67,6 +73,11 @@ public class DeviceManager implements C2monDeviceManager {
 
   /** Provides methods for requesting information from the C2MON server */
   private final DeviceRequestHandler requestHandler;
+
+  /**
+   * Map of {@link DeviceUpdateListener}s to a set of {@link Device}s.
+   */
+  private Map<DeviceUpdateListener, Set<Device>> deviceUpdateListeners = new HashMap<>();
 
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service.
@@ -141,21 +152,7 @@ public class DeviceManager implements C2monDeviceManager {
 
   @Override
   public void subscribeDevice(Device device, final DeviceUpdateListener listener) {
-    DeviceImpl deviceImpl = (DeviceImpl) device;
-
-    // Here, just get the tag IDs to avoid calling the server
-    Set<Long> dataTagIds = deviceImpl.getPropertyDataTagIds();
-
-    // Use TagManager to subscribe to all properties of the device
-    deviceImpl.addDeviceUpdateListener(listener);
-    tagManager.subscribeDataTags(dataTagIds, deviceImpl);
-
-    // If the device contains properties that are client rules, also subscribe
-    // to the tags contained within those rules
-    for (ClientRuleTag<?> ruleTag : deviceImpl.getRuleTags()) {
-      tagManager.subscribeDataTags(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
-    }
-
+    subscribeDevices(new HashSet<>(Arrays.asList(device)), listener);
   }
 
   @Override
@@ -164,7 +161,7 @@ public class DeviceManager implements C2monDeviceManager {
 
     for (Device device : devices) {
       if (device.getName().equals(deviceName)) {
-        subscribeDevice(device, listener);
+        subscribeDevices(new HashSet<Device>(Arrays.asList(device)), listener);
         return;
       }
     }
@@ -175,39 +172,133 @@ public class DeviceManager implements C2monDeviceManager {
 
   @Override
   public void subscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
+    Set<Long> dataTagIds = new HashSet<>();
+
     for (Device device : devices) {
-      subscribeDevice(device, listener);
+      DeviceImpl deviceImpl = (DeviceImpl) device;
+
+      // Here, just get the tag IDs to avoid calling the server
+      dataTagIds.addAll(deviceImpl.getPropertyDataTagIds());
+
+      deviceUpdateListeners.put(listener, new HashSet<>(devices));
+
+      // If the device contains properties that are client rules, also subscribe
+      // to the tags contained within those rules
+      for (ClientRuleTag<?> ruleTag : deviceImpl.getRuleTags()) {
+        tagManager.subscribeDataTags(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
+      }
+    }
+
+    // Use TagManager to subscribe to all properties of the device
+    tagManager.subscribeDataTags(dataTagIds, this);
+  }
+
+  @Override
+  public void onInitialUpdate(Collection<ClientDataTagValue> initialValues) {
+    List<Device> devices = deviceCache.getAllDevices();
+    Set<Device> updatedDevices = new HashSet<>();
+
+    for (ClientDataTagValue tag : initialValues) {
+      // Find the device(s) that use this tag
+      for (Device device : devices) {
+        DeviceImpl deviceImpl = (DeviceImpl) device;
+
+        if (deviceImpl.getPropertyDataTagIds().contains(tag.getId())) {
+          deviceImpl.updateProperty(tag);
+          updatedDevices.add(device);
+        }
+      }
+    }
+
+    // Invoke the listeners that are interested in these tags/devices
+    for (Map.Entry<DeviceUpdateListener, Set<Device>> entry : deviceUpdateListeners.entrySet()) {
+      if (updatedDevices.equals(entry.getValue())) {
+        entry.getKey().onInitialUpdate(new ArrayList<Device>(updatedDevices));
+      }
+    }
+  }
+
+  @Override
+  public void onUpdate(ClientDataTagValue tag) {
+    List<Device> devices = deviceCache.getAllDevices();
+
+    // Find the device(s) that use this tag
+    for (Device device : devices) {
+      DeviceImpl deviceImpl = (DeviceImpl) device;
+
+      if (deviceImpl.getPropertyDataTagIds().contains(tag.getId())) {
+        PropertyInfo propertyInfo = deviceImpl.updateProperty(tag);
+
+        // Invoke the listeners that are interested in these tags/devices
+        for (Map.Entry<DeviceUpdateListener, Set<Device>> entry : deviceUpdateListeners.entrySet()) {
+          if (entry.getValue().contains(device)) {
+            entry.getKey().onUpdate(device, propertyInfo);
+          }
+        }
+      }
     }
   }
 
   @Override
   public void unsubscribeDevice(Device device, DeviceUpdateListener listener) {
-    DeviceImpl deviceImpl = (DeviceImpl) device;
-    Set<Long> dataTagIds = deviceImpl.getPropertyDataTagIds();
-
-    // Use TagManager to unsubscribe from all properties of the device
-    tagManager.unsubscribeDataTags(dataTagIds, deviceImpl);
-
-    // Remove the listener
-    deviceImpl.removeDeviceUpdateListener(listener);
-
-    // Remove the device from the cache if nobody is listening for updates
-    if (!deviceImpl.hasUpdateListeners()) {
-      deviceCache.remove(device);
-    }
+    unsubscribeDevices(new HashSet<Device>(Arrays.asList(device)), listener);
   }
 
   @Override
   public void unsubscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
+    Set<Long> dataTagIds = new HashSet<>();
+
     for (Device device : devices) {
-      unsubscribeDevice(device, listener);
+      DeviceImpl deviceImpl = (DeviceImpl) device;
+      dataTagIds.addAll(deviceImpl.getPropertyDataTagIds());
+
+      // Remove the device from the listener
+      deviceUpdateListeners.get(listener).remove(device);
+
+      // Remove the device from the cache if nobody is listening for updates
+      if (!isSubscribed(device)) {
+        deviceCache.remove(device);
+      }
     }
+
+    // If no devices are left in the set, remove the listener itself
+    if (deviceUpdateListeners.get(listener).isEmpty()) {
+      deviceUpdateListeners.remove(listener);
+    }
+
+    // Use TagManager to unsubscribe from all properties of the device
+    tagManager.unsubscribeDataTags(dataTagIds, this);
   }
 
   @Override
   public void unsubscribeAllDevices(final DeviceUpdateListener listener) {
     Set<Device> allDevices = new HashSet<Device>(deviceCache.getAllDevices());
     unsubscribeDevices(allDevices, listener);
+  }
+
+  /**
+   * Check if the given device is subscribed to by any listener.
+   *
+   * @param device the device to be checked
+   * @return true if the device is subscribed to, false otherwise
+   */
+  public boolean isSubscribed(Device device) {
+    for (Set<Device> devices : deviceUpdateListeners.values()) {
+      if (devices.contains(device)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Return all {@link DeviceUpdateListener} instances.
+   *
+   * @return the set of {@link DeviceUpdateListener}s
+   */
+  public Set<DeviceUpdateListener> getDeviceUpdateListeners() {
+    return deviceUpdateListeners.keySet();
   }
 
   /**

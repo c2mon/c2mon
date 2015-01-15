@@ -42,9 +42,10 @@ import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.ClientConstantValue;
-import cern.c2mon.client.ext.device.property.ClientDeviceProperty;
-import cern.c2mon.client.ext.device.property.ClientDevicePropertyImpl;
-import cern.c2mon.client.ext.device.property.PropertyInfo;
+import cern.c2mon.client.ext.device.property.Field;
+import cern.c2mon.client.ext.device.property.FieldImpl;
+import cern.c2mon.client.ext.device.property.Property;
+import cern.c2mon.client.ext.device.property.PropertyImpl;
 import cern.c2mon.client.ext.device.util.DeviceTestUtils;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
@@ -84,11 +85,11 @@ public class DeviceImplTest {
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock);
 
-    ClientDeviceProperty property = device.getProperty("test_property_1");
+    Property property = device.getProperty("test_property_1");
     // Manually set the tag manager to the mock one
-    ((ClientDevicePropertyImpl) property).setTagManager(tagManagerMock);
+    ((PropertyImpl) property).setTagManager(tagManagerMock);
     Assert.assertTrue(property.getTagId().equals(cdt1.getId()));
-    Assert.assertTrue(property.getDataTag() != null);
+    Assert.assertTrue(property.getTag() != null);
     Assert.assertTrue(property.getFields().size() == 0);
     Assert.assertTrue(property.getCategory() == Category.TAG_ID);
 
@@ -125,26 +126,26 @@ public class DeviceImplTest {
     EasyMock.replay(tagManagerMock);
 
     // Attempt to retrieve field value from non-mapped property
-    ClientDeviceProperty property = device.getProperty("nonexistent");
+    Property property = device.getProperty("nonexistent");
     Assert.assertNull(property);
 
     property = device.getProperty("cpuLoadInPercent");
     Assert.assertTrue(property.getTagId() == cdt1.getId());
-    Assert.assertTrue(property.getDataTag() != null && property.getDataTag() instanceof ClientDataTagValue);
+    Assert.assertTrue(property.getTag() != null && property.getTag() instanceof ClientDataTagValue);
     Assert.assertTrue(property.getFields().size() == 0);
     Assert.assertTrue(property.getCategory() == Category.TAG_ID);
     property = device.getProperty("responsiblePerson");
     Assert.assertNull(property.getTagId());
     Assert.assertTrue(property.getCategory() == Category.CONSTANT_VALUE);
-    Assert.assertTrue(property.getDataTag() != null && property.getDataTag() instanceof ClientConstantValue<?>);
+    Assert.assertTrue(property.getTag() != null && property.getTag() instanceof ClientConstantValue<?>);
     property = device.getProperty("someCalculations");
     Assert.assertNull(property.getTagId());
     Assert.assertTrue(property.getCategory() == Category.CLIENT_RULE);
-    Assert.assertTrue(property.getDataTag() != null && property.getDataTag() instanceof ClientRuleTag<?>);
+    Assert.assertTrue(property.getTag() != null && property.getTag() instanceof ClientRuleTag<?>);
     property = device.getProperty("numCores");
     Assert.assertNull(property.getTagId());
     Assert.assertTrue(property.getCategory() == Category.CONSTANT_VALUE);
-    Assert.assertTrue(property.getDataTag() != null && property.getDataTag() instanceof ClientConstantValue<?>);
+    Assert.assertTrue(property.getTag() != null && property.getTag() instanceof ClientConstantValue<?>);
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock);
@@ -200,31 +201,31 @@ public class DeviceImplTest {
     device.setDeviceProperties(deviceProperties);
     device.setTagManager(tagManagerMock);
 
-    Assert.assertTrue(device.getProperty("cpuLoadInPercent").getDataTag().getId().equals(cdt1.getId()));
-    Assert.assertTrue(device.getProperty("responsiblePerson").getDataTag().getId().equals(ccv1.getId()));
-    Assert.assertTrue(device.getProperty("responsiblePerson").getDataTag().getType() == String.class);
-    Assert.assertTrue(device.getProperty("responsiblePerson").getDataTag().getValue().equals(ccv1.getValue()));
-    Assert.assertTrue(device.getProperty("someCalculations").getDataTag().getId().equals(crt.getId()));
-    Assert.assertTrue(device.getProperty("someCalculations").getDataTag().getRuleExpression().getExpression().equals(crt.getRuleExpression().getExpression()));
-    Assert.assertTrue(device.getProperty("someCalculations").getDataTag().getType().equals(crt.getType()));
-    Assert.assertTrue(device.getProperty("someCalculations").getDataTag().getValue().equals(1.5F));
-    Assert.assertTrue(device.getProperty("numCores").getDataTag().getId().equals(ccv2.getId()));
-    Assert.assertTrue(device.getProperty("numCores").getDataTag().getType().equals(ccv2.getType()));
-    Assert.assertTrue(device.getProperty("numCores").getDataTag().getValue().equals(ccv2.getValue()));
+    Assert.assertTrue(device.getProperty("cpuLoadInPercent").getTag().getId().equals(cdt1.getId()));
+    Assert.assertTrue(device.getProperty("responsiblePerson").getTag().getId().equals(ccv1.getId()));
+    Assert.assertTrue(device.getProperty("responsiblePerson").getTag().getType() == String.class);
+    Assert.assertTrue(device.getProperty("responsiblePerson").getTag().getValue().equals(ccv1.getValue()));
+    Assert.assertTrue(device.getProperty("someCalculations").getTag().getId().equals(crt.getId()));
+    Assert.assertTrue(device.getProperty("someCalculations").getTag().getRuleExpression().getExpression().equals(crt.getRuleExpression().getExpression()));
+    Assert.assertTrue(device.getProperty("someCalculations").getTag().getType().equals(crt.getType()));
+    Assert.assertTrue(device.getProperty("someCalculations").getTag().getValue().equals(1.5F));
+    Assert.assertTrue(device.getProperty("numCores").getTag().getId().equals(ccv2.getId()));
+    Assert.assertTrue(device.getProperty("numCores").getTag().getType().equals(ccv2.getType()));
+    Assert.assertTrue(device.getProperty("numCores").getTag().getValue().equals(ccv2.getValue()));
 
-    ClientDeviceProperty acquisition = device.getProperty("acquisition");
-    Assert.assertTrue(acquisition.getField("cpuLoadInPercent2").getDataTag().getId().equals(cdt2.getId()));
-    Assert.assertTrue(acquisition.getField("responsiblePerson2").getDataTag().getId().equals(ccv1.getId()));
-    Assert.assertTrue(acquisition.getField("responsiblePerson2").getDataTag().getType() == String.class);
-    Assert.assertTrue(acquisition.getField("responsiblePerson2").getDataTag().getValue().equals(ccv1.getValue()));
-    Assert.assertTrue(acquisition.getField("someCalculations2").getDataTag().getId().equals(crt.getId()));
-    Assert.assertTrue(acquisition.getField("someCalculations2").getDataTag().getRuleExpression().getExpression()
+    Property acquisition = device.getProperty("acquisition");
+    Assert.assertTrue(acquisition.getField("cpuLoadInPercent2").getTag().getId().equals(cdt2.getId()));
+    Assert.assertTrue(acquisition.getField("responsiblePerson2").getTag().getId().equals(ccv1.getId()));
+    Assert.assertTrue(acquisition.getField("responsiblePerson2").getTag().getType() == String.class);
+    Assert.assertTrue(acquisition.getField("responsiblePerson2").getTag().getValue().equals(ccv1.getValue()));
+    Assert.assertTrue(acquisition.getField("someCalculations2").getTag().getId().equals(crt.getId()));
+    Assert.assertTrue(acquisition.getField("someCalculations2").getTag().getRuleExpression().getExpression()
         .equals(crt.getRuleExpression().getExpression()));
-    Assert.assertTrue(acquisition.getField("someCalculations2").getDataTag().getType().equals(crt.getType()));
-    Assert.assertTrue(acquisition.getField("someCalculations2").getDataTag().getValue().equals(1.5F));
-    Assert.assertTrue(acquisition.getField("numCores2").getDataTag().getId().equals(ccv2.getId()));
-    Assert.assertTrue(acquisition.getField("numCores2").getDataTag().getType().equals(ccv2.getType()));
-    Assert.assertTrue(acquisition.getField("numCores2").getDataTag().getValue().equals(ccv2.getValue()));
+    Assert.assertTrue(acquisition.getField("someCalculations2").getTag().getType().equals(crt.getType()));
+    Assert.assertTrue(acquisition.getField("someCalculations2").getTag().getValue().equals(1.5F));
+    Assert.assertTrue(acquisition.getField("numCores2").getTag().getId().equals(ccv2.getId()));
+    Assert.assertTrue(acquisition.getField("numCores2").getTag().getType().equals(ccv2.getType()));
+    Assert.assertTrue(acquisition.getField("numCores2").getTag().getValue().equals(ccv2.getValue()));
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock);
@@ -262,37 +263,6 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testPropertyUpdate() throws RuleFormatException {
-
-    DeviceImpl device = getTestDevice();
-    ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
-    cdt1.update(DeviceTestUtils.createValidTransferTag(cdt1.getId(), "test_tag_name", 1L));
-
-    Map<String, ClientDataTagValue> deviceProperties = new HashMap<String, ClientDataTagValue>();
-    deviceProperties.put("test_property_name", cdt1);
-    device.setDeviceProperties(deviceProperties);
-
-    device.addDeviceUpdateListener(new DeviceUpdateListener() {
-      @Override
-      public void onUpdate(Device device, PropertyInfo propertyInfo) {
-        // do nothing
-      }
-
-      @Override
-      public void onInitialUpdate(Device device) {
-      }
-    });
-
-    // Update the tag value
-    ClientDataTagImpl cdt2 = new ClientDataTagImpl(100000L);
-    cdt2.update(DeviceTestUtils.createValidTransferTag(cdt1.getId(), cdt1.getName(), 2L));
-    device.onUpdate(cdt2);
-
-    // Check that the device stored the new update properly
-    Assert.assertTrue(((Long) device.getProperty("test_property_name").getDataTag().getValue()) == 2L);
-  }
-
-  @Test
   public void testRuleUpdate() throws RuleFormatException, ClassNotFoundException, InterruptedException {
     // Reset the mock
     EasyMock.reset(tagManagerMock);
@@ -320,7 +290,7 @@ public class DeviceImplTest {
     device.setDeviceProperties(deviceProperties);
     device.setTagManager(tagManagerMock);
 
-    ClientRuleTag rule = (ClientRuleTag) device.getProperty("test_property_rule_name").getDataTag();
+    ClientRuleTag rule = (ClientRuleTag) device.getProperty("test_property_rule_name").getTag();
     Assert.assertNotNull(rule);
     Assert.assertTrue(rule.isValid());
     Assert.assertTrue((Float) rule.getValue() == 1F);
@@ -360,7 +330,7 @@ public class DeviceImplTest {
   @Test
   public void testGetNonexistentProperty() {
     DeviceImpl device = getTestDevice();
-    ClientDeviceProperty value = device.getProperty("nonexistent");
+    Property value = device.getProperty("nonexistent");
     Assert.assertNull(value);
   }
 
@@ -375,14 +345,14 @@ public class DeviceImplTest {
     ClientRuleTag crt = new ClientRuleTag(new SimpleRuleExpression("(#123 + #234) / 2"), Float.class);
     ClientConstantValue ccv2 = new ClientConstantValue(4, Integer.class);
 
-    Map<String, ClientDeviceProperty> fields = new HashMap<>();
-    fields.put("cpuLoadInPercent", new ClientDevicePropertyImpl("cpuLoadInPercent", Category.TAG_ID, cdt1));
-    fields.put("responsiblePerson", new ClientDevicePropertyImpl("responsiblePerson", Category.CONSTANT_VALUE, ccv1));
-    fields.put("someCalculations", new ClientDevicePropertyImpl("someCalculations", Category.CLIENT_RULE, crt));
-    fields.put("numCores", new ClientDevicePropertyImpl("numCores", Category.CONSTANT_VALUE, ccv2));
+    Map<String, Field> fields = new HashMap<>();
+    fields.put("cpuLoadInPercent", new FieldImpl("cpuLoadInPercent", Category.TAG_ID, cdt1));
+    fields.put("responsiblePerson", new FieldImpl("responsiblePerson", Category.CONSTANT_VALUE, ccv1));
+    fields.put("someCalculations", new FieldImpl("someCalculations", Category.CLIENT_RULE, crt));
+    fields.put("numCores", new FieldImpl("numCores", Category.CONSTANT_VALUE, ccv2));
 
-    HashMap<String, ClientDeviceProperty> properties = new HashMap<>();
-    properties.put("acquisition", new ClientDevicePropertyImpl("acquisition", Category.MAPPED_PROPERTY, fields));
+    HashMap<String, Property> properties = new HashMap<>();
+    properties.put("acquisition", new PropertyImpl("acquisition", Category.MAPPED_PROPERTY, fields));
 
     device.setDeviceProperties(properties);
     device.setTagManager(tagManagerMock);
@@ -394,15 +364,15 @@ public class DeviceImplTest {
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock);
 
-    ClientDeviceProperty property = device.getProperty("acquisition");
-    ClientDeviceProperty field = property.getField("cpuLoadInPercent");
+    Property property = device.getProperty("acquisition");
+    Field field = property.getField("cpuLoadInPercent");
     Assert.assertTrue(field.getTagId() == cdt1.getId());
     field = property.getField("responsiblePerson");
-    Assert.assertTrue(field.getDataTag().getValue() == ccv1.getValue());
+    Assert.assertTrue(field.getTag().getValue() == ccv1.getValue());
     field = property.getField("someCalculations");
-    Assert.assertTrue(field.getDataTag().getRuleExpression().getExpression() == crt.getRuleExpression().getExpression());
+    Assert.assertTrue(field.getTag().getRuleExpression().getExpression() == crt.getRuleExpression().getExpression());
     field = property.getField("numCores");
-    Assert.assertTrue(field.getDataTag().getValue() == ccv2.getValue());
+    Assert.assertTrue(field.getTag().getValue() == ccv2.getValue());
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock);
@@ -449,20 +419,20 @@ public class DeviceImplTest {
     device.setDeviceProperties(deviceProperties);
     device.setTagManager(tagManagerMock);
 
-    ClientDeviceProperty fields = device.getProperty("acquisition");
+    Property fields = device.getProperty("acquisition");
 
-    ClientDataTagValue v = fields.getField("cpuLoadInPercent").getDataTag();
-    Assert.assertTrue(fields.getField("cpuLoadInPercent").getDataTag().getId().equals(cdt.getId()));
-    Assert.assertTrue(fields.getField("responsiblePerson").getDataTag().getId().equals(ccv1.getId()));
-    Assert.assertTrue(fields.getField("responsiblePerson").getDataTag().getType() == String.class);
-    Assert.assertTrue(fields.getField("responsiblePerson").getDataTag().getValue().equals(ccv1.getValue()));
-    Assert.assertTrue(fields.getField("someCalculations").getDataTag().getId().equals(crt.getId()));
-    Assert.assertTrue(fields.getField("someCalculations").getDataTag().getRuleExpression().getExpression().equals(crt.getRuleExpression().getExpression()));
-    Assert.assertTrue(fields.getField("someCalculations").getDataTag().getType().equals(crt.getType()));
-    Assert.assertTrue(fields.getField("someCalculations").getDataTag().getValue().equals(1.5F));
-    Assert.assertTrue(fields.getField("numCores").getDataTag().getId().equals(ccv2.getId()));
-    Assert.assertTrue(fields.getField("numCores").getDataTag().getType().equals(ccv2.getType()));
-    Assert.assertTrue(fields.getField("numCores").getDataTag().getValue().equals(ccv2.getValue()));
+    ClientDataTagValue v = fields.getField("cpuLoadInPercent").getTag();
+    Assert.assertTrue(fields.getField("cpuLoadInPercent").getTag().getId().equals(cdt.getId()));
+    Assert.assertTrue(fields.getField("responsiblePerson").getTag().getId().equals(ccv1.getId()));
+    Assert.assertTrue(fields.getField("responsiblePerson").getTag().getType() == String.class);
+    Assert.assertTrue(fields.getField("responsiblePerson").getTag().getValue().equals(ccv1.getValue()));
+    Assert.assertTrue(fields.getField("someCalculations").getTag().getId().equals(crt.getId()));
+    Assert.assertTrue(fields.getField("someCalculations").getTag().getRuleExpression().getExpression().equals(crt.getRuleExpression().getExpression()));
+    Assert.assertTrue(fields.getField("someCalculations").getTag().getType().equals(crt.getType()));
+    Assert.assertTrue(fields.getField("someCalculations").getTag().getValue().equals(1.5F));
+    Assert.assertTrue(fields.getField("numCores").getTag().getId().equals(ccv2.getId()));
+    Assert.assertTrue(fields.getField("numCores").getTag().getType().equals(ccv2.getType()));
+    Assert.assertTrue(fields.getField("numCores").getTag().getValue().equals(ccv2.getValue()));
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock);

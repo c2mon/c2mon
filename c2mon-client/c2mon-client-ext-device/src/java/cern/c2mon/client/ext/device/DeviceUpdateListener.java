@@ -17,6 +17,8 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.device;
 
+import java.util.List;
+
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 
 /**
@@ -28,6 +30,23 @@ import cern.c2mon.client.ext.device.property.PropertyInfo;
  * @author Justin Lewis Salmon
  */
 public interface DeviceUpdateListener {
+
+  /**
+   * This method is only called once before the listener gets subscribed to the
+   * device properties, in order to provide the initial values.
+   *
+   * <p>
+   * Please note, that this method has to return in order to not block the
+   * listener subscription. Only after it returns will the
+   * {@link #onUpdate(Device, PropertyInfo)} be called.
+   * </p>
+   *
+   * @param devices the list of devices containing the initial values of the
+   *          tags to which the listener subscribed to.
+   *
+   * @param device
+   */
+  void onInitialUpdate(List<Device> devices);
 
   /**
    * When a particular property on a device changes, this method will be called.
@@ -58,21 +77,4 @@ public interface DeviceUpdateListener {
    * @see PropertyInfo
    */
   void onUpdate(Device device, PropertyInfo propertyInfo);
-
-  /**
-   * This method is only called once before the listener gets subscribed to the
-   * device properties, in order to provide the initial values.
-   *
-   * <p>
-   * Please note, that this method has to return in order to not block the
-   * listener subscription. Only after it returns will the
-   * {@link #onUpdate(Device, PropertyInfo)} be called.
-   * </p>
-   *
-   * @param device the device containing the initial values of the tags to which
-   *          the listener subscribed to.
-   *
-   * @param device
-   */
-  void onInitialUpdate(Device device);
 }

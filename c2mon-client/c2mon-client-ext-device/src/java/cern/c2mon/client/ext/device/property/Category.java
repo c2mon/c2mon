@@ -24,8 +24,7 @@ import cern.c2mon.shared.client.device.DeviceProperty;
  *
  * Supporting new property categories should be relatively easy. It should only
  * be necessary to add a new item to this enum and then modify the
- * {@link ClientDevicePropertyFactory#createClientDeviceProperty(DeviceProperty)}
- * method.
+ * {@link PropertyFactory#createProperty(DeviceProperty)} method.
  *
  * @author Justin Lewis Salmon
  */
