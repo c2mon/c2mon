@@ -310,9 +310,6 @@ public class ConfigurationReport extends ClientRequestReport {
   public String toXML() {
     if (isResult()) {
       StringBuffer str = new StringBuffer(1000);
-      str.append("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-      str.append("<?xml-stylesheet href=\"generic_tag.xsl\" type=\"text/xsl\" ?>\n");
-
       str.append("<ConfigurationReport>\n");
 
       str.append("<id>");
