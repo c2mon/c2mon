@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -77,6 +78,7 @@ public class ClientDataTagCacheImplTest {
    * @throws Exception
    */
   @Test
+  @DirtiesContext
   public void testAddDataTagUpdateListener() throws Exception {
     // Test setup
     Set<Long> tagIds = new HashSet<Long>();
@@ -108,6 +110,7 @@ public class ClientDataTagCacheImplTest {
 
 
   @Test
+  @DirtiesContext
   public void testUnsubscribeAllDataTags() throws Exception {
     // test setup
     Set<Long> tagIds = new HashSet<Long>();
@@ -147,6 +150,7 @@ public class ClientDataTagCacheImplTest {
 
 
   @Test
+  @DirtiesContext
   public void testContainsTag() throws Exception {
     // Test setup
     Set<Long> tagIds = new HashSet<Long>();
@@ -177,6 +181,7 @@ public class ClientDataTagCacheImplTest {
   }
 
   @Test
+  @DirtiesContext
   public void testHistoryMode() throws Exception {
     // Test setup
     Set<Long> tagIds = new HashSet<Long>();

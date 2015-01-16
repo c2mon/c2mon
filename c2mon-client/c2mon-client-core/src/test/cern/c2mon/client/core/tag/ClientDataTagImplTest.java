@@ -166,7 +166,7 @@ public class ClientDataTagImplTest {
 
     //run test
     EasyMock.replay(mockUpdateListener);
-    cdt.addUpdateListener(mockUpdateListener, true);
+    cdt.addUpdateListener(mockUpdateListener);
 
     //check test success
     EasyMock.verify(mockUpdateListener);
@@ -182,7 +182,7 @@ public class ClientDataTagImplTest {
         assertEquals(cdt, tagUpdate);
         checkTagValueCopy(cdt, tagUpdate);
       }
-    }, true);
+    });
 
     cdt.onUpdate(createValidTransferTag(1234L));
   }
@@ -202,7 +202,7 @@ public class ClientDataTagImplTest {
       public void onUpdate(ClientDataTagValue tagUpdate) {
         // Do nothing
       }
-    }, true);
+    });
 
     clone = cdt.clone();
     checkTagCopy(cdt, clone);

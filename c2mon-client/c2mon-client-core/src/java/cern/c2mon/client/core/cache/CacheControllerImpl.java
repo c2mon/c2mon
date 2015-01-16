@@ -144,7 +144,7 @@ class CacheControllerImpl implements CacheController {
       listeners = historyTag.getUpdateListeners();
       
       historyTag.removeAllUpdateListeners();
-      liveCache.get(entry.getKey()).addUpdateListeners(listeners, true);
+      liveCache.get(entry.getKey()).addUpdateListeners(listeners);
     }
     
     activeCache = liveCache;
@@ -168,7 +168,7 @@ class CacheControllerImpl implements CacheController {
         
         listeners = liveTag.getUpdateListeners();
         liveTag.removeAllUpdateListeners();
-        historyTag.addUpdateListeners(listeners, true);
+        historyTag.addUpdateListeners(listeners);
         historyCache.put(entry.getKey(), historyTag);
       }
     }

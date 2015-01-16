@@ -322,72 +322,104 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public <T extends DataTagUpdateListener> void addDataTagUpdateListener(final Set<Long> tagIds, final T listener) throws CacheSynchronizationException {
-    doAddDataTagUpdateListener(tagIds, listener, !(listener instanceof DataTagListener));
+    doAddDataTagUpdateListener(tagIds, listener, (listener instanceof DataTagListener));
   }
   
-  private void doAddDataTagUpdateListener(final Set<Long> tagIds, final DataTagUpdateListener listener, final boolean sendInitialValuesToListener) throws CacheSynchronizationException {
+  /**
+   * Inner method for subscribing the given listener to the list of tags. In case a tag is not yet in the
+   * client cache, it is going to be fetched from the server and all the topic subscription will handled.
+   * @param tagIds list of tags ids to which the listener shall be subscribed
+   * @param listener the listener to subscribe.
+   * @param sendInitialUpdateSeperately {@code true}, if the {@link DataTagUpdateListener} is in fact a
+   *        {@link DataTagListener} which allows sending the initial updates on a separate method.
+   * @throws CacheSynchronizationException In case of errors during the subscription.
+   */
+  private void doAddDataTagUpdateListener(final Set<Long> tagIds, final DataTagUpdateListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
+    
+    // tags which are not yet subscribed
     final Set<Long> newTagIds = new HashSet<Long>();
-    final Collection<ClientDataTagValue> initialValues = new ArrayList<>(tagIds.size());
+    // Needed if, the initial values shall be sent on the separate #onInitialUpdate() method
+    final Map<Long, ClientDataTagValue> initialUpdates = new HashMap<>(tagIds.size());
+    
     synchronized (getHistoryModeSyncLock()) {
       cacheWriteLock.lock();
       try {
         ClientDataTagImpl cdt = null;
+        
+        // filter all tag ids, which have not been subscribed, yet.
         for (Long tagId : tagIds) {
+          
           if (liveCache.containsKey(tagId)) {
-            cdt = controller.getActiveCache().get(tagId);
-            try {
-              initialValues.add(cdt.clone());
-            }
-            catch (CloneNotSupportedException e) {
-              throw new RuntimeException("ClientDataTagImpl object could not be cloned for tag " + tagId + ": " + cdt.toString());
-            }
-            cdt.addUpdateListener(listener, sendInitialValuesToListener);
-          } else {
-            newTagIds.add(tagId);
-          }
-        }
-
-        if (newTagIds.size() > 0) {
-          // Create the uninitialised tags
-          cacheSynchronizer.createTags(newTagIds);
-
-          // Add the update listeners and supervision listeners
-          for (Long tagId : newTagIds) {
-            cdt = controller.getActiveCache().get(tagId);
-            if (cdt != null) {
-              supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
+            
+            if (sendInitialUpdateSeperately) {
+              cdt = controller.getActiveCache().get(tagId);
               try {
-                initialValues.add(cdt.clone());
+                initialUpdates.put(tagId, cdt.clone());
               }
               catch (CloneNotSupportedException e) {
                 throw new RuntimeException("ClientDataTagImpl object could not be cloned for tag " + tagId + ": " + cdt.toString());
               }
-              cdt.addUpdateListener(listener, sendInitialValuesToListener);
             }
+            
+          } else {
+            newTagIds.add(tagId);
           }
-          
-          // Before subscribing to the update topics we send the initial values,
-          // if the listener is of type DataTagListener
-          if (!sendInitialValuesToListener && listener instanceof DataTagListener) {
-            if (LOG.isDebugEnabled()) {
-              LOG.debug("doAddDataTagUpdateListener() - Sending initial values to DataTagListener");
-            }
-            ((DataTagListener) listener).onInitialUpdate(initialValues);
-          }
+        } // for loop
 
-          // Asynchronously subscribe to the topics and get the latest values
-          // again
+        if (!newTagIds.isEmpty()) {
+          // Create the uninitialised tags
+          cacheSynchronizer.createTags(newTagIds);
+            
+          // Add the supervision listeners
+          for (Long tagId : newTagIds) {
+            cdt = controller.getActiveCache().get(tagId);
+            if (cdt != null) {
+              supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
+              
+              if (sendInitialUpdateSeperately) {
+                try {
+                  initialUpdates.put(tagId, cdt.clone());
+                }
+                catch (CloneNotSupportedException e) {
+                  throw new RuntimeException("ClientDataTagImpl object could not be cloned for tag " + tagId + ": " + cdt.toString());
+                }
+              }
+              
+            }
+          } // end for
+            
+        } // end if
+          
+        // Before subscribing to the update topics we send the initial values,
+        // if the listener is of type DataTagListener
+        if (sendInitialUpdateSeperately && listener instanceof DataTagListener) {
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("doAddDataTagUpdateListener() - Sending initial values to DataTagListener");
+          }
+          ((DataTagListener) listener).onInitialUpdate(initialUpdates.values());
+        }
+        
+        // Add the listener to all tags
+        for (Long tagId : tagIds) {
+          cdt = controller.getActiveCache().get(tagId);
+          cdt.addUpdateListener(listener, initialUpdates.get(tagId));
+        }
+        
+        if (!newTagIds.isEmpty()) {
+          // Asynchronously subscribe to the topics and get the latest values again
           cacheSynchronizer.subscribeTags(newTagIds);
         }
-
+      	 
       } 
       finally {
         cacheWriteLock.unlock();
       }
     }
 
-    // Inform listeners (e.g. HistoryManager) about new subscriptions
-    fireOnNewTagSubscriptionsEvent(newTagIds);
+    if (!newTagIds.isEmpty()) {
+      // Inform listeners (e.g. HistoryManager) about new subscriptions
+      fireOnNewTagSubscriptionsEvent(newTagIds);
+    }
   }
 
   @Override

@@ -284,7 +284,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
             supervisionManager.removeSupervisionListener(liveTag);
             final ClientDataTagImpl unkownTag = new ClientDataTagImpl(tagId);
             unkownTag.getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
-            unkownTag.addUpdateListeners(liveTag.getUpdateListeners(), true);
+            unkownTag.addUpdateListeners(liveTag.getUpdateListeners());
             liveCache.put(tagId, unkownTag);
           }
         }

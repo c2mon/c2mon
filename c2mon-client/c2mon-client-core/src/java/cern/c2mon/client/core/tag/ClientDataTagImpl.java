@@ -38,8 +38,10 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
+import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTag;
+import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.client.common.util.ConcurrentIdentitySet;
 import cern.c2mon.client.jms.SupervisionListener;
@@ -450,29 +452,53 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
   /**
    * Adds a <code>DataTagUpdateListener</code> to the ClientDataTag and
-   * generates an initial update event for that listener. Any change to the
-   * ClientDataTag value or quality attributes will trigger an update event to
-   * all <code>DataTagUpdateListener</code> objects registered.
+   * generates an initial update event, in case that the initalValue parameter
+   * is not specified (null) or different to the current value.<p>
+   * Any change to the ClientDataTag value or quality attributes will trigger
+   * an update event to all <code>DataTagUpdateListener</code> objects registered.
    *
    * @param listener the DataTagUpdateListener that will receive value updates message for this tag
-   * @param sendInitialValuesToListener if set to <code>true</code>, the listener will receive the
-   *                                    current value of the tag.
+   * @param initialValue In case the user subscribed with a {@link DataTagListener} provide here 
+   *                     the initial value which was sent through {@link DataTagListener#onInitialUpdate(Collection)}
+   *                     method. Otherwise, pass {@code null} as parameter, if the initial update shall be sent via the
+   *                     {@link DataTagUpdateListener#onUpdate(ClientDataTagValue)}
    * @see #removeUpdateListener(DataTagUpdateListener)
    */
-  public void addUpdateListener(final DataTagUpdateListener listener, final boolean sendInitialValuesToListener) {
+  public void addUpdateListener(final DataTagUpdateListener listener, final ClientDataTagValue initialValue) {
     if (LOG.isTraceEnabled()) {
       LOG.trace("addUpdateListener() called.");
     }
     listeners.add(listener);
 
-    if (sendInitialValuesToListener) {
-      try {
-        listener.onUpdate(this.clone());
-      } catch (CloneNotSupportedException cloneException) {
-        LOG.fatal("addUpdateListener() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
-        throw new RuntimeException(cloneException);
+    updateTagLock.readLock().lock();
+    try {
+      boolean sendInitialUpdate = !TagComparator.compare(this, initialValue);
+      
+      if (sendInitialUpdate) {
+        try {
+          listener.onUpdate(this.clone());
+        } catch (CloneNotSupportedException cloneException) {
+          LOG.fatal("addUpdateListener() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
+          throw new RuntimeException(cloneException);
+        }
       }
     }
+    finally {
+      updateTagLock.readLock().unlock();
+    }
+  }
+  
+  /**
+   * Adds a <code>DataTagUpdateListener</code> to the ClientDataTag and
+   * generates an initial update event for that listener. Any change to the
+   * ClientDataTag value or quality attributes will trigger an update event to
+   * all <code>DataTagUpdateListener</code> objects registered.
+   *
+   * @param listener the DataTagUpdateListener that will receive value updates message for this tag
+   * @see #removeUpdateListener(DataTagUpdateListener)
+   */
+  public void addUpdateListener(final DataTagUpdateListener listener) {
+    addUpdateListener(listener, null);
   }
 
   /**
@@ -486,9 +512,9 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    *                                    current value of the tag.
    * @see #removeUpdateListener(DataTagUpdateListener)
    */
-  public void addUpdateListeners(final Collection<DataTagUpdateListener> listeners, final boolean sendInitialValuesToListener) {
+  public void addUpdateListeners(final Collection<DataTagUpdateListener> listeners) {
     for (DataTagUpdateListener listener : listeners) {
-      addUpdateListener(listener, sendInitialValuesToListener);
+      addUpdateListener(listener);
     }
   }
 
