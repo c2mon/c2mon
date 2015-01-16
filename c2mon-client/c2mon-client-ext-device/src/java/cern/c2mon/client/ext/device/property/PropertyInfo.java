@@ -62,9 +62,49 @@ public class PropertyInfo {
   /**
    * Retrieve the name of the nested field within the mapped property.
    *
-   * @return the field name
+   * @return the field name, or {@code null}, if the property has no fields defined.
    */
   public String getFieldName() {
     return fieldName;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fieldName == null) ? 0 : fieldName.hashCode());
+    result = prime * result + ((propertyName == null) ? 0 : propertyName.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof PropertyInfo)) {
+      return false;
+    }
+    PropertyInfo other = (PropertyInfo) obj;
+    if (fieldName == null) {
+      if (other.fieldName != null) {
+        return false;
+      }
+    }
+    else if (!fieldName.equals(other.fieldName)) {
+      return false;
+    }
+    if (propertyName == null) {
+      if (other.propertyName != null) {
+        return false;
+      }
+    }
+    else if (!propertyName.equals(other.propertyName)) {
+      return false;
+    }
+    return true;
   }
 }
