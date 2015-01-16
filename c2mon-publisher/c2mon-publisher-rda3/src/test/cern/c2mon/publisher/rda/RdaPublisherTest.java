@@ -27,6 +27,9 @@ public class RdaPublisherTest {
     /** If an error occurred */
     private volatile boolean error = false;
 
+    /** if first update was received **/
+    private volatile boolean firstUpdateFlag = false;
+
     @Before
     public void beforeTest() {
         System.setProperty("app.name", "TIM-RDA-SERVER-TEST");
@@ -71,6 +74,9 @@ public class RdaPublisherTest {
                     if (id != 161027) {
                         subscriptionTestOK = false;
                         error = true;
+                        if (updateType == UpdateType.UT_FIRST_UPDATE) {
+                            firstUpdateFlag = true;
+                        }
                     } else {
                         subscriptionTestOK = true;
                     }
@@ -96,5 +102,6 @@ public class RdaPublisherTest {
 
         assertTrue(subscriptionTestOK);
         assertFalse("A RDA3 subscription error occured", error);
+        assertFalse("First update was NOT received but was expected", firstUpdateFlag);
     }
 }
