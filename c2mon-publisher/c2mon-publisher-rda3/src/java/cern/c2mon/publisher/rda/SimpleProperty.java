@@ -115,7 +115,10 @@ final class SimpleProperty implements DataTagUpdateListener {
         Data newValue = pack(cdt);
         LOG.debug("Value update received for RDA property {} : {}", rdaPropertyName, newValue);
 
-        subscriptionSource.notify(new AcquiredData(newValue));
+        // check, because there might not be any RDA3 clients subscribed yet
+        if (subscriptionSource != null) {
+            subscriptionSource.notify(new AcquiredData(newValue));
+        }
         currentValue = newValue;
     }
 
