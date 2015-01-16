@@ -1,157 +1,135 @@
 /**
- * Copyright (c) 2014 European Organisation for Nuclear Research (CERN), All Rights Reserved.
+ * Copyright (c) 2015 European Organisation for Nuclear Research (CERN), All Rights Reserved.
  */
 package cern.c2mon.publisher.rda;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cern.c2mon.client.common.listener.DataTagUpdateListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
-
-/*
-import cern.cmw.BadParameter;
-import cern.cmw.Data;
-import cern.cmw.IOError;
-import cern.cmw.rda.server.DeviceServerBase;
-import cern.cmw.rda.server.IOPoint;
-import cern.cmw.rda.server.ValueChangeListener;
-*/
+import cern.cmw.data.Data;
+import cern.cmw.data.DataFactory;
+import cern.cmw.rda3.common.data.AcquiredData;
+import cern.cmw.rda3.common.exception.ServerException;
+import cern.cmw.rda3.server.core.SetRequest;
+import cern.cmw.rda3.server.subscription.SubscriptionSource;
 
 /**
- * This class represents a RDA property. For each tag which is published
- * via RDA an instance of this class is created. It handles the registration
- * of the listeners and is responsible of notifiying all subscribers about
- * value updates.
+ * This class represents a RDA3 property. For each tag which is published via RDA3 an instance of this class is created.
+ * It is responsible of notifying all subscribers about value updates.
  *
- * @author Matthias Braeger
+ * @author Matthias Braeger, Wojtek Buczak (refactoring for RDA3)
  */
 final class SimpleProperty implements DataTagUpdateListener {
-  
-  /** Log4j logger instance */
-  private static final Logger LOG = Logger.getLogger(SimpleProperty.class);
-  
-  /** The current tag value of the device */
-  //private Data currentValue = null;
 
-  /** List of registered listeners which are interested in this value */
-  //private final List<ValueChangeListener> listeners;
-  
-  /** The RDA property name for which this class has been instanciated for */
-  private final String rdaPropertyName;
+    /** Log4j logger instance */
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleProperty.class);
 
-  /**
-   * Default Constructor
-   */
-  SimpleProperty(final String pRdaPropertyName) {
-    this.rdaPropertyName = pRdaPropertyName;
-    //listeners = Collections.synchronizedList(new ArrayList<ValueChangeListener>());
-  }
+    /** The current tag value of the device */
+    private Data currentValue = null;
 
-  /**
-   * @see DeviceServerBase#get(IOPoint, Data)
-   */
-//  synchronized Data get(final IOPoint iop, final Data context) throws BadParameter, IOError {
-//    if (currentValue == null) {
-//      throw new IOError("C2MON-RDA", 0, "Data is uninitialized");
-//    }
-//    return currentValue;
-//  }
+    /** a subscription source reference **/
+    private SubscriptionSource subscriptionSource;
 
-  /**
-   * @see DeviceServerBase#set(IOPoint, Data, Data)
-   */
-//  synchronized void set(final IOPoint iop, final Data value, final Data context) throws BadParameter, IOError {
-//    throw new IOError("C2MON-RDA", 0, "SET is not supported by the server");
-//  }
+    /** The RDA property name for which this class has been instanciated for */
+    private final String rdaPropertyName;
 
-  /**
-   * @see DeviceServerBase#monitorOn(IOPoint, ValueChangeListener)
-   */
-//  synchronized void monitorOn(final IOPoint iop, final ValueChangeListener listener) throws BadParameter {
-//    listeners.add(listener);
-//    listener.valueUpdated(null, currentValue, (currentValue != null));
-//  }
+    /**
+     * Default Constructor
+     */
+    SimpleProperty(final String pRdaPropertyName) {
+        this.rdaPropertyName = pRdaPropertyName;
+    }
 
-  /**
-   * @see DeviceServerBase#monitorOff(IOPoint, ValueChangeListener)
-   */
-//  synchronized void monitorOff(final IOPoint iop, final ValueChangeListener listener) {
-//    listeners.remove(listener);
-//  }
+    synchronized Data get() {
+        return currentValue;
+    }
 
-  /**
-   * Creates a CMW Data object of the {@link ClientDataTagValue} object
-   * @param cdt The {@link ClientDataTagValue} object that shall be packed as CMW Data
-   * @return The representation of the {@link ClientDataTagValue} object
-   */
-//  private static Data pack(final ClientDataTagValue cdt) {
-//    Data data = new Data();
-//    
-//    switch (cdt.getTypeNumeric()) {
-//      case TYPE_BOOLEAN: 
-//        data.insert((Boolean) cdt.getValue());
-//        break;
-//      case TYPE_BYTE:
-//        data.insert((Byte) cdt.getValue());
-//        break;
-//      case TYPE_DOUBLE:
-//        data.insert((Double) cdt.getValue());
-//        break;
-//      case TYPE_FLOAT:
-//        data.insert((Float) cdt.getValue());
-//        break;
-//      case TYPE_INTEGER:
-//        data.insert((Integer) cdt.getValue());
-//        break;
-//      case TYPE_LONG:
-//        data.insert((Long) cdt.getValue());
-//        break;
-//      case TYPE_SHORT:
-//        data.insert((Short) cdt.getValue());
-//        break;
-//      case TYPE_STRING:
-//        data.insert((String) cdt.getValue());
-//        break;
-//      default:
-//        LOG.warn("The data value of tag " + cdt.getId() + " is uninitialized");
-//        return null;
-//    }
-//    
-//    data.insert("id", cdt.getId());
-//    data.insert("valid", cdt.isValid());
-//    data.insert("simulated", cdt.isSimulated());
-//    data.insert("valueDescription", cdt.getValueDescription());
-//    data.insert("description", cdt.getDescription());
-//    data.insert("unit", cdt.getUnit());
-//    data.insert("quality", cdt.getDataTagQuality().toString());
-//    data.insert("qualityDescription", cdt.getDataTagQuality().getDescription());
-//    data.insert("name", cdt.getName());
-//    data.insert("mode", cdt.getMode().toString());
-//    data.insert("timestamp", Long.valueOf(cdt.getServerTimestamp().getTime()).doubleValue());
-//    data.insert("sourceTimestamp", cdt.getTimestamp().getTime());
-//    return data;
-//  }
+    /**
+     * @throws ServerException
+     */
+    synchronized void set(final SetRequest request) throws ServerException {
+        throw new ServerException("SET is not supported by the server");
+    }
 
-  /**
-   * Generates a new {@link Data} object from the received tag update and
-   * propagates it to all the listeners.
-   */
-  @Override
-  public synchronized void onUpdate(final ClientDataTagValue cdt) {
-//    Data newValue = pack(cdt);
-//    if (LOG.isDebugEnabled()) {
-//      LOG.debug("Value update received for RDA property " + rdaPropertyName + " : " + newValue);
-//    }
-//    
-//    synchronized (listeners) {
-//      for (ValueChangeListener l : listeners) {
-//        l.valueUpdated(currentValue, newValue, true);
-//      }
-//    }
-//    currentValue = newValue;
-  }
+    /**
+     * Creates a CMW Data object of the {@link ClientDataTagValue} object
+     * 
+     * @param cdt The {@link ClientDataTagValue} object that shall be packed as CMW Data
+     * @return The representation of the {@link ClientDataTagValue} object
+     */
+    private static Data pack(final ClientDataTagValue cdt) {
+        Data data = DataFactory.createData();
+
+        switch (cdt.getTypeNumeric()) {
+        case TYPE_BOOLEAN:
+            data.append("value", (Boolean) cdt.getValue());
+            break;
+        case TYPE_BYTE:
+            data.append("value", (Byte) cdt.getValue());
+            break;
+        case TYPE_DOUBLE:
+            data.append("value", (Double) cdt.getValue());
+            break;
+        case TYPE_FLOAT:
+            data.append("value", (Float) cdt.getValue());
+            break;
+        case TYPE_INTEGER:
+            data.append("value", (Integer) cdt.getValue());
+            break;
+        case TYPE_LONG:
+            data.append("value", (Long) cdt.getValue());
+            break;
+        case TYPE_SHORT:
+            data.append("value", (Short) cdt.getValue());
+            break;
+        case TYPE_STRING:
+            data.append("value", (String) cdt.getValue());
+            break;
+        default:
+            LOG.warn("The data value of tag " + cdt.getId() + " is uninitialized");
+            return null;
+        }
+
+        data.append("id", cdt.getId());
+        data.append("valid", cdt.isValid());
+        data.append("simulated", cdt.isSimulated());
+        data.append("valueDescription", cdt.getValueDescription());
+        data.append("description", cdt.getDescription());
+        data.append("unit", cdt.getUnit());
+        data.append("quality", cdt.getDataTagQuality().toString());
+        data.append("qualityDescription", cdt.getDataTagQuality().getDescription());
+        data.append("name", cdt.getName());
+        data.append("mode", cdt.getMode().toString());
+        data.append("timestamp", Long.valueOf(cdt.getServerTimestamp().getTime()).doubleValue());
+        data.append("sourceTimestamp", cdt.getTimestamp().getTime());
+        return data;
+    }
+
+    /**
+     * Generates a new {@link Data} object from the received tag update and propagates it to all the listeners.
+     */
+    @Override
+    public synchronized void onUpdate(final ClientDataTagValue cdt) {
+        Data newValue = pack(cdt);
+        LOG.debug("Value update received for RDA property {} : {}", rdaPropertyName, newValue);
+
+        subscriptionSource.notify(new AcquiredData(newValue));
+        currentValue = newValue;
+    }
+
+    /**
+     * @param subscription
+     */
+    public synchronized void setSubscriptionSource(SubscriptionSource subscription) {
+        this.subscriptionSource = subscription;
+    }
+
+    /**
+     * @param subscription
+     */
+    public synchronized void removeSubscriptionSource() {
+        this.subscriptionSource = null;
+    }
 }

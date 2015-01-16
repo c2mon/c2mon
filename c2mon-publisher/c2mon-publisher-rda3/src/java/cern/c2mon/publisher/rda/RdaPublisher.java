@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2014 European Organisation for Nuclear Research (CERN), All Rights Reserved.
+ * Copyright (c) 2015 European Organisation for Nuclear Research (CERN), All Rights Reserved.
  */
 package cern.c2mon.publisher.rda;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
@@ -18,10 +18,9 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.publisher.Publisher;
 import cern.c2mon.publisher.core.Gateway;
 import cern.c2mon.shared.client.tag.TagConfig;
-import cern.cmw.data.Data;
-import cern.cmw.data.DataFactory;
 import cern.cmw.rda3.common.data.AcquiredData;
 import cern.cmw.rda3.common.exception.RdaException;
+import cern.cmw.rda3.common.exception.ServerException;
 import cern.cmw.rda3.common.request.Request;
 import cern.cmw.rda3.server.core.GetRequest;
 import cern.cmw.rda3.server.core.RequestReplyCallback;
@@ -33,17 +32,12 @@ import cern.cmw.rda3.server.subscription.SubscriptionCreator;
 import cern.cmw.rda3.server.subscription.SubscriptionRequest;
 import cern.cmw.rda3.server.subscription.SubscriptionSource;
 
-/*
- * import cern.cmw.BadParameter; import cern.cmw.Data; import cern.cmw.IOError; import cern.cmw.InternalException;
- * import cern.cmw.rda.demo.SimpleServer; import cern.cmw.rda.server.DeviceServerBase; import
- * cern.cmw.rda.server.IOPoint; import cern.cmw.rda.server.ValueChangeListener;
- */
-
 /**
  * This class is based on the {@link SimpleServer} that is provided with the RDA package. It creates and registeres a
- * new RDA server and is able to publish data tags as RDA data. The property name corresponds the name of the data tag.
+ * new RDA3 server and is able to publish data tags as RDA3 data. The property name corresponds the name of the data
+ * tag.
  *
- * @author Matthias Braeger
+ * @author Matthias Braeger, Wojtek Buczak (refactoring for RDA3)
  */
 @Service
 public final class RdaPublisher implements Publisher {
@@ -55,7 +49,7 @@ public final class RdaPublisher implements Publisher {
      * Maps the RDA3 properties to the tag names. For each tag subscription there is exactly one entry registered in
      * this map.
      */
-    private final Map<String, SimpleProperty> properties = new HashMap<String, SimpleProperty>();
+    private static final Map<String, SimpleProperty> properties = new ConcurrentHashMap<String, SimpleProperty>();
 
     private final Server server;
     private Thread srvThread;
@@ -102,99 +96,85 @@ public final class RdaPublisher implements Publisher {
      * Private method to find a property by its property name
      * 
      * @param name The name of the device which corresponds to the data tag name
-     * @return A reference to the device
-     * @throws BadParameter In case the device is not known.
+     * @return A reference to the device or null if not found
      */
-    private SimpleProperty findProperty(final String name) /* throws BadParameter */{
-        SimpleProperty property = properties.get(name);
-        if (property == null) {
-            // throw new BadParameter("Property '" + name + "' not found");
-        }
-        return property;
+    private static SimpleProperty findProperty(final String name) {
+        return properties.get(name);
     }
 
     private static class RRCallback implements RequestReplyCallback {
 
         @Override
         public void get(GetRequest request) {
-            Data data = DataFactory.createData();
-            data.append("value", "Get from RDA3 Java server");
-            request.requestCompleted(new AcquiredData(data));
-        }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("GET - {}", request.getPropertyName());
+            }
+            SimpleProperty property = findProperty(request.getPropertyName());
 
-        // @Override
-        // public Data get(final IOPoint iop, final Data context) throws BadParameter, IOError {
-        // if (LOG.isDebugEnabled()) {
-        // LOG.debug("GET - " + iop.getDeviceName() + "/" + iop.getPropertyName());
-        // }
-        // SimpleProperty property = findProperty(iop.getPropertyName());
-        // return property.get(iop, context);
-        // }
+            if (null == property) {
+                request.requestFailed(new ServerException("Property '" + request.getPropertyName() + "' not found"));
+            } else {
+                request.requestCompleted(new AcquiredData(property.get()));
+            }
+        }
 
         @Override
         public void set(SetRequest request) {
-            System.out.println("New SET: " + request.getAPName());
-            System.out.println("New SET context: " + request.getContext());
-            System.out.println("New SET data: " + request.getData());
 
-            request.requestCompleted();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("SET - {}", request.getPropertyName());
+            }
+            SimpleProperty property = findProperty(request.getPropertyName());
+
+            if (null == property) {
+                request.requestFailed(new ServerException("Property '" + request.getPropertyName() + "' not found"));
+            } else {
+
+                try {
+                    property.set(request);
+                } catch (ServerException e) {
+                    request.requestFailed(e);
+                }
+
+                request.requestCompleted();
+            }
         }
-
-        // @Override
-        // public void set(final IOPoint iop, final Data value, final Data context) throws BadParameter, IOError {
-        // if (LOG.isDebugEnabled()) {
-        // LOG.debug("SET - " + iop.getDeviceName() + "/" + iop.getPropertyName());
-        // }
-        // SimpleProperty property = findProperty(iop.getPropertyName());
-        // property.set(iop, value, context);
-        // }
 
     }
 
     private static class SubCallback implements SubscriptionCallback {
+
         @Override
         public void subscribe(SubscriptionRequest request) {
-            System.out.println("subscribe: " + request.getId());
+            SimpleProperty property = findProperty(request.getPropertyName());
+
+            LOG.debug("subscribe: {}", request.getId());
 
             SubscriptionCreator creator = request.accept();
 
-            Data data = DataFactory.createData();
-            data.append("field", "First update from RDA3 Java server");
-            creator.firstUpdate(new AcquiredData(data));
+            creator.firstUpdate(new AcquiredData(property.get()));
 
             creator.startPublishing();
         }
-
-        // @Override
-        // public void monitorOn(final IOPoint iop, final ValueChangeListener listener) throws BadParameter {
-        // SimpleProperty property = findProperty(iop.getPropertyName());
-        // property.monitorOn(iop, listener);
-        // }
 
         @Override
         public void unsubscribe(Request request) {
             System.out.println("unsubscribed: " + request.getHeader().getId());
         }
 
-        // @Override
-        // public void monitorOff(final IOPoint iop, final ValueChangeListener listener) {
-        // try {
-        // SimpleProperty property = findProperty(iop.getPropertyName());
-        // property.monitorOff(iop, listener);
-        // }
-        // catch (Exception ex) {
-        // ex.printStackTrace();
-        // }
-        // }
-
         @Override
         public void subscriptionSourceAdded(SubscriptionSource subscription) {
-            System.out.println("subscriptionSourceAdded: " + subscription.getId());
+            LOG.debug("subscriptionSourceAdded: {}", subscription.getId());
+
+            SimpleProperty property = findProperty(subscription.getPropertyName());
+            property.setSubscriptionSource(subscription);
         }
 
         @Override
         public void subscriptionSourceRemoved(SubscriptionSource subscription) {
-            System.out.println("subscriptionSourceRemoved: " + subscription.getId());
+            LOG.debug("subscriptionSourceRemoved: {}", subscription.getId());
+            SimpleProperty property = findProperty(subscription.getPropertyName());
+            property.removeSubscriptionSource();
         }
     }
 
@@ -241,8 +221,7 @@ public final class RdaPublisher implements Publisher {
     private static String getRdaProperty(final String japcPublication) throws IllegalArgumentException {
         if (japcPublication == null || japcPublication.equalsIgnoreCase("") || !japcPublication.contains("/")
                 || japcPublication.split("/").length != 2) {
-            throw new IllegalArgumentException(
-                    "JAPC publication address has wrong format! Expected <device>/<property>");
+            throw new IllegalArgumentException("Publication address has wrong format! Expected <device>/<property>");
         }
 
         return japcPublication.split("/")[1];
