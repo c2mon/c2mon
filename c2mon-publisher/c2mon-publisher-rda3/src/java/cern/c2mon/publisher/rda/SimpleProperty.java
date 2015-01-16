@@ -32,7 +32,7 @@ final class SimpleProperty implements DataTagUpdateListener {
     /** a subscription source reference **/
     private SubscriptionSource subscriptionSource;
 
-    /** The RDA property name for which this class has been instanciated for */
+    /** The RDA property name for which this class has been instantiated for */
     private final String rdaPropertyName;
 
     /**
