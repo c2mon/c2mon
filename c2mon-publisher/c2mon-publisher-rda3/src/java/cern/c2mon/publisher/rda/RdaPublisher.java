@@ -33,7 +33,7 @@ import cern.cmw.rda3.server.subscription.SubscriptionRequest;
 import cern.cmw.rda3.server.subscription.SubscriptionSource;
 
 /**
- * This class is based on the {@link SimpleServer} that is provided with the RDA package. It creates and registeres a
+ * This class is based on the SimpleServer that is provided with the RDA package. It creates and registeres a
  * new RDA3 server and is able to publish data tags as RDA3 data. The property name corresponds the name of the data
  * tag.
  *
