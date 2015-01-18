@@ -37,8 +37,8 @@ public class RdaPublisherTest {
         System.setProperty("c2mon.client.conf.url", "http://timweb/conf/c2mon-client.properties");
         System.setProperty("log4j.configuration", "cern/c2mon/publisher/rda/log4j.xml");
         System.setProperty("c2mon.publisher.tid.location", "src/test/cern/c2mon/publisher/rda/test.tid");
-        System.setProperty("c2mon.publisher.rda.server.name", "TIM-RDA-SERVER-TEST");
-        System.setProperty("c2mon.publisher.rda.device.name", "TIM.RDA.DEVICE.TEST");
+        System.setProperty("c2mon.publisher.rda.server.name", "TIM-RDA3-SERVER-TEST");
+        System.setProperty("c2mon.publisher.rda.device.name", "TIM.RDA3.DEVICE.TEST");
     }
 
     /**
@@ -54,8 +54,9 @@ public class RdaPublisherTest {
         try {
 
             client = ClientServiceBuilder.newInstance().build();
+                        
             AccessPoint accessPoint = client.getAccessPoint(System.getProperty("c2mon.publisher.rda.device.name"),
-                    "EY.L04.EMD801_4R:POSITION");
+                    "EY.L04.EMD801_4R:POSITION", System.getProperty("c2mon.publisher.rda.server.name"));
 
             sub = accessPoint.subscribe(new NotificationListener() {
 
