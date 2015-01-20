@@ -1,45 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>cern.c2mon.c2mon-client</groupId>
-		<artifactId>c2mon-client-pom</artifactId>
-		<version>1.1.3</version>
-	</parent>
+  <parent>
+    <groupId>cern.c2mon.c2mon-client</groupId>
+    <artifactId>c2mon-client-pom</artifactId>
+    <version>1.1.3</version>
+  </parent>
 
-	<groupId>cern.c2mon.c2mon-deploy</groupId>
-	<artifactId>c2mon-publisher-rda3-deploy</artifactId>
-	<name>Deploys the RDA3 publisher for C2MON</name>
-	<version>1.0.0-SNAPSHOT</version>
+  <groupId>cern.c2mon.c2mon-deploy</groupId>
+  <artifactId>c2mon-publisher-rda3-deploy</artifactId>
+  <name>Deploys the RDA3 publisher for C2MON</name>
+  <version>1.0.0-SNAPSHOT</version>
 
-	<packaging>pom</packaging>
+  <packaging>pom</packaging>
 
-	<description>
+  <description>
 		C2MON RDA3 publisher assembling all required modules and configuration files
     </description>
-	<url></url>
+  <url></url>
 
-	<developers />
+  <developers />
 
-	<dependencies>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-publisher</groupId>
-			<artifactId>c2mon-publisher-rda3</artifactId>
-			<version>[1.0.0,2.0.0)</version>
-		</dependency>
-	</dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-publisher</groupId>
+      <artifactId>c2mon-publisher-rda3</artifactId>
+      <version>[1.0.0,2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+  </dependencies>
 
-	<modules>
-		<module>modules/tim2</module>
-		<module>modules/dmn2</module>
-	</modules>
+  <modules>
+    <module>modules/tim2</module>
+    <module>modules/dmn2</module>
+  </modules>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-publisher-rda3-deploy</developerConnection>
-	</scm>
-	<build />
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-publisher-rda3-deploy</developerConnection>
+  </scm>
+  <build />
 
 
 
