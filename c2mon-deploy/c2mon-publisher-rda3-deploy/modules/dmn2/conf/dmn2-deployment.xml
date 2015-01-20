@@ -65,7 +65,7 @@
 
             <!-- JVM arguments -->
             <property name="cmw.directory.client.serverList" value="cmw-dir-test:5021" /> <!-- force the rda3 server to bind to the TEST dir service -->
-            <property name="c2mon.publisher.rda.server.name" value="DMN-RDA3-SERVER-TEST" /> <!-- Needed for setting the RDA server name -->            
+            <property name="c2mon.publisher.rda.server.name" value="DMN-RDA3-SERVER" /> <!-- Needed for setting the RDA server name -->            
             <property name="c2mon.publisher.tid.location" value="${INSTALL_DIR}/conf/publisher.tid" />
             <property name="log4j.configuration" value="${INSTALL_DIR}/conf/log4j.xml" />
             <property name="c2mon.log.path" value="${INSTALL_DIR}/log" />
