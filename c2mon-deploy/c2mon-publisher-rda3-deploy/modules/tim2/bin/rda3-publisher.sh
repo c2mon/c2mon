@@ -3,9 +3,9 @@
 # TIM RDA PUBLISHER
 #
 # Author: Matthias Braeger (GS-ASE-SSE)
-# Date:   March 2012
+# Date:   January 2015
 #
-# This script is used to launch the RDA Publisher on a linux
+# This script is used to launch the RDA3 Publisher on a linux
 # server. 
 # Please be aware that this script will NOT run from 
 # everywhere but from the APP_HOME directory.  
@@ -34,11 +34,11 @@ APP_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
 # PROCESS specific variables #
 ##############################
 
-export PROCESS_NAME=rda-publisher
+export PROCESS_NAME=rda3-publisher
 PROCESS_COMMAND=$1
 
 # The script which is actually calling the RDA publisher
-STARTUP_SCRIPT=${APP_HOME}/bin/RDA-PUBLISHER-STARTUP.jvm
+STARTUP_SCRIPT=${APP_HOME}/bin/RDA3-PUBLISHER-STARTUP.jvm
 
 TIME=`date +"%F %T.%3N"`
 
