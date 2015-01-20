@@ -33,5 +33,5 @@ public class ApiVersion {
   /**
    * HTTP header string for version 1.
    */
-  public static final String API_V1 = "application/vnd.c2mon.web.restapi-v1+json";
+  public static final String API_V1 = "application/json; version=c2mon.web.restapi.v1";
 }
