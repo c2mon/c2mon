@@ -189,7 +189,7 @@ public final class RdaPublisher implements Publisher {
     public void onUpdate(final ClientDataTagValue cdt, final TagConfig cdtConfig) {
         // Saves the received value into a separate file
         Logger logger = LoggerFactory.getLogger("ClientDataTagLogger");
-        logger.debug(cdt.toString());
+        logger.debug(cdt);
 
         if (cdt.getDataTagQuality().isExistingTag() && cdtConfig != null) {
             try {
