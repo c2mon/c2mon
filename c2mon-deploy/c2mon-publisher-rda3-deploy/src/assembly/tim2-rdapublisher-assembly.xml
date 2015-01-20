@@ -22,7 +22,7 @@
 
 		<!--  copy the starting script -->
 		<file>
-			<source>${basedir}/bin/rda-publisher.sh</source>
+			<source>${basedir}/bin/rda3-publisher.sh</source>
 			<outputDirectory>bin/</outputDirectory>
 			<destName>rda-publisher.sh</destName>
 			<lineEnding>unix</lineEnding>
