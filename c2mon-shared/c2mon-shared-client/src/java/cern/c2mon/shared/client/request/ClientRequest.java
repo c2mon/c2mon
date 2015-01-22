@@ -63,6 +63,10 @@ public interface ClientRequest {
      */
     APPLY_CONFIGURATION_REQUEST,
     /**
+     * Used to retrieve a Configuration Report from the server.
+     */
+    RETRIEVE_CONFIGURATION_REQUEST,
+    /**
      * Used to request the DAQ XML configuration from the server.
      * The request parameter needs setting to the DAQ name.
      * Only a single XML can be put in a given request.

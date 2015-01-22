@@ -27,7 +27,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.convert.Convert;
+
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
+import cern.c2mon.shared.client.configuration.report.ProcessListConverter;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 
 /**
@@ -38,21 +44,25 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
  * @author Mark Brightwell
  *
  */
+@Root(name="ConfigurationReport")
 public class ConfigurationReport extends ClientRequestReport {
 
   /**
    * The configuration id.
    */
+  @Element
   private long id = -1;
 
   /**
    * The configuration name.
    */
+  @Element
   private String name = null;
 
   /**
    * The user who ran this configuration.
    */
+  @Element(required = false)
   private String user = null;
 
   /**
@@ -60,27 +70,33 @@ public class ConfigurationReport extends ClientRequestReport {
    * to apply it (is a success only if all elements were successfully
    * applied.
    */
+  @Element
   private ConfigConstants.Status status = null;
 
   /**
    * Optional additional description.
    */
+  @Element(name = "status-description")
   private String statusDescription = null;
 
   /**
    * Time the configuration was applied.
    */
+  @Element
   private Timestamp timestamp = null;
 
   /**
    * List of subreports for each element.
    */
+  @ElementList(name = "ConfigurationElementReports")
   private ArrayList<ConfigurationElementReport> elementReports = new ArrayList<ConfigurationElementReport>();
 
   /**
    * A list of the DAQs that need restarting for the configuration to take effect
    * (a single configuration can apply changes across many DAQs).
    */
+  @Element(name = "daq-reboot")
+  @Convert(ProcessListConverter.class)
   private Set<String> processesToReboot = new HashSet<String>();
 
   /**
@@ -241,6 +257,13 @@ public class ConfigurationReport extends ClientRequestReport {
    */
   public void setStatusDescription(final String pStatusDescription) {
     this.statusDescription = pStatusDescription;
+  }
+
+  /**
+   * @return the timestamp
+   */
+  public Timestamp getTimestamp() {
+    return timestamp;
   }
 
   /**

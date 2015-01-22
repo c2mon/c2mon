@@ -11,29 +11,29 @@ public interface TagConfig extends ClientRequestResult{
    * @return the tag identifier
    */
   Long getId();
-  
+
   /**
    * @return The String representation of the <code>RuleExpression</code> object
    * or <code>null</code>, if the tag does not represent a rule.
    */
   String getRuleExpression();
-  
+
   /**
    * @return collection of ids of Rules using this Tag
    */
   Collection<Long> getRuleIds();
-  
+
   /**
    * The topic name on which these updates are expected.
-   * 
+   *
    * @return the JMS topic name as String
    */
   String getTopicName();
-  
+
   /**
    * @return true if the Tag is a control tag
    */
-  Boolean isControlTag();
+  boolean isControlTag();
 
   /**
    * @return min value this Tag can take
@@ -44,12 +44,12 @@ public interface TagConfig extends ClientRequestResult{
    * @return max value this Tag can take
    */
   String getMaxValue();
-  
+
   /**
    * @return DIP publication topic
    */
   String getDipPublication();
-  
+
   /**
    * @return JAPC publication topic
    */
@@ -110,5 +110,5 @@ public interface TagConfig extends ClientRequestResult{
   /**
    * @return true if this Tag is logged to the STL
    */
-  Boolean isLogged();
+  boolean isLogged();
 }

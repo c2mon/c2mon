@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2011 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration;
@@ -22,51 +22,62 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 
 /**
  * A report with details of the success/failure of applying
  * a single {@link ConfigurationElement} or changes triggered
- * by a parent ConfigurationElement. 
- * 
+ * by a parent ConfigurationElement.
+ *
  * @author Mark Brightwell
  *
  */
+@Root(name = "ConfigurationElementReport")
 public class ConfigurationElementReport {
 
   /**
    * The action of the {@link ConfigurationElement}.
    */
+  @Element
   private ConfigConstants.Action action = null;
-  
+
   /**
    * The entity reconfigured.
    */
+  @Element
   private ConfigConstants.Entity entity = null;
-  
+
   /**
    * The id of the entity being reconfigured.
    */
+  @Element
   private Long id = null;
-  
+
   /**
-   * The status set during reconfiguration (success, failure, ...) 
+   * The status set during reconfiguration (success, failure, ...)
    */
+  @Element
   private ConfigConstants.Status status = null;
 
   /**
    * Additional status textual information.
    */
+  @Element(name = "status-message", required = false)
   private String statusMessage = null;
-  
+
   /**
    * A list of subreports if this {@link ConfigurationElement}
    * triggered other changes (not associated to a ConfigurationElement
    * themselves).
    */
+  @ElementList(name = "sub-reports", required = false)
   private ArrayList<ConfigurationElementReport> subreports = new ArrayList<ConfigurationElementReport>();
 
- 
+
   /**
    * Constructor for a ConfigurationReport representing a successful operation.
    * @param pAction ConfigurationAction.CREATE, ConfigurationAction.REMOVE or ConfigurationAction.UPDATE
@@ -76,7 +87,7 @@ public class ConfigurationElementReport {
   public ConfigurationElementReport(final ConfigConstants.Action pAction, final ConfigConstants.Entity pEntity, final Long pId) {
     this(pAction, pEntity, pId, ConfigConstants.Status.OK, null);
   }
-  
+
   /**
    * Constructor for a ConfigurationReport representing a FAILED operation.
    * @param pAction ConfigurationAction.CREATE, ConfigurationAction.REMOVE or ConfigurationAction.UPDATE
@@ -92,7 +103,13 @@ public class ConfigurationElementReport {
     this.status = pStatus;
     this.statusMessage = pStatusMessage;
   }
-  
+
+  /**
+   * No-arg constructor, needed for XML deserialisation
+   */
+  public ConfigurationElementReport() {
+  }
+
   /**
    * Check whether the configuration operation was successful or not.
    * @return true if the configuration operation was successful.
@@ -100,7 +117,7 @@ public class ConfigurationElementReport {
   public boolean isSuccess() {
     return this.status != null && this.status.equals(ConfigConstants.Status.OK);
   }
-  
+
   /**
    * Returns true if the status of the report is RESTART.
    * @return true if reboot required
@@ -108,7 +125,7 @@ public class ConfigurationElementReport {
   public boolean requiresReboot() {
     return this.status != null && this.status.equals(ConfigConstants.Status.RESTART);
   }
-  
+
   /**
    * Returns true if an error occurred during the configuration
    * (should not be used if the system recognises that a DAQ
@@ -118,7 +135,14 @@ public class ConfigurationElementReport {
   public boolean isFailure() {
     return this.status != null && this.status.equals(ConfigConstants.Status.FAILURE);
   }
-  
+
+  /**
+   * @return the status
+   */
+  public ConfigConstants.Status getStatus() {
+    return status;
+  }
+
   /**
    * Get a message describing why the configuration operation failed.
    * This method will return null if the configuration exception was successful.
@@ -127,7 +151,7 @@ public class ConfigurationElementReport {
   public String getStatusMessage() {
     return this.statusMessage;
   }
-  
+
  /**
   * XML representation of the report, used for sending and displaying
   * in a browser.
@@ -144,7 +168,7 @@ public class ConfigurationElementReport {
     str.append("    <entity>");
     str.append(this.entity);
     str.append("</entity>\n");
-    
+
     str.append("    <id>");
     str.append(this.id);
     str.append("</id>\n");
@@ -152,13 +176,13 @@ public class ConfigurationElementReport {
     str.append("    <status>");
     str.append(this.status);
     str.append("</status>\n");
-    
+
     if (this.statusMessage != null) {
       str.append("    <status-message><![CDATA[");
       str.append(this.statusMessage);
       str.append("]]></status-message>\n");
     }
-    
+
     int numSubReports = this.subreports.size();
     if (numSubReports > 0) {
       str.append("<sub-reports>\n");
@@ -167,11 +191,11 @@ public class ConfigurationElementReport {
       }
       str.append("</sub-reports>\n");
     }
-  
+
     str.append("  </ConfigurationElementReport>\n");
     return str.toString();
   }
-  
+
   /**
    * Sets a message with a warning status flag.
    * @param pWarningMessage the message
@@ -192,7 +216,7 @@ public class ConfigurationElementReport {
       statusMessage = statusMessage + "; " + pFailureMessage;
     } else {
       this.statusMessage = pFailureMessage;
-    }    
+    }
   }
 
   /**
@@ -208,7 +232,7 @@ public class ConfigurationElementReport {
   }
 
   /**
-   * Adds the exception trace to the status message. 
+   * Adds the exception trace to the status message.
    * @param e the Exception
    */
   public void setExceptionTrace(final Exception e) {
@@ -229,10 +253,11 @@ public class ConfigurationElementReport {
    * Calls toXML().
    * @return an XML description
    */
-  public String toString() {
-    return toXML();
-  }
-  
+//  @Override
+//  public String toString() {
+//    return toXML();
+//  }
+
   /**
    * Adds a report to the list of subreports of this report and adjusts the success flag
    * and message (message is appended).
@@ -277,17 +302,17 @@ public class ConfigurationElementReport {
    */
   public ArrayList<ConfigurationElementReport> getSubreports() {
     return subreports;
-  }  
-  
+  }
+
   /**
    * For testing only
    * @param args none needed
    */
   public static void main(final String[] args) {
-    ConfigurationElementReport report = 
+    ConfigurationElementReport report =
      new ConfigurationElementReport(
-       ConfigConstants.Action.CREATE, 
-       ConfigConstants.Entity.ALARM, 
+       ConfigConstants.Action.CREATE,
+       ConfigConstants.Entity.ALARM,
        new Long(100000), ConfigConstants.Status.WARNING,
        "DOn't know why"
       );

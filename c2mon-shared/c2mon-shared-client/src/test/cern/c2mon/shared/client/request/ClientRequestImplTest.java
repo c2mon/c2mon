@@ -256,7 +256,7 @@ public class ClientRequestImplTest {
       assertTrue(originalTagConfig.getTimeDeadband() == receivedTagConfig.getTimeDeadband());
       assertTrue(originalTagConfig.getValueDeadband() == receivedTagConfig.getValueDeadband());
 
-      assertTrue(originalTagConfig.isControlTag() .equals(receivedTagConfig.isControlTag()));
+      assertTrue(originalTagConfig.isControlTag() == receivedTagConfig.isControlTag());
       assertTrue(originalTagConfig.isGuaranteedDelivery() == (receivedTagConfig.isGuaranteedDelivery()));
       assertTrue(originalTagConfig.getRuleIds() .equals(receivedTagConfig.getRuleIds()));
       assertTrue(originalTagConfig.getAlarmIds() .equals(receivedTagConfig.getAlarmIds()));

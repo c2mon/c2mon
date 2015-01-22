@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +80,7 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   /**
    * List of rule ids which are using this tag.
    */
-  @ElementList    
+  @ElementList
   private ArrayList<Long> ruleIds = new ArrayList<Long>();
 
   /**
@@ -90,7 +89,7 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   @ElementList
   private ArrayList<Long> alarmIds = new ArrayList<Long>();
 
-  /** In case of a rule tag this field should not be null */ 
+  /** In case of a rule tag this field should not be null */
   @Element(required = false)
   private String ruleExpressionStr;
 
@@ -111,7 +110,7 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   private String maxValue;
 
   /**
-   * String representation of the JMS destination where 
+   * String representation of the JMS destination where
    * <code>TransferTagValue</code> is published on change.
    */
   @Element(required = false)
@@ -272,7 +271,7 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   }
 
   @Override
-  public Boolean isControlTag() {
+  public boolean isControlTag() {
     return controlTag;
   }
 
@@ -303,7 +302,7 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
    * Adds a publication to the transfer object.
    * @param publisher the publisher
    * @param topic the topic the Tag is published on
-   */ 
+   */
   public void addPublication(final Publisher publisher, final String topic) {
     this.publications.put(publisher, topic);
   }
@@ -320,14 +319,14 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
 
   /**
    * @param minValue the minValue to set
-   */  
+   */
   public void setMinValue(String minValue) {
     this.minValue = minValue;
   }
 
   /**
    * @param maxValue the maxValue to set
-   */  
+   */
   public void setMaxValue(String maxValue) {
     this.maxValue = maxValue;
   }
@@ -427,7 +426,7 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
   }
 
   @Override
-  public Boolean isLogged() {
+  public boolean isLogged() {
     return logged;
   }
 
