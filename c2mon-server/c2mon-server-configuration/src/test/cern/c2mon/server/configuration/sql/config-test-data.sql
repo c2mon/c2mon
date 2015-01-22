@@ -78,7 +78,15 @@ insert into timconfig (configid, configname, configdesc, author, configstate, cr
      
 insert into timconfigelt (seqid, configid, modetype, elementtype, elementpkey)
   values (4,4,'UPDATE','DataTag','5000000');
-  
+
+insert into timconfigval (seqid, elementfield, elementvalue) values (4,'name','Config_test_datatag');
+insert into timconfigval (seqid, elementfield, elementvalue) values (4,'description','test description config datatag');
+insert into timconfigval (seqid, elementfield, elementvalue) values (4,'dataType','Float');
+insert into timconfigval (seqid, elementfield, elementvalue) values (4,'mode','2');
+insert into timconfigval (seqid, elementfield, elementvalue) values (4,'isLogged','false');
+insert into timconfigval (seqid, elementfield, elementvalue) values (4,'unit','config unit m/sec');
+insert into timconfigval (seqid, elementfield, elementvalue) values (4,'valueDictionary','20=value_description');
+insert into timconfigval (seqid, elementfield, elementvalue) values (4,'equipmentId','150');
 insert into timconfigval (seqid, elementfield, elementvalue) values (4,'japcAddress','testConfigJAPCaddress2');
 insert into timconfigval (seqid, elementfield, elementvalue) values (4,'dipAddress','null');
 

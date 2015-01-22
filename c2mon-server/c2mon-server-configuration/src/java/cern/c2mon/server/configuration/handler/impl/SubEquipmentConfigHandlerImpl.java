@@ -42,7 +42,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.DataTagRemove;
 
 /**
@@ -139,8 +138,8 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   @Override
   public List<ProcessChange> updateSubEquipment(Long subEquipmentId, Properties elementProperties) throws IllegalAccessException {
     if (elementProperties.containsKey("parent_equip_id")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED,
-          "Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
+      LOGGER.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
+      elementProperties.remove("parent_equip_id");
     }
     return commonUpdate(subEquipmentId, elementProperties);
   }

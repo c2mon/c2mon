@@ -18,14 +18,13 @@ import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.daqcommunication.in.JmsContainerManager;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 
 /**
  * See interface docs.
- * 
+ *
  * @author Mark Brightwell
- * 
+ *
  */
 @Service
 public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
@@ -52,7 +51,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
 
   /**
    * Autowired constructor.
-   * 
+   *
    * @param processFacade the facade bean
    * @param processCache the cache bean
    * @param processDAO the DAO bean
@@ -71,10 +70,10 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
 
   /**
    * Creates the process and inserts it into the cache and DB (DB first).
-   * 
+   *
    * <p>
    * Changing a process id is not currently allowed.
-   * 
+   *
    * @param element
    *          the configuration element
    * @throws IllegalAccessException
@@ -98,7 +97,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
    * No changes to the Process configuration are currently passed to the DAQ
    * layer, but the Configuration object is already build into the logic below
    * (always empty and hence ignored in the {@link ConfigurationLoader}).
-   * 
+   *
    * @param id
    * @param properties
    * @return change requiring DAQ reboot, but not to be sent to the DAQ layer
@@ -109,20 +108,22 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
   @Transactional(value = "cacheTransactionManager")
   public ProcessChange doUpdateProcess(final Long id, final Properties properties) throws IllegalAccessException {
     if (properties.containsKey("id")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, "Attempting to change the process id - this is not currently supported!");
+      LOGGER.warn("Attempting to change the process id - this is not currently supported!");
+      properties.remove("id");
     }
     if (properties.containsKey("name")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, "Attempting to change the process name - this is not currently supported!");
+      LOGGER.warn("Attempting to change the process name - this is not currently supported!");
+      properties.remove("name");
     }
     boolean aliveConfigure = false;
     if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
       aliveConfigure = true;
     }
-    Change processUpdate;    
+    Change processUpdate;
     processCache.acquireWriteLockOnKey(id);
     try {
       Process process = processCache.get(id);
-      try {                
+      try {
         if (aliveConfigure) {
           processFacade.removeAliveTimer(process.getId());
         }
@@ -141,7 +142,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
           processFacade.removeAliveTimer(process.getId());
         }
         throw new UnexpectedRollbackException("Unexpected exception caught while updating a Process configuration.", e);
-      }   
+      }
     } finally {
       if (processCache.isWriteLockedByCurrentThread(id)) {
         processCache.releaseWriteLockOnKey(id);
@@ -160,7 +161,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
   @Override
   public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
     LOGGER.debug("Removing Process Equipments for process " + processId);
-    try {      
+    try {
       processCache.acquireWriteLockOnKey(processId);
       try {
         Process process = processCache.get(processId);

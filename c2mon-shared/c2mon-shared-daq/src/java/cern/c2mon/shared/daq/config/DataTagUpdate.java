@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005 - 2010 CERN This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,29 +12,29 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.shared.daq.config;
 
 /**
  * A datatag update POJO.
- * 
+ *
  * <p>If adding a field to this class, make sure the setter
  * adjusts the isEmpty field.
- * 
+ *
  * @author alang
  *
  */
 @SuppressWarnings("unchecked")
 public class DataTagUpdate extends Change implements ITagChange {
-  
+
     /**
      * Records if this update contains a field to update or not.
      */
-    private transient boolean isEmpty = true;    
+    private transient boolean isEmpty = true;
     /**
-     * The data tag id. 
+     * The data tag id.
      */
     private long dataTagId;
     /**
@@ -65,18 +65,18 @@ public class DataTagUpdate extends Change implements ITagChange {
      * The new max-value of the data tag or null if unchanged.
      */
     private Comparable maxValue;
-    
+
     /**
      * Creates a new data tag update change.
      */
     public DataTagUpdate() {
     }
-    
+
     /**
      * This constructor is a kind copy constructor it may be used from
      * subclasses to create an object of this class for serialization to
      * the DAQ core.
-     * 
+     *
      * @param dataTagUpdate The change object to copy.
      */
     public DataTagUpdate(final DataTagUpdate dataTagUpdate) {
@@ -93,7 +93,7 @@ public class DataTagUpdate extends Change implements ITagChange {
             getFieldsToRemove().add(remove);
         }
     }
-    
+
     /**
      * Creates a new data tag update change.
      * @param changeId The change id of the new change.
@@ -106,7 +106,7 @@ public class DataTagUpdate extends Change implements ITagChange {
         this.dataTagId = dataTagId;
         this.equipmentId = equipmentId;
     }
-    
+
     /**
      * @return the dataTagId
      */
@@ -144,20 +144,20 @@ public class DataTagUpdate extends Change implements ITagChange {
      */
     public void setName(final String name) {
         this.name = name;
-        setEmpty(false);
+        //setEmpty(false);
     }
     /**
      * @return the mode or null if unchanged.
      */
-    public Short getMode() {      
+    public Short getMode() {
         return mode;
     }
     /**
      * @param mode the mode to set
      */
-    public void setMode(final Short mode) {      
+    public void setMode(final Short mode) {
         this.mode = mode;
-        setEmpty(false);
+        //setEmpty(false);
     }
     /**
      * @return the dataType or null if unchanged.
@@ -181,7 +181,7 @@ public class DataTagUpdate extends Change implements ITagChange {
     /**
      * @param minValue the minValue to set
      */
-    public void setMinValue(final Comparable minValue) {     
+    public void setMinValue(final Comparable minValue) {
         this.minValue = minValue;
         setEmpty(false);
     }
@@ -203,6 +203,7 @@ public class DataTagUpdate extends Change implements ITagChange {
      * Sets the equipment id of the data tag.
      * @param equipmentId The equipment id of the data tag.
      */
+    @Override
     public void setEquipmentId(final long equipmentId) {
         this.equipmentId = equipmentId;
     }
@@ -211,6 +212,7 @@ public class DataTagUpdate extends Change implements ITagChange {
      * Returns the equipment id of the data tag.
      * @return The equipment id of the data tag.
      */
+    @Override
     public long getEquipmentId() {
         return equipmentId;
     }
@@ -227,13 +229,13 @@ public class DataTagUpdate extends Change implements ITagChange {
      * Returns true if no fields were set in this update object,
      * in which case the server does not need to send it down to
      * the DAQ.
-     * 
+     *
      * <p>For use on server side.
-     * 
+     *
      * @return true if no fields are set
      */
     public boolean isEmpty() {
       return isEmpty;
     }
-    
+
 }

@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2011 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
@@ -27,6 +27,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.server.cache.AliveTimerCache;
+import cern.c2mon.server.cache.CommFaultTagCache;
+import cern.c2mon.server.cache.EquipmentCache;
+import cern.c2mon.server.cache.EquipmentFacade;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
 import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
@@ -34,45 +40,38 @@ import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.EquipmentConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.c2mon.server.cache.AliveTimerCache;
-import cern.c2mon.server.cache.CommFaultTagCache;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
-import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
 
 /**
  * See interface documentation.
- * 
+ *
  * @author Mark Brightwell
  *
  */
 @Service
 public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<Equipment> implements EquipmentConfigHandler {
-  
+
   private static final Logger LOGGER = Logger.getLogger(EquipmentConfigHandlerImpl.class);
-  
+
   private EquipmentConfigTransacted equipmentConfigTransacted;
-  
+
   private SubEquipmentConfigHandler subEquipmentConfigHandler;
-  
+
   private DataTagConfigHandler dataTagConfigHandler;
-  
+
   private CommandTagConfigHandler commandTagConfigHandler;
-  
+
   private EquipmentFacade equipmentFacade;
-  
-  @Autowired  
+
+  @Autowired
   private ProcessConfigHandler processConfigHandler;
-  
+
   private EquipmentCache equipmentCache;
-  
+
   /**
    * Autowired constructor.
    */
@@ -85,7 +84,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
     this.subEquipmentConfigHandler = subEquipmentConfigHandler;
     this.dataTagConfigHandler = dataTagConfigHandler;
     this.commandTagConfigHandler = commandTagConfigHandler;
-    this.equipmentFacade = equipmentFacade;    
+    this.equipmentFacade = equipmentFacade;
     this.equipmentCache = equipmentCache;
     this.equipmentConfigTransacted = equipmentConfigTransacted;
   }
@@ -93,28 +92,28 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Override
   public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
     LOGGER.debug("Removing Equipment " + equipmentid);
-    try {      
+    try {
       Equipment equipment = equipmentCache.get(equipmentid);
       //WARNING: outside equipment lock, as all these use methods that access a Process (to create ProcessChange object)!
       removeEquipmentTags(equipment, equipmentReport);
       removeEquipmentCommands(equipment, equipmentReport);
-      removeSubEquipments(new ArrayList<Long>(equipment.getSubEquipmentIds()), equipmentReport);      
+      removeSubEquipments(new ArrayList<Long>(equipment.getSubEquipmentIds()), equipmentReport);
       equipmentCache.acquireWriteLockOnKey(equipmentid);
       try {
-        equipmentConfigTransacted.doRemoveEquipment(equipment, equipmentReport);        
+        equipmentConfigTransacted.doRemoveEquipment(equipment, equipmentReport);
         equipmentCache.releaseWriteLockOnKey(equipmentid);
         removeEquipmentControlTags(equipment, equipmentReport); //must be removed last as equipment references them; when this returns are removed from cache and DB permanently
-        //remove alive & commfault after control tags, or could be pulled back in from DB to cache!        
+        //remove alive & commfault after control tags, or could be pulled back in from DB to cache!
         equipmentFacade.removeAliveTimer(equipmentid);
         equipmentFacade.removeCommFault(equipmentid);
         processConfigHandler.removeEquipmentFromProcess(equipmentid, equipment.getProcessId());
         equipmentCache.remove(equipmentid);
         EquipmentUnitRemove equipmentUnitRemove = new EquipmentUnitRemove(0L, equipmentid); //id is reset
-        return new ProcessChange(equipment.getProcessId(), equipmentUnitRemove);        
+        return new ProcessChange(equipment.getProcessId(), equipmentUnitRemove);
       } finally {
         if (equipmentCache.isWriteLockedByCurrentThread(equipmentid))
           equipmentCache.releaseWriteLockOnKey(equipmentid);
-      }      
+      }
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.debug("Equipment not found in cache - unable to remove it.");
       equipmentReport.setWarning("Equipment not found in cache so cannot be removed.");
@@ -132,19 +131,19 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Override
   public List<ProcessChange> updateEquipment(Long equipmentId, Properties elementProperties) throws IllegalAccessException {
     if (elementProperties.containsKey("processId")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED, 
-          "Attempting to change the parent process id of an equipment - this is not currently supported!");
-    }    
+      LOGGER.warn("Attempting to change the parent process id of an equipment - this is not currently supported!");
+      elementProperties.remove("processId");
+    }
     return commonUpdate(equipmentId, elementProperties);
   }
-  
+
   /**
    * Removes the subequipments attached to this equipment.
    * Exceptions are caught, added to the report and thrown
    * up to interrupt the equipment removal.
-   * 
+   *
    *<p>Call within Equipment lock.
-   * 
+   *
    * @param equipment the equipment for which the subequipments should be removed
    * @param equipmentReport the report at the equipment level
    */
@@ -156,41 +155,41 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
         subEquipmentConfigHandler.removeSubEquipment(subEquipmentId, subEquipmentReport);
       } catch (Exception ex) {
         subEquipmentReport.setFailure("Exception caught - aborting removal of subequipment "
-            + subEquipmentId , ex); 
+            + subEquipmentId , ex);
         throw new RuntimeException("Aborting reconfiguration as unable to remove subequipment.", ex);
       }
-      
+
     }
   }
-  
+
   /**
    * Removes the tags for this equipment. The DAQ is not informed as
    * this method is only called when the whole Equipment is removed.
-   * 
+   *
    * <p>Call within equipment lock.
    * @param equipment for which the tags should be removed
    * @throws RuntimeException if fail to remove tag
    */
-  private void removeEquipmentTags(Equipment equipment, ConfigurationElementReport equipmentReport) {   
+  private void removeEquipmentTags(Equipment equipment, ConfigurationElementReport equipmentReport) {
     for (Long dataTagId : new ArrayList<Long>(equipment.getDataTagIds())) { //copy as list is modified by removeDataTag
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       equipmentReport.addSubReport(tagReport);
       dataTagConfigHandler.removeDataTag(dataTagId, tagReport);
-    }   
+    }
   }
-  
+
   /**
    * Removes all command tags associated with this equipment.
    * @param equipment reference
    * @param equipmentReport report to add subreports to
    */
-  private void removeEquipmentCommands(Equipment equipment, ConfigurationElementReport equipmentReport) {   
+  private void removeEquipmentCommands(Equipment equipment, ConfigurationElementReport equipmentReport) {
     for (Long commandTagId : new ArrayList<Long>(equipment.getCommandTagIds())) { //copy as modified when removing command tag
       ConfigurationElementReport commandReport = new ConfigurationElementReport(Action.REMOVE, Entity.COMMANDTAG, commandTagId);
       equipmentReport.addSubReport(commandReport);
-      commandTagConfigHandler.removeCommandTag(commandTagId, commandReport);         
+      commandTagConfigHandler.removeCommandTag(commandTagId, commandReport);
     }
   }
- 
+
 
 }

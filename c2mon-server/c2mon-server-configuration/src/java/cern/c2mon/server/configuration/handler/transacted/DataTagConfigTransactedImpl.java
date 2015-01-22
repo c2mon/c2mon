@@ -28,7 +28,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
@@ -167,10 +166,11 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW) //("cacheTransactionManager")
   public ProcessChange doUpdateDataTag(final Long id, final Properties properties) {
     LOGGER.trace("Updating DataTag " + id);
-    //reject if trying to change equipment it is attached to - not currently allowed
+    // Warn if trying to change equipment it is attached to - not currently allowed
     if (properties.containsKey("equipmentId") || properties.containsKey("subEquipmentId")) {
-      throw new ConfigurationException(ConfigurationException.UNDEFINED,
-          "Attempting to change the equipment/subequipment to which a tag is attached - this is not currently supported!");
+      LOGGER.warn("Attempting to change the equipment/subequipment to which a tag is attached - this is not currently supported!");
+      properties.remove("equipmentId");
+      properties.remove("subEquipmentId");
     }
     Change dataTagUpdate = null;
     tagCache.acquireWriteLockOnKey(id);

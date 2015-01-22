@@ -1,6 +1,7 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Properties;
@@ -21,6 +22,7 @@ import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 
 /**
@@ -33,10 +35,10 @@ public class DataTagConfigTransactedImplTest {
 
   IMocksControl control;
 
-  //class to test
+  // class to test
   private DataTagConfigTransactedImpl dataTagConfigTransacted;
 
-  //mocks
+  // mocks
   private EquipmentFacade equipmentFacade;
   private SubEquipmentFacade subEquipmentFacade;
   private RuleTagConfigHandler ruleTagConfigHandler;
@@ -66,7 +68,7 @@ public class DataTagConfigTransactedImplTest {
     control.reset();
 
     DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag();
-    //mimick the actions of the datatag facade
+    // mimic the actions of the datatag facade
     DataTagUpdate update = new DataTagUpdate();
     update.setDataTagId(dataTag.getId());
     update.setEquipmentId(dataTag.getEquipmentId());
@@ -86,6 +88,7 @@ public class DataTagConfigTransactedImplTest {
 
   /**
    * Tests a non-empty update gets through to DAQ.
+   *
    * @throws IllegalAccessException
    */
   @Test
@@ -93,7 +96,7 @@ public class DataTagConfigTransactedImplTest {
     control.reset();
 
     DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag();
-    //mimick the actions of the datatag facade
+    // mimic the actions of the datatag facade
     DataTagUpdate update = new DataTagUpdate();
     update.setDataTagId(dataTag.getId());
     update.setEquipmentId(dataTag.getEquipmentId());
@@ -101,17 +104,89 @@ public class DataTagConfigTransactedImplTest {
     dataTagCache.acquireWriteLockOnKey(dataTag.getId());
     EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
     EasyMock.expect(dataTagFacade.updateConfig(dataTag, new Properties())).andReturn(update);
-    EasyMock.expect(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId())).andReturn(50L);
     dataTagLoaderDAO.updateConfig(dataTag);
     dataTagCache.releaseWriteLockOnKey(dataTag.getId());
 
     control.replay();
 
     ProcessChange change = dataTagConfigTransacted.doUpdateDataTag(dataTag.getId(), new Properties());
+    assertFalse(change.processActionRequired());
+    assertEquals(null, change.getProcessId());
+
+    control.verify();
+  }
+
+  @Test
+  public void testUpdateDAQRelatedPropertiesOfDataTag() throws IllegalAccessException {
+    control.reset();
+
+    DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag();
+
+    DataTagUpdate update = new DataTagUpdate();
+    update.setDataTagId(dataTag.getId());
+    update.setEquipmentId(dataTag.getEquipmentId());
+    update.setDataTagAddressUpdate(new DataTagAddressUpdate());
+
+    Properties properties = new Properties();
+    properties.put("address", "new address");
+    properties.put("dataType", "new data type");
+    properties.put("minValue", "new min val");
+    properties.put("maxValue", "new max val");
+
+    dataTagCache.acquireWriteLockOnKey(dataTag.getId());
+
+    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
+    EasyMock.expect(dataTagFacade.updateConfig(dataTag, properties)).andReturn(update);
+    EasyMock.expect(equipmentFacade.getProcessIdForAbstractEquipment(dataTag.getEquipmentId())).andReturn(50L);
+
+    dataTagLoaderDAO.updateConfig(dataTag);
+    dataTagCache.releaseWriteLockOnKey(dataTag.getId());
+
+    control.replay();
+
+    ProcessChange change = dataTagConfigTransacted.doUpdateDataTag(dataTag.getId(), properties);
     assertTrue(change.processActionRequired());
     assertEquals(Long.valueOf(50), change.getProcessId());
 
     control.verify();
   }
 
+  @Test
+  public void testUpdateNonDAQRelatedPropertiesOfDataTag() throws IllegalAccessException {
+    control.reset();
+    DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag();
+
+    DataTagUpdate update = new DataTagUpdate();
+    update.setDataTagId(dataTag.getId());
+    update.setEquipmentId(dataTag.getEquipmentId());
+    update.setName("new name");
+
+    // Update all properties that do not require DAQ reconfiguration
+    Properties properties = new Properties();
+    properties.put("id", dataTag.getId());
+    properties.put("name", "new name");
+    properties.put("description", "new description");
+    properties.put("mode", "new mode");
+    properties.put("isLogged", "new logged");
+    properties.put("unit", "new unit");
+    properties.put("equipmentId", dataTag.getEquipmentId());
+    properties.put("valueDictionary", "new dict");
+    properties.put("japcAddress", "new japc address");
+    properties.put("dipAddress", "new dip address");
+
+    dataTagCache.acquireWriteLockOnKey(dataTag.getId());
+
+    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
+    EasyMock.expect(dataTagFacade.updateConfig(dataTag, properties)).andReturn(update);
+
+    dataTagLoaderDAO.updateConfig(dataTag);
+    dataTagCache.releaseWriteLockOnKey(dataTag.getId());
+
+    control.replay();
+
+    ProcessChange change = dataTagConfigTransacted.doUpdateDataTag(dataTag.getId(), properties);
+    assertFalse(change.processActionRequired());
+
+    control.verify();
+  }
 }
