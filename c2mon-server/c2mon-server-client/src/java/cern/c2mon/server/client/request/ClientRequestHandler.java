@@ -232,8 +232,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @return The response that shall be transfered back to the C2MON client
    *         layer
    */
-  private Collection<? extends ClientRequestResult> handleClientRequest(@Valid final ClientRequest clientRequest, final Session session,
-      final Destination replyDestination) {
+  private Collection<? extends ClientRequestResult> handleClientRequest(@Valid final ClientRequest clientRequest,
+                                                                        final Session session,
+                                                                        final Destination replyDestination) {
 
     switch (clientRequest.getRequestType()) {
 
@@ -247,7 +248,12 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       if (LOG.isDebugEnabled()) {
         LOG.debug("handleClientRequest() - Received an APPLY_CONFIGURATION_REQUEST with " + clientRequest.getTagIds().size() + " configurations.");
       }
-      return handleConfigurationReportRequest(clientRequest, session, replyDestination);
+      return handleApplyConfigurationRequest(clientRequest, session, replyDestination);
+    case RETRIEVE_CONFIGURATION_REQUEST:
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("handleClientRequest() - Received a RETRIEVE_CONFIGURATION_REQUEST.");
+      }
+      return handleRetrieveConfigurationsRequest(clientRequest, session, replyDestination);
     case TAG_REQUEST:
       if (LOG.isDebugEnabled()) {
         LOG.debug("handleClientRequest() - Received a TAG_REQUEST for " + clientRequest.getTagIds().size() + " tags.");
@@ -387,8 +393,9 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @return Configuration Report
    */
   @SuppressWarnings("unchecked")
-  private Collection<? extends ClientRequestResult> handleConfigurationReportRequest(final ClientRequest configurationRequest, final Session session,
-      final Destination replyDestination) {
+  private Collection<? extends ClientRequestResult> handleApplyConfigurationRequest(final ClientRequest configurationRequest,
+                                                                                    final Session session,
+                                                                                    final Destination replyDestination) {
 
     // !!! TagId field is also used for Configuration Ids
     final Iterator<Long> iter = configurationRequest.getTagIds().iterator();
@@ -411,6 +418,18 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
       }
     } // end while
     return reports;
+  }
+
+  /**
+   * Inner method which handles a request to retrive configuration reports
+   *
+   * @param configurationRequest The request sent by the client
+   * @return A collection of configuration reports
+   */
+  private Collection<? extends ClientRequestResult> handleRetrieveConfigurationsRequest(final ClientRequest configurationRequest,
+                                                                                       final Session session,
+                                                                                       final Destination replyDestination) {
+    return configurationLoader.getReports();
   }
 
   /**

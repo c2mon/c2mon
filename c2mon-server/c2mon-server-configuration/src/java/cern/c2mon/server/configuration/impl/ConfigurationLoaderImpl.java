@@ -20,14 +20,25 @@ package cern.c2mon.server.configuration.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileWriter;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
+import org.simpleframework.xml.transform.RegistryMatcher;
+import org.simpleframework.xml.transform.Transform;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.cache.ClusterCache;
@@ -539,4 +550,66 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     return applyConfiguration(configId, null);
   }
 
+  @Override
+  public List<ConfigurationReport> getReports() {
+    List<ConfigurationReport> reports = new ArrayList<>();
+
+    // Read all report files and deserialise them
+    try {
+      ArrayList<File> files = new ArrayList<File>(Arrays.asList(new File(reportDirectory).listFiles(new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+          String extension = "";
+          int i = pathname.getName().lastIndexOf('.');
+          if (i > 0) {
+              extension = pathname.getName().substring(i+1);
+          }
+
+          return pathname.getName().startsWith("report_") && extension.equals("xml");
+        }
+      })));
+
+      DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+      RegistryMatcher matcher = new RegistryMatcher();
+      matcher.bind(Timestamp.class, new DateFormatTransformer(format));
+
+      Strategy strategy = new AnnotationStrategy();
+      Serializer serializer = new Persister(strategy, matcher);
+
+      for (File file : files) {
+        ConfigurationReport report = serializer.read(ConfigurationReport.class, file);
+        LOGGER.debug(report);
+        reports.add(report);
+      }
+
+    } catch (Exception e) {
+      LOGGER.error("Error deserialising configuration report", e);
+    }
+
+    return reports;
+  }
+
+  /**
+   * Enables deserialisation of timestamps inside configuration reports.
+   *
+   * @author Justin Lewis Salmon
+   */
+  class DateFormatTransformer implements Transform<Timestamp> {
+    private DateFormat dateFormat;
+
+    public DateFormatTransformer(DateFormat dateFormat) {
+      this.dateFormat = dateFormat;
+    }
+
+    @Override
+    public Timestamp read(String value) throws Exception {
+      return new Timestamp(dateFormat.parse(value).getTime());
+    }
+
+    @Override
+    public String write(Timestamp value) throws Exception {
+      return dateFormat.format(value);
+    }
+
+  }
 }
