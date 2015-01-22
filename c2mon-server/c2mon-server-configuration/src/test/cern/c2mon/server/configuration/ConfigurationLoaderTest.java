@@ -83,6 +83,7 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl;
 import cern.c2mon.server.configuraton.helper.ObjectEqualityComparison;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
 import cern.c2mon.server.test.TestDataInserter;
@@ -92,6 +93,7 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.report.ProcessListConverter;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -973,7 +975,7 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
   @Test
   public void testCreateUpdateSubEquipment() throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParserConfigurationException,
       TransformerException, NoSimpleValueParseException {
-    expect(mockManager.sendConfiguration(EasyMock.anyLong(), EasyMock.<List<Change>> anyObject())).andReturn(new ConfigurationChangeEventReport());
+    expect(mockManager.sendConfiguration(EasyMock.anyLong(), EasyMock.<List<Change>> anyObject())).andReturn(new ConfigurationChangeEventReport()).times(2);
     replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(19);
@@ -1006,15 +1008,9 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
 
-    // update should fail as try to change parent id
-    boolean failed = false;
-    try {
-      report = configurationLoader.applyConfiguration(20);
-    } catch (cern.c2mon.shared.client.configuration.ConfigurationException e) {
-      System.out.println(e.getConfigurationReport());
-      failed = true;
-    }
-    assertFalse(failed);
+    report = configurationLoader.applyConfiguration(20);
+    System.out.println(report.toXML());
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
 
     verify(mockManager);
   }
@@ -1384,5 +1380,39 @@ public class ConfigurationLoaderTest implements ApplicationContextAware {
     public void run() {
       report = configurationLoader.applyConfiguration(2);
     }
+  }
+
+  @Test
+  public void testGetConfigurationReports() {
+    ((ConfigurationLoaderImpl) configurationLoader).setReportDirectory(".");
+    List<ConfigurationReport> reports = configurationLoader.getReports();
+    assertFalse(reports.isEmpty());
+
+    for (ConfigurationReport report : reports) {
+      assertNotNull(report.getName());
+      assertNotNull(report.getId());
+      assertNotNull(report.getStatus());
+      assertNotNull(report.getStatusDescription());
+    }
+  }
+
+  @Test
+  public void testProcessListConverter() {
+    ProcessListConverter converter = new ProcessListConverter();
+
+    String list = "[P_TEST01, P_TEST02]";
+    Set<String> processList = converter.convert(list);
+    assertTrue(processList.size() == 2);
+    assertTrue(processList.contains("P_TEST01"));
+    assertTrue(processList.contains("P_TEST02"));
+
+    list = "[P_TEST01]";
+    processList = converter.convert(list);
+    assertTrue(processList.size() == 1);
+    assertTrue(processList.contains("P_TEST01"));
+
+    list = "[]";
+    processList = converter.convert(list);
+    assertTrue(processList.size() == 0);
   }
 }
