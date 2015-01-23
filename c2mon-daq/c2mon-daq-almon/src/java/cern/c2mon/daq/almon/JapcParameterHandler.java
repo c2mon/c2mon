@@ -70,11 +70,10 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
         this.address = hwAddress;
         this.ems = ems;
         this.amSender = amSender;
-        
+
         // initialize tag
         ems.sendTagFiltered(tag, Boolean.FALSE, System.currentTimeMillis());
     }
-        
 
     /**
      * The startMonitoring() must be called in order for the parameter to get subscribed
@@ -84,7 +83,7 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
 
             // initialize the tag
             this.amSender.terminate(tag, ems, address.getAlarmTriplet(), System.currentTimeMillis());
-            
+
             String deviceName = address.getAlarmTriplet().getFaultMember();
 
             // increment
@@ -103,8 +102,8 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
             if (address.hasCycle()) {
                 selector = ParameterValueFactory.newSelector(address.getCycle());
             }
-            shandle = p.createSubscription(selector, this);            
-            
+            shandle = p.createSubscription(selector, this);
+
             shandle.startMonitoring();
 
         } catch (ParameterException e) {
@@ -128,8 +127,10 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
             this.amSender.terminate(tag, ems, address.getAlarmTriplet(), System.currentTimeMillis());
         }
 
-        shandle.stopMonitoring();
-        shandle = null;
+        if (shandle != null) {
+            shandle.stopMonitoring();
+            shandle = null;
+        }
     }
 
     @Override
@@ -157,8 +158,8 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
 
         } // synchronized
 
-        // invalidate tag        
-        this.ems.sendInvalidTag (this.tag, SourceDataQuality.DATA_UNAVAILABLE, reason);
+        // invalidate tag
+        this.ems.sendInvalidTag(this.tag, SourceDataQuality.DATA_UNAVAILABLE, reason);
     }
 
     /**
