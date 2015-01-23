@@ -24,6 +24,12 @@ body {
 .navbar {
   margin-bottom: 20px;
 }
+
+/* Alter the colour of bootstrap's navbar */
+.navbar-default {
+  background-color: rgb(247, 247, 247);
+}
+
 </style>
 
 </head>
@@ -64,26 +70,8 @@ body {
       </h1>
     </div>
 
-
-
     <div>
       <p>This page documents the C2MON REST API, what it is capable of, and how to use it to integrate C2MON data into web applications.</p>
-
-
-      <div class="alert alert-warning" role="alert">
-        <p>
-          <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-          This documentation is under construction, and may change frequently.
-        </p>
-      </div>
-
-      <!--         <div class="aui-message problem shadowed information-macro">
-          <p class="title">Under Construction</p>
-          <span class="aui-icon icon-problem">Icon</span>
-          <div class="message-content">
-            <p>This documentation is under construction, and may change frequently.</p>
-          </div>
-        </div> -->
 
       <table class="table table-bordered table-condensed">
         <tbody>
@@ -156,6 +144,7 @@ body {
           <strong>Devices</strong> (and their properties/fields)
         </li>
       </ul>
+      
       <h1>Data Format</h1>
       <p>Currently, the API responds in JSON format only. It is lightweight, easy to parse, easy to read and has great support on the web. Support for XML
         responses could be added in the future if the need arises.</p>
@@ -188,7 +177,6 @@ body {
       <p>
         It is possible to retrieve both the<strong> current live value</strong> and <strong>historical values</strong> of data tags.
       </p>
-
       <h2>Accessing Live Values</h2>
       <p>To retrieve live cache values from the server, the URL structure is as described in the following table:</p>
       <table class="table table-bordered">
@@ -316,6 +304,7 @@ body {
         <code>yyyy-MM-dd HH:mm:ss</code>
         <span>&quot;.</span>
       </p>
+      
       <h1>
         <span>API Versioning</span>
       </h1>
@@ -338,6 +327,7 @@ body {
 }
 </pre>
       <p>Error descriptions are generally descriptive enough to allow the client to understand the reason for the failure.</p>
+      
       <h1>Security</h1>
       <p>Currently, the API does not require authentication, as it is not possible to execute commands and also because it is restricted to the TN. However,
         in the future, RBAC authentication may be implemented.</p>
