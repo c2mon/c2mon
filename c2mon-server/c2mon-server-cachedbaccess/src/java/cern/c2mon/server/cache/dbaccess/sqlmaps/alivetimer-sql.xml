@@ -48,6 +48,6 @@
     
     <select id="getNumberItems" resultType="Integer">
       SELECT COUNT(DISTINCT ALIVEID)
-        FROM FROM ALIVETIMER
+        FROM ALIVETIMER
     </select>
   </mapper>
