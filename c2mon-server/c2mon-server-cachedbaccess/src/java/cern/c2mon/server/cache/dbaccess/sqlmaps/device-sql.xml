@@ -143,6 +143,11 @@
     WHERE DEVID = #{id}
   </select>
 
+  <select id="getNumberItems" resultType="Integer">
+    SELECT COUNT(DISTINCT DEVID)
+      FROM DEVICE
+  </select>
+
   <delete id="deleteDevice" parameterType="Long">
     DELETE FROM DEVICE WHERE DEVID = #{id}
   </delete>

@@ -112,5 +112,10 @@
        WHERE EQID = #{id}
          AND E1.EQ_PROCID IS NULL
     </select>
-            
+
+    <select id="getNumberItems" resultType="Integer">
+      SELECT COUNT(*)
+        FROM EQUIPMENT
+       WHERE EQ_PROCID IS NULL
+    </select>
   </mapper>

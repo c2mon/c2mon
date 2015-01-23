@@ -106,5 +106,8 @@
        WHERE cmdid = #{id}
     </select>
     
-                                                                 
+    <select id="getNumberItems" resultType="Integer">
+      SELECT COUNT(DISTINCT CMDID)
+        FROM COMMANDTAG
+    </select>
   </mapper>

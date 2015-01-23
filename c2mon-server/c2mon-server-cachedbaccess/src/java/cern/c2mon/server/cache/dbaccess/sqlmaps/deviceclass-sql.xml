@@ -137,6 +137,11 @@
     WHERE DEVCLASSID = #{id}
   </select>
 
+  <select id="getNumberItems" resultType="Integer">
+    SELECT COUNT(DISTINCT DEVCLASSID)
+      FROM DEVICECLASS
+  </select>
+
   <delete id="deleteDeviceClass" parameterType="Long">
     DELETE FROM DEVICECLASS WHERE DEVCLASSID = #{id}
   </delete>

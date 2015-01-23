@@ -111,5 +111,9 @@
         FROM PROCESS
        WHERE PROCID = #{id}        
     </select>
-            
+
+    <select id="getNumberItems" resultType="Integer">
+      SELECT COUNT(DISTINCT PROCID)
+        FROM PROCESS
+    </select>
   </mapper>

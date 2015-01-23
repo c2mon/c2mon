@@ -32,5 +32,9 @@
         FROM commfaulttag
        WHERE commfaultid = #{id}
     </select>
-            
+
+    <select id="getNumberItems" resultType="Integer">
+      SELECT COUNT(DISTINCT COMMFAULTID)
+        FROM COMMFAULTTAG
+    </select>
   </mapper>

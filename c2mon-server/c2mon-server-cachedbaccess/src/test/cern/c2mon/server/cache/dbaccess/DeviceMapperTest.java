@@ -133,7 +133,7 @@ public class DeviceMapperTest {
     fields.add(new DeviceProperty(2L, "FIELD_RESPONSIBLE_PERSON", "Mr. Administrator", "constantValue", null));
     fields.add(new DeviceProperty(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", "clientRule", "Float"));
     fields.add(new DeviceProperty(4L, "FIELD_NUM_CORES", "2", "constantValue", "Integer"));
-    DeviceProperty dvp5 = new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", fields);
+    DeviceProperty dvp5 = new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", null, fields);
     List<DeviceProperty> properties = new ArrayList<>(Arrays.asList(dvp1, dvp2, dvp3, dvp4, dvp5));
 
     device.setDeviceProperties(properties);
@@ -144,6 +144,8 @@ public class DeviceMapperTest {
     deviceMapper.insertDevice(device);
     for (DeviceProperty property : ((DeviceCacheObject) device).getDeviceProperties()) {
       deviceMapper.insertDeviceProperty(device.getId(), property);
+
+
     }
     for (DeviceCommand command : ((DeviceCacheObject) device).getDeviceCommands()) {
       deviceMapper.insertDeviceCommand(device.getId(), command);
@@ -158,6 +160,12 @@ public class DeviceMapperTest {
 
     for (DeviceProperty property : properties) {
       assertDevicePropertyListContains(propertiesFromDb, property);
+
+      if (property.getFields() != null && !property.getFields().isEmpty()) {
+        for (DeviceProperty field : property.getFields().values()) {
+          assertDevicePropertyListContains(new ArrayList<DeviceProperty>(property.getFields().values()), field);
+        }
+      }
     }
 
     List<DeviceCommand> commands = fromDb.getDeviceCommands();
