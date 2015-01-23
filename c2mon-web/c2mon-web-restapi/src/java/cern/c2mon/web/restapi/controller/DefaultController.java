@@ -34,9 +34,21 @@ import cern.c2mon.web.restapi.exception.UnknownResourceException;
 public class DefaultController {
 
   /**
+   * When a request is made to the API root, show a HTML page with some
+   * documentation about the API.
+   */
+  @RequestMapping("/")
+  public String rootRequest(HttpServletRequest request) {
+    return "root";
+  }
+
+  /**
    * When a request is made to an unmapped URL, simply throw an
    * UnknownResourceException, which will be handled by Spring and converted
    * into a proper JSON error response.
+   *
+   * Requests for static CSS and JavaScript should not be mapped to this
+   * controller. They will be handled be the default servlet handler.
    */
   @RequestMapping("/**")
   public void unmappedRequest(HttpServletRequest request) throws UnknownResourceException {
