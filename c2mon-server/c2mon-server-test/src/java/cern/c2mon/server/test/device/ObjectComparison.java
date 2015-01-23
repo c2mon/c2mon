@@ -37,7 +37,7 @@ public class ObjectComparison {
     assertEquals(expectedObject.getName(), cacheObject.getName());
     assertEquals(expectedObject.getCategory(), cacheObject.getCategory());
 
-    if (expectedObject.getCategory().equals("mappedProperty") || expectedObject.getFields() != null) {
+    if ((expectedObject.getCategory() != null && expectedObject.getCategory().equals("mappedProperty")) || expectedObject.getFields() != null) {
       for (DeviceProperty field : expectedObject.getFields().values()) {
         assertDevicePropertyListContains(new ArrayList<>(cacheObject.getFields().values()), field);
       }
