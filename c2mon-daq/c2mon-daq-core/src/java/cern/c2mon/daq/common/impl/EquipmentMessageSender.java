@@ -19,6 +19,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
+import java.security.InvalidParameterException;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -537,8 +538,18 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * @param tagID The id of the tag to get.
    * @return The SourceDataTag with this id.
    */
-  private SourceDataTag getTag(final long tagID) {
-    return (SourceDataTag) this.equipmentConfiguration.getSourceDataTag(tagID);
+  private SourceDataTag getTag(final Long tagID) {
+    if (tagID == null) {
+      throw new InvalidParameterException("Passed null parameter as tag ID");
+    }
+    
+    SourceDataTag sdt = (SourceDataTag) this.equipmentConfiguration.getSourceDataTag(tagID);
+    
+    if (sdt == null) {
+      throw new RuntimeException("Could not get the SourceDataTag for tag " + tagID + ". The tag is not registered in the equipment configurations cache. No update is sent!");
+    }
+    
+    return sdt;
   }
 
   /**
