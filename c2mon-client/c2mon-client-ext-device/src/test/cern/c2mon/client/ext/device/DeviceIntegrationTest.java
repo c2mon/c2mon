@@ -93,7 +93,7 @@ public class DeviceIntegrationTest {
     }
   }
 
-  static DeviceUpdateListener listener = new DeviceUpdateListener() {
+  static DeviceInfoUpdateListener listener = new DeviceInfoUpdateListener() {
     @Override
     public void onInitialUpdate(List<Device> devices) {
       for (Device device : devices) {

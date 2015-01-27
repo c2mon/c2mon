@@ -18,7 +18,6 @@
 
 package cern.c2mon.client.ext.device;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -78,11 +77,6 @@ public interface C2monDeviceManager {
    * </p>
    *
    * <p>
-   * The {@link DeviceUpdateListener#onDevicesNotFound(List)} method of the
-   * listener will not be called when subscribing to devices using this method.
-   * </p>
-   *
-   * <p>
    * Note: only a single property will change for any given listener invocation.
    * The listener will be invoked multiple times to reflect multiple property
    * changes.
@@ -95,45 +89,6 @@ public interface C2monDeviceManager {
    * @see DeviceUpdateListener
    */
   void subscribeDevice(final Device device, final DeviceUpdateListener listener);
-
-  /**
-   * Subscribe to retrieve updates of property changes of a device by name.
-   *
-   * <p>
-   * Subscribing to a device means subscribing to all the properties of that
-   * device. When a particular property changes, the given
-   * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method will be
-   * called with the device itself and the name of the property that has
-   * changed.
-   * </p>
-   *
-   * <p>
-   * When a device is first subscribed to, the {@link
-   * DeviceUpdateListener#onInitialUpdate(List<Device>))} method is passed a
-   * single-item list containing a reference to the fully initialised device.
-   * Note that the {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)}
-   * method is guaranteed not to be called until this method returns.
-   * </p>
-   *
-   * <p>
-   * The {@link DeviceUpdateListener#onDevicesNotFound(List)} method of the
-   * listener will not be called when subscribing to devices using this method.
-   * </p>
-   *
-   * <p>
-   * Note: only a single property will change for any given listener invocation.
-   * The listener will be invoked multiple times to reflect multiple property
-   * changes.
-   * </p>
-   *
-   * @param className the class name of the device you want to subscribe to
-   * @param deviceName the name of the device you want to subscribe to
-   * @param listener the callback listener that will be notified when a device
-   *          property changes
-   *
-   * @throws DeviceNotFoundException if no device of the given class was found
-   */
-  void subscribeDevice(final String className, final String deviceName, final DeviceUpdateListener listener) throws DeviceNotFoundException;
 
   /**
    * Subscribe to retrieve updates of property changes of a set of devices.
@@ -155,11 +110,6 @@ public interface C2monDeviceManager {
    * </p>
    *
    * <p>
-   * The {@link DeviceUpdateListener#onDevicesNotFound(List)} method of the
-   * listener will not be called when subscribing to devices using this method.
-   * </p>
-   *
-   * <p>
    * Note: only a single property will change for any given listener invocation.
    * The listener will be invoked multiple times to reflect multiple property
    * changes.
@@ -170,6 +120,46 @@ public interface C2monDeviceManager {
    *          property changes
    */
   void subscribeDevices(final Set<Device> devices, final DeviceUpdateListener listener);
+
+  /**
+   * Subscribe to retrieve updates of property changes of a device by name.
+   *
+   * <p>
+   * Subscribing to a device means subscribing to all the properties of that
+   * device. When a particular property changes, the given
+   * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method will be
+   * called with the device itself and the name of the property that has
+   * changed.
+   * </p>
+   *
+   * <p>
+   * When a device is first subscribed to, the {@link
+   * DeviceUpdateListener#onInitialUpdate(List<Device>))} method is passed a
+   * single-item list containing a reference to the fully initialised device.
+   * Note that the {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)}
+   * method is guaranteed not to be called until this method returns.
+   * </p>
+   *
+   * <p>
+   * If the device is not found on the server, the
+   * {@link DeviceUpdateListener#onDevicesNotFound(List)} method of the listener
+   * will be called.
+   * </p>
+   *
+   * <p>
+   * Note: only a single property will change for any given listener invocation.
+   * The listener will be invoked multiple times to reflect multiple property
+   * changes.
+   * </p>
+   *
+   * @param className the class name of the device you want to subscribe to
+   * @param deviceName the name of the device you want to subscribe to
+   * @param listener the callback listener that will be notified when a device
+   *          property changes
+   *
+   * @see DeviceInfo
+   */
+  void subscribeDevice(DeviceInfo info, final DeviceInfoUpdateListener listener) throws DeviceNotFoundException;
 
   /**
    * Subscribe to retrieve updates of property changes of a set of devices by
@@ -214,7 +204,7 @@ public interface C2monDeviceManager {
    *
    * @see DeviceInfo
    */
-  void subscribeDevices(final HashSet<DeviceInfo> deviceInfoList, final DeviceUpdateListener listener);
+  void subscribeDevices(final Set<DeviceInfo> deviceInfoList, final DeviceInfoUpdateListener listener);
 
   /**
    * Unsubscribe from a previously subscribed-to device.

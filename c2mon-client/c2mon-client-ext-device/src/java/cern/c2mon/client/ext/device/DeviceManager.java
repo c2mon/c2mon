@@ -39,7 +39,6 @@ import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
-import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
@@ -157,21 +156,6 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
   }
 
   @Override
-  public void subscribeDevice(String className, String deviceName, DeviceUpdateListener listener) throws DeviceNotFoundException {
-    List<Device> devices = getAllDevices(className);
-
-    for (Device device : devices) {
-      if (device.getName().equals(deviceName)) {
-        subscribeDevice(device, listener);
-        return;
-      }
-    }
-
-    // If we didn't find the device, throw the exception
-    throw new DeviceNotFoundException("No devices found of class " + className);
-  }
-
-  @Override
   public void subscribeDevices(Set<Device> devices, final DeviceUpdateListener listener) {
     Set<Long> dataTagIds = new HashSet<>();
 
@@ -195,7 +179,12 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
   }
 
   @Override
-  public void subscribeDevices(HashSet<DeviceInfo> deviceInfoList, DeviceUpdateListener listener) {
+  public void subscribeDevice(DeviceInfo deviceInfo, DeviceInfoUpdateListener listener) {
+    subscribeDevices(new HashSet<>(Arrays.asList(deviceInfo)), listener);
+  }
+
+  @Override
+  public void subscribeDevices(Set<DeviceInfo> deviceInfoList, DeviceInfoUpdateListener listener) {
     try {
       // Ask the server for the devices
       Collection<TransferDevice> serverResponse = requestHandler.getDevices(deviceInfoList);
@@ -232,8 +221,10 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
         deviceCache.add(device);
       }
 
-      // Make the subscription
-      subscribeDevices(devices, listener);
+      if (devices.size() > 0) {
+        // Make the subscription
+        subscribeDevices(devices, listener);
+      }
 
     } catch (JMSException e) {
       LOG.error("subscribeDevices() - JMS connection lost -> Could not retrieve devices from the C2MON server.", e);

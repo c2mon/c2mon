@@ -371,10 +371,8 @@ public class DeviceManagerTest {
 
     ClientCommandTagImpl cct1 = new ClientCommandTagImpl<>(-1L);
 
-    // Expect the device manager to check the cache
-    EasyMock.expect(deviceCacheMock.getAllDevices("test_device_class")).andReturn(new ArrayList<Device>());
-    // Expect the device manager to retrieve the device
-    expect(requestHandlerMock.getAllDevices(EasyMock.<String> anyObject())).andReturn(devicesReturnList);
+    // Expect the device manager to retrieve the devices
+    expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(devicesReturnList);
     // Expect the device manager to get the command tag
     EasyMock.expect(commandManagerMock.getCommandTag(EasyMock.<Long> anyObject())).andReturn(cct1).times(1);
     // Expect the device manager to add the device to the cache
@@ -408,7 +406,7 @@ public class DeviceManagerTest {
     replay(requestHandlerMock);
 
     // Run the actual code to be tested
-    deviceManager.subscribeDevice("test_device_class", "test_device_1", listener);
+    deviceManager.subscribeDevice(new DeviceInfo("test_device_class", "test_device_1"), listener);
 
     // Simulate the tag update calls
     new Thread(new Runnable() {
@@ -431,26 +429,37 @@ public class DeviceManagerTest {
   }
 
   @Test
-  public void testSubscribeNonexistentDeviceByName() throws DeviceNotFoundException, JMSException {
+  public void testSubscribeNonexistentDeviceByName() throws DeviceNotFoundException, JMSException, InterruptedException {
     // Reset the mock
     EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     reset(requestHandlerMock);
 
-    // Expect the device manager to check the cache
-    EasyMock.expect(deviceCacheMock.getAllDevices(EasyMock.<String> anyObject())).andReturn(new ArrayList<Device>());
-    // Expect the device manager to retrieve the device
-    expect(requestHandlerMock.getAllDevices(EasyMock.<String> anyObject())).andReturn(new ArrayList<TransferDevice>());
+    // Expect the device manager to retrieve the devices
+    expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(new ArrayList<TransferDevice>());
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     replay(requestHandlerMock);
 
-    try {
-      // Attempt to get a nonexistent device - should throw exception
-      deviceManager.subscribeDevice("nonexistent", "nonexistent", new TestDeviceUpdateListener());
-      Assert.fail("Exception not thrown");
-    } catch (DeviceNotFoundException e) {
-    }
+    // Attempt to get a nonexistent device
+    final CountDownLatch latch = new CountDownLatch(1);
+    deviceManager.subscribeDevice(new DeviceInfo("nonexistent", "nonexistent"), new DeviceInfoUpdateListener() {
+      @Override
+      public void onUpdate(Device device, PropertyInfo propertyInfo) {
+      }
+
+      @Override
+      public void onInitialUpdate(List<Device> devices) {
+      }
+
+      @Override
+      public void onDevicesNotFound(List<DeviceInfo> unknownDevices) {
+        latch.countDown();
+      }
+    });
+
+    latch.await(1000, TimeUnit.MILLISECONDS);
+    Assert.assertTrue(latch.getCount() == 0);
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
@@ -691,7 +700,7 @@ public class DeviceManagerTest {
     EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock);
   }
 
-  class TestDeviceUpdateListener implements DeviceUpdateListener {
+  class TestDeviceUpdateListener implements DeviceInfoUpdateListener {
 
     CountDownLatch latch = new CountDownLatch(1);
     List<Device> devices;
