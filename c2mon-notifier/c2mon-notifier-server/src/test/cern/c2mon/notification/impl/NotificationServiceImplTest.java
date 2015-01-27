@@ -204,7 +204,6 @@ public class NotificationServiceImplTest {
     }
     
     
-    @Test
     public void useIntermediateBroker() throws Exception {
         BrokerService broker = null;
         try {
@@ -214,12 +213,12 @@ public class NotificationServiceImplTest {
             broker.setUseShutdownHook(false);
             broker.setSystemExitOnShutdown(true);
             broker.start();
+            broker.waitUntilStarted();
             
             String requestQueue = "requests";
             
             ConnectionFactory fac = new ActiveMQConnectionFactory("vm://localhost");
 
-            NotificationServiceImpl service = new NotificationServiceImpl(new SubscriptionRegistryTest.RegWithoutDb());
             JmsTemplate responderForRequests = new JmsTemplate(fac);
             responderForRequests.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
             responderForRequests.setPriority(0);
@@ -241,15 +240,16 @@ public class NotificationServiceImplTest {
             try {
                 clientService.setSubscriber(s);
             } catch (ServiceException sx) {
-                System.err.println(sx.getMessage());
                 fail(sx.getMessage());
             }
             Subscriber fromServer = clientService.getSubscriber(s.getUserName());
+            System.out.println("Got subscriber from Server : "  + fromServer);
             assertTrue(s.equals(fromServer));
             
-            System.out.println("Got subscriber from Server : "  + fromServer);
+            
         } finally {
             broker.stop();
+            broker.waitUntilStopped();
         }
     }
     
