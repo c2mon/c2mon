@@ -65,6 +65,7 @@ import cern.c2mon.client.ext.device.util.DeviceTestUtils;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
 import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
@@ -131,8 +132,8 @@ public class DeviceManagerTest {
     reset(requestHandlerMock);
 
     List<TransferDevice> devicesReturnList = new ArrayList<TransferDevice>();
-    final TransferDeviceImpl device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
-    final TransferDeviceImpl device2 = new TransferDeviceImpl(1000L, "test_device_2", 1L);
+    final TransferDeviceImpl device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_device_class");
+    final TransferDeviceImpl device2 = new TransferDeviceImpl(1000L, "test_device_2", 1L, "test_device_class");
     device1.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
     device2.addDeviceProperty(new DeviceProperty(2L, "TEST_PROPERTY_2", "100431", "tagId", null));
     device1.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
@@ -363,7 +364,7 @@ public class DeviceManagerTest {
     reset(requestHandlerMock);
 
     List<TransferDevice> devicesReturnList = new ArrayList<TransferDevice>();
-    final TransferDeviceImpl transferDevice = new TransferDeviceImpl(1000L, "test_device_1", 1L);
+    final TransferDeviceImpl transferDevice = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_device_class");
     transferDevice.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
     transferDevice.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
     devicesReturnList.add(transferDevice);
@@ -388,7 +389,6 @@ public class DeviceManagerTest {
     EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
       @Override
       public Boolean answer() throws Throwable {
-        System.out.println("oninitialupdate");
         deviceManager.onInitialUpdate(Arrays.asList((ClientDataTagValue) new ClientDataTagImpl(100430L)));
         return true;
       }
@@ -451,6 +451,80 @@ public class DeviceManagerTest {
       Assert.fail("Exception not thrown");
     } catch (DeviceNotFoundException e) {
     }
+
+    // Verify that everything happened as expected
+    EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
+    verify(requestHandlerMock);
+  }
+
+  @Test
+  public void testSubscribeDevicesByName() throws JMSException {
+ // Reset the mock
+    EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
+    reset(requestHandlerMock);
+
+    List<TransferDevice> devicesReturnList = new ArrayList<TransferDevice>();
+    final TransferDeviceImpl transferDevice = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_device_class");
+    transferDevice.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
+    devicesReturnList.add(transferDevice);
+
+    DeviceInfo known = new DeviceInfo("test_device_class", "test_device_1");
+    DeviceInfo unknown = new DeviceInfo("test_device_class", "unknown_device");
+    HashSet<DeviceInfo> infoList = new HashSet<>(Arrays.asList(known, unknown));
+
+    // Expect the device manager to retrieve the devices
+    expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(devicesReturnList);
+    // Expect the device manager to add the device to the cache
+    final Capture<Device> capturedDevice = new Capture<>();
+    deviceCacheMock.add(EasyMock.capture(capturedDevice));
+    EasyMock.expectLastCall();
+
+    final TestDeviceUpdateListener listener = new TestDeviceUpdateListener();
+    // This time we want to make sure that onDevicesNotFound() is also called
+    listener.setLatch(2);
+
+    // Expect the device manager to subscribe to the tags
+    tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagListener> anyObject());
+    EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+      @Override
+      public Boolean answer() throws Throwable {
+        deviceManager.onInitialUpdate(Arrays.asList((ClientDataTagValue) new ClientDataTagImpl(100430L)));
+        return true;
+      }
+    }).once();
+
+    // Expect the device manager to get the devices from the cache - once to
+    // call onInitialUpdate() and once to call onUpdate()
+    EasyMock.expect(deviceCacheMock.getAllDevices()).andAnswer(new IAnswer<List<Device>>() {
+      @Override
+      public List<Device> answer() throws Throwable {
+        return Arrays.asList(capturedDevice.getValue());
+      }
+    }).times(2);
+
+    // Setup is finished, need to activate the mock
+    EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
+    replay(requestHandlerMock);
+
+    // Run the actual code to be tested
+    deviceManager.subscribeDevices(infoList, listener);
+
+    // Simulate the tag update calls
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        deviceManager.onUpdate(new ClientDataTagImpl(100430L));
+      }
+    }).start();
+
+    listener.await(5000L);
+    Device device2 = listener.getDevice();
+    Assert.assertNotNull(device2);
+    Assert.assertTrue(device2.getId() == listener.getDevice().getId());
+
+    Assert.assertTrue(listener.getDevice().getProperty("TEST_PROPERTY_1").getTag().getId().equals(100430L));
+
+    Assert.assertTrue(listener.getUnknownDevices().size() == 1);
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
@@ -619,8 +693,9 @@ public class DeviceManagerTest {
 
   class TestDeviceUpdateListener implements DeviceUpdateListener {
 
-    final CountDownLatch latch = new CountDownLatch(1);
+    CountDownLatch latch = new CountDownLatch(1);
     List<Device> devices;
+    List<DeviceInfo> unknownDevices;
     PropertyInfo propertyInfo;
 
     @Override
@@ -634,6 +709,13 @@ public class DeviceManagerTest {
     public void onUpdate(Device device, PropertyInfo propertyInfo) {
       LOG.info("onUpdate()");
       this.propertyInfo = propertyInfo;
+      latch.countDown();
+    }
+
+    @Override
+    public void onDevicesNotFound(List<DeviceInfo> unknownDevices) {
+      this.unknownDevices = unknownDevices;
+      LOG.info("onDevicesNotFound()");
       latch.countDown();
     }
 
@@ -652,15 +734,13 @@ public class DeviceManagerTest {
     public List<Device> getDevices() {
       return devices;
     }
-  }
 
-  class CustomAnswer implements IAnswer<Object> {
-    public Device cachedDevice;
-    @Override
-    public Object answer() throws Throwable {
-      System.out.println("custom answer");
-      cachedDevice = (Device) EasyMock.getCurrentArguments()[0];
-      return cachedDevice;
+    public List<DeviceInfo> getUnknownDevices() {
+      return unknownDevices;
+    }
+
+    public void setLatch(int count) {
+      latch = new CountDownLatch(count);
     }
   }
 

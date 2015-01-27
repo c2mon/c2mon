@@ -288,10 +288,11 @@ public abstract class TransferObjectFactory {
    * Creates a <code>TransferDevice</code> object for the given device.
    *
    * @param device the device object to be transferred
+   * @param className the name of the device class
    * @return the resulting <code>TransferDevice</code> object
    */
-  public static TransferDevice createTransferDevice(Device device) {
-    TransferDeviceImpl transferDevice = new TransferDeviceImpl(device.getId(), device.getName(), device.getDeviceClassId());
+  public static TransferDevice createTransferDevice(Device device, String className) {
+    TransferDeviceImpl transferDevice = new TransferDeviceImpl(device.getId(), device.getName(), device.getDeviceClassId(), className);
     transferDevice.addDeviceProperties(device.getDeviceProperties());
     transferDevice.addDeviceCommands(device.getDeviceCommands());
     return transferDevice;

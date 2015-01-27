@@ -46,6 +46,9 @@ public class TransferDeviceImpl implements TransferDevice {
   /** The device class ID */
   private final Long deviceClassId;
 
+  /** The device class name */
+  private final String deviceClassName;
+
   /** The device properties */
   private List<DeviceProperty> deviceProperties = new ArrayList<>();
 
@@ -69,11 +72,13 @@ public class TransferDeviceImpl implements TransferDevice {
    * @param pDeviceId the unique device ID
    * @param pDeviceName the name of the device
    * @param pDeviceClassId the ID of the device class
+   * @param pDeviceClassName the name of the device class
    */
-  public TransferDeviceImpl(final Long pDeviceId, final String pDeviceName, final Long pDeviceClassId) {
+  public TransferDeviceImpl(final Long pDeviceId, final String pDeviceName, final Long pDeviceClassId, final String pDeviceClassName) {
     this.id = pDeviceId;
     this.name = pDeviceName;
     this.deviceClassId = pDeviceClassId;
+    this.deviceClassName = pDeviceClassName;
   }
 
   @Override
@@ -89,6 +94,11 @@ public class TransferDeviceImpl implements TransferDevice {
   @Override
   public Long getDeviceClassId() {
     return this.deviceClassId;
+  }
+
+  @Override
+  public String getDeviceClassName() {
+    return this.deviceClassName;
   }
 
   @Override

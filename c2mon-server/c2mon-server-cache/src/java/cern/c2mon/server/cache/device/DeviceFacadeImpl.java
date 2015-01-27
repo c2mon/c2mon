@@ -18,8 +18,13 @@
 package cern.c2mon.server.cache.device;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Serializer;
@@ -39,6 +44,7 @@ import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.device.DeviceCommandList;
 import cern.c2mon.server.common.device.DevicePropertyList;
 import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
@@ -91,7 +97,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
 
     } catch (CacheElementNotFoundException e) {
       // If we didn't find a class with the given name, return an empty list.
-      LOG.warn("Error getting device class ny name", e);
+      LOG.warn("Error getting device class by name", e);
       return devices;
     }
 
@@ -101,6 +107,49 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
     }
 
     return devices;
+  }
+
+  @Override
+  public List<Device> getDevices(Set<DeviceInfo> deviceInfoList) {
+    List<Device> devices = new ArrayList<>();
+
+    // Reorganise the data structure to make processing a bit easier
+    Map<String, Set<String>> classNamesToDeviceNames = new HashMap<>();
+    for (DeviceInfo deviceInfo : deviceInfoList) {
+      if (!classNamesToDeviceNames.containsKey(deviceInfo.getClassName())) {
+        classNamesToDeviceNames.put(deviceInfo.getClassName(), new HashSet<>(Arrays.asList(deviceInfo.getDeviceName())));
+      } else {
+        classNamesToDeviceNames.get(deviceInfo.getClassName()).add(deviceInfo.getDeviceName());
+      }
+    }
+
+    // Build up a list of requested devices. Note that this list may not be
+    // complete. It is the client's responsibility to check the completeness of
+    // the returned list.
+    for (Map.Entry<String, Set<String>> entry : classNamesToDeviceNames.entrySet()) {
+      String className = entry.getKey();
+      Set<String> deviceNames = entry.getValue();
+
+      try {
+        List<Device> deviceList = getDevices(className);
+
+        for (Device device : deviceList) {
+          if (deviceNames.contains(device.getName())) {
+            devices.add(device);
+          }
+        }
+
+      } catch (CacheElementNotFoundException e) {
+        LOG.warn("Didn't find any devices of class " + className, e);
+      }
+    }
+
+    return devices;
+  }
+
+  @Override
+  public String getClassNameForDevice(Long deviceId) {
+    return deviceClassCache.get(deviceCache.get(deviceId).getDeviceClassId()).getName();
   }
 
   @Override
@@ -177,8 +226,8 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
     // Cross-check properties
     for (DeviceProperty deviceProperty : cacheObject.getDeviceProperties()) {
       if (!deviceClass.getPropertyNames().contains(deviceProperty.getName())) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "DeviceProperty \"" + deviceProperty.getName()
-            + "\" (id: " + deviceProperty.getId() + ") must refer to a property defined in parent class");
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "DeviceProperty \"" + deviceProperty.getName() + "\" (id: "
+            + deviceProperty.getId() + ") must refer to a property defined in parent class");
       }
 
       if (!deviceClass.getPropertyIds().contains(deviceProperty.getId())) {
@@ -191,8 +240,8 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
         for (DeviceProperty field : deviceProperty.getFields().values()) {
 
           if (!deviceClass.getFieldNames(deviceProperty.getName()).contains(field.getName())) {
-            throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "PropertyField \"" + field.getName()
-                + "\" (id: " + field.getId() + ") must refer to a field defined in parent class property");
+            throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "PropertyField \"" + field.getName() + "\" (id: " + field.getId()
+                + ") must refer to a field defined in parent class property");
           }
 
           if (!deviceClass.getFieldIds(deviceProperty.getName()).contains(field.getId())) {

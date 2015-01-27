@@ -437,8 +437,8 @@ public class ClientRequestImplTest {
     assertEquals(ClientRequest.RequestType.DEVICE_REQUEST, receivedRequest.getRequestType());
 
     // Fake response from server
-    TransferDevice device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
-    TransferDevice device2 = new TransferDeviceImpl(2000L, "test_device_2", 1L);
+    TransferDevice device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_class_name");
+    TransferDevice device2 = new TransferDeviceImpl(2000L, "test_device_2", 1L, "test_class_name");
     Collection<TransferDevice> responseList = new ArrayList<>();
     responseList.add(device1);
     responseList.add(device2);
@@ -451,6 +451,8 @@ public class ClientRequestImplTest {
 
     assertTrue(receivedResponse.get(0).getDeviceClassId().equals(1L));
     assertTrue(receivedResponse.get(1).getDeviceClassId().equals(1L));
+    assertTrue(receivedResponse.get(0).getDeviceClassName().equals("test_class_name"));
+    assertTrue(receivedResponse.get(0).getDeviceClassName().equals("test_class_name"));
 
   }
 

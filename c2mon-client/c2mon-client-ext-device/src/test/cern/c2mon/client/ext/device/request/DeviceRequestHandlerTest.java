@@ -71,8 +71,8 @@ public class DeviceRequestHandlerTest {
     EasyMock.reset(jmsProxyMock);
 
     Collection<ClientRequestResult> mockResponse = new ArrayList<>();
-    TransferDeviceImpl dti1 = new TransferDeviceImpl(1000L, "test_device_1", 1L);
-    TransferDeviceImpl dti2 = new TransferDeviceImpl(2000L, "test_device_2", 1L);
+    TransferDeviceImpl dti1 = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_class_name");
+    TransferDeviceImpl dti2 = new TransferDeviceImpl(2000L, "test_device_2", 1L, "test_class_name");
     dti1.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
     dti2.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_2", "100430", "tagId", null));
     dti1.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
@@ -92,6 +92,8 @@ public class DeviceRequestHandlerTest {
     Assert.assertTrue(devices.get(1).getId().equals(dti2.getId()));
     Assert.assertTrue(devices.get(0).getDeviceClassId().equals(dti1.getDeviceClassId()));
     Assert.assertTrue(devices.get(1).getDeviceClassId().equals(dti2.getDeviceClassId()));
+    Assert.assertTrue(devices.get(0).getDeviceClassName().equals(dti1.getDeviceClassName()));
+    Assert.assertTrue(devices.get(1).getDeviceClassName().equals(dti2.getDeviceClassName()));
 
     Assert.assertTrue(!devices.get(0).getDeviceProperties().isEmpty());
     Assert.assertTrue(devices.get(0).getDeviceProperties().get(0).getName().equals("TEST_PROPERTY_1"));

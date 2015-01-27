@@ -18,6 +18,7 @@
 package cern.c2mon.client.ext.device.request;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.jms.JMSException;
 
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.impl.RequestHandlerImpl;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 
@@ -55,7 +57,7 @@ public class DeviceRequestHandler extends RequestHandlerImpl {
    * @throws JMSException if JMS problem occurs or not connected at the moment
    */
   public Collection<DeviceClassNameResponse> getAllDeviceClassNames() throws JMSException {
-    ClientRequestImpl<DeviceClassNameResponse> namesRequest = new ClientRequestImpl<DeviceClassNameResponse>(DeviceClassNameResponse.class);
+    ClientRequestImpl<DeviceClassNameResponse> namesRequest = new ClientRequestImpl<>(DeviceClassNameResponse.class);
     return jmsProxy.sendRequest(namesRequest, defaultRequestQueue, namesRequest.getTimeout());
   }
 
@@ -67,9 +69,25 @@ public class DeviceRequestHandler extends RequestHandlerImpl {
    * @throws JMSException if JMS problem occurs or not connected at the moment
    */
   public Collection<TransferDevice> getAllDevices(String deviceClassName) throws JMSException {
-    ClientRequestImpl<TransferDevice> devicesRequest = new ClientRequestImpl<TransferDevice>(TransferDevice.class);
+    ClientRequestImpl<TransferDevice> devicesRequest = new ClientRequestImpl<>(TransferDevice.class);
     devicesRequest.setRequestParameter(deviceClassName);
     return jmsProxy.sendRequest(devicesRequest, defaultRequestQueue, devicesRequest.getTimeout());
   }
 
+  /**
+   * Retrieve a set of devices from the server based on descriptions contained
+   * within {@link DeviceInfo} objects.
+   *
+   * If a device was not found, it will be omitted from the returned list.
+   *
+   * @param deviceInfoList the set of {@link DeviceInfo} objects describing the
+   *          devices to be subscribed to
+   * @return a list of devices that were found
+   * @throws JMSException if JMS problem occurs or not connected at the moment
+   */
+  public Collection<TransferDevice> getDevices(Set<DeviceInfo> deviceInfoList) throws JMSException {
+    ClientRequestImpl<TransferDevice> devicesRequest = new ClientRequestImpl<>(TransferDevice.class);
+    devicesRequest.setObjectParameter(deviceInfoList);
+    return jmsProxy.sendRequest(devicesRequest, defaultRequestQueue, devicesRequest.getTimeout());
+  }
 }

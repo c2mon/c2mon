@@ -126,6 +126,7 @@ public class ClientRequestHandlerTest {
 
     // Expect the request handler to look up the device class ID
     EasyMock.expect(deviceFacadeMock.getDevices("test_device_class_name_1")).andReturn(devices);
+    EasyMock.expect(deviceFacadeMock.getClassNameForDevice(EasyMock.<Long> anyObject())).andReturn(request.getRequestParameter()).times(2);
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(deviceFacadeMock);

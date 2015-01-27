@@ -18,10 +18,12 @@
 
 package cern.c2mon.client.ext.device;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
+import cern.c2mon.shared.client.device.DeviceInfo;
 
 /**
  * This interface describes the methods which are provided by the C2MON device
@@ -68,11 +70,16 @@ public interface C2monDeviceManager {
    * </p>
    *
    * <p>
-   * When a device is first subscribed to, the
-   * {@link DeviceUpdateListener#onInitialUpdate(Device)} method is passed a
-   * reference to the fully initialised device. Note that the
-   * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method is
-   * guaranteed not to be called until this method returns.
+   * When a device is first subscribed to, the {@link
+   * DeviceUpdateListener#onInitialUpdate(List<Device>)} method is passed a
+   * single-item list containing a reference to the fully initialised device.
+   * Note that the {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)}
+   * method is guaranteed not to be called until this method returns.
+   * </p>
+   *
+   * <p>
+   * The {@link DeviceUpdateListener#onDevicesNotFound(List)} method of the
+   * listener will not be called when subscribing to devices using this method.
    * </p>
    *
    * <p>
@@ -90,7 +97,7 @@ public interface C2monDeviceManager {
   void subscribeDevice(final Device device, final DeviceUpdateListener listener);
 
   /**
-   * Subscribe to retrieve updates of property changes of a device.
+   * Subscribe to retrieve updates of property changes of a device by name.
    *
    * <p>
    * Subscribing to a device means subscribing to all the properties of that
@@ -101,11 +108,16 @@ public interface C2monDeviceManager {
    * </p>
    *
    * <p>
-   * When a device is first subscribed to, the
-   * {@link DeviceUpdateListener#onInitialUpdate(Device)} method is passed a
-   * reference to the fully initialised device. Note that the
-   * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method is
-   * guaranteed not to be called until this method returns.
+   * When a device is first subscribed to, the {@link
+   * DeviceUpdateListener#onInitialUpdate(List<Device>))} method is passed a
+   * single-item list containing a reference to the fully initialised device.
+   * Note that the {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)}
+   * method is guaranteed not to be called until this method returns.
+   * </p>
+   *
+   * <p>
+   * The {@link DeviceUpdateListener#onDevicesNotFound(List)} method of the
+   * listener will not be called when subscribing to devices using this method.
    * </p>
    *
    * <p>
@@ -135,11 +147,16 @@ public interface C2monDeviceManager {
    * </p>
    *
    * <p>
-   * When a device is first subscribed to, the
-   * {@link DeviceUpdateListener#onInitialUpdate(Device)} method is passed a
-   * reference to the fully initialised device. Note that the
+   * When a device is first subscribed to, the {@link
+   * DeviceUpdateListener#onInitialUpdate(List<Device>))} method is passed a
+   * list containing references to the fully initialised devices. Note that the
    * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method is
    * guaranteed not to be called until this method returns.
+   * </p>
+   *
+   * <p>
+   * The {@link DeviceUpdateListener#onDevicesNotFound(List)} method of the
+   * listener will not be called when subscribing to devices using this method.
    * </p>
    *
    * <p>
@@ -153,6 +170,51 @@ public interface C2monDeviceManager {
    *          property changes
    */
   void subscribeDevices(final Set<Device> devices, final DeviceUpdateListener listener);
+
+  /**
+   * Subscribe to retrieve updates of property changes of a set of devices by
+   * name.
+   *
+   * <p>
+   * Subscribing to a device means subscribing to all the properties of that
+   * device. When a particular property changes, the given
+   * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method will be
+   * called with the device itself and the name of the property that has
+   * changed.
+   * </p>
+   *
+   * <p>
+   * When a device is first subscribed to, the {@link
+   * DeviceUpdateListener#onInitialUpdate(List<Device>))} method is passed a
+   * list containing references to the fully initialised devices. Note that the
+   * {@link DeviceUpdateListener#onUpdate(Device, PropertyInfo)} method is
+   * guaranteed not to be called until this method returns.
+   * </p>
+   *
+   * <p>
+   * This method takes a set of {@link DeviceInfo} objects, each of which
+   * describes a device by its class and its name. If any devices described are
+   * not found by the server, then the
+   * {@link DeviceUpdateListener#onDevicesNotFound(List)} method will be called,
+   * where its argument contains a list of {@link DeviceInfo} objects that were
+   * not found.
+   * </p>
+   *
+   * <p>
+   * Note: only a single property will change for any given listener invocation.
+   * The listener will be invoked multiple times to reflect multiple property
+   * changes.
+   * </p>
+   *
+   * @param deviceInfoList the list of {@link DeviceInfo} objects describing the
+   *          devices you wish to subscribe to
+   * @param listener the callback listener that will be notified when a device
+   *          property changes, and also possibly when unknown devices were
+   *          requested
+   *
+   * @see DeviceInfo
+   */
+  void subscribeDevices(final HashSet<DeviceInfo> deviceInfoList, final DeviceUpdateListener listener);
 
   /**
    * Unsubscribe from a previously subscribed-to device.

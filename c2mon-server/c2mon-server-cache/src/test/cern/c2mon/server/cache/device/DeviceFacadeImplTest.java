@@ -23,8 +23,10 @@ import static cern.c2mon.server.test.device.ObjectComparison.assertPropertyListC
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -46,6 +48,7 @@ import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.device.Property;
 import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
 
@@ -326,5 +329,45 @@ public class DeviceFacadeImplTest {
 
     // Verify that everything happened as expected
     EasyMock.verify(deviceCacheMock, deviceClassCacheMock);
+  }
+
+  @Test
+  public void testGetDevicesByName() {
+    // Reset the mock
+    EasyMock.reset(deviceCacheMock, deviceClassCacheMock);
+
+    DeviceClassCacheObject class1 = new DeviceClassCacheObject(10L, "class_1", "");
+    DeviceClassCacheObject class2 = new DeviceClassCacheObject(20L, "class_2", "");
+
+    DeviceCacheObject device1 = new DeviceCacheObject(1L, "device_a", 10L);
+    DeviceCacheObject device2 = new DeviceCacheObject(2L, "device_b", 10L);
+    DeviceCacheObject device3 = new DeviceCacheObject(3L, "device_a", 20L);
+
+    class1.setDeviceIds(Arrays.asList(device1.getId(), device2.getId()));
+    class2.setDeviceIds(Arrays.asList(device3.getId()));
+
+    DeviceInfo di1 = new DeviceInfo("class_1", "device_a");
+    DeviceInfo di2 = new DeviceInfo("class_1", "device_b");
+    DeviceInfo di3 = new DeviceInfo("class_2", "device_a");
+    DeviceInfo di4 = new DeviceInfo("class_2", "unknown_device");
+    Set<DeviceInfo> deviceInfoList = new HashSet<>(Arrays.asList(di1, di2, di3, di4));
+
+    // Expectations
+    EasyMock.expect(deviceClassCacheMock.getDeviceClassByName(di1.getClassName())).andReturn(class1);
+    EasyMock.expect(deviceClassCacheMock.getDeviceClassByName(di3.getClassName())).andReturn(class2);
+    EasyMock.expect(deviceCacheMock.getCopy(device1.getId())).andReturn(device1);
+    EasyMock.expect(deviceCacheMock.getCopy(device2.getId())).andReturn(device2);
+    EasyMock.expect(deviceCacheMock.getCopy(device3.getId())).andReturn(device3);
+
+    // Setup is finished, need to activate the mock
+    EasyMock.replay(deviceCacheMock, deviceClassCacheMock);
+
+    List<Device> devices = deviceFacade.getDevices(deviceInfoList);
+    // Should only have 3 devices
+    Assert.assertTrue(devices.size() == 3);
+
+    // Verify that everything happened as expected
+    EasyMock.verify(deviceCacheMock, deviceClassCacheMock);
+
   }
 }

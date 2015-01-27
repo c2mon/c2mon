@@ -224,6 +224,7 @@ public class ClientModuleIntegrationTest implements ApplicationContextAware {
         assertEquals(device1.getId(), new Long(300));
         assertEquals(device1.getName(), "TEST_DEVICE_1");
         assertEquals(device1.getDeviceClassId(), new Long(400));
+        assertEquals(device1.getDeviceClassName(), "TEST_DEVICE_CLASS_1");
 
         List<DeviceProperty> deviceProperties = device1.getDeviceProperties();
         assertNotNull(deviceProperties);

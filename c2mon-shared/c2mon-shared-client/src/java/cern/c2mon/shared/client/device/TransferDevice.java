@@ -52,6 +52,13 @@ public interface TransferDevice extends ClientRequestResult {
   public Long getDeviceClassId();
 
   /**
+   * Retrieve the name of the class to which this device belongs.
+   *
+   * @return the class name
+   */
+  public String getDeviceClassName();
+
+  /**
    * Retrieve the properties of this device.
    *
    * @return the list of device properties

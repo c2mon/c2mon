@@ -17,7 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.server.cache.device;
 
-import static cern.c2mon.server.test.device.ObjectComparison.*;
+import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropertyListContains;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

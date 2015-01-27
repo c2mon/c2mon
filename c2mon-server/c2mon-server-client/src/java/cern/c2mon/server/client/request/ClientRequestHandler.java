@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
@@ -42,6 +43,7 @@ import cern.c2mon.server.supervision.SupervisionFacade;
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
@@ -629,13 +631,22 @@ public class ClientRequestHandler implements SessionAwareMessageListener<Message
    * @param deviceRequest the request sent by the client
    * @return a collection of all devices of the requested class
    */
+  @SuppressWarnings("unchecked")
   private Collection<? extends ClientRequestResult> handleDeviceRequest(final ClientRequest deviceRequest) {
     Collection<TransferDevice> transferDevices = new ArrayList<>();
-    String deviceClassName = deviceRequest.getRequestParameter();
+    List<Device> devices;
 
-    List<Device> devices = deviceFacade.getDevices(deviceClassName);
+    if (deviceRequest.getObjectParameter() != null) {
+      Set<DeviceInfo> deviceInfoList = (Set<DeviceInfo>) deviceRequest.getObjectParameter();
+      devices = deviceFacade.getDevices(deviceInfoList);
+    }
+    else {
+      String deviceClassName = deviceRequest.getRequestParameter();
+      devices = deviceFacade.getDevices(deviceClassName);
+    }
+
     for (Device device : devices) {
-      transferDevices.add(TransferObjectFactory.createTransferDevice(device));
+      transferDevices.add(TransferObjectFactory.createTransferDevice(device, deviceFacade.getClassNameForDevice(device.getId())));
     }
 
     return transferDevices;

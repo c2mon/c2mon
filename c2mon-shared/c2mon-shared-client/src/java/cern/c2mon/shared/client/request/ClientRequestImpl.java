@@ -4,6 +4,7 @@ import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -18,6 +19,7 @@ import cern.c2mon.shared.client.command.CommandTagHandleImpl;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
+import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
@@ -73,7 +75,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   /** Request parameter */
   private String requestParameter;
 
-  /** Object parameter. Only used by EXECUTE_COMMAND_REQUEST so far */
+  /** Object parameter. Only used by EXECUTE_COMMAND_REQUEST and DEVICE_REQUEST so far */
   private Object objectParameter;
 
   /**
@@ -287,6 +289,10 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
       ClientRequestImpl<CommandReport> clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
       clientRequest.setObjectParameter(object);
       return clientRequest;
+    } else if (object instanceof Set) {
+      ClientRequestImpl<TransferDevice> clientRequest = new ClientRequestImpl<>(TransferDevice.class);
+      clientRequest.setObjectParameter(object);
+      return clientRequest;
     }
     throw new UnsupportedOperationException("The object type is not supported by this class.");
   }
@@ -381,17 +387,24 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   }
 
   /**
-   * Only supported by EXECUTE_COMMAND_REQUESTS so far.
-   * @param objectParameter the Object to set.
-   * In case of the EXECUTE_COMMAND_REQUEST this is a {@link CommandExecuteRequest}.
+   * Only supported by EXECUTE_COMMAND_REQUESTS and DEVICE_REQUEST so far.
+   *
+   * @param objectParameter the Object to set. In case of the
+   *          EXECUTE_COMMAND_REQUEST this is a {@link CommandExecuteRequest}.
+   *          In case of a DEVICE_REQUEST, it is a set of {@link DeviceInfo}
+   *          objects.
    */
   public void setObjectParameter(final Object objectParameter) {
-    if (!requestType.equals(RequestType.EXECUTE_COMMAND_REQUEST)) {
+    if (!requestType.equals(RequestType.EXECUTE_COMMAND_REQUEST) && !requestType.equals(RequestType.DEVICE_REQUEST)) {
       throw new UnsupportedOperationException(
           "This method is not supported by requests of type " + requestType);
     }
     else if (requestType.equals(RequestType.EXECUTE_COMMAND_REQUEST)
              && !(objectParameter instanceof CommandExecuteRequest)) {
+      throw new UnsupportedOperationException(
+          "The request type " + requestType + " does not support object parameter of class " + objectParameter.getClass().getName());
+    }
+    else if (requestType.equals(RequestType.DEVICE_REQUEST) && !(objectParameter instanceof Set)) {
       throw new UnsupportedOperationException(
           "The request type " + requestType + " does not support object parameter of class " + objectParameter.getClass().getName());
     }
@@ -409,7 +422,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   public boolean isObjectRequest() {
     // command handles are sent back as Objects
     // (in contrast with other responses which are sent as JsonTextMessages)
-    return getRequestType() == RequestType.EXECUTE_COMMAND_REQUEST;
+    return getRequestType() == RequestType.EXECUTE_COMMAND_REQUEST || (getRequestType() == RequestType.DEVICE_REQUEST && objectParameter != null);
   }
 
   @Override

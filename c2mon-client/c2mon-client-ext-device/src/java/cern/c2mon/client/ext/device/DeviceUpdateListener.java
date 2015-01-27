@@ -20,6 +20,7 @@ package cern.c2mon.client.ext.device;
 import java.util.List;
 
 import cern.c2mon.client.ext.device.property.PropertyInfo;
+import cern.c2mon.shared.client.device.DeviceInfo;
 
 /**
  * Callback interface for a device. An update event is fired when a property on
@@ -77,4 +78,21 @@ public interface DeviceUpdateListener {
    * @see PropertyInfo
    */
   void onUpdate(Device device, PropertyInfo propertyInfo);
+
+  /**
+   * If the
+   * {@link C2monDeviceManager#subscribeDevices(java.util.HashSet, DeviceUpdateListener)}
+   * method was used to subscribe to a set of devices by name, then this method
+   * will potentially be called if any devices requested were not found on the
+   * server.
+   *
+   * <p>
+   * Note: if this method is to be called, it will be called before any other
+   * callback methods of this listener.
+   * </p>
+   *
+   * @param unknownDevices the list of {@link DeviceInfo} objects that were not
+   *          found on the server.
+   */
+  void onDevicesNotFound(List<DeviceInfo> unknownDevices);
 }

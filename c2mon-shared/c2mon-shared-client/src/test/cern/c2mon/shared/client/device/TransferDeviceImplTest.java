@@ -16,7 +16,7 @@ public class TransferDeviceImplTest {
 
   @Test
   public void testBasicUsage() {
-    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L);
+    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L, "test_class_name");
     String jsonString = dti.toJson();
 
     TransferDevice received = TransferDeviceImpl.fromJson(jsonString);
@@ -27,7 +27,7 @@ public class TransferDeviceImplTest {
 
   @Test
   public void testAddDeviceProperties() throws ClassNotFoundException {
-    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L);
+    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L, "test_class_name");
     List<DeviceProperty> properties = new ArrayList<>();
     DeviceProperty p1 = new DeviceProperty(1L, "cpuLoadInPercent", "987654", "tagId", null);
     DeviceProperty p2 = new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null);
@@ -53,7 +53,7 @@ public class TransferDeviceImplTest {
 
   @Test
   public void testAddDeviceCommands() {
-    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L);
+    TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L, "test_class_name");
     dti.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "1000", "commandTagId", null));
     dti.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "2000", "commandTagId", null));
     dti.addDeviceCommands(new ArrayList<DeviceCommand>() {

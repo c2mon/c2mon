@@ -17,6 +17,7 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.device;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.Field;
 import cern.c2mon.client.ext.device.property.Property;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
+import cern.c2mon.shared.client.device.DeviceInfo;
 
 /**
  * Integration test which takes all configured Devices of all classes and
@@ -84,6 +86,10 @@ public class DeviceIntegrationTest {
       log.info("Unsubscribing and re-subscribing to all devices");
       manager.unsubscribeDevices(new HashSet<Device>(devices), listener);
       manager.subscribeDevices(new HashSet<Device>(devices), listener);
+
+      log.info("Attempting subscription to an unknown device");
+      DeviceInfo info = new DeviceInfo("unknown", "unknown");
+      manager.subscribeDevices(new HashSet<>(Arrays.asList(info)), listener);
     }
   }
 
@@ -112,6 +118,14 @@ public class DeviceIntegrationTest {
     public void onUpdate(Device device, PropertyInfo propertyInfo) {
       log.info("onUpdate(): device=" + device.getName() + " property=" + propertyInfo.getPropertyName() + " value="
           + device.getProperty(propertyInfo.getPropertyName()).getTag().getValue());
+    }
+
+    @Override
+    public void onDevicesNotFound(List<DeviceInfo> unknownDevices) {
+      log.info("onDevicesNotFound(): The following devices were requested but not found on the server:");
+      for (DeviceInfo info : unknownDevices) {
+        log.info("\tclass=" + info.getClassName() + " device=" + info.getDeviceName());
+      }
     }
   };
 }

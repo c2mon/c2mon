@@ -43,6 +43,7 @@ import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
+import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.rule.RuleFormatException;
 
@@ -161,7 +162,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
 
     for (Device device : devices) {
       if (device.getName().equals(deviceName)) {
-        subscribeDevices(new HashSet<Device>(Arrays.asList(device)), listener);
+        subscribeDevice(device, listener);
         return;
       }
     }
@@ -191,6 +192,52 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
 
     // Use TagManager to subscribe to all properties of the device
     tagManager.subscribeDataTags(dataTagIds, this);
+  }
+
+  @Override
+  public void subscribeDevices(HashSet<DeviceInfo> deviceInfoList, DeviceUpdateListener listener) {
+    try {
+      // Ask the server for the devices
+      Collection<TransferDevice> serverResponse = requestHandler.getDevices(deviceInfoList);
+      Set<Device> devices = new HashSet<>();
+      List<DeviceInfo> unknownDevices = new ArrayList<>();
+
+      // Convert the response objects into client devices. If any were not
+      // returned, add them to the list of unknown devices.
+      for (DeviceInfo deviceInfo : deviceInfoList) {
+        Device device = null;
+
+        for (TransferDevice transferDevice : serverResponse) {
+          if (transferDevice.getDeviceClassName().equals(deviceInfo.getClassName()) && transferDevice.getName().equals(deviceInfo.getDeviceName())) {
+            device = createClientDevice(transferDevice, deviceInfo.getClassName());
+            devices.add(device);
+          }
+        }
+
+        if (device == null) {
+          LOG.info("Unknown device (class: " + deviceInfo.getClassName() + " name: " + deviceInfo.getDeviceName() + " requested.");
+          unknownDevices.add(deviceInfo);
+        }
+      }
+
+      // If there were unknown devices in the request list, we need to notify
+      // the client by invoking the onDeviceNotFound() method of the listener.
+      if (unknownDevices.size() > 0) {
+        listener.onDevicesNotFound(unknownDevices);
+      }
+
+      // TODO: Caching of devices
+      // TODO: Device reconfiguration should somehow trigger client update
+      for (Device device : devices) {
+        deviceCache.add(device);
+      }
+
+      // Make the subscription
+      subscribeDevices(devices, listener);
+
+    } catch (JMSException e) {
+      LOG.error("subscribeDevices() - JMS connection lost -> Could not retrieve devices from the C2MON server.", e);
+    }
   }
 
   @Override
