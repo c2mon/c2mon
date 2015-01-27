@@ -38,21 +38,21 @@ public interface Device {
    *
    * @return the device id
    */
-  public Long getId();
+  Long getId();
 
   /**
    * Retrieve the name of this device.
    *
    * @return the device name
    */
-  public String getName();
+  String getName();
 
   /**
    * Retrieve the name of the class to which this device belongs.
    *
    * @return the device class name
    */
-  public String getDeviceClassName();
+  String getDeviceClassName();
 
   /**
    * Retrieve a particular property of this device.
@@ -86,7 +86,7 @@ public interface Device {
    *
    * @see Property
    */
-  public Property getProperty(String propertyName);
+  Property getProperty(String propertyName);
 
   /**
    * Retrieve all properties of this device.
@@ -96,7 +96,7 @@ public interface Device {
    *
    * @see Property
    */
-  public List<Property> getProperties();
+  List<Property> getProperties();
 
   /**
    * Retrieve the names of all properties of this device.
@@ -104,7 +104,7 @@ public interface Device {
    * @return the list of device property names, or an empty list if the device
    *         contains no properties
    */
-  public List<String> getPropertyNames();
+  List<String> getPropertyNames();
 
   /**
    * Retrieve a particular command of this device.
@@ -114,7 +114,7 @@ public interface Device {
    *
    * @see ClientCommandTag
    */
-  public ClientCommandTag getCommand(String commandName);
+  ClientCommandTag getCommand(String commandName);
 
   /**
    * Return all commands of this device.
@@ -123,5 +123,5 @@ public interface Device {
    *
    * @see ClientCommandTag
    */
-  public Map<String, ClientCommandTag> getCommands();
+  Map<String, ClientCommandTag> getCommands();
 }
