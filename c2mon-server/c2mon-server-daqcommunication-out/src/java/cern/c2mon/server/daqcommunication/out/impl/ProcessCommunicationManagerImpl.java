@@ -45,7 +45,7 @@ import cern.c2mon.shared.client.command.CommandExecutionStatus;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandReportImpl;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.Change;

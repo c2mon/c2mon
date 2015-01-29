@@ -1,4 +1,4 @@
-package cern.c2mon.shared.daq.datatag;
+package cern.c2mon.shared.common.datatag;
 
 
 import java.io.Serializable;
@@ -8,8 +8,6 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import cern.c2mon.shared.common.datatag.DataTagAddress;
 
 
 

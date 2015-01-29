@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2010 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,13 +13,12 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.shared.daq.command;
+package cern.c2mon.shared.common.command;
 
 import cern.c2mon.shared.common.Cacheable;
-import cern.c2mon.shared.common.command.AuthorizationDetails;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 
 /**
@@ -28,9 +27,9 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddress;
  * XML can be generated from a CommandTag object), although this
  * code is actually only used on the server (TODO move it to a server
  * class - CommandTagCacheObject for instance!).
- * 
+ *
  * @param <T> the type of value this command can be set to
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -67,7 +66,7 @@ public interface CommandTag<T> extends Cacheable {
   AuthorizationDetails getAuthorizationDetails();
 
   /**
-   * Returns the details of a given command execution.  
+   * Returns the details of a given command execution.
    * @return details with value etc
    */
   CommandExecutionDetails<T> getCommandExecutionDetails();

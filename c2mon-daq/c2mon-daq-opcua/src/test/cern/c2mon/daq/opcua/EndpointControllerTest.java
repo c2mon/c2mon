@@ -25,7 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint.STATE;
@@ -33,18 +32,19 @@ import cern.c2mon.daq.opcua.connection.common.IOPCEndpointFactory;
 import cern.c2mon.daq.opcua.connection.common.impl.EndpointControllerDefault;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddress;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 public class EndpointControllerTest {
     

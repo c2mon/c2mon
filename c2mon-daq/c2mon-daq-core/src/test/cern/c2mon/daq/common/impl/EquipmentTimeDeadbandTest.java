@@ -12,8 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
@@ -21,10 +19,12 @@ import cern.c2mon.daq.tools.EquipmentSenderHelper;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagDeadband;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
-import cern.c2mon.shared.daq.filter.FilteredDataTagValue.FilterType;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 
 /**
  * 

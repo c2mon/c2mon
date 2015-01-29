@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005 - 2011 CERN This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,10 +12,10 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.shared.daq.command;
+package cern.c2mon.shared.common.command;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -83,7 +83,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
      * Creates a new SourceCommandTag.
-     * 
+     *
      * @param id The id of the new tag.
      * @param name The name of the new tag.
      * @param sourceTimeout The timeout till the command is considered as failed.
@@ -91,8 +91,8 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
      * fails.
      * @param hwAddress The hardware address of the command tag.
      */
-    public SourceCommandTag(final Long id, final String name, 
-            final int sourceTimeout, final int sourceRetries, 
+    public SourceCommandTag(final Long id, final String name,
+            final int sourceTimeout, final int sourceRetries,
             final HardwareAddress hwAddress) {
         this.id = id;
         this.name = name;
@@ -103,16 +103,17 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
      * Get the unique numeric identifier of the command tag.
-     * 
+     *
      * @return the unique numeric identifier of the command tag.
      */
+    @Override
     public Long getId() {
         return this.id;
     }
 
     /**
      * Set the unique numeric identifier of the command tag.
-     * 
+     *
      * @param pId
      *            the new unique numeric identifier for the command tag.
      */
@@ -122,16 +123,17 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
      * Get the unique name of the command tag.
-     * 
+     *
      * @return the unique name of the command tag.
      */
+    @Override
     public String getName() {
         return this.name;
     }
 
     /**
      * Set the unique name of the command tag.
-     * 
+     *
      * @param pName
      *            the new name for the command tag.
      */
@@ -141,7 +143,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
      * Gets the source timeout of this tag.
-     * 
+     *
      * @return The source timeout.
      */
     @Override
@@ -151,7 +153,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
      * Sets the source timeout of this tag.
-     * 
+     *
      * @param newSourceTimeout The new source timeout.
      */
     public void setSourceTimeout(final int newSourceTimeout) {
@@ -160,7 +162,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
      * Gets the maximum number of retries sending this command.
-     * 
+     *
      * @return The maximum number of command execution retries.
      */
     public int getSourceRetries() {
@@ -169,7 +171,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
      * Sets the maximum number of command execution retries.
-     * 
+     *
      * @param newSourceRetries The new maximum number of retries.
      */
     public void setSourceRetries(final int newSourceRetries) {
@@ -178,9 +180,10 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
      * Returns the hardware address of this tag.
-     * 
+     *
      * @return The hardware address of this tag.
      */
+    @Override
     public HardwareAddress getHardwareAddress() {
         return this.hwAddress;
     }
@@ -195,7 +198,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
 
     /**
      * Generates a XML String from the provided command tag.
-     * 
+     *
      * @param cmd The command tag which should be used.
      * @return The XML String matching this command tag.
      */
@@ -226,7 +229,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
     /**
      * Creates a SourceCommandTag from a DOM element. The provided element
      * MUST be a element CommandTag element.
-     * 
+     *
      * @param domElement The DOM element to use.
      * @return The created SourceCommandTag.
      */
@@ -271,7 +274,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
     /**
      * Creates a deep clone of this object which means it also clones
      * the containing hardware address.
-     * 
+     *
      * @return The clone of the object.
      * @throws CloneNotSupportedException This exception should never happen with
      * a SourceCommandTag.
@@ -284,17 +287,17 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
             clonedSourceCommandTag.setHardwareAddress(getHardwareAddress().clone());
         return clonedSourceCommandTag;
     }
-    
+
     /**
      * Validates the command tag and throws an exception if validation
      * fails.
-     * 
+     *
      * @throws ConfigurationException Thrown if the command tag is not valid.
      */
     public void validate() throws ConfigurationException {
         if (hwAddress == null) {
             throw new ConfigurationException(
-                    ConfigurationException.INVALID_PARAMETER_VALUE, 
+                    ConfigurationException.INVALID_PARAMETER_VALUE,
                     "Hardware address null. Command Tag not valid."
                     );
         }

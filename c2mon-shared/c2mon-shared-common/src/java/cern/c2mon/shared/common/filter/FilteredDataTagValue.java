@@ -16,7 +16,7 @@
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
-package cern.c2mon.shared.daq.filter;
+package cern.c2mon.shared.common.filter;
 
 import java.sql.Timestamp;
 
@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 
 /**
  * does not allow null values for attributes (empty strings only)

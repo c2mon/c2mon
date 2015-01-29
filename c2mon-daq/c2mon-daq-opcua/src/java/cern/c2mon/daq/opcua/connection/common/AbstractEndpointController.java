@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.opcua.EndpointEquipmentLogListener;
 import cern.c2mon.daq.opcua.EndpointTypesUnknownException;
@@ -38,13 +37,14 @@ import cern.c2mon.daq.opcua.connection.common.impl.OPCCommunicationException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.daq.opcua.connection.common.impl.StatusChecker;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * AbstractEndpointController abstract class (no implementation of this class)

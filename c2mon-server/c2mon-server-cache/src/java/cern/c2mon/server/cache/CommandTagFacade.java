@@ -19,8 +19,8 @@
 package cern.c2mon.server.cache;
 
 import cern.c2mon.server.cache.common.ConfigurableCacheFacade;
-import cern.c2mon.shared.daq.command.CommandTag;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 
 /**
  * Facade bean to interact with CommandTag cache objects residing

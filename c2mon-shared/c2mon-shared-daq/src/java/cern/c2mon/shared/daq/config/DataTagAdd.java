@@ -17,7 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.daq.config;
 
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 
 /**
  * The data tag add event.

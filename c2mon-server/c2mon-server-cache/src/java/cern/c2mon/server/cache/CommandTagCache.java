@@ -18,7 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache;
 
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Interface to the {@link CommandTag} cache.

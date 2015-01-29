@@ -11,7 +11,7 @@ import cern.c2mon.server.command.CommandExecutionManager;
 import cern.c2mon.server.command.CommandPersistenceListener;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandTagLog;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Bean listening to the command module and logging command executions to

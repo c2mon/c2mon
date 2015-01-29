@@ -18,8 +18,8 @@
 package cern.c2mon.daq.common.conf.core;
 
 import cern.c2mon.daq.common.conf.equipment.EquipmentConfigurationChangerHelper;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 /**

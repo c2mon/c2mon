@@ -21,6 +21,8 @@ package cern.c2mon.shared.daq.datatag;
 
 import org.apache.log4j.or.ObjectRenderer;
 
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+
 
 /**
  * Log4j ObjectRenderer for the SourceDataTagValue class.

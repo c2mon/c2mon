@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * Implementation of the QualityConverter service.

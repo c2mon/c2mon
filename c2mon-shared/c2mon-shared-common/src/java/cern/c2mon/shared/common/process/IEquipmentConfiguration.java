@@ -15,13 +15,12 @@
  *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.daq.common.conf.equipment;
+package cern.c2mon.shared.common.process;
 
 import java.util.Map;
 
-import cern.c2mon.daq.common.conf.core.SubEquipmentConfiguration;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * The equipment configuration interface covers all for the implementation
@@ -86,14 +85,14 @@ public interface IEquipmentConfiguration {
 
     /**
      * Retrieve all SubEquipment configurations.
-     * 
+     *
      * @return the map of SubEquipment configuration
      */
     Map<Long, SubEquipmentConfiguration> getSubEquipmentConfigurations();
 
     /**
      * Retrieve a single SubEquipment configuration.
-     * 
+     *
      * @param subEquipmentId the id of the SubEquipment configuration
      * @return the SubEquipment configuration
      */

@@ -7,7 +7,7 @@ import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
 import cern.c2mon.server.cache.loading.CommandTagDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * CommandTag DAO implementation.

@@ -8,7 +8,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * This class is responsible for generating the alive messages for the simulated

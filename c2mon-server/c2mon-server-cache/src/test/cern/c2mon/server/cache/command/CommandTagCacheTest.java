@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Integration test of the CommandTagCache with the cache loading

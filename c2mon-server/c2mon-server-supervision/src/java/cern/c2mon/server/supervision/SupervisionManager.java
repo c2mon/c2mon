@@ -19,7 +19,7 @@
 package cern.c2mon.server.supervision;
 
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;

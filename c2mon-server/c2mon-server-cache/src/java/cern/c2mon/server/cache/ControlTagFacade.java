@@ -5,8 +5,8 @@ import java.sql.Timestamp;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.thread.Event;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 
 /**
  * Facade bean containing the logic for interacting with

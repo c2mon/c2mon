@@ -12,13 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.ValueChangeMonitor;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
+import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ConfigurationXMLConstants;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 public class EquipmentConfigurationFactory extends XMLTagValueExtractor implements ConfigurationXMLConstants {

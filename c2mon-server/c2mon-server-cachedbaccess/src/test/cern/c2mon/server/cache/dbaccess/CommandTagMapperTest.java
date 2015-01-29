@@ -20,8 +20,8 @@ import cern.c2mon.server.cache.dbaccess.test.TestDataHelper;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.daq.command.CommandTag;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)

@@ -34,7 +34,7 @@ import cern.c2mon.server.cache.loading.CommandTagDAO;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.CommandTagAdd;
 import cern.c2mon.shared.daq.config.CommandTagRemove;

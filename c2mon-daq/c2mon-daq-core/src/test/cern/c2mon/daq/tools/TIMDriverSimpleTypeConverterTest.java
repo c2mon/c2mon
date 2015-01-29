@@ -22,8 +22,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.type.TagDataType;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 public class TIMDriverSimpleTypeConverterTest {
     

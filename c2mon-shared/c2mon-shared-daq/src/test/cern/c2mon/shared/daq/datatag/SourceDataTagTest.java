@@ -8,6 +8,8 @@ import org.junit.Test;
 
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 
 /**
  * Unit test of SourceDataTag class.

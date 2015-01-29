@@ -42,8 +42,8 @@ import cern.c2mon.daq.jec.plc.JECIndexOutOfRangeException;
 import cern.c2mon.daq.jec.plc.JECPFrames;
 import cern.c2mon.daq.jec.plc.StdConstants;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The

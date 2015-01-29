@@ -18,9 +18,9 @@ import org.simpleframework.xml.Transient;
 
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.command.CommandExecutionDetails;
+import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.daq.command.CommandExecutionDetails;
-import cern.c2mon.shared.daq.command.CommandTag;
 
 /**
  * Note: does not keep the latest value of the command. Commands are logged in the STL account.

@@ -20,6 +20,8 @@ package cern.c2mon.shared.daq.filter;
 
 import org.apache.log4j.or.ObjectRenderer;
 
+import cern.c2mon.shared.common.filter.FilteredDataTagValue;
+
 /**
  * The renderer class of the FilteredDataTagValue class, used by
  * log4j.

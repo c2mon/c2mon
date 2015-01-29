@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005 - 2011 CERN This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.jec;
@@ -22,14 +22,9 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
-import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.common.datatag.DataTagDeadband;
-import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.c2mon.daq.jec.address.AnalogJECAddressSpace;
 import cern.c2mon.daq.jec.address.AnalogJECProfibusWagoAddressSpace;
 import cern.c2mon.daq.jec.address.BooleanJECAdressSpace;
@@ -40,15 +35,20 @@ import cern.c2mon.daq.jec.frames.AnalogDataProcessor;
 import cern.c2mon.daq.jec.frames.BooleanDataProcessor;
 import cern.c2mon.daq.jec.frames.InfoMessageProcessor;
 import cern.c2mon.daq.jec.frames.JECCommandRunner;
-import cern.c2mon.daq.jec.tools.JECBinaryHelper;
-import cern.c2mon.daq.jec.tools.JECConversionHelper;
 import cern.c2mon.daq.jec.plc.JECIndexOutOfRangeException;
 import cern.c2mon.daq.jec.plc.JECPFrames;
 import cern.c2mon.daq.jec.plc.StdConstants;
+import cern.c2mon.daq.jec.tools.JECBinaryHelper;
+import cern.c2mon.daq.jec.tools.JECConversionHelper;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.DataTagDeadband;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
 
 /**
  * JEC Controller to control tag configuration and processing of frames.
- * 
+ *
  * @author Andreas Lang
  *
  */
@@ -65,7 +65,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * The different possible states of the JECController.
-     * 
+     *
      * @author Andreas Lang
      *
      */
@@ -90,7 +90,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      * Holds the sequence number of the last message received from the JEC PLC.
      */
     //private byte lastSequenceNumber;
-    
+
     /**
      * The command runner which sends the command to the PLC and processes the answer frames.
      */
@@ -164,7 +164,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Creates a new JECController.
-     * 
+     *
      * @param plcFactory The PLCObjectFactory used o communicate with the PLC
      * @param connectionSampler Connection sampler thread.
      * @param jecCommandRunner JecCommandRunner.
@@ -173,8 +173,8 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      * @param equipmentLoggerFactory The equipment logger to use.
      */
     public JECController(final PLCObjectFactory plcFactory,
-            final PLCConnectionSampler connectionSampler, 
-            final JECCommandRunner jecCommandRunner, 
+            final PLCConnectionSampler connectionSampler,
+            final JECCommandRunner jecCommandRunner,
             final IEquipmentMessageSender equipmentMessageSender,
             final EquipmentLoggerFactory equipmentLoggerFactory) {
         equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
@@ -212,7 +212,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
         }
         runningState = RUNNING_STATE.RUNNING;
     }
- 
+
     /**
      * Stops the frame processing. This will stop all related threads. And you will
      * not be able to restart them.
@@ -228,7 +228,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Sets this controller to a pause state.
-     * 
+     *
      * @param pause True if the frame processing should be paused else false.
      */
     @Override
@@ -252,7 +252,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      * @param processImmediately True if the frame should be processed immediately.
      * @return True if the frame was successfully processed else false.
      */
-    private synchronized boolean pushFrame(final JECPFrames frame, 
+    private synchronized boolean pushFrame(final JECPFrames frame,
             final boolean processImmediately) {
         boolean success;
         AbstractJECPFrameProcessor currentProcessor = null;
@@ -274,7 +274,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
             }
             /*
              * This is a small hack. The PLC will return a frame for this values
-             * at startup even if there are no tags configured. In this case the 
+             * at startup even if there are no tags configured. In this case the
              * frame should only be acknowledged and not processed. The processing
              * would fail because an empty processor has no array to store the
              * values.
@@ -289,7 +289,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
             break;
         //command acknowledgment from the PLC: we do nothing with this on our side
         case StdConstants.BOOL_CMD_CTRL_MSG:
-            getEquipmentLogger().info("BOOLEAN COMMAND CONTROL ACKNOWLEDGMENT RECEIVED: nothing to do");                
+            getEquipmentLogger().info("BOOLEAN COMMAND CONTROL ACKNOWLEDGMENT RECEIVED: nothing to do");
             break;
         //standard analog updates from monitored process
         //always acknowledge
@@ -308,7 +308,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
             }
             /*
              * This is a small hack. The PLC will return a frame for this values
-             * at startup even if there are no tags configured. In this case the 
+             * at startup even if there are no tags configured. In this case the
              * frame should only be acknowledged and not processed. The processing
              * would fail because an empty processor has no array to store the
              * values.
@@ -366,7 +366,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
     }
 
     /**
-     * 
+     *
      */
     private void updateAliveTimer() {
         if (getConnectionSampler() != null)
@@ -390,7 +390,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Configures a command tag. (Updates the address space)
-     * 
+     *
      * @param sourceCommandTag The command tag to configure.
      */
     @Override
@@ -419,7 +419,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Configures a data tag.
-     * 
+     *
      * @param sourceDataTag The tag to configure.
      */
     @Override
@@ -487,7 +487,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Immediately processes the provided frame.
-     * 
+     *
      * @param frame The frame to process.
      * @return True if the frame was successfully processed else false.
      */
@@ -499,7 +499,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
     /**
      * Pushes the frame into the controller to process it when the thread comes
      * to its place in the queue.
-     * 
+     *
      * @param frame The frame to push.
      */
     @Override
@@ -507,7 +507,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
         if (runningState == RUNNING_STATE.STOPPED) {
             throw new IllegalStateException("JECFrameController has bee stopped! Create a new one and start it in order to restart the controller.");
         }
-        // Info messages should always be processed synchronously 
+        // Info messages should always be processed synchronously
         if (frame.getMsgID() == StdConstants.INFO_MSG) {
             pushFrame(frame, true);
         }
@@ -550,7 +550,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      * case of lost of a slave (WAGO), PLC will send an INFO message with the
      * slave ID and then, all the registered tags coming from this slave will be
      * invalidated.
-     * 
+     *
      * @param slaveAddress
      *            - Native address of the slave
      * @param sourceTimestamp The timestamp when the request arrived.
@@ -568,7 +568,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      * case of lost and the alive of a slave (WAGO, CAMAC, etc), PLC will send
      * an INFO message with the slave ID and then, all the registered tags
      * coming from this slave will be revalidated.
-     * 
+     *
      * @param slaveAddress
      *            - Slave address identifier
      * @param sourceTimestamp The timestamp when the request arrived.
@@ -586,7 +586,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
      * used to map DataTags with WordNumber and BitNumber - Format: x#y ; x =
      * WordNumber; y = BitNumber - Eg. Wordnumber=134, BitNumber=4 -> returns
      * 134#4 as key
-     * 
+     *
      * @param wrdNum
      *            - Word Id for the tag
      * @param bitNum
@@ -599,27 +599,12 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Returns the number of analog data JEC frames on the PLC.
-     * 
+     *
      * @return The number of frames.
      */
     @Override
     public int getNumberOfAnalogDataJECFrames() {
-        int maxWordId = analogDataProcessor.getJecAddressSpace().getMaxWordIdPLC(); 
-        if (maxWordId < 0) { //not set
-          return 0;
-        } else {
-          return (maxWordId * 2 / StdConstants.JEC_DATA_SIZE) + 1;
-        }        
-    }
-
-    /**
-     * Returns the number of boolean data JEC frames on the PLC.
-     * 
-     * @return The number of frames.
-     */
-    @Override
-    public int getNumberOfBooleanDataJECFrames() {
-        int maxWordId = booleanDataProcessor.getJecAddressSpace().getMaxWordId();        
+        int maxWordId = analogDataProcessor.getJecAddressSpace().getMaxWordIdPLC();
         if (maxWordId < 0) { //not set
           return 0;
         } else {
@@ -628,9 +613,24 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
     }
 
     /**
-     * Returns the SetConfiguration message JECFrame which is sent at startup 
+     * Returns the number of boolean data JEC frames on the PLC.
+     *
+     * @return The number of frames.
+     */
+    @Override
+    public int getNumberOfBooleanDataJECFrames() {
+        int maxWordId = booleanDataProcessor.getJecAddressSpace().getMaxWordId();
+        if (maxWordId < 0) { //not set
+          return 0;
+        } else {
+          return (maxWordId * 2 / StdConstants.JEC_DATA_SIZE) + 1;
+        }
+    }
+
+    /**
+     * Returns the SetConfiguration message JECFrame which is sent at startup
      * to the PLC.
-     * 
+     *
      * @return The SetConfiguation JECFrame.
      */
     @Override
@@ -652,16 +652,17 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
     /**
      * This method is used to acknowledge every message sent by the PLC. This
      * method was created to guarantee that all messages arrive to the driver.
-     * 
+     *
      * TODO TIM-808 add a new method here that calls this one, but without sendFrame parameter: create the sendFrame yourself,
      * as is done in the AbstractJECPFrameProcessor. This new method can then be called from the pushFrame method
      * to ackn. all required frames (see comments on the ones that need acks).
-     * 
+     *
      * @param recvMsg JEC received message
      * @param sendFrame JECFrame to use to send to the PLC.
      * @throws IOException Throws an IOException if the connection to the PLC fails.
      */
-    public void acknowledgeReceivedMessage(final JECPFrames sendFrame, 
+    @Override
+    public void acknowledgeReceivedMessage(final JECPFrames sendFrame,
             final JECPFrames recvMsg) throws IOException {
         // Prepare a JEC frame to be identified as an ACKNOWLEDGE MESSAGE
         sendFrame.SetMessageIdentifier(StdConstants.ACK_MSG);
@@ -682,7 +683,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Configures the deadband for an analog data tag.
-     * 
+     *
      * @param analogDataTag The analog data tag to add.
      */
     private void configureDeadband(final ISourceDataTag analogDataTag) {
@@ -697,10 +698,10 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
             if (resolutionFactor == 0) {
                 getEquipmentLogger().debug("Value deadband found for tag " + analogDataTag.getId() + ", to be converted in IEEE bits: " + deadbandValue);
                 if (filteringType == DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE) {
-                    int intBits = JECBinaryHelper.maskIEEEAbsoluteFilteringType(Float.floatToIntBits(deadbandValue));                    
+                    int intBits = JECBinaryHelper.maskIEEEAbsoluteFilteringType(Float.floatToIntBits(deadbandValue));
                     JECBinaryHelper.putIEEEAnalogValueIntoArray(anaRawDeadbandValues, intBits, wordID);
                 } else if (filteringType == DataTagDeadband.DEADBAND_EQUIPMENT_RELATIVE) {
-                    int intBits = JECBinaryHelper.maskIEEERelativeFilteringType(Float.floatToIntBits(deadbandValue));                    
+                    int intBits = JECBinaryHelper.maskIEEERelativeFilteringType(Float.floatToIntBits(deadbandValue));
                     JECBinaryHelper.putIEEEAnalogValueIntoArray(anaRawDeadbandValues, intBits, wordID);
                 } else
                     // TODO Is this the desired behavior? Process deadband?
@@ -709,10 +710,10 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
                 getEquipmentLogger().debug("Value deadband found for tag " + analogDataTag.getId() + ": " + deadbandValue);
                 if (filteringType == DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE) {
                     short rawDeadbandValue = JECConversionHelper.convertDeadbandValueToRawDeadband(physicalMaxValue, physicalMinValue, deadbandValue, resolutionFactor);
-                    rawDeadbandValue = JECBinaryHelper.maskAbsoluteFilteringType(rawDeadbandValue);                    
+                    rawDeadbandValue = JECBinaryHelper.maskAbsoluteFilteringType(rawDeadbandValue);
                     JECBinaryHelper.putAnalogValueIntoArray(anaRawDeadbandValues, rawDeadbandValue, wordID);
                 } else if (filteringType == DataTagDeadband.DEADBAND_EQUIPMENT_RELATIVE) {
-                    short hrfDeadBandValue = JECBinaryHelper.maskRelativeFilteringType((short) (deadbandValue * StdConstants.MANTISSA));                    
+                    short hrfDeadBandValue = JECBinaryHelper.maskRelativeFilteringType((short) (deadbandValue * StdConstants.MANTISSA));
                     JECBinaryHelper.putAnalogValueIntoArray(anaRawDeadbandValues, hrfDeadBandValue, wordID);
                 } else
                     // TODO Is this the desired behavior? Process deadband?
@@ -723,7 +724,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Gets the deadband configuration JECFrame.
-     * 
+     *
      * @param blockID The block id the frame is for.
      * @return The deadband configuration JECFrame.
      * @throws JECIndexOutOfRangeException This exception is thrown if the block id
@@ -737,7 +738,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
             configureDeadband(analogDataTag);
           } catch (IllegalArgumentException e) {
             getEquipmentLogger().error("Exception caught while configuring deadband for PLC for tag " + analogDataTag.getId() + " - will not be correctly configured on PLC side.", e);
-          }            
+          }
         }
         JECPFrames sendFrame = plcFactory.getRawSendFrame();
         sendFrame.UpdateMsgID(StdConstants.SET_CFG_MSG);
@@ -750,8 +751,8 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
         // Write the current block deadbands inside a JEC frame
         sendFrame.AddJECData(anaRawDeadbandValues,
-                blockID * StdConstants.JEC_DATA_SIZE, 
-                StdConstants.JEC_DATA_SIZE); 
+                blockID * StdConstants.JEC_DATA_SIZE,
+                StdConstants.JEC_DATA_SIZE);
         return sendFrame;
     }
 
@@ -771,9 +772,9 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
     }
 
     /**
-     * Checks if the provided hardware address is in the currently configured 
+     * Checks if the provided hardware address is in the currently configured
      * address range.
-     * 
+     *
      * @param hardwareAddress The hardware address to check.
      * @return True if the address is in range else false.
      */
@@ -813,8 +814,8 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Removes a SourceCommandTag from the configuration.
-     * 
-     * @param sourceCommandTag The command tag to remove. 
+     *
+     * @param sourceCommandTag The command tag to remove.
      */
     @Override
     public void removeCommandTag(final ISourceCommandTag sourceCommandTag) {
@@ -823,7 +824,7 @@ public class JECController implements IJECFrameController, IJECTagConfigurationC
 
     /**
      * Removes a data tag from the configuration.
-     * 
+     *
      * @param sourceDataTag The source data tag to remove.
      */
     @Override

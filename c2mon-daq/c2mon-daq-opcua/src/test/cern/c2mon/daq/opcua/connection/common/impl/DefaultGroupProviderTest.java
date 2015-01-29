@@ -9,7 +9,7 @@ import cern.c2mon.daq.opcua.connection.common.impl.ItemDefinition;
 import cern.c2mon.daq.opcua.connection.common.impl.SubscriptionGroup;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagDeadband;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 
 public class DefaultGroupProviderTest {
     

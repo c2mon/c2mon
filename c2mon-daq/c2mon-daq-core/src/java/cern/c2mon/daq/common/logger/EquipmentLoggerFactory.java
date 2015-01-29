@@ -26,9 +26,9 @@ import org.apache.log4j.Layout;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
 
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 
 /**
  * This class is used to create EquipmentLoggers.

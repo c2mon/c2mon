@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005 - 2011 CERN This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,19 +12,19 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.shared.daq.datatag;
+package cern.c2mon.shared.common.datatag;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.shared.common.datatag.ValueChangeMonitor;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.type.TagDataType;
 /**
  * The Source Data Tag interface which is used to cover most of the information
  * for the implementation layer.
- * 
+ *
  * @author Andreas Lang
  *
  */
@@ -63,12 +63,13 @@ public interface ISourceDataTag {
     /**
      * Gets the timedeadband of this tag. This is the maximum time the DAQ
      * sends updates to the server.
-     * 
-     * @deprecated This should only be used from the DAQ core. Equipment 
+     *
+     * @deprecated This should only be used from the DAQ core. Equipment
      * specific implementations which also provide a timedeadband mechanism
      * should use a value from their hardware address.
      * @return The time deadband of this tag.
      */
+    @Deprecated
     int getTimeDeadband();
     /**
      * Gets the hardware address of this tag.
@@ -80,19 +81,19 @@ public interface ISourceDataTag {
      * @return The current value of this tag.
      */
     SourceDataTagValue getCurrentValue();
-    
+
     /**
      * Checks if tag has VCM registered
      * @return true if value check monitor is defined, false otherwise
      */
     boolean hasValueCheckMonitor();
-        
+
     /**
      * Gets the value check monitor object, if defined
-     * @return value check monitor object's reference 
+     * @return value check monitor object's reference
      */
     ValueChangeMonitor getValueCheckMonitor();
-    
+
     /**
      * Invalidate the current value of a SourceDataTag The invalidate method
      * will always return a SourceDataTagValue object, unless
@@ -122,5 +123,5 @@ public interface ISourceDataTag {
      * @return The SourceDataTagValue to send to the server.
      */
     SourceDataTagValue invalidate(final SourceDataQuality quality);
-    
+
 }

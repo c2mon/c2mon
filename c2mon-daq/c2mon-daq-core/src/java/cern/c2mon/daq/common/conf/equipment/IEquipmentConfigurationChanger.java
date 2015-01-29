@@ -17,6 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 
 /**

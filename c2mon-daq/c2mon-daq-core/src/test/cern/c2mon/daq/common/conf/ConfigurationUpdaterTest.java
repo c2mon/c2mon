@@ -1,20 +1,20 @@
 package cern.c2mon.daq.common.conf;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 
+import static org.junit.Assert.*;
 import cern.c2mon.daq.common.conf.core.ConfigurationUpdater;
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.daq.config.CommandTagUpdate;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 public class ConfigurationUpdaterTest {
     private ConfigurationUpdater configurationUpdater = new ConfigurationUpdater();

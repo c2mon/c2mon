@@ -31,13 +31,13 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.command.CommandExecutionDetails;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.DataTagValueDictionary;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import cern.c2mon.shared.daq.command.CommandExecutionDetails;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 

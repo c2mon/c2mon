@@ -1,4 +1,4 @@
-package cern.c2mon.shared.daq.command;
+package cern.c2mon.shared.common.command;
 
 import java.sql.Timestamp;
 

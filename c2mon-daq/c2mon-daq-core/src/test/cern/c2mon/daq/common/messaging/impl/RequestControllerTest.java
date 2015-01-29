@@ -7,17 +7,18 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
+import static org.junit.Assert.*;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
@@ -29,7 +30,6 @@ import cern.c2mon.shared.daq.config.DataTagRemove;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 

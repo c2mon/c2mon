@@ -11,9 +11,9 @@ import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 
 public class AliveWriterTest {

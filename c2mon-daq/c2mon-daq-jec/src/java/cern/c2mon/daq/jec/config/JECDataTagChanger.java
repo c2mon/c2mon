@@ -22,10 +22,10 @@ import cern.c2mon.daq.common.conf.equipment.DataTagChangerHelper;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.jec.IJECRestarter;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The JECDataTagChanger applies all changes necessary for data tags.

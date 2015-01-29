@@ -20,7 +20,7 @@ package cern.c2mon.daq.filter.dynamic;
 
 import java.util.Map;
 
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 
 /**
  * Implementations of this class control the activation and inactivation of the

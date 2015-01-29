@@ -23,8 +23,8 @@ import org.xml.sax.SAXException;
 
 import cern.c2mon.shared.common.DOMFactory;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 
 public class ConfigurationObjectFactoryTest {

@@ -17,7 +17,7 @@ import org.xml.sax.SAXException;
 
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 
 public class ConfigurationDOMFactoryTest extends AbstractXMLTst {

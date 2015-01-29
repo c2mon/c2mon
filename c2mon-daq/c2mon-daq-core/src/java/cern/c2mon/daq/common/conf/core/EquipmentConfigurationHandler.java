@@ -19,9 +19,9 @@ package cern.c2mon.daq.common.conf.core;
 
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationHandler;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 
 /**
  * Implementation of an equipment configuration handler which in fact wraps methods

@@ -26,11 +26,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.impl.EquipmentCommandHandler;
 import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
@@ -45,13 +42,16 @@ import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * This Kernel is the main class of the daq. It aggregates other classes

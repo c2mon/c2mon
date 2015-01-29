@@ -7,29 +7,28 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 import static org.easymock.classextension.EasyMock.*;
-
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.jec.JECController;
 import cern.c2mon.daq.jec.PLCConnectionSampler;
 import cern.c2mon.daq.jec.PLCObjectFactory;
 import cern.c2mon.daq.jec.address.TestPLCHardwareAddress;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.daq.jec.config.PLCConfiguration;
 import cern.c2mon.daq.jec.frames.JECCommandRunner;
 import cern.c2mon.daq.jec.plc.JECPFrames;
 import cern.c2mon.daq.jec.plc.StdConstants;
 import cern.c2mon.daq.jec.plc.TestPLCDriver;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 
 public class JECControllerTest {
     

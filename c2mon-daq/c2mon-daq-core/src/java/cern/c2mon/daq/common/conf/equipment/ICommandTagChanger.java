@@ -17,7 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.config.ChangeReport;
 /**
  * Specific DAQ implementations should implement and register (or configure via

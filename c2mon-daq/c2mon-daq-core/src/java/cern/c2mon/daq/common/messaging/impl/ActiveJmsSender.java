@@ -27,12 +27,12 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jms.core.JmsTemplate;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
 import cern.c2mon.daq.common.messaging.JmsSender;
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 
 /**
  * Implementation of the JMSSender interface for sending update messages to

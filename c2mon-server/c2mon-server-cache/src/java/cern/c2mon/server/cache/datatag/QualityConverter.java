@@ -1,7 +1,7 @@
 package cern.c2mon.server.cache.datatag;
 
 import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 
 /**
  * Provides methods for calculating the quality of a DataTag

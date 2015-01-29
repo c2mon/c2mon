@@ -1,4 +1,4 @@
-package cern.c2mon.shared.daq.datatag;
+package cern.c2mon.shared.common.datatag;
 
 
 import java.io.Serializable;

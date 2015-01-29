@@ -23,10 +23,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import cern.c2mon.shared.common.DOMFactory;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * Class to create DOM artifacts from configuration objects.

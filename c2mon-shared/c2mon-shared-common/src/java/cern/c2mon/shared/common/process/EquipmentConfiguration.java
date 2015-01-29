@@ -8,17 +8,16 @@
  * this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA. Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.daq.common.conf.core;
+package cern.c2mon.shared.common.process;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 
 /**
  * This class is responsible for keeping equipment configuration parameters
@@ -299,7 +298,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
 
     /**
      * Retrieve a single SubEquipment configuration.
-     * 
+     *
      * @param subEquipmentId the id of the SubEquipment configuration
      * @return the of SubEquipment configuration
      */

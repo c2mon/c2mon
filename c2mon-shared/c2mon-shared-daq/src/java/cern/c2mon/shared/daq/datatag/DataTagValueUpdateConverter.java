@@ -31,6 +31,7 @@ import org.springframework.jms.support.converter.MessageConverter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**

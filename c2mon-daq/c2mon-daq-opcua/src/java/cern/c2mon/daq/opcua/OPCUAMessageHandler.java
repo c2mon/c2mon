@@ -2,7 +2,6 @@ package cern.c2mon.daq.opcua;
 
 import java.util.List;
 
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.opcua.connection.common.AbstractOPCUAMessageHandler;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpointFactory;
 import cern.c2mon.daq.opcua.connection.common.impl.DefaultOPCEndpointFactory;
@@ -11,6 +10,7 @@ import cern.c2mon.daq.opcua.connection.common.impl.OPCCriticalException;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddress;
 import cern.c2mon.daq.opcua.connection.common.impl.OPCUADefaultAddressParser;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 /**
  * The OPCMessageHandler is the entry point of the application. It is created
  * and called by the core. Here the OPC module can access the configuration and

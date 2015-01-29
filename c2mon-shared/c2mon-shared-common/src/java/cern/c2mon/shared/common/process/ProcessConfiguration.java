@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.daq.common.conf.core;
+package cern.c2mon.shared.common.process;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

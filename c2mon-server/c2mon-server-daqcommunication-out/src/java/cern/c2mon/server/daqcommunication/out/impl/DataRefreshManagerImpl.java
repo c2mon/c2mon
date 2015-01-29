@@ -16,8 +16,8 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.daqcommunication.out.DataRefreshManager;
 import cern.c2mon.server.daqcommunication.out.ProcessCommunicationManager;
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 

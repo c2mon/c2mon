@@ -15,7 +15,7 @@
  * 
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
-package cern.c2mon.shared.daq.command;
+package cern.c2mon.shared.common.command;
 
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 /**

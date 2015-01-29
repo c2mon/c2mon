@@ -34,7 +34,7 @@ import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Implementation of the CommandTag cache.

@@ -2,8 +2,8 @@ package cern.c2mon.daq.tools;
 
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.type.TypeConverter;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * Class with all possible validations for Data Tag Values

@@ -24,9 +24,9 @@ import java.sql.Timestamp;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.filter.IFilterMessageSender;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 
 /**
  * This class is a helper to deal with all sender methods that use the Filter Message Sender

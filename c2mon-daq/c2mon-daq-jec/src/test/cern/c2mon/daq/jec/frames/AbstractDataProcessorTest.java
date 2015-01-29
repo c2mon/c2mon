@@ -25,10 +25,10 @@ import cern.c2mon.daq.jec.plc.JECIndexOutOfRangeException;
 import cern.c2mon.daq.jec.plc.JECPFrames;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 public class AbstractDataProcessorTest {
     

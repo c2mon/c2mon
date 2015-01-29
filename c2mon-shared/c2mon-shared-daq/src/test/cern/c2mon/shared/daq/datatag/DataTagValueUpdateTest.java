@@ -15,29 +15,32 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.util.parser.ParserException;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * Unit test of DataTagValueUpdate class.
- * 
+ *
  * @author Mark Brightwell
  * @author Nacho Vilches
- * 
+ *
  */
 public class DataTagValueUpdateTest {
-  
+
   /**
    * Log4j Logger for the DataTagValueUpdateTest class.
    */
   protected static final Logger LOGGER = Logger.getLogger(DataTagValueUpdateTest.class);
-  
+
   /**
    * Test Type enum for testing different configurations (PIK, NO_PIK,...)
    */
   public enum TestType {
     NO_PIK(-1L), PIK(12345L), WRONG_PIK(67890L);
-    
+
     /**
      * Test pik
      */
@@ -45,7 +48,7 @@ public class DataTagValueUpdateTest {
 
     /**
      * Set test type pik
-     * 
+     *
      * @param pik Test type pik
      */
     TestType(final Long pik) {
@@ -54,36 +57,36 @@ public class DataTagValueUpdateTest {
 
     /**
      * Get test type pik
-     * 
+     *
      * @return Test type pik
      */
     public final Long getPik() {
       return this.pik;
     }
   }
-  
+
   /**
    * Test Type for the current tests
    */
   TestType testType = null;
-  
+
   /**
    * DataTagValueUpdate to turn into XML
-   * 
+   *
    */
   DataTagValueUpdate dataTagValueUpdateTO = null;
-  
+
   /**
    * DataTagValueUpdate to be filled out by info read from XML
    */
   DataTagValueUpdate dataTagValueUpdateFROM = null;
-  
+
   /**
    * XML to be filled with data from the DataTagValueUpdate and
-   * to be read by DataTagValueUpdate 
+   * to be read by DataTagValueUpdate
    */
   String xml = null;
-  
+
   /**
    * DocumentBuilder
    */
@@ -91,9 +94,9 @@ public class DataTagValueUpdateTest {
 
   /**
    * Tests parsing of an XML update message succeeds.
-   * 
+   *
    * @throws ParserConfigurationException
-   * @throws ParserException 
+   * @throws ParserException
    */
   @Test
   public void testFromXml() throws ParserConfigurationException, ParserException {
@@ -111,12 +114,12 @@ public class DataTagValueUpdateTest {
     Assert.assertNotNull(update.getValues());
     Assert.assertEquals(7, update.getValues().size());
   }
-  
+
   /**
    * Tests parsing of an XML update message succeeds with PIK
-   * 
+   *
    * @throws ParserConfigurationException
-   * @throws ParserException 
+   * @throws ParserException
    */
   @Test
   public void testFromXmlWithPIK() throws ParserConfigurationException, ParserException {
@@ -133,9 +136,9 @@ public class DataTagValueUpdateTest {
     Assert.assertNotNull(update);
     Assert.assertNotNull(update.getValues());
     Assert.assertEquals(7, update.getValues().size());
-    Assert.assertEquals(TestType.PIK.getPik(), update.processPIK);
+    Assert.assertEquals(TestType.PIK.getPik(), update.getProcessPIK());
   }
-  
+
   /**
    * Checks whether the parser handles correctly updates with empty quality descriptions.
    * @throws ParserConfigurationException
@@ -144,64 +147,64 @@ public class DataTagValueUpdateTest {
   public void testFromXMLWithEmptyMessage() throws ParserConfigurationException {
     SimpleXMLParser parser = new SimpleXMLParser();
     String xmlString = "<DataTagValueUpdate process-id=\"4077\"><DataTag id=\"126329\" name=\"FW.L08.FDED-00072_8.1_VMA8211/1:DEF_TPS_FERM\" control=\"false\"><quality><code>4</code><desc><![CDATA[]]></desc></quality><timestamp>1350761384924</timestamp><daq-timestamp>1350761384924</daq-timestamp></DataTag></DataTagValueUpdate>";
-    
+
     DataTagValueUpdate update = DataTagValueUpdate.fromXML(parser.parse(xmlString).getDocumentElement());
     Assert.assertNotNull(update);
-    
+
     for (SourceDataTagValue sdt : update.getValues()) {
       Assert.assertNotNull(sdt.getQuality().getDescription());
       Assert.assertEquals("", sdt.getQuality().getDescription());
       Assert.assertEquals(4, sdt.getQuality().getQualityCode());
     }
   }
-  
+
   @Test
   public void testToXml() throws ParserConfigurationException, ParserException {
     // We test with no PIK info
     this.testType = TestType.NO_PIK;
-    
+
     // Send DataTagValueUpdate info to XML
     sendToXML();
     // Read DataTagValueUpdate from XML
     readFromXML();
-    
+
     // Checks
-    Assert.assertEquals(this.dataTagValueUpdateTO.processId, this.dataTagValueUpdateFROM.processId);
-    Assert.assertEquals(this.dataTagValueUpdateFROM.processPIK, null);
+    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessId(), this.dataTagValueUpdateFROM.getProcessId());
+    Assert.assertEquals(this.dataTagValueUpdateFROM.getProcessPIK(), null);
   }
-  
+
   @Test
   public void testToXmlWithPIK() {
     // We test with PIK info
     this.testType = TestType.PIK;
-    
+
     // Send DataTagValueUpdate info to XML
     sendToXML();
     // Read DataTagValueUpdate from XML
     readFromXML();
-    
+
     // Checks
-    Assert.assertEquals(this.dataTagValueUpdateTO.processId, this.dataTagValueUpdateFROM.processId);
-    Assert.assertEquals(this.dataTagValueUpdateTO.processPIK, this.dataTagValueUpdateFROM.processPIK);
-    Assert.assertEquals(this.dataTagValueUpdateFROM.processPIK, TestType.PIK.getPik());
+    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessId(), this.dataTagValueUpdateFROM.getProcessId());
+    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessPIK(), this.dataTagValueUpdateFROM.getProcessPIK());
+    Assert.assertEquals(this.dataTagValueUpdateFROM.getProcessPIK(), TestType.PIK.getPik());
   }
-  
+
   @Test
   public void testToXmlWithWrongPIK() {
     // We test with WRONG_PIK info
     this.testType = TestType.WRONG_PIK;
-    
+
     // Send DataTagValueUpdate info to XML
     sendToXML();
     // Read DataTagValueUpdate from XML
     readFromXML();
-    
+
     // Checks
-    Assert.assertEquals(this.dataTagValueUpdateTO.processId, this.dataTagValueUpdateFROM.processId);
-    Assert.assertEquals(this.dataTagValueUpdateTO.processPIK, this.dataTagValueUpdateFROM.processPIK);
-    Assert.assertEquals(this.dataTagValueUpdateFROM.processPIK, TestType.WRONG_PIK.getPik());
+    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessId(), this.dataTagValueUpdateFROM.getProcessId());
+    Assert.assertEquals(this.dataTagValueUpdateTO.getProcessPIK(), this.dataTagValueUpdateFROM.getProcessPIK());
+    Assert.assertEquals(this.dataTagValueUpdateFROM.getProcessPIK(), TestType.WRONG_PIK.getPik());
   }
-  
+
   /*
    * Function for sending the DataTagValueUpdate to a XMML file
    */
@@ -236,28 +239,28 @@ public class DataTagValueUpdateTest {
         Assert.assertTrue(false);
         return;
     }
-    
+
     // Create SourceDataTagValue values to fill the DataTagValueUpdate
     for (int j=0; j< 5; j++) {
       SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(
-          new Long(j), ("tag.name.of.tag." + j), false, new Boolean(false), 
+          new Long(j), ("tag.name.of.tag." + j), false, new Boolean(false),
           new SourceDataQuality((short)j, "everything rather OK" + j), System.currentTimeMillis(), 2, false, null,1000
           );
       sourceDataTagValue.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
       this.dataTagValueUpdateTO.addValue(sourceDataTagValue);
     }
-    
+
     // Create XML from object
     this.xml = dataTagValueUpdateTO.toXML();
     System.out.println("createXML - xml\n:" + this.xml);
   }
-  
+
   /*
    *  Function for reading the DataTagValueUpdate from a XMML file
    */
   public void readFromXML() {
     Document doc = null;
-    
+
     try {
       ByteArrayInputStream in = new ByteArrayInputStream(xml.getBytes("US-ASCII"));
       InputSource inputSource2 = new InputSource(in);
@@ -269,7 +272,7 @@ public class DataTagValueUpdateTest {
       in=null;
     }
     catch (Exception e) {}
-    
+
     // Read DataTagValueUpdate  back from XML
     this.dataTagValueUpdateFROM = DataTagValueUpdate.fromXML(doc.getDocumentElement());
     System.out.println(this.dataTagValueUpdateFROM.toXML());

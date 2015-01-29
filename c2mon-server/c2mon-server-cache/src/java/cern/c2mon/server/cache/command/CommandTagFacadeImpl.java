@@ -34,12 +34,12 @@ import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
+import cern.c2mon.shared.common.command.CommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import cern.c2mon.shared.common.type.TagDataType;
-import cern.c2mon.shared.daq.command.CommandTag;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
 import cern.c2mon.shared.daq.config.CommandTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 

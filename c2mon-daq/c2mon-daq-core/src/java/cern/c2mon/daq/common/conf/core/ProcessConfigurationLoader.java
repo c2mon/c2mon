@@ -30,6 +30,8 @@ import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.config.ConfigurationXMLConstants;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;

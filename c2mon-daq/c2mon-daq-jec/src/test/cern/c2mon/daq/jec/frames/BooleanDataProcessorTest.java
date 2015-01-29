@@ -4,17 +4,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.easymock.classextension.EasyMock.*;
-
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.jec.JECMessageHandler;
 import cern.c2mon.daq.jec.PLCObjectFactory;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 import cern.c2mon.daq.jec.address.BooleanJECAdressSpace;
 import cern.c2mon.daq.jec.config.PLCConfiguration;
 import cern.c2mon.daq.jec.frames.BooleanDataProcessor;

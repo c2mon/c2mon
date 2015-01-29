@@ -24,9 +24,9 @@ import org.w3c.dom.NodeList;
 
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.ObjectFactory;
+import cern.c2mon.shared.common.command.SourceCommandTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.type.TypeConverter;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * Class to create configuration objects from parts of the DOM tree. If you

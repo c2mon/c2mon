@@ -16,12 +16,12 @@ import cern.c2mon.daq.opcua.connection.common.IGroupProvider;
 import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpointListener;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
 import cern.c2mon.shared.common.type.TypeConverter;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The abstract OPC endpoint.

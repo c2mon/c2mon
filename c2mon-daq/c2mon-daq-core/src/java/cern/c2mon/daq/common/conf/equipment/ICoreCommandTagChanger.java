@@ -17,7 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.daq.config.ChangeReport;
 /**
  * This interface may be implemented and registered by core classes.

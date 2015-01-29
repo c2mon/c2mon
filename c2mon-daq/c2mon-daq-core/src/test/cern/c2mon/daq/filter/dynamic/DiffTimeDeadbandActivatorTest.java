@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.daq.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 
 
 public class DiffTimeDeadbandActivatorTest extends AbstractTestDyanmicTimeDeadbandActivator {

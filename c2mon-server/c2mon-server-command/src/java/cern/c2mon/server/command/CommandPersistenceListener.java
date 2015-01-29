@@ -19,7 +19,7 @@
 package cern.c2mon.server.command;
 
 import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Interface that must be implemented by the class dealing

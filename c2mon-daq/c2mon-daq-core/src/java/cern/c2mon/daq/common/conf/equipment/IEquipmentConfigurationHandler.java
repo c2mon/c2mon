@@ -17,6 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
+
 /**
  * Interface for an equipment configuration handler which is used
  * to restrict visibility and access to the configuration.

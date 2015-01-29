@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Required;
 
 import cern.c2mon.daq.common.jmx.JmsSenderMXBean;
 import cern.c2mon.daq.common.messaging.JmsSender;
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;

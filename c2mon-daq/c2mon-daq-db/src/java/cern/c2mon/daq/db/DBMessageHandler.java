@@ -12,12 +12,12 @@ import java.util.Properties;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.db.dao.IDbDaqDao;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * This class represents the DB DAQ. It establishes the connection with the TIM

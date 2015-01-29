@@ -26,6 +26,17 @@ package cern.c2mon.daq.testhandler;
 public interface TestMessageHandlerMBean {
 
   /**
+   * Causes the simulated Process to go down by preventing the sending of its
+   * alive tag.
+   */
+  public void suppressProcessAliveTag();
+
+  /**
+   * Re-enables the sending of the alive tag for the Process.
+   */
+  public void activateProcessAliveTag();
+
+  /**
    * Causes the simulated Equipment to go down by preventing the sending of its
    * alive tag.
    */

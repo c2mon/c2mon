@@ -25,14 +25,14 @@ import cern.c2mon.daq.opcua.connection.common.IItemDefinitionFactory;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpointListener;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.OPCCommandHardwareAddress.COMMAND_TYPE;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 public class OPCEndpointTest {
 

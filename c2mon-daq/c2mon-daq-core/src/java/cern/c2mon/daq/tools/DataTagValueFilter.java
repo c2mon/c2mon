@@ -4,11 +4,11 @@ import static java.lang.String.format;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.shared.common.datatag.DataTagDeadband;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TagDataType;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
-import cern.c2mon.shared.daq.filter.FilteredDataTagValue.FilterType;
 
 /**
  * Class with all possible filters for Data Tag Values

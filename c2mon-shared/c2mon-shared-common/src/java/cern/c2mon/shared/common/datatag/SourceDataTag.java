@@ -1,4 +1,4 @@
-package cern.c2mon.shared.daq.datatag;
+package cern.c2mon.shared.common.datatag;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -12,20 +12,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.ValueChangeMonitor;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagDeadband;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 import cern.c2mon.shared.common.type.TagDataType;
 import cern.c2mon.shared.common.type.TypeConverter;
-import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
 
 /**
  * The SourceDataTag class is the representation of a DataTag on the driver side. It contains all tag-specific
  * information the driver needs to acquired values for the tag it represents and to send them on to the application
  * server.
- * 
+ *
  * @author Jan Stowisek
  * @version $Revision: 1.22 $ ($Date: 2009/05/12 13:05:39 $ - $State: Exp $)
  */
@@ -86,7 +82,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Creates a new SourceDataTag
-     * 
+     *
      * @param id The id of the new tag.
      * @param name The name of the new tag.
      * @param control True if the data tag should be a control tag.
@@ -97,7 +93,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Creates a new SourceDataTag.
-     * 
+     *
      * @param id The id of the new tag.
      * @param name The name of the new tag.
      * @param controlTag True if the data tag should be a control tag.
@@ -117,7 +113,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Gets the id of the data tag.
-     * 
+     *
      * @return The id of the data tag.
      */
     @Override
@@ -127,7 +123,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Gets the name of the data tag.
-     * 
+     *
      * @return The name of the data tag.
      */
     @Override
@@ -137,7 +133,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Sets the name of this data tag.
-     * 
+     *
      * @param newName The new name of this data tag.
      */
     public void setName(final String newName) {
@@ -146,16 +142,17 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Gets the data tag data type.
-     * 
+     *
      * @return The data tag data type.
      */
+    @Override
     public String getDataType() {
         return this.dataType;
     }
 
     /**
      * Sets the data tag type of this data tag and updates also the numeric type.
-     * 
+     *
      * @param newDataType The new data tag type.
      */
     public void setDataType(final String newDataType) {
@@ -164,16 +161,17 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Gets the numeric representation of the data type.
-     * 
+     *
      * @return The numeric representation of the data type. See {@link TagDataType} constants for details.
      */
+    @Override
     public int getDataTypeNumeric() {
         return TagDataType.getDataTypeNumeric(dataType);
     }
 
     /**
      * Returns true if this is a control tag.
-     * 
+     *
      * @return True if it is a control tag else false.
      */
     public boolean isControlTag() {
@@ -182,7 +180,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Returns the mode of this data tag. See {@link DataTagConstants} for details.
-     * 
+     *
      * @return The mode of this data tag.
      */
     public short getMode() {
@@ -191,7 +189,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Checks if the data tag is in operation mode.
-     * 
+     *
      * @return True if it is in operation modee else false.
      */
     public boolean isInOperation() {
@@ -200,7 +198,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Checks if the data tag is in test mode.
-     * 
+     *
      * @return True if the data tag is in test mode else false.
      */
     public boolean isInTest() {
@@ -209,7 +207,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Checks if the data tag is in maintenance mode.
-     * 
+     *
      * @return True if the data tag is in maintenance mode else false.
      */
     public boolean isInMaintenance() {
@@ -218,7 +216,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Sets if this tag is a control tag.
-     * 
+     *
      * @param isControlTag If true the tag will be set as control tag else it will be no control tag.
      */
     public void setControlTag(final boolean isControlTag) {
@@ -227,7 +225,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Gets the data tag address.
-     * 
+     *
      * @return The data tag address.
      */
     public DataTagAddress getAddress() {
@@ -236,7 +234,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Sets the data tag address.
-     * 
+     *
      * @param newAddress The new data tag address.
      */
     public void setAddress(final DataTagAddress newAddress) {
@@ -245,7 +243,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Returns the min value of the data tag value as comparable object.
-     * 
+     *
      * @return The min value.
      */
     public Comparable getMinValue() {
@@ -254,7 +252,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Sets the min value of this tag.
-     * 
+     *
      * @param pMinValue The new min value of this tag.
      */
     public void setMinValue(final Comparable pMinValue) {
@@ -263,7 +261,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Returns the max value of the data tag value as comparable object.
-     * 
+     *
      * @return The max value.
      */
     public Comparable getMaxValue() {
@@ -272,7 +270,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Sets the max value of this tag.
-     * 
+     *
      * @param pMaxValue The new max value.
      */
     public void setMaxValue(final Comparable pMaxValue) {
@@ -281,9 +279,10 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Gets the hardware address of this tag.
-     * 
+     *
      * @return The hardware address of this tag.
      */
+    @Override
     public HardwareAddress getHardwareAddress() {
         if (address == null) {
             return null;
@@ -294,29 +293,30 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Gets the current value of this tag (might be null).
-     * 
+     *
      * @return The current value of this tag.
      */
+    @Override
     public synchronized SourceDataTagValue getCurrentValue() {
         if (currentValue != null)
             return this.currentValue.clone();
         else
             return null;
     }
-    
+
     /**
      * Updates this source data tags value.
-     * 
+     *
      * @param value The new value. (Should match the right data type)
      * @return A SourceDataTag value object to send to the server.
      */
     public synchronized SourceDataTagValue update(final Object value) {
         return doUpdate(new SourceDataQuality(), value, null, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()));
     }
-    
+
     /**
      * Updates this source data tags value.
-     * 
+     *
      * @param value The new value. (Should match the right data type)
      * @param srcTimestamp The source timestamp of the value.
      * @return A SourceDataTag value object to send to the server.
@@ -327,25 +327,25 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Updates this source data tags value.
-     * 
+     *
      * @param value The new value. (Should match the right data type)
      * @param valueDescription The description of the new value.
      * @param timestamp The src timestamp of the value (the DAQ timestamp is set to the system time at this point)
      * @return A SourceDataTag value object to send to the server.
      */
     public synchronized SourceDataTagValue update(final Object value, final String valueDescription, final Timestamp srcTimestamp) {
-      return doUpdate(new SourceDataQuality(), value, valueDescription, srcTimestamp, new Timestamp(System.currentTimeMillis()));  
+      return doUpdate(new SourceDataQuality(), value, valueDescription, srcTimestamp, new Timestamp(System.currentTimeMillis()));
     }
-    
+
     /**
      * Updates this source data tags value.
-     * 
+     *
      * @param value The new value. (Should match the right data type)
      * @param sourceDataQuality The quality of the new new SDValue
      * @param valueDescription The description of the new value.
      * @param timestamp The src timestamp of the value (the DAQ timestamp is set to the system time at this point)
-     * @param daqTimestamp 
-     * 
+     * @param daqTimestamp
+     *
      * @return A SourceDataTag value object to send to the server.
      */
     private synchronized SourceDataTagValue doUpdate(final SourceDataQuality sourceDataQuality, final Object value, final String valueDescription,
@@ -362,7 +362,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
             this.address.isGuaranteedDelivery(), valueDescription, this.address.getTimeToLive());
         this.currentValue.setDaqTimestamp(daqTimestamp);
       }
-  
+
       return this.currentValue.clone();
     }
 
@@ -377,7 +377,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
     /**
      * Returns a FilteredDataTagValue from the current tag, with adjusted quality fields. Is used to send invalidation
      * messages to the filter queue.
-     * 
+     *
      * @param sourceDataQuality the quality object for the tag
      * @param timestamp the time when the quality message was received
      * @param dynamicFiltered flag for dynamic filtering
@@ -404,7 +404,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Returns a FilteredDataTagValue object for the datatag, with updated value and timestamp.
-     * 
+     *
      * @param timestamp the timestamp of the new value reading
      * @param tagValue the tag value
      * @param valueDescription the value description
@@ -443,14 +443,15 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * <LI>the quality code of the SourceDataQuality object is OK
      * <LI>the timestamp passed as a parameter is older than the timestamp of the current value
      * </UL>
-     * 
+     *
      * @param quality The quality of the source data tag value.
      * @return The SourceDataTagValue to send to the server.
      */
+    @Override
     public SourceDataTagValue invalidate(final SourceDataQuality quality) {
         return update(quality, null, null, null);
     }
-    
+
     /**
      * Invalidate the current value of a SourceDataTag The invalidate method will always return a SourceDataTagValue
      * object, unless
@@ -461,41 +462,42 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * </UL>
      * <p>
      * If the timestamp passed is null, the current time is taken as source invalidation.
-     * 
+     *
      * @param quality The quality of the source data tag value.
      * @param timestamp Timestamp for the invalidation.
      * @return The SourceDataTagValue to send to the server.
      */
+    @Override
     public synchronized SourceDataTagValue invalidate(final SourceDataQuality quality, final Timestamp timestamp) {
       if (quality == null || quality.isValid()) {
         return null;
-      } 
-      
+      }
+
       if (this.currentValue != null) {
         return update(quality, this.currentValue.getValue(), this.currentValue.getValueDescription(), timestamp);
       } else {
-        return update(quality, null, null, timestamp);   
+        return update(quality, null, null, timestamp);
       }
     }
-    
+
     /**
      * Updates the current value of a SourceDataTag and its quality. The method will always return a SourceDataTagValue
      * object, unless
      * <UL>
      * <LI>the timestamp passed as a parameter is older than the timestamp of the current value
      * </UL>
-     * 
+     *
      * @param quality The quality of the source data tag value.
      * @param value The new value. (Should match the right data type)
      * @param valueDescription The description of the new value.
      * @param timestamp Timestamp for the invalidation.
      * @return The SourceDataTagValue to send to the server.
      */
-    public SourceDataTagValue update(final SourceDataQuality quality, final Object value, final String valueDescription, 
-        final Timestamp timestamp) {  
+    public SourceDataTagValue update(final SourceDataQuality quality, final Object value, final String valueDescription,
+        final Timestamp timestamp) {
       Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis());
       Timestamp srcTimestamp = timestamp == null ? daqTimestamp : timestamp;
-      
+
       return doUpdate(quality, value, valueDescription, srcTimestamp, daqTimestamp);
     }
 
@@ -508,7 +510,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * create SourceDataTag objects for the configuration XML file received from the server. As the server uses the
      * SourceDataTag.toConfigXML() method to create the configuration XML file, there should never be a problem decoding
      * the XML file on the driver side.
-     * 
+     *
      * @param domElement The dom element to use. This must be the SourceDataTag element.
      * @return The creates SourceDataTag.
      */
@@ -557,7 +559,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
     /**
      * Returns an XML representation of the SourceDataTag object. This XML snipplet is used in the configuration XML
      * sent to the driver.
-     * 
+     *
      * @return XML String of this data tag.
      */
     public String toConfigXML() {
@@ -615,7 +617,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
     /**
      * Validates this data tag. At the moment this means only checking if the data tag address is != null and then
      * validating the data tag address.
-     * 
+     *
      * @throws ConfigurationException If the validation fails a ConfigurationException is thrown.
      */
     public void validate() throws ConfigurationException {
@@ -628,7 +630,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * Does a deep clone of this data tag.
-     * 
+     *
      * @return The clone of this source data tag.
      */
     @Override
@@ -636,7 +638,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
         SourceDataTag clonedSourceDataTag = null;
         try {
             clonedSourceDataTag = (SourceDataTag) super.clone();
-            
+
             if (this.address != null) {
                 clonedSourceDataTag.setAddress(this.address.clone());
             }
@@ -653,7 +655,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * returns the value deadband
-     * 
+     *
      * @return The value deadband
      */
     @Override
@@ -667,7 +669,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
 
     /**
      * returns the value deadband type
-     * 
+     *
      * @return The value deadband type
      */
     @Override
@@ -682,7 +684,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
     /**
      * Short way to get the timedeadband of this tag. The timedeadband is the shortest time period the DAQ should send
      * updates to the Server.
-     * 
+     *
      * @return The time deadband value.
      */
     @Override

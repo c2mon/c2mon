@@ -17,9 +17,9 @@
  *****************************************************************************/
 package cern.c2mon.daq.jec.config;
 
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * Interface for classes implementing the ability to handle the tag configuration.

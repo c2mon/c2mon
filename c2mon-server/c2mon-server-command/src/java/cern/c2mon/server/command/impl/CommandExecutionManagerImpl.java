@@ -40,8 +40,8 @@ import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl.Builder;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
-import cern.c2mon.shared.daq.command.CommandExecutionDetails;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandExecutionDetails;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Implementation of the CommandExecutionManager for TIM.

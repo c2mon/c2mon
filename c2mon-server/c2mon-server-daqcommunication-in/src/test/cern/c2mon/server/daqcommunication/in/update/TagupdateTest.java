@@ -19,9 +19,6 @@
 package cern.c2mon.server.daqcommunication.in.update;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -52,10 +49,10 @@ import cern.c2mon.server.test.broker.TestBrokerService;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * Integration testing of the server-daqcommunication-in module.

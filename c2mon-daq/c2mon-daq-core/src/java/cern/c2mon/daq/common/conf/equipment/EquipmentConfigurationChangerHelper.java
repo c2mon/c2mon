@@ -17,6 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.equipment;
 
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
+
 /**
  * Helper class to simplify checks for equipment implementations.
  * 

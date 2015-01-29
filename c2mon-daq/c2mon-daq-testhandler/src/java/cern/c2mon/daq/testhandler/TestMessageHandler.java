@@ -25,25 +25,27 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
-import cern.c2mon.daq.common.conf.core.SubEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.jmx.JmxRegistrationMXBean;
 import cern.c2mon.daq.common.jmx.JmxRegistrationMXBean.MBeanType;
+import cern.c2mon.daq.common.messaging.impl.ProcessMessageSender;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagDeadband;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 import cern.c2mon.shared.common.type.TagDataType;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * This class simulates the behaviour of a DAQ connected to some equipment, by
@@ -91,6 +93,9 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
   private Map<String, String> configurationParams = new HashMap<String, String>();
 
   EquipmentAliveTimer equipmentAliveTimer;
+
+  @Autowired
+  ProcessMessageSender processMessageSender;
 
   /**
    * The standard java timer
@@ -292,6 +297,11 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
   }
 
   @Override
+  public void suppressProcessAliveTag() {
+    getProcessMessageSender().stopAliveTimer();
+  }
+
+  @Override
   public void suppressEquipmentAliveTag() {
     getEquipmentLogger().debug("Suppressing the Equipment alive tag");
     equipmentAliveTimer.terminateEquipmentAliveTimer();
@@ -301,6 +311,11 @@ public class TestMessageHandler extends EquipmentMessageHandler implements TestM
   public void suppressSubEquipmentAliveTag(int aliveTagId) {
     getEquipmentLogger().debug("Suppressing a SubEquipment alive tag (id: " + aliveTagId + ")");
     equipmentAliveTimer.terminateSubEquipmentAliveTimer(new Long(aliveTagId));
+  }
+
+  @Override
+  public void activateProcessAliveTag() {
+    getProcessMessageSender().startAliveTimer();
   }
 
   @Override

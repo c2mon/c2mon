@@ -8,9 +8,9 @@ import org.junit.Test;
 
 import cern.c2mon.daq.jec.IJECRestarter;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
 import cern.c2mon.shared.daq.config.ChangeReport;
 
 public class JECCommandTagChangerTest {

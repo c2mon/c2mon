@@ -31,9 +31,9 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.supervision.impl.SupervisionTagNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * Integration test of supervision module with core cache modules.

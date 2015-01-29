@@ -8,8 +8,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
 import cern.c2mon.daq.jec.IJECRestarter;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 
 public class JECEquipmentConfigurationChangerTest {

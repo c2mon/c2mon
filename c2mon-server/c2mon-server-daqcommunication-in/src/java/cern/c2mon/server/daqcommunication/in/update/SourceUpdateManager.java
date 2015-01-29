@@ -18,7 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.daqcommunication.in.update;
 
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 
 /**
  * Listener receiving incoming updates from the DAQ layer.

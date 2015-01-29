@@ -26,9 +26,9 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 
 /**

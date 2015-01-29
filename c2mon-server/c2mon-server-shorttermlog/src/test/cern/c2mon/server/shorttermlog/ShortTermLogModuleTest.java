@@ -22,7 +22,7 @@ import cern.c2mon.shared.client.command.CommandExecutionStatus;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandReportImpl;
 import cern.c2mon.shared.client.command.CommandTagLog;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Tests the module works correctly, mocking all other

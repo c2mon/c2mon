@@ -18,7 +18,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading;
 
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * CommandTag DAO specification, containing all methods

@@ -12,10 +12,10 @@ import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.jec.IJECRestarter;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 import cern.c2mon.shared.daq.config.ChangeReport;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 public class JECDataTagChangerTest {
 

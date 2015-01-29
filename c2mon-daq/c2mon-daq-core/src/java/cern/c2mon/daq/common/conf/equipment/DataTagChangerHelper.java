@@ -19,7 +19,7 @@ package cern.c2mon.daq.common.conf.equipment;
 
 
 import cern.c2mon.shared.common.datatag.DataTagDeadband;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * Helper class for SourceDataTag changers. It has a some helper methods

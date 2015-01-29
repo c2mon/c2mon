@@ -29,8 +29,8 @@ import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
+import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import cern.c2mon.shared.daq.command.CommandTag;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({"classpath:cern/c2mon/server/cache/dbaccess/config/server-cachedbaccess-test.xml"})

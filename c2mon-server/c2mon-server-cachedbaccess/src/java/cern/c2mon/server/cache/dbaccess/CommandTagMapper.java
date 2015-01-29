@@ -1,7 +1,7 @@
 package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.command.CommandTagCacheObject;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Interface to bean for persisting the CommandTagCacheObject

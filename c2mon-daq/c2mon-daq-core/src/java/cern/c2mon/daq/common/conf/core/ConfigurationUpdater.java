@@ -23,12 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.config.CommandTagUpdate;
 import cern.c2mon.shared.daq.config.ConfigurationJavaConstants;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
@@ -36,7 +38,6 @@ import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * Updater for the values in the reconfiguration objects.

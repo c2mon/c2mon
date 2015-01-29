@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpoint;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * Regularly writes to a value in the OPC server to simulate an alive.

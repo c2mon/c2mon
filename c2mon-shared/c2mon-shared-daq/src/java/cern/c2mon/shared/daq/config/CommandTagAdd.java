@@ -17,7 +17,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.daq.config;
 
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 
 /**
  * Command tag add event

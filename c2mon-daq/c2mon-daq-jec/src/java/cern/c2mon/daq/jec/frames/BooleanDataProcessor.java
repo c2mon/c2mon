@@ -21,7 +21,7 @@ package cern.c2mon.daq.jec.frames;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.jec.PLCObjectFactory;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.daq.jec.address.BooleanJECAdressSpace;
 import cern.c2mon.daq.jec.tools.JECBinaryHelper;
 import cern.c2mon.daq.jec.plc.StdConstants;

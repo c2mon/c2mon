@@ -40,11 +40,11 @@ import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * {@link DataTagFacade} and {@link ControlTagFacade} have some functionalities in common which

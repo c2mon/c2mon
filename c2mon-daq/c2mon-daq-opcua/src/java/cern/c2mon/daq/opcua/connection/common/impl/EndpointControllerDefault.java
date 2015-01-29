@@ -23,11 +23,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.opcua.EndpointEquipmentLogListener;
 import cern.c2mon.daq.opcua.connection.common.AbstractEndpointController;
 import cern.c2mon.daq.opcua.connection.common.IOPCEndpointFactory;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 
 /**
  * EndpointControllerDefault class

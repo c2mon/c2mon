@@ -26,9 +26,9 @@ import org.apache.log4j.Logger;
 
 import cern.c2mon.daq.common.conf.core.CommonConfiguration;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.messaging.JmsLifecycle;
-import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.common.filter.FilteredDataTagValue;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.filter.FilteredDataTagValueUpdate;
 import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;

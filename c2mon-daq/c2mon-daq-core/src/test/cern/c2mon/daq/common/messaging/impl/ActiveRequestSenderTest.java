@@ -49,9 +49,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.daq.common.conf.core.CommonConfiguration;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.tools.CommandParamsHandler;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;

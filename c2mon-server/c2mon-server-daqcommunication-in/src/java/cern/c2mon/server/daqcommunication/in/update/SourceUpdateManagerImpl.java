@@ -42,9 +42,9 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.server.supervision.SupervisionManager;
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * Implementation of the bean processing incoming updates from the

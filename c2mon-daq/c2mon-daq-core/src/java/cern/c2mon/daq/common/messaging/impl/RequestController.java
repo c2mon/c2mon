@@ -20,9 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
+import cern.c2mon.shared.common.command.SourceCommandTag;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.Change;
@@ -37,8 +39,6 @@ import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitRemove;
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 
@@ -93,7 +93,7 @@ public class RequestController {
             LOGGER.debug("Removing data tag " + ((DataTagRemove) change).getDataTagId());
             report = configurationController.onDataTagRemove((DataTagRemove) change);
         } else if (change instanceof DataTagUpdate) {
-            LOGGER.debug("Removing data tag" + ((DataTagUpdate) change).getDataTagId());
+            LOGGER.debug("Updating data tag" + ((DataTagUpdate) change).getDataTagId());
             report = configurationController.onDataTagUpdate((DataTagUpdate) change);
         } else if (change instanceof CommandTagAdd) {
             CommandTagAdd addChange = (CommandTagAdd) change;

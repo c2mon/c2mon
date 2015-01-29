@@ -19,11 +19,11 @@ package cern.c2mon.daq.jec.frames;
 
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.ICommandRunner;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.jec.PLCObjectFactory;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.daq.jec.tools.JECConversionHelper;
 import cern.c2mon.daq.jec.plc.JECIndexOutOfRangeException;

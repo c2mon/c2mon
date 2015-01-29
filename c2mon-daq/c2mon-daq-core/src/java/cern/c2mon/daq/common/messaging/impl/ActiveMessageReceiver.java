@@ -38,8 +38,8 @@ import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.w3c.dom.Document;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.messaging.ProcessMessageReceiver;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.config.ConfigurationDOMFactory;

@@ -6,7 +6,6 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.jec.PLCObjectFactory;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
@@ -14,10 +13,11 @@ import cern.c2mon.daq.jec.config.PLCConfiguration;
 import cern.c2mon.daq.jec.plc.JECPFrames;
 import cern.c2mon.daq.jec.plc.StdConstants;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
-import cern.c2mon.shared.daq.command.SourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
 
 public class JECCommandRunnerTest {
 

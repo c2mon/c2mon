@@ -27,7 +27,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
-import cern.c2mon.shared.daq.command.CommandTag;
+import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
