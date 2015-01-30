@@ -53,7 +53,6 @@ import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
-import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
 import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.Field;
 import cern.c2mon.client.ext.device.property.FieldImpl;
@@ -358,7 +357,7 @@ public class DeviceManagerTest {
   }
 
   @Test
-  public void testSubscribeDeviceByName() throws JMSException, DeviceNotFoundException, ClassNotFoundException, RuleFormatException {
+  public void testSubscribeDeviceByName() throws JMSException, ClassNotFoundException, RuleFormatException {
     // Reset the mock
     EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     reset(requestHandlerMock);
@@ -429,7 +428,7 @@ public class DeviceManagerTest {
   }
 
   @Test
-  public void testSubscribeNonexistentDeviceByName() throws DeviceNotFoundException, JMSException, InterruptedException {
+  public void testSubscribeNonexistentDeviceByName() throws JMSException, InterruptedException {
     // Reset the mock
     EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     reset(requestHandlerMock);
