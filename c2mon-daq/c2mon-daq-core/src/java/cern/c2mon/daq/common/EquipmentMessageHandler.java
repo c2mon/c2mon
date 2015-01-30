@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the CERN Control and Monitoring (C2MON) platform. See
  * http://cern.ch/c2mon
- * 
+ *
  * Copyright (C) 2005-2013 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,19 +13,19 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: C2MON team, c2mon-support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.common;
 
 import org.apache.log4j.Logger;
 
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationHandler;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 
 /**
  * The Abstract EquipmentMessageHandler is a general superclass for all
@@ -65,7 +65,7 @@ public abstract class EquipmentMessageHandler {
 	/**
 	 * This static method is used to create an instance of appropriate
 	 * EquipmentMessageHandler subclass
-	 * 
+	 *
 	 * @param handlerClassName The name of the handler
 	 * @param equipmentCommandHandler The command handler to register the command runner.
 	 * @param equipmentConfigurationHandler The configuration handler to access the
@@ -80,9 +80,9 @@ public abstract class EquipmentMessageHandler {
 	public static final EquipmentMessageHandler createEquipmentMessageHandler(
 			final String handlerClassName,
 			final IEquipmentCommandHandler equipmentCommandHandler,
-			final IEquipmentConfigurationHandler equipmentConfigurationHandler, 
-			final IEquipmentMessageSender equipmentMessageSender) 
-					throws InstantiationException, IllegalAccessException, 
+			final IEquipmentConfigurationHandler equipmentConfigurationHandler,
+			final IEquipmentMessageSender equipmentMessageSender)
+					throws InstantiationException, IllegalAccessException,
 					ClassNotFoundException {
 		COMMON_LOGGER.debug("entering createFromConfiguration()..");
 		COMMON_LOGGER.debug("creating EquipmentMessageHandler...");
@@ -98,9 +98,9 @@ public abstract class EquipmentMessageHandler {
 	/**
 	 * This method returns a reference to the Equipment configuration object
 	 * (containing configuration parameters of the considered equipment unit).
-	 * It does the same as calling 
+	 * It does the same as calling
 	 * getEquipmentConfigurationHandler().getEquipmentConfiguration().
-	 * 
+	 *
 	 * @return EquipmentConfiguration
 	 */
 	public IEquipmentConfiguration getEquipmentConfiguration() {
@@ -111,7 +111,7 @@ public abstract class EquipmentMessageHandler {
 	/**
 	 * This method sets the Equipment unit's reference to the
 	 * EquipmentConfigurationHandler object
-	 * 
+	 *
 	 * @param equipmentConfigurationHandler
 	 *            The EquipmentConfigurationHandler object
 	 */
@@ -148,7 +148,7 @@ public abstract class EquipmentMessageHandler {
 
 	/**
 	 * Sets the equipment logger factory.
-	 * 
+	 *
 	 * @return  The equipment logger factory.
 	 */
 	public EquipmentLoggerFactory getEquipmentLoggerFactory() {
@@ -157,7 +157,7 @@ public abstract class EquipmentMessageHandler {
 
 	/**
 	 * Sets the equipment logger factory.
-	 * 
+	 *
 	 * @param equipmentLoggerFactory
 	 *            The new equipment logger factory.
 	 */
@@ -171,7 +171,7 @@ public abstract class EquipmentMessageHandler {
 	 * EquipmentMessageHandler is expected to connect to its data source. If the
 	 * connection fails (potentially, after several attempts), an EqIOException
 	 * must be thrown.
-	 * 
+	 *
 	 * @throws EqIOException
 	 *             Error while connecting to the data source.
 	 */
@@ -182,7 +182,7 @@ public abstract class EquipmentMessageHandler {
 	 * EquipmentMessageHandler class. When this method is called, the
 	 * EquipmentMessageHandler is expected to disconnect from its data source.
 	 * If the disconnection fails, an EqIOException must be thrown.
-	 * 
+	 *
 	 * @throws EqIOException
 	 *             Error while disconnecting from the data source.
 	 */
@@ -195,16 +195,16 @@ public abstract class EquipmentMessageHandler {
 	public abstract void refreshAllDataTags();
 
 	/**
-	 * This method should refresh the data tag cache value with the value 
+	 * This method should refresh the data tag cache value with the value
 	 * from the equipment hardware and send them to the server.
-	 * 
+	 *
 	 * @param dataTagId The id of the data tag to refresh.
 	 */
 	public abstract void refreshDataTag(final long dataTagId);
 
 	/**
 	 * Sets the current equipment message sender.
-	 * 
+	 *
 	 * @param equipmentMessageSender
 	 *            The equipment message sender to set.
 	 */
@@ -214,7 +214,7 @@ public abstract class EquipmentMessageHandler {
 
 	/**
 	 * Returns the equipment message sender.
-	 * 
+	 *
 	 * @return The current equipment message sender.
 	 */
 	public IEquipmentMessageSender getEquipmentMessageSender() {
@@ -222,10 +222,10 @@ public abstract class EquipmentMessageHandler {
 	}
 
 	/**
-	 * Returns the equipment configuration handler which has all necessary 
+	 * Returns the equipment configuration handler which has all necessary
 	 * configuration for the equipment as well as ways to listen to configuration
 	 * changes.
-	 * 
+	 *
 	 * @return The equipment configuration handler of this equipment message handler.
 	 */
 	public IEquipmentConfigurationHandler getEquipmentConfigurationHandler() {
@@ -234,7 +234,7 @@ public abstract class EquipmentMessageHandler {
 
 	/**
 	 * Sets the command handler of this equipment message handler.
-	 * @param equipmentCommandHandler The command handler to register the equipments 
+	 * @param equipmentCommandHandler The command handler to register the equipments
 	 * command runner.
 	 */
 	public void setEquipmentCommandHandler(final IEquipmentCommandHandler equipmentCommandHandler) {
@@ -262,8 +262,8 @@ public abstract class EquipmentMessageHandler {
 	/**
 	 * This disconnects the DAQ from the datasource and makes sure
 	 * all delayed data (time deadband) is send immediately.
-	 * 
-	 * @throws EqIOException Throws an equipment IOException if the 
+	 *
+	 * @throws EqIOException Throws an equipment IOException if the
 	 * sending fails.
 	 */
 	public void shutdown() throws EqIOException {

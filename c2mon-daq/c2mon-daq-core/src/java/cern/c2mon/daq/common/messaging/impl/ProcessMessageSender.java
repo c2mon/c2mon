@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2010 CERN This program is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the License,
@@ -12,7 +12,7 @@
  * copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
@@ -27,15 +27,14 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
-import cern.c2mon.daq.common.conf.core.RunOptions;
 import cern.c2mon.daq.common.jmx.JmxRegistrationMXBean;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
@@ -50,7 +49,7 @@ import cern.c2mon.shared.util.buffer.SynchroBufferListener;
  * up to the JMSSenders to release the threads, if for instance they are not
  * critical (see @see cern.c2mon.daq.common.messaging.ActiveProxySender for
  * wrapping non-essential JMSSender's).
- * 
+ *
  * For low priority messages, two synchrobuffer's are used (one for persistent,
  * the other for non-persistent messages).
  */
@@ -89,7 +88,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
     /**
      * Creates a new ProcessMessageSender.
-     * 
+     *
      * @param configurationController The configurationController to access
      * all configuration values.
      */
@@ -128,7 +127,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
         ProcessConfiguration processConfiguration = getConfigurationController().getProcessConfiguration();
         aliveTimer.setInterval(processConfiguration.getAliveInterval());
     }
-    
+
     /**
      * Stops the Process alive timer. Used at final DAQ shutdown.
      */
@@ -140,6 +139,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
      * This method is responsible for creating a JMS XML message containing
      * alive tag and putting it to the TIM JMS queue
      */
+    @Override
     public final void sendAlive() {
         ProcessConfiguration processConfiguration = getConfigurationController().getProcessConfiguration();
         LOGGER.debug("sending AliveTag. tag id : " + processConfiguration.getAliveTagID());
@@ -173,14 +173,16 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
     /**
      * This methods is responsible for sending CommFaultTag message
-     * 
+     *
      * @param tagID
      *            The CommFaultTag identifier
      */
+    @Override
     public final synchronized void sendCommfaultTag(final long tagID, final Object value) {
         sendCommfaultTag(tagID, value, null);
     }
 
+    @Override
     public void sendCommfaultTag(long tagID, Object value, String pDescription) {
         ProcessConfiguration processConfiguration = getConfigurationController().getProcessConfiguration();
         LOGGER.debug("Sending CommfaultTag. tag id : " + tagID);
@@ -243,17 +245,17 @@ public class ProcessMessageSender implements IProcessMessageSender {
      * Connects to all the registered brokers (individual JMSSenders should
      * implement this on separate threads if the connection is unessential).
      */
-    public final void connect() { 
+    public final void connect() {
         Iterator<JmsSender> it = jmsSenders.iterator();
         while (it.hasNext()) {
           JmsSender jmsSender = it.next();
-          
+
           // Helper class for registering the MXBean to the current server
           JmxRegistrationMXBean jmxRegistrationMXBean = new JmxRegistrationMXBean(JmxRegistrationMXBean.MBeanType.JMS, jmsSender.getBeanName());
-          
+
           // Register JmsSender as MXBean
           jmxRegistrationMXBean.registerMBean(jmsSender);
-         
+
           // Connection
           jmsSender.connect();
         }
@@ -272,7 +274,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
     /**
      * Forwards the value to all the JMS senders.
-     * 
+     *
      * @param sourceDataTagValue
      *            the value to send
      * @throws JMSException
@@ -285,7 +287,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
             it.next().processValue(sourceDataTagValue);
           } catch (Exception e) {
             LOGGER.error("Unhandled exception caught while sending a source value (tag id " + sourceDataTagValue.getId() + ") - the value update will be lost.", e);
-          }            
+          }
         }
         // log value in appropriate log file
         sourceDataTagValue.log();
@@ -293,7 +295,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
     /**
      * Forwards the list of values to all the JMS senders.
-     * 
+     *
      * @throws JMSException
      *             if one of the senders throws one (individual senders should
      *             also listen to these locally to take any necessary action)
@@ -307,7 +309,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
             it.next().processValues(dataTagValueUpdate);
           } catch (Exception e) {
             LOGGER.error("Unhandled exception caught while sending a collection of source values - the updates will be lost.", e);
-          }            
+          }
         }
         // log value in appropriate log file
         dataTagValueUpdate.log();
@@ -315,7 +317,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
     /**
      * Setter method.
-     * 
+     *
      * @param jmsSenders
      *            the jmsSenders to set
      */
@@ -340,18 +342,19 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
         /**
          * This method is called by Synchorbuffer, each time a PullEvent occurs.
-         * 
+         *
          * @param event
          *            the pull event, containing the collection of objects to be
          *            sent
          * @throws cern.c2mon.shared.util.buffer.PullException
          * @throws cern.laser.util.buffer.PullException
          */
+        @Override
         public void pull(PullEvent event) throws PullException {
             ProcessConfiguration processConfiguration = getConfigurationController().getProcessConfiguration();
             LOGGER.debug("entering pull()..");
             LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());
-            
+
             // We add the PIK to our communication process
             DataTagValueUpdate dataTagValueUpdate;
             dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
@@ -374,9 +377,9 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
                     // clear the message size counter
                     currentMsgSize = 0;
-                    
+
                     // create new dataTagValueUpdate object
-                    
+
                     // We add the PIK to our communication process
                     dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
                 } // if

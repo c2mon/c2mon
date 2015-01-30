@@ -29,8 +29,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
-import cern.c2mon.daq.common.conf.core.SubEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.ICoreDataTagChanger;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
@@ -40,10 +38,12 @@ import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.daq.tools.EquipmentSenderHelper;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
 
 /**
  * EquipmentMessageSender to control all filtering and sending.
@@ -542,13 +542,13 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     if (tagID == null) {
       throw new InvalidParameterException("Passed null parameter as tag ID");
     }
-    
+
     SourceDataTag sdt = (SourceDataTag) this.equipmentConfiguration.getSourceDataTag(tagID);
-    
+
     if (sdt == null) {
       throw new RuntimeException("Could not get the SourceDataTag for tag " + tagID + ". The tag is not registered in the equipment configurations cache. No update is sent!");
     }
-    
+
     return sdt;
   }
 
