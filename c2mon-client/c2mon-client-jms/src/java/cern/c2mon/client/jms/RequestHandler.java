@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2011 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.client.jms;
@@ -24,96 +24,98 @@ import javax.jms.JMSException;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.process.ProcessNameResponse;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.tag.TagConfig;
-import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
+import cern.c2mon.shared.client.request.ClientRequestErrorReport;
+import cern.c2mon.shared.client.request.ClientRequestProgressReport;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.tag.TagConfig;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
 
 /**
  * Interface to Spring singleton bean proving convenient server
  * request methods.
- * 
+ *
  * @author Mark Brightwell
  *
  */
 public interface RequestHandler {
-    
+
 
   /**
    * Applies the configuration and returns a Configuration Report.
    * The values are fetched from the server.
    * However, in case of a connection error or an unknown configuration Id the corresponding
    * tag might be missing.
-   * 
+   *
    * @param configurationId The configuration id used to fetch the Configuration Report object
    * @return A Configuration Report object
-   */  
-    ConfigurationReport applyConfiguration(Long configurationId);    
-    
+   */
+    ConfigurationReport applyConfiguration(Long configurationId);
+
     /**
      * Applies the configuration and returns a Configuration Report.
      * The values are fetched from the server.
      * However, in case of a connection error or an unknown configuration Id the corresponding
      * tag might be missing.
-     * 
+     *
      * @param configurationId The configuration id used to fetch the Configuration Report object
      * @param reportListener Is informed about the progress of the operation on the server side.
      * @see ClientRequestProgressReport
      * @see ClientRequestErrorReport
      * @return A Configuration Report object
-     */  
-    ConfigurationReport applyConfiguration(Long configurationId, ClientRequestReportListener reportListener);   
-    
+     */
+    ConfigurationReport applyConfiguration(Long configurationId, ClientRequestReportListener reportListener);
+
     /**
      * Queries the server for the latest values and configuration
      * details for the request tags.
-     * 
+     *
      * <p>If called with an empty collection returns an empty collection.
-     * 
+     *
      * @param tagIds the ids of the tags
      * @return a collection of Alarms ({@link AlarmValue})
      * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
      * @throws NullPointerException if called with a null argument
      * @throws RuntimeException if the response from the server is null (probable timeout)
      */
-    Collection<AlarmValue> requestAlarms(Collection<Long> tagIds) throws JMSException;  
-    
+    Collection<AlarmValue> requestAlarms(Collection<Long> tagIds) throws JMSException;
+
     /**
      * Queries the server for a collection of the (latest) active alarms.
-     * 
+     *
      * @return a collection of active alarms ({@link AlarmValue})
      * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
      * @throws NullPointerException if called with a null argument
      * @throws RuntimeException if the response from the server is null (probable timeout)
      */
-    Collection<AlarmValue> requestAllActiveAlarms() throws JMSException;  
-    
+    Collection<AlarmValue> requestAllActiveAlarms() throws JMSException;
+
     /**
      * Queries the server for the latest values and configuration
      * details for the request tags.
-     * 
+     *
      * <p>If called with an empty collection returns an empty collection.
-     * 
+     *
      * @param tagIds the ids of the tags
      * @return a collection of TagConfigurations
      * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
      * @throws NullPointerException if called with a null argument
      * @throws RuntimeException if the response from the server is null (probable timeout)
      */
-    Collection<TagConfig> requestTagConfigurations(Collection<Long> tagIds) throws JMSException;    
-    
+    Collection<TagConfig> requestTagConfigurations(Collection<Long> tagIds) throws JMSException;
+
 
   /**
    * Queries the server for the latest values and configuration
    * details for the request tags.
-   * 
+   *
    * <p>If called with an empty collection returns an empty collection.
-   * 
+   *
    * @param tagIds the ids of the tags
    * @return a collection of transfer objects with the values/configuration information
    * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
@@ -121,12 +123,12 @@ public interface RequestHandler {
    * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<TagUpdate> requestTags(Collection<Long> tagIds) throws JMSException;
-  
+
   /**
    * Queries the server for the latest values for the request tags.
-   * 
+   *
    * <p>If called with an empty collection returns an empty collection.
-   * 
+   *
    * @param tagIds the ids of the tags
    * @return a collection of transfer objects with the value information
    * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
@@ -134,17 +136,17 @@ public interface RequestHandler {
    * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<TagValueUpdate> requestTagValues(Collection<Long> tagIds) throws JMSException;
-  
+
   /**
    * Queries the server for the current Supervision status of all
    * entities in the server (Process, Equipment and SubEquipment).
    * @return a collection of current events, each containing the status
    *                  of one of the entities
-   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request 
+   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
    * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException;
-  
+
   /**
    * Request CommandTags from the server.
    * @param commandIds ids of desired command tags
@@ -153,9 +155,9 @@ public interface RequestHandler {
    * @throws RuntimeException if no response is received from the server (probably timeout)
    */
   Collection<CommandTagHandle> requestCommandTagHandles(Collection<Long> commandIds);
-  
+
   /**
-   * 
+   *
    * @param <T> the value type of the command
    * @param commandExecuteRequest the request details for executing this command
    * @return a report about this execution
@@ -163,11 +165,11 @@ public interface RequestHandler {
    * @throws RuntimeException if no response is received from the server (probably timeout)
    */
   <T> CommandReport executeCommand(CommandExecuteRequest<T> commandExecuteRequest) throws JMSException;
-  
+
   /**
    * Requests the DAQ config XML for a given process. Never returns null.
    * @param processName the name of the Process
-   * @return the DAQ XML as String 
+   * @return the DAQ XML as String
    * @throws JMSException if JMS problem occurs or not connected at the moment
    * @throws RuntimeException if server is unable to answer the request (message contains details)
    */
@@ -175,9 +177,17 @@ public interface RequestHandler {
 
   /**
    * Requests a list of Names for all the existing processes.
-   * 
-   * @return a list of all process names 
+   *
+   * @return a list of all process names
    * @throws JMSException if JMS problem occurs or not connected at the moment
-   */      
+   */
   Collection<ProcessNameResponse> getProcessNames() throws JMSException;
+
+  /**
+   * Requests a list of all previously applied configuration reports.
+   *
+   * @return the list of reports
+   * @throws JMSException if JMS problem occurs or not connected at the moment
+   */
+  Collection<ConfigurationReport> getConfigurationReports() throws JMSException;
 }

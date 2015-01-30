@@ -10,6 +10,7 @@
  *****************************************************************************/
 package cern.c2mon.client.jms.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,7 +59,6 @@ import cern.c2mon.client.jms.HeartbeatListener;
 import cern.c2mon.client.jms.JmsProxy;
 import cern.c2mon.client.jms.SupervisionListener;
 import cern.c2mon.client.jms.TopicRegistrationDetails;
-import cern.c2mon.shared.client.command.CommandExecuteRequest;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 import cern.c2mon.shared.client.request.ClientRequestReport;
@@ -86,7 +86,7 @@ import com.google.gson.JsonSyntaxException;
  * <p>
  * Connect and disconnect methods are synchronized to prevent them running in
  * parallel.
- * 
+ *
  * @author Mark Brightwell
  */
 @Service
@@ -259,7 +259,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
   /**
    * Constructor.
-   * 
+   *
    * @param connectionFactory
    *          the JMS connection factory
    * @param supervisionTopic
@@ -300,8 +300,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
     sessions = new ConcurrentHashMap<MessageListenerWrapper, Session>();
     topicToWrapper = new ConcurrentHashMap<String, MessageListenerWrapper>();
-    registeredListeners = new ConcurrentHashMap<TagUpdateListener, TopicRegistrationDetails>();    
-    listenerLock = new ReentrantReadWriteLock().writeLock();    
+    registeredListeners = new ConcurrentHashMap<TagUpdateListener, TopicRegistrationDetails>();
+    listenerLock = new ReentrantReadWriteLock().writeLock();
     connectionListeners = new ArrayList<ConnectionListener>();
     connectionListenersLock = new ReentrantReadWriteLock();
     supervisionListenerWrapper = new SupervisionListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
@@ -419,6 +419,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       if (connected) {
         disconnect(); // notifies listeners
         new Thread(new Runnable() {
+          @Override
           public void run() {
             connect();
           }
@@ -433,7 +434,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   /**
    * Refreshes all the Topic subscriptions. Assumes previous connection/sessions
    * are now inactive.
-   * 
+   *
    * @throws JMSException
    *           if problem subscribing
    */
@@ -498,7 +499,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   /**
    * Called when refreshing subscriptions at start up and again if the
    * connection goes down.
-   * 
+   *
    * @throws JMSException
    *           if unable to subscribe
    */
@@ -513,7 +514,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   /**
    * Called when refreshing subscriptions at start up and again if the
    * connection goes down.
-   * 
+   *
    * @throws JMSException
    *           if unable to subscribe
    */
@@ -644,8 +645,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         if (jsonRequest.isObjectRequest()) { // used for EXECUTE_COMMAND_REQUESTS
 
           // send only the object
-          CommandExecuteRequest o = (CommandExecuteRequest) jsonRequest.getObjectParameter();
-          message = session.createObjectMessage(o);
+          //CommandExecuteRequest o = (CommandExecuteRequest) jsonRequest.getObjectParameter();
+          message = session.createObjectMessage((Serializable) jsonRequest.getObjectParameter());
 
         } else { // used for all other request types
 
@@ -662,7 +663,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
           producer.setTimeToLive(JMS_MESSAGE_TIMEOUT);
           producer.send(message);
 
-          while (connected && !shutdownRequested) { // until we receive the result 
+          while (connected && !shutdownRequested) { // until we receive the result
             // (it is possible to receive progress and / or error reports during this process)
 
             Message replyMessage = consumer.receive(timeout);
@@ -716,14 +717,14 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * This can either be the final Result or a Report on the progress of the request.
    * @param jsonMessage the received message.
    * @param jsonRequest the original request. useful to decode the message
-   * @param reportListener informed in case a Report is received. Can be null 
+   * @param reportListener informed in case a Report is received. Can be null
    * in case no one cares about the progress of this request.
    * @param <T> type returned depends on the ClientRequest type.
-   * @return a Collection of ClientRequestResults. 
+   * @return a Collection of ClientRequestResults.
    * @throws JMSException if problem subscribing
    */
   private <T extends ClientRequestResult> Collection<T> handleJsonResponse(
-      final TextMessage jsonMessage, final JsonRequest<T> jsonRequest, final ClientRequestReportListener reportListener) 
+      final TextMessage jsonMessage, final JsonRequest<T> jsonRequest, final ClientRequestReportListener reportListener)
       throws JsonSyntaxException, JMSException {
 
     Collection<T> resultCollection = jsonRequest.fromJsonResponse(jsonMessage.getText());
@@ -735,7 +736,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       ClientRequestReport report = (ClientRequestReport) result;
       if (isResult(report)) // received the result!
         return resultCollection; // bye - bye!
-      else { // received a report -> 
+      else { // received a report ->
         handleJsonReportResponse(report, reportListener); // let's handle the report! still waiting for the result though
         return null;
       }

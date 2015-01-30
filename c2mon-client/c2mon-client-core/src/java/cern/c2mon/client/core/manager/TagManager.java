@@ -129,7 +129,7 @@ public class TagManager implements CoreTagManager {
   public void refreshDataTags(final Collection<Long> tagIds) {
     cache.refresh(new HashSet<Long>(tagIds));
   }
-  
+
   @Override
   public void subscribeDataTag(final Long dataTagId, final DataTagUpdateListener listener) throws CacheSynchronizationException {
     if (dataTagId == null) {
@@ -137,17 +137,17 @@ public class TagManager implements CoreTagManager {
       LOG.warn("subscribeDataTag() : " + error);
       throw new IllegalArgumentException(error);
     }
-    
+
     Set<Long> id = new HashSet<>(1);
     id.add(dataTagId);
     subscribeDataTags(id, listener);
   }
-  
+
   @Override
   public void subscribeDataTags(final Set<Long> tagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException {
     doTagSubscription(tagIds, listener);
   }
-  
+
   @Override
   public void subscribeDataTag(final Long dataTagId, final DataTagListener listener) throws CacheSynchronizationException {
     if (dataTagId == null) {
@@ -155,7 +155,7 @@ public class TagManager implements CoreTagManager {
       LOG.warn("subscribeDataTagUpdate() : " + error);
       throw new IllegalArgumentException(error);
     }
-    
+
     Set<Long> id = new HashSet<>(1);
     id.add(dataTagId);
     subscribeDataTags(id, listener);
@@ -169,7 +169,7 @@ public class TagManager implements CoreTagManager {
   public void subscribeDataTags(final Set<Long> tagIds, final DataTagListener listener) {
     doTagSubscription(tagIds, listener);
   }
-  
+
   /**
    * Inner method that handles the tag subscription.
    * @param tagIds List of tag ids
@@ -190,7 +190,7 @@ public class TagManager implements CoreTagManager {
       LOG.warn("doTagSubscription() : " + error);
       throw new IllegalArgumentException(error);
     }
-    
+
     if (tagIds.isEmpty()) {
       String info = "Called with empty tag id list. Ignoring request.";
       LOG.info("doTagSubscription() : " + info);
@@ -214,7 +214,7 @@ public class TagManager implements CoreTagManager {
       throw cse;
     }
   }
-  
+
   @Override
   public void unsubscribeDataTag(Long dataTagId, DataTagUpdateListener listener) {
     if (dataTagId == null) {
@@ -222,7 +222,7 @@ public class TagManager implements CoreTagManager {
       LOG.warn("unsubscribeDataTag() : " + error);
       throw new IllegalArgumentException(error);
     }
-    
+
     Set<Long> id = new HashSet<>(1);
     id.add(dataTagId);
     unsubscribeDataTags(id, listener);
@@ -248,7 +248,7 @@ public class TagManager implements CoreTagManager {
       if (alarmListeners.size() == 0) {
         jmsProxy.registerAlarmListener(this);
       }
-      
+
       LOG.debug(new StringBuilder("addAlarmListener() : adding alarm listener " + listener.getClass()));
       alarmListeners.add(listener);
     } finally {
@@ -282,7 +282,7 @@ public class TagManager implements CoreTagManager {
     cache.removeTagSubscriptionListener(listener);
   }
 
-  
+
 
   @Override
   public Collection<ClientDataTagValue> getDataTags(final Collection<Long> tagIds) {
@@ -403,6 +403,16 @@ public class TagManager implements CoreTagManager {
   public ConfigurationReport applyConfiguration(Long configurationId, ClientRequestReportListener reportListener) {
 
     return clientRequestHandler.applyConfiguration(configurationId, reportListener);
+  }
+
+  @Override
+  public Collection<ConfigurationReport> getConfigurationReports() {
+    try {
+      return clientRequestHandler.getConfigurationReports();
+    } catch (JMSException e) {
+      LOG.error("getConfigurationReports() - JMS connection lost -> Could not retrieve configuration reports from the C2MON server.", e);
+    }
+    return new ArrayList<>();
   }
 
   @Override

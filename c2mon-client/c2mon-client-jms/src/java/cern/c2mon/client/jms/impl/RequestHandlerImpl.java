@@ -46,6 +46,8 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.request.ClientRequest;
+import cern.c2mon.shared.client.request.ClientRequest.RequestType;
+import cern.c2mon.shared.client.request.ClientRequest.ResultType;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -299,6 +301,21 @@ public class RequestHandlerImpl implements RequestHandler {
     CommandReport report = c.iterator().next();
 
     return report;
+  }
+
+  @Override
+  public Collection<ConfigurationReport> getConfigurationReports() throws JMSException {
+
+    ClientRequestImpl<ConfigurationReport> clientRequest = new ClientRequestImpl<>(ResultType.TRANSFER_CONFIGURATION_REPORT,
+        RequestType.RETRIEVE_CONFIGURATION_REQUEST, 10000);
+    Collection<ConfigurationReport> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
+
+    if (reports.isEmpty()) {
+      LOGGER.warn("getConfigurationReports() returned an empty collection");
+    }
+
+    LOGGER.trace("getConfigurationReports(): Received " + reports.size() + " configuration reports");
+    return reports;
   }
 
   /**

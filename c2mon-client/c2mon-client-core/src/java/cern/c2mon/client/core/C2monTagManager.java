@@ -65,7 +65,7 @@ public interface C2monTagManager {
    * @see C2monSupervisionManager#isServerConnectionWorking()
    */
   void subscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener) throws CacheSynchronizationException;
-  
+
   /**
    * Registers a listener to receive the current (initial) value and updates for one specific data tag.<p>
    * The C2MON client API will handle for you in the background the initialization of the data
@@ -84,9 +84,9 @@ public interface C2monTagManager {
    * @see C2monSupervisionManager#isServerConnectionWorking();
    */
   void subscribeDataTag(final Long dataTagId, final DataTagUpdateListener listener) throws CacheSynchronizationException;
-  
+
   /**
-   * Registers a listener to receive updates for specific data tags. 
+   * Registers a listener to receive updates for specific data tags.
    * The method will return the initial values of the subscribed tags to {@link DataTagListener#onInitialUpdate(Collection)}.
    * <b>Please note</b> that the {@link DataTagListener#onUpdate(ClientDataTagValue)} method will then not
    * receive the initial values.<p>
@@ -104,10 +104,10 @@ public interface C2monTagManager {
    * @see C2monSupervisionManager#isServerConnectionWorking()
    */
   void subscribeDataTags(final Set<Long> dataTagIds, final DataTagListener listener) throws CacheSynchronizationException;
-  
+
   /**
-   * Registers a listener to receive updates for a specific data tag. 
-   * The method will return the initial value of the subscribed tag to {@link DataTagListener#onInitialUpdate(Collection)}. <b>Please note</b> 
+   * Registers a listener to receive updates for a specific data tag.
+   * The method will return the initial value of the subscribed tag to {@link DataTagListener#onInitialUpdate(Collection)}. <b>Please note</b>
    * that the {@link DataTagListener#onUpdate(ClientDataTagValue)} method will then not receive the initial value.<p>
    * The C2MON client API will handle for you in the background the initialization of the data
    * tags with the C2MON server, if this was not already done before. <p>
@@ -133,7 +133,7 @@ public interface C2monTagManager {
    * @param listener the listener which shall be registered
    */
   void unsubscribeDataTags(final Set<Long> dataTagIds, final DataTagUpdateListener listener);
-  
+
   /**
    * Unregisters a listener from receiving updates for specific data tag.
    *
@@ -268,6 +268,13 @@ public interface C2monTagManager {
    * @return A Configuration Report object
    */
   ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener);
+
+  /**
+   * Retrieve a list of all previously applied configuration reports from the server.
+   *
+   * @return the list of previously applied configuration reports
+   */
+  Collection<ConfigurationReport> getConfigurationReports();
 
   /**
    * Requests the DAQ config XML for a given process.
