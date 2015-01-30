@@ -21,7 +21,6 @@ package cern.c2mon.client.ext.device;
 import java.util.List;
 import java.util.Set;
 
-import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
 import cern.c2mon.shared.client.device.DeviceInfo;
 
 /**
@@ -159,7 +158,7 @@ public interface C2monDeviceManager {
    *
    * @see DeviceInfo
    */
-  void subscribeDevice(DeviceInfo info, final DeviceInfoUpdateListener listener) throws DeviceNotFoundException;
+  void subscribeDevice(DeviceInfo info, final DeviceInfoUpdateListener listener);
 
   /**
    * Subscribe to retrieve updates of property changes of a set of devices by
