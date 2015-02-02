@@ -18,9 +18,12 @@
 
 package cern.c2mon.client.ext.device;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
+import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.shared.client.device.DeviceInfo;
 
 /**
@@ -40,6 +43,25 @@ public interface C2monDeviceManager {
    * @return the list of all device class names
    */
   List<String> getAllDeviceClassNames();
+
+  /**
+   * Retrieve a single device.
+   *
+   * <p>
+   * Note: retrieving a device using this method does not automatically
+   * subscribe to that device. Accessing a property of the device will fetch the
+   * value from the server only once. To receive updates about property changes,
+   * use one of the provided subscription methods.
+   * </p>
+   *
+   * @param info the {@link DeviceInfo} object describing the device you wish to
+   *          subscribe to
+   * @return the requested device
+   *
+   * @throws DeviceNotFoundException if no device was found that matches the
+   *           given {@link DeviceInfo} description
+   */
+  Device getDevice(DeviceInfo info) throws DeviceNotFoundException;
 
   /**
    * Retrieve all devices of a particular class.
@@ -151,8 +173,8 @@ public interface C2monDeviceManager {
    * changes.
    * </p>
    *
-   * @param className the class name of the device you want to subscribe to
-   * @param deviceName the name of the device you want to subscribe to
+   * @param info the {@link DeviceInfo} object describing the device you wish to
+   *          subscribe to
    * @param listener the callback listener that will be notified when a device
    *          property changes
    *
@@ -228,4 +250,14 @@ public interface C2monDeviceManager {
    */
   void unsubscribeAllDevices(final DeviceUpdateListener listener);
 
+  /**
+   * Retrieve all devices that are subscribed to receive updates on a particular
+   * {@link DeviceUpdateListener}.
+   *
+   * @param listener the listener that was previously used to make a
+   *          subscription
+   * @return the list of devices that were subscribed to using the given
+   *         listener
+   */
+  Collection<Device> getAllSubscribedDevices(DeviceUpdateListener listener);
 }

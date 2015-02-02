@@ -39,6 +39,7 @@ import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
+import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
@@ -117,6 +118,36 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
     }
 
     return deviceClassNames;
+  }
+
+  @Override
+  public Device getDevice(DeviceInfo info) throws DeviceNotFoundException {
+    Device device = null;
+
+    try {
+      // Ask the server for the device
+      Collection<TransferDevice> serverResponse = requestHandler.getDevices(new HashSet<>(Arrays.asList(info)));
+
+      // Convert the response object into a client device
+      for (TransferDevice transferDevice : serverResponse) {
+        if (transferDevice.getDeviceClassName().equals(info.getClassName()) && transferDevice.getName().equals(info.getDeviceName())) {
+          device = createClientDevice(transferDevice, info.getClassName());
+
+          // Add the device to the cache
+          deviceCache.add(device);
+        }
+      }
+
+    } catch (JMSException e) {
+      LOG.error("subscribeDevices() - JMS connection lost -> Could not retrieve devices from the C2MON server.", e);
+    }
+
+    // If the device was not found, throw an exception
+    if (device == null) {
+      throw new DeviceNotFoundException("Unknown device (class: " + info.getClassName() + " name: " + info.getDeviceName() + " requested.");
+    }
+
+    return device;
   }
 
   @Override
@@ -312,6 +343,17 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
   public void unsubscribeAllDevices(final DeviceUpdateListener listener) {
     Set<Device> allDevices = new HashSet<Device>(deviceCache.getAllDevices());
     unsubscribeDevices(allDevices, listener);
+  }
+
+  @Override
+  public Collection<Device> getAllSubscribedDevices(DeviceUpdateListener listener) {
+    Collection<Device> devices = deviceUpdateListeners.get(listener);
+
+    if (devices == null) {
+      devices = new ArrayList<>();
+    }
+
+    return devices;
   }
 
   /**

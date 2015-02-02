@@ -24,6 +24,7 @@ import static org.easymock.classextension.EasyMock.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +54,7 @@ import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
+import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
 import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.Field;
 import cern.c2mon.client.ext.device.property.FieldImpl;
@@ -121,6 +123,62 @@ public class DeviceManagerTest {
     Assert.assertTrue(deviceClassNames.get(1) == deviceClassNamesReturnMap.get(1).getDeviceClassName());
 
     // Verify that everything happened as expected
+    verify(requestHandlerMock);
+  }
+
+  @Test
+  public void testGetDevice() throws DeviceNotFoundException, JMSException {
+    // Reset the mock
+    EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
+    reset(requestHandlerMock);
+
+    TransferDevice transferDevice = new TransferDeviceImpl(1000L, "test_device", 1L, "test_class");
+
+    // Expectations
+    EasyMock.expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(Arrays.asList(transferDevice));
+    final Capture<Device> capturedDevice = new Capture<>();
+    deviceCacheMock.add(EasyMock.capture(capturedDevice));
+    EasyMock.expectLastCall();
+
+    // Setup is finished, need to activate the mock
+    EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
+    replay(requestHandlerMock);
+
+    // Run the actual code to test
+    DeviceInfo info = new DeviceInfo("test_class", "test_device");
+    Device device = deviceManager.getDevice(info);
+
+    Assert.assertTrue(device.getDeviceClassName().equals("test_class"));
+    Assert.assertTrue(device.getName().equals("test_device"));
+
+    // Verify that everything happened as expected
+    EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
+    verify(requestHandlerMock);
+  }
+
+  @Test
+  public void testGetUnknownDevice() throws DeviceNotFoundException, JMSException {
+    // Reset the mock
+    EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
+    reset(requestHandlerMock);
+
+    // Expectations
+    EasyMock.expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(new ArrayList<TransferDevice>());
+
+    // Setup is finished, need to activate the mock
+    EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
+    replay(requestHandlerMock);
+
+    // Run the actual code to test
+    // Test retrieving an unknown device - should throw exception
+    try {
+      deviceManager.getDevice(new DeviceInfo("unknown", "unknown"));
+      Assert.fail("Exception not thrown");
+    } catch (DeviceNotFoundException e) {
+    }
+
+    // Verify that everything happened as expected
+    EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     verify(requestHandlerMock);
   }
 
@@ -467,7 +525,7 @@ public class DeviceManagerTest {
 
   @Test
   public void testSubscribeDevicesByName() throws JMSException {
- // Reset the mock
+    // Reset the mock
     EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     reset(requestHandlerMock);
 
@@ -539,28 +597,34 @@ public class DeviceManagerTest {
     verify(requestHandlerMock);
   }
 
-//  @Test
-//  public void testPropertyUpdate() throws RuleFormatException {
-//    // Reset the mock
-//    EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
-//    reset(requestHandlerMock);
-//
-//    DeviceImpl device = new DeviceImpl(1000L, "test_device", 1L, "test_device_class", tagManagerMock, commandManagerMock);
-//    ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
-//    cdt1.update(DeviceTestUtils.createValidTransferTag(cdt1.getId(), "test_tag_name", 1L));
-//
-//    Map<String, ClientDataTagValue> deviceProperties = new HashMap<String, ClientDataTagValue>();
-//    deviceProperties.put("test_property_name", cdt1);
-//    device.setDeviceProperties(deviceProperties);
-//
-//    // Update the tag value
-//    ClientDataTagImpl cdt2 = new ClientDataTagImpl(100000L);
-//    cdt2.update(DeviceTestUtils.createValidTransferTag(cdt1.getId(), cdt1.getName(), 2L));
-//    deviceManager.onUpdate(cdt2);
-//
-//    // Check that the device stored the new update properly
-//    Assert.assertTrue(((Long) device.getProperty("test_property_name").getTag().getValue()) == 2L);
-//  }
+  // @Test
+  // public void testPropertyUpdate() throws RuleFormatException {
+  // // Reset the mock
+  // EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock,
+  // commandManagerMock);
+  // reset(requestHandlerMock);
+  //
+  // DeviceImpl device = new DeviceImpl(1000L, "test_device", 1L,
+  // "test_device_class", tagManagerMock, commandManagerMock);
+  // ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
+  // cdt1.update(DeviceTestUtils.createValidTransferTag(cdt1.getId(),
+  // "test_tag_name", 1L));
+  //
+  // Map<String, ClientDataTagValue> deviceProperties = new HashMap<String,
+  // ClientDataTagValue>();
+  // deviceProperties.put("test_property_name", cdt1);
+  // device.setDeviceProperties(deviceProperties);
+  //
+  // // Update the tag value
+  // ClientDataTagImpl cdt2 = new ClientDataTagImpl(100000L);
+  // cdt2.update(DeviceTestUtils.createValidTransferTag(cdt1.getId(),
+  // cdt1.getName(), 2L));
+  // deviceManager.onUpdate(cdt2);
+  //
+  // // Check that the device stored the new update properly
+  // Assert.assertTrue(((Long)
+  // device.getProperty("test_property_name").getTag().getValue()) == 2L);
+  // }
 
   @Test
   public void testUnsubscribeDevices() {
@@ -632,7 +696,6 @@ public class DeviceManagerTest {
   public void testUnsubscribeAllDevices() {
     // Reset the mock
     EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock);
-    System.out.println("testUnsubscribeAllDevices");
 
     final ClientDataTagImpl cdt1 = new ClientDataTagImpl(100000L);
     final ClientDataTagImpl cdt2 = new ClientDataTagImpl(200000L);
@@ -697,6 +760,57 @@ public class DeviceManagerTest {
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+  }
+
+  @Test
+  public void testGetAllSubscribedDevices() throws JMSException {
+    // Reset the mock
+    EasyMock.reset(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    reset(requestHandlerMock);
+
+    DeviceInfo di1 = new DeviceInfo("test_class", "test_device_1");
+    DeviceInfo di2 = new DeviceInfo("test_class", "test_device_2");
+    Set<DeviceInfo> deviceInfoList = new HashSet<>(Arrays.asList(di1, di2));
+
+    TransferDevice transferDevice1 = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_class");
+    TransferDevice transferDevice2 = new TransferDeviceImpl(1001L, "test_device_2", 1L, "test_class");
+    Collection<TransferDevice> transferDeviceList1 = Arrays.asList(transferDevice1, transferDevice2);
+    TransferDevice transferDevice3 = new TransferDeviceImpl(1002L, "test_device_3", 1L, "test_class");
+    Collection<TransferDevice> transferDeviceList2 = Arrays.asList(transferDevice3);
+
+    // Expectations
+    EasyMock.expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(transferDeviceList1);
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall().times(2);
+    tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagListener> anyObject());
+    EasyMock.expectLastCall();
+
+    EasyMock.expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(transferDeviceList2);
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall();
+    tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagListener> anyObject());
+    EasyMock.expectLastCall();
+
+    // Setup is finished, need to activate the mock
+    EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    replay(requestHandlerMock);
+
+    // Run the actual code to test
+    // Subscribe to a list of devices
+    DeviceInfoUpdateListener listener1 = new TestDeviceUpdateListener();
+    deviceManager.subscribeDevices(deviceInfoList, listener1);
+    Collection<Device> subscribedDevices = deviceManager.getAllSubscribedDevices(listener1);
+    Assert.assertTrue(subscribedDevices.size() == 2);
+
+    // Subscribe to a single device
+    DeviceInfoUpdateListener listener2 = new TestDeviceUpdateListener();
+    deviceManager.subscribeDevice(new DeviceInfo("test_class", "test_device_3"), listener2);
+    subscribedDevices = deviceManager.getAllSubscribedDevices(listener2);
+    Assert.assertTrue(subscribedDevices.size() == 1);
+
+    // Verify that everything happened as expected
+    EasyMock.verify(tagManagerMock, deviceCacheMock, dataTagCacheMock);
+    verify(requestHandlerMock);
   }
 
   class TestDeviceUpdateListener implements DeviceInfoUpdateListener {
