@@ -33,7 +33,7 @@ public enum Category {
   /**
    * A property containing a tag id which points to a data tag.
    */
-  TAG_ID("tagId"),
+  DATATAG("tagId"),
 
   /**
    * A property containing a constant value.

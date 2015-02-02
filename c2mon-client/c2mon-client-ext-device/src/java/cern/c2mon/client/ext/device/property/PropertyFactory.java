@@ -63,8 +63,8 @@ public class PropertyFactory {
     }
 
     // If we have a tag ID, it takes priority.
-    if (deviceProperty.getCategory().equals(Category.TAG_ID.getCategory())) {
-      return new PropertyImpl(deviceProperty.getName(), Category.TAG_ID, Long.parseLong(deviceProperty.getValue()));
+    if (deviceProperty.getCategory().equals(Category.DATATAG.getCategory())) {
+      return new PropertyImpl(deviceProperty.getName(), Category.DATATAG, Long.parseLong(deviceProperty.getValue()));
     }
 
     // If we have a client rule, that comes next in the hierarchy.
@@ -100,7 +100,7 @@ public class PropertyFactory {
     } else if (tag instanceof ClientConstantValue<?>) {
       category = Category.CONSTANT_VALUE;
     } else {
-      category = Category.TAG_ID;
+      category = Category.DATATAG;
     }
 
     return new PropertyImpl(name, category, tag);
@@ -126,7 +126,7 @@ public class PropertyFactory {
    * @return the newly converted {@link Field} instance
    */
   private static Field createField(Property property) {
-    if (property.getCategory().equals(Category.TAG_ID)) {
+    if (property.getCategory().equals(Category.DATATAG)) {
       return new FieldImpl(property.getName(), property.getCategory(), property.getTagId());
     } else {
       return new FieldImpl(property.getName(), property.getCategory(), ((BasePropertyImpl) property).getValue());

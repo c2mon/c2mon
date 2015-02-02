@@ -91,7 +91,7 @@ public class DeviceImplTest {
     Assert.assertTrue(property.getTagId().equals(cdt1.getId()));
     Assert.assertTrue(property.getTag() != null);
     Assert.assertTrue(property.getFields().size() == 0);
-    Assert.assertTrue(property.getCategory() == Category.TAG_ID);
+    Assert.assertTrue(property.getCategory() == Category.DATATAG);
 
     // Verify that everything happened as expected
     EasyMock.verify(tagManagerMock);
@@ -133,7 +133,7 @@ public class DeviceImplTest {
     Assert.assertTrue(property.getTagId() == cdt1.getId());
     Assert.assertTrue(property.getTag() != null && property.getTag() instanceof ClientDataTagValue);
     Assert.assertTrue(property.getFields().size() == 0);
-    Assert.assertTrue(property.getCategory() == Category.TAG_ID);
+    Assert.assertTrue(property.getCategory() == Category.DATATAG);
     property = device.getProperty("responsiblePerson");
     Assert.assertNull(property.getTagId());
     Assert.assertTrue(property.getCategory() == Category.CONSTANT_VALUE);
@@ -346,7 +346,7 @@ public class DeviceImplTest {
     ClientConstantValue ccv2 = new ClientConstantValue(4, Integer.class);
 
     Map<String, Field> fields = new HashMap<>();
-    fields.put("cpuLoadInPercent", new FieldImpl("cpuLoadInPercent", Category.TAG_ID, cdt1));
+    fields.put("cpuLoadInPercent", new FieldImpl("cpuLoadInPercent", Category.DATATAG, cdt1));
     fields.put("responsiblePerson", new FieldImpl("responsiblePerson", Category.CONSTANT_VALUE, ccv1));
     fields.put("someCalculations", new FieldImpl("someCalculations", Category.CLIENT_RULE, crt));
     fields.put("numCores", new FieldImpl("numCores", Category.CONSTANT_VALUE, ccv2));

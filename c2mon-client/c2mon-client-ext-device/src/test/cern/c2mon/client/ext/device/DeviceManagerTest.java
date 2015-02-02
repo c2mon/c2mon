@@ -353,7 +353,7 @@ public class DeviceManagerTest {
     Map<String, Field> deviceFields = new HashMap<>();
 
     for (int i = 0; i < 1000; i++) {
-      deviceFields.put("test_field_name_" + i, new FieldImpl("test_field_name_" + i, Category.TAG_ID, new Long(i)));
+      deviceFields.put("test_field_name_" + i, new FieldImpl("test_field_name_" + i, Category.DATATAG, new Long(i)));
     }
 
     HashMap<String, Property> deviceProperties = new HashMap<>();
