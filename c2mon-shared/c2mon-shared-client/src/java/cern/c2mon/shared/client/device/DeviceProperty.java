@@ -142,16 +142,25 @@ public class DeviceProperty implements Cloneable, Serializable {
   /**
    * Get the value of this property.
    *
-   * @return the client rule string
+   * @return the property value
    */
   public String getValue() {
     return value;
   }
 
   /**
+   * Set the value of this property.
+   *
+   * @param value the value to set
+   */
+  public void setValue(String value) {
+    this.value = value;
+  }
+
+  /**
    * Get the category of this property.
    *
-   * @return the constant value
+   * @return the property category
    */
   public String getCategory() {
     return category;
