@@ -296,8 +296,12 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
     DevicePropertyList devicePropertyList = serializer.read(DevicePropertyList.class, xmlString);
 
     for (DeviceProperty deviceProperty : devicePropertyList.getDeviceProperties()) {
+
       // Remove all whitespace and control characters
-      deviceProperty.setValue(deviceProperty.getValue().replaceAll("[\u0000-\u001f]", "").trim());
+      if (deviceProperty.getValue() != null) {
+        deviceProperty.setValue(deviceProperty.getValue().replaceAll("[\u0000-\u001f]", "").trim());
+      }
+
       deviceProperties.add(deviceProperty);
     }
 
