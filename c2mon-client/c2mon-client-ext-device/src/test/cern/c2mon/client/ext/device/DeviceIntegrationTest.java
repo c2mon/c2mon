@@ -17,12 +17,17 @@
  ******************************************************************************/
 package cern.c2mon.client.ext.device;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 
+import cern.c2mon.client.ext.device.listener.DeviceInfoUpdateListener;
 import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.Field;
 import cern.c2mon.client.ext.device.property.Property;
@@ -42,8 +47,11 @@ public class DeviceIntegrationTest {
 
   static Logger log = Logger.getLogger(DeviceIntegrationTest.class);
 
-  public static void main(String[] args) {
+  static CountDownLatch latch;
+
+  public static void main(String[] args) throws InterruptedException {
     C2monDeviceManager manager = C2monDeviceGateway.getDeviceManager();
+    List<Device> allDevices = new ArrayList<>();
 
     List<String> deviceClassNames = manager.getAllDeviceClassNames();
     log.info("Retrieved the following DeviceClass names:");
@@ -54,6 +62,7 @@ public class DeviceIntegrationTest {
 
     for (String name : deviceClassNames) {
       List<Device> devices = manager.getAllDevices(name);
+      allDevices.addAll(devices);
 
       log.info("Retrieved the following devices for device class " + name + ":");
       for (Device device : devices) {
@@ -83,14 +92,23 @@ public class DeviceIntegrationTest {
         manager.subscribeDevice(device, listener);
       }
 
-      log.info("Unsubscribing and re-subscribing to all devices");
+      log.info("Unsubscribing from all devices");
       manager.unsubscribeDevices(new HashSet<Device>(devices), listener);
-      manager.subscribeDevices(new HashSet<Device>(devices), listener);
-
-      log.info("Attempting subscription to an unknown device");
-      DeviceInfo info = new DeviceInfo("unknown", "unknown");
-      manager.subscribeDevices(new HashSet<>(Arrays.asList(info)), listener);
     }
+
+    log.info("Attempting subscription to an unknown device");
+    DeviceInfo info = new DeviceInfo("unknown", "unknown");
+    manager.subscribeDevices(new HashSet<>(Arrays.asList(info)), listener);
+
+    log.info("Subscribing to two different devices with the same listener (should get two callbacks)");
+    latch = new CountDownLatch(2);
+    manager.subscribeDevice(allDevices.get(0), listener2);
+    manager.subscribeDevice(allDevices.get(1), listener2);
+
+    latch.await(1000, TimeUnit.MILLISECONDS);
+    Assert.assertTrue(latch.getCount() == 0);
+
+    manager.unsubscribeAllDevices(listener2);
   }
 
   static DeviceInfoUpdateListener listener = new DeviceInfoUpdateListener() {
@@ -126,6 +144,25 @@ public class DeviceIntegrationTest {
       for (DeviceInfo info : unknownDevices) {
         log.info("\tclass=" + info.getClassName() + " device=" + info.getDeviceName());
       }
+    }
+  };
+
+  static DeviceInfoUpdateListener listener2 = new DeviceInfoUpdateListener() {
+
+    @Override
+    public void onUpdate(Device device, PropertyInfo propertyInfo) {
+      log.info("onUpdate()");
+    }
+
+    @Override
+    public void onInitialUpdate(List<Device> devices) {
+      log.info("onInitialUpdate()");
+      latch.countDown();
+    }
+
+    @Override
+    public void onDevicesNotFound(List<DeviceInfo> unknownDevices) {
+      log.info("onDevicesNotFound()");
     }
   };
 }

@@ -20,10 +20,8 @@ package cern.c2mon.client.ext.device;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jms.JMSException;
@@ -40,6 +38,9 @@ import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
+import cern.c2mon.client.ext.device.listener.DeviceInfoUpdateListener;
+import cern.c2mon.client.ext.device.listener.DeviceUpdateListener;
+import cern.c2mon.client.ext.device.listener.ListenerWrapper;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.client.ext.device.request.DeviceRequestHandler;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
@@ -76,9 +77,10 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
   private final DeviceRequestHandler requestHandler;
 
   /**
-   * Map of {@link DeviceUpdateListener}s to a set of {@link Device}s.
+   * Set of {@link ListenerWrapper} objects which wrap a
+   * {@link DeviceUpdateListener} and a set of {@link Device}s.
    */
-  private Map<DeviceUpdateListener, Set<Device>> deviceUpdateListeners = new HashMap<>();
+  private Set<ListenerWrapper> deviceUpdateListeners = new HashSet<>();
 
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service.
@@ -196,7 +198,10 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
       // Here, just get the tag IDs to avoid calling the server
       dataTagIds.addAll(deviceImpl.getPropertyDataTagIds());
 
-      deviceUpdateListeners.put(listener, new HashSet<>(devices));
+      deviceUpdateListeners.add(new ListenerWrapper(listener, new HashSet<>(devices)));
+
+      // Add the devices to the cache
+      deviceCache.add(device);
 
       // If the device contains properties that are client rules, also subscribe
       // to the tags contained within those rules
@@ -280,9 +285,12 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
     }
 
     // Invoke the listeners that are interested in these tags/devices
-    for (Map.Entry<DeviceUpdateListener, Set<Device>> entry : deviceUpdateListeners.entrySet()) {
-      if (updatedDevices.equals(entry.getValue())) {
-        entry.getKey().onInitialUpdate(new ArrayList<Device>(updatedDevices));
+    for (ListenerWrapper wrapper : deviceUpdateListeners) {
+      if (updatedDevices.equals(wrapper.getDevices())) {
+        if (wrapper.isInitialUpdateRequired()) {
+          wrapper.getListener().onInitialUpdate(new ArrayList<Device>(updatedDevices));
+          wrapper.setInitialUpdateRequired(false);
+        }
       }
     }
   }
@@ -299,9 +307,9 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
         PropertyInfo propertyInfo = deviceImpl.updateProperty(tag);
 
         // Invoke the listeners that are interested in these tags/devices
-        for (Map.Entry<DeviceUpdateListener, Set<Device>> entry : deviceUpdateListeners.entrySet()) {
-          if (entry.getValue().contains(device)) {
-            entry.getKey().onUpdate(device, propertyInfo);
+        for (ListenerWrapper wrapper : deviceUpdateListeners) {
+          if (wrapper.getDevices().contains(device)) {
+            wrapper.getListener().onUpdate(device, propertyInfo);
           }
         }
       }
@@ -322,7 +330,11 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
       dataTagIds.addAll(deviceImpl.getPropertyDataTagIds());
 
       // Remove the device from the listener
-      deviceUpdateListeners.get(listener).remove(device);
+      for (ListenerWrapper wrapper : deviceUpdateListeners) {
+        if (wrapper.getListener().equals(listener)) {
+          wrapper.getDevices().remove(device);
+        }
+      }
 
       // Remove the device from the cache if nobody is listening for updates
       if (!isSubscribed(device)) {
@@ -331,9 +343,13 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
     }
 
     // If no devices are left in the set, remove the listener itself
-    if (deviceUpdateListeners.get(listener).isEmpty()) {
-      deviceUpdateListeners.remove(listener);
+    List<ListenerWrapper> listenersToRemove = new ArrayList<>();
+    for (ListenerWrapper wrapper : deviceUpdateListeners) {
+      if (wrapper.getDevices().isEmpty()) {
+        listenersToRemove.add(wrapper);
+      }
     }
+    deviceUpdateListeners.removeAll(listenersToRemove);
 
     // Use TagManager to unsubscribe from all properties of the device
     tagManager.unsubscribeDataTags(dataTagIds, this);
@@ -347,10 +363,12 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
 
   @Override
   public Collection<Device> getAllSubscribedDevices(DeviceUpdateListener listener) {
-    Collection<Device> devices = deviceUpdateListeners.get(listener);
+    Collection<Device> devices = new ArrayList<>();
 
-    if (devices == null) {
-      devices = new ArrayList<>();
+    for (ListenerWrapper wrapper : deviceUpdateListeners) {
+      if (wrapper.getListener().equals(listener)) {
+        devices = wrapper.getDevices();
+      }
     }
 
     return devices;
@@ -363,8 +381,9 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
    * @return true if the device is subscribed to, false otherwise
    */
   public boolean isSubscribed(Device device) {
-    for (Set<Device> devices : deviceUpdateListeners.values()) {
-      if (devices.contains(device)) {
+
+    for (ListenerWrapper wrapper : deviceUpdateListeners) {
+      if (wrapper.getDevices().contains(device)) {
         return true;
       }
     }
@@ -378,7 +397,13 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
    * @return the set of {@link DeviceUpdateListener}s
    */
   public Set<DeviceUpdateListener> getDeviceUpdateListeners() {
-    return deviceUpdateListeners.keySet();
+    Set<DeviceUpdateListener> listeners = new HashSet<>();
+
+    for (ListenerWrapper wrapper : deviceUpdateListeners) {
+      listeners.add(wrapper.getListener());
+    }
+
+    return listeners;
   }
 
   /**

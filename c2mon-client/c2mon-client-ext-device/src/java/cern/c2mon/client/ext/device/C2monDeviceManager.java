@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
+import cern.c2mon.client.ext.device.listener.DeviceInfoUpdateListener;
+import cern.c2mon.client.ext.device.listener.DeviceUpdateListener;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 import cern.c2mon.shared.client.device.DeviceInfo;
 

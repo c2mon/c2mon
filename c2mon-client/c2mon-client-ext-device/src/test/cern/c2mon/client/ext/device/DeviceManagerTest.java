@@ -55,6 +55,7 @@ import cern.c2mon.client.core.tag.ClientCommandTagImpl;
 import cern.c2mon.client.core.tag.ClientDataTagImpl;
 import cern.c2mon.client.ext.device.cache.DeviceCache;
 import cern.c2mon.client.ext.device.exception.DeviceNotFoundException;
+import cern.c2mon.client.ext.device.listener.DeviceInfoUpdateListener;
 import cern.c2mon.client.ext.device.property.Category;
 import cern.c2mon.client.ext.device.property.Field;
 import cern.c2mon.client.ext.device.property.FieldImpl;

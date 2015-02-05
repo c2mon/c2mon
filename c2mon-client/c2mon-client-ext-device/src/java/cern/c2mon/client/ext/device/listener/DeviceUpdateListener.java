@@ -15,10 +15,11 @@
  *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
-package cern.c2mon.client.ext.device;
+package cern.c2mon.client.ext.device.listener;
 
 import java.util.List;
 
+import cern.c2mon.client.ext.device.Device;
 import cern.c2mon.client.ext.device.property.PropertyInfo;
 
 /**
