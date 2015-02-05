@@ -221,6 +221,9 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
 
   @Override
   public void subscribeDevices(Set<DeviceInfo> deviceInfoList, DeviceInfoUpdateListener listener) {
+    // Copy the list into a HashSet to make sure it's serialisable
+    deviceInfoList = new HashSet<>(deviceInfoList);
+
     try {
       // Ask the server for the devices
       Collection<TransferDevice> serverResponse = requestHandler.getDevices(deviceInfoList);
