@@ -353,12 +353,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
             
             if (sendInitialUpdateSeperately) {
               cdt = controller.getActiveCache().get(tagId);
-              try {
-                initialUpdates.put(tagId, cdt.clone());
-              }
-              catch (CloneNotSupportedException e) {
-                throw new RuntimeException("ClientDataTagImpl object could not be cloned for tag " + tagId + ": " + cdt.toString());
-              }
+              initialUpdates.put(tagId, cdt.clone());
             }
             
           } else {
@@ -377,12 +372,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
               supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
               
               if (sendInitialUpdateSeperately) {
-                try {
-                  initialUpdates.put(tagId, cdt.clone());
-                }
-                catch (CloneNotSupportedException e) {
-                  throw new RuntimeException("ClientDataTagImpl object could not be cloned for tag " + tagId + ": " + cdt.toString());
-                }
+                initialUpdates.put(tagId, cdt.clone());
               }
               
             }

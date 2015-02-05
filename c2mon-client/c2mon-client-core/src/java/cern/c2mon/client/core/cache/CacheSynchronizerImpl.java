@@ -434,18 +434,13 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
    */
   private void synchronizeHistoryCache() {
     if (controller.isHistoryModeEnabled()) {
-      try {
-        ClientDataTagImpl cdt = null;
-        ClientDataTagImpl historyTag = null;
-        for (Long tagId : historyCacheUpdateList) {
-          cdt = liveCache.get(tagId);
-          historyTag = cdt.clone();
-          // Adds the clone (without listeners) to the history cache.
-          historyCache.put(tagId, historyTag);
-        }
-      } catch (CloneNotSupportedException e) {
-        LOG.error("synchronizeHistoryCache() - ClientDataTag is not clonable. Please check the code!", e);
-        throw new RuntimeException(e);
+      ClientDataTagImpl cdt = null;
+      ClientDataTagImpl historyTag = null;
+      for (Long tagId : historyCacheUpdateList) {
+        cdt = liveCache.get(tagId);
+        historyTag = cdt.clone();
+        // Adds the clone (without listeners) to the history cache.
+        historyCache.put(tagId, historyTag);
       }
       historyCacheUpdateList.clear();
     }

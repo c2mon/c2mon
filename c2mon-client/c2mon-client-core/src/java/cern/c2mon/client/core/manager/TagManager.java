@@ -312,11 +312,9 @@ public class TagManager implements CoreTagManager {
             ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
             cdt.update(tagUpdate);
             supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
-            try {
-              resultList.add((ClientDataTagValue) cdt.clone());
-            } catch (CloneNotSupportedException e) {
-              LOG.error("getDataTags() - CloneNotSupportedException - " + cdt.getId(), e);
-            }
+            
+            resultList.add((ClientDataTagValue) cdt.clone());
+            
             supervisionManager.removeSupervisionListener(cdt);
           } catch (RuleFormatException e) {
             LOG.error("getDataTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);

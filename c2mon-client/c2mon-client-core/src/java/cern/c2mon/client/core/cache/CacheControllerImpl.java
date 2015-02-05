@@ -160,22 +160,17 @@ class CacheControllerImpl implements CacheController {
     ClientDataTagImpl historyTag = null;
     Collection<DataTagUpdateListener> listeners = null;
     
-    try {
-      for (Entry<Long, ClientDataTagImpl> entry : liveCache.entrySet()) {
-        liveTag = entry.getValue();
-        
-        historyTag = liveTag.clone();
-        
-        listeners = liveTag.getUpdateListeners();
-        liveTag.removeAllUpdateListeners();
-        historyTag.addUpdateListeners(listeners);
-        historyCache.put(entry.getKey(), historyTag);
-      }
+    for (Entry<Long, ClientDataTagImpl> entry : liveCache.entrySet()) {
+      liveTag = entry.getValue();
+      
+      historyTag = liveTag.clone();
+      
+      listeners = liveTag.getUpdateListeners();
+      liveTag.removeAllUpdateListeners();
+      historyTag.addUpdateListeners(listeners);
+      historyCache.put(entry.getKey(), historyTag);
     }
-    catch (CloneNotSupportedException e) {
-      LOG.error("enableHistoryMode() - ClientDataTag is not clonable. Please check the code!", e);
-      throw new RuntimeException(e);
-    }
+  
     activeCache = historyCache;
   }
 }

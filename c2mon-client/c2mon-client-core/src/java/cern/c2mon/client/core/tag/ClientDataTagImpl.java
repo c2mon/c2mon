@@ -386,6 +386,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @param statusToRemove The invalid quality status to be removed from this tag.
    */
   public void validate(final TagQualityStatus statusToRemove) {
+    ClientDataTag clone = null;
     updateTagLock.writeLock().lock();
     try {
       if (LOG.isTraceEnabled()) {
@@ -394,11 +395,15 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       if (tagQuality.isInvalidStatusSet(statusToRemove)) {
         // remove the quality status
         tagQuality.removeInvalidStatus(statusToRemove);
-        notifyListeners();
+        clone = this.clone();
       }
     }
     finally {
       updateTagLock.writeLock().unlock();
+    }
+    
+    if (clone != null) {
+      notifyListeners(clone);
     }
   }
 
@@ -411,6 +416,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    * @param description the quality description
    */
   public void invalidate(final TagQualityStatus status, final String description) {
+    ClientDataTag clone = null;
     updateTagLock.writeLock().lock();
     try {
       if (LOG.isTraceEnabled()) {
@@ -419,33 +425,31 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       // Invalidate the object.
       tagQuality.addInvalidStatus(status, description);
 
-      notifyListeners();
+      clone = this.clone();
     }
     finally {
       updateTagLock.writeLock().unlock();
+    }
+    
+    if (clone != null) {
+      notifyListeners(clone);
     }
   }
 
   /**
    * Private method to notify all registered <code>DataTagUpdateListener</code> instances.
+   * Please avoid calling this method within a WRITELOCK block since it could be a potential
+   * candidate for risking a deadlocks.
+   * @param Please only provide a clone of this tag
    */
-  private void notifyListeners() {
-    try {
-      final ClientDataTag clone = this.clone();
-
-      for (DataTagUpdateListener updateListener : listeners) {
-        try {
-          updateListener.onUpdate(clone);
-        }
-        catch (Exception e) {
-          LOG.error("notifyListeners() : error notifying DataTagUpdateListeners", e);
-        }
+  private synchronized void notifyListeners(final ClientDataTag clone) {
+    for (DataTagUpdateListener updateListener : listeners) {
+      try {
+        updateListener.onUpdate(clone);
       }
-    }
-    catch (CloneNotSupportedException cloneException) {
-      LOG.fatal(
-          "notifyListeners() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
-      throw new RuntimeException(cloneException);
+      catch (Exception e) {
+        LOG.error("notifyListeners() : error notifying DataTagUpdateListeners", e);
+      }
     }
   }
 
@@ -470,21 +474,21 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     }
     listeners.add(listener);
 
+    ClientDataTag clone = null;
     updateTagLock.readLock().lock();
     try {
       boolean sendInitialUpdate = !TagComparator.compare(this, initialValue);
       
       if (sendInitialUpdate) {
-        try {
-          listener.onUpdate(this.clone());
-        } catch (CloneNotSupportedException cloneException) {
-          LOG.fatal("addUpdateListener() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
-          throw new RuntimeException(cloneException);
-        }
+        clone = this.clone();
       }
     }
     finally {
       updateTagLock.readLock().unlock();
+    }
+    
+    if (clone != null) {
+      listener.onUpdate(clone);
     }
   }
   
@@ -663,21 +667,28 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
   @Override
   public boolean update(final TagValueUpdate tagValueUpdate) {
+    ClientDataTag clone = null;
+    boolean valid = false;
+    
     updateTagLock.writeLock().lock();
     try {
-      boolean valid = isValidUpdate(tagValueUpdate);
+      valid = isValidUpdate(tagValueUpdate);
 
       if (valid) {
         doUpdateValues(tagValueUpdate);
         // Notify all listeners of the update
-        notifyListeners();
+        clone = this.clone();
       }
-
-      return valid;
     }
     finally {
       updateTagLock.writeLock().unlock();
     }
+    
+    if (clone != null) {
+      notifyListeners(clone);
+    }
+    
+    return valid;
   }
 
   /* (non-Javadoc)
@@ -685,9 +696,12 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    */
   @Override
   public boolean update(final TagUpdate tagUpdate) throws RuleFormatException {
+    ClientDataTag clone = null;
+    boolean valid = false;
+    
     updateTagLock.writeLock().lock();
     try {
-      boolean valid = isValidUpdate(tagUpdate);
+      valid = isValidUpdate(tagUpdate);
 
       if (valid) {
         if (tagUpdate.getRuleExpression() != null) {
@@ -722,14 +736,18 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
         unit = tagUpdate.getUnit();
 
         // Notify all listeners of the update
-        notifyListeners();
+        clone = this.clone();
       }
-
-      return valid;
     }
     finally {
       updateTagLock.writeLock().unlock();
     }
+    
+    if (clone != null) {
+      notifyListeners(clone);
+    }
+    
+    return valid;
   }
 
   /**
@@ -980,7 +998,7 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
    */
   @SuppressWarnings("unchecked")
   @Override
-  public ClientDataTagImpl clone() throws CloneNotSupportedException {
+  public ClientDataTagImpl clone() {
     updateTagLock.readLock().lock();
     try {
       ClientDataTagImpl clone = (ClientDataTagImpl) super.clone();
@@ -1041,6 +1059,11 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
       clone.listeners = new ConcurrentIdentitySet<DataTagUpdateListener>();
 
       return clone;
+    }
+    catch (CloneNotSupportedException cloneException) {
+      LOG.fatal(
+          "clone() - Cloning the ClientDataTagImpl object failed! No update sent to the client.");
+      throw new RuntimeException(cloneException);
     }
     finally {
       updateTagLock.readLock().unlock();
@@ -1104,6 +1127,9 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
     if (supervisionEvent == null) {
       return;
     }
+    
+    ClientDataTag clone = null;
+    
     updateTagLock.writeLock().lock();
     try {
       boolean validUpdate = false;
@@ -1134,12 +1160,16 @@ public class ClientDataTagImpl implements ClientDataTag, TopicRegistrationDetail
 
         if (oldEvent == null || !supervisionEvent.equals(oldEvent)) {
           // Notify all listeners of the update
-          notifyListeners();
+          clone = this.clone();
         }
       }
     }
     finally {
       updateTagLock.writeLock().unlock();
+    }
+    
+    if (clone != null) {
+      notifyListeners(clone);
     }
   }
 
