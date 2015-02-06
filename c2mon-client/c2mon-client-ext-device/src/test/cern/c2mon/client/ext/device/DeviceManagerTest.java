@@ -260,6 +260,9 @@ public class DeviceManagerTest {
     // Expect the device manager to get the devices from the cache - once to
     // call onInitialUpdate() and once to call onUpdate()
     EasyMock.expect(deviceCacheMock.getAllDevices()).andReturn(Arrays.asList((Device) device1)).times(2);
+    // Expect the device manager to add the devices to the cache
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall();
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock);
@@ -321,6 +324,9 @@ public class DeviceManagerTest {
     // Expect the device manager to get the devices from the cache - once to
     // call onInitialUpdate() and once to call onUpdate()
     EasyMock.expect(deviceCacheMock.getAllDevices()).andReturn(Arrays.asList((Device) device1)).times(2);
+    // Expect the device manager to add the devices to the cache
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall();
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock);
@@ -385,6 +391,9 @@ public class DeviceManagerTest {
     // Expect the device manager to get the devices from the cache - once to
     // call onInitialUpdate() and once to call onUpdate()
     EasyMock.expect(deviceCacheMock.getAllDevices()).andReturn(Arrays.asList((Device) device1)).times(2);
+    // Expect the device manager to add the devices to the cache
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall();
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock);
@@ -458,6 +467,10 @@ public class DeviceManagerTest {
         return Arrays.asList(capturedDevice.getValue());
       }
     }).times(2);
+
+    // Expect the device manager to add the devices to the cache
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall();
 
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
@@ -569,6 +582,10 @@ public class DeviceManagerTest {
       }
     }).times(2);
 
+    // Expect the device manager to add the devices to the cache
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall();
+
     // Setup is finished, need to activate the mock
     EasyMock.replay(tagManagerMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     replay(requestHandlerMock);
@@ -657,6 +674,9 @@ public class DeviceManagerTest {
     // Expect the device manager to get the devices from the cache - once to
     // call onInitialUpdate() and once to call onUpdate()
     EasyMock.expect(deviceCacheMock.getAllDevices()).andReturn(Arrays.asList((Device) device1)).times(2);
+    // Expect the device manager to add the devices to the cache
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall().times(2);
 
     // Expect the device manager to unsubscribe the tags
     tagManagerMock.unsubscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagListener> anyObject());
@@ -734,6 +754,9 @@ public class DeviceManagerTest {
     // Expect the device manager to get the devices from the cache - once to
     // call onInitialUpdate() and once to call onUpdate()
     EasyMock.expect(deviceCacheMock.getAllDevices()).andReturn(Arrays.asList((Device) device1)).times(3);
+    // Expect the device manager to add the devices to the cache
+    deviceCacheMock.add(EasyMock.<Device> anyObject());
+    EasyMock.expectLastCall().times(2);
 
     // Expect the device manager to get all cached devices before unsubscribing
     EasyMock.expect(deviceCacheMock.getAllDevices()).andReturn(new ArrayList<Device>(devices)).once();
@@ -782,7 +805,7 @@ public class DeviceManagerTest {
     // Expectations
     EasyMock.expect(requestHandlerMock.getDevices(EasyMock.<Set<DeviceInfo>> anyObject())).andReturn(transferDeviceList1);
     deviceCacheMock.add(EasyMock.<Device> anyObject());
-    EasyMock.expectLastCall().times(2);
+    EasyMock.expectLastCall().times(5);
     tagManagerMock.subscribeDataTags(EasyMock.<Set<Long>> anyObject(), EasyMock.<DataTagListener> anyObject());
     EasyMock.expectLastCall();
 
