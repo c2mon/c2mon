@@ -171,8 +171,12 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         }
       }
     }
-    
+
     refresh(tagIds);
+    
+    // Checks, if there are tags which needs to be synchronized with
+    // the history cache.
+    synchronizeHistoryCache();
   }
 
   /**
@@ -364,11 +368,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         // update has been missed whilst subscribing to the topic
         LOG.info("Synchronizing cache values after update topic registration");
         synchronizeCacheValues(newKnownTags);
-
-        // Checks, if there are tags which needs to be synchronized with
-        // the history cache.
-        synchronizeHistoryCache();
-
+        
       } catch (JMSException e) {
         throw new CacheSynchronizationException("Could not refresh tags in the live cache.", e);
       }
