@@ -2,26 +2,25 @@ package cern.c2mon.shared.common.datatag;
 
 import java.io.Serializable;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Logger;
+import org.simpleframework.xml.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import cern.c2mon.shared.util.parser.ParserException;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.log4j.Logger;
-
 /**
  * Address associated with a DataTag DataTags are linked to data sources (e.g. PLCs, external SCADA systems etc.) via a
  * DataTagAddress object. This object contains the configuration parameters needed by a DAQ module to acquire values
  * from the data source. In addition to data acquisition parameters, the DataTagAddress object also configures deadband
  * filtering and transformation factors for a given tag.
- * 
+ *
  * @author Jan Stowisek
  * @version $Revision: 1.19 $ ($Date: 2007/07/04 12:38:55 $ - $State: Exp $)
  */
@@ -57,6 +56,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * HardwareAddress class is abstract, so the object will always be of a subclass of HardwareAddress (e.g.
      * PLCEquipmentAddress for the JECEquipmentHandler).
      */
+    @Element(name = "HardwareAddress", required = false)
     private HardwareAddress hardwareAddress;
 
     /**
@@ -64,23 +64,26 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * of the TTL are discarded. The ttl is only relevant in times of great (huge) server load or, especially, in case
      * of server unavailability.
      */
+    @Element(name = "time-to-live", required = false)
     private int timeToLive;
 
     /**
      * Several types of value-based deadband filtering are possible and must be supported by all TIM drivers :
-     * 
+     *
      * <PRE>
-     * DEADBAND_ABSOLUTE, DEADBAND_RELATIVE, 
+     * DEADBAND_ABSOLUTE, DEADBAND_RELATIVE,
      * DEADBAND_NONE
      * </PRE>
      */
+    @Element(name = "value-deadband-type", required = false)
     private short valueDeadbandType;
 
     /**
      * Determines which type of value-related deadband filtering is applied.
-     * 
+     *
      * @see cern.c2mon.shared.common.datatag.DataTagDeadband
      */
+    @Element(name = "value-deadband", required = false)
     private float valueDeadband;
 
     /**
@@ -88,6 +91,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * before a new value is accepted by the driver. This is to avoid that a (faulty) equipment unit that bombs a driver
      * with values slows down the entire system.
      */
+    @Element(name = "time-deadband", required = false)
     private volatile int timeDeadband;
 
     /**
@@ -104,6 +108,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * </UL>
      * The priority value is also used as a JMS property when the driver sends a tag value update to the server.
      */
+    @Element
     private int priority;
 
     /**
@@ -111,8 +116,10 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
      * guaranteedDelivery is enabled, DataTagValueUpdate messages must always reach the server, even in case of a
      * temporary server failure.
      */
+    @Element(name = "guaranteed-delivery")
     private boolean guaranteedDelivery;
 
+    @Element(name = "value-change-monitor", required = false)
     private volatile ValueChangeMonitor valueChangeMonitor;
 
     // ----------------------------------------------------------------------------
@@ -137,7 +144,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     /**
      * Constructor Default values: The timeToLive is set to TTL_FOREVER, the deadband is set to DEADBAND_NONE, the
      * transformation factor is set to TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
-     * 
+     *
      * @param hardwareAddress the hardware address for the DataTagAddress object
      */
     public DataTagAddress(HardwareAddress hardwareAddress) {
@@ -153,7 +160,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     /**
      * Constructor Default values: The deadband is set to DEADBAND_NONE, the transformation factor is set to
      * TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
-     * 
+     *
      * @param hardwareAddress the hardware address for the DataTagAddress object
      * @param timeToLive
      * @see #timeToLive
@@ -164,7 +171,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
 
     /**
      * Constructor
-     * 
+     *
      * @param hardwareAddress the hardware address for the DataTagAddress object
      * @param timeToLive TTL in seconds
      * @param valueDeadbandType type of value-based deadband filtering
@@ -186,9 +193,10 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
 
     /**
      * Returns a new DataTagAddress object that is an exact copy of "this".
-     * 
+     *
      * @return The clone of this data tag address.
      */
+    @Override
     public DataTagAddress clone() {
         DataTagAddress clonedAddress = null;
         try {
@@ -298,7 +306,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
 
     /**
      * Set the value for deadband filtering.
-     * 
+     *
      * @param value value for deadband filtering. If a the specified value is negative, deadband filtering is disabled.
      */
     public void setValueDeadband(float value) {
@@ -318,7 +326,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
 
     /**
      * Set the time-to-live (TTL) for values sent by a data source.
-     * 
+     *
      * @param ttl the time-to-live in milliseconds. If the specified ttl is less than 0, ttl defaults to TTL_FOREVER.
      */
     public void setTimeToLive(int ttl) {
@@ -367,7 +375,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         if (valueChangeMonitor != null) {
             str.append(valueChangeMonitor.toString());
         }
-        
+
         if (timeToLive != TTL_FOREVER) {
             str.append("        <time-to-live>");
             str.append(timeToLive);
@@ -402,7 +410,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
          * if (minValue != null) { str.append("        <min-value data-type=\"");
          * str.append(minValue.getClass().getName().substring(10)); str.append("\">"); str.append(minValue);
          * str.append("</min-value>\n"); }
-         * 
+         *
          * if (maxValue != null) { str.append("        <max-value data-type=\"");
          * str.append(maxValue.getClass().getName().substring(10)); str.append("\">"); str.append(maxValue);
          * str.append("</max-value>\n"); }
@@ -435,7 +443,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         }
     }
 
-    public static DataTagAddress fromConfigXML(Element element) {
+    public static DataTagAddress fromConfigXML(org.w3c.dom.Element element) {
 
         DataTagAddress result = new DataTagAddress();
 
@@ -450,9 +458,9 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
             if (fieldNode.getNodeType() == Node.ELEMENT_NODE) {
                 fieldName = fieldNode.getNodeName();
                 if (fieldName.equals("HardwareAddress")) {
-                    result.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML((Element) fieldNode));
+                    result.setHardwareAddress(HardwareAddressFactory.getInstance().fromConfigXML((org.w3c.dom.Element) fieldNode));
                 } else if (fieldName.equals("value-change-monitor")) {
-                    result.valueChangeMonitor = ValueChangeMonitor.fromConfigXML((Element) fieldNode);
+                    result.valueChangeMonitor = ValueChangeMonitor.fromConfigXML((org.w3c.dom.Element) fieldNode);
                 } else {
                     fieldValueString = fieldNode.getFirstChild().getNodeValue();
                     if (fieldName.equals("time-to-live")) {
@@ -478,6 +486,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
         return result;
     }
 
+    @Override
     public boolean equals(Object pObj) {
         boolean result = pObj instanceof DataTagAddress;
         if (result) {
@@ -524,7 +533,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
 
     /**
      * Sets the static timedeadband to true timedeadband will not be deactivated.
-     * 
+     *
      * @param staticTimedeadband True if static timedeadband should e active elese false.
      */
     public void setStaticTimedeadband(final boolean staticTimedeadband) {
@@ -533,7 +542,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
 
     /**
      * The static timedeadband switch.
-     * 
+     *
      * @return True if static timedeadband should e active elese false.
      */
     public boolean isStaticTimedeadband() {

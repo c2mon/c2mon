@@ -7,7 +7,8 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.w3c.dom.Element;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -38,26 +39,32 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
     private static final long serialVersionUID = -145678123L;
 
     /** Unique numeric identifier of the DataTag */
+    @Attribute
     private Long id;
 
     /** Unique name of the DataTag */
+    @Attribute
     private String name;
 
     /** Flag indicating whether this DataTag transports supervision information */
+    @Attribute
     private boolean control;
 
     /** Flag indicating the tag's mode: operational, in test or in maintenance */
+    @Element(required = false)
     private short mode;
 
     /**
      * Data type of the tag's values. Values of any other data type will be rejected during the update.
      */
+    @Element(name = "data-type")
     private String dataType;
 
     /**
      * The min value as comparable without specified type to avoid splitting up the source data tag in different
      * generics.
      */
+    @Element(name = "min-value", required = false, type = String.class)
     @SuppressWarnings("unchecked")
     private Comparable minValue;
 
@@ -65,12 +72,14 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * The max value as comparable without specified type to avoid splitting up the source data tag in different
      * generics.
      */
+    @Element(name = "max-value", required = false, type = String.class)
     @SuppressWarnings("unchecked")
     private Comparable maxValue;
 
     /**
      * Address information, including parameters for deadband filtering, transformations etc.
      */
+    @Element(name = "DataTagAddress")
     private DataTagAddress address;
 
     /** Current value of the SourceDataTag */
@@ -109,6 +118,12 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
         this.mode = mode;
         this.dataType = dataType;
         this.address = address;
+    }
+
+    /**
+     * No-arg constructor (required for XML deserialisation).
+     */
+    public SourceDataTag() {
     }
 
     /**
@@ -514,7 +529,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
      * @param domElement The dom element to use. This must be the SourceDataTag element.
      * @return The creates SourceDataTag.
      */
-    public static SourceDataTag fromConfigXML(final Element domElement) {
+    public static SourceDataTag fromConfigXML(final org.w3c.dom.Element domElement) {
 
         Long id = Long.valueOf(domElement.getAttribute("id"));
         String name = domElement.getAttribute("name");
@@ -541,7 +556,7 @@ public class SourceDataTag implements Serializable, Cloneable, ISourceDataTag {
                 } else if (fieldName.equals("mode")) {
                     result.mode = Short.parseShort(fieldValueString);
                 } else if (fieldName.equals("DataTagAddress")) {
-                    result.address = DataTagAddress.fromConfigXML((Element) fieldNode);
+                    result.address = DataTagAddress.fromConfigXML((org.w3c.dom.Element) fieldNode);
                 } else if (fieldName.equals("min-value") || fieldName.equals("max-value")) {
                     String dataType = fieldNode.getAttributes().item(0).getNodeValue();
                     Comparable value = (Comparable) TypeConverter.cast(fieldValueString, dataType);

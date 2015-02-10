@@ -1,5 +1,7 @@
 package cern.c2mon.shared.common.datatag.address.impl;
 
+import org.simpleframework.xml.Element;
+
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
 
@@ -17,23 +19,26 @@ public final class DIPHardwareAddressImpl extends HardwareAddressImpl implements
   // ---------------------------------------------------------------------------
   // Private member definitions
   // ---------------------------------------------------------------------------
-  /** 
+  /**
    * The name of the DIP publication (DIP item) to which we subscribe.
-   */  
+   */
+  @Element(name = "item-name")
   protected String itemName;
 
-  /** 
-   * If the DIP publication is a structure, this field specifies the field name 
+  /**
+   * If the DIP publication is a structure, this field specifies the field name
    * of the desired value within the structure.
-   */  
+   */
+  @Element(name = "field-name")
   protected String fieldName;
 
-  /** 
+  /**
    * If the DIP data type is an array type, this field specifies the index
    * of the desired value within the array.
    */
+  @Element(name = "field-index")
   protected int fieldIndex = -1;
-  
+
   // ---------------------------------------------------------------------------
   // Constructors
   // ---------------------------------------------------------------------------
@@ -90,20 +95,22 @@ public final class DIPHardwareAddressImpl extends HardwareAddressImpl implements
   // Public accessor methods
   // ---------------------------------------------------------------------------
 
-  /** 
+  /**
    * Get the name of the DIP publication (DIP item).
    * The item name can never be null.
    * @return the name of the DIP publication
    */
+  @Override
   public final String getItemName() {
     return this.itemName;
   }
 
   /**
    * Get the name of the field within the published structure.
-   * Note: If isComplexItem() returns false, the field will be null. In this 
+   * Note: If isComplexItem() returns false, the field will be null. In this
    * case the DIP publication is not a structure.
    */
+  @Override
   public final String getFieldName() {
     return this.fieldName;
   }
@@ -111,8 +118,9 @@ public final class DIPHardwareAddressImpl extends HardwareAddressImpl implements
   /**
    * Get the index of the element within an array published on DIP.
    */
+  @Override
   public final int getFieldIndex() {
-    return this.fieldIndex;  
+    return this.fieldIndex;
   }
 
   // ---------------------------------------------------------------------------
@@ -120,21 +128,23 @@ public final class DIPHardwareAddressImpl extends HardwareAddressImpl implements
   // ---------------------------------------------------------------------------
 
   /**
-   * Returns true if the DIP publication is a structure. 
-   * In this case, the DIPHardwareAddress object refers to a given field 
+   * Returns true if the DIP publication is a structure.
+   * In this case, the DIPHardwareAddress object refers to a given field
    * within the structure.
    * @see #getFieldName()
    */
+  @Override
   public boolean isComplexItem() {
     return (this.fieldName != null);
   }
- 
+
   /**
-   * Returns true if the DIP publication contains an array. 
-   * In this case the DIPHardwareAddress object refers to a field within the 
+   * Returns true if the DIP publication contains an array.
+   * In this case the DIPHardwareAddress object refers to a field within the
    * array.
    * @see #getFieldIndex()
    */
+  @Override
   public boolean isArrayItem() {
     return (this.fieldIndex > -1);
   }
@@ -164,11 +174,12 @@ public final class DIPHardwareAddressImpl extends HardwareAddressImpl implements
     return;
   }
 
+  @Override
   public void validate() throws ConfigurationException {
     if (this.itemName == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"itemName\" must not be null");
     }
-    
+
     if (this.fieldIndex < -1) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"fieldIndex\" must >= -1");
     }

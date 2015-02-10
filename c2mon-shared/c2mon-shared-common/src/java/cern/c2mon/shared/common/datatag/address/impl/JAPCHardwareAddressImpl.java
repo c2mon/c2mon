@@ -8,43 +8,43 @@ import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
 public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPCHardwareAddress {
 
     private static final long serialVersionUID = 6770995924304633009L;
-    
+
     @Element(required = false)
     protected String protocol = null;
 
     @Element(required = false)
     protected String service = null;
 
-    @Element
+    @Element(name = "device-name")
     protected String deviceName = null;
 
-    @Element
+    @Element(name = "property-name")
     protected String propertyName = null;
 
-    @Element(required = false)
+    @Element(name = "cycle-selector", required = false)
     protected String cycleSelector = null;
 
-    @Element(required = false)
+    @Element(name = "index-field-name", required = false)
     protected String indexFieldName = null;
 
-    @Element(required = false)
+    @Element(name = "index-name", required = false)
     protected String indexName = null;
 
-    @Element(required = false)
+    @Element(name = "data-field-name", required = false)
     protected String dataFieldName = null;
 
-    @Element
+    @Element(name = "column-index")
     protected int columnIndex = -1;
 
-    @Element
+    @Element(name = "row-index")
     protected int rowIndex = -1;
 
-    @Element(required = false)
+    @Element(name = "command-type", required = false)
     protected String commandType = null;
 
-    @Element(required = false)
+    @Element(name = "context-field", required = false)
     protected String contextField = null;
-    
+
     @Element(required = false)
     protected String filter = null;
 
@@ -84,8 +84,8 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
         setCommandType(commandType);
         setContextField(contextField);
     }
-    
-    
+
+
     public JAPCHardwareAddressImpl(final String pDeviceName, final String pPropertyName, final String dataFieldName,
             final String commandType, String contextField,  String filter) throws ConfigurationException {
         setDeviceName(pDeviceName);
@@ -94,12 +94,13 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
         setCommandType(commandType);
         setContextField(contextField);
         setFilter(filter);
-    }    
-    
+    }
+
 
     /**
      * @return the protocol
      */
+    @Override
     public final String getProtocol() {
         return protocol;
     }
@@ -107,22 +108,27 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
     /**
      * @return the service
      */
+    @Override
     public final String getService() {
         return service;
     }
 
+    @Override
     public final String getDeviceName() {
         return this.deviceName;
     }
 
+    @Override
     public final String getPropertyName() {
         return this.propertyName;
     }
 
+    @Override
     public final String getCycleSelector() {
         return this.cycleSelector;
     }
 
+    @Override
     public final String getIndexFieldName() {
         return this.indexFieldName;
     }
@@ -130,6 +136,7 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
     /**
      * @return the parameterName
      */
+    @Override
     public final String getIndexName() {
         return this.indexName;
     }
@@ -137,6 +144,7 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
     /**
      * @return the dataField
      */
+    @Override
     public final String getDataFieldName() {
         return this.dataFieldName;
     }
@@ -144,18 +152,22 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
     /**
      * @return column index of the data point element inside the array or array2d or -1 if not used
      */
+    @Override
     public int getColumnIndex() {
         return this.columnIndex;
     }
 
+    @Override
     public String getContextField() {
         return this.contextField;
     }
-    
+
+    @Override
     public boolean hasContextField() {
         return (this.contextField == null || this.contextField.length() == 0) ? false : true;
     }
 
+    @Override
     public COMMAND_TYPE getCommandType() {
         COMMAND_TYPE result = COMMAND_TYPE.UNKNOWN;
 
@@ -171,10 +183,11 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
 
     }
 
-       
+
     /**
      * @return row index of the data point element inside the array or array2d or -1 if not used
      */
+    @Override
     public int getRowIndex() {
         return this.rowIndex;
     }
@@ -187,18 +200,18 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
         return (rowIndex == -1 ? false : true);
     }
 
-    
+
     @Override
-    public String getFilter() {       
+    public String getFilter() {
         return filter;
-    }    
-    
+    }
+
     @Override
     public boolean hasFilter() {
         return (filter == null || filter.length() == 0) ? false : true;
     }
-    
-    
+
+
     /**
      * @param protocol the protocol to set
      */
@@ -266,11 +279,12 @@ public class JAPCHardwareAddressImpl extends HardwareAddressImpl implements JAPC
     protected final void setContextField(final String contextField) throws ConfigurationException {
         this.contextField = contextField;
     }
-    
+
     protected final void setFilter(final String filter) throws ConfigurationException {
         this.filter = filter;
     }
 
+    @Override
     public void validate() throws ConfigurationException {
-    }   
+    }
 }

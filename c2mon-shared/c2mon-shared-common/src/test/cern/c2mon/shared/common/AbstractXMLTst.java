@@ -38,21 +38,21 @@ public class AbstractXMLTst {
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "no");
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-    
+
         //initialize StreamResult with File object to save to file
         StreamResult result = new StreamResult(new StringWriter());
         DOMSource source = new DOMSource(document);
         transformer.transform(source, result);
-    
+
         String xmlString = result.getWriter().toString();
         return xmlString;
     }
-    
+
     public void validateDocument(Document document, String xsdURL) throws ParserConfigurationException, SAXException, IOException, TransformerConfigurationException, TransformerFactoryConfigurationError, TransformerException {
 //        Element element = (Element) document.getElementsByTagName("ConfigurationChangeEvent").item(0);
 //        element.setAttribute("xmlns", "http://timweb.cern.ch/schemas/tim-daq/Configuration");
         // create a SchemaFactory capable of understanding WXS schemas
-        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.XML_NS_URI);
 //        factory.
         URL location = new URL(xsdURL);
         // load a WXS schema, represented by a Schema instance
@@ -60,17 +60,17 @@ public class AbstractXMLTst {
         // create a Validator instance, which can be used to validate an instance document
         Validator validator = schema.newValidator();
 //        validator.setErrorHandler(new ErrorHandler() {
-//            
+//
 //            @Override
 //            public void warning(final SAXParseException exception) throws SAXException {
 //                exception.printStackTrace();
 //            }
-//            
+//
 //            @Override
 //            public void fatalError(final SAXParseException exception) throws SAXException {
 //                exception.printStackTrace();
 //            }
-//            
+//
 //            @Override
 //            public void error(final SAXParseException exception) throws SAXException {
 //                exception.printStackTrace();

@@ -2,19 +2,17 @@ package cern.c2mon.shared.common.datatag;
 
 
 import java.io.Serializable;
-
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
-
-import org.apache.log4j.Logger;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 
 /**
@@ -33,7 +31,7 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
    * Simple XML parser for reading dictionary objects from XML.
    */
   private static SimpleXMLParser parser = null;
-  
+
   /**
    * Log4j Logger for this class.
    */
@@ -53,7 +51,7 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
    * HashMap used to internally manage the (value, description) pairs.
    */
   private HashMap descriptions;
-    
+
   /**
    * Default constructor.
    * Initialisation of an empty value dictionary
@@ -65,7 +63,7 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
   /**
    * Copy constructor.
    * Creates a new DataTagValueDictionary holding the same descriptions
-   * as the original. 
+   * as the original.
    */
   public DataTagValueDictionary(DataTagValueDictionary old) {
     if (old != null) {
@@ -74,11 +72,12 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
       this.descriptions = new HashMap(DataTagValueDictionary.INITIAL_CAPACITY);
     }
   }
-  
+
   /**
    * New clone implementation - should remove above copy constructor in due course...
    */
-  public Object clone() {    
+  @Override
+  public Object clone() {
     try {
       DataTagValueDictionary  dataTagValueDictionary = (DataTagValueDictionary) super.clone();
       dataTagValueDictionary.descriptions = (HashMap) this.descriptions.clone();
@@ -87,7 +86,7 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
       e.printStackTrace(); //should never get here...
       throw new RuntimeException("Exception caught when cloning a DataTagValueDictionary - this should not be happening!");
     }
-    
+
   }
 
   /**
@@ -122,23 +121,24 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
    * @return the preconfigured description for a certain value, null if no description is configured
    */
   public final String getDescription(final Object pValue) {
-	
+
     return
       pValue == null ? null : (String) descriptions.get(pValue);
   }
 
   /**
-   * Returns a string representation of this map. 
-   * The string representation consists of a list of key-value mappings, 
+   * Returns a string representation of this map.
+   * The string representation consists of a list of key-value mappings,
    * enclosed in braces.
    */
+  @Override
   public String toString() {
     return this.descriptions.toString();
   }
-  
+
   public String toXML() {
     StringBuilder str = new StringBuilder(200);
-    str.append("<DataTagValueDictionary>\n");
+    str.append("<DataTagValueDictionary>");
 
     Iterator it = this.descriptions.keySet().iterator();
     Object key = null;
@@ -152,10 +152,10 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
       str.append(this.descriptions.get(key));
       str.append("</entry>");
     }
-    str.append("</DataTagValueDictionary>\n");
+    str.append("</DataTagValueDictionary>");
     return str.toString();
   }
-  
+
   public static DataTagValueDictionary fromXML(final String pXML) {
     if (parser != null) {
       try {
@@ -170,17 +170,17 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
       return null;
     }
   }
-  
+
   public static DataTagValueDictionary fromXML(final Element pDocumentElement) {
     DataTagValueDictionary result = new DataTagValueDictionary();
-  
+
     NodeList fields = pDocumentElement.getChildNodes();
 
     String fieldName;
     String fieldValueString;
     Node fieldNode;
     int fieldsCount = fields.getLength();
-    
+
     String dataType  = null;
     String keyString = null;
     String description = null;
@@ -196,7 +196,7 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
           dataType = fieldNode.getAttributes().getNamedItem("type").getNodeValue();
           keyString = fieldNode.getAttributes().getNamedItem("key").getNodeValue();
           description = fieldValueString;
-          
+
           if (dataType.equals("Integer")) {
             result.addDescription(Integer.valueOf(keyString), description);
           } else if (dataType.equals("Float")) {
@@ -215,7 +215,7 @@ public class DataTagValueDictionary implements Serializable, Cloneable {
     }// for
     return result;
   }
-  
+
   static {
     try {
       parser = new SimpleXMLParser();

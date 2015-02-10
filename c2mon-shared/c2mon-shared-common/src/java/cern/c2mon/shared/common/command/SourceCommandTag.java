@@ -17,7 +17,8 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.command;
 
-import org.w3c.dom.Element;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -35,17 +36,20 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
     /**
      * Unique numeric identifier of the command tag
      */
+    @Attribute
     private Long id;
 
     /**
      * Unique (human-readable) name of the command tag
      */
+    @Attribute
     private String name;
 
     /**
      * HardwareAddress object used by the driver's EquipmentMessageHandler to
      * actually send the command value to the piece of equipment concerned.
      */
+    @Element(name = "HardwareAddress")
     private HardwareAddress hwAddress;
 
     /**
@@ -65,11 +69,13 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
      * milliseconds before trying again.
      * </UL>
      */
+    @Element(name = "source-timeout")
     private int sourceTimeout;
 
     /**
      * Maximum number of retries if an attempt to execute a command fails.
      */
+    @Element(name = "source-retries")
     private int sourceRetries;
 
     /**
@@ -99,6 +105,12 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
         this.sourceTimeout = sourceTimeout;
         this.sourceRetries = sourceRetries;
         this.hwAddress = hwAddress;
+    }
+
+    /**
+     * No-arg constructor (required for XML deserialisation).
+     */
+    public SourceCommandTag() {
     }
 
     /**
@@ -233,7 +245,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
      * @param domElement The DOM element to use.
      * @return The created SourceCommandTag.
      */
-    public static SourceCommandTag fromConfigXML(final Element domElement) {
+    public static SourceCommandTag fromConfigXML(final org.w3c.dom.Element domElement) {
         Long id = Long.valueOf(domElement.getAttribute("id"));
         String name = domElement.getAttribute("name");
 
@@ -264,7 +276,7 @@ public class SourceCommandTag implements Cloneable, ISourceCommandTag {
                 }
 
                 if (fieldName.equals("HardwareAddress")) {
-                    result.hwAddress = HardwareAddressFactory.getInstance().fromConfigXML((Element) fieldNode);
+                    result.hwAddress = HardwareAddressFactory.getInstance().fromConfigXML((org.w3c.dom.Element) fieldNode);
                 }
             }
         }

@@ -8,17 +8,17 @@ public class DBHardwareAddressImpl extends HardwareAddressImpl implements DBHard
 
 	/** Serial UID */
 	private static final long serialVersionUID = 3098291787686272949L;
-	
-	@Element
+
+	@Element(name = "db-item-name")
 	protected String dbItemName;
-	
+
 	public DBHardwareAddressImpl(){}
-    
-	
+
+
 	public DBHardwareAddressImpl(String dbItemName){
 		this.dbItemName = dbItemName;
 	}
-	
+
 	@Override
 	public String getDBItemName() {
 		return dbItemName;

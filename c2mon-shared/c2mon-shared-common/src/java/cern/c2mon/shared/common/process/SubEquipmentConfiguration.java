@@ -17,6 +17,9 @@
  ******************************************************************************/
 package cern.c2mon.shared.common.process;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+
 /**
  * This class is responsible for keeping SubEquipment configuration parameters.
  *
@@ -27,33 +30,39 @@ public class SubEquipmentConfiguration {
   /**
    * Unique SubEquipment identifier.
    */
+  @Attribute
   private Long id;
 
   /**
    * Identifier of the data tag that is used to signal a communication fault to
    * the server.
    */
+  @Element(name = "commfault-tag-id")
   private Long commFaultTagId;
 
   /**
    * Value that the communication fault tag has to take if there is a
    * communication problem with the SubEquipment.
    */
+  @Element(name = "commfault-tag-value")
   private boolean commFaultTagValue;
 
   /**
    * Identifier of the SubEquipment alive tag.
    */
+  @Element(name = "alive-tag-id")
   private Long aliveTagId;
 
   /**
    * Interval (ms) between 2 SubEquipment alive tags.
    */
+  @Element(name = "alive-interval")
   private Long aliveInterval;
 
   /**
    * SubEquipment name.
    */
+  @Attribute
   private String name;
 
   /**
@@ -72,10 +81,23 @@ public class SubEquipmentConfiguration {
   }
 
   /**
+   * No-arg constructor (needed for XML deserialisation).
+   */
+  public SubEquipmentConfiguration() {
+  }
+
+  /**
    * @return the id
    */
   public Long getId() {
     return id;
+  }
+
+  /**
+   * @return the name
+   */
+  public String getName() {
+    return name;
   }
 
   /**

@@ -8,17 +8,17 @@ import cern.c2mon.shared.common.datatag.address.PLCHardwareAddress;
 
 /**
  * Implementation of the PLCHardwareAddress interface.
- * Objects of this class represent hardware addresses for DataTags and 
- * CommandTags that are linked to PLCs. The address structure is generic, 
- * so it covers Siemens as well as Schneider PLCs. 
+ * Objects of this class represent hardware addresses for DataTags and
+ * CommandTags that are linked to PLCs. The address structure is generic,
+ * so it covers Siemens as well as Schneider PLCs.
  *
  * @author Jan Stowisek
- * @version $Revision: 1.5 $ ($Date: 2006/09/11 10:35:37 $ - $State: Exp $) 
+ * @version $Revision: 1.5 $ ($Date: 2006/09/11 10:35:37 $ - $State: Exp $)
  * @see cern.c2mon.shared.common.datatag.address.PLCHardwareAddress
  */
- 
+
 public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHardwareAddress {
-  
+
   /** Auto-generated serial versin UID */
   private static final long serialVersionUID = -4631934618859298750L;
 
@@ -27,67 +27,67 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
   // ---------------------------------------------------------------------------
   /**
    * Type of data block within the PLC.
-   * The block type can only be one of the constant values defined in 
-   * STRUCT_BOOLEAN, STRUCT_ANALOG, STRUCT_BOOLEAN_COMMAND and 
+   * The block type can only be one of the constant values defined in
+   * STRUCT_BOOLEAN, STRUCT_ANALOG, STRUCT_BOOLEAN_COMMAND and
    * STRUCT_ANALOG_COMMAND.
    * @see PLCHardwareAddress#STRUCT_BOOLEAN
    * @see PLCHardwareAddress#STRUCT_ANALOG
    * @see PLCHardwareAddress#STRUCT_BOOLEAN_COMMAND
    * @see PLCHardwareAddress#STRUCT_ANALOG_COMMAND
    */
-  @Element
+  @Element(name = "block-type")
   protected int blockType = 0;
-  
+
   /**
    * Identifier of the word within the data block.
    * The word id is an integer number >=0
    */
-  @Element
+  @Element(name = "word-id")
   protected int wordId = 0;
-  
+
   /**
    * Identifier of the bit within the word.
    * The bit id is -1 for analog values, [0..15] for boolean values.
    */
-  @Element
+  @Element(name = "bit-id")
   protected int bitId = 0;
-  
+
   /**
-   * Human-readable physical minimum value. 
-   * This parameter, together with the physical maximum value, is needed to 
+   * Human-readable physical minimum value.
+   * This parameter, together with the physical maximum value, is needed to
    * convert hardware values sent by the PLC to engineering values.
    * @see #physicalMaxVal
    */
-  @Element
+  @Element(name = "physical-min-val")
   protected float physicalMinVal = 0f;
-  
+
   /**
-   * Human-readable physical maximum value. 
-   * This parameter, together with the physical minimum value, is needed to 
+   * Human-readable physical maximum value.
+   * This parameter, together with the physical minimum value, is needed to
    * convert hardware values sent by the PLC to engineering values.
    * @see #physicalMinVal
    */
-  @Element
+  @Element(name = "physical-max-val")
   protected float physicalMaxVal = 0f;
 
   /**
    * Resolution of the A/D converter.
    */
-  @Element
+  @Element(name = "resolution-factor")
   protected int resolutionFactor = 0;
 
   /**
    * Physical address of the tag, depending on PLC model used.
    */
-  @Element
+  @Element(name = "native-address")
   protected String nativeAddress = null;
 
   /**
    * Command pulse length in milliseconds for boolean commands.
    */
-  @Element
+  @Element(name = "command-pulse-length")
   protected int commandPulseLength;
-  
+
   // ----------------------------------------------------------------------------
   // CONSTRUCTORS
   // ----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
   protected PLCHardwareAddressImpl() {
     // Do nothing
   }
-  
+
   /**
    * @param pBlockType the type of data block within the PLC
    * @param pWordId the identifier of the word within the data block
@@ -111,12 +111,12 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * @throws ConfigurationException In case the given configuration parameters are wrong
    */
   public PLCHardwareAddressImpl (
-      final int pBlockType, final int pWordId, final int pBitId, 
+      final int pBlockType, final int pWordId, final int pBitId,
       final int pResolutionFactor, final float pMinVal, final float pMaxVal, final String pNativeAddress
   ) throws ConfigurationException {
     this(pBlockType, pWordId, pBitId, pResolutionFactor, pMinVal, pMaxVal, pNativeAddress, 0);
   }
-  
+
   /**
    * @param pBlockType the type of data block within the PLC
    * @param pWordId the identifier of the word within the data block
@@ -129,7 +129,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * @throws ConfigurationException In case the given configuration parameters are wrong
    */
   public PLCHardwareAddressImpl (
-      final int pBlockType, final int pWordId, final int pBitId, 
+      final int pBlockType, final int pWordId, final int pBitId,
       final int pResolutionFactor, final float pMinVal, final float pMaxVal, final String pNativeAddress,
       final int pCmdPulseLength
   ) throws ConfigurationException {
@@ -149,8 +149,8 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
 
   /**
    * Get the type of data block within the PLC.
-   * The block type can only be one of the constant values defined in 
-   * STRUCT_BOOLEAN, STRUCT_ANALOG, STRUCT_BOOLEAN_COMMAND and 
+   * The block type can only be one of the constant values defined in
+   * STRUCT_BOOLEAN, STRUCT_ANALOG, STRUCT_BOOLEAN_COMMAND and
    * STRUCT_ANALOG_COMMAND.
    * @return the type of data block within the PLC
    * @see PLCHardwareAddress#STRUCT_BOOLEAN
@@ -158,6 +158,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * @see PLCHardwareAddress#STRUCT_BOOLEAN_COMMAND
    * @see PLCHardwareAddress#STRUCT_ANALOG_COMMAND
    */
+  @Override
   public final int getBlockType() {
     return this.blockType;
   }
@@ -167,6 +168,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * The word id is an integer number >=0
    * @return the identifier of the word within the data block
    */
+  @Override
   public final int getWordId() {
     return this.wordId;
   }
@@ -176,26 +178,29 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * The bit id is -1 for analog values, [0..15] for boolean values.
    * @return the identifier of the bit within the word
    */
+  @Override
   public final int getBitId() {
     return this.bitId;
   }
 
   /**
-   * Get the human-readable physical minimum value. 
-   * This parameter, together with the physical maximum value, is needed to 
+   * Get the human-readable physical minimum value.
+   * This parameter, together with the physical maximum value, is needed to
    * convert hardware values sent by the PLC to engineering values.
    * @see #getPhysicalMaxVal()
    */
+  @Override
   public final float getPhysicalMinVal() {
     return this.physicalMinVal;
   }
 
   /**
-   * Get the human-readable physical maximum value. 
-   * This parameter, together with the physical minimum value, is needed to 
+   * Get the human-readable physical maximum value.
+   * This parameter, together with the physical minimum value, is needed to
    * convert hardware values sent by the PLC to engineering values.
    * @see #getPhysicalMinVal()
    */
+  @Override
   public final float getPhysicMaxVal() {
     return this.physicalMaxVal;
   }
@@ -204,6 +209,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * Get the physical address of the tag, depending on PLC model used.
    * @return the physical address of the tag, depending on PLC model used
    */
+  @Override
   public final String getNativeAddress() {
     return this.nativeAddress;
   }
@@ -212,16 +218,18 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
    * Get the resolution of the A/D converter.
    * @return the resolution of the A/D converter
    */
+  @Override
   public final int getResolutionFactor() {
     return this.resolutionFactor;
   }
 
+  @Override
   public int getCommandPulseLength() {
     return this.commandPulseLength;
   }
 
   /**
-   * Set the type of data structure in the PLC 
+   * Set the type of data structure in the PLC
    * The type can be STRUCT_BOOLEAN, STRUCT_ANALOG or STRUCT_COMMAND.
    */
   public final void setBlockType(final int pBlockType) throws ConfigurationException {
@@ -239,7 +247,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
     }
     this.blockType = pBlockType;
     return;
-      
+
   }
 
   /**
@@ -276,25 +284,25 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
   }
 
   /**
-   * Sets the human-readable physical minimum value. 
-   * This parameter, together with the physical maximum value, is needed to 
+   * Sets the human-readable physical minimum value.
+   * This parameter, together with the physical maximum value, is needed to
    * convert hardware values sent by the PLC to engineering values.
-   * @param pMinVal the human-readable physical minimum value 
+   * @param pMinVal the human-readable physical minimum value
    */
   public final void setPhysicalMinVal(final float pMinVal) {
     this.physicalMinVal = pMinVal;
   }
 
   /**
-   * Sets the human-readable physical maximum value. 
-   * This parameter, together with the physical minimum value, is needed to 
+   * Sets the human-readable physical maximum value.
+   * This parameter, together with the physical minimum value, is needed to
    * convert hardware values sent by the PLC to engineering values.
-   * @param pMaxVal the human-readable physical maximum value 
+   * @param pMaxVal the human-readable physical maximum value
    */
   public final void setPhysicalMaxVal(final float pMaxVal) {
     this.physicalMaxVal = pMaxVal;
   }
-  
+
   /**
    * Sets the physical address of the tag, depending on PLC model used.
    * @param pNativeAddress the physical address of the tag, depending on PLC model used.
@@ -302,7 +310,7 @@ public class PLCHardwareAddressImpl extends HardwareAddressImpl implements PLCHa
   public final void setNativeAddress(final String pNativeAddress) {
     this.nativeAddress = pNativeAddress;
   }
-  
+
   /**
    * Sets the resolution of the A/D converter.
    * @param pResolutionFactor the resolution of the A/D converter.

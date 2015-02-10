@@ -8,9 +8,9 @@ import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
 /**
  * This class represents the hardware address of an OPC server item Each item
  * can provide up to two different addresses, one being for backup reasons
- * 
+ *
  * @author mruizgar
- * 
+ *
  */
 public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHardwareAddress {
 
@@ -25,14 +25,14 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
     /**
      * The name of the OPC tag name to which we subscribe.
      */
-    @Element
+    @Element(name = "opc-item-name")
     protected String opcItemName;
 
     /**
      * The name of the OPC tag name to which we subscribe in case the
      * subscription to "opcItemName" fails
      */
-    @Element(required = false)
+    @Element(name = "opc-redundant-item-name", required = false)
     protected String opcRedundantItemName = null;
 
     /**
@@ -44,13 +44,13 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
     /**
      * Command pulse length in milliseconds for boolean commands.
      */
-    @Element
+    @Element(name = "command-pulse-length")
     protected int commandPulseLength;
 
-    @Element
+    @Element(name = "address-type")
     protected ADDRESS_TYPE addressType = ADDRESS_TYPE.STRING;
 
-    @Element
+    @Element(name = "command-type")
     protected COMMAND_TYPE commandType = COMMAND_TYPE.CLASSIC;
 
     // ---------------------------------------------------------------------------
@@ -59,7 +59,7 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
 
     /**
      * Create a OPCHardwareAddress object
-     * 
+     *
      * @param pItemName
      *            name of an opc item
      * @throws ConfigurationException
@@ -71,7 +71,7 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
 
     /**
      * Create a OPCHardwareAddress object
-     * 
+     *
      * @param pItemName
      *            name of an opc item
      * @param pCommandPulseLength
@@ -99,9 +99,10 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
 
     /**
      * Get the name of the OPC item The item name can never be null.
-     * 
+     *
      * @return the name of the OPC item
      */
+    @Override
     public final String getOPCItemName() {
         // For the first time when it has not been initialized yet
         if (currentOPCItemName == null) {
@@ -113,9 +114,10 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
     /**
      * Gets the name of the OPCItem that is not currently being used, to which
      * the dataTag is not currently attached
-     * 
+     *
      * @return String The opc redundanta item name
      */
+    @Override
     public final String getOpcRedundantItemName() {
         return opcRedundantItemName;
 
@@ -123,16 +125,17 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
 
     /**
      * Returns the commandpulselength attribute
-     * 
+     *
      * @return int The configured miliseconds for the commandPulseLenght
      */
+    @Override
     public final int getCommandPulseLength() {
         return this.commandPulseLength;
     }
 
     /**
      * Gets the currentOPCItemName attribute
-     * 
+     *
      * @return String the currentOPCItemName value
      */
     public final String getCurrentOPCItemName() {
@@ -141,7 +144,7 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
 
     /**
      * Sets the currentOPCItemName value
-     * 
+     *
      * @param opcItemName
      *            The opcItemName that is being used at the moment
      */
@@ -155,7 +158,7 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
 
     /**
      * Sets the value of the OPCItemName attribute
-     * 
+     *
      * @param pItemName
      *            The value to be set
      * @throws ConfigurationException
@@ -172,7 +175,7 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
 
     /**
      * Set the pulse length in milliseconds for boolean commands.
-     * 
+     *
      * @param pCmdPulseLength
      *            pulse length im milliseconds
      * @throws ConfigurationException
@@ -189,10 +192,10 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
 
     /**
      * Sets the opcRedundantItemName value to the one received as argument
-     * 
+     *
      * @param secondaryOpcItemName
      *            the secondaryOpcItemName to set
-     * 
+     *
      */
     public final void setOpcRedundantItemName(final String secondaryOpcItemName) {
         this.opcRedundantItemName = secondaryOpcItemName;
@@ -200,10 +203,11 @@ public class OPCHardwareAddressImpl extends HardwareAddressImpl implements OPCHa
 
     /**
      * Validates the configuration of the hardwareAddress
-     * 
+     *
      * @throws ConfigurationException
      *             when the opcItemName is set to NULL
      */
+    @Override
     public final void validate() throws ConfigurationException {
         if (opcItemName == null) {
             throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"opcItemName\" must not be null");

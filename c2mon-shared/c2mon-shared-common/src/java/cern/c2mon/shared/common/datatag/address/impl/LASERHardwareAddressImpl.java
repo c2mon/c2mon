@@ -1,5 +1,7 @@
 package cern.c2mon.shared.common.datatag.address.impl;
 
+import org.simpleframework.xml.Element;
+
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.LASERHardwareAddress;
 
@@ -13,39 +15,43 @@ import cern.c2mon.shared.common.datatag.address.LASERHardwareAddress;
  */
 
 public final class LASERHardwareAddressImpl extends HardwareAddressImpl implements LASERHardwareAddress {
- 
+
   // ---------------------------------------------------------------------------
   // Private member definitions
   // ---------------------------------------------------------------------------
 
-  /** 
+  /**
    * the name of the LASER alarm category
-   */  
+   */
+  @Element(name = "alarm-category")
   protected String alarmCategory;
 
-  /** 
+  /**
    * the name of the alarm family
-   */  
+   */
+  @Element(name = "fault-family")
   protected String faultFamily;
 
   /**
    * the name of the alarm fault member
    */
+  @Element(name = "fault-member")
   protected String faultMember;
-  
-  
+
+
   /**
    * the alarm fault code
    */
+  @Element(name = "fault-code")
   protected int faultCode = -1;
-  
-  
-  
+
+
+
   // ---------------------------------------------------------------------------
   // Constructors
   // ---------------------------------------------------------------------------
 
-  
+
   /**
    * Create a LASERHardwareAddress object with specified category, fault family, member and code.
    * @param pCategoryName name of a structured DIP publication
@@ -53,7 +59,7 @@ public final class LASERHardwareAddressImpl extends HardwareAddressImpl implemen
    * @param pFaultMember
    * @param pFalutCode
    */
-  public LASERHardwareAddressImpl(final String pCategoryName, final String pFaultFamily, 
+  public LASERHardwareAddressImpl(final String pCategoryName, final String pFaultFamily,
                                 final String pFaultMember, final int pFaultCode) throws ConfigurationException {
     setAlarmCategory(pCategoryName);
     setFaultFamily(pFaultFamily);
@@ -74,43 +80,47 @@ public final class LASERHardwareAddressImpl extends HardwareAddressImpl implemen
   // Public accessor methods
   // ---------------------------------------------------------------------------
 
-   /** 
+   /**
    * Get the name of the LASER alarm category
    * The category me can never be null.
    * @return the name of the alarm category
    */
+  @Override
   public final String getAlarmCategory() {
     return this.alarmCategory;
   }
 
 
-  /** 
+  /**
    * Get the name of the alarm family
-   * The alarm family can never be null.  
+   * The alarm family can never be null.
    * @return the name of the alarm category
    */
+  @Override
   public String getFaultFamily(){
     return this.faultFamily;
   }
 
 
-  /** 
+  /**
    * Get the name of the alarm fault member
    * The fault member me can never be null.
    * @return the name of the alarm category
-   */  
+   */
+  @Override
   public String getFaultMember() {
-    return this.faultMember;  
+    return this.faultMember;
   }
 
 
-  /** 
+  /**
    * Get the name of the alarm fault code
    * The code me can never be null.
    * @return the name of the alarm category
-   */  
+   */
+  @Override
   public int getFalutCode() {
-    return this.faultCode;  
+    return this.faultCode;
   }
 
 
@@ -118,7 +128,7 @@ public final class LASERHardwareAddressImpl extends HardwareAddressImpl implemen
   // Public utitlity methods
   // ---------------------------------------------------------------------------
 
- 
+
 
   // ---------------------------------------------------------------------------
   // Private accessor methods
@@ -134,8 +144,8 @@ public final class LASERHardwareAddressImpl extends HardwareAddressImpl implemen
     this.alarmCategory = pAlarmCategory;
     return;
   }
-  
-  
+
+
   protected final void setFaultFamily(final String pFaultFamily) throws ConfigurationException {
     if (pFaultFamily == null) {
       throw new ConfigurationException(
@@ -146,8 +156,8 @@ public final class LASERHardwareAddressImpl extends HardwareAddressImpl implemen
     this.faultFamily = pFaultFamily;
     return;
   }
-  
-  
+
+
   protected final void setFaultMember(final String pFaultMember) throws ConfigurationException {
     if (pFaultMember == null) {
       throw new ConfigurationException(
@@ -157,15 +167,16 @@ public final class LASERHardwareAddressImpl extends HardwareAddressImpl implemen
     }
     this.faultMember = pFaultMember;
     return;
-  }  
+  }
 
 
-  
-  protected final void setFaultCode(final int pFaultCode) throws ConfigurationException {    
+
+  protected final void setFaultCode(final int pFaultCode) throws ConfigurationException {
     this.faultCode = pFaultCode;
     return;
-  }  
+  }
 
+  @Override
   public void validate() throws ConfigurationException {
     if (this.alarmCategory == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"alarmCategory\" must not be null");
@@ -178,7 +189,7 @@ public final class LASERHardwareAddressImpl extends HardwareAddressImpl implemen
     if (this.faultMember == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"faultMember\" must not be null");
     }
-    
+
     if (this.faultCode < 0) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"faultCode\" must be >= 0");
     }

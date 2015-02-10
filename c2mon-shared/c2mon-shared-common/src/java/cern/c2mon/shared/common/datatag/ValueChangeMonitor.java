@@ -6,15 +6,12 @@ package cern.c2mon.shared.common.datatag;
 
 import java.io.Serializable;
 
-import javax.xml.parsers.ParserConfigurationException;
-
+import org.simpleframework.xml.Attribute;
 import org.w3c.dom.Element;
-
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * The <code>ValueChangeMonitor</code> class (or VCM) defines the value-change-monitoring factors for selected metrics
- * 
+ *
  * @author wbuczak
  */
 public class ValueChangeMonitor implements Serializable, Cloneable {
@@ -35,11 +32,11 @@ public class ValueChangeMonitor implements Serializable, Cloneable {
         public String getOperatorXml() {
             return operatorXml;
         }
-        
+
         public String getOperatorEpl() {
             return operatorEpl;
         }
-                
+
         public String getNegOperatorEpl() {
             return negOperatorEpl;
         }
@@ -47,8 +44,10 @@ public class ValueChangeMonitor implements Serializable, Cloneable {
 
     private static final long serialVersionUID = -1866720946000066235L;
 
+    @Attribute
     private volatile Double step;
 
+    @Attribute
     private volatile Integer timeWindow;
 
     private volatile OPERATOR operator = OPERATOR.UNDEFINED;
@@ -162,11 +161,11 @@ public class ValueChangeMonitor implements Serializable, Cloneable {
     public String toString() {
         return toConfigXML();
     }
-    
+
     public String toConfigXML() {
-     
+
         StringBuilder bld = new StringBuilder("<value-change-monitor ");
-        
+
         if (step != null ) {
             bld.append("step=\"").append(operator.getOperatorXml()).append(step.floatValue()).append("\" ");
         }
@@ -174,12 +173,12 @@ public class ValueChangeMonitor implements Serializable, Cloneable {
         if (timeWindow != null ) {
             bld.append("timeWindow=\"").append(timeWindow).append("\" ");
         }
-        
+
         bld.append("/>");
-        
+
         return bld.toString();
     }
-    
+
     @Override
     public ValueChangeMonitor clone() throws CloneNotSupportedException {
       return (ValueChangeMonitor) super.clone();

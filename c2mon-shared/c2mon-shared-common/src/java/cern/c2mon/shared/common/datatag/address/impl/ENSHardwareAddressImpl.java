@@ -13,7 +13,7 @@ import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
  * @see cern.c2mon.shared.common.datatag.address.ENSHardwareAddress
  */
  public class ENSHardwareAddressImpl  extends HardwareAddressImpl implements ENSHardwareAddress {
- 
+
   private static final long serialVersionUID = -2040981497036089084L;
   /**
    * ENS address of the tag.
@@ -24,11 +24,11 @@ import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
   /**
    * ENS data type of the tag.
    */
-  @Element
+  @Element(name = "data-type")
   protected String dataType = null;
-  
+
   /**
-   * Constructor for internal use 
+   * Constructor for internal use
    * (for reading the HardwareAddress back from XML)
    */
   protected ENSHardwareAddressImpl() {
@@ -37,7 +37,7 @@ import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
 
   /**
    * Constructor for creating a fully initialised ENSHardwareAddress object.
-   * @param pAddress 
+   * @param pAddress
    * @param pDataType
    */
   public ENSHardwareAddressImpl(final String pAddress, final String pDataType) throws ConfigurationException {
@@ -45,10 +45,12 @@ import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
     setDataType(pDataType);
   }
 
+  @Override
   public final String getAddress() {
     return this.address;
   }
 
+  @Override
   public final String getDataType() {
     return this.dataType;
   }
@@ -57,13 +59,13 @@ import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
     if (pAddress == null) {
       throw new ConfigurationException(
           ConfigurationException.INVALID_PARAMETER_VALUE,
-          "Parameter \"address\" must not be null for ENS HardwareAddress." 
+          "Parameter \"address\" must not be null for ENS HardwareAddress."
       );
     }
     if (pAddress.length() > 16) {
       throw new ConfigurationException(
           ConfigurationException.INVALID_PARAMETER_VALUE,
-          "Parameter \"address\" can be max. 16 characters." 
+          "Parameter \"address\" can be max. 16 characters."
       );
     }
     this.address = pAddress;
@@ -73,10 +75,10 @@ import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
     if (pDataType == null) {
       throw new ConfigurationException(
           ConfigurationException.INVALID_PARAMETER_VALUE,
-          "Parameter \"dataType\" must not be null for ENS HardwareAddress." 
+          "Parameter \"dataType\" must not be null for ENS HardwareAddress."
       );
     }
-    if (!pDataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_ANALOG) && 
+    if (!pDataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_ANALOG) &&
         !pDataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_DIGITAL) &&
         !pDataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_COUNTER) &&
         !pDataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_CTRL_SETPOINT) &&
@@ -89,25 +91,26 @@ import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
     }
     this.dataType = pDataType;
   }
-  
+
+  @Override
   public void validate() throws ConfigurationException {
     if (this.address == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"address\" must not be null");
     }
-    
+
     if (this.dataType == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"dataType\" must not be null");
     }
-    
-    if (!this.dataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_ANALOG) && 
+
+    if (!this.dataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_ANALOG) &&
         !this.dataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_DIGITAL) &&
         !this.dataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_COUNTER) &&
         !this.dataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_CTRL_SETPOINT) &&
         !this.dataType.equalsIgnoreCase(ENSHardwareAddress.TYPE_CTRL_SIMPLE)
-       ) {    
+       ) {
          throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Invalid value for parameter \"dataType\" : " + this.dataType);
     }
-    
+
   }
-  
+
 }
