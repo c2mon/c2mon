@@ -1,7 +1,6 @@
 package cern.c2mon.web.configviewer.security;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,15 +26,9 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
   private static Logger logger = Logger.getLogger(CustomAuthenticationProvider.class);
 
   /**
-   * */
-  @Autowired
-  public CustomAuthenticationProvider() {
-  }
-
-  /**
-   * Our own custom authentication method. 
+   * Our own custom authentication method.
    * @param authentication contains information about the current user (and his password).
-   * @return the result of our authentication attempt. 
+   * @return the result of our authentication attempt.
    */
   @Override
   public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
@@ -43,17 +36,20 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
     String username = (String) authentication.getPrincipal();
     String password = (String) authentication.getCredentials();
 
-    // try to login
-    if (!C2monServiceGateway.getSessionManager().login(APP_NAME, username, password))
-      throw new BadCredentialsException("Invalid username/password"); // failed to login
+    // Don't attempt to login the user if they are already logged in.
+    if (!C2monServiceGateway.getSessionManager().isUserLogged(username)) {
+      if (!C2monServiceGateway.getSessionManager().login(APP_NAME, username, password)) {
+        throw new BadCredentialsException("Invalid username/password");
+      }
+    } else {
+      logger.debug("Repeated login for user " + username);
+    }
 
-// login successful => check if Authorized
-//    String role = getRole(username);
     String role = "ROLE_ADMIN";
 
     Authentication customAuthentication =
       new CustomUserAuthentication(role, authentication);
-    
+
     customAuthentication.setAuthenticated(true);
 
     return customAuthentication;
@@ -77,7 +73,7 @@ public class CustomAuthenticationProvider  implements AuthenticationProvider  {
             role = "ROLE_PROCESS_VIEWER";
           }
         }
-    
+
     role = "ROLE_ADMIN";
     return role;
   }
