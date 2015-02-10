@@ -20,7 +20,7 @@ import cern.c2mon.client.core.C2monSessionManager;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
 /**
- * Decides whether the current user has enough permissions 
+ * Decides whether the current user has enough permissions
  * to access a page or not.
  * @author ekoufaki
  */
@@ -30,12 +30,12 @@ public class RbacDecisionManager implements AccessDecisionManager {
   private Map<String, String> authorizationDetails;
 
   /**
-   * Decides whether the current user has enough permissions 
+   * Decides whether the current user has enough permissions
    * to access a page or not.
-   *  
+   *
    * @param authorizationDetails A map of (PageUrls, AuthorizationDetails) required to access each page.
    * The AuthorizationDetails should be provided as 3 comma seperated strings in the following order: "Class,Device,Property"
-   * Example: "TIM_APPLICATIONS,TIM_WEBCONFIG,RUN" 
+   * Example: "TIM_APPLICATIONS,TIM_WEBCONFIG,RUN"
    */
   @Autowired
   public RbacDecisionManager(final Map<String, String> authorizationDetails) {
@@ -56,9 +56,9 @@ public class RbacDecisionManager implements AccessDecisionManager {
     // The supports method ensures we are dealing with FilterInvocations
     //  so we can safely cast the secure object
     FilterInvocation invocation = (FilterInvocation) secureObject;
-    WebAuthenticationDetails requestDetails = (WebAuthenticationDetails) 
+    WebAuthenticationDetails requestDetails = (WebAuthenticationDetails)
     authentication.getDetails();
-    
+
     // The url that the user tries to access
     String username = (String) authentication.getPrincipal();
     String pageUrl = invocation.getRequestUrl();
@@ -71,23 +71,21 @@ public class RbacDecisionManager implements AccessDecisionManager {
       logger.info("no special permissions required to access:" + pageUrl);
       return; // bye - bye!
     }
-    
-    
-	if (!sessionManager.isAuthorized(username, details))  {
-	    if (sessionManager.isUserLogged(username)){	      
-		    logger.info(username 
-			          + " tried to access:" + pageUrl + " but does not have permission to do so!");
-			   throw new AccessDeniedException("go away"); // user does not have permission!	    
-	    }
-	    else{
-	      logger.info(username 
-             + " tried to access:" + pageUrl + " but he is not connected!");
-	      authentication.setAuthenticated(false);
-	      throw new AccessDeniedException("User not logged"); // user is not logged     
-	    }
-	}
-    logger.info(username 
-        + " succesfully authorised to access:" + pageUrl);
+
+
+    if (!sessionManager.isUserLogged(username)) {
+      logger.info(username + " tried to access: " + pageUrl + " but is not logged in.");
+      authentication.setAuthenticated(false);
+      throw new AccessDeniedException("User not logged in");
+
+    } else {
+      if (!sessionManager.isAuthorized(username, details)) {
+        logger.info(username + " tried to access: " + pageUrl + " but does not have permission.");
+        throw new AccessDeniedException("Permission denied");
+      }
+    }
+
+    logger.info(username + " succesfully authorised to access: " + pageUrl);
   }
 
   /**
@@ -117,7 +115,7 @@ public class RbacDecisionManager implements AccessDecisionManager {
    * @return an RbacAuthorizationDetails Object
    */
   private RbacAuthorizationDetails splitDetails(final String stringEncodedAuthDetails) {
-    
+
     RbacAuthorizationDetails details;
     try {
       details = RbacAuthorizationDetailsParser.parseRbacDetails(stringEncodedAuthDetails);
