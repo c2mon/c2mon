@@ -58,11 +58,22 @@
       <artifactId>commons-dbcp</artifactId>
       <version>1.4</version>
     </dependency>
+    
     <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis-spring</artifactId>
-      <!-- be carefull with this: mybatis-spring > 1.0.1 requires: mybatis version > 3.0.5 more info here -> http://www.mybatis.org/spring/ -->
+      <!-- 
+        mybatis-spring > 1.1.0 requires: mybatis version > 3.1.0 
+        More info here: http://mybatis.github.io/spring/ 
+      -->
       <version>1.2.2</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+      <version>3.2.7</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- test dependencies -->
@@ -86,11 +97,6 @@
         <configuration>
           <argLine>
             <!-- for the tests -->
-            -Dc2mon.jdbc.driver=oracle.jdbc.OracleDriver
-            -Dc2mon.jdbc.ro.url="jdbc:oracle:thin:@( DESCRIPTION= (ADDRESS= (PROTOCOL=TCP) (HOST=dbsrva3202.cern.ch)
-            (PORT=1574) ) (ENABLE=BROKEN) (CONNECT_DATA= (SID=TIMTST)))"
-            -Dc2mon.jdbc.ro.user=timop
-            -Dc2mon.jdbc.ro.password=optim1954
             -Dc2mon.client.conf.url=http://timweb/conf/c2mon-client.properties
 
             <!-- added during the migration to Spring -->
