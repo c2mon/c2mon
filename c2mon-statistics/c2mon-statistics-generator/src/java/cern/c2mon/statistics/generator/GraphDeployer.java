@@ -31,13 +31,13 @@ import cern.c2mon.statistics.generator.exceptions.InvalidTableNameException;
 
 /**
  * The main class of the chart and table deployer package.
- * 
+ *
  * Contains the main method that should be run once the new
  * statistics have been generated in the database.
- * 
+ *
  * Can always be run manually to refresh the graphs (if for some reason
  * the cron job was not performed, for example).
- * 
+ *
  * @author mbrightw
  *
  */
@@ -48,69 +48,69 @@ public class GraphDeployer {
      * (resides in top chart directory).
      */
     private static final String LOCK_FILE_NAME = "charts.lck";
-    
+
     /**
      * The minimum number of characters that the image, html and deploy directories must have
      * (enforced to avoid deleting other directories by mistake).
      */
     private static final short MIN_DIR_LENGTH = 5;
-    
+
     /**
      * The log4j process logger.
      */
-    private static Logger logger;
-      
+    private static Logger logger = Logger.getLogger(GraphDeployer.class);
+
     /**
      * The deployment system directory. Must be at least MIN_DIR_LENGTH characters long.
      */
     private String deployHome;
-    
+
     /**
      * The web home on the web server (where the charts and html directories are).
      */
     private String webHome;
-    
+
     /**
      * The name of the directory where the chart images should be written to
      * in deployHome. Must be at least MIN_DIR_LENGTH characters long.
      */
     private String imageDirName = null;
-    
+
     /**
      * The name of directory where the html fragments should be written to
      * in deployHome. Must be at least MIN_DIR_LENGTH characters long.
      */
     private String htmlDirName = null;
-    
+
     /**
-     * The list of charts to be deployed to the web 
+     * The list of charts to be deployed to the web
      * (charts together with description etc.)
      */
     private ArrayList<WebChart> webCharts = new ArrayList<WebChart>();
     //Collection<Tables> tables;
-    
+
     /**
      * Reference to the collection of standard styles for TIM charts.
      */
     private TimChartStyles timChartStyles;
-    
+
     /**
      * Default constructor.
      */
-    GraphDeployer() {
+    public GraphDeployer() {
     }
-    
+
     /**
      * Constructs the main graph deployer object from the configuration XML document.
      * @param graphXMLDocument the XML document specifying the graphs and tables
      */
-    final void configure(final Document graphXMLDocument) {
+    public final void configure(final Document graphXMLDocument) {
         //get the TIM chart style information
         timChartStyles = TimChartStyles.fromXML(graphXMLDocument);
-        
+
         //get the charts in the document
         NodeList chartElements = graphXMLDocument.getElementsByTagName("chart");
-        int listLength = chartElements.getLength(); 
+        int listLength = chartElements.getLength();
         logger.info(listLength + " charts found in configuration file");
         //iterate through all the chart elements in the XML document
         for (int i = 0; i < listLength; i++) {
@@ -150,13 +150,13 @@ public class GraphDeployer {
                 System.err.println("Statistics generator was terminated.");
                 tableEx.printStackTrace();
                 throw new RuntimeException(tableEx);
-            }         
+            }
         }
         logger.info(webCharts.size() + " charts correctly configured");
-        
+
         //get the chart groups in the XML document
         NodeList chartGroupElements = graphXMLDocument.getElementsByTagName("chart-group");
-        listLength = chartGroupElements.getLength(); 
+        listLength = chartGroupElements.getLength();
         logger.info(listLength + " charts groups found in configuration file");
         //iterate through all the chart group elements in the XML document
         for (int i = 0; i < listLength; i++) {
@@ -173,14 +173,14 @@ public class GraphDeployer {
                 System.err.println("GraphConfigException caught while processing XML config document.");
                 System.err.println("Skipping this chart collection. It will no longer be available for display. See log file.");
                 ex.printStackTrace();
-                continue; 
+                continue;
             } catch (SQLException sqlEx) {
                 //if SQL Exception occurs, skip graph and notify by email
                 logger.warn("SQL exception caught while generating chart in collection: " + sqlEx);
                 logger.warn("skipping this chart and sending notification...");
                 System.err.println("SQL exception caught while generating chart in collection. See log file for details.");
                 sqlEx.printStackTrace();
-                continue;           
+                continue;
             } catch (InvalidTableNameException tableEx) {
                 //if bad table name used, stop the package to prevent SQL injection errors
                 logger.fatal("Detected table name with unauthorized characters (non-alphanumeric + _");
@@ -189,18 +189,18 @@ public class GraphDeployer {
                 System.err.println("Statistics generator was terminated.");
                 tableEx.printStackTrace();
                 throw new RuntimeException(tableEx);
-            }    
-            
+            }
+
         }
-        
-            
-        
+
+
+
         //get the tables in the document
     }
-    
+
     /**
      * Deploys the charts and tables to the correct directory.
-     * 
+     *
      * If an error in writing to the disc occurs, the deployment is interrupted and
      * an email notification is sent.
      */
@@ -216,14 +216,14 @@ public class GraphDeployer {
             logger.fatal("exiting...");
             throw new RuntimeException(ioEx);
         }
-                  
+
         //deploy the tables to the web -- tables not implemented
         //deployTables();
     }
-    
+
     /**
-     * Deploys all the charts (images and html) to the web directories. 
-     * 
+     * Deploys all the charts (images and html) to the web directories.
+     *
      * @throws IOException error in writing one of the charts to disc
      */
     private void deployCharts() throws IOException {
@@ -237,53 +237,62 @@ public class GraphDeployer {
             //(could be null if chart type not recognized)
             WebChart currentWebChart = it.next();
             if (currentWebChart.canDeploy()) {
-                currentWebChart.deploy(webHome, deployHome, imageDirName, htmlDirName); 
-            }          
+                currentWebChart.deploy(webHome, deployHome, imageDirName, htmlDirName);
+            }
         }
         if (logger.isDebugEnabled()) {
             logger.debug("...leaving deployCharts()");
         }
     }
-    
+
     /**
-     * Removes all the current charts and html directories (if they exist) 
+     * Removes all the current charts and html directories (if they exist)
      * and recreates them (to remove old charts). Must be called within a file lock.
      */
-    private void renewDirectories() {                      
-        try {                        
-            logger.info("cleaning old directories");        
+    private void renewDirectories() {
+        try {
+            logger.info("cleaning old directories");
             //remove image and html directories
             File imageDir = new File(deployHome, imageDirName);
             File htmlDir = new File(deployHome, htmlDirName);
             if (imageDir.exists()) {
-                FileUtils.deleteDirectory(imageDir);           
+                FileUtils.deleteDirectory(imageDir);
             }
             if (htmlDir.exists()) {
-                FileUtils.deleteDirectory(htmlDir);          
+                FileUtils.deleteDirectory(htmlDir);
             }
-            
+
             //recreate them
             if (!htmlDir.mkdir()) {
               throw new IOException("Error in creating HTML directory.");
             }
             if (!imageDir.mkdir()) {
               throw new IOException("Error in creating image directory.");
-            }            
-            
+            }
+
         } catch (IOException ioEx) {
             logger.fatal("IOException caught when removing deploy directories: " + ioEx.getMessage());
             ioEx.printStackTrace();
             throw new RuntimeException(ioEx);
-        }        
+        }
     }
-    
+
+    /**
+     * Retrieve the raw charts.
+     *
+     * @return the list of {@link WebChart} objects
+     */
+    public ArrayList<WebChart> getWebCharts() {
+      return webCharts;
+    }
+
     /**
      * The main method of the graph deployer package. When run, it generates
      * the graphs from the database, saves the images, and creates and saves
      * the html fragments for displaying on the web.
-     * 
+     *
      * It takes the following arguments:
-     * 
+     *
      * -w, --webhome        the web home on the web server (where the charts and html directories are)
      * -d, --deployhome     the top directory where the charts and html should be deployed under
      * -i, --imagedir       the directory where the generated images are written to in webhome
@@ -291,18 +300,16 @@ public class GraphDeployer {
      * -h, --htmldir        the directory where the html fragments are written to in webhome
      * -l, --log4j          the log4j configuration file
      * -R                   remove all old contents of html and image directories at runtime !!handle with care!!
-     * 
+     *
      * @param args takes the arguments deployhome, imagedir, graphconfig, htmldir, log4j
      */
     public static void main(final String[] args) {
-        
+
         boolean cleanDirectories = false;
-        
-        logger = Logger.getLogger(GraphDeployer.class);
-        
+
         GraphDeployer deployer = new GraphDeployer();
-        
-        // the command line options    
+
+        // the command line options
         Option wOption = new Option("w", "webhome", true, "the web home on the web server (where the charts and html directories are)");
         wOption.setRequired(true);
         Option dOption = new Option("d", "deployhome", true, "the top directory where the charts and html should be deployed under");
@@ -317,7 +324,7 @@ public class GraphDeployer {
         lOption.setRequired(true);
         Option rOption = new Option("R", false, "remove all old content of html and image directories (clean option) !!handle with care!!");
         rOption.setRequired(false);
-        
+
         Options options = new Options();
         options.addOption(wOption);
         options.addOption(dOption);
@@ -328,10 +335,10 @@ public class GraphDeployer {
         options.addOption(rOption);
 
         // the command line option Strings
-        
+
         String chartConfigLocation = null;
         String loggerConfig = null;
-        
+
         // try to parse the commandline
         try {
             CommandLineParser parser = new GnuParser();
@@ -343,25 +350,25 @@ public class GraphDeployer {
             chartConfigLocation = cmd.getOptionValue("c");
             loggerConfig = cmd.getOptionValue("l");
             cleanDirectories = cmd.hasOption("R");
-            
+
         } catch (ParseException e) {  // parsing fails
-            System.err.println("Error in parsing the command line arguments.");           
+            System.err.println("Error in parsing the command line arguments.");
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("GraphDeployer", options);
             e.printStackTrace();
             System.exit(1);
         }
-        
-        if (deployer.deployHome.length() < MIN_DIR_LENGTH 
-              || deployer.imageDirName.length() < MIN_DIR_LENGTH  
+
+        if (deployer.deployHome.length() < MIN_DIR_LENGTH
+              || deployer.imageDirName.length() < MIN_DIR_LENGTH
               || deployer.htmlDirName.length() < MIN_DIR_LENGTH) {
             System.err.println("deploy, image and html directory names must be at least 5 letters long");
             System.exit(1);
         }
-        
+
         // set the name of the process
         System.setProperty("tim.process.name", "GraphDeployer");
-        
+
         // try to configure the logger
         try {
             // Load log4j xml file
@@ -375,7 +382,7 @@ public class GraphDeployer {
             ex.printStackTrace();
             System.exit(1);
         }
-        
+
         //parse graph XML file
         Document graphXMLDocument;
         DOMParser parser = new DOMParser();
@@ -400,35 +407,35 @@ public class GraphDeployer {
             logger.fatal("exiting...");
             System.exit(1);
         }
-        
+
         //deploy the graph collection to the web
         logger.info("deploying statistics to the web");
-        
+
         //lock access to these directories using the lock file,
-        //since the web application also accesses them                    
+        //since the web application also accesses them
         FileLock lock = null;
         RandomAccessFile lockFileRandom = null;
-        
+
         try {
           logger.debug("obtaining file lock...");
-          
-          //lock access            
-          File lockFile = new File(deployer.deployHome, GraphDeployer.LOCK_FILE_NAME);                                                             
-          lockFileRandom = new RandomAccessFile(lockFile, "rw"); 
+
+          //lock access
+          File lockFile = new File(deployer.deployHome, GraphDeployer.LOCK_FILE_NAME);
+          lockFileRandom = new RandomAccessFile(lockFile, "rw");
           FileChannel channel = lockFileRandom.getChannel();
           lock = channel.lock();
-          
+
           //clean and deploy
           if (cleanDirectories) {
             deployer.renewDirectories();
-          }  
+          }
           deployer.deploy();
-          
-        } catch (IOException ioEx) {          
+
+        } catch (IOException ioEx) {
           logger.error("IOException caught while cleaning and deploying new charts: " + ioEx.getMessage());
           ioEx.printStackTrace(System.err);
           throw new RuntimeException(ioEx);
-          
+
         } finally {
           //release lock and lock file if they were set
           if (lock != null) {
@@ -448,7 +455,7 @@ public class GraphDeployer {
             }
           }
         }
-        
+
 
     }
 
