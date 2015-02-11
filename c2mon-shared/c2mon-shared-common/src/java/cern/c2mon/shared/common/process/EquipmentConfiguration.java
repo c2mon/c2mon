@@ -37,7 +37,7 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
    * TODO make this a required attribute!
    */
   @Attribute
-  private Long id;
+  private Long id = 0L;
 
   /**
    * Equipment name.
