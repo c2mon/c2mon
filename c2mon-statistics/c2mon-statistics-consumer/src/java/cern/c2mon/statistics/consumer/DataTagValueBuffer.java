@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2009 CERN This program is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the License,
@@ -12,7 +12,7 @@
  * copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
@@ -33,7 +33,7 @@ import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.pmanager.persistence.impl.TimPersistenceManager;
-import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
 import cern.c2mon.shared.util.buffer.SynchroBufferListener;
@@ -42,13 +42,13 @@ import cern.c2mon.shared.util.buffer.SynchroBufferListener;
  * A wrapper class for the SynchroBuffer containing the tag values. The class
  * uses the SqlMapper class to write the values in the buffer to the database
  * (the values are written when a PullEvent is registered on the SynchroBuffer).
- * 
+ *
  * @author mbrightw
- * 
+ *
  */
 public class DataTagValueBuffer implements SynchroBufferListener {
 
- 
+
     /**
      * The synchro buffer containing the SourceDataTagValue objects.
      */
@@ -63,7 +63,7 @@ public class DataTagValueBuffer implements SynchroBufferListener {
      * The class managing the fallback mechanism.
      */
     private IPersistenceManager persistenceManager;
-    
+
     /**
      * Parameters for buffer initialization.
      */
@@ -71,30 +71,30 @@ public class DataTagValueBuffer implements SynchroBufferListener {
     private int bufferMaxWindow;
     private int bufferWindowGrowth;
     private int bufferCapacity;
-    
+
     /**
      * Fallback file name.
      */
     private String fallbackFile;
-    
+
     @PostConstruct
     public void init() {
-    
+
         //create an alarm listener (does nothing so far)
         IAlarmListener alarmListener = new AlarmListener();
         //create a persistence handler
         IDBPersistenceHandler dbPersistenceHandler = new DBPersistenceHandler();
-        
+
         //create the persistence manager (need to pass an instance of FilterPersistenceObject here)
         persistenceManager = new TimPersistenceManager(
-                                          dbPersistenceHandler, 
-                                          fallbackFile, 
-                                          alarmListener, 
+                                          dbPersistenceHandler,
+                                          fallbackFile,
+                                          alarmListener,
                                           (IFallback) new FilterPersistenceObject(new FilteredDataTagValue(new Long(0), "class")));
-        
+
         //initialize the SynchroBuffer
-        tagValueBuffer = new SynchroBuffer(bufferMinWindow, bufferMaxWindow, 
-                                        bufferWindowGrowth, SynchroBuffer.DUPLICATE_OK, 
+        tagValueBuffer = new SynchroBuffer(bufferMinWindow, bufferMaxWindow,
+                                        bufferWindowGrowth, SynchroBuffer.DUPLICATE_OK,
                                         bufferCapacity);
         tagValueBuffer.setSynchroBufferListener(this);
         tagValueBuffer.enable();
@@ -102,7 +102,7 @@ public class DataTagValueBuffer implements SynchroBufferListener {
 
     /**
      * Add one FilteredDataTagValue to the buffer.
-     * 
+     *
      * @param dataTagValue the FilteredDataTagValue to add
      */
     public void addValue(final FilteredDataTagValue dataTagValue) {
@@ -116,9 +116,9 @@ public class DataTagValueBuffer implements SynchroBufferListener {
      * FilteredDataTagValue objects are coming from the received XML messages
      * and are here added as FilterPersistenceObject's to the SynchroBuffer
      * (FilterPersistenceObject objects are needed for the fallback manager).
-     * 
+     *
      * @param tagValueCollection a collection of FilteredDataTagValue's
-     *            
+     *
      */
     public void addValues(final Collection<FilteredDataTagValue> tagValueCollection) {
         logger.debug("adding data tag values to buffer");
@@ -144,6 +144,7 @@ public class DataTagValueBuffer implements SynchroBufferListener {
      * @param event the event that triggers the pull
      */
 
+    @Override
     public final void pull(final PullEvent event) {
         if (logger.isDebugEnabled()) {
             logger.debug("entering filter server SynchroBuffer pull()...");

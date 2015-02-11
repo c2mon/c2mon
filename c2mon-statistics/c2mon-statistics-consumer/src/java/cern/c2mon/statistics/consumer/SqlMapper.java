@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2009 CERN This program is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the License,
@@ -12,7 +12,7 @@
  * copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
@@ -28,7 +28,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.shared.daq.filter.FilteredDataTagValue;
+import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 
 import com.ibatis.common.resources.Resources;
 import com.ibatis.sqlmap.client.SqlMapClient;
@@ -36,9 +36,9 @@ import com.ibatis.sqlmap.client.SqlMapClientBuilder;
 
 /**
  * Wrapper class for the SqlMapClient (ibatis)
- * 
+ *
  * @author Mark Brightwell
- * 
+ *
  */
 public final class SqlMapper {
 
@@ -46,7 +46,7 @@ public final class SqlMapper {
      * The number of inserts per batch.
      */
     private static final int INSERTS_PER_BATCH = 500;
-    
+
     /**
      * The general logger.
      */
@@ -61,20 +61,20 @@ public final class SqlMapper {
      * The SqlMapClient that this class is wrapping.
      */
     private static final SqlMapClient SQLMAP;
-    
-    
+
+
 
     static {
         try {
             //get c2mon.properties file containing DB access details
             String timPropertiesLocation;
             if (System.getProperty("c2mon.properties") == null) {
-                timPropertiesLocation = System.getProperty("consumer.home") + "/conf/c2mon-consumer.properties"; 
+                timPropertiesLocation = System.getProperty("consumer.home") + "/conf/c2mon-consumer.properties";
             }
             else {
                 timPropertiesLocation = System.getProperty("c2mon.properties");
             }
-            
+
             // the input stream for properties file
             FileInputStream timPropertiesFile = null;
 
@@ -97,7 +97,7 @@ public final class SqlMapper {
                 LOGGER.fatal("IOException caught : " + ex.getMessage());
                 ex.printStackTrace();
             }
-            
+
             //construct the SqlMap from the XML file, using the tim.properties DB settings
             String resource = "cern/c2mon/statistics/consumer/sqlmap/FilterSqlMapConfig.xml";
             Reader reader = Resources.getResourceAsReader(resource);
@@ -107,11 +107,11 @@ public final class SqlMapper {
             throw new RuntimeException("Error initializing SqlConfig class. Cause: " + e);
         }
     }
-    
+
     /**
      * Private constructor to override public one.
      */
-    private SqlMapper() {     
+    private SqlMapper() {
     }
 
     /**
@@ -124,7 +124,7 @@ public final class SqlMapper {
 
     /**
      * Writes the list of updates to the database.
-     * 
+     *
      * @param dataValues a list of FilterPersistenceObject's
      * @throws IDBPersistenceException if error in writing list of objects to database
      */
@@ -144,7 +144,7 @@ public final class SqlMapper {
                     SQLMAP.startBatch();
                     int counter = 0;
                     // insert the tags into the database in max batches of INSERTS_PER_BATCH
-                    while (it.hasNext() && counter < INSERTS_PER_BATCH) {                        
+                    while (it.hasNext() && counter < INSERTS_PER_BATCH) {
                         FilteredDataTagValue filteredDataTagValue = ((FilterPersistenceObject) it.next()).getFilteredDataTagValue();
                         TAGLOGGER.info(filteredDataTagValue);
                         SQLMAP.insert("insertTagValue", filteredDataTagValue);
@@ -169,7 +169,7 @@ public final class SqlMapper {
 
     /**
      * A method for testing the database insertion.
-     * @param fdt the FilteredDataTagValue to write to database 
+     * @param fdt the FilteredDataTagValue to write to database
      */
     public static void testInsert(final FilteredDataTagValue fdt) {
         try {
