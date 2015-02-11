@@ -62,12 +62,14 @@ import cern.c2mon.shared.util.parser.SimpleXMLParser;
 public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
     /**
+     * Note: when running as Junit from your IDE you need to set the following JVM args first:
+     * 
      * -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9999
      * -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true
-     * -Dcom.sun.management.jmxremote.password.file=src/test/ch/cern/tim/driver/jmx/testsrv.password
-     * -Dcom.sun.management.jmxremote.access.file=src/test/ch/cern/tim/driver/jmx/testsrv.access
+     * -Dcom.sun.management.jmxremote.password.file=src/test/cern/c2mon/daq/jmx/testsrv.password
+     * -Dcom.sun.management.jmxremote.access.file=src/test/cern/c2mon/daq/jmx/testsrv.access
      * 
-     * -Djmx.daq.passwd.file="src/test/ch/cern/tim/driver/jmx/pcache-passwords.txt"
+     * -Djmx.daq.passwd.file="src/test/cern/c2mon/daq/jmx/pcache-passwords.txt"
      */
 
     static Logger log = Logger.getLogger(JMXMessageHandlerTest.class);
@@ -200,7 +202,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
         assertEquals(SourceDataQuality.INCORRECT_NATIVE_ADDRESS, sdtv.getLastValue(54677L).getQuality()
                 .getQualityCode());
-        assertEquals("The specified MBean does not exist in the repository: cern.example.mbeans:type=WrongMBean", sdtv
+        assertEquals("non-accessible: The specified MBean does not exist in the repository: cern.example.mbeans:type=WrongMBean", sdtv
                 .getLastValue(54677L).getQuality().getDescription());
     }
 

@@ -83,6 +83,8 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
     volatile static RbaLoginService service = null;
 
+    private static final String NON_ACCESIBLE = "non-accessible:";
+
     private String jmxServiceUrl;
     private int jmxPollingTime;
 
@@ -453,7 +455,8 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
                 logger.error(format("Exception caught while trying to open subscription for tag[%d]. error: %s",
                         tag.getId(), errorMsg));
                 logger.error(format("Invalidating tag[%d] with quality: INCORRECT_NATIVE_ADDRESS", tag.getId()));
-                getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, errorMsg);
+                getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
+                        NON_ACCESIBLE + " " + errorMsg);
             }
 
         } else {
@@ -741,7 +744,8 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
             if (logger.isDebugEnabled())
                 logger.debug(format("Invalidating tag[%d] with quality INCORRECT_NATIVE_ADDRESS and description: %s",
                         tag.getId(), errorMsg));
-            getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS, errorMsg);
+            getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
+                    NON_ACCESIBLE + " " + errorMsg);
         }
 
         if (logger.isTraceEnabled())
