@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.DataTagListener;
 import cern.c2mon.client.common.tag.ClientDataTagValue;
+import cern.c2mon.client.common.util.ConcurrentSet;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.cache.BasicCacheHandler;
@@ -80,7 +81,7 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
    * Set of {@link ListenerWrapper} objects which wrap a
    * {@link DeviceUpdateListener} and a set of {@link Device}s.
    */
-  private Set<ListenerWrapper> deviceUpdateListeners = new HashSet<>();
+  private Set<ListenerWrapper> deviceUpdateListeners = new ConcurrentSet<>();
 
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service.
@@ -198,8 +199,6 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
       // Here, just get the tag IDs to avoid calling the server
       dataTagIds.addAll(deviceImpl.getPropertyDataTagIds());
 
-      deviceUpdateListeners.add(new ListenerWrapper(listener, new HashSet<>(devices)));
-
       // Add the devices to the cache
       deviceCache.add(device);
 
@@ -209,6 +208,9 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
         tagManager.subscribeDataTags(ruleTag.getRuleExpression().getInputTagIds(), ruleTag);
       }
     }
+
+    // Register the listener
+    deviceUpdateListeners.add(new ListenerWrapper(listener, new HashSet<>(devices)));
 
     // Use TagManager to subscribe to all properties of the device
     tagManager.subscribeDataTags(dataTagIds, this);
@@ -330,12 +332,12 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
 
     for (Device device : devices) {
       DeviceImpl deviceImpl = (DeviceImpl) device;
-      dataTagIds.addAll(deviceImpl.getPropertyDataTagIds());
 
       // Remove the device from the listener
       for (ListenerWrapper wrapper : deviceUpdateListeners) {
         if (wrapper.getListener().equals(listener)) {
           wrapper.getDevices().remove(device);
+          dataTagIds.addAll(deviceImpl.getPropertyDataTagIds());
         }
       }
 
@@ -384,7 +386,6 @@ public class DeviceManager implements C2monDeviceManager, DataTagListener {
    * @return true if the device is subscribed to, false otherwise
    */
   public boolean isSubscribed(Device device) {
-
     for (ListenerWrapper wrapper : deviceUpdateListeners) {
       if (wrapper.getDevices().contains(device)) {
         return true;

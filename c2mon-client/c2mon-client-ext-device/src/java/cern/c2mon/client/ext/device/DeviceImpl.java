@@ -32,6 +32,7 @@ import cern.c2mon.client.common.tag.ClientDataTagValue;
 import cern.c2mon.client.core.C2monCommandManager;
 import cern.c2mon.client.core.C2monTagManager;
 import cern.c2mon.client.core.tag.ClientRuleTag;
+import cern.c2mon.client.ext.device.listener.DeviceUpdateListener;
 import cern.c2mon.client.ext.device.property.Field;
 import cern.c2mon.client.ext.device.property.FieldImpl;
 import cern.c2mon.client.ext.device.property.Property;
@@ -50,52 +51,6 @@ import cern.c2mon.shared.rule.RuleFormatException;
  * @author Justin Lewis Salmon
  */
 public class DeviceImpl implements Device, Cloneable {
-
-  /* (non-Javadoc)
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((deviceClassId == null) ? 0 : deviceClassId.hashCode());
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    return result;
-  }
-
-  /* (non-Javadoc)
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof DeviceImpl)) {
-      return false;
-    }
-    DeviceImpl other = (DeviceImpl) obj;
-    if (deviceClassId == null) {
-      if (other.deviceClassId != null) {
-        return false;
-      }
-    }
-    else if (!deviceClassId.equals(other.deviceClassId)) {
-      return false;
-    }
-    if (id == null) {
-      if (other.id != null) {
-        return false;
-      }
-    }
-    else if (!id.equals(other.id)) {
-      return false;
-    }
-    return true;
-  }
 
   /** Log4j logger for this class */
   private static final Logger LOG = Logger.getLogger(DeviceImpl.class);
@@ -432,5 +387,43 @@ public class DeviceImpl implements Device, Cloneable {
     for (Property property : deviceProperties.values()) {
       ((PropertyImpl) property).setTagManager(tagManager);
     }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((deviceClassId == null) ? 0 : deviceClassId.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof DeviceImpl)) {
+      return false;
+    }
+    DeviceImpl other = (DeviceImpl) obj;
+    if (deviceClassId == null) {
+      if (other.deviceClassId != null) {
+        return false;
+      }
+    } else if (!deviceClassId.equals(other.deviceClassId)) {
+      return false;
+    }
+    if (id == null) {
+      if (other.id != null) {
+        return false;
+      }
+    } else if (!id.equals(other.id)) {
+      return false;
+    }
+    return true;
   }
 }
