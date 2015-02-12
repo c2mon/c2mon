@@ -34,6 +34,7 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 public class EquipmentMessageSenderTest {
 
     private static final long EQ_COMFAULT_ID = 1L;
+    private static final long EQ_ALIVE_ID = 0L;
     private static final float VALUE_DEADBAND = 25.0f;
     private static final long EQUIPMENT_ID = 1L;
     private static final Long SUB_KEY1 = 1337L;
@@ -48,6 +49,7 @@ public class EquipmentMessageSenderTest {
     private SourceDataTag sdt1;
     private SourceDataTag sdt2;
     private SourceDataTag sdt3;
+    private SourceDataTag alive;
 
     private EquipmentMessageSender equipmentMessageSender;
     private EquipmentSenderHelper equipmentSenderHelper = new EquipmentSenderHelper();
@@ -72,9 +74,12 @@ public class EquipmentMessageSenderTest {
         sdt3 = createSourceDataTag(3L, "sdt3", "Integer", DataTagDeadband.DEADBAND_PROCESS_RELATIVE_VALUE_DESCR_CHANGE,
                 DataTagConstants.PRIORITY_LOW, false);
 
+        alive = createSourceDataTag(EQ_ALIVE_ID, "eqalive", "String", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_HIGH, false);
+
         equipmentConfiguration.getDataTags().put(1L, sdt1);
         equipmentConfiguration.getDataTags().put(2L, sdt2);
         equipmentConfiguration.getDataTags().put(3L, sdt3);
+        equipmentConfiguration.getDataTags().put(0L, alive);
 
         equipmentConfiguration.getSubEquipmentConfigurations().put(10L, new SubEquipmentConfiguration(10L, "test1", SUB_KEY1, false));
         equipmentConfiguration.getSubEquipmentConfigurations().put(11L, new SubEquipmentConfiguration(11L, "test2", SUB_KEY2, true));
