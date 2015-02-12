@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2010 CERN This program is free software; you can redistribute
  * it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the License,
@@ -12,7 +12,7 @@
  * copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
@@ -25,14 +25,14 @@ import java.util.Vector;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.dip.Dip;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The
  * class is used for communication driver - data sources using DIP protocol
- * 
+ *
  * @author vilches
  */
 public class DIPMessageHandler extends EquipmentMessageHandler {
@@ -55,23 +55,24 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
    * This method is responsible for opening subscriptions for all supervised
    * SourceDataTags (data point elements). Also initializes the alive
    * mechanism.
-   * 
+   *
    * @throws EqIOException
    *             In cast of connection errors
    * @roseuid 409A0D150295
    */
+  @Override
   public void connectToDataSource() {
     getEquipmentLogger().info("connectToDataSource - Entering connectToDataSource..");
 
     // initialize alive mechanism
-    alivePublisher = new DipAlivePublisher(getEquipmentConfiguration().getName(), 
+    alivePublisher = new DipAlivePublisher(getEquipmentConfiguration().getName(),
         getEquipmentConfiguration().getSourceDataTag(getEquipmentConfiguration().getAliveTagId()), // null if not Tag found
         getEquipmentConfiguration().getAliveTagInterval(), getEquipmentLoggerFactory());
     alivePublisher.start();
-    
+
     // Controller
     if (this.dipController == null) {
-        this.dipController = new DIPController(getEquipmentLoggerFactory(), getEquipmentConfiguration(), 
+        this.dipController = new DIPController(getEquipmentLoggerFactory(), getEquipmentConfiguration(),
                 getEquipmentMessageSender());
     }
 
@@ -84,7 +85,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
         // each time
         this.dipController.setDipFactory(Dip.create(getEquipmentConfiguration().getId() + "_" + Long.valueOf(time).toString()));
         this.handler = new DipMessageHandlerDataListener(this.dipController, getEquipmentLogger(DipMessageHandlerDataListener.class));
-        
+
         this.dipController.setHandler(this.handler);
       } catch (Exception ex) {
         getEquipmentLogger().error("connectToDataSource - The handler cound not initialise properly its connection", ex);
@@ -131,11 +132,11 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
    * This method checks if there are any errors in the subscription table, i.e
    * : if there's more than one tag registered with the same dip item-name AND
    * field-name. All 'problematic' tags are returned in the result array
-   * 
+   *
    * @param tags4topic
    *            - the hashtable with all registered tags for topics
-   *            
-   * @return 
+   *
+   * @return
    */
   private Hashtable<String, Vector<ISourceDataTag>> testSubscriptions(final Map<String, Vector<ISourceDataTag>> tags4topic) {
     Hashtable<String, Vector<ISourceDataTag>> tmptable = new Hashtable<String, Vector<ISourceDataTag>>();
@@ -182,7 +183,7 @@ public class DIPMessageHandler extends EquipmentMessageHandler {
 
   /**
    * This method closes all previously opened subscriptions.
-   * 
+   *
    * @throws cern.c2mon.tools.equipmentexceptions.EqIOException
    * @roseuid 409A0D1502EF
    */

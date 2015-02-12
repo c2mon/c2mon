@@ -14,7 +14,7 @@ import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * @author wbuczak

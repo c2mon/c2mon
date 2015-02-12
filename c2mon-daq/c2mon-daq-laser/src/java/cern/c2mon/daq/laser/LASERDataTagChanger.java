@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2013 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,34 +13,34 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.laser;
 
 import static java.lang.String.format;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The LASERDataTagChanger is used for dynamic reconfiguration of Data Tags
- * 
+ *
  * @author Nacho Vilches
- * 
+ *
  */
 public class LASERDataTagChanger implements IDataTagChanger {
-  
+
   /**
    * LASER controller
    */
   private LASERController laserController;
-  
+
   /**
    * Creates a new SSHDataTagChanger.
-   * 
-   * @param laserController 
+   *
+   * @param laserController
    *
    */
   public LASERDataTagChanger(final LASERController laserController) {
@@ -64,7 +64,7 @@ public class LASERDataTagChanger implements IDataTagChanger {
     if (this.laserController.getEquipmentLogger().isDebugEnabled()) {
       this.laserController.getEquipmentLogger().debug(format("onAddDataTag - leaving onAddCommandTag(%d)", sourceDataTag.getId()));
     }
-    
+
   }
 
   @Override
@@ -80,7 +80,7 @@ public class LASERDataTagChanger implements IDataTagChanger {
     if (this.laserController.getEquipmentLogger().isDebugEnabled()) {
       this.laserController.getEquipmentLogger().debug(format("onRemoveDataTag - leaving onRemoveDataTag(%d)", sourceDataTag.getId()));
     }
-    
+
   }
 
   @Override

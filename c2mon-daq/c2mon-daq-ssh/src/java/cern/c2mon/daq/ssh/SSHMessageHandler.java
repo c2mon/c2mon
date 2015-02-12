@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2013 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,32 +13,32 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 //Source file: E:\\development\\CERN\\tim-daq\\tim-daq-ssh\\src\\java\\cern\\c2mon\\daq\\ssh\\SSHMessageHandler.java
 
 // TIM. CERN. All rights reserved.
-//  
+//
 // T Nick:           Date:       Info:
 // -------------------------------------------------------------------------
 // D wbuczak    19/Sep/2005     Class generation from the model
 // P wbuczak    20/Sep/2005     First implementation
-// 
+//
 // -------------------------------------------------------------------------
 
 package cern.c2mon.daq.ssh;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
+import cern.c2mon.daq.ssh.tools.SSHHelper;
 import cern.c2mon.daq.tools.equipmentexceptions.EqException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.c2mon.daq.ssh.tools.SSHHelper;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * The SSHMessageHandler is used for handling TIM ssh requests in the data
  * acquisition layer.
- * 
+ *
  * @author vilches
  */
 public class SSHMessageHandler extends EquipmentMessageHandler {
@@ -62,15 +62,16 @@ public class SSHMessageHandler extends EquipmentMessageHandler {
    */
   private SSHHelper sshHelper;
 
-  
+
   /**
    * @throws cern.c2mon.daq.tools.equipmentexceptions.EqIOException
    */
+  @Override
   public void connectToDataSource() throws EqIOException {
     if (getEquipmentLogger().isDebugEnabled()) {
       getEquipmentLogger().debug("connectToDataSource - entering connectToDataSource()..");
     }
-    
+
     // Create the Helper object
     this.sshHelper = new SSHHelper(getEquipmentLoggerFactory(), getEquipmentConfiguration(), getEquipmentMessageSender());
 
@@ -98,7 +99,7 @@ public class SSHMessageHandler extends EquipmentMessageHandler {
 
     // Go through all data tags and start-up the periodic executors..
     for (ISourceDataTag sdt : getEquipmentConfiguration().getSourceDataTags().values()) {
-      this.sshController.connection(sdt, null);        
+      this.sshController.connection(sdt, null);
     }
 
     // Add the Command Runner
@@ -112,11 +113,12 @@ public class SSHMessageHandler extends EquipmentMessageHandler {
   /**
    * @throws EqIOException
    */
+  @Override
   public void disconnectFromDataSource() throws EqIOException {
     if (getEquipmentLogger().isDebugEnabled()) {
       getEquipmentLogger().debug("disconnectFromDataSource - entering diconnectFromDataSource()..");
     }
-    
+
     // Disconnect all
     if (this.sshController != null) {
       for (Long tagID : this.sshController.getSshCommandExecutors().keySet()) {
@@ -129,7 +131,7 @@ public class SSHMessageHandler extends EquipmentMessageHandler {
     if (getEquipmentLogger().isDebugEnabled()) {
       getEquipmentLogger().debug("disconnectFromDataSource - leaving diconnectFromDataSource()");
     }
-  }    
+  }
 
   @Override
   public void refreshAllDataTags() {
@@ -141,7 +143,7 @@ public class SSHMessageHandler extends EquipmentMessageHandler {
   public void refreshDataTag(long dataTagId) {
     // TODO Implement this method.
   }
-  
+
   /**
    * This method is only used for testing purposes
    * @return The SSH helper class

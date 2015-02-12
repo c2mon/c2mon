@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2013 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.ssh.tools;
@@ -21,12 +21,12 @@ package cern.c2mon.daq.ssh.tools;
 import java.util.TimerTask;
 
 import cern.c2mon.daq.tools.equipmentexceptions.EqDataTagException;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 
 /**
  * This class models the action/task that is taken each timer's 'tick'
- * 
+ *
  * @author vilches
  */
 public class PeriodicSSHTask extends TimerTask {
@@ -46,6 +46,7 @@ public class PeriodicSSHTask extends TimerTask {
   /**
    * @roseuid 43302FED02AF
    */
+  @Override
   public void run() {
     try {
       this.sshHelper.recalculateDataTagValue(tag.getId());

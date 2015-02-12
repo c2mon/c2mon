@@ -13,12 +13,12 @@ import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * This alarm sender implementation does not send alarms to LASER. It's only goal is to LOG all alarm
  * activations/terminations/updates into a dedicated logger file
- * 
+ *
  * @author wbuczak
  */
 public class AlmonLoggingSenderImpl implements AlmonSender {

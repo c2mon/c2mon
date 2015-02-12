@@ -37,7 +37,7 @@ import cern.c2mon.daq.almon.address.impl.AlmonHardwareAddressImpl;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.almon.sender.TestAlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.japc.Parameter;
 import cern.japc.Selector;
 import cern.japc.ext.mockito.Cycle;
@@ -47,7 +47,7 @@ import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 
 /**
  * The <code>GmJapcParameterHandlerTest</code> tests GM alarm activation/termination algorithm.
- * 
+ *
  * @author wbuczak
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -79,7 +79,7 @@ public class GmJapcParameterHandlerTest {
         when(sdt.getId()).thenReturn(1000L);
 
         ems = Mockito.mock(IEquipmentMessageSender.class);
-        ems = mock(IEquipmentMessageSender.class);        
+        ems = mock(IEquipmentMessageSender.class);
 
     }
 

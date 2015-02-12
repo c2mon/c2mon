@@ -19,12 +19,12 @@ import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.TestAlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * This alarm sender implementation is used for test purposes only. It records all alarm
  * activations/terminations/updates in its internal cache, which can later be used for validation in the tests
- * 
+ *
  * @author wbuczak
  */
 public class DummyAlmonSenderImpl implements TestAlmonSender {
@@ -42,7 +42,6 @@ public class DummyAlmonSenderImpl implements TestAlmonSender {
         }
     }
 
-    @Override
     public void activate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
         LOG.info("activating alarm: {}", alarmTriplet);
@@ -55,7 +54,6 @@ public class DummyAlmonSenderImpl implements TestAlmonSender {
         }
     }
 
-    @Override
     public void terminate(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp) {
         LOG.info("terminating alarm: {}", alarmTriplet);
@@ -63,12 +61,11 @@ public class DummyAlmonSenderImpl implements TestAlmonSender {
             alarms.put(alarmTriplet, new ArrayList<AlarmRecord>());
         }
         alarms.get(alarmTriplet).add(new AlarmRecord(AlarmState.TERMINATED, userTimestamp));
-        if (ems != null) {            
+        if (ems != null) {
             ems.sendTagFiltered(sdt, Boolean.FALSE, System.currentTimeMillis());
         }
     }
 
-    @Override
     public void update(ISourceDataTag sdt, IEquipmentMessageSender ems, AlarmTriplet alarmTriplet,
             long userTimestamp, UserProperties userProperties) {
         LOG.info("updating alarm: {}", alarmTriplet);

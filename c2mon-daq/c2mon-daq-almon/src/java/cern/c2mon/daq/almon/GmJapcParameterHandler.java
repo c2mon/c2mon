@@ -8,7 +8,7 @@ import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.japc.AcquiredParameterValue;
 import cern.japc.MapParameterValue;
 import cern.japc.SimpleParameterValue;
@@ -17,7 +17,7 @@ import cern.japc.ValueType;
 
 /**
  * The <code>FesaJapcParameterHandler</code> is a parameter handler implementation for GM alarms
- * 
+ *
  * @author wbuczak
  */
 public class GmJapcParameterHandler extends JapcParameterHandler {

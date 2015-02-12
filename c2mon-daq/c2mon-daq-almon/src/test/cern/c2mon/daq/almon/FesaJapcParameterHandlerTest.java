@@ -50,7 +50,7 @@ import cern.c2mon.daq.almon.plsline.PlsLineResolver;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.almon.sender.TestAlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.japc.Parameter;
 import cern.japc.Selector;
 import cern.japc.ext.mockito.Cycle;
@@ -60,7 +60,7 @@ import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 
 /**
  * The <code>GmJapcParameterHandlerTest</code> tests FESA alarm activation/termination algorithm.
- * 
+ *
  * @author wbuczak
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -95,8 +95,8 @@ public class FesaJapcParameterHandlerTest {
 
         sdt = Mockito.mock(ISourceDataTag.class);
         when(sdt.getId()).thenReturn(1000L);
-        
-        ems = mock(IEquipmentMessageSender.class);        
+
+        ems = mock(IEquipmentMessageSender.class);
     }
 
     @After
@@ -280,7 +280,7 @@ public class FesaJapcParameterHandlerTest {
     /**
      * The goal of this tests it to verify alarm monitor correctly handles activations/terminations of the device access
      * fault alarms.
-     * 
+     *
      * @throws Exception
      */
     // @Test(timeout = 4000)
@@ -299,71 +299,71 @@ public class FesaJapcParameterHandlerTest {
 
         /*
          * // create mock parameter Parameter p1 = mockParameter("PR.TFB-AMP/Alarm");
-         * 
+         *
          * // register behavior - by default throw exception simulating the server is down
          * when(p1.getValue(null)).thenThrow(pe(EX_SERVER_DOWN));
-         * 
+         *
          * // 4 FESA parameters, pointing to the same device FesaParameter fesaParameter1 = new
          * FesaParameter("PR.TFB-AMP", "Alarm", "DAMPERPS_100010", "NONE", "ADTPSMODULE_210", "PR.TFB-AMP", 1000);
          * FesaParameter fesaParameter2 = new FesaParameter("PR.TFB-AMP", "Alarm", "DAMPERPS_100020", "NONE",
          * "ADTPSMODULE_210", "PR.TFB-AMP", 2000); FesaParameter fesaParameter3 = new FesaParameter("PR.TFB-AMP",
          * "Alarm", "DAMPERPS_100030", "NONE", "ADTPSMODULE_210", "PR.TFB-AMP", 3000); FesaParameter fesaParameter4 =
          * new FesaParameter("PR.TFB-AMP", "Alarm", "DAMPERPS_100040", "NONE", "ADTPSMODULE_210", "PR.TFB-AMP", 4000);
-         * 
+         *
          * handler1 = new FesaJapcParameterHandler(fesaParameter1, senderProxy, plsLineResolver); handler2 = new
          * FesaJapcParameterHandler(fesaParameter2, senderProxy, plsLineResolver); handler3 = new
          * FesaJapcParameterHandler(fesaParameter3, senderProxy, plsLineResolver); handler4 = new
          * FesaJapcParameterHandler(fesaParameter4, senderProxy, plsLineResolver);
-         * 
+         *
          * handler1.startMonitoring(); handler2.startMonitoring(); handler3.startMonitoring();
          * handler4.startMonitoring();
-         * 
+         *
          * SuperCycle superCycle = newSuperCycle(new Cycle("", 200)); superCycle.start();
-         * 
+         *
          * AlarmTriplet deviceAccessFaultTriplet = new AlarmTriplet(ALARM_MON_FAULT_FAMILY, "PR.TFB-AMP", 2);
-         * 
+         *
          * while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 1) { Thread.sleep(50); }
-         * 
+         *
          * List<AlarmRecord> records = mockSender.getAlarmsSequence(deviceAccessFaultTriplet); assertEquals(1,
          * records.size()); AlarmRecord r1 = records.get(0); assertEquals(AlarmState.ACTIVE, r1.getAlarmState());
          * assertEquals(ERROR_SERVER_UNREACHABLE, r1.getUserProperties().get(ASI_PREFIX_PROPERTY));
          * assertEquals(EX_SERVER_DOWN, r1.getUserProperties().get(ALMON_FAULT_PROPERTY_TAG));
-         * 
+         *
          * // now stop monitoring ONLY of the one of the FESA parameters handler1.stopMonitoring(); Thread.sleep(100);
          * handler2.stopMonitoring(); Thread.sleep(300); handler3.stopMonitoring(); Thread.sleep(300);
-         * 
+         *
          * // still - just one activation record is expected records =
          * mockSender.getAlarmsSequence(deviceAccessFaultTriplet); assertEquals(1, records.size());
-         * 
+         *
          * // stop monitoring of the remaining parameter handler4.stopMonitoring();
-         * 
+         *
          * while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 2) { Thread.sleep(50); }
-         * 
+         *
          * records = mockSender.getAlarmsSequence(deviceAccessFaultTriplet); assertEquals(2, records.size());
          * AlarmRecord r2 = records.get(1); assertEquals(AlarmState.TERMINATED, r2.getAlarmState());
-         * 
+         *
          * // OK, again, subscribe just 1 parameter - back to the same device handler1 = new
          * FesaJapcParameterHandler(fesaParameter1, senderProxy, plsLineResolver); handler1.startMonitoring();
-         * 
+         *
          * while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 3) { Thread.sleep(50); }
-         * 
+         *
          * // we should have back activation of the device fault records =
          * mockSender.getAlarmsSequence(deviceAccessFaultTriplet); assertEquals(3, records.size()); AlarmRecord r3 =
          * records.get(2); assertEquals(AlarmState.ACTIVE, r3.getAlarmState()); assertEquals(ERROR_SERVER_UNREACHABLE,
          * r3.getUserProperties().get(ASI_PREFIX_PROPERTY)); assertEquals(EX_SERVER_DOWN,
          * r3.getUserProperties().get(ALMON_FAULT_PROPERTY_TAG));
-         * 
+         *
          * // change the exception thrown by the RDA server
          * doThrow(pe(EX_DEVICE_UNKNOWN)).when(p1).getValue(anySelector());
-         * 
+         *
          * // wait for alarm update while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 4) {
          * Thread.sleep(50); } assertEquals(4, records.size()); AlarmRecord r4 = records.get(3);
          * assertEquals(AlarmState.ACTIVE, r4.getAlarmState()); assertEquals(ERROR_UNKNOWN_DEVICE,
          * r4.getUserProperties().get(ASI_PREFIX_PROPERTY)); assertEquals(EX_DEVICE_UNKNOWN,
          * r4.getUserProperties().get(ALMON_FAULT_PROPERTY_TAG));
-         * 
+         *
          * // stop parameter's monitoring handler1.stopMonitoring();
-         * 
+         *
          * // wait for alarm termination while (mockSender.getAlarmsSequence(deviceAccessFaultTriplet).size() < 5) {
          * Thread.sleep(50); } assertEquals(5, records.size()); AlarmRecord r5 = records.get(4);
          * assertEquals(AlarmState.TERMINATED, r5.getAlarmState());
@@ -431,7 +431,7 @@ public class FesaJapcParameterHandlerTest {
         assertNotNull(r2.getUserProperties().get(ASI_SUFFIX_PROPERTY));
         assertEquals("suffix1", r2.getUserProperties().get(ASI_SUFFIX_PROPERTY));
         assertEquals("1", r2.getUserProperties().get(FESA_PLS_LINE_USER_PROPERTY));
-        
+
     }
 
 }

@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import cern.c2mon.daq.almon.address.AlmonHardwareAddress;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.japc.Parameter;
 import cern.japc.ParameterException;
 import cern.japc.ParameterValueListener;
@@ -28,7 +28,7 @@ import cern.japc.factory.ParameterValueFactory;
 /**
  * Base class for GM and FESA JAPC parameter subscriptions. Implements common JAPC parameter subscription + device
  * access fault handling mechanisms.
- * 
+ *
  * @author wbuczak
  */
 public abstract class JapcParameterHandler implements ParameterValueListener {

@@ -4,16 +4,15 @@
  */
 package cern.c2mon.daq.ens;
 
-import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagDeadband;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.impl.ENSHardwareAddressImpl;
 
 /**
  * @author Filipe Campos - EFACEC SE
  *
  * This class encapsulates the CEfaEntity object, with the SourceDataTag obj
- * 
+ *
  */
 public class CEfaDbObj {
 
@@ -21,15 +20,15 @@ public class CEfaDbObj {
 	private ISourceDataTag timObj = null;
 	/** object from ens */
 	private CEfaEntity ensObj = null;
-	
+
 	/**
 	 * constructor
 	 *
 	 */
 	public CEfaDbObj(){
-		
+
 	}
-	
+
 	/**
 	 * set time object
 	 * @param obj
@@ -41,7 +40,7 @@ public class CEfaDbObj {
 	/**
 	 * set ens object
 	 * @param obj
-	 */	
+	 */
 	final public void setEnsObj( CEfaEntity obj  ){
 		ensObj = obj ;
 	}
@@ -67,10 +66,10 @@ public class CEfaDbObj {
 	 * @param hardAddr
 	 */
 	public boolean createEnsObj(ENSHardwareAddressImpl hardAddr, ISourceDataTag sourceDataTag) {
-		
+
 		// if does not exist , create it
 		if( ensObj == null ){
-			
+
 			String entType = hardAddr.getDataType();
 			if( entType.equals(ENSHardwareAddressImpl.TYPE_DIGITAL) ) {
 				ensObj = new CEfaEntityDig();
@@ -83,7 +82,7 @@ public class CEfaDbObj {
 				// 2005.07.08 - FC
 				if( sourceDataTag.getValueDeadbandType() == DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE ) {
 					ensObj.setDeadband( sourceDataTag.getValueDeadband() );
-					
+
 					// for cern, they jitter 1 like 0
 					float fDeadb = ensObj.fGetDeadBand() ;
 					if( fDeadb >= 1.0f ){
@@ -99,7 +98,7 @@ public class CEfaDbObj {
 				// 2005.07.08 - FC
 				if( sourceDataTag.getValueDeadbandType() == DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE ) {
 					ensObj.setDeadband( sourceDataTag.getValueDeadband() );
-					
+
 					// for cern, they jitter 1 like 0
 					float fDeadb = ensObj.fGetDeadBand() ;
 					if( fDeadb >= 1.0f ){
@@ -107,7 +106,7 @@ public class CEfaDbObj {
 						ensObj.setDeadband( fDeadb );
 					}
 				}
-				
+
 			}
 			else if( entType.equals(ENSHardwareAddressImpl.TYPE_CTRL_SIMPLE) ){
 				ensObj = new CEfaEntityCtr();
@@ -116,16 +115,16 @@ public class CEfaDbObj {
 				ensObj = new CEfaEntityCtrSet();
 			}
 		}
-		
+
 		if( ensObj==null || timObj==null ){
 			return false;
 		}
-		
+
 		// here already exist, update properties
 		ensObj.setId( hardAddr.getAddress() , timObj.getName() );
 		ensObj.bSetInvCode( CEfaEntity.EFAENT_UNINITIALISED );
-		
+
 		return true;
-	}	
-	
+	}
+
 }

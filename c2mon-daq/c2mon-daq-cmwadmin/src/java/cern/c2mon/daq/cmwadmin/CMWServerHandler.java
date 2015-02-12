@@ -4,18 +4,16 @@
 package cern.c2mon.daq.cmwadmin;
 
 import static java.lang.String.format;
-
-import cern.c2mon.daq.cmwadmin.TagOperationException;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.SimpleHardwareAddress;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
@@ -25,7 +23,7 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
  * the connection test interval must be greater than the polling time, otherwise the system will constantly consider
  * that the connection timed out. That's why the prog takes the polling time as passed by the configuration, and
  * considers that connection checking should occur once per two pollings. TODO check in and deploy
- * 
+ *
  * @author Mark Buttner, Wojtek Buczak
  */
 public class CMWServerHandler extends EquipmentMessageHandler implements Runnable, IDataTagChanger, IEquipmentConfigurationChanger {
@@ -112,6 +110,7 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
      * data acquisition thread. The loop sleeps for the given delay, checks that the last contact is not too long time
      * ago and notifies the server accordingly.
      */
+    @Override
     public void run() {
 
         // send the first initial commfault tag
@@ -152,7 +151,7 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
     //
     /**
      * On connection: check the equipment address and than start the acquisition and connection monitoring threads
-     * 
+     *
      * @throws EqIOException an I/O exception for the C2MON equipment
      */
     @Override
@@ -165,9 +164,9 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
         getEquipmentConfigurationHandler().setDataTagChanger(this);
         // set equipment configuration changer
         getEquipmentConfigurationHandler().setEquipmentConfigurationChanger(this);
-       
-        verifyTags();        
-        
+
+        verifyTags();
+
         if (!cern.cmw.rda.client.RDAService.initialized()) {
             cern.cmw.rda.client.RDAService.init();
         }
@@ -183,7 +182,7 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
 
     /**
      * parses the equipment address
-     * 
+     *
      * @throws EqIOException
      */
     private void parseEquipmentAddress() throws EqIOException {
@@ -245,7 +244,7 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
         if (acquisitionThread != null) {
             acquisitionThread.shutdown();
             try {
-                acquisitionThread.join(DISCONNECT_TIMEOUT * 1000);                
+                acquisitionThread.join(DISCONNECT_TIMEOUT * 1000);
                 acquisitionThread.interrupt();
             } catch (InterruptedException ie) {
                 getEquipmentLogger().warn("Acquisition thread did not stop within delay, skipping");
@@ -435,8 +434,8 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
 
         return result;
     }
-    
-    
+
+
     @Override
     public void onUpdateEquipmentConfiguration(
             @SuppressWarnings("unused") IEquipmentConfiguration equipmentConfiguration,
@@ -458,6 +457,6 @@ public class CMWServerHandler extends EquipmentMessageHandler implements Runnabl
             getEquipmentLogger().debug("leaving onUpdateEquipmentConfiguration()");
         }
 
-    }    
+    }
 
 }

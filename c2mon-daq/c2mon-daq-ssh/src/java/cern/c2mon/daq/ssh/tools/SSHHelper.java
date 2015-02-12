@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2013 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.ssh.tools;
@@ -34,15 +34,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqDataTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqException;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.SSHHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 
 import com.mindbright.jca.security.SecureRandom;
 import com.mindbright.ssh2.SSH2ConsoleRemote;
@@ -54,7 +54,7 @@ import com.mindbright.util.SecureRandomAndPad;
 
 /**
  * Helper class implementing some common methods used all over the SSH daq
- * 
+ *
  * @author vilches
  *
  */
@@ -122,7 +122,7 @@ public class SSHHelper {
    * @param address
    * @throws EqException
    */
-  public SSHHelper(final EquipmentLoggerFactory equipmentLoggerFactory, final IEquipmentConfiguration equipmentConfiguration, 
+  public SSHHelper(final EquipmentLoggerFactory equipmentLoggerFactory, final IEquipmentConfiguration equipmentConfiguration,
           final IEquipmentMessageSender equipmentMessageSender) {
       this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
       this.equipmentConfiguration = equipmentConfiguration;
@@ -179,7 +179,7 @@ public class SSHHelper {
   /**
    * Called periodcally by background timer threads to recalculate a value of
    * the specified tag
-   * 
+   *
    * @param dtagId
    *            - the identifier of the tag to recalculate
    */
@@ -325,7 +325,7 @@ public class SSHHelper {
 
   /**
    * Parses the execution feedback XML
-   * 
+   *
    * @return SSHExecutionFeedback - with the status exectution code and
    *         description
    * @param xmlFeedback
@@ -334,7 +334,7 @@ public class SSHHelper {
     this.equipmentLogger.debug("parseSSHExecutionFeedback - entering parseSSHExecutionFeedback()..");
     /**
      * The started process should throw the following XML output on stdout:
-     * 
+     *
      * <?xml version="1.0"?> <execution-status> <status-code>0</status-code>
      * <status-description> blah blah blah..</status-description> <value
      * type="java.l  ang.Integer">0</value> </execution-status>"
@@ -373,21 +373,21 @@ public class SSHHelper {
               value = new Integer(childNode.getFirstChild().getNodeValue());
             } catch (Exception ex) {
               this.equipmentLogger.error(errMessage, ex);
-              throw new EqCommandTagException(errMessage);                            
+              throw new EqCommandTagException(errMessage);
             }
           } else if (type.equals("java.lang.Boolean")) {
             try {
               value = new Boolean(childNode.getFirstChild().getNodeValue());
             } catch (Exception ex) {
               this.equipmentLogger.error(errMessage, ex);
-              throw new EqCommandTagException(errMessage);                            
+              throw new EqCommandTagException(errMessage);
             }
           } else if (type.equals("java.lang.Long")) {
             try {
               value = new Long(childNode.getFirstChild().getNodeValue());
             } catch (Exception ex) {
               this.equipmentLogger.error(errMessage, ex);
-              throw new EqCommandTagException(errMessage);                            
+              throw new EqCommandTagException(errMessage);
             }
           } else if (type.equals("java.lang.Float")) {
             try {
@@ -399,9 +399,9 @@ public class SSHHelper {
           } else if (type.equals("java.lang.Double")) {
             try {
               value = new Double(childNode.getFirstChild().getNodeValue());
-            } catch (Exception ex) {   
+            } catch (Exception ex) {
               this.equipmentLogger.error(errMessage, ex);
-              throw new EqCommandTagException(errMessage);                            
+              throw new EqCommandTagException(errMessage);
             }
           } else if (type.equals("java.lang.String")) {
             value = new Integer(childNode.getFirstChild().getNodeValue());
@@ -432,7 +432,7 @@ public class SSHHelper {
   /**
    * This private method (used mainly for ssh_key path in eq. address) is used
    * for obtaining environment variables $HOME & $USER from the string
-   * 
+   *
    * @return String with the variables replaced by their values obtained from
    *         the system
    * @param pPath
@@ -483,7 +483,7 @@ public class SSHHelper {
   /**
    * This private method is used by the handler for ssh client authentication
    * using user-name & password
-   * 
+   *
    * @return
    * @param userPassword
    * @param userName
@@ -519,7 +519,7 @@ public class SSHHelper {
   /**
    * This private method is used by the handler for ssh client authentication
    * using ssh rsa key
-   * 
+   *
    * @return
    * @param keyPass
    * @param keyPath
@@ -560,7 +560,7 @@ public class SSHHelper {
      * NOTE, this is how it should be done if you want good randomness,
      * however good randomness takes time so we settle with just some
      * low-entropy garbage here.
-     * 
+     *
      * RandomSeed seed = new RandomSeed("/dev/random", "/dev/urandom");
      * byte[] s = seed.getBytesBlocking(20); return new
      * SecureRandomAndPad(new SecureRandom(s));
@@ -570,7 +570,7 @@ public class SSHHelper {
   }
 
   /**
-   * 
+   *
    * @param serverAlias
    * @return
    */
@@ -613,7 +613,7 @@ public class SSHHelper {
   }
 
   /**
-   * 
+   *
    * @param adddr
    * @return
    */
@@ -628,7 +628,7 @@ public class SSHHelper {
   }
 
   /**
-   * 
+   *
    * @param adddr
    * @return
    */
@@ -642,7 +642,7 @@ public class SSHHelper {
   }
 
   /**
-   * 
+   *
    * @param adddr
    * @return
    */
@@ -660,7 +660,7 @@ public class SSHHelper {
   }
 
   /**
-   * 
+   *
    * @param adddr
    * @return
    */

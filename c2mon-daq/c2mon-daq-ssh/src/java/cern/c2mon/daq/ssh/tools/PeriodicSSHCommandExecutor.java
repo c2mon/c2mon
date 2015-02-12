@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2013 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,21 +13,21 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.ssh.tools;
 
 import java.util.Timer;
 
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.SSHHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * This class implements periodic ssh task execution mechanisms. It is used
  * by the data tags, that needs to be periodically updated, and which values
  * rely on ssh commands execution states
- * 
+ *
  * @author vilches
  */
 public class PeriodicSSHCommandExecutor {
@@ -45,7 +45,7 @@ public class PeriodicSSHCommandExecutor {
 
   /**
    * The constructor.
-   * 
+   *
    * @param owner
    * @roseuid 43302FE800DB
    */
@@ -58,7 +58,7 @@ public class PeriodicSSHCommandExecutor {
     // ms
     long delay = ((SSHHardwareAddress) tag.getHardwareAddress()).getCallDelay() * 1000; // in
     // ms
-    // normalize the values            
+    // normalize the values
     if (delay < 0)
       delay = 0;
 
@@ -67,7 +67,7 @@ public class PeriodicSSHCommandExecutor {
 
   /**
    * This method sets the timer's 'tick' interval
-   * 
+   *
    * @param milisecondsInterval
    * @roseuid 43302FE803D4
    */
@@ -77,7 +77,7 @@ public class PeriodicSSHCommandExecutor {
 
   /**
    * This method is used for timer's termination
-   * 
+   *
    * @roseuid 43302FEA0283
    */
   public void terminateTimer() {

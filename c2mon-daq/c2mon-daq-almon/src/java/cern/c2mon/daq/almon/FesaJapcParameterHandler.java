@@ -11,7 +11,7 @@ import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.plsline.PlsLineResolver;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.japc.AcquiredParameterValue;
 import cern.japc.MapParameterValue;
 import cern.japc.Type;
@@ -19,7 +19,7 @@ import cern.japc.ValueConversionException;
 
 /**
  * The <code>FesaJapcParameterHandler</code> is a parameter handler implementation for FESA
- * 
+ *
  * @author wbuczak
  */
 public class FesaJapcParameterHandler extends JapcParameterHandler {

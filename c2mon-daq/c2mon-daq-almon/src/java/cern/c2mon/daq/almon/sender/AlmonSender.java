@@ -7,11 +7,11 @@ package cern.c2mon.daq.almon.sender;
 import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * This interface defines a set of operations common to all alarm senders
- * 
+ *
  * @author wbuczak
  */
 public interface AlmonSender {

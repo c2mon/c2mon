@@ -5,7 +5,7 @@
 package cern.c2mon.daq.test;
 
 import static java.lang.String.format;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -20,21 +20,21 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.w3c.dom.Element;
 
-import cern.c2mon.daq.common.impl.EquipmentCommandHandler;
-import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
-import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
-import cern.c2mon.daq.common.conf.core.EquipmentConfiguration;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
-import cern.c2mon.daq.common.conf.core.ProcessConfiguration;
 import cern.c2mon.daq.common.conf.core.RunOptions;
+import cern.c2mon.daq.common.impl.EquipmentCommandHandler;
+import cern.c2mon.daq.common.impl.EquipmentMessageSender;
+import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.daq.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 
 /**
  * This class implements a common parent class for JUnit testing framework for EquipmentMessageHandlers.
@@ -42,13 +42,13 @@ import cern.c2mon.daq.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActi
  */
 
 public abstract class GenericMessageHandlerTst {
-                  
+
     protected static final String TEST_PROCESS_NAME = "P_TEST_01";
 
-    protected static final Long TEST_PROCESS_ID = 1L;    
-    
+    protected static final Long TEST_PROCESS_ID = 1L;
+
     protected EquipmentMessageHandler msgHandler;
-    
+
     protected IProcessMessageSender messageSender;
 
     protected IFilterMessageSender filterMessageSender;
@@ -58,14 +58,14 @@ public abstract class GenericMessageHandlerTst {
     protected IDynamicTimeDeadbandFilterActivator lowDynamicTimeDeadbandFilterActivator;
 
     protected EquipmentMessageSender equipmentMessageSender;
-    
+
     protected ProcessConfiguration pconf = new ProcessConfiguration();
-    
-    protected EquipmentConfiguration equipmentConfiguration; 
-    
+
+    protected EquipmentConfiguration equipmentConfiguration;
+
     protected ConfigurationController configurationController;
-   
-    static Logger log = Logger.getLogger(GenericMessageHandlerTst.class); 
+
+    static Logger log = Logger.getLogger(GenericMessageHandlerTst.class);
 
     @Rule
     public TestName testName = new TestName();
@@ -90,13 +90,13 @@ public abstract class GenericMessageHandlerTst {
 
         return null;
     }
-    
-    
+
+
     protected abstract void beforeTest() throws Exception;
-    
+
     protected abstract void afterTest() throws Exception;
-    
-       
+
+
     @Before
     public void setUp() throws Exception {
 
@@ -121,7 +121,7 @@ public abstract class GenericMessageHandlerTst {
 
         // configure the handler only if the test requires it - i.e. is annotated with UseConf annotation
         if (testConfig != null) {
-            
+
             messageSender = createMock(IProcessMessageSender.class);
             filterMessageSender = createMock(IFilterMessageSender.class);
 
@@ -131,7 +131,7 @@ public abstract class GenericMessageHandlerTst {
 
             equipmentMessageSender = new EquipmentMessageSender(filterMessageSender, messageSender,
                     medDynamicTimeDeadbandFilterActivator, lowDynamicTimeDeadbandFilterActivator);
-          
+
             RunOptions roptions = new RunOptions();
             configurationController = new ConfigurationController(roptions, null);
             configurationController.setProcessConfiguration(pconf);
@@ -142,14 +142,14 @@ public abstract class GenericMessageHandlerTst {
 
             pconf.setAliveTagID(1000L);
             pconf.setAliveInterval(20000);
-            
+
             if (log.isDebugEnabled()) {
                 log
                         .debug(format("configuring equipment with following test configuration file: %s\n",
                                 testConfig));
             }
-            
-            
+
+
             String confFileAbsPath = null;
             try {
                 confFileAbsPath = this.getClass().getResource(testConfig).getPath();
@@ -157,15 +157,15 @@ public abstract class GenericMessageHandlerTst {
             catch (Exception ex) {
                 fail("configuration file not found: "+testConfig);
             }
-            
-            
+
+
             Element rootConfElement = parseEquipmentConfiguration(confFileAbsPath);
             //ProcessConfigurationLoader processConfigurationLoader = new ProcessConfigurationLoader();
             assertNotNull(rootConfElement);
 
-            
+
             assertNotNull("Did you annotate your test with @UseHandler annotation ?!", getHandlerClass());
-            
+
             // update handler name
             rootConfElement.getElementsByTagName("handler-class-name").item(0).getFirstChild().setNodeValue(
                     getHandlerClass());
@@ -174,9 +174,9 @@ public abstract class GenericMessageHandlerTst {
             long equipmentId = equipmentConfiguration.getId();
             EquipmentLoggerFactory factory = EquipmentLoggerFactory.createFactory(equipmentConfiguration, pconf, roptions);
             msgHandler = EquipmentMessageHandler.createEquipmentMessageHandler(
-                    equipmentConfiguration.getHandlerClassName(), 
-                    new EquipmentCommandHandler(equipmentId, new RequestController(configurationController)), 
-                    new EquipmentConfigurationHandler(equipmentId, configurationController), 
+                    equipmentConfiguration.getHandlerClassName(),
+                    new EquipmentCommandHandler(equipmentId, new RequestController(configurationController)),
+                    new EquipmentConfigurationHandler(equipmentId, configurationController),
                     equipmentMessageSender);
             msgHandler.setEquipmentLoggerFactory(factory);
 //            equipmentMessageSender.setEquipmentConfiguration(equipmentConfiguration);
@@ -184,27 +184,27 @@ public abstract class GenericMessageHandlerTst {
             this.equipmentMessageSender.init(equipmentConfiguration, factory);
             pconf.getEquipmentConfigurations().put(equipmentId, equipmentConfiguration);
             msgHandler.setEquipmentMessageSender(equipmentMessageSender);
-            msgHandler.setEquipmentLoggerFactory(new EquipmentLoggerFactory(equipmentConfiguration.getHandlerClassName(), equipmentId, 
+            msgHandler.setEquipmentLoggerFactory(new EquipmentLoggerFactory(equipmentConfiguration.getHandlerClassName(), equipmentId,
                     equipmentConfiguration.getName(), pconf.getProcessName(), false, false));
-            
-            
+
+
             // call some test-specific before test initializer
             beforeTest();
-            
+
             Thread.sleep(120);
         }
 
     }
 
-     
+
     @After
     public void cleanUp() throws Exception {
         if (msgHandler != null)
             msgHandler.disconnectFromDataSource();
         afterTest();
     }
-    
-    
+
+
     protected static final Element parseEquipmentConfiguration(final String confXML) {
         Element result = null;
         try {
@@ -215,6 +215,6 @@ public abstract class GenericMessageHandlerTst {
             log.error("could not parse configuration document", ex);
         }
         return result;
-    }    
-    
+    }
+
 }

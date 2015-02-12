@@ -1,9 +1,9 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005-2013 CERN.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
@@ -13,7 +13,7 @@
  * details. You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 package cern.c2mon.daq.ssh;
@@ -22,11 +22,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 import cern.c2mon.daq.common.ICommandRunner;
-import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.ssh.tools.SSHHelper;
 import cern.c2mon.daq.ssh.tools.SSHXMLExecutionFeedback;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.datatag.address.SSHHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 
 import com.mindbright.ssh2.SSH2ConsoleRemote;
@@ -34,12 +34,12 @@ import com.mindbright.ssh2.SSH2SimpleClient;
 
 /**
  * The command runner sends commands to the PLC and processes the answers to the command.
- * 
+ *
  * @author vilches
  *
  */
 public class SSHCommandRunner implements ICommandRunner {
-  
+
   /**
    * SSH Helper class with some helping methods.
    */
@@ -47,8 +47,8 @@ public class SSHCommandRunner implements ICommandRunner {
 
   /**
    * Creates a new SSHCommandRunner.
-   * 
-   * @param sshHelper 
+   *
+   * @param sshHelper
    */
   public SSHCommandRunner(final SSHHelper sshHelper) {
     this.sshHelper = sshHelper;
@@ -56,7 +56,7 @@ public class SSHCommandRunner implements ICommandRunner {
 
   /**
    * Runs the command matching the source command tag value.
-   * 
+   *
    * @param sourceCommandTagValue Value to identify the command to run.
    * @throws EqCommandTagException Throws an exception if the execution of the command fails.
    * @return Returns a message about the execution of the command or null if there is no need.
@@ -111,7 +111,7 @@ public class SSHCommandRunner implements ICommandRunner {
       try {
         client = this.sshHelper.authenticate(server, port, user, passwd);
       } catch (Exception ex) {
-        this.sshHelper.getEquipmentLogger().error("runCommand - command execution failed: cound not establish ssh connection. " 
+        this.sshHelper.getEquipmentLogger().error("runCommand - command execution failed: cound not establish ssh connection. "
             + "Exception error message : " + ex.getMessage());
         throw new EqCommandTagException("command execution failure: cound not establish ssh connection. error message : " + ex.getMessage());
       }
@@ -172,7 +172,7 @@ public class SSHCommandRunner implements ICommandRunner {
       // if the execution code indicates possible error ..
       if (exitStatus != SSHHelper.EXIT_CODE_SUCCESS) {
         throw new EqCommandTagException(exitStatus, "The execution ended with exit code : " + exitStatus);
-      } else { 
+      } else {
         // if the exit status is fine
         if (address.isXMLProtocolConfigured()) {
           SSHXMLExecutionFeedback execFeedback = this.sshHelper.parseSSHExecutionFeedback(feedback);

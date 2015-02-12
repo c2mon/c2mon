@@ -4,13 +4,12 @@
 package cern.c2mon.daq.cmwadmin;
 
 import static java.lang.String.format;
-
-import cern.cmw.adm.ServerAdmin;
 import cern.c2mon.daq.cmwadmin.CMWServerHandler.TagType;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.cmw.adm.ServerAdmin;
 
 /**
  * The thread that connects to the server and queries for status information. As it is a single thread per server, there
@@ -18,7 +17,7 @@ import cern.c2mon.shared.daq.datatag.SourceDataQuality;
  * driver will not flood the CMW server with additional connection requests (which could also fail). This class runs as
  * (almost) endless loop, sleeping a while, querying the standard status data and additional data properties if
  * possible, and than matches the obtained data with the datatags configured for monitoring
- * 
+ *
  * @author Mark Buttner, Wojtek Buczak
  */
 public class CMWAdminAcquisitionThread extends Thread {
@@ -37,7 +36,7 @@ public class CMWAdminAcquisitionThread extends Thread {
 
     /**
      * Constructor. Stores the handler and extract the data into our shortcuts
-     * 
+     *
      * @param handler <code>CMWServerHandler</code> the implementation of C2MON's EquipmentMessageHandler
      */
     public CMWAdminAcquisitionThread(final CMWServerHandler handler) {
@@ -50,7 +49,7 @@ public class CMWAdminAcquisitionThread extends Thread {
     // ------------------------------------- GETTERS -----------------------------------
     /**
      * This method is sync'd because the connection monitoring thread uses this information
-     * 
+     *
      * @return <code>long</code> the timestamp of the last successful contact
      */
     public synchronized long getLastContact() {
@@ -59,7 +58,7 @@ public class CMWAdminAcquisitionThread extends Thread {
 
     /**
      * This method is sync'd because the connection monitoring thread uses this information
-     * 
+     *
      * @return <code>String</code> the message related to the last obeserved error on conn attempt
      */
     public synchronized String getLastError() {
@@ -69,7 +68,7 @@ public class CMWAdminAcquisitionThread extends Thread {
     // ------------------------------------- SETTERS -----------------------------------
     /**
      * Sync'd update of the last contact timestamp (-< the connection monitor might try to read at the same time ...)
-     * 
+     *
      * @param lastContact <code>long</code>
      */
     private synchronized void setLastContact(long lastContact) {
@@ -78,7 +77,7 @@ public class CMWAdminAcquisitionThread extends Thread {
 
     /**
      * Sync'd update of the last error message (-< the connection monitor might try to read at the same time ...)
-     * 
+     *
      * @param lastError <code>String</code>
      */
     private synchronized void setLastError(String lastError) {
@@ -154,7 +153,7 @@ public class CMWAdminAcquisitionThread extends Thread {
 
     /**
      * Send updated tag to the server
-     * 
+     *
      * @param tag
      * @param userValueDescription
      * @throws Exception

@@ -1,8 +1,8 @@
 /*
  * $Id $
- * 
+ *
  * $Date$ $Revision$ $Author$
- * 
+ *
  * Copyright CERN ${year}, All Rights Reserved.
  */
 package cern.c2mon.daq.jms;
@@ -22,20 +22,18 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import cern.c2mon.daq.jms.BrokerConfig;
-import cern.c2mon.daq.jms.JMSMessageHandler;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 
 @UseHandler(JMSMessageHandler.class)
 public class JmsMessageHandlerTest extends GenericMessageHandlerTst {
 
     static Logger log = Logger.getLogger(JmsMessageHandlerTest.class);
-    
+
     JMSMessageHandler jmsHandler;
 
     //
@@ -66,7 +64,7 @@ public class JmsMessageHandlerTest extends GenericMessageHandlerTst {
         replay(messageSender);
 
         jmsHandler.connectToDataSource();
-        
+
         Thread.sleep(1000);
 
         verify(messageSender);
@@ -74,7 +72,7 @@ public class JmsMessageHandlerTest extends GenericMessageHandlerTst {
         //assertEquals(2, jmsHandler.brokersList.size());
         //assertEquals(1, jmsHandler.bridgedBrokers.size());
     }
-    
+
     @Test
     @UseConf("e_jms_test2.xml")
     public void testBrokerCluster() throws Exception {
@@ -85,9 +83,9 @@ public class JmsMessageHandlerTest extends GenericMessageHandlerTst {
 
         messageSender.addValue(EasyMock.capture(sdtv));
         expectLastCall().times(4);
-        
+
         replay(messageSender);
-        
+
         BrokerService broker = new BrokerService();
         broker.setPersistent(false);
         broker.setDedicatedTaskRunner(false);
@@ -97,7 +95,7 @@ public class JmsMessageHandlerTest extends GenericMessageHandlerTst {
         broker.setSystemExitOnShutdown(true);
         broker.addConnector("tcp://localhost:61616");
         broker.start();
-        
+
         BrokerService broker2 = new BrokerService();
         broker2.setPersistent(false);
         broker2.setBrokerName("localtest2");
@@ -105,16 +103,16 @@ public class JmsMessageHandlerTest extends GenericMessageHandlerTst {
         broker2.setUseShutdownHook(false);
         broker2.setSystemExitOnShutdown(true);
         broker2.addConnector("tcp://localhost:61617");
-        
+
         NetworkConnector nc = broker2.addNetworkConnector(new URI("static://(tcp://localhost:61616)"));
         nc.setDuplex(true);
         nc.setNetworkTTL(2);
-        
+
         broker2.start();
-        
+
         jmsHandler.connectToDataSource();
         jmsHandler.runCheck();
-        
+
         Thread.sleep(1000);
 
         verify(messageSender);
@@ -125,26 +123,26 @@ public class JmsMessageHandlerTest extends GenericMessageHandlerTst {
         assertEquals(1, sdtv.getNumberOfCapturedValues(54611L));
         assertEquals(1, sdtv.getNumberOfCapturedValues(54612L));
     }
-    
-    
-    
+
+
+
     @Test(expected=EqIOException.class)
     @UseConf("e_failingHWAdress.xml")
     public void testFailedHWAddress() throws Exception {
 
       jmsHandler.connectToDataSource();
-   
+
     }
-    
-    
+
+
     @Test
     @UseConf("e_failingConnection.xml")
     public void testConnectionFailed() throws Exception {
-        
+
         Capture<Long> id = new Capture<Long>();
         Capture<Boolean> val = new Capture<Boolean>();
         Capture<String> msg = new Capture<String>();
-             
+
         /*
          * the commFaultTag is set to Ok at the beginning, so expect the call.
          */
@@ -160,28 +158,28 @@ public class JmsMessageHandlerTest extends GenericMessageHandlerTst {
 
         jmsHandler.connectToDataSource();
         jmsHandler.runCheck();
-     
+
         Thread.sleep(1000);
 
         verify(messageSender);
 
         assertEquals(1, sdtv.getNumberOfCapturedValues(54676L));
         assertEquals(1, sdtv.getNumberOfCapturedValues(54677L));
-        
-        
+
+
         assertEquals(SourceDataQuality.DATA_UNAVAILABLE, sdtv.getLastValue(54676L).getQuality().getQualityCode());
         assertEquals("Cannot aquire queue message perf for 'tcp://I-do-not-exist:61661 ': Could not connect to broker URL: tcp://I-do-not-exist:61661. Reason: java.net.UnknownHostException: I-do-not-exist", sdtv.getLastValue(54676L).getQuality().getDescription());
 
         assertEquals(SourceDataQuality.DATA_UNAVAILABLE, sdtv.getLastValue(54677L).getQuality().getQualityCode());
-        assertEquals("Cannot aquire topic message perf for 'tcp://I-do-not-exist:61661 ': Could not connect to broker URL: tcp://I-do-not-exist:61661. Reason: java.net.UnknownHostException: I-do-not-exist", sdtv.getLastValue(54677L).getQuality().getDescription());        
-        
+        assertEquals("Cannot aquire topic message perf for 'tcp://I-do-not-exist:61661 ': Could not connect to broker URL: tcp://I-do-not-exist:61661. Reason: java.net.UnknownHostException: I-do-not-exist", sdtv.getLastValue(54677L).getQuality().getDescription());
+
     }
-    
-    
+
+
     @Test
     @UseConf("e_jms_test2.xml")
     public void testSimpleDataTagAddress() {
-            
+
         BrokerConfig g;
         try {
             g = JMSMessageHandler.generateConfig(equipmentConfiguration);

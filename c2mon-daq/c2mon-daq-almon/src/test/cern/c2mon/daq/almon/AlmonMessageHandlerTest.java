@@ -3,18 +3,6 @@
  */
 package cern.c2mon.daq.almon;
 
-import static cern.japc.ext.mockito.JapcMock.mockParameter;
-import static cern.japc.ext.mockito.JapcMock.mpv;
-import static cern.japc.ext.mockito.JapcMock.newSuperCycle;
-import static cern.japc.ext.mockito.JapcMock.pe;
-import static cern.japc.ext.mockito.JapcMock.resetJapcMock;
-import static cern.japc.ext.mockito.JapcMock.sel;
-import static cern.japc.ext.mockito.JapcMock.setAnswer;
-import static cern.japc.ext.mockito.JapcMock.whenGetValueThen;
-import static java.lang.System.setProperty;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -32,13 +20,13 @@ import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 import cern.japc.Parameter;
 import cern.japc.Selector;
@@ -51,7 +39,7 @@ import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
  * This class implements a set of JUnit tests for <code>AlmonMessageHandler</code>. All tests that require
  * AlmonMessageHandler's pre-configuration with XML based configuration shall be annotated with <code>UseConf</code>
  * annotation, specifying the XML file to be used.
- * 
+ *
  * @see cern.c2mon.daq.almon.AlmonMessageHandler
  * @author wbuczak
  */
@@ -159,7 +147,7 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
      * This test verifies the Almon DAQ's behavior when a request to add a new DataTag is received at runtime. The DAQ
      * is supposed to subscribe to it and when it receives the valu for the new tag is should propagate it to the
      * business layer
-     * 
+     *
      * @throws Exception
      */
     @Test(timeout = 5000)
@@ -288,7 +276,7 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
     /**
      * This test verifies the Almon DAQ's behavior when a request to remove an existing DataTag is received at runtime.
      * The DAQ is expected to unregister such tag, and terminate the active alarm (if previously active)
-     * 
+     *
      * @throws Exception
      */
     @Test(timeout = 5000)
@@ -363,7 +351,7 @@ public class AlmonMessageHandlerTest extends GenericMessageHandlerTst {
     @UseConf("conf-gm-one-metric.xml")
     /**
      * Note: this test is to be executed as the very last one. It uses JAPC mockito super-cycle, which for some reason
-     * is not reset correctly one it is stopped and therefore can impact other tests 
+     * is not reset correctly one it is stopped and therefore can impact other tests
      * @throws Exception
      */
     public void test__DeviceGoesDown() throws Exception {

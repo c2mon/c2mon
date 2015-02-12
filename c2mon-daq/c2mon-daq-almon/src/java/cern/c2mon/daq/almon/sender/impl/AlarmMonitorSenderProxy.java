@@ -23,7 +23,7 @@ import cern.c2mon.daq.almon.address.AlarmTriplet;
 import cern.c2mon.daq.almon.address.UserProperties;
 import cern.c2mon.daq.almon.sender.AlmonSender;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
 /**
  * The alarm monitor sender proxy keeps a list of alarm monitor senders which are called to forward alarms. The proxy
@@ -34,7 +34,7 @@ import cern.c2mon.shared.daq.datatag.ISourceDataTag;
  * alarms list. It will discard calls to underlying senders when attempting to activate a triplet which is already
  * active. Similarly, it will not forward the call to terminate an alarm if it has already been terminated. In addition
  * the proxy sender exposes a set of monitoring JMX metrics.
- * 
+ *
  * @author wbuczak
  */
 @ManagedResource(objectName = "cern.c2mon.daq.almon.sender:name=AlarmMonitorServerProxy", description = "alarm montor sender proxy")

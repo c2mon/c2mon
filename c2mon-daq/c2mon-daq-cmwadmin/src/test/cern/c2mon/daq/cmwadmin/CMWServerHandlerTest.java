@@ -15,19 +15,18 @@ import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import cern.c2mon.daq.cmwadmin.CMWServerHandler;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 
 /**
  * This class implements a set of JUnit tests for <code>CMWServerHandler</code>. All tests that require
  * CMWServerHandler's pre-configuration with XML based configuration shall be annotated with <code>UseConf</code>
  * annotation, specifying the XML file to be used.
- * 
+ *
  * @see
  * @see cern.c2mon.daq.cmwadmin.CMWServerHandler
  * @author mbuttner

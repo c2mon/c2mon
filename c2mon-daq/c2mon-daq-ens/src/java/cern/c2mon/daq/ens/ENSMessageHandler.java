@@ -1,7 +1,7 @@
 /******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2005 - 2011 CERN This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,7 +12,7 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  *****************************************************************************/
 
@@ -29,20 +29,20 @@ import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.ENSHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
-import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.impl.ENSHardwareAddressImpl;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 
 /**
  * This is a skeleton of the specialised EquipmentMessageHandler component for
  * ENS. It is a subclass of the abstract EquipmentMessageHandler class provided
- * by the TIM DAQ Core. This Class that makes connection so SCATEX 
+ * by the TIM DAQ Core. This Class that makes connection so SCATEX
  * (SCATEX is a SCADA(Supervisory Control and Data Acquisition) system),
  * througth a gatex (GAte To EXternal System) server connection. Developed by EFACEC SE.
- * 
+ *
  * @version 1.3.0
  * @author EFACEC SE - Filipe Campos
  */
@@ -66,7 +66,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 //    // TODO Remove?
 //    /** simulation mode */
 //    private static final boolean bSimulMode = false;
-//    
+//
 //    private int testProc = 0, testSecs = 0;
 //
 //    /** garbage collector timeout */
@@ -195,7 +195,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * Sleep which will just return if it gets interrupted.
-     * 
+     *
      * @param msecs milliseconds to sleep
      */
     public void mySleep(final int msecs) {
@@ -208,7 +208,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * log for this class
-     * 
+     *
      * @param str string to log
      */
     public void myClassLog(final String str) {
@@ -217,7 +217,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * log for this class
-     * 
+     *
      * @param str string to log
      */
     public void myClassErr(final String str) {
@@ -226,7 +226,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * set the comm failure bit
-     * 
+     *
      * @param isFailed true if comm has failure
      */
     public void setCommFailure(final boolean isFailed) {
@@ -256,7 +256,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
      * the ENS address string It shall be like this
      * srv1=ens1.cern.ch;srv2=ens2.cern
      * .ch;comm_tim_s=30;wdog_tim_s=60;max_bytes=4096;max_retrys=3
-     * 
+     *
      * @return Returns true if the parsing was sucessfull else it will return false.
      * @author Filipe Campos - EFACEC SE
      */
@@ -301,15 +301,16 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
     /**
      * This method is called by the DAQ core on start-up, after the
      * EquipmentMessageHandler has been fully configured.
-     * 
+     *
      * This method must prepare a connection to the data source, create
      * subscriptions for each monitored SourceDataTag, prepare SourceCommandTags
      * for execution etc. When this method returns without throwing an
      * EqIOException, the core expects the EquipmentMessageHandler to be ready
      * to acquire data and to send commands.
-     * 
+     *
      * @throws EqIOException Thrown if connection to equipment failed.
      */
+    @Override
     public void connectToDataSource() throws EqIOException {
         myClassLog("** connectToDataSource ** ");
 
@@ -333,15 +334,16 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * This method is called by the DAQ core before the DAQ process exits.
-     * 
+     *
      * This method must close all open subscriptions and release all resources
      * acquired by the EquipmentMessageHandler. When this method returns without
      * throwing an EqIOException, the DAQ core assumes that the
      * EquipmentMessageHandler is ready for shutdown or for a new call to
      * connectToDataSource()
-     * 
+     *
      * @throws EqIOException Thrown if the communication to disconnect failed.
      */
+    @Override
     public void disconnectFromDataSource() throws EqIOException {
         myClassLog("** disconnectFromDataSource ** ");
         synchronized (monFinish) {
@@ -360,12 +362,12 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
         }
         throw new EqIOException("disconnectFromDataSource gives 10s timeout");
     }
-    
+
     @Override
     public void refreshAllDataTags() {
         // TODO In general this might be just a restart.
     }
-    
+
     @Override
     public void refreshDataTag(final long dataTagId) {
         // TODO Implement this method.
@@ -373,20 +375,20 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * This method is called to execute a command on the EquipmentMessageHandler.
-     * 
+     *
      * The EMH is responsible for executing the command. If the method returns
      * without throwing an Exception, the core assumes that the command has been
      * executed successfully.
-     * 
+     *
      * TO BE DEFINED: Each command has a "source timeout". If the method does
      * not return within the number of milliseconds specified in the
      * SourceCommandTag object, execution will be interrupted by the DAQ core
      * and the core will assume that command execution has failed.
-     * 
+     *
      * @param pcmdTagValue the SourceDataTagValue object
      * @throws EqCommandTagException Throws an exception if the command failed.
      */
-    protected void sendCommand(final SourceCommandTagValue pcmdTagValue) 
+    protected void sendCommand(final SourceCommandTagValue pcmdTagValue)
             throws EqCommandTagException {
 
         myClassLog("[Rx cmd request] cmdid = " + pcmdTagValue.getId());
@@ -445,6 +447,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
     /**
      * the thread of the class method
      */
+    @Override
     public void run() {
         myClassLog("========== STARTING ENS HANDLER LOOP ===========");
         flagRestart = false;
@@ -510,7 +513,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * here config can add to internal db a entity
-     * 
+     *
      * @param sdt sourcedatatag give by tim
      * @param hardAddr hardware address that have ens atributes
      * @return True if the data tag is added to the database of registered
@@ -567,7 +570,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * get type of entity with hardware address
-     * 
+     *
      * @param hardAddr hardware address that have ens atributes
      * @return The type constant of this point.
      * @author Filipe Campos - EFACEC SE
@@ -590,7 +593,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * this method has to config gatex memory db to connect to scatex
-     * 
+     *
      */
     @SuppressWarnings("unchecked")
     public void configGatex() {
@@ -634,8 +637,8 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
                     // This test is redundant it is already checked in configAddToDb
                     if (entType < NUM_SXENT) {
                         /*
-                         *  If a tag was successfully added to the db it is 
-                         *  removed from the used tag list. At this point 
+                         *  If a tag was successfully added to the db it is
+                         *  removed from the used tag list. At this point
                          *  the name of the local field gets confusing. It is actually
                          *  not the map of used tags it gets then more and more a map
                          *  of unused tags.
@@ -648,7 +651,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
                 }
             }
             /*
-             * Here the array of used tags has evolved to the map of 
+             * Here the array of used tags has evolved to the map of
              * unused tags.
              */
 
@@ -736,7 +739,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * send a commando to gatex, has to check timeout
-     * 
+     *
      * @param ensTag ens tag to send
      * @param ensValue ens value if it is a setpoint
      * @param rcCode result code
@@ -806,7 +809,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * convert ens status event to status of tim and send it
-     * 
+     *
      * @param ensEnt
      * @param sdt
      * @param isServerFailed
@@ -841,7 +844,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * this method is the gatex tick
-     * 
+     *
      */
     public void tickGatex() {
         mySleep(1);
@@ -1078,7 +1081,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
         } while (--iMaxEvents > 0);
 
-        // 
+        //
         // counter events
         //
         // TODO This would be a wonderful place for a method and a for loop
@@ -1212,7 +1215,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
 //    /**
 //     * get used memory (http://www.javaworld.com)
-//     * 
+//     *
 //     * @return used memory in bytes
 //     */
 //    private static long usedMemory() {
@@ -1221,7 +1224,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
 //    /**
 //     * make gc clean, with finalizator (http://www.javaworld.com)
-//     * 
+//     *
 //     */
 //    private static void _runGC() throws Exception {
 //        long usedMem1 = usedMemory(), usedMem2 = Long.MAX_VALUE;
@@ -1236,7 +1239,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
 //    /**
 //     * my garbage collector with finalizator
-//     * 
+//     *
 //     */
 //    private void gc() {
 //        System.out.println("*** gc in *** ->" + usedMemory());
@@ -1297,7 +1300,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
     // TODO Find out what ctr means.
     /**
      * get next ctr order
-     * 
+     *
      * @return return ctr order
      */
     public int getCtrOrd() {
@@ -1314,7 +1317,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * convert utc time to local (V1.1.0)
-     * 
+     *
      * @param ttag The time in UTC format.
      * @return The converted time.
      */
@@ -1327,6 +1330,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
     /**
      * finalize method
      */
+    @Override
     protected void finalize() {
 
         synchronized (monFinish) {
@@ -1353,7 +1357,7 @@ public class ENSMessageHandler extends EquipmentMessageHandler implements Runnab
 
     /**
      * Wrapper method which calls the old send command method.
-     * 
+     *
      * @param sourceCommandTagValue The source command to run.
      * @exception EqCommandTagException Thrown if the command fails.
      */
