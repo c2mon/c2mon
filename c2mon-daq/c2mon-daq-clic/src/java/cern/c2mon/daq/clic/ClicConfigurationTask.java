@@ -13,17 +13,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.dmn2.agentlib.AgentClient;
 import cern.dmn2.agentlib.AgentContext;
 import cern.dmn2.agentlib.CommandType;
 import cern.dmn2.agentlib.FieldDataType;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
-import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * The <code>ClicConfigurationTask</code> class implements a task responsible for automatic CLIC reconfiguration
- * 
+ *
  * @author wbuczak
  */
 public class ClicConfigurationTask implements Runnable {

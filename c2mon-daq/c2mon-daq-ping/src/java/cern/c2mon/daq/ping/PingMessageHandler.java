@@ -16,15 +16,15 @@ import java.util.concurrent.TimeUnit;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.SimpleHardwareAddress;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * This is a specialized subclass of the general EquipmentMessageHandler. The class implements an
@@ -75,7 +75,7 @@ public class PingMessageHandler extends EquipmentMessageHandler implements IData
 
     /**
      * stops poller for given tag
-     * 
+     *
      * @param tagId
      */
     synchronized void stopPingTask(final Long tagId) {

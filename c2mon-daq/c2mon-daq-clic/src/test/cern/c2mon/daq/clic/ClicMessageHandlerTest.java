@@ -15,21 +15,21 @@ import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import cern.dmn2.agentlib.AgentClientConstants;
 import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
+import cern.dmn2.agentlib.AgentClientConstants;
 
 /**
  * @author wbuczak
@@ -48,8 +48,8 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
     public static final String ACTIVEMQ_URL = "tcp://localhost:9999";
     public static final String ACTIVEMQ_FAILOVER_URL = "failover:(" + ACTIVEMQ_URL
             + ")?jms.prefetchPolicy.all=100&startupMaxReconnectAttempts=2";
-    
-    
+
+
     @Override
     protected void beforeTest() throws Exception {
         System.setProperty(AgentClientConstants.DMN2_AGENTLIB_BROKER_PROPERTY, ACTIVEMQ_FAILOVER_URL);
@@ -142,7 +142,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
 
     @Test
     @UseConf("conf-clic-two-metrics.xml")
-    public void subscriptionWithClicReconfigurationTest1() throws Exception {                       
+    public void subscriptionWithClicReconfigurationTest1() throws Exception {
         messageSender.sendCommfaultTag(107211, true);
         expectLastCall().once();
 
@@ -273,7 +273,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
     /**
      * The goal of this test is to verify the CLIC message handler's behavior when a request to add a new DataTag is
      * received at runtime.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -347,7 +347,7 @@ public class ClicMessageHandlerTest extends GenericMessageHandlerTst {
     /**
      * The goal of this test is to verify the CLIC message handler's behavior when a request to remove an existing
      * DataTag is received at runtime.
-     * 
+     *
      * @throws Exception
      */
     @Test

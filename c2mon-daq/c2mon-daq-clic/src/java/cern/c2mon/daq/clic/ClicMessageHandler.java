@@ -19,13 +19,13 @@ import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.dmn2.agentlib.AgentClient;
 import cern.dmn2.agentlib.AgentCommunicationException;
 import cern.dmn2.agentlib.AgentContext;
@@ -277,7 +277,7 @@ public class ClicMessageHandler extends EquipmentMessageHandler implements IComm
 
     /**
      * Registers new tag. starts subscription etc..
-     * 
+     *
      * @param tag
      */
     protected synchronized void registerTag(ISourceDataTag tag) throws TagOperationException {

@@ -25,20 +25,20 @@ import cern.c2mon.daq.test.GenericMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * This class implements a set of JUnit tests for <code>PingMessageHandler</code>. All tests that require
  * PingMessageHandler's pre-configuration with XML based configuration shall be annotated with <code>UseConf</code>
  * annotation, specifying the XML file to be used.
- * 
+ *
  * @see
  * @see cern.c2mon.daq.ping.PingMessageHandler
  * @author wbuczak
@@ -288,7 +288,7 @@ public class PingMessageHandlerTest extends GenericMessageHandlerTst {
      * NOTE: this test is an integration test, run agains real devices. It should be commented out before commiting to
      * SVN because if the machines availability changes, this would cause that test to fail. It should only be
      * uncommented to run from local development machine, by a developer.
-     * 
+     *
      * @throws Exception
      */
     // @Test
