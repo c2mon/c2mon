@@ -25,6 +25,7 @@
     <dependency>
       <groupId>cern.tim.tim-client</groupId>
       <artifactId>tim-jviews-viewer</artifactId>
+      <version>[1.2.8, 2.0.0)</version>
     </dependency>
   </dependencies>
 
