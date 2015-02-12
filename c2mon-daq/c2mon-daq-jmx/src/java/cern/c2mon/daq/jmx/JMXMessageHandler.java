@@ -38,21 +38,21 @@ import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
 import cern.c2mon.patterncache.PatternCache;
 import cern.c2mon.patterncache.PatternCacheFileWatchdog;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.JMXHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.JMXHardwareAddress.ReceiveMethod;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.rba.util.lookup.RbaTokenLookup;
 import cern.rba.util.relogin.RbaLoginService;
 
@@ -123,7 +123,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
     /**
      * This class implements a Thread responsibile for opening RMI connection to MBean server and initializing DataTags
-     * 
+     *
      * @author wbuczak
      */
     protected class OpenMBeanConnectionTask implements Runnable {
@@ -256,7 +256,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     /**
      * This class implements a polling task. Polling tasks are executed periodically in order to get most recent values
      * of tags, that support polling as reception method
-     * 
+     *
      * @author wbuczak
      */
     protected class PollerTask implements Runnable {
@@ -316,7 +316,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
     /**
      * This class implements a listener for MBean server notifications
-     * 
+     *
      * @author wbuczak
      */
     protected class DataTagUpdateListener implements NotificationListener {
@@ -399,7 +399,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
     /**
      * stops poller for given tag
-     * 
+     *
      * @param tagId
      */
     void jmxStopPoller(final Long tagId) {
@@ -506,7 +506,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     }
 
     /**
-     * 
+     *
      */
     void stopConnectionTestingTask() {
         logger.trace("entering stopConnectionTestingTask()..");
@@ -599,7 +599,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     /**
      * this private method extracts a value from a given map attribute of <code>CompositeData</code> bean implementing
      * <code>TabularData</code> interface
-     * 
+     *
      * @param mapAttribute a <code>TabularData</code> attribute
      * @param key a map key to be used
      * @return a value extracted from the map or null + value description
@@ -625,7 +625,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
     /**
      * This method extracts the value of the JMX bean's attribute, based on the attribute type and information provided
      * inside the tag's hardware address
-     * 
+     *
      * @param jmxAttribute JMX bean's attribute
      * @param tagAddress DataTag's hardware address
      * @return extracted value of null, if extraction was not possible
@@ -810,7 +810,7 @@ public class JMXMessageHandler extends EquipmentMessageHandler implements IComma
 
     /**
      * checks the equipment address
-     * 
+     *
      * @throws EqIOException
      */
     private void parseEquipmentAddress() throws EqIOException {

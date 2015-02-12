@@ -27,7 +27,6 @@ import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.daq.jmx.JMXMessageHandler;
 import cern.c2mon.daq.jmx.mbeans.AttributeHolder;
 import cern.c2mon.daq.jmx.mbeans.AttributeHolderMBean;
 import cern.c2mon.daq.jmx.mbeans.Cache;
@@ -39,21 +38,21 @@ import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * This class implements a set of JUnit tests for <code>JMXMessageHandler</code>. All tests that require
  * JMXMessageHandler's pre-configuration with XML based configuration shall be annotated with <code>UseConf</code>
  * annotation, specifying the XML file to be used.
- * 
+ *
  * @see
  * @see cern.c2mon.daq.jmx.JMXMessageHandler
  * @author wbuczak
@@ -63,12 +62,12 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
     /**
      * Note: when running as Junit from your IDE you need to set the following JVM args first:
-     * 
+     *
      * -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9999
      * -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=true
      * -Dcom.sun.management.jmxremote.password.file=src/test/cern/c2mon/daq/jmx/testsrv.password
      * -Dcom.sun.management.jmxremote.access.file=src/test/cern/c2mon/daq/jmx/testsrv.access
-     * 
+     *
      * -Djmx.daq.passwd.file="src/test/cern/c2mon/daq/jmx/pcache-passwords.txt"
      */
 
@@ -161,7 +160,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
         jmxHandler.connectToDataSource();
 
         Thread.sleep(2000);
-               
+
         verify(messageSender);
 
         assertEquals(
@@ -541,7 +540,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
     /**
      * The goal of this test is to verify the JMX message handler's behavior when a request to add a new DataTag is
      * received at runtime.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -571,7 +570,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
 
         Thread.sleep(1000);
 
-        StringBuilder str = new StringBuilder();        
+        StringBuilder str = new StringBuilder();
 
         str.append("<DataTag id=\"1000001\" name=\"JAPC-TEST-TAG02\" control=\"false\">");
         str.append("  <data-type>Integer</data-type>");
@@ -632,7 +631,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
     /**
      * The goal of this test is to verify the JMX message handler's behavior when a request to remove an existing
      * DataTag is received at runtime.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -834,7 +833,7 @@ public class JMXMessageHandlerTest extends GenericMessageHandlerTst {
     /**
      * This is a logging project integration test. Normally it should be commented out (@Ignore annotation) Uncomment if
      * you need to run it from your development environment, but do not commit!
-     * 
+     *
      * @throws Exception
      */
     @Test
