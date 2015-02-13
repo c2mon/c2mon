@@ -4,7 +4,7 @@
   <parent>
     <groupId>cern.c2mon.c2mon-shared</groupId>
     <artifactId>c2mon-shared-pom</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
   </parent>
   <groupId>cern.c2mon.c2mon-shared</groupId>
   <artifactId>c2mon-shared-client</artifactId>
@@ -12,8 +12,8 @@
   <name>c2mon-shared-client</name>
   <packaging>jar</packaging>
   <description>
-    	Classes shared across the server and client tiers of the C2MON system.
-    </description>
+    Classes shared across the server and client tiers of the C2MON system.
+  </description>
   <url>http://cern.ch/c2mon</url>
 
   <scm>
