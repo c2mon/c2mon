@@ -3,6 +3,18 @@
  */
 package cern.c2mon.daq.almon;
 
+import static cern.japc.ext.mockito.JapcMock.mockParameter;
+import static cern.japc.ext.mockito.JapcMock.mpv;
+import static cern.japc.ext.mockito.JapcMock.newSuperCycle;
+import static cern.japc.ext.mockito.JapcMock.pe;
+import static cern.japc.ext.mockito.JapcMock.resetJapcMock;
+import static cern.japc.ext.mockito.JapcMock.sel;
+import static cern.japc.ext.mockito.JapcMock.setAnswer;
+import static cern.japc.ext.mockito.JapcMock.whenGetValueThen;
+import static java.lang.System.setProperty;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

@@ -1,8 +1,8 @@
 /*
  * $Id $
- * 
+ *
  * $Date$ $Revision$ $Author$
- * 
+ *
  * Copyright CERN ${year}, All Rights Reserved.
  */
 package cern.c2mon.daq.japc;
@@ -37,7 +37,13 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import cern.c2mon.daq.japc.JAPCMessageHandler;
+import cern.c2mon.daq.test.GenericMessageHandlerTst;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.test.UseHandler;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.japc.MapParameterValue;
 import cern.japc.Parameter;
 import cern.japc.ParameterException;
@@ -50,19 +56,12 @@ import cern.japc.ext.mockito.JapcMock;
 import cern.japc.ext.mockito.SuperCycle;
 import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 import cern.japc.factory.ParameterValueFactory;
-import cern.c2mon.daq.test.GenericMessageHandlerTst;
-import cern.c2mon.daq.test.UseConf;
-import cern.c2mon.daq.test.UseHandler;
-import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
-import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This class implements a set of JUnit tests for JAPCMessageHandler. THe class uses mockito for JAPC simulation. All
  * the tests that require JAPCMessageHandler's pre-configuration with XML based configuration shall be annotated with
  * UseConf annotation, specifying the XML file to be used.
- * 
+ *
  * @author wbuczak
  */
 @UseHandler(value = JAPCMessageHandler.class)

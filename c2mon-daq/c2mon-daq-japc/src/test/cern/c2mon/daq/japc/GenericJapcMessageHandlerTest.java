@@ -19,54 +19,51 @@ import java.util.Map;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.daq.japc.GenericJapcMessageHandler;
+import cern.c2mon.daq.test.SourceDataTagValueCapture;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.test.UseHandler;
+import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.command.SourceCommandTagValue;
+import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
+import cern.c2mon.shared.daq.config.DataTagAdd;
+import cern.c2mon.shared.daq.config.DataTagRemove;
+import cern.c2mon.shared.daq.config.DataTagUpdate;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 import cern.japc.Parameter;
 import cern.japc.ParameterValue;
 import cern.japc.Selector;
 import cern.japc.SimpleParameterValue;
 import cern.japc.ext.mockito.JapcMock;
 import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
-import cern.japc.factory.ParameterMetaFactoryConstants;
 import cern.japc.factory.ParameterValueFactory;
-import cern.c2mon.daq.test.SourceDataTagValueCapture;
-import cern.c2mon.daq.test.UseConf;
-import cern.c2mon.daq.test.UseHandler;
-import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
-import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.config.ChangeReport;
-import cern.c2mon.shared.daq.config.DataTagAdd;
-import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.config.DataTagUpdate;
-import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**
  * This class implements a set of JUnit tests for GenericJapcMessageHandler. THe class uses mockito for JAPC simulation.
  * All tests that requiring ClicJapcMessageHandler's pre-configuration with XML based configuration shall be annotated
  * with UseConf annotation, specifying the XML file to be used, and the handler class
- * 
+ *
  * @author wbuczak
  */
 @UseHandler(GenericJapcMessageHandler.class)
 public class GenericJapcMessageHandlerTest extends AbstractGenericJapcMessageHandlerTst {
-           
+
     /**
      * This tests verifies the default GenericJapcMessageHandler's subscription mechanism. The generic handler by
      * default expects values to be organized in in triplets: [value,timestamp,description]
-     * 
+     *
      * @throws Exception
      */
     @Test
     @UseConf("e_japc_test-generic-handler1.xml")
     public void subscription_Test1() throws Exception {
-        
+
         JapcMock.init();
 
         messageSender.sendCommfaultTag(107211, true);
@@ -135,7 +132,7 @@ public class GenericJapcMessageHandlerTest extends AbstractGenericJapcMessageHan
      * This tests verifies the default GenericJapcMessageHandler's subscription mechanism. The generic handler by
      * default expects values to be organized in in triplets: [value,timestamp,description] This time we test what
      * happens when some fields are missing
-     * 
+     *
      * @throws Exception
      */
 
@@ -195,7 +192,7 @@ public class GenericJapcMessageHandlerTest extends AbstractGenericJapcMessageHan
 
     /**
      * uncomment this test only for integration test for tests with real PING JAPC-Yami agent
-     * 
+     *
      * @throws Exception
      */
     // @Test
@@ -304,7 +301,7 @@ public class GenericJapcMessageHandlerTest extends AbstractGenericJapcMessageHan
     /**
      * The goal of this test is to verify the Generic JAPC DAQ's behavior when a request to add a new DataTag is
      * received at runtime.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -422,7 +419,7 @@ public class GenericJapcMessageHandlerTest extends AbstractGenericJapcMessageHan
     /**
      * The goal of this test is to verify the Generic JAPC DAQ's behavior when a request to remove an existing DataTag
      * is received at runtime.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -517,7 +514,7 @@ public class GenericJapcMessageHandlerTest extends AbstractGenericJapcMessageHan
     /**
      * The goal of this test is to verify the Generic JAPC DAQ's behavior when a request to update an existing DataTag
      * is received at runtime.
-     * 
+     *
      * @throws Exception
      */
     @Test

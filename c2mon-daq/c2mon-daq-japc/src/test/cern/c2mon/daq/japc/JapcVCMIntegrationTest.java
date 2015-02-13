@@ -1,9 +1,9 @@
 package cern.c2mon.daq.japc;
 
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
 //import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
@@ -16,35 +16,34 @@ import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.daq.japc.GenericJapcMessageHandler;
 import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.vcm.ValueChangeMonitorEngine;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 
 /**
- * This class implements integration tests for VCMs using real JAPC-RDA publication. This tests should normally 
+ * This class implements integration tests for VCMs using real JAPC-RDA publication. This tests should normally
  * be annotated with @Ignore, in order to avoid its execution by by the continuous-integration environment.
  * Comment out the @Ignore annotation if you wish to execute this test in your local development environment.
- * 
+ *
  * @author wbuczak
  */
 @Ignore
 @UseHandler(GenericJapcMessageHandler.class)
 public class JapcVCMIntegrationTest extends AbstractGenericJapcMessageHandlerTst {
 
-    
+
     DriverKernel kernel;
-    
+
     static {
         // don't use JAPC mockito-  we want to subscribe to real JAPC-RDA device
         initMockito = false;
     }
-   
-    
+
+
     void setUpKernel() {
         kernel = createMock(DriverKernel.class);
 
@@ -56,13 +55,13 @@ public class JapcVCMIntegrationTest extends AbstractGenericJapcMessageHandlerTst
         // normally kernel will be autowired by spring
         ValueChangeMonitorEngine.getInstance().setDriverKernel(kernel);
     }
-    
+
     @Test
     @UseConf("e_japc_test_vcm1.xml")
     public void test_IntegrationTestVCM1() throws Exception {
-  
+
         setUpKernel();
-        
+
         messageSender.sendCommfaultTag(107211, true);
         expectLastCall().once();
 

@@ -9,15 +9,15 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.conf.equipment.IEquipmentConfiguration;
 import cern.c2mon.daq.common.logger.EquipmentLogger;
 import cern.c2mon.daq.common.logger.EquipmentLoggerFactory;
 import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.japc.AcquiredParameterValue;
 import cern.japc.MapParameterValue;
 import cern.japc.Parameter;
@@ -37,7 +37,7 @@ import cern.japc.factory.ParameterValueFactory;
 import cern.japc.spi.ParameterUrlImpl;
 
 public class JAPCController {
-    
+
     protected class ParameterValueListenerImpl implements ParameterValueListener {
 
         private final ISourceDataTag tag;
@@ -74,27 +74,27 @@ public class JAPCController {
 
     public static final String DEFAULT_PROTOCOL = "rda";
     public static final String DEFAULT_SERVICE = "rda";
-    
+
     /**
      * The equipment logger of this class.
      */
     private EquipmentLogger equipmentLogger;
-    
+
     /**
      * The equipment configuration of this handler.
      */
     private IEquipmentConfiguration equipmentConfiguration;
-    
+
     /**
      * The equipment message sender to send to the server.
      */
     private IEquipmentMessageSender equipmentMessageSender;
-    
+
     /**
      * JAPC parameter factory instance.
      */
     private ParameterFactory parameterFactory;
-    
+
     /**
      * A HashMap with topics that the handler subscribes to as keys and
      * a its handled japc subscriptions as value
@@ -103,35 +103,35 @@ public class JAPCController {
 
     /**
      * Default constructor
-     * 
+     *
      */
     public JAPCController() {}
-    
+
     /**
      * Constructor
-     * 
+     *
      * @param equipmentLogger
      * @param equipmentConfiguration
      * @param equipmentMessageSender
-     * 
+     *
      */
-    public JAPCController(EquipmentLoggerFactory equipmentLoggerFactory, IEquipmentConfiguration equipmentConfiguration, 
+    public JAPCController(EquipmentLoggerFactory equipmentLoggerFactory, IEquipmentConfiguration equipmentConfiguration,
             IEquipmentMessageSender equipmentMessageSender) {
       this.equipmentLogger = equipmentLoggerFactory.getEquipmentLogger(getClass());
       this.equipmentConfiguration = equipmentConfiguration;
       this.equipmentMessageSender = equipmentMessageSender;
     }
-    
+
     /**
      * Connection
-     * 
+     *
      * @param sourceDataTag
-     * @param changeReport 
-     * 
+     * @param changeReport
+     *
      */
     public CHANGE_STATE connection(final ISourceDataTag sourceDataTag, final ChangeReport changeReport) {
       getEquipmentLogger().debug("connection - Connecting " + sourceDataTag.getId());
-                    
+
       // Obtain JAPC address information about the tag
       JAPCHardwareAddress addr = (JAPCHardwareAddress) sourceDataTag.getHardwareAddress();
 
@@ -141,7 +141,7 @@ public class JAPCController {
           String protocol = checkProtocol(addr.getProtocol());
           String service = checkService(addr.getService());
 
-          Parameter parameter = this.parameterFactory.newParameter(new ParameterUrlImpl(protocol, service, 
+          Parameter parameter = this.parameterFactory.newParameter(new ParameterUrlImpl(protocol, service,
                   addr.getDeviceName(), addr.getPropertyName(), null));
 
           // Create a selector for the parameter ( on change )
@@ -149,7 +149,7 @@ public class JAPCController {
           // TODO : verify why tests fails if onChange flag is set to true!
           Selector selector = ParameterValueFactory.newSelector(addr.getCycleSelector(), false);
 
-          getEquipmentLogger().debug(String.format("creating subscription handle for parameter: %s  selector: %s", 
+          getEquipmentLogger().debug(String.format("creating subscription handle for parameter: %s  selector: %s",
                   parameter.getName(), addr.getCycleSelector()));
           // Create a subscription handle for the parameter with the given selector
           SubscriptionHandle handle = parameter.createSubscription(selector, new ParameterValueListenerImpl(sourceDataTag));
@@ -168,32 +168,32 @@ public class JAPCController {
           getEquipmentLogger().error(bld);
           getEquipmentMessageSender().sendInvalidTag(sourceDataTag, SourceDataQuality.INCORRECT_NATIVE_ADDRESS,
                   bld.toString());
-          
+
           if (changeReport != null) {
-              changeReport.appendInfo("connection - Unable to create subscription for tag: " + sourceDataTag.getId() 
+              changeReport.appendInfo("connection - Unable to create subscription for tag: " + sourceDataTag.getId()
                       + ". Problem description: " + e.getMessage());
             }
-          
+
           return CHANGE_STATE.FAIL;
       }
-      
+
       getEquipmentLogger().debug("connection - Leaving ...");
       if (changeReport != null) {
         changeReport.appendInfo("connection - JAPC subscription succesfully created.");
       }
-      
+
       return CHANGE_STATE.SUCCESS;
     }
-    
+
     /**
      * Disconnection
-     * 
+     *
      * @param dipSubscription
-     * @param changeReport 
+     * @param changeReport
      */
     public CHANGE_STATE disconnection(final SubscriptionHandle handle, final ChangeReport changeReport) {
       getEquipmentLogger().debug("disconnection - Starting ...");
-      
+
       try {
           handle.stopMonitoring();
       } catch (Exception e) {
@@ -202,47 +202,47 @@ public class JAPCController {
           if (changeReport != null) {
               changeReport.appendError("disconnection - Unexpected problem : " + e.getMessage());
             }
-          
+
           return CHANGE_STATE.REBOOT;
       }
-      
+
       getEquipmentLogger().debug("disconnection - Leaving ...");
       if (changeReport != null) {
         changeReport.appendInfo("disconnection - JAPC unsubscription succesfully done.");
       }
-      
+
       return CHANGE_STATE.SUCCESS;
     }
-    
+
     /**
      * Disconnection
-     * 
+     *
      * @param sourceDataTag
      * @param changeReport
      */
     public CHANGE_STATE disconnection(final ISourceDataTag sourceDataTag, final ChangeReport changeReport) {
         // Hardware Address
         JAPCHardwareAddress addr = (JAPCHardwareAddress) sourceDataTag.getHardwareAddress();
-        
+
         // Disconnect the sourcedataTag
         CHANGE_STATE state = disconnection(this.japcSubscriptions.get(addr.getDeviceName()), changeReport);
-        
+
         // Remove it from the list of dipSubscriptions
         if (state == CHANGE_STATE.SUCCESS) {
           if (this.japcSubscriptions.remove(addr.getDeviceName()) == null) {
             if (changeReport != null) {
               changeReport.appendInfo("disconnection - No mapping for key " + addr.getDeviceName());
             }
-            
+
             return CHANGE_STATE.FAIL;
           }
         }
-        
+
         return state;
     }
-    
+
     /**
-     * 
+     *
      * @param protocol
      * @return
      */
@@ -252,9 +252,9 @@ public class JAPCController {
         else
             return protocol;
     }
-    
+
     /**
-     * 
+     *
      * @param service
      * @return
      */
@@ -264,73 +264,73 @@ public class JAPCController {
         else
             return service;
     }
-    
+
     /**
      * @return the equipmentMessageSender
      */
     public IEquipmentMessageSender getEquipmentMessageSender() {
         return this.equipmentMessageSender;
     }
-    
+
     /**
      * @param equipmentMessageSender The equipmentMessageSender to set
      */
     public void setEquipmentMessageSender(final IEquipmentMessageSender equipmentMessageSender) {
         this.equipmentMessageSender = equipmentMessageSender;
     }
-    
+
     /**
      * @param the equipmentLogger The equipmentLogger to set
      */
     public void setEquipmentLogger(final EquipmentLogger equipmentLogger) {
         this.equipmentLogger = equipmentLogger;
     }
-    
+
     /**
      * @return the equipmentLogger
      */
     public EquipmentLogger getEquipmentLogger() {
         return this.equipmentLogger;
     }
-    
+
     /**
      * @param the equipmentConfiguration The equipmentConfiguration to set
      */
     public void setEquipmentConfiguration(final IEquipmentConfiguration equipmentConfiguration) {
         this.equipmentConfiguration = equipmentConfiguration;
     }
-    
+
     /**
      * @return the equipmentConfiguration
      */
     public IEquipmentConfiguration getEquipmentConfiguration() {
         return this.equipmentConfiguration;
     }
-    
+
 
     /**
-     * 
+     *
      * @param parameterFactory
      */
     public void setParameterFactory(final ParameterFactory parameterFactory) {
       this.parameterFactory = parameterFactory;
     }
-    
+
     /**
-     * 
+     *
      * @return parameterFactory
      */
     public ParameterFactory getParameterFactory() {
       return this.parameterFactory;
     }
-    
+
     /**
      * @return the dipSubscriptions
      */
     public ConcurrentHashMap<String, SubscriptionHandle> getJAPCSubscriptions() {
         return this.japcSubscriptions;
     }
-    
+
     protected void handleJAPCValue(final ISourceDataTag tag, final String pParameterName,
             final AcquiredParameterValue pParameterValue) {
 
@@ -704,12 +704,12 @@ public class JAPCController {
     // }
     // }
 
-    
+
 
     /**
      * this method is a temporary <<hack>> to solve the problem with JAPC source timestamps delivered often in microsec.
      * istead of ns.
-     * 
+     *
      * @param sTimeStamp
      * @return
      */

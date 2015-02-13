@@ -15,7 +15,7 @@ import cern.c2mon.daq.japc.AbstractGenericJapcMessageHandlerTst;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.japc.Parameter;
 import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 
@@ -24,7 +24,7 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
 
     /**
      * This tests verifies the BisJapcMessageHandler's subscription mechanism.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -53,7 +53,7 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
 
         String[] fieldNames1 = { "FIELD1", "STATUS", "FIELD2"};
         String[] fieldNames2 = { "FIELD1", "FIELD2", "STATUS"};
-        
+
         float[] valueArray1 = { 0, 1, 2};
         float[] valueArray2 = { 99, 0, 2};
 
@@ -75,11 +75,11 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
         // set the new value
         p1.setValue(null, mpv(fields, values2));
 
-        Thread.sleep(1000);       
+        Thread.sleep(1000);
 
         verify(messageSender);
 
-        
+
         assertEquals(SourceDataQuality.OK, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
         assertEquals(1, sdtv.getFirstValue(54675L).getValue());
 
@@ -87,7 +87,7 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
         assertEquals(2, sdtv.getLastValue(54675L).getValue());
     }
 
-    
+
     @Test
     @UseConf("e_japc_bis1.xml")
     public void subscription_Test2() throws Exception {
@@ -114,7 +114,7 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
 
         String[] fieldNames1 = { "FIELD1", "STATUS", "FIELD2"};
         String[] fieldNames2 = { "FIELD1", "FIELD2", "STATUS"};
-        
+
         float[] valueArray1 = { 0, 1, 2};
         float[] valueArray2 = { 99, 0, 2};
 
@@ -136,12 +136,12 @@ public class BisJapcMessageHandlerTest extends AbstractGenericJapcMessageHandler
         // set the new value
         p1.setValue(null, mpv(fields, values2));
 
-        Thread.sleep(1000);       
+        Thread.sleep(1000);
 
         verify(messageSender);
-        
+
         assertEquals(SourceDataQuality.INCORRECT_NATIVE_ADDRESS, sdtv.getFirstValue(54675L).getQuality().getQualityCode());
-        assertEquals("field: registerNames not found", sdtv.getFirstValue(54675L).getQuality().getDescription());      
-    }    
-    
+        assertEquals("field: registerNames not found", sdtv.getFirstValue(54675L).getQuality().getDescription());
+    }
+
 }

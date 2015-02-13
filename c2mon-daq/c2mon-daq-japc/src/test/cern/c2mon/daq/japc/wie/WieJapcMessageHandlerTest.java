@@ -1,7 +1,23 @@
 package cern.c2mon.daq.japc.wie;
 
-import src.java.cern.c2mon.daq.japc.wie.WieJapcMessageHandler;
-import src.test.cern.c2mon.daq.japc.AbstractGenericJapcMessageHandlerTst;
+import static cern.japc.ext.mockito.JapcMock.mockParameter;
+import static cern.japc.ext.mockito.JapcMock.mpv;
+import static cern.japc.ext.mockito.JapcMock.setAnswer;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+
+import org.easymock.EasyMock;
+import org.junit.Test;
+
+import cern.c2mon.daq.japc.AbstractGenericJapcMessageHandlerTst;
+import cern.c2mon.daq.test.SourceDataTagValueCapture;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.test.UseHandler;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.japc.Parameter;
+import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
 
 @UseHandler(WieJapcMessageHandler.class)
 public class WieJapcMessageHandlerTest extends AbstractGenericJapcMessageHandlerTst {

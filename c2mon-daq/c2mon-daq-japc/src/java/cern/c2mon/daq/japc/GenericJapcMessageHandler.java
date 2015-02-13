@@ -21,13 +21,13 @@ import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.japc.AcquiredParameterValue;
 import cern.japc.MapParameterValue;
 import cern.japc.Parameter;
@@ -244,7 +244,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
 
     /**
      * this method can be overridden by inheriting classes, if needed Default implementation is empty
-     * 
+     *
      * @throws EqIOException
      */
     protected void beforeConnectToDataSource() throws EqIOException {
@@ -306,7 +306,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
 
     /**
      * Registers new tag. starts subscription etc..
-     * 
+     *
      * @param tag
      */
     protected void registerTag(ISourceDataTag tag) throws TagOperationException {
@@ -422,7 +422,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
     /**
      * this is the default implementation of the handleJAPCValue method. For more specific JAPC handlers this method
      * should be overwritten
-     * 
+     *
      * @param tag
      * @param pParameterName
      * @param pParameterValue
@@ -526,7 +526,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
     /**
      * // TODO: this method should return true, temporarily returns false because of the bug in the japc-mockito
      * (otherwise the tests would fail)
-     * 
+     *
      * @return
      */
     protected boolean isSelectorOnChangeEnabled() {
@@ -783,7 +783,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
     /**
      * this method is a temporary <<hack>> to solve the problem with JAPC source timestamps delivered often in microsec.
      * istead of ns.
-     * 
+     *
      * @param sTimeStamp
      * @return
      */
@@ -803,7 +803,7 @@ public class GenericJapcMessageHandler extends EquipmentMessageHandler implement
 
     /**
      * This method is used to retrieve the array index for the requested value
-     * 
+     *
      * @param name the parameter Name
      * @return the array index of the parameter name
      */

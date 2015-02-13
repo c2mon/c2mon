@@ -15,17 +15,17 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
+import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
 import cern.japc.MapParameterValue;
 import cern.japc.SimpleParameterValue;
 import cern.japc.ValueType;
-import cern.c2mon.daq.tools.TIMDriverSimpleTypeConverter;
-import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 
 /**
  * This is a wrapper class for the MapParameterValue objects. It helps reading the value that is specified by a
  * SourceDataTag and JAPCHardwareAddress object.
- * 
+ *
  * @author Matthias Braeger
  */
 public class MPVReader {
@@ -45,7 +45,7 @@ public class MPVReader {
 
     /**
      * Default Constructor
-     * 
+     *
      * @param mpv The MapParameterValue object
      * @param addr The JAPCHardwareAddress
      * @param logger The EquipmentLogger for log4j
@@ -60,7 +60,7 @@ public class MPVReader {
 
     /**
      * Returns the value that has been requested within the JAPCHardwareAddress object.
-     * 
+     *
      * @return The actual value of the related data tag
      * @throws IndexOutOfBoundsException In case of an incorrect native address
      */
@@ -148,7 +148,7 @@ public class MPVReader {
 
     /**
      * Private method which is used to retrieve the array index for the requested value
-     * 
+     *
      * @param name the parameter Name
      * @return the array index of the parameter name
      */

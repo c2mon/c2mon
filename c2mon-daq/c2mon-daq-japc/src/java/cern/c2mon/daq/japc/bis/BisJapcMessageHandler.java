@@ -1,9 +1,9 @@
 package cern.c2mon.daq.japc.bis;
 
 import cern.c2mon.daq.japc.GenericJapcMessageHandler;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 import cern.japc.AcquiredParameterValue;
 import cern.japc.MapParameterValue;
 import cern.japc.ParameterException;
@@ -19,7 +19,7 @@ public class BisJapcMessageHandler extends GenericJapcMessageHandler {
 
     public static final String NAMES_ARRAY_FIELD = "registerNames";
     public static final String VALUES_ARRAY_FIELD = "registerValues";
-  
+
 
     @Override
     protected void handleJAPCValue(ISourceDataTag tag, String pParameterName, AcquiredParameterValue pParameterValue) {
@@ -52,16 +52,16 @@ public class BisJapcMessageHandler extends GenericJapcMessageHandler {
         MapParameterValue mapValue = (MapParameterValue) value;
 
         try {
-           
-            SimpleParameterValue valuesField = mapValue.get(VALUES_ARRAY_FIELD);                        
+
+            SimpleParameterValue valuesField = mapValue.get(VALUES_ARRAY_FIELD);
             if (valuesField == null) {
                 throw new ParameterException("field: "+VALUES_ARRAY_FIELD + " not found");
             }
-            
+
             ValueType valuesFieldType = valuesField.getValueType();
 
             int index = getIndex(mapValue, NAMES_ARRAY_FIELD, addr.getDataFieldName());
-            
+
             sendJAPCSValueFromArray(tag, valuesField, valuesFieldType, timeStamp, index);
 
         } catch (Exception e) {

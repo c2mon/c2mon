@@ -1,8 +1,8 @@
 /*
  * $Id $
- * 
+ *
  * $Date$ $Revision$ $Author$
- * 
+ *
  * Copyright CERN ${year}, All Rights Reserved.
  */
 package cern.c2mon.daq.japc.gm;
@@ -29,21 +29,20 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import cern.c2mon.daq.japc.AbstractGenericJapcMessageHandlerTst;
-import cern.c2mon.daq.japc.gm.GmJapcMessageHandler;
+import cern.c2mon.daq.test.UseConf;
+import cern.c2mon.daq.test.UseHandler;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.japc.Parameter;
 import cern.japc.Selector;
 import cern.japc.ext.mockito.Cycle;
 import cern.japc.ext.mockito.answers.DefaultParameterAnswer;
-import cern.c2mon.daq.test.UseConf;
-import cern.c2mon.daq.test.UseHandler;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValue;
 
 /**
  * This class implements a set of JUnit tests for GmJapcMessageHandler. THe class uses mockito for JAPC simulation. All
  * tests that requiring GmJapcMessageHandler's pre-configuration with XML based configuration shall be annotated with
  * UseConf annotation, specifying the XML file to be used, and the handler class
- * 
+ *
  * @author wbuczak
  */
 @UseHandler(GmJapcMessageHandler.class)

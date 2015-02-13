@@ -1,12 +1,12 @@
 // TIM. CERN. All rights reserved.
-//  
+//
 // T Nick: Date: Info:
 // -------------------------------------------------------------------------
 // D jstowisek --/May/2006 Implementation of the prototype
 // P wbuczak 23/May/2006 handler implementation
 // P wbuczak 25/Jun/2010  upgrade to newest JAPC. Refactoring.
 //                                      Support for various JAPC protocols.
-//                                
+//
 //
 // -------------------------------------------------------------------------
 
@@ -16,10 +16,10 @@ import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.ICommandRunner;
 import cern.c2mon.daq.tools.equipmentexceptions.EqCommandTagException;
 import cern.c2mon.daq.tools.equipmentexceptions.EqIOException;
+import cern.c2mon.shared.common.command.ISourceCommandTag;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.c2mon.shared.daq.command.ISourceCommandTag;
 import cern.c2mon.shared.daq.command.SourceCommandTagValue;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
 import cern.japc.Parameter;
 import cern.japc.ParameterValue;
 import cern.japc.Selector;
@@ -33,7 +33,7 @@ import cern.japc.spi.ParameterUrlImpl;
  * EquipmentMessageHandler for TIM DAQ for JAPC protocol.
  */
 public class JAPCMessageHandler extends EquipmentMessageHandler implements ICommandRunner {
-    
+
     /**
      * JAPC controller
      */
@@ -48,14 +48,14 @@ public class JAPCMessageHandler extends EquipmentMessageHandler implements IComm
     @Override
     public void connectToDataSource() throws EqIOException {
         getEquipmentLogger().debug("entering connectToDataSource()..");
-        
+
         // If this is the first time this method is called (on start-up), create
         // a JAPC controller
         if (this.japcController == null) {
-            this.japcController = new JAPCController(getEquipmentLoggerFactory(), getEquipmentConfiguration(), 
+            this.japcController = new JAPCController(getEquipmentLoggerFactory(), getEquipmentConfiguration(),
                     getEquipmentMessageSender());
         }
-        
+
 
         // If this is the first time this method is called (on start-up), create
         // a JAPC parameter factory
@@ -79,7 +79,7 @@ public class JAPCMessageHandler extends EquipmentMessageHandler implements IComm
         // Add Data Tag Changer
         JAPCDataTagChanger dataTagChanger = new JAPCDataTagChanger(this.japcController, getEquipmentLogger(JAPCDataTagChanger.class));
         getEquipmentConfigurationHandler().setDataTagChanger(dataTagChanger);
-        
+
         // Connection
         for (ISourceDataTag sourceDataTag : getEquipmentConfiguration().getSourceDataTags().values()) {
             this.japcController.connection(sourceDataTag, null);
@@ -89,14 +89,14 @@ public class JAPCMessageHandler extends EquipmentMessageHandler implements IComm
     }
 
     @Override
-    public void disconnectFromDataSource() throws EqIOException {    
+    public void disconnectFromDataSource() throws EqIOException {
         getEquipmentLogger().debug("entering diconnectFromDataSource()..");
 
         if (this.japcController != null) {
             for (String key : this.japcController.getJAPCSubscriptions().keySet()) {
                 // The Key is the TopicName and the Value the DipSubscription
                 this.japcController.disconnection(this.japcController.getJAPCSubscriptions().get(key), null);
-                
+
             }
         }
         else {
@@ -105,7 +105,7 @@ public class JAPCMessageHandler extends EquipmentMessageHandler implements IComm
 
         getEquipmentLogger().debug("leaving diconnectFromDataSource()");
     }
-   
+
 
     @Override
     public void refreshAllDataTags() {
@@ -122,7 +122,7 @@ public class JAPCMessageHandler extends EquipmentMessageHandler implements IComm
         sendCommand(sourceCommandTagValue);
         return null;
     }
-    
+
     // TODO move to implementation of ICommandRunner
     protected void sendCommand(SourceCommandTagValue p0) throws EqCommandTagException {
         getEquipmentLogger().debug("entering sendCommand()..");

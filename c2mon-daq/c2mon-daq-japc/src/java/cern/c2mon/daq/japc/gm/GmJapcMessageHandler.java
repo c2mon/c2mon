@@ -1,21 +1,21 @@
 /*
  * $Id $
- * 
+ *
  * $Date$ $Revision$ $Author$
- * 
+ *
  * Copyright CERN ${year}, All Rights Reserved.
  */
 package cern.c2mon.daq.japc.gm;
 
 import cern.c2mon.daq.japc.GenericJapcMessageHandler;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
 import cern.japc.AcquiredParameterValue;
 import cern.japc.ParameterValue;
 import cern.japc.SimpleParameterValue;
 import cern.japc.Type;
 import cern.japc.ValueHeader;
-import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * A dedicated JAPC handler for GM devices

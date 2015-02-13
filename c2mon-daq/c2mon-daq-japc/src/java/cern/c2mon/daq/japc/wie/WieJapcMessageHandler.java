@@ -2,22 +2,22 @@ package cern.c2mon.daq.japc.wie;
 
 /*
  * $Id $
- * 
+ *
  * $Date$ $Revision$ $Author$
- * 
+ *
  * Copyright CERN ${2012}, All Rights Reserved.
  */
 
 import cern.c2mon.daq.japc.GenericJapcMessageHandler;
+import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.SourceDataQuality;
+import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
 import cern.japc.AcquiredParameterValue;
 import cern.japc.MapParameterValue;
 import cern.japc.ParameterValue;
 import cern.japc.SimpleParameterValue;
 import cern.japc.Type;
 import cern.japc.ValueType;
-import cern.c2mon.shared.common.datatag.address.JAPCHardwareAddress;
-import cern.c2mon.shared.daq.datatag.ISourceDataTag;
-import cern.c2mon.shared.daq.datatag.SourceDataQuality;
 
 /**
  * A dedicated JAPC handler for Wiener Fan Traydevices
