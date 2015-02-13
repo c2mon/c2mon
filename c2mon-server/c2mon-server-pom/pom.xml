@@ -126,7 +126,7 @@
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-util</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
         <exclusions>
           <exclusion>
             <groupId>org.springframework</groupId>
@@ -137,12 +137,12 @@
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-common</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-daq</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
         <exclusions>
           <exclusion>
             <groupId>org.springframework</groupId>
@@ -153,112 +153,112 @@
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-client</artifactId>
-        <version>[0.9.9,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-rule</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-shared</groupId>
         <artifactId>c2mon-shared-persistence-manager</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
 
       <!-- c2mon-server libraries -->
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-common</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-test</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-auth</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-cache</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-cachedbaccess</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-cacheloading</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-cachepersistence</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-daqcommunication-out</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-daqcommunication-in</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-supervision</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-configuration</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-alarm</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-command</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-rule</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-benchmark</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-lifecycle</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.c2mon-server</groupId>
         <artifactId>c2mon-server-shorttermlog</artifactId>
-        <version>[1.0.0,2.0.0)</version>
+        <version>LATEST</version>
       </dependency>
 
       <!-- 3rd parties -->
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>[4.8.1, 5.0.0)</version>
+        <version>LATEST</version>
         <scope>test</scope>
       </dependency>
       <dependency>
