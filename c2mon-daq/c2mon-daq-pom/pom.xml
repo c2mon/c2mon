@@ -1,237 +1,235 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern</groupId>
-		<artifactId>parent-pom</artifactId>
-		<version>1.0.5-SNAPSHOT</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern</groupId>
+    <artifactId>parent-pom</artifactId>
+    <version>1.0.5-SNAPSHOT</version>
+  </parent>
 
-	<groupId>cern.c2mon.c2mon-daq</groupId>
-	<artifactId>c2mon-daq-pom</artifactId>
-	<version>1.1.8-SNAPSHOT</version>
-	<packaging>pom</packaging>
+  <groupId>cern.c2mon.c2mon-daq</groupId>
+  <artifactId>c2mon-daq-pom</artifactId>
+  <version>1.1.8-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-	<description>
-		This is a common parent POM for all c2mon-daq modules
-    </description>
-	<url>http://timweb.cern.ch</url>
+  <description>
+    This is a common parent POM for all c2mon-daq modules
+  </description>
+  <url>http://timweb.cern.ch</url>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-pom</developerConnection>
-	</scm>
-
-
-	<!-- Shared version number properties -->
-	<properties>
-		<org.springframework.version>3.2.3.RELEASE</org.springframework.version>
-	</properties>
-
-	<dependencyManagement>
-
-		<dependencies>
-
-			<!-- c2mon shared libraries -->
-			<dependency>
-				<groupId>cern.c2mon.c2mon-shared</groupId>
-				<artifactId>c2mon-shared-util</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-shared</groupId>
-				<artifactId>c2mon-shared-common</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-shared</groupId>
-				<artifactId>c2mon-shared-daq</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-
-			<!-- Commonly used DAQ modules -->
-			<dependency>
-				<groupId>cern.c2mon.c2mon-daq</groupId>
-				<artifactId>c2mon-daq-core</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-daq</groupId>
-				<artifactId>c2mon-daq-testhandler</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cern.c2mon.c2mon-daq</groupId>
-				<artifactId>c2mon-daq-test</artifactId>
-				<version>[1.0.0,2.0.0)</version>
-				<scope>test</scope>
-			</dependency>
-
-			<!-- ********************** 3rd parties *********************************************** -->
-
-			<!-- spring libraries -->
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-core</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-context</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-orm</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-beans</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-jdbc</artifactId>
-				<version>${org.springframework.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-test</artifactId>
-				<version>${org.springframework.version}</version>
-				<scope>test</scope>
-			</dependency>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-pom</developerConnection>
+  </scm>
 
 
-			<!-- CERN's 3rd parties -->
+  <!-- Shared version number properties -->
+  <properties>
+    <org.springframework.version>3.2.3.RELEASE</org.springframework.version>
+  </properties>
 
-			<!-- CMW-ADMIN -->
-			<dependency>
-				<groupId>cern.accsoft.security</groupId>
-				<artifactId>accsoft-security-rba-util</artifactId>
-				<version>2.0.2</version>
-			</dependency>
+  <dependencyManagement>
 
-			<dependency>
-				<groupId>log4j</groupId>
-				<artifactId>log4j</artifactId>
-				<version>[1.2.16,2.0.0)</version>
-			</dependency>
-			<dependency>
-				<groupId>cglib</groupId>
-				<artifactId>cglib</artifactId>
-				<version>2.1_3</version>
-			</dependency>
-			<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xercesImpl</artifactId>
-				<version>2.8.0</version>
-			</dependency>
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>[4.8.1, 5.0.0)</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.activemq</groupId>
-				<artifactId>activemq-all</artifactId>
-				<version>5.5.1-fuse-02-05</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jencks</groupId>
-				<artifactId>jencks-amqpool</artifactId>
-				<version>2.2</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-pool</groupId>
-				<artifactId>commons-pool</artifactId>
-				<version>1.5.4</version>
-			</dependency>
-			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymock</artifactId>
-				<version>3.1</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymockclassextension</artifactId>
-				<version>3.1</version>
-				<scope>test</scope>
-			</dependency>
+    <dependencies>
 
-			<!-- esper is used by the DAQ core for value change monitoring -->
-			<dependency>
-				<groupId>com.espertech</groupId>
-				<artifactId>esper</artifactId>
-				<version>4.6.0</version>
-			</dependency>
-		</dependencies>
+      <!-- c2mon shared libraries -->
+      <dependency>
+        <groupId>cern.c2mon.c2mon-shared</groupId>
+        <artifactId>c2mon-shared-util</artifactId>
+        <version>LATEST</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-shared</groupId>
+        <artifactId>c2mon-shared-common</artifactId>
+        <version>LATEST</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-shared</groupId>
+        <artifactId>c2mon-shared-daq</artifactId>
+        <version>LATEST</version>
+      </dependency>
 
+      <!-- Commonly used DAQ modules -->
+      <dependency>
+        <groupId>cern.c2mon.c2mon-daq</groupId>
+        <artifactId>c2mon-daq-core</artifactId>
+        <version>LATEST</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-daq</groupId>
+        <artifactId>c2mon-daq-testhandler</artifactId>
+        <version>LATEST</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.c2mon-daq</groupId>
+        <artifactId>c2mon-daq-test</artifactId>
+        <version>LATEST</version>
+        <scope>test</scope>
+      </dependency>
 
-	</dependencyManagement>
+      <!-- ********************** 3rd parties *********************************************** -->
 
-	<build>
-		<!-- DEFINE ALL PLUGINS THAT NEED TO BE USED BY SERVER MODULS HERE -->
-		<pluginManagement>
-			<plugins>
-				<!-- NOTE: Unless specified directly we don't need a groupId specification because the group is org.apache.maven.plugins 
-					...which is assumed by default. -->
-
-				<plugin>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.2.1</version>
-				</plugin>
-				<plugin>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.6</version>
-				</plugin>
-				<plugin>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.8</version>
-				</plugin>
+      <!-- spring libraries -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-orm</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-beans</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${org.springframework.version}</version>
+        <scope>test</scope>
+      </dependency>
 
 
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<!-- <groupId>some-group-id</groupId> -->
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-antrun-plugin</artifactId>
-										<versionRange>[1.0.0,)</versionRange>
-										<goals>
-											<goal>run</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute>
-											<runOnIncremental>false</runOnIncremental>
-										</execute>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
+      <!-- CERN's 3rd parties -->
+
+      <!-- CMW-ADMIN -->
+      <dependency>
+        <groupId>cern.accsoft.security</groupId>
+        <artifactId>accsoft-security-rba-util</artifactId>
+        <version>2.0.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>LATEST</version>
+      </dependency>
+      <dependency>
+        <groupId>cglib</groupId>
+        <artifactId>cglib</artifactId>
+        <version>2.1_3</version>
+      </dependency>
+      <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.8.0</version>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>LATEST</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-all</artifactId>
+        <version>5.5.1-fuse-02-05</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jencks</groupId>
+        <artifactId>jencks-amqpool</artifactId>
+        <version>2.2</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-pool</groupId>
+        <artifactId>commons-pool</artifactId>
+        <version>1.5.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>3.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymockclassextension</artifactId>
+        <version>3.1</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- esper is used by the DAQ core for value change monitoring -->
+      <dependency>
+        <groupId>com.espertech</groupId>
+        <artifactId>esper</artifactId>
+        <version>4.6.0</version>
+      </dependency>
+    </dependencies>
+
+
+  </dependencyManagement>
+
+  <build>
+    <!-- DEFINE ALL PLUGINS THAT NEED TO BE USED BY SERVER MODULS HERE -->
+    <pluginManagement>
+      <plugins>
+        <!-- NOTE: Unless specified directly we don't need a groupId specification because the group is org.apache.maven.plugins ...which is assumed by default. -->
+
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.6</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.8</version>
+        </plugin>
+
+
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <!-- <groupId>some-group-id</groupId> -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <versionRange>[1.0.0,)</versionRange>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute>
+                      <runOnIncremental>false</runOnIncremental>
+                    </execute>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
-              <!-- Disable doclint (which comes with Java 8) as it is very strict with javadoc and causes build failures. -->
-              <!-- TODO: Fix all the javadoc so we can re-enable doclint. -->
+            <!-- Disable doclint (which comes with Java 8) as it is very strict with javadoc and causes build failures. -->
+            <!-- TODO: Fix all the javadoc so we can re-enable doclint. -->
             <additionalparam>-Xdoclint:none</additionalparam>
           </configuration>
         </plugin>
-			</plugins>
+      </plugins>
 
-		</pluginManagement>
-	</build>
+    </pluginManagement>
+  </build>
 
 </project>
