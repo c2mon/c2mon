@@ -36,7 +36,7 @@
                      threshold="debug"
                      xmlns:log4j='http://jakarta.apache.org/log4j/'>
 
-  <renderer  renderedClass="cern.c2mon.shared.daq.datatag.SourceDataTagValue"
+  <renderer  renderedClass="cern.c2mon.shared.common.datatag.SourceDataTagValue"
              renderingClass="cern.c2mon.shared.daq.datatag.SourceDataTagValueRenderer" />
              
   <renderer  renderedClass="cern.c2mon.server.common.rule.RuleTag"
@@ -196,7 +196,7 @@
     <param name="BufferSize" value="1" /> 
   	<param name="SMTPHost" value="cernmx.cern.ch" />
   	<param name="From" value="tim.support@cern.ch" />
-  	<param name="To" value="ignacio.vilches.calvo@cern.ch,Matthias.Braeger@cern.ch" />
+  	<param name="To" value="Matthias.Braeger@cern.ch,justin.lewis.salmon@cern.ch" />
   	<param name="Subject" value="C2MON server warning" />
   	<layout class="org.apache.log4j.PatternLayout">
   	  <param name="ConversionPattern" value="%-d{yyy-MM-dd HH:mm:ss.SSS} %m%n" />
@@ -216,7 +216,7 @@
   	<param name="BufferSize" value="1" />  	 
   	<param name="SMTPHost" value="cernmx.cern.ch" />
   	<param name="From" value="tim.support@cern.ch" />
-  	<param name="To" value="0041764876862@mail2sms.cern.ch,0041764875788@mail2sms.cern.ch" />
+  	<param name="To" value="0041764876862@mail2sms.cern.ch,0041764875788@mail2sms.cern.ch,0041764832903@mail2sms.cern.ch" />
   	<param name="Subject" value="C2MON server warning" />
   	<layout class="org.apache.log4j.PatternLayout">
   	  <param name="ConversionPattern" value="%m" />
