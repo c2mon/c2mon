@@ -1,100 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>cern.c2mon.c2mon-daq</groupId>
-		<artifactId>c2mon-daq-pom</artifactId>
-		<version>1.1.7</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>cern.c2mon.c2mon-daq</groupId>
+    <artifactId>c2mon-daq-pom</artifactId>
+    <version>1.1.8</version>
+  </parent>
 
-	<artifactId>c2mon-daq-japc</artifactId>
-	<name>c2mon-daq-japc</name>
-	<version>1.2.10</version>
+  <artifactId>c2mon-daq-japc</artifactId>
+  <name>c2mon-daq-japc</name>
+  <version>1.2.10</version>
 
-	<packaging>jar</packaging>
-	<description>C2MON data acquisition component for JAPC.</description>
-	<url />
+  <packaging>jar</packaging>
+  <description>C2MON data acquisition component for JAPC.</description>
+  <url />
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-japc</developerConnection>
-	</scm>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-daq/c2mon-daq-japc</developerConnection>
+  </scm>
 
-	<dependencies>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-daq</groupId>
-			<artifactId>c2mon-daq-core</artifactId>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-core</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cern.c2mon.c2mon-shared</groupId>
-			<artifactId>c2mon-shared-daq</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-shared</groupId>
+      <artifactId>c2mon-shared-daq</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>cern.c2mon.c2mon-daq</groupId>
-			<artifactId>c2mon-daq-test</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymockclassextension</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>cern.c2mon.c2mon-daq</groupId>
+      <artifactId>c2mon-daq-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymockclassextension</artifactId>
+    </dependency>
 
-		<!-- JAPC -->
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc</artifactId>
-			<version>[2.23.11,3.0.0)</version>
-		</dependency>
+    <!-- JAPC -->
+    <dependency>
+      <groupId>cern.japc</groupId>
+      <artifactId>japc</artifactId>
+      <version>[2.23.11,3.0.0)</version>
+    </dependency>
 
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-remote</artifactId>
-			<version>[3.9.3,4.0.0)</version>
-		</dependency>
+    <dependency>
+      <groupId>cern.japc</groupId>
+      <artifactId>japc-ext-remote</artifactId>
+      <version>[3.9.3,4.0.0)</version>
+    </dependency>
 
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-cmwrda</artifactId>
-			<version>[2.16.0,3.0.0)</version>
-		</dependency>
+    <dependency>
+      <groupId>cern.japc</groupId>
+      <artifactId>japc-ext-cmwrda</artifactId>
+      <version>[2.16.0,3.0.0)</version>
+    </dependency>
 
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-cmwrda3</artifactId>
-			<version>[1.0.2,2.0.0)</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-snmp</artifactId>
-			<version>[1.0.4,2.0.0)</version>
-		</dependency>
-		<dependency>
-			<groupId>cern.japc</groupId>
-			<artifactId>japc-ext-mockito</artifactId>
-			<version>[0.1.6,1.0.0)</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>cern.japc</groupId>
+      <artifactId>japc-ext-cmwrda3</artifactId>
+      <version>[1.0.2,2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.japc</groupId>
+      <artifactId>japc-ext-snmp</artifactId>
+      <version>[1.0.4,2.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>cern.japc</groupId>
+      <artifactId>japc-ext-mockito</artifactId>
+      <version>[0.1.6,1.0.0)</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
-	<developers />
+  <developers />
 
 </project>
