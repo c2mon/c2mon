@@ -1,35 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>cern.c2mon.c2mon-server</groupId>
-		<artifactId>c2mon-server-pom</artifactId>
-		<version>1.1.3</version>
-	</parent>
+  <parent>
+    <groupId>cern.c2mon.c2mon-server</groupId>
+    <artifactId>c2mon-server-pom</artifactId>
+    <version>1.1.5</version>
+  </parent>
 
-	<groupId>cern.c2mon.c2mon-deploy</groupId>
-	<artifactId>c2mon-server-deploy</artifactId>
-	<version>1.5.5-SNAPSHOT</version>
+  <groupId>cern.c2mon.c2mon-deploy</groupId>
+  <artifactId>c2mon-server-deploy</artifactId>
+  <version>1.5.5-SNAPSHOT</version>
 
-	<packaging>pom</packaging>
+  <packaging>pom</packaging>
 
-	<description>
-		C2MON server assembling all required modules and configuration files for TIM2 and DMN2 solutions
-    </description>
-	<url></url>
+  <description>
+    C2MON server assembling all required modules and configuration files for TIM2 and DMN2 solutions
+  </description>
+  <url></url>
 
-	<scm>
-		<developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-server-deploy</developerConnection>
-	</scm>
+  <scm>
+    <developerConnection>scm:svn:svn+ssh://svn.cern.ch/reps/tim2/trunk/c2mon/c2mon-deploy/c2mon-server-deploy</developerConnection>
+  </scm>
 
-	<developers />
+  <developers />
 
-	<modules>
-		<module>modules/tim2</module>
-		<module>modules/dmn2</module>
+  <modules>
+    <module>modules/tim2</module>
+    <module>modules/dmn2</module>
     <module>modules/demo</module>
-	</modules>
+  </modules>
 
 </project>
