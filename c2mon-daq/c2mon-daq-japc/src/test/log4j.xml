@@ -9,7 +9,7 @@
 	<!--
 		Create a ConsoleAppender. Log messages are written to the console
 	-->
-  <renderer renderedClass="cern.c2mon.shared.daq.filter.FilteredDataTagValue"
+  <renderer renderedClass="cern.c2mon.shared.common.filter.FilteredDataTagValue"
           renderingClass="cern.c2mon.shared.daq.filter.FilteredDataTagValueRenderer" />
 
 
