@@ -145,7 +145,7 @@ public class AlmonMessageHandler extends EquipmentMessageHandler implements Runn
     }
 
     @Override
-    public void refreshDataTag(@SuppressWarnings("unused") long dataTagId) {
+    public void refreshDataTag(long dataTagId) {
         // TODO Auto-generated method stub
 
     }

@@ -1,0 +1,24 @@
+		<DataTag id="#tag_id#" name="#alarm_id#" control="false">
+			<data-type>Boolean</data-type>
+			<DataTagAddress>
+				<HardwareAddress class="cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl">
+					<address>
+					  {
+					    "type": "#device_type#",
+					    "property": "#device_property#",
+					    "field": "value",
+
+					    "alarmTriplet": {
+					           "faultFamily": "#ff#",
+					           "faultMember": "#fm#",
+					           "faultCode": "#fc#"
+					    }
+					  }
+					</address>
+				</HardwareAddress>
+				<time-to-live>3600000</time-to-live>
+				<priority>2</priority>
+				<guaranteed-delivery>true</guaranteed-delivery>
+			</DataTagAddress>
+		</DataTag>
+

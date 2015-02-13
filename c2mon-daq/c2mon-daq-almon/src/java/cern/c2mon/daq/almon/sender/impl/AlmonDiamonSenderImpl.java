@@ -19,7 +19,8 @@ import cern.c2mon.shared.common.datatag.ISourceDataTag;
 /**
  * @author wbuczak
  */
-@ManagedResource(objectName = "cern.c2mon.daq.almon.sender:name=AlmonDiamonSender", description = "diamon alarms montor sender")
+@ManagedResource(objectName = "cern.c2mon.daq.almon.sender:name=AlmonDiamonSender", 
+    description = "diamon alarms montor sender")
 public class AlmonDiamonSenderImpl implements AlmonSender {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlmonDiamonSenderImpl.class);

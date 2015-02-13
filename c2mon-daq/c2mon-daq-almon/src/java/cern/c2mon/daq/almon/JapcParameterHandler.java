@@ -95,17 +95,28 @@ public abstract class JapcParameterHandler implements ParameterValueListener {
                 }
             }// synchronized
 
-            Parameter p = ParameterFactory.newInstance().newParameter(address.getDevice(), address.getProperty());
-
-            Selector selector = null;
-
-            if (address.hasCycle()) {
-                selector = ParameterValueFactory.newSelector(address.getCycle());
+            String device = address.getDevice();
+            String prop = address.getProperty();
+            
+            // TODO something not properly handled here when device is null ...            
+            if (device == null)
+            {
+                LOG.error("Trying to create JAPC parameter for " + device + "/" + prop);
+                throw new ParameterException("Can not subscribe to NULL device");
             }
-            shandle = p.createSubscription(selector, this);
-
-            shandle.startMonitoring();
-
+            else
+            {
+                Parameter p = ParameterFactory.newInstance().newParameter(device, prop);
+    
+                Selector selector = null;
+    
+                if (address.hasCycle()) {
+                    selector = ParameterValueFactory.newSelector(address.getCycle());
+                }
+                shandle = p.createSubscription(selector, this);
+    
+                shandle.startMonitoring();
+            }
         } catch (ParameterException e) {
 
             LOG.warn("subscribing to parameter: {} failed. Reason: {}", address.getJapcParameterName(), e.getMessage());
