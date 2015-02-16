@@ -25,11 +25,8 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
- * TODO if we loose contact with BOTH spectrum servers, set the equipment communication tag down!
- *      as long as there is one, we consider ourselves as happy!
- * 
- * TODO for testing we need to release the old server with an optional "raw traffic forwarder"
- *      so that we get a copy of all messages to this test system
+ * TODO use the log-comm file from production installation and create a "player" writing this
+ *      to the socket of our DAQ.
  *      
  * @author mbuttner
  */
@@ -51,10 +48,11 @@ IEquipmentConfigurationChanger {
     public void connectToDataSource() throws EqIOException {
         IEquipmentConfiguration config = getEquipmentConfiguration();
         SpectrumEquipConfig spectrumConfig = JsonUtils.fromJson(config.getAddress(), SpectrumEquipConfig.class);
-        spectrum = new SpectrumListener(spectrumConfig);
+        spectrum = SpectrumListener.getInstance();
+        spectrum.setConfig(spectrumConfig);
         listenerThr = new Thread(spectrum);
         listenerThr.start();
-        proc = new EventProcessor(getEquipmentMessageSender());
+        proc = new EventProcessor(getEquipmentMessageSender(), spectrumConfig);
         procThr = new Thread(proc);
     }
 
@@ -142,14 +140,8 @@ IEquipmentConfigurationChanger {
     @Override
     public void run() {
         getEquipmentMessageSender().confirmEquipmentStateOK();
-
         for (ISourceDataTag tag : getEquipmentConfiguration().getSourceDataTags().values()) {
-//            try {
-                registerTag(tag);
-//            } catch (TagOperationException ex) {
-//                getEquipmentLogger().error(ex.getMessage());
-//                getEquipmentMessageSender().sendInvalidTag(tag, SourceDataQuality.DATA_UNAVAILABLE, ex.getMessage());
-//            }
+            registerTag(tag);
         }        
     }
 

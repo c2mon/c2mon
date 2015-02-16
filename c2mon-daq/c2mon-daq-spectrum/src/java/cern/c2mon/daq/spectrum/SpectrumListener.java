@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,20 +28,33 @@ import org.slf4j.LoggerFactory;
 public class SpectrumListener implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(SpectrumListener.class);
-
+    private static SpectrumListener listener;
+    
     private SpectrumEquipConfig config;
     private boolean cont = true;
-        
+
+    private LinkedBlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>();
+    
     //
     // --- CONSTRUCTION --------------------------------------------------------------------
     //
-    public SpectrumListener(SpectrumEquipConfig config) {
-        this.config = config;
-    }
+    private SpectrumListener() {
         
+    }
+
+    public static SpectrumListener getInstance() {
+        if (listener == null) {
+            listener = new SpectrumListener();
+        }
+        return listener;
+    }
     //
     // --- PUBLIC METHODS -------------------------------------------------------------------
     //
+    public void setConfig(SpectrumEquipConfig config) {
+        this.config = config;
+    }
+    
     /**
      * Sets the "cont" flag to false, so that the thread stops after the next request.
      */
@@ -47,6 +62,9 @@ public class SpectrumListener implements Runnable {
         cont = false;
     }
 
+    public Queue<Event> getQueue() {
+        return eventQueue;
+    }
         
     /**
      * The thread's main. Listens on the Server.port and accepts incoming requests. Each message
@@ -74,8 +92,7 @@ public class SpectrumListener implements Runnable {
                         BufferedReader in = new BufferedReader(new InputStreamReader(skt.getInputStream()));
                         while (!in.ready()) { /**/ }
                         String msg = in.readLine();
-                        Event event = new Event(serverName, msg);
-                        EventQueue.getQueue().addEvent(event);
+                        eventQueue.add(new Event(serverName, msg));
                         in.close();
                         log.info("Event " + msg + " processed.");
                     } else {

@@ -59,57 +59,18 @@ public class Event {
     
     private static Logger log = Logger.getLogger(Event.class);    
     private static Logger logComm = Logger.getLogger("LOG_COMM");
-    
-    
-    /**
-     * Hostname of the Spectrum server at the origin of this event.
-     */
-    private String serverName;
-    
-    /**
-     * The raw data received over TCP socket
-     */
-    private String msg;
-    
-    /**
-     * The event type might be CLR, SET, UPD or RESET
-     */
-    private String eventType;
-    
-    /**
-     * The IP address in the form aaa.bbb.ccc.dddd sent over TCP by the Spectrum server
-     */
-    private String ipAddress;
 
-    /**
-     * Set to false if the keepalive is received from Spectrum, but indicates an error
-     */
-    private boolean spectrumNotifierOk = true;
-    
-    /**
-     * The date string in the form yyyy/mm/dd sent over TCP by the Spectrum server
-     */
-    private String dateString;
-
-    /**
-     * The time string in the form hh:mi:ss sent over TCP by the Spectrum server
-     */
-    private String timeString;
-    
-    /**
-     * The model field sent over TCP by the Spectrum server
-     */
-    private String model;
-    
-    /**
-     * Information provided by Spectrum and used to build the help URL for further information
-     */
+    // Message data sent over TCP by the Spectrum server
+    private String serverName;                  // Hostname of the Spectrum server at the origin of this event
+    private String msg;                         // The raw data received over TCP socket
+    private String eventType;                   // The event type might be CLR, SET, UPD or RESET
+    private String ipAddress;                   // in the form aaa.bbb.ccc.dddd sent over TCP by Spectrum 
+    private boolean spectrumNotifierOk = true;  // maybe false (when keep alive from Spectrum signals an error)
+    private String dateString;                  // in the form yyyy/mm/dd
+    private String timeString;                  // in the form hh:mi:ss
+    private String model;                       
     private String modelHandle;
-    
-    /**
-     * The Spectrum alarm id sent over TCP by the Spectrum server
-     */
-    private long alarmId;
+    private long alarmId;                       // The Spectrum one!
     
     /**
      * The Spectrum cause id, real identifier for a device and a problem as the alarm id might by
@@ -117,30 +78,15 @@ public class Event {
      */
     private String causeId;
     
-    /**
-     * Alarm description provided by Spectrum
-     */
     private String problemDescription;
-        
-    /**
-     * URL for additional info, derived from fields in the message
-     */
     private String contextURL;
-    
-    /**
-     * Derived from the IP address if possible
-     */
     private String hostname;
 
-    /**
-     * Object used to synchronize actions at the instance level
-     */
     private Object lock = new Object();
     
-    
-    
-    
-    /// ==================================== Instance part: An Event =======================================
+    //
+    // --- CONSTRUCTION --------------------------------------------------------------------------------
+    //
     
     /**
      * Constructor. Only stores the raw data and extracts the event type. This is a choice in order to 
@@ -158,6 +104,9 @@ public class Event {
         setEventType(st.nextToken());
     }
     
+    //
+    // --- PUBLIC METHODS -------------------------------------------------------------------------------
+    //
     /**
      * Hack the event properties out of the raw data. Should be called on event consuming, not generating !
      */

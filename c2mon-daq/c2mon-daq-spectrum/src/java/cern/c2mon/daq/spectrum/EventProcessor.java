@@ -6,8 +6,7 @@ package cern.c2mon.daq.spectrum;
 
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.Queue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,13 +68,19 @@ public class EventProcessor implements Runnable {
         
     private static final Logger LOG = LoggerFactory.getLogger(EventProcessor.class);
 
+    public static final long BACKUP_DELAY = 10 * 60 * 1000; // 10mn
+    
     private IEquipmentMessageSender equipmentMessageSender;
     private SpectrumEquipConfig config;
     private HashMap<String, SpectrumAlarm> monitoredHosts = new HashMap<String, SpectrumAlarm>();
     private boolean cont = true;
     
+    private long lastEventPrimary = 0;
+    private long lastEventSecondary = 0;
     private long lastKalPrimary = 0;
     private long lastKalSecondary = 0;
+    private boolean primaryOk;
+    private boolean secondaryOk;
     
     //
     // --- CONSTRUCTION -------------------------------------------------------------------------------
@@ -96,7 +101,7 @@ public class EventProcessor implements Runnable {
     }
 
     public void add(String hostname, ISourceDataTag tag) {
-        monitoredHosts.put(hostname, new SpectrumAlarm(hostname, tag));
+        monitoredHosts.put(hostname, new SpectrumAlarm(tag));
     }    
 
     
@@ -116,85 +121,72 @@ public class EventProcessor implements Runnable {
                 // if no event is available, we will sleep for 5 seconds ...
                 Thread.sleep(5 * 1000);
                 
-                // ... and than process whatever is available on the event queue.
-                // TODO from time to time check the server status here!!
-                // -> for normal delay ... check legacy code
+                // time check the server status here
+                long now = System.currentTimeMillis();
+                if ((!this.primaryOk && !secondaryOk) ||
+                    ((now - this.lastKalPrimary > BACKUP_DELAY) && (now - this.lastKalSecondary > BACKUP_DELAY))
+                        ){
+                    equipmentMessageSender.confirmEquipmentStateIncorrect();
+                } else {
+                    equipmentMessageSender.confirmEquipmentStateOK();                    
+                }
                 
-                while (EventQueue.getQueue().available()) {
-                    Event event = EventQueue.getQueue().consumeEvent();
+                // ... and than process whatever is available on the event queue.
+                Queue<Event> q = SpectrumListener.getInstance().getQueue();
+                while (!q.isEmpty()) {
+                    Event event = q.poll();
 
                     // 
                     // For a "reset" event (manually sent if detected here), we have to clear all active alarms
                     if (event.toReset()) {
                         LOG.warn("Spectrum sent a RST event, terminate all active alarms..." );
-                        SpectrumServer.terminateAll(event.getServerName( )/*, manager*/);
+                        terminateAll();
                         LOG.warn("All alarms terminated (RESET event)." );
-                    } else {
-                        
+                    } else {                        
                         // set attributes of the event based on the raw data stored on construction
                         event.prepare();
-                        eventLog.info("RECEIVED: [" + event.getServerName() + "] " + event);
+                        LOG.info("RECEIVED: [" + event.getServerName() + "] " + event);
                         
                         if (event.isKeepAlive()) {
-                            //
-                            SpectrumServer.setLastKeepAliveTs(event.getServerName(), event.isSpectrumNotifierOk());
-                            eventLog.info("RECEIVED: [" + event.getServerName() + "] " + event);
+                            setLastKeepAliveTs(event.getServerName(), event.isSpectrumNotifierOk());
+                            LOG.info("RECEIVED: [" + event.getServerName() + "] " + event);
                         } else {
                         
                             String hostname = event.getHostname();
-                            String alarmId = null;
-                            synchronized(laserAlarms) {
-                                alarmId = laserAlarms.get(hostname);
+                            SpectrumAlarm alarm = null;
+                            synchronized(monitoredHosts) {
+                                alarm = monitoredHosts.get(hostname);
                             }
                         
                             // if we have a valid LASER alarm for the Spectrum event ...
-                            if (alarmId != null) {
+                            if (alarm != null) {
                             
                                 // the timestamp based reset procedure: an event older than the previously received one means
                                 // that Spectrum was restarted and that we have to clean (because we will receive all active
                                 // alarms now
                                 long uts = event.getUserTimestamp();
-/*
- *  For debugging purposes, check timestamps of data sent by Spectrum
- *                              long lastEventTs = SpectrumServer.getLastEventTs(event.getServerName());
-                                if (uts != 0 && (uts + (3 * 60 * 1000) < lastEventTs)) {
-                                    log.warn("Spectrum sent a timestamp older than for a previous event, terminate all ..." );
-                                    log.warn("Spectrum server:          " + event.getServerName());
-                                    log.warn("User timestamp:           " + new Date(uts));
-                                    log.warn("Previous event timestamp: " + new Date(lastEventTs));
-                                    SpectrumServer.terminateAll(event.getServerName(), manager);
-                                    log.warn("All alarms terminated." );
-                                    eventLog.info("RESET: by Spectrum timestamp");
-                                }
-*/                              
-                                SpectrumServer.setLastEventTs(event.getServerName(), uts);  // remember the timestamp of the last event from Spectrum
+                                setLastEventTs(event.getServerName(), uts);  
                             
-                                //
-                                //  Build the alarm and based on the event type try to activate or terminate
-                                //
-                                AlarmInstance alarm = 
-                                    builder.clear()
-                                        .setProblemKey(alarmId)
-                                        .setUserTimestamp(System.currentTimeMillis())
-                                        .setProperty("PB_DESC", event.getProblemDescription())
-                                        .setProperty("SPECTRUM_URL", event.getContextURL())
-                                        .getInstance();        
+                                String descr = event.getProblemDescription() + " (" + event.getContextURL() + ")";
+                                long ts = System.currentTimeMillis();
                                 if (event.toActivate()) {
-                                    eventLog.info("ACTIVATE: [" + event.getServerName() + "] " + event);
-                                    SpectrumServer.addAlarm(event.getServerName(), alarm, event.getAlarmId(), manager);
+                                    LOG.info("ACTIVATE: [" + event.getServerName() + "] " + event);
+                                    alarm.activate(event.getAlarmId());
+                                    equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.TRUE, ts, descr);
                                 }
                                 if (event.toTerminate()) {
-                                    eventLog.info("TERMINATE: [" + event.getServerName() + "] " + event);
-                                    SpectrumServer.removeAlarm(event.getServerName(), alarm, event.getAlarmId(), manager);
+                                    LOG.info("TERMINATE: [" + event.getServerName() + "] " + event);
+                                    alarm.terminate(event.getAlarmId());
+                                    if (!alarm.isAlarmOn())
+                                    {
+                                        equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.FALSE, ts, descr);
+                                    }
                                 }
                             } else {
                                 LOG.warn("No alarm definition found for host " + hostname + ", event discarded");
-                                discardedLog.warn("No alarm definition found for host " + hostname + ", event discarded");
-                                eventLog.info("DISCARD: [" + event.getServerName() + "] " + event);
                             }
                         }
                         LOG.info("Consumed event [" + event + "]");
-                        SpectrumServer.listServers();
                     }
                 }
             } catch (Exception e) {
@@ -203,4 +195,52 @@ public class EventProcessor implements Runnable {
         }
     }
    
+
+    //
+    // --- PRIVATE METHODS -------------------------------------------------------------------------------
+    //
+    /**
+     * @param serverName
+     * @param spectrumNotifierOk
+     */
+    private void setLastKeepAliveTs(String serverName, boolean spectrumNotifierOk) {
+        if (serverName.equals(config.getPrimaryServer())) {
+            this.lastKalPrimary = System.currentTimeMillis();
+            primaryOk = spectrumNotifierOk;
+        }
+        if (serverName.equals(config.getSecondaryServer())) {
+            this.lastKalSecondary = System.currentTimeMillis();
+            secondaryOk = spectrumNotifierOk;            
+        }        
+    }
+
+    private void terminateAll()
+    {
+        for (SpectrumAlarm alarm : monitoredHosts.values())
+        {
+            if (alarm.isAlarmOn())
+            {
+                equipmentMessageSender.sendTagFiltered(alarm.getTag(), Boolean.FALSE, System.currentTimeMillis());
+                alarm.clear();
+            }
+        }
+    }
+
+    private void setLastEventTs(String serverName, long uts) {
+        if (serverName.equals(config.getPrimaryServer())) {
+            if (uts < this.lastEventPrimary)
+            {
+                terminateAll();
+            }
+            this.lastEventPrimary = uts;
+        }
+        if (serverName.equals(config.getSecondaryServer())) {
+            if (uts < this.lastEventSecondary)
+            {
+                terminateAll();
+            }
+            this.lastEventSecondary = uts;
+        }                
+    }
+
 }

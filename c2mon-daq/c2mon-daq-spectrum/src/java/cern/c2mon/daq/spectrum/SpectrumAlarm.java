@@ -8,9 +8,16 @@ import java.util.ArrayList;
 
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 
+/***
+ * The alarm for a given host is considered to be "on" if Spectrum signaled at least one
+ * error for it. The alarm goes off only once the entire list of various errors signaled
+ * by Spectrum was signaled to be terminated. For this purpose, each instance keeps a list
+ * of errors actually active for a given host.
+ * 
+ * @author mbuttner
+ */
 public class SpectrumAlarm {
     
-    private String hostname;
     private ArrayList<Long> spectrumAlarmIds ;
     private ISourceDataTag tag;
     private boolean alarmOn;
@@ -18,9 +25,8 @@ public class SpectrumAlarm {
     //
     // --- CONSTRUCTION --------------------------------------------------------------
     //
-    public SpectrumAlarm(String hostname, ISourceDataTag tag)
+    public SpectrumAlarm(ISourceDataTag tag)
     {
-        this.hostname = hostname;
         spectrumAlarmIds = new ArrayList<Long>();
         alarmOn = false;
         this.tag = tag;
@@ -34,30 +40,29 @@ public class SpectrumAlarm {
         return spectrumAlarmIds.size();
     }
 
-    public String getHostname() {
-        return hostname;
-    }
-
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-    }
-
     public ISourceDataTag getTag() {
         return tag;
-    }
-
-    public void setTag(ISourceDataTag tag) {
-        this.tag = tag;
     }
 
     public boolean isAlarmOn() {
         return alarmOn;
     }
-
-    public void setAlarmOn(boolean alarmOn) {
-        this.alarmOn = alarmOn;
+    
+    /**
+     * When the Spectrum server operates a reset, we have to clean all known errors at once
+     */
+    public void clear() {
+        spectrumAlarmIds.clear();
+        alarmOn = false;
     }
     
+    /**
+     * If the specified Spectrum error is not yet known in our list for this host, it
+     * is added. As the list contains at least one error after the call, the global
+     * alarm for us is always true.
+     * 
+     * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
+     */
     public void activate(long spectrumAlarmId)
     {
         if (!spectrumAlarmIds.contains(spectrumAlarmId))
@@ -67,6 +72,12 @@ public class SpectrumAlarm {
         alarmOn = true;
     }
 
+    /**
+     * Remove the specified error. If after the call the list is empty, the alarms is
+     * considered to be off
+     * 
+     * @param spectrumAlarmId <code>long</code> id of the alarm as defined by Spectrum
+     */
     public void terminate(long spectrumAlarmId)
     {
         if (spectrumAlarmIds.contains(spectrumAlarmId))
