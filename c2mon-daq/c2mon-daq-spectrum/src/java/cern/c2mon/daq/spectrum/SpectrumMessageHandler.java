@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import cern.c2mon.daq.common.EquipmentMessageHandler;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
-import cern.c2mon.daq.common.vcm.testhandler.TagOperationException;
 import cern.c2mon.daq.spectrum.address.SpectrumHardwareAddress;
 import cern.c2mon.daq.spectrum.address.SpectrumHardwareAddressFactory;
 import cern.c2mon.daq.spectrum.util.JsonUtils;
@@ -108,7 +107,7 @@ IEquipmentConfigurationChanger {
         changeReport.setState(CHANGE_STATE.SUCCESS);
         try {
             unregisterTag(sourceDataTag);
-        } catch (TagOperationException ex) {
+        } catch (Exception ex) {
             changeReport.setState(CHANGE_STATE.FAIL);
             changeReport.appendError(ex.getMessage());
         }
@@ -123,7 +122,7 @@ IEquipmentConfigurationChanger {
             try {
                 LOG.debug(format("calling  unregisterTag(%d)..", oldSourceDataTag.getId()));
                 unregisterTag(oldSourceDataTag);
-            } catch (TagOperationException ex) {
+            } catch (Exception ex) {
                 changeReport.appendWarn(ex.getMessage());
             }
             LOG.debug(format("calling  registerTag(%d)..", sourceDataTag.getId()));
@@ -170,7 +169,7 @@ IEquipmentConfigurationChanger {
         }
     }
 
-    synchronized void unregisterTag(ISourceDataTag tag) throws TagOperationException {
+    synchronized void unregisterTag(ISourceDataTag tag) throws Exception {
         try {
             SimpleHardwareAddress saddr = (SimpleHardwareAddress) tag.getHardwareAddress();
             SpectrumHardwareAddress addr = SpectrumHardwareAddressFactory.fromJson(saddr.getAddress().trim());
@@ -178,7 +177,7 @@ IEquipmentConfigurationChanger {
         } catch (Exception ex) {
             String err = format("Unable to unregister tag: %d. Problem description: %s", tag.getId(), ex.getMessage());
             LOG.error(err);
-            throw new TagOperationException(err);
+            throw new Exception(err);
         }
     }
 

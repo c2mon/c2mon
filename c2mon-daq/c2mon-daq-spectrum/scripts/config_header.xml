@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?><ProcessConfiguration xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/Configuration http://timweb/schemas/c2mon-daq/ProcessConfiguration.xsd"  process-id="50" type="initialise">
+<alive-tag-id>2276607</alive-tag-id>
+<alive-interval>60000</alive-interval>
+<max-message-size>100</max-message-size>
+<max-message-delay>1000</max-message-delay>
+<EquipmentUnits>
+
+<EquipmentUnit id="5250" name="SPECTRUM">
+	<handler-class-name>cern.c2mon.daq.spectrum.SpectrumMessageHandler</handler-class-name>
+	<commfault-tag-id>107211</commfault-tag-id>
+	<commfault-tag-value>false</commfault-tag-value>
+	<address>
+		{
+			"primaryServer": "cs-srv-42.cern.ch",
+			"secondaryServer": "cs-srv-43.cern.ch",
+			"port": 12001
+		}
+	</address>	
+	<SubEquipmentUnits />
+
+	<DataTags>
+

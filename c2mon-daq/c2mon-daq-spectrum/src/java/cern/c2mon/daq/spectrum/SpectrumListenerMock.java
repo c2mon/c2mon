@@ -36,7 +36,7 @@ public class SpectrumListenerMock implements SpectrumListenerIntf {
 
                 String ligne = inr.readLine();
                 if (ligne != null && ligne.indexOf(">>>") > 0) {
-                    String msg = ligne.substring(ligne.indexOf(">>>") + 4);  
+                    String msg = ligne.substring(ligne.indexOf(">>>") + 3);  
                     msg = msg.substring(0, msg.indexOf("<<<"));
                     LOG.info("Raw:  {}", ligne);
                     LOG.info("Trim: {}", msg);
