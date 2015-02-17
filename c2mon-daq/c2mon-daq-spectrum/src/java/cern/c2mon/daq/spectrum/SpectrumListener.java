@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * @version 29 May 2009
  * 
  */
-public class SpectrumListener implements Runnable {
+public class SpectrumListener implements Runnable, SpectrumListenerIntf {
 
     private static final Logger log = LoggerFactory.getLogger(SpectrumListener.class);
     private static SpectrumListener listener;
@@ -51,6 +51,7 @@ public class SpectrumListener implements Runnable {
     //
     // --- PUBLIC METHODS -------------------------------------------------------------------
     //
+    @Override
     public void setConfig(SpectrumEquipConfig config) {
         this.config = config;
     }
@@ -58,10 +59,12 @@ public class SpectrumListener implements Runnable {
     /**
      * Sets the "cont" flag to false, so that the thread stops after the next request.
      */
+    @Override
     public void shutdown() {
         cont = false;
     }
 
+    @Override
     public Queue<Event> getQueue() {
         return eventQueue;
     }

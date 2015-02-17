@@ -25,8 +25,9 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
- * TODO use the log-comm file from production installation and create a "player" writing this
- *      to the socket of our DAQ.
+ * TODO player should have command line interface for step by step execution (and exit, and run n msg's)
+ * TODO add "active list interface to the DAQ", based on JDK web
+ * TODO compare results to production status
  *      
  * @author mbuttner
  */
@@ -36,7 +37,7 @@ IEquipmentConfigurationChanger {
     private static final Logger LOG = LoggerFactory.getLogger(SpectrumMessageHandler.class);
 
     private Thread listenerThr;
-    private SpectrumListener spectrum;
+    private SpectrumListenerIntf spectrum;
     
     private Thread procThr;
     private EventProcessor proc;
@@ -48,7 +49,7 @@ IEquipmentConfigurationChanger {
     public void connectToDataSource() throws EqIOException {
         IEquipmentConfiguration config = getEquipmentConfiguration();
         SpectrumEquipConfig spectrumConfig = JsonUtils.fromJson(config.getAddress(), SpectrumEquipConfig.class);
-        spectrum = SpectrumListener.getInstance();
+        spectrum = SpectrumConnector.getListener();
         spectrum.setConfig(spectrumConfig);
         listenerThr = new Thread(spectrum);
         listenerThr.start();
