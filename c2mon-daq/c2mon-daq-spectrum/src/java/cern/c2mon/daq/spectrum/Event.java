@@ -114,7 +114,7 @@ public class Event {
         synchronized(lock) {
             StringTokenizer st = new StringTokenizer(msg);
             try {
-                logComm.info(">>>" + msg + "<<<");
+                logComm.debug(">>>" + msg + "<<<");
                 setEventType(st.nextToken());
                 
                 //
@@ -151,7 +151,7 @@ public class Event {
                     if (!this.isKeepAlive()) {
                         long oldAlarmId = alarmId;
                         alarmId = Long.parseLong(causeId, 16);
-                        logComm.info("Message format " + MESSAGE_FORMAT_VERSION + "]: replaced alarm id " 
+                        logComm.debug("Message format " + MESSAGE_FORMAT_VERSION + "]: replaced alarm id " 
                             + oldAlarmId + " with " + alarmId + " based on cause id " + causeId);
                     }
 //                }
@@ -312,4 +312,6 @@ public class Event {
         if (this.eventType.equals(EVENT_RESET)) return true;
         return false;       
     }
+    
+    
 }

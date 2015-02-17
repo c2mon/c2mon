@@ -5,7 +5,7 @@
 package cern.c2mon.daq.spectrum;
 
 /**
- * Object for desializing the Json transmitted equipment configuration stuff. To work 
+ * Object for deserializing the Json transmitted equipment configuration stuff. To work 
  * correctly with gson library, we have a public parameter-less constructor as well as 
  * getters and setters for everything.
  * 
@@ -20,9 +20,7 @@ public class SpectrumEquipConfig
     //
     // --- CONSTRUCTION --------------------------------------------------------------------
     //
-    public SpectrumEquipConfig()
-    {
-        
+    public SpectrumEquipConfig() {        
     }
 
     //

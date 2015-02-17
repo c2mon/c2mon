@@ -24,9 +24,11 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 
 /**
+ * TODO time compression mode: do not sleep if the message concerns an quipment we are not interested in
  * TODO player should have command line interface for step by step execution (and exit, and run n msg's)
  * TODO add "active list interface to the DAQ", based on JDK web
  * TODO compare results to production status
+ * TODO create unit tests especially for referencing/dreferencing alarms for the same host
  *      
  * @author mbuttner
  */
@@ -48,12 +50,17 @@ IEquipmentConfigurationChanger {
     public void connectToDataSource() throws EqIOException {
         IEquipmentConfiguration config = getEquipmentConfiguration();
         SpectrumEquipConfig spectrumConfig = JsonUtils.fromJson(config.getAddress(), SpectrumEquipConfig.class);
-        spectrum = SpectrumConnector.getListener();
-        spectrum.setConfig(spectrumConfig);
-        listenerThr = new Thread(spectrum);
-        listenerThr.start();
+
         proc = new EventProcessor(getEquipmentMessageSender(), spectrumConfig);
         procThr = new Thread(proc);
+
+        spectrum = SpectrumConnector.getListener();
+        spectrum.setConfig(spectrumConfig);
+        spectrum.setQueue(proc.getQueue());
+        listenerThr = new Thread(spectrum);
+        
+        listenerThr.start();
+        procThr.start();
     }
 
     @Override

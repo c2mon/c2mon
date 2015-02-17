@@ -10,7 +10,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public class SpectrumListener implements Runnable, SpectrumListenerIntf {
     private SpectrumEquipConfig config;
     private boolean cont = true;
 
-    private LinkedBlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>();
+    private Queue<Event> eventQueue;
     
     //
     // --- CONSTRUCTION --------------------------------------------------------------------
@@ -65,8 +64,8 @@ public class SpectrumListener implements Runnable, SpectrumListenerIntf {
     }
 
     @Override
-    public Queue<Event> getQueue() {
-        return eventQueue;
+    public void setQueue(Queue<Event> eventQueue) {
+        this.eventQueue = eventQueue;
     }
         
     /**

@@ -7,6 +7,7 @@ package cern.c2mon.daq.spectrum;
 
 import java.util.HashMap;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,11 +78,13 @@ public class EventProcessor implements Runnable {
     
     private long lastEventPrimary = 0;
     private long lastEventSecondary = 0;
-    private long lastKalPrimary = 0;
-    private long lastKalSecondary = 0;
-    private boolean primaryOk;
-    private boolean secondaryOk;
-    
+    private long lastKalPrimary = System.currentTimeMillis();
+    private long lastKalSecondary = System.currentTimeMillis();
+    private boolean primaryOk = true;
+    private boolean secondaryOk = true;
+
+    private LinkedBlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>();
+
     //
     // --- CONSTRUCTION -------------------------------------------------------------------------------
     //
@@ -94,6 +97,10 @@ public class EventProcessor implements Runnable {
     public void shutdown()
     {
         cont = false;
+    }
+    
+    public Queue<Event> getQueue() {
+        return eventQueue;
     }
     
     public void del(String hostname) {
@@ -115,27 +122,36 @@ public class EventProcessor implements Runnable {
         cont = true;
         lastKalPrimary = System.currentTimeMillis();
         lastKalSecondary = System.currentTimeMillis();
-        
+
+        long loopcounter = 0;
         while (cont) {
             try {                
                 // if no event is available, we will sleep for 5 seconds ...
                 Thread.sleep(5 * 1000);
                 
                 // time check the server status here
-                long now = System.currentTimeMillis();
-                if ((!this.primaryOk && !secondaryOk) ||
-                    ((now - this.lastKalPrimary > BACKUP_DELAY) && (now - this.lastKalSecondary > BACKUP_DELAY))
-                        ){
-                    equipmentMessageSender.confirmEquipmentStateIncorrect();
-                } else {
-                    equipmentMessageSender.confirmEquipmentStateOK();                    
+                if (loopcounter % 12 == 0) {
+                    long now = System.currentTimeMillis();
+                    if ((!this.primaryOk && !secondaryOk) ||
+                        ((now - this.lastKalPrimary > BACKUP_DELAY) && (now - this.lastKalSecondary > BACKUP_DELAY))
+                            ){
+                        LOG.warn("Lost connecion with both Spectrum servers");
+                        equipmentMessageSender.confirmEquipmentStateIncorrect();
+                    } else {
+                        LOG.info("Spectrum connection check OK");
+                        equipmentMessageSender.confirmEquipmentStateOK();                    
+                    }
                 }
+
+                loopcounter++;
+                LOG.debug("Processor loop " + loopcounter);
                 
                 // ... and than process whatever is available on the event queue.
-                Queue<Event> q = SpectrumListener.getInstance().getQueue();
-                while (!q.isEmpty()) {
-                    Event event = q.poll();
+                while (!eventQueue.isEmpty()) {
+                    Event event = eventQueue.poll();
 
+                    LOG.debug("Processing event {}", event.toString());
+                    
                     // 
                     // For a "reset" event (manually sent if detected here), we have to clear all active alarms
                     if (event.toReset()) {
@@ -145,7 +161,7 @@ public class EventProcessor implements Runnable {
                     } else {                        
                         // set attributes of the event based on the raw data stored on construction
                         event.prepare();
-                        LOG.info("RECEIVED: [" + event.getServerName() + "] " + event);
+                        LOG.debug("RECEIVED: [" + event.getServerName() + "] " + event);
                         
                         if (event.isKeepAlive()) {
                             setLastKeepAliveTs(event.getServerName(), event.isSpectrumNotifierOk());
@@ -186,7 +202,7 @@ public class EventProcessor implements Runnable {
                                 LOG.warn("No alarm definition found for host " + hostname + ", event discarded");
                             }
                         }
-                        LOG.info("Consumed event [" + event + "]");
+                        LOG.debug("Consumed event [" + event + "]");
                     }
                 }
             } catch (Exception e) {

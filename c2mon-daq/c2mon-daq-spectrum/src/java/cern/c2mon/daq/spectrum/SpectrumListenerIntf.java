@@ -6,13 +6,18 @@ package cern.c2mon.daq.spectrum;
 
 import java.util.Queue;
 
+/**
+ * Interface for Spectrum connections, used by the real class as well as the
+ * mock for testing.
+ * 
+ * @author mbuttner
+ */
 public interface SpectrumListenerIntf extends Runnable {
 
-    public abstract void setConfig(SpectrumEquipConfig config);
+    void setConfig(SpectrumEquipConfig config);
 
-    public abstract void shutdown();
+    void shutdown();
 
-    public abstract Queue<Event> getQueue();
-
+    void setQueue(Queue<Event> queue);
 
 }
