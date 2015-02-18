@@ -456,6 +456,11 @@ public class ClientRequestImplTest {
 
   }
 
+  @Test
+  public void testTagStatisticsRequest() {
+    // TODO
+  }
+
   private String mockSupervisionValueResponse(final String jsonSupervisionRequest, final int size) {
     ClientRequest tagRequest = ClientRequestImpl.fromJson(jsonSupervisionRequest);
 

@@ -83,7 +83,12 @@ public interface ClientRequest {
     /**
      * Used to request a list of devices from the server.
      */
-    DEVICE_REQUEST
+    DEVICE_REQUEST,
+    /**
+     * Used to request statistics about the number fo configured and
+     * invalid tags from the server.
+     */
+    TAG_STATISTICS_REQUEST,
   };
 
   /**
@@ -121,6 +126,8 @@ public interface ClientRequest {
     TRANSFER_DEVICE_CLASS_NAMES,
     /** @see cern.c2mon.shared.client.device.TransferDevice */
     TRANSFER_DEVICE_LIST,
+    /** @see cern.c2mon.shared.client.statistics.TagStatisticsResponse */
+    TRANSFER_TAG_STATISTICS
   };
 
   /**

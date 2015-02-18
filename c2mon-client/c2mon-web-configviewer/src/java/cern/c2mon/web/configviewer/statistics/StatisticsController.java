@@ -36,9 +36,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import cern.c2mon.shared.client.configuration.TagStatisticsResponse;
 import cern.c2mon.shared.client.lifecycle.LifecycleEventType;
 import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.statistics.generator.charts.WebChart;

@@ -31,6 +31,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -136,6 +137,14 @@ public interface RequestHandler {
    * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<TagValueUpdate> requestTagValues(Collection<Long> tagIds) throws JMSException;
+
+  /**
+   * Queries the server for statistics about the number of configured and invalid tags.
+   *
+   * @return a {@link TagStatisticsResponse} object contining the tag statistics
+   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   */
+  TagStatisticsResponse requestTagStatistics() throws JMSException;
 
   /**
    * Queries the server for the current Supervision status of all

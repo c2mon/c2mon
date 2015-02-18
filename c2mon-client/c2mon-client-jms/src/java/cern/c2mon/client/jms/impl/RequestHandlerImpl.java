@@ -50,6 +50,7 @@ import cern.c2mon.shared.client.request.ClientRequest.RequestType;
 import cern.c2mon.shared.client.request.ClientRequest.ResultType;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
 import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -316,6 +317,13 @@ public class RequestHandlerImpl implements RequestHandler {
 
     LOGGER.trace("getConfigurationReports(): Received " + reports.size() + " configuration reports");
     return reports;
+  }
+
+  @Override
+  public TagStatisticsResponse requestTagStatistics() throws JMSException {
+    ClientRequestImpl<TagStatisticsResponse> clientRequest = new ClientRequestImpl<>(TagStatisticsResponse.class);
+    Collection<TagStatisticsResponse> response = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
+    return response.iterator().next();
   }
 
   /**

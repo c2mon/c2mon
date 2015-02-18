@@ -26,6 +26,8 @@ import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponseImpl;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.tag.TagConfig;
@@ -157,6 +159,11 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
     else if (clazz == TransferDevice.class) {
       resultType = ResultType.TRANSFER_DEVICE_LIST;
       requestType = RequestType.DEVICE_REQUEST;
+      requestTimeout = 10000;
+    }
+    else if (clazz == TagStatisticsResponse.class) {
+      resultType = ResultType.TRANSFER_TAG_STATISTICS;
+      requestType = RequestType.TAG_STATISTICS_REQUEST;
       requestTimeout = 10000;
     }
     else {
@@ -358,6 +365,9 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
         return getGson().fromJson(jsonReader, collectionType);
       case TRANSFER_DEVICE_LIST:
         collectionType = new TypeToken<Collection<TransferDeviceImpl>>() { } .getType();
+        return getGson().fromJson(jsonReader, collectionType);
+      case TRANSFER_TAG_STATISTICS:
+        collectionType = new TypeToken<Collection<TagStatisticsResponseImpl>>() { } .getType();
         return getGson().fromJson(jsonReader, collectionType);
       default:
         throw new JsonSyntaxException("Unknown result type specified");

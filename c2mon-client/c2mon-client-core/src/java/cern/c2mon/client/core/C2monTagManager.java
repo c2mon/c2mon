@@ -34,6 +34,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.request.ClientRequestErrorReport;
 import cern.c2mon.shared.client.request.ClientRequestProgressReport;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 
 /**
@@ -297,6 +298,14 @@ public interface C2monTagManager {
    */
   int getCacheSize();
 
+  /**
+   * Retrieve a {@link TagStatisticsResponse} object containing current
+   * statistics about the server, including the current number of configured and
+   * invalid tags for the server itself and for each DAQ process.
+   *
+   * @return the tag statistics object
+   */
+  TagStatisticsResponse getTagStatistics();
 
   /**
    * This method is used to synchronize subscribed data tags with the

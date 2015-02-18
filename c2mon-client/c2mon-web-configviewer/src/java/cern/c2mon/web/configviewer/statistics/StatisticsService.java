@@ -30,8 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.shared.client.configuration.TagStatisticsResponse;
 import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.statistics.generator.charts.WebChart;
 import cern.c2mon.web.configviewer.service.ProcessService;

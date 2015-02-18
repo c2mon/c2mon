@@ -39,6 +39,7 @@ import cern.c2mon.client.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
+import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.rule.RuleFormatException;
@@ -312,9 +313,9 @@ public class TagManager implements CoreTagManager {
             ClientDataTagImpl cdt = new ClientDataTagImpl(tagUpdate.getId());
             cdt.update(tagUpdate);
             supervisionManager.addSupervisionListener(cdt, cdt.getProcessIds(), cdt.getEquipmentIds(), cdt.getSubEquipmentIds());
-            
-            resultList.add((ClientDataTagValue) cdt.clone());
-            
+
+            resultList.add(cdt.clone());
+
             supervisionManager.removeSupervisionListener(cdt);
           } catch (RuleFormatException e) {
             LOG.error("getDataTags() - Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
@@ -461,5 +462,17 @@ public class TagManager implements CoreTagManager {
   @Override
   public boolean isSubscribed(DataTagUpdateListener listener) {
     return tagUpdateListeners.contains(listener);
+  }
+
+  @Override
+  public TagStatisticsResponse getTagStatistics() {
+    try {
+      TagStatisticsResponse response = clientRequestHandler.requestTagStatistics();
+      return response;
+    } catch (JMSException e) {
+      LOG.error("getConfigurationReports() - JMS connection lost -> Could not retrieve configuration reports from the C2MON server.", e);
+    }
+
+    return null;
   }
 }
