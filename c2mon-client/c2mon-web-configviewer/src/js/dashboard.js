@@ -57,7 +57,7 @@
 
   // Get the total server uptime
   $.getJSON('statistics/server/uptime/total', function(data) {
-    $('#server-uptime-total').text(data);
+    $('#server-uptime-total').text(data.toFixed(4).replace(/0{0,2}$/, ""));
   });
 
   // Get the total number of rolling restarts
