@@ -26,7 +26,7 @@
     <dependency>
       <groupId>cern.c2mon.c2mon-publisher</groupId>
       <artifactId>c2mon-publisher-rda3</artifactId>
-      <version>[1.0.0,2.0.0)</version>
+      <version>LATEST</version>
     </dependency>
   </dependencies>
 
