@@ -95,6 +95,24 @@
 
 
 
+		<dependency>
+			<groupId>com.progress.sonic</groupId>
+			<artifactId>sonic-client</artifactId>
+			<version>6.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic</groupId>
+			<artifactId>sonic-reconnect</artifactId>
+			<version>5.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.progress.sonic</groupId>
+			<artifactId>sonic-loader</artifactId>
+			<version>5.0.0</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<developers>

@@ -70,7 +70,7 @@ public class SpectrumEventProcessor implements Runnable {
         
     private static final Logger LOG = LoggerFactory.getLogger(SpectrumEventProcessor.class);
 
-    public static final long BACKUP_DELAY = 10 * 60 * 1000; // 10mn
+    public static final long BACKUP_DELAY = 7 * 60 * 1000; // 5mn in reality, but let them some delay ...
     
     private IEquipmentMessageSender equipmentMessageSender;
     private SpectrumEquipConfig config;

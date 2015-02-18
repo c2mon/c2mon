@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cern.c2mon.daq.spectrum.util.JmsProviderIntf;
+import cern.c2mon.daq.spectrum.util.SonicConnector;
 
 /**
  * 
@@ -34,12 +35,12 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
     public void run() {
         cont = true;
         try {
-            Class<?> cls = Class.forName(System.getProperty("diamon.jms.provider"));
-            JmsProviderIntf jms = (JmsProviderIntf) cls.newInstance();
+//            Class<?> cls = Class.forName(System.getProperty("diamon.jms.provider"));
+            JmsProviderIntf jms = new SonicConnector();
             Connection conn = jms.getConnection();
             conn.start();
             
-            Session sess = conn.createSession(true, 0);
+            Session sess = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination topic = sess.createTopic("CERN.DIAMON.SPECTRUM");
             MessageConsumer cons = sess.createConsumer(topic);
             cons.setMessageListener(this);
@@ -90,11 +91,11 @@ public class SpectrumListenerJms implements SpectrumListenerIntf, MessageListene
         try {
             TextMessage tm = (TextMessage) msg;
             String content = tm.getText();
-            String server = msg.getStringProperty("spectrum_server");
+            String server = msg.getStringProperty("spectrum_Server");
             SpectrumEvent event = new SpectrumEvent(server, content);
             eventQueue.add(event);        
             LOG.info("Queued message from {}", server);            
-            LOG.debug("-> content: {}", content);            
+            LOG.info("-> content: {}", content);            
         } catch (Exception e) {
             LOG.error("Failed to process JMS message", e);            
         }
