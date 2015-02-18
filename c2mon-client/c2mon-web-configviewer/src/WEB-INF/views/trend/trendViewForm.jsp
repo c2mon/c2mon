@@ -1,53 +1,22 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib prefix="c2mon" tagdir="/WEB-INF/tags"%>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<c2mon:template title="${title}">
 
-<title>${title}</title>
-
-<link rel="shortcut icon" href="../img/chart_icon.png">
-
-<link rel="stylesheet" type="text/css" href="../css/bootstrap/bootstrap.css" />
 <link rel="stylesheet" type="text/css" href="../css/datepicker.css">
 
-<style type="text/css">
-body {
-  padding-top: 50px;
-  padding-bottom: 40px;
-}
-
-.sidebar-nav {
-  padding: 9px 0;
-}
-</style>
-
-</head>
-
-<body>
-
-
-  <div class="container">
-    <div class="row">
-
-
+  <div class="row">
+    <div class="col-lg-12">
       <ul class="breadcrumb">
-        <li><a href="../">Home</a> <span class="divider"></span></li>
+        <li>
+          <a href="../">Home</a>
+          <span class="divider"></span>
+        </li>
         <li>${title}</li>
-
-        <sec:authorize ifNotGranted="ROLE_ANONYMOUS">
-          <span class="pull-right">
-            <a href="../j_spring_security_logout">Logout&nbsp;</a>
-            <span class="glyphicon glyphicon-log-out"></span>
-          </span>
-        </sec:authorize>
       </ul>
 
-      <div class="jumbotron">
+      <div class="page-header">
         <h1>${title}</h1>
       </div>
 
@@ -62,9 +31,15 @@ body {
       </c:if>
 
       <ul id="tabs" class="nav nav-tabs">
-        <li><a href="#records" data-toggle="tab">Last Records</a></li>
-        <li><a href="#days" data-toggle="tab">Last Days</a></li>
-        <li><a href="#date" data-toggle="tab">From date to date</a></li>
+        <li>
+          <a href="#records" data-toggle="tab">Last Records</a>
+        </li>
+        <li>
+          <a href="#days" data-toggle="tab">Last Days</a>
+        </li>
+        <li>
+          <a href="#date" data-toggle="tab">From date to date</a>
+        </li>
       </ul>
       <div id="tab-content" class="tab-content">
 
@@ -158,30 +133,12 @@ body {
           </form>
         </div>
       </div>
-
-    </div>
-    <!--/row-->
-
-    <div class="row">
-      <footer>
-        <hr>
-        <p>
-          &copy; CERN
-          <script type="text/javascript">
-                      document.write(new Date().getFullYear())
-                    </script>
-        </p>
-      </footer>
     </div>
   </div>
-  <!--/.fluid-container-->
+  <!--/row-->
 
-  <!-- Le javascript
-        ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
+</c2mon:template>
 
-  <script src="../js/jquery/jquery.js"></script>
-  <script src="../js/bootstrap/bootstrap.js"></script>
   <script src="../js/bootstrap/bootstrap-datepicker.js"></script>
 
   <script type="text/javascript">
@@ -206,9 +163,3 @@ body {
         }
       });
     </script>
-
-</body>
-</html>
-
-
-

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * This file is part of the Technical Infrastructure Monitoring (TIM) project.
  * See http://ts-project-tim.web.cern.ch
- * 
+ *
  * Copyright (C) 2004 - 2014 CERN. This program is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either version 2 of the
@@ -12,16 +12,16 @@
  * a copy of the GNU General Public License along with this program; if not,
  * write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- * 
+ *
  * Author: TIM team, tim.support@cern.ch
  ******************************************************************************/
 
 /**
  * This object is the main trend view chart.
- * 
+ *
  * @param data: CSV data of the data points to plot.
  * @param invalidPoints: array of invalid points.
- * 
+ *
  * @author Justin Lewis Salmon
  */
 function TrendView(id, csv, invalidPoints, xlabel, ylabel) {
@@ -45,7 +45,7 @@ function TrendView(id, csv, invalidPoints, xlabel, ylabel) {
  * appropriate.
  */
 TrendView.prototype.init = function() {
-  
+
   // Register a click handler for the reset zoom button
   $('#reset-zoom').prop('disabled', true);
   $('#reset-zoom').click(function() {
@@ -103,9 +103,9 @@ TrendView.prototype.init = function() {
 /**
  * Parse the CSV returned by the server into objects that Highcharts can
  * understand and plot. The current format is the following:
- * 
+ *
  * timestamp,value,valueDescription,quality
- * 
+ *
  * @param csv the history CSV returned by the server
  */
 TrendView.prototype.parseCSV = function(csv) {
@@ -202,6 +202,7 @@ TrendView.prototype.createChart = function() {
     exporting : {
       enabled : false
     },
+    useHTML: true,
     plotOptions : {
       series : {
         turboThreshold : 0,
@@ -211,6 +212,7 @@ TrendView.prototype.createChart = function() {
           // Show the tooltip when a point is clicked, not automatically
           click : function(evt) {
             this.chart.myTooltip.refresh(evt.point, evt);
+            $('#popover-help').popover('toggle');
           },
           mouseOut : function() {
             this.chart.myTooltip.hide();
@@ -235,7 +237,7 @@ TrendView.prototype.createChart = function() {
 TrendView.prototype.formatTooltip = function() {
   var timestamp = Highcharts.dateFormat('%Y-%m-%d %H:%M:%S.%L', this.x);
   var value = Highcharts.numberFormat(this.y, 2);
-  var s = '<table class="table"><thead>' + '<tr><th colspan="2">'
+  var s = '<table class="table" style="font-size: small;"><thead>' + '<tr><th colspan="2">'
       + this.series.name + '</th></tr>' + '</thead><tbody>'
       + '<tr><th>Timestamp</th><td>' + timestamp + '</td></tr>'
       + '<tr><th>Value</th><td>' + value;
@@ -358,13 +360,14 @@ TrendView.prototype.showInvalidPlotBands = function() {
  * parameters contain MENU=false, then we hide the toolbar, otherwise not.
  */
 TrendView.prototype.shouldHideMenu = function() {
-  if (typeof this.getUrlVars()["MENU"] == 'undefined')
+  if (typeof this.getUrlVars()["MENU"] == 'undefined') {
     return false;
-  else {
-    if (this.getUrlVars()["MENU"].toUpperCase() == "FALSE")
+  } else {
+    if (this.getUrlVars()["MENU"].toUpperCase() == "FALSE") {
       return true;
-    else
+    } else {
       return false;
+    }
   }
 }
 
@@ -373,13 +376,14 @@ TrendView.prototype.shouldHideMenu = function() {
  * parameters contain TITLE=false, then we hide the title, otherwise not.
  */
 TrendView.prototype.shouldHideTitle = function() {
-  if (typeof this.getUrlVars()["TITLE"] == 'undefined')
+  if (typeof this.getUrlVars()["TITLE"] == 'undefined') {
     return false;
-  else {
-    if (this.getUrlVars()["TITLE"].toUpperCase() == "FALSE")
+  } else {
+    if (this.getUrlVars()["TITLE"].toUpperCase() == "FALSE") {
       return true;
-    else
+    } else {
       return false;
+    }
   }
 }
 

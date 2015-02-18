@@ -1,44 +1,18 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="c2mon" tagdir="/WEB-INF/tags"%>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>${title}</title>
-
-<link rel="stylesheet" type="text/css" href="../css/bootstrap/bootstrap.css" />
-
-<style type="text/css">
-body {
-  padding-top: 50px;
-  padding-bottom: 40px;
-}
-</style>
-
-</head>
-
-<body>
-
-  <div class="container">
-    <div class="row">
-
+<c2mon:template title="${title}">
+  <div class="row">
+    <div class="col-lg-12">
       <ul class="breadcrumb">
-        <li><a href="../">Home</a> <span class="divider"></span></li>
+        <li>
+          <a href="../">Home</a>
+          <span class="divider"></span>
+        </li>
         <li>${title}</li>
-
-        <sec:authorize ifNotGranted="ROLE_ANONYMOUS">
-          <span class="pull-right">
-            <a href="../j_spring_security_logout">Logout&nbsp;</a>
-            <span class="glyphicon glyphicon-log-out"></span>
-          </span>
-        </sec:authorize>
       </ul>
 
-
-      <div class="jumbotron">
+      <div class="page-header">
         <h1>${title}</h1>
       </div>
 
@@ -55,27 +29,7 @@ body {
       </form>
 
     </div>
-    <!--/row-->
-
-    <div class="row">
-      <footer>
-        <hr>
-        <p>
-          &copy; CERN
-          <script type="text/javascript">
-                      document.write(new Date().getFullYear())
-                    </script>
-        </p>
-      </footer>
-    </div>
   </div>
-  <!--/.fluid-container-->
-
-  <!-- Placed at the end of the document so the pages load faster -->
-  <script src="../js/jquery/jquery.js"></script>
-  <script src="../js/bootstrap/bootstrap.js"></script>
-
-</body>
-</html>
-
+  <!--/row-->
+</c2mon:template>
 

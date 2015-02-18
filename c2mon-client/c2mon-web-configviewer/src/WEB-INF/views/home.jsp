@@ -1,148 +1,350 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
+<%@ taglib prefix="c2mon" tagdir="/WEB-INF/tags"%>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<c2mon:template title="${title}">
+  <div class="row">
+    <div class="col-lg-12">
+      <ul class="breadcrumb">
+        <li><a href="#">Home</a></li>
+      </ul>
 
-<title>Online Viewer Home</title>
-
-<meta name="description" content="">
-<meta name="author" content="">
-
-<!-- Le styles -->
-<link rel="stylesheet" type="text/css" href="<c:url value="css/bootstrap/bootstrap.css"/>" />
-
-<style type="text/css">
-body {
-  padding-top: 50px;
-  padding-bottom: 40px;
-  /*   padding-left: 50px; */
-}
-
-.sidebar-nav {
-  padding: 9px 0;
-}
-</style>
-</head>
-
-<body>
-
-  <div class="container">
-    <div class="row">
-
-      <div class="">
-
-        <ul class="breadcrumb">
-          <li>Home</li>
-
-          <sec:authorize ifNotGranted="ROLE_ANONYMOUS">
-            <span class="pull-right">
-              <a href="j_spring_security_logout">Logout&nbsp;</a>
-              <span class="glyphicon glyphicon-log-out"></span>
-            </span>
-          </sec:authorize>
-        </ul>
-
-        <div class="jumbotron">
-          <h1>Online Viewer Home</h1>
-        </div>
-
-        <sec:authorize ifNotGranted="ROLE_ANONYMOUS">
-          <div class="alert alert-info">
-            Hi
-            <span style="color: #708090; font-size: 14pt">${username}!</span>
-            It's nice to see you again! Please select an option:
-          </div>
-        </sec:authorize>
-        <sec:authorize ifAllGranted="ROLE_ANONYMOUS">
-          <div class="alert alert-info">Welcome! Please select an option:</div>
-        </sec:authorize>
-
-        <div class="row">
-          <div class="col-md-4">
-            <h3>Tag Viewer</h3>
-            <p>
-              <a class="btn btn-default" href="tagviewer/form">Go! &raquo;</a>
-            </p>
-          </div>
-          <!--/span-->
-          <div class="col-md-4">
-            <h3>History Viewer</h3>
-            <p>
-              <a class="btn btn-default" href="historyviewer/form">Table &raquo;</a>
-              <a class="btn btn-default" href="trendviewer/form">Trend &raquo;</a>
-            </p>
-          </div>
-          <!--/span-->
-          <div class="col-md-4">
-            <h3>Alarm Viewer</h3>
-            <p>
-              <a class="btn btn-default" href="alarmviewer/form">Go! &raquo;</a>
-            </p>
-          </div>
-          <!--/span-->
-        </div>
-        <!--/row-->
-        <div class="row">
-          <div class="col-md-4">
-            <h3>Command Viewer</h3>
-            <p>
-              <a class="btn btn-default" href="commandviewer/form">Go! &raquo;</a>
-            </p>
-          </div>
-          <!--/span-->
-          <div class="col-md-4">
-            <h3>Config Loader</h3>
-            <p>
-              <a class="btn btn-default" href="configloader/progress">Go! &raquo;</a>
-            </p>
-          </div>
-          <!--/span-->
-          <div class="col-md-4">
-            <h3>DAQ XML Viewer</h3>
-            <p>
-              <a class="btn btn-default" href="process/form">Go! &raquo;</a>
-            </p>
-          </div>
-          <!--/span-->
-        </div>
-        <!--/row-->
-
-
-        <sec:authorize ifNotGranted="ROLE_ANONYMOUS">
-          <p>
-          <div class="alert alert-success">
-            <span>
-              You are currently logged in.
-              <a href="j_spring_security_logout">Logout</a>
-            </span>
-          </div>
-          </p>
-        </sec:authorize>
-
+      <div class="page-header">
+        <h1>Dashboard</h1>
       </div>
-      <!--/span-->
     </div>
-    <!--/row-->
 
+    <div class="col-lg-3 col-md-6">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-3">
+              <i class="fa fa-check fa-5x"></i>
+            </div>
+            <div class="col-xs-9 text-right">
+              <div class="huge">
+                <span id="server-uptime-total"></span><small>%</small>
+              </div>
+              <div>Server availability this year</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <div class="row">
-      <footer>
-        <hr>
-        <p>
-          &copy; CERN
-          <script type="text/javascript">
-                      document.write(new Date().getFullYear())
-                    </script>
-        </p>
-      </footer>
+    <div class="col-lg-3 col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-3">
+              <i class="fa fa-tags fa-5x"></i>
+            </div>
+            <div class="col-xs-9 text-right">
+              <div class="huge">
+                <span id="num-updates-yesterday"></span>
+              </div>
+              <div>Number of tag updates yesterday</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-3">
+              <i class="fa fa-repeat fa-5x"></i>
+            </div>
+            <div class="col-xs-9 text-right">
+              <div class="huge">
+                <span id="num-rolling-restarts"></span>
+              </div>
+              <div>Transparent server restarts this year</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-3">
+              <i class="fa fa-warning fa-5x"></i>
+            </div>
+            <div class="col-xs-9 text-right">
+              <div class="huge">
+                <span id="num-service-outages"></span>
+              </div>
+              <div>Service outages this year</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-12">
+      <p class="lead">Welcome to the C2MON Web Interface!</p>
+
+      <!--       <p>DAQ uptime, server uptime, server restarts, DAQ restarts, Equipment disconnections, etc - current amount of invalid tags in the server... or per
+        DAQ - Current amount of configured tags, devices, classes,</p> -->
     </div>
   </div>
-  <!--/.fluid-container-->
 
-</body>
-</html>
+
+  <div class="row">
+
+    <div class="col-lg-12">
+      <div role="tabpanel">
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a href="#application-server" aria-controls="home" role="tab" data-toggle="tab">Server Statistics</a></li>
+          <li role="presentation"><a href="#process" aria-controls="profile" role="tab" data-toggle="tab">DAQ Statistics</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+
+
+          <!-- Application server pane -->
+          <div role="tabpanel" class="tab-pane active" id="application-server">
+
+            <div class="row">
+              <div class="col-lg-6" style="padding-bottom: 20px;">
+                <h3>
+                  C2MON Server Statistics <br> <small> <span> <i class="fa fa-tags fa-fw"></i> <strong><span
+                        id="num-tags-configured"><i class="fa fa-refresh fa-spin"></i></span></strong> tags configured
+                  </span> <span> <i class="fa fa-warning fa-fw"></i> <strong><span id="num-invalid-tags"><i class="fa fa-refresh fa-spin"></i></span></strong>
+                      invalid tags
+                  </span>
+                  </small>
+
+                </h3>
+                <h3>Charts</h3>
+                <p>The following charts show availability and throughput statistics for the C2MON server.</p>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <div class="pull-right">
+                      <form class="form-inline" style="margin-top: -7px;">
+                        <div class="form-group">
+                          <label for="server-availability-select">Year: </label> <select id="server-availability-year" class="form-control">
+                          </select>
+                        </div>
+                      </form>
+                    </div>
+                    <i class="fa fa-bar-chart-o fa-fw"></i> Server Availability
+                  </div>
+                  <!-- /.panel-heading -->
+                  <div class="panel-body">
+                    <div class="flot-chart">
+                      <div class="flot-chart-content" id="server-availability-monthly" style="width: 100%; margin: 0 auto"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+              <div class="col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> Total Updates to Application Server
+                  </div>
+                  <!-- /.panel-heading -->
+                  <div class="panel-body">
+                    <div class="flot-chart">
+                      <div class="flot-chart-content" id="server-updates" style="width: 100%; margin: 0 auto"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+              <div class="col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> Updates per DAQ (including filtered)
+                  </div>
+                  <!-- /.panel-heading -->
+                  <div class="panel-body">
+                    <div class="flot-chart" style="height: 800px;">
+                      <div class="flot-chart-content" id="server-updates-per-daq-filtered"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+              <div class="col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> Updates per DAQ
+                  </div>
+                  <!-- /.panel-heading -->
+                  <div class="panel-body">
+                    <div class="flot-chart" style="height: 800px;">
+                      <div class="flot-chart-content" id="server-updates-per-daq"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+            </div>
+          </div>
+
+
+
+          <!-- DAQ pane -->
+          <div role="tabpanel" class="tab-pane" id="process">
+
+            <div class="row">
+              <div class="col-lg-6" style="padding-bottom: 20px; padding-top: 20px;">
+                <p>Select a DAQ process from the dropdown box below to view statistics for that DAQ.</p>
+                <form class="form-inline">
+                  <div class="form-group">
+                    <label for="process-names">Select DAQ: </label> <select id="process-names" class="form-control"></select>
+                  </div>
+                </form>
+
+                <h3>
+                  DAQ Statistics <small><span id="process-name"></span> <br> <span> <i class="fa fa-tags fa-fw"></i> <strong><span
+                        id="num-process-tags-configured"><i class="fa fa-refresh fa-spin"></i></span></strong> tags configured
+                  </span> <span> <i class="fa fa-warning fa-fw"></i> <strong><span id="num-process-invalid-tags"><i
+                          class="fa fa-refresh fa-spin"></i></span></strong> invalid tags
+                  </span> </small>
+                </h3>
+                <h3>Charts</h3>
+                <p>The following charts show availability and throughput statistics for the selected DAQ process.</p>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="chart-container col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> DAQ Availability
+                  </div>
+                  <!-- /.panel-heading -->
+                  <div class="panel-body">
+                    <div class="flot-chart">
+                      <div class="flot-chart-content" id="daq-availability-monthly" style="width: 100%; margin: 0 auto"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+              <div class="chart-container col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> DAQ updates
+                  </div>
+                  <!-- /.panel-heading  -->
+                  <div class="panel-body">
+                    <div class="flot-chart">
+                      <div class="flot-chart-content" id="daq-updates"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body  -->
+                </div>
+                <!-- /.panel  -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+              <div class="chart-container col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> DAQ filtering reasons
+                  </div>
+                  <!-- /.panel-heading  -->
+                  <div class="panel-body">
+                    <div class="flot-chart">
+                      <div class="flot-chart-content" id="daq-filtered-reasons"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body  -->
+                </div>
+                <!-- /.panel  -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+              <div class="chart-container col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> DAQ filtered update qualities
+                  </div>
+                  <!-- /.panel-heading  -->
+                  <div class="panel-body">
+                    <div class="flot-chart">
+                      <div class="flot-chart-content" id="daq-filtered-qualities"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body  -->
+                </div>
+                <!-- /.panel  -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+              <div class="chart-container col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> DAQ invalid updates
+                  </div>
+                  <!-- /.panel-heading  -->
+                  <div class="panel-body">
+                    <div class="flot-chart">
+                      <div class="flot-chart-content" id="daq-updates-invalid"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body  -->
+                </div>
+                <!-- /.panel  -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+              <div class="chart-container col-lg-6">
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <i class="fa fa-bar-chart-o fa-fw"></i> DAQ invalid update qualities
+                  </div>
+                  <!-- /.panel-heading  -->
+                  <div class="panel-body">
+                    <div class="flot-chart">
+                      <div class="flot-chart-content" id="daq-updates-invalid-qualities"></div>
+                    </div>
+                  </div>
+                  <!-- /.panel-body  -->
+                </div>
+                <!-- /.panel  -->
+              </div>
+              <!-- /.col-lg-6 -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</c2mon:template>
+
+<script src="<c:url value="/js/highcharts.js"/>" type="text/javascript"></script>
+<script src="<c:url value="/js/dashboard.js"/>" type="text/javascript"></script>
